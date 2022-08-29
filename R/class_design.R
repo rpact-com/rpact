@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6275 $
-## |  Last changed: $Date: 2022-06-09 13:35:36 +0200 (Thu, 09 Jun 2022) $
+## |  File version: $Revision: 6524 $
+## |  Last changed: $Date: 2022-08-24 11:09:52 +0200 (Mi, 24 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -32,6 +32,8 @@ NULL
 #'
 #' @description
 #' Basic class for trial designs.
+#' 
+#' @field kMax 
 #'
 #' @details
 #' \code{TrialDesign} is the basic class for
@@ -269,8 +271,6 @@ TrialDesignCharacteristics <- setRefClass("TrialDesignCharacteristics",
 )
 
 #'
-#' @name TrialDesignCharacteristics_as.data.frame
-#'
 #' @title
 #' Coerce TrialDesignCharacteristics to a Data Frame
 #'
@@ -301,7 +301,7 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
     } else {
         parameterNamesToBeExcluded <- c("inflationFactor")
     }
-    return(x$.getAsDataFrame(
+    return(.getAsDataFrame(parameterSet = x, 
         parameterNames = parameterNamesToBeExcluded,
         niceColumnNamesEnabled = niceColumnNamesEnabled, includeAllParameters = includeAllParameters,
         handleParameterNamesAsToBeExcluded = TRUE,
@@ -969,6 +969,7 @@ plot.TrialDesign <- function(x, y, ..., main = NA_character_,
         grid = 1, plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
     designName <- deparse(fCall$x)
+    .assertGgplotIsInstalled()
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     typeNumbers <- .getPlotTypeNumber(type, x)
     if (is.null(plotSettings)) {
@@ -1061,8 +1062,6 @@ plot.TrialDesign <- function(x, y, ..., main = NA_character_,
 }
 
 #'
-#' @name TrialDesign_as.data.frame
-#'
 #' @title
 #' Coerce TrialDesign to a Data Frame
 #'
@@ -1095,7 +1094,7 @@ as.data.frame.TrialDesign <- function(x, row.names = NULL,
     } else {
         parameterNames <- x$.getParametersToShow()
     }
-    return(x$.getAsDataFrame(
+    return(.getAsDataFrame(parameterSet = x, 
         parameterNames = parameterNames,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters,

@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 5577 $
-## |  Last changed: $Date: 2021-11-19 09:14:42 +0100 (Fr, 19 Nov 2021) $
+## |  File version: $Revision: 6517 $
+## |  Last changed: $Date: 2022-08-22 16:26:44 +0200 (Mo, 22 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
 
@@ -23,6 +23,9 @@
 #' 
 #' @title
 #' Event Probabilities
+#' 
+#' @field overallEventProbabilities Deprecated field which will be removed in one of the next releases. 
+#'        Use 'cumulativeEventProbabilities' instead.
 #' 
 #' @description 
 #' Class for the definition of event probabilities.
@@ -57,7 +60,8 @@ EventProbabilities <- setRefClass("EventProbabilities",
 		dropoutRate2 = "numeric", 
 		dropoutTime = "numeric",
 		maxNumberOfSubjects = "numeric",
-		overallEventProbabilities = "numeric",
+		overallEventProbabilities = "numeric", # deprecated
+        cumulativeEventProbabilities = "numeric",
 		eventProbabilities1 = "numeric",
 		eventProbabilities2 = "numeric"
 	),
@@ -67,6 +71,7 @@ EventProbabilities <- setRefClass("EventProbabilities",
 			.plotSettings <<- PlotSettings()
 			.parameterNames <<- C_PARAMETER_NAMES
 			.parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
+            .setParameterType("overallEventProbabilities", C_PARAM_NOT_APPLICABLE) # deprecated
 		},
 		
 		getPlotSettings = function() {
@@ -268,9 +273,9 @@ plot.EventProbabilities <- function(x, y, ...,
 	data <- data.frame(
 		xValues = c(x$time, x$time, x$time),
 		yValues = c(
-			x$overallEventProbabilities * maxNumberOfSubjects, # overall
-			x$eventProbabilities1 * maxNumberOfSubjects1,      # treatment
-			x$eventProbabilities2 * maxNumberOfSubjects2       # control
+			x$cumulativeEventProbabilities * maxNumberOfSubjects, # cumulative
+			x$eventProbabilities1 * maxNumberOfSubjects1,         # treatment
+			x$eventProbabilities2 * maxNumberOfSubjects2          # control
 		),
 		categories = c(
 			rep("Overall", length(x$time)),
@@ -299,7 +304,7 @@ plot.EventProbabilities <- function(x, y, ...,
 	
 	srcCmd <- .showPlotSourceInformation(objectName = xObjectName, 
 		xParameterName = "time", 
-		yParameterNames = c("overallEventProbabilities", "eventProbabilities1", "eventProbabilities2"), 
+		yParameterNames = c("cumulativeEventProbabilities", "eventProbabilities1", "eventProbabilities2"), 
 		type = type,
 		showSource = showSource)
 	if (!is.na(yObjectName)) {

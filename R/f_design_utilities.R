@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6291 $
-## |  Last changed: $Date: 2022-06-13 08:36:13 +0200 (Mon, 13 Jun 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6522 $
+## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_assertions.R
@@ -135,10 +135,10 @@ NULL
     }
 
     if (design$sided == 2 && .isDefinedArgument(parameterValues) &&
-            (!.isTrialDesignInverseNormalOrGroupSequential(design) || 
-				(design$typeOfDesign != C_TYPE_OF_DESIGN_PT) && !.isBetaSpendingDesignType(design$typeBetaSpending)
-				) &&
-	            (twoSidedWarningForDefaultValues && !all(is.na(parameterValues)) ||
+            (!.isTrialDesignInverseNormalOrGroupSequential(design) ||
+                (design$typeOfDesign != C_TYPE_OF_DESIGN_PT) && !.isBetaSpendingDesignType(design$typeBetaSpending)
+            ) &&
+            (twoSidedWarningForDefaultValues && !all(is.na(parameterValues)) ||
                 (!twoSidedWarningForDefaultValues && any(na.omit(parameterValues) != defaultValue)))) {
         warning("'", parameterName, "' (", .arrayToString(parameterValues),
             ") will be ignored because the design is two-sided",
@@ -712,7 +712,7 @@ NULL
 #' getPiecewiseExponentialQuantile(y,
 #'     piecewiseSurvivalTime = piecewiseSurvivalTime
 #' )
-#' 
+#'
 #' @name utilitiesForPiecewiseExponentialDistribution
 #'
 NULL
@@ -864,7 +864,7 @@ NULL
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getLambdaByPi <- function(piValue,
-        eventTime = 12L, # C_EVENT_TIME_DEFAULT
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(piValue, "pi")
     .assertIsValidKappa(kappa)
@@ -889,7 +889,7 @@ getLambdaByMedian <- function(median, kappa = 1) {
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getHazardRatioByPi <- function(pi1, pi2,
-        eventTime = 12L, # C_EVENT_TIME_DEFAULT
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(pi1, "pi1")
     .assertIsValidPi(pi2, "pi2")
@@ -902,7 +902,7 @@ getHazardRatioByPi <- function(pi1, pi2,
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getPiByLambda <- function(lambda,
-        eventTime = 12L, # C_EVENT_TIME_DEFAULT
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidLambda(lambda)
     .assertIsValidKappa(kappa)
@@ -922,7 +922,7 @@ getPiByLambda <- function(lambda,
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getPiByMedian <- function(median,
-        eventTime = 12L, # C_EVENT_TIME_DEFAULT
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsNumericVector(median, "median")
     .assertIsValidKappa(kappa)
@@ -942,7 +942,7 @@ getMedianByLambda <- function(lambda, kappa = 1) {
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getMedianByPi <- function(piValue,
-        eventTime = 12L, # C_EVENT_TIME_DEFAULT
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(piValue, "piValue")
     .assertIsSingleNumber(eventTime, "eventTime")
@@ -1063,3 +1063,21 @@ getMedianByPi <- function(piValue,
     }
     return(dataFrame)
 }
+
+.getNoEarlyEfficacyZeroCorrectedValues <- function(design, values) {
+    if (design$kMax == 1) {
+        return(values)
+    }
+    if (design$typeOfDesign == "noEarlyEfficacy") {
+        values[1:(design$kMax - 1)] <- 0
+    } else if (design$typeOfDesign == "asUser") {
+        for (k in 1:(design$kMax - 1)) {
+            if (!is.na(design$userAlphaSpending[k]) && 
+                    abs(design$userAlphaSpending[k]) < 1e-16) {
+                values[k] <- 0
+            }
+        }
+    }
+    return(values)
+}
+

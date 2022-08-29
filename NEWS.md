@@ -1,4 +1,20 @@
 
+# rpact 3.3.1
+
+* Help pages improved
+* Parameter `betaAdjustment` can also be used in `getDesignInverseNormal()`
+* `subsets` removed from result of `getWideFormat()` for non-enrichment datasets
+* Summary of enrichment survival simulation results improved
+* Parameter `populations` in `getSimulationEnrichmentMeans()`, `getSimulationEnrichmentRates()`, and `getSimulationEnrichmentSurvival()` has been removed since it is always derived from `effectList`
+* Bug fixed in `getSimulationEnrichmentRates()` for calculated non-integer number of subjects 
+* Futility probabilities and futility bounds corrected for two-sided beta-spending function approach
+* `getRawData()`: the resulting `data.frame` now contains the correct `stopStage` and `lastObservationTime` (formerly `observationTime`)
+* `deltaWT` is provided with three decimal points for typeOfDesign = "WToptimum"
+* Generic `as.data.frame` functions improved
+* testthat version changed to edition 3
+* The rpact source code has been published on GitHub and the bug report link has been changed to https://github.com/rpact-com/rpact/issues
+* Minor improvements
+
 # rpact 3.3.0
 
 ## New features
@@ -11,7 +27,6 @@
 * `getSimulationMultiArmSurvival()`: single stage treatment arm specific event numbers account for selection procedure
 * User defined selection function can be used in `getSimulationEnrichmentRates()` and  `getSimulationEnrichmentSurvival()`
 * Design summary extended by information of `getDesignCharacteristics()`
-* `getSimulationSurvival()`: the result object now contains the new parameter `overallEventsPerStage`; the name of `eventsPerStage` in the print output has been corrected (was "cumulative" by mistake)
 * `getSimulationSurvival()`: the result object now contains the new parameter `overallEventsPerStage`, which contains the values previously given in `eventsPerStage` (it was "cumulative" by mistake); `eventsPerStage` contains now the non-cumulative values as expected
 * Minor improvements
 
@@ -40,7 +55,7 @@
 
 ## New features
 
-* Simulation tools for enrichment design testing means, rates, and hazard ratios: function `getSimulationEnrichmentMeans()`, `getSimulationEnrichmentRates()`, `getSimulationEnrichmentSimulation()` available for simulation of enrichment designs; 
+* Simulation tools for enrichment design testing means, rates, and hazard ratios: function `getSimulationEnrichmentMeans()`, `getSimulationEnrichmentRates()`, `getSimulationEnrichmentSurvival()` available for simulation of enrichment designs; 
 note that this is a novel implementation, hence experimental
 * `getDesignGroupSequential()` / `getDesignInverseNormal()`: new typeOfDesign = "noEarlyEfficacy" added
 

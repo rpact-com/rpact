@@ -2,12 +2,12 @@
 % Please edit documentation in R/parameter_descriptions.R
 \name{param_epsilonValue}
 \alias{param_epsilonValue}
-\title{Parameter Description: EpsilonValue}
+\title{Parameter Description: Epsilon Value}
 \arguments{
 \item{epsilonValue}{For \code{typeOfSelection = "epsilon"} (select treatment arm / population not worse than 
 epsilon compared to the best), the parameter \code{epsilonValue} has to be specified.}
 }
 \description{
-Parameter Description: EpsilonValue
+Parameter Description: Epsilon Value
 }
 \keyword{internal}

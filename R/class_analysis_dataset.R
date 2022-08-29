@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6094 $
-## |  Last changed: $Date: 2022-04-28 11:33:20 +0200 (Thu, 28 Apr 2022) $
+## |  File version: $Revision: 6303 $
+## |  Last changed: $Date: 2022-06-17 10:58:50 +0200 (Fri, 17 Jun 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -3831,8 +3831,6 @@ DatasetEnrichmentSurvival <- setRefClass("DatasetEnrichmentSurvival",
 
 
 #'
-#' @name Dataset_summary
-#'
 #' @title
 #' Dataset Summary
 #'
@@ -4088,8 +4086,6 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
     return(lines)
 }
 
-#'
-#' @name Dataset_print
 #'
 #' @title
 #' Print Dataset Values

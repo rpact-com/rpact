@@ -7,7 +7,7 @@
 getNumberOfSubjects(
   time,
   ...,
-  accrualTime = c(0L, 12L),
+  accrualTime = c(0, 12),
   accrualIntensity = 0.1,
   accrualIntensityType = c("auto", "absolute", "relative"),
   maxNumberOfSubjects = NA_real_

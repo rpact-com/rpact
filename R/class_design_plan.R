@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6283 $
-## |  Last changed: $Date: 2022-06-10 09:49:35 +0200 (Fri, 10 Jun 2022) $
+## |  File version: $Revision: 6497 $
+## |  Last changed: $Date: 2022-08-17 13:32:36 +0200 (Wed, 17 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -242,8 +242,6 @@ TrialDesignPlan <- setRefClass("TrialDesignPlan",
 )
 
 #'
-#' @name TrialDesignPlan_as.data.frame
-#'
 #' @title
 #' Coerce Trial Design Plan to a Data Frame
 #'
@@ -269,8 +267,7 @@ TrialDesignPlan <- setRefClass("TrialDesignPlan",
 #'
 as.data.frame.TrialDesignPlan <- function(x, row.names = NULL,
         optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
-    return(x$.getAsDataFrame(
-        parameterNames = NULL,
+    return(.getAsDataFrame(parameterSet = x, parameterNames = NULL,
         niceColumnNamesEnabled = niceColumnNamesEnabled, includeAllParameters = includeAllParameters
     ))
 }
@@ -2069,6 +2066,7 @@ plot.TrialDesignPlan <- function(x, y, ..., main = NA_character_,
         grid = 1, plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
     designPlanName <- deparse(fCall$x)
+    .assertGgplotIsInstalled()
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
 
     nMax <- list(...)[["nMax"]]

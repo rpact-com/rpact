@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6285 $
-## |  Last changed: $Date: 2022-06-10 10:49:23 +0200 (Fri, 10 Jun 2022) $
+## |  File version: $Revision: 6414 $
+## |  Last changed: $Date: 2022-07-15 09:17:18 +0200 (Fr, 15 Jul 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -276,7 +276,6 @@ NULL
 
 .createSimulationResultsEnrichmentObject <- function(...,
         design,
-        populations,
         effectList,
         intersectionTest,
         stratifiedAnalysis = NA,
@@ -358,21 +357,14 @@ NULL
     } else if (endpoint == "survival") {
         simulationResults <- SimulationResultsEnrichmentSurvival(design, showStatistics = showStatistics)
     }
-
-    .assertIsSinglePositiveInteger(populations, "populations", naAllowed = TRUE, validateType = FALSE)
-    if (is.na(populations)) {
-        if (is.null(effectList) || is.null(effectList[["subGroups"]])) {
-            .assertIsSinglePositiveInteger(populations, "populations", naAllowed = FALSE, validateType = FALSE)
-        }
-        populations <- .getGMaxFromSubGroups(effectList$subGroups)
+    
+    effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
+    gMax <- .getGMaxFromSubGroups(effectList$subGroups)
+    if (gMax > 4) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (", gMax, ") must not exceed 4")
     }
 
-    if (populations > 4) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (", populations, ") max not exceed 4")
-    }
-
-    gMax <- populations
-    kMax <- design$kMax
+    .assertIsValidThreshold(threshold, activeArms = gMax)
 
     intersectionTest <- intersectionTest[1]
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
@@ -385,7 +377,7 @@ NULL
         )
     }
 
-    typeOfSelection <- .assertIsValidTypeOfSelection(typeOfSelection, rValue, epsilonValue, populations)
+    typeOfSelection <- .assertIsValidTypeOfSelection(typeOfSelection, rValue, epsilonValue, gMax)
     if (length(typeOfSelection) == 1 && typeOfSelection == "userDefined" &&
             !is.null(threshold) && length(threshold) == 1 && threshold != -Inf) {
         warning("'threshold' (", threshold, ") will be ignored because 'typeOfSelection' = \"userDefined\"", call. = FALSE)
@@ -410,7 +402,7 @@ NULL
         )
     }
 
-    effectList <- .getValidatedEffectList(effectList, gMax = gMax)
+    kMax <- design$kMax
     if (endpoint == "means") {
         stDevH1 <- .ignoreParameterIfNotUsed(
             "stDevH1", stDevH1, kMax > 1,
@@ -445,8 +437,6 @@ NULL
         .assertValuesAreStrictlyIncreasing(plannedEvents, "plannedEvents")
         .setValueAndParameterType(simulationResults, "plannedEvents", plannedEvents, NA_real_)
     }
-
-    .assertIsValidThreshold(threshold, gMax)
 
     if (endpoint %in% c("means", "rates")) {
         .assertIsValidPlannedSubjects(plannedSubjects, kMax) # means + rates only
@@ -714,16 +704,16 @@ NULL
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))
 
-    simulationResults$.setParameterType("effectList", C_PARAM_USER_DEFINED)
-
     simulationResults$effectList <- effectList
-
+    simulationResults$.setParameterType("effectList", C_PARAM_USER_DEFINED)
+    
+    simulationResults$populations <- as.integer(gMax)
+    simulationResults$.setParameterType("populations", C_PARAM_DERIVED)
+    
     .setValueAndParameterType(
         simulationResults, "stratifiedAnalysis", stratifiedAnalysis,
         C_STRATIFIED_ANALYSIS_DEFAULT
     )
-
-    .setValueAndParameterType(simulationResults, "populations", as.integer(populations), C_POPULATIONS_DEFAULT)
 
     if (typeOfSelection != "userDefined") {
         .setValueAndParameterType(simulationResults, "threshold", threshold, -Inf)

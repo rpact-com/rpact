@@ -4,7 +4,7 @@
 \alias{param_populations}
 \title{Parameter Description: Populations}
 \arguments{
-\item{populations}{The number of populations in a two-sample comparison, default is \code{3}.}
+\item{populations}{The number of populations in a two-sample comparison, no default.}
 }
 \description{
 Parameter Description: Populations

@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_sample_size_calculator.R
-## |  Creation date: 15 June 2022, 11:15:55
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  Creation date: 12 August 2022, 09:11:07
+## |  File version: $Revision: 6512 $
+## |  Last changed: $Date: 2022-08-19 08:30:41 +0200 (Fr, 19 Aug 2022) $
+## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing the Sample Size Calculation of Testing Means for Different Designs and Arguments")
+test_plan_section("Testing the Sample Size Calculation of Testing Means for Different Designs and Arguments")
 
 
 test_that("'getSampleSizeMeans': Sample size calculation of testing means for one sided group sequential design", {
@@ -1219,7 +1219,7 @@ test_that("'getSampleSizeMeans': Sample size calculation of testing means for tw
 
 })
 
-context("Testing the Sample Size Calculation of Testing Rates for Different Designs and Arguments")
+test_plan_section("Testing the Sample Size Calculation of Testing Rates for Different Designs and Arguments")
 
 
 test_that("'getSampleSizeRates': Sample size calculation of testing rates for one sided group sequential design", {
@@ -1996,7 +1996,7 @@ test_that("'getSampleSizeRates': Sample size calculation of testing rates for tw
 
 })
 
-context("Testing the Sample Size Calculation of Survival Designs for Different Designs and Arguments")
+test_plan_section("Testing the Sample Size Calculation of Survival Designs for Different Designs and Arguments")
 
 
 test_that("'getSampleSizeSurvival': Fixed sample size with minimum required definitions, pi1 = c(0.4, 0.5, 0.6) and pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default, only alpha = 0.01 is specified", {
@@ -2186,7 +2186,7 @@ test_that("'getSampleSizeSurvival': Sample size calculation of survival designs 
 	expect_equal(sampleSizeResult$numberOfSubjects2[1, ], 36.651986, tolerance = 1e-07)
 	expect_equal(sampleSizeResult$numberOfSubjects2[2, ], 59.539826, tolerance = 1e-07)
 	expect_equal(sampleSizeResult$numberOfSubjects2[3, ], 62.507704, tolerance = 1e-07)
-	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH1, 236.50497, tolerance = 1e-07)
+	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH1, 236.50498, tolerance = 1e-07)
 	expect_equal(sampleSizeResult$criticalValuesEffectScale[1, ], 4.9325954, tolerance = 1e-07)
 	expect_equal(sampleSizeResult$criticalValuesEffectScale[2, ], 2.3170793, tolerance = 1e-07)
 	expect_equal(sampleSizeResult$criticalValuesEffectScale[3, ], 1.6774418, tolerance = 1e-07)
@@ -6233,7 +6233,7 @@ test_that("'getSampleSizeSurvival': sample size calculation of survival data for
 
 })
 
-context("Testing the Sample Size Calculation of Survival Designs for Other Parameter Variants")
+test_plan_section("Testing the Sample Size Calculation of Survival Designs for Other Parameter Variants")
 
 
 test_that("'getSampleSizeSurvival': For fixed sample design, determine necessary accrual time if 200 subjects and 30 subjects per time unit can be recruited", {
@@ -7791,7 +7791,7 @@ test_that("'getSampleSizeSurvival': testing expected warnings and errors", {
 
 })
 
-context("Testing Other Functions of the Sample Size Calculator for Survival Designs")
+test_plan_section("Testing Other Functions of the Sample Size Calculator for Survival Designs")
 
 
 test_that("'getEventProbabilities': check expected events over time for overall survival (case 1)", {
@@ -7848,7 +7848,7 @@ test_that("'getEventProbabilities': check expected events over time for overall 
 	    allocationRatioPlanned = 1, hazardRatio = 0.8,
 	    dropoutRate1 = 0.05, dropoutRate2 = 0.05, dropoutTime = 12,
 	    maxNumberOfSubjects = 1405
-	)$overallEventProbabilities
+	)$cumulativeEventProbabilities
 	eventsOS <- eventsOS * 1405
 
 	expect_equal(round(timeOS, 2), c(37.60, 46.72, 59.00))
@@ -7893,7 +7893,7 @@ test_that("'getEventProbabilities': check expected events over time for overall 
 
 	## Comparison of the results of EventProbabilities object 'eventsOS' with expected results
 	expect_equal(eventsOS$lambda1, c(0.012, 0.008, 0.004, 0.002), tolerance = 1e-07)
-	expect_equal(eventsOS$overallEventProbabilities, c(0.13811859, 0.20546928, 0.2598385), tolerance = 1e-07)
+	expect_equal(eventsOS$cumulativeEventProbabilities, c(0.13811859, 0.20546928, 0.2598385), tolerance = 1e-07)
 	expect_equal(eventsOS$eventProbabilities1, c(0.12437783, 0.18544801, 0.23527681), tolerance = 1e-07)
 	expect_equal(eventsOS$eventProbabilities2, c(0.15185935, 0.22549055, 0.28440019), tolerance = 1e-07)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -7903,7 +7903,7 @@ test_that("'getEventProbabilities': check expected events over time for overall 
 	    expect_output(summary(eventsOS)$show())
 	    eventsOSCodeBased <- eval(parse(text = getObjectRCode(eventsOS, stringWrapParagraphWidth = NULL)))
 	    expect_equal(eventsOSCodeBased$lambda1, eventsOS$lambda1, tolerance = 1e-05)
-	    expect_equal(eventsOSCodeBased$overallEventProbabilities, eventsOS$overallEventProbabilities, tolerance = 1e-05)
+	    expect_equal(eventsOSCodeBased$cumulativeEventProbabilities, eventsOS$cumulativeEventProbabilities, tolerance = 1e-05)
 	    expect_equal(eventsOSCodeBased$eventProbabilities1, eventsOS$eventProbabilities1, tolerance = 1e-05)
 	    expect_equal(eventsOSCodeBased$eventProbabilities2, eventsOS$eventProbabilities2, tolerance = 1e-05)
 	    expect_type(names(eventsOS), "character")

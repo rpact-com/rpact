@@ -15,12 +15,12 @@
 ## |  
 ## |  File name: test-f_analysis_enrichment_rates.R
 ## |  Creation date: 23 February 2022, 14:03:22
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  File version: $Revision: 6501 $
+## |  Last changed: $Date: 2022-08-17 14:55:43 +0200 (Mi, 17 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Analysis Enrichment Rates Function")
+test_plan_section("Testing Analysis Enrichment Rates Function")
 
 
 test_that("'getAnalysisResults': enrichment rates, one sub-population, non-stratified input, select S1 at second IA, directionUpper = FALSE, gMax = 2", {

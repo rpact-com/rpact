@@ -14,7 +14,7 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File version: $Revision: 6291 $
-## |  Last changed: $Date: 2022-06-13 08:36:13 +0200 (Mon, 13 Jun 2022) $
+## |  Last changed: $Date: 2022-06-13 08:36:13 +0200 (Mo, 13 Jun 2022) $
 ## |
 
 getTestInformationRatesDefault <- function(kMax) {

@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_input_validation.R
-## |  Creation date: 23 February 2022, 14:04:13
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:09:00
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing the Correct Input Validation of All Analysis Functions")
+test_plan_section("Testing the Correct Input Validation of All Analysis Functions")
 
 
 test_that("Errors and warnings for calculation of analysis results with dataset of means", {

@@ -28,21 +28,21 @@
 
 \item{...}{Optional \link[=param_three_dots_plot]{plot arguments}. Furthermore the following arguments can be defined:
 \itemize{
-\item \code{thetaRange}: A range of assumed effect sizes if testing means or a survival design was specified. 
+\item \code{thetaRange}: A range of assumed effect sizes if testing means or a survival design was specified.
       Additionally, if testing means was selected, an assumed standard deviation can be specified (default is 1).
-\item \code{piTreatmentRange}: A range of assumed rates pi1 to calculate the conditional power. 
-      Additionally, if a two-sample comparison was selected, pi2 can be specified (default is the value from 
-      \code{getAnalysisResults}). 
-\item \code{directionUpper}: Specifies the direction of the alternative, 
+\item \code{piTreatmentRange}: A range of assumed rates pi1 to calculate the conditional power.
+      Additionally, if a two-sample comparison was selected, pi2 can be specified (default is the value from
+      \code{getAnalysisResults}).
+\item \code{directionUpper}: Specifies the direction of the alternative,
       only applicable for one-sided testing; default is \code{TRUE}
       which means that larger values of the test statistics yield smaller p-values.
-\item \code{\link[=param_thetaH0]{thetaH0}}: The null hypothesis value, default is 0 for the normal and the binary case, 
-      it is 1 for the survival case.      
-      For testing a rate in one sample, a value thetaH0 in (0,1) has to be specified for 
+\item \code{\link[=param_thetaH0]{thetaH0}}: The null hypothesis value, default is 0 for the normal and the binary case,
+      it is 1 for the survival case.
+      For testing a rate in one sample, a value thetaH0 in (0,1) has to be specified for
       defining the null hypothesis H0: pi = thetaH0.
 }}
 
-\item{type}{The plot type (default = 1). Note that at the moment only one type 
+\item{type}{The plot type (default = 1). Note that at the moment only one type
 (the conditional power plot) is available.}
 
 \item{nPlanned}{The additional (i.e., "new" and not cumulative) sample size planned for each of the subsequent stages. 
@@ -107,9 +107,11 @@ Generic function to plot all kinds of stage results.
 The conditional power is calculated only if effect size and sample size is specified.
 }
 \examples{
-design <- getDesignGroupSequential(kMax = 4, alpha = 0.025, 
-    informationRates = c(0.2, 0.5, 0.8, 1), 
-    typeOfDesign = "WT", deltaWT = 0.25)
+design <- getDesignGroupSequential(
+    kMax = 4, alpha = 0.025,
+    informationRates = c(0.2, 0.5, 0.8, 1),
+    typeOfDesign = "WT", deltaWT = 0.25
+)
 
 dataExample <- getDataset(
     n = c(20, 30, 30),

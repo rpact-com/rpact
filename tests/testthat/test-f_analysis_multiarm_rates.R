@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_analysis_multiarm_rates.R
-## |  Creation date: 23 February 2022, 14:04:45
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 15 August 2022, 15:00:46
+## |  File version: $Revision: 6498 $
+## |  Last changed: $Date: 2022-08-17 13:33:01 +0200 (Mi, 17 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-context("Testing the Analysis Rates Functionality for Three or More Treatments")
+test_plan_section("Testing the Analysis Rates Functionality for Three or More Treatments")
 
 test_that("'getAnalysisResultsMultiArm' with dataset of rates", {
     design1 <- getDesignInverseNormal(

@@ -7,7 +7,6 @@
 getSimulationEnrichmentSurvival(
   design = NULL,
   ...,
-  populations = NA_integer_,
   effectList = NULL,
   intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
   stratifiedAnalysis = TRUE,
@@ -40,9 +39,7 @@ and \code{sided} can be directly entered as argument where necessary.}
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{populations}{The number of populations in a two-sample comparison, default is \code{3}.}
-
-\item{effectList}{List of effect sizes with columns and number of rows 
+\item{effectList}{List of subsets, prevalences, and effect sizes with columns and number of rows 
 reflecting the different situations to consider (see examples).}
 
 \item{intersectionTest}{Defines the multiple test for the intersection 

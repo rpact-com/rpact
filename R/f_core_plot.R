@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6293 $
-## |  Last changed: $Date: 2022-06-14 07:19:38 +0200 (Tue, 14 Jun 2022) $
+## |  File version: $Revision: 6519 $
+## |  Last changed: $Date: 2022-08-23 13:56:40 +0200 (Di, 23 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -310,10 +310,6 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
     if (plotType > 12) {
         return(TRUE)
     }
-
-    # 	if (inherits(resultObject, "TrialDesignPlan") && plotType %in% c(1:4)) {
-    # 		return(TRUE)
-    # 	}
 
     for (param in c("alternative", "pi1", "hazardRatio")) {
         if (!is.null(resultObject[[param]]) &&
@@ -725,13 +721,15 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (inherits(parameterSet, "TrialDesignSet")) {
-        data <- as.data.frame(parameterSet,
+        suppressWarnings(data <- as.data.frame(parameterSet,
             niceColumnNamesEnabled = FALSE,
-            includeAllParameters = TRUE, addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
+            includeAllParameters = TRUE, 
+            addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
             theta = theta, nMax = nMax
-        )
+        ))
     } else {
-        data <- as.data.frame(parameterSet, niceColumnNamesEnabled = FALSE, includeAllParameters = TRUE)
+        suppressWarnings(data <- as.data.frame(parameterSet, niceColumnNamesEnabled = FALSE, 
+            includeAllParameters = TRUE))
     }
 
     if (!.isTrialDesignSet(parameterSet)) {
@@ -1044,7 +1042,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
                 categories = .getCategories(data, yParameterName2, tableColumnNames)
             )
         }
-        if (!is.null(yParameterName3)) {
+        if (!is.null(yParameterName3)) {           
             df3 <- data.frame(
                 xValues = data$xValues,
                 yValues = data$yValues3 * scalingFactor2,

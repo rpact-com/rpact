@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_base_means.R
-## |  Creation date: 23 February 2022, 13:59:37
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:04:36
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing the Analysis Means Functionality for One Treatment")
+test_plan_section("Testing the Analysis Means Functionality for One Treatment")
 
 
 test_that("'getAnalysisResults' for two-stage group sequential design and a dataset of one mean per stage (bindingFutility = FALSE)", {
@@ -840,7 +840,7 @@ test_that("'getAnalysisResults' for different designs and a dataset of one mean 
 
 })
 
-context("Testing the Analysis Means Functionality for Two Treatments")
+test_plan_section("Testing the Analysis Means Functionality for Two Treatments")
 
 
 test_that("'getAnalysisResults' for a Fisher design and a dataset of two means per stage", {
@@ -1748,7 +1748,7 @@ test_that("Check that the conditional power is as expected for different designs
 
 })
 
-context("Testing 'getStageResults'")
+test_plan_section("Testing 'getStageResults'")
 
 
 test_that("'getStageResults' for an inverse normal design and one or two treatments", {

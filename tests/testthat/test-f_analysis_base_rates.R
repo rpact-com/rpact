@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_base_rates.R
-## |  Creation date: 18 March 2022, 10:57:15
-## |  File version: $Revision: 5931 $
-## |  Last changed: $Date: 2022-03-18 13:45:05 +0100 (Fr, 18 Mrz 2022) $
+## |  Creation date: 12 August 2022, 09:05:33
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing the Analysis Rates Functionality for One Treatment")
+test_plan_section("Testing the Analysis Rates Functionality for One Treatment")
 
 
 test_that("'getAnalysisResults' for a group sequential design and one treatment", {
@@ -1391,7 +1391,7 @@ test_that("'getAnalysisResults' for a  four-stage Fisher design and one treatmen
 
 })
 
-context("Testing the Analysis Rates Functionality for Two Treatments")
+test_plan_section("Testing the Analysis Rates Functionality for Two Treatments")
 
 
 test_that("'getAnalysisResults' for a  four-stage group sequential design and two treatments", {

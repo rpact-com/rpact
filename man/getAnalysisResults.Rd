@@ -57,7 +57,7 @@ For more information see \code{\link{getDataset}}.}
        \code{"overallPooled"}, \code{"pairwisePooled"}, and \code{"notPooled"}, default is \code{"overallPooled"}.
       For enrichment designs, the options are: \code{"pooled"}, \code{"pooledFromFull"} (one subset only),
       and \code{"notPooled"}, default is \code{"pooled"}.}
-  \item{\code{thetaH1} and \code{assumedStDevs} or \code{piTreatments}, \code{piControl}}{The
+  \item{\code{thetaH1} and \code{assumedStDevs} or \code{piTreatments}, \code{piControls}}{The
       assumed effect size or assumed rates to calculate the conditional power in multi-arm trials
       or enrichment designs. For survival designs, \code{thetaH1} refers to the hazard ratio.
       You can specify a value or a vector with elements referring to the
@@ -166,7 +166,7 @@ to calculate the analysis results.
 
 \examples{
 \donttest{
-# Example 1 One-Sample Test
+# Example 1 One-Sample t Test
 # Perform an analysis within a three-stage group sequential design with
 # O'Brien & Fleming boundaries and one-sample data with a continuous outcome
 # where H0: mu = 1.2 is to be tested
@@ -193,8 +193,8 @@ getAnalysisResults(design = dsnIN, dataInput = dataMeans, thetaH0 = 1.2)
 
 design <- getDesignGroupSequential(typeOfDesign = "asOF")
 dataSurvival <- getDataset(
-		overallEvents = c(33, 72, 116),
-		overallLogRanks = c(1.33, 1.88, 1.902))
+		cumulativeEvents = c(33, 72, 116),
+		cumulativeLogRanks = c(1.33, 1.88, 1.902))
 getAnalysisResults(design, dataInput = dataSurvival, maxInformation = 120,
 		informationEpsilon = 5)
 

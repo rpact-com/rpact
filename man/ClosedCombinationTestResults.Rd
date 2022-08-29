@@ -8,7 +8,7 @@
 Class for multi-arm analysis results based on a closed combination test.
 }
 \details{
-This object cannot be created directly; use \code{\link{getAnalysisResults}} 
+This object cannot be created directly; use \code{\link{getAnalysisResults}}
 with suitable arguments to create the multi-arm analysis results of a closed combination test design.
 }
 

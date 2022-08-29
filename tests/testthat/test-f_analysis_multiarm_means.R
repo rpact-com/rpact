@@ -14,22 +14,26 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_analysis_multiarm_means.R
-## |  Creation date: 23 February 2022, 14:04:13
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:59:10
+## |  File version: $Revision: 6498 $
+## |  Last changed: $Date: 2022-08-17 13:33:01 +0200 (Mi, 17 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-context("Testing the Analysis Means Functionality for Three or More Treatments")
+test_plan_section("Testing the Analysis Means Functionality for Three or More Treatments")
 
 test_that("'getAnalysisResultsMultiArm' with dataset of means", {
-        
-    .skipTestIfDisabled()
-        
     design1 <- getDesignInverseNormal(
         kMax = 4, alpha = 0.02, futilityBounds = c(-0.5, 0, 0.5),
         bindingFutility = FALSE, typeOfDesign = "asKD", gammaA = 1.2, informationRates = c(0.15, 0.4, 0.7, 1)
     )
+
+    design2 <- getDesignFisher(
+        kMax = 4, alpha = 0.02, alpha0Vec = c(0.7, 0.5, 0.3), method = "equalAlpha",
+        bindingFutility = TRUE, informationRates = c(0.15, 0.4, 0.7, 1)
+    )
+
+    design3 <- getDesignConditionalDunnett(alpha = 0.02, informationAtInterim = 0.4, secondStageConditioning = TRUE)
 
     # directionUpper = TRUE
     dataExample1 <- getDataset(
@@ -46,6 +50,23 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
         stDevs3 = c(25.6, 23.2),
         stDevs4 = c(21.5, 22.7)
     )
+
+    # directionUpper = FALSE
+    dataExample2 <- getDataset(
+        n1 = c(13, 25),
+        n2 = c(15, NA),
+        n3 = c(14, 27),
+        n4 = c(12, 29),
+        means1 = -c(24.2, 22.2),
+        means2 = -c(18.8, NA),
+        means3 = -c(26.7, 27.7),
+        means4 = -c(9.2, 12.2),
+        stDevs1 = c(24.4, 22.1),
+        stDevs2 = c(21.2, NA),
+        stDevs3 = c(25.6, 23.2),
+        stDevs4 = c(21.5, 22.7)
+    )
+
 
     # @refFS[Formula]{fs:multiarmRejectionRule}
     # @refFS[Formula]{fs:adjustedPValueDunnett}
@@ -68,8 +89,7 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
     # @refFS[Formula]{fs:computeRCIsMultiArm}
     results1 <- getAnalysisResults(
         design = design1, dataInput = dataExample1,
-        intersectionTest = "Simes", varianceOption = "overallPooled", nPlanned = c(20, 20), 
-        normalApproximation = FALSE, directionUpper = TRUE
+        intersectionTest = "Simes", varianceOption = "overallPooled", nPlanned = c(20, 20), normalApproximation = FALSE, directionUpper = TRUE
     )
 
     ## Comparison of the results of AnalysisResultsMultiArmInverseNormal object 'results1' with expected results
@@ -116,10 +136,7 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
 
-    design2 <- getDesignFisher(
-        kMax = 4, alpha = 0.02, alpha0Vec = c(0.7, 0.5, 0.3), method = "equalAlpha",
-        bindingFutility = TRUE, informationRates = c(0.15, 0.4, 0.7, 1)
-    )
+    .skipTestIfDisabled()
 
     # @refFS[Formula]{fs:multiarmRejectionRule}
     # @refFS[Formula]{fs:adjustedPValueDunnett}
@@ -164,9 +181,6 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
     expect_equal(results2$repeatedPValues[1, ], c(0.17335289, 0.062127989, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results2$repeatedPValues[2, ], c(0.20285189, NA_real_, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results2$repeatedPValues[3, ], c(0.15638134, 0.015781417, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results2$conditionalPowerSimulated[1, ], c(NA_real_, NA_real_, 0.277, 0.453), tolerance = 1e-05)
-    expect_equal(results2$conditionalPowerSimulated[2, ], c(NA_real_, NA_real_, NA_real_, NA_real_))
-    expect_equal(results2$conditionalPowerSimulated[3, ], c(NA_real_, NA_real_, 1, 1))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(results2), NA)))
         expect_output(print(results2)$show())
@@ -179,7 +193,6 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
         expect_equal(results2CodeBased$repeatedConfidenceIntervalLowerBounds, results2$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results2CodeBased$repeatedConfidenceIntervalUpperBounds, results2$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results2CodeBased$repeatedPValues, results2$repeatedPValues, tolerance = 1e-05)
-        expect_equal(results2CodeBased$conditionalPowerSimulated, results2$conditionalPowerSimulated, tolerance = 1e-05)
         expect_type(names(results2), "character")
         df <- as.data.frame(results2)
         expect_s3_class(df, "data.frame")
@@ -188,8 +201,6 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
-    
-    design3 <- getDesignConditionalDunnett(alpha = 0.02, informationAtInterim = 0.4, secondStageConditioning = TRUE)
 
     # @refFS[Formula]{fs:multiarmRejectionRule}
     # @refFS[Formula]{fs:adjustedPValueDunnett}
@@ -258,22 +269,6 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
-    
-    # directionUpper = FALSE
-    dataExample2 <- getDataset(
-        n1 = c(13, 25),
-        n2 = c(15, NA),
-        n3 = c(14, 27),
-        n4 = c(12, 29),
-        means1 = -c(24.2, 22.2),
-        means2 = -c(18.8, NA),
-        means3 = -c(26.7, 27.7),
-        means4 = -c(9.2, 12.2),
-        stDevs1 = c(24.4, 22.1),
-        stDevs2 = c(21.2, NA),
-        stDevs3 = c(25.6, 23.2),
-        stDevs4 = c(21.5, 22.7)
-    )
 
     # @refFS[Formula]{fs:multiarmRejectionRule}
     # @refFS[Formula]{fs:adjustedPValueDunnett}
@@ -386,9 +381,6 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
     expect_equal(results5$repeatedPValues[1, ], c(0.19623626, 0.071653269, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results5$repeatedPValues[2, ], c(0.21026955, NA_real_, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results5$repeatedPValues[3, ], c(0.15433667, 0.019180306, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results5$conditionalPowerSimulated[1, ], c(NA_real_, NA_real_, 0.256, 0.431), tolerance = 1e-05)
-    expect_equal(results5$conditionalPowerSimulated[2, ], c(NA_real_, NA_real_, NA_real_, NA_real_))
-    expect_equal(results5$conditionalPowerSimulated[3, ], c(NA_real_, NA_real_, 1, 1))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(results5), NA)))
         expect_output(print(results5)$show())
@@ -401,7 +393,6 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
         expect_equal(results5CodeBased$repeatedConfidenceIntervalLowerBounds, results5$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results5CodeBased$repeatedConfidenceIntervalUpperBounds, results5$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results5CodeBased$repeatedPValues, results5$repeatedPValues, tolerance = 1e-05)
-        expect_equal(results5CodeBased$conditionalPowerSimulated, results5$conditionalPowerSimulated, tolerance = 1e-05)
         expect_type(names(results5), "character")
         df <- as.data.frame(results5)
         expect_s3_class(df, "data.frame")

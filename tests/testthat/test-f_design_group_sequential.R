@@ -14,16 +14,37 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_group_sequential.R
-## |  Creation date: 23 February 2022, 14:05:54
-## |  File version: $Revision: 5976 $
-## |  Last changed: $Date: 2022-04-01 10:23:44 +0200 (Fr, 01 Apr 2022) $
+## |  Creation date: 15 August 2022, 15:51:04
+## |  File version: $Revision: 6492 $
+## |  Last changed: $Date: 2022-08-15 15:52:28 +0200 (Mo, 15 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing the Group Sequential and Inverse Normal Design Functionality")
+test_plan_section("Testing the Group Sequential and Inverse Normal Design Functionality")
 
+
+test_that("'getGroupSequentialProbabilities' with one and two continuation regions for weighted test statistic", {
+	# @refFS[Formula]{{fs:testStatisticGroupSequentialWeightedAverage}}
+	xa <- getGroupSequentialProbabilities(matrix(c(rep(-qnorm(0.95), 4), rep(qnorm(0.95), 4)), nrow = 2, byrow = TRUE), (1:4) / 4)
+
+	## Comparison of the results of matrixarray object 'xa' with expected results
+	expect_equal(xa[1, ], c(0.05, 0.030074925, 0.020961248, 0.01595848), tolerance = 1e-07)
+	expect_equal(xa[2, ], c(0.95, 0.86992507, 0.8188889, 0.78196917), tolerance = 1e-07)
+	expect_equal(xa[3, ], c(1, 0.9, 0.83985015, 0.79792765), tolerance = 1e-07)
+
+	xb <- getGroupSequentialProbabilities(matrix(c(rep(-qnorm(0.95), 4), rep(-1, 4), rep(1, 4), rep(qnorm(0.95), 4)), nrow = 4, byrow = TRUE), (1:4) / 4)
+
+	## Comparison of the results of matrixarray object 'xb' with expected results
+	expect_equal(xb[1, ], c(0.05, 0.016446517, 0.005264288, 0.0019569508), tolerance = 1e-07)
+	expect_equal(xb[2, ], c(0.15865525, 0.048950554, 0.017478997, 0.0072417024), tolerance = 1e-07)
+	expect_equal(xb[3, ], c(0.84134475, 0.16835995, 0.047529077, 0.017187717), tolerance = 1e-07)
+	expect_equal(xb[4, ], c(0.95, 0.20086399, 0.059743786, 0.022472468), tolerance = 1e-07)
+	expect_equal(xb[5, ], c(1, 0.21731051, 0.065008074, 0.024429419), tolerance = 1e-07)
+
+})
 
 test_that("'getDesignInverseNormal' with default parameters: parameters and results are as expected", {
+
 	# @refFS[Tab.]{fs:tab:output:getDesignInverseNormal}
 	# @refFS[Formula]{fs:criticalValuesOBrienFleming}
 	x0 <- getDesignInverseNormal()
@@ -98,7 +119,7 @@ test_that("'getDesignInverseNormal' with type of design = 'asHSD', 'bsHSD', 'asK
 	expect_equal(y1$information, c(1.891882, 3.7837641, 9.4594101), tolerance = 1e-07)
 	expect_equal(y1$power, c(0.12783451, 0.34055165, 0.86), tolerance = 1e-07)
 	expect_equal(y1$rejectionProbabilities, c(0.12783451, 0.21271713, 0.51944835), tolerance = 1e-07)
-	expect_equal(y1$futilityProbabilities, c(9.8658765e-10, 9.7584074e-10), tolerance = 1e-07)
+	expect_equal(y1$futilityProbabilities, c(0, 0))
 	expect_equal(y1$averageSampleNumber1, 0.83081135, tolerance = 1e-07)
 	expect_equal(y1$averageSampleNumber01, 1.0142116, tolerance = 1e-07)
 	expect_equal(y1$averageSampleNumber0, 1.0697705, tolerance = 1e-07)
@@ -327,7 +348,7 @@ test_that("'getDesignGroupSequential' with type of design = 'asUser'", {
 
 	.skipTestIfDisabled()
 
-	# @refFS[Tab.]{fs:tab:output:getDesignInverseNormal}
+	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	x5 <- getDesignGroupSequential(
 	    typeOfDesign = "asUser",
@@ -399,6 +420,7 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsUser' a
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
+
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asP' and information rate < 1 at maximum stage", {
@@ -660,6 +682,624 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 
 })
 
+test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' and binding futility bounds, two-sided (kMax = 3)", {
+
+	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
+	# @refFS[Formula]{fs:alphaSpendingConcept}
+	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
+	# @refFS[Formula]{fs:betaSpendingApproach}
+	# @refFS[Formula]{fs:betaSpendingKimDeMets}
+	# @refFS[Formula]{fs:etaSpendingApproachTwoSided}
+	# @refFS[Formula]{fs:betaSpendingAdjustment}
+	suppressWarnings(x7c <- getDesignGroupSequential(
+	    kMax = 3, alpha = 0.09, beta = 0.11, sided = 2,
+	    typeOfDesign = "asOF", typeBetaSpending = "bsKD",
+	    informationRates = c(0.2, 0.55, 1),
+	    gammaB = 2.5, bindingFutility = TRUE
+	))
+
+	## Comparison of the results of TrialDesignGroupSequential object 'x7c' with expected results
+	expect_equal(x7c$power, c(0.0013105743, 0.39377047, 0.889997), tolerance = 1e-07)
+	expect_equal(x7c$futilityBounds, c(NA_real_, 0.30419861), tolerance = 1e-07)
+	expect_equal(x7c$alphaSpent, c(1.475171e-05, 0.013740227, 0.09), tolerance = 1e-07)
+	expect_equal(x7c$betaSpent, c(0, 0.023123303, 0.11), tolerance = 1e-07)
+	expect_equal(x7c$criticalValues, c(4.3323635, 2.4641251, 1.7013171), tolerance = 1e-07)
+	expect_equal(x7c$stageLevels, c(7.375855e-06, 0.006867409, 0.044441733), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(x7c), NA)))
+	    expect_output(print(x7c)$show())
+	    invisible(capture.output(expect_error(summary(x7c), NA)))
+	    expect_output(summary(x7c)$show())
+	    suppressWarnings(x7cCodeBased <- eval(parse(text = getObjectRCode(x7c, stringWrapParagraphWidth = NULL))))
+	    expect_equal(x7cCodeBased$power, x7c$power, tolerance = 1e-05)
+	    expect_equal(x7cCodeBased$futilityBounds, x7c$futilityBounds, tolerance = 1e-05)
+	    expect_equal(x7cCodeBased$alphaSpent, x7c$alphaSpent, tolerance = 1e-05)
+	    expect_equal(x7cCodeBased$betaSpent, x7c$betaSpent, tolerance = 1e-05)
+	    expect_equal(x7cCodeBased$criticalValues, x7c$criticalValues, tolerance = 1e-05)
+	    expect_equal(x7cCodeBased$stageLevels, x7c$stageLevels, tolerance = 1e-05)
+	    expect_type(names(x7c), "character")
+	    df <- as.data.frame(x7c)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(x7c)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	suppressWarnings(x7d <- getDesignGroupSequential(
+	    kMax = 3, alpha = 0.05, beta = 0.2, sided = 2,
+	    typeOfDesign = "asOF", typeBetaSpending = "bsKD",
+	    informationRates = c(0.4, 0.65, 1),
+	    gammaB = 1.5, bindingFutility = TRUE
+	))
+
+	## Comparison of the results of TrialDesignGroupSequential object 'x7d' with expected results
+	expect_equal(x7d$power, c(0.063122463, 0.41229849, 0.79999885), tolerance = 1e-07)
+	expect_equal(x7d$futilityBounds, c(0.32391511, 0.9194681), tolerance = 1e-07)
+	expect_equal(x7d$alphaSpent, c(0.00078830351, 0.010867832, 0.04999999), tolerance = 1e-07)
+	expect_equal(x7d$betaSpent, c(0.050596443, 0.10480935, 0.2), tolerance = 1e-07)
+	expect_equal(x7d$criticalValues, c(3.3568694, 2.5549656, 1.9350784), tolerance = 1e-07)
+	expect_equal(x7d$stageLevels, c(0.00039415176, 0.0053099152, 0.026490337), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(x7d), NA)))
+	    expect_output(print(x7d)$show())
+	    invisible(capture.output(expect_error(summary(x7d), NA)))
+	    expect_output(summary(x7d)$show())
+	    suppressWarnings(x7dCodeBased <- eval(parse(text = getObjectRCode(x7d, stringWrapParagraphWidth = NULL))))
+	    expect_equal(x7dCodeBased$power, x7d$power, tolerance = 1e-05)
+	    expect_equal(x7dCodeBased$futilityBounds, x7d$futilityBounds, tolerance = 1e-05)
+	    expect_equal(x7dCodeBased$alphaSpent, x7d$alphaSpent, tolerance = 1e-05)
+	    expect_equal(x7dCodeBased$betaSpent, x7d$betaSpent, tolerance = 1e-05)
+	    expect_equal(x7dCodeBased$criticalValues, x7d$criticalValues, tolerance = 1e-05)
+	    expect_equal(x7dCodeBased$stageLevels, x7d$stageLevels, tolerance = 1e-05)
+	    expect_type(names(x7d), "character")
+	    df <- as.data.frame(x7d)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(x7d)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+})
+
+test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' and non-binding futility bounds, no betaAdjustment, two-sided (kMax = 3)", {
+
+	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
+	# @refFS[Formula]{fs:alphaSpendingConcept}
+	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
+	# @refFS[Formula]{fs:betaSpendingApproach}
+	# @refFS[Formula]{fs:betaSpendingKimDeMets}
+	# @refFS[Formula]{fs:etaSpendingApproachTwoSided}
+	# @refFS[Formula]{fs:betaSpendingAdjustment}
+	suppressWarnings(x7e <- getDesignGroupSequential(
+	    kMax = 3, alpha = 0.09, beta = 0.11, sided = 2,
+	    typeOfDesign = "asOF", typeBetaSpending = "bsKD",
+	    informationRates = c(0.4, 0.65, 1),
+	    betaAdjustment = FALSE,
+	    gammaB = 2.5, bindingFutility = FALSE
+	))
+
+	## Comparison of the results of TrialDesignGroupSequential object 'x7e' with expected results
+	expect_equal(x7e$power, c(0.14268064, 0.57037981, 0.88999701), tolerance = 1e-07)
+	expect_equal(x7e$futilityBounds, c(NA_real_, 0.64692592), tolerance = 1e-07)
+	expect_equal(x7e$alphaSpent, c(0.0030525896, 0.025803646, 0.09), tolerance = 1e-07)
+	expect_equal(x7e$betaSpent, c(0, 0.037469343, 0.11), tolerance = 1e-07)
+	expect_equal(x7e$criticalValues, c(2.9623919, 2.2442359, 1.7391729), tolerance = 1e-07)
+	expect_equal(x7e$stageLevels, c(0.0015262948, 0.012408614, 0.041002179), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(x7e), NA)))
+	    expect_output(print(x7e)$show())
+	    invisible(capture.output(expect_error(summary(x7e), NA)))
+	    expect_output(summary(x7e)$show())
+	    suppressWarnings(x7eCodeBased <- eval(parse(text = getObjectRCode(x7e, stringWrapParagraphWidth = NULL))))
+	    expect_equal(x7eCodeBased$power, x7e$power, tolerance = 1e-05)
+	    expect_equal(x7eCodeBased$futilityBounds, x7e$futilityBounds, tolerance = 1e-05)
+	    expect_equal(x7eCodeBased$alphaSpent, x7e$alphaSpent, tolerance = 1e-05)
+	    expect_equal(x7eCodeBased$betaSpent, x7e$betaSpent, tolerance = 1e-05)
+	    expect_equal(x7eCodeBased$criticalValues, x7e$criticalValues, tolerance = 1e-05)
+	    expect_equal(x7eCodeBased$stageLevels, x7e$stageLevels, tolerance = 1e-05)
+	    expect_type(names(x7e), "character")
+	    df <- as.data.frame(x7e)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(x7e)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+})
+
+test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', binding futility bounds and delayed response (kMax = 3)", {
+
+	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
+	# @refFS[Formula]{fs:alphaSpendingConcept}
+	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
+	# @refFS[Formula]{fs:betaSpendingApproach}
+	# @refFS[Formula]{fs:betaSpendingOBrienFleming}
+	# @refFS[Formula]{fs:delayedResponseCondition1}
+	# @refFS[Formula]{fs:delayedResponseCondition2}
+	# @refFS[Formula]{fs:delayedResponsePower}
+	suppressWarnings(dl1 <- getDesignGroupSequential(
+	    kMax = 3, alpha = 0.05, beta = 0.1, sided = 1,
+	    typeOfDesign = "asOF", typeBetaSpending = "bsOF",
+	    informationRates = c(0.4, 0.65, 1),
+	    bindingFutility = TRUE,
+	    delayedInformation = c(0.1, 0.2)
+	))
+
+	## Comparison of the results of TrialDesignGroupSequential object 'dl1' with expected results
+	expect_equal(dl1$power, c(0.15998522, 0.59313184, 0.9), tolerance = 1e-07)
+	expect_equal(dl1$futilityBounds, c(-0.46043472, 0.64445014), tolerance = 1e-07)
+	expect_equal(dl1$alphaSpent, c(0.001941913, 0.015055713, 0.05), tolerance = 1e-07)
+	expect_equal(dl1$betaSpent, c(0.00930224, 0.041331422, 0.1), tolerance = 1e-07)
+	expect_equal(dl1$criticalValues, c(2.8874465, 2.1853011, 1.6575593), tolerance = 1e-07)
+	expect_equal(dl1$stageLevels, c(0.001941913, 0.014433388, 0.048703222), tolerance = 1e-07)
+	expect_equal(dl1$decisionCriticalValues, c(1.3388855, 1.5378695, 1.6575593), tolerance = 1e-07)
+	expect_equal(dl1$reversalProbabilities, c(1.7563249e-06, 0.0014674026), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl1), NA)))
+	    expect_output(print(dl1)$show())
+	    invisible(capture.output(expect_error(summary(dl1), NA)))
+	    expect_output(summary(dl1)$show())
+	    suppressWarnings(dl1CodeBased <- eval(parse(text = getObjectRCode(dl1, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl1CodeBased$power, dl1$power, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$futilityBounds, dl1$futilityBounds, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$alphaSpent, dl1$alphaSpent, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$betaSpent, dl1$betaSpent, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$criticalValues, dl1$criticalValues, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$stageLevels, dl1$stageLevels, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$decisionCriticalValues, dl1$decisionCriticalValues, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$reversalProbabilities, dl1$reversalProbabilities, tolerance = 1e-05)
+	    expect_type(names(dl1), "character")
+	    df <- as.data.frame(dl1)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl1)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	dl2 <- getDesignCharacteristics(dl1)
+
+	## Comparison of the results of TrialDesignCharacteristics object 'dl2' with expected results
+	expect_equal(dl2$nFixed, 8.5638474, tolerance = 1e-07)
+	expect_equal(dl2$shift, 8.8633082, tolerance = 1e-07)
+	expect_equal(dl2$inflationFactor, 1.034968, tolerance = 1e-07)
+	expect_equal(dl2$information, c(3.5453233, 5.7611503, 8.8633082), tolerance = 1e-07)
+	expect_equal(dl2$power, c(0.15755984, 0.59089729, 0.9), tolerance = 1e-07)
+	expect_equal(dl2$rejectionProbabilities, c(0.15755984, 0.43333745, 0.30910271), tolerance = 1e-07)
+	expect_equal(dl2$futilityProbabilities, c(0.0095560402, 0.032904105), tolerance = 1e-07)
+	expect_equal(dl2$averageSampleNumber1, 0.87652961, tolerance = 1e-07)
+	expect_equal(dl2$averageSampleNumber01, 0.92477729, tolerance = 1e-07)
+	expect_equal(dl2$averageSampleNumber0, 0.79932679, tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl2), NA)))
+	    expect_output(print(dl2)$show())
+	    invisible(capture.output(expect_error(summary(dl2), NA)))
+	    expect_output(summary(dl2)$show())
+	    suppressWarnings(dl2CodeBased <- eval(parse(text = getObjectRCode(dl2, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl2CodeBased$nFixed, dl2$nFixed, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$shift, dl2$shift, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$inflationFactor, dl2$inflationFactor, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$information, dl2$information, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$power, dl2$power, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$rejectionProbabilities, dl2$rejectionProbabilities, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$futilityProbabilities, dl2$futilityProbabilities, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$averageSampleNumber1, dl2$averageSampleNumber1, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$averageSampleNumber01, dl2$averageSampleNumber01, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$averageSampleNumber0, dl2$averageSampleNumber0, tolerance = 1e-05)
+	    expect_type(names(dl2), "character")
+	    df <- as.data.frame(dl2)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl2)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	suppressWarnings(dl3 <- getDesignGroupSequential(
+	    kMax = 3, alpha = 0.05, beta = 0.1, sided = 1,
+	    typeOfDesign = "asOF", typeBetaSpending = "bsOF",
+	    informationRates = c(0.4, 0.65, 1),
+	    bindingFutility = TRUE,
+	    delayedInformation = c(0, 0.2)
+	))
+
+	## Comparison of the results of TrialDesignGroupSequential object 'dl3' with expected results
+	expect_equal(dl3$power, c(0.15998522, 0.59313184, 0.9), tolerance = 1e-07)
+	expect_equal(dl3$futilityBounds, c(-0.46043472, 0.64445014), tolerance = 1e-07)
+	expect_equal(dl3$alphaSpent, c(0.001941913, 0.015055713, 0.05), tolerance = 1e-07)
+	expect_equal(dl3$betaSpent, c(0.00930224, 0.041331422, 0.1), tolerance = 1e-07)
+	expect_equal(dl3$criticalValues, c(2.8874465, 2.1853011, 1.6575593), tolerance = 1e-07)
+	expect_equal(dl3$stageLevels, c(0.001941913, 0.014433388, 0.048703222), tolerance = 1e-07)
+	expect_equal(dl3$decisionCriticalValues, c(NA_real_, 1.5378695, 1.6575593), tolerance = 1e-07)
+	expect_equal(dl3$reversalProbabilities, c(NA_real_, 0.0014674026), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl3), NA)))
+	    expect_output(print(dl3)$show())
+	    invisible(capture.output(expect_error(summary(dl3), NA)))
+	    expect_output(summary(dl3)$show())
+	    suppressWarnings(dl3CodeBased <- eval(parse(text = getObjectRCode(dl3, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl3CodeBased$power, dl3$power, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$futilityBounds, dl3$futilityBounds, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$alphaSpent, dl3$alphaSpent, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$betaSpent, dl3$betaSpent, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$criticalValues, dl3$criticalValues, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$stageLevels, dl3$stageLevels, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$decisionCriticalValues, dl3$decisionCriticalValues, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$reversalProbabilities, dl3$reversalProbabilities, tolerance = 1e-05)
+	    expect_type(names(dl3), "character")
+	    df <- as.data.frame(dl3)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl3)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	dl4 <- getDesignCharacteristics(dl3)
+
+	## Comparison of the results of TrialDesignCharacteristics object 'dl4' with expected results
+	expect_equal(dl4$nFixed, 8.5638474, tolerance = 1e-07)
+	expect_equal(dl4$shift, 8.8633608, tolerance = 1e-07)
+	expect_equal(dl4$inflationFactor, 1.0349742, tolerance = 1e-07)
+	expect_equal(dl4$information, c(3.5453443, 5.7611845, 8.8633608), tolerance = 1e-07)
+	expect_equal(dl4$power, c(0.15755967, 0.59089852, 0.9), tolerance = 1e-07)
+	expect_equal(dl4$rejectionProbabilities, c(0.15755967, 0.43333886, 0.30910148), tolerance = 1e-07)
+	expect_equal(dl4$futilityProbabilities, c(0.0095558971, 0.032903612), tolerance = 1e-07)
+	expect_equal(dl4$averageSampleNumber1, 0.85923802, tolerance = 1e-07)
+	expect_equal(dl4$averageSampleNumber01, 0.91378094, tolerance = 1e-07)
+	expect_equal(dl4$averageSampleNumber0, 0.76574207, tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl4), NA)))
+	    expect_output(print(dl4)$show())
+	    invisible(capture.output(expect_error(summary(dl4), NA)))
+	    expect_output(summary(dl4)$show())
+	    suppressWarnings(dl4CodeBased <- eval(parse(text = getObjectRCode(dl4, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl4CodeBased$nFixed, dl4$nFixed, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$shift, dl4$shift, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$inflationFactor, dl4$inflationFactor, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$information, dl4$information, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$power, dl4$power, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$rejectionProbabilities, dl4$rejectionProbabilities, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$futilityProbabilities, dl4$futilityProbabilities, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$averageSampleNumber1, dl4$averageSampleNumber1, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$averageSampleNumber01, dl4$averageSampleNumber01, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$averageSampleNumber0, dl4$averageSampleNumber0, tolerance = 1e-05)
+	    expect_type(names(dl4), "character")
+	    df <- as.data.frame(dl4)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl4)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	suppressWarnings(dl5 <- getDesignGroupSequential(
+	    kMax = 3, alpha = 0.05, beta = 0.1, sided = 1,
+	    typeOfDesign = "asOF", typeBetaSpending = "bsOF",
+	    informationRates = c(0.4, 0.65, 1),
+	    bindingFutility = TRUE,
+	    delayedInformation = 0.3
+	))
+
+	## Comparison of the results of TrialDesignGroupSequential object 'dl5' with expected results
+	expect_equal(dl5$power, c(0.15998522, 0.59313184, 0.9), tolerance = 1e-07)
+	expect_equal(dl5$futilityBounds, c(-0.46043472, 0.64445014), tolerance = 1e-07)
+	expect_equal(dl5$alphaSpent, c(0.001941913, 0.015055713, 0.05), tolerance = 1e-07)
+	expect_equal(dl5$betaSpent, c(0.00930224, 0.041331422, 0.1), tolerance = 1e-07)
+	expect_equal(dl5$criticalValues, c(2.8874465, 2.1853011, 1.6575593), tolerance = 1e-07)
+	expect_equal(dl5$stageLevels, c(0.001941913, 0.014433388, 0.048703222), tolerance = 1e-07)
+	expect_equal(dl5$decisionCriticalValues, c(1.505831, 1.5735979, 1.6575593), tolerance = 1e-07)
+	expect_equal(dl5$reversalProbabilities, c(0.00018341474, 0.0027022502), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl5), NA)))
+	    expect_output(print(dl5)$show())
+	    invisible(capture.output(expect_error(summary(dl5), NA)))
+	    expect_output(summary(dl5)$show())
+	    suppressWarnings(dl5CodeBased <- eval(parse(text = getObjectRCode(dl5, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl5CodeBased$power, dl5$power, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$futilityBounds, dl5$futilityBounds, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$alphaSpent, dl5$alphaSpent, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$betaSpent, dl5$betaSpent, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$criticalValues, dl5$criticalValues, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$stageLevels, dl5$stageLevels, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$decisionCriticalValues, dl5$decisionCriticalValues, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$reversalProbabilities, dl5$reversalProbabilities, tolerance = 1e-05)
+	    expect_type(names(dl5), "character")
+	    df <- as.data.frame(dl5)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl5)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	dl6 <- getDesignCharacteristics(dl5)
+
+	## Comparison of the results of TrialDesignCharacteristics object 'dl6' with expected results
+	expect_equal(dl6$nFixed, 8.5638474, tolerance = 1e-07)
+	expect_equal(dl6$shift, 8.7180222, tolerance = 1e-07)
+	expect_equal(dl6$inflationFactor, 1.018003, tolerance = 1e-07)
+	expect_equal(dl6$information, c(3.4872089, 5.6667144, 8.7180222), tolerance = 1e-07)
+	expect_equal(dl6$power, c(0.15429254, 0.58752252, 0.9), tolerance = 1e-07)
+	expect_equal(dl6$rejectionProbabilities, c(0.15429254, 0.43322998, 0.31247748), tolerance = 1e-07)
+	expect_equal(dl6$futilityProbabilities, c(0.0099602552, 0.03429374), tolerance = 1e-07)
+	expect_equal(dl6$averageSampleNumber1, 0.94451255, tolerance = 1e-07)
+	expect_equal(dl6$averageSampleNumber01, 0.96721799, tolerance = 1e-07)
+	expect_equal(dl6$averageSampleNumber0, 0.89669187, tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl6), NA)))
+	    expect_output(print(dl6)$show())
+	    invisible(capture.output(expect_error(summary(dl6), NA)))
+	    expect_output(summary(dl6)$show())
+	    suppressWarnings(dl6CodeBased <- eval(parse(text = getObjectRCode(dl6, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl6CodeBased$nFixed, dl6$nFixed, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$shift, dl6$shift, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$inflationFactor, dl6$inflationFactor, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$information, dl6$information, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$power, dl6$power, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$rejectionProbabilities, dl6$rejectionProbabilities, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$futilityProbabilities, dl6$futilityProbabilities, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$averageSampleNumber1, dl6$averageSampleNumber1, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$averageSampleNumber01, dl6$averageSampleNumber01, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$averageSampleNumber0, dl6$averageSampleNumber0, tolerance = 1e-05)
+	    expect_type(names(dl6), "character")
+	    df <- as.data.frame(dl6)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl6)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+})
+
+test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsP', non-binding futility bounds and delayed response (kMax = 3)", {
+
+	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
+	# @refFS[Formula]{fs:alphaSpendingConcept}
+	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
+	# @refFS[Formula]{fs:betaSpendingApproach}
+	# @refFS[Formula]{fs:betaSpendingOBrienFleming}
+	# @refFS[Formula]{fs:delayedResponseCondition1}
+	# @refFS[Formula]{fs:delayedResponseCondition2}
+	# @refFS[Formula]{fs:delayedResponsePower}
+	suppressWarnings(dl1 <- getDesignGroupSequential(
+	    kMax = 3, alpha = 0.05, beta = 0.1, sided = 1,
+	    typeOfDesign = "asP", typeBetaSpending = "bsP",
+	    informationRates = c(0.4, 0.65, 1),
+	    bindingFutility = FALSE,
+	    delayedInformation = c(0.1, 0.2)
+	))
+
+	## Comparison of the results of TrialDesignGroupSequential object 'dl1' with expected results
+	expect_equal(dl1$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07)
+	expect_equal(dl1$futilityBounds, c(0.5448398, 1.0899149), tolerance = 1e-07)
+	expect_equal(dl1$alphaSpent, c(0.026156858, 0.037497241, 0.05), tolerance = 1e-07)
+	expect_equal(dl1$betaSpent, c(0.052313716, 0.074994481, 0.099999999), tolerance = 1e-07)
+	expect_equal(dl1$criticalValues, c(1.9405431, 2.0327662, 1.9734104), tolerance = 1e-07)
+	expect_equal(dl1$stageLevels, c(0.026156858, 0.021038075, 0.02422441), tolerance = 1e-07)
+	expect_equal(dl1$decisionCriticalValues, c(1.3362296, 1.657468, 1.9734104), tolerance = 1e-07)
+	expect_equal(dl1$reversalProbabilities, c(0.0020439695, 0.0026967589), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl1), NA)))
+	    expect_output(print(dl1)$show())
+	    invisible(capture.output(expect_error(summary(dl1), NA)))
+	    expect_output(summary(dl1)$show())
+	    suppressWarnings(dl1CodeBased <- eval(parse(text = getObjectRCode(dl1, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl1CodeBased$power, dl1$power, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$futilityBounds, dl1$futilityBounds, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$alphaSpent, dl1$alphaSpent, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$betaSpent, dl1$betaSpent, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$criticalValues, dl1$criticalValues, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$stageLevels, dl1$stageLevels, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$decisionCriticalValues, dl1$decisionCriticalValues, tolerance = 1e-05)
+	    expect_equal(dl1CodeBased$reversalProbabilities, dl1$reversalProbabilities, tolerance = 1e-05)
+	    expect_type(names(dl1), "character")
+	    df <- as.data.frame(dl1)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl1)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	dl2 <- getDesignCharacteristics(dl1)
+
+	## Comparison of the results of TrialDesignCharacteristics object 'dl2' with expected results
+	expect_equal(dl2$nFixed, 8.5638474, tolerance = 1e-07)
+	expect_equal(dl2$shift, 11.345796, tolerance = 1e-07)
+	expect_equal(dl2$inflationFactor, 1.324848, tolerance = 1e-07)
+	expect_equal(dl2$information, c(4.5383183, 7.3747672, 11.345796), tolerance = 1e-07)
+	expect_equal(dl2$power, c(0.57788702, 0.78847934, 0.9), tolerance = 1e-07)
+	expect_equal(dl2$rejectionProbabilities, c(0.57788702, 0.21059232, 0.11152066), tolerance = 1e-07)
+	expect_equal(dl2$futilityProbabilities, c(0.056427171, 0.024888086), tolerance = 1e-07)
+	expect_equal(dl2$averageSampleNumber1, 0.86088771, tolerance = 1e-07)
+	expect_equal(dl2$averageSampleNumber01, 0.9483049, tolerance = 1e-07)
+	expect_equal(dl2$averageSampleNumber0, 0.80259202, tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl2), NA)))
+	    expect_output(print(dl2)$show())
+	    invisible(capture.output(expect_error(summary(dl2), NA)))
+	    expect_output(summary(dl2)$show())
+	    suppressWarnings(dl2CodeBased <- eval(parse(text = getObjectRCode(dl2, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl2CodeBased$nFixed, dl2$nFixed, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$shift, dl2$shift, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$inflationFactor, dl2$inflationFactor, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$information, dl2$information, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$power, dl2$power, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$rejectionProbabilities, dl2$rejectionProbabilities, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$futilityProbabilities, dl2$futilityProbabilities, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$averageSampleNumber1, dl2$averageSampleNumber1, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$averageSampleNumber01, dl2$averageSampleNumber01, tolerance = 1e-05)
+	    expect_equal(dl2CodeBased$averageSampleNumber0, dl2$averageSampleNumber0, tolerance = 1e-05)
+	    expect_type(names(dl2), "character")
+	    df <- as.data.frame(dl2)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl2)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	suppressWarnings(dl3 <- getDesignGroupSequential(
+	    kMax = 3, alpha = 0.05, beta = 0.1, sided = 1,
+	    typeOfDesign = "asP", typeBetaSpending = "bsP",
+	    informationRates = c(0.4, 0.65, 1),
+	    bindingFutility = FALSE,
+	    delayedInformation = c(0, 0.2)
+	))
+
+	## Comparison of the results of TrialDesignGroupSequential object 'dl3' with expected results
+	expect_equal(dl3$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07)
+	expect_equal(dl3$futilityBounds, c(0.5448398, 1.0899149), tolerance = 1e-07)
+	expect_equal(dl3$alphaSpent, c(0.026156858, 0.037497241, 0.05), tolerance = 1e-07)
+	expect_equal(dl3$betaSpent, c(0.052313716, 0.074994481, 0.099999999), tolerance = 1e-07)
+	expect_equal(dl3$criticalValues, c(1.9405431, 2.0327662, 1.9734104), tolerance = 1e-07)
+	expect_equal(dl3$stageLevels, c(0.026156858, 0.021038075, 0.02422441), tolerance = 1e-07)
+	expect_equal(dl3$decisionCriticalValues, c(NA_real_, 1.657468, 1.9734104), tolerance = 1e-07)
+	expect_equal(dl3$reversalProbabilities, c(NA_real_, 0.0026967589), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl3), NA)))
+	    expect_output(print(dl3)$show())
+	    invisible(capture.output(expect_error(summary(dl3), NA)))
+	    expect_output(summary(dl3)$show())
+	    suppressWarnings(dl3CodeBased <- eval(parse(text = getObjectRCode(dl3, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl3CodeBased$power, dl3$power, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$futilityBounds, dl3$futilityBounds, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$alphaSpent, dl3$alphaSpent, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$betaSpent, dl3$betaSpent, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$criticalValues, dl3$criticalValues, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$stageLevels, dl3$stageLevels, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$decisionCriticalValues, dl3$decisionCriticalValues, tolerance = 1e-05)
+	    expect_equal(dl3CodeBased$reversalProbabilities, dl3$reversalProbabilities, tolerance = 1e-05)
+	    expect_type(names(dl3), "character")
+	    df <- as.data.frame(dl3)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl3)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	dl4 <- getDesignCharacteristics(dl3)
+
+	## Comparison of the results of TrialDesignCharacteristics object 'dl4' with expected results
+	expect_equal(dl4$nFixed, 8.5638474, tolerance = 1e-07)
+	expect_equal(dl4$shift, 11.462579, tolerance = 1e-07)
+	expect_equal(dl4$inflationFactor, 1.3384848, tolerance = 1e-07)
+	expect_equal(dl4$information, c(4.5850317, 7.4506765, 11.462579), tolerance = 1e-07)
+	expect_equal(dl4$power, c(0.57954342, 0.78973163, 0.9), tolerance = 1e-07)
+	expect_equal(dl4$rejectionProbabilities, c(0.57954342, 0.21018821, 0.11026837), tolerance = 1e-07)
+	expect_equal(dl4$futilityProbabilities, c(0.055196532, 0.024225352), tolerance = 1e-07)
+	expect_equal(dl4$averageSampleNumber1, 0.7829433, tolerance = 1e-07)
+	expect_equal(dl4$averageSampleNumber01, 0.89251343, tolerance = 1e-07)
+	expect_equal(dl4$averageSampleNumber0, 0.71271214, tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl4), NA)))
+	    expect_output(print(dl4)$show())
+	    invisible(capture.output(expect_error(summary(dl4), NA)))
+	    expect_output(summary(dl4)$show())
+	    suppressWarnings(dl4CodeBased <- eval(parse(text = getObjectRCode(dl4, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl4CodeBased$nFixed, dl4$nFixed, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$shift, dl4$shift, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$inflationFactor, dl4$inflationFactor, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$information, dl4$information, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$power, dl4$power, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$rejectionProbabilities, dl4$rejectionProbabilities, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$futilityProbabilities, dl4$futilityProbabilities, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$averageSampleNumber1, dl4$averageSampleNumber1, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$averageSampleNumber01, dl4$averageSampleNumber01, tolerance = 1e-05)
+	    expect_equal(dl4CodeBased$averageSampleNumber0, dl4$averageSampleNumber0, tolerance = 1e-05)
+	    expect_type(names(dl4), "character")
+	    df <- as.data.frame(dl4)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl4)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	expect_warning(
+	    dl5 <- getDesignGroupSequential(
+	        kMax = 3, alpha = 0.05, beta = 0.1, sided = 1,
+	        typeOfDesign = "asP", typeBetaSpending = "bsP",
+	        informationRates = c(0.4, 0.65, 1),
+	        bindingFutility = FALSE,
+	        delayedInformation = 0
+	    )
+	)
+
+	## Comparison of the results of TrialDesignGroupSequential object 'dl5' with expected results
+	expect_equal(dl5$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07)
+	expect_equal(dl5$futilityBounds, c(0.5448398, 1.0899149), tolerance = 1e-07)
+	expect_equal(dl5$alphaSpent, c(0.026156858, 0.037497241, 0.05), tolerance = 1e-07)
+	expect_equal(dl5$betaSpent, c(0.052313716, 0.074994481, 0.099999999), tolerance = 1e-07)
+	expect_equal(dl5$criticalValues, c(1.9405431, 2.0327662, 1.9734104), tolerance = 1e-07)
+	expect_equal(dl5$stageLevels, c(0.026156858, 0.021038075, 0.02422441), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl5), NA)))
+	    expect_output(print(dl5)$show())
+	    invisible(capture.output(expect_error(summary(dl5), NA)))
+	    expect_output(summary(dl5)$show())
+	    suppressWarnings(dl5CodeBased <- eval(parse(text = getObjectRCode(dl5, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl5CodeBased$power, dl5$power, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$futilityBounds, dl5$futilityBounds, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$alphaSpent, dl5$alphaSpent, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$betaSpent, dl5$betaSpent, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$criticalValues, dl5$criticalValues, tolerance = 1e-05)
+	    expect_equal(dl5CodeBased$stageLevels, dl5$stageLevels, tolerance = 1e-05)
+	    expect_type(names(dl5), "character")
+	    df <- as.data.frame(dl5)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl5)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+	dl6 <- getDesignCharacteristics(dl5)
+
+	## Comparison of the results of TrialDesignCharacteristics object 'dl6' with expected results
+	expect_equal(dl6$nFixed, 8.5638474, tolerance = 1e-07)
+	expect_equal(dl6$shift, 11.746896, tolerance = 1e-07)
+	expect_equal(dl6$inflationFactor, 1.3716844, tolerance = 1e-07)
+	expect_equal(dl6$information, c(4.6987583, 7.6354822, 11.746896), tolerance = 1e-07)
+	expect_equal(dl6$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07)
+	expect_equal(dl6$rejectionProbabilities, c(0.58983431, 0.20296375, 0.10720193), tolerance = 1e-07)
+	expect_equal(dl6$futilityProbabilities, c(0.052313716, 0.022680765), tolerance = 1e-07)
+	expect_equal(dl6$averageSampleNumber1, 0.73486016, tolerance = 1e-07)
+	expect_equal(dl6$averageSampleNumber01, 0.8455149, tolerance = 1e-07)
+	expect_equal(dl6$averageSampleNumber0, 0.67993383, tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(dl6), NA)))
+	    expect_output(print(dl6)$show())
+	    invisible(capture.output(expect_error(summary(dl6), NA)))
+	    expect_output(summary(dl6)$show())
+	    suppressWarnings(dl6CodeBased <- eval(parse(text = getObjectRCode(dl6, stringWrapParagraphWidth = NULL))))
+	    expect_equal(dl6CodeBased$nFixed, dl6$nFixed, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$shift, dl6$shift, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$inflationFactor, dl6$inflationFactor, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$information, dl6$information, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$power, dl6$power, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$rejectionProbabilities, dl6$rejectionProbabilities, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$futilityProbabilities, dl6$futilityProbabilities, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$averageSampleNumber1, dl6$averageSampleNumber1, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$averageSampleNumber01, dl6$averageSampleNumber01, tolerance = 1e-05)
+	    expect_equal(dl6CodeBased$averageSampleNumber0, dl6$averageSampleNumber0, tolerance = 1e-05)
+	    expect_type(names(dl6), "character")
+	    df <- as.data.frame(dl6)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(dl6)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
+})
+
 test_that("'getDesignGroupSequential' with binding futility bounds", {
 
 	.skipTestIfDisabled()
@@ -731,11 +1371,11 @@ test_that("'getDesignGroupSequential' with binding futility bounds", {
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x8c' with expected results
-	expect_equal(x8c$power, c(0.17601916, 0.63139858, 0.77), tolerance = 1e-07)
-	expect_equal(x8c$deltaWT, 0.39, tolerance = 1e-07)
-	expect_equal(x8c$alphaSpent, c(0.006639846, 0.017990309, 0.025), tolerance = 1e-07)
-	expect_equal(x8c$criticalValues, c(2.4761792, 2.2229286, 2.1690292), tolerance = 1e-07)
-	expect_equal(x8c$stageLevels, c(0.006639846, 0.013110309, 0.015040233), tolerance = 1e-07)
+	expect_equal(x8c$power, c(0.17785982, 0.63184407, 0.77), tolerance = 1e-07)
+	expect_equal(x8c$deltaWT, 0.393, tolerance = 1e-07)
+	expect_equal(x8c$alphaSpent, c(0.0067542296, 0.01805085, 0.025), tolerance = 1e-07)
+	expect_equal(x8c$criticalValues, c(2.4700754, 2.2239834, 2.1715117), tolerance = 1e-07)
+	expect_equal(x8c$stageLevels, c(0.0067542296, 0.013074779, 0.014946256), tolerance = 1e-07)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x8c), NA)))
 	    expect_output(print(x8c)$show())
@@ -764,11 +1404,11 @@ test_that("'getDesignGroupSequential' with binding futility bounds", {
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x8d' with expected results
-	expect_equal(x8d$power, c(0.27985915, 0.63939135, 0.80444921, 0.9), tolerance = 1e-07)
-	expect_equal(x8d$deltaWT, 0.48, tolerance = 1e-07)
-	expect_equal(x8d$alphaSpent, c(0.0082512101, 0.015455479, 0.020598238, 0.025), tolerance = 1e-07)
-	expect_equal(x8d$criticalValues, c(2.6416137, 2.6052458, 2.5902992, 2.5787648), tolerance = 1e-07)
-	expect_equal(x8d$stageLevels, c(0.0041256051, 0.0045904179, 0.0047946269, 0.0049577133), tolerance = 1e-07)
+	expect_equal(x8d$power, c(0.27905065, 0.63899817, 0.80432197, 0.9), tolerance = 1e-07)
+	expect_equal(x8d$deltaWT, 0.479, tolerance = 1e-07)
+	expect_equal(x8d$alphaSpent, c(0.0082066211, 0.015417447, 0.020576899, 0.025), tolerance = 1e-07)
+	expect_equal(x8d$criticalValues, c(2.6434487, 2.6052491, 2.5895574, 2.577451), tolerance = 1e-07)
+	expect_equal(x8d$stageLevels, c(0.0041033106, 0.0045903747, 0.0048049705, 0.0049765989), tolerance = 1e-07)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x8d), NA)))
 	    expect_output(print(x8d)$show())
@@ -797,11 +1437,11 @@ test_that("'getDesignGroupSequential' with binding futility bounds", {
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x8e' with expected results
-	expect_equal(x8e$power, c(0.067932398, 0.50628745, 0.76237915, 0.9), tolerance = 1e-07)
-	expect_equal(x8e$deltaWT, 0.18, tolerance = 1e-07)
-	expect_equal(x8e$alphaSpent, c(0.00054745752, 0.0059439465, 0.014151805, 0.02499999), tolerance = 1e-07)
-	expect_equal(x8e$criticalValues, c(3.4563925, 2.7688119, 2.5253005, 2.3512665), tolerance = 1e-07)
-	expect_equal(x8e$stageLevels, c(0.00027372876, 0.0028130552, 0.0057799702, 0.0093548142), tolerance = 1e-07)
+	expect_equal(x8e$power, c(0.068425642, 0.50677837, 0.76253381, 0.9), tolerance = 1e-07)
+	expect_equal(x8e$deltaWT, 0.181, tolerance = 1e-07)
+	expect_equal(x8e$alphaSpent, c(0.00055484217, 0.0059655413, 0.01417086, 0.02499999), tolerance = 1e-07)
+	expect_equal(x8e$criticalValues, c(3.4527796, 2.7678356, 2.5251363, 2.3516384), tolerance = 1e-07)
+	expect_equal(x8e$stageLevels, c(0.00027742108, 0.0028214959, 0.0057826708, 0.0093454685), tolerance = 1e-07)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x8e), NA)))
 	    expect_output(print(x8e)$show())

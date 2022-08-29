@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6291 $
-## |  Last changed: $Date: 2022-06-13 08:36:13 +0200 (Mon, 13 Jun 2022) $
+## |  File version: $Revision: 6514 $
+## |  Last changed: $Date: 2022-08-22 14:31:53 +0200 (Mo, 22 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -228,7 +228,7 @@ NULL
     }
 }
 
-.assertIsInClosedInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE) {
+.assertIsInClosedInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = TRUE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
     if (naAllowed && all(is.na(x))) {
         return(invisible())
@@ -237,7 +237,8 @@ NULL
     if (!naAllowed && length(x) > 1 && any(is.na(x))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", xName, "' (", .arrayToString(x), ") must be a valid numeric vector or a single NA"
+            "'", xName, "' (", .arrayToString(x), ") must be a valid numeric vector or a single NA",
+            call. = call.
         )
     }
 
@@ -246,18 +247,20 @@ NULL
             prefix <- ifelse(length(x) > 1, "each value of ", "")
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, prefix,
-                "'", xName, "' (", .arrayToString(x), ") must be >= ", lower
+                "'", xName, "' (", .arrayToString(x), ") must be >= ", lower,
+                call. = call.
             )
         }
     } else if (any(x < lower, na.rm = TRUE) || any(x > upper, na.rm = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'", xName, "' (", .arrayToString(x), ") is out of bounds [", lower, "; ", upper, "]"
+            "'", xName, "' (", .arrayToString(x), ") is out of bounds [", lower, "; ", upper, "]",
+            call. = call.
         )
     }
 }
 
-.assertIsInOpenInterval <- function(x, xName, lower, upper, naAllowed = FALSE) {
+.assertIsInOpenInterval <- function(x, xName, lower, upper, naAllowed = FALSE, call. = TRUE) {
     if (naAllowed && all(is.na(x))) {
         return(invisible())
     }
@@ -274,13 +277,15 @@ NULL
             prefix <- ifelse(length(x) > 1, "each value of ", "")
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, prefix,
-                "'", xName, "' (", .arrayToString(x), ") must be > ", lower
+                "'", xName, "' (", .arrayToString(x), ") must be > ", lower,
+                call. = call.
             )
         }
     } else if (any(x <= lower, na.rm = TRUE) || any(x >= upper, na.rm = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'", xName, "' (", .arrayToString(x), ") is out of bounds (", lower, "; ", upper, ")"
+            "'", xName, "' (", .arrayToString(x), ") is out of bounds (", lower, "; ", upper, ")",
+            call. = call.
         )
     }
 }
@@ -434,12 +439,13 @@ NULL
     return(inherits(dataInput, "DatasetSurvival"))
 }
 
-.assertIsNumericVector <- function(x, argumentName, naAllowed = FALSE, noDefaultAvailable = FALSE) {
+.assertIsNumericVector <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = TRUE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
-            "' must be a valid numeric value or vector"
+            "' must be a valid numeric value or vector",
+            call. = call.
         )
     }
 
@@ -448,17 +454,20 @@ NULL
     if ((!naAllowed && any(is.na(x))) || !is.numeric(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must be a valid numeric value or vector"
+            .arrayToString(x), ") must be a valid numeric value or vector",
+            call. = call.
         )
     }
 }
 
-.assertIsIntegerVector <- function(x, argumentName, naAllowed = FALSE, validateType = TRUE, noDefaultAvailable = FALSE) {
+.assertIsIntegerVector <- function(x, argumentName, ..., naAllowed = FALSE,
+        validateType = TRUE, noDefaultAvailable = FALSE, call. = TRUE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
-            "' must be a valid integer value or vector"
+            "' must be a valid integer value or vector",
+            call. = call.
         )
     }
 
@@ -472,34 +481,47 @@ NULL
             (!validateType && any(as.integer(na.omit(x)) != na.omit(x)))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must be a valid integer value or vector"
+            .arrayToString(x), ") must be a valid integer value or vector",
+            call. = call.
         )
     }
 }
 
-.assertIsLogicalVector <- function(x, argumentName, naAllowed = FALSE, noDefaultAvailable = FALSE) {
+.assertIsLogicalVector <- function(x, argumentName, ..., naAllowed = FALSE,
+        noDefaultAvailable = FALSE, call. = TRUE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid logical value or vector")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' ",
+            "must be a valid logical value or vector",
+            call. = call.
+        )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if ((!naAllowed && all(is.na(x))) || !is.logical(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (", x, ") must be a valid logical value or vector")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (", x, ") ",
+            "must be a valid logical value or vector",
+            call. = call.
+        )
     }
 }
 
-.assertIsNoDefault <- function(x, argumentName, noDefaultAvailable, checkNA = FALSE) {
+.assertIsNoDefault <- function(x, argumentName, noDefaultAvailable, ..., checkNA = FALSE, call. = TRUE) {
     if (noDefaultAvailable && (!checkNA || all(is.na(x)))) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be specified, there is no default value")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' ",
+            "must be specified, there is no default value",
+            call. = call.
+        )
     }
 }
 
-.assertIsSingleLogical <- function(x, argumentName, naAllowed = FALSE, noDefaultAvailable = FALSE) {
+.assertIsSingleLogical <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = TRUE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a single logical value")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a single logical value",
+            call. = call.
+        )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
@@ -507,22 +529,26 @@ NULL
     if (length(x) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
-            .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single logical value"
+            .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single logical value",
+            call. = call.
         )
     }
 
     if ((!naAllowed && is.na(x)) || !is.logical(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            ifelse(isS4(x), .getClassName(x), x), ") must be a single logical value"
+            ifelse(isS4(x), .getClassName(x), x), ") must be a single logical value",
+            call. = call.
         )
     }
 }
 
-.assertIsSingleNumber <- function(x, argumentName, naAllowed = FALSE, noDefaultAvailable = FALSE) {
+.assertIsSingleNumber <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = TRUE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid numeric value")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid numeric value",
+            call. = call.
+        )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
@@ -530,35 +556,39 @@ NULL
     if (length(x) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
-            .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single numeric value"
+            .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single numeric value",
+            call. = call.
         )
     }
 
     if ((!naAllowed && is.na(x)) || !is.numeric(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            ifelse(isS4(x), .getClassName(x), x), ") must be a valid numeric value"
+            ifelse(isS4(x), .getClassName(x), x), ") must be a valid numeric value",
+            call. = call.
         )
     }
 }
 
-.assertIsSingleInteger <- function(x, argumentName, naAllowed = FALSE,
-        validateType = TRUE, noDefaultAvailable = FALSE) {
+.assertIsSingleInteger <- function(x, argumentName, ..., naAllowed = FALSE,
+        validateType = TRUE, noDefaultAvailable = FALSE, call. = TRUE) {
     .assertIsSinglePositiveInteger(
         x = x, argumentName = argumentName,
         naAllowed = naAllowed, validateType = validateType,
-        mustBePositive = FALSE, noDefaultAvailable = noDefaultAvailable
+        mustBePositive = FALSE, noDefaultAvailable = noDefaultAvailable,
+        call. = call.
     )
 }
 
 .assertIsSinglePositiveInteger <- function(x, argumentName, ...,
-        naAllowed = FALSE, validateType = TRUE, mustBePositive = TRUE, noDefaultAvailable = FALSE) {
+        naAllowed = FALSE, validateType = TRUE, mustBePositive = TRUE, noDefaultAvailable = FALSE, call. = TRUE) {
     prefix <- ifelse(mustBePositive, "single positive ", "single ")
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'", argumentName, "' must be a ", prefix, "integer value"
+            "'", argumentName, "' must be a ", prefix, "integer value",
+            call. = call.
         )
     }
 
@@ -568,7 +598,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
             .arrayToString(x, vectorLookAndFeelEnabled = TRUE),
-            " must be a ", prefix, "integer value"
+            " must be a ", prefix, "integer value",
+            call. = call.
         )
     }
 
@@ -576,22 +607,26 @@ NULL
             (!validateType && !is.na(x) && !is.infinite(x) && as.integer(x) != x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(isS4(x), .getClassName(x), x), ") must be a ", prefix, "integer value"
+            "'", argumentName, "' (", ifelse(isS4(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            call. = call.
         )
     }
 
     if (mustBePositive && !is.na(x) && !is.infinite(x) && x <= 0) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(isS4(x), .getClassName(x), x), ") must be a ", prefix, "integer value"
+            "'", argumentName, "' (", ifelse(isS4(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            call. = call.
         )
     }
 }
 
-.assertIsSingleCharacter <- function(x, argumentName, naAllowed = FALSE, noDefaultAvailable = FALSE) {
+.assertIsSingleCharacter <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = TRUE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid character value")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid character value",
+            call. = call.
+        )
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
@@ -599,49 +634,63 @@ NULL
     if (length(x) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
-            .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single character value"
+            .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single character value",
+            call. = call.
         )
     }
 
     if (!is.character(x)) {
-        stop(sprintf(paste0(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'%s' must be a valid character value (is an instance of class '%s')"
-        ), argumentName, .getClassName(x)))
+        stop(
+            sprintf(paste0(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'%s' must be a valid character value (is an instance of class '%s')"
+            ), argumentName, .getClassName(x)),
+            call. = call.
+        )
     }
 
     if (!naAllowed && is.na(x)) {
-        stop(sprintf(paste0(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'%s' (NA) must be a valid character value"
-        ), argumentName))
+        stop(
+            sprintf(paste0(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'%s' (NA) must be a valid character value"
+            ), argumentName),
+            call. = call.
+        )
     }
 }
 
-.assertIsCharacter <- function(x, argumentName, naAllowed = FALSE) {
+.assertIsCharacter <- function(x, argumentName, ..., naAllowed = FALSE, call. = TRUE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'", argumentName, "' must be a valid character value or vector"
+            "'", argumentName, "' must be a valid character value or vector",
+            call. = call.
         )
     }
 
     if (!all(is.character(x))) {
-        stop(sprintf(paste0(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'%s' must be a valid character value or vector ",
-            "(is an instance of class '%s')"
-        ), argumentName, .getClassName(x)))
+        stop(
+            sprintf(paste0(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'%s' must be a valid character value or vector ",
+                "(is an instance of class '%s')"
+            ), argumentName, .getClassName(x)),
+            call. = call.
+        )
     }
 
     if (!naAllowed && any(is.na(x))) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'%s' (%s) must be a valid character value (NA is not allowed)"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                    "'%s' (%s) must be a valid character value (NA is not allowed)"
+                ),
+                argumentName, .arrayToString(x)
             ),
-            argumentName, .arrayToString(x)
-        ))
+            call. = call.
+        )
     }
 }
 
@@ -812,7 +861,7 @@ NULL
     }
 }
 
-.assertIsValidIterationsAndSeed <- function(iterations, seed, zeroIterationsAllowed = TRUE) {
+.assertIsValidIterationsAndSeed <- function(iterations, seed, ..., zeroIterationsAllowed = TRUE) {
     if (is.null(iterations) || length(iterations) == 0 || !is.numeric(iterations)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -878,7 +927,8 @@ NULL
     }
 }
 
-.assertIsValidKMax <- function(kMax, kMaxLowerBound = 1, kMaxUpperBound = C_KMAX_UPPER_BOUND, showWarnings = FALSE) {
+.assertIsValidKMax <- function(kMax, kMaxLowerBound = 1,
+        kMaxUpperBound = C_KMAX_UPPER_BOUND, ..., showWarnings = FALSE) {
     .assertIsSingleInteger(kMax, "kMax", validateType = FALSE)
     .assertIsInClosedInterval(kMax, "kMax", lower = kMaxLowerBound, upper = kMaxUpperBound)
     if (showWarnings && kMax > 10) {
@@ -942,7 +992,7 @@ NULL
     }
 }
 
-.assertValuesAreInsideBounds <- function(parameterName, values, lowerBound, upperBound,
+.assertValuesAreInsideBounds <- function(parameterName, values, lowerBound, upperBound, ...,
         lowerBoundInclusive = TRUE, upperBoundInclusive = TRUE) {
     lower <- min(values)
     upper <- max(values)
@@ -1251,7 +1301,7 @@ NULL
 }
 
 .warnInCaseOfUnknownArguments <- function(..., functionName, ignore = c(),
-        numberOfAllowedUnnamedParameters = 0) {
+        numberOfAllowedUnnamedParameters = 0, exceptionEnabled = FALSE) {
     args <- list(...)
     if (length(args) == 0) {
         return(invisible())
@@ -1280,10 +1330,18 @@ NULL
                 argValue <- .arrayToString(arg, vectorLookAndFeelEnabled = length(arg) > 1, encapsulate = is.character(arg))
                 argValue <- paste0(" = ", argValue)
             }, error = function(e) {})
-            warning("Argument unknown in ", functionName, "(...): '", argName, "'",
-                argValue, " will be ignored",
-                call. = FALSE
-            )
+            if (exceptionEnabled) {
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+                    "argument unknown in ", functionName, "(...): '", argName, "'",
+                    argValue, " is not allowed",
+                    call. = FALSE
+                )
+            } else {
+                warning("Argument unknown in ", functionName, "(...): '", argName, "'",
+                    argValue, " will be ignored",
+                    call. = FALSE
+                )
+            }
         }
     }
 }
@@ -2276,12 +2334,10 @@ NULL
     }
 }
 
-
 .isValidVarianceOptionEnrichment <- function(varianceOption) {
     return(!is.null(varianceOption) && length(varianceOption) == 1 && !is.na(varianceOption) &&
         is.character(varianceOption) && varianceOption %in% C_VARIANCE_OPTIONS_ENRICHMENT)
 }
-
 
 .assertIsValidVarianceOptionEnrichment <- function(design, varianceOption) {
     if (!.isValidVarianceOptionEnrichment(varianceOption)) {
@@ -2325,9 +2381,15 @@ NULL
     if (typeOfSelection == "rBest") {
         .assertIsSingleNumber(rValue, "rValue", naAllowed = FALSE, noDefaultAvailable = TRUE)
         if (activeArms == 1) {
-            warning("'typeOfSelection' (\"", typeOfSelection, "\") will be ignored because 'activeArms' or 'populations' = 1", call. = FALSE)
+            warning("'typeOfSelection' (\"", typeOfSelection, "\") will be ignored ",
+                "because 'activeArms' or 'populations' = 1",
+                call. = FALSE
+            )
         } else if (rValue > activeArms) {
-            warning("'rValue' (", rValue, ") is larger than activeArms or populations (", activeArms, ") and will be ignored", call. = FALSE)
+            warning("'rValue' (", rValue, ") is larger than activeArms or populations ",
+                "(", activeArms, ") and will be ignored",
+                call. = FALSE
+            )
         }
     } else if (!is.na(rValue)) {
         warning("'rValue' (", rValue, ") will be ignored because 'typeOfSelection' != \"rBest\"", call. = FALSE)
@@ -2337,7 +2399,10 @@ NULL
         .assertIsSingleNumber(epsilonValue, "epsilonValue", naAllowed = FALSE, noDefaultAvailable = TRUE)
         .assertIsInClosedInterval(epsilonValue, "epsilonValue", lower = 0, upper = NULL, naAllowed = TRUE)
     } else if (!is.na(epsilonValue)) {
-        warning("'epsilonValue' (", epsilonValue, ") will be ignored because 'typeOfSelection' != \"epsilon\"", call. = FALSE)
+        warning("'epsilonValue' (", epsilonValue, ") will be ignored ",
+            "because 'typeOfSelection' != \"epsilon\"",
+            call. = FALSE
+        )
     }
 
     return(typeOfSelection)
@@ -2419,7 +2484,10 @@ NULL
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'decisionMatrix' must have two or four rows")
     }
     if (ncol(decisionMatrix) != kMax) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'decisionMatrix' must have 'kMax' (= length(informationRates) = ", kMax, ") columns")
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'decisionMatrix' must have 'kMax' ",
+            "(= length(informationRates) = ", kMax, ") columns"
+        )
     }
     if (any(decisionMatrix[2:nrow(decisionMatrix), ] < decisionMatrix[1:(nrow(decisionMatrix) - 1), ])) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'decisionMatrix' needs to be increasing in each column")
@@ -2598,17 +2666,17 @@ NULL
     if (is.null(design) && is.null(delayedInformation)) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "either 'design' or 'delayedInformation' must be specified")
     }
-    
+
     if (!is.null(design)) {
         if (!.isTrialDesignInverseNormalOrGroupSequential(design)) {
             return(FALSE)
         }
-        
+
         delayedInformation <- design[["delayedInformation"]]
     }
     if (is.null(delayedInformation)) {
         return(FALSE)
     }
-    
+
     return(all(!is.na(delayedInformation)) && any(delayedInformation >= 1e-03))
 }

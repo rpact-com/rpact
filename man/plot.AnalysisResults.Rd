@@ -29,18 +29,18 @@
 
 \item{...}{Optional \link[=param_three_dots_plot]{plot arguments}. Furthermore the following arguments can be defined:
 \itemize{
-\item \code{thetaRange}: A range of assumed effect sizes if testing means or a survival design was specified. 
-      Additionally, if testing means was selected, \code{assumedStDev} (assumed standard deviation) 
+\item \code{thetaRange}: A range of assumed effect sizes if testing means or a survival design was specified.
+      Additionally, if testing means was selected, \code{assumedStDev} (assumed standard deviation)
       can be specified (default is \code{1}).
-\item \code{piTreatmentRange}: A range of assumed rates pi1 to calculate the conditional power. 
-      Additionally, if a two-sample comparison was selected, \code{pi2} can be specified (default is the value from 
-      \code{getAnalysisResults}). 
-\item \code{directionUpper}: Specifies the direction of the alternative, 
+\item \code{piTreatmentRange}: A range of assumed rates pi1 to calculate the conditional power.
+      Additionally, if a two-sample comparison was selected, \code{pi2} can be specified (default is the value from
+      \code{getAnalysisResults}).
+\item \code{directionUpper}: Specifies the direction of the alternative,
       only applicable for one-sided testing; default is \code{TRUE}
       which means that larger values of the test statistics yield smaller p-values.
-\item \code{\link[=param_thetaH0]{thetaH0}}: The null hypothesis value, default is \code{0} for 
-      the normal and the binary case, it is \code{1} for the survival case.      
-      For testing a rate in one sample, a value thetaH0 in (0, 1) has to be specified for 
+\item \code{\link[=param_thetaH0]{thetaH0}}: The null hypothesis value, default is \code{0} for
+      the normal and the binary case, it is \code{1} for the survival case.
+      For testing a rate in one sample, a value thetaH0 in (0, 1) has to be specified for
       defining the null hypothesis H0: \code{pi = thetaH0}.
 }}
 

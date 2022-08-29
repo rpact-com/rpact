@@ -13,13 +13,14 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6291 $
-## |  Last changed: $Date: 2022-06-13 08:36:13 +0200 (Mon, 13 Jun 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6522 $
+## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_constants.R
 #' @include f_core_utilities.R
+#' @include f_logger.R
 NULL
 
 .getFisherCombinationSize <- function(kMax, alpha0Vec, criticalValues, tVec,
@@ -76,7 +77,7 @@ getDesignFisher <- function(...,
         sided = 1, # C_SIDED_DEFAULT
         bindingFutility = NA,
         tolerance = 1e-14, # C_ANALYSIS_TOLERANCE_FISHER_DEFAULT
-        iterations = 0L,
+        iterations = 0,
         seed = NA_real_) {
     .assertIsValidTolerance(tolerance)
     .assertIsValidIterationsAndSeed(iterations, seed)
@@ -121,7 +122,7 @@ getDesignFisher <- function(...,
 .getDesignFisher <- function(kMax = NA_integer_, alpha = NA_real_, method = C_FISHER_METHOD_DEFAULT,
         userAlphaSpending = NA_real_, alpha0Vec = NA_real_, informationRates = NA_real_,
         sided = 1, bindingFutility = C_BINDING_FUTILITY_FISHER_DEFAULT,
-        tolerance = C_ANALYSIS_TOLERANCE_FISHER_DEFAULT, iterations = 0L, seed = NA_real_,
+        tolerance = C_ANALYSIS_TOLERANCE_FISHER_DEFAULT, iterations = 0, seed = NA_real_,
         userFunctionCallEnabled = FALSE) {
     method <- .matchArgument(method, C_FISHER_METHOD_DEFAULT)
 
@@ -233,7 +234,7 @@ getDesignFisher <- function(...,
     }
     design$criticalValues <- rep(NA_real_, design$kMax)
 
-    design$.setParameterType("scale", C_PARAM_GENERATED)
+    design$.setParameterType("scale", C_PARAM_NOT_APPLICABLE)
     design$.setParameterType("criticalValues", C_PARAM_GENERATED)
 
     if (design$bindingFutility) {

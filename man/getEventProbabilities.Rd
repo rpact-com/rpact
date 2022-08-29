@@ -7,7 +7,7 @@
 getEventProbabilities(
   time,
   ...,
-  accrualTime = c(0L, 12L),
+  accrualTime = c(0, 12),
   accrualIntensity = 0.1,
   accrualIntensityType = c("auto", "absolute", "relative"),
   kappa = 1,
@@ -18,7 +18,7 @@ getEventProbabilities(
   hazardRatio = NA_real_,
   dropoutRate1 = 0,
   dropoutRate2 = 0,
-  dropoutTime = 12L,
+  dropoutTime = 12,
   maxNumberOfSubjects = NA_real_
 )
 }
@@ -121,6 +121,6 @@ y <- getEventProbabilities(timeVector, accrualTime = c(0, 20, 60),
     hazardRatio = 2
 )
 \donttest{
-plot(timeVector, y$overallEventProbabilities, type = 'l')
+plot(timeVector, y$cumulativeEventProbabilities, type = 'l')
 }
 }

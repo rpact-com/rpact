@@ -11,19 +11,19 @@
 \alias{getMedianByPi}
 \title{Survival Helper Functions for Conversion of Pi, Lambda, Median}
 \usage{
-getLambdaByPi(piValue, eventTime = 12L, kappa = 1)
+getLambdaByPi(piValue, eventTime = 12, kappa = 1)
 
 getLambdaByMedian(median, kappa = 1)
 
-getHazardRatioByPi(pi1, pi2, eventTime = 12L, kappa = 1)
+getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1)
 
-getPiByLambda(lambda, eventTime = 12L, kappa = 1)
+getPiByLambda(lambda, eventTime = 12, kappa = 1)
 
-getPiByMedian(median, eventTime = 12L, kappa = 1)
+getPiByMedian(median, eventTime = 12, kappa = 1)
 
 getMedianByLambda(lambda, kappa = 1)
 
-getMedianByPi(piValue, eventTime = 12L, kappa = 1)
+getMedianByPi(piValue, eventTime = 12, kappa = 1)
 }
 \arguments{
 \item{piValue, pi1, pi2, lambda, median}{Value that shall be converted.}

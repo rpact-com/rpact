@@ -26,7 +26,7 @@ with continuation matrix\cr
 l_1,...,l_kMax\cr
 u_1,...,u_kMax\cr
 For 4 rows, the continuation region contains of two regions and the probability matrix is
-obtained analogeously (cf., Wassmer and Brannath, 2016).
+obtained analogously (cf., Wassmer and Brannath, 2016).
 }
 \examples{
 # Calculate Type I error rates in the two-sided group sequential setting when

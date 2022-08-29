@@ -14,17 +14,15 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6276 $
-## |  Last changed: $Date: 2022-06-09 14:07:33 +0200 (Thu, 09 Jun 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6523 $
+## |  Last changed: $Date: 2022-08-23 18:17:05 +0200 (Di, 23 Aug 2022) $
+## |  Last changed by: $Author: wassmer $
 ## | 
 
 #' @include f_core_utilities.R
 NULL
 
 #'
-#' @name SimulationResults_names
-#' 
 #' @title
 #' Names of a Simulation Results Object
 #'
@@ -2109,9 +2107,9 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
 #' @inheritParams param_grid
 #' @param type The plot type (default = \code{1}). The following plot types are available:
 #' \itemize{
-#'   \item \code{1}: creates a 'Overall Success' plot (multi-arm only)
-#'   \item \code{2}: creates a 'Success per Stage' plot (multi-arm only)
-#'   \item \code{3}: creates a 'Selected Arms per Stage' plot (multi-arm only)
+#'   \item \code{1}: creates a 'Overall Success' plot (multi-arm and enrichment only)
+#'   \item \code{2}: creates a 'Success per Stage' plot (multi-arm and enrichment  only)
+#'   \item \code{3}: creates a 'Selected Arms per Stage' plot (multi-arm and enrichment  only)
 #'   \item \code{4}: creates a 'Reject per Stage' or 'Rejected Arms per Stage' plot
 #'   \item \code{5}: creates a 'Overall Power and Early Stopping' plot
 #'   \item \code{6}: creates a 'Expected Number of Subjects and Power / Early Stop' or 
@@ -2119,11 +2117,11 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
 #'   \item \code{7}: creates an 'Overall Power' plot
 #'   \item \code{8}: creates an 'Overall Early Stopping' plot
 #'   \item \code{9}: creates an 'Expected Sample Size' or 'Expected Number of Events' plot
-#'   \item \code{10}: creates a 'Study Duration' plot (non-multi-arm survival only)
-#'   \item \code{11}: creates an 'Expected Number of Subjects' plot (non-multi-arm survival only)
-#'   \item \code{12}: creates an 'Analysis Times' plot (non-multi-arm survival only)
-#'   \item \code{13}: creates a 'Cumulative Distribution Function' plot (non-multi-arm survival only)
-#'   \item \code{14}: creates a 'Survival Function' plot (non-multi-arm survival only)
+#'   \item \code{10}: creates a 'Study Duration' plot (non-multi-arm and non-enrichment survival only)
+#'   \item \code{11}: creates an 'Expected Number of Subjects' plot (non-multi-arm and non-enrichment survival only)
+#'   \item \code{12}: creates an 'Analysis Times' plot (non-multi-arm and non-enrichment survival only)
+#'   \item \code{13}: creates a 'Cumulative Distribution Function' plot (non-multi-arm and non-enrichment survival only)
+#'   \item \code{14}: creates a 'Survival Function' plot (non-multi-arm and non-enrichment survival only)
 #'   \item \code{"all"}: creates all available plots and returns it as a grid plot or list
 #' }
 #' @inheritParams param_three_dots_plot
@@ -2153,6 +2151,7 @@ plot.SimulationResults <- function(x, y, ..., main = NA_character_,
 		
 	fCall = match.call(expand.dots = FALSE)
 	simulationResultsName <- deparse(fCall$x)
+    .assertGgplotIsInstalled()
 	.assertIsSingleInteger(grid, "grid", validateType = FALSE)
 	typeNumbers <- .getPlotTypeNumber(type, x)
 	if (is.null(plotSettings)) {
@@ -2189,8 +2188,6 @@ plot.SimulationResults <- function(x, y, ..., main = NA_character_,
 }
 
 #'
-#' @name SimulationResults_print
-#' 
 #' @title
 #' Print Simulation Results
 #' 
@@ -2373,7 +2370,7 @@ getData.SimulationResults <- function(x) {
 #' @description
 #' Returns the raw survival data which was generated for simulation.
 #' 
-#' @param x An \code{\link{SimulationResults}} object created by \code{\link{getSimulationSurvival}}.
+#' @param x A \code{\link{SimulationResults}} object created by \code{\link{getSimulationSurvival}}.
 #' @param aggregate Logical. If \code{TRUE} the raw data will be aggregated similar to
 #'        the result of \code{\link{getData}}, default is \code{FALSE}.
 #'

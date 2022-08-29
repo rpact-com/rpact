@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6238 $
-## |  Last changed: $Date: 2022-06-03 10:47:52 +0200 (Fri, 03 Jun 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6522 $
+## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include class_simulation_results.R
@@ -125,6 +125,12 @@ NULL
 #' and constant or non-constant piecewise accrual).
 #' Additionally, integers \code{allocation1} and \code{allocation2} can be specified that determine the number allocated
 #' to treatment group 1 and treatment group 2, respectively.
+#' More precisely, unequal randomization ratios must be specified via the two integer arguments \code{allocation1} and 
+#' \code{allocation2} which describe how many subjects are consecutively enrolled in each group, respectively, before a 
+#' subject is assigned to the other group. For example, the arguments \code{allocation1 = 2}, \code{allocation2 = 1}, 
+#' \code{maxNumberOfSubjects = 300} specify 2:1 randomization with 200 subjects randomized to intervention and 100 to 
+#' control. (Caveat: Do not use \code{allocation1 = 200}, \code{allocation2 = 100}, \code{maxNumberOfSubjects = 300} 
+#' as this would imply that the 200 intervention subjects are enrolled prior to enrollment of any control subjects.)
 #'
 #' \code{conditionalPower}\cr
 #' The definition of \code{thetaH1} makes only sense if \code{kMax} > 1
@@ -234,13 +240,13 @@ getSimulationSurvival <- function(design = NULL, ...,
         piecewiseSurvivalTime = NA_real_,
         allocation1 = 1, # C_ALLOCATION_1_DEFAULT
         allocation2 = 1, # C_ALLOCATION_2_DEFAULT
-        eventTime = 12L, # C_EVENT_TIME_DEFAULT
-        accrualTime = c(0L, 12L), # C_ACCRUAL_TIME_DEFAULT
+        eventTime = 12, # C_EVENT_TIME_DEFAULT
+        accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
         accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),
         dropoutRate1 = 0, # C_DROP_OUT_RATE_1_DEFAULT
         dropoutRate2 = 0, # C_DROP_OUT_RATE_2_DEFAULT
-        dropoutTime = 12L, # C_DROP_OUT_TIME_DEFAULT
+        dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
         maxNumberOfSubjects = NA_real_,
         plannedEvents = NA_real_,
         minNumberOfEventsPerStage = NA_real_,
@@ -806,24 +812,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         warning("Failed to calculate expected number of events", call. = FALSE)
     }
 
-    data <- resultData$data[!is.na(resultData$data$iterationNumber), ]
-
-    data$trialStop <- (data$rejectPerStage == 1 | data$futilityPerStage == 1 |
-        data$stageNumber == design$kMax)
-
-    if (!is.null(data$eventsPerStage) && !any(is.nan(data$eventsPerStage))) {
-        if (directionUpper) {
-            data$hazardRatioEstimateLR <- exp(data$logRankStatistic *
-                (1 + allocation1 / allocation2) / sqrt(allocation1 / allocation2 *
-					(data$overallEvents1 + data$overallEvents2)))
-        } else {
-            data$hazardRatioEstimateLR <- exp(-data$logRankStatistic *
-                (1 + allocation1 / allocation2) / sqrt(allocation1 / allocation2 *
-                    (data$overallEvents1 + data$overallEvents2)))
-        }
-    }
-
-    simulationResults$.data <- data
+    simulationResults$.data <- resultData$data[!is.na(resultData$data$iterationNumber), ]
 
     stages <- 1:design$kMax
     rawData <- resultData$rawData
@@ -831,6 +820,10 @@ getSimulationSurvival <- function(design = NULL, ...,
         rawData <- rawData[!is.na(rawData$iterationNumber), ]
     }
     if (!is.null(rawData) && nrow(rawData) > 0 && ncol(rawData) > 0) {
+        
+        rawData <- rawData[order(rawData$iterationNumber, rawData$subjectId),]
+        rownames(rawData) <- NULL
+        
         stopStageNumbers <- rawData$stopStage
         missingStageNumbers <- c()
         if (length(stopStageNumbers) > 0) {

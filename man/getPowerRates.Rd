@@ -77,7 +77,8 @@ The following generics (R generic functions) are available for this result objec
 }
 }
 \description{
-Returns the power, stopping probabilities, and expected sample size for testing rates in one or two samples at given sample sizes.
+Returns the power, stopping probabilities, and expected sample size for testing rates
+in one or two samples at given sample sizes.
 }
 \details{
 At given design the function calculates the power, stopping probabilities, and expected sample size,
@@ -87,7 +88,8 @@ In a two treatment groups design, additionally, an allocation ratio = n1/n2 can 
 If a null hypothesis value thetaH0 != 0 for testing the difference of two rates
 or \code{thetaH0 != 1} for testing the risk ratio is specified, the
 formulas according to Farrington & Manning (Statistics in Medicine, 1990) are used (only one-sided testing).
-Critical bounds and stopping for futility bounds are provided at the effect scale (rate, rate difference, or rate ratio, respectively).
+Critical bounds and stopping for futility bounds are provided at the effect scale
+(rate, rate difference, or rate ratio, respectively).
 For the two-sample case, the calculation here is performed at fixed pi2 as given as argument in the function.
 Note that the power calculation for rates is always based on the normal approximation.
 }

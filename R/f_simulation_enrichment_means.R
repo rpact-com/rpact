@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 5594 $
-## |  Last changed: $Date: 2021-11-26 15:24:35 +0100 (Fr, 26 Nov 2021) $
+## |  File version: $Revision: 6414 $
+## |  Last changed: $Date: 2022-07-15 09:17:18 +0200 (Fr, 15 Jul 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -354,7 +354,6 @@ NULL
 #' @inheritParams param_threshold
 #' @inheritParams param_effectList
 #' @inheritParams param_stDevSimulation
-#' @inheritParams param_populations
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
@@ -409,7 +408,6 @@ NULL
 #' @export
 #'
 getSimulationEnrichmentMeans <- function(design = NULL, ...,
-        populations = NA_integer_, # C_POPULATIONS_DEFAULT
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
         stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT,
@@ -453,7 +451,6 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
 
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design                      = design,
-        populations                 = populations,
         effectList                  = effectList,
         intersectionTest            = intersectionTest,
         stratifiedAnalysis          = stratifiedAnalysis,

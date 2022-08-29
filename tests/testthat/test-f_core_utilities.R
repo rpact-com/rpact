@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_core_utilities.R
-## |  Creation date: 23 February 2022, 14:05:49
-## |  File version: $Revision: 6291 $
-## |  Last changed: $Date: 2022-06-13 08:36:13 +0200 (Mon, 13 Jun 2022) $
+## |  Creation date: 12 August 2022, 09:09:46
+## |  File version: $Revision: 6514 $
+## |  Last changed: $Date: 2022-08-22 14:31:53 +0200 (Mo, 22 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Result Object Print Output")
+test_plan_section("Testing Result Object Print Output")
 
 
 test_that("The output does not contain any issues", {
@@ -31,9 +31,10 @@ test_that("The output does not contain any issues", {
 	expect_equal(sum(grepl("ISSUES", capture.output(getSampleSizeMeans(getDesignGroupSequential())$show()))), 0)
 	expect_equal(sum(grepl("ISSUES", capture.output(getSampleSizeRates()$show()))), 0)
 	expect_equal(sum(grepl("ISSUES", capture.output(getSampleSizeSurvival(getDesignInverseNormal(kMax = 2))$show()))), 0)
+
 })
 
-context("Testing Core Utility Functions")
+test_plan_section("Testing Core Utility Functions")
 
 
 test_that("'getValidatedInformationRates': 'informationRates' must be generated correctly based on specified 'kMax'", {
@@ -92,6 +93,10 @@ test_that("'getValidatedInformationRates': 'informationRates' must be generated 
 
 	design18 <- getTestDesign(kMax = 6L, designClass = "TrialDesignFisher")
 	expect_equal(.getValidatedInformationRates(design18), c(0.16666667, 0.33333333, 0.5, 0.66666667, 0.83333333, 1), tolerance = 1e-08)
+
+
+
+
 })
 
 test_that("'getValidatedInformationRates': 'informationRates' must be set correctly based on specified 'informationRates'", {
@@ -152,6 +157,9 @@ test_that("'getValidatedInformationRates': 'informationRates' must be set correc
 	design36 <- getTestDesign(informationRates = c(0.1333, 0.26667, 0.4, 0.53333, 0.8667, 1), designClass = "TrialDesignFisher")
 	expect_equal(.getValidatedInformationRates(design36), c(0.1333, 0.26667, 0.4, 0.53333, 0.8667, 1), tolerance = 1e-07)
 
+
+
+
 	design37 <- getTestDesign(futilityBounds = 2, designClass = "TrialDesignGroupSequential")
 	expect_equal(.getValidatedInformationRates(design37), c(0.5, 1), tolerance = 1e-07)
 
@@ -196,6 +204,10 @@ test_that("'getValidatedInformationRates': 'informationRates' must be set correc
 
 	design51 <- getTestDesign(futilityBounds = c(0.01, 0.01, 0.01, 0.5, 1), designClass = "TrialDesignFisher")
 	expect_equal(.getValidatedInformationRates(design51), c(0.16666667, 0.33333333, 0.5, 0.66666667, 0.83333333, 1), tolerance = 1e-07)
+
+
+
+
 })
 
 test_that("'getValidatedInformationRates': 'kMax' must be set correctly based on specified 'informationRates'", {
@@ -256,6 +268,9 @@ test_that("'getValidatedInformationRates': 'kMax' must be set correctly based on
 	design69 <- getTestDesign(informationRates = c(0.1333, 0.26667, 0.4, 0.53333, 0.8667, 1), designClass = "TrialDesignFisher")
 	expect_equal(design69$kMax, 6, tolerance = 1e-07)
 
+
+
+
 	design70 <- getTestDesign(futilityBounds = 2, designClass = "TrialDesignGroupSequential")
 	expect_equal(design70$kMax, 2, tolerance = 1e-07)
 
@@ -300,6 +315,10 @@ test_that("'getValidatedInformationRates': 'kMax' must be set correctly based on
 
 	design84 <- getTestDesign(futilityBounds = c(0.01, 0.01, 0.01, 0.5, 1), designClass = "TrialDesignFisher")
 	expect_equal(design84$kMax, 6, tolerance = 1e-07)
+
+
+
+
 })
 
 test_that("'getValidatedInformationRates': 'futilityBounds' must be generated correctly based on specified 'kMax'", {
@@ -426,6 +445,9 @@ test_that("'getValidatedInformationRates': 'futilityBounds' must be generated co
 	design124 <- getTestDesign(kMax = 20L, designClass = "TrialDesignInverseNormal")
 	expect_equal(.getValidatedFutilityBounds(design124), c(-6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6), tolerance = 1e-08)
 
+
+
+
 	design125 <- getTestDesign(kMax = 1L, designClass = "TrialDesignFisher")
 	expect_equal(.getValidatedAlpha0Vec(design125), numeric(0), tolerance = 1e-08)
 
@@ -443,6 +465,9 @@ test_that("'getValidatedInformationRates': 'futilityBounds' must be generated co
 
 	design130 <- getTestDesign(kMax = 6L, designClass = "TrialDesignFisher")
 	expect_equal(.getValidatedAlpha0Vec(design130), c(1, 1, 1, 1, 1), tolerance = 1e-08)
+
+
+
 })
 
 test_that("'getValidatedInformationRates': 'futilityBounds' must be set correctly based on specified 'futilityBounds'", {
@@ -563,6 +588,9 @@ test_that("'getValidatedInformationRates': 'futilityBounds' must be set correctl
 	design168 <- getTestDesign(futilityBounds = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2), designClass = "TrialDesignInverseNormal")
 	expect_equal(.getValidatedFutilityBounds(design168), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2), tolerance = 1e-07)
 
+
+
+
 	design169 <- getTestDesign(futilityBounds = 0.5, designClass = "TrialDesignFisher")
 	expect_equal(.getValidatedAlpha0Vec(design169), 0.5, tolerance = 1e-07)
 
@@ -577,6 +605,8 @@ test_that("'getValidatedInformationRates': 'futilityBounds' must be set correctl
 
 	design173 <- getTestDesign(futilityBounds = c(0.01, 0.01, 0.01, 0.5, 1), designClass = "TrialDesignFisher")
 	expect_equal(.getValidatedAlpha0Vec(design173), c(0.01, 0.01, 0.01, 0.5, 1), tolerance = 1e-07)
+
+
 
 	design174 <- getTestDesign(informationRates = c(0.4, 1), designClass = "TrialDesignGroupSequential")
 	expect_equal(.getValidatedFutilityBounds(design174), -6, tolerance = 1e-07)
@@ -692,6 +722,9 @@ test_that("'getValidatedInformationRates': 'futilityBounds' must be set correctl
 	design211 <- getTestDesign(informationRates = c(0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.68, 0.72, 0.76, 1), designClass = "TrialDesignInverseNormal")
 	expect_equal(.getValidatedFutilityBounds(design211), c(-6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6), tolerance = 1e-07)
 
+
+
+
 	design212 <- getTestDesign(informationRates = c(0.4, 1), designClass = "TrialDesignFisher")
 	expect_equal(.getValidatedAlpha0Vec(design212), 1, tolerance = 1e-07)
 
@@ -706,6 +739,9 @@ test_that("'getValidatedInformationRates': 'futilityBounds' must be set correctl
 
 	design216 <- getTestDesign(informationRates = c(0.1333, 0.26667, 0.4, 0.53333, 0.8667, 1), designClass = "TrialDesignFisher")
 	expect_equal(.getValidatedAlpha0Vec(design216), c(1, 1, 1, 1, 1), tolerance = 1e-07)
+
+
+
 })
 
 test_that("'getValidatedInformationRates': 'kMax' must be set correctly based on specified 'futilityBounds'", {
@@ -864,6 +900,9 @@ test_that("'getValidatedInformationRates': 'kMax' must be set correctly based on
 	.getValidatedFutilityBounds(design254)
 	expect_equal(design254$kMax, 20, tolerance = 1e-07)
 
+
+
+
 	design255 <- getTestDesign(futilityBounds = 0.5, designClass = "TrialDesignFisher")
 	.getValidatedAlpha0Vec(design255)
 	expect_equal(design255$kMax, 2, tolerance = 1e-07)
@@ -883,6 +922,8 @@ test_that("'getValidatedInformationRates': 'kMax' must be set correctly based on
 	design259 <- getTestDesign(futilityBounds = c(0.01, 0.01, 0.01, 0.5, 1), designClass = "TrialDesignFisher")
 	.getValidatedAlpha0Vec(design259)
 	expect_equal(design259$kMax, 6, tolerance = 1e-07)
+
+
 
 	design260 <- getTestDesign(informationRates = c(0.4, 1), designClass = "TrialDesignGroupSequential")
 	.getValidatedFutilityBounds(design260)
@@ -1036,6 +1077,9 @@ test_that("'getValidatedInformationRates': 'kMax' must be set correctly based on
 	.getValidatedFutilityBounds(design297)
 	expect_equal(design297$kMax, 20, tolerance = 1e-07)
 
+
+
+
 	design298 <- getTestDesign(informationRates = c(0.4, 1), designClass = "TrialDesignFisher")
 	.getValidatedAlpha0Vec(design298)
 	expect_equal(design298$kMax, 2, tolerance = 1e-07)
@@ -1055,14 +1099,28 @@ test_that("'getValidatedInformationRates': 'kMax' must be set correctly based on
 	design302 <- getTestDesign(informationRates = c(0.1333, 0.26667, 0.4, 0.53333, 0.8667, 1), designClass = "TrialDesignFisher")
 	.getValidatedAlpha0Vec(design302)
 	expect_equal(design302$kMax, 6, tolerance = 1e-07)
+
+
+
 })
 
-context("Testing Utilities")
+test_plan_section("Testing Utilities")
+
+
+test_that("Testing '.moveValue'", {
+    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "B"), c("A", "B", "E", "C", "D"))
+    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "A"), c("A", "E", "B", "C", "D"))
+    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "A", "E"), c("B", "C", "D", "E", "A"))
+    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "E"), c("A", "B", "C", "D", "E"))
+    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "A", "A"), c("A", "B", "C", "D", "E"))
+    expect_equal(.moveValue(c("A"), "A", "A"), c("A"))
+})
 
 test_that("Testing '.toCapitalized'", {
 	expect_equal(.toCapitalized("zip code"), "Zip Code")
 	expect_equal(.toCapitalized("state of the art"), "State of the Art")
 	expect_equal(.toCapitalized("final and count"), "Final and Count")
+
 })
 
 test_that("Testing '.equalsRegexpIgnoreCase'", {
@@ -1077,6 +1135,7 @@ test_that("Testing '.equalsRegexpIgnoreCase'", {
 
 	expect_equal(.equalsRegexpIgnoreCase("stages2", "stages?"), TRUE)
 	expect_equal(.equalsRegexpIgnoreCase("1stage2", "stages?"), TRUE)
+
 })
 
 test_that("Testing 'isUndefinedArgument' and 'isValidArgument'", {
@@ -1107,6 +1166,12 @@ test_that("Testing 'isUndefinedArgument' and 'isValidArgument'", {
 
 	expect_error(.isDefinedArgument(notExistingTestVariable, argumentExistsValidationEnabled = FALSE))
 	expect_error(.isDefinedArgument(notExistingTestVariable))
+
+	# skip_if_translated()
+	# expect_error(.isDefinedArgument(notExistingTestVariable),
+	# 	paste0("Missing argument: the object 'notExistingTestVariable' has not been defined anywhere. ",
+	# 	"Please define it first, e.g., run 'notExistingTestVariable <- 1'"), fixed = TRUE)
+
 })
 
 test_that("Result of 'setSeed(seed)' is working for different arguments, incl. NULL and NA", {
@@ -1129,6 +1194,7 @@ test_that("Result of 'setSeed(seed)' is working for different arguments, incl. N
 	expect_equal(.setSeed(123), 123)
 	expect_equal(.setSeed(0), 0)
 	expect_equal(.setSeed(5e-5), 5e-5)
+
 })
 
 test_that("Testing '.getInputForZeroOutputInsideTolerance''", {
@@ -1140,6 +1206,7 @@ test_that("Testing '.getInputForZeroOutputInsideTolerance''", {
 	expect_equal(.getInputForZeroOutputInsideTolerance(input, tolerance, tolerance), input)
 	expect_equal(.getInputForZeroOutputInsideTolerance(input, tolerance + epsilon, tolerance), NA_real_)
 	expect_equal(.getInputForZeroOutputInsideTolerance(input, tolerance - epsilon, tolerance), input)
+
 })
 
 test_that("Testing '.arrayToString'", {
@@ -1151,6 +1218,7 @@ test_that("Testing '.arrayToString'", {
 	expect_equal(.arrayToString(c(1, 2, NA), vectorLookAndFeelEnabled = TRUE), "c(1, 2, NA)")
 	expect_equal(.arrayToString(c(NA, NA, NA), vectorLookAndFeelEnabled = TRUE), "c(NA, NA, NA)")
 	expect_equal(.arrayToString(c(1, NULL, 3), vectorLookAndFeelEnabled = TRUE), "c(1, 3)")
+
 })
 
 test_that("Testing '.getQNorm'", {
@@ -1159,6 +1227,7 @@ test_that("Testing '.getQNorm'", {
 	expect_equal(.getQNorm(1 - 1e-12), qnorm(1 - 1e-12))
 	expect_equal(sign(.getQNorm(0)), sign(qnorm(0)))
 	expect_equal(.getQNorm(1e-12), qnorm(1e-12))
+
 })
 
 test_that("Testing '.getOneMinusQNorm'", {
@@ -1167,6 +1236,7 @@ test_that("Testing '.getOneMinusQNorm'", {
 	expect_equal(.getOneMinusQNorm(1 - 1e-12), -qnorm(1 - 1e-12))
 	expect_equal(sign(.getOneMinusQNorm(0)), sign(1 - qnorm(0)))
 	expect_equal(.getOneMinusQNorm(1e-12), -qnorm(1e-12))
+
 })
 
 test_that("Testing '.getInputProducingZeroOutput'", {
@@ -1197,6 +1267,7 @@ test_that("Testing '.getInputProducingZeroOutput'", {
 
 	expect_equal(.getInputProducingZeroOutput(1, tolerance - epsilon, 2, tolerance, tolerance), 1)
 	expect_equal(.getInputProducingZeroOutput(1, tolerance, 2, tolerance - epsilon, tolerance), 2)
+
 })
 
 test_that("Testing '.getOneDimensionalRoot'", {

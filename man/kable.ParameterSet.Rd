@@ -7,7 +7,7 @@
 kable.ParameterSet(x, ...)
 }
 \arguments{
-\item{x}{A \code{ParameterSet}. If x does not inherit from class \code{\link{ParameterSet}}, 
+\item{x}{A \code{ParameterSet}. If x does not inherit from class \code{\link{ParameterSet}},
 \code{knitr::kable(x)} will be returned.}
 
 \item{...}{Other arguments (see \code{\link[knitr]{kable}}).}
@@ -17,8 +17,8 @@ The \code{kable()} function returns the output of the specified object formatted
 }
 \details{
 Generic function to represent a parameter set in Markdown.
-Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to 
-specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the 
+Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
+specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
 top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
 that all headings will be written bold but are not explicit defined as header.
 }

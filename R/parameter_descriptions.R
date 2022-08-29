@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 5612 $
-## |  Last changed: $Date: 2021-12-02 17:34:44 +0100 (Do, 02 Dez 2021) $
+## |  File version: $Revision: 6522 $
+## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
 ## |  Last changed by: $Author: wassmer $
 ## | 
 
@@ -33,8 +33,7 @@ NULL
 NULL
 
 #' Parameter Description: Maximum Number of Stages
-#' @param kMax The maximum number of stages \code{K}. 
-#'   \code{K = 1, 2, 3, ...} (default is \code{3}).
+#' @param kMax The maximum number of stages \code{K}, default is \code{3}. 
 #'   The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 #'   \code{6} for Fisher combination test designs.  
 #' @name param_kMax
@@ -48,8 +47,8 @@ NULL
 NULL
 
 #' Parameter Description: Beta
-#' @param beta Type II error rate, necessary for providing sample size calculations \cr
-#'   (e.g., \code{\link{getSampleSizeMeans}}), beta spending function designs, 
+#' @param beta Type II error rate, necessary for providing sample size calculations 
+#' 	(e.g., \code{\link{getSampleSizeMeans}}), beta spending function designs, 
 #'   or optimum designs, default is \code{0.20}.
 #' @name param_beta
 #' @keywords internal
@@ -695,7 +694,7 @@ NULL
 NULL
 
 #' Parameter Description: Effect List
-#' @param effectList List of effect sizes with columns and number of rows 
+#' @param effectList List of subsets, prevalences, and effect sizes with columns and number of rows 
 #'   reflecting the different situations to consider (see examples).
 #' @name param_effectList
 #' @keywords internal
@@ -708,7 +707,7 @@ NULL
 NULL
 
 #' Parameter Description: Populations
-#' @param populations The number of populations in a two-sample comparison, default is \code{3}. 
+#' @param populations The number of populations in a two-sample comparison, no default. 
 #' @name param_populations
 #' @keywords internal
 NULL
@@ -788,14 +787,14 @@ NULL
 #' @keywords internal
 NULL
 
-#' Parameter Description: RValue
+#' Parameter Description: R Value
 #' @param rValue For \code{typeOfSelection = "rbest"} (select the \code{rValue} best treatment arms / populations), 
 #'   the parameter \code{rValue} has to be specified.
 #' @name param_rValue
 #' @keywords internal
 NULL
 
-#' Parameter Description: EpsilonValue
+#' Parameter Description: Epsilon Value
 #' @param epsilonValue For \code{typeOfSelection = "epsilon"} (select treatment arm / population not worse than 
 #'   epsilon compared to the best), the parameter \code{epsilonValue} has to be specified.
 #' @name param_epsilonValue

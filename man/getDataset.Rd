@@ -113,9 +113,9 @@ datasetOfMeans
 datasetOfMeans$show(showType = 2)
 \donttest{
 datasetOfMeans <- getDataset(
-    overallSampleSizes = c(22, 33, 55, 66),
-    overallMeans = c(1.000, 1.033, 1.020, 1.017),
-    overallStDevs = c(1.00, 1.38, 1.64, 1.58)
+    cumulativeSampleSizes = c(22, 33, 55, 66),
+    cumulativeMeans = c(1.000, 1.033, 1.020, 1.017),
+    cumulativeStDevs = c(1.00, 1.38, 1.64, 1.58)
 )
 datasetOfMeans
 datasetOfMeans$show(showType = 2)
@@ -157,15 +157,15 @@ datasetOfMeans
 # Create a Dataset of Means (three groups) where the comparison of 
 # treatment arm 1 to control is dropped at the second interim stage:
 datasetOfMeans <- getDataset(
-   overallN1      = c(22, 33, NA),
-   overallN2      = c(20, 34, 56),
-   overallN3      = c(22, 31, 52),
-   overallMeans1  = c(1.64, 1.54, NA),
-   overallMeans2  = c(1.7, 1.5, 1.77),
-   overallMeans3  = c(2.5, 2.06, 2.99),
-   overallStDevs1 = c(1.5, 1.9, NA),
-   overallStDevs2 = c(1.3, 1.3, 1.1),
-   overallStDevs3 = c(1, 1.3, 1.8))
+   cumN1      = c(22, 33, NA),
+   cumN2      = c(20, 34, 56),
+   cumN3      = c(22, 31, 52),
+   cumMeans1  = c(1.64, 1.54, NA),
+   cumMeans2  = c(1.7, 1.5, 1.77),
+   cumMeans3  = c(2.5, 2.06, 2.99),
+   cumStDevs1 = c(1.5, 1.9, NA),
+   cumStDevs2 = c(1.3, 1.3, 1.1),
+   cumStDevs3 = c(1, 1.3, 1.8))
 datasetOfMeans
 
 # Create a Dataset of Rates (one group):
@@ -197,9 +197,9 @@ datasetOfRates
 
 # Create a Survival Dataset
 datasetSurvival <- getDataset(
-    overallEvents = c(8, 15, 19, 31),
-    overallAllocationRatios = c(1, 1, 1, 2),
-    overallLogRanks = c(1.52, 1.98, 1.99, 2.11)
+    cumEvents = c(8, 15, 19, 31),
+    cumAllocationRatios = c(1, 1, 1, 2),
+    cumLogRanks = c(1.52, 1.98, 1.99, 2.11)
 )
 datasetSurvival
  

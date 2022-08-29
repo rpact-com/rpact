@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6040 $
-## |  Last changed: $Date: 2022-04-21 13:00:04 +0200 (Do, 21 Apr 2022) $
+## |  File version: $Revision: 6497 $
+## |  Last changed: $Date: 2022-08-17 13:32:36 +0200 (Wed, 17 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -192,7 +192,7 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
                 .futilityPerStage <- probs$futilityProbabilities
             } else {
                 if (sided == 2) {
-                    if (.design$typeOfDesign == C_TYPE_OF_DESIGN_PT) {
+					if (.design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(.design$typeBetaSpending) && .design$typeBetaSpending != "none") {
                         futilityBounds[is.na(futilityBounds)] <- 0
                         decisionMatrix <- matrix(c(
                             -criticalValues - theta * sqrt(nMax * informationRates),
@@ -216,7 +216,7 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
                 }
 
                 probs <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
-
+					
                 if (nrow(probs) == 3) {
                     .averageSampleNumber <- nMax - sum((probs[3, 1:(kMax - 1)] - probs[2, 1:(kMax - 1)] + probs[1, 1:(kMax - 1)]) *
                         (informationRates[kMax] - informationRates[1:(kMax - 1)]) * nMax)
@@ -242,6 +242,7 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
                     .rejectPerStage <- probs[3, 1:kMax] - probs[2, 1:kMax]
                     if (kMax > 1) {
                         .futilityPerStage <- probs[1, 1:(kMax - 1)]
+                        .rejectPerStage <- .getNoEarlyEfficacyZeroCorrectedValues(.design, .rejectPerStage)
                     }
                 }
 
@@ -277,8 +278,6 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
 )
 
 #'
-#' @name PowerAndAverageSampleNumberResult_as.data.frame
-#'
 #' @title
 #' Coerce Power And Average Sample Number Result to a Data Frame
 #'
@@ -308,8 +307,7 @@ as.data.frame.PowerAndAverageSampleNumberResult <- function(x, row.names = NULL,
         optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
     parameterNames <- x$.getVisibleFieldNames()
     parameterNames <- parameterNames[parameterNames != "nMax"]
-    dataFrame <- x$.getAsDataFrame(
-        parameterNames = parameterNames,
+    dataFrame <- .getAsDataFrame(parameterSet = x, parameterNames = parameterNames,
         niceColumnNamesEnabled = niceColumnNamesEnabled, includeAllParameters = includeAllParameters,
         tableColumnNames = .getTableColumnNames(design = x$.design)
     )

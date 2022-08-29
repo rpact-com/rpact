@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_parameter_set_utilities.R
-## |  Creation date: 23 February 2022, 14:06:28
-## |  File version: $Revision: 6265 $
-## |  Last changed: $Date: 2022-06-08 14:07:39 +0200 (Wed, 08 Jun 2022) $
+## |  Creation date: 12 August 2022, 09:11:30
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Parameter Set Utility Functions")
+test_plan_section("Testing Parameter Set Utility Functions")
 
 
 test_that("'.getParameterValueFormatted' produce correct results if parameter is an array", {

@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_base_survival.R
-## |  Creation date: 10 June 2022, 10:57:52
-## |  File version: $Revision: 6287 $
-## |  Last changed: $Date: 2022-06-10 12:24:18 +0200 (Fri, 10 Jun 2022) $
+## |  Creation date: 12 August 2022, 09:11:41
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Simulation Survival Function")
+test_plan_section("Testing Simulation Survival Function")
 
 
 test_that("'getSimulationSurvival': configuration 1", {
@@ -1266,7 +1266,7 @@ test_that("'getSimulationSurvival': test expected warnings and errors", {
 
 })
 
-context("Testing the Simulation of Survival Data for Different Parameter Variants")
+test_plan_section("Testing the Simulation of Survival Data for Different Parameter Variants")
 
 
 test_that("'getSimulationSurvival': Fixed sample size with minimum required definitions, pi1 = c(0.4, 0.5, 0.6) and pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default", {

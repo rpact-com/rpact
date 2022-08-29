@@ -8,9 +8,9 @@
 A basic class for multi-arm analysis results.
 }
 \details{
-\code{AnalysisResultsMultiArm} is the basic class for 
+\code{AnalysisResultsMultiArm} is the basic class for
 \itemize{
-  \item \code{\link{AnalysisResultsMultiArmFisher}}, 
+  \item \code{\link{AnalysisResultsMultiArmFisher}},
   \item \code{\link{AnalysisResultsMultiArmInverseNormal}}, and
   \item \code{\link{AnalysisResultsConditionalDunnett}}.
 }

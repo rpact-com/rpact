@@ -13,12 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6287 $
-## |  Last changed: $Date: 2022-06-10 12:24:18 +0200 (Fri, 10 Jun 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6507 $
+## |  Last changed: $Date: 2022-08-18 11:23:56 +0200 (Do, 18 Aug 2022) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
+#' @include f_logger.R
 NULL
 
 #' @title
@@ -68,7 +69,7 @@ NULL
 #'        \code{"overallPooled"}, \code{"pairwisePooled"}, and \code{"notPooled"}, default is \code{"overallPooled"}.
 #'       For enrichment designs, the options are: \code{"pooled"}, \code{"pooledFromFull"} (one subset only),
 #'       and \code{"notPooled"}, default is \code{"pooled"}.}
-#'   \item{\code{thetaH1} and \code{assumedStDevs} or \code{piTreatments}, \code{piControl}}{The
+#'   \item{\code{thetaH1} and \code{assumedStDevs} or \code{piTreatments}, \code{piControls}}{The
 #'       assumed effect size or assumed rates to calculate the conditional power in multi-arm trials
 #'       or enrichment designs. For survival designs, \code{thetaH1} refers to the hazard ratio.
 #'       You can specify a value or a vector with elements referring to the
@@ -251,8 +252,7 @@ getAnalysisResults <- function(design, dataInput, ...,
                     stringWrapParagraphWidth = NULL
                 )))
                 options("rpact.analyis.repeated.p.values.warnings.enabled" = "FALSE")
-                warning("Repeated p-values not available at final stage because there is 'typeOfDesign' = '",
-                    design$typeOfDesign, "'",
+                warning("Repeated p-values not available for automatic recalculation of boundaries at final stage",
                     call. = FALSE
                 )
             } else {
@@ -2040,7 +2040,7 @@ getFinalConfidenceInterval <- function(design, dataInput, ...,
         stageResults, iterations = 0, seed = NA_real_) {
     .warnInCaseOfUnknownArguments(
         functionName =
-            ".getConditionalRejectionProbabilitiesFisherSimulated", ignore = c("design"), ...
+            ".getConditionalRejectionProbabilitiesFisherSimulated", ignore = c("design", "simulateCRP"), ...
     )
 
     design <- stageResults$.design

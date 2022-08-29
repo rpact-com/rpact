@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_base_survival.R
-## |  Creation date: 23 February 2022, 14:01:42
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:06:47
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing the Analysis Survival Functionality for the Group Sequential Design")
+test_plan_section("Testing the Analysis Survival Functionality for the Group Sequential Design")
 
 
 test_that("'getAnalysisResults' for a two-stage group sequential design and survival data", {
@@ -393,7 +393,7 @@ test_that("'getAnalysisResults' for a three-stage ggroup sequential design and s
 
 })
 
-context("Testing the Analysis Survival Functionality for the Inverse Normal Design")
+test_plan_section("Testing the Analysis Survival Functionality for the Inverse Normal Design")
 
 
 test_that("'getAnalysisResults' for a three-stage inverse normal design and survival data", {
@@ -702,7 +702,7 @@ test_that("'getAnalysisResults' for a three-stage inverse normal design and surv
 
 })
 
-context("Testing the Analysis Survival Functionality for the Fisher Design")
+test_plan_section("Testing the Analysis Survival Functionality for the Fisher Design")
 
 
 test_that("'getAnalysisResults' for a three-stage Fisher design and 'bindingFutility = TRUE'", {

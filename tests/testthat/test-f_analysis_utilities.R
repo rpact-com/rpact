@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_utilities.R
-## |  Creation date: 18 March 2022, 10:58:32
-## |  File version: $Revision: 6279 $
-## |  Last changed: $Date: 2022-06-09 17:48:13 +0200 (Thu, 09 Jun 2022) $
+## |  Creation date: 12 August 2022, 09:09:45
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing the Function Get Observed Information Rates")
+test_plan_section("Testing the Function Get Observed Information Rates")
 
 
 test_that("'getObservedInformationRates': final-stage", {

@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_multiarm_survival.R
-## |  Creation date: 10 June 2022, 12:27:59
-## |  File version: $Revision: 6288 $
-## |  Last changed: $Date: 2022-06-10 13:23:18 +0200 (Fri, 10 Jun 2022) $
+## |  Creation date: 12 August 2022, 09:12:36
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Simulation Multi-Arm Survival Function")
+test_plan_section("Testing Simulation Multi-Arm Survival Function")
 
 
 test_that("'getSimulationMultiArmSurvival': several configurations", {

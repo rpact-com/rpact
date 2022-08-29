@@ -12,7 +12,7 @@
 
 <meta name="author" content="Friedrich Pahlke and Gernot Wassmer" />
 
-<meta name="date" content="2022-06-15" />
+<meta name="date" content="2022-08-24" />
 
 <title>Getting started with rpact</title>
 
@@ -26,22 +26,6 @@ document.addEventListener('DOMContentLoaded', function(e) {
     if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
     a = h.attributes;
     while (a.length > 0) h.removeAttribute(a[0].name);
-  }
-});
-</script>
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
   }
 });
 </script>
@@ -255,11 +239,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Getting started with rpact</h1>
 <h4 class="author">Friedrich Pahlke and Gernot Wassmer</h4>
-<h4 class="date">2022-06-15</h4>
+<h4 class="date">2022-08-24</h4>
 
 
 
-<p>Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.</p>
+<p>Confirmatory Adaptive Clinical Trial Design, Simulation, and
+Analysis.</p>
 <div id="functional-range" class="section level2">
 <h2>Functional Range</h2>
 <ul>
@@ -277,12 +262,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>Fixed sample design and designs with interim analysis stages</li>
 <li>Simulation tool for means, rates, and survival data
 <ul>
-<li>Assessment of adaptive sample size/event number recalculations based on conditional power</li>
-<li>Assessment of treatment selection strategies in multi-arm trials</li>
+<li>Assessment of adaptive sample size/event number recalculations based
+on conditional power</li>
+<li>Assessment of treatment selection strategies in multi-arm
+trials</li>
 </ul></li>
 <li>Adaptive analysis of means, rates, and survival data</li>
 <li>Adaptive designs and analysis for multi-arm trials</li>
-<li>Simulation and analysis for enrichment designs testing means, rates, and hazard ratios</li>
+<li>Simulation and analysis for enrichment designs testing means, rates,
+and hazard ratios</li>
 </ul>
 </div>
 <div id="learn-to-use-rpact" class="section level2">
@@ -297,33 +285,44 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </blockquote>
 <div id="vignettes" class="section level3">
 <h3>Vignettes</h3>
-<p>The vignettes are hosted at <a href="https://www.rpact.com/vignettes">www.rpact.com/vignettes</a> and cover the following topics:</p>
+<p>The vignettes are hosted at <a href="https://www.rpact.com/vignettes">www.rpact.com/vignettes</a> and
+cover the following topics:</p>
 <ol style="list-style-type: decimal">
 <li>Defining group-sequential boundaries</li>
-<li>Designing group-sequential trials with two groups and a continuous endpoint</li>
+<li>Designing group-sequential trials with two groups and a continuous
+endpoint</li>
 <li>Designing group-sequential trials with a binary endpoint</li>
-<li>Designing group-sequential trials with two groups and a survival endpoint</li>
-<li>Simulation-based design of group-sequential trials with a survival endpoint</li>
-<li>An example to illustrate boundary re-calculations during the trial</li>
+<li>Designing group-sequential trials with two groups and a survival
+endpoint</li>
+<li>Simulation-based design of group-sequential trials with a survival
+endpoint</li>
+<li>An example to illustrate boundary re-calculations during the
+trial</li>
 <li>Analysis of a group-sequential trial with a survival endpoint</li>
 <li>Defining accrual time and accrual intensity</li>
 <li>How to use R generics with <code>rpact</code></li>
 <li>How to create admirable plots with <code>rpact</code></li>
-<li>Comparing sample size and power calculation results for a group-sequential trial with a survival endpoint: <a href="https://cran.r-project.org/package=rpact">rpact</a> vs. <a href="https://cran.r-project.org/package=gsDesign">gsDesign</a></li>
+<li>Comparing sample size and power calculation results for a
+group-sequential trial with a survival endpoint: <a href="https://cran.r-project.org/package=rpact">rpact</a> vs. <a href="https://cran.r-project.org/package=gsDesign">gsDesign</a></li>
 <li>Supplementing and enhancing rpact’s graphical capabilities with <a href="https://cran.r-project.org/package=ggplot2">ggplot2</a></li>
-<li>Using the inverse normal combination test for analyzing a trial with continuous endpoint and potential sample size reassessment</li>
+<li>Using the inverse normal combination test for analyzing a trial with
+continuous endpoint and potential sample size reassessment</li>
 <li>Planning a trial with binary endpoints</li>
 <li>Planning a survival trial</li>
-<li>Simulation of a trial with a binary endpoint and unblinded sample size re-calculation</li>
+<li>Simulation of a trial with a binary endpoint and unblinded sample
+size re-calculation</li>
 <li>How to create summaries</li>
 <li>How to create analysis result (one- and multi-arm) plots</li>
 <li>How to create simulation result (one- and multi-arm) plots</li>
 <li>Simulating multi-arm designs with a continuous endpoint</li>
 <li>Analysis of a multi-arm design with a binary endpoint</li>
 <li>Step-by-Step rpact Tutorial</li>
-<li>Planning and Analyzing a Group-Sequential Multi-Arm-Multi-Stage Design with Binary Endpoint using rpact</li>
-<li>Two-arm analysis for continuous data with covariates from raw data (<em>exclusive</em>)</li>
-<li>How to install the latest developer version (<em>exclusive</em>)</li>
+<li>Planning and Analyzing a Group-Sequential Multi-Arm-Multi-Stage
+Design with Binary Endpoint using rpact</li>
+<li>Two-arm analysis for continuous data with covariates from raw data
+(<em>exclusive</em>)</li>
+<li>How to install the latest developer version
+(<em>exclusive</em>)</li>
 </ol>
 </div>
 </div>
@@ -332,17 +331,24 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="workflow" class="section level3">
 <h3>Workflow</h3>
 <ul>
-<li>Everything is starting with a design, e.g.: <code>design &lt;- getDesignGroupSequential()</code></li>
-<li>Find the optimal design parameters with help of <code>rpact</code> comparison tools: <code>getDesignSet</code></li>
-<li>Calculate the required sample size, e.g.: <code>getSampleSizeMeans()</code>, <code>getPowerMeans()</code></li>
-<li>Simulate specific characteristics of an adaptive design, e.g.: <code>getSimulationMeans()</code></li>
-<li>Collect your data, import it into R and create a dataset: <code>data &lt;- getDataset()</code></li>
-<li>Analyze your data: <code>getAnalysisResults(design, data)</code></li>
+<li>Everything is starting with a design, e.g.:
+<code>design &lt;- getDesignGroupSequential()</code></li>
+<li>Find the optimal design parameters with help of <code>rpact</code>
+comparison tools: <code>getDesignSet</code></li>
+<li>Calculate the required sample size, e.g.:
+<code>getSampleSizeMeans()</code>, <code>getPowerMeans()</code></li>
+<li>Simulate specific characteristics of an adaptive design, e.g.:
+<code>getSimulationMeans()</code></li>
+<li>Collect your data, import it into R and create a dataset:
+<code>data &lt;- getDataset()</code></li>
+<li>Analyze your data:
+<code>getAnalysisResults(design, data)</code></li>
 </ul>
 </div>
 <div id="focus-on-usability" class="section level3">
 <h3>Focus on Usability</h3>
-<p>The most important <code>rpact</code> functions have intuitive names:</p>
+<p>The most important <code>rpact</code> functions have intuitive
+names:</p>
 <ul>
 <li><code>getDesign</code>[<code>GroupSequential</code>/<code>InverseNormal</code>/<code>Fisher</code>]<code>()</code></li>
 <li><code>getDesignCharacteristics()</code></li>
@@ -353,11 +359,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><code>getAnalysisResults()</code></li>
 <li><code>getStageResults()</code></li>
 </ul>
-<p>RStudio/Eclipse: auto code completion makes it easy to use these functions.</p>
+<p>RStudio/Eclipse: auto code completion makes it easy to use these
+functions.</p>
 </div>
 <div id="r-generics" class="section level3">
 <h3>R generics</h3>
-<p>In general, everything runs with the R standard functions which are always present in R: so-called R generics, e.g., <code>print</code>, <code>summary</code>, <code>plot</code>, <code>as.data.frame</code>, <code>names</code>, <code>length</code></p>
+<p>In general, everything runs with the R standard functions which are
+always present in R: so-called R generics, e.g., <code>print</code>,
+<code>summary</code>, <code>plot</code>, <code>as.data.frame</code>,
+<code>names</code>, <code>length</code></p>
 </div>
 <div id="utilities" class="section level3">
 <h3>Utilities</h3>
@@ -368,24 +378,35 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><code>getNumberOfSubjects()</code></li>
 <li><code>getEventProbabilities()</code></li>
 <li><code>getPiecewiseExponentialDistribution()</code></li>
-<li>survival helper functions for conversion of <code>pi</code>, <code>lambda</code> and <code>median</code>, e.g., <code>getLambdaByMedian()</code></li>
-<li><code>testPackage()</code>: installation qualification on a client computer or company server (via unit tests)</li>
+<li>survival helper functions for conversion of <code>pi</code>,
+<code>lambda</code> and <code>median</code>, e.g.,
+<code>getLambdaByMedian()</code></li>
+<li><code>testPackage()</code>: installation qualification on a client
+computer or company server (via unit tests)</li>
 </ul>
 </div>
 </div>
 <div id="validation" class="section level2">
 <h2>Validation</h2>
-<p>Please <a href="https://www.rpact.com/contact">contact</a> us to learn how to use <code>rpact</code> on FDA/GxP-compliant validated corporate computer systems and how to get a copy of the formal validation documentation that is customized and licensed for exclusive use by your company, e.g., to fulfill regulatory requirements.</p>
+<p>Please <a href="https://www.rpact.com/contact">contact</a> us to
+learn how to use <code>rpact</code> on FDA/GxP-compliant validated
+corporate computer systems and how to get a copy of the formal
+validation documentation that is customized and licensed for exclusive
+use by your company, e.g., to fulfill regulatory requirements.</p>
 </div>
 <div id="about" class="section level2">
 <h2>About</h2>
 <ul>
-<li><strong>rpact</strong> is a comprehensive validated<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> R package for clinical research which
+<li><strong>rpact</strong> is a comprehensive validated<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> R package for clinical
+research which
 <ul>
-<li>enables the design and analysis of confirmatory adaptive group sequential designs</li>
+<li>enables the design and analysis of confirmatory adaptive group
+sequential designs</li>
 <li>is a powerful sample size calculator</li>
 <li>is a free of charge open-source software licensed under <a href="https://cran.r-project.org/web/licenses/LGPL-3">LGPL-3</a></li>
-<li>particularly, implements the methods described in the recent monograph by <a href="https://doi.org/10.1007%2F978-3-319-32562-0">Wassmer and Brannath (2016)</a></li>
+<li>particularly, implements the methods described in the recent
+monograph by <a href="https://doi.org/10.1007%2F978-3-319-32562-0">Wassmer and Brannath
+(2016)</a></li>
 </ul></li>
 </ul>
 <blockquote>
@@ -397,7 +418,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>enterprise software development services</li>
 <li>technical support for the <code>rpact</code> package</li>
 <li>consultancy and user training for clinical research using R</li>
-<li>validated software solutions and R package development for clinical research</li>
+<li>validated software solutions and R package development for clinical
+research</li>
 </ul></li>
 </ul>
 <blockquote>
@@ -411,10 +433,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="https://www.rpact.com/contact">www.rpact.com/contact</a></li>
 </ul>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>The rpact validation documentation is available exclusively for our customers and supporting companies. For more information visit <a href="https://www.rpact.com/services/sla">www.rpact.com/services/sla</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>The rpact validation documentation is available
+exclusively for our customers and supporting companies. For more
+information visit <a href="https://www.rpact.com/services/sla">www.rpact.com/services/sla</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 

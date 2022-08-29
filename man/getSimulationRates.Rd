@@ -244,7 +244,7 @@ getPowerRates(designIN, pi1 = seq(0.3, 0.6, 0.1), pi2 = 0.3, maxNumberOfSubjects
 
 # Assess power and average sample size if a sample size reassessment is 
 # foreseen at conditional power 80\% for the subsequent stage (decrease and increase) 
-# based on observed overall rates and specified minNumberOfSubjectsPerStage 
+# based on observed overall (cumulative) rates and specified minNumberOfSubjectsPerStage 
 # and maxNumberOfSubjectsPerStage
 
 # Do the same under the assumption that a sample size increase only takes place 

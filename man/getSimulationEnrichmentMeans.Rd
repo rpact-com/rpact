@@ -7,7 +7,6 @@
 getSimulationEnrichmentMeans(
   design = NULL,
   ...,
-  populations = NA_integer_,
   effectList = NULL,
   intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
   stratifiedAnalysis = TRUE,
@@ -40,9 +39,7 @@ and \code{sided} can be directly entered as argument where necessary.}
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{populations}{The number of populations in a two-sample comparison, default is \code{3}.}
-
-\item{effectList}{List of effect sizes with columns and number of rows 
+\item{effectList}{List of subsets, prevalences, and effect sizes with columns and number of rows 
 reflecting the different situations to consider (see examples).}
 
 \item{intersectionTest}{Defines the multiple test for the intersection 
@@ -226,14 +223,14 @@ simResultsPE <- getSimulationEnrichmentMeans(design = ds,
 print(simResultsPE)
 
 # Assess the design characteristics of a user defined selection
-# strategy in a two-stage design with no interim efficacy stop
+# strategy in a three-stage design with no interim efficacy stop
 # using the inverse normal method for combining the stages.
 # Only the second interim is used for a selecting of a study
 # population. There is a small probability for stopping the trial
 # at the first interim.
 
 # Define design
-ds <- getDesignInverseNormal(typeOfDesign = "asOF", kMax = 3)
+ds <- getDesignInverseNormal(typeOfDesign = "noEarlyEfficacy", kMax = 3)
 
 # Define selection function
 mySelection <- function(effectVector, stage) {

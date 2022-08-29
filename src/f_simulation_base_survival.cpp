@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6285 $
- * Last changed: $Date: 2022-06-10 10:49:23 +0200 (Fri, 10 Jun 2022) $
+ * File version: $Revision: 6501 $
+ * Last changed: $Date: 2022-08-17 14:55:43 +0200 (Mi, 17 Aug 2022) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -189,7 +189,7 @@ NumericVector getTestStatistics(int stage, int designNumber, NumericVector infor
 	if (designNumber == 2) {
 
 		if (stage == 1) {
-			return NumericVector::create(logRankOverStages[0], NA_REAL);
+			return NumericVector::create(logRankOverStages[0], 1 - getNormalDistribution((double) logRankOverStages[0]));
 		}
 
 		NumericVector independentIncrements = getIndependentIncrements(stage, eventsPerStage, logRankOverStages);
@@ -202,7 +202,8 @@ NumericVector getTestStatistics(int stage, int designNumber, NumericVector infor
 					independentIncrements[indices2])) /
 			sqrt((double) informationRates[stage - 1]);
 
-		return NumericVector::create(value, NA_REAL);
+		double pValueSeparate = 1 - getNormalDistribution((double) independentIncrements[stage - 1]);
+		return NumericVector::create(value, pValueSeparate);
 	}
 
 	// Fisher design
@@ -417,6 +418,7 @@ NumericMatrix getSimulationStepResultsSurvival(
 				trialStopEventCounter++;
 			}
 		} else { // all other designs
+			pValuesSeparate[k - 1] = testStatistic[1];
 			if ((sided == 1 && testStatistic[0] >= criticalValues[k - 1]) ||
 					(sided == 2 && std::abs((double) testStatistic[0]) >= criticalValues[k - 1])) {
 				rejections[k - 1]++;
@@ -628,7 +630,7 @@ List getSimulationSurvivalCpp(
 	NumericVector conditionalPowerAchieved = NumericVector(simResultsVectorLength, NA_REAL);
 
 	// raw datasets per stage
-	int rawDataVectorLength = maxNumberOfRawDatasetsPerStage * n * kMax *maxNumberOfSubjects;
+	int rawDataVectorLength = maxNumberOfRawDatasetsPerStage * n * kMax * maxNumberOfSubjects;
 	IntegerVector rawDataPerStage = IntegerVector(kMax, 0);
 
 	NumericVector rawDataIterationNumbers = NumericVector(rawDataVectorLength, NA_REAL);
@@ -754,14 +756,17 @@ List getSimulationSurvivalCpp(
 
 			// get raw datasets per stage
 			if (maxNumberOfRawDatasetsPerStage > 0) {
+				double lastObservationTime = stepResults(kMax - 1, 15);
 				for (int k = kMax - 1; k >= 0; k--) {
-					if (rawDataPerStage[k] < maxNumberOfRawDatasetsPerStage && stepResults(k, 9) > 0) {
+					int numberOfIterations = stepResults(k, 9);
+					int numberOfRejections = stepResults(k, 5);
+					int numberOfFutilityStops = stepResults(k, 7);
+					if (rawDataPerStage[k] < maxNumberOfRawDatasetsPerStage && numberOfIterations > 0) {
 
 						int start = k * maxNumberOfSubjects + pi1Index * kMax * maxNumberOfSubjects +
 								rawDataPerStage[k] * n * kMax * maxNumberOfSubjects;
 
 						double observationTime = stepResults(k, 15);
-
 						if (R_IsNA(observationTime)) {
 							break;
 						}
@@ -777,7 +782,11 @@ List getSimulationSurvivalCpp(
 						for (int i = 0; i < maxNumberOfSubjects; i++) {
 							rawDataPi1Values[start + i] = pi1;
 							rawDataIterationNumbers[start + i] = iterationIndex + 1;
-							rawDataStageNumbers[start + i] = k + 1;
+							if (numberOfRejections == 0 && numberOfFutilityStops == 0) {
+								rawDataStageNumbers[start + i] = kMax;
+							} else {
+								rawDataStageNumbers[start + i] = k + 1;
+							}
 
 							rawDataSubjectIds[start + i] = i + 1;
 							rawDataAccrualTime[start + i] = accrualTime[i];
@@ -785,7 +794,11 @@ List getSimulationSurvivalCpp(
 							rawDataSurvivalTime[start + i] = survivalTime[i];
 							rawDataDropoutTime[start + i] = dropoutTime[i];
 
-							rawDataObservationTime[start + i] = observationTime;
+							if (numberOfRejections == 0 && numberOfFutilityStops == 0) {
+								rawDataObservationTime[start + i] = lastObservationTime;
+							} else {
+								rawDataObservationTime[start + i] = observationTime;
+							}
 							rawDataTimeUnderObservation[start + i] = timeUnderObservation[i];
 							rawDataEvent[start + i] = event[i];
 							rawDataDropoutEvent[start + i] = dropoutEvent[i];
@@ -797,7 +810,11 @@ List getSimulationSurvivalCpp(
 							}
 						}
 
-						rawDataPerStage[k]++;
+						if (numberOfRejections == 0 && numberOfFutilityStops == 0) {
+							rawDataPerStage[kMax - 1]++;
+						} else {
+							rawDataPerStage[k]++;
+						}
 
 						break;
 					}
@@ -844,6 +861,19 @@ List getSimulationSurvivalCpp(
 		Named("conditionalPowerAchieved") = vectorDivide(conditionalPowerAchievedSum, iterationsSum)
 	);
 
+	LogicalVector trialStop = LogicalVector(simResultsVectorLength, NA_LOGICAL);
+	NumericVector hazardRatioEstimateLR = NumericVector(simResultsVectorLength, NA_REAL);
+    double logRankStatisticSign = directionUpper ? 1 : -1;
+	for (int i = 0; i < rejections.length(); i++) {
+		trialStop[i] = (rejections[i] == 1 || futilityStops[i] == 1 || stageNumbers[i] == kMax);
+
+		if (!R_IsNA((double) events[i])) {
+			hazardRatioEstimateLR[i] = exp(logRankStatisticSign * logRankStatistics[i] *
+				(1 + allocation1 / allocation2) / sqrt(allocation1 / allocation2 *
+					(events1[i] + events2[i])));
+		}
+	}
+
 	DataFrame data = DataFrame::create(
 		Named("iterationNumber") = iterationNumbers,
 		Named("stageNumber") = stageNumbers,
@@ -861,7 +891,9 @@ List getSimulationSurvivalCpp(
 		Named("testStatistic") = testStatistics,
 		Named("logRankStatistic") = logRankStatistics,
 		Named("conditionalPowerAchieved") = conditionalPowerAchieved,
-		Named("pValuesSeparate") = pValuesSeparate
+		Named("pValuesSeparate") = pValuesSeparate,
+		Named("trialStop") = trialStop,
+		Named("hazardRatioEstimateLR") = hazardRatioEstimateLR
 	);
 
 	if (maxNumberOfRawDatasetsPerStage > 0) {
@@ -877,7 +909,7 @@ List getSimulationSurvivalCpp(
 			Named("survivalTime") = rawDataSurvivalTime,
 			Named("dropoutTime") = rawDataDropoutTime,
 
-			Named("observationTime") = rawDataObservationTime,
+			Named("lastObservationTime") = rawDataObservationTime, // deprecated: observationTime
 			Named("timeUnderObservation") = rawDataTimeUnderObservation,
 			Named("event") = rawDataEvent,
 			Named("dropoutEvent") = rawDataDropoutEvent,

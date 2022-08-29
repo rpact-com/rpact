@@ -8,7 +8,7 @@
 Class for analysis results results based on an inverse normal design.
 }
 \details{
-This object cannot be created directly; use \code{\link{getAnalysisResults}} 
+This object cannot be created directly; use \code{\link{getAnalysisResults}}
 with suitable arguments to create the analysis results of a inverse normal design.
 }
 

@@ -13,12 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6293 $
-## |  Last changed: $Date: 2022-06-14 07:19:38 +0200 (Tue, 14 Jun 2022) $
+## |  File version: $Revision: 6514 $
+## |  Last changed: $Date: 2022-08-22 14:31:53 +0200 (Mo, 22 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_constants.R
+#' @include f_logger.R
 NULL
 
 utils::globalVariables(".parallelComputingCluster")
@@ -44,140 +45,6 @@ utils::globalVariables(".parallelComputingArguments")
             return(NA_character_)
         }
     )
-}
-
-#'
-#' @title
-#' Set Log Level
-#'
-#' @description
-#' Sets the \code{rpact} log level.
-#'
-#' @param logLevel The new log level to set. Can be one of
-#'        "PROGRESS", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "DISABLED".
-#'        Default is "PROGRESS".
-#'
-#' @details
-#' This function sets the log level of the \code{rpact} internal log message system.
-#' By default only calculation progress messages will be shown on the output console,
-#' particularly \code{\link{getAnalysisResults}} shows this kind of messages.
-#' The output of these messages can be disabled by setting the log level to \code{"DISABLED"}.
-#'
-#' @seealso
-#' \itemize{
-#'   \item \code{\link{getLogLevel}} for getting the current log level,
-#'   \item \code{\link{resetLogLevel}} for resetting the log level to default.
-#' }
-#'
-#' @examples
-#' \dontrun{
-#' # show debug messages
-#' setLogLevel("DEBUG")
-#'
-#' # disable all log messages
-#' setLogLevel("DISABLED")
-#' }
-#'
-#' @keywords internal
-#'
-#' @export
-#'
-setLogLevel <- function(logLevel = c(
-            "PROGRESS", "ERROR", "WARN",
-            "INFO", "DEBUG", "TRACE", "DISABLED"
-        )) {
-    logLevel <- match.arg(logLevel)
-
-    if (!is.character(logLevel) || !(logLevel %in% c(
-            C_LOG_LEVEL_TRACE,
-            C_LOG_LEVEL_DEBUG,
-            C_LOG_LEVEL_INFO,
-            C_LOG_LEVEL_WARN,
-            C_LOG_LEVEL_ERROR,
-            C_LOG_LEVEL_PROGRESS,
-            C_LOG_LEVEL_DISABLED
-        ))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'logLevel' must be one of ",
-            "c(", paste(paste0("'", c(
-                C_LOG_LEVEL_TRACE,
-                C_LOG_LEVEL_DEBUG,
-                C_LOG_LEVEL_INFO,
-                C_LOG_LEVEL_WARN,
-                C_LOG_LEVEL_ERROR,
-                C_LOG_LEVEL_PROGRESS,
-                C_LOG_LEVEL_DISABLED
-            ), "'"), collapse = ", "), ")"
-        )
-    }
-
-    Sys.setenv("RPACT_LOG_LEVEL" = logLevel)
-}
-
-#'
-#' @title
-#' Get Log Level
-#'
-#' @description
-#' Returns the current \code{rpact} log level.
-#'
-#' @details
-#' This function gets the log level of the \code{rpact} internal log message system.
-#'
-#' @seealso
-#' \itemize{
-#'   \item \code{\link{setLogLevel}} for setting the log level,
-#'   \item \code{\link{resetLogLevel}} for resetting the log level to default.
-#' }
-#'
-#' @return Returns a \code{\link[base]{character}} of length 1 specifying the current log level.
-#'
-#' @examples
-#' # show current log level
-#' getLogLevel()
-#' 
-#' @keywords internal
-#'
-#' @export
-#'
-getLogLevel <- function() {
-    logLevel <- Sys.getenv("RPACT_LOG_LEVEL")
-    if (logLevel == "") {
-        logLevel <- C_LOG_LEVEL_PROGRESS
-        Sys.setenv("RPACT_LOG_LEVEL" = logLevel)
-    }
-    return(logLevel)
-}
-
-#'
-#' @title
-#' Reset Log Level
-#'
-#' @description
-#' Resets the \code{rpact} log level.
-#'
-#' @details
-#' This function resets the log level of the \code{rpact} internal log message
-#' system to the default value \code{"PROGRESS"}.
-#'
-#' @seealso
-#' \itemize{
-#'   \item \code{\link{getLogLevel}} for getting the current log level,
-#'   \item \code{\link{setLogLevel}} for setting the log level.
-#' }
-#'
-#' @examples
-#' \dontrun{
-#' # reset log level to default value
-#' resetLogLevel()
-#' }
-#'
-#' @keywords internal
-#'
-#' @export
-#'
-resetLogLevel <- function() {
-    setLogLevel(C_LOG_LEVEL_PROGRESS)
 }
 
 .createParallelComputingCluster <- function() {
@@ -540,60 +407,6 @@ resetLogLevel <- function() {
     }
 
     return(paste0("list(", result, ")"))
-}
-
-#
-# @title
-# Set Seed
-#
-# @description
-# Sets the seed, generates it if \code{is.na(seed) == TRUE} and returns it.
-#
-# @param seed the seed to set.
-#
-# @details
-# Internal function.
-#
-# @return the (generated) seed.
-#
-# @examples
-#
-# .setSeed(12345)
-#
-# mySeed <- .setSeed()
-#
-# @keywords internal
-#
-.setSeed <- function(seed = NA_real_) {
-    if (!is.null(seed) && !is.na(seed)) {
-        if (is.na(as.integer(seed))) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'seed' must be a valid integer")
-        }
-
-        set.seed(seed = seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
-        return(seed)
-    }
-
-    if (exists(".Random.seed") && length(.Random.seed) > 0) {
-        seed <- .Random.seed[length(.Random.seed)]
-    } else {
-        seed <- round(stats::runif(1) * 1e8)
-    }
-
-    .logDebug("Set seed to %s", seed)
-
-    tryCatch(
-        {
-            set.seed(seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
-        },
-        error = function(e) {
-            .logError("Failed to set seed to '%s' (%s): %s", seed, .getClassName(seed), e)
-            seed <- NA_real_
-            traceback()
-        }
-    )
-
-    invisible(seed)
 }
 
 .getInputForZeroOutputInsideTolerance <- function(input, output, tolerance = .Machine$double.eps^0.25) {
@@ -1016,85 +829,7 @@ resetLogLevel <- function() {
     return(firstValue < secondValue)
 }
 
-.logBase <- function(s, ..., logLevel) {
-    if (length(list(...)) > 0) {
-        cat(paste0("[", logLevel, "]"), sprintf(s, ...), "\n")
-    } else {
-        cat(paste0("[", logLevel, "]"), s, "\n")
-    }
-}
 
-.logTrace <- function(s, ...) {
-    if (getLogLevel() == C_LOG_LEVEL_TRACE) {
-        .logBase(s, ..., logLevel = C_LOG_LEVEL_TRACE)
-    }
-}
-
-.logDebug <- function(s, ...) {
-    if (getLogLevel() %in% c(C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG)) {
-        .logBase(s, ..., logLevel = C_LOG_LEVEL_DEBUG)
-    }
-}
-
-.logInfo <- function(s, ...) {
-    if (getLogLevel() %in% c(
-            C_LOG_LEVEL_TRACE,
-            C_LOG_LEVEL_DEBUG, C_LOG_LEVEL_INFO
-        )) {
-        .logBase(s, ..., logLevel = C_LOG_LEVEL_INFO)
-    }
-}
-
-.logWarn <- function(s, ...) {
-    if (getLogLevel() %in% c(
-            C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG,
-            C_LOG_LEVEL_INFO, C_LOG_LEVEL_WARN
-        )) {
-        .logBase(s, ..., logLevel = C_LOG_LEVEL_WARN)
-    }
-}
-
-.logError <- function(s, ...) {
-    if (getLogLevel() %in% c(
-            C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG,
-            C_LOG_LEVEL_INFO, C_LOG_LEVEL_WARN, C_LOG_LEVEL_ERROR
-        )) {
-        .logBase(s, ..., logLevel = C_LOG_LEVEL_ERROR)
-    }
-}
-
-.getRuntimeString <- function(startTime, ..., endTime = Sys.time(), runtimeUnits = c("secs", "auto"), addBrackets = FALSE) {
-    runtimeUnits <- match.arg(runtimeUnits)
-    if (runtimeUnits == "secs") {
-        time <- as.numeric(difftime(endTime, startTime, units = "secs"))
-        time <- round(time, ifelse(time < 1, 4, 2))
-        timeStr <- paste0(time, " secs")
-    } else {
-        timeStr <- format(difftime(endTime, startTime))
-    }
-    if (addBrackets) {
-        timeStr <- paste0("[", timeStr, "]")
-    }
-    return(timeStr)
-}
-
-.logProgress <- function(s, ..., startTime, runtimeUnits = c("secs", "auto")) {
-    if (!(getLogLevel() %in% c(
-            C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG,
-            C_LOG_LEVEL_INFO, C_LOG_LEVEL_WARN,
-            C_LOG_LEVEL_ERROR, C_LOG_LEVEL_PROGRESS
-        ))) {
-        return(invisible())
-    }
-
-    runtimeUnits <- match.arg(runtimeUnits)
-    timeStr <- .getRuntimeString(startTime, runtimeUnits = runtimeUnits, addBrackets = TRUE)
-    if (length(list(...)) > 0) {
-        cat(paste0("[", C_LOG_LEVEL_PROGRESS, "]"), sprintf(s, ...), timeStr, "\n")
-    } else {
-        cat(paste0("[", C_LOG_LEVEL_PROGRESS, "]"), s, timeStr, "\n")
-    }
-}
 
 .setParameterType <- function(parameterSet, parameterName, parameterType) {
     if (is.null(parameterSet)) {
@@ -1171,649 +906,6 @@ resetLogLevel <- function() {
     return(values)
 }
 
-# cf. testthat::skip_on_cran()
-.skipTestIfDisabled <- function() {
-    if (!isTRUE(.isCompleteUnitTestSetEnabled()) &&
-            base::requireNamespace("testthat", quietly = TRUE)) {
-        testthat::skip("Test is disabled")
-    }
-}
-
-.skipTestIfNotX64 <- function() {
-    if (!.isMachine64Bit() && !.isMinimumRVersion4() && base::requireNamespace("testthat", quietly = TRUE)) {
-        testthat::skip("The test is only intended for R version 4.x or 64-bit computers (x86-64)")
-    }
-}
-
-.isMachine64Bit <- function() {
-    return(Sys.info()[["machine"]] == "x86-64")
-}
-
-.isMinimumRVersion4 <- function() {
-    return(R.Version()$major >= 4)
-}
-
-.getTestthatResultLine <- function(fileContent) {
-    if (grepl("\\[ OK:", fileContent)) {
-        indexStart <- regexpr("\\[ OK: \\d", fileContent)[[1]]
-        indexEnd <- regexpr("FAILED: \\d{1,5} \\]", fileContent)
-        indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
-        resultPart <- substr(fileContent, indexStart, indexEnd)
-        return(resultPart)
-    }
-
-    indexStart <- regexpr("\\[ FAIL \\d", fileContent)[[1]]
-    if (indexStart == -1) {
-        return("[ FAIL 0 | WARN 0 | SKIP 0 | PASS 14868 ]")
-    }
-
-    indexEnd <- regexpr("PASS \\d{1,5} \\]", fileContent)
-    indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
-    resultPart <- substr(fileContent, indexStart, indexEnd)
-    return(resultPart)
-}
-
-.getTestthatResultNumberOfFailures <- function(fileContent) {
-    if (grepl("FAILED:", fileContent)) {
-        line <- .getTestthatResultLine(fileContent)
-        index <- regexpr("FAILED: \\d{1,5} \\]", line)
-        indexStart <- index[[1]] + 8
-        indexEnd <- index[[1]] + attr(index, "match.length") - 3
-        return(substr(line, indexStart, indexEnd))
-    }
-
-    line <- .getTestthatResultLine(fileContent)
-    index <- regexpr("FAIL \\d{1,5} ", line)
-    indexStart <- index[[1]] + 5
-    indexEnd <- index[[1]] + attr(index, "match.length") - 2
-    return(substr(line, indexStart, indexEnd))
-}
-
-.getTestthatResultNumberOfSkippedTests <- function(fileContent) {
-    if (grepl("SKIPPED:", fileContent)) {
-        line <- .getTestthatResultLine(fileContent)
-        index <- regexpr("SKIPPED: \\d{1,5} {1,1}", line)
-        indexStart <- index[[1]] + 9
-        indexEnd <- index[[1]] + attr(index, "match.length") - 2
-        return(substr(line, indexStart, indexEnd))
-    }
-
-    line <- .getTestthatResultLine(fileContent)
-    index <- regexpr("SKIP \\d{1,5} {1,1}", line)
-    indexStart <- index[[1]] + 5
-    indexEnd <- index[[1]] + attr(index, "match.length") - 2
-    return(substr(line, indexStart, indexEnd))
-}
-
-# testFileTargetDirectory <- "D:/R/_temp/test_debug"
-.downloadUnitTests <- function(testFileTargetDirectory, ..., token, secret,
-        method = "auto", mode = "wb", cacheOK = TRUE, extra = getOption("download.file.extra"),
-        cleanOldFiles = TRUE, connectionType = c("http", "ftp", "pkg")) {
-    .assertIsSingleCharacter(testFileTargetDirectory, "testFileTargetDirectory")
-    .assertIsSingleCharacter(token, "token")
-    .assertIsSingleCharacter(secret, "secret")
-    connectionType <- match.arg(connectionType)
-
-    if (grepl("testthat(/|\\\\)?$", testFileTargetDirectory)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'testFileTargetDirectory' (", testFileTargetDirectory, ") must not end with 'testthat'"
-        )
-    }
-
-    if (cleanOldFiles) {
-        unlink(testFileTargetDirectory, recursive = TRUE)
-    }
-    dir.create(testFileTargetDirectory, recursive = TRUE)
-
-    testthatSubDirectory <- file.path(testFileTargetDirectory, "testthat")
-    if (!dir.exists(testthatSubDirectory)) {
-        dir.create(testthatSubDirectory, recursive = TRUE)
-    }
-
-    if (connectionType == "ftp") {
-        suppressWarnings(.downloadUnitTestsViaFtp(
-            testFileTargetDirectory = testFileTargetDirectory,
-            testthatSubDirectory = testthatSubDirectory,
-            token = token, secret = secret, method = method, mode = mode,
-            cacheOK = cacheOK, extra = extra
-        ))
-    } else if (connectionType == "http") {
-        suppressWarnings(.downloadUnitTestsViaHttp(
-            testFileTargetDirectory = testFileTargetDirectory,
-            testthatSubDirectory = testthatSubDirectory,
-            token = token, secret = secret
-        ))
-    } else if (connectionType == "pkg") {
-        .prepareUnitTestFiles(extra, testFileTargetDirectory, token, secret)
-    }
-}
-
-.prepareUnitTestFiles <- function(packageSource, testFileTargetDirectory, token, secret) {
-    if (is.null(packageSource)) {
-        return(invisible())
-    }
-
-    .assertIsValidCipher("token", token)
-    .assertIsValidCipher("secret", secret)
-
-    .assertIsSingleCharacter(packageSource, "packageSource")
-    if (!file.exists(packageSource)) {
-        warning(sQuote("packageSource"), " (", packageSource, ") does not exist")
-    }
-
-    if (!grepl("\\.tar\\.gz$", packageSource)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " must have a .tar.gz extension")
-    }
-
-    unlinkFile <- FALSE
-    if (grepl("^http", packageSource)) {
-        tempFile <- tempfile(fileext = ".tar.gz")
-        if (utils::download.file(packageSource, tempFile) != 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(packageSource), " seems to be an invalid URL")
-        }
-        packageSource <- tempFile
-        unlinkFile <- TRUE
-    }
-
-    testthatTempDirectory <- NULL
-    tryCatch(
-        {
-            contentLines <- utils::untar(packageSource, list = TRUE)
-            if (!("rpact/DESCRIPTION" %in% contentLines) || !("rpact/tests/testthat/" %in% contentLines)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " is not an rpact package source file")
-            }
-
-            testthatTempDirectory <- file.path(testFileTargetDirectory, "temp")
-            utils::untar(packageSource, files = c(
-                "rpact/tests/testthat.R",
-                "rpact/tests/testthat/"
-            ), exdir = testthatTempDirectory)
-            testthatTempSubDirectory <- file.path(testthatTempDirectory, "rpact", "tests")
-            testFiles <- list.files(testthatTempSubDirectory, pattern = "\\.R$", recursive = TRUE)
-            for (testFile in testFiles) {
-                file.copy(file.path(testthatTempSubDirectory, testFile), file.path(testFileTargetDirectory, testFile))
-            }
-            message(length(testFiles), " extracted from ", sQuote(packageSource), " and copied to ", sQuote(testFileTargetDirectory))
-        },
-        finally = {
-            if (!is.null(testthatTempDirectory)) {
-                unlink(testthatTempDirectory, recursive = TRUE)
-            }
-            if (unlinkFile) {
-                unlink(packageSource)
-            }
-        }
-    )
-}
-
-.downloadUnitTestsViaHttp <- function(testFileTargetDirectory, ..., testthatSubDirectory, token, secret) {
-    indexFile <- file.path(testFileTargetDirectory, "index.html")
-    currentFile <- NA_character_
-    tryCatch(
-        {
-            version <- utils::packageVersion("rpact")
-            baseUrl <- paste0("http://", token, ":", secret, "@unit.tests.rpact.com/", version, "/tests/")
-
-            if (!dir.exists(testFileTargetDirectory)) {
-                dir.create(testFileTargetDirectory)
-            }
-            if (!dir.exists(testthatSubDirectory)) {
-                dir.create(testthatSubDirectory)
-            }
-
-            testthatBaseFile <- system.file("tests", "testthat.R", package = "rpact")
-            if (file.exists(testthatBaseFile)) {
-                file.copy(testthatBaseFile, file.path(testFileTargetDirectory, "testthat.R"))
-            } else {
-                currentFile <- "testthat.R"
-                result <- download.file(
-                    url = paste0(baseUrl, "testthat.R"),
-                    destfile = file.path(testFileTargetDirectory, "testthat.R"),
-                    method = "auto", mode = "wb"
-                )
-                if (result != 0) {
-                    warning("'testthat.R' download result in ", result)
-                }
-            }
-
-            currentFile <- "index.txt"
-            result <- download.file(
-                url = paste0(baseUrl, "testthat/index.txt"),
-                destfile = indexFile, quiet = TRUE,
-                method = "auto", mode = "wb"
-            )
-            if (result != 0) {
-                warning("Unit test index file download result in ", result)
-            }
-
-            lines <- .readLinesFromFile(indexFile)
-            lines <- lines[grepl("\\.R", lines)]
-            testFiles <- gsub("\\.R<.*", ".R", lines)
-            testFiles <- gsub(".*>", "", testFiles)
-            testFiles <- gsub(" *$", "", testFiles)
-            if (length(testFiles) == 0) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "online source does not contain any unit test files"
-                )
-            }
-
-            startTime <- Sys.time()
-            message("Start to download ", length(testFiles), " unit test files (http). Please wait...")
-            for (testFile in testFiles) {
-                currentFile <- testFile
-                result <- download.file(
-                    url = paste0(baseUrl, "testthat/", testFile),
-                    destfile = file.path(testthatSubDirectory, testFile), quiet = TRUE,
-                    method = "auto", mode = "wb"
-                )
-            }
-            message(
-                length(testFiles), " unit test files downloaded successfully (needed ",
-                .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
-            )
-        },
-        warning = function(w) {
-            if (grepl("404 Not Found", w$message)) {
-                stop(
-                    C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "failed to download unit test files (http): file ", sQuote(currentFile), " not found"
-                )
-            }
-        },
-        error = function(e) {
-            if (grepl(C_EXCEPTION_TYPE_RUNTIME_ISSUE, e$message)) {
-                stop(e$message)
-            }
-            .logDebug(e$message)
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "failed to download unit test files (http): illegal 'token' / 'secret' or rpact version ", version, " unknown"
-            )
-        },
-        finally = {
-            if (file.exists(indexFile)) {
-                tryCatch(
-                    {
-                        file.remove(indexFile)
-                    },
-                    error = function(e) {
-                        warning("Failed to remove unit test index file: ", e$message, call. = FALSE)
-                    }
-                )
-            }
-        }
-    )
-}
-
-.downloadUnitTestsViaFtp <- function(testFileTargetDirectory, ..., testthatSubDirectory, token, secret,
-        method = "auto", mode = "wb", cacheOK = TRUE, extra = getOption("download.file.extra")) {
-    indexFile <- file.path(testFileTargetDirectory, "index.html")
-    tryCatch(
-        {
-            version <- utils::packageVersion("rpact")
-            baseUrl <- paste0("ftp://", token, ":", secret, "@ftp.rpact.com/", version, "/tests/")
-
-            testthatBaseFile <- system.file("tests", "testthat.R", package = "rpact")
-            if (file.exists(testthatBaseFile)) {
-                file.copy(testthatBaseFile, file.path(testFileTargetDirectory, "testthat.R"))
-            } else {
-                result <- download.file(
-                    url = paste0(baseUrl, "testthat.R"),
-                    destfile = file.path(testFileTargetDirectory, "testthat.R"),
-                    method = method, quiet = TRUE, mode = mode,
-                    cacheOK = cacheOK, extra = extra, headers = NULL
-                )
-                if (result != 0) {
-                    warning("'testthat.R' download result in ", result)
-                }
-            }
-
-            result <- download.file(
-                url = paste0(baseUrl, "testthat/"),
-                destfile = indexFile,
-                method = method, quiet = TRUE, mode = mode,
-                cacheOK = cacheOK, extra = extra, headers = NULL
-            )
-            if (result != 0) {
-                warning("Unit test index file download result in ", result)
-            }
-
-            lines <- .readLinesFromFile(indexFile)
-            lines <- lines[grepl("\\.R", lines)]
-            testFiles <- gsub("\\.R<.*", ".R", lines)
-            testFiles <- gsub(".*>", "", testFiles)
-            if (length(testFiles) == 0) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "online source does not contain any unit test files"
-                )
-            }
-
-            startTime <- Sys.time()
-            message("Start to download ", length(testFiles), " unit test files (ftp). Please wait...")
-            for (testFile in testFiles) {
-                result <- download.file(
-                    url = paste0(baseUrl, "testthat/", testFile),
-                    destfile = file.path(testthatSubDirectory, testFile),
-                    method = method, quiet = TRUE, mode = mode,
-                    cacheOK = cacheOK,
-                    extra = extra,
-                    headers = NULL
-                )
-            }
-            message(
-                length(testFiles), " unit test files downloaded successfully (needed ",
-                .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
-            )
-        },
-        error = function(e) {
-            .logDebug(e$message)
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "failed to download unit test files (ftp): illegal 'token' / 'secret' or rpact version ", version, " unknown"
-            )
-        },
-        finally = {
-            if (file.exists(indexFile)) {
-                tryCatch(
-                    {
-                        file.remove(indexFile)
-                    },
-                    error = function(e) {
-                        warning("Failed to remove unit test index file: ", e$message, call. = FALSE)
-                    }
-                )
-            }
-        }
-    )
-}
-
-.getConnectionArgument <- function(connection, name = c(
-            "token", "secret", "method",
-            "mode", "cacheEnabled", "extra", "cleanOldFiles", "connectionType"
-        )) {
-    if (is.null(connection) || !is.list(connection)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'connection' must be a list (is ", .getClassName(connection), ")")
-    }
-
-    name <- match.arg(name)
-    defaultValues <- list(
-        "token" = NULL,
-        "secret" = NULL,
-        "method" = "auto",
-        "mode" = "wb",
-        "cacheEnabled" = TRUE,
-        "extra" = getOption("download.file.extra"),
-        "cleanOldFiles" = TRUE,
-        "connectionType" = "http"
-    )
-
-    value <- connection[[name]]
-    if (is.null(value)) {
-        return(defaultValues[[name]])
-    }
-
-    return(value)
-}
-
-#' @title
-#' Test Package
-#
-#' @description
-#' This function allows the installed package \code{rpact} to be tested.
-#'
-#' @param outDir The output directory where all test results shall be saved.
-#'     By default the current working directory is used.
-#' @param completeUnitTestSetEnabled If \code{TRUE} (default) all existing unit tests will
-#'     be executed; a subset of all unit tests will be used otherwise.
-#' @param types The type(s) of tests to be done. Can be one or more of
-#'     \code{c("tests", "examples", "vignettes")}, default is "tests" only.
-#' @param connection A \code{list} where owners of the rpact validation documentation
-#'     can enter a \code{token} and a \code{secret} to get full access to all unit tests, e.g.,
-#'     to fulfill regulatory requirements (see \href{https://www.rpact.com}{www.rpact.com} for more information).
-#' @inheritParams param_three_dots
-#'
-#' @details
-#' This function creates the subdirectory \code{rpact-tests} in the specified output directory
-#' and copies all unit test files of the package to this newly created directory.
-#' Then the function runs all tests (or a subset of all tests if
-#' \code{completeUnitTestSetEnabled} is \code{FALSE}) using
-#' \code{\link[tools]{testInstalledPackage}}.
-#' The test results will be saved to the text file \code{testthat.Rout} that can be found
-#' in the subdirectory \code{rpact-tests}.
-#'
-#' @return The value of \code{completeUnitTestSetEnabled} will be returned invisible.
-#'
-#' @examples
-#' \dontrun{
-#' testPackage()
-#' }
-#'
-#' @export
-#'
-testPackage <- function(outDir = ".", ...,
-        completeUnitTestSetEnabled = TRUE,
-        types = "tests",
-        connection = list(token = NULL, secret = NULL)) {
-    .assertTestthatIsInstalled()
-    .assertMnormtIsInstalled()
-
-    if (!dir.exists(outDir)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test output directory '", outDir, "' does not exist"
-        )
-    }
-
-    startTime <- Sys.time()
-
-    Sys.setenv("LANGUAGE" = "EN")
-    on.exit(Sys.unsetenv("LANGUAGE"))
-
-    temp <- .isCompleteUnitTestSetEnabled()
-    on.exit(Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = temp), add = TRUE)
-    Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = completeUnitTestSetEnabled)
-
-    debug <- .getOptionalArgument("debug", ...)
-    if (!is.null(debug) && length(debug) == 1 && isTRUE(as.logical(debug))) {
-        setLogLevel(C_LOG_LEVEL_DEBUG)
-    } else {
-        setLogLevel(C_LOG_LEVEL_DISABLED)
-    }
-    on.exit(resetLogLevel(), add = TRUE)
-
-    token <- .getConnectionArgument(connection, "token")
-    secret <- .getConnectionArgument(connection, "secret")
-    fullTestEnabled <- (!is.null(token) && !is.null(secret) &&
-        length(token) == 1 && length(secret) == 1 &&
-        !is.na(token) && !is.na(secret))
-
-    if (completeUnitTestSetEnabled && fullTestEnabled) {
-        cat("Run all tests. Please wait...\n")
-        cat("Have a break - it takes about 30 minutes.\n")
-        cat("Exceution of all available unit tests startet at ",
-            format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
-            sep = ""
-        )
-    } else if (!fullTestEnabled) {
-        cat("Run a small subset of all tests. Please wait...\n")
-        cat("This is just a quick test (see comments below).\n")
-        cat("The entire test will take only some seconds.\n")
-    } else {
-        cat("Run a subset of all tests. Please wait...\n")
-        cat("This is just a quick test, i.e., all time consuming tests will be skipped.\n")
-        cat("The entire test will take about a minute.\n")
-    }
-
-    if (outDir == ".") {
-        outDir <- getwd()
-    }
-
-    oldResultFiles <- c(
-        file.path(outDir, "rpact-tests", "testthat.Rout"),
-        file.path(outDir, "rpact-tests", "testthat.Rout.fail")
-    )
-    for (oldResultFile in oldResultFiles) {
-        if (file.exists(oldResultFile)) {
-            file.remove(oldResultFile)
-        }
-    }
-
-    pkgName <- "rpact"
-    if (!fullTestEnabled) {
-        tools::testInstalledPackage(pkg = pkgName, outDir = outDir, types = types)
-    } else {
-        testFileTargetDirectory <- file.path(outDir, paste0(pkgName, "-tests"))
-        .downloadUnitTests(
-            testFileTargetDirectory = testFileTargetDirectory,
-            token = token,
-            secret = secret,
-            method = .getConnectionArgument(connection, "method"),
-            mode = .getConnectionArgument(connection, "mode"),
-            cacheOK = .getConnectionArgument(connection, "cacheEnabled"),
-            extra = .getConnectionArgument(connection, "extra"),
-            cleanOldFiles = .getConnectionArgument(connection, "cleanOldFiles"),
-            connectionType = .getConnectionArgument(connection, "connectionType")
-        )
-        .testInstalledPackage(
-            testFileDirectory = testFileTargetDirectory,
-            pkgName = pkgName, outDir = testFileTargetDirectory, Ropts = ""
-        )
-    }
-
-    outDir <- file.path(outDir, paste0(pkgName, "-tests"))
-
-    endTime <- Sys.time()
-
-    if (completeUnitTestSetEnabled) {
-        cat("Test exceution ended at ",
-            format(endTime, "%H:%M (%d-%B-%Y)"), "\n",
-            sep = ""
-        )
-    }
-
-    cat("Total runtime for testing: ", .getRuntimeString(startTime, endTime = endTime, runtimeUnits = "auto"), ".\n", sep = "")
-
-    inputFileName <- file.path(outDir, "testthat.Rout")
-    if (file.exists(inputFileName)) {
-        fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
-        if (completeUnitTestSetEnabled && fullTestEnabled) {
-            cat("All unit tests were completed successfully, i.e., the installation \n",
-                "qualification was successful.\n",
-                sep = ""
-            )
-        } else {
-            cat("Unit tests were completed successfully.\n", sep = "")
-        }
-        cat("Results:\n")
-        cat(.getTestthatResultLine(fileContent), "\n")
-        cat("\n")
-        cat("Test results were written to directory \n",
-            "'", outDir, "' (see file 'testthat.Rout')\n",
-            sep = ""
-        )
-        skipped <- .getTestthatResultNumberOfSkippedTests(fileContent)
-        if (skipped > 0) {
-            cat("-------------------------------------------------------------------------\n")
-            cat("Note that ", skipped, " tests were skipped; ",
-                "a possible reason may be that expected \n",
-                "error messages could not be tested ",
-                "because of local translation.\n",
-                sep = ""
-            )
-        }
-        cat("-------------------------------------------------------------------------\n")
-        cat("Please visit www.rpact.com to learn how to use rpact on FDA/GxP-compliant \n",
-            "validated corporate computer systems and how to get a copy of the formal \n",
-            "validation documentation that is customized and licensed for exclusive use \n",
-            "by your company/organization, e.g., to fulfill regulatory requirements.\n",
-            sep = ""
-        )
-    } else {
-        inputFileName <- file.path(outDir, "testthat.Rout.fail")
-        if (file.exists(inputFileName)) {
-            fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
-            if (completeUnitTestSetEnabled) {
-                cat(.getTestthatResultNumberOfFailures(fileContent),
-                    " unit tests failed, i.e., the installation qualification was not successful.\n",
-                    sep = ""
-                )
-            } else {
-                cat(.getTestthatResultNumberOfFailures(fileContent), " unit tests failed :(\n", sep = "")
-            }
-            cat("Results:\n")
-            cat(.getTestthatResultLine(fileContent), "\n")
-            cat("Test results were written to directory '", outDir, "' (see file 'testthat.Rout.fail')\n", sep = "")
-        }
-    }
-    if (!fullTestEnabled) {
-        cat("-------------------------------------------------------------------------\n")
-        cat("Note that only a small subset of all available unit tests were executed.\n")
-        cat("You need a personal 'token' and 'secret' to perform all unit tests.\n")
-        cat("You can find these data in the appendix of the validation documentation \n")
-        cat("licensed for your company/organization.\n")
-    } else if (!completeUnitTestSetEnabled) {
-        cat("Note that only a small subset of all available unit tests were executed.\n")
-        cat("Use testPackage(completeUnitTestSetEnabled = TRUE) to perform all unit tests.\n")
-    }
-
-    invisible(.isCompleteUnitTestSetEnabled())
-}
-
-.testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", outDir = ".", Ropts = "") {
-    if (!dir.exists(testFileDirectory)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'testFileDirectory' (", testFileDirectory, ") does not exist")
-    }
-
-    workingDirectoryBefore <- setwd(outDir)
-    on.exit(setwd(workingDirectoryBefore))
-
-    setwd(testFileDirectory)
-    message(gettextf("Running specific tests for package %s", sQuote(pkgName)), domain = NA)
-    testFiles <- dir(".", pattern = "\\.R$")
-    for (testFile in testFiles) {
-        message(gettextf("  Running %s", sQuote(testFile)), domain = NA)
-        outfile <- paste0(testFile, "out")
-        cmd <- paste(
-            shQuote(file.path(R.home("bin"), "R")),
-            "CMD BATCH --vanilla --no-timing", Ropts,
-            shQuote(testFile), shQuote(outfile)
-        )
-        cmd <- if (.Platform$OS.type == "windows") paste(cmd, "LANGUAGE=C") else paste("LANGUAGE=C", cmd)
-        res <- system(cmd)
-        if (res) {
-            file.rename(outfile, paste(outfile, "fail", sep = "."))
-            return(invisible(1L))
-        }
-
-        savefile <- paste(outfile, "save", sep = ".")
-        if (file.exists(savefile)) {
-            message(gettextf(
-                "  comparing %s to %s ...",
-                sQuote(outfile), sQuote(savefile)
-            ),
-            appendLF = FALSE, domain = NA
-            )
-            res <- Rdiff(outfile, savefile)
-            if (!res) message(" OK")
-        }
-    }
-    setwd(workingDirectoryBefore)
-
-    return(invisible(0L))
-}
-
-.isCompleteUnitTestSetEnabled <- function() {
-    completeUnitTestSetEnabled <- as.logical(Sys.getenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED"))
-    if (is.na(completeUnitTestSetEnabled)) {
-        completeUnitTestSetEnabled <- FALSE
-        Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = completeUnitTestSetEnabled)
-    }
-    return(isTRUE(completeUnitTestSetEnabled))
-}
-
 .getVariedParameterVectorByValue <- function(variedParameter) {
     return((variedParameter[2] - variedParameter[1]) / C_VARIED_PARAMETER_SEQUENCE_LENGTH_DEFAULT)
 }
@@ -1881,7 +973,7 @@ testPackage <- function(outDir = ".", ...,
 #'
 #' @examples
 #' printCitation()
-#' 
+#'
 #' @keywords internal
 #'
 #' @export
@@ -2003,7 +1095,7 @@ printCitation <- function(inclusiveR = TRUE) {
 #'
 #' @examples
 #' getParameterCaption(getDesignInverseNormal(), "kMax")
-#' 
+#'
 #' @keywords internal
 #'
 #' @export
@@ -2052,7 +1144,7 @@ getParameterCaption <- function(obj, parameterName) {
 #'
 #' @examples
 #' getParameterName(getDesignInverseNormal(), "Maximum number of stages")
-#' 
+#'
 #' @keywords internal
 #'
 #' @export
@@ -2106,8 +1198,10 @@ getParameterName <- function(obj, parameterCaption) {
     }
     if (is.null(insertPositionColumnName) || length(insertPositionColumnName) != 1 ||
             is.na(insertPositionColumnName) || !is.character(insertPositionColumnName)) {
-        stop("Illegal argument: 'insertPositionColumnName' (", .getClassName(insertPositionColumnName), 
-            ") must be a valid character value")
+        stop(
+            "Illegal argument: 'insertPositionColumnName' (", .getClassName(insertPositionColumnName),
+            ") must be a valid character value"
+        )
     }
     if (is.null(columnName) || length(columnName) != 1 || is.na(columnName) || !is.character(columnName)) {
         stop("Illegal argument: 'columnName' (", .getClassName(columnName), ") must be a valid character value")
@@ -2276,7 +1370,9 @@ getParameterName <- function(obj, parameterCaption) {
         params <- c()
         for (paramName in names(x)) {
             paramValue <- x[[paramName]]
-            params <- c(params, paste0(paramName, " = ", .getArgumentValueRCode(x = paramValue, name = paramName)))
+            if (name != "effectList" || paramName != "piControls" || (!is.null(paramValue) && length(paramValue) > 0)) {
+                params <- c(params, paste0(paramName, " = ", .getArgumentValueRCode(x = paramValue, name = paramName)))
+            }
         }
         return(paste0("list(", paste0(params, collapse = ", "), ")"))
     }
@@ -2377,10 +1473,9 @@ getObjectRCode <- function(obj, ...,
         stringWrapPrefix = "",
         newArgumentValues = list(),
         tolerance = 1e-07) {
-        
     functionName <- deparse(substitute(obj))
     functionName <- sub("\\(.*\\)$", "", functionName)
-    
+
     .assertIsSingleNumber(tolerance, "tolerance")
     .assertIsInClosedInterval(tolerance, "tolerance", lower = 1e-15, upper = 1e-03)
 
@@ -2638,8 +1733,10 @@ getObjectRCode <- function(obj, ...,
         informationRates <- obj[["informationRates"]]
         if (!is.null(informationRates) && length(informationRates) > 0) {
             kMax <- obj[["kMax"]]
-            if (isTRUE(all.equal(target = .getInformationRatesDefault(kMax), 
-                    current = informationRates, tolerance = tolerance))) {
+            if (isTRUE(all.equal(
+                    target = .getInformationRatesDefault(kMax),
+                    current = informationRates, tolerance = tolerance
+                ))) {
                 objNames <- objNames[objNames != "informationRates"]
                 if (!("kMax" %in% objNames) && kMax != 3) {
                     objNames <- c("kMax", objNames)
@@ -2732,7 +1829,7 @@ getObjectRCode <- function(obj, ...,
                 }
             }
         }
-        
+
         if (inherits(obj, "TrialDesignPlanSurvival")) {
             if (!("accrualTime" %in% objNames) &&
                     obj$.getParameterType("accrualTime") == "g" && !all(is.na(obj$accrualTime))) {
@@ -2879,3 +1976,40 @@ getObjectRCode <- function(obj, ...,
 
     return(result)
 }
+
+.moveValue <- function(values, value, insertPositionValue) {
+    if (is.null(insertPositionValue) || length(insertPositionValue) != 1 || is.na(insertPositionValue)) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            "'insertPositionValue' (", class(insertPositionValue), ") must be a valid single value")
+    }
+    if (is.null(value) || length(value) != 1 || is.na(value)) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            "'value' (", class(value), ") must be a valid single value")
+    }
+    if (!(value %in% values)) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'value' (", value, ") does not exist in the specified vector 'values'")
+    }
+    if (!(insertPositionValue %in% values)) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'insertPositionValue' (", insertPositionValue, 
+            ") does not exist in the specified vector 'values'")
+    }
+    if (value == insertPositionValue) {
+        return(values)
+    }
+    
+    originalValues <- values
+    values <- values[values != value]
+    insertPositioIndex <- which(values == insertPositionValue)
+    if (insertPositioIndex != (which(originalValues == value) - 1)) {
+        if (insertPositioIndex == length(values)) {
+            values <- c(values[1:insertPositioIndex], value)
+        } else {
+            values <- c(values[1:insertPositioIndex], value, values[(insertPositioIndex + 1):length(values)])
+        }
+    }
+    return(values)
+}
+
+

@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_power_calculator.R
-## |  Creation date: 23 February 2022, 14:06:00
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 17 August 2022, 13:44:11
+## |  File version: $Revision: 6499 $
+## |  Last changed: $Date: 2022-08-17 13:50:08 +0200 (Wed, 17 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing the Power Calculation of Testing Means for Different Designs and Arguments")
+test_plan_section("Testing the Power Calculation of Testing Means for Different Designs and Arguments")
 
 
 test_that("'getPowerMeans': Power calculation of means in one sample for one-sided group sequential design", {
@@ -1124,12 +1124,9 @@ test_that("'getPowerMeans': Power calculation of mean difference in two samples 
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	###################################################################################################
-	###################################################################################################
-
 })
 
-context("Testing the Power Calculation of Testing Rates for Different Designs and Arguments")
+test_plan_section("Testing the Power Calculation of Testing Rates for Different Designs and Arguments")
 
 
 test_that("'getPowerRates': Power calculation of rate in one sample for one-sided group sequential design", {
@@ -1730,12 +1727,9 @@ test_that("'getPowerRates': Power calculation of rate in two samples for two-sid
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	###################################################################################################
-	###################################################################################################
-
 })
 
-context("Testing the Power Calculation of Survival Designs for Different Designs and Arguments")
+test_plan_section("Testing the Power Calculation of Survival Designs for Different Designs and Arguments")
 
 
 test_that("'getPowerSurvival': Fixed sample size with minimum required definitions, pi1 = c(0.4, 0.5, 0.6) and pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default", {
@@ -2803,12 +2797,9 @@ test_that("'getPowerSurvival': Power calculation of survival designs for two-sid
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	###################################################################################################
-	###################################################################################################
-
 })
 
-context("Testing the Power Calculation of Survival Designs for Other Parameter Variants")
+test_plan_section("Testing the Power Calculation of Survival Designs for Other Parameter Variants")
 
 
 test_that("'getPowerSurvival': Four stage O'Brien and Fleming group sequential design with minimum required definitions, pi1 = c(0.4, 0.5, 0.6) and pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default", {

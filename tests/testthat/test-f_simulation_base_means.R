@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_base_means.R
-## |  Creation date: 23 February 2022, 14:06:28
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:11:30
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Simulation Means Function")
+test_plan_section("Testing Simulation Means Function")
 
 
 test_that("'getSimulationMeans': several configurations", {
@@ -602,7 +602,7 @@ test_that("'getSimulationMeans': several configurations", {
 
 })
 
-context("Testing Simulation Means Function in a Systematic Way")
+test_plan_section("Testing Simulation Means Function in a Systematic Way")
 
 
 test_that("'getSimulationMeans': Fisher design with several configurations", {

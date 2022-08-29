@@ -24,9 +24,9 @@ getDesignInverseNormal(
   userBetaSpending = NA_real_,
   gammaB = NA_real_,
   bindingFutility = NA,
+  betaAdjustment = NA,
   constantBoundsHP = 3,
   twoSidedPower = NA,
-  delayedInformation = NA_real_,
   tolerance = 1e-08
 )
 }
@@ -34,15 +34,14 @@ getDesignInverseNormal(
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{kMax}{The maximum number of stages \code{K}. 
-\code{K = 1, 2, 3, ...} (default is \code{3}).
+\item{kMax}{The maximum number of stages \code{K}, default is \code{3}. 
 The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 \code{6} for Fisher combination test designs.}
 
 \item{alpha}{The significance level alpha, default is \code{0.025}.}
 
-\item{beta}{Type II error rate, necessary for providing sample size calculations \cr
-(e.g., \code{\link{getSampleSizeMeans}}), beta spending function designs, 
+\item{beta}{Type II error rate, necessary for providing sample size calculations 
+  (e.g., \code{\link{getSampleSizeMeans}}), beta spending function designs, 
 or optimum designs, default is \code{0.20}.}
 
 \item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}.}
@@ -93,6 +92,10 @@ beta-spending up to each interim stage.}
 the critical values is affected by the futility bounds and the futility threshold is binding in the 
 sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
 
+\item{betaAdjustment}{For two-sided beta spending designs, if \code{betaAdjustement = TRUE} a linear
+adjustment of the beta spending values is performed if an overlapping of decision regions for futility
+stopping at earlier stages occurs, otherwise no adjustment is performed (default is \code{TRUE}).}
+
 \item{constantBoundsHP}{The constant bounds up to stage \code{kMax - 1} for the
 Haybittle & Peto design (default is \code{3}).}
 
@@ -100,9 +103,6 @@ Haybittle & Peto design (default is \code{3}).}
 the sample size calculation is performed by considering both tails of the distribution.
 Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
 should be directed to one part.}
-
-\item{delayedInformation}{Delay of information for delayed response designs. Can be a numeric value or a
-numeric vector of length \code{kMax - 1}}
 
 \item{tolerance}{The numerical tolerance, default is \code{1e-08}.}
 }
@@ -148,11 +148,22 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 \examples{
 # Calculate two-sided critical values for a four-stage 
 # Wang & Tsiatis design with Delta = 0.25 at level alpha = 0.05
-getDesignInverseNormal(kMax = 4, sided = 2, typeOfDesign = "WT", deltaWT = 0.25) 
+getDesignInverseNormal(kMax = 4, alpha = 0.05, sided = 2, 
+    typeOfDesign = "WT", deltaWT = 0.25) 
 
-# Calculate the Pocock type alpha spending critical values if the second 
-# interim analysis was performed after 70\% of information was observed
-getDesignInverseNormal(informationRates = c(0.4, 0.7), typeOfDesign = "asP") 
+# Defines a two-stage design at one-sided alpha = 0.025 with provision of early stopping  
+# if the one-sided p-value exceeds 0.5 at interim and no early stopping for efficacy. 
+# The futility bound is non-binding.
+getDesignInverseNormal(kMax = 2, typeOfDesign = "noEarlyEfficacy", futilityBounds = 0)  
+
+\donttest{
+# Calculate one-sided critical values and binding futility bounds for a three-stage 
+# design with alpha- and beta-spending functions according to Kim & DeMets with gamma = 2.5
+# (planned informationRates as specified, default alpha = 0.025 and beta = 0.2)
+getDesignInverseNormal(kMax = 3, informationRates = c(0.3, 0.75, 1), 
+    typeOfDesign = "asKD", gammaA = 2.5, typeBetaSpending = "bsKD", 
+    gammaB = 2.5, bindingFutility = TRUE)
+} 
 
 }
 \seealso{

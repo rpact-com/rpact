@@ -7,7 +7,6 @@
 getSimulationEnrichmentRates(
   design = NULL,
   ...,
-  populations = NA_integer_,
   effectList = NULL,
   intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
   stratifiedAnalysis = TRUE,
@@ -41,9 +40,7 @@ and \code{sided} can be directly entered as argument where necessary.}
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{populations}{The number of populations in a two-sample comparison, default is \code{3}.}
-
-\item{effectList}{List of effect sizes with columns and number of rows 
+\item{effectList}{List of subsets, prevalences, and effect sizes with columns and number of rows 
 reflecting the different situations to consider (see examples).}
 
 \item{intersectionTest}{Defines the multiple test for the intersection 
@@ -208,30 +205,17 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 # Assess a population selection strategy with two subset populations and
 # a binary endpoint using a stratified analysis. No early efficacy stop,
 # weighted inverse normal method with weight sqrt(0.4).
- 
-subGroups <- c("S1", "S2", "S12", "R")
-prevalences <- c(0.1, 0.4, 0.2, 0.3)
-p2 <- c(0.3, 0.4, 0.3, 0.55)
-range1 <- p2[1] + seq(0.0, 0.2, 0.2)
-range2 <- p2[2] + seq(0.0, 0.2, 0.2)
-range3 <- p2[3] + seq(0.0, 0.2, 0.2)
-range4 <- p2[4] + seq(0.0, 0.2, 0.2)
-piTreatments <- c()
-for (x1 in range1) {
-    for (x2 in range2) {
-        for (x3 in range3) {
-            for (x4 in range4) {
-                piTreatments <- c(piTreatments, x1, x2, x3, x4)
-            }
-        }
-    }
-}
-effectList <- list(subGroups=subGroups, prevalences=prevalences,
-piControl = p2, piTreatments = matrix(piTreatments, byrow = TRUE, ncol = 4))
-
+pi2 <- c(0.3, 0.4, 0.3, 0.55)
+pi1Seq <- seq(0.0, 0.2, 0.2)
+pi1 <- matrix(rep(pi1Seq, length(pi2)), ncol = length(pi1Seq), byrow = TRUE) + pi2
+effectList <- list(
+    subGroups = c("S1", "S2", "S12", "R"), 
+    prevalences = c(0.1, 0.4, 0.2, 0.3),
+    piControl = pi2, 
+    piTreatments = expand.grid(pi1[1, ], pi1[2, ], pi1[3, ], pi1[4, ])
+)
 ds <- getDesignInverseNormal(informationRates = c(0.4, 1),
     typeOfDesign = "noEarlyEfficacy")
-
 simResultsPE <- getSimulationEnrichmentRates(ds, plannedSubjects = c(150, 300),
     allocationRatioPlanned = 1.5, directionUpper = TRUE,
     effectList = effectList, stratifiedAnalysis = TRUE,
