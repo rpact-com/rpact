@@ -38,9 +38,9 @@ for changing x or y axis limits without dropping data observations.}
 
 \item{type}{The plot type (default = \code{1}). The following plot types are available:
 \itemize{
-  \item \code{1}: creates a 'Overall Success' plot (multi-arm only)
-  \item \code{2}: creates a 'Success per Stage' plot (multi-arm only)
-  \item \code{3}: creates a 'Selected Arms per Stage' plot (multi-arm only)
+  \item \code{1}: creates a 'Overall Success' plot (multi-arm and enrichment only)
+  \item \code{2}: creates a 'Success per Stage' plot (multi-arm and enrichment  only)
+  \item \code{3}: creates a 'Selected Arms per Stage' plot (multi-arm and enrichment  only)
   \item \code{4}: creates a 'Reject per Stage' or 'Rejected Arms per Stage' plot
   \item \code{5}: creates a 'Overall Power and Early Stopping' plot
   \item \code{6}: creates a 'Expected Number of Subjects and Power / Early Stop' or 
@@ -48,11 +48,11 @@ for changing x or y axis limits without dropping data observations.}
   \item \code{7}: creates an 'Overall Power' plot
   \item \code{8}: creates an 'Overall Early Stopping' plot
   \item \code{9}: creates an 'Expected Sample Size' or 'Expected Number of Events' plot
-  \item \code{10}: creates a 'Study Duration' plot (non-multi-arm survival only)
-  \item \code{11}: creates an 'Expected Number of Subjects' plot (non-multi-arm survival only)
-  \item \code{12}: creates an 'Analysis Times' plot (non-multi-arm survival only)
-  \item \code{13}: creates a 'Cumulative Distribution Function' plot (non-multi-arm survival only)
-  \item \code{14}: creates a 'Survival Function' plot (non-multi-arm survival only)
+  \item \code{10}: creates a 'Study Duration' plot (non-multi-arm and non-enrichment survival only)
+  \item \code{11}: creates an 'Expected Number of Subjects' plot (non-multi-arm and non-enrichment survival only)
+  \item \code{12}: creates an 'Analysis Times' plot (non-multi-arm and non-enrichment survival only)
+  \item \code{13}: creates a 'Cumulative Distribution Function' plot (non-multi-arm and non-enrichment survival only)
+  \item \code{14}: creates a 'Survival Function' plot (non-multi-arm and non-enrichment survival only)
   \item \code{"all"}: creates all available plots and returns it as a grid plot or list
 }}
 

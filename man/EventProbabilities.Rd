@@ -10,5 +10,12 @@ Class for the definition of event probabilities.
 \details{
 \code{EventProbabilities} is a class for the definition of event probabilities.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{overallEventProbabilities}}{Deprecated field which will be removed in one of the next releases. 
+Use 'cumulativeEventProbabilities' instead.}
+}}
+
 
 \keyword{internal}

@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-class_analysis_dataset.R
-## |  Creation date: 23 February 2022, 13:59:29
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:04:25
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing the Class 'Dataset'")
+test_plan_section("Testing the Class 'Dataset'")
 
 
 test_that("Usage of 'getDataset'", {
@@ -2219,7 +2219,7 @@ test_that("Function '.naOmitBackward' works as expected", {
 
 })
 
-context("Testing that 'getDataset' Throws Exceptions as Expected")
+test_plan_section("Testing that 'getDataset' Throws Exceptions as Expected")
 
 
 test_that("Wrong parameter usage of 'getDataset'", {
@@ -2256,7 +2256,7 @@ test_that("Wrong parameter usage of 'getDataset'", {
 
 })
 
-context("Testing datasets for enrichment designs")
+test_plan_section("Testing datasets for enrichment designs")
 
 
 test_that("Creation of a dataset of means with subsets", {
@@ -2304,8 +2304,8 @@ test_that("Creation of a dataset of means with subsets", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-    
-    .skipTestIfDisabled()
+
+	.skipTestIfDisabled()
 
 	x2 <- getDataset(
 	    stages = c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3),
@@ -2457,16 +2457,17 @@ test_that("Creation of a dataset of survival data with subsets", {
 
 test_that("Illegal creation of a dataset of means with subsets: invalid sample size", {
 
-	expect_error(getDataset(
-	    sampleSize1 = c(NA, NA),
-	    sampleSize2 = c(NA, NA),
-	    mean1       = c(NA, NA),
-	    mean2       = c(NA, NA),
-	    stDev1      = c(NA, NA),
-	    stDev2      = c(NA, NA)
-	),
-	"Illegal argument: 'sampleSize1' is NA at first stage; a valid numeric value must be specified at stage 1",
-	fixed = TRUE
+	expect_error(
+	    getDataset(
+	        sampleSize1 = c(NA, NA),
+	        sampleSize2 = c(NA, NA),
+	        mean1       = c(NA, NA),
+	        mean2       = c(NA, NA),
+	        stDev1      = c(NA, NA),
+	        stDev2      = c(NA, NA)
+	    ),
+	    "Illegal argument: 'sampleSize1' is NA at first stage; a valid numeric value must be specified at stage 1",
+	    fixed = TRUE
 	)
 
 })
@@ -2557,21 +2558,22 @@ test_that("Illegal creation of a dataset of means with subsets: wrong deselectio
 
 test_that("Illegal creation of a dataset of means with subsets: inconsistent number of stages", {
 
-    .skipTestIfDisabled()
-        
-	expect_error(getDataset(
-	    sampleSize1 = c(12, NA, 21),
-	    sampleSize2 = c(18, NA, 21),
-	    mean1       = c(107.7, NA, 84.9),
-	    mean2       = c(165.6, NA, 195.9),
-	    stDev1      = c(128.5, NA, 139.5),
-	    stDev2      = c(120.1, NA, 185.0)
-	),
-	paste0(
-	    "Illegal argument: 'sampleSize1' contains a NA at stage 2 followed by a ",
-	    "value for a higher stage; NA's must be the last values"
-	),
-	fixed = TRUE
+	.skipTestIfDisabled()
+
+	expect_error(
+	    getDataset(
+	        sampleSize1 = c(12, NA, 21),
+	        sampleSize2 = c(18, NA, 21),
+	        mean1       = c(107.7, NA, 84.9),
+	        mean2       = c(165.6, NA, 195.9),
+	        stDev1      = c(128.5, NA, 139.5),
+	        stDev2      = c(120.1, NA, 185.0)
+	    ),
+	    paste0(
+	        "Illegal argument: 'sampleSize1' contains a NA at stage 2 followed by a ",
+	        "value for a higher stage; NA's must be the last values"
+	    ),
+	    fixed = TRUE
 	)
 
 	S1 <- getDataset(
@@ -2604,8 +2606,8 @@ test_that("Illegal creation of a dataset of means with subsets: inconsistent num
 
 test_that("Illegal creation of a dataset of means with subsets: too small standard deviation in F (two subsets)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1N <- getDataset(
 	    sampleSize1 = c(39, 34, NA),
 	    sampleSize2 = c(33, 45, NA),
@@ -2645,8 +2647,8 @@ test_that("Illegal creation of a dataset of means with subsets: too small standa
 
 test_that("Illegal creation of a dataset of means with subsets: too small sample size in F (two subsets)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1N <- getDataset(
 	    sampleSize1 = c(39, 34, NA),
 	    sampleSize2 = c(33, 45, NA),
@@ -2686,8 +2688,8 @@ test_that("Illegal creation of a dataset of means with subsets: too small sample
 
 test_that("Illegal creation of a dataset of means with subsets: wrong deselection (three subsets)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize2 = c(12, 33, 21),
 	    sampleSize1 = c(18, 17, 23),
@@ -2736,8 +2738,8 @@ test_that("Illegal creation of a dataset of means with subsets: wrong deselectio
 
 test_that("Valid creation of a dataset of means with subsets: no error occurs", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize2 = c(12, 33, 21),
 	    sampleSize1 = c(18, 17, 23),
@@ -2780,8 +2782,8 @@ test_that("Valid creation of a dataset of means with subsets: no error occurs", 
 
 test_that("Illegal creation of a dataset of rates with subsets: too small number of events in F (one subset)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(22, 31, 37),
 	    sampleSize2 = c(28, 33, 39),
@@ -2805,8 +2807,8 @@ test_that("Illegal creation of a dataset of rates with subsets: too small number
 
 test_that("Illegal creation of a dataset of rates with subsets: too small sample size in F (one subset)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(22, 31, 37),
 	    sampleSize2 = c(28, 33, 39),
@@ -2830,8 +2832,8 @@ test_that("Illegal creation of a dataset of rates with subsets: too small sample
 
 test_that("Illegal creation of a dataset of rates with subsets: wrong deselection (one subset)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(22, 31, NA),
 	    sampleSize2 = c(28, 33, NA),
@@ -2858,8 +2860,8 @@ test_that("Illegal creation of a dataset of rates with subsets: wrong deselectio
 
 test_that("Illegal creation of a dataset of rates with subsets: too small sample size in F (three subsets)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(84, 94, 25),
 	    sampleSize2 = c(82, 75, 23),
@@ -2900,8 +2902,8 @@ test_that("Illegal creation of a dataset of rates with subsets: too small sample
 
 test_that("Illegal creation of a dataset of rates with subsets: wrong deselection (three subsets)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(47, 33, 37),
 	    sampleSize2 = c(48, 47, 39),
@@ -2942,8 +2944,8 @@ test_that("Illegal creation of a dataset of rates with subsets: wrong deselectio
 
 test_that("Creation of a dataset of rates with subsets: empty subsets", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(84, 94, 25),
 	    sampleSize2 = c(82, 75, 23),
@@ -2981,8 +2983,8 @@ test_that("Creation of a dataset of rates with subsets: empty subsets", {
 
 test_that("Illegal creation of a dataset of rates with subsets: wrong deselection (R)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(84, 94, 25),
 	    sampleSize2 = c(82, 75, 23),
@@ -3023,8 +3025,8 @@ test_that("Illegal creation of a dataset of rates with subsets: wrong deselectio
 
 test_that("Illegal creation of a dataset of survival data with subsets: too small number of events (one group)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    events = c(37, 56, 22),
 	    logRanks = c(1.66, 1.38, 1.22),
@@ -3049,8 +3051,8 @@ test_that("Illegal creation of a dataset of survival data with subsets: too smal
 
 test_that("Illegal creation of a dataset of survival data with subsets: wrong deselection (one group)", {
 
-    .skipTestIfDisabled()
-    
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    overallExpectedEvents = c(13.3, NA, NA),
 	    overallEvents = c(16, NA, NA),
@@ -3077,8 +3079,8 @@ test_that("Illegal creation of a dataset of survival data with subsets: wrong de
 
 test_that("Creation of a dataset of survival data with subsets: no error occurs", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    events = c(37, 13, 26),
 	    logRanks = -c(1.66, 1.239, 0.785)
@@ -3100,8 +3102,8 @@ test_that("Creation of a dataset of survival data with subsets: no error occurs"
 
 test_that("Illegal creation of a dataset of survival data with subsets: too small number of events (two groups)", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    events = c(37, 13, 26),
 	    logRanks = -c(1.66, 1.239, 0.785)
@@ -3128,9 +3130,9 @@ test_that("Illegal creation of a dataset of survival data with subsets: too smal
 })
 
 test_that("Illegal creation of a dataset of survival data with subsets: inconsistent deselection", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	expect_error(getDataset(
 	    overallExpectedEvents = c(13.4, 35.4, 43.7),
 	    overallEvents = c(16, 37, 47),

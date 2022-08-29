@@ -8,7 +8,7 @@
 Class for stage results survival data.
 }
 \details{
-This object cannot be created directly; use \code{getStageResults} 
+This object cannot be created directly; use \code{getStageResults}
 with suitable arguments to create the stage results of a dataset of survival data.
 }
 \section{Fields}{

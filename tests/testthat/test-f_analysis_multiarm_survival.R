@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_analysis_multiarm_survival.R
-## |  Creation date: 23 February 2022, 14:05:10
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:59:44
+## |  File version: $Revision: 6498 $
+## |  Last changed: $Date: 2022-08-17 13:33:01 +0200 (Mi, 17 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-context("Testing the Analysis Survival Functionality for Three or More Treatments")
+test_plan_section("Testing the Analysis Survival Functionality for Three or More Treatments")
 
 test_that("'getAnalysisResultsMultiArm' with survival data and different options", {
     design1 <- getDesignInverseNormal(
@@ -320,8 +320,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
     expect_equal(results5$thetaH1[2, ], NA_real_)
     expect_equal(results5$conditionalRejectionProbabilities[1, ], c(0.10966368, 1, NA_real_), tolerance = 1e-05)
     expect_equal(results5$conditionalRejectionProbabilities[2, ], c(0.10966368, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results5$conditionalPower[1, ], c(NA_real_, NA_real_, 0.93227664), tolerance = 1e-05)
-    expect_equal(results5$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_))
     expect_equal(results5$repeatedConfidenceIntervalLowerBounds[1, ], c(0.91202463, 1.0654055, NA_real_), tolerance = 1e-05)
     expect_equal(results5$repeatedConfidenceIntervalLowerBounds[2, ], c(0.81259534, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results5$repeatedConfidenceIntervalUpperBounds[1, ], c(6.3731146, 4.2132456, NA_real_), tolerance = 1e-05)
@@ -336,7 +334,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
         results5CodeBased <- eval(parse(text = getObjectRCode(results5, stringWrapParagraphWidth = NULL)))
         expect_equal(results5CodeBased$thetaH1, results5$thetaH1, tolerance = 1e-05)
         expect_equal(results5CodeBased$conditionalRejectionProbabilities, results5$conditionalRejectionProbabilities, tolerance = 1e-05)
-        expect_equal(results5CodeBased$conditionalPower, results5$conditionalPower, tolerance = 1e-05)
         expect_equal(results5CodeBased$repeatedConfidenceIntervalLowerBounds, results5$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results5CodeBased$repeatedConfidenceIntervalUpperBounds, results5$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results5CodeBased$repeatedPValues, results5$repeatedPValues, tolerance = 1e-05)
@@ -379,8 +376,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
     expect_equal(results6$thetaH1[2, ], NA_real_)
     expect_equal(results6$conditionalRejectionProbabilities[1, ], c(0.1211541, 1, NA_real_), tolerance = 1e-05)
     expect_equal(results6$conditionalRejectionProbabilities[2, ], c(0.1211541, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results6$conditionalPower[1, ], c(NA_real_, NA_real_, 0.94819096), tolerance = 1e-05)
-    expect_equal(results6$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_))
     expect_equal(results6$repeatedConfidenceIntervalLowerBounds[1, ], c(0.90417824, 1.0568242, NA_real_), tolerance = 1e-05)
     expect_equal(results6$repeatedConfidenceIntervalLowerBounds[2, ], c(0.80436275, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results6$repeatedConfidenceIntervalUpperBounds[1, ], c(6.4284199, 4.2747728, NA_real_), tolerance = 1e-05)
@@ -395,7 +390,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
         results6CodeBased <- eval(parse(text = getObjectRCode(results6, stringWrapParagraphWidth = NULL)))
         expect_equal(results6CodeBased$thetaH1, results6$thetaH1, tolerance = 1e-05)
         expect_equal(results6CodeBased$conditionalRejectionProbabilities, results6$conditionalRejectionProbabilities, tolerance = 1e-05)
-        expect_equal(results6CodeBased$conditionalPower, results6$conditionalPower, tolerance = 1e-05)
         expect_equal(results6CodeBased$repeatedConfidenceIntervalLowerBounds, results6$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results6CodeBased$repeatedConfidenceIntervalUpperBounds, results6$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results6CodeBased$repeatedPValues, results6$repeatedPValues, tolerance = 1e-05)
@@ -438,8 +432,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
     expect_equal(results7$thetaH1[2, ], NA_real_)
     expect_equal(results7$conditionalRejectionProbabilities[1, ], c(0.1023739, 1, NA_real_), tolerance = 1e-05)
     expect_equal(results7$conditionalRejectionProbabilities[2, ], c(0.1023739, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results7$conditionalPower[1, ], c(NA_real_, NA_real_, 0.92036569), tolerance = 1e-05)
-    expect_equal(results7$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_))
     expect_equal(results7$repeatedConfidenceIntervalLowerBounds[1, ], c(0.90464342, 1.0577667, NA_real_), tolerance = 1e-05)
     expect_equal(results7$repeatedConfidenceIntervalLowerBounds[2, ], c(0.80485046, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results7$repeatedConfidenceIntervalUpperBounds[1, ], c(6.4251144, 4.2597035, NA_real_), tolerance = 1e-05)
@@ -454,7 +446,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
         results7CodeBased <- eval(parse(text = getObjectRCode(results7, stringWrapParagraphWidth = NULL)))
         expect_equal(results7CodeBased$thetaH1, results7$thetaH1, tolerance = 1e-05)
         expect_equal(results7CodeBased$conditionalRejectionProbabilities, results7$conditionalRejectionProbabilities, tolerance = 1e-05)
-        expect_equal(results7CodeBased$conditionalPower, results7$conditionalPower, tolerance = 1e-05)
         expect_equal(results7CodeBased$repeatedConfidenceIntervalLowerBounds, results7$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results7CodeBased$repeatedConfidenceIntervalUpperBounds, results7$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results7CodeBased$repeatedPValues, results7$repeatedPValues, tolerance = 1e-05)
@@ -497,8 +488,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
     expect_equal(results8$thetaH1[2, ], NA_real_)
     expect_equal(results8$conditionalRejectionProbabilities[1, ], c(0.10166729, 1, NA_real_), tolerance = 1e-05)
     expect_equal(results8$conditionalRejectionProbabilities[2, ], c(0.10166729, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results8$conditionalPower[1, ], c(NA_real_, NA_real_, 0.91912747), tolerance = 1e-05)
-    expect_equal(results8$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_))
     expect_equal(results8$repeatedConfidenceIntervalLowerBounds[1, ], c(0.90417824, 1.0568242, NA_real_), tolerance = 1e-05)
     expect_equal(results8$repeatedConfidenceIntervalLowerBounds[2, ], c(0.80436275, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results8$repeatedConfidenceIntervalUpperBounds[1, ], c(6.4284199, 4.2747728, NA_real_), tolerance = 1e-05)
@@ -513,7 +502,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
         results8CodeBased <- eval(parse(text = getObjectRCode(results8, stringWrapParagraphWidth = NULL)))
         expect_equal(results8CodeBased$thetaH1, results8$thetaH1, tolerance = 1e-05)
         expect_equal(results8CodeBased$conditionalRejectionProbabilities, results8$conditionalRejectionProbabilities, tolerance = 1e-05)
-        expect_equal(results8CodeBased$conditionalPower, results8$conditionalPower, tolerance = 1e-05)
         expect_equal(results8CodeBased$repeatedConfidenceIntervalLowerBounds, results8$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results8CodeBased$repeatedConfidenceIntervalUpperBounds, results8$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results8CodeBased$repeatedPValues, results8$repeatedPValues, tolerance = 1e-05)
@@ -851,8 +839,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
     expect_equal(results14$thetaH1[2, ], NA_real_)
     expect_equal(results14$conditionalRejectionProbabilities[1, ], c(0.10966368, 1, NA_real_), tolerance = 1e-05)
     expect_equal(results14$conditionalRejectionProbabilities[2, ], c(0.10966368, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results14$conditionalPower[1, ], c(NA_real_, NA_real_, 0.93227664), tolerance = 1e-05)
-    expect_equal(results14$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_))
     expect_equal(results14$repeatedConfidenceIntervalLowerBounds[1, ], c(0.15690919, 0.23734662, NA_real_), tolerance = 1e-05)
     expect_equal(results14$repeatedConfidenceIntervalLowerBounds[2, ], c(0.12446713, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results14$repeatedConfidenceIntervalUpperBounds[1, ], c(1.0964616, 0.93860979, NA_real_), tolerance = 1e-05)
@@ -867,7 +853,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
         results14CodeBased <- eval(parse(text = getObjectRCode(results14, stringWrapParagraphWidth = NULL)))
         expect_equal(results14CodeBased$thetaH1, results14$thetaH1, tolerance = 1e-05)
         expect_equal(results14CodeBased$conditionalRejectionProbabilities, results14$conditionalRejectionProbabilities, tolerance = 1e-05)
-        expect_equal(results14CodeBased$conditionalPower, results14$conditionalPower, tolerance = 1e-05)
         expect_equal(results14CodeBased$repeatedConfidenceIntervalLowerBounds, results14$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results14CodeBased$repeatedConfidenceIntervalUpperBounds, results14$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results14CodeBased$repeatedPValues, results14$repeatedPValues, tolerance = 1e-05)
@@ -910,8 +895,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
     expect_equal(results15$thetaH1[2, ], NA_real_)
     expect_equal(results15$conditionalRejectionProbabilities[1, ], c(0.1211541, 1, NA_real_), tolerance = 1e-05)
     expect_equal(results15$conditionalRejectionProbabilities[2, ], c(0.1211541, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results15$conditionalPower[1, ], c(NA_real_, NA_real_, 0.94819096), tolerance = 1e-05)
-    expect_equal(results15$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_))
     expect_equal(results15$repeatedConfidenceIntervalLowerBounds[1, ], c(0.15555937, 0.23393056, NA_real_), tolerance = 1e-05)
     expect_equal(results15$repeatedConfidenceIntervalLowerBounds[2, ], c(0.12320632, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results15$repeatedConfidenceIntervalUpperBounds[1, ], c(1.1059766, 0.94623115, NA_real_), tolerance = 1e-05)
@@ -926,7 +909,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
         results15CodeBased <- eval(parse(text = getObjectRCode(results15, stringWrapParagraphWidth = NULL)))
         expect_equal(results15CodeBased$thetaH1, results15$thetaH1, tolerance = 1e-05)
         expect_equal(results15CodeBased$conditionalRejectionProbabilities, results15$conditionalRejectionProbabilities, tolerance = 1e-05)
-        expect_equal(results15CodeBased$conditionalPower, results15$conditionalPower, tolerance = 1e-05)
         expect_equal(results15CodeBased$repeatedConfidenceIntervalLowerBounds, results15$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results15CodeBased$repeatedConfidenceIntervalUpperBounds, results15$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results15CodeBased$repeatedPValues, results15$repeatedPValues, tolerance = 1e-05)
@@ -969,8 +951,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
     expect_equal(results16$thetaH1[2, ], NA_real_)
     expect_equal(results16$conditionalRejectionProbabilities[1, ], c(0.1023739, 1, NA_real_), tolerance = 1e-05)
     expect_equal(results16$conditionalRejectionProbabilities[2, ], c(0.1023739, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results16$conditionalPower[1, ], c(NA_real_, NA_real_, 0.92036569), tolerance = 1e-05)
-    expect_equal(results16$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_))
     expect_equal(results16$repeatedConfidenceIntervalLowerBounds[1, ], c(0.15563938, 0.23475813, NA_real_), tolerance = 1e-05)
     expect_equal(results16$repeatedConfidenceIntervalLowerBounds[2, ], c(0.1232811, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results16$repeatedConfidenceIntervalUpperBounds[1, ], c(1.1054079, 0.94538806, NA_real_), tolerance = 1e-05)
@@ -985,7 +965,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
         results16CodeBased <- eval(parse(text = getObjectRCode(results16, stringWrapParagraphWidth = NULL)))
         expect_equal(results16CodeBased$thetaH1, results16$thetaH1, tolerance = 1e-05)
         expect_equal(results16CodeBased$conditionalRejectionProbabilities, results16$conditionalRejectionProbabilities, tolerance = 1e-05)
-        expect_equal(results16CodeBased$conditionalPower, results16$conditionalPower, tolerance = 1e-05)
         expect_equal(results16CodeBased$repeatedConfidenceIntervalLowerBounds, results16$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results16CodeBased$repeatedConfidenceIntervalUpperBounds, results16$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results16CodeBased$repeatedPValues, results16$repeatedPValues, tolerance = 1e-05)
@@ -1028,8 +1007,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
     expect_equal(results17$thetaH1[2, ], NA_real_)
     expect_equal(results17$conditionalRejectionProbabilities[1, ], c(0.10166729, 1, NA_real_), tolerance = 1e-05)
     expect_equal(results17$conditionalRejectionProbabilities[2, ], c(0.10166729, NA_real_, NA_real_), tolerance = 1e-05)
-    expect_equal(results17$conditionalPower[1, ], c(NA_real_, NA_real_, 0.91912747), tolerance = 1e-05)
-    expect_equal(results17$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_))
     expect_equal(results17$repeatedConfidenceIntervalLowerBounds[1, ], c(0.15555937, 0.23393056, NA_real_), tolerance = 1e-05)
     expect_equal(results17$repeatedConfidenceIntervalLowerBounds[2, ], c(0.12320632, NA_real_, NA_real_), tolerance = 1e-05)
     expect_equal(results17$repeatedConfidenceIntervalUpperBounds[1, ], c(1.1059766, 0.94623115, NA_real_), tolerance = 1e-05)
@@ -1044,7 +1021,6 @@ test_that("'getAnalysisResultsMultiArm' with survival data and different options
         results17CodeBased <- eval(parse(text = getObjectRCode(results17, stringWrapParagraphWidth = NULL)))
         expect_equal(results17CodeBased$thetaH1, results17$thetaH1, tolerance = 1e-05)
         expect_equal(results17CodeBased$conditionalRejectionProbabilities, results17$conditionalRejectionProbabilities, tolerance = 1e-05)
-        expect_equal(results17CodeBased$conditionalPower, results17$conditionalPower, tolerance = 1e-05)
         expect_equal(results17CodeBased$repeatedConfidenceIntervalLowerBounds, results17$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
         expect_equal(results17CodeBased$repeatedConfidenceIntervalUpperBounds, results17$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
         expect_equal(results17CodeBased$repeatedPValues, results17$repeatedPValues, tolerance = 1e-05)

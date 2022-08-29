@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_utilities.R
-## |  Creation date: 23 February 2022, 14:06:28
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:11:29
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Design Utility Functions")
+test_plan_section("Testing Design Utility Functions")
 
 
 test_that("'getPiByLambda' and 'getLambdaByPi' produce corresponding results", {
@@ -252,10 +252,10 @@ test_that("'ppwexp' and 'qpwexp' produce corresponding results ('piecewiseSurviv
 test_that("'getPiecewiseExponentialRandomNumbers': test that mean random numbers are as expected", {
 
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
-	set.seed(12345)
+	set.seed(123456)
 	piecewiseSurvivalTime <- c(0, 16, 22)
 	piecewiseLambda <- c(0.003, 0.003, 0.003)
-	y <- 1 / mean(getPiecewiseExponentialRandomNumbers(5000,
+	y <- 1 / mean(getPiecewiseExponentialRandomNumbers(100000,
 	    piecewiseSurvivalTime = piecewiseSurvivalTime, piecewiseLambda = piecewiseLambda, kappa = 1
 	))
 	expect_equal(y, piecewiseLambda[1], tolerance = 5e-04)
@@ -265,10 +265,10 @@ test_that("'getPiecewiseExponentialRandomNumbers': test that mean random numbers
 test_that("'rpwexp': test that mean random numbers are as expected", {
 
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
-	set.seed(12345)
+	set.seed(123456)
 	piecewiseSurvivalTime <- c(0, 16, 22)
 	piecewiseLambda <- c(0.003, 0.003, 0.003)
-	y <- 1 / mean(rpwexp(5000, s = piecewiseSurvivalTime, lambda = piecewiseLambda, kappa = 1))
+	y <- 1 / mean(rpwexp(100000, s = piecewiseSurvivalTime, lambda = piecewiseLambda, kappa = 1))
 
 	expect_equal(y, piecewiseLambda[1], tolerance = 5e-04)
 
@@ -277,13 +277,13 @@ test_that("'rpwexp': test that mean random numbers are as expected", {
 test_that("'getPiecewiseExponentialRandomNumbers': test that mean random numbers are as expected ('piecewiseSurvivalTime' defined as list)", {
 
 	# @refFS[Formula]{fs:pieceWiseExponentialRandomVariable}
-	set.seed(12345)
+	set.seed(123456)
 	piecewiseSurvivalTime <- list(
 	    "<16"      = 0.003,
 	    "16 - <22" = 0.003,
 	    ">=22"      = 0.003
 	)
-	y <- 1 / mean(getPiecewiseExponentialRandomNumbers(5000,
+	y <- 1 / mean(getPiecewiseExponentialRandomNumbers(100000,
 	    piecewiseSurvivalTime = piecewiseSurvivalTime, kappa = 1
 	))
 
@@ -294,13 +294,13 @@ test_that("'getPiecewiseExponentialRandomNumbers': test that mean random numbers
 test_that("'rpwexp': test that mean random numbers are as expected ('piecewiseSurvivalTime' defined as list)", {
 
 	# @refFS[Formula]{fs:pieceWiseExponentialRandomVariable}
-	set.seed(12345)
+	set.seed(123456)
 	piecewiseSurvivalTime <- list(
 	    "<16"      = 0.003,
 	    "16 - <22" = 0.003,
 	    ">=22"      = 0.003
 	)
-	y <- 1 / mean(rpwexp(5000, s = piecewiseSurvivalTime, kappa = 1))
+	y <- 1 / mean(rpwexp(100000, s = piecewiseSurvivalTime, kappa = 1))
 
 	expect_equal(y, 0.003, tolerance = 5e-04)
 

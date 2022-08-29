@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_enrichment_means.R
-## |  Creation date: 23 February 2022, 14:06:45
-## |  File version: $Revision: 6279 $
-## |  Last changed: $Date: 2022-06-09 17:48:13 +0200 (Thu, 09 Jun 2022) $
+## |  Creation date: 12 August 2022, 09:11:47
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Simulation Enrichment Means Function")
+test_plan_section("Testing Simulation Enrichment Means Function")
 
 
 test_that("'getSimulationEnrichmentMeans': gMax = 2", {
@@ -108,8 +108,8 @@ test_that("'getSimulationEnrichmentMeans': gMax = 2", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-    
-    .skipTestIfDisabled()
+
+	.skipTestIfDisabled()
 
 	suppressWarnings(simResult2 <- getSimulationEnrichmentMeans(design,
 	    populations = 2,
@@ -268,8 +268,8 @@ test_that("'getSimulationEnrichmentMeans': gMax = 2", {
 
 test_that("'getSimulationEnrichmentMeans': gMax = 3", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:subsec:intersectionTestsEnrichment}
@@ -286,7 +286,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 3", {
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
 	# @refFS[Formula]{fs:simulatingEnrichmentEffectSpecification}
 	# @refFS[Formula]{fs:enrichmentRejectionRule}
-
 	effectList <- list(
 	    subGroups = c("S1", "S2", "S12", "R"),
 	    prevalences = c(0.05, 0.35, 0.15, 0.45),
@@ -479,8 +478,8 @@ test_that("'getSimulationEnrichmentMeans': gMax = 3", {
 
 test_that("'getSimulationEnrichmentMeans': gMax = 4", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:subsec:intersectionTestsEnrichment}
@@ -497,7 +496,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 4", {
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
 	# @refFS[Formula]{fs:simulatingEnrichmentEffectSpecification}
 	# @refFS[Formula]{fs:enrichmentRejectionRule}
-
 	effects <- matrix(c(2.3, 3.1, 0.9, 1.2, 2.1, 3.4, 0.9, 0.2), byrow = TRUE, ncol = 8)
 	effectList <- list(subGroups = c("S1", "S2", "S3", "S12", "S13", "S23", "S123", "R"),
 			prevalences = c(0.1, 0.05, 0.1, 0.15, 0.1, 0.15, 0.3, 0.05), effects = effects, 
@@ -615,8 +613,8 @@ test_that("'getSimulationEnrichmentMeans': gMax = 4", {
 
 test_that("'getSimulationEnrichmentMeans': comparison of base and enrichment for inverse normal", {
 
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:sec:simulationFunctions}
@@ -627,7 +625,6 @@ test_that("'getSimulationEnrichmentMeans': comparison of base and enrichment for
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
 	# @refFS[Formula]{fs:simulatingEnrichmentEffectSpecification}
 	# @refFS[Formula]{fs:enrichmentRejectionRule}
-
 	effectSeq <- seq(0, 0.7, 0.1)
 	effects <- matrix(effectSeq, byrow = TRUE, ncol = 1)
 	effectList <- list(subGroups = "F", prevalences = 1, stDevs = 1.3, effects = effects)
@@ -668,9 +665,9 @@ test_that("'getSimulationEnrichmentMeans': comparison of base and enrichment for
 })
 
 test_that("'getSimulationEnrichmentMeans': comparison of base and enrichment for Fisher combination", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:sec:simulationFunctions}
@@ -681,7 +678,6 @@ test_that("'getSimulationEnrichmentMeans': comparison of base and enrichment for
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
 	# @refFS[Formula]{fs:simulatingEnrichmentEffectSpecification}
 	# @refFS[Formula]{fs:enrichmentRejectionRule}
-
 	effectSeq <- seq(0, 0.7, 0.1)
 	effects <- matrix(effectSeq, byrow = TRUE, ncol = 1)
 	effectList <- list(subGroups = "F", prevalences = 1, stDevs = 1.3, effects = effects)

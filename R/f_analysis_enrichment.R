@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 5906 $
-## |  Last changed: $Date: 2022-02-26 19:10:21 +0100 (Sa, 26 Feb 2022) $
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -383,7 +383,7 @@ NULL
     .assertIsValidNPlanned(nPlanned = nPlanned, kMax = kMax, stage = stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
-
+    
     if (stageResults$isDatasetMeans()) {
         .warnInCaseOfUnusedArgument(piTreatmentRange, "piTreatmentRange", NA_real_, "plot")
         .warnInCaseOfUnusedArgument(piControls, "piControls", NA_real_, "plot")

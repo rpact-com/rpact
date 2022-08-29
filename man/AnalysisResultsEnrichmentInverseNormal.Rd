@@ -8,7 +8,7 @@
 Class for enrichment analysis results based on a inverse normal design.
 }
 \details{
-This object cannot be created directly; use \code{\link{getAnalysisResults}} 
+This object cannot be created directly; use \code{\link{getAnalysisResults}}
 with suitable arguments to create the enrichment analysis results of an inverse normal design.
 }
 

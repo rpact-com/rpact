@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-class_time.R
-## |  Creation date: 23 February 2022, 13:59:35
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:04:34
+## |  File version: $Revision: 6496 $
+## |  Last changed: $Date: 2022-08-17 09:41:33 +0200 (Mi, 17 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Class 'PiecewiseSurvivalTime'")
+test_plan_section("Testing Class 'PiecewiseSurvivalTime'")
 
 
 test_that("Testing 'getPiecewiseSurvivalTime': isPiecewiseSurvivalEnabled()", {
@@ -1135,7 +1135,7 @@ test_that("Testing 'getPiecewiseSurvivalTime': vector based definition", {
 	paste0(
 	    "Illegal argument: 'hazardRatio' can only be calculated if ",
 	    "'unique(lambda1 / lambda2)' result in a single value; ",
-	    "current result = c(1.2, 1, 1.667) (delayed response is not allowed)"
+	    "current result = c(1.2, 1, 1.667) (e.g., delayed response is not allowed)"
 	),
 	fixed = TRUE
 	)
@@ -1507,7 +1507,7 @@ test_that("Testing 'getPiecewiseSurvivalTime': list-wise definition", {
 
 })
 
-context("Testing Class 'AccrualTime'")
+test_plan_section("Testing Class 'AccrualTime'")
 
 
 test_that("Testing 'getAccrualTime': isAccrualTimeEnabled()", {
@@ -2484,8 +2484,8 @@ test_that("Testing 'getAccrualTime': check expected warnings and errors", {
 
 	# @refFS[Tab.]{fs:tab:output:getAccrualTime}
 	expect_warning(getAccrualTime(accrualTime = c(0, 6), accrualIntensity = c(0.22, 0.33)),
-	    "The specified accrual time and intensity cannot be supplemented ",
-	    "automatically with the missing information; therefore further calculations are not possible",
+	    paste0("The specified accrual time and intensity cannot be supplemented ",
+	        "automatically with the missing information; therefore further calculations are not possible"),
 	    fixed = TRUE
 	)
 
@@ -2496,23 +2496,23 @@ test_that("Testing 'getAccrualTime': check expected warnings and errors", {
 
 	.skipTestIfDisabled()
 
-	expect_warning(getAccrualTime(accrualTime = c(0, 24, 30), 
+	suppressWarnings(expect_warning(getAccrualTime(accrualTime = c(0, 24, 30), 
 	        accrualIntensity = c(30, 45, 55), maxNumberOfSubjects = 720),
 	    "Last 2 accrual intensity values (45, 55) ignored",
 	    fixed = TRUE
-	)
+	))
 
-	expect_warning(getAccrualTime(accrualTime = c(0, 24, 30, 40), 
+	suppressWarnings(expect_warning(getAccrualTime(accrualTime = c(0, 24, 30, 40), 
 	        accrualIntensity = c(30, 45, 55, 66), maxNumberOfSubjects = 720),
 	    "Last 2 accrual time values (30, 40) ignored",
 	    fixed = TRUE
-	)
+	))
 
-	expect_warning(getAccrualTime(accrualTime = c(0, 24, 30, 40), 
+	suppressWarnings(expect_warning(getAccrualTime(accrualTime = c(0, 24, 30, 40), 
 	        accrualIntensity = c(30, 45, 55, 66), maxNumberOfSubjects = 720),
 	    "Last 3 accrual intensity values (45, 55, 66) ignored",
 	    fixed = TRUE
-	)
+	))
 
 	expect_warning(getAccrualTime(accrualTime = c(0, 6, 15, 25), accrualIntensity = c(0, 22, 33)),
 	    "It makes no sense to start 'accrualIntensity' (0, 22, 33) with 0",

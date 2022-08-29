@@ -7,7 +7,7 @@
 getRawData(x, aggregate = FALSE)
 }
 \arguments{
-\item{x}{An \code{\link{SimulationResults}} object created by \code{\link{getSimulationSurvival}}.}
+\item{x}{A \code{\link{SimulationResults}} object created by \code{\link{getSimulationSurvival}}.}
 
 \item{aggregate}{Logical. If \code{TRUE} the raw data will be aggregated similar to
 the result of \code{\link{getData}}, default is \code{FALSE}.}

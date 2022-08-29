@@ -13,10 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6015 $
-## |  Last changed: $Date: 2022-04-08 14:23:17 +0200 (Fr, 08 Apr 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  Last changed by: $Author: pahlke $
 ## |
+
+#' @include f_logger.R
+NULL
 
 .calcRatesTestStatistics <- function(dataInput, subset, stage, thetaH0,
         stratifiedAnalysis, normalApproximation, directionUpper) {
@@ -427,6 +430,9 @@
     )
 
     results <- AnalysisResultsEnrichmentFisher(design = design, dataInput = dataInput)
+    .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
+    .setValueAndParameterType(results, "seed", seed, NA_real_)
+    
     results <- .getAnalysisResultsRatesEnrichmentAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -505,31 +511,21 @@
         # conditional power
         startTime <- Sys.time()
         if (.isTrialDesignFisher(design)) {
-            conditionalPowerResults <- .getConditionalPowerRatesEnrichment(
+            results$.conditionalPowerResults <- .getConditionalPowerRatesEnrichment(
                 stageResults = stageResults,
                 stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
                 piTreatments = piTreatments, piControls = piControls, iterations = iterations, seed = seed
             )
-            if (conditionalPowerResults$simulated) {
-                results$conditionalPowerSimulated <- conditionalPowerResults$conditionalPower
-                results$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
-                results$.setParameterType("conditionalPowerSimulated", C_PARAM_GENERATED)
-            } else {
-                results$conditionalPower <- conditionalPowerResults$conditionalPower
-                results$conditionalPowerSimulated <- matrix(numeric(0))
-                results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
-                results$.setParameterType("conditionalPowerSimulated", C_PARAM_NOT_APPLICABLE)
-            }
+            .synchronizeIterationsAndSeed(results)
         } else {
-            conditionalPowerResults <- .getConditionalPowerRatesEnrichment(
+            results$.conditionalPowerResults <- .getConditionalPowerRatesEnrichment(
                 stageResults = stageResults,
                 stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
                 piTreatments = piTreatments, piControls = piControls
             )
-            results$conditionalPower <- conditionalPowerResults$conditionalPower
+            results$conditionalPower <- results$.conditionalPowerResults$conditionalPower
             results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
         }
-        results$.conditionalPowerResults <- conditionalPowerResults
         .logProgress("Conditional power calculated", startTime = startTime)
 
         # CRP - conditional rejection probabilities
@@ -794,7 +790,6 @@
         iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
     design <- stageResults$.design
     gMax <- stageResults$getGMax()
-
     kMax <- design$kMax
 
     piTreatmentsH1 <- .getOptionalArgument("piTreatmentsH1", ...)
@@ -897,7 +892,8 @@
             useAdjustment = useAdjustment,
             piControls = piControls,
             piTreatments = piTreatments,
-            iterations = iterations, seed = seed, ...
+            iterations = iterations, 
+            seed = seed, ...
         ))
     }
 
@@ -1016,6 +1012,7 @@
 .getConditionalPowerRatesEnrichmentFisher <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, piTreatments, piControls, useAdjustment = TRUE,
         iterations, seed) {
+        
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     .warnInCaseOfUnknownArguments(

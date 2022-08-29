@@ -14,7 +14,7 @@ getPiecewiseSurvivalTime(
   pi2 = NA_real_,
   median1 = NA_real_,
   median2 = NA_real_,
-  eventTime = 12L,
+  eventTime = 12,
   kappa = 1,
   delayedResponseAllowed = FALSE
 )

@@ -8,7 +8,7 @@
 Basic class for stage results.
 }
 \details{
-\code{StageResults} is the basic class for \code{StageResultsMeans}, 
+\code{StageResults} is the basic class for \code{StageResultsMeans},
 \code{StageResultsRates}, and \code{StageResultsSurvival}.
 }
 \section{Fields}{

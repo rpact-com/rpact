@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6287 $
-## |  Last changed: $Date: 2022-06-10 12:24:18 +0200 (Fri, 10 Jun 2022) $
+## |  File version: $Revision: 6524 $
+## |  Last changed: $Date: 2022-08-24 11:09:52 +0200 (Mi, 24 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
 
@@ -152,15 +152,15 @@ C_PI_1_DEFAULT <- seq(0.2, 0.5, 0.1)
 C_PI_1_SAMPLE_SIZE_DEFAULT <- c(0.4, 0.5, 0.6)
 C_DROP_OUT_RATE_1_DEFAULT <- 0
 C_DROP_OUT_RATE_2_DEFAULT <- 0
-C_DROP_OUT_TIME_DEFAULT <- 12L
-C_EVENT_TIME_DEFAULT <- 12L
+C_DROP_OUT_TIME_DEFAULT <- 12
+C_EVENT_TIME_DEFAULT <- 12
 C_ALLOCATION_1_DEFAULT <- 1
 C_ALLOCATION_2_DEFAULT <- 1
 C_MAX_ITERATIONS_DEFAULT <- 10L
 C_MAX_SIMULATION_ITERATIONS_DEFAULT <- 1000L
-C_ACCRUAL_TIME_DEFAULT <- c(0L, 12L)
+C_ACCRUAL_TIME_DEFAULT <- c(0, 12)
 C_ACCRUAL_INTENSITY_DEFAULT <- 0.1
-C_FOLLOW_UP_TIME_DEFAULT <- 6L
+C_FOLLOW_UP_TIME_DEFAULT <- 6
 
 #
 # Constants used in 'f_simulation_multiarm[...].R'
@@ -642,7 +642,7 @@ C_PARAMETER_NAMES <- list(
 	absoluteAccrualIntensityEnabled = "Absolute accrual intensity is enabled",
 	
 	time = "Time",
-	overallEventProbabilities = "Cumulative event probabilities",
+    cumulativeEventProbabilities = "Cumulative event probabilities",
 	eventProbabilities1 = "Event probabilities (1)",
 	eventProbabilities2 = "Event probabilities (2)",
 	
@@ -1052,7 +1052,7 @@ C_TABLE_COLUMN_NAMES <- list(
 	absoluteAccrualIntensityEnabled = "Absolute accrual intensity is enabled",
 	
 	time = "Time",
-	overallEventProbabilities = "Cumulative event probability",
+    cumulativeEventProbabilities = "Cumulative event probability",
 	eventProbabilities1 = "Event probability (1)",
 	eventProbabilities2 = "Event probability (2)",
 	
@@ -1399,7 +1399,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
 	singleNumberOfEventsPerStage = ".formatEvents",
 	
 	time = ".formatTime",
-	overallEventProbabilities = ".formatProbabilities",
+    cumulativeEventProbabilities = ".formatProbabilities",
 	eventProbabilities1 = ".formatProbabilities",
 	eventProbabilities2 = ".formatProbabilities",
 	

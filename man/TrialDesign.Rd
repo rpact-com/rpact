@@ -15,5 +15,11 @@ Basic class for trial designs.
   \item \code{\link{TrialDesignInverseNormal}}.
 }
 }
+\section{Fields}{
+
+\describe{
+\item{\code{kMax}}{}
+}}
+
 
 \keyword{internal}

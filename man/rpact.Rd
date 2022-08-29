@@ -47,7 +47,9 @@ in Clinical Trials (Springer Series in Pharmaceutical Statistics; \doi{10.1007/9
 Useful links:
 \itemize{
   \item \url{https://www.rpact.org}
-  \item Report bugs at \url{https://www.rpact.com/bugreport}
+  \item \url{https://www.rpact.com}
+  \item \url{https://github.com/rpact-com/rpact}
+  \item Report bugs at \url{https://github.com/rpact-com/rpact/issues}
 }
 
 }

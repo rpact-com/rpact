@@ -8,7 +8,7 @@
 Class for conditional power calculations
 }
 \details{
-This object cannot be created directly; use \code{\link{getConditionalPower}} 
+This object cannot be created directly; use \code{\link{getConditionalPower}}
 with suitable arguments to create the results of a group sequential or a combination test design.
 }
 

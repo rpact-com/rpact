@@ -13,10 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6015 $
-## |  Last changed: $Date: 2022-04-08 14:23:17 +0200 (Fr, 08 Apr 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6488 $
+## |  Last changed: $Date: 2022-08-15 10:28:13 +0200 (Mon, 15 Aug 2022) $
+## |  Last changed by: $Author: pahlke $
 ## |
+
+#' @include f_logger.R
+NULL
 
 # @title
 # Get Analysis Results Rates
@@ -221,31 +224,21 @@
         # conditional power
         startTime <- Sys.time()
         if (.isTrialDesignFisher(design)) {
-            conditionalPowerResults <- .getConditionalPowerRatesMultiArm(
+            results$.conditionalPowerResults <- .getConditionalPowerRatesMultiArm(
                 stageResults = stageResults,
                 stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
                 piTreatments = piTreatments, piControl = piControl, iterations = iterations, seed = seed
             )
-            if (conditionalPowerResults$simulated) {
-                results$conditionalPowerSimulated <- conditionalPowerResults$conditionalPower
-                results$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
-                results$.setParameterType("conditionalPowerSimulated", C_PARAM_GENERATED)
-            } else {
-                results$conditionalPower <- conditionalPowerResults$conditionalPower
-                results$conditionalPowerSimulated <- matrix(numeric(0))
-                results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
-                results$.setParameterType("conditionalPowerSimulated", C_PARAM_NOT_APPLICABLE)
-            }
+            .synchronizeIterationsAndSeed(results)
         } else {
-            conditionalPowerResults <- .getConditionalPowerRatesMultiArm(
+            results$.conditionalPowerResults <- .getConditionalPowerRatesMultiArm(
                 stageResults = stageResults,
                 stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
                 piTreatments = piTreatments, piControl = piControl
             )
-            results$conditionalPower <- conditionalPowerResults$conditionalPower
+            results$conditionalPower <- results$.conditionalPowerResults$conditionalPower
             results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
         }
-        results$.conditionalPowerResults <- conditionalPowerResults
         .logProgress("Conditional power calculated", startTime = startTime)
 
         # CRP - conditional rejection probabilities

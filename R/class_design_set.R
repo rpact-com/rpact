@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6287 $
-## |  Last changed: $Date: 2022-06-10 12:24:18 +0200 (Fri, 10 Jun 2022) $
+## |  File version: $Revision: 6513 $
+## |  Last changed: $Date: 2022-08-19 15:14:36 +0200 (Fri, 19 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -99,8 +99,6 @@ getDesignSet <- function(...) {
 }
 
 #'
-#' @name Trial_Design_Set_summary
-#'
 #' @title
 #' Trial Design Set Summary
 #'
@@ -160,6 +158,7 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
 #' @include f_core_plot.R
+#' @include f_logger.R
 #'
 #' @keywords internal
 #'
@@ -581,8 +580,6 @@ setMethod(
 )
 
 #'
-#' @name TrialDesignSet_names
-#'
 #' @title
 #' Names of a Trial Design Set Object
 #'
@@ -608,8 +605,6 @@ names.TrialDesignSet <- function(x) {
     return(x$.getVisibleFieldNames())
 }
 
-#'
-#' @name TrialDesignSet_length
 #'
 #' @title
 #' Length of Trial Design Set
@@ -637,8 +632,6 @@ length.TrialDesignSet <- function(x) {
     return(length(x$designs))
 }
 
-#'
-#' @name TrialDesignSet_as.data.frame
 #'
 #' @title
 #' Coerce Trial Design Set to a Data Frame
@@ -696,10 +689,10 @@ as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
             )
         }
 
-        df <- as.data.frame(design,
+        suppressWarnings(df <- as.data.frame(design,
             niceColumnNamesEnabled = niceColumnNamesEnabled,
             includeAllParameters = includeAllParameters
-        )
+        ))
 
         if (.isTrialDesignWithValidFutilityBounds(design)) {
             futilityBoundsName <- "futilityBounds"
@@ -722,10 +715,10 @@ as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
 
         if (addPowerAndAverageSampleNumber) {
             results <- PowerAndAverageSampleNumberResult(design, theta = theta, nMax = nMax)
-            df2 <- as.data.frame(results,
+            suppressWarnings(df2 <- as.data.frame(results,
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
                 includeAllParameters = includeAllParameters
-            )
+            ))
             df <- merge(df, df2, all.y = TRUE)
         }
         if (is.null(dataFrame)) {
@@ -809,6 +802,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         grid = 1, plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
     designSetName <- deparse(fCall$x)
+    .assertGgplotIsInstalled()
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     typeNumbers <- .getPlotTypeNumber(type, x)
     if (is.null(plotSettings)) {

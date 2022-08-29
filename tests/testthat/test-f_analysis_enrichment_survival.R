@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_enrichment_survival.R
-## |  Creation date: 23 February 2022, 14:03:50
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 17 August 2022, 13:43:46
+## |  File version: $Revision: 6499 $
+## |  Last changed: $Date: 2022-08-17 13:50:08 +0200 (Wed, 17 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Analysis Enrichment Survival Function")
+test_plan_section("Testing Analysis Enrichment Survival Function")
 
 
 test_that("'getAnalysisResults': enrichment survival, one sub-population, non-stratified analysis, select S1 at second, gMax = 2", {
@@ -215,9 +215,9 @@ test_that("'getAnalysisResults': enrichment survival, one sub-population, non-st
 })
 
 test_that("'getAnalysisResults': enrichment survival, one sub-population, stratified data input, select S1 at first, gMax = 2", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISidakEnrichment}
@@ -434,9 +434,9 @@ test_that("'getAnalysisResults': enrichment survival, two sub-populations, non-s
 })
 
 test_that("'getAnalysisResults': enrichment survival, two sub-populations, stratified analysis, select S1 and S2 at first IA, select S1 at second, gMax = 3", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISidakEnrichment}

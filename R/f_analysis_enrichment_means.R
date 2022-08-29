@@ -13,10 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6015 $
-## |  Last changed: $Date: 2022-04-08 14:23:17 +0200 (Fr, 08 Apr 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6488 $
+## |  Last changed: $Date: 2022-08-15 10:28:13 +0200 (Mon, 15 Aug 2022) $
+## |  Last changed by: $Author: pahlke $
 ## |
+
+#' @include f_logger.R
+NULL
 
 .calcMeansVariancesTestStatistics <- function(dataInput, subset, stage, thetaH0, stratifiedAnalysis, varianceOption) {
     .assertIsSingleInteger(stage, "stage")
@@ -290,7 +293,6 @@
         paste("stage ", (1:kMax), sep = "")
     )
 
-
     subsets <- .createSubsetsByGMax(gMax = gMax, stratifiedInput = dataInput$isStratified(), subsetIdPrefix = "S")
     for (k in 1:stage) {
         for (population in 1:gMax) {
@@ -485,6 +487,9 @@
     )
 
     results <- AnalysisResultsEnrichmentFisher(design = design, dataInput = dataInput)
+    .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
+    .setValueAndParameterType(results, "seed", seed, NA_real_)
+    
     results <- .getAnalysisResultsMeansEnrichmentAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -555,33 +560,23 @@
         # conditional power
         startTime <- Sys.time()
         if (.isTrialDesignFisher(design)) {
-            conditionalPowerResults <- .getConditionalPowerMeansEnrichment(
+            results$.conditionalPowerResults <- .getConditionalPowerMeansEnrichment(
                 stageResults = stageResults,
                 stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
                 thetaH1 = thetaH1, assumedStDevs = assumedStDevs, iterations = iterations, seed = seed
             )
-            if (conditionalPowerResults$simulated) {
-                results$conditionalPowerSimulated <- conditionalPowerResults$conditionalPower
-                results$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
-                results$.setParameterType("conditionalPowerSimulated", C_PARAM_GENERATED)
-            } else {
-                results$conditionalPower <- conditionalPowerResults$conditionalPower
-                results$conditionalPowerSimulated <- matrix(numeric(0))
-                results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
-                results$.setParameterType("conditionalPowerSimulated", C_PARAM_NOT_APPLICABLE)
-            }
+            .synchronizeIterationsAndSeed(results)
         } else {
-            conditionalPowerResults <- .getConditionalPowerMeansEnrichment(
+            results$.conditionalPowerResults <- .getConditionalPowerMeansEnrichment(
                 stageResults = stageResults,
                 stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
                 thetaH1 = thetaH1, assumedStDevs = assumedStDevs
             )
-            results$conditionalPower <- conditionalPowerResults$conditionalPower
+            results$conditionalPower <- results$.conditionalPowerResults$conditionalPower
             results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
         }
-        results$thetaH1 <- matrix(conditionalPowerResults$thetaH1, ncol = 1)
-        results$assumedStDevs <- matrix(conditionalPowerResults$assumedStDevs, ncol = 1)
-        results$.conditionalPowerResults <- conditionalPowerResults
+        results$thetaH1 <- matrix(results$.conditionalPowerResults$thetaH1, ncol = 1)
+        results$assumedStDevs <- matrix(results$.conditionalPowerResults$assumedStDevs, ncol = 1)
         .logProgress("Conditional power calculated", startTime = startTime)
 
         # CRP - conditional rejection probabilities
@@ -1176,7 +1171,7 @@
     criticalValues <- design$criticalValues
     weightsFisher <- .getWeightsFisher(design)
 
-    # results$conditionalPower <- matrix(NA_real_, nrow = gMax, ncol = kMax)
+    results$conditionalPower <- matrix(NA_real_, nrow = gMax, ncol = kMax)
 
     results$iterations <- as.integer(iterations)
     results$.setParameterType("iterations", C_PARAM_USER_DEFINED)

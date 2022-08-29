@@ -14,13 +14,13 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-generic_functions.R
-## |  Creation date: 23 February 2022, 14:07:41
-## |  File version: $Revision: 5881 $
-## |  Last changed: $Date: 2022-02-24 12:35:06 +0100 (Do, 24 Feb 2022) $
+## |  Creation date: 12 August 2022, 09:12:44
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
-context("Testing Class 'SummaryFactory'")
+test_plan_section("Testing Class 'SummaryFactory'")
 
 
 test_that("Testing 'summary.ParameterSet': no errors occur", {
@@ -124,36 +124,36 @@ test_that("Testing 'summary.ParameterSet': no errors occur", {
 	expect_named(as.data.frame(piecewiseSurvivalTime))
 	expect_named(as.data.frame(accrualTime))
 
-	expect_is(as.data.frame(design, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(designFisher, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(designCharacteristics, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(powerAndASN, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(designSet, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(dataset, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(stageResults, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(designPlan, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(simulationResults, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(piecewiseSurvivalTime, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.data.frame(accrualTime, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(design, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(designFisher, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(designCharacteristics, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(powerAndASN, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(designSet, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(dataset, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(stageResults, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(designPlan, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(simulationResults, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(piecewiseSurvivalTime, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_s3_class(as.data.frame(accrualTime, niceColumnNamesEnabled = FALSE), "data.frame")
 
-	expect_is(as.matrix(design), "matrix")
-	expect_is(as.matrix(designFisher), "matrix")
-	expect_is(as.matrix(designCharacteristics), "matrix")
-	expect_is(as.matrix(powerAndASN), "matrix")
-	expect_is(as.matrix(designSet), "matrix")
-	expect_is(as.matrix(dataset), "matrix")
-	expect_is(as.matrix(stageResults), "matrix")
-	expect_is(as.matrix(designPlan), "matrix")
-	expect_is(as.matrix(simulationResults), "matrix")
-	expect_is(as.matrix(piecewiseSurvivalTime), "matrix")
-	expect_is(as.matrix(accrualTime), "matrix")
+	expect_type(as.matrix(design), "character")
+	expect_type(as.matrix(designFisher), "character")
+	expect_type(as.matrix(designCharacteristics), "double")
+	expect_type(as.matrix(powerAndASN), "double")
+	expect_type(as.matrix(designSet), "character")
+	expect_type(as.matrix(dataset), "double")
+	expect_type(as.matrix(stageResults), "character")
+	expect_type(as.matrix(designPlan), "double")
+	expect_type(as.matrix(simulationResults), "double")
+	expect_type(as.matrix(piecewiseSurvivalTime), "double")
+	expect_type(as.matrix(accrualTime), "double")
 
 	suppressWarnings(analysisResults <- getAnalysisResults(design, dataset))
 	expect_vector(names(analysisResults))
 	expect_output(print(analysisResults))
 	expect_output(summary(analysisResults)$show())
 	expect_named(as.data.frame(analysisResults))
-	expect_is(as.data.frame(analysisResults, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_is(as.matrix(analysisResults), "matrix")
+	expect_s3_class(as.data.frame(analysisResults, niceColumnNamesEnabled = FALSE), "data.frame")
+	expect_type(as.matrix(analysisResults), "character")
 })
 

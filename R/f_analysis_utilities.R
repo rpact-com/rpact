@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6094 $
-## |  Last changed: $Date: 2022-04-28 11:33:20 +0200 (Thu, 28 Apr 2022) $
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -671,27 +671,33 @@ NULL
 
 .isDataObject <- function(..., dataObjectkeyWords) {
     .assertIsValidDatasetArgument(...)
-
     argNames <- .getArgumentNames(...)
     if (length(argNames) == 0) {
         return(FALSE)
     }
-
-    # 	argNames <- tolower(argNames)
-    #    dataObjectkeyWords <- c(dataObjectkeyWords, paste0(dataObjectkeyWords, "1"))
-
+    
     dataObjectkeyWords <- .getAllParameterNameVariants(dataObjectkeyWords)
-
     matching <- intersect(argNames, dataObjectkeyWords)
-
     return(length(matching) > 0)
 }
 
 .isDataObjectEnrichment <- function(...) {
-    return(.isDataObject(...,
-        dataObjectkeyWords =
-            c(C_KEY_WORDS_SUBSETS, paste0(C_KEY_WORDS_SUBSETS, "1"))
-    ))
+    enrichmentEnabled <- .isDataObject(...,
+        dataObjectkeyWords = c(C_KEY_WORDS_SUBSETS, paste0(C_KEY_WORDS_SUBSETS, "1"))
+    )
+    if (!enrichmentEnabled) {
+        return(FALSE)
+    }
+    
+    args <- list(...)
+    if (length(args) == 1 && is.data.frame(args[[1]])) {
+        data <- args[[1]]
+        if ("subsets" %in% colnames(data) && all(is.na(data[["subsets"]]))) {
+            return(FALSE)
+        }
+    }
+    
+    return(enrichmentEnabled)
 }
 
 .isDataObjectMeans <- function(...) {
@@ -773,6 +779,10 @@ getWideFormat <- function(dataInput) {
     .assertIsDataset(dataInput)
     paramNames <- names(dataInput)
     paramNames <- paramNames[!(paramNames %in% c("groups"))]
+    if (!dataInput$.enrichmentEnabled) {
+        paramNames <- paramNames[!(paramNames %in% c("subsets"))]
+    }
+    
     numberOfSubsets <- dataInput$getNumberOfSubsets()
     numberOfGroups <- dataInput$getNumberOfGroups(survivalCorrectionEnabled = FALSE)
     if (numberOfSubsets <= 1) {
@@ -1120,4 +1130,65 @@ getObservedInformationRates <- function(dataInput, ...,
         informationRates = informationRates,
         status = status
     ))
+}
+
+.synchronizeIterationsAndSeed <- function(results) {
+    if (is.null(results[[".conditionalPowerResults"]])) {
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(.getClassName(results)), 
+            " does not contain field ", sQuote(".conditionalPowerResults"))
+    }
+    
+    if (results$.design$kMax == 1) {
+        return(invisible(results))
+    }
+    
+    if (results$.conditionalPowerResults$simulated) {
+        results$conditionalPowerSimulated <- results$.conditionalPowerResults$conditionalPower
+        results$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
+        results$.setParameterType("conditionalPowerSimulated", C_PARAM_GENERATED)
+    
+        results$.setParameterType("seed", results$.conditionalPowerResults$.getParameterType("seed"))
+        results$seed <- results$.conditionalPowerResults$seed
+        results$.setParameterType("iterations",
+            results$.conditionalPowerResults$.getParameterType("iterations")
+        )
+        results$iterations <- results$.conditionalPowerResults$iterations
+    } else {
+        results$conditionalPower <- results$.conditionalPowerResults$conditionalPower
+        if (is.matrix(results$conditionalPowerSimulated)) {
+            results$conditionalPowerSimulated <- matrix()
+        } else {
+            results$conditionalPowerSimulated <- numeric(0)
+        }
+        results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
+        results$.setParameterType("conditionalPowerSimulated", C_PARAM_NOT_APPLICABLE)
+        
+        results$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
+        results$.setParameterType("iterations", C_PARAM_NOT_APPLICABLE)
+    }
+    
+    return(invisible(results))
+}
+
+.updateParameterTypeOfIterationsAndSeed <- function(results, ...) {
+    if (!results$simulated) {
+        results$iterations <- NA_integer_
+        results$seed <- NA_real_
+        results$.setParameterType("iterations", C_PARAM_NOT_APPLICABLE)
+        results$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
+        return(invisible(results))
+    }
+    
+    iterations <- .getOptionalArgument("iterations", ...)
+    results$.setParameterType("iterations", ifelse(is.null(iterations) || is.na(iterations) || 
+            identical(iterations, C_ITERATIONS_DEFAULT),
+        C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+    ))
+    
+    seed <- .getOptionalArgument("seed", ...)
+    results$.setParameterType("seed", ifelse(!is.null(seed) && !is.na(seed),
+        C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE
+    ))
+    
+    return(invisible(results))
 }

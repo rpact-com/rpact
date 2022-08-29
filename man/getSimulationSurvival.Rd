@@ -20,13 +20,13 @@ getSimulationSurvival(
   piecewiseSurvivalTime = NA_real_,
   allocation1 = 1,
   allocation2 = 1,
-  eventTime = 12L,
-  accrualTime = c(0L, 12L),
+  eventTime = 12,
+  accrualTime = c(0, 12),
   accrualIntensity = 0.1,
   accrualIntensityType = c("auto", "absolute", "relative"),
   dropoutRate1 = 0,
   dropoutRate2 = 0,
-  dropoutTime = 12L,
+  dropoutTime = 12,
   maxNumberOfSubjects = NA_real_,
   plannedEvents = NA_real_,
   minNumberOfEventsPerStage = NA_real_,
@@ -195,6 +195,12 @@ assumptions (exponentially, piecewise exponentially, or Weibull distributed surv
 and constant or non-constant piecewise accrual).
 Additionally, integers \code{allocation1} and \code{allocation2} can be specified that determine the number allocated
 to treatment group 1 and treatment group 2, respectively.
+More precisely, unequal randomization ratios must be specified via the two integer arguments \code{allocation1} and 
+\code{allocation2} which describe how many subjects are consecutively enrolled in each group, respectively, before a 
+subject is assigned to the other group. For example, the arguments \code{allocation1 = 2}, \code{allocation2 = 1}, 
+\code{maxNumberOfSubjects = 300} specify 2:1 randomization with 200 subjects randomized to intervention and 100 to 
+control. (Caveat: Do not use \code{allocation1 = 200}, \code{allocation2 = 100}, \code{maxNumberOfSubjects = 300} 
+as this would imply that the 200 intervention subjects are enrolled prior to enrollment of any control subjects.)
 
 \code{conditionalPower}\cr
 The definition of \code{thetaH1} makes only sense if \code{kMax} > 1

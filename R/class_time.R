@@ -13,9 +13,9 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6293 $
-## |  Last changed: $Date: 2022-06-14 07:19:38 +0200 (Tue, 14 Jun 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6522 $
+## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
+## |  Last changed by: $Author: wassmer $
 ## | 
 
 C_REGEXP_GREATER_OR_EQUAL <- ">= ?"
@@ -190,12 +190,12 @@ getPiecewiseSurvivalTime <- function(piecewiseSurvivalTime = NA_real_,
 		pi2 = NA_real_,
 		median1 = NA_real_,
 		median2 = NA_real_,
-		eventTime = 12L, # C_EVENT_TIME_DEFAULT
+		eventTime = 12, # C_EVENT_TIME_DEFAULT
 		kappa = 1,
 		delayedResponseAllowed = FALSE) {
 		
 	.warnInCaseOfUnknownArguments(functionName = "getPiecewiseSurvivalTime", ..., 
-		ignore = c(".pi1Default", ".lambdaBased", ".silent"))
+		ignore = c(".pi1Default", ".lambdaBased", ".silent"), exceptionEnabled = TRUE)
 	
 	if (inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvival")) {
 		piecewiseSurvivalTime <- piecewiseSurvivalTime$.piecewiseSurvivalTime
@@ -229,8 +229,9 @@ getPiecewiseSurvivalTime <- function(piecewiseSurvivalTime = NA_real_,
 	.assertIsSingleNumber(eventTime, "eventTime", naAllowed = TRUE)
 	.assertIsValidKappa(kappa)
 	.assertIsSingleLogical(delayedResponseAllowed, "delayedResponseAllowed")
-	
-	return(PiecewiseSurvivalTime(piecewiseSurvivalTime = piecewiseSurvivalTime, 
+    
+	return(PiecewiseSurvivalTime(
+        piecewiseSurvivalTime = piecewiseSurvivalTime, 
 		lambda1 = lambda1, 
 		lambda2 = lambda2,
 		hazardRatio = hazardRatio,
@@ -342,6 +343,7 @@ getAccrualTime <- function(accrualTime = NA_real_,
 #' @include f_core_constants.R
 #' @include class_core_parameter_set.R
 #' @include f_core_utilities.R
+#' @include f_logger.R
 #' 
 #' @keywords internal
 #' 
@@ -798,7 +800,7 @@ PiecewiseSurvivalTime <- setRefClass("PiecewiseSurvivalTime",
 									"'lambda2' can only be calculated if 'unique(lambda1 / hazardRatio^(1 / kappa))' ",
 									"result in a single value; current result = ", 
 									.arrayToString(round(lambda2, 4), vectorLookAndFeelEnabled = TRUE), 
-									" (delayed response is not allowed)")
+									" (e.g., delayed response is not allowed)")
 							}
 							
 							median2 <<- getMedianByLambda(lambda2, kappa)
@@ -1118,7 +1120,7 @@ PiecewiseSurvivalTime <- setRefClass("PiecewiseSurvivalTime",
 						"'hazardRatio' can only be calculated if 'unique(lambda1 / lambda2)' ",
 						"result in a single value; current result = ", 
 						.arrayToString(round(hr, 4), vectorLookAndFeelEnabled = TRUE), 
-						" (delayed response is not allowed)")
+						" (e.g., delayed response is not allowed)")
 				}
 				
 			}

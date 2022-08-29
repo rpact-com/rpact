@@ -8,7 +8,7 @@
 A basic class for enrichment analysis results.
 }
 \details{
-\code{AnalysisResultsEnrichment} is the basic class for 
+\code{AnalysisResultsEnrichment} is the basic class for
 \itemize{
   \item \code{\link{AnalysisResultsEnrichmentFisher}} and
   \item \code{\link{AnalysisResultsEnrichmentInverseNormal}}.

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 5644 $
-## |  Last changed: $Date: 2021-12-10 14:14:55 +0100 (Fr, 10 Dez 2021) $
+## |  File version: $Revision: 6466 $
+## |  Last changed: $Date: 2022-08-08 14:32:20 +0200 (Mo, 08 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -150,6 +150,15 @@ NULL
 
         selsubs <- !is.na(subjectsPerStage[, k]) & subjectsPerStage[, k] > 0
 
+        if (any(round(subjectsPerStage[selsubs, k] * const / (1 + const)) < 1) ||
+                any(round(subjectsPerStage[selsubs, k] / (1 + const)) < 1)) {
+            stop(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "at least one sample size specification too small to create simulation results, ",
+                "e.g., due to small prevalences of subsets"
+            )
+        }
+
         simEventsTreatment[selsubs, k] <- stats::rbinom(
             rep(1, sum(selsubs)),
             round(subjectsPerStage[selsubs, k] * const / (1 + const)), piTreatments[selsubs]
@@ -159,6 +168,7 @@ NULL
             rep(1, sum(selsubs)),
             round(subjectsPerStage[selsubs, k] / (1 + const)), piControls[selsubs]
         )
+
 
         if (gMax == 1) {
             rm <- (simEventsControl[1, k] + simEventsTreatment[1, k]) / subjectsPerStage[1, k]
@@ -171,8 +181,10 @@ NULL
                     sqrt(rm * (1 - rm)) * sqrt(subjectsPerStage[1, k] * const / (1 + const)^2)
             }
             populationSubjectsPerStage[1, k] <- subjectsPerStage[1, k]
-            overallRatesTreatment[1, k] <- sum(simEventsTreatment[1, 1:k]) * (1 + const) / const / sum(subjectsPerStage[1, 1:k])
-            overallRatesControl[1, k] <- sum(simEventsControl[1, 1:k]) * (1 + const) / sum(subjectsPerStage[1, 1:k])
+            overallRatesTreatment[1, k] <- sum(simEventsTreatment[1, 1:k]) /
+                round(const / (1 + const) * sum(subjectsPerStage[1, 1:k]))
+            overallRatesControl[1, k] <- sum(simEventsControl[1, 1:k]) /
+                round(1 / (1 + const) * sum(subjectsPerStage[1, 1:k]))
             overallEffectSizes[1, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[1, k] - overallRatesControl[1, k])
             rm <- sum(simEventsControl[1, 1:k] + simEventsTreatment[1, 1:k]) / sum(subjectsPerStage[1, 1:k])
@@ -196,8 +208,10 @@ NULL
                 }
             }
             populationSubjectsPerStage[1, k] <- subjectsPerStage[1, k]
-            overallRatesTreatment[1, k] <- sum(simEventsTreatment[1, 1:k]) * (1 + const) / const / sum(subjectsPerStage[1, 1:k])
-            overallRatesControl[1, k] <- sum(simEventsControl[1, 1:k]) * (1 + const) / sum(subjectsPerStage[1, 1:k])
+            overallRatesTreatment[1, k] <- sum(simEventsTreatment[1, 1:k]) /
+                round(const / (1 + const) * sum(subjectsPerStage[1, 1:k]))
+            overallRatesControl[1, k] <- sum(simEventsControl[1, 1:k]) /
+                round(1 / (1 + const) * sum(subjectsPerStage[1, 1:k]))
             overallEffectSizes[1, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[1, k] - overallRatesControl[1, k])
             rm <- sum(simEventsControl[1, 1:k] + simEventsTreatment[1, 1:k]) / sum(subjectsPerStage[1, 1:k])
@@ -240,10 +254,10 @@ NULL
                 }
             }
             populationSubjectsPerStage[2, k] <- sum(subjectsPerStage[1:2, k], na.rm = TRUE)
-            overallRatesTreatment[2, k] <- sum(simEventsTreatment[1:2, 1:k], na.rm = TRUE) * (1 + const) / const /
-                sum(subjectsPerStage[1:2, 1:k], na.rm = TRUE)
-            overallRatesControl[2, k] <- sum(simEventsControl[1:2, 1:k], na.rm = TRUE) * (1 + const) /
-                sum(subjectsPerStage[1:2, 1:k], na.rm = TRUE)
+            overallRatesTreatment[2, k] <- sum(simEventsTreatment[1:2, 1:k], na.rm = TRUE) /
+                round(const / (1 + const) * sum(subjectsPerStage[1:2, 1:k], na.rm = TRUE))
+            overallRatesControl[2, k] <- sum(simEventsControl[1:2, 1:k], na.rm = TRUE) /
+                round(1 / (1 + const) * sum(subjectsPerStage[1:2, 1:k], na.rm = TRUE))
             overallEffectSizes[2, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[2, k] - overallRatesControl[2, k])
             rm <- sum(simEventsControl[1:2, 1:k] + simEventsTreatment[1:2, 1:k], na.rm = TRUE) /
@@ -288,10 +302,10 @@ NULL
                 }
             }
             populationSubjectsPerStage[1, k] <- sum(subjectsPerStage[c(1, 3), k], na.rm = TRUE)
-            overallRatesTreatment[1, k] <- sum(simEventsTreatment[c(1, 3), 1:k], na.rm = TRUE) * (1 + const) / const /
-                sum(subjectsPerStage[c(1, 3), 1:k], na.rm = TRUE)
-            overallRatesControl[1, k] <- sum(simEventsControl[c(1, 3), 1:k], na.rm = TRUE) * (1 + const) /
-                sum(subjectsPerStage[c(1, 3), 1:k], na.rm = TRUE)
+            overallRatesTreatment[1, k] <- sum(simEventsTreatment[c(1, 3), 1:k], na.rm = TRUE) /
+                round(const / (1 + const) * sum(subjectsPerStage[c(1, 3), 1:k], na.rm = TRUE))
+            overallRatesControl[1, k] <- sum(simEventsControl[c(1, 3), 1:k], na.rm = TRUE) /
+                round(1 / (1 + const) * sum(subjectsPerStage[c(1, 3), 1:k], na.rm = TRUE))
             overallEffectSizes[1, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[1, k] - overallRatesControl[1, k])
             rm <- sum(simEventsControl[c(1, 3), 1:k] + simEventsTreatment[c(1, 3), 1:k], na.rm = TRUE) /
@@ -335,10 +349,10 @@ NULL
                 }
             }
             populationSubjectsPerStage[2, k] <- sum(subjectsPerStage[c(2, 3), k], na.rm = TRUE)
-            overallRatesTreatment[2, k] <- sum(simEventsTreatment[c(2, 3), 1:k], na.rm = TRUE) * (1 + const) / const /
-                sum(subjectsPerStage[c(2, 3), 1:k], na.rm = TRUE)
-            overallRatesControl[2, k] <- sum(simEventsControl[c(2, 3), 1:k], na.rm = TRUE) * (1 + const) /
-                sum(subjectsPerStage[c(2, 3), 1:k], na.rm = TRUE)
+            overallRatesTreatment[2, k] <- sum(simEventsTreatment[c(2, 3), 1:k], na.rm = TRUE) /
+                round(const / (1 + const) * sum(subjectsPerStage[c(2, 3), 1:k], na.rm = TRUE))
+            overallRatesControl[2, k] <- sum(simEventsControl[c(2, 3), 1:k], na.rm = TRUE) /
+                round(1 / (1 + const) * sum(subjectsPerStage[c(2, 3), 1:k], na.rm = TRUE))
             overallEffectSizes[2, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[2, k] - overallRatesControl[2, k])
             rm <- sum(simEventsControl[c(2, 3), 1:k] + simEventsTreatment[c(2, 3), 1:k], na.rm = TRUE) /
@@ -382,10 +396,10 @@ NULL
                 }
             }
             populationSubjectsPerStage[3, k] <- sum(subjectsPerStage[1:4, k], na.rm = TRUE)
-            overallRatesTreatment[3, k] <- sum(simEventsTreatment[1:4, 1:k], na.rm = TRUE) * (1 + const) / const /
-                sum(subjectsPerStage[1:4, 1:k], na.rm = TRUE)
-            overallRatesControl[3, k] <- sum(simEventsControl[1:4, 1:k], na.rm = TRUE) * (1 + const) /
-                sum(subjectsPerStage[1:4, 1:k], na.rm = TRUE)
+            overallRatesTreatment[3, k] <- sum(simEventsTreatment[1:4, 1:k], na.rm = TRUE) /
+                round(const / (1 + const) * sum(subjectsPerStage[1:4, 1:k], na.rm = TRUE))
+            overallRatesControl[3, k] <- sum(simEventsControl[1:4, 1:k], na.rm = TRUE) /
+                round(1 / (1 + const) * sum(subjectsPerStage[1:4, 1:k], na.rm = TRUE))
             overallEffectSizes[3, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[3, k] - overallRatesControl[3, k])
             rm <- sum(simEventsControl[1:4, 1:k] + simEventsTreatment[1:4, 1:k], na.rm = TRUE) /
@@ -430,10 +444,10 @@ NULL
                 }
             }
             populationSubjectsPerStage[1, k] <- sum(subjectsPerStage[c(1, 4, 5, 7), k], na.rm = TRUE)
-            overallRatesTreatment[1, k] <- sum(simEventsTreatment[c(1, 4, 5, 7), 1:k], na.rm = TRUE) * (1 + const) / const /
-                sum(subjectsPerStage[c(1, 4, 5, 7), 1:k], na.rm = TRUE)
-            overallRatesControl[1, k] <- sum(simEventsControl[c(1, 4, 5, 7), 1:k], na.rm = TRUE) * (1 + const) /
-                sum(subjectsPerStage[c(1, 4, 5, 7), 1:k], na.rm = TRUE)
+            overallRatesTreatment[1, k] <- sum(simEventsTreatment[c(1, 4, 5, 7), 1:k], na.rm = TRUE) /
+                round(const / (1 + const) * sum(subjectsPerStage[c(1, 4, 5, 7), 1:k], na.rm = TRUE))
+            overallRatesControl[1, k] <- sum(simEventsControl[c(1, 4, 5, 7), 1:k], na.rm = TRUE) /
+                round(1 / (1 + const) * sum(subjectsPerStage[c(1, 4, 5, 7), 1:k], na.rm = TRUE))
             overallEffectSizes[1, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[1, k] - overallRatesControl[1, k])
             rm <- sum(simEventsControl[c(1, 4, 5, 7), 1:k] + simEventsTreatment[c(1, 4, 5, 7), 1:k], na.rm = TRUE) /
@@ -477,10 +491,10 @@ NULL
                 }
             }
             populationSubjectsPerStage[2, k] <- sum(subjectsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE)
-            overallRatesTreatment[2, k] <- sum(simEventsTreatment[c(2, 4, 6, 7), 1:k], na.rm = TRUE) * (1 + const) / const /
-                sum(subjectsPerStage[c(2, 4, 6, 7), 1:k], na.rm = TRUE)
-            overallRatesControl[2, k] <- sum(simEventsControl[c(2, 4, 6, 7), 1:k], na.rm = TRUE) * (1 + const) /
-                sum(subjectsPerStage[c(2, 4, 6, 7), 1:k], na.rm = TRUE)
+            overallRatesTreatment[2, k] <- sum(simEventsTreatment[c(2, 4, 6, 7), 1:k], na.rm = TRUE) /
+                round(const / (1 + const) * sum(subjectsPerStage[c(2, 4, 6, 7), 1:k], na.rm = TRUE))
+            overallRatesControl[2, k] <- sum(simEventsControl[c(2, 4, 6, 7), 1:k], na.rm = TRUE) /
+                round(1 / (1 + const) * sum(subjectsPerStage[c(2, 4, 6, 7), 1:k], na.rm = TRUE))
             overallEffectSizes[2, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[2, k] - overallRatesControl[2, k])
             rm <- sum(simEventsControl[c(2, 4, 6, 7), 1:k] + simEventsTreatment[c(2, 4, 6, 7), 1:k], na.rm = TRUE) /
@@ -524,10 +538,10 @@ NULL
                 }
             }
             populationSubjectsPerStage[3, k] <- sum(subjectsPerStage[c(3, 5, 6, 7), k], na.rm = TRUE)
-            overallRatesTreatment[3, k] <- sum(simEventsTreatment[c(3, 5, 6, 7), 1:k], na.rm = TRUE) * (1 + const) / const /
-                sum(subjectsPerStage[c(3, 5, 6, 7), 1:k], na.rm = TRUE)
-            overallRatesControl[3, k] <- sum(simEventsControl[c(3, 5, 6, 7), 1:k], na.rm = TRUE) * (1 + const) /
-                sum(subjectsPerStage[c(3, 5, 6, 7), 1:k], na.rm = TRUE)
+            overallRatesTreatment[3, k] <- sum(simEventsTreatment[c(3, 5, 6, 7), 1:k], na.rm = TRUE) /
+                round(const / (1 + const) * sum(subjectsPerStage[c(3, 5, 6, 7), 1:k], na.rm = TRUE))
+            overallRatesControl[3, k] <- sum(simEventsControl[c(3, 5, 6, 7), 1:k], na.rm = TRUE) /
+                round(1 / (1 + const) * sum(subjectsPerStage[c(3, 5, 6, 7), 1:k], na.rm = TRUE))
             overallEffectSizes[3, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[3, k] - overallRatesControl[3, k])
             rm <- sum(simEventsControl[c(3, 5, 6, 7), 1:k] + simEventsTreatment[c(3, 5, 6, 7), 1:k], na.rm = TRUE) /
@@ -571,10 +585,10 @@ NULL
                 }
             }
             populationSubjectsPerStage[4, k] <- sum(subjectsPerStage[1:8, k], na.rm = TRUE)
-            overallRatesTreatment[4, k] <- sum(simEventsTreatment[1:8, 1:k], na.rm = TRUE) * (1 + const) / const /
-                sum(subjectsPerStage[1:8, 1:k], na.rm = TRUE)
-            overallRatesControl[4, k] <- sum(simEventsControl[1:8, 1:k], na.rm = TRUE) * (1 + const) /
-                sum(subjectsPerStage[1:8, 1:k], na.rm = TRUE)
+            overallRatesTreatment[4, k] <- sum(simEventsTreatment[1:8, 1:k], na.rm = TRUE) /
+                round(const / (1 + const) * sum(subjectsPerStage[1:8, 1:k], na.rm = TRUE))
+            overallRatesControl[4, k] <- sum(simEventsControl[1:8, 1:k], na.rm = TRUE) /
+                round(1 / (1 + const) * sum(subjectsPerStage[1:8, 1:k], na.rm = TRUE))
             overallEffectSizes[4, k] <-
                 (2 * directionUpper - 1) * (overallRatesTreatment[4, k] - overallRatesControl[4, k])
             rm <- sum(simEventsControl[1:8, 1:k] + simEventsTreatment[1:8, 1:k], na.rm = TRUE) /
@@ -736,7 +750,6 @@ NULL
 #' @inheritParams param_adaptations
 #' @inheritParams param_threshold
 #' @inheritParams param_effectList
-#' @inheritParams param_populations
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
@@ -794,7 +807,6 @@ NULL
 #' @export
 #'
 getSimulationEnrichmentRates <- function(design = NULL, ...,
-        populations = NA_integer_, # C_POPULATIONS_DEFAULT
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
         stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT,
@@ -839,7 +851,6 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
 
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design = design,
-        populations = populations,
         effectList = effectList,
         intersectionTest = intersectionTest,
         stratifiedAnalysis = stratifiedAnalysis,
@@ -1085,7 +1096,7 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
-        armNumber = dataPopulationNumber,
+        populationNumber = dataPopulationNumber,
         effect = dataEffect,
         numberOfSubjects = dataNumberOfSubjects,
         numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,

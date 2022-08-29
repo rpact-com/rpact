@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6294 $
-## |  Last changed: $Date: 2022-06-14 12:08:55 +0200 (Di, 14 Jun 2022) $
+## |  File version: $Revision: 6517 $
+## |  Last changed: $Date: 2022-08-22 16:26:44 +0200 (Mo, 22 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -45,7 +45,7 @@ NULL
 #' l_1,...,l_kMax\cr
 #' u_1,...,u_kMax\cr
 #' For 4 rows, the continuation region contains of two regions and the probability matrix is
-#' obtained analogeously (cf., Wassmer and Brannath, 2016).
+#' obtained analogously (cf., Wassmer and Brannath, 2016).
 #'
 #' @family design functions
 #'
@@ -59,7 +59,6 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     return(.getGroupSequentialProbabilities(decisionMatrix = decisionMatrix, informationRates = informationRates))
 }
-
 
 .validateGroupSequentialProbabilityResultsMulti <- function(...) {
     args <- list(...)
@@ -657,10 +656,10 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     optimumDesign <- stats::optimize(.getOptimumDesign,
         design = design,
-        interval = c(0, 1), tol = 0.001
+        interval = c(0, 1), tol = 0.0001
     )
 
-    design$deltaWT <- round(optimumDesign$minimum, 2)
+    design$deltaWT <- round(optimumDesign$minimum, 3)
     design$.setParameterType("deltaWT", C_PARAM_GENERATED)
 
     # Recalculation of design characteristics with rounded design$deltaWT
@@ -998,9 +997,9 @@ getDesignInverseNormal <- function(...,
         userBetaSpending = NA_real_,
         gammaB = NA_real_,
         bindingFutility = NA,
+        betaAdjustment = NA,
         constantBoundsHP = 3, # C_CONST_BOUND_HP_DEFAULT,
         twoSidedPower = NA,
-        delayedInformation = NA_real_,
         tolerance = 1e-08 # C_DESIGN_TOLERANCE_DEFAULT
         ) {
     .warnInCaseOfUnknownArguments(functionName = "getDesignInverseNormal", ignore = c("cppEnabled"), ...)
@@ -1029,9 +1028,9 @@ getDesignInverseNormal <- function(...,
         userBetaSpending = userBetaSpending,
         gammaB = gammaB,
         bindingFutility = bindingFutility,
+        betaAdjustment = betaAdjustment,
         constantBoundsHP = constantBoundsHP,
         twoSidedPower = twoSidedPower,
-        delayedInformation = delayedInformation,
         tolerance = tolerance,
         userFunctionCallEnabled = TRUE
     ))
@@ -1055,6 +1054,7 @@ getDesignInverseNormal <- function(...,
         userBetaSpending = NA_real_,
         gammaB = NA_real_,
         bindingFutility = NA,
+        betaAdjustment = NA,
         constantBoundsHP = C_CONST_BOUND_HP_DEFAULT,
         twoSidedPower = NA,
         tolerance = C_DESIGN_TOLERANCE_DEFAULT) {
@@ -1079,6 +1079,7 @@ getDesignInverseNormal <- function(...,
         userBetaSpending = userBetaSpending,
         gammaB = gammaB,
         bindingFutility = bindingFutility,
+        betaAdjustment = betaAdjustment,
         constantBoundsHP = constantBoundsHP,
         twoSidedPower = twoSidedPower,
         tolerance = tolerance,
@@ -1326,21 +1327,25 @@ getDesignInverseNormal <- function(...,
 
     if (design$kMax == 1) {
         if (!identical(design$informationRates, 1)) {
-            warning("Information rate", ifelse(length(design$informationRates) != 1, "s", ""), " ",
-                .arrayToString(design$informationRates, vectorLookAndFeelEnabled = TRUE),
-                " will be ignored",
-                call. = FALSE
-            )
+            if (!is.na(design$informationRates)) {
+                warning("Information rate", ifelse(length(design$informationRates) != 1, "s", ""), " ",
+                    .arrayToString(design$informationRates, vectorLookAndFeelEnabled = TRUE),
+                    " will be ignored",
+                    call. = FALSE
+                )
+            }
             design$informationRates <- 1
         }
         design$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
         design$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
     }
-    
+
     if (design$sided == 2 && design$typeOfDesign != C_TYPE_OF_DESIGN_PT &&
-        .isBetaSpendingDesignType(design$typeBetaSpending)) { 
+            .isBetaSpendingDesignType(design$typeBetaSpending)) {
         warning("The two-sided beta-spending approach is experimental and ",
-            "hence not fully validated (see www.rpact.com/experimental)", call. = FALSE)
+            "hence not fully validated (see www.rpact.com/experimental)",
+            call. = FALSE
+        )
     }
 
     .assertIsNumericVector(delayedInformation, "delayedInformation", naAllowed = TRUE)
@@ -1367,7 +1372,8 @@ getDesignInverseNormal <- function(...,
     decisionCriticalValues <- numeric(kMax)
     reversalProbabilities <- numeric(kMax - 1)
 
-    if (!is.na(delayedInformation) && (design$sided != 1 || all(design$futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT + 1e-06))) {
+    if (!all(is.na(delayedInformation)) &&
+            (design$sided != 1 || all(design$futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT + 1e-06))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "decision critical values for delayed response design are only available for ",
@@ -1499,9 +1505,11 @@ getDesignInverseNormal <- function(...,
     design$delayedInformation[design$delayedInformation < 1e-03] <- 0
     design$.setParameterType("decisionCriticalValues", C_PARAM_GENERATED)
     design$.setParameterType("reversalProbabilities", C_PARAM_GENERATED)
-    
+
     warning("The delayed information design feature is experimental and ",
-        "hence not fully validated (see www.rpact.com/experimental)", call. = FALSE)
+        "hence not fully validated (see www.rpact.com/experimental)",
+        call. = FALSE
+    )
 
     return(design)
 }
@@ -1587,7 +1595,7 @@ getDesignInverseNormal <- function(...,
 #'        should be directed to one part.
 #' @param betaAdjustment For two-sided beta spending designs, if \code{betaAdjustement = TRUE} a linear
 #' 		  adjustment of the beta spending values is performed if an overlapping of decision regions for futility
-#' 		  stopping at earlier stages occurs, otherwise no adjustement is performed (default is \code{TRUE}).
+#' 		  stopping at earlier stages occurs, otherwise no adjustment is performed (default is \code{TRUE}).
 #' @param tolerance The numerical tolerance, default is \code{1e-08}.
 #' @inheritParams param_three_dots
 #'
@@ -1963,12 +1971,20 @@ getDesignCharacteristics <- function(design) {
             designCharacteristics$power <- cumsum(probs[3, ] - probs[2, ])
             designCharacteristics$rejectionProbabilities <- probs[3, ] - probs[2, ]
         }
+
         if (design$kMax > 1) {
             if (design$sided == 2) {
                 designCharacteristics$futilityProbabilities <- rep(0, design$kMax - 1)
             } else {
                 designCharacteristics$futilityProbabilities <- probs[1, 1:(design$kMax - 1)]
+                designCharacteristics$futilityProbabilities[design$futilityBounds == C_FUTILITY_BOUNDS_DEFAULT] <- 0
             }
+            designCharacteristics$power <- .getNoEarlyEfficacyZeroCorrectedValues(
+                design, designCharacteristics$power
+            )
+            designCharacteristics$rejectionProbabilities <- .getNoEarlyEfficacyZeroCorrectedValues(
+                design, designCharacteristics$rejectionProbabilities
+            )
         }
         designCharacteristics$information <- informationRates * shift
         designCharacteristics$averageSampleNumber1 <- .getAverageSampleNumber(
@@ -2157,5 +2173,3 @@ getSimulatedRejectionsDelayedResponse <- function(design, ..., delta = 0, iterat
     result$time <- Sys.time() - startTime
     return(result)
 }
-
-

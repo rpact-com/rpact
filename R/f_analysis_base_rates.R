@@ -13,10 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6139 $
-## |  Last changed: $Date: 2022-05-10 14:45:01 +0200 (Tue, 10 May 2022) $
+## |  File version: $Revision: 6485 $
+## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
+
+#' @include f_logger.R
+NULL
 
 # @title
 # Get Analysis Results Rates
@@ -220,20 +223,7 @@
                 nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
                 pi1 = pi1, pi2 = pi2, iterations = iterations, seed = seed
             )
-            if (results$.conditionalPowerResults$simulated) {
-                results$conditionalPowerSimulated <- results$.conditionalPowerResults$conditionalPower
-                results$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
-                results$.setParameterType("conditionalPowerSimulated", C_PARAM_GENERATED)
-                results$.setParameterType("seed", results$.conditionalPowerResults$.getParameterType("seed"))
-                results$seed <- results$.conditionalPowerResults$seed
-                results$.setParameterType("iterations", results$.conditionalPowerResults$.getParameterType("iterations"))
-                results$iterations <- results$.conditionalPowerResults$iterations
-            } else {
-                results$conditionalPower <- results$.conditionalPowerResults$conditionalPower
-                results$conditionalPowerSimulated <- numeric(0)
-                results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
-                results$.setParameterType("conditionalPowerSimulated", C_PARAM_NOT_APPLICABLE)
-            }
+            .synchronizeIterationsAndSeed(results)
         } else {
             results$.conditionalPowerResults <- .getConditionalPowerRates(
                 stageResults = stageResults,
@@ -1125,20 +1115,7 @@
         results$iterations <- cp$iterations
         results$seed <- cp$seed
         results$simulated <- cp$simulated
-        if (results$simulated) {
-            results$.setParameterType(
-                "iterations",
-                ifelse(is.null(.getOptionalArgument("iterations", ...)),
-                    C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-                )
-            )
-            results$.setParameterType(
-                "seed",
-                ifelse(is.null(.getOptionalArgument("seed", ...)),
-                    C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-                )
-            )
-        }
+        .updateParameterTypeOfIterationsAndSeed(results, ...)
     } else {
         .stopWithWrongDesignMessage(stageResults$.design)
     }

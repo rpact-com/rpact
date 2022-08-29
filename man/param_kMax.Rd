@@ -4,8 +4,7 @@
 \alias{param_kMax}
 \title{Parameter Description: Maximum Number of Stages}
 \arguments{
-\item{kMax}{The maximum number of stages \code{K}. 
-\code{K = 1, 2, 3, ...} (default is \code{3}).
+\item{kMax}{The maximum number of stages \code{K}, default is \code{3}. 
 The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 \code{6} for Fisher combination test designs.}
 }

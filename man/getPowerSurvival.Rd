@@ -20,15 +20,15 @@ getPowerSurvival(
   hazardRatio = NA_real_,
   piecewiseSurvivalTime = NA_real_,
   allocationRatioPlanned = 1,
-  eventTime = 12L,
-  accrualTime = c(0L, 12L),
+  eventTime = 12,
+  accrualTime = c(0, 12),
   accrualIntensity = 0.1,
   accrualIntensityType = c("auto", "absolute", "relative"),
   maxNumberOfSubjects = NA_real_,
   maxNumberOfEvents = NA_real_,
   dropoutRate1 = 0,
   dropoutRate2 = 0,
-  dropoutTime = 12L
+  dropoutTime = 12
 )
 }
 \arguments{

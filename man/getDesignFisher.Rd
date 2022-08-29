@@ -15,7 +15,7 @@ getDesignFisher(
   sided = 1,
   bindingFutility = NA,
   tolerance = 1e-14,
-  iterations = 0L,
+  iterations = 0,
   seed = NA_real_
 )
 }
@@ -23,8 +23,7 @@ getDesignFisher(
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{kMax}{The maximum number of stages \code{K}. 
-\code{K = 1, 2, 3, ...} (default is \code{3}).
+\item{kMax}{The maximum number of stages \code{K}, default is \code{3}. 
 The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 \code{6} for Fisher combination test designs.}
 
