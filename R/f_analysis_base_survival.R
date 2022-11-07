@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6652 $
+## |  Last changed: $Date: 2022-11-01 08:59:51 +0100 (Tue, 01 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -43,7 +43,7 @@ NULL
         ))
     }
 
-    .stopWithWrongDesignMessage(design)
+    .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
 .getAnalysisResultsSurvivalInverseNormal <- function(..., design,
@@ -170,7 +170,6 @@ NULL
     results$.setParameterType("testActions", C_PARAM_GENERATED)
 
     if (design$kMax > 1) {
-
         # conditional power
         startTime <- Sys.time()
         if (.isTrialDesignFisher(design)) {
@@ -234,10 +233,9 @@ NULL
     .logProgress("Repeated p-values calculated", startTime = startTime)
 
     if (design$kMax > 1) {
-
         # final p-value
         startTime <- Sys.time()
-        finalPValue <- getFinalPValue(stageResults)
+        finalPValue <- getFinalPValue(stageResults, showWarnings = FALSE)
         results$finalPValues <- .getVectorWithFinalValueAtFinalStage(
             kMax = design$kMax,
             finalValue = finalPValue$pFinal, finalStage = finalPValue$finalStage
@@ -250,7 +248,7 @@ NULL
         # final confidence interval & median unbiased estimate
         startTime <- Sys.time()
         finalConfidenceIntervals <- .getFinalConfidenceIntervalSurvival(
-            design = design, dataInput = dataInput, thetaH0 = thetaH0, stage = stage, 
+            design = design, dataInput = dataInput, thetaH0 = thetaH0, stage = stage,
             directionUpper = directionUpper, tolerance = tolerance
         )
 
@@ -296,7 +294,9 @@ NULL
         stage = NA_integer_, userFunctionCallEnabled = FALSE) {
     .assertIsDatasetSurvival(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
-    .assertIsValidDirectionUpper(directionUpper, design$sided, userFunctionCallEnabled = userFunctionCallEnabled)
+    .assertIsValidDirectionUpper(directionUpper, design$sided,
+        userFunctionCallEnabled = userFunctionCallEnabled
+    )
     .warnInCaseOfUnknownArguments(
         functionName = "getStageResultsSurvival",
         ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), ...
@@ -392,7 +392,7 @@ NULL
         return(.getRepeatedConfidenceIntervalsSurvivalFisher(design = design, ...))
     }
 
-    .stopWithWrongDesignMessage(design)
+    .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
 .getRootThetaSurvival <- function(..., design, dataInput, stage, directionUpper, thetaLow, thetaUp,
@@ -485,63 +485,62 @@ NULL
     repeatedConfidenceIntervals <- matrix(NA_real_, 2, design$kMax)
     for (k in (1:stage)) {
         startTime <- Sys.time()
-		if (criticalValues[k] < C_QNORM_MAXIMUM) {		
-		
-	        # Finding maximum upper and minimum lower bounds for RCIs
-	        thetaLow <- exp(.getUpperLowerThetaSurvival(
-	            design = design, dataInput = dataInput,
-	            theta = -1, stage = k, directionUpper = TRUE,
-	            conditionFunction = conditionFunction, firstParameterName = firstParameterName,
-	            secondValue = criticalValues[k]
-	        ))
-	
-	        thetaUp <- exp(.getUpperLowerThetaSurvival(
-	            design = design, dataInput = dataInput,
-	            theta = 1, stage = k, directionUpper = FALSE,
-	            conditionFunction = conditionFunction, firstParameterName = firstParameterName,
-	            secondValue = criticalValues[k]
-	        ))
-	
-	        # Finding upper and lower RCI limits through root function
-	        repeatedConfidenceIntervals[1, k] <- .getRootThetaSurvival(
-	            design = design, dataInput = dataInput, stage = k, directionUpper = C_DIRECTION_UPPER_DEFAULT,
-	            thetaLow = thetaLow, thetaUp = thetaUp, firstParameterName = firstParameterName,
-	            secondValue = criticalValues[k], tolerance = tolerance,
-	            callingFunctionInformation = paste0("Repeated confidence interval [1, ", k, "]")
-	        )
-	
-	        repeatedConfidenceIntervals[2, k] <- .getRootThetaSurvival(
-	            design = design, dataInput = dataInput, stage = k, directionUpper = FALSE,
-	            thetaLow = thetaLow, thetaUp = thetaUp, firstParameterName = firstParameterName,
-	            secondValue = criticalValues[k], tolerance = tolerance,
-	            callingFunctionInformation = paste0("Repeated confidence interval [2, ", k, "]")
-	        )
-	
-	        # Adjustment for binding futility bounds
-			if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {		
-	            parameterName <- ifelse(.isTrialDesignFisher(design), "pValues", firstParameterName)
-	
-	            futilityCorr[k] <- .getRootThetaSurvival(
-	                design = design, dataInput = dataInput, stage = k - 1, directionUpper = directionUpper,
-	                thetaLow = thetaLow, thetaUp = thetaUp,
-	                firstParameterName = parameterName, secondValue = bounds[k - 1], tolerance = tolerance,
-	                callingFunctionInformation = paste0("Repeated confidence interval, futility correction [", k, "]")
-	            )
-	
-	            if (directionUpper) {
-	                repeatedConfidenceIntervals[1, k] <- min(min(futilityCorr[2:k]), repeatedConfidenceIntervals[1, k])
-	            } else {
-	                repeatedConfidenceIntervals[2, k] <- max(max(futilityCorr[2:k]), repeatedConfidenceIntervals[2, k])
-	            }
-	        }
-	        .logProgress("Repeated confidence interval of stage %s calculated", startTime = startTime, k)
-	
-	        if (!is.na(repeatedConfidenceIntervals[1, k]) && !is.na(repeatedConfidenceIntervals[2, k]) &&
-	                repeatedConfidenceIntervals[1, k] > repeatedConfidenceIntervals[2, k]) {
-	            repeatedConfidenceIntervals[, k] <- rep(NA_real_, 2)
-	        }
-	    }
-	}	
+        if (criticalValues[k] < C_QNORM_MAXIMUM) {
+            # Finding maximum upper and minimum lower bounds for RCIs
+            thetaLow <- exp(.getUpperLowerThetaSurvival(
+                design = design, dataInput = dataInput,
+                theta = -1, stage = k, directionUpper = TRUE,
+                conditionFunction = conditionFunction, firstParameterName = firstParameterName,
+                secondValue = criticalValues[k]
+            ))
+
+            thetaUp <- exp(.getUpperLowerThetaSurvival(
+                design = design, dataInput = dataInput,
+                theta = 1, stage = k, directionUpper = FALSE,
+                conditionFunction = conditionFunction, firstParameterName = firstParameterName,
+                secondValue = criticalValues[k]
+            ))
+
+            # Finding upper and lower RCI limits through root function
+            repeatedConfidenceIntervals[1, k] <- .getRootThetaSurvival(
+                design = design, dataInput = dataInput, stage = k, directionUpper = C_DIRECTION_UPPER_DEFAULT,
+                thetaLow = thetaLow, thetaUp = thetaUp, firstParameterName = firstParameterName,
+                secondValue = criticalValues[k], tolerance = tolerance,
+                callingFunctionInformation = paste0("Repeated confidence interval [1, ", k, "]")
+            )
+
+            repeatedConfidenceIntervals[2, k] <- .getRootThetaSurvival(
+                design = design, dataInput = dataInput, stage = k, directionUpper = FALSE,
+                thetaLow = thetaLow, thetaUp = thetaUp, firstParameterName = firstParameterName,
+                secondValue = criticalValues[k], tolerance = tolerance,
+                callingFunctionInformation = paste0("Repeated confidence interval [2, ", k, "]")
+            )
+
+            # Adjustment for binding futility bounds
+            if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
+                parameterName <- ifelse(.isTrialDesignFisher(design), "pValues", firstParameterName)
+
+                futilityCorr[k] <- .getRootThetaSurvival(
+                    design = design, dataInput = dataInput, stage = k - 1, directionUpper = directionUpper,
+                    thetaLow = thetaLow, thetaUp = thetaUp,
+                    firstParameterName = parameterName, secondValue = bounds[k - 1], tolerance = tolerance,
+                    callingFunctionInformation = paste0("Repeated confidence interval, futility correction [", k, "]")
+                )
+
+                if (directionUpper) {
+                    repeatedConfidenceIntervals[1, k] <- min(min(futilityCorr[2:k]), repeatedConfidenceIntervals[1, k])
+                } else {
+                    repeatedConfidenceIntervals[2, k] <- max(max(futilityCorr[2:k]), repeatedConfidenceIntervals[2, k])
+                }
+            }
+            .logProgress("Repeated confidence interval of stage %s calculated", startTime = startTime, k)
+
+            if (!is.na(repeatedConfidenceIntervals[1, k]) && !is.na(repeatedConfidenceIntervals[2, k]) &&
+                    repeatedConfidenceIntervals[1, k] > repeatedConfidenceIntervals[2, k]) {
+                repeatedConfidenceIntervals[, k] <- rep(NA_real_, 2)
+            }
+        }
+    }
 
     return(repeatedConfidenceIntervals)
 }
@@ -924,7 +923,7 @@ NULL
         results$simulated <- cp$simulated
         .updateParameterTypeOfIterationsAndSeed(results, ...)
     } else {
-        .stopWithWrongDesignMessage(stageResults$.design)
+        .stopWithWrongDesignMessage(stageResults$.design, inclusiveConditionalDunnett = FALSE)
     }
 
     results$nPlanned <- cp$nPlanned
@@ -1043,7 +1042,7 @@ NULL
     stageResults <- .getStageResultsSurvival(
         design = design, dataInput = dataInput, stage = stage,
         thetaH0 = thetaH0, directionUpper = directionUpper
-    )    
+    )
 
     finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
     medianUnbiasedGeneral <- NA_real_
@@ -1130,16 +1129,23 @@ NULL
         }
     }
 
+    if (!any(is.na(finalConfidenceIntervalGeneral))) {
+        finalConfidenceIntervalGeneral <- sort(finalConfidenceIntervalGeneral)
+    }
+    if (!any(is.na(finalConfidenceInterval))) {
+        finalConfidenceInterval <- sort(finalConfidenceInterval)
+    }
+
     return(list(
         stage = stage,
-        thetaH0 = thetaH0, 
+        thetaH0 = thetaH0,
         directionUpper = directionUpper,
-        tolerance = tolerance,            
+        tolerance = tolerance,
         finalStage = finalStage,
         medianUnbiasedGeneral = medianUnbiasedGeneral,
-        finalConfidenceIntervalGeneral = sort(finalConfidenceIntervalGeneral),
+        finalConfidenceIntervalGeneral = finalConfidenceIntervalGeneral,
         medianUnbiased = medianUnbiased,
-        finalConfidenceInterval = sort(finalConfidenceInterval)
+        finalConfidenceInterval = finalConfidenceInterval
     ))
 }
 
@@ -1245,9 +1251,9 @@ NULL
 
     return(list(
         stage = stage,
-        thetaH0 = thetaH0, 
+        thetaH0 = thetaH0,
         directionUpper = directionUpper,
-        tolerance = tolerance,            
+        tolerance = tolerance,
         finalStage = finalStage,
         medianUnbiasedGeneral = medianUnbiasedGeneral,
         finalConfidenceIntervalGeneral = sort(finalConfidenceIntervalGeneral),
@@ -1289,9 +1295,9 @@ NULL
 
     return(list(
         stage = stage,
-        thetaH0 = thetaH0, 
+        thetaH0 = thetaH0,
         directionUpper = directionUpper,
-        tolerance = tolerance,            
+        tolerance = tolerance,
         finalStage = finalStage,
         medianUnbiased = medianUnbiased,
         finalConfidenceInterval = finalConfidenceInterval
@@ -1346,5 +1352,5 @@ NULL
         ))
     }
 
-    .stopWithWrongDesignMessage(design)
+    .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }

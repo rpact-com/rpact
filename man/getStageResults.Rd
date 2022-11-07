@@ -11,8 +11,8 @@ getStageResults(design, dataInput, ..., stage = NA_integer_)
 
 \item{dataInput}{The summary data used for calculating the test results. 
 This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival} 
-and should be created with the function \code{getDataset}.
-For more information see \code{\link{getDataset}}.}
+and should be created with the function \code{\link[=getDataset]{getDataset()}}.
+For more information see \code{\link[=getDataset]{getDataset()}}.}
 
 \item{...}{Further (optional) arguments to be passed:
 \describe{
@@ -65,11 +65,11 @@ For more information see \code{\link{getDataset}}.}
 Returns a \code{\link{StageResults}} object.
 \itemize{
   \item \code{\link[=names.StageResults]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.StageResults]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.StageResults]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.StageResults]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.StageResults]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{

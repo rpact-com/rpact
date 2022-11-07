@@ -12,6 +12,6 @@ dataRates
 }
 \description{
 A dataset containing the sample sizes and events of one group.
-Use \code{getDataset(dataRates)} to create a dataset object that can be processed by \code{\link{getAnalysisResults}}.
+Use \code{getDataset(dataRates)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 }
-\keyword{datasets}
+\keyword{internal}

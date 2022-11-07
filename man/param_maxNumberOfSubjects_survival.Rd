@@ -5,7 +5,7 @@
 \title{Parameter Description: Maximum Number Of Subjects For Survival Endpoint}
 \arguments{
 \item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified.
-If accrual time and accrual intensity is specified, this will be calculated.}
+If accrual time and accrual intensity are specified, this will be calculated. Must be a positive integer of length 1.}
 }
 \description{
 Parameter Description: Maximum Number Of Subjects For Survival Endpoint

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6519 $
-## |  Last changed: $Date: 2022-08-23 13:56:40 +0200 (Di, 23 Aug 2022) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -355,14 +355,14 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
 #' Function to identify the available plot types of an object.
 #'
 #' @param obj The object for which the plot types shall be identified, e.g. produced by
-#'        \code{\link{getDesignGroupSequential}} or \code{\link{getSampleSizeMeans}}.
+#'        \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} or \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}.
 #' @param output The output type. Can be one of \code{c("numeric", "caption", "numcap", "capnum")}.
 #' @param numberInCaptionEnabled If \code{TRUE}, the number will be added to the
 #'        caption, default is \code{FALSE}.
 #'
 #' @details
-#' \code{plotTypes} and \code{getAvailablePlotTypes} are equivalent, i.e.,
-#' \code{plotTypes} is a short form of \code{getAvailablePlotTypes}.
+#' \code{plotTypes} and \code{getAvailablePlotTypes()} are equivalent, i.e.,
+#' \code{plotTypes} is a short form of \code{getAvailablePlotTypes()}.
 #'
 #' \code{output}:
 #' \enumerate{

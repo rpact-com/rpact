@@ -17,6 +17,6 @@ In the wide format (unstacked), the data are presented with each different data 
 the different groups are in separate columns.
 }
 \seealso{
-\code{\link{getLongFormat}} for returning the dataset as a \code{\link[base]{data.frame}} in long format.
+\code{\link[=getLongFormat]{getLongFormat()}} for returning the dataset as a \code{\link[base]{data.frame}} in long format.
 }
 \keyword{internal}

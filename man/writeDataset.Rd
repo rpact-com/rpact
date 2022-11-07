@@ -61,7 +61,7 @@ See the 'Encoding' section of the help for file, the 'R Data Import/Export Manua
 Writes a dataset to a CSV file.
 }
 \details{
-\code{\link{writeDataset}} is a wrapper function that coerces the dataset to a data frame and uses \cr
+\code{\link[=writeDataset]{writeDataset()}} is a wrapper function that coerces the dataset to a data frame and uses \cr
 \code{\link[utils]{write.table}} to write it to a CSV file.
 }
 \examples{
@@ -78,8 +78,8 @@ writeDataset(datasetOfRates, "dataset_rates.csv")
 }
 \seealso{
 \itemize{
-  \item \code{\link{writeDatasets}} for writing multiple datasets,
-  \item \code{\link{readDataset}} for reading a single dataset,
-  \item \code{\link{readDatasets}} for reading multiple datasets.
+  \item \code{\link[=writeDatasets]{writeDatasets()}} for writing multiple datasets,
+  \item \code{\link[=readDataset]{readDataset()}} for reading a single dataset,
+  \item \code{\link[=readDatasets]{readDatasets()}} for reading multiple datasets.
 }
 }

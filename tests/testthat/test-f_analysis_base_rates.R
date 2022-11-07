@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_base_rates.R
 ## |  Creation date: 12 August 2022, 09:05:33
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,7 +24,10 @@ test_plan_section("Testing the Analysis Rates Functionality for One Treatment")
 
 
 test_that("'getAnalysisResults' for a group sequential design and one treatment", {
-	design0 <- getDesignGroupSequential(
+        
+    .skipTestIfDisabled()
+        
+    design0 <- getDesignGroupSequential(
 	    kMax = 2, alpha = 0.025, informationRates = c(0.2, 1),
 	    typeOfDesign = "asKD", gammaA = 2.8
 	)

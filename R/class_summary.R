@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6496 $
-## |  Last changed: $Date: 2022-08-17 09:41:33 +0200 (Wed, 17 Aug 2022) $
+## |  File version: $Revision: 6656 $
+## |  Last changed: $Date: 2022-11-03 08:41:40 +0100 (Thu, 03 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -992,6 +992,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
     settings <- .getSummaryObjectSettings(object)
     sided <- ifelse(settings$multiArmEnabled || settings$enrichmentEnabled, 1, design$sided)
     directionUpper <- object[["directionUpper"]]
+    if (is.null(directionUpper) || length(directionUpper) != 1 || is.na(directionUpper)) {
+        directionUpper <- TRUE
+    }
+    
     comparisonH0 <- " = "
     comparisonH1 <- NA_character_
     if (inherits(object, "AnalysisResults") && !is.null(directionUpper)) {
@@ -2170,11 +2174,11 @@ SummaryFactory <- setRefClass("SummaryFactory",
 .createSummary <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
     output <- match.arg(output)
     if (inherits(object, "TrialDesignCharacteristics")) {
-        return(.createSummaryDesignPlan(object$.design, digits = digits, output = output))
+        return(.createSummaryDesignPlan(object$.design, digits = digits, output = output, showStageLevels = TRUE))
     }
 
     if (.isTrialDesign(object) || .isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
-        return(.createSummaryDesignPlan(object, digits = digits, output = output))
+        return(.createSummaryDesignPlan(object, digits = digits, output = output, showStageLevels = !.isTrialDesignPlan(object)))
     }
 
     if (inherits(object, "AnalysisResults")) {
@@ -2720,7 +2724,9 @@ SummaryFactory <- setRefClass("SummaryFactory",
 #
 # Main function for creating a summary of a design or design plan
 #
-.createSummaryDesignPlan <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
+.createSummaryDesignPlan <- function(object, digits = NA_integer_, 
+        output = c("all", "title", "overview", "body"), showStageLevels = FALSE) {
+        
     output <- match.arg(output)
     designPlan <- NULL
     if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
@@ -2763,6 +2769,15 @@ SummaryFactory <- setRefClass("SummaryFactory",
             parameterCaption = .getSummaryParameterCaptionCriticalValues(design),
             roundDigits = digitsGeneral
         )
+        
+        if (showStageLevels) {
+            summaryFactory$addParameter(design,
+                parameterName = "stageLevels",
+                parameterCaption = "Stage Levels",
+                roundDigits = digitsProbabilities, 
+                smoothedZeroFormat = TRUE
+            )
+        }
     }
 
     if (.isTrialDesignFisher(design)) {

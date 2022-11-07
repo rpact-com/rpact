@@ -24,6 +24,9 @@ test_plan_section("Testing the Function Get Observed Information Rates")
 
 
 test_that("'getObservedInformationRates': final-stage", {
+        
+    .skipTestIfDisabled()
+        
 	data1 <- getDataset(overallN = c(22, 45), overallEvents = c(11, 28))
 	# @refFS[Formula]{fs:getObservedInformationRates}
 	# @refFS[Formula]{fs:getObservedInformationRates:finalStageReached}
@@ -38,7 +41,9 @@ test_that("'getObservedInformationRates': final-stage", {
 })
 
 test_that("'getObservedInformationRates': over-running", {
-
+        
+    .skipTestIfDisabled()
+        
 	data2 <- getDataset(overallN = c(22, 45), overallEvents = c(11, 28))
 	# @refFS[Formula]{fs:getObservedInformationRates}
 	# @refFS[Formula]{fs:getObservedInformationRates:overRunning}
@@ -53,7 +58,9 @@ test_that("'getObservedInformationRates': over-running", {
 })
 
 test_that("'getObservedInformationRates': interim-stage", {
-
+        
+    .skipTestIfDisabled()
+        
 	data3 <- getDataset(overallN = c(22, 45), overallEvents = c(11, 28))
 	# @refFS[Formula]{fs:getObservedInformationRates}
 	# @refFS[Formula]{fs:getObservedInformationRates:interimStage}
@@ -68,7 +75,9 @@ test_that("'getObservedInformationRates': interim-stage", {
 })
 
 test_that("'getObservedInformationRates': under-running with absolute information epsilon", {
-
+        
+    .skipTestIfDisabled()
+        
 	data4 <- getDataset(overallN = c(22, 45), overallEvents = c(11, 28))
 	# @refFS[Formula]{fs:getObservedInformationRates}
 	# @refFS[Formula]{fs:getObservedInformationRates:underRunning}
@@ -84,7 +93,9 @@ test_that("'getObservedInformationRates': under-running with absolute informatio
 })
 
 test_that("'getObservedInformationRates': under-running with relative information epsilon", {
-
+        
+    .skipTestIfDisabled()
+        
 	data5 <- getDataset(overallN = c(22, 45), overallEvents = c(11, 28))
 	# @refFS[Formula]{fs:getObservedInformationRates}
 	# @refFS[Formula]{fs:getObservedInformationRates:underRunningRelative}

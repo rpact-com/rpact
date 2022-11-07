@@ -7,7 +7,8 @@
 \method{names}{SimulationResults}(x)
 }
 \arguments{
-\item{x}{A \code{\link{SimulationResults}} object created by \code{getSimulationResults[MultiArm/Enrichment][Means/Rates/Survival]}.}
+\item{x}{A \code{\link{SimulationResults}} object created by 
+\code{getSimulationResults[MultiArm/Enrichment][Means/Rates/Survival]}.}
 }
 \value{
 Returns a \code{\link[base]{character}} vector containing the names of the \code{\link{AnalysisResults}} object.

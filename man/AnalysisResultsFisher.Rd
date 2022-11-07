@@ -8,7 +8,7 @@
 Class for analysis results based on a Fisher combination test design.
 }
 \details{
-This object cannot be created directly; use \code{\link{getAnalysisResults}}
+This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 with suitable arguments to create the analysis results of a Fisher combination test design.
 }
 

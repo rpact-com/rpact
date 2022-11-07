@@ -22,12 +22,12 @@ samples sizes and event numbers defined as floating-point numbers will be trunca
 Returns a \code{\link{Dataset}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.Dataset]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.Dataset]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -90,11 +90,11 @@ For enrichment designs, the comparison of two samples is provided for an unstrat
 (sub-population wise) or stratified data input.\cr
 For unstratified (sub-population wise) data input the data sets are defined for the sub-populations
 S1, S2, ..., F, where F refers to the full populations. Use of \code{getDataset(S1 = , S2, ..., F = )}
-defines the data set to be used in \code{\link{getAnalysisResults}} (see examples)\cr
+defines the data set to be used in \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 For stratified data input the data sets are defined for the strata S1, S12, S2, ..., R, where R
 refers to the remainder of the strata such that the union of all sets is the full population.
 Use of \code{getDataset(S1 = , S12 = , S2, ..., R = )} defines the data set to be used in
-\code{\link{getAnalysisResults}} (see examples)\cr
+\code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 For survival data, for enrichment designs the log-rank statistics should be entered as stratified
 log-rank statistics in order to provide strong control of Type I error rate. For stratified data input,
 the variables to be specified in \code{getDataset()} are \code{events}, \code{expectedEvents},

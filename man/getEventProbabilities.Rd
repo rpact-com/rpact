@@ -29,10 +29,10 @@ getEventProbabilities(
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{accrualTime}{The assumed accrual time intervals for the study, default is 
-\code{c(0, 12)} (for details see \code{\link{getAccrualTime}}).}
+\code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
-\item{accrualIntensity}{A vector of accrual intensities, default is the relative 
-intensity \code{0.1} (for details see \code{\link{getAccrualTime}}).}
+\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative 
+intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
 \item{accrualIntensityType}{A character value specifying the accrual intensity input type.
 Must be one of \code{"auto"}, \code{"absolute"}, or \code{"relative"}; default is \code{"auto"},
@@ -52,13 +52,13 @@ and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample r
 
 \item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise 
 definition of the exponential survival time cumulative distribution function \cr
-(for details see \code{\link{getPiecewiseSurvivalTime}}).}
+(for details see \code{\link[=getPiecewiseSurvivalTime]{getPiecewiseSurvivalTime()}}).}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
-\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).}
+\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
-\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).}
+\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups 
 design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered, 
@@ -66,7 +66,7 @@ the optimal allocation ratio yielding the smallest overall sample size is determ
 
 \item{hazardRatio}{The vector of hazard ratios under consideration. 
 If the event or hazard rates in both treatment groups are defined, the hazard ratio needs 
-not to be specified as it is calculated, there is no default.}
+not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
 
 \item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
 
@@ -84,12 +84,12 @@ at fixed end of accrual.}
 Returns a \code{\link{EventProbabilities}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.EventProbabilities]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.EventProbabilities]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -97,7 +97,7 @@ Returns the event probabilities for specified parameters at given time vector.
 }
 \details{
 The function computes the overall event probabilities in a two treatment groups design.
-For details of the parameters see \code{\link{getSampleSizeSurvival}}.
+For details of the parameters see \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}.
 }
 \section{How to get help for generic functions}{
 

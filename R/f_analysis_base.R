@@ -13,14 +13,44 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6507 $
-## |  Last changed: $Date: 2022-08-18 11:23:56 +0200 (Do, 18 Aug 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6646 $
+## |  Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
 #' @include f_logger.R
 NULL
+
+.getDesignAndDataInput <- function(..., design, dataInput) {
+    if (missing(design) && missing(dataInput)) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, sQuote("dataInput"), " must be specified")
+    }
+
+    if (missing(dataInput) && !missing(design) && inherits(design, "Dataset")) {
+        dataInput <- design
+        if (!is.null(dataInput$.design) && inherits(dataInput$.design, "TrialDesign")) {
+            design <- dataInput$.design
+        } else {
+            design <- .getDefaultDesign(..., type = "analysis")
+        }
+    } else if (!missing(dataInput) && missing(design)) {
+        if (!is.null(dataInput$.design) && inherits(dataInput$.design, "TrialDesign")) {
+            design <- dataInput$.design
+        } else {
+            design <- .getDefaultDesign(..., type = "analysis")
+        }
+    } else {
+        .warnInCaseOfTwoSidedPowerArgument(...)
+    }
+
+    .assertIsTrialDesign(design)
+
+    return(list(
+        design = design,
+        dataInput = dataInput$copy(shallow = FALSE)
+    ))
+}
 
 #' @title
 #' Get Analysis Results
@@ -108,11 +138,11 @@ NULL
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
 #'   \item \code{\link[=names.AnalysisResults]{names}} to obtain the field names,
-#'   \item \code{\link[=print.ParameterSet]{print}} to print the object,
-#'   \item \code{\link[=summary.AnalysisResults]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.AnalysisResults]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.AnalysisResults]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=print.ParameterSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.AnalysisResults]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.AnalysisResults]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.AnalysisResults]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'
@@ -120,7 +150,8 @@ NULL
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link{getObservedInformationRates}} for recalculation the observed information rates.
+#'   \item \code{\link[=getObservedInformationRates]{getObservedInformationRates()}} 
+#'         for recalculation the observed information rates.
 #' }
 #'
 #' @family analysis functions
@@ -137,20 +168,15 @@ getAnalysisResults <- function(design, dataInput, ...,
         stage = NA_integer_,
         maxInformation = NULL,
         informationEpsilon = NULL) {
-    if (missing(dataInput) && !missing(design) && inherits(design, "Dataset")) {
-        dataInput <- design
-        design <- .getDefaultDesign(..., type = "analysis")
-    } else if (!missing(dataInput) && missing(design)) {
-        design <- .getDefaultDesign(..., type = "analysis")
-    } else {
-        .assertIsTrialDesign(design)
-        .warnInCaseOfTwoSidedPowerArgument(...)
-    }
+    designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
+    design <- designAndDataInput$design
+    dataInput <- designAndDataInput$dataInput
 
     repeatedPValues <- NULL
     informationRatesRecalculated <- FALSE
 
-    if (.isAlphaSpendingDesign(design) && (design$typeBetaSpending == "none") && .isTrialDesignGroupSequential(design) && !.isMultiArmDataset(dataInput)) {
+    if (.isAlphaSpendingDesign(design) && (design$typeBetaSpending == "none") &&
+            .isTrialDesignGroupSequential(design) && !.isMultiArmDataset(dataInput)) {
         observedInformationRates <- NULL
         absoluteInformations <- NULL
         status <- NULL
@@ -442,11 +468,11 @@ getAnalysisResults <- function(design, dataInput, ...,
 #' @return Returns a \code{\link{StageResults}} object.
 #' \itemize{
 #'   \item \code{\link[=names.StageResults]{names}} to obtain the field names,
-#'   \item \code{\link[=print.FieldSet]{print}} to print the object,
-#'   \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.StageResults]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.StageResults]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.StageResults]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.StageResults]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'
@@ -457,6 +483,10 @@ getAnalysisResults <- function(design, dataInput, ...,
 #' @export
 #'
 getStageResults <- function(design, dataInput, ..., stage = NA_integer_) {
+    designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
+    design <- designAndDataInput$design
+    dataInput <- designAndDataInput$dataInput
+
     if (.isMultiArmDataset(dataInput)) {
         return(.getStageResultsMultiArm(
             design = design, dataInput = dataInput, stage = stage, ...
@@ -469,7 +499,6 @@ getStageResults <- function(design, dataInput, ..., stage = NA_integer_) {
         ))
     }
 
-    .assertIsTrialDesign(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
@@ -551,7 +580,6 @@ getTestActions <- function(stageResults, ...) {
     .warnInCaseOfUnknownArguments(functionName = "getTestActions", ...)
 
     stageResults <- .getStageResultsObject(stageResults, functionName = "getTestActions", ...)
-    .stopInCaseOfIllegalStageDefinition(stageResults, ...)
     .assertIsStageResultsNonMultiHypotheses(stageResults)
     design <- stageResults$.design
 
@@ -725,7 +753,12 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
         directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
         tolerance = 1e-06, # C_ANALYSIS_TOLERANCE_DEFAULT
         stage = NA_integer_) {
+        
     .assertIsValidTolerance(tolerance)
+
+    designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
+    design <- designAndDataInput$design
+    dataInput <- designAndDataInput$dataInput
 
     if (.isEnrichmentDataset(dataInput)) {
         return(.getRepeatedConfidenceIntervalsEnrichment(
@@ -739,7 +772,6 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
         ))
     }
 
-    .assertIsTrialDesign(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
@@ -769,6 +801,12 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
 }
 
 .getStageResultsObject <- function(stageResults, ..., functionName) {
+    if (missing(stageResults)) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined")
+    }
+    
+    .stopInCaseOfIllegalStageDefinition(stageResults, ...)
+    
     args <- list(...)
     if (.isTrialDesign(stageResults)) {
         if (length(args) == 0) {
@@ -780,6 +818,10 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
             "The separate specification of the design in ", functionName, "() is deprecated ",
             "because the 'stageResults' object contains the design already"
         )
+    }
+    
+    if (.isDataset(stageResults)) {
+        stageResults <- getStageResults(dataInput = stageResults, ...)
     }
 
     if (!.isStageResults(stageResults)) {
@@ -827,17 +869,18 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
 #' estimated via simulation.
 #'
 #' @seealso
-#' \code{\link{plot.StageResults}} or \code{\link{plot.AnalysisResults}} for plotting the conditional power.
+#' \code{\link[=plot.StageResults]{plot.StageResults()}} or \code{\link[=plot.AnalysisResults]{plot.AnalysisResults()}} 
+#' for plotting the conditional power.
 #'
 #' @return Returns a \code{\link{ConditionalPowerResults}} object.
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
-#'   \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-#'   \item \code{\link[=print.FieldSet]{print}} to print the object,
-#'   \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.ParameterSet]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'
@@ -850,10 +893,10 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
 getConditionalPower <- function(stageResults, ..., nPlanned,
         allocationRatioPlanned = 1 # C_ALLOCATION_RATIO_DEFAULT
         ) {
-    .stopInCaseOfIllegalStageDefinition(stageResults, ...)
-    .assertIsValidAllocationRatioPlanned(allocationRatioPlanned, stageResults$.dataInput$getNumberOfGroups())
+    #.stopInCaseOfIllegalStageDefinition(stageResults, ...)
     stageResults <- .getStageResultsObject(stageResults = stageResults, functionName = "getConditionalPower", ...)
-
+    .assertIsValidAllocationRatioPlanned(allocationRatioPlanned, stageResults$.dataInput$getNumberOfGroups())
+    
     conditionalPower <- NULL
     if (.isEnrichmentStageResults(stageResults)) {
         conditionalPower <- .getConditionalPowerEnrichment(
@@ -1006,7 +1049,6 @@ getRepeatedPValues <- function(stageResults, ...,
     .assertIsValidTolerance(tolerance)
     .assertIsValidTolerance(tolerance)
     stageResults <- .getStageResultsObject(stageResults, functionName = "getRepeatedPValues", ...)
-    .stopInCaseOfIllegalStageDefinition(stageResults, ...)
 
     if (.isEnrichmentStageResults(stageResults)) {
         return(.getRepeatedPValuesEnrichment(stageResults = stageResults, tolerance = tolerance, ...))
@@ -1025,29 +1067,18 @@ getRepeatedPValues <- function(stageResults, ...,
         ))
     }
 
-    if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
-        if (design$typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER, C_TYPE_OF_DESIGN_WT_OPTIMUM)) {
-            showWarnings <- as.logical(getOption("rpact.analyis.repeated.p.values.warnings.enabled", "TRUE"))
-            if (showWarnings) {
-                warning("Repeated p-values not available for 'typeOfDesign' = '",
-                    design$typeOfDesign, "'",
-                    call. = FALSE
-                )
-            }
-            return(rep(NA_real_, design$kMax))
-        }
-    }
-
-    if (.isTrialDesignFisher(design)) {
-        if (design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
-            warning("Repeated p-values not available for 'method' = '",
-                C_FISHER_METHOD_USER_DEFINED_ALPHA, "'",
+    if (.isTrialDesignInverseNormalOrGroupSequential(design) && 
+            design$typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER, C_TYPE_OF_DESIGN_WT_OPTIMUM)) {
+        showWarnings <- as.logical(getOption("rpact.analyis.repeated.p.values.warnings.enabled", "TRUE"))
+        if (showWarnings) {
+            warning("Repeated p-values not available for 'typeOfDesign' = '",
+                design$typeOfDesign, "'",
                 call. = FALSE
             )
-            return(rep(NA_real_, design$kMax))
         }
+        return(rep(NA_real_, design$kMax))
     }
-
+    
     if (.isTrialDesignInverseNormal(design)) {
         return(.getRepeatedPValuesInverseNormal(
             stageResults = stageResults, tolerance = tolerance, ...
@@ -1061,12 +1092,20 @@ getRepeatedPValues <- function(stageResults, ...,
     }
 
     if (.isTrialDesignFisher(design)) {
+        if (design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
+            warning("Repeated p-values not available for 'method' = '",
+                C_FISHER_METHOD_USER_DEFINED_ALPHA, "'",
+                call. = FALSE
+            )
+            return(rep(NA_real_, design$kMax))
+        }
+        
         return(.getRepeatedPValuesFisher(
             stageResults = stageResults, tolerance = tolerance, ...
         ))
     }
 
-    .stopWithWrongDesignMessage(design)
+    .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
 #
@@ -1148,7 +1187,8 @@ getRepeatedPValues <- function(stageResults, ...,
                     } else {
                         decisionMatrix <- matrix(c(
                             rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
-                            c(design$criticalValues[1:(finalStage - 1)], -.getOneMinusQNorm(stageResults$overallPValues[finalStage]))
+                            c(design$criticalValues[1:(finalStage - 1)], 
+                                -.getOneMinusQNorm(stageResults$overallPValues[finalStage]))
                         ),
                         nrow = 2, byrow = TRUE
                         )
@@ -1243,6 +1283,7 @@ getRepeatedPValues <- function(stageResults, ...,
         if (.getOneMinusQNorm(stageResults$overallPValues[k]) >= design$criticalValues[k]) {
             return(k)
         }
+        
         if (design$sided == 2) {
             if (.getOneMinusQNorm(stageResults$overallPValues[k]) <= -design$criticalValues[k]) {
                 return(k)
@@ -1422,23 +1463,34 @@ getRepeatedPValues <- function(stageResults, ...,
 getFinalPValue <- function(stageResults, ...) {
     stageResults <- .getStageResultsObject(stageResults, functionName = "getFinalPValue", ...)
 
-    .stopInCaseOfIllegalStageDefinition(stageResults, ...)
-
     .assertIsStageResultsNonMultiHypotheses(stageResults)
-
+    
     if (stageResults$.design$kMax == 1) {
+        warning("Final p-value is not available for fixed designs", call. = FALSE)
         return(list(finalStage = NA_integer_, pFinal = NA_real_))
     }
-
+    
+    finalPValue <- NULL
     if (.isTrialDesignInverseNormalOrGroupSequential(stageResults$.design)) {
-        return(.getFinalPValueInverseNormalOrGroupSequential(stageResults))
+        finalPValue <- .getFinalPValueInverseNormalOrGroupSequential(stageResults)
     }
-
-    if (.isTrialDesignFisher(stageResults$.design)) {
-        return(.getFinalPValueFisher(stageResults))
+    else if (.isTrialDesignFisher(stageResults$.design)) {
+        finalPValue <- .getFinalPValueFisher(stageResults)
     }
-
-    .stopWithWrongDesignMessage(stageResults$.design)
+    
+    if (is.null(finalPValue)) {
+        .stopWithWrongDesignMessage(stageResults$.design, 
+            inclusiveConditionalDunnett = .isMultiArmStageResults(stageResults))
+    }
+    
+    if (stageResults$.design$kMax > 1 && is.na(finalPValue$finalStage) && 
+            (length(finalPValue$pFinal) == 0 || all(is.na(finalPValue$pFinal)))) {
+        if(.getOptionalArgument("showWarnings", optionalArgumentDefaultValue = TRUE, ...)) {
+            warning("Final p-value not calculated because final stage not reached", call. = FALSE)
+        }
+    }
+    
+    return(finalPValue)
 }
 
 .getVectorWithFinalValueAtFinalStage <- function(..., kMax, finalValue, finalStage) {
@@ -1512,43 +1564,59 @@ getFinalConfidenceInterval <- function(design, dataInput, ...,
         tolerance = 1e-06, # C_ANALYSIS_TOLERANCE_DEFAULT
         stage = NA_integer_) {
     .assertIsValidTolerance(tolerance)
-    .assertIsTrialDesign(design)
+
+    designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
+    design <- designAndDataInput$design
+    dataInput <- designAndDataInput$dataInput
+
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
 
     .assertIsDatasetNonMultiHypotheses(dataInput)
     on.exit(dataInput$.trim())
+    
+    if (design$kMax == 1) {
+        warning("Final confidence interval is not available for fixed designs", call. = FALSE)
+    }
 
-    if (design$bindingFutility) {
+    if (design$kMax > 1 && design$bindingFutility) {
         warning("Two-sided final confidence bounds are not appropriate, ",
             "use one-sided version (i.e., one bound) only",
             call. = FALSE
         )
     }
 
+    finalConfidenceInterval <- NULL
     if (dataInput$isDatasetMeans()) {
-        return(.getFinalConfidenceIntervalMeans(
+        finalConfidenceInterval <- .getFinalConfidenceIntervalMeans(
             design = design, dataInput = dataInput, directionUpper = directionUpper,
             thetaH0 = thetaH0, tolerance = tolerance, stage = stage, ...
-        ))
+        )
     }
-
-    if (dataInput$isDatasetRates()) {
-        return(.getFinalConfidenceIntervalRates(
+    else if (dataInput$isDatasetRates()) {
+        finalConfidenceInterval <- .getFinalConfidenceIntervalRates(
             design = design, dataInput = dataInput, directionUpper = directionUpper,
             thetaH0 = thetaH0, tolerance = tolerance, stage = stage, ...
-        ))
+        )
     }
-
-
-    if (dataInput$isDatasetSurvival()) {
-        return(.getFinalConfidenceIntervalSurvival(
+    else if (dataInput$isDatasetSurvival()) {
+        finalConfidenceInterval <- .getFinalConfidenceIntervalSurvival(
             design = design, dataInput = dataInput, directionUpper = directionUpper,
             thetaH0 = thetaH0, tolerance = tolerance, stage = stage
-        ))
+        )
+    }
+    
+    if (is.null(finalConfidenceInterval)) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
+    }
+    
+    if (design$kMax > 1 && is.na(finalConfidenceInterval$finalStage) && 
+            (length(finalConfidenceInterval$finalConfidenceInterval) == 0 || 
+                all(is.na(finalConfidenceInterval$finalConfidenceInterval)))) {
+        warning("Final confidence interval not calculated because final stage not reached", call. = FALSE)
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
+    return(finalConfidenceInterval)
 }
 
 #
@@ -2123,8 +2191,6 @@ getConditionalRejectionProbabilities <- function(stageResults, ...) {
         functionName = "getConditionalRejectionProbabilities", ...
     )
 
-    .stopInCaseOfIllegalStageDefinition(stageResults, ...)
-
     if (.isEnrichmentStageResults(stageResults)) {
         return(.getConditionalRejectionProbabilitiesEnrichment(stageResults = stageResults, ...))
     }
@@ -2156,7 +2222,8 @@ getConditionalRejectionProbabilities <- function(stageResults, ...) {
         ))
     }
 
-    .stopWithWrongDesignMessage(stageResults$.design)
+    .stopWithWrongDesignMessage(stageResults$.design, 
+        inclusiveConditionalDunnett = .isMultiArmStageResults(stageResults))
 }
 
 .getDecisionMatrixRoot <- function(..., design, stage, stageResults, tolerance, firstParameterName,

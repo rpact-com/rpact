@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6514 $
-## |  Last changed: $Date: 2022-08-22 14:31:53 +0200 (Mo, 22 Aug 2022) $
+## |  File version: $Revision: 6649 $
+## |  Last changed: $Date: 2022-10-28 10:46:32 +0200 (Fri, 28 Oct 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -23,12 +23,24 @@
 #'
 #' @title
 #' Conditional Power Results
+#' 
+#' @field nPlanned The new sample size planned for each of the subsequent stages.
+#' @field allocationRatioPlanned The planned allocation ratio \code{n1/n2} for a 
+#'        two treatment groups design, default is \code{1}. Is a numeric vector of length 1.
+#' @template field_iterations
+#' @template field_seed
+#' @field simulated Logical. Describes if the power for Fisher's combination test 
+#'        has been simulated. Only applicable when using Fisher designs.
+#' @field conditionalPower The conditional power at each stage of the trial. 
+#'        Is a numeric vector of length \code{kMax}.
+#' @field thetaH1 For survival designs, refers to the hazard ratio. Is a numeric vector of length 1.
+#' @field assumedStDev The assumed standard deviation. Is a numeric vector of length 1.
 #'
 #' @description
 #' Class for conditional power calculations
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getConditionalPower}}
+#' This object cannot be created directly; use \code{\link[=getConditionalPower]{getConditionalPower()}}
 #' with suitable arguments to create the results of a group sequential or a combination test design.
 #'
 #' @keywords internal
@@ -358,7 +370,7 @@ ConditionalPowerResultsEnrichmentSurvival <- setRefClass("ConditionalPowerResult
 #' Class for multi-arm analysis results based on a closed combination test.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
+#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 #' with suitable arguments to create the multi-arm analysis results of a closed combination test design.
 #'
 #' @keywords internal
@@ -978,7 +990,7 @@ summary.AnalysisResults <- function(object, ..., type = 1, digits = NA_integer_)
 #' @description
 #' Returns the \code{\link{AnalysisResults}} object as data frame.
 #'
-#' @param x An \code{\link{AnalysisResults}} object created by \code{\link{getAnalysisResults}}.
+#' @param x An \code{\link{AnalysisResults}} object created by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -1020,7 +1032,7 @@ as.data.frame.AnalysisResults <- function(x, row.names = NULL, optional = FALSE,
 #' @description
 #' Function to get the names of an \code{\link{AnalysisResults}} object.
 #'
-#' @param x An \code{\link{AnalysisResults}} object created by \code{\link{getAnalysisResults}}.
+#' @param x An \code{\link{AnalysisResults}} object created by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #'
 #' @details
 #' Returns the names of an analysis results that can be accessed by the user.
@@ -1050,7 +1062,7 @@ names.AnalysisResults <- function(x) {
 #' Class for analysis results results based on a group sequential design.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
+#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 #' with suitable arguments to create the analysis results of a group sequential design.
 #'
 #' @include class_core_parameter_set.R
@@ -1088,7 +1100,7 @@ AnalysisResultsGroupSequential <- setRefClass("AnalysisResultsGroupSequential",
 #' Class for analysis results results based on an inverse normal design.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
+#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 #' with suitable arguments to create the analysis results of a inverse normal design.
 #'
 #' @include class_core_parameter_set.R
@@ -1115,7 +1127,7 @@ AnalysisResultsInverseNormal <- setRefClass("AnalysisResultsInverseNormal",
 #' Class for multi-arm analysis results based on a inverse normal design.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
+#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 #' with suitable arguments to create the multi-arm analysis results of an inverse normal design.
 #'
 #' @include class_core_parameter_set.R
@@ -1142,7 +1154,7 @@ AnalysisResultsMultiArmInverseNormal <- setRefClass("AnalysisResultsMultiArmInve
 #' Class for enrichment analysis results based on a inverse normal design.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
+#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 #' with suitable arguments to create the enrichment analysis results of an inverse normal design.
 #'
 #' @include class_core_parameter_set.R
@@ -1172,7 +1184,7 @@ AnalysisResultsEnrichmentInverseNormal <- setRefClass("AnalysisResultsEnrichment
 #' Class for analysis results based on a Fisher combination test design.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
+#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 #' with suitable arguments to create the analysis results of a Fisher combination test design.
 #'
 #' @include class_core_parameter_set.R
@@ -1210,7 +1222,7 @@ AnalysisResultsFisher <- setRefClass("AnalysisResultsFisher",
 #' Class for multi-arm analysis results based on a Fisher combination test design.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
+#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 #' with suitable arguments to create the multi-arm analysis results of a Fisher combination test design.
 #'
 #' @include class_core_parameter_set.R
@@ -1242,7 +1254,7 @@ AnalysisResultsMultiArmFisher <- setRefClass("AnalysisResultsMultiArmFisher",
 #' Class for multi-arm analysis results based on a Fisher combination test design.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
+#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 #' with suitable arguments to create the multi-arm analysis results of a Fisher combination test design.
 #'
 #' @include class_core_parameter_set.R
@@ -1275,7 +1287,7 @@ AnalysisResultsEnrichmentFisher <- setRefClass("AnalysisResultsEnrichmentFisher"
 #' Class for multi-arm analysis results based on a conditional Dunnett test design.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
+#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 #' with suitable arguments to create the multi-arm analysis results of a conditional Dunnett test design.
 #'
 #' @keywords internal
@@ -1389,7 +1401,7 @@ AnalysisResultsConditionalDunnett <- setRefClass("AnalysisResultsConditionalDunn
 #' @description
 #' Plots the conditional power together with the likelihood function.
 #'
-#' @param x The analysis results at given stage, obtained from \code{\link{getAnalysisResults}}.
+#' @param x The analysis results at given stage, obtained from \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
 #' @inheritParams param_nPlanned
 #' @inheritParams param_stage
@@ -1411,7 +1423,7 @@ AnalysisResultsConditionalDunnett <- setRefClass("AnalysisResultsConditionalDunn
 #'       can be specified (default is \code{1}).
 #' \item \code{piTreatmentRange}: A range of assumed rates pi1 to calculate the conditional power.
 #'       Additionally, if a two-sample comparison was selected, \code{pi2} can be specified (default is the value from
-#'       \code{getAnalysisResults}).
+#'       \code{\link[=getAnalysisResults]{getAnalysisResults()}}).
 #' \item \code{directionUpper}: Specifies the direction of the alternative,
 #'       only applicable for one-sided testing; default is \code{TRUE}
 #'       which means that larger values of the test statistics yield smaller p-values.
@@ -1606,6 +1618,10 @@ plot.AnalysisResults <- function(x, y, ..., type = 1L,
             if (is.null(assumedStDevs)) {
                 assumedStDevs <- as.numeric(x$assumedStDevs)
             }
+            
+            gMax <- x$.stageResults$getGMax()
+            .assertIsValidAssumedStDevs(assumedStDevs, gMax)
+            
             functionCall$assumedStDevs <- assumedStDevs
         } else {
             assumedStDev <- eval.parent(functionCall$assumedStDev)

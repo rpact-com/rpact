@@ -31,4 +31,4 @@ to learn how to
 
 You can use \code{rawDataTwoArmNormal} to reproduce the examples in the vignette.
 }
-\keyword{datasets}
+\keyword{internal}

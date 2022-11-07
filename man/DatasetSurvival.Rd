@@ -8,15 +8,15 @@
 Class for a dataset of survival data.
 }
 \details{
-This object cannot be created directly; better use \code{\link{getDataset}}
+This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
 with suitable arguments to create a dataset of survival data.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{groups}}{The group numbers.}
+\item{\code{groups}}{The group numbers. Is an integer vector of length number of stages times number of groups.}
 
-\item{\code{stages}}{The stage numbers.}
+\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
 
 \item{\code{overallEvents}}{The cumulative events.}
 

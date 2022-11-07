@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_input_validation.R
 ## |  Creation date: 12 August 2022, 09:09:00
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,6 +24,7 @@ test_plan_section("Testing the Correct Input Validation of All Analysis Function
 
 
 test_that("Errors and warnings for calculation of analysis results with dataset of means", {
+        
 	.skipTestIfDisabled()
 
 	design1 <- getDesignInverseNormal(

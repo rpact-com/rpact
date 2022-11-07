@@ -22,6 +22,6 @@ getParameterName(getDesignInverseNormal(), "Maximum number of stages")
 
 }
 \seealso{
-\code{\link{getParameterCaption}} for getting the parameter caption for a given name.
+\code{\link[=getParameterCaption]{getParameterCaption()}} for getting the parameter caption for a given name.
 }
 \keyword{internal}

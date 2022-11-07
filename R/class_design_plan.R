@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6497 $
-## |  Last changed: $Date: 2022-08-17 13:32:36 +0200 (Wed, 17 Aug 2022) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -282,7 +282,7 @@ as.data.frame.TrialDesignPlan <- function(x, row.names = NULL,
 #' Trial design plan for means.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getSampleSizeMeans}}
+#' This object cannot be created directly; use \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}
 #' with suitable arguments to create a design plan for a dataset of means.
 #'
 #' @include class_core_parameter_set.R
@@ -427,7 +427,7 @@ TrialDesignPlanMeans <- setRefClass("TrialDesignPlanMeans",
 #' Trial design plan for rates.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getSampleSizeRates}}
+#' This object cannot be created directly; use \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
 #' with suitable arguments to create a design plan for a dataset of rates.
 #'
 #' @include class_core_parameter_set.R
@@ -569,7 +569,7 @@ TrialDesignPlanRates <- setRefClass("TrialDesignPlanRates",
 #' Trial design plan for survival data.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link{getSampleSizeSurvival}}
+#' This object cannot be created directly; use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 #' with suitable arguments to create a design plan for a dataset of survival data.
 #'
 #' @include class_core_parameter_set.R
@@ -2006,12 +2006,12 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
 #' Trial Design Plan Plotting
 #'
 #' @param x The trial design plan, obtained from \cr
-#'        \code{\link{getSampleSizeMeans}}, \cr
-#'        \code{\link{getSampleSizeRates}}, \cr
-#'        \code{\link{getSampleSizeSurvival}}, \cr
-#'        \code{\link{getPowerMeans}}, \cr
-#'        \code{\link{getPowerRates}} or \cr
-#'        \code{\link{getPowerSurvival}}.
+#'        \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}, \cr
+#'        \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}, \cr
+#'        \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}, \cr
+#'        \code{\link[=getPowerMeans]{getPowerMeans()}}, \cr
+#'        \code{\link[=getPowerRates]{getPowerRates()}} or \cr
+#'        \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
 #' @param main The main title.
 #' @param xlab The x-axis label.

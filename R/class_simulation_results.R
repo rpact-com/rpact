@@ -14,9 +14,9 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6523 $
-## |  Last changed: $Date: 2022-08-23 18:17:05 +0200 (Di, 23 Aug 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6619 $
+## |  Last changed: $Date: 2022-10-20 11:41:21 +0200 (Thu, 20 Oct 2022) $
+## |  Last changed by: $Author: pahlke $
 ## | 
 
 #' @include f_core_utilities.R
@@ -29,7 +29,8 @@ NULL
 #' @description
 #' Function to get the names of a \code{\link{SimulationResults}} object.
 #' 
-#' @param x A \code{\link{SimulationResults}} object created by \code{getSimulationResults[MultiArm/Enrichment][Means/Rates/Survival]}.
+#' @param x A \code{\link{SimulationResults}} object created by 
+#' \code{getSimulationResults[MultiArm/Enrichment][Means/Rates/Survival]}.
 #' 
 #' @details
 #' Returns the names of a simulation results that can be accessed by the user.
@@ -57,6 +58,9 @@ names.SimulationResults <- function(x) {
 #' 
 #' @description
 #' A class for simulation results.
+#' 
+#' @template field_seed
+#' @template field_iterations
 #' 
 #' @details 
 #' \code{SimulationResults} is the basic class for 
@@ -550,7 +554,6 @@ SimulationResultsBaseMeans <- setRefClass("SimulationResultsBaseMeans",
 		thetaH1 = "numeric",
 		stDevH1 = "numeric",
 		calcSubjectsFunction = "function",
-		
 		expectedNumberOfSubjects = "numeric"
 	),
 	methods = list(
@@ -583,8 +586,12 @@ SimulationResultsBaseMeans <- setRefClass("SimulationResultsBaseMeans",
 #' @description
 #' A class for simulation results means.
 #' 
+#' @field groups The number of groups. Is an integer vector of length 1.
+#' @template field_directionUpper
+#' @template field_normalApproximation
+#' 
 #' @details 
-#' Use \code{\link{getSimulationMeans}} to create an object of this type.
+#' Use \code{\link[=getSimulationMeans]{getSimulationMeans()}} to create an object of this type.
 #' 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -635,7 +642,7 @@ SimulationResultsMeans <- setRefClass("SimulationResultsMeans",
 #' A class for simulation results means in multi-arm designs.
 #' 
 #' @details 
-#' Use \code{\link{getSimulationMultiArmMeans}} to create an object of this type.
+#' Use \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}} to create an object of this type.
 #' 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -700,7 +707,6 @@ SimulationResultsBaseRates <- setRefClass("SimulationResultsBaseRates",
 		minNumberOfSubjectsPerStage = "numeric",
 		maxNumberOfSubjectsPerStage = "numeric",
 		calcSubjectsFunction = "function",
-		
 		expectedNumberOfSubjects = "numeric"
 	),
 	methods = list(
@@ -734,8 +740,12 @@ SimulationResultsBaseRates <- setRefClass("SimulationResultsBaseRates",
 #' @description
 #' A class for simulation results rates.
 #' 
+#' @field groups The number of groups. Is an integer vector of length 1.
+#' @template field_directionUpper
+#' @template field_normalApproximation
+#' 
 #' @details 
-#' Use \code{\link{getSimulationRates}} to create an object of this type.
+#' Use \code{\link[=getSimulationRates]{getSimulationRates()}} to create an object of this type.
 #' 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -805,7 +815,7 @@ SimulationResultsRates <- setRefClass("SimulationResultsRates",
 #' A class for simulation results rates in multi-arm designs.
 #' 
 #' @details 
-#' Use \code{\link{getSimulationMultiArmRates}} to create an object of this type.
+#' Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}} to create an object of this type.
 #' 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -907,7 +917,7 @@ SimulationResultsBaseSurvival <- setRefClass("SimulationResultsBaseSurvival",
 #' A class for simulation results survival.
 #' 
 #' @details 
-#' Use \code{\link{getSimulationSurvival}} to create an object of this type.
+#' Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} to create an object of this type.
 #' 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1003,7 +1013,7 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
 #' A class for simulation results survival in multi-arm designs.
 #' 
 #' @details 
-#' Use \code{\link{getSimulationMultiArmSurvival}} to create an object of this type.
+#' Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}} to create an object of this type.
 #' 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1072,7 +1082,7 @@ SimulationResultsMultiArmSurvival <- setRefClass("SimulationResultsMultiArmSurvi
 #' A class for simulation results means in enrichment designs.
 #' 
 #' @details 
-#' Use \code{\link{getSimulationEnrichmentMeans}} to create an object of this type.
+#' Use \code{\link[=getSimulationEnrichmentMeans]{getSimulationEnrichmentMeans()}} to create an object of this type.
 #' 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1136,7 +1146,7 @@ SimulationResultsEnrichmentMeans <- setRefClass("SimulationResultsEnrichmentMean
 #' A class for simulation results rates in enrichment designs.
 #' 
 #' @details 
-#' Use \code{\link{getSimulationEnrichmentRates}} to create an object of this type.
+#' Use \code{\link[=getSimulationEnrichmentRates]{getSimulationEnrichmentRates()}} to create an object of this type.
 #' 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1202,7 +1212,7 @@ SimulationResultsEnrichmentRates <- setRefClass("SimulationResultsEnrichmentRate
 #' A class for simulation results survival in enrichment designs.
 #' 
 #' @details 
-#' Use \code{\link{getSimulationEnrichmentSurvival}} to create an object of this type.
+#' Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurvival()}} to create an object of this type.
 #' 
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -2093,7 +2103,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
 #' Simulation Results Plotting
 #' 
 #' @param x The simulation results, obtained from \cr
-#'        \code{\link{getSimulationSurvival}}.
+#'        \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
 #' @param main The main title.
 #' @param xlab The x-axis label.
@@ -2223,13 +2233,13 @@ print.SimulationResults <- function(x, ..., showStatistics = FALSE, markdown = F
 #' @description
 #' Returns the aggregated simulation data.
 #' 
-#' @param x A \code{\link{SimulationResults}} object created by \code{\link{getSimulationMeans}},\cr 
-#'  \code{\link{getSimulationRates}}, \code{\link{getSimulationSurvival}}, \code{\link{getSimulationMultiArmMeans}},\cr 
-#'  \code{\link{getSimulationMultiArmRates}}, or \code{\link{getSimulationMultiArmSurvival}}.
+#' @param x A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationMeans]{getSimulationMeans()}},\cr 
+#'  \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr 
+#'  \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
 #'
 #' @details
 #' This function can be used to get the aggregated simulated data from an simulation results  
-#' object, for example, obtained by \code{\link{getSimulationSurvival}}.
+#' object, for example, obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
 #' In this case, the data frame contains the following columns:
 #' \enumerate{
 #'   \item \code{iterationNumber}: The number of the simulation iteration.
@@ -2263,8 +2273,8 @@ print.SimulationResults <- function(x, ..., showStatistics = FALSE, markdown = F
 #'         log-rank statistic.
 
 #' }
-#' A subset of variables is provided for \code{\link{getSimulationMeans}}, \code{\link{getSimulationRates}}, \code{\link{getSimulationMultiArmMeans}},\cr 
-#'  \code{\link{getSimulationMultiArmRates}}, or \code{\link{getSimulationMultiArmSurvival}}.
+#' A subset of variables is provided for \code{\link[=getSimulationMeans]{getSimulationMeans()}}, \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr 
+#'  \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
 #' 
 #' @template return_dataframe
 #' 
@@ -2370,16 +2380,16 @@ getData.SimulationResults <- function(x) {
 #' @description
 #' Returns the raw survival data which was generated for simulation.
 #' 
-#' @param x A \code{\link{SimulationResults}} object created by \code{\link{getSimulationSurvival}}.
+#' @param x A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
 #' @param aggregate Logical. If \code{TRUE} the raw data will be aggregated similar to
-#'        the result of \code{\link{getData}}, default is \code{FALSE}.
+#'        the result of \code{\link[=getData]{getData()}}, default is \code{FALSE}.
 #'
 #' @details
-#' This function works only if \code{\link{getSimulationSurvival}} was called with a \cr
+#' This function works only if \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} was called with a \cr
 #' \code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}).
 #' 
 #' This function can be used to get the simulated raw data from a simulation results  
-#' object obtained by \code{\link{getSimulationSurvival}}. Note that \code{\link{getSimulationSurvival}} 
+#' object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}. Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} 
 #' must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
 #' The data frame contains the following columns: 
 #' \enumerate{

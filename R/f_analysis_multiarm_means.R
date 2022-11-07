@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6488 $
-## |  Last changed: $Date: 2022-08-15 10:28:13 +0200 (Mon, 15 Aug 2022) $
+## |  File version: $Revision: 6649 $
+## |  Last changed: $Date: 2022-10-28 10:46:32 +0200 (Fri, 28 Oct 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1028,9 +1028,9 @@ NULL
         assumedStDevs, stageResults, stage,
         results = results
     )
+    .assertIsValidAssumedStDevs(assumedStDevs, gMax)
     thetaH1 <- .assertIsValidThetaH1ForMultiArm(thetaH1, stageResults, stage, results = results)
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
-
     if (length(thetaH1) != 1 && length(thetaH1) != gMax) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -1038,15 +1038,6 @@ NULL
                 "length of 'thetaH1' (%s) ",
                 "must be equal to 'gMax' (%s) or 1"
             ), .arrayToString(thetaH1), gMax)
-        )
-    }
-    if (length(assumedStDevs) != 1 && length(assumedStDevs) != gMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'assumedStDevs' (%s) ",
-                "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(assumedStDevs), gMax)
         )
     }
 

@@ -4,7 +4,7 @@
 \alias{param_showSource}
 \title{Parameter Description: Show Source}
 \arguments{
-\item{showSource}{If \code{TRUE}, the parameter names of the object will 
+\item{showSource}{Logical. If \code{TRUE}, the parameter names of the object will 
 be printed which were used to create the plot; that may be, e.g., 
 useful to check the values or to create own plots with the base R \code{plot} function.
 Alternatively \code{showSource} can be defined as one of the following character values: 

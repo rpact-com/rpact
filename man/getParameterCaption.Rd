@@ -21,6 +21,6 @@ getParameterCaption(getDesignInverseNormal(), "kMax")
 
 }
 \seealso{
-\code{\link{getParameterName}} for getting the parameter name for a given caption.
+\code{\link[=getParameterName]{getParameterName()}} for getting the parameter name for a given caption.
 }
 \keyword{internal}

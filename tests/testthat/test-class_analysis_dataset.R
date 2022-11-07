@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-class_analysis_dataset.R
 ## |  Creation date: 12 August 2022, 09:04:25
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,6 +24,9 @@ test_plan_section("Testing the Class 'Dataset'")
 
 
 test_that("Usage of 'getDataset'", {
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:dataInputVariants}
 	# @refFS[Tab.]fs:tab:output:getDatasetMeans}
 	datasetOfMeans1 <- getDataset(
@@ -68,7 +71,7 @@ test_that("Usage of 'getDataset'", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
+    
 	## Comparison of the results of data.frame object 'datasetOfMeans1$.data' with expected results
 	expect_equal(datasetOfMeans1$.data$stage, factor(c(1, 1, 2, 2, 3, 3, 4, 4)))
 	expect_equal(datasetOfMeans1$.data$group, factor(c(1, 2, 1, 2, 1, 2, 1, 2)))
@@ -88,8 +91,6 @@ test_that("Usage of 'getDataset'", {
 	expect_equal(datasetOfMeans1$overallSampleSizes, datasetOfMeans1$.data$overallSampleSize, tolerance = 1e-07)
 	expect_equal(datasetOfMeans1$overallMeans, datasetOfMeans1$.data$overallMean, tolerance = 1e-07)
 	expect_equal(datasetOfMeans1$overallStDevs, datasetOfMeans1$.data$overallStDev, tolerance = 1e-07)
-
-	.skipTestIfDisabled()
 
 	x <- getMultipleStageResultsForDataset(datasetOfMeans1)
 
@@ -2033,7 +2034,9 @@ test_that("Trim command works as expected for suvival data", {
 })
 
 test_that("Dataset functions 'getNumberOfStages' and 'getNumberOfGroups' work as expected for means", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:dataInputVariants}
 	# @refFS[Tab.]fs:tab:output:getDatasetMeans}
 	data1 <- getDataset(
@@ -2052,8 +2055,6 @@ test_that("Dataset functions 'getNumberOfStages' and 'getNumberOfGroups' work as
 	expect_equal(data1$getNumberOfStages(FALSE), 3)
 	expect_equal(data1$getNumberOfGroups(), 3)
 	expect_equal(data1$getNumberOfGroups(survivalCorrectionEnabled = FALSE), 3)
-
-	.skipTestIfDisabled()
 
 	data2 <- getDataset(
 	    overallN1 = c(22, 33, 55),
@@ -2092,6 +2093,8 @@ test_that("Dataset functions 'getNumberOfStages' and 'getNumberOfGroups' work as
 })
 
 test_that("Dataset functions 'getNumberOfStages' and 'getNumberOfGroups' work as expected for rates", {
+        
+    .skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:dataInputVariants}
 	# @refFS[Tab.]fs:tab:output:getDatasetRates}
@@ -2208,7 +2211,9 @@ test_that("Dataset functions 'getNumberOfStages' and 'getNumberOfGroups' work as
 })
 
 test_that("Function '.naOmitBackward' works as expected", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(.naOmitBackward(c(1, NA_real_, 3, NA_real_)), c(1, NA_real_, 3))
 	expect_equal(.naOmitBackward(c(1, NA_real_, 3, NA_real_, 5)), c(1, NA_real_, 3, NA_real_, 5))
 	expect_equal(.naOmitBackward(c(1, NA_real_, NA_real_)), c(1))
@@ -2223,6 +2228,9 @@ test_plan_section("Testing that 'getDataset' Throws Exceptions as Expected")
 
 
 test_that("Wrong parameter usage of 'getDataset'", {
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:dataInputVariants}
 	expect_error(getDataset(),
 	    "Missing argument: data.frame, data vectors, or datasets expected",
@@ -2260,6 +2268,9 @@ test_plan_section("Testing datasets for enrichment designs")
 
 
 test_that("Creation of a dataset of means with subsets", {
+        
+    .skipTestIfDisabled()
+        
 	x <- getDataset(
 	    stage = c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3),
 	    subset = c("S1", "S2", "S12", "R", "S1", "S2", "S12", "R", "S1", "S2", "S12", "R"),
@@ -2304,8 +2315,6 @@ test_that("Creation of a dataset of means with subsets", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	x2 <- getDataset(
 	    stages = c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3),
@@ -2362,7 +2371,9 @@ test_that("Creation of a dataset of means with subsets", {
 })
 
 test_that("Creation of a dataset of rates with subsets", {
-
+        
+    .skipTestIfDisabled()
+        
 	x <- getDataset(
 	    stage = c(1, 1, 2, 2),
 	    subset = c("S1", "R", "S1", "R"),
@@ -2407,7 +2418,9 @@ test_that("Creation of a dataset of rates with subsets", {
 })
 
 test_that("Creation of a dataset of survival data with subsets", {
-
+        
+    .skipTestIfDisabled()
+        
 	x <- getDataset(
 	    stage = c(1, 1, 2, 2),
 	    subset = c("S1", "R", "S1", "R"),
@@ -2456,7 +2469,9 @@ test_that("Creation of a dataset of survival data with subsets", {
 })
 
 test_that("Illegal creation of a dataset of means with subsets: invalid sample size", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_error(
 	    getDataset(
 	        sampleSize1 = c(NA, NA),
@@ -2473,7 +2488,9 @@ test_that("Illegal creation of a dataset of means with subsets: invalid sample s
 })
 
 test_that("Illegal creation of a dataset of means with subsets: too small standard deviation (one subset)", {
-
+        
+    .skipTestIfDisabled()
+        
 	S1 <- getDataset(
 	    sampleSize1 = c(12, 21),
 	    sampleSize2 = c(18, 21),
@@ -2500,7 +2517,9 @@ test_that("Illegal creation of a dataset of means with subsets: too small standa
 })
 
 test_that("Illegal creation of a dataset of means with subsets: too small sample size in F (one group)", {
-
+        
+    .skipTestIfDisabled()
+        
 	S1 <- getDataset(
 	    sampleSize1 = c(12, 21),
 	    sampleSize2 = c(30, 21),
@@ -2527,7 +2546,9 @@ test_that("Illegal creation of a dataset of means with subsets: too small sample
 })
 
 test_that("Illegal creation of a dataset of means with subsets: wrong deselection (one group)", {
-
+        
+    .skipTestIfDisabled()
+        
 	S1 <- getDataset(
 	    sampleSize1 = c(12, NA),
 	    sampleSize2 = c(18, NA),

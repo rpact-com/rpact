@@ -20,9 +20,9 @@ functions.
 \section{Fields}{
 
 \describe{
-\item{\code{stages}}{The stage numbers.}
+\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
 
-\item{\code{groups}}{The group numbers.}
+\item{\code{groups}}{The group numbers. Is an integer vector of length number of stages times number of groups.}
 }}
 
 

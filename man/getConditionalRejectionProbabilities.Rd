@@ -7,7 +7,7 @@
 getConditionalRejectionProbabilities(stageResults, ...)
 }
 \arguments{
-\item{stageResults}{The results at given stage, obtained from \code{\link{getStageResults}}.}
+\item{stageResults}{The results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}}.}
 
 \item{...}{Further (optional) arguments to be passed:
 \describe{

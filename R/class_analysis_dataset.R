@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6303 $
-## |  Last changed: $Date: 2022-06-17 10:58:50 +0200 (Fri, 17 Jun 2022) $
+## |  File version: $Revision: 6646 $
+## |  Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -108,18 +108,19 @@ C_KEY_WORDS <- c(
 #' @details
 #' \code{readDataset} is a wrapper function that uses \code{\link[utils]{read.table}} to read the
 #' CSV file into a data frame, transfers it from long to wide format with \code{\link[stats]{reshape}}
-#' and puts the data to \code{\link{getDataset}}.
+#' and puts the data to \code{\link[=getDataset]{getDataset()}}.
 #'
 #' @template return_object_dataset
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link{readDatasets}} for reading multiple datasets,
-#'   \item \code{\link{writeDataset}} for writing a single dataset,
-#'   \item \code{\link{writeDatasets}} for writing multiple datasets.
+#'   \item \code{\link[=readDatasets]{readDatasets()}} for reading multiple datasets,
+#'   \item \code{\link[=writeDataset]{writeDataset()}} for writing a single dataset,
+#'   \item \code{\link[=writeDatasets]{writeDatasets()}} for writing multiple datasets.
 #' }
 #'
 #' @examples
+#' \donttest{
 #' dataFileRates <- system.file("extdata",
 #'     "dataset_rates.csv",
 #'     package = "rpact"
@@ -154,6 +155,7 @@ C_KEY_WORDS <- c(
 #' if (dataFileSurvivalMultiArm != "") {
 #'     datasetSurvivalMultiArm <- readDataset(dataFileSurvivalMultiArm)
 #'     datasetSurvivalMultiArm
+#' }
 #' }
 #' 
 #' @export
@@ -204,14 +206,14 @@ readDataset <- function(file, ..., header = TRUE, sep = ",", quote = "\"",
 #' @param ... Further arguments to be passed to \code{\link[utils]{write.table}}.
 #'
 #' @details
-#' \code{\link{writeDataset}} is a wrapper function that coerces the dataset to a data frame and uses \cr
+#' \code{\link[=writeDataset]{writeDataset()}} is a wrapper function that coerces the dataset to a data frame and uses \cr
 #' \code{\link[utils]{write.table}} to write it to a CSV file.
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link{writeDatasets}} for writing multiple datasets,
-#'   \item \code{\link{readDataset}} for reading a single dataset,
-#'   \item \code{\link{readDatasets}} for reading multiple datasets.
+#'   \item \code{\link[=writeDatasets]{writeDatasets()}} for writing multiple datasets,
+#'   \item \code{\link[=readDataset]{readDataset()}} for reading a single dataset,
+#'   \item \code{\link[=readDatasets]{readDatasets()}} for reading multiple datasets.
 #' }
 #'
 #' @examples
@@ -268,15 +270,15 @@ writeDataset <- function(dataset, file, ..., append = FALSE, quote = TRUE, sep =
 #' @param ... Further arguments to be passed to \code{\link[utils]{read.table}}.
 #'
 #' @details
-#' Reads a file that was written by \code{\link{writeDatasets}} before.
+#' Reads a file that was written by \code{\link[=writeDatasets]{writeDatasets()}} before.
 #'
 #' @return Returns a \code{\link[base]{list}} of \code{\link{Dataset}} objects.
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link{readDataset}} for reading a single dataset,
-#'   \item \code{\link{writeDatasets}} for writing multiple datasets,
-#'   \item \code{\link{writeDataset}} for writing a single dataset.
+#'   \item \code{\link[=readDataset]{readDataset()}} for reading a single dataset,
+#'   \item \code{\link[=writeDatasets]{writeDatasets()}} for writing multiple datasets,
+#'   \item \code{\link[=writeDataset]{writeDataset()}} for writing a single dataset.
 #' }
 #'
 #' @examples
@@ -355,13 +357,13 @@ readDatasets <- function(file, ..., header = TRUE, sep = ",", quote = "\"",
 #' @param ... Further arguments to be passed to \code{\link[utils]{write.table}}.
 #'
 #' @details
-#' The format of the CSV file is optimized for usage of \code{\link{readDatasets}}.
+#' The format of the CSV file is optimized for usage of \code{\link[=readDatasets]{readDatasets()}}.
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link{writeDataset}} for writing a single dataset,
-#'   \item \code{\link{readDatasets}} for reading multiple datasets,
-#'   \item \code{\link{readDataset}} for reading a single dataset.
+#'   \item \code{\link[=writeDataset]{writeDataset()}} for writing a single dataset,
+#'   \item \code{\link[=readDatasets]{readDatasets()}} for reading multiple datasets,
+#'   \item \code{\link[=readDataset]{readDataset()}} for reading a single dataset.
 #' }
 #'
 #' @examples
@@ -506,11 +508,11 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
 #' (sub-population wise) or stratified data input.\cr
 #' For unstratified (sub-population wise) data input the data sets are defined for the sub-populations
 #' S1, S2, ..., F, where F refers to the full populations. Use of \code{getDataset(S1 = , S2, ..., F = )}
-#' defines the data set to be used in \code{\link{getAnalysisResults}} (see examples)\cr
+#' defines the data set to be used in \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 #' For stratified data input the data sets are defined for the strata S1, S12, S2, ..., R, where R
 #' refers to the remainder of the strata such that the union of all sets is the full population.
 #' Use of \code{getDataset(S1 = , S12 = , S2, ..., R = )} defines the data set to be used in
-#' \code{\link{getAnalysisResults}} (see examples)\cr
+#' \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 #' For survival data, for enrichment designs the log-rank statistics should be entered as stratified
 #' log-rank statistics in order to provide strong control of Type I error rate. For stratified data input,
 #' the variables to be specified in \code{getDataset()} are \code{events}, \code{expectedEvents},
@@ -534,6 +536,20 @@ getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
     }
 
     if (.optionalArgsContainsDatasets(...)) {
+        if (length(args) == 1) {
+            return(args[[1]])
+        }
+        
+        design <- .getDesignFromArgs(...)
+        if (length(args) == 2 && !is.null(design)) {
+            dataset <- .getDatasetFromArgs(...)
+            if (!is.null(dataset)) {
+                dataset <- dataset$copy(shallow = FALSE)
+                dataset$.design <- design
+                return(dataset)
+            }
+        }
+        
         return(.getEnrichmentDatasetFromArgs(...))
     }
 
@@ -552,11 +568,21 @@ getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
     }
 
     dataFrame <- .getDataFrameFromArgs(...)
+    
+    design <- .getDesignFromArgs(...)
 
     if (is.null(dataFrame)) {
+        args <- .removeDesignFromArgs(args)
+        
         paramNames <- names(args)
         paramNames <- paramNames[paramNames != ""]
-        if (length(paramNames) != length(args)) {
+        
+        numberOfParameters <- length(args)
+        if (numberOfParameters > 0 && names(args)[1] == "" && .isTrialDesign(args[[1]])) {
+            numberOfParameters <- numberOfParameters - 1
+        }
+        
+        if (length(paramNames) != numberOfParameters) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all parameters must be named")
         }
 
@@ -573,7 +599,8 @@ getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
         return(DatasetMeans(
             dataFrame = dataFrame,
             floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-            enrichmentEnabled = enrichmentEnabled
+            enrichmentEnabled = enrichmentEnabled,
+            .design = design
         ))
     }
 
@@ -581,7 +608,8 @@ getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
         return(DatasetRates(
             dataFrame = dataFrame,
             floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-            enrichmentEnabled = enrichmentEnabled
+            enrichmentEnabled = enrichmentEnabled,
+            .design = design
         ))
     }
 
@@ -589,7 +617,8 @@ getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
         return(DatasetEnrichmentSurvival(
             dataFrame = dataFrame,
             floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-            enrichmentEnabled = enrichmentEnabled
+            enrichmentEnabled = enrichmentEnabled,
+            .design = design
         ))
     }
 
@@ -597,7 +626,8 @@ getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
         return(DatasetSurvival(
             dataFrame = dataFrame,
             floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-            enrichmentEnabled = enrichmentEnabled
+            enrichmentEnabled = enrichmentEnabled,
+            .design = design
         ))
     }
 
@@ -1290,8 +1320,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #' @description
 #' Basic class for datasets.
 #'
-#' @field stages The stage numbers.
-#' @field groups The group numbers.
+#' @template field_stages
+#' @template field_groups
 #'
 #' @details
 #' \code{Dataset} is the basic class for
@@ -1305,6 +1335,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
+#' @include class_design.R
 #' @include f_core_constants.R
 #' @include f_core_assertions.R
 #'
@@ -1323,6 +1354,7 @@ Dataset <- setRefClass("Dataset",
         .kMax = "integer",
         .enrichmentEnabled = "logical",
         .inputType = "character",
+        .design = "ANY",
         stages = "integer",
         groups = "integer",
         subsets = "character"
@@ -1760,14 +1792,14 @@ Dataset <- setRefClass("Dataset",
 #' @description
 #' Class for a dataset of means.
 #'
-#' @field groups The group numbers.
-#' @field stages The stage numbers.
-#' @field sampleSizes The sample sizes.
-#' @field means The means.
-#' @field stDevs The standard deviations.
+#' @template field_groups
+#' @template field_stages
+#' @template field_sampleSizes
+#' @field means The means. Is a numeric vector of length number of stages times number of groups.
+#' @field stDevs The standard deviations. Is a numeric vector of length number of stages times number of groups.
 #'
 #' @details
-#' This object cannot be created directly; better use \code{\link{getDataset}}
+#' This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
 #' with suitable arguments to create a dataset of means.
 #'
 #' @include class_core_parameter_set.R
@@ -2621,15 +2653,15 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
 #' @description
 #' Class for a dataset of rates.
 #'
-#' @field groups The group numbers.
-#' @field stages The stage numbers.
-#' @field sampleSizes The sample sizes.
-#' @field events The events.
-#' @field overallSampleSizes The cumulative sample sizes.
-#' @field overallEvents The cumulative events.
+#' @template field_groups
+#' @template field_stages
+#' @template field_sampleSizes
+#' @field events The events. Is an integer vector of length number of groups times number of stages.
+#' @field overallSampleSizes The cumulative sample sizes. Is an integer vector of length number of groups times number of stages.
+#' @field overallEvents The cumulative events. Is an integer vector of length number of groups times number of stages.
 #'
 #' @details
-#' This object cannot be created directly; better use \code{\link{getDataset}}
+#' This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
 #' with suitable arguments to create a dataset of rates.
 #'
 #' @include class_core_parameter_set.R
@@ -3090,8 +3122,8 @@ DatasetRates <- setRefClass("DatasetRates",
 #' @description
 #' Class for a dataset of survival data.
 #'
-#' @field groups The group numbers.
-#' @field stages The stage numbers.
+#' @template field_groups
+#' @template field_stages
 #' @field overallEvents The cumulative events.
 #' @field overallAllocationRatios The cumulative allocations ratios.
 #' @field overallLogRanks The overall logrank test statistics.
@@ -3099,7 +3131,7 @@ DatasetRates <- setRefClass("DatasetRates",
 #' @field logRanks The logrank test statistics.
 #'
 #' @details
-#' This object cannot be created directly; better use \code{\link{getDataset}}
+#' This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
 #' with suitable arguments to create a dataset of survival data.
 #'
 #' @include class_core_parameter_set.R

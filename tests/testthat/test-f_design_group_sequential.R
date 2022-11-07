@@ -24,6 +24,9 @@ test_plan_section("Testing the Group Sequential and Inverse Normal Design Functi
 
 
 test_that("'getGroupSequentialProbabilities' with one and two continuation regions for weighted test statistic", {
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{{fs:testStatisticGroupSequentialWeightedAverage}}
 	xa <- getGroupSequentialProbabilities(matrix(c(rep(-qnorm(0.95), 4), rep(qnorm(0.95), 4)), nrow = 2, byrow = TRUE), (1:4) / 4)
 
@@ -312,6 +315,8 @@ test_that("'getDesignInverseNormal' with type of design = 'asHSD', 'bsHSD', 'asK
 
 test_that("'getDesignInverseNormal' with binding futility bounds", {
 
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getDesignInverseNormal}
 	# @refFS[Formula]{fs:criticalValuesWithFutility}
 	# @refFS[Formula]{fs:criticalValuesWangTiatis}
@@ -381,6 +386,8 @@ test_that("'getDesignGroupSequential' with type of design = 'asUser'", {
 
 test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsUser' and non-binding futility bounds", {
 
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingPocock}
@@ -424,7 +431,9 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsUser' a
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asP' and information rate < 1 at maximum stage", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingPocock}
@@ -547,7 +556,9 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsUser' and binding futility bounds", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingPocock}
@@ -683,7 +694,9 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' and binding futility bounds, two-sided (kMax = 3)", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
@@ -764,7 +777,9 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' and non-binding futility bounds, no betaAdjustment, two-sided (kMax = 3)", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
@@ -811,7 +826,9 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', binding futility bounds and delayed response (kMax = 3)", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
@@ -1057,7 +1074,9 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', b
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsP', non-binding futility bounds and delayed response (kMax = 3)", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
@@ -1746,7 +1765,9 @@ test_that("'getDesignGroupSequential' with type of design = 'noEarlyEfficacy'", 
 })
 
 test_that("'getDesignInverseNormal': illegal arguments throw exceptions as expected", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_error(getDesignInverseNormal(
 	    typeOfDesign = C_TYPE_OF_DESIGN_AS_USER,
 	    userAlphaSpending = c(0.01, 0.02, 0.023, 0.023, 0.025), kMax = 4
@@ -1933,7 +1954,9 @@ test_that("'getDesignInverseNormal': illegal arguments throw exceptions as expec
 })
 
 test_that("'getDesignGroupSequential': illegal arguments throw exceptions as expected", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_error(getDesignGroupSequential(
 	    typeOfDesign = C_TYPE_OF_DESIGN_AS_USER,
 	    userAlphaSpending = c(0.01, 0.02, 0.023, 0.023, 0.025), kMax = 4

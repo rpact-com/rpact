@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6619 $
+## |  Last changed: $Date: 2022-10-20 11:41:21 +0200 (Thu, 20 Oct 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -369,7 +369,7 @@ NULL
         return(.getAnalysisResultsRatesFisherEnrichment(design = design, dataInput = dataInput, ...))
     }
 
-    .stopWithWrongDesignMessage(design)
+    .stopWithWrongDesignMessageEnrichment(design)
 }
 
 .getAnalysisResultsRatesInverseNormalEnrichment <- function(...,
@@ -775,10 +775,12 @@ NULL
     if (.isTrialDesignInverseNormal(design)) {
         return(.getRepeatedConfidenceIntervalsRatesEnrichmentInverseNormal(design = design, ...))
     }
+    
     if (.isTrialDesignFisher(design)) {
         return(.getRepeatedConfidenceIntervalsRatesEnrichmentFisher(design = design, ...))
     }
-    .stopWithWrongDesignMessage(design)
+    
+    .stopWithWrongDesignMessageEnrichment(design)
 }
 
 #

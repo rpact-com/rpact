@@ -8,27 +8,36 @@
 Class for stage results survival data.
 }
 \details{
-This object cannot be created directly; use \code{getStageResults}
+This object cannot be created directly; use \code{\link[=getStageResults]{getStageResults()}}
 with suitable arguments to create the stage results of a dataset of survival data.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{testStatistics}}{The stage-wise test statistics.}
+\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
 
-\item{\code{pValues}}{The stage-wise p-values.}
+\item{\code{testStatistics}}{The stage-wise test statistics. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{combInverseNormal}}{The inverse normal test.}
+\item{\code{overallTestStatistics}}{The overall i.e. cumulated test statistics. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{combFisher}}{The Fisher's combination test.}
+\item{\code{pValues}}{The stage-wise p-values. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{effectSizes}}{The effect sizes for different designs.}
+\item{\code{overallPValues}}{The overall i.e. cumulated p-values. Is a numeric vector of length \code{kMax}.}
+
+\item{\code{combInverseNormal}}{The stage-wise test statistics for the inverse normal test. Is a numeric vector of length \code{kMax}.}
+
+\item{\code{combFisher}}{Test statistic for Fisher's combination test. H~0~}
+
+\item{\code{effectSizes}}{The stage-wise effect sizes. Is a numeric vector of length \code{kMax}.}
 
 \item{\code{testActions}}{The action drawn from test result.}
 
-\item{\code{weightsFisher}}{The weights for Fisher's combination test.}
+\item{\code{weightsFisher}}{The weights for Fisher's combination test. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{weightsInverseNormal}}{The weights for inverse normal statistic.}
+\item{\code{weightsFisher}}{The weights for inverse normal statistic.. Is a numeric vector of length \code{kMax}.}
+
+\item{\code{normalApproximation}}{Logical. Describes if a normal approximation was used when calculating p-values.
+Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio.}
 }}
 
 

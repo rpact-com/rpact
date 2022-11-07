@@ -14,14 +14,15 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6294 $
- * Last changed: $Date: 2022-06-14 12:08:55 +0200 (Di, 14 Jun 2022) $
+ * File version: $Revision: 6646 $
+ * Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
  * Last changed by: $Author: pahlke $
  *
  */
+#include <Rcpp.h>
 
 // [[Rcpp::plugins(cpp11)]]
-#include <Rcpp.h>
+
 #include <cmath>
 #include "f_utilities.h"
 #include "f_simulation_survival_utilities.h"
@@ -862,7 +863,7 @@ List getDesignGroupSequentialBetaSpendingOneSidedCpp(
 				shift,
 				tolerance);
             return (double) futilityBounds[kMax - 1] - (double) criticalValues[kMax - 1];
-        }, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS); // bisection: -4.0, 10.0
+        }, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
     } else {
     	futilityBounds = NumericVector(kMax, NA_REAL);
     	shiftResult = bisection2([&](double shift) {

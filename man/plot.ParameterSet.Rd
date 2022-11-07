@@ -51,7 +51,7 @@ Choose one of the following values to specify the position manually:
   \item \code{6}: legend position right bottom
 }}
 
-\item{showSource}{If \code{TRUE}, the parameter names of the object will 
+\item{showSource}{Logical. If \code{TRUE}, the parameter names of the object will 
 be printed which were used to create the plot; that may be, e.g., 
 useful to check the values or to create own plots with the base R \code{plot} function.
 Alternatively \code{showSource} can be defined as one of the following character values: 
@@ -65,7 +65,7 @@ Alternatively \code{showSource} can be defined as one of the following character
 }
 Note: no plot object will be returned if \code{showSource} is a character.}
 
-\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link{getPlotSettings}}.}
+\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.}
 }
 \value{
 Returns a \code{ggplot2} object.

@@ -18,14 +18,14 @@
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{digits}{Defines how many digits are to be used for numeric values.}
+\item{digits}{Defines how many digits are to be used for numeric values. Must be a positive integer of length 1.}
 }
 \value{
 Returns a \code{\link{SummaryFactory}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object
 }
 }
 \description{

@@ -4,7 +4,7 @@
 \alias{param_tolerance}
 \title{Parameter Description: Tolerance}
 \arguments{
-\item{tolerance}{The numerical tolerance, default is \code{1e-06}.}
+\item{tolerance}{The numerical tolerance, default is \code{1e-06}. Must be a positive numeric of length 1.}
 }
 \description{
 Parameter Description: Tolerance

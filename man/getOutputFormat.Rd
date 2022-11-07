@@ -37,7 +37,7 @@ objects can be shown and written to a file.
 }
 \details{
 Output formats can be written to a text file by specifying a \code{file}.
-See \code{\link{setOutputFormat}}() to learn how to read a formerly saved file.
+See \code{\link[=setOutputFormat]{setOutputFormat()}}() to learn how to read a formerly saved file.
 
 Note that the \code{parameterName} must not match exactly, e.g., for p-values the
 following parameter names will be recognized amongst others:

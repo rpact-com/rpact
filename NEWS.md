@@ -1,4 +1,13 @@
 
+# rpact 3.3.2
+
+* Design objects can be piped into `getDataset()` to enable pipe syntax for analysis, e.g., 
+`getDesignGroupSequential() |> getDataset(dataMeans) |> getAnalysisResults()`
+* Performance of simulation means improved for 1 and 2 groups (by translating from R to C++)
+* Total test time was cut in half by improving simulation performance and enabling parallel testing
+* `SystemRequirements: C++11` added to DESCRIPTION to enable C++ 11 compilation on R 3.x
+* Minor improvements
+
 # rpact 3.3.1
 
 * Help pages improved

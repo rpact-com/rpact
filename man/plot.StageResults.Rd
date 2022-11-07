@@ -22,7 +22,8 @@
 )
 }
 \arguments{
-\item{x}{The stage results at given stage, obtained from \code{getStageResults} or \code{getAnalysisResults}.}
+\item{x}{The stage results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}} or 
+\code{\link[=getAnalysisResults]{getAnalysisResults()}}.}
 
 \item{y}{Not available for this kind of plot (is only defined to be compatible to the generic plot function).}
 
@@ -32,7 +33,7 @@
       Additionally, if testing means was selected, an assumed standard deviation can be specified (default is 1).
 \item \code{piTreatmentRange}: A range of assumed rates pi1 to calculate the conditional power.
       Additionally, if a two-sample comparison was selected, pi2 can be specified (default is the value from
-      \code{getAnalysisResults}).
+      \code{\link[=getAnalysisResults]{getAnalysisResults()}}).
 \item \code{directionUpper}: Specifies the direction of the alternative,
       only applicable for one-sided testing; default is \code{TRUE}
       which means that larger values of the test statistics yield smaller p-values.
@@ -80,7 +81,7 @@ Choose one of the following values to specify the position manually:
   \item \code{6}: legend position right bottom
 }}
 
-\item{showSource}{If \code{TRUE}, the parameter names of the object will 
+\item{showSource}{Logical. If \code{TRUE}, the parameter names of the object will 
 be printed which were used to create the plot; that may be, e.g., 
 useful to check the values or to create own plots with the base R \code{plot} function.
 Alternatively \code{showSource} can be defined as one of the following character values: 
@@ -94,7 +95,7 @@ Alternatively \code{showSource} can be defined as one of the following character
 }
 Note: no plot object will be returned if \code{showSource} is a character.}
 
-\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link{getPlotSettings}}.}
+\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.}
 }
 \value{
 Returns a \code{ggplot2} object.
@@ -121,6 +122,8 @@ dataExample <- getDataset(
 
 stageResults <- getStageResults(design, dataExample, thetaH0 = 20)
 
+\donttest{
 if (require(ggplot2)) plot(stageResults, nPlanned = c(30), thetaRange = c(0, 100))
+}
 
 }

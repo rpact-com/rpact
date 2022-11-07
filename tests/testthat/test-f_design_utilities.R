@@ -24,6 +24,9 @@ test_plan_section("Testing Design Utility Functions")
 
 
 test_that("'getPiByLambda' and 'getLambdaByPi' produce corresponding results", {
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(getLambdaByPi(getPiByLambda(0.01, eventTime = 1, kappa = 1), eventTime = 1, kappa = 1), 0.01, tolerance = 1e-04)
 
 	expect_equal(getLambdaByPi(getPiByLambda(0.03, eventTime = 1, kappa = 1), eventTime = 1, kappa = 1), 0.03, tolerance = 1e-04)
@@ -175,12 +178,12 @@ test_that("'getPiByLambda' and 'getLambdaByPi' produce corresponding results", {
 	expect_equal(getLambdaByPi(getPiByLambda(0.09, eventTime = 21, kappa = 5), eventTime = 21, kappa = 5), 0.09, tolerance = 1e-04)
 
 
-
-
 })
 
 test_that("'getPiecewiseExponentialDistribution' and 'getPiecewiseExponentialQuantile' produce corresponding results", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
 	piecewiseLambda <- c(0.03, 0.05, 0.08)
 	piecewiseSurvivalTime <- c(0, 16, 22)
@@ -197,7 +200,9 @@ test_that("'getPiecewiseExponentialDistribution' and 'getPiecewiseExponentialQua
 })
 
 test_that("'ppwexp' and 'qpwexp' produce corresponding results", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
 	piecewiseLambda <- c(0.03, 0.05, 0.08)
 	piecewiseSurvivalTime <- c(0, 16, 22)
@@ -214,7 +219,9 @@ test_that("'ppwexp' and 'qpwexp' produce corresponding results", {
 })
 
 test_that("'getPiecewiseExponentialDistribution' and 'getPiecewiseExponentialQuantile' produce corresponding results ('piecewiseSurvivalTime' defined as list)", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
 	piecewiseSurvivalTime <- list(
 	    "<16"      = 0.03,
@@ -234,7 +241,9 @@ test_that("'getPiecewiseExponentialDistribution' and 'getPiecewiseExponentialQua
 })
 
 test_that("'ppwexp' and 'qpwexp' produce corresponding results ('piecewiseSurvivalTime' defined as list)", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
 	piecewiseSurvivalTime <- list(
 	    "<16"      = 0.03,
@@ -250,7 +259,9 @@ test_that("'ppwexp' and 'qpwexp' produce corresponding results ('piecewiseSurviv
 })
 
 test_that("'getPiecewiseExponentialRandomNumbers': test that mean random numbers are as expected", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
 	set.seed(123456)
 	piecewiseSurvivalTime <- c(0, 16, 22)
@@ -263,7 +274,9 @@ test_that("'getPiecewiseExponentialRandomNumbers': test that mean random numbers
 })
 
 test_that("'rpwexp': test that mean random numbers are as expected", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
 	set.seed(123456)
 	piecewiseSurvivalTime <- c(0, 16, 22)
@@ -275,7 +288,9 @@ test_that("'rpwexp': test that mean random numbers are as expected", {
 })
 
 test_that("'getPiecewiseExponentialRandomNumbers': test that mean random numbers are as expected ('piecewiseSurvivalTime' defined as list)", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialRandomVariable}
 	set.seed(123456)
 	piecewiseSurvivalTime <- list(
@@ -292,7 +307,9 @@ test_that("'getPiecewiseExponentialRandomNumbers': test that mean random numbers
 })
 
 test_that("'rpwexp': test that mean random numbers are as expected ('piecewiseSurvivalTime' defined as list)", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialRandomVariable}
 	set.seed(123456)
 	piecewiseSurvivalTime <- list(
@@ -307,13 +324,17 @@ test_that("'rpwexp': test that mean random numbers are as expected ('piecewiseSu
 })
 
 test_that("'getPiecewiseExponentialDistribution': test that function call with singel lambda is working", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(getPiecewiseExponentialDistribution(4, piecewiseLambda = 0.003), 0.01192829, tolerance = 5e-05)
 
 })
 
 test_that("'.convertStageWiseToOverallValues': test that function is working as expected", {
-
+        
+    .skipTestIfDisabled()
+        
 	x1 <- .convertStageWiseToOverallValues(c(1:5))
 
 	## Comparison of the results of matrixarray object 'x1' with expected results

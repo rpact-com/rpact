@@ -35,17 +35,18 @@ getDesignGroupSequential(
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{kMax}{The maximum number of stages \code{K}, default is \code{3}. 
+\item{kMax}{The maximum number of stages \code{K}. 
+Must be a positive integer of length 1 (default value is \code{3}).
 The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 \code{6} for Fisher combination test designs.}
 
-\item{alpha}{The significance level alpha, default is \code{0.025}.}
+\item{alpha}{The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.}
 
 \item{beta}{Type II error rate, necessary for providing sample size calculations 
-  (e.g., \code{\link{getSampleSizeMeans}}), beta spending function designs, 
-or optimum designs, default is \code{0.20}.}
+(e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs, 
+or optimum designs, default is \code{0.20}. Must be a positive numeric of length 1.}
 
-\item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}.}
+\item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. Must be a positive integer of length 1.}
 
 \item{informationRates}{The information rates (that must be fixed prior to the trial), 
 default is \code{(1:kMax) / kMax}.}
@@ -89,7 +90,7 @@ beta-spending up to each interim stage.}
 
 \item{gammaB}{Parameter for beta spending function.}
 
-\item{bindingFutility}{If \code{bindingFutility = TRUE} is specified the calculation of 
+\item{bindingFutility}{Logical. If \code{bindingFutility = TRUE} is specified the calculation of 
 the critical values is affected by the futility bounds and the futility threshold is binding in the 
 sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
 
@@ -114,12 +115,12 @@ numeric vector of length \code{kMax - 1}}
 Returns a \code{\link{TrialDesign}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesign]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesign]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.TrialDesign]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.TrialDesign]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -165,12 +166,12 @@ getDesignGroupSequential(kMax = 3, informationRates = c(0.3, 0.75, 1),
 
 # Calculate the Pocock type alpha spending critical values if the first 
 # interim analysis was performed after 40\% of the maximum information was observed
-# and the second after 40\% of the maximum information was observed (default alpha = 0.025)
+# and the second after 70\% of the maximum information was observed (default alpha = 0.025)
 getDesignGroupSequential(informationRates = c(0.4, 0.7), typeOfDesign = "asP") 
 
 }
 \seealso{
-\code{\link{getDesignSet}} for creating a set of designs to compare different designs.
+\code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare different designs.
 
 Other design functions: 
 \code{\link{getDesignCharacteristics}()},

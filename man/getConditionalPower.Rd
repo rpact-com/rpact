@@ -7,7 +7,7 @@
 getConditionalPower(stageResults, ..., nPlanned, allocationRatioPlanned = 1)
 }
 \arguments{
-\item{stageResults}{The results at given stage, obtained from \code{\link{getStageResults}}.}
+\item{stageResults}{The results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}}.}
 
 \item{...}{Further (optional) arguments to be passed:
 \describe{
@@ -39,12 +39,12 @@ design, default is \code{1}. For multi-arm designs, it is the allocation ratio r
 Returns a \code{\link{ConditionalPowerResults}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.ParameterSet]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -85,7 +85,8 @@ getConditionalPower(stageResults, thetaH1 = -0.4,
 
 }
 \seealso{
-\code{\link{plot.StageResults}} or \code{\link{plot.AnalysisResults}} for plotting the conditional power.
+\code{\link[=plot.StageResults]{plot.StageResults()}} or \code{\link[=plot.AnalysisResults]{plot.AnalysisResults()}} 
+for plotting the conditional power.
 
 Other analysis functions: 
 \code{\link{getAnalysisResults}()},

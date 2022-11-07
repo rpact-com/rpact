@@ -13,9 +13,9 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6522 $
-## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  Last changed by: $Author: pahlke $
 ## | 
 
 C_REGEXP_GREATER_OR_EQUAL <- ">= ?"
@@ -168,12 +168,12 @@ TimeDefinition <- setRefClass("TimeDefinition",
 #' @return Returns a \code{\link{PiecewiseSurvivalTime}} object.
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
-#'   \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-#'   \item \code{\link[=print.FieldSet]{print}} to print the object,
-#'   \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.ParameterSet]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #' 
@@ -259,17 +259,17 @@ getPiecewiseSurvivalTime <- function(piecewiseSurvivalTime = NA_real_,
 #' 
 #' @template details_piecewise_accrual
 #' 
-#' @seealso \code{\link{getNumberOfSubjects}} for calculating the number of subjects at given time points. 
+#' @seealso \code{\link[=getNumberOfSubjects]{getNumberOfSubjects()}} for calculating the number of subjects at given time points. 
 #' 
 #' @return Returns an \code{\link{AccrualTime}} object.
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
-#'   \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-#'   \item \code{\link[=print.FieldSet]{print}} to print the object,
-#'   \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.ParameterSet]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'

@@ -4,7 +4,7 @@
 \alias{param_plotPointsEnabled}
 \title{Parameter Description: Plot Points Enabled}
 \arguments{
-\item{plotPointsEnabled}{If \code{TRUE}, additional points will be plotted.}
+\item{plotPointsEnabled}{Logical. If \code{TRUE}, additional points will be plotted.}
 }
 \description{
 Parameter Description: Plot Points Enabled

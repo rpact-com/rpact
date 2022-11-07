@@ -19,8 +19,8 @@ getFinalConfidenceInterval(
 
 \item{dataInput}{The summary data used for calculating the test results. 
 This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival} 
-and should be created with the function \code{getDataset}.
-For more information see \code{\link{getDataset}}.}
+and should be created with the function \code{\link[=getDataset]{getDataset()}}.
+For more information see \code{\link[=getDataset]{getDataset()}}.}
 
 \item{...}{Further (optional) arguments to be passed:
 \describe{
@@ -35,7 +35,7 @@ For more information see \code{\link{getDataset}}.}
       i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
 }}
 
-\item{directionUpper}{Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative, 
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
@@ -54,7 +54,7 @@ That is, in case of (one-sided) testing of
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for 
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
-\item{tolerance}{The numerical tolerance, default is \code{1e-06}.}
+\item{tolerance}{The numerical tolerance, default is \code{1e-06}. Must be a positive numeric of length 1.}
 
 \item{stage}{The stage number (optional). Default: total number of existing stages in the data input.}
 }

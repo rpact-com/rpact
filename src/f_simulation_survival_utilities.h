@@ -21,6 +21,9 @@
  */
 
 #include <Rcpp.h>
+
+// [[Rcpp::plugins(cpp11)]]
+
 using namespace Rcpp;
 
 #ifndef PKG_RPACT_H2

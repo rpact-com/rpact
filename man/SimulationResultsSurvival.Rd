@@ -8,7 +8,7 @@
 A class for simulation results survival.
 }
 \details{
-Use \code{\link{getSimulationSurvival}} to create an object of this type.
+Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} to create an object of this type.
 }
 
 \keyword{internal}

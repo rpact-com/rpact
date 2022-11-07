@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6497 $
-## |  Last changed: $Date: 2022-08-17 13:32:36 +0200 (Wed, 17 Aug 2022) $
+## |  File version: $Revision: 6656 $
+## |  Last changed: $Date: 2022-11-03 08:41:40 +0100 (Thu, 03 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -35,12 +35,23 @@ NULL
     }
 }
 
+.skipTestIfPipeOperatorNotAvailable <- function() {
+    if (!.isPipeOperatorAvailable()) {
+        testthat::skip("The test is disabled because it works only for R version >= 4.1.0 (pipe operator is available)")
+    }
+}
+
 .isMachine64Bit <- function() {
     return(Sys.info()[["machine"]] == "x86-64")
 }
 
 .isMinimumRVersion4 <- function() {
     return(R.Version()$major >= 4)
+}
+
+.isPipeOperatorAvailable <- function() {
+    rVersion <- R.Version()
+    return(rVersion$major >= 4 && rVersion$minor >= "1.0")
 }
 
 .getTestthatResultLine <- function(fileContent) {
@@ -482,7 +493,7 @@ testPackage <- function(outDir = ".", ...,
 
     if (completeUnitTestSetEnabled && fullTestEnabled) {
         cat("Run all tests. Please wait...\n")
-        cat("Have a break - it takes about 30 minutes.\n")
+        cat("Have a break - it takes about 15 minutes.\n")
         cat("Exceution of all available unit tests startet at ",
             format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
             sep = ""
@@ -679,5 +690,5 @@ testPackage <- function(outDir = ".", ...,
 #' @keywords internal
 #' 
 test_plan_section <- function(section) {
-    cat("--- ", section, " ---\n", sep = "")
+    cat("\n\n--- ", section, " ---\n", sep = "")
 }

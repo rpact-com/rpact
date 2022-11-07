@@ -7,10 +7,10 @@
 getRawData(x, aggregate = FALSE)
 }
 \arguments{
-\item{x}{A \code{\link{SimulationResults}} object created by \code{\link{getSimulationSurvival}}.}
+\item{x}{A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.}
 
 \item{aggregate}{Logical. If \code{TRUE} the raw data will be aggregated similar to
-the result of \code{\link{getData}}, default is \code{FALSE}.}
+the result of \code{\link[=getData]{getData()}}, default is \code{FALSE}.}
 }
 \value{
 Returns a \code{\link[base]{data.frame}}.
@@ -19,11 +19,11 @@ Returns a \code{\link[base]{data.frame}}.
 Returns the raw survival data which was generated for simulation.
 }
 \details{
-This function works only if \code{\link{getSimulationSurvival}} was called with a \cr
+This function works only if \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} was called with a \cr
 \code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}).
 
 This function can be used to get the simulated raw data from a simulation results  
-object obtained by \code{\link{getSimulationSurvival}}. Note that \code{\link{getSimulationSurvival}} 
+object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}. Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} 
 must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
 The data frame contains the following columns: 
 \enumerate{

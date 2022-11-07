@@ -4,7 +4,7 @@
 \alias{param_stageResults}
 \title{Parameter Description: Stage Results}
 \arguments{
-\item{stageResults}{The results at given stage, obtained from \code{\link{getStageResults}}.}
+\item{stageResults}{The results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}}.}
 }
 \description{
 Parameter Description: Stage Results

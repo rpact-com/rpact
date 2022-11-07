@@ -8,8 +8,31 @@
 Class for conditional power calculations
 }
 \details{
-This object cannot be created directly; use \code{\link{getConditionalPower}}
+This object cannot be created directly; use \code{\link[=getConditionalPower]{getConditionalPower()}}
 with suitable arguments to create the results of a group sequential or a combination test design.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{nPlanned}}{The new sample size planned for each of the subsequent stages.}
+
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio \code{n1/n2} for a 
+two treatment groups design, default is \code{1}. Is a numeric vector of length 1.}
+
+\item{\code{iterations}}{The number of iterations used for simulations. Is an integer of length 1.}
+
+\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
+
+\item{\code{simulated}}{Logical. Describes if the power for Fisher's combination test 
+has been simulated. Only applicable when using Fisher designs.}
+
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. 
+Is a numeric vector of length \code{kMax}.}
+
+\item{\code{thetaH1}}{For survival designs, refers to the hazard ratio. Is a numeric vector of length 1.}
+
+\item{\code{assumedStDev}}{The assumed standard deviation. Is a numeric vector of length 1.}
+}}
+
 
 \keyword{internal}

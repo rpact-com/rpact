@@ -18,5 +18,13 @@ A class for simulation results.
   \item \code{\link{SimulationResultsMultiArmSurvival}}.
 }
 }
+\section{Fields}{
+
+\describe{
+\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
+
+\item{\code{iterations}}{The number of iterations used for simulations. Is an integer of length 1.}
+}}
+
 
 \keyword{internal}

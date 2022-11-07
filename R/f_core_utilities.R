@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6514 $
-## |  Last changed: $Date: 2022-08-22 14:31:53 +0200 (Mo, 22 Aug 2022) $
+## |  File version: $Revision: 6612 $
+## |  Last changed: $Date: 2022-10-07 12:20:55 +0200 (Fr, 07 Okt 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -95,7 +95,11 @@ utils::globalVariables(".parallelComputingArguments")
     return(s)
 }
 
-.formatCamelCase <- function(x, title = FALSE) {
+.formatCamelCaseSingleWord <- function(x, title = FALSE) {
+    if (length(x) == 0 || nchar(trimws(x)) == 0) {
+        return(x)
+    }
+    
     indices <- gregexpr("[A-Z]", x)[[1]]
     parts <- strsplit(x, "[A-Z]")[[1]]
     result <- ""
@@ -112,6 +116,22 @@ utils::globalVariables(".parallelComputingArguments")
         result <- paste0(result, parts[length(parts)])
     }
     return(trimws(result))
+}
+
+.formatCamelCase <- function(x, title = FALSE, ..., ignoreBlackList = FALSE) {
+    words <- strsplit(x, " ")[[1]]
+    parts <- character(0)
+    for (word in words) {
+        parts <- c(parts, .formatCamelCaseSingleWord(word, title = title))
+    }
+    result <- paste0(parts, collapse = " ")
+    if (grepl(" $", x)) {
+        result <- paste0(result, " ")
+    }
+    if (title) {
+        result <- .toCapitalized(result, ignoreBlackList = ignoreBlackList)
+    }
+    return(result)
 }
 
 .firstCharacterToUpperCase <- function(x, ..., sep = "") {
@@ -1088,7 +1108,7 @@ printCitation <- function(inclusiveR = TRUE) {
 #' This function identifies and returns the caption that will be used in print outputs of an rpact result object.
 #'
 #' @seealso
-#' \code{\link{getParameterName}} for getting the parameter name for a given caption.
+#' \code{\link[=getParameterName]{getParameterName()}} for getting the parameter name for a given caption.
 #'
 #' @return Returns a \code{\link[base]{character}} of specifying the corresponding caption of a given parameter name.
 #' Returns \code{NULL} if the specified \code{parameterName} does not exist.
@@ -1137,7 +1157,7 @@ getParameterCaption <- function(obj, parameterName) {
 #' that will be used in print outputs of an rpact result object.
 #'
 #' @seealso
-#' \code{\link{getParameterCaption}} for getting the parameter caption for a given name.
+#' \code{\link[=getParameterCaption]{getParameterCaption()}} for getting the parameter caption for a given name.
 #'
 #' @return Returns a \code{\link[base]{character}} of specifying the corresponding name of a given parameter caption.
 #' Returns \code{NULL} if the specified \code{parameterCaption} does not exist.
@@ -1456,7 +1476,7 @@ rcmd <- function(obj, ...,
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' \code{\link{getObjectRCode}} (short: \code{\link{rcmd}}) recreates
+#' \code{\link[=getObjectRCode]{getObjectRCode()}} (short: \code{\link[=rcmd]{rcmd()}}) recreates
 #' the R commands that result in the specified object \code{obj}.
 #' \code{obj} must be an instance of class \code{ParameterSet}.
 #'

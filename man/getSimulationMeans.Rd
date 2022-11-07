@@ -66,14 +66,14 @@ This can be a vector of assumed alternatives, default is \code{seq(0, 1, 0.2)}.}
 \item{stDev}{The standard deviation under which the data is simulated, 
 default is \code{1}. 
 If \code{meanRatio = TRUE} is specified, \code{stDev} defines 
-the coefficient of variation \code{sigma / mu2}.}
+the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.}
 
-\item{plannedSubjects}{\code{plannedSubjects} is a vector of length \code{kMax} (the number of stages of the design) 
+\item{plannedSubjects}{\code{plannedSubjects} is a numeric vector of length \code{kMax} (the number of stages of the design) 
 that determines the number of cumulated (overall) subjects when the interim stages are planned.
 For two treatment arms, it is the number of subjects for both treatment arms. 
 For multi-arm designs, \code{plannedSubjects} refers to the number of subjects per selected active arm.}
 
-\item{directionUpper}{Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative, 
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
@@ -81,14 +81,14 @@ which means that larger values of the test statistics yield smaller p-values.}
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.}
 
 \item{minNumberOfSubjectsPerStage}{When performing a data driven sample size recalculation, 
-the vector \code{minNumberOfSubjectsPerStage} with length kMax determines the 
+the numeric vector \code{minNumberOfSubjectsPerStage} with length kMax determines the 
 minimum number of subjects per stage (i.e., not cumulated), the first element 
 is not taken into account. For two treatment arms, it is the number of subjects for both treatment arms. 
 For multi-arm designs \code{minNumberOfSubjectsPerStage} refers
 to the minimum number of subjects per selected active arm.}
 
 \item{maxNumberOfSubjectsPerStage}{When performing a data driven sample size recalculation, 
-the vector \code{maxNumberOfSubjectsPerStage} with length kMax determines the maximum number 
+the numeric vector \code{maxNumberOfSubjectsPerStage} with length kMax determines the maximum number 
 of subjects per stage (i.e., not cumulated), the first element is not taken into account.
 For two treatment arms, it is the number of subjects for both treatment arms. 
 For multi-arm designs \code{maxNumberOfSubjectsPerStage} refers
@@ -103,13 +103,13 @@ the conditional power will be calculated under the observed effect size. Optiona
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
 \item{thetaH1}{If specified, the value of the alternative under which 
-the conditional power or sample size recalculation calculation is performed.}
+the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.}
 
 \item{stDevH1}{If specified, the value of the standard deviation under which 
 the conditional power or sample size recalculation calculation is performed,
-default is the value of \code{stDev}.}
+default is the value of \code{stDev}. Must be a positive numeric of length 1.}
 
-\item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}.}
+\item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
 
 \item{seed}{The seed to reproduce the simulation, default is a random seed.}
 
@@ -117,7 +117,7 @@ default is the value of \code{stDev}.}
 recalculation. By default, sample size recalculation is performed with conditional power with specified
 \code{minNumberOfSubjectsPerStage} and \code{maxNumberOfSubjectsPerStage} (see details and examples).}
 
-\item{showStatistics}{If \code{TRUE}, summary statistics of the simulated data
+\item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default
 is \code{FALSE}.}
 }
@@ -125,12 +125,12 @@ is \code{FALSE}.}
 Returns a \code{\link{SimulationResults}} object.
 The following generics (R generic functions) are available for this object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.SimulationResults]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.SimulationResults]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -182,7 +182,7 @@ Example 2: \cr
 \code{simulationResults$setShowStatistics(FALSE)}\cr
 \code{simulationResults}\cr
 
-\code{\link{getData}} can be used to get the aggregated simulated data from the
+\code{\link[=getData]{getData()}} can be used to get the aggregated simulated data from the
 object as \code{\link[base]{data.frame}}. The data frame contains the following columns:
 \enumerate{
   \item \code{iterationNumber}: The number of the simulation iteration.

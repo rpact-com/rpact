@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -328,6 +328,7 @@ NULL
 
 .createDataFrame <- function(...) {
     args <- list(...)
+    args <- .removeDesignFromArgs(args)
     argNames <- .getArgumentNames(...)
     if (length(args) == 0 || length(argNames) == 0) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "data.frame or data vectors expected")
@@ -548,6 +549,45 @@ NULL
     return(dataFrame)
 }
 
+.getDesignFromArgs <- function(...) {
+    args <- list(...)
+    if (length(args) == 0) {
+        return(NULL)
+    }
+
+    for (arg in args) {
+        if (.isTrialDesign(arg)) {
+            return(arg)
+        }
+    }
+
+    return(NULL)
+}
+
+.getDatasetFromArgs <- function(...) {
+    args <- list(...)
+    if (length(args) == 0) {
+        return(NULL)
+    }
+
+    for (arg in args) {
+        if (.isDataset(arg)) {
+            return(arg)
+        }
+    }
+
+    return(NULL)
+}
+
+.removeDesignFromArgs <- function(args) {
+    for (i in 1:length(args)) {
+        if (.isTrialDesign(args[[i]])) {
+            return(args[-i])
+        }
+    }
+    return(args)
+}
+
 .getArgumentNames <- function(...) {
     dataFrame <- .getDataFrameFromArgs(...)
     if (!is.null(dataFrame)) {
@@ -558,6 +598,8 @@ NULL
     if (length(args) == 0) {
         return(character(0))
     }
+    
+    args <- .removeDesignFromArgs(args)
 
     return(names(args))
 }
@@ -767,7 +809,7 @@ NULL
 #' the different groups are in separate columns.
 #'
 #' @seealso
-#' \code{\link{getLongFormat}} for returning the dataset as a \code{\link[base]{data.frame}} in long format.
+#' \code{\link[=getLongFormat]{getLongFormat()}} for returning the dataset as a \code{\link[base]{data.frame}} in long format.
 #'
 #' @return A \code{\link[base]{data.frame}} will be returned.
 #'
@@ -892,7 +934,7 @@ getWideFormat <- function(dataInput) {
 #' the data for the different groups are in one column and the dataset contains an additional "group" column.
 #'
 #' @seealso
-#' \code{\link{getWideFormat}} for returning the dataset as a \code{\link[base]{data.frame}} in wide format.
+#' \code{\link[=getWideFormat]{getWideFormat()}} for returning the dataset as a \code{\link[base]{data.frame}} in wide format.
 #'
 #' @return A \code{\link[base]{data.frame}} will be returned.
 #'
@@ -979,7 +1021,8 @@ getLongFormat <- function(dataInput) {
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link{getAnalysisResults}} for using \code{getObservedInformationRates} implicit,
+#'   \item \code{\link[=getAnalysisResults]{getAnalysisResults()}} for using 
+#'         \code{getObservedInformationRates()} implicit,
 #'   \item https://www.rpact.com/vignettes/rpact_boundary_update_example
 #' }
 #'

@@ -27,14 +27,14 @@ definition of the exponential survival time cumulative distribution function (se
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
-\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).}
+\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
-\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).}
+\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
 
 \item{hazardRatio}{The vector of hazard ratios under consideration. 
 If the event or hazard rates in both treatment groups are defined, the hazard ratio needs 
-not to be specified as it is calculated, there is no default.}
+not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
 
 \item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group, 
 default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or 
@@ -44,7 +44,7 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 
 \item{median1}{The assumed median survival time in the treatment group, there is no default.}
 
-\item{median2}{The assumed median survival time in the reference group, there is no default.}
+\item{median2}{The assumed median survival time in the reference group, there is no default. Must be a positive numeric of length 1.}
 
 \item{eventTime}{The assumed time under which the event rates are calculated, default is \code{12}.}
 
@@ -67,12 +67,12 @@ otherwise it will be validated that the response is not delayed, default is \cod
 Returns a \code{\link{PiecewiseSurvivalTime}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.ParameterSet]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{

@@ -10,9 +10,9 @@ getData(x)
 getData.SimulationResults(x)
 }
 \arguments{
-\item{x}{A \code{\link{SimulationResults}} object created by \code{\link{getSimulationMeans}},\cr 
-\code{\link{getSimulationRates}}, \code{\link{getSimulationSurvival}}, \code{\link{getSimulationMultiArmMeans}},\cr 
-\code{\link{getSimulationMultiArmRates}}, or \code{\link{getSimulationMultiArmSurvival}}.}
+\item{x}{A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationMeans]{getSimulationMeans()}},\cr 
+\code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr 
+\code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.}
 }
 \value{
 Returns a \code{\link[base]{data.frame}}.
@@ -22,7 +22,7 @@ Returns the aggregated simulation data.
 }
 \details{
 This function can be used to get the aggregated simulated data from an simulation results  
-object, for example, obtained by \code{\link{getSimulationSurvival}}.
+object, for example, obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
 In this case, the data frame contains the following columns:
 \enumerate{
   \item \code{iterationNumber}: The number of the simulation iteration.
@@ -55,8 +55,8 @@ In this case, the data frame contains the following columns:
   \item \code{hazardRatioEstimateLR}: The estimated hazard ratio, derived from the 
         log-rank statistic.
 }
-A subset of variables is provided for \code{\link{getSimulationMeans}}, \code{\link{getSimulationRates}}, \code{\link{getSimulationMultiArmMeans}},\cr 
- \code{\link{getSimulationMultiArmRates}}, or \code{\link{getSimulationMultiArmSurvival}}.
+A subset of variables is provided for \code{\link[=getSimulationMeans]{getSimulationMeans()}}, \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr 
+ \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
 }
 \examples{
 results <- getSimulationSurvival(pi1 = seq(0.3,0.6,0.1), pi2 = 0.3, eventTime = 12, 

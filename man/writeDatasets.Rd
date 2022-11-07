@@ -61,7 +61,7 @@ See the 'Encoding' section of the help for file, the 'R Data Import/Export Manua
 Writes a list of datasets to a CSV file.
 }
 \details{
-The format of the CSV file is optimized for usage of \code{\link{readDatasets}}.
+The format of the CSV file is optimized for usage of \code{\link[=readDatasets]{readDatasets()}}.
 }
 \examples{
 \dontrun{
@@ -84,8 +84,8 @@ writeDatasets(datasets, "datasets_rates.csv")
 }
 \seealso{
 \itemize{
-  \item \code{\link{writeDataset}} for writing a single dataset,
-  \item \code{\link{readDatasets}} for reading multiple datasets,
-  \item \code{\link{readDataset}} for reading a single dataset.
+  \item \code{\link[=writeDataset]{writeDataset()}} for writing a single dataset,
+  \item \code{\link[=readDatasets]{readDatasets()}} for reading multiple datasets,
+  \item \code{\link[=readDataset]{readDataset()}} for reading a single dataset.
 }
 }

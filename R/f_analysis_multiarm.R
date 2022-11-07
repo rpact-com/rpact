@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 5906 $
-## |  Last changed: $Date: 2022-02-26 19:10:21 +0100 (Sa, 26 Feb 2022) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -665,7 +665,7 @@ getClosedCombinationTestResults <- function(stageResults) {
 #' @family analysis functions
 #' @details
 #' For performing the conditional Dunnett test the design must be defined through the function
-#' \code{\link{getDesignConditionalDunnett}}.\cr
+#' \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}.\cr
 #' See Koenig et al. (2008) and Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
 #'
 #' @template return_object_closed_combination_test_results

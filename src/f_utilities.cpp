@@ -14,14 +14,15 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6416 $
- * Last changed: $Date: 2022-07-15 09:24:06 +0200 (Fr, 15 Jul 2022) $
+ * File version: $Revision: 6646 $
+ * Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
  * Last changed by: $Author: pahlke $
  *
  */
 
-// [[Rcpp::plugins(cpp11)]]
 #include <Rcpp.h>
+
+// [[Rcpp::plugins(cpp11)]]
 
 using namespace Rcpp;
 
@@ -91,12 +92,6 @@ double getOneMinusQNorm(double p, double mean = 0, double sd = 1,
     }
 
     return result;
-}
-
-std::string toString(const double i) {
-    std::ostringstream ostr;
-    ostr << i;
-    return ostr.str();
 }
 
 template<int RTYPE>
@@ -337,103 +332,6 @@ NumericMatrix matrixMultiply(NumericMatrix x, double y) {
         }
     }
     return result;
-}
-
-/**
- * Returns a string representing the given vector
- */
-std::string vectorToString(NumericVector x) {
-    if (x.length() == 0) return "[]";
-    std::ostringstream os;
-    os << "[";
-    for (int i = 0; i < x.length(); i++) {
-        os << x[i];
-        if (i + 1 < x.length()) os << ", ";
-    }
-    os << "]";
-    return os.str();
-}
-
-/**
- * Calculates root of function f in given interval using the secant method
- */
-double secant(Function f, double x0, double x1, double min, double max, double tolerance, int maxIter) {
-    int step = 1;
-    double f0, f1, f2, x2;
-    if (x0 > max || x1 > max || x0 < min || x1 < min) {
-    	Rcout << "x0 or x1 not in bounds. Continuing with either bound as parameter instead.\n";
-    }
-    do {
-        if (x0 < x1) {
-            x2 = x0;
-            x0 = x1;
-            x1 = x2;
-        }
-        x0 = x0 < min ? min : x0;
-        x1 = x1 > max ? max : x1;
-        f0 = Rf_asReal(f(x0));
-        f1 = Rf_asReal(f(x1));
-        if (f0 == f1) {
-            x2 = x0 + (x0 / 2.0);
-            x2 = x2 < min ? min : x2 > max ? max : x2;
-            f0 = Rf_asReal(f(x2));
-        }
-        x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
-        x2 = x2 < min ? min : x2 > max ? max : x2;
-        f2 = Rf_asReal(f(x2));
-
-        x0 = x1;
-        f0 = f1;
-        x1 = x2;
-        f1 = f2;
-
-        step++;
-        if (step > maxIter) {
-            throw std::invalid_argument("No root within tolerance after given iterations found.");
-        }
-    } while (std::abs(f2) > tolerance);
-    return x2;
-}
-
-/**
- * Calculates root of function f in given interval using the secant method
- */
-double secant(std::function<double(double)> f, double x0, double x1, double min, double max, double tolerance, int maxIter) {
-    int step = 1;
-    double f0, f1, f2, x2;
-    if (x0 > max || x1 > max || x0 < min || x1 < min) {
-    	Rcout << "x0 or x1 not in bounds. Continuing with either bound as parameter instead.\n";
-    }
-    do {
-        if (x0 < x1) {
-            x2 = x0;
-            x0 = x1;
-            x1 = x2;
-        }
-        x0 = x0 < min ? min : x0;
-        x1 = x1 > max ? max : x1;
-        f0 = f(x0);
-        f1 = f(x1);
-        if (f0 == f1) {
-            x2 = x0 + (x0 / 2.0);
-            x2 = x2 < min ? min : x2 > max ? max : x2;
-            f0 = f(x2);
-        }
-        x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
-        x2 = x2 < min ? min : x2 > max ? max : x2;
-        f2 = f(x2);
-
-        x0 = x1;
-        f0 = f1;
-        x1 = x2;
-        f1 = f2;
-
-        step++;
-        if (step > maxIter) {
-            throw std::invalid_argument("No root within tolerance after given iterations found.");
-        }
-    } while (std::abs(f2) > tolerance);
-    return x2;
 }
 
 /**
@@ -678,10 +576,6 @@ double zeroin(Function f, double lower, double upper, double tolerance, int maxI
     return zeroin([&](double x){return Rf_asReal(f(x));}, lower, upper, tolerance, maxIter);
 }
 
-double bizero(Function f, double lower, double upper, double tolerance, int maxIter) {
-    return bizero([&](double x){return Rf_asReal(f(x));}, lower, upper, tolerance, maxIter);
-}
-
 double max(NumericVector x) {
     if (x.length() == 0) throw std::invalid_argument("Vector is Empty.");
     double max = x[0];
@@ -731,3 +625,11 @@ std::string getCipheredValue(String x) {
 void logDebug(std::string s) {
     Rcout << s << std::endl;
 }
+
+/**
+ * Seed safe implementation of stats:rt()
+ */
+double getRandomTDistribution(double df, double ncp) {
+	return Rcpp::rnorm(1, ncp)[0] / sqrt(R::rchisq(df) / df);
+}
+

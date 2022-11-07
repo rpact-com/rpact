@@ -19,7 +19,7 @@ getAvailablePlotTypes(
 }
 \arguments{
 \item{obj}{The object for which the plot types shall be identified, e.g. produced by
-\code{\link{getDesignGroupSequential}} or \code{\link{getSampleSizeMeans}}.}
+\code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} or \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}.}
 
 \item{output}{The output type. Can be one of \code{c("numeric", "caption", "numcap", "capnum")}.}
 
@@ -34,8 +34,8 @@ a numeric vector, a character vector, or a list will be returned.
 Function to identify the available plot types of an object.
 }
 \details{
-\code{plotTypes} and \code{getAvailablePlotTypes} are equivalent, i.e.,
-\code{plotTypes} is a short form of \code{getAvailablePlotTypes}.
+\code{plotTypes} and \code{getAvailablePlotTypes()} are equivalent, i.e.,
+\code{plotTypes} is a short form of \code{getAvailablePlotTypes()}.
 
 \code{output}:
 \enumerate{

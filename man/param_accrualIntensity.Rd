@@ -4,8 +4,8 @@
 \alias{param_accrualIntensity}
 \title{Parameter Description: Accrual Intensity}
 \arguments{
-\item{accrualIntensity}{A vector of accrual intensities, default is the relative 
-intensity \code{0.1} (for details see \code{\link{getAccrualTime}}).}
+\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative 
+intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 }
 \description{
 Parameter Description: Accrual Intensity

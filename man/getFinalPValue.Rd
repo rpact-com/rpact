@@ -7,7 +7,7 @@
 getFinalPValue(stageResults, ...)
 }
 \arguments{
-\item{stageResults}{The results at given stage, obtained from \code{\link{getStageResults}}.}
+\item{stageResults}{The results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}}.}
 
 \item{...}{Only available for backward compatibility.}
 }

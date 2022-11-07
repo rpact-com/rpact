@@ -32,7 +32,7 @@ be added to data frame, default is \code{FALSE}.}
 
 \item{theta}{A vector of standardized effect sizes (theta values), default is a sequence from -1 to 1.}
 
-\item{nMax}{The maximum sample size.}
+\item{nMax}{The maximum sample size. Must be a positive integer of length 1.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}

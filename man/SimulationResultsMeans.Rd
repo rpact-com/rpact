@@ -8,7 +8,20 @@
 A class for simulation results means.
 }
 \details{
-Use \code{\link{getSimulationMeans}} to create an object of this type.
+Use \code{\link[=getSimulationMeans]{getSimulationMeans()}} to create an object of this type.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{groups}}{The number of groups. Is an integer vector of length 1.}
+
+\item{\code{directionUpper}}{Logical. Specifies the direction of the alternative, 
+only applicable for one-sided testing, default is TRUE which means that larger values 
+of the test statistics yield smaller p-values.}
+
+\item{\code{normalApproximation}}{Logical. Describes if a normal approximation was used when calculating p-values.
+Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio.}
+}}
+
 
 \keyword{internal}

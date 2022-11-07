@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_simulation_multiarm_means.R
 ## |  Creation date: 12 August 2022, 09:12:18
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,6 +24,9 @@ test_plan_section("Testing Simulation Multi-Arm Means Function")
 
 
 test_that("'getSimulationMultiArmMeans': several configurations", {
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDesigns}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDoseResponseRelationShips}
@@ -96,7 +99,7 @@ test_that("'getSimulationMultiArmMeans': several configurations", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
+    
 	x2 <- getSimulationMultiArmMeans(
 	    seed = 1234, getDesignInverseNormal(informationRates = c(0.2, 0.6, 1)),
 	    typeOfShape = "userDefined", activeArms = 4,
@@ -155,8 +158,6 @@ test_that("'getSimulationMultiArmMeans': several configurations", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	x3 <- getSimulationMultiArmMeans(
 	    seed = 1234, getDesignInverseNormal(informationRates = c(0.2, 0.6, 1)),
@@ -1397,6 +1398,8 @@ test_that("'getSimulationMultiArmMeans': using calcSubjectsFunction", {
 
 test_that("'getSimulationMultiArmMeans': using selectArmsFunction", {
 
+    .skipTestIfDisabled()
+        
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDesigns}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDoseResponseRelationShips}
@@ -1410,7 +1413,6 @@ test_that("'getSimulationMultiArmMeans': using selectArmsFunction", {
 	# @refFS[Formula]{fs:adjustedPValueSubsetDunnett}
 	# @refFS[Formula]{fs:adjustedPValueSubsetSidak}
 	# @refFS[Formula]{fs:adjustedPValueSubsetSimes}
-	.skipTestIfDisabled()
 
 	selectArmsFunctionSimulationMultiArmMeans <- function(effectSizes) {
 	    return(c(TRUE, FALSE, FALSE, FALSE))
