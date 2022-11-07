@@ -8,23 +8,24 @@
 Class for a dataset of rates.
 }
 \details{
-This object cannot be created directly; better use \code{\link{getDataset}}
+This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
 with suitable arguments to create a dataset of rates.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{groups}}{The group numbers.}
+\item{\code{groups}}{The group numbers. Is an integer vector of length number of stages times number of groups.}
 
-\item{\code{stages}}{The stage numbers.}
+\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
 
-\item{\code{sampleSizes}}{The sample sizes.}
+\item{\code{sampleSizes}}{The sample sizes for each group and stage.
+Is an integer vector of length number of stages times number of groups.}
 
-\item{\code{events}}{The events.}
+\item{\code{events}}{The events. Is an integer vector of length number of groups times number of stages.}
 
-\item{\code{overallSampleSizes}}{The cumulative sample sizes.}
+\item{\code{overallSampleSizes}}{The cumulative sample sizes. Is an integer vector of length number of groups times number of stages.}
 
-\item{\code{overallEvents}}{The cumulative events.}
+\item{\code{overallEvents}}{The cumulative events. Is an integer vector of length number of groups times number of stages.}
 }}
 
 

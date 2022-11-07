@@ -12,6 +12,6 @@ dataEnrichmentSurvival
 }
 \description{
 A dataset containing the log-rank statistics, events, and allocation ratios of two groups.
-Use \code{getDataset(dataEnrichmentSurvival)} to create a dataset object that can be processed by \code{\link{getAnalysisResults}}.
+Use \code{getDataset(dataEnrichmentSurvival)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 }
-\keyword{datasets}
+\keyword{internal}

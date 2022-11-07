@@ -8,7 +8,7 @@
 A class for simulation results rates in enrichment designs.
 }
 \details{
-Use \code{\link{getSimulationEnrichmentRates}} to create an object of this type.
+Use \code{\link[=getSimulationEnrichmentRates]{getSimulationEnrichmentRates()}} to create an object of this type.
 }
 
 \keyword{internal}

@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_enrichment_survival.R
 ## |  Creation date: 17 August 2022, 13:43:46
-## |  File version: $Revision: 6499 $
-## |  Last changed: $Date: 2022-08-17 13:50:08 +0200 (Wed, 17 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,7 +24,10 @@ test_plan_section("Testing Analysis Enrichment Survival Function")
 
 
 test_that("'getAnalysisResults': enrichment survival, one sub-population, non-stratified analysis, select S1 at second, gMax = 2", {
-	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
+        
+    .skipTestIfDisabled()
+        
+    # @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISidakEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISpiessensEnrichment}

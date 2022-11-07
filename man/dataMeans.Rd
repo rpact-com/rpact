@@ -12,6 +12,6 @@ dataMeans
 }
 \description{
 A dataset containing the sample sizes, means, and standard deviations of one group.
-Use \code{getDataset(dataMeans)} to create a dataset object that can be processed by \code{\link{getAnalysisResults}}.
+Use \code{getDataset(dataMeans)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 }
-\keyword{datasets}
+\keyword{internal}

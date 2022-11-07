@@ -62,7 +62,8 @@ getObservedInformationRates(data,
 }
 \seealso{
 \itemize{
-  \item \code{\link{getAnalysisResults}} for using \code{getObservedInformationRates} implicit,
+  \item \code{\link[=getAnalysisResults]{getAnalysisResults()}} for using 
+        \code{getObservedInformationRates()} implicit,
   \item https://www.rpact.com/vignettes/rpact_boundary_update_example
 }
 }

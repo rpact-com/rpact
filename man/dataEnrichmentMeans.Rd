@@ -12,6 +12,6 @@ dataEnrichmentMeans
 }
 \description{
 A dataset containing the sample sizes, means, and standard deviations of two groups.
-Use \code{getDataset(dataEnrichmentMeans)} to create a dataset object that can be processed by \code{\link{getAnalysisResults}}.
+Use \code{getDataset(dataEnrichmentMeans)} to create a dataset object that can be processed by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 }
-\keyword{datasets}
+\keyword{internal}

@@ -24,6 +24,9 @@ test_plan_section("Testing Simulation Enrichment Means Function")
 
 
 test_that("'getSimulationEnrichmentMeans': gMax = 2", {
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:subsec:intersectionTestsEnrichment}
@@ -108,8 +111,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 2", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	suppressWarnings(simResult2 <- getSimulationEnrichmentMeans(design,
 	    populations = 2,

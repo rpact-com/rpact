@@ -13,17 +13,25 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6514 $
-## |  Last changed: $Date: 2022-08-22 14:31:53 +0200 (Mo, 22 Aug 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6650 $
+## |  Last changed: $Date: 2022-10-29 14:57:26 +0200 (Sa, 29 Okt 2022) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
 NULL
 
-.stopWithWrongDesignMessage <- function(design) {
+.stopWithWrongDesignMessage <- function(design, ..., inclusiveConditionalDunnett = TRUE) {
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'design' must be an instance of ", .arrayToString(
-        .getTrialDesignClassNames(),
+        .getTrialDesignClassNames(inclusiveConditionalDunnett = inclusiveConditionalDunnett),
+        vectorLookAndFeelEnabled = FALSE
+    ), " (is '", .getClassName(design), "')")
+}
+
+.stopWithWrongDesignMessageEnrichment <- function(design, ..., inclusiveConditionalDunnett = TRUE) {
+    trialDesignClassNames <- c(C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL, C_CLASS_NAME_TRIAL_DESIGN_FISHER)
+    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'design' must be an instance of ", .arrayToString(
+        trialDesignClassNames,
         vectorLookAndFeelEnabled = FALSE
     ), " (is '", .getClassName(design), "')")
 }
@@ -303,7 +311,7 @@ NULL
         if (fieldName != "stages" && l1 != l2) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
-                "all parameters must have the same length ('stage' has length ", l1,
+                "all parameters must have the same length ('stages' has length ", l1,
                 ", '", fieldName, "' has length ", l2, ")"
             )
         }
@@ -418,7 +426,7 @@ NULL
     if (!.isDatasetSurvival(dataInput = dataInput)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' must be an instance of class ",
-            "'DatasetSurvival' (is '", .getClassName(dataInput), "')"
+            "'DatasetSurvival' or 'DatasetEnrichmentSurvival' (is '", .getClassName(dataInput), "')"
         )
     }
 }
@@ -436,7 +444,7 @@ NULL
 }
 
 .isDatasetSurvival <- function(dataInput) {
-    return(inherits(dataInput, "DatasetSurvival"))
+    return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
 .assertIsNumericVector <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = TRUE) {
@@ -1331,7 +1339,7 @@ NULL
                 argValue <- paste0(" = ", argValue)
             }, error = function(e) {})
             if (exceptionEnabled) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "argument unknown in ", functionName, "(...): '", argName, "'",
                     argValue, " is not allowed",
                     call. = FALSE
@@ -1700,6 +1708,18 @@ NULL
     invisible(assumedStDev)
 }
 
+.assertIsValidAssumedStDevs <- function(assumedStDevs, gMax) {
+    if (length(assumedStDevs) != 1 && length(assumedStDevs) != gMax) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            sprintf(paste0(
+                "length of 'assumedStDevs' (%s) ",
+                "must be equal to 'gMax' (%s) or 1"
+            ), .arrayToString(assumedStDevs), gMax)
+        )
+    }
+}
+
 .assertIsValidPiTreatmentsForMultiArm <- function(piTreatments,
         stageResults = NULL, stage = NULL, ..., results = NULL) {
     if (!is.null(stageResults) && all(is.na(piTreatments)) && !is.null(stage)) {
@@ -1781,7 +1801,7 @@ NULL
 }
 
 .assertIsValidDirectionUpper <- function(directionUpper, sided,
-        objectType = c("power", "sampleSize"), userFunctionCallEnabled = FALSE) {
+        objectType = c("sampleSize", "power"), userFunctionCallEnabled = FALSE) {
     objectType <- match.arg(objectType)
 
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)

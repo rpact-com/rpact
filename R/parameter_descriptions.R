@@ -13,9 +13,9 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6522 $
-## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  Last changed by: $Author: pahlke $
 ## | 
 
 #' Parameter Description: "..."
@@ -33,7 +33,8 @@ NULL
 NULL
 
 #' Parameter Description: Maximum Number of Stages
-#' @param kMax The maximum number of stages \code{K}, default is \code{3}. 
+#' @param kMax The maximum number of stages \code{K}. 
+#'   Must be a positive integer of length 1 (default value is \code{3}).
 #'   The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 #'   \code{6} for Fisher combination test designs.  
 #' @name param_kMax
@@ -41,21 +42,21 @@ NULL
 NULL
 
 #' Parameter Description: Alpha
-#' @param alpha The significance level alpha, default is \code{0.025}.
+#' @param alpha The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.
 #' @name param_alpha
 #' @keywords internal
 NULL
 
 #' Parameter Description: Beta
 #' @param beta Type II error rate, necessary for providing sample size calculations 
-#' 	(e.g., \code{\link{getSampleSizeMeans}}), beta spending function designs, 
-#'   or optimum designs, default is \code{0.20}.
+#'   (e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs, 
+#'   or optimum designs, default is \code{0.20}. Must be a positive numeric of length 1.
 #' @name param_beta
 #' @keywords internal
 NULL
 
 #' Parameter Description: Sided
-#' @param sided Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. 
+#' @param sided Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. Must be a positive integer of length 1.
 #' @name param_sided
 #' @keywords internal
 NULL
@@ -68,7 +69,7 @@ NULL
 NULL
 
 #' Parameter Description: Binding Futility
-#' @param bindingFutility If \code{bindingFutility = TRUE} is specified the calculation of 
+#' @param bindingFutility Logical. If \code{bindingFutility = TRUE} is specified the calculation of 
 #'   the critical values is affected by the futility bounds and the futility threshold is binding in the 
 #'   sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).
 #' @name param_bindingFutility
@@ -103,7 +104,7 @@ NULL
 NULL
 
 #' Parameter Description: N_max
-#' @param nMax The maximum sample size.  
+#' @param nMax The maximum sample size. Must be a positive integer of length 1.  
 #' @name param_nMax
 #' @keywords internal
 NULL
@@ -128,7 +129,7 @@ NULL
 
 #' Parameter Description: Effect Under Alternative 
 #' @param thetaH1 If specified, the value of the alternative under which 
-#'   the conditional power or sample size recalculation calculation is performed. 
+#'   the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.
 #' @name param_thetaH1
 #' @keywords internal
 NULL
@@ -137,21 +138,21 @@ NULL
 #' @param stDev The standard deviation under which the sample size or power 
 #'   calculation is performed, default is \code{1}. 
 #'   If \code{meanRatio = TRUE} is specified, \code{stDev} defines 
-#'   the coefficient of variation \code{sigma / mu2}. 
+#'   the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.
 #' @name param_stDev
 #' @keywords internal
 NULL
 
 #' Parameter Description: Lambda (1)
 #' @param lambda1 The assumed hazard rate in the treatment group, there is no default.
-#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). 
+#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.
 #' @name param_lambda1
 #' @keywords internal
 NULL
 
 #' Parameter Description: Lambda (2)
 #' @param lambda2 The assumed hazard rate in the reference group, there is no default.
-#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
+#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.
 #' @name param_lambda2
 #' @keywords internal
 NULL
@@ -194,7 +195,7 @@ NULL
 NULL
 
 #' Parameter Description: Median (2)
-#' @param median2 The assumed median survival time in the reference group, there is no default.
+#' @param median2 The assumed median survival time in the reference group, there is no default. Must be a positive numeric of length 1.
 #' @name param_median2
 #' @keywords internal
 NULL
@@ -202,7 +203,7 @@ NULL
 #' Parameter Description: Hazard Ratio
 #' @param hazardRatio The vector of hazard ratios under consideration. 
 #'   If the event or hazard rates in both treatment groups are defined, the hazard ratio needs 
-#'   not to be specified as it is calculated, there is no default. 
+#'   not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.
 #' @name param_hazardRatio
 #' @keywords internal
 NULL
@@ -216,7 +217,7 @@ NULL
 #' Parameter Description: Piecewise Survival Time
 #' @param piecewiseSurvivalTime A vector that specifies the time intervals for the piecewise 
 #'   definition of the exponential survival time cumulative distribution function \cr
-#'   (for details see \code{\link{getPiecewiseSurvivalTime}}). 
+#'   (for details see \code{\link[=getPiecewiseSurvivalTime]{getPiecewiseSurvivalTime()}}). 
 #' @name param_piecewiseSurvivalTime
 #' @keywords internal
 NULL
@@ -287,7 +288,7 @@ NULL
 ##
 
 #' Parameter Description: Stage Results
-#' @param stageResults The results at given stage, obtained from \code{\link{getStageResults}}.
+#' @param stageResults The results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}}.
 #' @name param_stageResults
 #' @keywords internal
 NULL
@@ -325,7 +326,7 @@ NULL
 NULL
 
 #' Parameter Description: Direction Upper
-#' @param directionUpper Specifies the direction of the alternative, 
+#' @param directionUpper Logical. Specifies the direction of the alternative, 
 #'   only applicable for one-sided testing; default is \code{TRUE}
 #'   which means that larger values of the test statistics yield smaller p-values.
 #' @name param_directionUpper
@@ -335,8 +336,8 @@ NULL
 #' Parameter Description: Data Input
 #' @param dataInput The summary data used for calculating the test results. 
 #'   This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival} 
-#'   and should be created with the function \code{getDataset}.
-#'   For more information see \code{\link{getDataset}}.
+#'   and should be created with the function \code{\link[=getDataset]{getDataset()}}.
+#'   For more information see \code{\link[=getDataset]{getDataset()}}.
 #' @name param_dataInput
 #' @keywords internal
 NULL
@@ -409,7 +410,7 @@ NULL
 
 #' Parameter Description: Min Number Of Events Per Stage
 #' @param minNumberOfEventsPerStage When performing a data driven sample size recalculation, 
-#'   the vector \code{minNumberOfEventsPerStage} with length kMax determines the 
+#'   the numeric vector \code{minNumberOfEventsPerStage} with length kMax determines the 
 #'   minimum number of events per stage (i.e., not cumulated), the first element 
 #'   is not taken into account.   
 #' @name param_minNumberOfEventsPerStage
@@ -418,14 +419,14 @@ NULL
 
 #' Parameter Description: Max Number Of Events Per Stage
 #' @param maxNumberOfEventsPerStage When performing a data driven sample size recalculation, 
-#'   the vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number 
+#'   the numeric vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number 
 #'   of events per stage (i.e., not cumulated), the first element is not taken into account.
 #' @name param_maxNumberOfEventsPerStage
 #' @keywords internal
 NULL
 
 #' Parameter Description: Planned Subjects
-#' @param plannedSubjects \code{plannedSubjects} is a vector of length \code{kMax} (the number of stages of the design) 
+#' @param plannedSubjects \code{plannedSubjects} is a numeric vector of length \code{kMax} (the number of stages of the design) 
 #'   that determines the number of cumulated (overall) subjects when the interim stages are planned.
 #'   For two treatment arms, it is the number of subjects for both treatment arms. 
 #'   For multi-arm designs, \code{plannedSubjects} refers to the number of subjects per selected active arm.
@@ -434,7 +435,7 @@ NULL
 NULL
 
 #' Parameter Description: Planned Events
-#' @param plannedEvents \code{plannedEvents} is a vector of length \code{kMax} (the number of stages of the design) 
+#' @param plannedEvents \code{plannedEvents} is a numeric vector of length \code{kMax} (the number of stages of the design) 
 #'   that determines the number of cumulated (overall) events in survival designs when the interim stages are planned.
 #'   For two treatment arms, it is the number of events for both treatment arms. 
 #'   For multi-arm designs, \code{plannedEvents} refers to the overall number of events for the selected arms plus control.
@@ -444,7 +445,7 @@ NULL
 
 #' Parameter Description: Minimum Number Of Subjects Per Stage
 #' @param minNumberOfSubjectsPerStage When performing a data driven sample size recalculation, 
-#'   the vector \code{minNumberOfSubjectsPerStage} with length kMax determines the 
+#'   the numeric vector \code{minNumberOfSubjectsPerStage} with length kMax determines the 
 #'   minimum number of subjects per stage (i.e., not cumulated), the first element 
 #'   is not taken into account. For two treatment arms, it is the number of subjects for both treatment arms. 
 #'   For multi-arm designs \code{minNumberOfSubjectsPerStage} refers
@@ -455,7 +456,7 @@ NULL
 
 #' Parameter Description: Maximum Number Of Subjects Per Stage
 #' @param maxNumberOfSubjectsPerStage When performing a data driven sample size recalculation, 
-#'   the vector \code{maxNumberOfSubjectsPerStage} with length kMax determines the maximum number 
+#'   the numeric vector \code{maxNumberOfSubjectsPerStage} with length kMax determines the maximum number 
 #'   of subjects per stage (i.e., not cumulated), the first element is not taken into account.
 #'   For two treatment arms, it is the number of subjects for both treatment arms. 
 #'   For multi-arm designs \code{maxNumberOfSubjectsPerStage} refers
@@ -466,7 +467,7 @@ NULL
 
 #' Parameter Description: Conditional Power
 #' @param conditionalPower The conditional power for the subsequent stage 
-#'   under which the sample size recalculation is performed.
+#'   under which the sample size recalculation is performed. Must be a positive numeric of length 1.
 #' @name param_conditionalPower
 #' @keywords internal
 NULL
@@ -484,7 +485,7 @@ NULL
 NULL
 
 #' Parameter Description: Maximum Number Of Iterations
-#' @param maxNumberOfIterations The number of simulation iterations, default is \code{1000}.
+#' @param maxNumberOfIterations The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.
 #' @name param_maxNumberOfIterations
 #' @keywords internal
 NULL
@@ -512,7 +513,7 @@ NULL
 NULL
 
 #' Parameter Description: Show Statistics 
-#' @param showStatistics If \code{TRUE}, summary statistics of the simulated data
+#' @param showStatistics Logical. If \code{TRUE}, summary statistics of the simulated data
 #'    are displayed for the \code{print} command, otherwise the output is suppressed, default
 #'    is \code{FALSE}. 
 #' @name param_showStatistics
@@ -528,21 +529,21 @@ NULL
 
 #' Parameter Description: Maximum Number Of Subjects For Survival Endpoint
 #' @param maxNumberOfSubjects \code{maxNumberOfSubjects > 0} needs to be specified.
-#'   If accrual time and accrual intensity is specified, this will be calculated.
+#'   If accrual time and accrual intensity are specified, this will be calculated. Must be a positive integer of length 1.
 #' @name param_maxNumberOfSubjects_survival
 #' @keywords internal
 NULL
 
 #' Parameter Description: Accrual Time
 #' @param accrualTime The assumed accrual time intervals for the study, default is 
-#'   \code{c(0, 12)} (for details see \code{\link{getAccrualTime}}).
+#'   \code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).
 #' @name param_accrualTime
 #' @keywords internal
 NULL
 
 #' Parameter Description: Accrual Intensity
-#' @param accrualIntensity A vector of accrual intensities, default is the relative 
-#'   intensity \code{0.1} (for details see \code{\link{getAccrualTime}}).
+#' @param accrualIntensity A numeric vector of accrual intensities, default is the relative 
+#'   intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).
 #' @name param_accrualIntensity
 #' @keywords internal
 NULL
@@ -558,7 +559,7 @@ NULL
 #' Parameter Description: Standard Deviation Under Alternative 
 #' @param stDevH1 If specified, the value of the standard deviation under which 
 #'   the conditional power or sample size recalculation calculation is performed,
-#'   default is the value of \code{stDev}.  
+#'   default is the value of \code{stDev}. Must be a positive numeric of length 1.  
 #' @name param_stDevH1
 #' @keywords internal
 NULL
@@ -567,7 +568,7 @@ NULL
 #' @param stDev The standard deviation under which the data is simulated, 
 #' default is \code{1}. 
 #' If \code{meanRatio = TRUE} is specified, \code{stDev} defines 
-#' the coefficient of variation \code{sigma / mu2}. 
+#' the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.
 #' @name param_stDevSimulation
 #' @keywords internal
 NULL
@@ -599,13 +600,13 @@ NULL
 NULL
 
 #' Parameter Description: Digits
-#' @param digits Defines how many digits are to be used for numeric values.
+#' @param digits Defines how many digits are to be used for numeric values. Must be a positive integer of length 1.
 #' @name param_digits
 #' @keywords internal
 NULL
 
 #' Parameter Description: Tolerance
-#' @param tolerance The numerical tolerance, default is \code{1e-06}.
+#' @param tolerance The numerical tolerance, default is \code{1e-06}. Must be a positive numeric of length 1.
 #' @name param_tolerance
 #' @keywords internal
 NULL
@@ -615,7 +616,7 @@ NULL
 ##
 
 #' Parameter Description: Plot Points Enabled
-#' @param plotPointsEnabled If \code{TRUE}, additional points will be plotted.
+#' @param plotPointsEnabled Logical. If \code{TRUE}, additional points will be plotted.
 #' @name param_plotPointsEnabled
 #' @keywords internal
 NULL
@@ -671,7 +672,7 @@ NULL
 NULL
 
 #' Parameter Description: Adaptations
-#' @param adaptations A vector of length \code{kMax - 1} indicating whether or not an adaptation takes 
+#' @param adaptations A logical vector of length \code{kMax - 1} indicating whether or not an adaptation takes 
 #'   place at interim k, default is \code{rep(TRUE, kMax - 1)}. 
 #' @name param_adaptations
 #' @keywords internal
@@ -707,7 +708,7 @@ NULL
 NULL
 
 #' Parameter Description: Populations
-#' @param populations The number of populations in a two-sample comparison, no default. 
+#' @param populations The number of populations in a two-sample comparison, default is \code{3}. 
 #' @name param_populations
 #' @keywords internal
 NULL
@@ -761,7 +762,7 @@ NULL
 NULL
 
 #' Parameter Description: Stratified Analysis
-#' @param stratifiedAnalysis For enrichment designs, typically a stratified analysis should be chosen.
+#' @param stratifiedAnalysis Logical. For enrichment designs, typically a stratified analysis should be chosen.
 #' For testing rates, also a non-stratified analysis based on overall data can be performed. 
 #' For survival data, only a stratified analysis is possible (see Brannath et al., 2009), 
 #' default is \code{TRUE}.
@@ -770,7 +771,7 @@ NULL
 NULL
 
 #' Parameter Description: Show Source
-#' @param showSource If \code{TRUE}, the parameter names of the object will 
+#' @param showSource Logical. If \code{TRUE}, the parameter names of the object will 
 #'   be printed which were used to create the plot; that may be, e.g., 
 #'   useful to check the values or to create own plots with the base R \code{plot} function.
 #'   Alternatively \code{showSource} can be defined as one of the following character values: 
@@ -796,7 +797,7 @@ NULL
 
 #' Parameter Description: Epsilon Value
 #' @param epsilonValue For \code{typeOfSelection = "epsilon"} (select treatment arm / population not worse than 
-#'   epsilon compared to the best), the parameter \code{epsilonValue} has to be specified.
+#'   epsilon compared to the best), the parameter \code{epsilonValue} has to be specified. Must be a numeric of length 1.
 #' @name param_epsilonValue
 #' @keywords internal
 NULL
@@ -832,7 +833,7 @@ NULL
 NULL
 
 #' Parameter Description: Plot Settings
-#' @param plotSettings An object of class \code{PlotSettings} created by \code{\link{getPlotSettings}}.
+#' @param plotSettings An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.
 #' @name param_plotSettings
 #' @keywords internal
 NULL

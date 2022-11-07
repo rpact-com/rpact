@@ -8,8 +8,16 @@
 Class for power and average sample number (ASN) results.
 }
 \details{
-This object cannot be created directly; use \code{getPowerAndAverageSampleNumber}
+This object cannot be created directly; use \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 with suitable arguments to create it.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{nMax}}{The maximum sample size. Is a positive integer of length 1.}
+
+\item{\code{theta}}{A vector of standardized effect sizes (theta values), default is a sequence from -1 to 1.}
+}}
+
 
 \keyword{internal}

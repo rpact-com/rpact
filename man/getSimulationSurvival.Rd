@@ -63,7 +63,7 @@ That is, in case of (one-sided) testing of
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for 
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
-\item{directionUpper}{Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative, 
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
@@ -74,18 +74,18 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 \item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
-\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).}
+\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
-\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).}
+\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
 
 \item{median1}{The assumed median survival time in the treatment group, there is no default.}
 
-\item{median2}{The assumed median survival time in the reference group, there is no default.}
+\item{median2}{The assumed median survival time in the reference group, there is no default. Must be a positive numeric of length 1.}
 
 \item{hazardRatio}{The vector of hazard ratios under consideration. 
 If the event or hazard rates in both treatment groups are defined, the hazard ratio needs 
-not to be specified as it is calculated, there is no default.}
+not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
 
 \item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification 
 of the shape of the Weibull distribution. 
@@ -101,7 +101,7 @@ and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample r
 
 \item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise 
 definition of the exponential survival time cumulative distribution function \cr
-(for details see \code{\link{getPiecewiseSurvivalTime}}).}
+(for details see \code{\link[=getPiecewiseSurvivalTime]{getPiecewiseSurvivalTime()}}).}
 
 \item{allocation1}{The number how many subjects are assigned to treatment 1 in a
 subsequent order, default is \code{1}}
@@ -112,10 +112,10 @@ subsequent order, default is \code{1}}
 \item{eventTime}{The assumed time under which the event rates are calculated, default is \code{12}.}
 
 \item{accrualTime}{The assumed accrual time intervals for the study, default is 
-\code{c(0, 12)} (for details see \code{\link{getAccrualTime}}).}
+\code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
-\item{accrualIntensity}{A vector of accrual intensities, default is the relative 
-intensity \code{0.1} (for details see \code{\link{getAccrualTime}}).}
+\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative 
+intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
 \item{accrualIntensityType}{A character value specifying the accrual intensity input type.
 Must be one of \code{"auto"}, \code{"absolute"}, or \code{"relative"}; default is \code{"auto"},
@@ -129,20 +129,20 @@ i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code
 treatment group, default is \code{12}.}
 
 \item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified.
-If accrual time and accrual intensity is specified, this will be calculated.}
+If accrual time and accrual intensity are specified, this will be calculated. Must be a positive integer of length 1.}
 
-\item{plannedEvents}{\code{plannedEvents} is a vector of length \code{kMax} (the number of stages of the design) 
+\item{plannedEvents}{\code{plannedEvents} is a numeric vector of length \code{kMax} (the number of stages of the design) 
 that determines the number of cumulated (overall) events in survival designs when the interim stages are planned.
 For two treatment arms, it is the number of events for both treatment arms. 
 For multi-arm designs, \code{plannedEvents} refers to the overall number of events for the selected arms plus control.}
 
 \item{minNumberOfEventsPerStage}{When performing a data driven sample size recalculation, 
-the vector \code{minNumberOfEventsPerStage} with length kMax determines the 
+the numeric vector \code{minNumberOfEventsPerStage} with length kMax determines the 
 minimum number of events per stage (i.e., not cumulated), the first element 
 is not taken into account.}
 
 \item{maxNumberOfEventsPerStage}{When performing a data driven sample size recalculation, 
-the vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number 
+the numeric vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number 
 of events per stage (i.e., not cumulated), the first element is not taken into account.}
 
 \item{conditionalPower}{If \code{conditionalPower} together with \code{minNumberOfSubjectsPerStage} and 
@@ -154,20 +154,20 @@ the conditional power will be calculated under the observed effect size. Optiona
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
 \item{thetaH1}{If specified, the value of the alternative under which 
-the conditional power or sample size recalculation calculation is performed.}
+the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.}
 
-\item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}.}
+\item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
 
 \item{maxNumberOfRawDatasetsPerStage}{The number of raw datasets per stage that shall
 be extracted and saved as \code{\link[base]{data.frame}}, default is \code{0}.
-\code{\link{getRawData}} can be used to get the extracted raw data from the object.}
+\code{\link[=getRawData]{getRawData()}} can be used to get the extracted raw data from the object.}
 
 \item{longTimeSimulationAllowed}{Logical that indicates whether long time simulations
 that consumes more than 30 seconds are allowed or not, default is \code{FALSE}.}
 
 \item{seed}{The seed to reproduce the simulation, default is a random seed.}
 
-\item{showStatistics}{If \code{TRUE}, summary statistics of the simulated data
+\item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default
 is \code{FALSE}.}
 }
@@ -175,12 +175,12 @@ is \code{FALSE}.}
 Returns a \code{\link{SimulationResults}} object.
 The following generics (R generic functions) are available for this object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.SimulationResults]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.SimulationResults]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -266,7 +266,7 @@ Example 2: \cr
 \code{simulationResults$setShowStatistics(FALSE)}\cr
 \code{simulationResults}\cr
 
-\code{\link{getData}} can be used to get the aggregated simulated data from the
+\code{\link[=getData]{getData()}} can be used to get the aggregated simulated data from the
 object as \code{\link[base]{data.frame}}. The data frame contains the following columns:
 \enumerate{
   \item \code{iterationNumber}: The number of the simulation iteration.
@@ -303,8 +303,8 @@ object as \code{\link[base]{data.frame}}. The data frame contains the following 
 
 \section{Raw Data}{
 
-\code{\link{getRawData}} can be used to get the simulated raw data from the
-object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival}
+\code{\link[=getRawData]{getRawData()}} can be used to get the simulated raw data from the
+object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival()}
 must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
 The data frame contains the following columns:
 \enumerate{

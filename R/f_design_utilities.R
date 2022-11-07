@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6522 $
-## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6631 $
+## |  Last changed: $Date: 2022-10-25 13:49:41 +0200 (Tue, 25 Oct 2022) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_assertions.R
@@ -77,7 +77,7 @@ NULL
 }
 
 .getDesignArgumentsToIgnoreAtUnknownArgumentCheck <- function(design, powerCalculationEnabled = FALSE) {
-    baseArgsToIgnore <- c("showObservedInformationRatesMessage")
+    baseArgsToIgnore <- c("showObservedInformationRatesMessage", "showWarnings")
 
     if (design$kMax > 1) {
         return(baseArgsToIgnore)
@@ -672,9 +672,9 @@ NULL
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' \code{getPiecewiseExponentialDistribution} (short: \code{ppwexp}),
-#' \code{getPiecewiseExponentialQuantile} (short: \code{qpwexp}), and
-#' \code{getPiecewiseExponentialRandomNumbers} (short: \code{rpwexp}) provide
+#' \code{getPiecewiseExponentialDistribution()} (short: \code{ppwexp()}),
+#' \code{getPiecewiseExponentialQuantile()} (short: \code{qpwexp()}), and
+#' \code{getPiecewiseExponentialRandomNumbers()} (short: \code{rpwexp()}) provide
 #' probabilities, quantiles, and random numbers according to a piecewise
 #' exponential or a Weibull distribution.
 #' The piecewise definition is performed through a vector of
@@ -853,7 +853,7 @@ rpwexp <- function(n, ..., s = NA_real_, lambda = NA_real_, kappa = 1) {
 #'
 #' @details
 #' Can be used, e.g., to convert median values into pi or lambda values for usage in
-#' \code{\link{getSampleSizeSurvival}} or \code{\link{getPowerSurvival}}.
+#' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}} or \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
 #'
 #' @return Returns a \code{\link[base]{numeric}} value or vector will be returned.
 #'

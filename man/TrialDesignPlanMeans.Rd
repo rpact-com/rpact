@@ -8,7 +8,7 @@
 Trial design plan for means.
 }
 \details{
-This object cannot be created directly; use \code{\link{getSampleSizeMeans}}
+This object cannot be created directly; use \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}
 with suitable arguments to create a design plan for a dataset of means.
 }
 

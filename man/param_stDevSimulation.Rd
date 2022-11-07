@@ -7,7 +7,7 @@
 \item{stDev}{The standard deviation under which the data is simulated, 
 default is \code{1}. 
 If \code{meanRatio = TRUE} is specified, \code{stDev} defines 
-the coefficient of variation \code{sigma / mu2}.}
+the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.}
 }
 \description{
 Parameter Description: Standard Deviation for Simulation

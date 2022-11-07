@@ -19,7 +19,7 @@ Sets the \code{rpact} log level.
 \details{
 This function sets the log level of the \code{rpact} internal log message system.
 By default only calculation progress messages will be shown on the output console,
-particularly \code{\link{getAnalysisResults}} shows this kind of messages.
+particularly \code{\link[=getAnalysisResults]{getAnalysisResults()}} shows this kind of messages.
 The output of these messages can be disabled by setting the log level to \code{"DISABLED"}.
 }
 \examples{
@@ -34,8 +34,8 @@ setLogLevel("DISABLED")
 }
 \seealso{
 \itemize{
-  \item \code{\link{getLogLevel}} for getting the current log level,
-  \item \code{\link{resetLogLevel}} for resetting the log level to default.
+  \item \code{\link[=getLogLevel]{getLogLevel()}} for getting the current log level,
+  \item \code{\link[=resetLogLevel]{resetLogLevel()}} for resetting the log level to default.
 }
 }
 \keyword{internal}

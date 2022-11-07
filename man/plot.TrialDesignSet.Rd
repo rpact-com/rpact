@@ -23,7 +23,7 @@
 )
 }
 \arguments{
-\item{x}{The trial design set, obtained from \code{\link{getDesignSet}}.}
+\item{x}{The trial design set, obtained from \code{\link[=getDesignSet]{getDesignSet()}}.}
 
 \item{y}{Not available for this kind of plot (is only defined to be compatible to the generic plot function).}
 
@@ -53,9 +53,9 @@ for changing x or y axis limits without dropping data observations.}
 
 \item{theta}{A vector of standardized effect sizes (theta values), default is a sequence from -1 to 1.}
 
-\item{nMax}{The maximum sample size.}
+\item{nMax}{The maximum sample size. Must be a positive integer of length 1.}
 
-\item{plotPointsEnabled}{If \code{TRUE}, additional points will be plotted.}
+\item{plotPointsEnabled}{Logical. If \code{TRUE}, additional points will be plotted.}
 
 \item{legendPosition}{The position of the legend. 
 By default (\code{NA_integer_}) the algorithm tries to find a suitable position. 
@@ -72,7 +72,7 @@ Choose one of the following values to specify the position manually:
   \item \code{6}: legend position right bottom
 }}
 
-\item{showSource}{If \code{TRUE}, the parameter names of the object will 
+\item{showSource}{Logical. If \code{TRUE}, the parameter names of the object will 
 be printed which were used to create the plot; that may be, e.g., 
 useful to check the values or to create own plots with the base R \code{plot} function.
 Alternatively \code{showSource} can be defined as one of the following character values: 
@@ -96,7 +96,7 @@ and a list of \code{ggplot} objects will be returned invisible.
 Note that one of the following packages must be installed to create a grid plot: 
 'ggpubr', 'gridExtra', or 'cowplot'.}
 
-\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link{getPlotSettings}}.}
+\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.}
 }
 \value{
 Returns a \code{ggplot2} object.

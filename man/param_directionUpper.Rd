@@ -4,7 +4,7 @@
 \alias{param_directionUpper}
 \title{Parameter Description: Direction Upper}
 \arguments{
-\item{directionUpper}{Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative, 
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 }

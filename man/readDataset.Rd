@@ -47,12 +47,12 @@ See the 'Encoding' section of the help for file, the 'R Data Import/Export Manua
 Returns a \code{\link{Dataset}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.Dataset]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.Dataset]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -61,9 +61,10 @@ Reads a data file and returns it as dataset object.
 \details{
 \code{readDataset} is a wrapper function that uses \code{\link[utils]{read.table}} to read the
 CSV file into a data frame, transfers it from long to wide format with \code{\link[stats]{reshape}}
-and puts the data to \code{\link{getDataset}}.
+and puts the data to \code{\link[=getDataset]{getDataset()}}.
 }
 \examples{
+\donttest{
 dataFileRates <- system.file("extdata",
     "dataset_rates.csv",
     package = "rpact"
@@ -99,12 +100,13 @@ if (dataFileSurvivalMultiArm != "") {
     datasetSurvivalMultiArm <- readDataset(dataFileSurvivalMultiArm)
     datasetSurvivalMultiArm
 }
+}
 
 }
 \seealso{
 \itemize{
-  \item \code{\link{readDatasets}} for reading multiple datasets,
-  \item \code{\link{writeDataset}} for writing a single dataset,
-  \item \code{\link{writeDatasets}} for writing multiple datasets.
+  \item \code{\link[=readDatasets]{readDatasets()}} for reading multiple datasets,
+  \item \code{\link[=writeDataset]{writeDataset()}} for writing a single dataset,
+  \item \code{\link[=writeDatasets]{writeDatasets()}} for writing multiple datasets.
 }
 }

@@ -7,12 +7,12 @@
 getRepeatedPValues(stageResults, ..., tolerance = 1e-06)
 }
 \arguments{
-\item{stageResults}{The results at given stage, obtained from \code{\link{getStageResults}}.}
+\item{stageResults}{The results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}}.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{tolerance}{The numerical tolerance, default is \code{1e-06}.}
+\item{tolerance}{The numerical tolerance, default is \code{1e-06}. Must be a positive numeric of length 1.}
 }
 \value{
 Returns a \code{\link[base]{numeric}} vector of length \code{kMax} or in case of multi-arm stage results

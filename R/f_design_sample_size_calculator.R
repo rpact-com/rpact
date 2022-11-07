@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6522 $
-## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
+## |  File version: $Revision: 6650 $
+## |  Last changed: $Date: 2022-10-29 14:57:26 +0200 (Sa, 29 Okt 2022) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -1261,7 +1261,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
     return(.getSampleSize(designPlan))
 }
 
-.createDesignPlanSurvival <- function(..., objectType = c("power", "sampleSize"),
+.createDesignPlanSurvival <- function(..., objectType = c("sampleSize", "power"),
         design,
         typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
         thetaH0, pi2, pi1,
@@ -1295,7 +1295,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
     .assertIsValidKappa(kappa)
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, design$sided, objectType)
+    .assertIsValidDirectionUpper(directionUpper, design$sided, objectType, userFunctionCallEnabled = TRUE)
 
     if (objectType == "power") {
         .assertIsSingleNumber(maxNumberOfEvents, "maxNumberOfEvents")
@@ -2816,17 +2816,17 @@ getSampleSizeSurvival <- function(design = NULL, ...,
 #'
 #' @details
 #' The function computes the overall event probabilities in a two treatment groups design.
-#' For details of the parameters see \code{\link{getSampleSizeSurvival}}.
+#' For details of the parameters see \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}.
 #'
 #' @return Returns a \code{\link{EventProbabilities}} object.
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
-#'   \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-#'   \item \code{\link[=print.FieldSet]{print}} to print the object,
-#'   \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.EventProbabilities]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.EventProbabilities]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'
@@ -3045,17 +3045,17 @@ getEventProbabilities <- function(time, ...,
 #' Calculate number of subjects over time range at given accrual time vector
 #' and accrual intensity. Intensity can either be defined in absolute or
 #' relative terms (for the latter, \code{maxNumberOfSubjects} needs to be defined)\cr
-#' The function is used by \code{\link{getSampleSizeSurvival}}.
+#' The function is used by \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}.
 #'
 #' @return Returns a \code{\link{NumberOfSubjects}} object.
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
-#'   \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-#'   \item \code{\link[=print.FieldSet]{print}} to print the object,
-#'   \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.NumberOfSubjects]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.NumberOfSubjects]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'
@@ -3896,8 +3896,8 @@ getNumberOfSubjects <- function(time, ...,
 }
 
 # Note that 'directionUpper' and 'maxNumberOfSubjects' are only applicable
-# for 'objectType' = "sampleSize"
-.createDesignPlanMeans <- function(..., objectType = c("power", "sampleSize"),
+# for 'objectType' = "power"
+.createDesignPlanMeans <- function(..., objectType = c("sampleSize", "power"),
         design, normalApproximation = FALSE, meanRatio = FALSE,
         thetaH0 = ifelse(meanRatio, 1, 0), alternative = NA_real_,
         stDev = C_STDEV_DEFAULT, directionUpper = NA,
@@ -3921,7 +3921,7 @@ getNumberOfSubjects <- function(time, ...,
         .assertIsInOpenInterval(alternative, "alternative", 0, NULL, naAllowed = TRUE)
     }
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, design$sided, objectType)
+    .assertIsValidDirectionUpper(directionUpper, design$sided, objectType, userFunctionCallEnabled = TRUE)
 
     if (objectType == "sampleSize" && !any(is.na(alternative))) {
         if (design$sided == 1 && any(alternative - thetaH0 <= 0)) {
@@ -4028,9 +4028,9 @@ getNumberOfSubjects <- function(time, ...,
 
 #
 # note that 'directionUpper' and 'maxNumberOfSubjects' are
-# only applicable for 'objectType' = "sampleSize"
+# only applicable for 'objectType' = "power"
 #
-.createDesignPlanRates <- function(..., objectType = c("power", "sampleSize"),
+.createDesignPlanRates <- function(..., objectType = c("sampleSize", "power"),
         design, normalApproximation = TRUE, riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0), pi1 = C_PI_1_SAMPLE_SIZE_DEFAULT,
         pi2 = C_PI_2_DEFAULT, directionUpper = NA,
@@ -4043,7 +4043,7 @@ getNumberOfSubjects <- function(time, ...,
     .assertIsValidGroupsParameter(groups)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsSingleLogical(riskRatio, "riskRatio")
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, design$sided, objectType)
+    .assertIsValidDirectionUpper(directionUpper, design$sided, objectType, userFunctionCallEnabled = TRUE)
 
     if (groups == 1) {
         if (!any(is.na(pi1)) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {

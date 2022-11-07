@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6522 $
-## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include class_simulation_results.R
@@ -111,7 +111,7 @@ NULL
 #' @inheritParams param_showStatistics
 #' @param maxNumberOfRawDatasetsPerStage The number of raw datasets per stage that shall
 #'        be extracted and saved as \code{\link[base]{data.frame}}, default is \code{0}.
-#'        \code{\link{getRawData}} can be used to get the extracted raw data from the object.
+#'        \code{\link[=getRawData]{getRawData()}} can be used to get the extracted raw data from the object.
 #' @param longTimeSimulationAllowed Logical that indicates whether long time simulations
 #'        that consumes more than 30 seconds are allowed or not, default is \code{FALSE}.
 #' @inheritParams param_seed
@@ -159,7 +159,7 @@ NULL
 #' \code{simulationResults$setShowStatistics(FALSE)}\cr
 #' \code{simulationResults}\cr
 #'
-#' \code{\link{getData}} can be used to get the aggregated simulated data from the
+#' \code{\link[=getData]{getData()}} can be used to get the aggregated simulated data from the
 #' object as \code{\link[base]{data.frame}}. The data frame contains the following columns:
 #' \enumerate{
 #'   \item \code{iterationNumber}: The number of the simulation iteration.
@@ -194,8 +194,8 @@ NULL
 #' }
 #'
 #' @section Raw Data:
-#' \code{\link{getRawData}} can be used to get the simulated raw data from the
-#' object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival}
+#' \code{\link[=getRawData]{getRawData()}} can be used to get the simulated raw data from the
+#' object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival()}
 #' must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
 #' The data frame contains the following columns:
 #' \enumerate{

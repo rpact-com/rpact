@@ -4,7 +4,7 @@
 \alias{param_alpha}
 \title{Parameter Description: Alpha}
 \arguments{
-\item{alpha}{The significance level alpha, default is \code{0.025}.}
+\item{alpha}{The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.}
 }
 \description{
 Parameter Description: Alpha

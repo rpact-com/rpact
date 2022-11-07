@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_base_survival.R
 ## |  Creation date: 12 August 2022, 09:06:47
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,7 +24,10 @@ test_plan_section("Testing the Analysis Survival Functionality for the Group Seq
 
 
 test_that("'getAnalysisResults' for a two-stage group sequential design and survival data", {
-	design0 <- getDesignGroupSequential(
+
+    .skipTestIfDisabled()
+        
+    design0 <- getDesignGroupSequential(
 	    kMax = 2, alpha = 0.025,
 	    informationRates = c(0.4, 1), bindingFutility = TRUE,
 	    typeOfDesign = "WT", deltaWT = 0.25, futilityBounds = 0
@@ -397,7 +400,8 @@ test_plan_section("Testing the Analysis Survival Functionality for the Inverse N
 
 
 test_that("'getAnalysisResults' for a three-stage inverse normal design and survival data", {
-	.skipTestIfDisabled()
+	
+    .skipTestIfDisabled()
 
 	design3 <- getDesignInverseNormal(
 	    kMax = 3, alpha = 0.025,
@@ -706,7 +710,8 @@ test_plan_section("Testing the Analysis Survival Functionality for the Fisher De
 
 
 test_that("'getAnalysisResults' for a three-stage Fisher design and 'bindingFutility = TRUE'", {
-	.skipTestIfDisabled()
+
+    .skipTestIfDisabled()
 
 	design5 <- getDesignFisher(
 	    kMax = 3, alpha = 0.025,

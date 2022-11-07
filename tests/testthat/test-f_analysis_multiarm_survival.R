@@ -15,14 +15,17 @@
 ## |
 ## |  File name: test-f_analysis_multiarm_survival.R
 ## |  Creation date: 12 August 2022, 09:59:44
-## |  File version: $Revision: 6498 $
-## |  Last changed: $Date: 2022-08-17 13:33:01 +0200 (Mi, 17 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing the Analysis Survival Functionality for Three or More Treatments")
 
 test_that("'getAnalysisResultsMultiArm' with survival data and different options", {
+        
+    .skipTestIfDisabled()
+        
     design1 <- getDesignInverseNormal(
         kMax = 3, alpha = 0.025, futilityBounds = c(-0.5, 0),
         bindingFutility = FALSE, typeOfDesign = "asKD", gammaA = 1.2, informationRates = c(0.4, 0.7, 1)

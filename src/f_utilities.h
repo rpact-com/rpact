@@ -20,8 +20,10 @@
  *
  */
 
-// [[Rcpp::plugins(cpp11)]]
 #include <Rcpp.h>
+
+// [[Rcpp::plugins(cpp11)]]
+
 using namespace Rcpp;
 
 #ifndef PKG_RPACT_H
@@ -85,12 +87,6 @@ NumericMatrix matrixMultiply(NumericMatrix x, double y);
 
 NumericVector repInt(int x, int y);
 
-std::string vectorToString(NumericVector x);
-
-double secant(std::function<double(double)> f, double x0, double x1, double min, double max, double tolerance, int maxIter);
-
-double bisection(std::function<double(double)> f, double lower, double upper, double tolerance, int maxIter);
-
 double bisection2(std::function<double(double)> f, double lower, double upper, double tolerance, int maxIter);
 
 double bizero(std::function<double(double)> f, double lower, double upper, double tolerance, int maxIter);
@@ -108,5 +104,7 @@ NumericVector rangeVector(NumericVector x, int from, int to);
 std::string getCipheredValue(String x);
 
 void logDebug(std::string s);
+
+double getRandomTDistribution(double df, double ncp);
 
 #endif

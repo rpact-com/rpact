@@ -57,6 +57,10 @@ getDesignGroupSequentialUserDefinedBetaSpendingCpp <- function(criticalValues, k
     .Call(`_rpact_getDesignGroupSequentialUserDefinedBetaSpendingCpp`, criticalValues, kMax, userAlphaSpending, userBetaSpending, sided, informationRates, bindingFutility, tolerance, typeOfDesign, gammaA, alpha, betaAdjustment, twoSidedPower)
 }
 
+getSimulationMeansLoopCpp <- function(alternative, kMax, maxNumberOfIterations, designNumber, informationRates, futilityBounds, alpha0Vec, criticalValues, meanRatio, thetaH0, stDev, groups, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction) {
+    .Call(`_rpact_getSimulationMeansLoopCpp`, alternative, kMax, maxNumberOfIterations, designNumber, informationRates, futilityBounds, alpha0Vec, criticalValues, meanRatio, thetaH0, stDev, groups, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction)
+}
+
 getSimulationSurvivalCpp <- function(designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocation1, allocation2, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa) {
     .Call(`_rpact_getSimulationSurvivalCpp`, designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocation1, allocation2, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa)
 }

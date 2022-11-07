@@ -23,11 +23,12 @@ getDesignFisher(
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and 
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{kMax}{The maximum number of stages \code{K}, default is \code{3}. 
+\item{kMax}{The maximum number of stages \code{K}. 
+Must be a positive integer of length 1 (default value is \code{3}).
 The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 \code{6} for Fisher combination test designs.}
 
-\item{alpha}{The significance level alpha, default is \code{0.025}.}
+\item{alpha}{The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.}
 
 \item{method}{\code{"equalAlpha"}, \code{"fullAlpha"}, \code{"noInteraction"}, or \code{"userDefinedAlpha"},
 default is \code{"equalAlpha"} (for details, see Wassmer, 1999).}
@@ -41,7 +42,7 @@ alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 
 \item{informationRates}{The information rates (that must be fixed prior to the trial), 
 default is \code{(1:kMax) / kMax}.}
 
-\item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}.}
+\item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. Must be a positive integer of length 1.}
 
 \item{bindingFutility}{If \code{bindingFutility = TRUE} is specified the calculation of
 the critical values is affected by the futility bounds (default is \code{TRUE}).}
@@ -58,19 +59,19 @@ The default value of \code{iterations} is 0, i.e., no simulation will be execute
 Returns a \code{\link{TrialDesign}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesign]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesign]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.TrialDesign]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.TrialDesign]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
 Performs Fisher's combination test and returns critical values for this design.
 }
 \details{
-\code{getDesignFisher} calculates the critical values and stage levels for
+\code{getDesignFisher()} calculates the critical values and stage levels for
 Fisher's combination test as described in Bauer (1989), Bauer and Koehne (1994),
 Bauer and Roehmel (1995), and Wassmer (1999) for equally and unequally sized stages.
 }
@@ -93,7 +94,7 @@ getDesignFisher(kMax = 2, method = "fullAlpha", alpha = 0.05, alpha0Vec = 0.50)
 
 }
 \seealso{
-\code{\link{getDesignSet}} for creating a set of designs to compare.
+\code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare.
 
 Other design functions: 
 \code{\link{getDesignCharacteristics}()},

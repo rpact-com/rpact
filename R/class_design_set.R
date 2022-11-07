@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6513 $
-## |  Last changed: $Date: 2022-08-19 15:14:36 +0200 (Fri, 19 Aug 2022) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -43,11 +43,11 @@ NULL
 #' \itemize{
 #'   \item \code{\link[=names.TrialDesignSet]{names}} to obtain the field names,
 #'   \item \code{\link[=length.TrialDesignSet]{length}} to obtain the number of design,
-#'   \item \code{\link[=print.FieldSet]{print}} to print the object,
-#'   \item \code{\link[=summary.TrialDesignSet]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.TrialDesignSet]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.TrialDesignSet]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'
@@ -150,10 +150,10 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 #' @field design The master design (optional).
 #'
 #' @details
-#' This object cannot be created directly; better use \code{\link{getDesignSet}}
+#' This object cannot be created directly; better use \code{\link[=getDesignSet]{getDesignSet()}}
 #' with suitable arguments to create a set of designs.
 #'
-#' @seealso \code{\link{getDesignSet}}
+#' @seealso \code{\link[=getDesignSet]{getDesignSet()}}
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -747,7 +747,7 @@ as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
 #' @description
 #' Plots a trial design set.
 #'
-#' @param x The trial design set, obtained from \code{\link{getDesignSet}}.
+#' @param x The trial design set, obtained from \code{\link[=getDesignSet]{getDesignSet()}}.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
 #' @param main The main title.
 #' @param xlab The x-axis label.

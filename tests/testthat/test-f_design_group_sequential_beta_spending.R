@@ -24,6 +24,9 @@ test_plan_section("Testing the Group Sequential Design Functionality with Beta S
 
 
 test_that("'getDesignGroupSequential' with two-sided beta spending (1)", {
+        
+    .skipTestIfDisabled()
+        
 	suppressWarnings(x <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.4, 0.8, 1),
 	    alpha = 0.05, typeOfDesign = "asKD", gammaA = 2.5, beta = 0.1, sided = 2,

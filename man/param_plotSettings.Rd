@@ -4,7 +4,7 @@
 \alias{param_plotSettings}
 \title{Parameter Description: Plot Settings}
 \arguments{
-\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link{getPlotSettings}}.}
+\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.}
 }
 \description{
 Parameter Description: Plot Settings

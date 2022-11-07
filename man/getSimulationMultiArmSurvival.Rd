@@ -71,11 +71,11 @@ hypotheses in the closed system of hypotheses.
 Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"}, 
 \code{"Sidak"}, and \code{"Hierarchical"}, default is \code{"Dunnett"}.}
 
-\item{directionUpper}{Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative, 
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
-\item{adaptations}{A vector of length \code{kMax - 1} indicating whether or not an adaptation takes 
+\item{adaptations}{A logical vector of length \code{kMax - 1} indicating whether or not an adaptation takes 
 place at interim k, default is \code{rep(TRUE, kMax - 1)}.}
 
 \item{typeOfSelection}{The way the treatment arms or populations are selected at interim. 
@@ -105,7 +105,7 @@ under the null, i.e., not accounting for the alternative is used,
  default is \code{"alternative"}.}
 
 \item{epsilonValue}{For \code{typeOfSelection = "epsilon"} (select treatment arm / population not worse than 
-epsilon compared to the best), the parameter \code{epsilonValue} has to be specified.}
+epsilon compared to the best), the parameter \code{epsilonValue} has to be specified. Must be a numeric of length 1.}
 
 \item{rValue}{For \code{typeOfSelection = "rbest"} (select the \code{rValue} best treatment arms / populations), 
 the parameter \code{rValue} has to be specified.}
@@ -115,7 +115,7 @@ exceeds \code{threshold}, default is \code{-Inf}.
 \code{threshold} can also be a vector of length \code{activeArms} referring to 
 a separate threshold condition over the treatment arms.}
 
-\item{plannedEvents}{\code{plannedEvents} is a vector of length \code{kMax} (the number of stages of the design) 
+\item{plannedEvents}{\code{plannedEvents} is a numeric vector of length \code{kMax} (the number of stages of the design) 
 that determines the number of cumulated (overall) events in survival designs when the interim stages are planned.
 For two treatment arms, it is the number of events for both treatment arms. 
 For multi-arm designs, \code{plannedEvents} refers to the overall number of events for the selected arms plus control.}
@@ -124,12 +124,12 @@ For multi-arm designs, \code{plannedEvents} refers to the overall number of even
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.}
 
 \item{minNumberOfEventsPerStage}{When performing a data driven sample size recalculation, 
-the vector \code{minNumberOfEventsPerStage} with length kMax determines the 
+the numeric vector \code{minNumberOfEventsPerStage} with length kMax determines the 
 minimum number of events per stage (i.e., not cumulated), the first element 
 is not taken into account.}
 
 \item{maxNumberOfEventsPerStage}{When performing a data driven sample size recalculation, 
-the vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number 
+the numeric vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number 
 of events per stage (i.e., not cumulated), the first element is not taken into account.}
 
 \item{conditionalPower}{If \code{conditionalPower} together with \code{minNumberOfSubjectsPerStage} and 
@@ -141,9 +141,9 @@ the conditional power will be calculated under the observed effect size. Optiona
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
 \item{thetaH1}{If specified, the value of the alternative under which 
-the conditional power or sample size recalculation calculation is performed.}
+the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.}
 
-\item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}.}
+\item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
 
 \item{seed}{The seed to reproduce the simulation, default is a random seed.}
 
@@ -155,7 +155,7 @@ recalculation. By default, sample size recalculation is performed with condition
 are selected. This function is allowed to depend on \code{effectVector} with length \code{activeArms}
 and \code{stage} (see examples).}
 
-\item{showStatistics}{If \code{TRUE}, summary statistics of the simulated data
+\item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default
 is \code{FALSE}.}
 }
@@ -163,12 +163,12 @@ is \code{FALSE}.}
 Returns a \code{\link{SimulationResults}} object.
 The following generics (R generic functions) are available for this object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.SimulationResults]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.SimulationResults]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{

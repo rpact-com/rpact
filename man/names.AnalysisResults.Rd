@@ -7,7 +7,7 @@
 \method{names}{AnalysisResults}(x)
 }
 \arguments{
-\item{x}{An \code{\link{AnalysisResults}} object created by \code{\link{getAnalysisResults}}.}
+\item{x}{An \code{\link{AnalysisResults}} object created by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.}
 }
 \value{
 Returns a \code{\link[base]{character}} vector containing the names of the \code{\link{AnalysisResults}} object.

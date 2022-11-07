@@ -11,19 +11,19 @@ getPowerAndAverageSampleNumber(design, theta = seq(-1, 1, 0.02), nMax = 100)
 
 \item{theta}{A vector of standardized effect sizes (theta values), default is a sequence from -1 to 1.}
 
-\item{nMax}{The maximum sample size.}
+\item{nMax}{The maximum sample size. Must be a positive integer of length 1.}
 }
 \value{
 Returns a \code{\link{PowerAndAverageSampleNumberResult}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.ParameterSet]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.PowerAndAverageSampleNumberResult]{as.data.frame}}
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.PowerAndAverageSampleNumberResult]{as.data.frame()}}
         to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{

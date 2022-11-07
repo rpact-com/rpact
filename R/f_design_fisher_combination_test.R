@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6522 $
-## |  Last changed: $Date: 2022-08-23 17:43:29 +0200 (Di, 23 Aug 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_constants.R
@@ -52,11 +52,11 @@ NULL
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' \code{getDesignFisher} calculates the critical values and stage levels for
+#' \code{getDesignFisher()} calculates the critical values and stage levels for
 #' Fisher's combination test as described in Bauer (1989), Bauer and Koehne (1994),
 #' Bauer and Roehmel (1995), and Wassmer (1999) for equally and unequally sized stages.
 #'
-#' @seealso \code{\link{getDesignSet}} for creating a set of designs to compare.
+#' @seealso \code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare.
 #'
 #' @template return_object_trial_design
 #' @template how_to_get_help_for_generics

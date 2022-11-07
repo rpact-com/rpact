@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 5594 $
-## |  Last changed: $Date: 2021-11-26 15:24:35 +0100 (Fr, 26 Nov 2021) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -53,9 +53,13 @@
                     sqrt(informationRates[2:stage] - informationRates[1:(stage - 1)]) %*%
                     testStatisticsPerStage[2:stage]) / sqrt(informationRates[stage])
             } else {
-                value <- (sqrt(informationRates[1]) * .getQNorm(stats::pt(testStatisticsPerStage[1], sampleSizesPerStage[1] - groups)) +
+                value <- (sqrt(informationRates[1]) *
+                    .getQNorm(stats::pt(testStatisticsPerStage[1], sampleSizesPerStage[1] - groups)) +
                     sqrt(informationRates[2:stage] - informationRates[1:(stage - 1)]) %*%
-                    .getQNorm(stats::pt(testStatisticsPerStage[2:stage], sampleSizesPerStage[2:stage] - groups))) / sqrt(informationRates[stage])
+                    .getQNorm(stats::pt(
+                        testStatisticsPerStage[2:stage],
+                        sampleSizesPerStage[2:stage] - groups
+                    ))) / sqrt(informationRates[stage])
             }
         }
     } else if (designNumber == 3L) {
@@ -98,7 +102,6 @@
     ))
 }
 
-
 .getSimulationMeansStageSubjects <- function(..., stage,
         meanRatio, thetaH0, groups, plannedSubjects,
         allocationRatioPlanned,
@@ -131,7 +134,6 @@
 
     return(stageSubjects)
 }
-
 
 .getSimulationStepMeans <- function(...,
         k,
@@ -251,7 +253,7 @@
             testResult <- (2 * directionUpper - 1) * stats::rt(1, stageSubjects - 2, nz)
         }
     }
-
+    
     sampleSizesPerStage <- c(sampleSizesPerStage, stageSubjects)
     testStatisticsPerStage <- c(testStatisticsPerStage, testResult)
 
@@ -311,6 +313,187 @@
         simulatedRejections = simulatedRejections,
         simulatedFutilityStop = simulatedFutilityStop,
         simulatedConditionalPower = simulatedConditionalPower
+    ))
+}
+
+.getSimulationMeansLoop <- function(alternative,
+        kMax,
+        maxNumberOfIterations,
+        designNumber,
+        informationRates,
+        futilityBounds,
+        alpha0Vec,
+        criticalValues,
+        meanRatio,
+        thetaH0,
+        stDev,
+        groups,
+        normalApproximation,
+        plannedSubjects,
+        directionUpper,
+        allocationRatioPlanned,
+        minNumberOfSubjectsPerStage,
+        maxNumberOfSubjectsPerStage,
+        conditionalPower,
+        thetaH1,
+        stDevH1,
+        calcSubjectsFunction) {
+    len <- length(alternative) * maxNumberOfIterations * kMax
+    dataIterationNumber <- rep(NA_real_, len)
+    dataStageNumber <- rep(NA_real_, len)
+    dataAlternative <- rep(NA_real_, len)
+    dataEffect <- rep(NA_real_, len)
+    dataNumberOfSubjects <- rep(NA_real_, len)
+    dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
+    dataRejectPerStage <- rep(NA_real_, len)
+    dataFutilityPerStage <- rep(NA_real_, len)
+    dataTestStatisticsPerStage <- rep(NA_real_, len)
+    dataTestStatistic <- rep(NA_real_, len)
+    dataTrialStop <- rep(NA, len)
+    dataConditionalPowerAchieved <- rep(NA_real_, len)
+    dataEffectEstimate <- rep(NA_real_, len)
+    dataPValuesSeparate <- rep(NA_real_, len)
+
+    cols <- length(alternative)
+    sampleSizes <- matrix(0, nrow = kMax, ncol = cols)
+    rejectPerStage <- matrix(0, nrow = kMax, ncol = cols)
+    overallReject <- rep(0, cols)
+    futilityPerStage <- matrix(0, kMax - 1, cols)
+    futilityStop <- rep(0, cols)
+    iterations <- matrix(0, nrow = kMax, ncol = cols)
+    expectedNumberOfSubjects <- rep(0, cols)
+    conditionalPowerAchieved <- matrix(NA_real_, nrow = kMax, ncol = cols)
+
+    index <- 1
+    for (i in 1:length(alternative)) {
+        simulatedSubjects <- rep(0, kMax)
+        simulatedOverallSubjects <- rep(0, kMax)
+        simulatedRejections <- rep(0, kMax)
+        simulatedFutilityStop <- rep(0, kMax - 1)
+        simulatedOverallSubjects <- 0
+        simulatedConditionalPower <- rep(0, kMax)
+
+        for (j in 1:maxNumberOfIterations) {
+            trialStop <- FALSE
+            sampleSizesPerStage <- c()
+            testStatisticsPerStage <- c()
+            testStatistic <- NULL
+            effectEstimate <- NULL
+
+            for (k in 1:kMax) {
+                if (!trialStop) {
+                    stepResult <- .getSimulationStepMeans(
+                        k = k,
+                        kMax = kMax,
+                        designNumber = designNumber,
+                        informationRates = informationRates,
+                        futilityBounds = futilityBounds,
+                        alpha0Vec = alpha0Vec,
+                        criticalValues = criticalValues,
+                        meanRatio = meanRatio,
+                        thetaH0 = thetaH0,
+                        alternative = alternative[i],
+                        stDev = stDev,
+                        groups = groups,
+                        normalApproximation = normalApproximation,
+                        plannedSubjects = plannedSubjects,
+                        directionUpper = directionUpper,
+                        allocationRatioPlanned = allocationRatioPlanned,
+                        minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage,
+                        maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage,
+                        conditionalPower = conditionalPower,
+                        thetaH1 = thetaH1,
+                        stDevH1 = stDevH1,
+                        effectEstimate = effectEstimate,
+                        sampleSizesPerStage = sampleSizesPerStage,
+                        testStatisticsPerStage = testStatisticsPerStage,
+                        testStatistic = testStatistic,
+                        calcSubjectsFunction = calcSubjectsFunction
+                    )
+
+                    trialStop <- stepResult$trialStop
+                    sampleSizesPerStage <- stepResult$sampleSizesPerStage
+                    testStatisticsPerStage <- stepResult$testStatisticsPerStage
+                    testStatistic <- stepResult$testStatistic
+                    simulatedSubjectsStep <- stepResult$simulatedSubjects
+                    simulatedRejectionsStep <- stepResult$simulatedRejections
+                    simulatedFutilityStopStep <- stepResult$simulatedFutilityStop
+                    effectEstimate <- stepResult$effectEstimate
+                    simulatedConditionalPowerStep <- NA_real_
+                    if (k > 1) {
+                        simulatedConditionalPowerStep <- stepResult$simulatedConditionalPower
+                    }
+                    iterations[k, i] <- iterations[k, i] + 1
+                    simulatedSubjects[k] <- simulatedSubjects[k] + simulatedSubjectsStep
+                    simulatedRejections[k] <- simulatedRejections[k] + simulatedRejectionsStep
+                    if (k < kMax) {
+                        simulatedFutilityStop[k] <- simulatedFutilityStop[k] + simulatedFutilityStopStep
+                    }
+                    simulatedConditionalPower[k] <-
+                        simulatedConditionalPower[k] + simulatedConditionalPowerStep
+
+                    dataIterationNumber[index] <- j
+                    dataStageNumber[index] <- k
+                    dataAlternative[index] <- alternative[i]
+                    dataNumberOfSubjects[index] <- simulatedSubjectsStep
+                    dataNumberOfCumulatedSubjects[index] <- sum(sampleSizesPerStage)
+                    dataRejectPerStage[index] <- simulatedRejectionsStep
+                    dataFutilityPerStage[index] <- simulatedFutilityStopStep
+                    dataTestStatistic[index] <- testStatistic$value
+                    dataTestStatisticsPerStage[index] <- testStatisticsPerStage[k]
+                    dataTrialStop[index] <- trialStop
+                    dataConditionalPowerAchieved[index] <- simulatedConditionalPowerStep
+                    dataEffectEstimate[index] <- effectEstimate
+                    if (designNumber == 3L) {
+                        dataPValuesSeparate[index] <- testStatistic$pValuesSeparate[k]
+                    }
+                    index <- index + 1
+                }
+            }
+        }
+
+        simulatedOverallSubjects <- sum(simulatedSubjects[1:k])
+        sampleSizes[, i] <- simulatedSubjects / iterations[, i]
+        rejectPerStage[, i] <- simulatedRejections / maxNumberOfIterations
+        overallReject[i] <- sum(simulatedRejections / maxNumberOfIterations)
+        futilityPerStage[, i] <- simulatedFutilityStop / maxNumberOfIterations
+        futilityStop[i] <- sum(simulatedFutilityStop / maxNumberOfIterations)
+        expectedNumberOfSubjects[i] <- simulatedOverallSubjects / maxNumberOfIterations
+        if (kMax > 1) {
+            conditionalPowerAchieved[2:kMax, i] <-
+                simulatedConditionalPower[2:kMax] / iterations[2:kMax, i]
+        }
+    }
+    
+    data <- data.frame(
+        iterationNumber = dataIterationNumber,
+        stageNumber = dataStageNumber,
+        alternative = dataAlternative,
+        numberOfSubjects = dataNumberOfSubjects,
+        numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,
+        rejectPerStage = dataRejectPerStage,
+        futilityPerStage = dataFutilityPerStage,
+        testStatistic = dataTestStatistic,
+        testStatisticsPerStage = dataTestStatisticsPerStage,
+        effectEstimate = dataEffectEstimate,
+        trialStop = dataTrialStop,
+        conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6)
+    )
+    if (designNumber == 3L) {
+        data$pValue <- dataPValuesSeparate
+    }
+    data <- data[!is.na(data$alternative), ]
+
+    return(list(
+        sampleSizes = sampleSizes,
+        iterations = iterations,
+        rejectPerStage = rejectPerStage,
+        overallReject = overallReject,
+        futilityPerStage = futilityPerStage,
+        futilityStop = futilityStop,
+        expectedNumberOfSubjects = expectedNumberOfSubjects,
+        conditionalPowerAchieved = conditionalPowerAchieved,
+        data = data
     ))
 }
 
@@ -390,7 +573,7 @@
 #' \code{simulationResults$setShowStatistics(FALSE)}\cr
 #' \code{simulationResults}\cr
 #'
-#' \code{\link{getData}} can be used to get the aggregated simulated data from the
+#' \code{\link[=getData]{getData()}} can be used to get the aggregated simulated data from the
 #' object as \code{\link[base]{data.frame}}. The data frame contains the following columns:
 #' \enumerate{
 #'   \item \code{iterationNumber}: The number of the simulation iteration.
@@ -441,11 +624,14 @@ getSimulationMeans <- function(design = NULL, ...,
         design <- .getDefaultDesign(..., type = "simulation")
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMeans",
-            ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "showStatistics"), ...
+            ignore = c(
+                .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE),
+                "showStatistics", "cppEnabled"
+            ), ...
         )
     } else {
         .assertIsTrialDesign(design)
-        .warnInCaseOfUnknownArguments(functionName = "getSimulationMeans", ignore = "showStatistics", ...)
+        .warnInCaseOfUnknownArguments(functionName = "getSimulationMeans", ignore = c("showStatistics", "cppEnabled"), ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
     }
     .assertIsSingleLogical(directionUpper, "directionUpper")
@@ -698,190 +884,76 @@ getSimulationMeans <- function(design = NULL, ...,
         alpha0Vec <- rep(NA_real_, design$kMax - 1)
         futilityBounds <- design$futilityBounds
     }
-    informationRates <- design$informationRates
-    criticalValues <- design$criticalValues
-    kMax <- design$kMax
-    cols <- length(alternative)
-    sampleSizes <- matrix(0, nrow = kMax, ncol = cols)
-    rejectPerStage <- matrix(0, nrow = kMax, ncol = cols)
-    overallReject <- rep(0, cols)
-    futilityPerStage <- matrix(0, kMax - 1, cols)
-    futilityStop <- rep(0, cols)
-    iterations <- matrix(0, nrow = kMax, ncol = cols)
-    expectedNumberOfSubjects <- rep(0, cols)
-    conditionalPowerAchieved <- matrix(NA_real_, nrow = kMax, ncol = cols)
-
-    len <- length(alternative) * maxNumberOfIterations * kMax
-    dataIterationNumber <- rep(NA_real_, len)
-    dataStageNumber <- rep(NA_real_, len)
-    dataAlternative <- rep(NA_real_, len)
-    dataEffect <- rep(NA_real_, len)
-    dataNumberOfSubjects <- rep(NA_real_, len)
-    dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
-    dataRejectPerStage <- rep(NA_real_, len)
-    dataFutilityPerStage <- rep(NA_real_, len)
-    dataTestStatisticsPerStage <- rep(NA_real_, len)
-    dataTestStatistic <- rep(NA_real_, len)
-    dataTrialStop <- rep(NA, len)
-    dataConditionalPowerAchieved <- rep(NA_real_, len)
-    dataEffectEstimate <- rep(NA_real_, len)
-    if (designNumber == 3L) {
-        dataPValuesSeparate <- rep(NA_real_, len)
-    }
 
     if (is.na(stDevH1)) {
         stDevH1 <- stDev
     }
 
-    index <- 1
-    for (i in 1:length(alternative)) {
-        simulatedSubjects <- rep(0, kMax)
-        simulatedOverallSubjects <- rep(0, kMax)
-        simulatedRejections <- rep(0, kMax)
-        simulatedFutilityStop <- rep(0, kMax - 1)
-        simulatedOverallSubjects <- 0
-        simulatedConditionalPower <- rep(0, kMax)
+    cppEnabled <- .getOptionalArgument("cppEnabled", ..., optionalArgumentDefaultValue = TRUE)
+    fun <- if (cppEnabled && simulationResults$.getParameterType("calcSubjectsFunction") != C_PARAM_USER_DEFINED) 
+        getSimulationMeansLoopCpp else .getSimulationMeansLoop
+    cppResult <- fun(
+        alternative = alternative,
+        kMax = design$kMax,
+        maxNumberOfIterations = maxNumberOfIterations,
+        designNumber = designNumber,
+        informationRates = design$informationRates,
+        futilityBounds = futilityBounds,
+        alpha0Vec = alpha0Vec,
+        criticalValues = design$criticalValues,
+        meanRatio = meanRatio,
+        thetaH0 = thetaH0,
+        stDev = stDev,
+        groups = groups,
+        normalApproximation = normalApproximation,
+        plannedSubjects = plannedSubjects,
+        directionUpper = directionUpper,
+        allocationRatioPlanned = allocationRatioPlanned,
+        minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage,
+        maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage,
+        conditionalPower = conditionalPower,
+        thetaH1 = thetaH1,
+        stDevH1 = stDevH1,
+        calcSubjectsFunction = calcSubjectsFunction
+    )
 
-        for (j in 1:maxNumberOfIterations) {
-            trialStop <- FALSE
-            sampleSizesPerStage <- c()
-            testStatisticsPerStage <- c()
-            testStatistic <- NULL
-            effectEstimate <- NULL
-
-            for (k in 1:kMax) {
-                if (!trialStop) {
-                    stepResult <- .getSimulationStepMeans(
-                        k = k,
-                        kMax = kMax,
-                        designNumber = designNumber,
-                        informationRates = informationRates,
-                        futilityBounds = futilityBounds,
-                        alpha0Vec = alpha0Vec,
-                        criticalValues = criticalValues,
-                        meanRatio = meanRatio,
-                        thetaH0 = thetaH0,
-                        alternative = alternative[i],
-                        stDev = stDev,
-                        groups = groups,
-                        normalApproximation = normalApproximation,
-                        plannedSubjects = plannedSubjects,
-                        directionUpper = directionUpper,
-                        allocationRatioPlanned = allocationRatioPlanned,
-                        minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage,
-                        maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage,
-                        conditionalPower = conditionalPower,
-                        thetaH1 = thetaH1,
-                        stDevH1 = stDevH1,
-                        effectEstimate = effectEstimate,
-                        sampleSizesPerStage = sampleSizesPerStage,
-                        testStatisticsPerStage = testStatisticsPerStage,
-                        testStatistic = testStatistic,
-                        calcSubjectsFunction = calcSubjectsFunction
-                    )
-
-                    trialStop <- stepResult$trialStop
-                    sampleSizesPerStage <- stepResult$sampleSizesPerStage
-                    testStatisticsPerStage <- stepResult$testStatisticsPerStage
-                    testStatistic <- stepResult$testStatistic
-                    simulatedSubjectsStep <- stepResult$simulatedSubjects
-                    simulatedRejectionsStep <- stepResult$simulatedRejections
-                    simulatedFutilityStopStep <- stepResult$simulatedFutilityStop
-                    effectEstimate <- stepResult$effectEstimate
-                    simulatedConditionalPowerStep <- NA_real_
-                    if (k > 1) {
-                        simulatedConditionalPowerStep <- stepResult$simulatedConditionalPower
-                    }
-                    iterations[k, i] <- iterations[k, i] + 1
-                    simulatedSubjects[k] <- simulatedSubjects[k] + simulatedSubjectsStep
-                    simulatedRejections[k] <- simulatedRejections[k] + simulatedRejectionsStep
-                    if (k < kMax) {
-                        simulatedFutilityStop[k] <- simulatedFutilityStop[k] + simulatedFutilityStopStep
-                    }
-                    simulatedConditionalPower[k] <-
-                        simulatedConditionalPower[k] + simulatedConditionalPowerStep
-
-                    dataIterationNumber[index] <- j
-                    dataStageNumber[index] <- k
-                    dataAlternative[index] <- alternative[i]
-                    dataNumberOfSubjects[index] <- simulatedSubjectsStep
-                    dataNumberOfCumulatedSubjects[index] <- sum(sampleSizesPerStage)
-                    dataRejectPerStage[index] <- simulatedRejectionsStep
-                    dataFutilityPerStage[index] <- simulatedFutilityStopStep
-                    dataTestStatistic[index] <- testStatistic$value
-                    dataTestStatisticsPerStage[index] <- testStatisticsPerStage[k]
-                    dataTrialStop[index] <- trialStop
-                    dataConditionalPowerAchieved[index] <- simulatedConditionalPowerStep
-                    dataEffectEstimate[index] <- effectEstimate
-                    if (designNumber == 3L) {
-                        dataPValuesSeparate[index] <- testStatistic$pValuesSeparate[k]
-                    }
-                    index <- index + 1
-                }
-            }
-        }
-
-        simulatedOverallSubjects <- sum(simulatedSubjects[1:k])
-        sampleSizes[, i] <- simulatedSubjects / iterations[, i]
-        rejectPerStage[, i] <- simulatedRejections / maxNumberOfIterations
-        overallReject[i] <- sum(simulatedRejections / maxNumberOfIterations)
-        futilityPerStage[, i] <- simulatedFutilityStop / maxNumberOfIterations
-        futilityStop[i] <- sum(simulatedFutilityStop / maxNumberOfIterations)
-        expectedNumberOfSubjects[i] <- simulatedOverallSubjects / maxNumberOfIterations
-        if (kMax > 1) {
-            conditionalPowerAchieved[2:kMax, i] <-
-                simulatedConditionalPower[2:kMax] / iterations[2:kMax, i]
-        }
-    }
+    sampleSizes <- cppResult$sampleSizes
     sampleSizes[is.na(sampleSizes)] <- 0
 
-    simulationResults$iterations <- iterations
+    simulationResults$iterations <- cppResult$iterations
     simulationResults$sampleSizes <- sampleSizes
-    simulationResults$rejectPerStage <- rejectPerStage
-    simulationResults$overallReject <- overallReject
-    simulationResults$futilityPerStage <- futilityPerStage
-    simulationResults$futilityStop <- futilityStop
-    if (kMax > 1) {
+    simulationResults$rejectPerStage <- cppResult$rejectPerStage
+    simulationResults$overallReject <- cppResult$overallReject
+    simulationResults$futilityPerStage <- cppResult$futilityPerStage
+    simulationResults$futilityStop <- cppResult$futilityStop
+    if (design$kMax > 1) {
         if (length(alternative) == 1) {
-            simulationResults$earlyStop <- sum(futilityPerStage) + sum(rejectPerStage[1:(kMax - 1)])
+            simulationResults$earlyStop <- sum(cppResult$futilityPerStage) + sum(cppResult$rejectPerStage[1:(design$kMax - 1)])
         } else {
-            if (kMax > 2) {
-                rejectPerStageColSum <- colSums(rejectPerStage[1:(kMax - 1), ])
+            if (design$kMax > 2) {
+                rejectPerStageColSum <- colSums(cppResult$rejectPerStage[1:(design$kMax - 1), ])
             } else {
-                rejectPerStageColSum <- rejectPerStage[1, ]
+                rejectPerStageColSum <- cppResult$rejectPerStage[1, ]
             }
-            simulationResults$earlyStop <- colSums(futilityPerStage) + rejectPerStageColSum
+            simulationResults$earlyStop <- colSums(cppResult$futilityPerStage) + rejectPerStageColSum
         }
     } else {
         simulationResults$earlyStop <- rep(0, length(alternative))
     }
 
-    simulationResults$expectedNumberOfSubjects <- expectedNumberOfSubjects
-    simulationResults$conditionalPowerAchieved <- conditionalPowerAchieved
+    simulationResults$expectedNumberOfSubjects <- cppResult$expectedNumberOfSubjects
+    simulationResults$conditionalPowerAchieved <- cppResult$conditionalPowerAchieved
 
     if (!all(is.na(simulationResults$conditionalPowerAchieved))) {
         simulationResults$.setParameterType("conditionalPowerAchieved", C_PARAM_GENERATED)
     }
-
-    data <- data.frame(
-        iterationNumber = dataIterationNumber,
-        stageNumber = dataStageNumber,
-        alternative = dataAlternative,
-        numberOfSubjects = dataNumberOfSubjects,
-        numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,
-        rejectPerStage = dataRejectPerStage,
-        futilityPerStage = dataFutilityPerStage,
-        testStatistic = dataTestStatistic,
-        testStatisticsPerStage = dataTestStatisticsPerStage,
-        effectEstimate = dataEffectEstimate,
-        trialStop = dataTrialStop,
-        conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6)
-    )
-    if (designNumber == 3L) {
-        data$pValue <- dataPValuesSeparate
-    }
+    
+    data <- cppResult$data
     data <- data[!is.na(data$alternative), ]
-
+    if (designNumber != 3L) {
+        data <- data[, colnames(data) != "pValue"]
+    }
+    data$trialStop <- as.logical(data$trialStop)
     simulationResults$.data <- data
 
     return(simulationResults)

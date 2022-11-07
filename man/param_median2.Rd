@@ -4,7 +4,7 @@
 \alias{param_median2}
 \title{Parameter Description: Median (2)}
 \arguments{
-\item{median2}{The assumed median survival time in the reference group, there is no default.}
+\item{median2}{The assumed median survival time in the reference group, there is no default. Must be a positive numeric of length 1.}
 }
 \description{
 Parameter Description: Median (2)

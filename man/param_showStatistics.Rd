@@ -4,7 +4,7 @@
 \alias{param_showStatistics}
 \title{Parameter Description: Show Statistics}
 \arguments{
-\item{showStatistics}{If \code{TRUE}, summary statistics of the simulated data
+\item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default
 is \code{FALSE}.}
 }

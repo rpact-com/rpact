@@ -24,6 +24,9 @@ test_plan_section("Testing Result Object Print Output")
 
 
 test_that("The output does not contain any issues", {
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(sum(grepl("ISSUES", capture.output(getDesignGroupSequential()$show()))), 0)
 	expect_equal(sum(grepl("ISSUES", capture.output(getDesignInverseNormal(kMax = 4)$show()))), 0)
 	expect_equal(sum(grepl("ISSUES", capture.output(getDesignFisher()$show()))), 0)
@@ -38,7 +41,8 @@ test_plan_section("Testing Core Utility Functions")
 
 
 test_that("'getValidatedInformationRates': 'informationRates' must be generated correctly based on specified 'kMax'", {
-	.skipTestIfDisabled()
+	
+    .skipTestIfDisabled()
 
 	design1 <- getTestDesign(kMax = 1L, designClass = "TrialDesignGroupSequential")
 	expect_equal(.getValidatedInformationRates(design1), 1, tolerance = 1e-08)
@@ -1108,6 +1112,9 @@ test_plan_section("Testing Utilities")
 
 
 test_that("Testing '.moveValue'", {
+        
+    .skipTestIfDisabled()
+        
     expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "B"), c("A", "B", "E", "C", "D"))
     expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "A"), c("A", "E", "B", "C", "D"))
     expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "A", "E"), c("B", "C", "D", "E", "A"))
@@ -1117,6 +1124,9 @@ test_that("Testing '.moveValue'", {
 })
 
 test_that("Testing '.toCapitalized'", {
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(.toCapitalized("zip code"), "Zip Code")
 	expect_equal(.toCapitalized("state of the art"), "State of the Art")
 	expect_equal(.toCapitalized("final and count"), "Final and Count")
@@ -1124,7 +1134,9 @@ test_that("Testing '.toCapitalized'", {
 })
 
 test_that("Testing '.equalsRegexpIgnoreCase'", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(.equalsRegexpIgnoreCase("stage2", "^stages?$"), FALSE)
 	expect_equal(.equalsRegexpIgnoreCase("stage", "^stages?$"), TRUE)
 	expect_equal(.equalsRegexpIgnoreCase("stages", "^stages?$"), TRUE)
@@ -1139,7 +1151,9 @@ test_that("Testing '.equalsRegexpIgnoreCase'", {
 })
 
 test_that("Testing 'isUndefinedArgument' and 'isValidArgument'", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(.isUndefinedArgument(NULL), TRUE)
 	expect_equal(.isUndefinedArgument(numeric(0)), TRUE)
 	expect_equal(.isUndefinedArgument(NA), TRUE)
@@ -1167,15 +1181,12 @@ test_that("Testing 'isUndefinedArgument' and 'isValidArgument'", {
 	expect_error(.isDefinedArgument(notExistingTestVariable, argumentExistsValidationEnabled = FALSE))
 	expect_error(.isDefinedArgument(notExistingTestVariable))
 
-	# skip_if_translated()
-	# expect_error(.isDefinedArgument(notExistingTestVariable),
-	# 	paste0("Missing argument: the object 'notExistingTestVariable' has not been defined anywhere. ",
-	# 	"Please define it first, e.g., run 'notExistingTestVariable <- 1'"), fixed = TRUE)
-
 })
 
 test_that("Result of 'setSeed(seed)' is working for different arguments, incl. NULL and NA", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	expect_false(is.null(.setSeed()))
 	expect_false(is.na(.setSeed()))
@@ -1198,7 +1209,9 @@ test_that("Result of 'setSeed(seed)' is working for different arguments, incl. N
 })
 
 test_that("Testing '.getInputForZeroOutputInsideTolerance''", {
-
+        
+    .skipTestIfDisabled()
+        
 	input <- 99
 	tolerance <- 1e-05
 	epsilon <- 1e-08
@@ -1210,7 +1223,9 @@ test_that("Testing '.getInputForZeroOutputInsideTolerance''", {
 })
 
 test_that("Testing '.arrayToString'", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(.arrayToString(NA, vectorLookAndFeelEnabled = TRUE), "NA")
 	expect_equal(.arrayToString(NULL, vectorLookAndFeelEnabled = TRUE), "NULL")
 	expect_equal(.arrayToString(c(1, 2, 3), vectorLookAndFeelEnabled = TRUE), "c(1, 2, 3)")
@@ -1222,7 +1237,9 @@ test_that("Testing '.arrayToString'", {
 })
 
 test_that("Testing '.getQNorm'", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(sign(.getQNorm(1)), sign(qnorm(1)))
 	expect_equal(.getQNorm(1 - 1e-12), qnorm(1 - 1e-12))
 	expect_equal(sign(.getQNorm(0)), sign(qnorm(0)))
@@ -1231,7 +1248,9 @@ test_that("Testing '.getQNorm'", {
 })
 
 test_that("Testing '.getOneMinusQNorm'", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_equal(sign(.getOneMinusQNorm(1)), sign(1 - qnorm(1)))
 	expect_equal(.getOneMinusQNorm(1 - 1e-12), -qnorm(1 - 1e-12))
 	expect_equal(sign(.getOneMinusQNorm(0)), sign(1 - qnorm(0)))
@@ -1240,7 +1259,9 @@ test_that("Testing '.getOneMinusQNorm'", {
 })
 
 test_that("Testing '.getInputProducingZeroOutput'", {
-
+        
+    .skipTestIfDisabled()
+        
 	tolerance <- 1e-05
 	epsilon <- 1e-08
 

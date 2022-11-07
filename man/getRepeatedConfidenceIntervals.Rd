@@ -18,8 +18,8 @@ getRepeatedConfidenceIntervals(
 
 \item{dataInput}{The summary data used for calculating the test results. 
 This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival} 
-and should be created with the function \code{getDataset}.
-For more information see \code{\link{getDataset}}.}
+and should be created with the function \code{\link[=getDataset]{getDataset()}}.
+For more information see \code{\link[=getDataset]{getDataset()}}.}
 
 \item{...}{Further arguments to be passed to methods (cf. separate functions in "See Also" below), e.g.,
 \describe{
@@ -48,11 +48,11 @@ For more information see \code{\link{getDataset}}.}
     For survival data, only a stratified analysis is possible (see Brannath et al., 2009), default is \code{TRUE}.}
 }}
 
-\item{directionUpper}{Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative, 
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
-\item{tolerance}{The numerical tolerance, default is \code{1e-06}.}
+\item{tolerance}{The numerical tolerance, default is \code{1e-06}. Must be a positive numeric of length 1.}
 
 \item{stage}{The stage number (optional). Default: total number of existing stages in the data input.}
 }

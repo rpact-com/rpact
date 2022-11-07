@@ -4,7 +4,7 @@
 \alias{param_maxNumberOfIterations}
 \title{Parameter Description: Maximum Number Of Iterations}
 \arguments{
-\item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}.}
+\item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
 }
 \description{
 Parameter Description: Maximum Number Of Iterations

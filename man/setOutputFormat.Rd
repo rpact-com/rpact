@@ -53,7 +53,7 @@ With this function the format of the standard outputs of all \code{rpact}
 objects can be changed and set user defined respectively.
 }
 \details{
-Output formats can be written to a text file (see \code{\link{getOutputFormat}}).
+Output formats can be written to a text file (see \code{\link[=getOutputFormat]{getOutputFormat()}}).
 To load your personal output formats read a formerly saved file at the beginning of your
 work with \code{rpact}, e.g. execute \code{setOutputFormat(file = "my_rpact_output_formats.txt")}.
 

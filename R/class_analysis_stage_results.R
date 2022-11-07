@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6497 $
-## |  Last changed: $Date: 2022-08-17 13:32:36 +0200 (Wed, 17 Aug 2022) $
+## |  File version: $Revision: 6646 $
+## |  Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -27,18 +27,19 @@
 #' @description
 #' Basic class for stage results.
 #'
+#' @template field_stages
+#' @template field_testStatistics
+#' @template field_pValues 
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_effectSizes
+#' @field testActions The action drawn from test result.
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#'
 #' @details
 #' \code{StageResults} is the basic class for \code{StageResultsMeans},
 #' \code{StageResultsRates}, and \code{StageResultsSurvival}.
-#'
-#' @field testStatistics The stage-wise test statistics.
-#' @field pValues The stage-wise p-values.
-#' @field combInverseNormal The inverse normal test.
-#' @field combFisher The Fisher's combination test.
-#' @field effectSizes The effect sizes for different designs.
-#' @field testActions The action drawn from test result.
-#' @field weightsFisher The weights for Fisher's combination test.
-#' @field weightsInverseNormal The weights for inverse normal statistic.
 #'
 #' @include f_core_utilities.R
 #' @include class_core_parameter_set.R
@@ -243,18 +244,24 @@ StageResults <- setRefClass("StageResults",
 #' @description
 #' Class for stage results of means.
 #'
-#' @details
-#' This object cannot be created directly; use \code{getStageResults}
-#' with suitable arguments to create the stage results of a dataset of means.
-#'
-#' @field testStatistics The stage-wise test statistics.
-#' @field pValues The stage-wise p-values.
-#' @field combInverseNormal The inverse normal test.
-#' @field combFisher The Fisher's combination test.
-#' @field effectSizes The effect sizes for different designs.
+#' @template field_stages
+#' @template field_testStatistics
+#' @template field_overallTestStatistics
+#' @template field_pValues
+#' @template field_overallPValues
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_effectSizes
 #' @field testActions The action drawn from test result.
-#' @field weightsFisher The weights for Fisher's combination test.
-#' @field weightsInverseNormal The weights for inverse normal statistic.
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#' @template field_normalApproximation
+#' @field equalVariances Logical. Describes if variances are assumed equal between groups. 
+#'        Specified via \code{equalVariances} in \code{\link[=getStageResults]{getStageResults()}}, default is \code{TRUE}.
+#'
+#' @details
+#' This object cannot be created directly; use \code{\link[=getStageResults]{getStageResults()}}
+#' with suitable arguments to create the stage results of a dataset of means.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
@@ -483,19 +490,23 @@ StageResultsMultiArmMeans <- setRefClass("StageResultsMultiArmMeans",
 #'
 #' @description
 #' Class for stage results of rates.
+#' 
+#' @template field_stages
+#' @template field_testStatistics
+#' @template field_overallTestStatistics
+#' @template field_pValues
+#' @template field_overallPValues
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_effectSizes
+#' @field testActions The action drawn from test result.
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#' @template field_normalApproximation
 #'
 #' @details
-#' This object cannot be created directly; use \code{getStageResults}
+#' This object cannot be created directly; use \code{\link[=getStageResults]{getStageResults()}}
 #' with suitable arguments to create the stage results of a dataset of rates.
-#'
-#' @field testStatistics The stage-wise test statistics.
-#' @field pValues The stage-wise p-values.
-#' @field combInverseNormal The inverse normal test.
-#' @field combFisher The Fisher's combination test.
-#' @field effectSizes The effect sizes for different designs.
-#' @field testActions The action drawn from test result.
-#' @field weightsFisher The weights for Fisher's combination test.
-#' @field weightsInverseNormal The weights for inverse normal statistic.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
@@ -710,19 +721,23 @@ StageResultsMultiArmRates <- setRefClass("StageResultsMultiArmRates",
 #'
 #' @description
 #' Class for stage results survival data.
+#' 
+#' @template field_stages
+#' @template field_testStatistics
+#' @template field_overallTestStatistics
+#' @template field_pValues
+#' @template field_overallPValues
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_effectSizes
+#' @field testActions The action drawn from test result.
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#' @template field_normalApproximation
 #'
 #' @details
-#' This object cannot be created directly; use \code{getStageResults}
+#' This object cannot be created directly; use \code{\link[=getStageResults]{getStageResults()}}
 #' with suitable arguments to create the stage results of a dataset of survival data.
-#'
-#' @field testStatistics The stage-wise test statistics.
-#' @field pValues The stage-wise p-values.
-#' @field combInverseNormal The inverse normal test.
-#' @field combFisher The Fisher's combination test.
-#' @field effectSizes The effect sizes for different designs.
-#' @field testActions The action drawn from test result.
-#' @field weightsFisher The weights for Fisher's combination test.
-#' @field weightsInverseNormal The weights for inverse normal statistic.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
@@ -1089,7 +1104,8 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #' @description
 #' Plots the conditional power together with the likelihood function.
 #'
-#' @param x The stage results at given stage, obtained from \code{getStageResults} or \code{getAnalysisResults}.
+#' @param x The stage results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}} or 
+#'        \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
 #' @inheritParams param_stage
 #' @inheritParams param_nPlanned
@@ -1110,7 +1126,7 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #'       Additionally, if testing means was selected, an assumed standard deviation can be specified (default is 1).
 #' \item \code{piTreatmentRange}: A range of assumed rates pi1 to calculate the conditional power.
 #'       Additionally, if a two-sample comparison was selected, pi2 can be specified (default is the value from
-#'       \code{getAnalysisResults}).
+#'       \code{\link[=getAnalysisResults]{getAnalysisResults()}}).
 #' \item \code{directionUpper}: Specifies the direction of the alternative,
 #'       only applicable for one-sided testing; default is \code{TRUE}
 #'       which means that larger values of the test statistics yield smaller p-values.
@@ -1140,9 +1156,11 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #' )
 #'
 #' stageResults <- getStageResults(design, dataExample, thetaH0 = 20)
-#'
+#' 
+#' \donttest{
 #' if (require(ggplot2)) plot(stageResults, nPlanned = c(30), thetaRange = c(0, 100))
-#'
+#' }
+#' 
 #' @export
 #'
 plot.StageResults <- function(x, y, ..., type = 1L,

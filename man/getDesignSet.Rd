@@ -20,11 +20,11 @@ The following generics (R generic functions) are available for this result objec
 \itemize{
   \item \code{\link[=names.TrialDesignSet]{names}} to obtain the field names,
   \item \code{\link[=length.TrialDesignSet]{length}} to obtain the number of design,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.TrialDesignSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesignSet]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.TrialDesignSet]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{

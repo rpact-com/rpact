@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6524 $
-## |  Last changed: $Date: 2022-08-24 11:09:52 +0200 (Mi, 24 Aug 2022) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -33,7 +33,16 @@ NULL
 #' @description
 #' Basic class for trial designs.
 #' 
-#' @field kMax 
+#' @template field_kMax
+#' @template field_alpha
+#' @template field_stages
+#' @template field_informationRates
+#' @template field_userAlphaSpending
+#' @template field_criticalValues
+#' @template field_stageLevels
+#' @template field_alphaSpent
+#' @template field_bindingFutility
+#' @template field_tolerance
 #'
 #' @details
 #' \code{TrialDesign} is the basic class for
@@ -191,10 +200,10 @@ TrialDesign <- setRefClass("TrialDesign",
 #'
 #' @details
 #' \code{TrialDesignCharacteristics} contains all fields required to collect the characteristics of a design.
-#' This object should not be created directly; use \code{getDesignCharacteristics}
+#' This object should not be created directly; use \code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}}
 #' with suitable arguments to create it.
 #'
-#' @seealso \code{\link{getDesignCharacteristics}} for getting the design characteristics.
+#' @seealso \code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}} for getting the design characteristics.
 #'
 #' @include class_core_parameter_set.R
 #' @include f_core_constants.R
@@ -317,12 +326,31 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
 #'
 #' @description
 #' Trial design for Fisher's combination test.
+#' 
+#' @template field_kMax
+#' @template field_alpha
+#' @template field_stages
+#' @template field_informationRates
+#' @template field_userAlphaSpending
+#' @template field_criticalValues
+#' @template field_stageLevels
+#' @template field_alphaSpent
+#' @template field_bindingFutility
+#' @template field_tolerance
+#' @field method "equalAlpha", "fullAlpha", "noInteraction", or "userDefinedAlpha", default is "equalAlpha" (for details, see Wassmer, 1999)
+#' @field alpha0Vec Stopping for futility bounds for stage-wise p-values.
+#' @field scale Is a numeric vector of length \code{kMax}-1 that applies to Fisher's design with unequally spaced information rates.
+#' @field nonStochasticCurtailment Logical. If \code{TRUE}, the stopping rule is based on the phenomenon of non-stochastic curtailment rather than stochastic reasoning.
+#' @template field_sided
+#' @field simAlpha The observed alpha error, if simulations have been performed. Is a numeric vector of length 1.
+#' @template field_iterations
+#' @template field_seed
 #'
 #' @details
-#' This object should not be created directly; use \code{\link{getDesignFisher}}
+#' This object should not be created directly; use \code{\link[=getDesignFisher]{getDesignFisher()}}
 #' with suitable arguments to create a Fisher combination test design.
 #'
-#' @seealso \code{\link{getDesignFisher}} for creating a Fisher combination test design.
+#' @seealso \code{\link[=getDesignFisher]{getDesignFisher()}} for creating a Fisher combination test design.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -458,12 +486,43 @@ TrialDesignFisher <- setRefClass(C_CLASS_NAME_TRIAL_DESIGN_FISHER,
 #'
 #' @description
 #' Trial design for inverse normal method.
+#' 
+#' @template field_kMax
+#' @template field_alpha
+#' @template field_stages
+#' @template field_informationRates
+#' @template field_userAlphaSpending
+#' @template field_criticalValues
+#' @template field_stageLevels
+#' @template field_alphaSpent
+#' @template field_bindingFutility
+#' @template field_tolerance
+#' @template field_typeOfDesign
+#' @template field_beta
+#' @template field_deltaWT
+#' @template field_deltaPT1
+#' @template field_deltaPT0
+#' @template field_futilityBounds
+#' @template field_gammaA
+#' @template field_gammaB
+#' @template field_optimizationCriterion
+#' @template field_sided
+#' @template field_betaSpent
+#' @template field_typeBetaSpending
+#' @template field_userBetaSpending
+#' @template field_power
+#' @template field_twoSidedPower
+#' @template field_constantBoundsHP
+#' @template field_betaAdjustment
+#' @template field_delayedInformation
+#' @template field_decisionCriticalValues
+#' @template field_reversalProbabilities
 #'
 #' @details
-#' This object should not be created directly; use \code{\link{getDesignInverseNormal}}
+#' This object should not be created directly; use \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}}
 #' with suitable arguments to create a inverse normal design.
 #'
-#' @seealso \code{\link{getDesignInverseNormal}} for creating a inverse normal design.
+#' @seealso \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}} for creating a inverse normal design.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -752,12 +811,43 @@ TrialDesignInverseNormal <- setRefClass(C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL
 #'
 #' @description
 #' Trial design for group sequential design.
+#' 
+#' @template field_kMax
+#' @template field_alpha
+#' @template field_stages
+#' @template field_informationRates
+#' @template field_userAlphaSpending
+#' @template field_criticalValues
+#' @template field_stageLevels
+#' @template field_alphaSpent
+#' @template field_bindingFutility
+#' @template field_tolerance
+#' @template field_typeOfDesign
+#' @template field_beta
+#' @template field_deltaWT
+#' @template field_deltaPT1
+#' @template field_deltaPT0
+#' @template field_futilityBounds
+#' @template field_gammaA
+#' @template field_gammaB
+#' @template field_optimizationCriterion
+#' @template field_sided
+#' @template field_betaSpent
+#' @template field_typeBetaSpending
+#' @template field_userBetaSpending
+#' @template field_power
+#' @template field_twoSidedPower
+#' @template field_constantBoundsHP
+#' @template field_betaAdjustment
+#' @template field_delayedInformation
+#' @template field_decisionCriticalValues
+#' @template field_reversalProbabilities
 #'
 #' @details
-#' This object should not be created directly; use \code{\link{getDesignGroupSequential}}
+#' This object should not be created directly; use \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}}
 #' with suitable arguments to create a group sequential design.
 #'
-#' @seealso \code{\link{getDesignGroupSequential}} for creating a group sequential design.
+#' @seealso \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} for creating a group sequential design.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -791,11 +881,26 @@ TrialDesignGroupSequential <- setRefClass(
 #'
 #' @description
 #' Trial design for conditional Dunnett tests.
+#' 
+#' @template field_kMax
+#' @template field_alpha
+#' @template field_stages
+#' @template field_informationRates
+#' @template field_userAlphaSpending
+#' @template field_criticalValues
+#' @template field_stageLevels
+#' @template field_alphaSpent
+#' @template field_bindingFutility
+#' @template field_tolerance
+#' @template field_informationAtInterim 
+#' @field secondStageConditioning Logical. The way the second stage p-values are calculated within 
+#' the closed system of hypotheses. If secondStageConditioning = FALSE is specified, the unconditional adjusted p-values are used, 
+#' otherwise conditional adjusted p-values are calculated, default is secondStageConditioning = TRUE.
+#' @template field_sided
 #'
 #' @details
-#' This object should not be created directly.
-# This object should not be created directly; use \code{\link{getDesignConditionalDunnett}}
-# with suitable arguments to create a conditional Dunnett test design.
+#' This object should not be created directly; use \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}
+#' with suitable arguments to create a conditional Dunnett test design.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -805,7 +910,7 @@ TrialDesignGroupSequential <- setRefClass(
 #'
 #' @importFrom methods new
 #'
-#' @seealso \code{\link{getDesignConditionalDunnett}} for creating a conditional Dunnett test design.
+#' @seealso \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}} for creating a conditional Dunnett test design.
 
 TrialDesignConditionalDunnett <- setRefClass(
     C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT,
@@ -873,7 +978,8 @@ TrialDesignConditionalDunnett <- setRefClass(
 #' For performing the conditional Dunnett test the design must be defined through this function.
 #' You can define the information fraction and the way of how to compute the second stage
 #' p-values only in the design definition, and not in the analysis call.\cr
-#' See \code{\link{getClosedConditionalDunnettTestResults}} for an example and Koenig et al. (2008) and
+#' See \code{\link[=getClosedConditionalDunnettTestResults]{getClosedConditionalDunnettTestResults()}} 
+#' for an example and Koenig et al. (2008) and
 #' Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
 #'
 #' @template return_object_trial_design
@@ -905,9 +1011,9 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #' Generic function to plot a trial design.
 #'
 #' @param x The trial design, obtained from \cr
-#'        \code{\link{getDesignGroupSequential}}, \cr
-#'        \code{\link{getDesignInverseNormal}} or \cr
-#'        \code{\link{getDesignFisher}}.
+#'        \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}}, \cr
+#'        \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}} or \cr
+#'        \code{\link[=getDesignFisher]{getDesignFisher()}}.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
 #' @param main The main title.
 #' @param xlab The x-axis label.
@@ -939,11 +1045,13 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #'
 #' Note that \code{\link[=param_nMax]{nMax}} is not an argument that it passed to \code{ggplot2}.
 #' Rather, the underlying calculations (e.g. power for different theta's or average sample size) are based
-#' on calls to function \code{\link{getPowerAndAverageSampleNumber}} which has argument \code{\link[=param_nMax]{nMax}}.
-#' I.e., \code{\link[=param_nMax]{nMax}} is not an argument to ggplot2 but to \code{\link{getPowerAndAverageSampleNumber}}
+#' on calls to function \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}} 
+#' which has argument \code{\link[=param_nMax]{nMax}}.
+#' I.e., \code{\link[=param_nMax]{nMax}} is not an argument to ggplot2 but to 
+#' \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 #' which is called prior to plotting.
 #'
-#' @seealso \code{\link{plot.TrialDesignSet}} to compare different designs or design parameters visual.
+#' @seealso \code{\link[=plot.TrialDesignSet]{plot()}} to compare different designs or design parameters visual.
 #'
 #' @template return_object_ggplot
 #'

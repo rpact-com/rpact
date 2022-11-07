@@ -8,7 +8,7 @@
 A class for simulation results rates in multi-arm designs.
 }
 \details{
-Use \code{\link{getSimulationMultiArmRates}} to create an object of this type.
+Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}} to create an object of this type.
 }
 
 \keyword{internal}

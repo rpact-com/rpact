@@ -18,6 +18,6 @@ all the values and another column listing the context of the value, i.e.,
 the data for the different groups are in one column and the dataset contains an additional "group" column.
 }
 \seealso{
-\code{\link{getWideFormat}} for returning the dataset as a \code{\link[base]{data.frame}} in wide format.
+\code{\link[=getWideFormat]{getWideFormat()}} for returning the dataset as a \code{\link[base]{data.frame}} in wide format.
 }
 \keyword{internal}

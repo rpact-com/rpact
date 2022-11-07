@@ -4,7 +4,7 @@
 \alias{param_nMax}
 \title{Parameter Description: N_max}
 \arguments{
-\item{nMax}{The maximum sample size.}
+\item{nMax}{The maximum sample size. Must be a positive integer of length 1.}
 }
 \description{
 Parameter Description: N_max

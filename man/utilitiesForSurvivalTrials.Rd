@@ -50,5 +50,5 @@ Functions to convert pi, lambda and median values into each other.
 }
 \details{
 Can be used, e.g., to convert median values into pi or lambda values for usage in
-\code{\link{getSampleSizeSurvival}} or \code{\link{getPowerSurvival}}.
+\code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}} or \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
 }

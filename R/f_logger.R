@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -112,13 +112,13 @@
 #' @details
 #' This function sets the log level of the \code{rpact} internal log message system.
 #' By default only calculation progress messages will be shown on the output console,
-#' particularly \code{\link{getAnalysisResults}} shows this kind of messages.
+#' particularly \code{\link[=getAnalysisResults]{getAnalysisResults()}} shows this kind of messages.
 #' The output of these messages can be disabled by setting the log level to \code{"DISABLED"}.
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link{getLogLevel}} for getting the current log level,
-#'   \item \code{\link{resetLogLevel}} for resetting the log level to default.
+#'   \item \code{\link[=getLogLevel]{getLogLevel()}} for getting the current log level,
+#'   \item \code{\link[=resetLogLevel]{resetLogLevel()}} for resetting the log level to default.
 #' }
 #'
 #' @examples
@@ -178,8 +178,8 @@ setLogLevel <- function(logLevel = c(
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link{setLogLevel}} for setting the log level,
-#'   \item \code{\link{resetLogLevel}} for resetting the log level to default.
+#'   \item \code{\link[=setLogLevel]{setLogLevel()}} for setting the log level,
+#'   \item \code{\link[=resetLogLevel]{resetLogLevel()}} for resetting the log level to default.
 #' }
 #'
 #' @return Returns a \code{\link[base]{character}} of length 1 specifying the current log level.
@@ -214,8 +214,8 @@ getLogLevel <- function() {
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link{getLogLevel}} for getting the current log level,
-#'   \item \code{\link{setLogLevel}} for setting the log level.
+#'   \item \code{\link[=getLogLevel]{getLogLevel()}} for getting the current log level,
+#'   \item \code{\link[=setLogLevel]{setLogLevel()}} for setting the log level.
 #' }
 #'
 #' @examples

@@ -24,6 +24,7 @@ test_plan_section("Testing the Sample Size Calculation of Testing Means for Diff
 
 
 test_that("'getSampleSizeMeans': Sample size calculation of testing means for one sided group sequential design", {
+        
 	# @refFS[Formula]{fs:criticalValuesWangTiatis}
 	# @refFS[Formula]{fs:inflationFactor}
 	# @refFS[Formula]{fs:expectedReduction}
@@ -835,7 +836,9 @@ test_that("'getSampleSizeMeans': Sample size calculation of testing means for on
 })
 
 test_that("'getSampleSizeMeans': Sample size calculation of testing means for two sided group sequential design", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:criticalValuesWangTiatis}
 	# @refFS[Formula]{fs:inflationFactor}
 	# @refFS[Formula]{fs:expectedReduction}
@@ -1223,7 +1226,8 @@ test_plan_section("Testing the Sample Size Calculation of Testing Rates for Diff
 
 
 test_that("'getSampleSizeRates': Sample size calculation of testing rates for one sided group sequential design", {
-	designGS1 <- getDesignGroupSequential(informationRates = c(0.2, 0.5, 1), sided = 1, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.3)
+	
+    designGS1 <- getDesignGroupSequential(informationRates = c(0.2, 0.5, 1), sided = 1, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.3)
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeRates}
 	# @refFS[Formula]{fs:sampleSizeOneRateExactOnesidedLargerpi1}
@@ -2000,7 +2004,8 @@ test_plan_section("Testing the Sample Size Calculation of Survival Designs for D
 
 
 test_that("'getSampleSizeSurvival': Fixed sample size with minimum required definitions, pi1 = c(0.4, 0.5, 0.6) and pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default, only alpha = 0.01 is specified", {
-	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
+	
+    # @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:sampleSizeSurvivalSchoenfeld}
 	# @refFS[Formula]{fs:sampleSizeSurvivalPatientNumber}
 	# @refFS[Formula]{fs:sampleSizeSurvivalEventProbabilityNotAcccountForOberservationTimes}
@@ -4732,7 +4737,9 @@ test_that("'getSampleSizeSurvival': sample size calculation of survival data for
 })
 
 test_that("'getSampleSizeSurvival': sample size calculation of survival data for two sided group sequential design and typeOfComputation = 'Freedman'", {
-
+        
+    .skipTestIfDisabled()
+        
 	designGS2 <- getDesignGroupSequential(
 	    informationRates = c(0.2, 0.5, 1), alpha = 0.25,
 	    sided = 2, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.3
@@ -6237,7 +6244,8 @@ test_plan_section("Testing the Sample Size Calculation of Survival Designs for O
 
 
 test_that("'getSampleSizeSurvival': For fixed sample design, determine necessary accrual time if 200 subjects and 30 subjects per time unit can be recruited", {
-	.skipTestIfDisabled()
+	
+    .skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
@@ -6297,7 +6305,9 @@ test_that("'getSampleSizeSurvival': For fixed sample design, determine necessary
 })
 
 test_that("'getSampleSizeSurvival': Determine necessary accrual time if 200 subjects and if the first 6 time units 20 subjects per time unit can be recruited, then 30 subjects per time unit", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
 	# @refFS[Formula]{fs:sampleSizeSurvivalPatientNumber}
@@ -7672,7 +7682,9 @@ test_that("'getSampleSizeSurvival': follow-up time is equal for different argume
 })
 
 test_that("'getSampleSizeSurvival': testing expected warnings and errors", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_error(getSampleSizeSurvival(
 	    accrualTime = c(0, 6), accrualIntensity = c(22, 53),
 	    lambda2 = 0.02, lambda1 = c(0.01, 0.015), followUpTime = 5
@@ -7795,7 +7807,8 @@ test_plan_section("Testing Other Functions of the Sample Size Calculator for Sur
 
 
 test_that("'getEventProbabilities': check expected events over time for overall survival (case 1)", {
-	.skipTestIfDisabled()
+	
+    .skipTestIfDisabled()
 
 	design <- getDesignGroupSequential(
 	    sided = 1, alpha = 0.025, beta = 0.2,
@@ -8436,6 +8449,8 @@ test_that("'getSampleSizeSurvival': check calculations for fixed design with rel
 
 test_that("'.getLambdaStepFunctionByTime': return correct lambda for specified time and piecewise exponential bounds", {
 
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
 	# @refFS[Formula]{fs:pieceWiseExponentialRandomVariable}
 	lambda1 <- .getLambdaStepFunctionByTime(time = 1, c(6, 9, 15, 21), c(0.025, 0.04, 0.015, 0.01, 0.007))

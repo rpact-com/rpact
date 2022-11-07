@@ -50,7 +50,7 @@ Returns a \code{\link[base]{list}} of \code{\link{Dataset}} objects.
 Reads a data file and returns it as a list of dataset objects.
 }
 \details{
-Reads a file that was written by \code{\link{writeDatasets}} before.
+Reads a file that was written by \code{\link[=writeDatasets]{writeDatasets()}} before.
 }
 \examples{
 dataFile <- system.file("extdata", "datasets_rates.csv", package = "rpact")
@@ -61,8 +61,8 @@ if (dataFile != "") {
 }
 \seealso{
 \itemize{
-  \item \code{\link{readDataset}} for reading a single dataset,
-  \item \code{\link{writeDatasets}} for writing multiple datasets,
-  \item \code{\link{writeDataset}} for writing a single dataset.
+  \item \code{\link[=readDataset]{readDataset()}} for reading a single dataset,
+  \item \code{\link[=writeDatasets]{writeDatasets()}} for writing multiple datasets,
+  \item \code{\link[=writeDataset]{writeDataset()}} for writing a single dataset.
 }
 }

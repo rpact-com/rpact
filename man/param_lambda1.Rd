@@ -5,7 +5,7 @@
 \title{Parameter Description: Lambda (1)}
 \arguments{
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
-\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).}
+\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
 }
 \description{
 Parameter Description: Lambda (1)

@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_base_means.R
 ## |  Creation date: 12 August 2022, 09:04:36
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,7 +24,10 @@ test_plan_section("Testing the Analysis Means Functionality for One Treatment")
 
 
 test_that("'getAnalysisResults' for two-stage group sequential design and a dataset of one mean per stage (bindingFutility = FALSE)", {
-	dataExample <- getDataset(
+        
+    .skipTestIfDisabled()
+
+    dataExample <- getDataset(
 	    n = 120,
 	    means = 0.45,
 	    stDevs = 1.3
@@ -844,7 +847,8 @@ test_plan_section("Testing the Analysis Means Functionality for Two Treatments")
 
 
 test_that("'getAnalysisResults' for a Fisher design and a dataset of two means per stage", {
-	.skipTestIfDisabled()
+
+    .skipTestIfDisabled()
 
 	# note: if third stage value of means1 (4.5) increases, lower bound of RCI does not increase
 	design7 <- getDesignFisher(kMax = 4, informationRates = c(0.2, 0.5, 0.9, 1), alpha = 0.05, alpha0Vec = rep(0.4, 3))
@@ -1752,8 +1756,9 @@ test_plan_section("Testing 'getStageResults'")
 
 
 test_that("'getStageResults' for an inverse normal design and one or two treatments", {
-	# .skipTestIfDisabled()
-
+        
+    .skipTestIfDisabled()
+        
 	designInverseNormal <- getDesignInverseNormal(
 	    kMax = 4, alpha = 0.025, sided = 1,
 	    typeOfDesign = "WT",

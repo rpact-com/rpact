@@ -54,7 +54,7 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 \item{pi2}{A numeric value that represents the assumed probability in the reference group if two treatment 
 groups are considered, default is \code{0.2}.}
 
-\item{directionUpper}{Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative, 
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
@@ -68,12 +68,12 @@ design, default is \code{1}. For multi-arm designs, it is the allocation ratio r
 Returns a \code{\link{TrialDesignPlan}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.TrialDesignSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesignPlan]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesignPlan]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.TrialDesignPlan]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.TrialDesignPlan]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{

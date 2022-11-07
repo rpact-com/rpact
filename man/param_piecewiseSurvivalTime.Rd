@@ -6,7 +6,7 @@
 \arguments{
 \item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise 
 definition of the exponential survival time cumulative distribution function \cr
-(for details see \code{\link{getPiecewiseSurvivalTime}}).}
+(for details see \code{\link[=getPiecewiseSurvivalTime]{getPiecewiseSurvivalTime()}}).}
 }
 \description{
 Parameter Description: Piecewise Survival Time

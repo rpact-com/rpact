@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6517 $
-## |  Last changed: $Date: 2022-08-22 16:26:44 +0200 (Mo, 22 Aug 2022) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1709,12 +1709,12 @@ getDesignGroupSequential <- function(...,
 #' @return Returns a \code{\link{TrialDesignCharacteristics}} object.
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
-#'   \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-#'   \item \code{\link[=print.FieldSet]{print}} to print the object,
-#'   \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.ParameterSet]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.TrialDesignCharacteristics]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.TrialDesignCharacteristics]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'
@@ -2074,13 +2074,13 @@ getDesignCharacteristics <- function(design) {
 #' @return Returns a \code{\link{PowerAndAverageSampleNumberResult}} object.
 #' The following generics (R generic functions) are available for this result object:
 #' \itemize{
-#'   \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-#'   \item \code{\link[=print.FieldSet]{print}} to print the object,
-#'   \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-#'   \item \code{\link[=plot.ParameterSet]{plot}} to plot the object,
-#'   \item \code{\link[=as.data.frame.PowerAndAverageSampleNumberResult]{as.data.frame}}
+#'   \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.PowerAndAverageSampleNumberResult]{as.data.frame()}}
 #'         to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'

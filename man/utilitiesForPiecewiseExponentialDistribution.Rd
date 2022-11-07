@@ -74,9 +74,9 @@ Distribution function, quantile function and random number generation for the
 piecewise exponential distribution.
 }
 \details{
-\code{getPiecewiseExponentialDistribution} (short: \code{ppwexp}),
-\code{getPiecewiseExponentialQuantile} (short: \code{qpwexp}), and
-\code{getPiecewiseExponentialRandomNumbers} (short: \code{rpwexp}) provide
+\code{getPiecewiseExponentialDistribution()} (short: \code{ppwexp()}),
+\code{getPiecewiseExponentialQuantile()} (short: \code{qpwexp()}), and
+\code{getPiecewiseExponentialRandomNumbers()} (short: \code{rpwexp()}) provide
 probabilities, quantiles, and random numbers according to a piecewise
 exponential or a Weibull distribution.
 The piecewise definition is performed through a vector of

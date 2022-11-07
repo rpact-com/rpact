@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_simulation_enrichment_rates.R
 ## |  Creation date: 12 August 2022, 09:11:54
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,6 +24,10 @@ test_plan_section("Testing Simulation Enrichment Rates Function")
 
 
 test_that("'getSimulationEnrichmentRates': gMax = 2", {
+        
+    .skipTestIfDisabled()
+    .skipTestIfNotX64()
+        
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:subsec:intersectionTestsEnrichment}
@@ -105,8 +109,6 @@ test_that("'getSimulationEnrichmentRates': gMax = 2", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-	.skipTestIfDisabled()
-	.skipTestIfNotX64()
 
 	suppressWarnings(simResult2 <- getSimulationEnrichmentRates(design,
 	    plannedSubjects = c(150, 300), effectList = effectList,
@@ -267,7 +269,10 @@ test_that("'getSimulationEnrichmentRates': gMax = 2", {
 })
 
 test_that("'getSimulationEnrichmentRates': gMax = 3", {
-
+        
+    .skipTestIfDisabled()
+    .skipTestIfNotX64()
+        
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:subsec:intersectionTestsEnrichment}
@@ -285,8 +290,6 @@ test_that("'getSimulationEnrichmentRates': gMax = 3", {
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
 	# @refFS[Formula]{fs:simulatingEnrichmentEffectSpecification}
 	# @refFS[Formula]{fs:enrichmentRejectionRule}
-	.skipTestIfDisabled()
-	.skipTestIfNotX64()
 
 	piTreatments <- c(
 	    0.30, 0.40, 0.30, 0.55, 0.30, 0.40, 0.30, 0.75, 0.30, 0.40, 0.50, 0.55, 0.30, 0.40, 0.50,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6050 $
-## |  Last changed: $Date: 2022-04-22 10:21:18 +0200 (Fri, 22 Apr 2022) $
+## |  File version: $Revision: 6585 $
+## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -789,7 +789,7 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' Output formats can be written to a text file (see \code{\link{getOutputFormat}}).
+#' Output formats can be written to a text file (see \code{\link[=getOutputFormat]{getOutputFormat()}}).
 #' To load your personal output formats read a formerly saved file at the beginning of your
 #' work with \code{rpact}, e.g. execute \code{setOutputFormat(file = "my_rpact_output_formats.txt")}.
 #'
@@ -1008,7 +1008,7 @@ setOutputFormat <- function(parameterName = NA_character_, ...,
 #'
 #' @details
 #' Output formats can be written to a text file by specifying a \code{file}.
-#' See \code{\link{setOutputFormat}}() to learn how to read a formerly saved file.
+#' See \code{\link[=setOutputFormat]{setOutputFormat()}}() to learn how to read a formerly saved file.
 #'
 #' Note that the \code{parameterName} must not match exactly, e.g., for p-values the
 #' following parameter names will be recognized amongst others:

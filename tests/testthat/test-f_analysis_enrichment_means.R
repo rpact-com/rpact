@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_enrichment_means.R
 ## |  Creation date: 17 August 2022, 13:42:18
-## |  File version: $Revision: 6499 $
-## |  Last changed: $Date: 2022-08-17 13:50:08 +0200 (Wed, 17 Aug 2022) $
+## |  File version: $Revision: 6658 $
+## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,6 +24,9 @@ test_plan_section("Testing Analysis Enrichment Means Function (one sub-populatio
 
 
 test_that("'getAnalysisResults': select S1 at first IA, gMax = 2, inverse normal design", {
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISidakEnrichment}
@@ -616,7 +619,8 @@ test_plan_section("Testing Analysis Enrichment Means Function (two sub-populatio
 
 
 test_that("'getAnalysisResults': stratified analysis, select S1 at first IA, gMax = 3", {
-	.skipTestIfDisabled()
+	
+    .skipTestIfDisabled()
 
 	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
@@ -990,7 +994,8 @@ test_plan_section("Testing Analysis Enrichment Means Function (more sub-populati
 
 
 test_that("'getAnalysisResults': select S1 and S3 at first IA, select S1 at second, gMax = 4", {
-	.skipTestIfDisabled()
+	
+    .skipTestIfDisabled()
 
 	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
@@ -1313,7 +1318,8 @@ test_plan_section("Testing Analysis Enrichment Means Function (more sub-populati
 
 
 test_that("'getAnalysisResults': select S1 at first IA, gMax = 3, no early efficacy stop", {
-	.skipTestIfDisabled()
+	
+    .skipTestIfDisabled()
 
 	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}

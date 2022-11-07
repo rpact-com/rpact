@@ -8,7 +8,7 @@
 Class for analysis results results based on a group sequential design.
 }
 \details{
-This object cannot be created directly; use \code{\link{getAnalysisResults}}
+This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
 with suitable arguments to create the analysis results of a group sequential design.
 }
 

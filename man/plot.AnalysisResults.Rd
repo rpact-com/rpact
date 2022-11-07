@@ -23,7 +23,7 @@
 )
 }
 \arguments{
-\item{x}{The analysis results at given stage, obtained from \code{\link{getAnalysisResults}}.}
+\item{x}{The analysis results at given stage, obtained from \code{\link[=getAnalysisResults]{getAnalysisResults()}}.}
 
 \item{y}{Not available for this kind of plot (is only defined to be compatible to the generic plot function).}
 
@@ -34,7 +34,7 @@
       can be specified (default is \code{1}).
 \item \code{piTreatmentRange}: A range of assumed rates pi1 to calculate the conditional power.
       Additionally, if a two-sample comparison was selected, \code{pi2} can be specified (default is the value from
-      \code{getAnalysisResults}).
+      \code{\link[=getAnalysisResults]{getAnalysisResults()}}).
 \item \code{directionUpper}: Specifies the direction of the alternative,
       only applicable for one-sided testing; default is \code{TRUE}
       which means that larger values of the test statistics yield smaller p-values.
@@ -81,7 +81,7 @@ Choose one of the following values to specify the position manually:
   \item \code{6}: legend position right bottom
 }}
 
-\item{showSource}{If \code{TRUE}, the parameter names of the object will 
+\item{showSource}{Logical. If \code{TRUE}, the parameter names of the object will 
 be printed which were used to create the plot; that may be, e.g., 
 useful to check the values or to create own plots with the base R \code{plot} function.
 Alternatively \code{showSource} can be defined as one of the following character values: 
@@ -105,7 +105,7 @@ and a list of \code{ggplot} objects will be returned invisible.
 Note that one of the following packages must be installed to create a grid plot: 
 'ggpubr', 'gridExtra', or 'cowplot'.}
 
-\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link{getPlotSettings}}.}
+\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.}
 }
 \value{
 Returns a \code{ggplot2} object.

@@ -8,7 +8,7 @@
 A class for simulation results means in enrichment designs.
 }
 \details{
-Use \code{\link{getSimulationEnrichmentMeans}} to create an object of this type.
+Use \code{\link[=getSimulationEnrichmentMeans]{getSimulationEnrichmentMeans()}} to create an object of this type.
 }
 
 \keyword{internal}

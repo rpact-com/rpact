@@ -8,21 +8,22 @@
 Class for a dataset of means.
 }
 \details{
-This object cannot be created directly; better use \code{\link{getDataset}}
+This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
 with suitable arguments to create a dataset of means.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{groups}}{The group numbers.}
+\item{\code{groups}}{The group numbers. Is an integer vector of length number of stages times number of groups.}
 
-\item{\code{stages}}{The stage numbers.}
+\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
 
-\item{\code{sampleSizes}}{The sample sizes.}
+\item{\code{sampleSizes}}{The sample sizes for each group and stage.
+Is an integer vector of length number of stages times number of groups.}
 
-\item{\code{means}}{The means.}
+\item{\code{means}}{The means. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{stDevs}}{The standard deviations.}
+\item{\code{stDevs}}{The standard deviations. Is a numeric vector of length number of stages times number of groups.}
 }}
 
 

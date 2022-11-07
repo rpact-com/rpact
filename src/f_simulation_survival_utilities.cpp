@@ -14,14 +14,16 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6416 $
- * Last changed: $Date: 2022-07-15 09:24:06 +0200 (Fr, 15 Jul 2022) $
+ * File version: $Revision: 6617 $
+ * Last changed: $Date: 2022-10-18 13:06:16 +0200 (Di, 18 Okt 2022) $
  * Last changed by: $Author: pahlke $
  *
  */
 
-// [[Rcpp::plugins(cpp11)]]
 #include <Rcpp.h>
+
+// [[Rcpp::plugins(cpp11)]]
+
 #include "f_utilities.h"
 
 using namespace Rcpp;

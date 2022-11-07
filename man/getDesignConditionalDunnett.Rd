@@ -11,7 +11,7 @@ getDesignConditionalDunnett(
 )
 }
 \arguments{
-\item{alpha}{The significance level alpha, default is \code{0.025}.}
+\item{alpha}{The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.}
 
 \item{informationAtInterim}{The information to be expected at interim, default is \code{informationAtInterim = 0.5}.}
 
@@ -24,12 +24,12 @@ conditional adjusted p-values are calculated, default is \code{secondStageCondit
 Returns a \code{\link{TrialDesign}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesign]{plot}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesign]{as.data.frame}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix}} to coerce the object to a \code{\link[base]{matrix}}.
+  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+  \item \code{\link[=print.FieldSet]{print()}} to print the object,
+  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+  \item \code{\link[=plot.TrialDesign]{plot()}} to plot the object,
+  \item \code{\link[=as.data.frame.TrialDesign]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -39,7 +39,8 @@ Defines the design to perform an analysis with the conditional Dunnett test.
 For performing the conditional Dunnett test the design must be defined through this function.
 You can define the information fraction and the way of how to compute the second stage
 p-values only in the design definition, and not in the analysis call.\cr
-See \code{\link{getClosedConditionalDunnettTestResults}} for an example and Koenig et al. (2008) and
+See \code{\link[=getClosedConditionalDunnettTestResults]{getClosedConditionalDunnettTestResults()}} 
+for an example and Koenig et al. (2008) and
 Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
 }
 \section{How to get help for generic functions}{

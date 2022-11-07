@@ -63,7 +63,7 @@ A \code{\link[base]{character}} value or vector will be returned.
 Returns the R source command of a result object.
 }
 \details{
-\code{\link{getObjectRCode}} (short: \code{\link{rcmd}}) recreates
+\code{\link[=getObjectRCode]{getObjectRCode()}} (short: \code{\link[=rcmd]{rcmd()}}) recreates
 the R commands that result in the specified object \code{obj}.
 \code{obj} must be an instance of class \code{ParameterSet}.
 }

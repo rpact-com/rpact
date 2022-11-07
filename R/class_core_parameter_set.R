@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6519 $
-## |  Last changed: $Date: 2022-08-23 13:56:40 +0200 (Di, 23 Aug 2022) $
+## |  File version: $Revision: 6539 $
+## |  Last changed: $Date: 2022-08-30 15:17:09 +0200 (Tue, 30 Aug 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1468,6 +1468,14 @@ kable.ParameterSet <- function(x, ...) {
                 "Use ", sub("print", "kable", objName), " without 'print' instead or ", sub("\\)", ", markdown = TRUE)", objName)
             )
         }
+        
+        if (.isSimulationResults(x)) {
+            showStatistics <- .getOptionalArgument("showStatistics", optionalArgumentDefaultValue = FALSE, ...)
+            if (isTRUE(showStatistics)) {
+                return(print(x, markdown = TRUE, showStatistics = TRUE))
+            }
+        }
+        
         return(print(x, markdown = TRUE))
     }
 

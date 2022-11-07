@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6524 $
-## |  Last changed: $Date: 2022-08-24 11:09:52 +0200 (Mi, 24 Aug 2022) $
+## |  File version: $Revision: 6569 $
+## |  Last changed: $Date: 2022-09-09 08:37:10 +0200 (Fri, 09 Sep 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
 
@@ -1243,6 +1243,8 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
 	means = ".formatMeans",	
 	stDevs = ".formatStDevs",
 	stDev = ".formatStDevs",
+    thetaH0 = ".formatStDevs",
+    alternative = ".formatStDevs",
 	assumedStDev = ".formatStDevs",
 	assumedStDevs = ".formatStDevs",
 	overallAllocationRatios = ".formatRatios",
