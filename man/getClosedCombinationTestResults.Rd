@@ -13,12 +13,12 @@ getClosedCombinationTestResults(stageResults)
 Returns a \code{\link{ClosedCombinationTestResults}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -27,12 +27,12 @@ and population enrichment designs.
 }
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 
@@ -66,7 +66,6 @@ getClosedCombinationTestResults(stageResults)
 }
 \seealso{
 Other analysis functions: 
-\code{\link{getAnalysisResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalPower}()},
 \code{\link{getConditionalRejectionProbabilities}()},

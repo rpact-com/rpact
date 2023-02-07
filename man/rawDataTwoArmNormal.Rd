@@ -11,23 +11,25 @@ A \code{\link[base]{data.frame}} object.
 rawDataTwoArmNormal
 }
 \description{
-An artificial dataset that was randomly generated 
+An artificial dataset that was randomly generated
 with simulated normal data. The data set has six variables:
-
-1. Subject id
-2. Stage number
-3. Group name
-4. An example outcome in that we are interested in
-5. The first covariate *gender*
-6. The second covariate *covariate*
+\enumerate{
+\item Subject id
+\item Stage number
+\item Group name
+\item An example outcome in that we are interested in
+\item The first covariate \emph{gender}
+\item The second covariate \emph{covariate}
+}
 }
 \details{
-See the vignette "Two-arm analysis for continuous data with covariates from raw data" 
-to learn how to  
-
-* import raw data from a csv file, 
-* calculate estimated adjusted (marginal) means (EMMs, least-squares means) for a linear model, and 
-* perform two-arm interim analyses with these data.
+See the vignette "Two-arm analysis for continuous data with covariates from raw data"
+to learn how to
+\itemize{
+\item import raw data from a csv file,
+\item calculate estimated adjusted (marginal) means (EMMs, least-squares means) for a linear model, and
+\item perform two-arm interim analyses with these data.
+}
 
 You can use \code{rawDataTwoArmNormal} to reproduce the examples in the vignette.
 }

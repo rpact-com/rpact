@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6283 $
-## |  Last changed: $Date: 2022-06-10 09:49:35 +0200 (Fri, 10 Jun 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -516,7 +516,7 @@ PlotSettings <- setRefClass("PlotSettings",
             "Sets the legend border"
             p <- p + ggplot2::theme(
                 legend.background =
-                    ggplot2::element_rect(fill = "white", colour = "black", size = scaleSize(0.4))
+                    ggplot2::element_rect(fill = "white", colour = "black", linewidth = scaleSize(0.4))
             )
             return(p)
         },

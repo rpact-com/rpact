@@ -4,19 +4,19 @@
 \alias{param_legendPosition}
 \title{Parameter Description: Legend Position On Plots}
 \arguments{
-\item{legendPosition}{The position of the legend. 
-By default (\code{NA_integer_}) the algorithm tries to find a suitable position. 
+\item{legendPosition}{The position of the legend.
+By default (\code{NA_integer_}) the algorithm tries to find a suitable position.
 Choose one of the following values to specify the position manually:
 \itemize{
-  \item \code{-1}: no legend will be shown
-  \item \code{NA}: the algorithm tries to find a suitable position
-  \item \code{0}: legend position outside plot
-  \item \code{1}: legend position left top
-  \item \code{2}: legend position left center
-  \item \code{3}: legend position left bottom
-  \item \code{4}: legend position right top
-  \item \code{5}: legend position right center
-  \item \code{6}: legend position right bottom
+\item \code{-1}: no legend will be shown
+\item \code{NA}: the algorithm tries to find a suitable position
+\item \code{0}: legend position outside plot
+\item \code{1}: legend position left top
+\item \code{2}: legend position left center
+\item \code{3}: legend position left bottom
+\item \code{4}: legend position right top
+\item \code{5}: legend position right center
+\item \code{6}: legend position right bottom
 }}
 }
 \description{

@@ -14,9 +14,9 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6646 $
- * Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
- * Last changed by: $Author: pahlke $
+ * File version: $Revision: 6721 $
+ * Last changed: $Date: 2022-12-13 15:30:21 +0100 (Di, 13 Dez 2022) $
+ * Last changed by: $Author: wassmer $
  *
  */
 #include <Rcpp.h>
@@ -514,12 +514,17 @@ double getZeroApproximation(NumericMatrix probs, double alpha, int sided) {
 
 // [[Rcpp::export]]
 double getSpendingValueCpp(double alpha, double x, double sided, String typeOfDesign, double gamma) {
+    
     if (typeOfDesign == C_TYPE_OF_DESIGN_AS_P || typeOfDesign == C_TYPE_OF_DESIGN_BS_P) {
         return alpha * log(1 + (exp(1) - 1) * x);
     }
 
-    if (typeOfDesign == C_TYPE_OF_DESIGN_AS_OF || typeOfDesign == C_TYPE_OF_DESIGN_BS_OF) {
-        return 2 * sided * (1 - R::pnorm(getOneMinusQNorm(alpha / (2 * sided)) / sqrt(x), 0, 1, 1, 0));
+    if (typeOfDesign == C_TYPE_OF_DESIGN_AS_OF) {
+        return 2 * sided * (getOneMinusPNorm(getOneMinusQNorm(alpha / (2 * sided)) / sqrt(x)));
+    }
+    
+    if (typeOfDesign == C_TYPE_OF_DESIGN_BS_OF) {
+        return 2 * (getOneMinusPNorm(getOneMinusQNorm(alpha / 2) / sqrt(x)));
     }
 
     if (typeOfDesign == C_TYPE_OF_DESIGN_AS_KD || typeOfDesign == C_TYPE_OF_DESIGN_BS_KD) {

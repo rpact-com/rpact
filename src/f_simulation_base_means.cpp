@@ -26,20 +26,28 @@
 
 #include <cmath>
 #include "f_utilities.h"
+#include "rpact_types.h"
+
 using namespace Rcpp;
 
-List getTestStatisticsMeans(double designNumber, NumericVector informationRates,
-		double groups, bool normalApproximation,
-		bool meanRatio, double thetaH0, double allocationRatioPlanned,
-		NumericVector sampleSizesPerStage, NumericVector testStatisticsPerStage) {
+NumericVector getTestStatisticsMeans(
+		double designNumber,
+		NumericVector informationRates,
+		int groups,
+		bool normalApproximation,
+		bool meanRatio,
+		double thetaH0,
+		NumericVector allocationRatioPlanned,
+		NumericVector sampleSizesPerStage,
+		NumericVector testStatisticsPerStage) {
 
-	NumericVector pValuesSeparate, standardizedEffectEstimate;
+	NumericVector pValuesSeparate = NumericVector(testStatisticsPerStage.size(), NA_REAL);
 	double value = 1;
 	int stage = sampleSizesPerStage.length();
 	double overallTestStatistic = vectorProduct(sqrt(sampleSizesPerStage), testStatisticsPerStage) /
 			sqrt(sum(sampleSizesPerStage));
 	if (normalApproximation) {
-		pValuesSeparate = 1.0 - pnorm(testStatisticsPerStage);
+		pValuesSeparate = 1.0 - Rcpp::pnorm(testStatisticsPerStage);
 	} else {
 		for (int i = 0; i < pValuesSeparate.length(); ++i) {
 			double df = sampleSizesPerStage[i] - groups;
@@ -106,164 +114,61 @@ List getTestStatisticsMeans(double designNumber, NumericVector informationRates,
 		}
 	}
 
+	double standardizedEffectEstimate;
 	if (groups == 1) {
 		standardizedEffectEstimate = overallTestStatistic / sqrt(sum(sampleSizesPerStage));
 	} else {
-		if (!meanRatio) {
-			standardizedEffectEstimate = overallTestStatistic /
-					sqrt(allocationRatioPlanned * sum(sampleSizesPerStage)) *
-					(1 + allocationRatioPlanned);
-		} else {
-			standardizedEffectEstimate = overallTestStatistic /
-					sqrt(allocationRatioPlanned * sum(sampleSizesPerStage)) *
-					sqrt((1 + allocationRatioPlanned) *
-							(1 + pow(thetaH0, 2) * allocationRatioPlanned));
-		}
+		NumericVector allocationRatios = rangeVector(allocationRatioPlanned, 0, stage - 1);
+		double numerator = !meanRatio ? 1 : pow(thetaH0, 2);
+		standardizedEffectEstimate = overallTestStatistic *
+			sqrt(1 / sum(allocationRatios / (1 + allocationRatios) * sampleSizesPerStage) +
+				numerator / sum(1 / (1 + allocationRatios) * sampleSizesPerStage));
 	}
 
-	return List::create(
-		_["value"] = value,
-		_["overallTestStatistic"] = overallTestStatistic,
-		_["standardizedEffectEstimate"] = standardizedEffectEstimate,
-		_["pValuesSeparate"] = pValuesSeparate
-	);
+	NumericVector result = NumericVector(3 + pValuesSeparate.size(), NA_REAL);
+	result[0] = value;
+	result[1] = overallTestStatistic;
+	result[2] = standardizedEffectEstimate;
+	for (int i = 0; i < pValuesSeparate.size(); i++) {
+		result[3 + i] = pValuesSeparate[i];
+	}
+	return result;
 }
 
-double getSimulationMeansStageSubjects(double stage,
-		bool meanRatio, double thetaH0, double groups, NumericVector plannedSubjects,
-		double allocationRatioPlanned,
+double getSimulationMeansStageSubjects(
+		int stage,
+		bool meanRatio,
+		double thetaH0,
+		int groups,
+		NumericVector plannedSubjects,
+		NumericVector allocationRatioPlanned,
 		NumericVector minNumberOfSubjectsPerStage,
 		NumericVector maxNumberOfSubjectsPerStage,
+		NumericVector sampleSizesPerStage,
 		double thetaH1,
 		double stDevH1,
-		NumericVector conditionalPower,
+		double conditionalPower,
 		double conditionalCriticalValue) {
 
-	if (NumericVector::is_na((double) conditionalPower[0])) {
+	if (R_IsNA(conditionalPower)) {
 		return plannedSubjects[stage - 1] - plannedSubjects[stage - 2];
 	}
+
 	double thetaStandardized = thetaH1 / stDevH1;
 
 	double mult = 1;
 	if (groups == 2) {
+		double allocationRatio = allocationRatioPlanned[stage - 1];
 		thetaH0 = meanRatio ? thetaH0 : 1;
-		mult = 1.0 + 1.0 / allocationRatioPlanned + pow(thetaH0, 2) * (1.0 + allocationRatioPlanned);
+		mult = 1.0 + 1.0 / allocationRatio + pow(thetaH0, 2) * (1.0 + allocationRatio);
 	}
 
-	double stageSubjects = pow(std::max(0.0, conditionalCriticalValue + getQNorm((double) conditionalPower[0])), 2) *
+	double stageSubjects = pow(std::max(0.0, conditionalCriticalValue + getQNorm(conditionalPower)), 2) *
 			mult / pow(std::max(1e-12, thetaStandardized), 2);
 
-	stageSubjects = std::min(
-			std::max(minNumberOfSubjectsPerStage[stage - 1], stageSubjects),
-			maxNumberOfSubjectsPerStage[stage - 1]);
-
-	return stageSubjects;
-}
-
-List getInitialSimulationStepMeans(
-		int k,
-		double kMax,
-		double designNumber,
-		NumericVector informationRates,
-		NumericVector futilityBounds,
-		NumericVector alpha0Vec,
-		NumericVector criticalValues,
-		bool meanRatio,
-		double thetaH0,
-		double alternative,
-		double stDev,
-		double groups,
-		bool normalApproximation,
-		NumericVector plannedSubjects,
-		bool directionUpper,
-		double allocationRatioPlanned,
-		NumericVector minNumberOfSubjectsPerStage,
-		NumericVector maxNumberOfSubjectsPerStage,
-		NumericVector conditionalPower,
-		double thetaH1,
-		double stDevH1) {
-
-	double nz, simulatedConditionalPower, testResult;
-	double stageSubjects = plannedSubjects[0];
-	if (groups == 1) {
-		nz = (alternative - thetaH0) / stDev * sqrt(stageSubjects);
-		if (normalApproximation) {
-			testResult = (2 * directionUpper - 1) * R::rnorm(nz, 1);
-		} else {
-			testResult = (2 * directionUpper - 1) *
-				getRandomTDistribution(stageSubjects - 1, nz);
-		}
-	} else {
-		if (!meanRatio) {
-			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatioPlanned * stageSubjects) /
-					(1 + allocationRatioPlanned);
-		} else {
-			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatioPlanned * stageSubjects) /
-					sqrt((1 + allocationRatioPlanned) * (1 + pow(thetaH0,2) * allocationRatioPlanned));
-		}
-		if (normalApproximation) {
-			testResult = (2 * directionUpper - 1) * R::rnorm(nz, 1);
-		} else {
-			testResult = (2 * directionUpper - 1) *
-				getRandomTDistribution(stageSubjects - 2, nz);
-		}
-	}
-
-	NumericVector sampleSizesPerStage = NumericVector::create(stageSubjects);
-	NumericVector testStatisticsPerStage = NumericVector::create(testResult);
-	List testStatistic = getTestStatisticsMeans(designNumber, informationRates, groups,
-			normalApproximation, meanRatio,
-			thetaH0, allocationRatioPlanned, sampleSizesPerStage,
-			testStatisticsPerStage);
-
-	double effectEstimate = (double) testStatistic["standardizedEffectEstimate"] * stDev;
-
-	double simulatedRejections = 0;
-	double simulatedFutilityStop = 0;
-	bool trialStop = false;
-	if (k == kMax) {
-		trialStop = true;
-	}
-	if (designNumber == 3L) {
-		if (!R_IsNA((double) testStatistic["value"]) && !R_IsNA((double) criticalValues[k - 1]) &&
-				(double) testStatistic["value"] <= criticalValues[k - 1]) {
-			simulatedRejections = 1;
-			trialStop = true;
-		}
-		NumericVector testStatisticPValuesSeparate = testStatistic["pValuesSeparate"];
-		if (!R_IsNA((double) testStatisticPValuesSeparate[k - 1]) && !R_IsNA((double) alpha0Vec[k - 1]) &&
-				k < kMax && (double) testStatisticPValuesSeparate[k - 1] >= alpha0Vec[k - 1]) {
-			simulatedFutilityStop = 1;
-			trialStop = true;
-		}
-	} else {
-		if (!R_IsNA((double) testStatistic["value"]) && !R_IsNA((double) criticalValues[k - 1]) &&
-				(double) testStatistic["value"] >= criticalValues[k - 1]) {
-			simulatedRejections = 1;
-			trialStop = true;
-		}
-		if (!R_IsNA((double) testStatistic["value"]) && !R_IsNA((double) futilityBounds[k - 1]) &&
-				k < kMax && (double) testStatistic["value"] <= futilityBounds[k - 1]) {
-			simulatedFutilityStop = 1;
-			trialStop = true;
-		}
-	}
-
-	if (!directionUpper) {
-		effectEstimate = -effectEstimate;
-	}
-
-	return List::create(
-		_["trialStop"] = trialStop,
-		_["sampleSizesPerStage"] = sampleSizesPerStage,
-		_["testStatisticsPerStage"] = testStatisticsPerStage,
-		_["testStatistic"] = testStatistic,
-		_["effectEstimate"] = effectEstimate,
-		_["simulatedSubjects"] = stageSubjects,
-		_["simulatedRejections"] = simulatedRejections,
-		_["simulatedFutilityStop"] = simulatedFutilityStop,
-		_["simulatedConditionalPower"] = simulatedConditionalPower
-	);
+	return std::min(
+		std::max((double) minNumberOfSubjectsPerStage[stage - 1], stageSubjects),
+		(double) maxNumberOfSubjectsPerStage[stage - 1]);
 }
 
 List getSimulationStepMeans(
@@ -278,27 +183,34 @@ List getSimulationStepMeans(
 		double thetaH0,
 		double alternative,
 		double stDev,
-		double groups,
+		int groups,
 		bool normalApproximation,
 		NumericVector plannedSubjects,
 		bool directionUpper,
-		double allocationRatioPlanned,
+		NumericVector allocationRatioPlanned,
 		NumericVector minNumberOfSubjectsPerStage,
 		NumericVector maxNumberOfSubjectsPerStage,
-		NumericVector conditionalPower,
+		double conditionalPower,
 		double thetaH1,
 		double stDevH1,
 		double effectEstimate,
 		NumericVector sampleSizesPerStage,
 		NumericVector testStatisticsPerStage,
-		List testStatistic) {
+		NumericVector testStatistic,
+		int calcSubjectsFunctionType,
+		Nullable<Function> calcSubjectsFunctionR,
+		Rcpp::XPtr<calcSubjectsFunctionMeansPtr> calcSubjectsFunctionCppXPtr) {
 
 	double nz, testResult, thetaStandardized, simulatedConditionalPower, conditionalCriticalValue;
 	double stageSubjects = plannedSubjects[0];
+	double testStatisticValue;
+	double criticalValue = criticalValues[k - 1];
 
 	// perform sample size size recalculation for stages 2, ..., kMax
 	simulatedConditionalPower = 0;
 	if (k > 1) {
+
+		testStatisticValue = testStatistic[0]; // value
 
 		// used effect size is either estimated from test statistic or pre-fixed
 		if (R_IsNA(thetaH1)) {
@@ -312,38 +224,69 @@ List getSimulationStepMeans(
 			thetaH1 = -thetaH1;
 			thetaStandardized = -thetaStandardized;
 		}
+
 		// conditional critical value to reject the null hypotheses at the next stage of the trial
 		if (designNumber == 3L) {
-			conditionalCriticalValue = getOneMinusQNorm(pow((double) criticalValues[k - 1] /
-					(double) testStatistic["value"],
+			conditionalCriticalValue = getOneMinusQNorm(pow(criticalValue /
+					testStatisticValue,
 					1.0 / sqrt((double) (informationRates[k - 1] -
 							informationRates[k - 2]) / informationRates[0])));
 		} else {
-			conditionalCriticalValue = (criticalValues[k - 1] *
+			conditionalCriticalValue = (criticalValue *
 					sqrt((double) informationRates[k - 1]) -
-					(double) testStatistic["value"] * sqrt((double) informationRates[k - 2])) /
+					testStatisticValue * sqrt((double) informationRates[k - 2])) /
 							sqrt((double) informationRates[k - 1] - informationRates[k - 2]);
 		}
 
-		stageSubjects = getSimulationMeansStageSubjects(k, meanRatio, thetaH0, groups, plannedSubjects,
+		if (calcSubjectsFunctionType == 1 && calcSubjectsFunctionR.isNotNull()) {
+			stageSubjects = Rf_asReal(
+				as<Function>(calcSubjectsFunctionR)(
+					_["stage"] = k,
+					_["meanRatio"] = meanRatio,
+					_["thetaH0"] = thetaH0,
+					_["groups"] = groups,
+					_["plannedSubjects"] = plannedSubjects,
+					_["sampleSizesPerStage"] = sampleSizesPerStage,
+					_["allocationRatioPlanned"] = allocationRatioPlanned,
+					_["minNumberOfSubjectsPerStage"] = minNumberOfSubjectsPerStage,
+					_["maxNumberOfSubjectsPerStage"] = maxNumberOfSubjectsPerStage,
+					_["conditionalPower"] = conditionalPower,
+					_["thetaH1"] = thetaH1,
+					_["stDevH1"] = stDevH1,
+					_["conditionalCriticalValue"] = conditionalCriticalValue));
+		} else {
+			calcSubjectsFunctionMeansPtr fun = *calcSubjectsFunctionCppXPtr;
+			stageSubjects = fun(
+				k,
+				meanRatio,
+				thetaH0,
+				groups,
+				plannedSubjects,
 				allocationRatioPlanned,
-				minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage,
-				thetaH1, stDevH1, conditionalPower,
+				minNumberOfSubjectsPerStage,
+				maxNumberOfSubjectsPerStage,
+				sampleSizesPerStage,
+				thetaH1,
+				stDevH1,
+				conditionalPower,
 				conditionalCriticalValue);
+		}
 
 		// calculate conditional power for computed stageSubjects
-		if (groups == 2.0) {
+		if (groups == 2) {
+			double allocationRatio = allocationRatioPlanned[k - 1];
 			if (!meanRatio) {
-				thetaStandardized = thetaStandardized * sqrt((double) allocationRatioPlanned) / (1.0 + allocationRatioPlanned);
+				thetaStandardized = thetaStandardized * sqrt(allocationRatio) / (1.0 + allocationRatio);
 			} else {
-				thetaStandardized = thetaStandardized * sqrt(allocationRatioPlanned) /
-						sqrt((1.0 + allocationRatioPlanned) * (1.0 + thetaH0 * allocationRatioPlanned));
+				thetaStandardized = thetaStandardized * sqrt(allocationRatio) /
+						sqrt((1.0 + allocationRatio) * (1.0 + thetaH0 * allocationRatio));
 			}
 		}
-		simulatedConditionalPower = 1 - R::pnorm(conditionalCriticalValue - thetaStandardized * sqrt(stageSubjects),0,1,1,0);
+		simulatedConditionalPower = getOneMinusPNorm(conditionalCriticalValue -
+			thetaStandardized * sqrt(stageSubjects));
 	}
 
-	if (groups == 1.0) {
+	if (groups == 1) {
 		nz = (alternative - thetaH0) / stDev * sqrt(stageSubjects);
 		if (normalApproximation) {
 			testResult = (2.0 * directionUpper - 1.0) * R::rnorm(nz, 1.0);
@@ -352,12 +295,13 @@ List getSimulationStepMeans(
 				getRandomTDistribution(stageSubjects - 1, nz);
 		}
 	} else {
+		double allocationRatio = allocationRatioPlanned[k - 1];
 		if (!meanRatio) {
-			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatioPlanned * stageSubjects) /
-					(1 + allocationRatioPlanned);
+			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatio * stageSubjects) /
+					(1 + allocationRatio);
 		} else {
-			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatioPlanned * stageSubjects) /
-					sqrt((1 + allocationRatioPlanned) * (1 + pow(thetaH0,2) * allocationRatioPlanned));
+			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatio * stageSubjects) /
+					sqrt((1 + allocationRatio) * (1 + pow(thetaH0,2) * allocationRatio));
 		}
 		if (normalApproximation) {
 			testResult = (2.0 * directionUpper - 1.0) * R::rnorm(nz, 1.0);
@@ -367,14 +311,19 @@ List getSimulationStepMeans(
 		}
 	}
 
-	sampleSizesPerStage.push_back(stageSubjects);
-	testStatisticsPerStage.push_back(testResult);
+	if (k > 1) {
+		sampleSizesPerStage.push_back(stageSubjects);
+		testStatisticsPerStage.push_back(testResult);
+	} else {
+		sampleSizesPerStage = NumericVector::create(stageSubjects);
+		testStatisticsPerStage = NumericVector::create(testResult);
+	}
 	testStatistic = getTestStatisticsMeans(designNumber, informationRates, groups,
 			normalApproximation, meanRatio,
 			thetaH0, allocationRatioPlanned, sampleSizesPerStage,
 			testStatisticsPerStage);
-
-	effectEstimate = (double) testStatistic["standardizedEffectEstimate"] * stDev;
+	testStatisticValue = testStatistic[0]; // value
+	effectEstimate = testStatistic[2] * stDev; // standardizedEffectEstimate
 
 	double simulatedRejections = 0;
 	double simulatedFutilityStop = 0;
@@ -383,33 +332,36 @@ List getSimulationStepMeans(
 		trialStop = true;
 	}
 	if (designNumber == 3L) {
-		if (!R_IsNA((double) testStatistic["value"]) && !R_IsNA((double) criticalValues[k - 1]) &&
-				(double) testStatistic["value"] <= criticalValues[k - 1]) {
+		if (!R_IsNA(testStatisticValue) && !R_IsNA(criticalValue) && testStatisticValue <= criticalValue) {
 			simulatedRejections = 1;
 			trialStop = true;
 		}
-		NumericVector testStatisticPValuesSeparate = testStatistic["pValuesSeparate"];
-		if (!R_IsNA((double) testStatisticPValuesSeparate[k - 1]) && !R_IsNA((double) alpha0Vec[k - 1]) &&
-				k < kMax && (double) testStatisticPValuesSeparate[k - 1] >= alpha0Vec[k - 1]) {
-			simulatedFutilityStop = 1;
-			trialStop = true;
+		double testStatisticPValueSeparate = testStatistic[3 + k - 1]; // pValuesSeparate
+		if (k < kMax && !R_IsNA(testStatisticPValueSeparate)) {
+			double alpha0 = alpha0Vec[k - 1];
+			if (!R_IsNA(alpha0) && testStatisticPValueSeparate >= alpha0) {
+				simulatedFutilityStop = 1;
+				trialStop = true;
+			}
 		}
 	} else {
-		if (!R_IsNA((double) testStatistic["value"]) && !R_IsNA((double) criticalValues[k - 1]) &&
-				(double) testStatistic["value"] >= criticalValues[k - 1]) {
+		if (!R_IsNA(testStatisticValue) && !R_IsNA(criticalValue) && testStatisticValue >= criticalValue) {
 			simulatedRejections = 1;
 			trialStop = true;
 		}
-		if (!R_IsNA((double) testStatistic["value"]) && !R_IsNA((double) futilityBounds[k - 1]) &&
-				k < kMax && (double) testStatistic["value"] <= futilityBounds[k - 1]) {
-			simulatedFutilityStop = 1;
-			trialStop = true;
+		if (k < kMax && !R_IsNA(testStatisticValue)) {
+			double futilityBound = futilityBounds[k - 1];
+			if (!R_IsNA(futilityBound) && testStatisticValue <= futilityBound) {
+				simulatedFutilityStop = 1;
+				trialStop = true;
+			}
 		}
 	}
 
 	if (!directionUpper) {
 		effectEstimate = -effectEstimate;
 	}
+
 	return List::create(
 		_["trialStop"] = trialStop,
 		_["sampleSizesPerStage"] = sampleSizesPerStage,
@@ -421,6 +373,10 @@ List getSimulationStepMeans(
 		_["simulatedFutilityStop"] = simulatedFutilityStop,
 		_["simulatedConditionalPower"] = simulatedConditionalPower
 	);
+}
+
+Rcpp::XPtr<calcSubjectsFunctionMeansPtr> getSimulationMeansStageSubjectsXPtr() {
+  return Rcpp::XPtr<calcSubjectsFunctionMeansPtr>(new calcSubjectsFunctionMeansPtr(&getSimulationMeansStageSubjects));
 }
 
 // [[Rcpp::export]]
@@ -436,17 +392,28 @@ List getSimulationMeansLoopCpp(
 		bool meanRatio,
 		double thetaH0,
 		double stDev,
-		double groups,
+		int groups,
 		bool normalApproximation,
 		NumericVector plannedSubjects,
 		bool directionUpper,
-		double allocationRatioPlanned,
+		NumericVector allocationRatioPlanned,
 		NumericVector minNumberOfSubjectsPerStage,
 		NumericVector maxNumberOfSubjectsPerStage,
-		NumericVector conditionalPower,
+		double conditionalPower,
 		double thetaH1,
 		double stDevH1,
-		Function calcSubjectsFunction) {
+		int calcSubjectsFunctionType,
+		Nullable<Function> calcSubjectsFunctionR,
+		SEXP calcSubjectsFunctionCpp) {
+
+	Rcpp::XPtr<calcSubjectsFunctionMeansPtr> calcSubjectsFunctionCppXPtr = getSimulationMeansStageSubjectsXPtr();
+	if (calcSubjectsFunctionType == 0) {
+		calcSubjectsFunctionR = NULL;
+	}
+	else if (calcSubjectsFunctionType == 2) {
+		calcSubjectsFunctionR = NULL;
+		calcSubjectsFunctionCppXPtr = Rcpp::XPtr<calcSubjectsFunctionMeansPtr>(calcSubjectsFunctionCpp);
+	}
 
     int cols = alternative.length();
 
@@ -486,113 +453,102 @@ List getSimulationMeansLoopCpp(
 	NumericVector dataEffectEstimate = NumericVector(len, NA_REAL);
 	NumericVector dataPValuesSeparate = NumericVector(len, NA_REAL);
 
+	bool trialStop;
+	List stepResult;
+	double effectEstimate;
+
+	double simulatedSubjectsStep;
+	double simulatedRejectionsStep;
+	double simulatedFutilityStopStep;
+	double simulatedConditionalPowerStep;
+
+	NumericVector testStatistic;
+	NumericVector sampleSizesPerStage;
+	NumericVector testStatisticsPerStage;
+
 	double index = 1;
 	for (int i = 1; i <= alternative.length(); i++) {
-		NumericVector simulatedSubjects (kMax);
-		NumericVector simulatedRejections (kMax);
-		NumericVector simulatedFutilityStop (kMax - 1);
-		NumericVector simulatedConditionalPower (kMax);
+		NumericVector simulatedSubjects(kMax);
+		NumericVector simulatedRejections(kMax);
+		NumericVector simulatedFutilityStop(kMax - 1);
+		NumericVector simulatedConditionalPower(kMax);
 
 		for (int j = 1; j <= maxNumberOfIterations; j++) {
-			bool trialStop = false;
-			List testStatistic;
-			NumericVector sampleSizesPerStage;
-			NumericVector testStatisticsPerStage;
-			double effectEstimate = 0;
+			trialStop = false;
+			effectEstimate = 0;
 
 			for (int k = 1; k <= kMax; k++) {
-				if (!trialStop) {
-					List stepResult;
-					if (testStatistic.size() == 0 || sampleSizesPerStage.size() == 0 || testStatisticsPerStage.size() == 0) {
-						stepResult = getInitialSimulationStepMeans(
-							k,
-							kMax,
-							designNumber,
-							informationRates,
-							futilityBounds,
-							alpha0Vec,
-							criticalValues,
-							meanRatio,
-							thetaH0,
-							(double) alternative[i - 1],
-							stDev,
-							groups,
-							normalApproximation,
-							plannedSubjects,
-							directionUpper,
-							allocationRatioPlanned,
-							minNumberOfSubjectsPerStage,
-							maxNumberOfSubjectsPerStage,
-							conditionalPower,
-							thetaH1,
-							stDevH1);
-					} else {
-						stepResult = getSimulationStepMeans(
-							k,
-							kMax,
-							designNumber,
-							informationRates,
-							futilityBounds,
-							alpha0Vec,
-							criticalValues,
-							meanRatio,
-							thetaH0,
-							(double) alternative[i - 1],
-							stDev,
-							groups,
-							normalApproximation,
-							plannedSubjects,
-							directionUpper,
-							allocationRatioPlanned,
-							minNumberOfSubjectsPerStage,
-							maxNumberOfSubjectsPerStage,
-							conditionalPower,
-							thetaH1,
-							stDevH1,
-							effectEstimate,
-							sampleSizesPerStage,
-							testStatisticsPerStage,
-							testStatistic);
-					}
-
-					trialStop = stepResult["trialStop"];
-					sampleSizesPerStage = stepResult["sampleSizesPerStage"];
-					testStatisticsPerStage = stepResult["testStatisticsPerStage"];
-					testStatistic = stepResult["testStatistic"];
-					double simulatedSubjectsStep = stepResult["simulatedSubjects"];
-					double simulatedRejectionsStep = stepResult["simulatedRejections"];
-					double simulatedFutilityStopStep = stepResult["simulatedFutilityStop"];
-					effectEstimate = stepResult["effectEstimate"];
-					double simulatedConditionalPowerStep = NA_REAL;
-					if (k > 1) {
-						simulatedConditionalPowerStep = stepResult["simulatedConditionalPower"];
-					}
-					iterations(k - 1, i - 1) = iterations(k - 1, i - 1) + 1;
-					simulatedSubjects[k - 1] = simulatedSubjects[k - 1] + simulatedSubjectsStep;
-					simulatedRejections[k - 1] = simulatedRejections[k - 1] + simulatedRejectionsStep;
-					if (k < kMax) {
-						simulatedFutilityStop[k - 1] = simulatedFutilityStop[k - 1] + simulatedFutilityStopStep;
-					}
-					simulatedConditionalPower[k - 1] = simulatedConditionalPower[k - 1] + simulatedConditionalPowerStep;
-
-					dataIterationNumber[index - 1] = j;
-					dataStageNumber[index - 1] = k;
-					dataAlternative[index - 1] = alternative[i - 1];
-					dataNumberOfSubjects[index - 1] = simulatedSubjectsStep;
-					dataNumberOfCumulatedSubjects[index - 1] = sum(sampleSizesPerStage);
-					dataRejectPerStage[index - 1] = simulatedRejectionsStep;
-					dataFutilityPerStage[index - 1] = simulatedFutilityStopStep;
-					dataTestStatistic[index - 1] = testStatistic["value"];
-					dataTestStatisticsPerStage[index - 1] = testStatisticsPerStage[k - 1];
-					dataTrialStop[index - 1] = trialStop;
-					dataConditionalPowerAchieved[index - 1] = simulatedConditionalPowerStep;
-					dataEffectEstimate[index - 1] = effectEstimate;
-					if (designNumber == 3L) {
-						NumericVector helperVec = testStatistic["pValuesSeparate"];
-						dataPValuesSeparate[index - 1] = helperVec[k - 1];
-					}
-					index++;
+				if (trialStop) {
+					break;
 				}
+
+				stepResult = getSimulationStepMeans(
+					k,
+					kMax,
+					designNumber,
+					informationRates,
+					futilityBounds,
+					alpha0Vec,
+					criticalValues,
+					meanRatio,
+					thetaH0,
+					(double) alternative[i - 1],
+					stDev,
+					groups,
+					normalApproximation,
+					plannedSubjects,
+					directionUpper,
+					allocationRatioPlanned,
+					minNumberOfSubjectsPerStage,
+					maxNumberOfSubjectsPerStage,
+					conditionalPower,
+					thetaH1,
+					stDevH1,
+					effectEstimate,
+					sampleSizesPerStage,
+					testStatisticsPerStage,
+					testStatistic,
+					calcSubjectsFunctionType,
+					calcSubjectsFunctionR,
+					calcSubjectsFunctionCppXPtr);
+
+				trialStop = stepResult["trialStop"];
+				sampleSizesPerStage = stepResult["sampleSizesPerStage"];
+				testStatisticsPerStage = stepResult["testStatisticsPerStage"];
+				testStatistic = stepResult["testStatistic"];
+				simulatedSubjectsStep = stepResult["simulatedSubjects"];
+				simulatedRejectionsStep = stepResult["simulatedRejections"];
+				simulatedFutilityStopStep = stepResult["simulatedFutilityStop"];
+				effectEstimate = stepResult["effectEstimate"];
+				if (k > 1) {
+					simulatedConditionalPowerStep = stepResult["simulatedConditionalPower"];
+				} else {
+					simulatedConditionalPowerStep = NA_REAL;
+				}
+				iterations(k - 1, i - 1) = iterations(k - 1, i - 1) + 1;
+				simulatedSubjects[k - 1] = simulatedSubjects[k - 1] + simulatedSubjectsStep;
+				simulatedRejections[k - 1] = simulatedRejections[k - 1] + simulatedRejectionsStep;
+				if (k < kMax) {
+					simulatedFutilityStop[k - 1] = simulatedFutilityStop[k - 1] + simulatedFutilityStopStep;
+				}
+				simulatedConditionalPower[k - 1] = simulatedConditionalPower[k - 1] + simulatedConditionalPowerStep;
+
+				dataIterationNumber[index - 1] = j;
+				dataStageNumber[index - 1] = k;
+				dataAlternative[index - 1] = alternative[i - 1];
+				dataNumberOfSubjects[index - 1] = simulatedSubjectsStep;
+				dataNumberOfCumulatedSubjects[index - 1] = sum(sampleSizesPerStage);
+				dataRejectPerStage[index - 1] = simulatedRejectionsStep;
+				dataFutilityPerStage[index - 1] = simulatedFutilityStopStep;
+				dataTestStatistic[index - 1] = testStatistic[0]; // value
+				dataTestStatisticsPerStage[index - 1] = testStatisticsPerStage[k - 1];
+				dataTrialStop[index - 1] = trialStop;
+				dataConditionalPowerAchieved[index - 1] = simulatedConditionalPowerStep;
+				dataEffectEstimate[index - 1] = effectEstimate;
+				if (designNumber == 3L) {
+					dataPValuesSeparate[index - 1] = testStatistic[3 + k - 1]; // pValuesSeparate
+				}
+				index++;
 			}
 		}
 

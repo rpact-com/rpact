@@ -39,10 +39,10 @@ Function to identify the available plot types of an object.
 
 \code{output}:
 \enumerate{
-  \item \code{numeric}: numeric output
-  \item \code{caption}: caption as character output
-  \item \code{numcap}:  list with number and caption
-  \item \code{capnum}:  list with caption and number
+\item \code{numeric}: numeric output
+\item \code{caption}: caption as character output
+\item \code{numcap}:  list with number and caption
+\item \code{capnum}:  list with caption and number
 }
 }
 \examples{

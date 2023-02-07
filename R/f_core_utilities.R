@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6612 $
-## |  Last changed: $Date: 2022-10-07 12:20:55 +0200 (Fr, 07 Okt 2022) $
+## |  File version: $Revision: 6752 $
+## |  Last changed: $Date: 2023-01-10 10:47:41 +0100 (Di, 10 Jan 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -130,6 +130,9 @@ utils::globalVariables(".parallelComputingArguments")
     }
     if (title) {
         result <- .toCapitalized(result, ignoreBlackList = ignoreBlackList)
+    }
+    if (grepl(" $", x) && !grepl(" $", result)) {
+        result <- paste0(result, " ")
     }
     return(result)
 }
@@ -1406,6 +1409,12 @@ getParameterName <- function(obj, parameterCaption) {
         x <- round(x, 3)
     } else if (name == "maxNumberOfSubjects" && length(x) == 1 && !is.na(x)) {
         x <- floor(x * 100) / 100
+    } else if (is.numeric(x) && !is.matrix(x)) {
+        seqTest <- .reconstructSequenceCommand(x)
+        if (!is.null(seqTest) && length(seqTest) == 1 && 
+                !is.na(seqTest) && grepl("^seq", seqTest)) {
+            return(seqTest)
+        }
     }
 
     if (is.matrix(x) && name == "effectMatrix") {
@@ -1424,6 +1433,7 @@ getParameterName <- function(obj, parameterCaption) {
     if (is.matrix(x) && grepl("effectMatrix|effects|piTreatments|hazardRatios", name)) {
         expectedResult <- paste0("matrix(", expectedResult, ", ncol = ", ncol(x), ")")
     }
+    
     return(expectedResult)
 }
 
@@ -1699,7 +1709,7 @@ getObjectRCode <- function(obj, ...,
     }
 
     if (inherits(obj, "SimulationResultsSurvival")) {
-        objNames <- objNames[objNames != "allocationRatioPlanned"]
+        objNames <- objNames[objNames != "allocationRatioPlanned"] # allocation1 and allocation2 are used instead
     }
 
     if (inherits(obj, "AnalysisResults") && grepl("Fisher", .getClassName(obj))) {
@@ -2032,4 +2042,23 @@ getObjectRCode <- function(obj, ...,
     return(values)
 }
 
+.reconstructSequenceCommand <- function(values) {
+    if (length(values) == 0 || all(is.na(values))) {
+        return(NA_character_)
+    }
+    
+    if (length(values) <= 3 || any(is.na(values))) {
+        return(.arrayToString(values, vectorLookAndFeelEnabled = (length(values) != 1)))
+    }
+    
+    minValue <- min(values)
+    maxValue <- max(values)
+    by <- (maxValue - minValue) / (length(values) - 1)
+    valuesTemp <- seq(minValue, maxValue, by)
+    if (isTRUE(all.equal(values, valuesTemp, tolerance = 1e-10))) {
+        return(paste0("seq(", minValue, ", ", maxValue, ", ", by, ")"))
+    }
+    
+    return(.arrayToString(values, vectorLookAndFeelEnabled = TRUE, maxLength = 10))
+}
 

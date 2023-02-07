@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_group_sequential.R
-## |  Creation date: 15 August 2022, 15:51:04
-## |  File version: $Revision: 6492 $
-## |  Last changed: $Date: 2022-08-15 15:52:28 +0200 (Mo, 15 Aug 2022) $
+## |  Creation date: 06 February 2023, 12:12:02
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,10 +24,7 @@ test_plan_section("Testing the Group Sequential and Inverse Normal Design Functi
 
 
 test_that("'getGroupSequentialProbabilities' with one and two continuation regions for weighted test statistic", {
-        
-    .skipTestIfDisabled()
-        
-	# @refFS[Formula]{{fs:testStatisticGroupSequentialWeightedAverage}}
+	# @refFS[Formula]{fs:testStatisticGroupSequentialWeightedAverage}
 	xa <- getGroupSequentialProbabilities(matrix(c(rep(-qnorm(0.95), 4), rep(qnorm(0.95), 4)), nrow = 2, byrow = TRUE), (1:4) / 4)
 
 	## Comparison of the results of matrixarray object 'xa' with expected results
@@ -315,8 +312,6 @@ test_that("'getDesignInverseNormal' with type of design = 'asHSD', 'bsHSD', 'asK
 
 test_that("'getDesignInverseNormal' with binding futility bounds", {
 
-    .skipTestIfDisabled()
-        
 	# @refFS[Tab.]{fs:tab:output:getDesignInverseNormal}
 	# @refFS[Formula]{fs:criticalValuesWithFutility}
 	# @refFS[Formula]{fs:criticalValuesWangTiatis}
@@ -386,8 +381,6 @@ test_that("'getDesignGroupSequential' with type of design = 'asUser'", {
 
 test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsUser' and non-binding futility bounds", {
 
-    .skipTestIfDisabled()
-        
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingPocock}
@@ -431,9 +424,7 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsUser' a
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asP' and information rate < 1 at maximum stage", {
-        
-    .skipTestIfDisabled()
-        
+
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingPocock}
@@ -556,9 +547,7 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsUser' and binding futility bounds", {
-        
-    .skipTestIfDisabled()
-        
+
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingPocock}
@@ -694,15 +683,13 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' and binding futility bounds, two-sided (kMax = 3)", {
-        
-    .skipTestIfDisabled()
-        
+
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
 	# @refFS[Formula]{fs:betaSpendingApproach}
 	# @refFS[Formula]{fs:betaSpendingKimDeMets}
-	# @refFS[Formula]{fs:etaSpendingApproachTwoSided}
+	# @refFS[Formula]{fs:betaSpendingApproachTwoSided}
 	# @refFS[Formula]{fs:betaSpendingAdjustment}
 	suppressWarnings(x7c <- getDesignGroupSequential(
 	    kMax = 3, alpha = 0.09, beta = 0.11, sided = 2,
@@ -777,15 +764,13 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' and non-binding futility bounds, no betaAdjustment, two-sided (kMax = 3)", {
-        
-    .skipTestIfDisabled()
-        
+
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
 	# @refFS[Formula]{fs:betaSpendingApproach}
 	# @refFS[Formula]{fs:betaSpendingKimDeMets}
-	# @refFS[Formula]{fs:etaSpendingApproachTwoSided}
+	# @refFS[Formula]{fs:betaSpendingApproachTwoSided}
 	# @refFS[Formula]{fs:betaSpendingAdjustment}
 	suppressWarnings(x7e <- getDesignGroupSequential(
 	    kMax = 3, alpha = 0.09, beta = 0.11, sided = 2,
@@ -826,9 +811,7 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', binding futility bounds and delayed response (kMax = 3)", {
-        
-    .skipTestIfDisabled()
-        
+
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
@@ -1074,9 +1057,7 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', b
 })
 
 test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsP', non-binding futility bounds and delayed response (kMax = 3)", {
-        
-    .skipTestIfDisabled()
-        
+
 	# @refFS[Tab.]{fs:tab:output:getDesignGroupSequential}
 	# @refFS[Formula]{fs:alphaSpendingConcept}
 	# @refFS[Formula]{fs:alphaSpendingOBrienFleming}
@@ -1765,9 +1746,7 @@ test_that("'getDesignGroupSequential' with type of design = 'noEarlyEfficacy'", 
 })
 
 test_that("'getDesignInverseNormal': illegal arguments throw exceptions as expected", {
-        
-    .skipTestIfDisabled()
-        
+
 	expect_error(getDesignInverseNormal(
 	    typeOfDesign = C_TYPE_OF_DESIGN_AS_USER,
 	    userAlphaSpending = c(0.01, 0.02, 0.023, 0.023, 0.025), kMax = 4
@@ -1954,9 +1933,7 @@ test_that("'getDesignInverseNormal': illegal arguments throw exceptions as expec
 })
 
 test_that("'getDesignGroupSequential': illegal arguments throw exceptions as expected", {
-        
-    .skipTestIfDisabled()
-        
+
 	expect_error(getDesignGroupSequential(
 	    typeOfDesign = C_TYPE_OF_DESIGN_AS_USER,
 	    userAlphaSpending = c(0.01, 0.02, 0.023, 0.023, 0.025), kMax = 4

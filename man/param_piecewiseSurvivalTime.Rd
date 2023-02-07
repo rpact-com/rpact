@@ -4,7 +4,7 @@
 \alias{param_piecewiseSurvivalTime}
 \title{Parameter Description: Piecewise Survival Time}
 \arguments{
-\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise 
+\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise
 definition of the exponential survival time cumulative distribution function \cr
 (for details see \code{\link[=getPiecewiseSurvivalTime]{getPiecewiseSurvivalTime()}}).}
 }

@@ -9,7 +9,7 @@ getRepeatedPValues(stageResults, ..., tolerance = 1e-06)
 \arguments{
 \item{stageResults}{The results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}}.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{tolerance}{The numerical tolerance, default is \code{1e-06}. Must be a positive numeric of length 1.}
@@ -54,7 +54,6 @@ getRepeatedPValues(getStageResults(design, dataInput = data))
 }
 \seealso{
 Other analysis functions: 
-\code{\link{getAnalysisResults}()},
 \code{\link{getClosedCombinationTestResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalPower}()},

@@ -23,7 +23,7 @@
 \item{y}{Not available for this kind of plot (is only defined to be compatible
 to the generic plot function).}
 
-\item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented 
+\item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented
 for changing x or y axis limits without dropping data observations.}
 
 \item{main}{The main title, default is \code{"Dataset"}.}
@@ -36,17 +36,17 @@ for changing x or y axis limits without dropping data observations.}
 
 \item{palette}{The palette, default is \code{"Set1"}.}
 
-\item{showSource}{Logical. If \code{TRUE}, the parameter names of the object will 
-be printed which were used to create the plot; that may be, e.g., 
+\item{showSource}{Logical. If \code{TRUE}, the parameter names of the object will
+be printed which were used to create the plot; that may be, e.g.,
 useful to check the values or to create own plots with the base R \code{plot} function.
-Alternatively \code{showSource} can be defined as one of the following character values: 
+Alternatively \code{showSource} can be defined as one of the following character values:
 \itemize{
-  \item \code{"commands"}: returns a character vector with plot commands
-  \item \code{"axes"}: returns a list with the axes definitions
-  \item \code{"test"}: all plot commands will be validated with \code{eval(parse())} and 
-        returned as character vector (function does not stop if an error occurs)
-  \item \code{"validate"}: all plot commands will be validated with \code{eval(parse())} and 
-        returned as character vector (function stops if an error occurs)
+\item \code{"commands"}: returns a character vector with plot commands
+\item \code{"axes"}: returns a list with the axes definitions
+\item \code{"test"}: all plot commands will be validated with \code{eval(parse())} and
+returned as character vector (function does not stop if an error occurs)
+\item \code{"validate"}: all plot commands will be validated with \code{eval(parse())} and
+returned as character vector (function stops if an error occurs)
 }
 Note: no plot object will be returned if \code{showSource} is a character.}
 

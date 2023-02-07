@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -108,6 +108,7 @@ NULL
 #' @inheritParams param_conditionalPowerSimulation
 #' @inheritParams param_thetaH1
 #' @inheritParams param_maxNumberOfIterations
+#' @inheritParams param_calcEventsFunction 
 #' @inheritParams param_showStatistics
 #' @param maxNumberOfRawDatasetsPerStage The number of raw datasets per stage that shall
 #'        be extracted and saved as \code{\link[base]{data.frame}}, default is \code{0}.
@@ -138,7 +139,21 @@ NULL
 #' \code{maxNumberOfEventsPerStage} are defined.
 #'
 #' Note that \code{numberOfSubjects}, \code{numberOfSubjects1}, and \code{numberOfSubjects2} in the output
-#' are expected number of subjects.
+#' are the expected number of subjects.
+#'
+#' \code{calcEventsFunction}\cr
+#' This function returns the number of events at given conditional power and conditional critical value for specified
+#' testing situation. The function might depend on variables
+#' \code{stage},
+#' \code{conditionalPower},
+#' \code{thetaH0},
+#' \code{plannedEvents},
+#' \code{eventsPerStage},
+#' \code{minNumberOfEventsPerStage},
+#' \code{maxNumberOfEventsPerStage},
+#' \code{allocationRatioPlanned},
+#' \code{conditionalCriticalValue},
+#' The function has to contain the three-dots argument '...' (see examples).
 #'
 #' @template details_piecewise_survival
 #'
@@ -257,6 +272,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         maxNumberOfRawDatasetsPerStage = 0,
         longTimeSimulationAllowed = FALSE,
         seed = NA_real_,
+        calcEventsFunction = NULL,
         showStatistics = FALSE) {
     .assertRcppIsInstalled()
 
@@ -294,10 +310,13 @@ getSimulationSurvival <- function(design = NULL, ...,
     .assertIsSinglePositiveInteger(maxNumberOfSubjects, "maxNumberOfSubjects",
         validateType = FALSE, naAllowed = TRUE
     )
-    .assertIsSinglePositiveInteger(allocation1, "allocation1", validateType = FALSE)
-    .assertIsSinglePositiveInteger(allocation2, "allocation2", validateType = FALSE)
+    .assertIsIntegerVector(allocation1, "allocation1", validateType = FALSE)
+    .assertIsIntegerVector(allocation2, "allocation2", validateType = FALSE)
+    .assertIsInClosedInterval(allocation1, "allocation1", lower = 1L, upper = NULL)
+    .assertIsInClosedInterval(allocation2, "allocation2", lower = 1L, upper = NULL)
     .assertIsSingleLogical(longTimeSimulationAllowed, "longTimeSimulationAllowed")
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
+    .assertIsValidPlannedSubjectsOrEvents(design, plannedEvents, parameterName = "plannedEvents")
 
     if (design$sided == 2) {
         stop(
@@ -434,15 +453,6 @@ getSimulationSurvival <- function(design = NULL, ...,
         accrualSetup$.getParameterType("accrualIntensity")
     )
 
-    .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
-    if (length(plannedEvents) != design$kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'plannedEvents' (", .arrayToString(plannedEvents), ") must have length ", design$kMax
-        )
-    }
-    .assertIsInClosedInterval(plannedEvents, "plannedEvents", lower = 1, upper = NULL)
-    .assertValuesAreStrictlyIncreasing(plannedEvents, "plannedEvents")
     simulationResults$plannedEvents <- plannedEvents
     simulationResults$.setParameterType("plannedEvents", C_PARAM_USER_DEFINED)
 
@@ -566,8 +576,18 @@ getSimulationSurvival <- function(design = NULL, ...,
     .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, C_DROP_OUT_RATE_2_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, C_DROP_OUT_TIME_DEFAULT)
     .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, C_THETA_H0_SURVIVAL_DEFAULT)
+    
+    allocationFraction <- getFraction(allocation1 / allocation2)
+    if (allocationFraction[1] != allocation1 || allocationFraction[2] != allocation2) {
+        warning(sprintf("allocation1 = %s and allocation2 = %s was replaced by allocation1 = %s and allocation2 = %s", 
+            allocation1, allocation2, allocationFraction[1], allocationFraction[2]), call. = FALSE)
+        allocation1 <- allocationFraction[1]
+        allocation2 <- allocationFraction[2]
+    }
+    
     .setValueAndParameterType(simulationResults, "allocation1", allocation1, C_ALLOCATION_1_DEFAULT)
     .setValueAndParameterType(simulationResults, "allocation2", allocation2, C_ALLOCATION_2_DEFAULT)
+    
     allocationRatioPlanned <- allocation1 / allocation2
     .setValueAndParameterType(
         simulationResults, "allocationRatioPlanned",
@@ -638,7 +658,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         ceiling(accrualSetup$maxNumberOfSubjects /
             (allocation1 + allocation2))
     )[1:accrualSetup$maxNumberOfSubjects]
-
+    
     if (.isTrialDesignFisher(design)) {
         alpha0Vec <- design$alpha0Vec
         futilityBounds <- rep(NA_real_, design$kMax - 1)
@@ -654,6 +674,27 @@ getSimulationSurvival <- function(design = NULL, ...,
     } else if (.isTrialDesignFisher(design)) {
         designNumber <- 3L
     }
+    
+    calcSubjectsFunctionList <- .getCalcSubjectsFunction(
+        design = design,
+        simulationResults = simulationResults,
+        calcFunction = calcEventsFunction,
+        expectedFunction = function(
+            stage,
+            conditionalPower,
+            thetaH0,
+            estimatedTheta,
+            plannedEvents,
+            eventsOverStages,
+            minNumberOfEventsPerStage,
+            maxNumberOfEventsPerStage,
+            allocationRatioPlanned,
+            conditionalCriticalValue) { NULL },
+        cppEnabled = TRUE
+    )
+    calcEventsFunctionType <- calcSubjectsFunctionList$calcSubjectsFunctionType
+    calcEventsFunctionR <- calcSubjectsFunctionList$calcSubjectsFunctionR
+    calcEventsFunctionCpp <- calcSubjectsFunctionList$calcSubjectsFunctionCpp
 
     resultData <- getSimulationSurvivalCpp(
         designNumber                   = designNumber,
@@ -667,8 +708,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         minNumberOfEventsPerStage      = minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage      = maxNumberOfEventsPerStage,
         directionUpper                 = directionUpper,
-        allocation1                    = allocation1,
-        allocation2                    = allocation2,
+        allocationRatioPlanned         = allocationRatioPlanned,
         accrualTime                    = accrualTimeValue,
         treatmentGroup                 = treatmentGroup,
         thetaH0                        = thetaH0,
@@ -686,7 +726,10 @@ getSimulationSurvival <- function(design = NULL, ...,
         maxNumberOfSubjects            = accrualSetup$maxNumberOfSubjects,
         maxNumberOfIterations          = maxNumberOfIterations,
         maxNumberOfRawDatasetsPerStage = maxNumberOfRawDatasetsPerStage,
-        kappa                          = kappa
+        kappa                          = kappa,
+        calcEventsFunctionType         = calcEventsFunctionType,
+        calcEventsFunctionR            = calcEventsFunctionR,
+        calcEventsFunctionCpp          = calcEventsFunctionCpp
     )
 
     overview <- resultData$overview
@@ -725,7 +768,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         .getNumberOfSubjects1(simulationResults$numberOfSubjects, allocationRatioPlanned)
     simulationResults$numberOfSubjects2 <-
         .getNumberOfSubjects2(simulationResults$numberOfSubjects, allocationRatioPlanned)
-    if (allocationRatioPlanned != 1) {
+    if (any(allocationRatioPlanned != 1)) {
         simulationResults$.setParameterType("numberOfSubjects1", C_PARAM_GENERATED)
         simulationResults$.setParameterType("numberOfSubjects2", C_PARAM_GENERATED)
     }

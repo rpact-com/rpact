@@ -4,7 +4,7 @@
 \alias{param_three_dots_plot}
 \title{Parameter Description: "..." (optional plot arguments)}
 \arguments{
-\item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented 
+\item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented
 for changing x or y axis limits without dropping data observations.}
 }
 \description{

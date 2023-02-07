@@ -5,7 +5,7 @@
 \title{Parameter Description: Calculate Events Function}
 \arguments{
 \item{calcEventsFunction}{Optionally, a function can be entered that defines the way of performing the sample size
-recalculation. By default, sample size recalculation is performed with conditional power with specified
+recalculation. By default, event number recalculation is performed with conditional power and specified
 \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage} (see details and examples).}
 }
 \description{

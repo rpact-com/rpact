@@ -22,8 +22,8 @@ resetLogLevel()
 }
 \seealso{
 \itemize{
-  \item \code{\link[=getLogLevel]{getLogLevel()}} for getting the current log level,
-  \item \code{\link[=setLogLevel]{setLogLevel()}} for setting the log level.
+\item \code{\link[=getLogLevel]{getLogLevel()}} for getting the current log level,
+\item \code{\link[=setLogLevel]{setLogLevel()}} for setting the log level.
 }
 }
 \keyword{internal}

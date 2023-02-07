@@ -15,7 +15,7 @@
 \arguments{
 \item{x}{An \code{\link{AnalysisResults}} object created by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 }
 \value{

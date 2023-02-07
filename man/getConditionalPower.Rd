@@ -11,59 +11,72 @@ getConditionalPower(stageResults, ..., nPlanned, allocationRatioPlanned = 1)
 
 \item{...}{Further (optional) arguments to be passed:
 \describe{
-  \item{\code{thetaH1} and \code{assumedStDevs} or \code{piTreatments}, \code{piControl}}{The
-     assumed effect size or assumed rates to calculate the conditional power in multi-arm trials
-     or enrichment designs. For survival designs, \code{thetaH1} refers to the hazard ratio.
-     You can specify a value or a vector with elements referring to the
-     treatment arms or the sub-populations, respectively.
-     For testing means, an assumed standard deviation can be specified, default is \code{1}.}
-  \item{\code{iterations}}{Iterations for simulating the power for Fisher's combination test.
-      If the power for more than one remaining stages is to be determined for Fisher's combination test,
-      it is estimated via simulation with specified \cr
-      \code{iterations}, the default value is \code{10000}.}
-  \item{\code{seed}}{Seed for simulating the power for Fisher's combination test.
-      See above, default is a random seed.}
+\item{\code{thetaH1} and \code{assumedStDevs}, \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
+The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned}
+is specified. For survival designs, \code{thetaH1} refers to the hazard ratio.
+For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome,
+\code{pi1} and \code{pi2} can be specified referring to the assumed treatment and control rate, respectively.
+In multi-armed or enrichment designs, you can
+specify a value or a vector with elements referring to the treatment arms or the sub-populations,
+respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl} (multi-arm
+designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr
+If not specified, the conditional power is calculated under the assumption of observed effect sizes,
+standard deviations, rates, or hazard ratios.}
+\item{\code{iterations}}{Iterations for simulating the power for Fisher's combination test.
+If the power for more than one remaining stages is to be determined for
+Fisher's combination test, it is estimated via simulation with specified \cr
+\code{iterations}, the default is \code{1000}.}
+\item{\code{seed}}{Seed for simulating the conditional power for Fisher's combination test.
+See above, default is a random seed.}
 }}
 
-\item{nPlanned}{The additional (i.e., "new" and not cumulative) sample size planned for each of the subsequent stages. 
-The argument must be a vector with length equal to the number of remaining stages and contain 
-the combined sample size from both treatment groups if two groups are considered. For survival outcomes, 
-it should contain the planned number of additional events. 
-For multi-arm designs, it is the per-comparison (combined) sample size. 
+\item{nPlanned}{The additional (i.e., "new" and not cumulative) sample size planned for each of the subsequent stages.
+The argument must be a vector with length equal to the number of remaining stages and contain
+the combined sample size from both treatment groups if two groups are considered. For survival outcomes,
+it should contain the planned number of additional events.
+For multi-arm designs, it is the per-comparison (combined) sample size.
 For enrichment designs, it is the (combined) sample size for the considered sub-population.}
 
-\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups 
-design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.}
+\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
+design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
+For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+In this case, a change of allocating subjects to treatment groups over the stages can be assessed.}
 }
 \value{
 Returns a \code{\link{ConditionalPowerResults}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
 Calculates and returns the conditional power.
 }
 \details{
-The conditional power is calculated only if the effect size and the sample size is specified.
+The conditional power is calculated if the planned sample size for the subsequent stages is specified.\cr
+For testing rates in a two-armed trial, pi1 and pi2 typically refer to the rates in the treatment
+and the control group, respectively. This is not mandatory, however, and so pi1 and pi2 can be interchanged.
+In many-to-one multi-armed trials, piTreatments and piControl refer to the rates in the treatment arms and
+the one control arm, and so they cannot be interchanged. piTreatments and piControls in enrichment designs
+can principally be interchanged, but we use the plural form to indicate that the rates can be differently
+specified for the sub-populations.
 
 For Fisher's combination test, the conditional power for more than one remaining stages is
 estimated via simulation.
 }
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 
@@ -85,11 +98,10 @@ getConditionalPower(stageResults, thetaH1 = -0.4,
 
 }
 \seealso{
-\code{\link[=plot.StageResults]{plot.StageResults()}} or \code{\link[=plot.AnalysisResults]{plot.AnalysisResults()}} 
+\code{\link[=plot.StageResults]{plot.StageResults()}} or \code{\link[=plot.AnalysisResults]{plot.AnalysisResults()}}
 for plotting the conditional power.
 
 Other analysis functions: 
-\code{\link{getAnalysisResults}()},
 \code{\link{getClosedCombinationTestResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalRejectionProbabilities}()},

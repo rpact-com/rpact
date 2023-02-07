@@ -10,8 +10,8 @@ A basic class for multi-hypotheses analysis results.
 \details{
 \code{AnalysisResultsMultiHypotheses} is the basic class for
 \itemize{
-  \item \code{\link{AnalysisResultsMultiArm}} and
-  \item \code{\link{AnalysisResultsEnrichment}}.
+\item \code{\link{AnalysisResultsMultiArm}} and
+\item \code{\link{AnalysisResultsEnrichment}}.
 }
 }
 

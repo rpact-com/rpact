@@ -16,39 +16,38 @@ getRepeatedConfidenceIntervals(
 \arguments{
 \item{design}{The trial design.}
 
-\item{dataInput}{The summary data used for calculating the test results. 
-This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival} 
+\item{dataInput}{The summary data used for calculating the test results.
+This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival}
 and should be created with the function \code{\link[=getDataset]{getDataset()}}.
 For more information see \code{\link[=getDataset]{getDataset()}}.}
 
-\item{...}{Further arguments to be passed to methods (cf. separate functions in "See Also" below), e.g.,
+\item{...}{Further arguments to be passed to methods (cf., separate functions in "See Also" below), e.g.,
 \describe{
-  \item{\code{normalApproximation}}{The
-      type of computation of the p-values. Default is \code{FALSE} for
-      testing means (i.e., the t test is used) and \code{TRUE} for testing rates and the hazard ratio.
-      For testing rates, if \code{normalApproximation = FALSE} is specified, the binomial test
-      (one sample) or the exact test of Fisher (two samples) is used for calculating the p-values.
-      In the survival setting, \code{normalApproximation = FALSE} has no effect.}
-  \item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
-      the t test assuming that the variances are equal or the t test without assuming this,
-      i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
-  \item{\code{intersectionTest}}{Defines the multiple test for the intersection
-      hypotheses in the closed system of hypotheses when testing multiple hypotheses.
-      Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"},
-      \code{"Sidak"}, and \code{"Hierarchical"}, default is \code{"Dunnett"}.
-      Four options are available in population enrichment designs: \code{"SpiessensDebois"} (one subset only),
-      \code{"Bonferroni"}, \code{"Simes"}, and \code{"Sidak"}, default is \code{"Simes"}.}
-  \item{\code{varianceOption}}{Defines the way to calculate the variance in multiple treatment arms (> 2)
-       or population enrichment designs for testing means. For multiple arms, three options are available:
-      \code{"overallPooled"}, \code{"pairwisePooled"}, and \code{"notPooled"}, default is \code{"overallPooled"}.
-      For enrichment designs, the options are: \code{"pooled"}, \code{"pooledFromFull"} (one subset only),
-      and \code{"notPooled"}, default is \code{"pooled"}.}
-  \item{\code{stratifiedAnalysis}}{For enrichment designs, typically a stratified analysis should be chosen.
-    For testing means and rates, also a non-stratified analysis based on overall data can be performed.
-    For survival data, only a stratified analysis is possible (see Brannath et al., 2009), default is \code{TRUE}.}
+\item{\code{normalApproximation}}{The type of computation of the p-values. Default is \code{FALSE} for
+testing means (i.e., the t test is used) and \code{TRUE} for testing rates and the hazard ratio.
+For testing rates, if \code{normalApproximation = FALSE} is specified, the binomial test
+(one sample) or the exact test of Fisher (two samples) is used for calculating the p-values.
+In the survival setting, \code{normalApproximation = FALSE} has no effect.}
+\item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
+the t test assuming that the variances are equal or the t test without assuming this,
+i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
+\item{\code{intersectionTest}}{Defines the multiple test for the intersection
+hypotheses in the closed system of hypotheses when testing multiple hypotheses.
+Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"},
+\code{"Sidak"}, and \code{"Hierarchical"}, default is \code{"Dunnett"}.
+Four options are available in population enrichment designs: \code{"SpiessensDebois"} (one subset only),
+\code{"Bonferroni"}, \code{"Simes"}, and \code{"Sidak"}, default is \code{"Simes"}.}
+\item{\code{varianceOption}}{Defines the way to calculate the variance in multiple treatment arms (> 2)
+or population enrichment designs for testing means. For multiple arms, three options are available:
+\code{"overallPooled"}, \code{"pairwisePooled"}, and \code{"notPooled"}, default is \code{"overallPooled"}.
+For enrichment designs, the options are: \code{"pooled"}, \code{"pooledFromFull"} (one subset only),
+and \code{"notPooled"}, default is \code{"pooled"}.}
+\item{\code{stratifiedAnalysis}}{For enrichment designs, typically a stratified analysis should be chosen.
+For testing means and rates, also a non-stratified analysis based on overall data can be performed.
+For survival data, only a stratified analysis is possible (see Brannath et al., 2009), default is \code{TRUE}.}
 }}
 
-\item{directionUpper}{Logical. Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
@@ -85,7 +84,6 @@ getRepeatedConfidenceIntervals(design, dataInput = data)
 }
 \seealso{
 Other analysis functions: 
-\code{\link{getAnalysisResults}()},
 \code{\link{getClosedCombinationTestResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalPower}()},

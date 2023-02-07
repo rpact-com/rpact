@@ -4,8 +4,8 @@
 \alias{param_dataInput}
 \title{Parameter Description: Data Input}
 \arguments{
-\item{dataInput}{The summary data used for calculating the test results. 
-This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival} 
+\item{dataInput}{The summary data used for calculating the test results.
+This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival}
 and should be created with the function \code{\link[=getDataset]{getDataset()}}.
 For more information see \code{\link[=getDataset]{getDataset()}}.}
 }

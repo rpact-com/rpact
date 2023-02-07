@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6650 $
-## |  Last changed: $Date: 2022-10-29 14:57:26 +0200 (Sa, 29 Okt 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -302,6 +302,13 @@ NULL
     .assertIsDataset(dataInput)
     if (!is.null(design)) {
         .assertIsTrialDesign(design)
+    }
+    
+    if (dataInput$.enrichmentEnabled && dataInput$getNumberOfGroups() != 2) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
+            "only population enrichment data with 2 groups can be analyzed but ", 
+            dataInput$getNumberOfGroups(), " group", 
+            ifelse(dataInput$getNumberOfGroups() == 1, " is", "s are"), " defined")
     }
 
     stages <- dataInput$stages
@@ -1902,7 +1909,7 @@ NULL
                 stop(msg, " Expected: '", argNamesExpected, "'")
             }
             stop(
-                msg, "\n", "Use one or more of the following arguments:\n ",
+                msg, "\n\n", "Use one or more of the following arguments:\n ",
                 .arrayToString(argNamesExpected, encapsulate = TRUE)
             )
         }
@@ -1957,6 +1964,22 @@ NULL
             ") must be a single value or a vector of length ", activeArms
         )
     }
+}
+
+.assertIsValidPlannedSubjectsOrEvents <- function(
+        design,
+        plannedValues, 
+        parameterName = c("plannedSubjects", "plannedEvents")) {
+    parameterName <- match.arg(parameterName)
+    .assertIsIntegerVector(plannedValues, parameterName, validateType = FALSE)
+    if (length(plannedValues) != design$kMax) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'", parameterName, "' (", .arrayToString(plannedValues), ") must have length ", design$kMax
+        )
+    }
+    .assertIsInClosedInterval(plannedValues, parameterName, lower = 1, upper = NULL)
+    .assertValuesAreStrictlyIncreasing(plannedValues, parameterName)
 }
 
 .assertIsValidNumberOfSubjectsPerStage <- function(parameterValues, parameterName, plannedSubjects,

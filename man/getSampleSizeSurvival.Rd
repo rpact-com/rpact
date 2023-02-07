@@ -31,34 +31,34 @@ getSampleSizeSurvival(
 )
 }
 \arguments{
-\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used. 
-In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower}, 
+\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used.
+In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
 and \code{sided} can be directly entered as argument where necessary.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{typeOfComputation}{Three options are available: \code{"Schoenfeld"}, \code{"Freedman"}, \code{"HsiehFreedman"}, 
-the default is \code{"Schoenfeld"}. For details, see Hsieh (Statistics in Medicine, 1992). 
+\item{typeOfComputation}{Three options are available: \code{"Schoenfeld"}, \code{"Freedman"}, \code{"HsiehFreedman"},
+the default is \code{"Schoenfeld"}. For details, see Hsieh (Statistics in Medicine, 1992).
 For non-inferiority testing (i.e., \code{thetaH0 != 1}), only Schoenfeld's formula can be used.}
 
-\item{thetaH0}{The null hypothesis value, 
-default is \code{0} for the normal and the binary case (testing means and rates, respectively), 
-it is \code{1} for the survival case (testing the hazard ratio).\cr\cr 
+\item{thetaH0}{The null hypothesis value,
+default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
-  \item \emph{means}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the mean ratio) can be specified.
-  \item \emph{rates}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
-  \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{means}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the mean ratio) can be specified.
+\item \emph{rates}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
+\item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
 }
-For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for 
+For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
-\item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group, 
-default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or 
+\item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
+default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 \code{seq(0.4, 0.6, 0.1)} (sample size calculations).}
 
 \item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
@@ -73,36 +73,36 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 
 \item{median2}{The assumed median survival time in the reference group, there is no default. Must be a positive numeric of length 1.}
 
-\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification 
-of the shape of the Weibull distribution. 
+\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
+of the shape of the Weibull distribution.
 Default is \code{1}, i.e., the exponential survival distribution is used instead of the Weibull distribution.
-Note that the Weibull distribution cannot be used for the piecewise definition of 
-the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa} 
+Note that the Weibull distribution cannot be used for the piecewise definition of
+the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa}
 can be specified.
-This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)} 
+This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)}
 of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
-For example, 
-\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)} 
+For example,
+\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
 and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample result.}
 
-\item{hazardRatio}{The vector of hazard ratios under consideration. 
-If the event or hazard rates in both treatment groups are defined, the hazard ratio needs 
+\item{hazardRatio}{The vector of hazard ratios under consideration.
+If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
 not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
 
-\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise 
+\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise
 definition of the exponential survival time cumulative distribution function \cr
 (for details see \code{\link[=getPiecewiseSurvivalTime]{getPiecewiseSurvivalTime()}}).}
 
-\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups 
-design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered, 
+\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
+design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered,
 the optimal allocation ratio yielding the smallest overall sample size is determined.}
 
 \item{eventTime}{The assumed time under which the event rates are calculated, default is \code{12}.}
 
-\item{accrualTime}{The assumed accrual time intervals for the study, default is 
+\item{accrualTime}{The assumed accrual time intervals for the study, default is
 \code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
-\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative 
+\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative
 intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
 \item{accrualIntensityType}{A character value specifying the accrual intensity input type.
@@ -119,19 +119,19 @@ the follow-up time for the required number of events is determined.}
 
 \item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
 
-\item{dropoutTime}{The assumed time for drop-out rates in the control and the 
+\item{dropoutTime}{The assumed time for drop-out rates in the control and the
 treatment group, default is \code{12}.}
 }
 \value{
 Returns a \code{\link{TrialDesignPlan}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesignPlan]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesignPlan]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.TrialDesignPlan]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.TrialDesignPlan]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -159,52 +159,52 @@ only the event rates are used for the calculation of the maximum number of subje
 }
 \section{Piecewise survival time}{
 
-The first element of the vector \code{piecewiseSurvivalTime} must be equal to \code{0}. 
-\code{piecewiseSurvivalTime} can also be a list that combines the definition of the 
-time intervals and hazard rates in the reference group. 
-The definition of the survival time in the treatment group is obtained by the specification 
+The first element of the vector \code{piecewiseSurvivalTime} must be equal to \code{0}.
+\code{piecewiseSurvivalTime} can also be a list that combines the definition of the
+time intervals and hazard rates in the reference group.
+The definition of the survival time in the treatment group is obtained by the specification
 of the hazard ratio (see examples for details).
 }
 
 \section{Staggered patient entry}{
 
-\code{accrualTime} is the time period of subjects' accrual in a study. 
+\code{accrualTime} is the time period of subjects' accrual in a study.
 It can be a value that defines the end of accrual or a vector.
-In this case, \code{accrualTime} can be used to define a non-constant accrual over time. 
-For this, \code{accrualTime} is a vector that defines the accrual intervals. 
-The first element of \code{accrualTime} must be equal to \code{0} and, additionally, 
-\code{accrualIntensity} needs to be specified. 
-\code{accrualIntensity} itself is a value or a vector (depending on the 
-length of \code{accrualtime}) that defines the intensity how subjects 
+In this case, \code{accrualTime} can be used to define a non-constant accrual over time.
+For this, \code{accrualTime} is a vector that defines the accrual intervals.
+The first element of \code{accrualTime} must be equal to \code{0} and, additionally,
+\code{accrualIntensity} needs to be specified.
+\code{accrualIntensity} itself is a value or a vector (depending on the
+length of \code{accrualtime}) that defines the intensity how subjects
 enter the trial in the intervals defined through \code{accrualTime}.
- 
-\code{accrualTime} can also be a list that combines the definition of the accrual time and 
+
+\code{accrualTime} can also be a list that combines the definition of the accrual time and
 accrual intensity (see below and examples for details).
 
-If the length of \code{accrualTime} and the length of \code{accrualIntensity} are the same 
-(i.e., the end of accrual is undefined), \code{maxNumberOfSubjects > 0} needs to be specified  
+If the length of \code{accrualTime} and the length of \code{accrualIntensity} are the same
+(i.e., the end of accrual is undefined), \code{maxNumberOfSubjects > 0} needs to be specified
 and the end of accrual is calculated.
 In that case, \code{accrualIntensity} is the number of subjects per time unit, i.e., the absolute accrual intensity.
 
-If the length of \code{accrualTime} equals the length of \code{accrualIntensity - 1}   
+If the length of \code{accrualTime} equals the length of \code{accrualIntensity - 1}
 (i.e., the end of accrual is defined), \code{maxNumberOfSubjects} is calculated if the absolute accrual intensity is given.
-If all elements in \code{accrualIntensity} are smaller than 1, \code{accrualIntensity} defines 
-the *relative* intensity how subjects enter the trial.
-For example, \code{accrualIntensity = c(0.1, 0.2)} specifies that in the second accrual interval 
-the intensity is doubled as compared to the first accrual interval. The actual (absolute) accrual intensity 
+If all elements in \code{accrualIntensity} are smaller than 1, \code{accrualIntensity} defines
+the \emph{relative} intensity how subjects enter the trial.
+For example, \code{accrualIntensity = c(0.1, 0.2)} specifies that in the second accrual interval
+the intensity is doubled as compared to the first accrual interval. The actual (absolute) accrual intensity
 is calculated for the calculated or given \code{maxNumberOfSubjects}.
-Note that the default is \code{accrualIntensity = 0.1} meaning that the *absolute* accrual intensity 
+Note that the default is \code{accrualIntensity = 0.1} meaning that the \emph{absolute} accrual intensity
 will be calculated.
 }
 
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 

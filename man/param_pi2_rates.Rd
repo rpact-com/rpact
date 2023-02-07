@@ -4,7 +4,7 @@
 \alias{param_pi2_rates}
 \title{Parameter Description: Pi (2) for Rates}
 \arguments{
-\item{pi2}{A numeric value that represents the assumed probability in the reference group if two treatment 
+\item{pi2}{A numeric value that represents the assumed probability in the reference group if two treatment
 groups are considered, default is \code{0.2}.}
 }
 \description{

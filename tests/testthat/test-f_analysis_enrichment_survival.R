@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_enrichment_survival.R
-## |  Creation date: 17 August 2022, 13:43:46
-## |  File version: $Revision: 6658 $
-## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
+## |  Creation date: 06 February 2023, 12:09:31
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,10 +24,9 @@ test_plan_section("Testing Analysis Enrichment Survival Function")
 
 
 test_that("'getAnalysisResults': enrichment survival, one sub-population, non-stratified analysis, select S1 at second, gMax = 2", {
-        
-    .skipTestIfDisabled()
-        
-    # @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
+	.skipTestIfDisabled()
+
+	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISidakEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISpiessensEnrichment}

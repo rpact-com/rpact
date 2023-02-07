@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_multiarm_rates.R
-## |  Creation date: 12 August 2022, 09:12:28
-## |  File version: $Revision: 6658 $
-## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
+## |  Creation date: 06 February 2023, 12:14:43
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,10 +24,8 @@ test_plan_section("Testing Simulation Multi-Arm Rates Function")
 
 
 test_that("'getSimulationMultiArmRates': several configurations", {
-        
-    .skipTestIfDisabled()
-    .skipTestIfNotX64()
-    
+	.skipTestIfNotX64()
+
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDesigns}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDoseResponseRelationShips}
@@ -100,7 +98,9 @@ test_that("'getSimulationMultiArmRates': several configurations", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-    
+
+	.skipTestIfDisabled()
+
 	x2 <- getSimulationMultiArmRates(
 	    seed = 1234, getDesignInverseNormal(informationRates = c(0.2, 0.6, 1)),
 	    typeOfShape = "userDefined", activeArms = 4,
@@ -1593,7 +1593,7 @@ test_that("'getSimulationMultiArmRates': comparison of base and multi-arm", {
 	    directionUpper = FALSE, piControl = 0.6, piMaxVector = seq(0.3, 0.6, 0.1),
 	    conditionalPower = 0.6, minNumberOfSubjectsPerStage = c(NA, 20, 20), maxNumberOfSubjectsPerStage = c(NA, 80, 80),
 	    piControlH1 = 0.4,
-	    piH1 = 0.3,
+	    piTreatmentsH1 = 0.3,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = allocationRatioPlanned, seed = 1234
 	)
 

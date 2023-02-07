@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_fisher_combination_test.R
-## |  Creation date: 12 August 2022, 09:09:51
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  Creation date: 06 February 2023, 12:12:01
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -32,7 +32,6 @@ test_that("'getDesignFisher' with default parameters: parameters and results are
 	expect_equal(designFisher0$alphaSpent, c(0.012308547, 0.01962413, 0.025), tolerance = 1e-07)
 	expect_equal(designFisher0$criticalValues, c(0.012308547, 0.0016635923, 0.00029106687), tolerance = 1e-07)
 	expect_equal(designFisher0$stageLevels, c(0.012308547, 0.012308547, 0.012308547), tolerance = 1e-07)
-	expect_equal(designFisher0$scale, c(1, 1))
 	expect_equal(designFisher0$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher0), NA)))
@@ -43,7 +42,6 @@ test_that("'getDesignFisher' with default parameters: parameters and results are
 	    expect_equal(designFisher0CodeBased$alphaSpent, designFisher0$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher0CodeBased$criticalValues, designFisher0$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher0CodeBased$stageLevels, designFisher0$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher0CodeBased$scale, designFisher0$scale, tolerance = 1e-05)
 	    expect_equal(designFisher0CodeBased$nonStochasticCurtailment, designFisher0$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher0), "character")
 	    df <- as.data.frame(designFisher0)
@@ -69,7 +67,6 @@ test_that("'getDesignFisher' with default parameters and simulated alpha: parame
 	expect_equal(designFisher$alphaSpent, c(0.012308547, 0.01962413, 0.025), tolerance = 1e-07)
 	expect_equal(designFisher$criticalValues, c(0.012308547, 0.0016635923, 0.00029106687), tolerance = 1e-07)
 	expect_equal(designFisher$stageLevels, c(0.012308547, 0.012308547, 0.012308547), tolerance = 1e-07)
-	expect_equal(designFisher$scale, c(1, 1))
 	expect_equal(designFisher$simAlpha, 0.0243, tolerance = 1e-07)
 	expect_equal(designFisher$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -81,7 +78,6 @@ test_that("'getDesignFisher' with default parameters and simulated alpha: parame
 	    expect_equal(designFisherCodeBased$alphaSpent, designFisher$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisherCodeBased$criticalValues, designFisher$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisherCodeBased$stageLevels, designFisher$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisherCodeBased$scale, designFisher$scale, tolerance = 1e-05)
 	    expect_equal(designFisherCodeBased$simAlpha, designFisher$simAlpha, tolerance = 1e-05)
 	    expect_equal(designFisherCodeBased$nonStochasticCurtailment, designFisher$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher), "character")
@@ -107,7 +103,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher1$alphaSpent, c(0.023314852, 0.05), tolerance = 1e-07)
 	expect_equal(designFisher1$criticalValues, c(0.023314852, 0.0087049407), tolerance = 1e-07)
 	expect_equal(designFisher1$stageLevels, c(0.023314852, 0.05), tolerance = 1e-07)
-	expect_equal(designFisher1$scale, 1)
 	expect_equal(designFisher1$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher1), NA)))
@@ -118,7 +113,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher1CodeBased$alphaSpent, designFisher1$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher1CodeBased$criticalValues, designFisher1$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher1CodeBased$stageLevels, designFisher1$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher1CodeBased$scale, designFisher1$scale, tolerance = 1e-05)
 	    expect_equal(designFisher1CodeBased$nonStochasticCurtailment, designFisher1$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher1), "character")
 	    df <- as.data.frame(designFisher1)
@@ -137,7 +131,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher2$alphaSpent, c(0.011823636, 0.019807903, 0.025), tolerance = 1e-07)
 	expect_equal(designFisher2$criticalValues, c(0.011823636, 0.00036698794, 3.0631293e-07), tolerance = 1e-07)
 	expect_equal(designFisher2$stageLevels, c(0.011823636, 0.011823636, 0.011823636), tolerance = 1e-07)
-	expect_equal(designFisher2$scale, c(1.4142136, 2.6457513), tolerance = 1e-07)
 	expect_equal(designFisher2$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher2), NA)))
@@ -148,7 +141,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher2CodeBased$alphaSpent, designFisher2$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher2CodeBased$criticalValues, designFisher2$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher2CodeBased$stageLevels, designFisher2$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher2CodeBased$scale, designFisher2$scale, tolerance = 1e-05)
 	    expect_equal(designFisher2CodeBased$nonStochasticCurtailment, designFisher2$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher2), "character")
 	    df <- as.data.frame(designFisher2)
@@ -167,7 +159,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher3$alphaSpent, c(0.0082575405, 0.014885188, 0.020347598, 0.025), tolerance = 1e-07)
 	expect_equal(designFisher3$criticalValues, c(0.0082575405, 0.00021760942, 4.7163541e-06, 8.3369321e-08), tolerance = 1e-07)
 	expect_equal(designFisher3$stageLevels, c(0.0082575405, 0.0082575405, 0.0082575405, 0.0082575405), tolerance = 1e-07)
-	expect_equal(designFisher3$scale, c(1.4142136, 1.7320508, 2), tolerance = 1e-07)
 	expect_equal(designFisher3$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher3), NA)))
@@ -178,7 +169,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher3CodeBased$alphaSpent, designFisher3$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher3CodeBased$criticalValues, designFisher3$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher3CodeBased$stageLevels, designFisher3$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher3CodeBased$scale, designFisher3$scale, tolerance = 1e-05)
 	    expect_equal(designFisher3CodeBased$nonStochasticCurtailment, designFisher3$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher3), "character")
 	    df <- as.data.frame(designFisher3)
@@ -197,7 +187,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher4$alphaSpent, c(0.011157609, 0.018733282, 0.022750003, 0.024162936, 0.025), tolerance = 1e-07)
 	expect_equal(designFisher4$criticalValues, c(0.011157609, 0.00033722277, 2.3068413e-05, 5.4825339e-06, 9.8015456e-08), tolerance = 1e-07)
 	expect_equal(designFisher4$stageLevels, c(0.011157609, 0.011157609, 0.011157609, 0.011157609, 0.011157609), tolerance = 1e-07)
-	expect_equal(designFisher4$scale, c(1.4142136, 1.4142136, 1, 2), tolerance = 1e-07)
 	expect_equal(designFisher4$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher4), NA)))
@@ -208,7 +197,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher4CodeBased$alphaSpent, designFisher4$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher4CodeBased$criticalValues, designFisher4$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher4CodeBased$stageLevels, designFisher4$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher4CodeBased$scale, designFisher4$scale, tolerance = 1e-05)
 	    expect_equal(designFisher4CodeBased$nonStochasticCurtailment, designFisher4$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher4), "character")
 	    df <- as.data.frame(designFisher4)
@@ -227,7 +215,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher5$alphaSpent, c(0.12649082, 0.17362071, 0.19349017, 0.19931765, 0.2), tolerance = 1e-07)
 	expect_equal(designFisher5$criticalValues, c(0.12649082, 0.027546669, 0.0068856935, 0.0018391192, 0.00051168366), tolerance = 1e-07)
 	expect_equal(designFisher5$stageLevels, c(0.12649082, 0.12649082, 0.12649082, 0.12649082, 0.12649082), tolerance = 1e-07)
-	expect_equal(designFisher5$scale, c(1, 1, 1, 1))
 	expect_equal(designFisher5$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher5), NA)))
@@ -238,7 +225,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher5CodeBased$alphaSpent, designFisher5$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher5CodeBased$criticalValues, designFisher5$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher5CodeBased$stageLevels, designFisher5$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher5CodeBased$scale, designFisher5$scale, tolerance = 1e-05)
 	    expect_equal(designFisher5CodeBased$nonStochasticCurtailment, designFisher5$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher5), "character")
 	    df <- as.data.frame(designFisher5)
@@ -257,7 +243,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher6$alphaSpent, c(1.0550077e-06, 0.00020026524, 0.0065266359, 0.025), tolerance = 1e-07)
 	expect_equal(designFisher6$criticalValues, c(1.0550077e-06, 1.0550077e-06, 1.0550077e-06, 1.0550077e-06), tolerance = 1e-07)
 	expect_equal(designFisher6$stageLevels, c(1.0550077e-06, 0.00020026524, 0.0065266359, 0.025), tolerance = 1e-07)
-	expect_equal(designFisher6$scale, c(1.4142136, 2, 1.7320508), tolerance = 1e-07)
 	expect_equal(designFisher6$nonStochasticCurtailment, TRUE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher6), NA)))
@@ -268,7 +253,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher6CodeBased$alphaSpent, designFisher6$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher6CodeBased$criticalValues, designFisher6$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher6CodeBased$stageLevels, designFisher6$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher6CodeBased$scale, designFisher6$scale, tolerance = 1e-05)
 	    expect_equal(designFisher6CodeBased$nonStochasticCurtailment, designFisher6$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher6), "character")
 	    df <- as.data.frame(designFisher6)
@@ -287,7 +271,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher7$alphaSpent, c(2.1580149e-06, 0.0066525356, 0.01947245), tolerance = 1e-07)
 	expect_equal(designFisher7$criticalValues, c(2.1580149e-06, 2.1580149e-06, 2.1580149e-06), tolerance = 1e-07)
 	expect_equal(designFisher7$stageLevels, c(2.1580149e-06, 0.008216166, 0.025), tolerance = 1e-07)
-	expect_equal(designFisher7$scale, c(2.4494897, 1.7320508), tolerance = 1e-07)
 	expect_equal(designFisher7$nonStochasticCurtailment, TRUE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher7), NA)))
@@ -298,7 +281,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher7CodeBased$alphaSpent, designFisher7$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher7CodeBased$criticalValues, designFisher7$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher7CodeBased$stageLevels, designFisher7$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher7CodeBased$scale, designFisher7$scale, tolerance = 1e-05)
 	    expect_equal(designFisher7CodeBased$nonStochasticCurtailment, designFisher7$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher7), "character")
 	    df <- as.data.frame(designFisher7)
@@ -317,7 +299,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher8$alphaSpent, c(0.0098603693, 0.012073314, 0.018133935, 0.025), tolerance = 1e-07)
 	expect_equal(designFisher8$criticalValues, c(0.0098603693, 0.00051915905, 0.00031149543, 0.00015574772), tolerance = 1e-07)
 	expect_equal(designFisher8$stageLevels, c(0.0098603693, 0.0044457148, 0.012979977, 0.025), tolerance = 1e-07)
-	expect_equal(designFisher8$scale, c(1, 1, 1))
 	expect_equal(designFisher8$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher8), NA)))
@@ -328,7 +309,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher8CodeBased$alphaSpent, designFisher8$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher8CodeBased$criticalValues, designFisher8$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher8CodeBased$stageLevels, designFisher8$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher8CodeBased$scale, designFisher8$scale, tolerance = 1e-05)
 	    expect_equal(designFisher8CodeBased$nonStochasticCurtailment, designFisher8$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher8), "character")
 	    df <- as.data.frame(designFisher8)
@@ -347,7 +327,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher9$alphaSpent, c(0.058031958, 0.064517887, 0.079453273, 0.092924559, 0.098794775, 0.1), tolerance = 1e-07)
 	expect_equal(designFisher9$criticalValues, c(0.058031958, 0.0026047006, 0.0015628203, 0.00078141017, 0.00031256407, 9.3769221e-05), tolerance = 1e-07)
 	expect_equal(designFisher9$stageLevels, c(0.058031958, 0.018103809, 0.044282865, 0.074062827, 0.095655516, 0.1), tolerance = 1e-07)
-	expect_equal(designFisher9$scale, c(1, 1, 1, 1, 1))
 	expect_equal(designFisher9$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher9), NA)))
@@ -358,7 +337,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher9CodeBased$alphaSpent, designFisher9$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher9CodeBased$criticalValues, designFisher9$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher9CodeBased$stageLevels, designFisher9$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher9CodeBased$scale, designFisher9$scale, tolerance = 1e-05)
 	    expect_equal(designFisher9CodeBased$nonStochasticCurtailment, designFisher9$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher9), "character")
 	    df <- as.data.frame(designFisher9)
@@ -380,7 +358,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher10$alphaSpent, c(0.082381502, 0.082401579, 0.084330144, 0.086806556, 0.10023391, 0.1), tolerance = 1e-07)
 	expect_equal(designFisher10$criticalValues, c(0.082381502, 0.00017925198, 0.00011812048, 5.906024e-05, 3.9204058e-05, 1.1761218e-05), tolerance = 1e-07)
 	expect_equal(designFisher10$stageLevels, c(0.082381502, 0.0005998602, 0.0062212598, 0.012409923, 0.09943647, 0.1), tolerance = 1e-07)
-	expect_equal(designFisher10$scale, c(0.70710678, 1.2247449, 1, 2.236068, 1), tolerance = 1e-07)
 	expect_equal(designFisher10$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher10), NA)))
@@ -391,7 +368,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher10CodeBased$alphaSpent, designFisher10$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher10CodeBased$criticalValues, designFisher10$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher10CodeBased$stageLevels, designFisher10$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher10CodeBased$scale, designFisher10$scale, tolerance = 1e-05)
 	    expect_equal(designFisher10CodeBased$nonStochasticCurtailment, designFisher10$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher10), "character")
 	    df <- as.data.frame(designFisher10)
@@ -410,7 +386,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher11$alphaSpent, c(0.01, 0.015, 0.02, 0.025), tolerance = 1e-07)
 	expect_equal(designFisher11$criticalValues, c(0.01, 0.0011768873, 0.00031357454, 0.00011586425), tolerance = 1e-07)
 	expect_equal(designFisher11$stageLevels, c(0.01, 0.0091148534, 0.013047692, 0.020300118), tolerance = 1e-07)
-	expect_equal(designFisher11$scale, c(1, 1, 1))
 	expect_equal(designFisher11$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher11), NA)))
@@ -421,7 +396,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher11CodeBased$alphaSpent, designFisher11$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher11CodeBased$criticalValues, designFisher11$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher11CodeBased$stageLevels, designFisher11$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher11CodeBased$scale, designFisher11$scale, tolerance = 1e-05)
 	    expect_equal(designFisher11CodeBased$nonStochasticCurtailment, designFisher11$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher11), "character")
 	    df <- as.data.frame(designFisher11)
@@ -443,7 +417,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	expect_equal(designFisher12$alphaSpent, c(0.01, 0.015, 0.02, 0.025), tolerance = 1e-07)
 	expect_equal(designFisher12$criticalValues, c(0.01, 0.00018389153, 2.6484943e-06, 5.2344628e-07), tolerance = 1e-07)
 	expect_equal(designFisher12$stageLevels, c(0.01, 0.0073532156, 0.0101804, 0.018500415), tolerance = 1e-07)
-	expect_equal(designFisher12$scale, c(1.4142136, 2, 1.7320508), tolerance = 1e-07)
 	expect_equal(designFisher12$nonStochasticCurtailment, FALSE)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(designFisher12), NA)))
@@ -454,7 +427,6 @@ test_that("'getDesignFisher' with kMax = 2,3,..,6: parameters and results are as
 	    expect_equal(designFisher12CodeBased$alphaSpent, designFisher12$alphaSpent, tolerance = 1e-05)
 	    expect_equal(designFisher12CodeBased$criticalValues, designFisher12$criticalValues, tolerance = 1e-05)
 	    expect_equal(designFisher12CodeBased$stageLevels, designFisher12$stageLevels, tolerance = 1e-05)
-	    expect_equal(designFisher12CodeBased$scale, designFisher12$scale, tolerance = 1e-05)
 	    expect_equal(designFisher12CodeBased$nonStochasticCurtailment, designFisher12$nonStochasticCurtailment, tolerance = 1e-05)
 	    expect_type(names(designFisher12), "character")
 	    df <- as.data.frame(designFisher12)

@@ -4,7 +4,7 @@
 \alias{param_effectList}
 \title{Parameter Description: Effect List}
 \arguments{
-\item{effectList}{List of subsets, prevalences, and effect sizes with columns and number of rows 
+\item{effectList}{List of subsets, prevalences, and effect sizes with columns and number of rows
 reflecting the different situations to consider (see examples).}
 }
 \description{

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6646 $
-## |  Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
+## |  File version: $Revision: 6793 $
+## |  Last changed: $Date: 2023-02-03 14:37:15 +0100 (Fri, 03 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -438,6 +438,111 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
     )
 }
 
+.getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
+    args <- list(...)
+    if (length(args) == 0) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "data.frame, data vectors, or datasets expected")
+    }
+    
+    if (.optionalArgsContainsDatasets(...)) {
+        if (length(args) == 1) {
+            return(args[[1]])
+        }
+        
+        design <- .getDesignFromArgs(...)
+        if (length(args) == 2 && !is.null(design)) {
+            dataset <- .getDatasetFromArgs(...)
+            if (!is.null(dataset)) {
+                dataset <- dataset$copy(shallow = FALSE)
+                dataset$.design <- design
+                return(dataset)
+            }
+        }
+        
+        return(.getEnrichmentDatasetFromArgs(...))
+    }
+    
+    exampleType <- args[["example"]]
+    if (!is.null(exampleType) && exampleType %in% c("means", "rates", "survival")) {
+        return(.getDatasetExample(exampleType = exampleType))
+    }
+    
+    if (length(args) == 1 && !is.null(args[[1]]) && is.list(args[[1]]) && !is.data.frame(args[[1]])) {
+        return(.getDatasetMeansFromModelsByStage(emmeansResults = args[[1]]))
+    }
+    
+    emmeansResults <- .getDatasetMeansModelObjectsList(args)
+    if (!is.null(emmeansResults) && length(emmeansResults) > 0) {
+        return(.getDatasetMeansFromModelsByStage(emmeansResults = emmeansResults))
+    }
+    
+    dataFrame <- .getDataFrameFromArgs(...)
+    
+    design <- .getDesignFromArgs(...)
+    
+    if (is.null(dataFrame)) {
+        args <- .removeDesignFromArgs(args)
+        
+        paramNames <- names(args)
+        paramNames <- paramNames[paramNames != ""]
+        
+        numberOfParameters <- length(args)
+        if (numberOfParameters > 0 && names(args)[1] == "" && .isTrialDesign(args[[1]])) {
+            numberOfParameters <- numberOfParameters - 1
+        }
+        
+        if (length(paramNames) != numberOfParameters) {
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all parameters must be named")
+        }
+        
+        if (length(paramNames) != length(unique(paramNames))) {
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "the parameter names must be unique")
+        }
+        
+        dataFrame <- .createDataFrame(...)
+    }
+    
+    enrichmentEnabled <- .isDataObjectEnrichment(...)
+    
+    if (.isDataObjectMeans(...)) {
+        return(DatasetMeans(
+                dataFrame = dataFrame,
+                floatingPointNumbersEnabled = floatingPointNumbersEnabled,
+                enrichmentEnabled = enrichmentEnabled,
+                .design = design
+            ))
+    }
+    
+    if (.isDataObjectRates(...)) {
+        return(DatasetRates(
+                dataFrame = dataFrame,
+                floatingPointNumbersEnabled = floatingPointNumbersEnabled,
+                enrichmentEnabled = enrichmentEnabled,
+                .design = design
+            ))
+    }
+    
+    if (.isDataObjectNonStratifiedEnrichmentSurvival(...)) {
+        return(DatasetEnrichmentSurvival(
+                dataFrame = dataFrame,
+                floatingPointNumbersEnabled = floatingPointNumbersEnabled,
+                enrichmentEnabled = enrichmentEnabled,
+                .design = design
+            ))
+    }
+    
+    if (.isDataObjectSurvival(...)) {
+        return(DatasetSurvival(
+                dataFrame = dataFrame,
+                floatingPointNumbersEnabled = floatingPointNumbersEnabled,
+                enrichmentEnabled = enrichmentEnabled,
+                .design = design
+            ))
+    }
+    
+    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "failed to identify dataset type")
+}
+
 #' @title
 #' Get Dataset
 #'
@@ -529,109 +634,14 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
 #'
 #' @export
 #'
-getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
-    args <- list(...)
-    if (length(args) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "data.frame, data vectors, or datasets expected")
+getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {  
+    dataset <- .getDataset(floatingPointNumbersEnabled = floatingPointNumbersEnabled, ...)
+    if (dataset$.enrichmentEnabled && dataset$getNumberOfGroups() != 2) {
+        warning("Only population enrichment data with 2 groups can be analyzed but ", 
+            dataset$getNumberOfGroups(), " group", 
+            ifelse(dataset$getNumberOfGroups() == 1, " is", "s are"), " defined", call. = FALSE)
     }
-
-    if (.optionalArgsContainsDatasets(...)) {
-        if (length(args) == 1) {
-            return(args[[1]])
-        }
-        
-        design <- .getDesignFromArgs(...)
-        if (length(args) == 2 && !is.null(design)) {
-            dataset <- .getDatasetFromArgs(...)
-            if (!is.null(dataset)) {
-                dataset <- dataset$copy(shallow = FALSE)
-                dataset$.design <- design
-                return(dataset)
-            }
-        }
-        
-        return(.getEnrichmentDatasetFromArgs(...))
-    }
-
-    exampleType <- args[["example"]]
-    if (!is.null(exampleType) && exampleType %in% c("means", "rates", "survival")) {
-        return(.getDatasetExample(exampleType = exampleType))
-    }
-
-    if (length(args) == 1 && !is.null(args[[1]]) && is.list(args[[1]]) && !is.data.frame(args[[1]])) {
-        return(.getDatasetMeansFromModelsByStage(emmeansResults = args[[1]]))
-    }
-
-    emmeansResults <- .getDatasetMeansModelObjectsList(args)
-    if (!is.null(emmeansResults) && length(emmeansResults) > 0) {
-        return(.getDatasetMeansFromModelsByStage(emmeansResults = emmeansResults))
-    }
-
-    dataFrame <- .getDataFrameFromArgs(...)
-    
-    design <- .getDesignFromArgs(...)
-
-    if (is.null(dataFrame)) {
-        args <- .removeDesignFromArgs(args)
-        
-        paramNames <- names(args)
-        paramNames <- paramNames[paramNames != ""]
-        
-        numberOfParameters <- length(args)
-        if (numberOfParameters > 0 && names(args)[1] == "" && .isTrialDesign(args[[1]])) {
-            numberOfParameters <- numberOfParameters - 1
-        }
-        
-        if (length(paramNames) != numberOfParameters) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all parameters must be named")
-        }
-
-        if (length(paramNames) != length(unique(paramNames))) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "the parameter names must be unique")
-        }
-
-        dataFrame <- .createDataFrame(...)
-    }
-
-    enrichmentEnabled <- .isDataObjectEnrichment(...)
-
-    if (.isDataObjectMeans(...)) {
-        return(DatasetMeans(
-            dataFrame = dataFrame,
-            floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-            enrichmentEnabled = enrichmentEnabled,
-            .design = design
-        ))
-    }
-
-    if (.isDataObjectRates(...)) {
-        return(DatasetRates(
-            dataFrame = dataFrame,
-            floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-            enrichmentEnabled = enrichmentEnabled,
-            .design = design
-        ))
-    }
-
-    if (.isDataObjectNonStratifiedEnrichmentSurvival(...)) {
-        return(DatasetEnrichmentSurvival(
-            dataFrame = dataFrame,
-            floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-            enrichmentEnabled = enrichmentEnabled,
-            .design = design
-        ))
-    }
-
-    if (.isDataObjectSurvival(...)) {
-        return(DatasetSurvival(
-            dataFrame = dataFrame,
-            floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-            enrichmentEnabled = enrichmentEnabled,
-            .design = design
-        ))
-    }
-
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "failed to identify dataset type")
+    return(dataset)
 }
 
 #' @rdname getDataset
@@ -1267,7 +1277,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     dataFrame <- .getEnrichmentDataFrameFromArgs(...)
     .validateEnrichmentDataFrame(dataFrame)
     dataFrame <- .getWideFormat(dataFrame)
-    return(getDataset(dataFrame = dataFrame))
+    return(.getDataset(dataFrame = dataFrame))
 }
 
 .getDatasetExample <- function(exampleType) {
@@ -2156,17 +2166,29 @@ DatasetMeans <- setRefClass("DatasetMeans",
             }
             return(result)
         },
+        .getStageWiseStDev = function(overallStDevs, sampleSizes, overallSampleSizes, means, overallMeans, k) {
+            numBeforeK <- (overallSampleSizes[k - 1] - 1) * overallStDevs[k - 1]^2
+            numK <- (overallSampleSizes[k] - 1) * overallStDevs[k]^2
+            numSumBeforeK <- sum(sampleSizes[1:(k - 1)] * (means[1:(k - 1)] - overallMeans[k - 1])^2)
+            numSumK <- sum(sampleSizes[1:k] * (means[1:k] - overallMeans[k])^2)
+            denom <- (sampleSizes[k] - 1)
+            value <- (numK - numBeforeK + numSumBeforeK - numSumK) / denom
+            if (is.null(value) || length(value) != 1 || is.na(value) || value < 0) {
+                warning("No calculation of stage-wise standard deviation from ",
+                    "overall standard deviations possible at stage ", k, call. = FALSE)
+                return(NA_real_)
+            } 
+            
+            return(sqrt(value))
+        },
         .getStageWiseStDevs = function(overallStDevs, sampleSizes, overallSampleSizes, means, overallMeans) {
             result <- overallStDevs
             if (length(overallStDevs) == 1) {
                 return(result)
             }
 
-            for (k in 2:length(overallStDevs)) {
-                result[k] <- sqrt(((overallSampleSizes[k] - 1) * overallStDevs[k]^2 -
-                    (overallSampleSizes[k - 1] - 1) * overallStDevs[k - 1]^2 +
-                    sum(sampleSizes[1:(k - 1)] * (means[1:(k - 1)] - overallMeans[k - 1])^2) -
-                    sum(sampleSizes[1:k] * (means[1:k] - overallMeans[k])^2)) / (sampleSizes[k] - 1))
+            for (k in 2:length(overallStDevs)) { 
+                result[k] <- .getStageWiseStDev(overallStDevs, sampleSizes, overallSampleSizes, means, overallMeans, k)
             }
             return(result)
         },
@@ -3320,10 +3342,12 @@ DatasetSurvival <- setRefClass("DatasetSurvival",
                         suffix = group
                     )
                     .validateValues(overallEventsTemp, paste0("overallEvents", group))
-                    .assertValuesAreStrictlyIncreasing(overallEventsTemp,
-                        paste0("overallEvents", group),
-                        endingNasAllowed = TRUE
-                    )
+                    if (is.null(dataFrame[["subset"]]) || length(unique(dataFrame[["subset"]])) <= 1) {
+                        .assertValuesAreStrictlyIncreasing(overallEventsTemp,
+                            paste0("overallEvents", group),
+                            endingNasAllowed = TRUE
+                        )
+                    }
                     overallEvents <<- c(overallEvents, overallEventsTemp)
 
                     overallLogRanksTemp <- .getValuesByParameterName(

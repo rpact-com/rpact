@@ -34,8 +34,8 @@ setLogLevel("DISABLED")
 }
 \seealso{
 \itemize{
-  \item \code{\link[=getLogLevel]{getLogLevel()}} for getting the current log level,
-  \item \code{\link[=resetLogLevel]{resetLogLevel()}} for resetting the log level to default.
+\item \code{\link[=getLogLevel]{getLogLevel()}} for getting the current log level,
+\item \code{\link[=resetLogLevel]{resetLogLevel()}} for resetting the log level to default.
 }
 }
 \keyword{internal}

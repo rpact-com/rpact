@@ -9,22 +9,22 @@ getDesignSet(...)
 \arguments{
 \item{...}{\code{designs} or \code{design} and one or more design parameters, e.g., \code{deltaWT = c(0.1, 0.3, 0.4)}.
 \itemize{
-  \item \code{design} The master design (optional, you need to specify an
-        additional parameter that shall be varied).
-  \item \code{designs} The designs to compare (optional, you need to specify the variable \code{variedParameters}).
+\item \code{design} The master design (optional, you need to specify an
+additional parameter that shall be varied).
+\item \code{designs} The designs to compare (optional, you need to specify the variable \code{variedParameters}).
 }}
 }
 \value{
 Returns a \code{\link{TrialDesignSet}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.TrialDesignSet]{names}} to obtain the field names,
-  \item \code{\link[=length.TrialDesignSet]{length}} to obtain the number of design,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesignSet]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.TrialDesignSet]{names}} to obtain the field names,
+\item \code{\link[=length.TrialDesignSet]{length}} to obtain the number of design,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.TrialDesignSet]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -35,12 +35,12 @@ Specify a master design and one or more design parameters or a list of designs.
 }
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 

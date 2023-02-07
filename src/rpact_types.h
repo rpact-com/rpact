@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6621 $
- * Last changed: $Date: 2022-10-20 17:09:27 +0200 (Thu, 20 Oct 2022) $
+ * File version: $Revision: 6784 $
+ * Last changed: $Date: 2023-01-31 10:11:06 +0100 (Di, 31 Jan 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -29,10 +29,48 @@
 
 using namespace Rcpp;
 
-typedef double (*calcSubjectsFunctionPtr)(int stage, bool riskRatio, double thetaH0, double groups, NumericVector plannedSubjects,
-	bool directionUpper, double allocationRatioPlanned, NumericVector minNumberOfSubjectsPerStage,
-	NumericVector maxNumberOfSubjectsPerStage, NumericVector sampleSizesPerStage, NumericVector conditionalPower,
-	NumericVector overallRate, double conditionalCriticalValue, double farringtonManningValue1,
+typedef double (*calcSubjectsFunctionMeansPtr)(
+	int stage,
+	bool meanRatio,
+	double thetaH0,
+	int groups,
+	NumericVector plannedSubjects,
+	NumericVector allocationRatioPlanned,
+	NumericVector minNumberOfSubjectsPerStage,
+	NumericVector maxNumberOfSubjectsPerStage,
+	NumericVector sampleSizesPerStage,
+	double thetaH1,
+	double stDevH1,
+	double conditionalPower,
+	double conditionalCriticalValue);
+
+typedef double (*calcSubjectsFunctionRatesPtr)(
+	int stage,
+	bool riskRatio,
+	double thetaH0,
+	int groups,
+	NumericVector plannedSubjects,
+	bool directionUpper,
+	NumericVector allocationRatioPlanned,
+	NumericVector minNumberOfSubjectsPerStage,
+	NumericVector maxNumberOfSubjectsPerStage,
+	NumericVector sampleSizesPerStage,
+	NumericVector conditionalPower,
+	NumericVector overallRate,
+	double conditionalCriticalValue,
+	double farringtonManningValue1,
 	double farringtonManningValue2);
+
+typedef double (*calcEventsFunctionSurvivalPtr)(
+	int stage,
+	double conditionalPower,
+	double thetaH0,
+	double estimatedTheta,
+	NumericVector plannedEvents,
+	NumericVector eventsOverStages,
+	NumericVector minNumberOfEventsPerStage,
+	NumericVector maxNumberOfEventsPerStage,
+	double allocationRatioPlanned,
+	double conditionalCriticalValue);
 
 #endif /* SRC_RPACT_TYPES_H_ */

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6058 $
-## |  Last changed: $Date: 2022-04-26 08:36:08 +0200 (Tue, 26 Apr 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -29,7 +29,7 @@ NULL
         plannedSubjects,
         allocationRatioPlanned,
         selectedArms,
-        piH1,
+        piTreatmentsH1,
         piControlH1,
         overallRates,
         overallRatesControl,
@@ -45,14 +45,14 @@ NULL
             } else {
                 piAssumedControlH1 <- piControlH1
             }
-            if (is.na(piH1)) {
+            if (is.na(piTreatmentsH1)) {
                 if (directionUpper) {
                     piAssumedH1 <- min(overallRates[selectedArms[1:gMax, stage + 1], stage], na.rm = TRUE)
                 } else {
                     piAssumedH1 <- max(overallRates[selectedArms[1:gMax, stage + 1], stage], na.rm = TRUE)
                 }
             } else {
-                piAssumedH1 <- piH1
+                piAssumedH1 <- piTreatmentsH1
             }
             pim <- (allocationRatioPlanned * piAssumedH1 + piAssumedControlH1) / (1 + allocationRatioPlanned)
 
@@ -81,7 +81,7 @@ NULL
 .getSimulatedStageRatesMultiArm <- function(design, directionUpper, piVector, piControl,
         plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue,
         threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage, conditionalPower, piH1, piControlH1,
+        maxNumberOfSubjectsPerStage, conditionalPower, piTreatmentsH1, piControlH1,
         calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
     kMax <- length(plannedSubjects)
     gMax <- length(piVector)
@@ -210,7 +210,7 @@ NULL
                     plannedSubjects = plannedSubjects,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedArms = selectedArms,
-                    piH1 = piH1,
+                    piTreatmentsH1 = piTreatmentsH1,
                     piControlH1 = piControlH1,
                     overallRates = overallRates,
                     overallRatesControl = overallRatesControl,
@@ -240,14 +240,14 @@ NULL
                 piAssumedControlH1 <- piControlH1
             }
 
-            if (is.na(piH1)) {
+            if (is.na(piTreatmentsH1)) {
                 if (directionUpper) {
                     piAssumedH1 <- min(overallRates[selectedArms[1:gMax, k], k], na.rm = TRUE)
                 } else {
                     piAssumedH1 <- max(overallRates[selectedArms[1:gMax, k], k], na.rm = TRUE)
                 }
             } else {
-                piAssumedH1 <- piH1
+                piAssumedH1 <- piTreatmentsH1
             }
 
             pim <- (allocationRatioPlanned * piAssumedH1 + piAssumedControlH1) / (1 + allocationRatioPlanned)
@@ -303,7 +303,7 @@ NULL
 #'        default is \code{seq(0, 1, 0.2)}.
 #' @param piControl If specified, the assumed probability in the control arm
 #'        for simulation and under which the sample size recalculation is performed.
-#' @param piH1 If specified, the assumed probability in the active treatment arm(s)
+#' @param piTreatmentsH1 If specified, the assumed probability in the active treatment arm(s)
 #'        under which the sample size recalculation is performed.
 #' @param piControlH1 If specified, the assumed probability in the reference group
 #'        (if different from \code{piControl}) for which the conditional power was calculated.
@@ -361,7 +361,7 @@ NULL
 #' \code{conditionalCriticalValue},
 #' \code{overallRates},
 #' \code{overallRatesControl},
-#' \code{piH1}, and
+#' \code{piTreatmentsH1}, and
 #' \code{piControlH1}.
 #' The function has to contain the three-dots argument '...' (see examples).
 #'
@@ -394,7 +394,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
         conditionalPower = NA_real_,
-        piH1 = NA_real_,
+        piTreatmentsH1 = NA_real_, 
         piControlH1 = NA_real_,
         maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
@@ -446,7 +446,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage, # means + rates only
         maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage, # means + rates only
         conditionalPower            = conditionalPower,
-        piH1                        = piH1, # rates only
+        piTreatmentsH1              = piTreatmentsH1, # rates only
         piControlH1                 = piControlH1, # rates only
         maxNumberOfIterations       = maxNumberOfIterations,
         seed                        = seed,
@@ -467,7 +467,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     effectMatrix <- t(simulationResults$effectMatrix)
     piMaxVector <- simulationResults$piMaxVector # rates only
     piControl <- simulationResults$piControl # rates only
-    piH1 <- simulationResults$piH1 # rates only
+    piTreatmentsH1 <- simulationResults$piTreatmentsH1 # rates only
     piControlH1 <- simulationResults$piControlH1 # rates only
     conditionalPower <- simulationResults$conditionalPower
     minNumberOfSubjectsPerStage <- simulationResults$minNumberOfSubjectsPerStage
@@ -538,7 +538,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
                 minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage,
                 maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage,
                 conditionalPower = conditionalPower,
-                piH1 = piH1,
+                piTreatmentsH1 = piTreatmentsH1,
                 piControlH1 = piControlH1,
                 calcSubjectsFunction = calcSubjectsFunction,
                 calcSubjectsFunctionIsUserDefined = calcSubjectsFunctionIsUserDefined,

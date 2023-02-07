@@ -19,12 +19,12 @@
 \arguments{
 \item{x}{A \code{\link{TrialDesignSet}} object.}
 
-\item{niceColumnNamesEnabled}{Logical. If \code{TRUE}, nice looking column 
-names will be used; syntactic names (variable names) otherwise 
+\item{niceColumnNamesEnabled}{Logical. If \code{TRUE}, nice looking column
+names will be used; syntactic names (variable names) otherwise
 (see \code{\link[base]{make.names}}).}
 
-\item{includeAllParameters}{Logical. If \code{TRUE}, all available 
-parameters will be included in the data frame; 
+\item{includeAllParameters}{Logical. If \code{TRUE}, all available
+parameters will be included in the data frame;
 a meaningful parameter selection otherwise, default is \code{FALSE}.}
 
 \item{addPowerAndAverageSampleNumber}{If \code{TRUE}, power and average sample size will
@@ -34,7 +34,7 @@ be added to data frame, default is \code{FALSE}.}
 
 \item{nMax}{The maximum sample size. Must be a positive integer of length 1.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 }
 \value{

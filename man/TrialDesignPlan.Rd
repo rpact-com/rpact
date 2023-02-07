@@ -10,9 +10,9 @@ Basic class for trial design plans.
 \details{
 \code{TrialDesignPlan} is the basic class for
 \itemize{
-  \item \code{TrialDesignPlanMeans},
-  \item \code{TrialDesignPlanRates}, and
-  \item \code{TrialDesignPlanSurvival}.
+\item \code{TrialDesignPlanMeans},
+\item \code{TrialDesignPlanRates}, and
+\item \code{TrialDesignPlanSurvival}.
 }
 }
 

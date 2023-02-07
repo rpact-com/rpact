@@ -9,7 +9,7 @@ getLambdaStepFunction(timeValues, ..., piecewiseSurvivalTime, piecewiseLambda)
 \arguments{
 \item{timeValues}{A numeric vector that specifies the time values for which the lambda step values shall be calculated.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{piecewiseSurvivalTime}{A numeric vector that specifies the time intervals for the piecewise

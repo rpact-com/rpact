@@ -4,7 +4,7 @@
 \alias{param_dropoutTime}
 \title{Parameter Description: Dropout Time}
 \arguments{
-\item{dropoutTime}{The assumed time for drop-out rates in the control and the 
+\item{dropoutTime}{The assumed time for drop-out rates in the control and the
 treatment group, default is \code{12}.}
 }
 \description{

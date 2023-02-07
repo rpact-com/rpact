@@ -13,20 +13,28 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-.getTestStatisticsMeans <- function(..., designNumber, informationRates, groups, normalApproximation,
-        meanRatio, thetaH0, allocationRatioPlanned, sampleSizesPerStage, testStatisticsPerStage) {
+.getTestStatisticsMeans <- function(...,
+        designNumber,
+        informationRates,
+        groups,
+        normalApproximation,
+        meanRatio,
+        thetaH0,
+        allocationRatioPlanned,
+        sampleSizesPerStage,
+        testStatisticsPerStage) {
     stage <- length(sampleSizesPerStage)
 
     # This is an estimate of the overall test statistic disregarding the fact that the variance can be estimated
     # from the overall data (might have influence on the Type I error rate and power when choosing the conventional
     # group sequential design with unknown variance):
-    overallTestStatistic <- sqrt(sampleSizesPerStage) %*% testStatisticsPerStage /
-        sqrt(sum(sampleSizesPerStage))
+    overallTestStatistic <- sqrt(sampleSizesPerStage) %*% testStatisticsPerStage / 
+		sqrt(sum(sampleSizesPerStage))
 
     if (normalApproximation) {
         pValuesSeparate <- 1 - stats::pnorm(testStatisticsPerStage)
@@ -66,15 +74,15 @@
         weightsFisher <- rep(NA_real_, stage)
         weightsFisher[1] <- 1
         if (stage > 1) {
-            weightsFisher[2:stage] <- sqrt(informationRates[2:stage] -
-                informationRates[1:(stage - 1)]) / sqrt(informationRates[1])
+            weightsFisher[2:stage] <- sqrt(informationRates[2:stage] - informationRates[1:(stage - 1)]) / 
+				sqrt(informationRates[1])
         }
         if (normalApproximation) {
             value <- prod((1 - stats::pnorm(testStatisticsPerStage[1:stage]))^weightsFisher[1:stage])
         } else {
             value <- prod((1 - stats::pt(
                 testStatisticsPerStage[1:stage],
-                sampleSizesPerStage[1:stage] - groups
+                sampleSizesPerStage - groups
             ))^weightsFisher[1:stage])
         }
     }
@@ -82,18 +90,12 @@
     if (groups == 1) {
         standardizedEffectEstimate <- overallTestStatistic / sqrt(sum(sampleSizesPerStage))
     } else {
-        if (!meanRatio) {
-            standardizedEffectEstimate <- overallTestStatistic /
-                sqrt(allocationRatioPlanned * sum(sampleSizesPerStage)) *
-                (1 + allocationRatioPlanned)
-        } else {
-            standardizedEffectEstimate <- overallTestStatistic /
-                sqrt(allocationRatioPlanned * sum(sampleSizesPerStage)) *
-                sqrt((1 + allocationRatioPlanned) *
-                    (1 + thetaH0^2 * allocationRatioPlanned))
-        }
+        numerator <- if (!meanRatio) 1 else thetaH0^2
+        standardizedEffectEstimate <- overallTestStatistic *
+            sqrt(1 / sum(allocationRatioPlanned[1:stage] / (1 + allocationRatioPlanned[1:stage]) * sampleSizesPerStage) +
+                    numerator / sum(1 / (1 + allocationRatioPlanned[1:stage]) * sampleSizesPerStage))
     }
-
+	
     return(list(
         value = value,
         overallTestStatistic = overallTestStatistic,
@@ -103,7 +105,10 @@
 }
 
 .getSimulationMeansStageSubjects <- function(..., stage,
-        meanRatio, thetaH0, groups, plannedSubjects,
+        meanRatio,
+        thetaH0,
+        groups,
+        plannedSubjects,
         allocationRatioPlanned,
         minNumberOfSubjectsPerStage,
         maxNumberOfSubjectsPerStage,
@@ -121,15 +126,14 @@
     mult <- 1
     if (groups == 2) {
         thetaH0 <- ifelse(meanRatio, thetaH0, 1)
-        mult <- 1 + 1 / allocationRatioPlanned + thetaH0^2 * (1 + allocationRatioPlanned)
+        mult <- 1 + 1 / allocationRatioPlanned[stage] + thetaH0^2 * (1 + allocationRatioPlanned[stage])
     }
 
     stageSubjects <- (max(0, conditionalCriticalValue + .getQNorm(conditionalPower)))^2 * mult /
         (max(1e-12, thetaStandardized))^2
 
     stageSubjects <- min(
-        max(minNumberOfSubjectsPerStage[stage], stageSubjects),
-        maxNumberOfSubjectsPerStage[stage]
+        max(minNumberOfSubjectsPerStage[stage], stageSubjects), maxNumberOfSubjectsPerStage[stage]
     )
 
     return(stageSubjects)
@@ -162,12 +166,12 @@
         testStatisticsPerStage,
         testStatistic,
         calcSubjectsFunction) {
+        
     stageSubjects <- plannedSubjects[1]
 
     # perform sample size size recalculation for stages 2, ..., kMax
     simulatedConditionalPower <- 0
     if (k > 1) {
-
         # used effect size is either estimated from test statistic or pre-fixed
         if (is.na(thetaH1)) {
             thetaH1 <- effectEstimate
@@ -221,10 +225,10 @@
             thetaStandardized <- thetaStandardized
         } else {
             if (!meanRatio) {
-                thetaStandardized <- thetaStandardized * sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned)
+                thetaStandardized <- thetaStandardized * sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k])
             } else {
-                thetaStandardized <- thetaStandardized * sqrt(allocationRatioPlanned) /
-                    sqrt((1 + allocationRatioPlanned) * (1 + thetaH0 * allocationRatioPlanned))
+                thetaStandardized <- thetaStandardized * sqrt(allocationRatioPlanned[k]) /
+                    sqrt((1 + allocationRatioPlanned[k]) * (1 + thetaH0 * allocationRatioPlanned[k]))
             }
         }
         simulatedConditionalPower <-
@@ -241,11 +245,11 @@
     } else {
         if (!meanRatio) {
             nz <- (alternative - thetaH0) / stDev *
-                sqrt(allocationRatioPlanned * stageSubjects) / (1 + allocationRatioPlanned)
+                sqrt(allocationRatioPlanned[k] * stageSubjects) / (1 + allocationRatioPlanned[k])
         } else {
             nz <- (alternative - thetaH0) / stDev *
-                sqrt(allocationRatioPlanned * stageSubjects) /
-                sqrt((1 + allocationRatioPlanned) * (1 + thetaH0^2 * allocationRatioPlanned))
+                sqrt(allocationRatioPlanned[k] * stageSubjects) /
+                sqrt((1 + allocationRatioPlanned[k]) * (1 + thetaH0^2 * allocationRatioPlanned[k]))
         }
         if (normalApproximation) {
             testResult <- (2 * directionUpper - 1) * stats::rnorm(1, nz, 1)
@@ -253,7 +257,7 @@
             testResult <- (2 * directionUpper - 1) * stats::rt(1, stageSubjects - 2, nz)
         }
     }
-    
+
     sampleSizesPerStage <- c(sampleSizesPerStage, stageSubjects)
     testStatisticsPerStage <- c(testStatisticsPerStage, testResult)
 
@@ -337,7 +341,9 @@
         conditionalPower,
         thetaH1,
         stDevH1,
-        calcSubjectsFunction) {
+        calcSubjectsFunctionType,
+        calcSubjectsFunctionR,
+        calcSubjectsFunctionCpp) {
     len <- length(alternative) * maxNumberOfIterations * kMax
     dataIterationNumber <- rep(NA_real_, len)
     dataStageNumber <- rep(NA_real_, len)
@@ -408,7 +414,7 @@
                         sampleSizesPerStage = sampleSizesPerStage,
                         testStatisticsPerStage = testStatisticsPerStage,
                         testStatistic = testStatistic,
-                        calcSubjectsFunction = calcSubjectsFunction
+                        calcSubjectsFunction = calcSubjectsFunctionR
                     )
 
                     trialStop <- stepResult$trialStop
@@ -464,7 +470,7 @@
                 simulatedConditionalPower[2:kMax] / iterations[2:kMax, i]
         }
     }
-    
+
     data <- data.frame(
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
@@ -653,13 +659,16 @@ getSimulationMeans <- function(design = NULL, ...,
     .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE)
     .assertIsSingleNumber(stDevH1, "stDevH1", naAllowed = TRUE)
     .assertIsInOpenInterval(stDevH1, "stDevH1", 0, NULL, naAllowed = TRUE)
-    .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE)
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsValidStandardDeviation(stDev)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
     .assertIsSingleLogical(normalApproximation, "normalApproximation", naAllowed = FALSE)
+    .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
+	
+	simulationResults <- SimulationResultsMeans(design, showStatistics = showStatistics)
 
     if (design$sided == 2) {
         stop(
@@ -680,13 +689,36 @@ getSimulationMeans <- function(design = NULL, ...,
                 ") will be ignored because it is not applicable for 'groups' = 1",
                 call. = FALSE
             )
-            allocationRatioPlanned <- NA_real_
+            simulationResults$allocationRatioPlanned <- NA_real_
         }
-    } else if (is.na(allocationRatioPlanned)) {
-        allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
+        simulationResults$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)
+    } else { 
+		if (any(is.na(allocationRatioPlanned))) {
+        	allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
+		}	
+        
+        if (length(allocationRatioPlanned) == 1) {
+            allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
+        } else if (length(allocationRatioPlanned) != design$kMax) {
+            stop(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+                "must have length 1 or ", design$kMax, " (kMax)"
+            )
+        }
+		
+        if (length(unique(allocationRatioPlanned)) == 1) {
+            .setValueAndParameterType(
+                simulationResults, "allocationRatioPlanned",
+                allocationRatioPlanned[1], defaultValue = 1
+            )
+        } else {
+            .setValueAndParameterType(
+                simulationResults, "allocationRatioPlanned",
+                allocationRatioPlanned, defaultValue = rep(1, design$kMax)
+            )
+        }
     }
-
-    simulationResults <- SimulationResultsMeans(design, showStatistics = showStatistics)
 
     thetaH1 <- .ignoreParameterIfNotUsed(
         "thetaH1", thetaH1, design$kMax > 1,
@@ -750,10 +782,10 @@ getSimulationMeans <- function(design = NULL, ...,
             maxNumberOfSubjectsPerStage, NA_real_
         )
     }
-    if (!is.na(conditionalPower) && (design$kMax == 1)) {
+    if (!is.na(conditionalPower) && design$kMax == 1) {
         warning("'conditionalPower' will be ignored for fixed sample design", call. = FALSE)
     }
-    if (!is.null(calcSubjectsFunction) && (design$kMax == 1)) {
+    if (!is.null(calcSubjectsFunction) && design$kMax == 1) {
         warning("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE)
     }
 
@@ -788,26 +820,6 @@ getSimulationMeans <- function(design = NULL, ...,
             )
         )
     )
-    if (is.null(calcSubjectsFunction)) {
-        calcSubjectsFunction <- .getSimulationMeansStageSubjects
-    }
-    .assertIsValidFunction(
-        fun = calcSubjectsFunction,
-        funArgName = "calcSubjectsFunction",
-        expectedFunction = .getSimulationMeansStageSubjects
-    )
-    simulationResults$calcSubjectsFunction <- calcSubjectsFunction
-
-    .assertIsIntegerVector(plannedSubjects, "plannedSubjects", validateType = FALSE)
-    if (length(plannedSubjects) != design$kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'plannedSubjects' (", .arrayToString(plannedSubjects),
-            ") must have length ", design$kMax
-        )
-    }
-    .assertIsInClosedInterval(plannedSubjects, "plannedSubjects", lower = 1, upper = NULL)
-    .assertValuesAreStrictlyIncreasing(plannedSubjects, "plannedSubjects")
 
     effect <- alternative - thetaH0
     simulationResults$effect <- effect
@@ -825,13 +837,6 @@ getSimulationMeans <- function(design = NULL, ...,
     )
     .setValueAndParameterType(simulationResults, "stDev", stDev, C_STDEV_DEFAULT)
     .setValueAndParameterType(simulationResults, "groups", as.integer(groups), 2L)
-    .setValueAndParameterType(
-        simulationResults, "allocationRatioPlanned",
-        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
-    )
-    if (groups == 1L) {
-        simulationResults$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)
-    }
     .setValueAndParameterType(
         simulationResults, "plannedSubjects",
         plannedSubjects, NA_real_
@@ -884,14 +889,23 @@ getSimulationMeans <- function(design = NULL, ...,
         alpha0Vec <- rep(NA_real_, design$kMax - 1)
         futilityBounds <- design$futilityBounds
     }
-
     if (is.na(stDevH1)) {
         stDevH1 <- stDev
     }
 
     cppEnabled <- .getOptionalArgument("cppEnabled", ..., optionalArgumentDefaultValue = TRUE)
-    fun <- if (cppEnabled && simulationResults$.getParameterType("calcSubjectsFunction") != C_PARAM_USER_DEFINED) 
-        getSimulationMeansLoopCpp else .getSimulationMeansLoop
+    calcSubjectsFunctionList <- .getCalcSubjectsFunction(
+        design = design,
+        simulationResults = simulationResults,
+        calcFunction = calcSubjectsFunction,
+        expectedFunction = .getSimulationMeansStageSubjects,
+        cppEnabled = cppEnabled
+    )
+    calcSubjectsFunctionType <- calcSubjectsFunctionList$calcSubjectsFunctionType
+    calcSubjectsFunctionR <- calcSubjectsFunctionList$calcSubjectsFunctionR
+    calcSubjectsFunctionCpp <- calcSubjectsFunctionList$calcSubjectsFunctionCpp
+
+    fun <- if (cppEnabled) getSimulationMeansLoopCpp else .getSimulationMeansLoop
     cppResult <- fun(
         alternative = alternative,
         kMax = design$kMax,
@@ -914,7 +928,9 @@ getSimulationMeans <- function(design = NULL, ...,
         conditionalPower = conditionalPower,
         thetaH1 = thetaH1,
         stDevH1 = stDevH1,
-        calcSubjectsFunction = calcSubjectsFunction
+        calcSubjectsFunctionType = calcSubjectsFunctionType,
+        calcSubjectsFunctionR = calcSubjectsFunctionR,
+        calcSubjectsFunctionCpp = calcSubjectsFunctionCpp
     )
 
     sampleSizes <- cppResult$sampleSizes
@@ -947,7 +963,7 @@ getSimulationMeans <- function(design = NULL, ...,
     if (!all(is.na(simulationResults$conditionalPowerAchieved))) {
         simulationResults$.setParameterType("conditionalPowerAchieved", C_PARAM_GENERATED)
     }
-    
+
     data <- cppResult$data
     data <- data[!is.na(data$alternative), ]
     if (designNumber != 3L) {

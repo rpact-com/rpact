@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-class_time.R
-## |  Creation date: 12 August 2022, 09:04:34
-## |  File version: $Revision: 6496 $
-## |  Last changed: $Date: 2022-08-17 09:41:33 +0200 (Mi, 17 Aug 2022) $
+## |  Creation date: 06 February 2023, 12:04:17
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -76,8 +76,6 @@ test_that("Testing 'getPiecewiseSurvivalTime': simple vector based definition", 
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-    
-    .skipTestIfDisabled()
 
 	pwSurvivalTime2 <- getPiecewiseSurvivalTime(lambda2 = 0.5, lambda1 = 0.4)
 
@@ -122,6 +120,8 @@ test_that("Testing 'getPiecewiseSurvivalTime': simple vector based definition", 
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
+
+	.skipTestIfDisabled()
 
 	pwSurvivalTime2 <- getPiecewiseSurvivalTime(pi2 = 0.5, hazardRatio = 0.8)
 
@@ -1173,9 +1173,7 @@ test_that("Testing 'getPiecewiseSurvivalTime': vector based definition", {
 })
 
 test_that("Testing 'getPiecewiseSurvivalTime': check error and warnings", {
-        
-    .skipTestIfDisabled()
-        
+
 	# @refFS[Tab.]{fs:tab:output:getPiecewiseSurvivalTime}
 	expect_error(getPiecewiseSurvivalTime(hazardRatio = c(0.6, 0.8), lambda2 = 0.4, pi2 = 0.4),
 	    "Conflicting arguments: it is not allowed to specify 'pi2' (0.4) and 'lambda2' (0.4) concurrently",
@@ -1519,7 +1517,7 @@ test_that("Testing 'getAccrualTime': isAccrualTimeEnabled()", {
 })
 
 test_that("Testing 'getAccrualTime': vector based definition", {
-        
+
 	accrualTime1 <- getAccrualTime(
 	    accrualTime = c(0, 6, 9, 15),
 	    accrualIntensity = c(15, 21, 27), maxNumberOfSubjects = 315
@@ -2483,9 +2481,7 @@ test_that("Testing 'getAccrualTime': test absolute and relative definition", {
 })
 
 test_that("Testing 'getAccrualTime': check expected warnings and errors", {
-        
-    .skipTestIfDisabled()
-        
+
 	# @refFS[Tab.]{fs:tab:output:getAccrualTime}
 	expect_warning(getAccrualTime(accrualTime = c(0, 6), accrualIntensity = c(0.22, 0.33)),
 	    paste0("The specified accrual time and intensity cannot be supplemented ",
@@ -2596,7 +2592,7 @@ test_that("Testing 'getAccrualTime': list-wise definition", {
 })
 
 test_that("Testing 'getPiecewiseSurvivalTime': mixed arguments", {
-        
+
 	# @refFS[Tab.]{fs:tab:output:getPiecewiseSurvivalTime}
 	pwSurvivalTime1 <- getPiecewiseSurvivalTime(median1 = 37, hazardRatio = 0.8)
 
@@ -2641,9 +2637,7 @@ test_that("Testing 'getPiecewiseSurvivalTime': mixed arguments", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-    
-    .skipTestIfDisabled()
-    
+
 	pwSurvivalTime2 <- getPiecewiseSurvivalTime(lambda1 = 0.01873371, median2 = 29.6)
 
 	## Comparison of the results of PiecewiseSurvivalTime object 'pwSurvivalTime2' with expected results

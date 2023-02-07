@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6646 $
-## |  Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
+## |  File version: $Revision: 6793 $
+## |  Last changed: $Date: 2023-02-03 14:37:15 +0100 (Fri, 03 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -45,6 +45,7 @@ NULL
     }
 
     .assertIsTrialDesign(design)
+    .assertIsDataset(dataInput)
 
     return(list(
         design = design,
@@ -67,13 +68,25 @@ NULL
 #' @inheritParams param_stage
 #' @inheritParams param_maxInformation
 #' @inheritParams param_informationEpsilon
-#' @param ... Further arguments to be passed to methods (cf. separate functions in "See Also" below), e.g.,
+#' @param ... Further arguments to be passed to methods (cf., separate functions in "See Also" below), e.g.,
 #' \describe{
-#'   \item{\code{thetaH1} and \code{assumedStDev} or \code{pi1}, \code{pi2}}{The
-#'       assumed effect size or assumed rates to calculate the
-#'       conditional power. Depending on the type of dataset, either \code{thetaH1} (means and survival)
-#'       or \code{pi1}, \code{pi2} (rates) can be specified.
-#'       For testing means, an assumed standard deviation can be specified, default is \code{1}.}
+#'   \item{\code{thetaH1} and \code{assumedStDevs}, \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
+#'       The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned} 
+#' 		 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio. 
+#' 		 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome, 
+#' 		 \code{pi1} and \code{pi2} can be specified referring to the assumed treatment and control rate, respectively. 
+#' 		 In multi-armed or enrichment designs, you can 
+#'   	 specify a value or a vector with elements referring to the treatment arms or the sub-populations, 
+#'   	 respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl} (multi-arm 
+#'   	 designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr 
+#'   	 If not specified, the conditional power is calculated under the assumption of observed effect sizes, 
+#'   	 standard deviations, rates, or hazard ratios.}
+#'   \item{\code{iterations}}{Iterations for simulating the power for Fisher's combination test.
+#'       If the power for more than one remaining stages is to be determined for
+#'       Fisher's combination test, it is estimated via simulation with specified \cr
+#'       \code{iterations}, the default is \code{1000}.}
+#'   \item{\code{seed}}{Seed for simulating the conditional power for Fisher's combination test.
+#'       See above, default is a random seed.}
 #'   \item{\code{normalApproximation}}{The type of computation of the p-values. Default is \code{FALSE} for
 #'       testing means (i.e., the t test is used) and \code{TRUE} for testing rates and the hazard ratio.
 #'       For testing rates, if \code{normalApproximation = FALSE} is specified, the binomial test
@@ -82,12 +95,6 @@ NULL
 #'   \item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
 #'       the t test assuming that the variances are equal or the t test without assuming this,
 #'       i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
-#'   \item{\code{iterations}}{Iterations for simulating the power for Fisher's combination test.
-#'       If the power for more than one remaining stages is to be determined for
-#'       Fisher's combination test, it is estimated via simulation with specified \cr
-#'       \code{iterations}, the default is \code{1000}.}
-#'   \item{\code{seed}}{Seed for simulating the power for Fisher's combination test.
-#'       See above, default is a random seed.}
 #'   \item{\code{intersectionTest}}{Defines the multiple test for the intersection
 #'       hypotheses in the closed system of hypotheses when testing multiple hypotheses.
 #'       Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"},
@@ -96,15 +103,9 @@ NULL
 #'       \code{"Bonferroni"}, \code{"Simes"}, and \code{"Sidak"}, default is \code{"Simes"}.}
 #'   \item{\code{varianceOption}}{Defines the way to calculate the variance in multiple treatment arms (> 2)
 #'   	 or population enrichment designs for testing means. For multiple arms, three options are available:
-#'        \code{"overallPooled"}, \code{"pairwisePooled"}, and \code{"notPooled"}, default is \code{"overallPooled"}.
+#'       \code{"overallPooled"}, \code{"pairwisePooled"}, and \code{"notPooled"}, default is \code{"overallPooled"}.
 #'       For enrichment designs, the options are: \code{"pooled"}, \code{"pooledFromFull"} (one subset only),
 #'       and \code{"notPooled"}, default is \code{"pooled"}.}
-#'   \item{\code{thetaH1} and \code{assumedStDevs} or \code{piTreatments}, \code{piControls}}{The
-#'       assumed effect size or assumed rates to calculate the conditional power in multi-arm trials
-#'       or enrichment designs. For survival designs, \code{thetaH1} refers to the hazard ratio.
-#'       You can specify a value or a vector with elements referring to the
-#'       treatment arms or the sub-populations, respectively. If not specified, the conditional
-#'       power is calculated under the assumption of observed effect sizes, standard deviations, rates, or hazard ratios.}
 #'   \item{\code{stratifiedAnalysis}}{For enrichment designs, typically a stratified analysis should be chosen.
 #'       For testing means and rates, also a non-stratified analysis based on overall data can be performed.
 #'       For survival data, only a stratified analysis is possible (see Brannath et al., 2009), default is \code{TRUE}.}
@@ -117,12 +118,19 @@ NULL
 #' repeated overall p-values, and final stage p-values, median unbiased effect estimates,
 #' and final confidence intervals.
 #'
-#' For designs with more than two treatments arms (multi-arm designs) or enrichment designs
+#' For designs with more than two treatments arms (multi-arm designs) or enrichment designs 
 #' a closed combination test is performed.
 #' That is, additionally the statistics to be used in a closed testing procedure are provided.
 #'
-#' The conditional power is calculated only if effect size and sample size
-#' is specified. Median unbiased effect estimates and confidence intervals are calculated if
+#' The conditional power is calculated if the planned sample size for the subsequent stages is specified.\cr
+#' For testing rates in a two-armed trial, pi1 and pi2 typically refer to the rates in the treatment 
+#' and the control group, respectively. This is not mandatory, however, and so pi1 and pi2 can be interchanged.
+#' In many-to-one multi-armed trials, piTreatments and piControl refer to the rates in the treatment arms and 
+#' the one control arm, and so they cannot be interchanged. piTreatments and piControls in enrichment designs
+#' can principally be interchanged, but we use the plural form to indicate that the rates can be differently 
+#' specified for the sub-populations.     
+#' 
+#' Median unbiased effect estimates and confidence intervals are calculated if
 #' a group sequential design or an inverse normal combination test design was chosen, i.e., it is not applicable
 #' for Fisher's p-value combination test design.
 #' For the inverse normal combination test design with more than two stages, a warning informs that the validity
@@ -152,9 +160,8 @@ NULL
 #' \itemize{
 #'   \item \code{\link[=getObservedInformationRates]{getObservedInformationRates()}} 
 #'         for recalculation the observed information rates.
+#'   \item @family analysis functions
 #' }
-#'
-#' @family analysis functions
 #'
 #' @template examples_get_analysis_results
 #'
@@ -487,42 +494,40 @@ getStageResults <- function(design, dataInput, ..., stage = NA_integer_) {
     design <- designAndDataInput$design
     dataInput <- designAndDataInput$dataInput
 
-    if (.isMultiArmDataset(dataInput)) {
+	if (.isEnrichmentDataset(dataInput)) {
+		return(.getStageResultsEnrichment(
+			design = design, dataInput = dataInput, stage = stage, ...
+		))
+	} else if (.isMultiArmDataset(dataInput)) {
         return(.getStageResultsMultiArm(
             design = design, dataInput = dataInput, stage = stage, ...
         ))
-    }
-
-    if (.isEnrichmentDataset(dataInput)) {
-        return(.getStageResultsEnrichment(
-            design = design, dataInput = dataInput, stage = stage, ...
-        ))
-    }
-
-    stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
-    .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
-    on.exit(dataInput$.trim())
-
-    if (dataInput$isDatasetMeans()) {
-        return(.getStageResultsMeans(
-            design = design, dataInput = dataInput, stage = stage,
-            userFunctionCallEnabled = TRUE, ...
-        ))
-    }
-
-    if (dataInput$isDatasetRates()) {
-        return(.getStageResultsRates(
-            design = design, dataInput = dataInput, stage = stage,
-            userFunctionCallEnabled = TRUE, ...
-        ))
-    }
-
-    if (dataInput$isDatasetSurvival()) {
-        return(.getStageResultsSurvival(
-            design = design, dataInput = dataInput, stage = stage,
-            userFunctionCallEnabled = TRUE, ...
-        ))
-    }
+    } else {
+	    stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
+	    .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
+	    on.exit(dataInput$.trim())
+	
+	    if (dataInput$isDatasetMeans()) {
+	        return(.getStageResultsMeans(
+	            design = design, dataInput = dataInput, stage = stage,
+	            userFunctionCallEnabled = TRUE, ...
+	        ))
+	    }
+	
+	    if (dataInput$isDatasetRates()) {
+	        return(.getStageResultsRates(
+	            design = design, dataInput = dataInput, stage = stage,
+	            userFunctionCallEnabled = TRUE, ...
+	        ))
+	    }
+	
+	    if (dataInput$isDatasetSurvival()) {
+	        return(.getStageResultsSurvival(
+	            design = design, dataInput = dataInput, stage = stage,
+	            userFunctionCallEnabled = TRUE, ...
+	        ))
+	    }
+	}	
 
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not supported")
 }
@@ -705,10 +710,9 @@ getTestActions <- function(stageResults, ...) {
 #' @inheritParams param_directionUpper
 #' @inheritParams param_tolerance
 #' @inheritParams param_stage
-#' @param ... Further arguments to be passed to methods (cf. separate functions in "See Also" below), e.g.,
+#' @param ... Further arguments to be passed to methods (cf., separate functions in "See Also" below), e.g.,
 #' \describe{
-#'   \item{\code{normalApproximation}}{The
-#'       type of computation of the p-values. Default is \code{FALSE} for
+#'   \item{\code{normalApproximation}}{The type of computation of the p-values. Default is \code{FALSE} for
 #'       testing means (i.e., the t test is used) and \code{TRUE} for testing rates and the hazard ratio.
 #'       For testing rates, if \code{normalApproximation = FALSE} is specified, the binomial test
 #'       (one sample) or the exact test of Fisher (two samples) is used for calculating the p-values.
@@ -848,22 +852,33 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
 #' @inheritParams param_allocationRatioPlanned
 #' @param ... Further (optional) arguments to be passed:
 #' \describe{
-#'   \item{\code{thetaH1} and \code{assumedStDevs} or \code{piTreatments}, \code{piControl}}{The
-#'      assumed effect size or assumed rates to calculate the conditional power in multi-arm trials
-#'      or enrichment designs. For survival designs, \code{thetaH1} refers to the hazard ratio.
-#'      You can specify a value or a vector with elements referring to the
-#'      treatment arms or the sub-populations, respectively.
-#'      For testing means, an assumed standard deviation can be specified, default is \code{1}.}
+#'   \item{\code{thetaH1} and \code{assumedStDevs}, \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
+#'       The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned} 
+#' 		 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio. 
+#' 		 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome, 
+#' 		 \code{pi1} and \code{pi2} can be specified referring to the assumed treatment and control rate, respectively. 
+#' 		 In multi-armed or enrichment designs, you can 
+#'   	 specify a value or a vector with elements referring to the treatment arms or the sub-populations, 
+#'   	 respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl} (multi-arm 
+#'   	 designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr 
+#'   	 If not specified, the conditional power is calculated under the assumption of observed effect sizes, 
+#'   	 standard deviations, rates, or hazard ratios.}
 #'   \item{\code{iterations}}{Iterations for simulating the power for Fisher's combination test.
-#'       If the power for more than one remaining stages is to be determined for Fisher's combination test,
-#'       it is estimated via simulation with specified \cr
-#'       \code{iterations}, the default value is \code{10000}.}
-#'   \item{\code{seed}}{Seed for simulating the power for Fisher's combination test.
+#'       If the power for more than one remaining stages is to be determined for
+#'       Fisher's combination test, it is estimated via simulation with specified \cr
+#'       \code{iterations}, the default is \code{1000}.}
+#'   \item{\code{seed}}{Seed for simulating the conditional power for Fisher's combination test.
 #'       See above, default is a random seed.}
 #' }
 #'
 #' @details
-#' The conditional power is calculated only if the effect size and the sample size is specified.
+#' The conditional power is calculated if the planned sample size for the subsequent stages is specified.\cr
+#' For testing rates in a two-armed trial, pi1 and pi2 typically refer to the rates in the treatment 
+#' and the control group, respectively. This is not mandatory, however, and so pi1 and pi2 can be interchanged.
+#' In many-to-one multi-armed trials, piTreatments and piControl refer to the rates in the treatment arms and 
+#' the one control arm, and so they cannot be interchanged. piTreatments and piControls in enrichment designs
+#' can principally be interchanged, but we use the plural form to indicate that the rates can be differently 
+#' specified for the sub-populations.     
 #'
 #' For Fisher's combination test, the conditional power for more than one remaining stages is
 #' estimated via simulation.

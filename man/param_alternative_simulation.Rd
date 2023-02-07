@@ -4,7 +4,7 @@
 \alias{param_alternative_simulation}
 \title{Parameter Description: Alternative for Simulation}
 \arguments{
-\item{alternative}{The alternative hypothesis value for testing means under which the data is simulated. 
+\item{alternative}{The alternative hypothesis value for testing means under which the data is simulated.
 This can be a vector of assumed alternatives, default is \code{seq(0, 1, 0.2)}.}
 }
 \description{

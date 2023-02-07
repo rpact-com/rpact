@@ -10,9 +10,9 @@ A basic class for analysis results.
 \details{
 \code{AnalysisResults} is the basic class for
 \itemize{
-  \item \code{\link{AnalysisResultsFisher}},
-  \item \code{\link{AnalysisResultsGroupSequential}}, and
-  \item \code{\link{AnalysisResultsInverseNormal}}.
+\item \code{\link{AnalysisResultsFisher}},
+\item \code{\link{AnalysisResultsGroupSequential}}, and
+\item \code{\link{AnalysisResultsInverseNormal}}.
 }
 }
 

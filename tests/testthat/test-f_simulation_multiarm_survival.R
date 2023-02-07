@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_multiarm_survival.R
-## |  Creation date: 12 August 2022, 09:12:36
-## |  File version: $Revision: 6658 $
-## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
+## |  Creation date: 06 February 2023, 12:14:51
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,9 +24,6 @@ test_plan_section("Testing Simulation Multi-Arm Survival Function")
 
 
 test_that("'getSimulationMultiArmSurvival': several configurations", {
-        
-    .skipTestIfDisabled()
-        
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDesigns}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDoseResponseRelationShips}
@@ -103,7 +100,9 @@ test_that("'getSimulationMultiArmSurvival': several configurations", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-    
+
+	.skipTestIfDisabled()
+
 	x2 <- getSimulationMultiArmSurvival(
 	    seed = 1234, getDesignInverseNormal(informationRates = c(0.2, 0.6, 1)),
 	    typeOfShape = "userDefined", activeArms = 4,

@@ -25,32 +25,32 @@ getEventProbabilities(
 \arguments{
 \item{time}{A numeric vector with time values.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{accrualTime}{The assumed accrual time intervals for the study, default is 
+\item{accrualTime}{The assumed accrual time intervals for the study, default is
 \code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
-\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative 
+\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative
 intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
 \item{accrualIntensityType}{A character value specifying the accrual intensity input type.
 Must be one of \code{"auto"}, \code{"absolute"}, or \code{"relative"}; default is \code{"auto"},
 i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code{"absolute"}.}
 
-\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification 
-of the shape of the Weibull distribution. 
+\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
+of the shape of the Weibull distribution.
 Default is \code{1}, i.e., the exponential survival distribution is used instead of the Weibull distribution.
-Note that the Weibull distribution cannot be used for the piecewise definition of 
-the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa} 
+Note that the Weibull distribution cannot be used for the piecewise definition of
+the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa}
 can be specified.
-This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)} 
+This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)}
 of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
-For example, 
-\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)} 
+For example,
+\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
 and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample result.}
 
-\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise 
+\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise
 definition of the exponential survival time cumulative distribution function \cr
 (for details see \code{\link[=getPiecewiseSurvivalTime]{getPiecewiseSurvivalTime()}}).}
 
@@ -60,19 +60,19 @@ definition of the exponential survival time cumulative distribution function \cr
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
 \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
 
-\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups 
-design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered, 
+\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
+design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered,
 the optimal allocation ratio yielding the smallest overall sample size is determined.}
 
-\item{hazardRatio}{The vector of hazard ratios under consideration. 
-If the event or hazard rates in both treatment groups are defined, the hazard ratio needs 
+\item{hazardRatio}{The vector of hazard ratios under consideration.
+If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
 not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
 
 \item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
 
 \item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
 
-\item{dropoutTime}{The assumed time for drop-out rates in the control and the 
+\item{dropoutTime}{The assumed time for drop-out rates in the control and the
 treatment group, default is \code{12}.}
 
 \item{maxNumberOfSubjects}{If \code{maxNumberOfSubjects > 0} is specified,
@@ -84,12 +84,12 @@ at fixed end of accrual.}
 Returns a \code{\link{EventProbabilities}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.EventProbabilities]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.EventProbabilities]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -101,12 +101,12 @@ For details of the parameters see \code{\link[=getSampleSizeSurvival]{getSampleS
 }
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 

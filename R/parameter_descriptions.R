@@ -13,9 +13,9 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6780 $
+## |  Last changed: $Date: 2023-01-24 17:36:17 +0100 (Di, 24 Jan 2023) $
+## |  Last changed by: $Author: wassmer $
 ## | 
 
 #' Parameter Description: "..."
@@ -313,6 +313,8 @@ NULL
 #' Parameter Description: Allocation Ratio Planned
 #' @param allocationRatioPlanned The planned allocation ratio \code{n1 / n2} for a two treatment groups 
 #'   design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
+#'   For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages. 
+#' 	 In this case, a change of allocating subjects to treatment groups over the stages can be assessed.  
 #' @name param_allocationRatioPlanned
 #' @keywords internal
 NULL
@@ -492,7 +494,7 @@ NULL
 
 #' Parameter Description: Calculate Subjects Function
 #' @param calcSubjectsFunction Optionally, a function can be entered that defines the way of performing the sample size
-#'   recalculation. By default, sample size recalculation is performed with conditional power with specified
+#'   recalculation. By default, sample size recalculation is performed with conditional power and specified
 #'   \code{minNumberOfSubjectsPerStage} and \code{maxNumberOfSubjectsPerStage} (see details and examples).
 #' @name param_calcSubjectsFunction
 #' @keywords internal
@@ -500,7 +502,7 @@ NULL
 
 #' Parameter Description: Calculate Events Function
 #' @param calcEventsFunction Optionally, a function can be entered that defines the way of performing the sample size
-#'   recalculation. By default, sample size recalculation is performed with conditional power with specified
+#'   recalculation. By default, event number recalculation is performed with conditional power and specified
 #'   \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage} (see details and examples).
 #' @name param_calcEventsFunction
 #' @keywords internal

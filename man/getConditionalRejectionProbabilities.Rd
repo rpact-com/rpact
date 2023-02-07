@@ -11,12 +11,12 @@ getConditionalRejectionProbabilities(stageResults, ...)
 
 \item{...}{Further (optional) arguments to be passed:
 \describe{
-  \item{\code{iterations}}{Iterations for simulating the conditional
-      rejection probabilities for Fisher's combination test.
-      For checking purposes, it can be estimated via simulation with
-      specified \code{iterations}.}
-  \item{\code{seed}}{Seed for simulating the conditional rejection probabilities
-      for Fisher's combination test. See above, default is a random seed.}
+\item{\code{iterations}}{Iterations for simulating the conditional
+rejection probabilities for Fisher's combination test.
+For checking purposes, it can be estimated via simulation with
+specified \code{iterations}.}
+\item{\code{seed}}{Seed for simulating the conditional rejection probabilities
+for Fisher's combination test. See above, default is a random seed.}
 }}
 }
 \value{
@@ -54,7 +54,6 @@ getConditionalRejectionProbabilities(sr, simulateCRP = TRUE,
 }
 \seealso{
 Other analysis functions: 
-\code{\link{getAnalysisResults}()},
 \code{\link{getClosedCombinationTestResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalPower}()},

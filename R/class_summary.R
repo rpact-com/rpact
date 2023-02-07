@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6656 $
-## |  Last changed: $Date: 2022-11-03 08:41:40 +0100 (Thu, 03 Nov 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1171,9 +1171,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
         return(header)
     }
 
-    if (!is.na(allocationRatioPlanned)) {
+    if (!all(is.na(allocationRatioPlanned))) {
         return(.concatenateSummaryText(header,
-            paste0(prefix, "planned allocation ratio = ", allocationRatioPlanned),
+			paste0(prefix, "planned allocation ratio = ", 
+			.arrayToString(allocationRatioPlanned, vectorLookAndFeelEnabled = length(allocationRatioPlanned) > 1)),						
             sep = sep
         ))
     } else {
@@ -1229,11 +1230,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
         }
     }
 
-    if (design$sided == 1) {
-        header <- paste0(header, " (one-sided)")
-    } else {
-        header <- paste0(header, " (two-sided)")
-    }
+    header <- .concatenateSummaryText(header, 
+        paste0("(", ifelse(design$sided == 1, "one", "two"), "-sided, alpha = ", round(design$alpha, 4), ")"), sep = " ")
 
     if (!.isTrialDesignConditionalDunnett(design) && multiHypothesesEnabled) {
         if (stageResults$intersectionTest == "Dunnett") {
@@ -2085,10 +2083,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
             }
         } else if (settings$ratesEnabled) {
             if (settings$multiArmEnabled || settings$enrichmentEnabled) {
-                if (settings$multiArmEnabled && !is.na(designPlan$piH1)) {
+                if (settings$multiArmEnabled && !is.na(designPlan$piTreatmentsH1)) {
                     header <- .concatenateSummaryText(
                         header,
-                        paste0("pi(treatment)H1 = ", round(designPlan$piH1, 3))
+                        paste0("pi(treatment)H1 = ", round(designPlan$piTreatmentsH1, 3))
                     )
                 } else if (settings$enrichmentEnabled) {
                     piTreatmentH1 <- designPlan[["piTreatmentH1"]]
@@ -2502,22 +2500,30 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
     }
-
+    
+    ciLevel <- round((1 - design$alpha * (3 - design$sided)) * 100, 2)
+    if (.isTrialDesignConditionalDunnett(design)) {
+        parameterCaptionRepeatedPValues <- "Overall p-value"
+        parameterCaptionRepeatedCI <- paste0(ciLevel, "% overall confidence interval")
+    } else {
+        parameterCaptionRepeatedPValues <- ifelse(design$kMax == 1,
+            ifelse(design$sided == 1, "One-sided p-value", "Two-sided p-value"),
+            "Repeated p-value")
+        parameterCaptionRepeatedCI <- paste0(ciLevel, "% ",
+            ifelse(design$kMax == 1, "confidence interval", "repeated confidence interval")
+        )
+    }
+    
     summaryFactory$addParameter(analysisResults,
         parameterName = c("repeatedConfidenceIntervalLowerBounds", "repeatedConfidenceIntervalUpperBounds"),
-        parameterCaption = paste0(
-            round((1 - design$alpha * (3 - design$sided)) * 100, 2), "% ",
-            ifelse(design$kMax == 1, "confidence interval", "repeated confidence interval")
-        ),
+        parameterCaption = parameterCaptionRepeatedCI,
         roundDigits = digitsGeneral
     )
-
+    
     summaryFactory$addParameter(analysisResults,
         parameterName = "repeatedPValues",
-        parameterCaption = ifelse(design$kMax == 1,
-            ifelse(design$sided == 1, "One-sided p-value", "Two-sided p-value"),
-            "Repeated p-value"
-        ), roundDigits = digitsProbabilities, formatRepeatedPValues = TRUE
+        parameterCaption = parameterCaptionRepeatedPValues, 
+        roundDigits = digitsProbabilities, formatRepeatedPValues = TRUE
     )
 
     if (!multiHypothesesEnabled && !is.null(analysisResults[["finalStage"]]) && !all(is.na(analysisResults$finalStage))) {

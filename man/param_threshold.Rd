@@ -4,9 +4,9 @@
 \alias{param_threshold}
 \title{Parameter Description: Threshold}
 \arguments{
-\item{threshold}{Selection criterion: treatment arm / population is selected only if \code{effectMeasure} 
-exceeds \code{threshold}, default is \code{-Inf}. 
-\code{threshold} can also be a vector of length \code{activeArms} referring to 
+\item{threshold}{Selection criterion: treatment arm / population is selected only if \code{effectMeasure}
+exceeds \code{threshold}, default is \code{-Inf}.
+\code{threshold} can also be a vector of length \code{activeArms} referring to
 a separate threshold condition over the treatment arms.}
 }
 \description{

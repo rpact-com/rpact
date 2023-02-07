@@ -5,7 +5,7 @@
 \title{Parameter Description: Calculate Subjects Function}
 \arguments{
 \item{calcSubjectsFunction}{Optionally, a function can be entered that defines the way of performing the sample size
-recalculation. By default, sample size recalculation is performed with conditional power with specified
+recalculation. By default, sample size recalculation is performed with conditional power and specified
 \code{minNumberOfSubjectsPerStage} and \code{maxNumberOfSubjectsPerStage} (see details and examples).}
 }
 \description{

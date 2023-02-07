@@ -10,7 +10,7 @@
 Function to the \code{TrialDesign} at position \code{i} in a \code{TrialDesignSet} object.
 }
 \details{
-Can be used to iterate with "[index]"-syntax over all designs in a design set.
+Can be used to iterate over all designs in a design set.
 }
 \examples{
 designSet <- getDesignSet(design = getDesignFisher(), alpha = c(0.01, 0.05))

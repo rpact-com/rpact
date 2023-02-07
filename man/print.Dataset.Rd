@@ -14,7 +14,7 @@
 \arguments{
 \item{x}{A \code{\link{Dataset}} object.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{markdown}{If \code{TRUE}, the output will be created in Markdown.}

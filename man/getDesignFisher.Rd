@@ -20,10 +20,10 @@ getDesignFisher(
 )
 }
 \arguments{
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{kMax}{The maximum number of stages \code{K}. 
+\item{kMax}{The maximum number of stages \code{K}.
 Must be a positive integer of length 1 (default value is \code{3}).
 The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 \code{6} for Fisher combination test designs.}
@@ -33,13 +33,13 @@ The maximum selectable \code{kMax} is \code{20} for group sequential or inverse 
 \item{method}{\code{"equalAlpha"}, \code{"fullAlpha"}, \code{"noInteraction"}, or \code{"userDefinedAlpha"},
 default is \code{"equalAlpha"} (for details, see Wassmer, 1999).}
 
-\item{userAlphaSpending}{The user defined alpha spending. 
-Numeric vector of length \code{kMax} containing the cumulative 
+\item{userAlphaSpending}{The user defined alpha spending.
+Numeric vector of length \code{kMax} containing the cumulative
 alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 <= ... <= alpha_K <= alpha}.}
 
 \item{alpha0Vec}{Stopping for futility bounds for stage-wise p-values.}
 
-\item{informationRates}{The information rates (that must be fixed prior to the trial), 
+\item{informationRates}{The information rates (that must be fixed prior to the trial),
 default is \code{(1:kMax) / kMax}.}
 
 \item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. Must be a positive integer of length 1.}
@@ -59,12 +59,12 @@ The default value of \code{iterations} is 0, i.e., no simulation will be execute
 Returns a \code{\link{TrialDesign}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesign]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesign]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.TrialDesign]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.TrialDesign]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -77,12 +77,12 @@ Bauer and Roehmel (1995), and Wassmer (1999) for equally and unequally sized sta
 }
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 

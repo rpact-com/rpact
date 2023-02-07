@@ -4,8 +4,8 @@
 \alias{param_typeOfComputation}
 \title{Parameter Description: Type Of Computation}
 \arguments{
-\item{typeOfComputation}{Three options are available: \code{"Schoenfeld"}, \code{"Freedman"}, \code{"HsiehFreedman"}, 
-the default is \code{"Schoenfeld"}. For details, see Hsieh (Statistics in Medicine, 1992). 
+\item{typeOfComputation}{Three options are available: \code{"Schoenfeld"}, \code{"Freedman"}, \code{"HsiehFreedman"},
+the default is \code{"Schoenfeld"}. For details, see Hsieh (Statistics in Medicine, 1992).
 For non-inferiority testing (i.e., \code{thetaH0 != 1}), only Schoenfeld's formula can be used.}
 }
 \description{

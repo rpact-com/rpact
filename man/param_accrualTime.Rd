@@ -4,7 +4,7 @@
 \alias{param_accrualTime}
 \title{Parameter Description: Accrual Time}
 \arguments{
-\item{accrualTime}{The assumed accrual time intervals for the study, default is 
+\item{accrualTime}{The assumed accrual time intervals for the study, default is
 \code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 }
 \description{

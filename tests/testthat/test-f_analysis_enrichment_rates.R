@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_enrichment_rates.R
-## |  Creation date: 23 February 2022, 14:03:22
-## |  File version: $Revision: 6658 $
-## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
+## |  Creation date: 06 February 2023, 12:08:56
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,10 +24,9 @@ test_plan_section("Testing Analysis Enrichment Rates Function")
 
 
 test_that("'getAnalysisResults': enrichment rates, one sub-population, non-stratified input, select S1 at second IA, directionUpper = FALSE, gMax = 2", {
+	.skipTestIfDisabled()
 
-    .skipTestIfDisabled()
-        
-    # @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
+	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISidakEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISpiessensEnrichment}
@@ -123,9 +122,9 @@ test_that("'getAnalysisResults': enrichment rates, one sub-population, non-strat
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-    
-    .skipTestIfDisabled()
-    
+
+	.skipTestIfDisabled()
+
 	x2 <- getAnalysisResults(design1, dataInput1,
 	    stratifiedAnalysis = FALSE,
 	    intersectionTest = "Bonferroni",
@@ -492,9 +491,9 @@ test_that("'getAnalysisResults': enrichment rates, more sub-populations, select 
 })
 
 test_that("'getAnalysisResults': enrichment rates, more sub-populations, non-stratified input, select S1 and S2 at first IA, select S1 at second, directionUpper = FALSE, gMax = 4", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	# @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueForRCISidakEnrichment}
@@ -629,9 +628,9 @@ test_that("'getAnalysisResults': enrichment rates, more sub-populations, non-str
 })
 
 test_that("'getAnalysisResults': enrichment rates, expected warning for empty subsets", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(84, 94, 25),
 	    sampleSize2 = c(82, 75, 23),

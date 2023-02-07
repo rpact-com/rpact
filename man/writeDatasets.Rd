@@ -84,8 +84,8 @@ writeDatasets(datasets, "datasets_rates.csv")
 }
 \seealso{
 \itemize{
-  \item \code{\link[=writeDataset]{writeDataset()}} for writing a single dataset,
-  \item \code{\link[=readDatasets]{readDatasets()}} for reading multiple datasets,
-  \item \code{\link[=readDataset]{readDataset()}} for reading a single dataset.
+\item \code{\link[=writeDataset]{writeDataset()}} for writing a single dataset,
+\item \code{\link[=readDatasets]{readDatasets()}} for reading multiple datasets,
+\item \code{\link[=readDataset]{readDataset()}} for reading a single dataset.
 }
 }

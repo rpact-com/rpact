@@ -15,14 +15,14 @@ getObservedInformationRates(
 \arguments{
 \item{dataInput}{The dataset for which the information rates shall be recalculated.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{maxInformation}{Positive integer value specifying the maximum information.}
 
-\item{informationEpsilon}{Positive integer value specifying the absolute information epsilon, which 
+\item{informationEpsilon}{Positive integer value specifying the absolute information epsilon, which
 defines the maximum distance from the observed information to the maximum information that causes the final analysis.
-Updates at the final analysis in case the observed information at the final 
+Updates at the final analysis in case the observed information at the final
 analysis is smaller ("under-running") than the planned maximum information \code{maxInformation}, default is 0.
 Alternatively, a floating-point number > 0 and < 1 can be specified to define a relative information epsilon.}
 
@@ -62,8 +62,8 @@ getObservedInformationRates(data,
 }
 \seealso{
 \itemize{
-  \item \code{\link[=getAnalysisResults]{getAnalysisResults()}} for using 
-        \code{getObservedInformationRates()} implicit,
-  \item https://www.rpact.com/vignettes/rpact_boundary_update_example
+\item \code{\link[=getAnalysisResults]{getAnalysisResults()}} for using
+\code{getObservedInformationRates()} implicit,
+\item https://www.rpact.com/vignettes/rpact_boundary_update_example
 }
 }

@@ -7,7 +7,7 @@
 \method{names}{SimulationResults}(x)
 }
 \arguments{
-\item{x}{A \code{\link{SimulationResults}} object created by 
+\item{x}{A \code{\link{SimulationResults}} object created by
 \code{getSimulationResults[MultiArm/Enrichment][Means/Rates/Survival]}.}
 }
 \value{

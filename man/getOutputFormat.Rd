@@ -17,7 +17,7 @@ getOutputFormat(
 Leave the default \code{NA_character_} if
 the output format of all parameters shall be returned.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{file}{An optional file name where to write the output formats
@@ -42,11 +42,11 @@ See \code{\link[=setOutputFormat]{setOutputFormat()}}() to learn how to read a f
 Note that the \code{parameterName} must not match exactly, e.g., for p-values the
 following parameter names will be recognized amongst others:
 \enumerate{
-  \item \code{p value}
-  \item \code{p.values}
-  \item \code{p-value}
-  \item \code{pValue}
-  \item \code{rpact.output.format.p.value}
+\item \code{p value}
+\item \code{p.values}
+\item \code{p-value}
+\item \code{pValue}
+\item \code{rpact.output.format.p.value}
 }
 }
 \examples{

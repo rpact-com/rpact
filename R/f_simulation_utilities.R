@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6657 $
-## |  Last changed: $Date: 2022-11-03 16:39:51 +0100 (Do, 03 Nov 2022) $
+## |  File version: $Revision: 6708 $
+## |  Last changed: $Date: 2022-12-02 08:50:56 +0100 (Fr, 02 Dez 2022) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -616,56 +616,4 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     return(.getEffectList(effectData))
 }
 
-.getValidatedCalcSubjectsFunction <- function(..., design, 
-        simulationResults, calcSubjectsFunction, expectedFunction, cppEnabled) {
-        
-    if (design$kMax == 1) {
-        if (!is.null(calcSubjectsFunction)) {
-            warning("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE)
-        }
-        return(invisible(list(
-            calcSubjectsFunctionType = 0L,
-            calcSubjectsFunction = NULL,
-            calcSubjectsFunctionPtr = NULL
-        )))
-    }
-    
-    calcSubjectsFunctionType <- 0L
-    if (cppEnabled) {
-        if (!is.null(calcSubjectsFunction) && is.function(calcSubjectsFunction)) {
-            calcSubjectsFunctionType <- 1L
-        }
-    } else if (!is.null(calcSubjectsFunction)) {
-        calcSubjectsFunctionType <- 1L
-    }
-    
-    if (!is.null(calcSubjectsFunction) && is.function(calcSubjectsFunction)) {
-        simulationResults$.setParameterType(
-            "calcSubjectsFunction",
-            ifelse(design$kMax == 1, C_PARAM_NOT_APPLICABLE,
-                ifelse(!is.null(calcSubjectsFunction) && design$kMax > 1,
-                    C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE
-                )
-            )
-        )
-        simulationResults$calcSubjectsFunction <- calcSubjectsFunction
-    }
-    
-    if ((!cppEnabled || .isTrialDesignFisher(design)) && is.null(calcSubjectsFunction)) {
-        calcSubjectsFunction <- .getSimulationRatesStageSubjects
-    }
-    
-    if (!is.null(calcSubjectsFunction)) {
-        .assertIsValidFunction(
-            fun = calcSubjectsFunction,
-            funArgName = "calcSubjectsFunction",
-            expectedFunction = .getSimulationRatesStageSubjects
-        )
-    }
-    
-    return(list(
-        calcSubjectsFunctionType = calcSubjectsFunctionType,
-        calcSubjectsFunction = calcSubjectsFunction,
-        calcSubjectsFunctionPtr = NULL
-    ))
-}
+

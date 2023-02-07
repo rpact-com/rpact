@@ -4,8 +4,8 @@
 \alias{param_beta}
 \title{Parameter Description: Beta}
 \arguments{
-\item{beta}{Type II error rate, necessary for providing sample size calculations 
-(e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs, 
+\item{beta}{Type II error rate, necessary for providing sample size calculations
+(e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs,
 or optimum designs, default is \code{0.20}. Must be a positive numeric of length 1.}
 }
 \description{

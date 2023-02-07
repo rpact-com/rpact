@@ -37,38 +37,39 @@ getSimulationSurvival(
   maxNumberOfRawDatasetsPerStage = 0,
   longTimeSimulationAllowed = FALSE,
   seed = NA_real_,
+  calcEventsFunction = NULL,
   showStatistics = FALSE
 )
 }
 \arguments{
-\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used. 
-In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower}, 
+\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used.
+In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
 and \code{sided} can be directly entered as argument where necessary.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{thetaH0}{The null hypothesis value, 
-default is \code{0} for the normal and the binary case (testing means and rates, respectively), 
-it is \code{1} for the survival case (testing the hazard ratio).\cr\cr 
+\item{thetaH0}{The null hypothesis value,
+default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
-  \item \emph{means}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the mean ratio) can be specified.
-  \item \emph{rates}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
-  \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{means}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the mean ratio) can be specified.
+\item \emph{rates}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
+\item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
 }
-For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for 
+For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
-\item{directionUpper}{Logical. Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
-\item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group, 
-default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or 
+\item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
+default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 \code{seq(0.4, 0.6, 0.1)} (sample size calculations).}
 
 \item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
@@ -83,23 +84,23 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 
 \item{median2}{The assumed median survival time in the reference group, there is no default. Must be a positive numeric of length 1.}
 
-\item{hazardRatio}{The vector of hazard ratios under consideration. 
-If the event or hazard rates in both treatment groups are defined, the hazard ratio needs 
+\item{hazardRatio}{The vector of hazard ratios under consideration.
+If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
 not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
 
-\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification 
-of the shape of the Weibull distribution. 
+\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
+of the shape of the Weibull distribution.
 Default is \code{1}, i.e., the exponential survival distribution is used instead of the Weibull distribution.
-Note that the Weibull distribution cannot be used for the piecewise definition of 
-the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa} 
+Note that the Weibull distribution cannot be used for the piecewise definition of
+the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa}
 can be specified.
-This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)} 
+This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)}
 of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
-For example, 
-\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)} 
+For example,
+\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
 and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample result.}
 
-\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise 
+\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise
 definition of the exponential survival time cumulative distribution function \cr
 (for details see \code{\link[=getPiecewiseSurvivalTime]{getPiecewiseSurvivalTime()}}).}
 
@@ -111,10 +112,10 @@ subsequent order, default is \code{1}}
 
 \item{eventTime}{The assumed time under which the event rates are calculated, default is \code{12}.}
 
-\item{accrualTime}{The assumed accrual time intervals for the study, default is 
+\item{accrualTime}{The assumed accrual time intervals for the study, default is
 \code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
-\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative 
+\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative
 intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
 \item{accrualIntensityType}{A character value specifying the accrual intensity input type.
@@ -125,35 +126,35 @@ i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code
 
 \item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
 
-\item{dropoutTime}{The assumed time for drop-out rates in the control and the 
+\item{dropoutTime}{The assumed time for drop-out rates in the control and the
 treatment group, default is \code{12}.}
 
 \item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified.
 If accrual time and accrual intensity are specified, this will be calculated. Must be a positive integer of length 1.}
 
-\item{plannedEvents}{\code{plannedEvents} is a numeric vector of length \code{kMax} (the number of stages of the design) 
+\item{plannedEvents}{\code{plannedEvents} is a numeric vector of length \code{kMax} (the number of stages of the design)
 that determines the number of cumulated (overall) events in survival designs when the interim stages are planned.
-For two treatment arms, it is the number of events for both treatment arms. 
+For two treatment arms, it is the number of events for both treatment arms.
 For multi-arm designs, \code{plannedEvents} refers to the overall number of events for the selected arms plus control.}
 
-\item{minNumberOfEventsPerStage}{When performing a data driven sample size recalculation, 
-the numeric vector \code{minNumberOfEventsPerStage} with length kMax determines the 
-minimum number of events per stage (i.e., not cumulated), the first element 
+\item{minNumberOfEventsPerStage}{When performing a data driven sample size recalculation,
+the numeric vector \code{minNumberOfEventsPerStage} with length kMax determines the
+minimum number of events per stage (i.e., not cumulated), the first element
 is not taken into account.}
 
-\item{maxNumberOfEventsPerStage}{When performing a data driven sample size recalculation, 
-the numeric vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number 
+\item{maxNumberOfEventsPerStage}{When performing a data driven sample size recalculation,
+the numeric vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number
 of events per stage (i.e., not cumulated), the first element is not taken into account.}
 
-\item{conditionalPower}{If \code{conditionalPower} together with \code{minNumberOfSubjectsPerStage} and 
+\item{conditionalPower}{If \code{conditionalPower} together with \code{minNumberOfSubjectsPerStage} and
 \code{maxNumberOfSubjectsPerStage} (or \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage}
 for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
-It is defined as the power for the subsequent stage given the current data. By default, 
+It is defined as the power for the subsequent stage given the current data. By default,
 the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
 \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
-\item{thetaH1}{If specified, the value of the alternative under which 
+\item{thetaH1}{If specified, the value of the alternative under which
 the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.}
 
 \item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
@@ -167,6 +168,10 @@ that consumes more than 30 seconds are allowed or not, default is \code{FALSE}.}
 
 \item{seed}{The seed to reproduce the simulation, default is a random seed.}
 
+\item{calcEventsFunction}{Optionally, a function can be entered that defines the way of performing the sample size
+recalculation. By default, event number recalculation is performed with conditional power and specified
+\code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage} (see details and examples).}
+
 \item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default
 is \code{FALSE}.}
@@ -175,12 +180,12 @@ is \code{FALSE}.}
 Returns a \code{\link{SimulationResults}} object.
 The following generics (R generic functions) are available for this object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.SimulationResults]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.SimulationResults]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -195,11 +200,11 @@ assumptions (exponentially, piecewise exponentially, or Weibull distributed surv
 and constant or non-constant piecewise accrual).
 Additionally, integers \code{allocation1} and \code{allocation2} can be specified that determine the number allocated
 to treatment group 1 and treatment group 2, respectively.
-More precisely, unequal randomization ratios must be specified via the two integer arguments \code{allocation1} and 
-\code{allocation2} which describe how many subjects are consecutively enrolled in each group, respectively, before a 
-subject is assigned to the other group. For example, the arguments \code{allocation1 = 2}, \code{allocation2 = 1}, 
-\code{maxNumberOfSubjects = 300} specify 2:1 randomization with 200 subjects randomized to intervention and 100 to 
-control. (Caveat: Do not use \code{allocation1 = 200}, \code{allocation2 = 100}, \code{maxNumberOfSubjects = 300} 
+More precisely, unequal randomization ratios must be specified via the two integer arguments \code{allocation1} and
+\code{allocation2} which describe how many subjects are consecutively enrolled in each group, respectively, before a
+subject is assigned to the other group. For example, the arguments \code{allocation1 = 2}, \code{allocation2 = 1},
+\code{maxNumberOfSubjects = 300} specify 2:1 randomization with 200 subjects randomized to intervention and 100 to
+control. (Caveat: Do not use \code{allocation1 = 200}, \code{allocation2 = 100}, \code{maxNumberOfSubjects = 300}
 as this would imply that the 200 intervention subjects are enrolled prior to enrollment of any control subjects.)
 
 \code{conditionalPower}\cr
@@ -208,51 +213,65 @@ and if \code{conditionalPower}, \code{minNumberOfEventsPerStage}, and
 \code{maxNumberOfEventsPerStage} are defined.
 
 Note that \code{numberOfSubjects}, \code{numberOfSubjects1}, and \code{numberOfSubjects2} in the output
-are expected number of subjects.
+are the expected number of subjects.
+
+\code{calcEventsFunction}\cr
+This function returns the number of events at given conditional power and conditional critical value for specified
+testing situation. The function might depend on variables
+\code{stage},
+\code{conditionalPower},
+\code{thetaH0},
+\code{plannedEvents},
+\code{eventsPerStage},
+\code{minNumberOfEventsPerStage},
+\code{maxNumberOfEventsPerStage},
+\code{allocationRatioPlanned},
+\code{conditionalCriticalValue},
+The function has to contain the three-dots argument '...' (see examples).
 }
 \section{Piecewise survival time}{
 
-The first element of the vector \code{piecewiseSurvivalTime} must be equal to \code{0}. 
-\code{piecewiseSurvivalTime} can also be a list that combines the definition of the 
-time intervals and hazard rates in the reference group. 
-The definition of the survival time in the treatment group is obtained by the specification 
+The first element of the vector \code{piecewiseSurvivalTime} must be equal to \code{0}.
+\code{piecewiseSurvivalTime} can also be a list that combines the definition of the
+time intervals and hazard rates in the reference group.
+The definition of the survival time in the treatment group is obtained by the specification
 of the hazard ratio (see examples for details).
 }
 
 \section{Staggered patient entry}{
 
-\code{accrualTime} is the time period of subjects' accrual in a study. 
+\code{accrualTime} is the time period of subjects' accrual in a study.
 It can be a value that defines the end of accrual or a vector.
-In this case, \code{accrualTime} can be used to define a non-constant accrual over time. 
-For this, \code{accrualTime} is a vector that defines the accrual intervals. 
-The first element of \code{accrualTime} must be equal to \code{0} and, additionally, 
-\code{accrualIntensity} needs to be specified. 
-\code{accrualIntensity} itself is a value or a vector (depending on the 
-length of \code{accrualtime}) that defines the intensity how subjects 
+In this case, \code{accrualTime} can be used to define a non-constant accrual over time.
+For this, \code{accrualTime} is a vector that defines the accrual intervals.
+The first element of \code{accrualTime} must be equal to \code{0} and, additionally,
+\code{accrualIntensity} needs to be specified.
+\code{accrualIntensity} itself is a value or a vector (depending on the
+length of \code{accrualtime}) that defines the intensity how subjects
 enter the trial in the intervals defined through \code{accrualTime}.
- 
-\code{accrualTime} can also be a list that combines the definition of the accrual time and 
+
+\code{accrualTime} can also be a list that combines the definition of the accrual time and
 accrual intensity (see below and examples for details).
 
-If the length of \code{accrualTime} and the length of \code{accrualIntensity} are the same 
-(i.e., the end of accrual is undefined), \code{maxNumberOfSubjects > 0} needs to be specified  
+If the length of \code{accrualTime} and the length of \code{accrualIntensity} are the same
+(i.e., the end of accrual is undefined), \code{maxNumberOfSubjects > 0} needs to be specified
 and the end of accrual is calculated.
 In that case, \code{accrualIntensity} is the number of subjects per time unit, i.e., the absolute accrual intensity.
 
-If the length of \code{accrualTime} equals the length of \code{accrualIntensity - 1}   
+If the length of \code{accrualTime} equals the length of \code{accrualIntensity - 1}
 (i.e., the end of accrual is defined), \code{maxNumberOfSubjects} is calculated if the absolute accrual intensity is given.
-If all elements in \code{accrualIntensity} are smaller than 1, \code{accrualIntensity} defines 
-the *relative* intensity how subjects enter the trial.
-For example, \code{accrualIntensity = c(0.1, 0.2)} specifies that in the second accrual interval 
-the intensity is doubled as compared to the first accrual interval. The actual (absolute) accrual intensity 
+If all elements in \code{accrualIntensity} are smaller than 1, \code{accrualIntensity} defines
+the \emph{relative} intensity how subjects enter the trial.
+For example, \code{accrualIntensity = c(0.1, 0.2)} specifies that in the second accrual interval
+the intensity is doubled as compared to the first accrual interval. The actual (absolute) accrual intensity
 is calculated for the calculated or given \code{maxNumberOfSubjects}.
-Note that the default is \code{accrualIntensity = 0.1} meaning that the *absolute* accrual intensity 
+Note that the default is \code{accrualIntensity = 0.1} meaning that the \emph{absolute} accrual intensity
 will be calculated.
 }
 
 \section{Simulation Data}{
 
-The summary statistics "Simulated data" contains the following parameters: median [range]; mean +/-sd\cr
+The summary statistics "Simulated data" contains the following parameters: median \link{range}; mean +/-sd\cr
 
 \code{$show(showStatistics = FALSE)} or \code{$setShowStatistics(FALSE)} can be used to disable
 the output of the aggregated simulated data.\cr
@@ -269,35 +288,35 @@ Example 2: \cr
 \code{\link[=getData]{getData()}} can be used to get the aggregated simulated data from the
 object as \code{\link[base]{data.frame}}. The data frame contains the following columns:
 \enumerate{
-  \item \code{iterationNumber}: The number of the simulation iteration.
-  \item \code{stageNumber}: The stage.
-  \item \code{pi1}: The assumed or derived event rate in the treatment group.
-  \item \code{pi2}: The assumed or derived event rate in the control group.
-  \item \code{hazardRatio}: The hazard ratio under consideration (if available).
-  \item \code{analysisTime}: The analysis time.
-  \item \code{numberOfSubjects}: The number of subjects under consideration when the
-        (interim) analysis takes place.
-  \item \code{eventsPerStage1}: The observed number of events per stage
-        in treatment group 1.
-  \item \code{eventsPerStage2}: The observed number of events per stage
-        in treatment group 2.
-  \item \code{eventsPerStage}: The observed number of events per stage
-        in both treatment groups.
-  \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
-  \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
-  \item \code{eventsNotAchieved}: 1 if number of events could not be reached with
-        observed number of subjects, 0 otherwise.
-  \item \code{testStatistic}: The test statistic that is used for the test decision,
-        depends on which design was chosen (group sequential, inverse normal,
-        or Fisher combination test)'
-  \item \code{logRankStatistic}: Z-score statistic which corresponds to a one-sided
-        log-rank test at considered stage.
-  \item \code{hazardRatioEstimateLR}: The estimated hazard ratio, derived from the
-        log-rank statistic.
-  \item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
-  \item \code{conditionalPowerAchieved}: The conditional power for the subsequent stage of the trial for
-        selected sample size and effect. The effect is either estimated from the data or can be
-        user defined with \code{thetaH1}.
+\item \code{iterationNumber}: The number of the simulation iteration.
+\item \code{stageNumber}: The stage.
+\item \code{pi1}: The assumed or derived event rate in the treatment group.
+\item \code{pi2}: The assumed or derived event rate in the control group.
+\item \code{hazardRatio}: The hazard ratio under consideration (if available).
+\item \code{analysisTime}: The analysis time.
+\item \code{numberOfSubjects}: The number of subjects under consideration when the
+(interim) analysis takes place.
+\item \code{eventsPerStage1}: The observed number of events per stage
+in treatment group 1.
+\item \code{eventsPerStage2}: The observed number of events per stage
+in treatment group 2.
+\item \code{eventsPerStage}: The observed number of events per stage
+in both treatment groups.
+\item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
+\item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
+\item \code{eventsNotAchieved}: 1 if number of events could not be reached with
+observed number of subjects, 0 otherwise.
+\item \code{testStatistic}: The test statistic that is used for the test decision,
+depends on which design was chosen (group sequential, inverse normal,
+or Fisher combination test)'
+\item \code{logRankStatistic}: Z-score statistic which corresponds to a one-sided
+log-rank test at considered stage.
+\item \code{hazardRatioEstimateLR}: The estimated hazard ratio, derived from the
+log-rank statistic.
+\item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
+\item \code{conditionalPowerAchieved}: The conditional power for the subsequent stage of the trial for
+selected sample size and effect. The effect is either estimated from the data or can be
+user defined with \code{thetaH1}.
 }
 }
 
@@ -308,218 +327,307 @@ object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival(
 must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
 The data frame contains the following columns:
 \enumerate{
-  \item \code{iterationNumber}: The number of the simulation iteration.
-  \item \code{stopStage}: The stage of stopping.
-  \item \code{subjectId}: The subject id (increasing number 1, 2, 3, ...)
-  \item \code{accrualTime}: The accrual time, i.e., the time when the subject entered the trial.
-  \item \code{treatmentGroup}: The treatment group number (1 or 2).
-  \item \code{survivalTime}: The survival time of the subject.
-  \item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
-  \item \code{observationTime}: The specific observation time.
-  \item \code{timeUnderObservation}: The time under observation is defined as follows:\cr
-        if (event == TRUE) {\cr
-            timeUnderObservation <- survivalTime;\cr
-        } else if (dropoutEvent == TRUE) {\cr
-            timeUnderObservation <- dropoutTime;\cr
-        } else {\cr
-            timeUnderObservation <- observationTime - accrualTime;\cr
-        }
-  \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
-  \item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
+\item \code{iterationNumber}: The number of the simulation iteration.
+\item \code{stopStage}: The stage of stopping.
+\item \code{subjectId}: The subject id (increasing number 1, 2, 3, ...)
+\item \code{accrualTime}: The accrual time, i.e., the time when the subject entered the trial.
+\item \code{treatmentGroup}: The treatment group number (1 or 2).
+\item \code{survivalTime}: The survival time of the subject.
+\item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
+\item \code{observationTime}: The specific observation time.
+\item \code{timeUnderObservation}: The time under observation is defined as follows:\cr
+if (event == TRUE) {\cr
+timeUnderObservation <- survivalTime;\cr
+} else if (dropoutEvent == TRUE) {\cr
+timeUnderObservation <- dropoutTime;\cr
+} else {\cr
+timeUnderObservation <- observationTime - accrualTime;\cr
+}
+\item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
+\item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
 }
 }
 
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 
 \examples{
-# Fixed sample size with minimum required definitions, pi1 = (0.3,0.4,0.5,0.6) and 
-# pi2 = 0.3 at event time 12, and accrual time 24 
-getSimulationSurvival(pi1 = seq(0.3,0.6,0.1), pi2 = 0.3, eventTime = 12, 
-    accrualTime = 24, plannedEvents = 40, maxNumberOfSubjects = 200, 
-    maxNumberOfIterations = 10)
+# Fixed sample size with minimum required definitions, pi1 = (0.3,0.4,0.5,0.6) and
+# pi2 = 0.3 at event time 12, and accrual time 24
+getSimulationSurvival(
+    pi1 = seq(0.3, 0.6, 0.1), pi2 = 0.3, eventTime = 12,
+    accrualTime = 24, plannedEvents = 40, maxNumberOfSubjects = 200,
+    maxNumberOfIterations = 10
+)
 \donttest{
-# Increase number of simulation iterations 
-getSimulationSurvival(pi1 = seq(0.3,0.6,0.1), pi2 = 0.3, eventTime = 12, 
-    accrualTime = 24, plannedEvents = 40, maxNumberOfSubjects = 200, 
-    maxNumberOfIterations = 50)
+# Increase number of simulation iterations
+getSimulationSurvival(
+    pi1 = seq(0.3, 0.6, 0.1), pi2 = 0.3, eventTime = 12,
+    accrualTime = 24, plannedEvents = 40, maxNumberOfSubjects = 200,
+    maxNumberOfIterations = 50
+)
 
-# Determine necessary accrual time with default settings if 200 subjects and 
-# 30 subjects per time unit can be recruited 
-getSimulationSurvival(plannedEvents = 40, accrualTime = 0, 
-    accrualIntensity = 30, maxNumberOfSubjects = 200, maxNumberOfIterations = 50)
+# Determine necessary accrual time with default settings if 200 subjects and
+# 30 subjects per time unit can be recruited
+getSimulationSurvival(
+    plannedEvents = 40, accrualTime = 0,
+    accrualIntensity = 30, maxNumberOfSubjects = 200, maxNumberOfIterations = 50
+)
 
-# Determine necessary accrual time with default settings if 200 subjects and 
-# if the first 6 time units 20 subjects per time unit can be recruited, 
-# then 30 subjects per time unit 
-getSimulationSurvival(plannedEvents = 40, accrualTime = c(0, 6), 
-    accrualIntensity = c(20, 30), maxNumberOfSubjects = 200, 
-    maxNumberOfIterations = 50)
+# Determine necessary accrual time with default settings if 200 subjects and
+# if the first 6 time units 20 subjects per time unit can be recruited,
+# then 30 subjects per time unit
+getSimulationSurvival(
+    plannedEvents = 40, accrualTime = c(0, 6),
+    accrualIntensity = c(20, 30), maxNumberOfSubjects = 200,
+    maxNumberOfIterations = 50
+)
 
-# Determine maximum number of Subjects with default settings if the first 
-# 6 time units 20 subjects per time unit can be recruited, and after 
+# Determine maximum number of Subjects with default settings if the first
+# 6 time units 20 subjects per time unit can be recruited, and after
 # 10 time units 30 subjects per time unit
-getSimulationSurvival(plannedEvents = 40, accrualTime = c(0, 6, 10), 
-    accrualIntensity = c(20, 30), maxNumberOfIterations = 50)
+getSimulationSurvival(
+    plannedEvents = 40, accrualTime = c(0, 6, 10),
+    accrualIntensity = c(20, 30), maxNumberOfIterations = 50
+)
 
 # Specify accrual time as a list
 at <- list(
     "0 - <6"  = 20,
-    "6 - Inf" = 30)
-getSimulationSurvival(plannedEvents = 40, accrualTime = at, 
-    maxNumberOfSubjects = 200, maxNumberOfIterations = 50)
+    "6 - Inf" = 30
+)
+getSimulationSurvival(
+    plannedEvents = 40, accrualTime = at,
+    maxNumberOfSubjects = 200, maxNumberOfIterations = 50
+)
 
 # Specify accrual time as a list, if maximum number of subjects need to be calculated
 at <- list(
     "0 - <6"   = 20,
-    "6 - <=10" = 30)
+    "6 - <=10" = 30
+)
 getSimulationSurvival(plannedEvents = 40, accrualTime = at, maxNumberOfIterations = 50)
 
-# Specify effect size for a two-stage group sequential design with 
-# O'Brien & Fleming boundaries. Effect size is based on event rates  
+# Specify effect size for a two-stage group sequential design with
+# O'Brien & Fleming boundaries. Effect size is based on event rates
 # at specified event time, directionUpper = FALSE needs to be specified
 # because it should be shown that hazard ratio < 1
-getSimulationSurvival(design = getDesignGroupSequential(kMax = 2), 
-    pi1 = 0.2, pi2 = 0.3, eventTime = 24, plannedEvents = c(20, 40), 
-    maxNumberOfSubjects = 200, directionUpper = FALSE, maxNumberOfIterations = 50)
+designGS <- getDesignGroupSequential(kMax = 2)
+getSimulationSurvival(
+    design = designGS,
+    pi1 = 0.2, pi2 = 0.3, eventTime = 24, plannedEvents = c(20, 40),
+    maxNumberOfSubjects = 200, directionUpper = FALSE, maxNumberOfIterations = 50
+)
 
-# As above, but with a three-stage O'Brien and Fleming design with 
+# As above, but with a three-stage O'Brien and Fleming design with
 # specified information rates, note that planned events consists of integer values
-d3 <- getDesignGroupSequential(informationRates = c(0.4, 0.7, 1))
-getSimulationSurvival(design = d3, pi1 = 0.2, pi2 = 0.3, eventTime = 24, 
-    plannedEvents = round(d3$informationRates * 40), 
-    maxNumberOfSubjects = 200, directionUpper = FALSE, 
-    maxNumberOfIterations = 50)
+designGS2 <- getDesignGroupSequential(informationRates = c(0.4, 0.7, 1))
+getSimulationSurvival(
+    design = designGS2, 
+    pi1 = 0.2, pi2 = 0.3, eventTime = 24,
+    plannedEvents = round(designGS2$informationRates * 40),
+    maxNumberOfSubjects = 200, directionUpper = FALSE,
+    maxNumberOfIterations = 50
+)
 
-# Effect size is based on event rate at specified event time for the reference 
-# group and hazard ratio, directionUpper = FALSE needs to be specified because 
+# Effect size is based on event rate at specified event time for the reference
+# group and hazard ratio, directionUpper = FALSE needs to be specified because
 # it should be shown that hazard ratio < 1
-getSimulationSurvival(design = getDesignGroupSequential(kMax = 2), hazardRatio = 0.5, 
-    pi2 = 0.3, eventTime = 24, plannedEvents = c(20, 40), maxNumberOfSubjects = 200, 
-    directionUpper = FALSE, maxNumberOfIterations = 50)
+getSimulationSurvival(
+    design = designGS, hazardRatio = 0.5,
+    pi2 = 0.3, eventTime = 24, plannedEvents = c(20, 40), maxNumberOfSubjects = 200,
+    directionUpper = FALSE, maxNumberOfIterations = 50
+)
 
-# Effect size is based on hazard rate for the reference group and 
-# hazard ratio, directionUpper = FALSE needs to be specified because 
+# Effect size is based on hazard rate for the reference group and
+# hazard ratio, directionUpper = FALSE needs to be specified because
 # it should be shown that hazard ratio < 1
-getSimulationSurvival(design = getDesignGroupSequential(kMax = 2), 
-    hazardRatio = 0.5, lambda2 = 0.02, plannedEvents = c(20, 40), 
-    maxNumberOfSubjects = 200, directionUpper = FALSE, 
-    maxNumberOfIterations = 50) 
+getSimulationSurvival(
+    design = designGS,
+    hazardRatio = 0.5, lambda2 = 0.02, plannedEvents = c(20, 40),
+    maxNumberOfSubjects = 200, directionUpper = FALSE,
+    maxNumberOfIterations = 50
+)
 
-# Specification of piecewise exponential survival time and hazard ratios, 
+# Specification of piecewise exponential survival time and hazard ratios,
 # note that in getSimulationSurvival only on hazard ratio is used
 # in the case that the survival time is piecewise expoential
-getSimulationSurvival(design = getDesignGroupSequential(kMax = 2), 
-    piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04), 
-    hazardRatio = 1.5, plannedEvents = c(20, 40), maxNumberOfSubjects = 200, 
-    maxNumberOfIterations = 50)
+getSimulationSurvival(
+    design = designGS,
+    piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04),
+    hazardRatio = 1.5, plannedEvents = c(20, 40), maxNumberOfSubjects = 200,
+    maxNumberOfIterations = 50
+)
 
 pws <- list(
     "0 - <5"  = 0.01,
     "5 - <10" = 0.02,
-    ">=10"    = 0.04)
-getSimulationSurvival(design = getDesignGroupSequential(kMax = 2), 
-    piecewiseSurvivalTime = pws, hazardRatio = c(1.5), 
-    plannedEvents = c(20, 40), maxNumberOfSubjects = 200, 
-    maxNumberOfIterations = 50)
+    ">=10"    = 0.04
+)
+getSimulationSurvival(
+    design = designGS,
+    piecewiseSurvivalTime = pws, hazardRatio = c(1.5),
+    plannedEvents = c(20, 40), maxNumberOfSubjects = 200,
+    maxNumberOfIterations = 50
+)
 
-# Specification of piecewise exponential survival time for both treatment arms  
-getSimulationSurvival(design = getDesignGroupSequential(kMax = 2), 
-    piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04), 
-    lambda1 = c(0.015, 0.03, 0.06), plannedEvents = c(20, 40), 
-    maxNumberOfSubjects = 200, maxNumberOfIterations = 50)
+# Specification of piecewise exponential survival time for both treatment arms
+getSimulationSurvival(
+    design = designGS,
+    piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04),
+    lambda1 = c(0.015, 0.03, 0.06), plannedEvents = c(20, 40),
+    maxNumberOfSubjects = 200, maxNumberOfIterations = 50
+)
 
-# Specification of piecewise exponential survival time as a list, 
-# note that in getSimulationSurvival only on hazard ratio 
+# Specification of piecewise exponential survival time as a list,
+# note that in getSimulationSurvival only on hazard ratio
 # (not a vector) can be used
 pws <- list(
     "0 - <5"  = 0.01,
     "5 - <10" = 0.02,
-    ">=10"    = 0.04)
-getSimulationSurvival(design = getDesignGroupSequential(kMax = 2), 
-    piecewiseSurvivalTime = pws, hazardRatio = 1.5, 
-    plannedEvents = c(20, 40), maxNumberOfSubjects = 200, 
-    maxNumberOfIterations = 50)
+    ">=10"    = 0.04
+)
+getSimulationSurvival(
+    design = designGS,
+    piecewiseSurvivalTime = pws, hazardRatio = 1.5,
+    plannedEvents = c(20, 40), maxNumberOfSubjects = 200,
+    maxNumberOfIterations = 50
+)
 
-# Specification of piecewise exponential survival time and delayed effect 
-# (response after 5 time units)  
-getSimulationSurvival(design = getDesignGroupSequential(kMax = 2), 
-    piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04), 
-    lambda1 = c(0.01, 0.02, 0.06), plannedEvents = c(20, 40), 
-    maxNumberOfSubjects = 200, maxNumberOfIterations = 50)
+# Specification of piecewise exponential survival time and delayed effect
+# (response after 5 time units)
+getSimulationSurvival(
+    design = designGS,
+    piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04),
+    lambda1 = c(0.01, 0.02, 0.06), plannedEvents = c(20, 40),
+    maxNumberOfSubjects = 200, maxNumberOfIterations = 50
+)
 
 # Specify effect size based on median survival times
-getSimulationSurvival(median1 = 5, median2 = 3, plannedEvents = 40, 
-    maxNumberOfSubjects = 200, directionUpper = FALSE, 
-    maxNumberOfIterations = 50)
+getSimulationSurvival(
+    median1 = 5, median2 = 3, plannedEvents = 40,
+    maxNumberOfSubjects = 200, directionUpper = FALSE,
+    maxNumberOfIterations = 50
+)
 
-# Specify effect size based on median survival 
+# Specify effect size based on median survival
 # times of Weibull distribtion with kappa = 2
-getSimulationSurvival(median1 = 5, median2 = 3, kappa = 2, 
-    plannedEvents = 40, maxNumberOfSubjects = 200, 
-    directionUpper = FALSE, maxNumberOfIterations = 50)
+getSimulationSurvival(
+    median1 = 5, median2 = 3, kappa = 2,
+    plannedEvents = 40, maxNumberOfSubjects = 200,
+    directionUpper = FALSE, maxNumberOfIterations = 50
+)
 
-# Perform recalculation of number of events based on conditional power for a 
-# three-stage design with inverse normal combination test, where the conditional power 
-# is calculated under the specified effect size thetaH1 = 1.3 and up to a four-fold 
-# increase in originally planned sample size (number of events) is allowed
-# Note that the first value in minNumberOfEventsPerStage and 
+# Perform recalculation of number of events based on conditional power for a
+# three-stage design with inverse normal combination test, where the conditional power
+# is calculated under the specified effect size thetaH1 = 1.3 and up to a four-fold
+# increase in originally planned sample size (number of events) is allowed.
+# Note that the first value in minNumberOfEventsPerStage and
 # maxNumberOfEventsPerStage is arbitrary, i.e., it has no effect.
-dIN <- getDesignInverseNormal(informationRates = c(0.4, 0.7, 1))
+designIN <- getDesignInverseNormal(informationRates = c(0.4, 0.7, 1))
 
-resultsWithSSR1 <- getSimulationSurvival(design = dIN, 
-    hazardRatio = seq(1, 1.6, 0.1), 
-    pi2 = 0.3, conditionalPower = 0.8, thetaH1 = 1.3, 
-    plannedEvents = c(58, 102, 146), 
-    minNumberOfEventsPerStage = c(NA, 44, 44), 
+resultsWithSSR1 <- getSimulationSurvival(
+    design = designIN,
+    hazardRatio = seq(1, 1.6, 0.1),
+    pi2 = 0.3, conditionalPower = 0.8, thetaH1 = 1.3,
+    plannedEvents = c(58, 102, 146),
+    minNumberOfEventsPerStage = c(NA, 44, 44),
     maxNumberOfEventsPerStage = 4 * c(NA, 44, 44),
-    maxNumberOfSubjects = 800, maxNumberOfIterations = 50)
+    maxNumberOfSubjects = 800, maxNumberOfIterations = 50
+)
 resultsWithSSR1
 
-# If thetaH1 is unspecified, the observed hazard ratio estimate 
-# (calculated from the log-rank statistic) is used for performing the 
+# If thetaH1 is unspecified, the observed hazard ratio estimate
+# (calculated from the log-rank statistic) is used for performing the
 # recalculation of the number of events
-resultsWithSSR2 <- getSimulationSurvival(design = dIN, 
-    hazardRatio = seq(1, 1.6, 0.1), 
-    pi2 = 0.3, conditionalPower = 0.8, plannedEvents = c(58, 102, 146), 
-    minNumberOfEventsPerStage = c(NA, 44, 44), 
+resultsWithSSR2 <- getSimulationSurvival(
+    design = designIN,
+    hazardRatio = seq(1, 1.6, 0.1),
+    pi2 = 0.3, conditionalPower = 0.8, plannedEvents = c(58, 102, 146),
+    minNumberOfEventsPerStage = c(NA, 44, 44),
     maxNumberOfEventsPerStage = 4 * c(NA, 44, 44),
-    maxNumberOfSubjects = 800, maxNumberOfIterations = 50)
+    maxNumberOfSubjects = 800, maxNumberOfIterations = 50
+)
 resultsWithSSR2
 
 # Compare it with design without event size recalculation
-resultsWithoutSSR <- getSimulationSurvival(design = dIN, 
-    hazardRatio = seq(1, 1.6, 0.1), pi2 = 0.3, 
-    plannedEvents = c(58, 102, 145), maxNumberOfSubjects = 800, 
-    maxNumberOfIterations = 50)
+resultsWithoutSSR <- getSimulationSurvival(
+    design = designIN,
+    hazardRatio = seq(1, 1.6, 0.1), pi2 = 0.3,
+    plannedEvents = c(58, 102, 145), maxNumberOfSubjects = 800,
+    maxNumberOfIterations = 50
+)
 resultsWithoutSSR$overallReject
 resultsWithSSR1$overallReject
 resultsWithSSR2$overallReject
 
-# Confirm that event size racalcuation increases the Type I error rate, 
-# i.e., you have to use the combination test 
-dGS <- getDesignGroupSequential(informationRates = c(0.4, 0.7, 1))
-resultsWithSSRGS <- getSimulationSurvival(design = dGS, hazardRatio = seq(1), 
-    pi2 = 0.3, conditionalPower = 0.8, plannedEvents = c(58, 102, 145), 
-    minNumberOfEventsPerStage = c(NA, 44, 44), 
+# Confirm that event size racalcuation increases the Type I error rate,
+# i.e., you have to use the combination test
+resultsWithSSRGS <- getSimulationSurvival(
+    design = designGS2, 
+    hazardRatio = seq(1),
+    pi2 = 0.3, conditionalPower = 0.8, plannedEvents = c(58, 102, 145),
+    minNumberOfEventsPerStage = c(NA, 44, 44),
     maxNumberOfEventsPerStage = 4 * c(NA, 44, 44),
-    maxNumberOfSubjects = 800, maxNumberOfIterations = 50)
+    maxNumberOfSubjects = 800, maxNumberOfIterations = 50
+)
 resultsWithSSRGS$overallReject
 
-# Set seed to get reproduceable results
+# Set seed to get reproducable results
 identical(
-    getSimulationSurvival(plannedEvents = 40, maxNumberOfSubjects = 200, 
-        seed = 99)$analysisTime,
-    getSimulationSurvival(plannedEvents = 40, maxNumberOfSubjects = 200, 
-        seed = 99)$analysisTime
+    getSimulationSurvival(
+        plannedEvents = 40, maxNumberOfSubjects = 200,
+        seed = 99
+    )$analysisTime,
+    getSimulationSurvival(
+        plannedEvents = 40, maxNumberOfSubjects = 200,
+        seed = 99
+    )$analysisTime
+)
+
+# Perform recalculation of number of events based on conditional power as above.
+# The number of events is recalculated only in the first interim, the recalculated number
+# is also used for the final stage. Here, we use the user defind calcEventsFunction as
+# follows (note that the last stage value in minNumberOfEventsPerStage and maxNumberOfEventsPerStage
+# has no effect):
+myCalcEventsFunction <- function(...,
+        stage, conditionalPower, estimatedTheta,
+        plannedEvents, eventsOverStages,
+        minNumberOfEventsPerStage, maxNumberOfEventsPerStage,
+        conditionalCriticalValue) {
+    theta <- max(1 + 1e-12, estimatedTheta)
+    if (stage == 2) {
+        requiredStageEvents <-
+            max(0, conditionalCriticalValue + qnorm(conditionalPower))^2 / log(theta)^2
+        requiredStageEvents <- min(
+            max(minNumberOfEventsPerStage[stage], requiredStageEvents),
+            maxNumberOfEventsPerStage[stage]
+        ) + eventsOverStages[stage - 1]
+    } else {
+        requiredStageEvents <- 2 * eventsOverStages[stage - 1] - eventsOverStages[1]
+    }
+    return(requiredStageEvents)
+}
+resultsWithSSR <- getSimulationSurvival(
+    design = designIN,
+    hazardRatio = seq(1, 2.6, 0.5),
+    pi2 = 0.3,
+    conditionalPower = 0.8,
+    plannedEvents = c(58, 102, 146),
+    minNumberOfEventsPerStage = c(NA, 44, 4),
+    maxNumberOfEventsPerStage = 4 * c(NA, 44, 4),
+    maxNumberOfSubjects = 800,
+    calcEventsFunction = myCalcEventsFunction,
+    seed = 1234,
+    maxNumberOfIterations = 50
 )
 }
 
