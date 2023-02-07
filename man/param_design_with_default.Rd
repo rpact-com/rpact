@@ -4,8 +4,8 @@
 \alias{param_design_with_default}
 \title{Parameter Description: Design with Default}
 \arguments{
-\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used. 
-In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower}, 
+\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used.
+In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
 and \code{sided} can be directly entered as argument where necessary.}
 }
 \description{

@@ -4,9 +4,9 @@
 \alias{param_minNumberOfEventsPerStage}
 \title{Parameter Description: Min Number Of Events Per Stage}
 \arguments{
-\item{minNumberOfEventsPerStage}{When performing a data driven sample size recalculation, 
-the numeric vector \code{minNumberOfEventsPerStage} with length kMax determines the 
-minimum number of events per stage (i.e., not cumulated), the first element 
+\item{minNumberOfEventsPerStage}{When performing a data driven sample size recalculation,
+the numeric vector \code{minNumberOfEventsPerStage} with length kMax determines the
+minimum number of events per stage (i.e., not cumulated), the first element
 is not taken into account.}
 }
 \description{

@@ -1,4 +1,16 @@
 
+# rpact 3.3.3 "Issos"
+
+* `allocationRatioPlanned` for simulating means and rates for a two treatment groups design can be a vector of length kMax, the number of stages 
+* `calcSubjectsFunction` can be used in C++ version for simulating means and rates
+* `calcEventsFunction` added in getSimulationSurvival()
+* `getPerformanceScore()` added: calculates the performance score for simulation means results (1 and 2 groups; 2 stages)
+* Performance of simulation rates improved for 1 and 2 groups (by translating from R to C++)
+* Performance of simulation means improved for 1 and 2 groups
+* Two-sided O'Brien and Fleming beta-spending function corrected
+* Issue in plot type 5 for sample size means and rates fixed
+* Minor improvements
+
 # rpact 3.3.2
 
 * Design objects can be piped into `getDataset()` to enable pipe syntax for analysis, e.g., 

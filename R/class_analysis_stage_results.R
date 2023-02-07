@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6646 $
-## |  Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -997,8 +997,10 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         parametersToShow <- x$.getParametersToShow()
 
         return(.getAsDataFrame(
-            parameterSet = x, parameterNames = parametersToShow,
-            niceColumnNamesEnabled = niceColumnNamesEnabled, includeAllParameters = includeAllParameters,
+            parameterSet = x, 
+            parameterNames = parametersToShow,
+            niceColumnNamesEnabled = niceColumnNamesEnabled, 
+            includeAllParameters = includeAllParameters,
             tableColumnNames = .getTableColumnNames(design = x$.design)
         ))
     }

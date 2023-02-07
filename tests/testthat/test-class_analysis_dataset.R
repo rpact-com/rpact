@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-class_analysis_dataset.R
-## |  Creation date: 12 August 2022, 09:04:25
-## |  File version: $Revision: 6658 $
-## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
+## |  Creation date: 06 February 2023, 12:04:06
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,9 +24,6 @@ test_plan_section("Testing the Class 'Dataset'")
 
 
 test_that("Usage of 'getDataset'", {
-        
-    .skipTestIfDisabled()
-        
 	# @refFS[Tab.]{fs:tab:dataInputVariants}
 	# @refFS[Tab.]fs:tab:output:getDatasetMeans}
 	datasetOfMeans1 <- getDataset(
@@ -71,7 +68,7 @@ test_that("Usage of 'getDataset'", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-    
+
 	## Comparison of the results of data.frame object 'datasetOfMeans1$.data' with expected results
 	expect_equal(datasetOfMeans1$.data$stage, factor(c(1, 1, 2, 2, 3, 3, 4, 4)))
 	expect_equal(datasetOfMeans1$.data$group, factor(c(1, 2, 1, 2, 1, 2, 1, 2)))
@@ -91,6 +88,8 @@ test_that("Usage of 'getDataset'", {
 	expect_equal(datasetOfMeans1$overallSampleSizes, datasetOfMeans1$.data$overallSampleSize, tolerance = 1e-07)
 	expect_equal(datasetOfMeans1$overallMeans, datasetOfMeans1$.data$overallMean, tolerance = 1e-07)
 	expect_equal(datasetOfMeans1$overallStDevs, datasetOfMeans1$.data$overallStDev, tolerance = 1e-07)
+
+	.skipTestIfDisabled()
 
 	x <- getMultipleStageResultsForDataset(datasetOfMeans1)
 
@@ -2034,27 +2033,31 @@ test_that("Trim command works as expected for suvival data", {
 })
 
 test_that("Dataset functions 'getNumberOfStages' and 'getNumberOfGroups' work as expected for means", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	# @refFS[Tab.]{fs:tab:dataInputVariants}
 	# @refFS[Tab.]fs:tab:output:getDatasetMeans}
-	data1 <- getDataset(
-	    overallN1 = c(22, 33, NA),
-	    overallN2 = c(20, 34, 56),
-	    overallN3 = c(22, 31, 52),
-	    overallMeans1 = c(1.64, 1.54, NA),
-	    overallMeans2 = c(1.7, 1.5, 1.77),
-	    overallMeans3 = c(2.5, 2.06, 2.99),
-	    overallStDevs1 = c(1.5, 1.9, NA),
-	    overallStDevs2 = c(1.3, 1.3, 1.1),
-	    overallStDevs3 = c(1, 1.3, 1.8)
+	suppressWarnings(
+	    data1 <- getDataset(
+	        overallN1 = c(22, 33, NA),
+	        overallN2 = c(20, 34, 56),
+	        overallN3 = c(22, 31, 52),
+	        overallMeans1 = c(1.64, 1.54, NA),
+	        overallMeans2 = c(1.7, 1.5, 1.77),
+	        overallMeans3 = c(2.5, 2.06, 2.99),
+	        overallStDevs1 = c(1.5, 1.9, NA),
+	        overallStDevs2 = c(1.3, 1.3, 1.1),
+	        overallStDevs3 = c(1, 1.3, 1.8)
+	    )
 	)
 
 	expect_equal(data1$getNumberOfStages(), 3)
 	expect_equal(data1$getNumberOfStages(FALSE), 3)
 	expect_equal(data1$getNumberOfGroups(), 3)
 	expect_equal(data1$getNumberOfGroups(survivalCorrectionEnabled = FALSE), 3)
+
+	.skipTestIfDisabled()
 
 	data2 <- getDataset(
 	    overallN1 = c(22, 33, 55),
@@ -2093,8 +2096,8 @@ test_that("Dataset functions 'getNumberOfStages' and 'getNumberOfGroups' work as
 })
 
 test_that("Dataset functions 'getNumberOfStages' and 'getNumberOfGroups' work as expected for rates", {
-        
-    .skipTestIfDisabled()
+
+	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:dataInputVariants}
 	# @refFS[Tab.]fs:tab:output:getDatasetRates}
@@ -2211,9 +2214,9 @@ test_that("Dataset functions 'getNumberOfStages' and 'getNumberOfGroups' work as
 })
 
 test_that("Function '.naOmitBackward' works as expected", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	expect_equal(.naOmitBackward(c(1, NA_real_, 3, NA_real_)), c(1, NA_real_, 3))
 	expect_equal(.naOmitBackward(c(1, NA_real_, 3, NA_real_, 5)), c(1, NA_real_, 3, NA_real_, 5))
 	expect_equal(.naOmitBackward(c(1, NA_real_, NA_real_)), c(1))
@@ -2228,9 +2231,8 @@ test_plan_section("Testing that 'getDataset' Throws Exceptions as Expected")
 
 
 test_that("Wrong parameter usage of 'getDataset'", {
-        
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	# @refFS[Tab.]{fs:tab:dataInputVariants}
 	expect_error(getDataset(),
 	    "Missing argument: data.frame, data vectors, or datasets expected",
@@ -2268,9 +2270,8 @@ test_plan_section("Testing datasets for enrichment designs")
 
 
 test_that("Creation of a dataset of means with subsets", {
-        
-    .skipTestIfDisabled()
-        
+	.skipTestIfDisabled()
+
 	x <- getDataset(
 	    stage = c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3),
 	    subset = c("S1", "S2", "S12", "R", "S1", "S2", "S12", "R", "S1", "S2", "S12", "R"),
@@ -2315,6 +2316,8 @@ test_that("Creation of a dataset of means with subsets", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
+
+	.skipTestIfDisabled()
 
 	x2 <- getDataset(
 	    stages = c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3),
@@ -2371,18 +2374,19 @@ test_that("Creation of a dataset of means with subsets", {
 })
 
 test_that("Creation of a dataset of rates with subsets", {
-        
-    .skipTestIfDisabled()
-        
-	x <- getDataset(
-	    stage = c(1, 1, 2, 2),
-	    subset = c("S1", "R", "S1", "R"),
-	    sampleSizes1 = c(11, 24, 36, 49),
-	    sampleSizes2 = c(8, 18, 27, 38),
-	    sampleSizes3 = c(8, 18, 27, 38),
-	    events1 = c(10, 20, 32, 44),
-	    events2 = c(3, 8, 13, 19),
-	    events3 = c(3, 7, 12, 20)
+
+	.skipTestIfDisabled()
+	suppressWarnings(
+	    x <- getDataset(
+	        stage = c(1, 1, 2, 2),
+	        subset = c("S1", "R", "S1", "R"),
+	        sampleSizes1 = c(11, 24, 36, 49),
+	        sampleSizes2 = c(8, 18, 27, 38),
+	        sampleSizes3 = c(8, 18, 27, 38),
+	        events1 = c(10, 20, 32, 44),
+	        events2 = c(3, 8, 13, 19),
+	        events3 = c(3, 7, 12, 20)
+	    )
 	)
 
 	## Comparison of the results of DatasetRates object 'x' with expected results
@@ -2398,7 +2402,7 @@ test_that("Creation of a dataset of rates with subsets", {
 	    expect_output(print(x)$show())
 	    invisible(capture.output(expect_error(summary(x), NA)))
 	    expect_output(summary(x)$show())
-	    xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL)))
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
 	    expect_equal(xCodeBased$stages, x$stages, tolerance = 1e-05)
 	    expect_equal(xCodeBased$groups, x$groups, tolerance = 1e-05)
 	    expect_equal(xCodeBased$subsets, x$subsets, tolerance = 1e-05)
@@ -2418,18 +2422,20 @@ test_that("Creation of a dataset of rates with subsets", {
 })
 
 test_that("Creation of a dataset of survival data with subsets", {
-        
-    .skipTestIfDisabled()
-        
-	x <- getDataset(
-	    stage = c(1, 1, 2, 2),
-	    subset = c("S1", "R", "S1", "R"),
-	    events1 = c(10, 20, 32, 44),
-	    events2 = c(3, 8, 13, 19),
-	    events3 = c(3, 7, 12, 20),
-	    logRanks1 = c(2.2, 1.8, 1.9, 2.1),
-	    logRanks2 = c(1.99, 2.01, 2.05, 2.09),
-	    logRanks3 = c(2.32, 2.11, 2.14, 2.17)
+
+	.skipTestIfDisabled()
+
+	suppressWarnings(
+	    x <- getDataset(
+	        stage = c(1, 1, 2, 2),
+	        subset = c("S1", "R", "S1", "R"),
+	        events1 = c(10, 20, 32, 44),
+	        events2 = c(3, 8, 13, 19),
+	        events3 = c(3, 7, 12, 20),
+	        logRanks1 = c(2.2, 1.8, 1.9, 2.1),
+	        logRanks2 = c(1.99, 2.01, 2.05, 2.09),
+	        logRanks3 = c(2.32, 2.11, 2.14, 2.17)
+	    )
 	)
 
 	## Comparison of the results of DatasetSurvival object 'x' with expected results
@@ -2447,7 +2453,7 @@ test_that("Creation of a dataset of survival data with subsets", {
 	    expect_output(print(x)$show())
 	    invisible(capture.output(expect_error(summary(x), NA)))
 	    expect_output(summary(x)$show())
-	    xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL)))
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
 	    expect_equal(xCodeBased$stages, x$stages, tolerance = 1e-05)
 	    expect_equal(xCodeBased$groups, x$groups, tolerance = 1e-05)
 	    expect_equal(xCodeBased$subsets, x$subsets, tolerance = 1e-05)
@@ -2469,9 +2475,9 @@ test_that("Creation of a dataset of survival data with subsets", {
 })
 
 test_that("Illegal creation of a dataset of means with subsets: invalid sample size", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	expect_error(
 	    getDataset(
 	        sampleSize1 = c(NA, NA),
@@ -2488,9 +2494,9 @@ test_that("Illegal creation of a dataset of means with subsets: invalid sample s
 })
 
 test_that("Illegal creation of a dataset of means with subsets: too small standard deviation (one subset)", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(12, 21),
 	    sampleSize2 = c(18, 21),
@@ -2517,9 +2523,9 @@ test_that("Illegal creation of a dataset of means with subsets: too small standa
 })
 
 test_that("Illegal creation of a dataset of means with subsets: too small sample size in F (one group)", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(12, 21),
 	    sampleSize2 = c(30, 21),
@@ -2546,9 +2552,9 @@ test_that("Illegal creation of a dataset of means with subsets: too small sample
 })
 
 test_that("Illegal creation of a dataset of means with subsets: wrong deselection (one group)", {
-        
-    .skipTestIfDisabled()
-        
+
+	.skipTestIfDisabled()
+
 	S1 <- getDataset(
 	    sampleSize1 = c(12, NA),
 	    sampleSize2 = c(18, NA),
@@ -3202,6 +3208,130 @@ test_that("Illegal creation of a dataset of survival data with subsets: inconsis
 	    overallAllocationRatios = c(1, NA, NA)
 	)
 
-	expect_error(getDataset(S1 = S1, S2 = S2, S12 = S12, R = R), NA)
+	expect_error(getDataset(S1 = S1, S2 = S2, S12 = S12, R = R), NA)
+
+})
+
+test_that("Usage of the forward pipe operator", {
+    
+    .skipTestIfDisabled()
+    
+    .skipTestIfPipeOperatorNotAvailable()
+    
+    analysisResults <- getDesignGroupSequential(informationRates = c(20, 50, 80) / 80) |>
+        getDataset(
+            n = c(20, 30, 30),
+            means = c(45, 51, 45),
+            stDevs = c(130, 140, 120)
+        ) |>
+        getAnalysisResults()
+    
+    ## Comparison of the results of AnalysisResultsGroupSequential object 'analysisResults' with expected results
+    expect_equal(analysisResults$thetaH1, 47.25, tolerance = 1e-07)
+    expect_equal(analysisResults$assumedStDev, 128.66279, tolerance = 1e-07)
+    expect_equal(analysisResults$testActions, c("continue", "continue", "reject"))
+    expect_equal(analysisResults$conditionalRejectionProbabilities, c(0.081070604, 0.46575384, NA_real_), tolerance = 1e-07)
+    expect_equal(analysisResults$conditionalPower, c(NA_real_, NA_real_, NA_real_))
+    expect_equal(analysisResults$repeatedConfidenceIntervalLowerBounds, c(-102.89842, -1.4031361, 18.073438), tolerance = 1e-07)
+    expect_equal(analysisResults$repeatedConfidenceIntervalUpperBounds, c(192.89842, 98.603136, 76.426562), tolerance = 1e-07)
+    expect_equal(analysisResults$repeatedPValues, c(0.29621451, 0.028427113, 0.00077442832), tolerance = 1e-07)
+    expect_equal(analysisResults$finalStage, 3)
+    expect_equal(analysisResults$finalPValues, c(NA_real_, NA_real_, 0.0060885604), tolerance = 1e-07)
+    expect_equal(analysisResults$finalConfidenceIntervalLowerBounds, c(NA_real_, NA_real_, 9.555415), tolerance = 1e-07)
+    expect_equal(analysisResults$finalConfidenceIntervalUpperBounds, c(NA_real_, NA_real_, 71.404491), tolerance = 1e-07)
+    expect_equal(analysisResults$medianUnbiasedEstimates, c(NA_real_, NA_real_, 41.616412), tolerance = 1e-07)
+    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+        invisible(capture.output(expect_error(print(analysisResults), NA)))
+        expect_output(print(analysisResults)$show())
+        invisible(capture.output(expect_error(summary(analysisResults), NA)))
+        expect_output(summary(analysisResults)$show())
+        analysisResultsCodeBased <- eval(parse(text = getObjectRCode(analysisResults, stringWrapParagraphWidth = NULL)))
+        expect_equal(analysisResultsCodeBased$thetaH1, analysisResults$thetaH1, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$assumedStDev, analysisResults$assumedStDev, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$testActions, analysisResults$testActions, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$conditionalRejectionProbabilities, analysisResults$conditionalRejectionProbabilities, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$conditionalPower, analysisResults$conditionalPower, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$repeatedConfidenceIntervalLowerBounds, analysisResults$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$repeatedConfidenceIntervalUpperBounds, analysisResults$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$repeatedPValues, analysisResults$repeatedPValues, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$finalStage, analysisResults$finalStage, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$finalPValues, analysisResults$finalPValues, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$finalConfidenceIntervalLowerBounds, analysisResults$finalConfidenceIntervalLowerBounds, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$finalConfidenceIntervalUpperBounds, analysisResults$finalConfidenceIntervalUpperBounds, tolerance = 1e-05)
+        expect_equal(analysisResultsCodeBased$medianUnbiasedEstimates, analysisResults$medianUnbiasedEstimates, tolerance = 1e-05)
+        expect_type(names(analysisResults), "character")
+        df <- as.data.frame(analysisResults)
+        expect_s3_class(df, "data.frame")
+        expect_true(nrow(df) > 0 && ncol(df) > 0)
+        mtx <- as.matrix(analysisResults)
+        expect_true(is.matrix(mtx))
+        expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+    }
+    
+    finalConfidenceInterval <- getDesignGroupSequential() |>
+        getDataset(
+            n = c(20, 30, 30),
+            means = c(45, 51, 45),
+            stDevs = c(130, 140, 120)
+        ) |>
+        getFinalConfidenceInterval()
+    
+    ## Comparison of the results of list object 'finalConfidenceInterval' with expected results
+    expect_equal(finalConfidenceInterval$stage, 3)
+    expect_equal(finalConfidenceInterval$thetaH0, 0)
+    expect_equal(finalConfidenceInterval$directionUpper, TRUE)
+    expect_equal(finalConfidenceInterval$normalApproximation, FALSE)
+    expect_equal(finalConfidenceInterval$equalVariances, TRUE)
+    expect_equal(finalConfidenceInterval$tolerance, 1e-06, tolerance = 1e-07)
+    expect_equal(finalConfidenceInterval$finalStage, 2)
+    expect_equal(finalConfidenceInterval$medianUnbiasedGeneral, 0.34738475, tolerance = 1e-07)
+    expect_equal(finalConfidenceInterval$finalConfidenceIntervalGeneral, c(0.069908879, 0.62467355), tolerance = 1e-07)
+    expect_equal(finalConfidenceInterval$medianUnbiased, 46.815656, tolerance = 1e-07)
+    expect_equal(finalConfidenceInterval$finalConfidenceInterval, c(9.4213407, 84.184763), tolerance = 1e-07)
+    
+    suppressWarnings(
+        stageResults <- getDataset(
+                n = c(20, 30, 30),
+                means = c(45, 51, 45),
+                stDevs = c(130, 140, 120)
+            ) |>
+            getStageResults()
+    )
+    
+    ## Comparison of the results of StageResultsMeans object 'stageResults' with expected results
+    expect_equal(stageResults$overallTestStatistics, 1.5480471, tolerance = 1e-07)
+    expect_equal(stageResults$overallPValues, 0.0690533, tolerance = 1e-07)
+    expect_equal(stageResults$overallMeans, 45)
+    expect_equal(stageResults$overallStDevs, 130)
+    expect_equal(stageResults$overallSampleSizes, 20)
+    expect_equal(stageResults$testStatistics, 1.5480471, tolerance = 1e-07)
+    expect_equal(stageResults$pValues, 0.0690533, tolerance = 1e-07)
+    expect_equal(stageResults$effectSizes, 45)
+    expect_equal(stageResults$combInverseNormal, 1.4828789, tolerance = 1e-07)
+    expect_equal(stageResults$weightsInverseNormal, 1)
+    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+        invisible(capture.output(expect_error(print(stageResults), NA)))
+        expect_output(print(stageResults)$show())
+        invisible(capture.output(expect_error(summary(stageResults), NA)))
+        expect_output(summary(stageResults)$show())
+        suppressWarnings(stageResultsCodeBased <- eval(parse(text = getObjectRCode(stageResults, stringWrapParagraphWidth = NULL))))
+        expect_equal(stageResultsCodeBased$overallTestStatistics, stageResults$overallTestStatistics, tolerance = 1e-05)
+        expect_equal(stageResultsCodeBased$overallPValues, stageResults$overallPValues, tolerance = 1e-05)
+        expect_equal(stageResultsCodeBased$overallMeans, stageResults$overallMeans, tolerance = 1e-05)
+        expect_equal(stageResultsCodeBased$overallStDevs, stageResults$overallStDevs, tolerance = 1e-05)
+        expect_equal(stageResultsCodeBased$overallSampleSizes, stageResults$overallSampleSizes, tolerance = 1e-05)
+        expect_equal(stageResultsCodeBased$testStatistics, stageResults$testStatistics, tolerance = 1e-05)
+        expect_equal(stageResultsCodeBased$pValues, stageResults$pValues, tolerance = 1e-05)
+        expect_equal(stageResultsCodeBased$effectSizes, stageResults$effectSizes, tolerance = 1e-05)
+        expect_equal(stageResultsCodeBased$combInverseNormal, stageResults$combInverseNormal, tolerance = 1e-05)
+        expect_equal(stageResultsCodeBased$weightsInverseNormal, stageResults$weightsInverseNormal, tolerance = 1e-05)
+        expect_type(names(stageResults), "character")
+        df <- as.data.frame(stageResults)
+        expect_s3_class(df, "data.frame")
+        expect_true(nrow(df) > 0 && ncol(df) > 0)
+        mtx <- as.matrix(stageResults)
+        expect_true(is.matrix(mtx))
+        expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+    }
 })
 

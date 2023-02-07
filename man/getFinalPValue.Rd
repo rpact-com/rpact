@@ -14,8 +14,8 @@ getFinalPValue(stageResults, ...)
 \value{
 Returns a \code{\link[base]{list}} containing
 \itemize{
-  \item \code{finalStage},
-  \item \code{pFinal}.
+\item \code{finalStage},
+\item \code{pFinal}.
 }
 }
 \description{
@@ -40,7 +40,6 @@ getFinalPValue(getStageResults(design, dataInput = data))
 }
 \seealso{
 Other analysis functions: 
-\code{\link{getAnalysisResults}()},
 \code{\link{getClosedCombinationTestResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalPower}()},

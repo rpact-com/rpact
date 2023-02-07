@@ -22,12 +22,12 @@ samples sizes and event numbers defined as floating-point numbers will be trunca
 Returns a \code{\link{Dataset}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.Dataset]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.Dataset]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -37,38 +37,38 @@ Creates a dataset object and returns it.
 The different dataset types \code{DatasetMeans}, of \code{DatasetRates}, or
 \code{DatasetSurvival} can be created as follows:
 \itemize{
-  \item An element of \code{\link{DatasetMeans}} for one sample is created by \cr
-    \code{getDataset(sampleSizes =, means =, stDevs =)} where \cr
-    \code{sampleSizes}, \code{means}, \code{stDevs} are vectors with stage-wise sample sizes,
-    means and standard deviations of length given by the number of available stages.
-  \item An element of \code{\link{DatasetMeans}} for two samples is created by \cr
-    \code{getDataset(sampleSizes1 =, sampleSizes2 =, means1 =, means2 =, } \cr
-    \code{stDevs1 =, stDevs2 =)} where
-    \code{sampleSizes1}, \code{sampleSizes2}, \code{means1}, \code{means2},
-    \code{stDevs1}, \code{stDevs2} are vectors with
-    stage-wise sample sizes, means and standard deviations for the two treatment groups
-    of length given by the number of available stages.
-  \item An element of \code{\link{DatasetRates}} for one sample is created by \cr
-    \code{getDataset(sampleSizes =, events =)} where \code{sampleSizes}, \code{events} are vectors
-    with stage-wise sample sizes and events of length given by the number of available stages.
-  \item An element of \code{\link{DatasetRates}} for two samples is created by \cr
-    \code{getDataset(sampleSizes1 =, sampleSizes2 =, events1 =, events2 =)} where
-    \code{sampleSizes1}, \code{sampleSizes2}, \code{events1}, \code{events2}
-    are vectors with stage-wise sample sizes
-    and events  for the two treatment groups of length given by the number of available stages.
-  \item An element of \code{\link{DatasetSurvival}} is created by \cr
-    \code{getDataset(events =, logRanks =, allocationRatios =)} where
-    \code{events}, \code{logRanks}, and \code{allocation ratios} are the stage-wise events,
-    (one-sided) logrank statistics, and allocation ratios.
-  \item An element of \code{\link{DatasetMeans}}, \code{\link{DatasetRates}}, and \code{\link{DatasetSurvival}}
-    for more than one comparison is created by adding subsequent digits to the variable names.
-    The system can analyze these data in a multi-arm many-to-one comparison setting where the
-    group with the highest index represents the control group.
+\item An element of \code{\link{DatasetMeans}} for one sample is created by \cr
+\code{getDataset(sampleSizes =, means =, stDevs =)} where \cr
+\code{sampleSizes}, \code{means}, \code{stDevs} are vectors with stage-wise sample sizes,
+means and standard deviations of length given by the number of available stages.
+\item An element of \code{\link{DatasetMeans}} for two samples is created by \cr
+\code{getDataset(sampleSizes1 =, sampleSizes2 =, means1 =, means2 =, } \cr
+\code{stDevs1 =, stDevs2 =)} where
+\code{sampleSizes1}, \code{sampleSizes2}, \code{means1}, \code{means2},
+\code{stDevs1}, \code{stDevs2} are vectors with
+stage-wise sample sizes, means and standard deviations for the two treatment groups
+of length given by the number of available stages.
+\item An element of \code{\link{DatasetRates}} for one sample is created by \cr
+\code{getDataset(sampleSizes =, events =)} where \code{sampleSizes}, \code{events} are vectors
+with stage-wise sample sizes and events of length given by the number of available stages.
+\item An element of \code{\link{DatasetRates}} for two samples is created by \cr
+\code{getDataset(sampleSizes1 =, sampleSizes2 =, events1 =, events2 =)} where
+\code{sampleSizes1}, \code{sampleSizes2}, \code{events1}, \code{events2}
+are vectors with stage-wise sample sizes
+and events  for the two treatment groups of length given by the number of available stages.
+\item An element of \code{\link{DatasetSurvival}} is created by \cr
+\code{getDataset(events =, logRanks =, allocationRatios =)} where
+\code{events}, \code{logRanks}, and \code{allocation ratios} are the stage-wise events,
+(one-sided) logrank statistics, and allocation ratios.
+\item An element of \code{\link{DatasetMeans}}, \code{\link{DatasetRates}}, and \code{\link{DatasetSurvival}}
+for more than one comparison is created by adding subsequent digits to the variable names.
+The system can analyze these data in a multi-arm many-to-one comparison setting where the
+group with the highest index represents the control group.
 }
 Prefix \code{overall[Capital case of first letter of variable name]...} for the variable
 names enables entering the overall (cumulative) results and calculates stage-wise statistics.
-Since rpact version 3.2, the prefix \code{cumulative[Capital case of first letter of variable name]...} or 
-\code{cum[Capital case of first letter of variable name]...} can alternatively be used for this. 
+Since rpact version 3.2, the prefix \code{cumulative[Capital case of first letter of variable name]...} or
+\code{cum[Capital case of first letter of variable name]...} can alternatively be used for this.
 
 \code{n} can be used in place of \code{samplesizes}.
 

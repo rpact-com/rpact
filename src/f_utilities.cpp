@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6646 $
- * Last changed: $Date: 2022-10-28 08:10:28 +0200 (Fr, 28 Okt 2022) $
+ * File version: $Revision: 6754 $
+ * Last changed: $Date: 2023-01-12 14:55:17 +0100 (Do, 12 Jan 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -42,7 +42,7 @@ double getQNormThreshold() {
 
 double getQNorm(double p, double mean = 0, double sd = 1,
 		double lowerTail = 1, double logP = 0,
-		double epsilon = C_QNORM_EPSILON) {
+		double epsilon = 1.0e-100) {
 
 	if (p <= 0) {
 		p = epsilon;
@@ -63,9 +63,10 @@ double getQNorm(double p, double mean = 0, double sd = 1,
     return result;
 }
 
+// [[Rcpp::export]]
 double getOneMinusQNorm(double p, double mean = 0, double sd = 1,
 		double lowerTail = 1, double logP = 0,
-		double epsilon = C_QNORM_EPSILON) {
+		double epsilon = 1.0e-100) {
 
 	if (p <= 0) {
 		p = epsilon;
@@ -81,7 +82,7 @@ double getOneMinusQNorm(double p, double mean = 0, double sd = 1,
 		// prevent values that are close to 1 from becoming Inf, see qnorm(1)
 		// example: 1 - 1e-17 = 1 in R, i.e., qnorm(1 - 1e-17) = Inf
 		// on the other hand: qnorm(1e-323) = -38.44939
-    	result = 1 - R::qnorm(p, mean, sd, lowerTail, logP);
+    	result = R::qnorm(1 - p, mean, sd, lowerTail, logP);
     }
 
     if (result < -C_QNORM_THRESHOLD) {
@@ -92,6 +93,30 @@ double getOneMinusQNorm(double p, double mean = 0, double sd = 1,
     }
 
     return result;
+}
+
+double getOneMinusPNorm(double q, double mean = 0, double sd = 1,
+		double lowerTail = 1, double logP = 0,
+		double epsilon = 1.0e-100) {
+
+	// return 1 - R::pnorm(q, mean, sd, lowerTail, logP);
+
+	if (q == 0) {
+		return 0.5;
+	}
+
+	double result;
+	if (q < 5) {
+		result = 1.0 - R::pnorm(q, mean, sd, lowerTail, logP);
+	} else {
+		result = R::pnorm(-q, mean, sd, lowerTail, logP);
+	}
+
+	if (result <= 0) {
+		result = epsilon;
+	}
+
+	return result;
 }
 
 template<int RTYPE>
@@ -632,4 +657,36 @@ void logDebug(std::string s) {
 double getRandomTDistribution(double df, double ncp) {
 	return Rcpp::rnorm(1, ncp)[0] / sqrt(R::rchisq(df) / df);
 }
+
+// [[Rcpp::export]]
+IntegerVector getFraction(double x, double epsilon = 1.0e-6, int maxNumberOfSearchSteps = 30) {
+  int numerator = (int) floor(x);
+  int numerator0;
+  int numerator1 = 1;
+  int denominator = 1;
+  int denominator0;
+  int denominator1 = 0;
+  int factor0;
+  double factor1 = x - (double) numerator;
+
+  int i = 0;
+  while (++i < maxNumberOfSearchSteps) {
+    if (fabs(x - (double) numerator / (double) denominator) < epsilon) {
+    	break;
+    }
+
+    factor1 = 1 / factor1;
+    factor0 = (int) floor(factor1);
+    factor1 = factor1 - factor0;
+    numerator0 = numerator1;
+    numerator1 = numerator;
+    numerator = factor0 * numerator1 + numerator0;
+    denominator0 = denominator1;
+    denominator1 = denominator;
+    denominator = factor0 * denominator1 + denominator0;
+  }
+
+  return IntegerVector::create(numerator, denominator);
+}
+
 

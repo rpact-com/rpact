@@ -39,7 +39,7 @@ with suitable arguments to create the stage results of a dataset of means.
 \item{\code{normalApproximation}}{Logical. Describes if a normal approximation was used when calculating p-values.
 Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio.}
 
-\item{\code{equalVariances}}{Logical. Describes if variances are assumed equal between groups. 
+\item{\code{equalVariances}}{Logical. Describes if variances are assumed equal between groups.
 Specified via \code{equalVariances} in \code{\link[=getStageResults]{getStageResults()}}, default is \code{TRUE}.}
 }}
 

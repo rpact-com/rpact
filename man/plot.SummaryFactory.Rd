@@ -11,7 +11,7 @@
 
 \item{y}{Not available for this kind of plot (is only defined to be compatible to the generic plot function).}
 
-\item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented 
+\item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented
 for changing x or y axis limits without dropping data observations.}
 }
 \value{

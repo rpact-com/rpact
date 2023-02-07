@@ -4,8 +4,8 @@
 \alias{param_includeAllParameters}
 \title{Parameter Description: Include All Parameters}
 \arguments{
-\item{includeAllParameters}{Logical. If \code{TRUE}, all available 
-parameters will be included in the data frame; 
+\item{includeAllParameters}{Logical. If \code{TRUE}, all available
+parameters will be included in the data frame;
 a meaningful parameter selection otherwise, default is \code{FALSE}.}
 }
 \description{

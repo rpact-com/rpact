@@ -10,8 +10,8 @@ getData(x)
 getData.SimulationResults(x)
 }
 \arguments{
-\item{x}{A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationMeans]{getSimulationMeans()}},\cr 
-\code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr 
+\item{x}{A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationMeans]{getSimulationMeans()}},\cr
+\code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr
 \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.}
 }
 \value{
@@ -21,42 +21,42 @@ Returns a \code{\link[base]{data.frame}}.
 Returns the aggregated simulation data.
 }
 \details{
-This function can be used to get the aggregated simulated data from an simulation results  
+This function can be used to get the aggregated simulated data from an simulation results
 object, for example, obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
 In this case, the data frame contains the following columns:
 \enumerate{
-  \item \code{iterationNumber}: The number of the simulation iteration.
-  \item \code{stageNumber}: The stage.
-  \item \code{pi1}: The assumed or derived event rate in the treatment group.
-  \item \code{pi2}: The assumed or derived event rate in the control group.
-  \item \code{hazardRatio}: The hazard ratio under consideration (if available).
-  \item \code{analysisTime}: The analysis time.
-  \item \code{numberOfSubjects}: The number of subjects under consideration when the 
-        (interim) analysis takes place.
-  \item \code{eventsPerStage1}: The observed number of events per stage 
-        in treatment group 1.
-  \item \code{eventsPerStage2}: The observed number of events per stage 
-        in treatment group 2.
-  \item \code{eventsPerStage}: The observed number of events per stage 
-        in both treatment groups.
-  \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise. 
-  \item \code{eventsNotAchieved}: 1 if number of events could not be reached with 
-        observed number of subjects, 0 otherwise.
-  \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
-  \item \code{testStatistic}: The test statistic that is used for the test decision, 
-        depends on which design was chosen (group sequential, inverse normal, 
-        or Fisher combination test)'  
-  \item \code{logRankStatistic}: Z-score statistic which corresponds to a one-sided 
-        log-rank test at considered stage. 
-  \item \code{conditionalPowerAchieved}: The conditional power for the subsequent stage of the trial for 
-        selected sample size and effect. The effect is either estimated from the data or can be
-        user defined with \code{thetaH1} or \code{pi1H1} and \code{pi2H1}.
-  \item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.  
-  \item \code{hazardRatioEstimateLR}: The estimated hazard ratio, derived from the 
-        log-rank statistic.
+\item \code{iterationNumber}: The number of the simulation iteration.
+\item \code{stageNumber}: The stage.
+\item \code{pi1}: The assumed or derived event rate in the treatment group.
+\item \code{pi2}: The assumed or derived event rate in the control group.
+\item \code{hazardRatio}: The hazard ratio under consideration (if available).
+\item \code{analysisTime}: The analysis time.
+\item \code{numberOfSubjects}: The number of subjects under consideration when the
+(interim) analysis takes place.
+\item \code{eventsPerStage1}: The observed number of events per stage
+in treatment group 1.
+\item \code{eventsPerStage2}: The observed number of events per stage
+in treatment group 2.
+\item \code{eventsPerStage}: The observed number of events per stage
+in both treatment groups.
+\item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
+\item \code{eventsNotAchieved}: 1 if number of events could not be reached with
+observed number of subjects, 0 otherwise.
+\item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
+\item \code{testStatistic}: The test statistic that is used for the test decision,
+depends on which design was chosen (group sequential, inverse normal,
+or Fisher combination test)'
+\item \code{logRankStatistic}: Z-score statistic which corresponds to a one-sided
+log-rank test at considered stage.
+\item \code{conditionalPowerAchieved}: The conditional power for the subsequent stage of the trial for
+selected sample size and effect. The effect is either estimated from the data or can be
+user defined with \code{thetaH1} or \code{pi1H1} and \code{pi2H1}.
+\item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
+\item \code{hazardRatioEstimateLR}: The estimated hazard ratio, derived from the
+log-rank statistic.
 }
-A subset of variables is provided for \code{\link[=getSimulationMeans]{getSimulationMeans()}}, \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr 
- \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
+A subset of variables is provided for \code{\link[=getSimulationMeans]{getSimulationMeans()}}, \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr
+\code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
 }
 \examples{
 results <- getSimulationSurvival(pi1 = seq(0.3,0.6,0.1), pi2 = 0.3, eventTime = 12, 

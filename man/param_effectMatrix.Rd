@@ -4,7 +4,7 @@
 \alias{param_effectMatrix}
 \title{Parameter Description: Effect Matrix}
 \arguments{
-\item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and number of rows 
+\item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and number of rows
 reflecting the different situations to consider.}
 }
 \description{

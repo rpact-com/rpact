@@ -991,6 +991,7 @@ summary.AnalysisResults <- function(object, ..., type = 1, digits = NA_integer_)
 #' Returns the \code{\link{AnalysisResults}} object as data frame.
 #'
 #' @param x An \code{\link{AnalysisResults}} object created by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' @inheritParams param_niceColumnNamesEnabled
 #' @inheritParams param_three_dots
 #'
 #' @details

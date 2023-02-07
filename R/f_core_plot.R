@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -517,26 +517,6 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     ))
 }
 
-.reconstructSequenceCommand <- function(values) {
-    if (length(values) == 0 || all(is.na(values))) {
-        return(NA_character_)
-    }
-
-    if (length(values) <= 3) {
-        return(.arrayToString(values, vectorLookAndFeelEnabled = (length(values) != 1)))
-    }
-
-    minValue <- min(values)
-    maxValue <- max(values)
-    by <- (maxValue - minValue) / (length(values) - 1)
-    valuesTemp <- seq(minValue, maxValue, by)
-    if (identical(values, valuesTemp)) {
-        return(paste0("seq(", minValue, ", ", maxValue, ", ", by, ")"))
-    }
-
-    return(.arrayToString(values, vectorLookAndFeelEnabled = TRUE, maxLength = 10))
-}
-
 .getRexepSaveCharacter <- function(x) {
     x <- gsub("\\$", "\\\\$", x)
     x <- gsub("\\.", "\\\\.", x)
@@ -709,9 +689,15 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(invisible(FALSE))
 }
 
-.getParameterSetAsDataFrame <- function(parameterSet, designMaster,
+.getParameterSetAsDataFrame <- function(... , 
+        parameterSet, 
+        designMaster,
         addPowerAndAverageSampleNumber = FALSE,
-        theta = seq(-1, 1, 0.02), nMax = NA_integer_, yParameterNames = character(0)) {
+        theta = seq(-1, 1, 0.02), 
+        nMax = NA_integer_,
+        mandatoryParameterNames = character(0),
+        yParameterNames = character(0)) {
+        
     if (.isTrialDesignSet(parameterSet) && parameterSet$getSize() > 1 &&
             (is.null(parameterSet$variedParameters) || length(parameterSet$variedParameters) == 0)) {
         stop(
@@ -728,8 +714,13 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             theta = theta, nMax = nMax
         ))
     } else {
-        suppressWarnings(data <- as.data.frame(parameterSet, niceColumnNamesEnabled = FALSE, 
-            includeAllParameters = TRUE))
+        parameterNames <- parameterSet$.getVisibleFieldNamesOrdered()
+        suppressWarnings(data <- .getAsDataFrame(
+            parameterSet = parameterSet,
+            parameterNames = parameterNames,
+            niceColumnNamesEnabled = FALSE, 
+            includeAllParameters = FALSE,
+            mandatoryParameterNames = mandatoryParameterNames))
     }
 
     if (!.isTrialDesignSet(parameterSet)) {
@@ -823,6 +814,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         qnormAlphaLineEnabled = TRUE,
         yAxisScalingEnabled = TRUE,
         ratioEnabled = NA, plotSettings = NULL) {
+        
     simulationEnrichmentEnmabled <- grepl("SimulationResultsEnrichment", .getClassName(parameterSet))
     if (.isParameterSet(parameterSet) || .isTrialDesignSet(parameterSet)) {
         parameterNames <- c(xParameterName, yParameterNames)
@@ -878,11 +870,17 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (.isParameterSet(parameterSet) || .isTrialDesignSet(parameterSet)) {
-        df <- .getParameterSetAsDataFrame(parameterSet, designMaster,
+        df <- .getParameterSetAsDataFrame(
+            parameterSet = parameterSet, 
+            designMaster = designMaster,
             addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
-            theta = theta, nMax = nMax, yParameterNames = yParameterNames
+            theta = theta, 
+            nMax = nMax, 
+            mandatoryParameterNames = c(xParameterName, yParameterNames),
+            yParameterNames = yParameterNames
         )
         data <- df$data
+        
         variedParameters <- df$variedParameters
         variedParameters <- na.omit(variedParameters)
         variedParameters <- variedParameters[variedParameters != "NA"]
@@ -960,6 +958,14 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         "Lower and", yAxisLabel1, fixed = TRUE)
 
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
+        
+        if (!(xParameterName %in% colnames(data))) {
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset")
+        }
+        if (!(yParameterName1 %in% colnames(data))) {
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName1), " is not available in dataset")
+        }
+        
         data$xValues <- data[[xParameterName]]
         data$yValues <- data[[yParameterName1]]
         if (yParameterName1 == "futilityBounds") {
@@ -972,11 +978,17 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         if (is.null(yParameterName2) || is.na(yParameterName2)) {
             data$yValues2 <- rep(NA_real_, nrow(data))
         } else {
+            if (!(yParameterName2 %in% colnames(data))) {
+                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName2), " is not available in dataset")
+            }
             data$yValues2 <- data[[yParameterName2]]
         }
         if (is.null(yParameterName3)) {
             data$yValues3 <- rep(NA_real_, nrow(data))
         } else {
+            if (!(yParameterName3 %in% colnames(data))) {
+                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName3), " is not available in dataset")
+            }
             data$yValues3 <- data[[yParameterName3]]
         }
 

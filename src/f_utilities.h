@@ -41,6 +41,10 @@ double getOneMinusQNorm(double p, double mean = 0, double sd = 1,
 		double lowerTail = 1, double logP = 0,
 		double epsilon = getQNormEpsilon());
 
+double getOneMinusPNorm(double q, double mean = 0, double sd = 1,
+		double lowerTail = 1, double logP = 0,
+		double epsilon = getQNormEpsilon());
+
 IntegerVector getOrder(SEXP x, bool desc = false);
 
 NumericVector vectorSum(NumericVector x, NumericVector y);

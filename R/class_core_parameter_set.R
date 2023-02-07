@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6539 $
-## |  Last changed: $Date: 2022-08-30 15:17:09 +0200 (Tue, 30 Aug 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -661,9 +661,11 @@ ParameterSet <- setRefClass("ParameterSet",
             if (is.list(paramValueFormatted)) {
                 paramValueFormatted <- .listToString(paramValueFormatted)
             }
-            if (is.function(paramValue)) {
+            if (is.function(paramValue) || grepl("Function$", paramName)) {
                 paramValueFormatted <- ifelse(
-                    .getParameterType(paramName) == C_PARAM_USER_DEFINED, "user defined", "default"
+                    .getParameterType(paramName) == C_PARAM_USER_DEFINED, 
+                    ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"), 
+                    "default"
                 )
             }
             prefix <- ifelse(showParameterType, .showParameterType(paramName), "")
@@ -671,6 +673,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 name = paramCaption,
                 n = .getNChar(), prefix = prefix
             )
+            
             output <- paste(variableNameFormatted, paramValueFormatted, "\n")
             .cat(output, consoleOutputEnabled = consoleOutputEnabled)
             invisible(output)
@@ -710,7 +713,8 @@ ParameterSet <- setRefClass("ParameterSet",
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
                 includeAllParameters = includeAllParameters,
                 handleParameterNamesAsToBeExcluded = handleParameterNamesAsToBeExcluded,
-                returnParametersAsCharacter = TRUE, tableColumnNames = tableColumnNames
+                returnParametersAsCharacter = TRUE, 
+                tableColumnNames = tableColumnNames
             )
             result <- as.matrix(dataFrame)
             if (.isTrialDesignPlan(.self)) {
@@ -924,13 +928,16 @@ ParameterSet <- setRefClass("ParameterSet",
         parameterName,
         numberOfVariants,
         numberOfStages,
-        includeAllParameters) {
+        includeAllParameters,
+        mandatoryParameterNames) {
     if (parameterSet$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN && 
             parameterName != "futilityStop") {
         return(NULL)
     }
 
-    if (!includeAllParameters && parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE) {
+    if (!includeAllParameters && 
+            parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE &&
+            !(parameterName %in% mandatoryParameterNames)) {
         return(NULL)
     }
 
@@ -970,7 +977,8 @@ ParameterSet <- setRefClass("ParameterSet",
                 parameterName %in% c(
                     "plannedEvents", "plannedSubjects",
                     "minNumberOfEventsPerStage", "maxNumberOfEventsPerStage",
-                    "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage"
+                    "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage", 
+                    "allocationRatioPlanned"
                 )) {
             values <- c()
             for (stage in 1:numberOfStages) {
@@ -1071,7 +1079,8 @@ ParameterSet <- setRefClass("ParameterSet",
         niceColumnNamesEnabled,
         includeAllParameters,
         returnParametersAsCharacter,
-        tableColumnNames) {
+        tableColumnNames,
+        mandatoryParameterNames) {
     numberOfVariants <- .getMultidimensionalNumberOfVariants(parameterSet, parameterNames)
     numberOfStages <- parameterSet$.getMultidimensionalNumberOfStages(parameterNames)
 
@@ -1122,10 +1131,12 @@ ParameterSet <- setRefClass("ParameterSet",
         tryCatch(
             {
                 if (!(parameterName %in% c("stages", "adaptations", "effectList")) &&
+                        !grepl("Function$", parameterName) &&
                         (is.null(variedParameter) || parameterName != variedParameter)) {
                     columnValues <- .getDataFrameColumnValues(
                         parameterSet, parameterName,
-                        numberOfVariants, numberOfStages, includeAllParameters
+                        numberOfVariants, numberOfStages, 
+                        includeAllParameters, mandatoryParameterNames
                     )
                     if (!is.null(columnValues)) {
                         columnCaption <- parameterSet$.getDataFrameColumnCaption(
@@ -1252,9 +1263,16 @@ ParameterSet <- setRefClass("ParameterSet",
     return(dataFrame)
 }
 
-.getAsDataFrame <- function(parameterSet, parameterNames, niceColumnNamesEnabled = FALSE,
-        includeAllParameters = FALSE, handleParameterNamesAsToBeExcluded = FALSE,
-        returnParametersAsCharacter = FALSE, tableColumnNames = C_TABLE_COLUMN_NAMES) {
+.getAsDataFrame <- function(...,
+        parameterSet, 
+        parameterNames, 
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE, 
+        handleParameterNamesAsToBeExcluded = FALSE,
+        returnParametersAsCharacter = FALSE, 
+        tableColumnNames = C_TABLE_COLUMN_NAMES,
+        mandatoryParameterNames = character(0)) {
+      
     parameterNamesToBeExcluded <- c()
     if (handleParameterNamesAsToBeExcluded) {
         parameterNamesToBeExcluded <- parameterNames
@@ -1296,7 +1314,8 @@ ParameterSet <- setRefClass("ParameterSet",
     if (parameterSet$.containsMultidimensionalParameters(parameterNames)) {
         return(.addDelayedInformationRates(.getAsDataFrameMultidimensional(
             parameterSet, parameterNames, niceColumnNamesEnabled,
-            includeAllParameters, returnParametersAsCharacter, tableColumnNames
+            includeAllParameters, returnParametersAsCharacter, tableColumnNames,
+            mandatoryParameterNames
         )))
     }
 
@@ -1409,8 +1428,7 @@ as.data.frame.ParameterSet <- function(x, row.names = NULL,
         parameterSet = x, 
         parameterNames = NULL,
         niceColumnNamesEnabled = niceColumnNamesEnabled, 
-        includeAllParameters = includeAllParameters,
-        
+        includeAllParameters = includeAllParameters
     ))
 }
 

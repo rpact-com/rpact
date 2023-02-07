@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_base_means.R
-## |  Creation date: 12 August 2022, 09:11:30
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  Creation date: 06 February 2023, 12:13:46
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -480,7 +480,7 @@ test_that("'getSimulationMeans': several configurations", {
 	x9 <- getSimulationMeans(
 	    design = getDesignInverseNormal(futilityBounds = c(-0.5, 0.5)),
 	    groups = 2, meanRatio = TRUE, thetaH0 = 1.6, plannedSubjects = plannedSubjects,
-	    maxNumberOfIterations = maxNumberOfIterations, allocationRatioPlanned = 3, stDev = 1.5,
+	    maxNumberOfIterations = maxNumberOfIterations, allocationRatioPlanned = c(1, 3, 3), stDev = 1.5,
 	    alternative = seq(0.8, 1.6, 0.2), conditionalPower = 0.8,
 	    minNumberOfSubjectsPerStage = c(NA, 10, 10), maxNumberOfSubjectsPerStage = c(NA, 100, 100),
 	    directionUpper = FALSE, seed = seed
@@ -489,23 +489,23 @@ test_that("'getSimulationMeans': several configurations", {
 	## Comparison of the results of SimulationResultsMeans object 'x9' with expected results
 	expect_equal(x9$effect, c(-0.8, -0.6, -0.4, -0.2, 0), tolerance = 1e-07)
 	expect_equal(x9$iterations[1, ], c(100, 100, 100, 100, 100))
-	expect_equal(x9$iterations[2, ], c(90, 86, 80, 67, 68))
-	expect_equal(x9$iterations[3, ], c(72, 65, 52, 42, 25))
-	expect_equal(x9$overallReject, c(0.51, 0.34, 0.18, 0.09, 0.02), tolerance = 1e-07)
+	expect_equal(x9$iterations[2, ], c(95, 90, 82, 75, 68))
+	expect_equal(x9$iterations[3, ], c(73, 68, 53, 48, 26))
+	expect_equal(x9$overallReject, c(0.55, 0.37, 0.22, 0.1, 0.01), tolerance = 1e-07)
 	expect_equal(x9$rejectPerStage[1, ], c(0, 0, 0, 0, 0))
-	expect_equal(x9$rejectPerStage[2, ], c(0.1, 0.08, 0.06, 0.02, 0.01), tolerance = 1e-07)
-	expect_equal(x9$rejectPerStage[3, ], c(0.41, 0.26, 0.12, 0.07, 0.01), tolerance = 1e-07)
-	expect_equal(x9$futilityStop, c(0.18, 0.27, 0.42, 0.56, 0.74), tolerance = 1e-07)
-	expect_equal(x9$futilityPerStage[1, ], c(0.1, 0.14, 0.2, 0.33, 0.32), tolerance = 1e-07)
-	expect_equal(x9$futilityPerStage[2, ], c(0.08, 0.13, 0.22, 0.23, 0.42), tolerance = 1e-07)
-	expect_equal(x9$earlyStop, c(0.28, 0.35, 0.48, 0.58, 0.75), tolerance = 1e-07)
-	expect_equal(x9$expectedNumberOfSubjects, c(153.43814, 146.72246, 137.97717, 118.25728, 105.3636), tolerance = 1e-07)
+	expect_equal(x9$rejectPerStage[2, ], c(0.13, 0.08, 0.06, 0.04, 0), tolerance = 1e-07)
+	expect_equal(x9$rejectPerStage[3, ], c(0.42, 0.29, 0.16, 0.06, 0.01), tolerance = 1e-07)
+	expect_equal(x9$futilityStop, c(0.14, 0.24, 0.41, 0.48, 0.74), tolerance = 1e-07)
+	expect_equal(x9$futilityPerStage[1, ], c(0.05, 0.1, 0.18, 0.25, 0.32), tolerance = 1e-07)
+	expect_equal(x9$futilityPerStage[2, ], c(0.09, 0.14, 0.23, 0.23, 0.42), tolerance = 1e-07)
+	expect_equal(x9$earlyStop, c(0.27, 0.32, 0.47, 0.52, 0.74), tolerance = 1e-07)
+	expect_equal(x9$expectedNumberOfSubjects, c(159.13638, 155.22411, 142.49895, 133.05841, 108.89569), tolerance = 1e-07)
 	expect_equal(x9$sampleSizes[1, ], c(18, 18, 18, 18, 18))
-	expect_equal(x9$sampleSizes[2, ], c(84.396151, 86.486693, 90.951473, 92.934899, 94.926174), tolerance = 1e-07)
-	expect_equal(x9$sampleSizes[3, ], c(82.613334, 83.606008, 90.79999, 90.454524, 91.255188), tolerance = 1e-07)
+	expect_equal(x9$sampleSizes[2, ], c(85.987506, 91.370107, 92.601585, 94.55466, 96.567372), tolerance = 1e-07)
+	expect_equal(x9$sampleSizes[3, ], c(81.435959, 80.869134, 91.633298, 91.963359, 97.037972), tolerance = 1e-07)
 	expect_equal(x9$conditionalPowerAchieved[1, ], c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_))
-	expect_equal(x9$conditionalPowerAchieved[2, ], c(0.44090193, 0.35212758, 0.36163755, 0.29178438, 0.19458749), tolerance = 1e-07)
-	expect_equal(x9$conditionalPowerAchieved[3, ], c(0.62623215, 0.54530553, 0.37547827, 0.42766542, 0.36373939), tolerance = 1e-07)
+	expect_equal(x9$conditionalPowerAchieved[2, ], c(0.43130186, 0.31089581, 0.32119313, 0.2350347, 0.16563188), tolerance = 1e-07)
+	expect_equal(x9$conditionalPowerAchieved[3, ], c(0.64594535, 0.57199764, 0.39418023, 0.33812857, 0.31423783), tolerance = 1e-07)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x9), NA)))
 	    expect_output(print(x9)$show())

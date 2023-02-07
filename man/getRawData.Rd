@@ -22,29 +22,29 @@ Returns the raw survival data which was generated for simulation.
 This function works only if \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} was called with a \cr
 \code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}).
 
-This function can be used to get the simulated raw data from a simulation results  
-object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}. Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} 
+This function can be used to get the simulated raw data from a simulation results
+object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}. Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
 must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
-The data frame contains the following columns: 
+The data frame contains the following columns:
 \enumerate{
-  \item \code{iterationNumber}: The number of the simulation iteration.
-  \item \code{stopStage}: The stage of stopping.
-  \item \code{subjectId}: The subject id (increasing number 1, 2, 3, ...)
-  \item \code{accrualTime}: The accrual time, i.e., the time when the subject entered the trial.
-  \item \code{treatmentGroup}: The treatment group number (1 or 2).
-  \item \code{survivalTime}: The survival time of the subject.
-  \item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
-  \item \code{observationTime}: The specific observation time.
-  \item \code{timeUnderObservation}: The time under observation is defined as follows:\cr
-        if (event == TRUE) {\cr
-            timeUnderObservation <- survivalTime;\cr
-        } else if (dropoutEvent == TRUE) {\cr
-            timeUnderObservation <- dropoutTime;\cr
-        } else {\cr
-            timeUnderObservation <- observationTime - accrualTime;\cr
-        }
-  \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
-  \item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise. 
+\item \code{iterationNumber}: The number of the simulation iteration.
+\item \code{stopStage}: The stage of stopping.
+\item \code{subjectId}: The subject id (increasing number 1, 2, 3, ...)
+\item \code{accrualTime}: The accrual time, i.e., the time when the subject entered the trial.
+\item \code{treatmentGroup}: The treatment group number (1 or 2).
+\item \code{survivalTime}: The survival time of the subject.
+\item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
+\item \code{observationTime}: The specific observation time.
+\item \code{timeUnderObservation}: The time under observation is defined as follows:\cr
+if (event == TRUE) {\cr
+timeUnderObservation <- survivalTime;\cr
+} else if (dropoutEvent == TRUE) {\cr
+timeUnderObservation <- dropoutTime;\cr
+} else {\cr
+timeUnderObservation <- observationTime - accrualTime;\cr
+}
+\item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
+\item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
 }
 }
 \examples{

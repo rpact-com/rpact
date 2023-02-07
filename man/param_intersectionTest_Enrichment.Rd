@@ -4,9 +4,9 @@
 \alias{param_intersectionTest_Enrichment}
 \title{Parameter Description: Intersection Test}
 \arguments{
-\item{intersectionTest}{Defines the multiple test for the intersection 
-hypotheses in the closed system of hypotheses. 
-Four options are available in enrichment designs: \code{"SpiessensDebois"}, \code{"Bonferroni"}, \code{"Simes"}, 
+\item{intersectionTest}{Defines the multiple test for the intersection
+hypotheses in the closed system of hypotheses.
+Four options are available in enrichment designs: \code{"SpiessensDebois"}, \code{"Bonferroni"}, \code{"Simes"},
 and \code{"Sidak"}, default is \code{"Simes"}.}
 }
 \description{

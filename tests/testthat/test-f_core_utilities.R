@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_core_utilities.R
-## |  Creation date: 12 August 2022, 09:09:46
-## |  File version: $Revision: 6514 $
-## |  Last changed: $Date: 2022-08-22 14:31:53 +0200 (Mo, 22 Aug 2022) $
+## |  Creation date: 06 February 2023, 12:11:55
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,9 +24,6 @@ test_plan_section("Testing Result Object Print Output")
 
 
 test_that("The output does not contain any issues", {
-        
-    .skipTestIfDisabled()
-        
 	expect_equal(sum(grepl("ISSUES", capture.output(getDesignGroupSequential()$show()))), 0)
 	expect_equal(sum(grepl("ISSUES", capture.output(getDesignInverseNormal(kMax = 4)$show()))), 0)
 	expect_equal(sum(grepl("ISSUES", capture.output(getDesignFisher()$show()))), 0)
@@ -41,8 +38,7 @@ test_plan_section("Testing Core Utility Functions")
 
 
 test_that("'getValidatedInformationRates': 'informationRates' must be generated correctly based on specified 'kMax'", {
-	
-    .skipTestIfDisabled()
+	.skipTestIfDisabled()
 
 	design1 <- getTestDesign(kMax = 1L, designClass = "TrialDesignGroupSequential")
 	expect_equal(.getValidatedInformationRates(design1), 1, tolerance = 1e-08)
@@ -1112,31 +1108,43 @@ test_plan_section("Testing Utilities")
 
 
 test_that("Testing '.moveValue'", {
-        
-    .skipTestIfDisabled()
-        
-    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "B"), c("A", "B", "E", "C", "D"))
-    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "A"), c("A", "E", "B", "C", "D"))
-    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "A", "E"), c("B", "C", "D", "E", "A"))
-    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "E"), c("A", "B", "C", "D", "E"))
-    expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "A", "A"), c("A", "B", "C", "D", "E"))
-    expect_equal(.moveValue(c("A"), "A", "A"), c("A"))
+	expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "B"), c("A", "B", "E", "C", "D"))
+	expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "A"), c("A", "E", "B", "C", "D"))
+	expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "A", "E"), c("B", "C", "D", "E", "A"))
+	expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "E", "E"), c("A", "B", "C", "D", "E"))
+	expect_equal(.moveValue(c("A", "B", "C", "D", "E"), "A", "A"), c("A", "B", "C", "D", "E"))
+	expect_equal(.moveValue(c("A"), "A", "A"), c("A"))
+
 })
 
 test_that("Testing '.toCapitalized'", {
-        
-    .skipTestIfDisabled()
-        
+
 	expect_equal(.toCapitalized("zip code"), "Zip Code")
 	expect_equal(.toCapitalized("state of the art"), "State of the Art")
 	expect_equal(.toCapitalized("final and count"), "Final and Count")
+	expect_equal(.toCapitalized("Hazard Ratio"), "Hazard Ratio") 
+	expect_equal(.toCapitalized("hazard ratio function"), "Hazard Ratio Function")
+
+})
+
+test_that("Testing '.formatCamelCase'", {
+
+	expect_equal(.formatCamelCase("hazardRatio", title = TRUE), "Hazard Ratio")
+	expect_equal(.formatCamelCase("hazardRatio and informationRates", title = TRUE), "Hazard Ratio and Information Rates")
+	expect_equal(.formatCamelCase("hazardRatio", title = FALSE), "hazard ratio")
+	expect_equal(.formatCamelCase(" hazardRatio ", title = TRUE), " Hazard Ratio ")
+	expect_equal(.formatCamelCase("Hazard", title = TRUE), "Hazard")
+	expect_equal(.formatCamelCase("hazard", title = TRUE), "Hazard")
+	expect_equal(.formatCamelCase("hazard", title = FALSE), "hazard")
+	expect_equal(.formatCamelCase("Hazard", title = FALSE), "hazard")
+	expect_equal(.formatCamelCase("Hazard Ratio", title = TRUE), "Hazard Ratio")
+	expect_equal(.formatCamelCase(" hazard ratio ", title = TRUE), " Hazard Ratio ")
+	expect_equal(.formatCamelCase("HazardRatio", title = FALSE), "hazard ratio")
 
 })
 
 test_that("Testing '.equalsRegexpIgnoreCase'", {
-        
-    .skipTestIfDisabled()
-        
+
 	expect_equal(.equalsRegexpIgnoreCase("stage2", "^stages?$"), FALSE)
 	expect_equal(.equalsRegexpIgnoreCase("stage", "^stages?$"), TRUE)
 	expect_equal(.equalsRegexpIgnoreCase("stages", "^stages?$"), TRUE)
@@ -1151,9 +1159,7 @@ test_that("Testing '.equalsRegexpIgnoreCase'", {
 })
 
 test_that("Testing 'isUndefinedArgument' and 'isValidArgument'", {
-        
-    .skipTestIfDisabled()
-        
+
 	expect_equal(.isUndefinedArgument(NULL), TRUE)
 	expect_equal(.isUndefinedArgument(numeric(0)), TRUE)
 	expect_equal(.isUndefinedArgument(NA), TRUE)
@@ -1181,12 +1187,15 @@ test_that("Testing 'isUndefinedArgument' and 'isValidArgument'", {
 	expect_error(.isDefinedArgument(notExistingTestVariable, argumentExistsValidationEnabled = FALSE))
 	expect_error(.isDefinedArgument(notExistingTestVariable))
 
+	# skip_if_translated()
+	# expect_error(.isDefinedArgument(notExistingTestVariable),
+	# 	paste0("Missing argument: the object 'notExistingTestVariable' has not been defined anywhere. ",
+	# 	"Please define it first, e.g., run 'notExistingTestVariable <- 1'"), fixed = TRUE)
+
 })
 
 test_that("Result of 'setSeed(seed)' is working for different arguments, incl. NULL and NA", {
-        
-    .skipTestIfDisabled()
-        
+
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	expect_false(is.null(.setSeed()))
 	expect_false(is.na(.setSeed()))
@@ -1209,9 +1218,7 @@ test_that("Result of 'setSeed(seed)' is working for different arguments, incl. N
 })
 
 test_that("Testing '.getInputForZeroOutputInsideTolerance''", {
-        
-    .skipTestIfDisabled()
-        
+
 	input <- 99
 	tolerance <- 1e-05
 	epsilon <- 1e-08
@@ -1223,9 +1230,7 @@ test_that("Testing '.getInputForZeroOutputInsideTolerance''", {
 })
 
 test_that("Testing '.arrayToString'", {
-        
-    .skipTestIfDisabled()
-        
+
 	expect_equal(.arrayToString(NA, vectorLookAndFeelEnabled = TRUE), "NA")
 	expect_equal(.arrayToString(NULL, vectorLookAndFeelEnabled = TRUE), "NULL")
 	expect_equal(.arrayToString(c(1, 2, 3), vectorLookAndFeelEnabled = TRUE), "c(1, 2, 3)")
@@ -1237,9 +1242,7 @@ test_that("Testing '.arrayToString'", {
 })
 
 test_that("Testing '.getQNorm'", {
-        
-    .skipTestIfDisabled()
-        
+
 	expect_equal(sign(.getQNorm(1)), sign(qnorm(1)))
 	expect_equal(.getQNorm(1 - 1e-12), qnorm(1 - 1e-12))
 	expect_equal(sign(.getQNorm(0)), sign(qnorm(0)))
@@ -1248,9 +1251,7 @@ test_that("Testing '.getQNorm'", {
 })
 
 test_that("Testing '.getOneMinusQNorm'", {
-        
-    .skipTestIfDisabled()
-        
+
 	expect_equal(sign(.getOneMinusQNorm(1)), sign(1 - qnorm(1)))
 	expect_equal(.getOneMinusQNorm(1 - 1e-12), -qnorm(1 - 1e-12))
 	expect_equal(sign(.getOneMinusQNorm(0)), sign(1 - qnorm(0)))
@@ -1259,9 +1260,7 @@ test_that("Testing '.getOneMinusQNorm'", {
 })
 
 test_that("Testing '.getInputProducingZeroOutput'", {
-        
-    .skipTestIfDisabled()
-        
+
 	tolerance <- 1e-05
 	epsilon <- 1e-08
 

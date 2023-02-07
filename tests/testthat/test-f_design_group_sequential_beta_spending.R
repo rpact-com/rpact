@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_group_sequential_beta_spending.R
-## |  Creation date: 15 August 2022, 15:01:13
-## |  File version: $Revision: 6491 $
-## |  Last changed: $Date: 2022-08-15 15:37:18 +0200 (Mo, 15 Aug 2022) $
+## |  Creation date: 06 February 2023, 12:12:18
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,9 +24,6 @@ test_plan_section("Testing the Group Sequential Design Functionality with Beta S
 
 
 test_that("'getDesignGroupSequential' with two-sided beta spending (1)", {
-        
-    .skipTestIfDisabled()
-        
 	suppressWarnings(x <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.4, 0.8, 1),
 	    alpha = 0.05, typeOfDesign = "asKD", gammaA = 2.5, beta = 0.1, sided = 2,
@@ -191,9 +188,9 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (3)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(6.6585304e-07, 0.0017900571, 0.82193405, 0.93), tolerance = 1e-07)
+	expect_equal(x$power, c(6.6585296e-07, 0.0017900571, 0.82193405, 0.93), tolerance = 1e-07)
 	expect_equal(x$futilityBounds, c(NA_real_, NA_real_, 1.8509555), tolerance = 1e-07)
-	expect_equal(x$alphaSpent, c(2.2511015e-10, 1.1742122e-06, 0.01045986, 0.025), tolerance = 1e-07)
+	expect_equal(x$alphaSpent, c(2.2511014e-10, 1.1742122e-06, 0.01045986, 0.025), tolerance = 1e-07)
 	expect_equal(x$betaSpent, c(0, 0, 0.051333333, 0.07), tolerance = 1e-07)
 	expect_equal(x$criticalValues, c(6.3431527, 4.8600403, 2.560259, 2.292451), tolerance = 1e-07)
 	expect_equal(x$stageLevels, c(1.1255508e-10, 5.8680939e-07, 0.0052297087, 0.010939815), tolerance = 1e-07)
@@ -225,8 +222,8 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (3)", {
 	expect_equal(y$shift, 15.164247, tolerance = 1e-07)
 	expect_equal(y$inflationFactor, 1.0974644, tolerance = 1e-07)
 	expect_equal(y$information, c(2.274637, 3.7910617, 12.131397, 15.164247), tolerance = 1e-07)
-	expect_equal(y$power, c(6.6585305e-07, 0.0017900572, 0.82193406, 0.93), tolerance = 1e-07)
-	expect_equal(y$rejectionProbabilities, c(6.6585305e-07, 0.0017893913, 0.820144, 0.10806594), tolerance = 1e-07)
+	expect_equal(y$power, c(6.6585297e-07, 0.0017900572, 0.82193406, 0.93), tolerance = 1e-07)
+	expect_equal(y$rejectionProbabilities, c(6.6585297e-07, 0.0017893913, 0.820144, 0.10806594), tolerance = 1e-07)
 	expect_equal(y$futilityProbabilities, c(0, 0, 0.051333332), tolerance = 1e-07)
 	expect_equal(y$averageSampleNumber1, 0.90470787, tolerance = 1e-07)
 	expect_equal(y$averageSampleNumber01, 0.93283887, tolerance = 1e-07)
@@ -505,9 +502,9 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (7)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(3.8817388e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07)
+	expect_equal(x$power, c(3.8817384e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07)
 	expect_equal(x$futilityBounds, c(NA_real_, 0.33832477, 1.7778049), tolerance = 1e-07)
-	expect_equal(x$alphaSpent, c(2.2511015e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07)
+	expect_equal(x$alphaSpent, c(2.2511014e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07)
 	expect_equal(x$betaSpent, c(0, 0.0029411765, 0.0076470589, 0.0099999999), tolerance = 1e-07)
 	expect_equal(x$criticalValues, c(6.3431527, 3.7800251, 2.5620799, 2.2927506), tolerance = 1e-07)
 	expect_equal(x$stageLevels, c(1.1255508e-10, 7.8406284e-05, 0.0052023689, 0.010931184), tolerance = 1e-07)
@@ -539,8 +536,8 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (7)", {
 	expect_equal(y$shift, 23.351275, tolerance = 1e-07)
 	expect_equal(y$inflationFactor, 1.1191952, tolerance = 1e-07)
 	expect_equal(y$information, c(3.5026912, 9.3405098, 18.68102, 23.351275), tolerance = 1e-07)
-	expect_equal(y$power, c(3.8817388e-06, 0.23459418, 0.9598886, 0.99), tolerance = 1e-07)
-	expect_equal(y$rejectionProbabilities, c(3.8817388e-06, 0.2345903, 0.72529442, 0.030111395), tolerance = 1e-07)
+	expect_equal(y$power, c(3.8817384e-06, 0.23459418, 0.9598886, 0.99), tolerance = 1e-07)
+	expect_equal(y$rejectionProbabilities, c(3.8817384e-06, 0.2345903, 0.72529442, 0.030111395), tolerance = 1e-07)
 	expect_equal(y$futilityProbabilities, c(0, 0.0029411765, 0.0047058824), tolerance = 1e-07)
 	expect_equal(y$averageSampleNumber1, 0.79628246, tolerance = 1e-07)
 	expect_equal(y$averageSampleNumber01, 0.91655265, tolerance = 1e-07)
@@ -584,9 +581,9 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (8)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(3.8817388e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07)
+	expect_equal(x$power, c(3.8817384e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07)
 	expect_equal(x$futilityBounds, c(NA_real_, 0.33832477, 1.7778049), tolerance = 1e-07)
-	expect_equal(x$alphaSpent, c(2.2511015e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07)
+	expect_equal(x$alphaSpent, c(2.2511014e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07)
 	expect_equal(x$betaSpent, c(0, 0.0029411765, 0.0076470589, 0.0099999999), tolerance = 1e-07)
 	expect_equal(x$criticalValues, c(6.3431527, 3.7800251, 2.5620799, 2.2927506), tolerance = 1e-07)
 	expect_equal(x$stageLevels, c(1.1255508e-10, 7.8406284e-05, 0.0052023689, 0.010931184), tolerance = 1e-07)
@@ -618,8 +615,8 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (8)", {
 	expect_equal(y$shift, 23.351275, tolerance = 1e-07)
 	expect_equal(y$inflationFactor, 1.1191952, tolerance = 1e-07)
 	expect_equal(y$information, c(3.5026912, 9.3405098, 18.68102, 23.351275), tolerance = 1e-07)
-	expect_equal(y$power, c(3.8817388e-06, 0.23459418, 0.9598886, 0.99), tolerance = 1e-07)
-	expect_equal(y$rejectionProbabilities, c(3.8817388e-06, 0.2345903, 0.72529442, 0.030111395), tolerance = 1e-07)
+	expect_equal(y$power, c(3.8817384e-06, 0.23459418, 0.9598886, 0.99), tolerance = 1e-07)
+	expect_equal(y$rejectionProbabilities, c(3.8817384e-06, 0.2345903, 0.72529442, 0.030111395), tolerance = 1e-07)
 	expect_equal(y$futilityProbabilities, c(0, 0.0029411765, 0.0047058824), tolerance = 1e-07)
 	expect_equal(y$averageSampleNumber1, 0.79628246, tolerance = 1e-07)
 	expect_equal(y$averageSampleNumber01, 0.91655265, tolerance = 1e-07)
@@ -742,9 +739,9 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (10)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(3.8817388e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07)
+	expect_equal(x$power, c(3.8817384e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07)
 	expect_equal(x$futilityBounds, c(NA_real_, 0.33832477, 1.7778049), tolerance = 1e-07)
-	expect_equal(x$alphaSpent, c(2.2511015e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07)
+	expect_equal(x$alphaSpent, c(2.2511014e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07)
 	expect_equal(x$betaSpent, c(0, 0.0029411765, 0.0076470589, 0.0099999999), tolerance = 1e-07)
 	expect_equal(x$criticalValues, c(6.3431527, 3.7800251, 2.5620799, 2.2927506), tolerance = 1e-07)
 	expect_equal(x$stageLevels, c(1.1255508e-10, 7.8406284e-05, 0.0052023689, 0.010931184), tolerance = 1e-07)
@@ -776,8 +773,8 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (10)", {
 	expect_equal(y$shift, 23.351275, tolerance = 1e-07)
 	expect_equal(y$inflationFactor, 1.1191952, tolerance = 1e-07)
 	expect_equal(y$information, c(3.5026912, 9.3405098, 18.68102, 23.351275), tolerance = 1e-07)
-	expect_equal(y$power, c(3.8817388e-06, 0.23459418, 0.9598886, 0.99), tolerance = 1e-07)
-	expect_equal(y$rejectionProbabilities, c(3.8817388e-06, 0.2345903, 0.72529442, 0.030111395), tolerance = 1e-07)
+	expect_equal(y$power, c(3.8817384e-06, 0.23459418, 0.9598886, 0.99), tolerance = 1e-07)
+	expect_equal(y$rejectionProbabilities, c(3.8817384e-06, 0.2345903, 0.72529442, 0.030111395), tolerance = 1e-07)
 	expect_equal(y$futilityProbabilities, c(0, 0.0029411765, 0.0047058824), tolerance = 1e-07)
 	expect_equal(y$averageSampleNumber1, 0.79628246, tolerance = 1e-07)
 	expect_equal(y$averageSampleNumber01, 0.91655265, tolerance = 1e-07)

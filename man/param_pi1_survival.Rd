@@ -4,8 +4,8 @@
 \alias{param_pi1_survival}
 \title{Parameter Description: Pi (1) for Survival Data}
 \arguments{
-\item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group, 
-default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or 
+\item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
+default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 \code{seq(0.4, 0.6, 0.1)} (sample size calculations).}
 }
 \description{

@@ -33,7 +33,7 @@ getObjectRCode(
 \arguments{
 \item{obj}{The result object.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{leadingArguments}{A character vector with arguments that shall be inserted at the beginning of the function command,

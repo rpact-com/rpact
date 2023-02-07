@@ -4,9 +4,9 @@
 \alias{param_intersectionTest_MultiArm}
 \title{Parameter Description: Intersection Test}
 \arguments{
-\item{intersectionTest}{Defines the multiple test for the intersection 
-hypotheses in the closed system of hypotheses. 
-Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"}, 
+\item{intersectionTest}{Defines the multiple test for the intersection
+hypotheses in the closed system of hypotheses.
+Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"},
 \code{"Sidak"}, and \code{"Hierarchical"}, default is \code{"Dunnett"}.}
 }
 \description{

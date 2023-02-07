@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 5906 $
-## |  Last changed: $Date: 2022-02-26 19:10:21 +0100 (Sa, 26 Feb 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -396,7 +396,7 @@ NULL
         conditionalPower,
         thetaH1 = NA_real_, # means + survival only
         stDevH1 = NA_real_, # means only
-        piH1 = NA_real_, # rates only
+        piTreatmentsH1 = NA_real_, # rates only
         piControlH1 = NA_real_, # rates only
         maxNumberOfIterations,
         seed,
@@ -513,14 +513,14 @@ NULL
             simulationResults$.setParameterType("muMaxVector", C_PARAM_DERIVED)
         }
     } else if (endpoint == "rates") {
-        .assertIsSingleNumber(piH1, "piH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(piH1, "piH1", 0, 1, naAllowed = TRUE)
-        piH1 <- .ignoreParameterIfNotUsed(
-            "piH1", piH1, kMax > 1,
+        .assertIsSingleNumber(piTreatmentsH1, "piTreatmentsH1", naAllowed = TRUE)
+        .assertIsInOpenInterval(piTreatmentsH1, "piTreatmentsH1", 0, 1, naAllowed = TRUE)
+        piTreatmentsH1 <- .ignoreParameterIfNotUsed(
+            "piTreatmentsH1", piTreatmentsH1, kMax > 1,
             "design is fixed ('kMax' = 1)", "Assumed active rate(s)"
         )
 
-        .setValueAndParameterType(simulationResults, "piH1", piH1, NA_real_)
+        .setValueAndParameterType(simulationResults, "piTreatmentsH1", piTreatmentsH1, NA_real_)
 
         .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE) # , noDefaultAvailable = TRUE)
         .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = FALSE)

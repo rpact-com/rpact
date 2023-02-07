@@ -57,12 +57,20 @@ getDesignGroupSequentialUserDefinedBetaSpendingCpp <- function(criticalValues, k
     .Call(`_rpact_getDesignGroupSequentialUserDefinedBetaSpendingCpp`, criticalValues, kMax, userAlphaSpending, userBetaSpending, sided, informationRates, bindingFutility, tolerance, typeOfDesign, gammaA, alpha, betaAdjustment, twoSidedPower)
 }
 
-getSimulationMeansLoopCpp <- function(alternative, kMax, maxNumberOfIterations, designNumber, informationRates, futilityBounds, alpha0Vec, criticalValues, meanRatio, thetaH0, stDev, groups, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction) {
-    .Call(`_rpact_getSimulationMeansLoopCpp`, alternative, kMax, maxNumberOfIterations, designNumber, informationRates, futilityBounds, alpha0Vec, criticalValues, meanRatio, thetaH0, stDev, groups, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction)
+getSimulationMeansLoopCpp <- function(alternative, kMax, maxNumberOfIterations, designNumber, informationRates, futilityBounds, alpha0Vec, criticalValues, meanRatio, thetaH0, stDev, groups, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunctionType, calcSubjectsFunctionR, calcSubjectsFunctionCpp) {
+    .Call(`_rpact_getSimulationMeansLoopCpp`, alternative, kMax, maxNumberOfIterations, designNumber, informationRates, futilityBounds, alpha0Vec, criticalValues, meanRatio, thetaH0, stDev, groups, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunctionType, calcSubjectsFunctionR, calcSubjectsFunctionCpp)
 }
 
-getSimulationSurvivalCpp <- function(designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocation1, allocation2, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa) {
-    .Call(`_rpact_getSimulationSurvivalCpp`, designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocation1, allocation2, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa)
+getSimulationRatesCpp <- function(kMax, informationRates, criticalValues, pi1, pi2, maxNumberOfIterations, designNumber, groups, futilityBounds, alpha0Vec, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, pi1H1, pi2H1, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, riskRatio, thetaH0, calcSubjectsFunctionType, calcSubjectsFunctionR, calcSubjectsFunctionCpp) {
+    .Call(`_rpact_getSimulationRatesCpp`, kMax, informationRates, criticalValues, pi1, pi2, maxNumberOfIterations, designNumber, groups, futilityBounds, alpha0Vec, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, pi1H1, pi2H1, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, riskRatio, thetaH0, calcSubjectsFunctionType, calcSubjectsFunctionR, calcSubjectsFunctionCpp)
+}
+
+getSimulationSurvivalCpp <- function(designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocationRatioPlanned, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa, calcEventsFunctionType, calcEventsFunctionR, calcEventsFunctionCpp) {
+    .Call(`_rpact_getSimulationSurvivalCpp`, designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocationRatioPlanned, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa, calcEventsFunctionType, calcEventsFunctionR, calcEventsFunctionCpp)
+}
+
+getOneMinusQNorm <- function(p, mean = 0, sd = 1, lowerTail = 1, logP = 0, epsilon = 1.0e-100) {
+    .Call(`_rpact_getOneMinusQNorm`, p, mean, sd, lowerTail, logP, epsilon)
 }
 
 zeroin <- function(f, lower, upper, tolerance, maxIter) {
@@ -71,5 +79,9 @@ zeroin <- function(f, lower, upper, tolerance, maxIter) {
 
 getCipheredValue <- function(x) {
     .Call(`_rpact_getCipheredValue`, x)
+}
+
+getFraction <- function(x, epsilon = 1.0e-6, maxNumberOfSearchSteps = 30L) {
+    .Call(`_rpact_getFraction`, x, epsilon, maxNumberOfSearchSteps)
 }
 

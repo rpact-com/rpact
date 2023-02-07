@@ -4,7 +4,7 @@
 \alias{param_adaptations}
 \title{Parameter Description: Adaptations}
 \arguments{
-\item{adaptations}{A logical vector of length \code{kMax - 1} indicating whether or not an adaptation takes 
+\item{adaptations}{A logical vector of length \code{kMax - 1} indicating whether or not an adaptation takes
 place at interim k, default is \code{rep(TRUE, kMax - 1)}.}
 }
 \description{

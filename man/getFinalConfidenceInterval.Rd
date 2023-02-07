@@ -17,41 +17,41 @@ getFinalConfidenceInterval(
 \arguments{
 \item{design}{The trial design.}
 
-\item{dataInput}{The summary data used for calculating the test results. 
-This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival} 
+\item{dataInput}{The summary data used for calculating the test results.
+This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of \code{DatasetSurvival}
 and should be created with the function \code{\link[=getDataset]{getDataset()}}.
 For more information see \code{\link[=getDataset]{getDataset()}}.}
 
 \item{...}{Further (optional) arguments to be passed:
 \describe{
-  \item{\code{normalApproximation}}{
-      The type of computation of the p-values. Default is \code{FALSE} for
-      testing means (i.e., the t test is used) and TRUE for testing rates and the hazard ratio.
-      For testing rates, if \code{normalApproximation = FALSE} is specified, the binomial test
-      (one sample) or the exact test of Fisher (two samples) is used for calculating the p-values.
-      In the survival setting, \code{normalApproximation = FALSE} has no effect.}
-  \item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
-      the t test assuming that the variances are equal or the t test without assuming this,
-      i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
+\item{\code{normalApproximation}}{
+The type of computation of the p-values. Default is \code{FALSE} for
+testing means (i.e., the t test is used) and TRUE for testing rates and the hazard ratio.
+For testing rates, if \code{normalApproximation = FALSE} is specified, the binomial test
+(one sample) or the exact test of Fisher (two samples) is used for calculating the p-values.
+In the survival setting, \code{normalApproximation = FALSE} has no effect.}
+\item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
+the t test assuming that the variances are equal or the t test without assuming this,
+i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
 }}
 
-\item{directionUpper}{Logical. Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
-\item{thetaH0}{The null hypothesis value, 
-default is \code{0} for the normal and the binary case (testing means and rates, respectively), 
-it is \code{1} for the survival case (testing the hazard ratio).\cr\cr 
+\item{thetaH0}{The null hypothesis value,
+default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
-  \item \emph{means}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the mean ratio) can be specified.
-  \item \emph{rates}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
-  \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{means}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the mean ratio) can be specified.
+\item \emph{rates}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
+\item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
 }
-For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for 
+For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
 \item{tolerance}{The numerical tolerance, default is \code{1e-06}. Must be a positive numeric of length 1.}
@@ -61,11 +61,11 @@ defining the null hypothesis H0: \code{pi = thetaH0}.}
 \value{
 Returns a \code{\link[base]{list}} containing
 \itemize{
-  \item \code{finalStage},
-  \item \code{medianUnbiased},
-  \item \code{finalConfidenceInterval},
-  \item \code{medianUnbiasedGeneral}, and
-  \item \code{finalConfidenceIntervalGeneral}.
+\item \code{finalStage},
+\item \code{medianUnbiased},
+\item \code{finalConfidenceInterval},
+\item \code{medianUnbiasedGeneral}, and
+\item \code{finalConfidenceIntervalGeneral}.
 }
 }
 \description{
@@ -98,7 +98,6 @@ getFinalConfidenceInterval(design, dataInput = data)
 }
 \seealso{
 Other analysis functions: 
-\code{\link{getAnalysisResults}()},
 \code{\link{getClosedCombinationTestResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalPower}()},

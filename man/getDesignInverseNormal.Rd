@@ -31,35 +31,35 @@ getDesignInverseNormal(
 )
 }
 \arguments{
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{kMax}{The maximum number of stages \code{K}. 
+\item{kMax}{The maximum number of stages \code{K}.
 Must be a positive integer of length 1 (default value is \code{3}).
 The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
 \code{6} for Fisher combination test designs.}
 
 \item{alpha}{The significance level alpha, default is \code{0.025}. Must be a positive numeric of length 1.}
 
-\item{beta}{Type II error rate, necessary for providing sample size calculations 
-(e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs, 
+\item{beta}{Type II error rate, necessary for providing sample size calculations
+(e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs,
 or optimum designs, default is \code{0.20}. Must be a positive numeric of length 1.}
 
 \item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. Must be a positive integer of length 1.}
 
-\item{informationRates}{The information rates (that must be fixed prior to the trial), 
+\item{informationRates}{The information rates (that must be fixed prior to the trial),
 default is \code{(1:kMax) / kMax}.}
 
 \item{futilityBounds}{The futility bounds, defined on the test statistic z scale
 (numeric vector of length \code{kMax - 1}).}
 
-\item{typeOfDesign}{The type of design. Type of design is one of the following: 
-O'Brien & Fleming (\code{"OF"}), Pocock (\code{"P"}), Wang & Tsiatis Delta class (\code{"WT"}), 
-Pampallona & Tsiatis (\code{"PT"}), Haybittle & Peto ("HP"), 
-Optimum design within Wang & Tsiatis class (\code{"WToptimum"}), 
-O'Brien & Fleming type alpha spending (\code{"asOF"}), Pocock type alpha spending (\code{"asP"}), 
-Kim & DeMets alpha spending (\code{"asKD"}), Hwang, Shi & DeCani alpha spending (\code{"asHSD"}), 
-user defined alpha spending (\code{"asUser"}), no early efficacy stop (\code{"noEarlyEfficacy"}), 
+\item{typeOfDesign}{The type of design. Type of design is one of the following:
+O'Brien & Fleming (\code{"OF"}), Pocock (\code{"P"}), Wang & Tsiatis Delta class (\code{"WT"}),
+Pampallona & Tsiatis (\code{"PT"}), Haybittle & Peto ("HP"),
+Optimum design within Wang & Tsiatis class (\code{"WToptimum"}),
+O'Brien & Fleming type alpha spending (\code{"asOF"}), Pocock type alpha spending (\code{"asP"}),
+Kim & DeMets alpha spending (\code{"asKD"}), Hwang, Shi & DeCani alpha spending (\code{"asHSD"}),
+user defined alpha spending (\code{"asUser"}), no early efficacy stop (\code{"noEarlyEfficacy"}),
 default is \code{"OF"}.}
 
 \item{deltaWT}{Delta for Wang & Tsiatis Delta class.}
@@ -80,8 +80,8 @@ Kim & DeMets beta spending, Hwang, Shi & DeCani beta spending, user defined
 beta spending (\code{"bsOF"}, \code{"bsP"}, \code{"bsKD"},
 \code{"bsHSD"}, \code{"bsUser"}, default is \code{"none"}).}
 
-\item{userAlphaSpending}{The user defined alpha spending. 
-Numeric vector of length \code{kMax} containing the cumulative 
+\item{userAlphaSpending}{The user defined alpha spending.
+Numeric vector of length \code{kMax} containing the cumulative
 alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 <= ... <= alpha_K <= alpha}.}
 
 \item{userBetaSpending}{The user defined beta spending. Vector of length \code{kMax} containing the cumulative
@@ -89,8 +89,8 @@ beta-spending up to each interim stage.}
 
 \item{gammaB}{Parameter for beta spending function.}
 
-\item{bindingFutility}{Logical. If \code{bindingFutility = TRUE} is specified the calculation of 
-the critical values is affected by the futility bounds and the futility threshold is binding in the 
+\item{bindingFutility}{Logical. If \code{bindingFutility = TRUE} is specified the calculation of
+the critical values is affected by the futility bounds and the futility threshold is binding in the
 sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
 
 \item{betaAdjustment}{For two-sided beta spending designs, if \code{betaAdjustement = TRUE} a linear
@@ -111,12 +111,12 @@ should be directed to one part.}
 Returns a \code{\link{TrialDesign}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesign]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesign]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.TrialDesign]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.TrialDesign]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -124,25 +124,25 @@ Provides adjusted boundaries and defines a group sequential design for its use i
 the inverse normal combination test.
 }
 \details{
-Depending on \code{typeOfDesign} some parameters are specified, others not. 
+Depending on \code{typeOfDesign} some parameters are specified, others not.
 For example, only if \code{typeOfDesign} \code{"asHSD"} is selected, \code{gammaA} needs to be specified.
 
-If an alpha spending approach was specified (\code{"asOF"}, \code{"asP"}, \code{"asKD"}, \code{"asHSD"}, or \code{"asUser"}) 
+If an alpha spending approach was specified (\code{"asOF"}, \code{"asP"}, \code{"asKD"}, \code{"asHSD"}, or \code{"asUser"})
 additionally a beta spending function can be specified to produce futility bounds.
 
-For optimum designs, \code{"ASNH1"} minimizes the expected sample size under H1, 
-\code{"ASNIFH1"} minimizes the sum of the maximum sample and the expected sample size under H1, 
-and \code{"ASNsum"}  minimizes the sum of the maximum sample size, the expected sample size under a value midway H0 and H1, 
+For optimum designs, \code{"ASNH1"} minimizes the expected sample size under H1,
+\code{"ASNIFH1"} minimizes the sum of the maximum sample and the expected sample size under H1,
+and \code{"ASNsum"}  minimizes the sum of the maximum sample size, the expected sample size under a value midway H0 and H1,
 and the expected sample size under H1.
 }
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 

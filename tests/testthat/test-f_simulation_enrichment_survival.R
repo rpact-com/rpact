@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_enrichment_survival.R
-## |  Creation date: 12 August 2022, 09:12:10
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  Creation date: 06 February 2023, 12:14:22
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,9 +24,6 @@ test_plan_section("Testing Simulation Enrichment Survival Function")
 
 
 test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
-        
-    .skipTestIfDisabled()
-        
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:subsec:intersectionTestsEnrichment}
@@ -41,6 +38,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 	# @refFS[Formula]{fs:adjustedPValueSimesEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueSpiessensDeboisEnrichmentSurvival}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEvents}
+	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEventsWithControls}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalLogRanks}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalAdjustedPrevalances}
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
@@ -51,7 +49,8 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 	    1.432188, 1.432188, 1.432188, 1.432188, 1.432188, 1.432188, 1.432188
 	), ncol = 2)
 
-	effectList <- list(subGroups = c("S", "R"), prevalences = c(0.4, 0.6), hazardRatios = hazardRatios)
+	effectList <- list(subGroups = c("S", "R"), prevalences = c(0.4, 0.6), 
+			hazardRatios = hazardRatios, piControls = c(0.1, 0.3))
 
 	design <- getDesignInverseNormal(informationRates = c(0.3, 1), typeOfDesign = "asUser", userAlphaSpending = c(0.01, 0.025))
 
@@ -69,20 +68,20 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 
 	## Comparison of the results of SimulationResultsEnrichmentSurvival object 'simResult1' with expected results
 	expect_equal(simResult1$iterations[1, ], c(100, 100, 100, 100, 100, 100, 100))
-	expect_equal(simResult1$iterations[2, ], c(100, 99, 97, 95, 90, 85, 72))
-	expect_equal(simResult1$rejectAtLeastOne, c(0.16, 0.22, 0.45, 0.6, 0.78, 0.86, 0.92), tolerance = 1e-07)
-	expect_equal(unlist(as.list(simResult1$rejectedPopulationsPerStage)), c(0, 0.02, 0.02, 0.07, 0.05, 0.16, 0.05, 0.3, 0.17, 0.49, 0.21, 0.62, 0.35, 0.54, 0.05, 0.1, 0.02, 0.17, 0.1, 0.32, 0.16, 0.42, 0.17, 0.53, 0.22, 0.57, 0.33, 0.53), tolerance = 1e-07)
+	expect_equal(simResult1$iterations[2, ], c(100, 99, 99, 98, 95, 98, 91))
+	expect_equal(simResult1$rejectAtLeastOne, c(0.25, 0.26, 0.44, 0.49, 0.63, 0.52, 0.78), tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult1$rejectedPopulationsPerStage)), c(0, 0, 0.02, 0.05, 0.04, 0.07, 0.03, 0.14, 0.09, 0.24, 0.06, 0.36, 0.2, 0.47, 0.08, 0.17, 0.02, 0.21, 0.09, 0.33, 0.1, 0.37, 0.12, 0.47, 0.09, 0.42, 0.15, 0.52), tolerance = 1e-07)
 	expect_equal(simResult1$futilityPerStage[1, ], c(0, 0, 0, 0, 0, 0, 0))
-	expect_equal(simResult1$earlyStop[1, ], c(0, 0.01, 0.03, 0.05, 0.1, 0.15, 0.28), tolerance = 1e-07)
-	expect_equal(simResult1$successPerStage[1, ], c(0, 0.01, 0.03, 0.05, 0.1, 0.15, 0.28), tolerance = 1e-07)
-	expect_equal(simResult1$successPerStage[2, ], c(0.01, 0.05, 0.15, 0.28, 0.48, 0.61, 0.55), tolerance = 1e-07)
-	expect_equal(unlist(as.list(simResult1$selectedPopulations)), c(1, 1, 1, 0.99, 1, 0.97, 1, 0.95, 1, 0.9, 1, 0.85, 1, 0.72, 1, 1, 1, 0.99, 1, 0.97, 1, 0.95, 1, 0.9, 1, 0.85, 1, 0.72), tolerance = 1e-07)
+	expect_equal(simResult1$earlyStop[1, ], c(0, 0.01, 0.01, 0.02, 0.05, 0.02, 0.09), tolerance = 1e-07)
+	expect_equal(simResult1$successPerStage[1, ], c(0, 0.01, 0.01, 0.02, 0.05, 0.02, 0.09), tolerance = 1e-07)
+	expect_equal(simResult1$successPerStage[2, ], c(0, 0.03, 0.08, 0.13, 0.24, 0.39, 0.47), tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult1$selectedPopulations)), c(1, 1, 1, 0.99, 1, 0.99, 1, 0.98, 1, 0.95, 1, 0.98, 1, 0.91, 1, 1, 1, 0.99, 1, 0.99, 1, 0.98, 1, 0.95, 1, 0.98, 1, 0.91), tolerance = 1e-07)
 	expect_equal(simResult1$numberOfPopulations[1, ], c(2, 2, 2, 2, 2, 2, 2))
 	expect_equal(simResult1$numberOfPopulations[2, ], c(2, 2, 2, 2, 2, 2, 2))
-	expect_equal(simResult1$expectedNumberOfEvents, c(120, 119.2, 117.6, 116, 112, 108, 97.6), tolerance = 1e-07)
-	expect_equal(unlist(as.list(simResult1$singleNumberOfEventsPerStage)), c(14.163599, 28.327198, 15.080284, 30.160567, 16, 32, 16.925752, 33.851505, 17.861157, 35.722315, 18.810731, 37.621462, 19.780244, 39.560487, 25.836401, 51.672802, 24.919716, 49.839433, 24, 48, 23.074248, 46.148495, 22.138843, 44.277685, 21.189269, 42.378538, 20.219756, 40.439513), tolerance = 1e-07)
+	expect_equal(simResult1$expectedNumberOfEvents, c(120, 119.2, 119.2, 118.4, 116, 118.4, 112.8), tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult1$singleNumberOfEventsPerStage)), c(6.4000002, 12.8, 6.9157979, 13.831596, 7.4434489, 14.886898, 7.9849789, 15.969958, 8.5428984, 17.085797, 9.1204104, 18.240821, 9.7216794, 19.443359, 33.6, 67.2, 33.084202, 66.168404, 32.556551, 65.113102, 32.015021, 64.030042, 31.457102, 62.914203, 30.87959, 61.759179, 30.278321, 60.556641), tolerance = 1e-07)
 	expect_equal(simResult1$conditionalPowerAchieved[1, ], c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_))
-	expect_equal(simResult1$conditionalPowerAchieved[2, ], c(0.13647132, 0.29139937, 0.31543636, 0.4252398, 0.58131066, 0.58903037, 0.64693196), tolerance = 1e-07)
+	expect_equal(simResult1$conditionalPowerAchieved[2, ], c(0.15269538, 0.28989266, 0.28620537, 0.37651752, 0.47283912, 0.47668973, 0.531968), tolerance = 1e-07)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(simResult1), NA)))
 	    expect_output(print(simResult1)$show())
@@ -110,8 +109,9 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
+	.skipTestIfDisabled()
+
 	suppressWarnings(simResult2 <- getSimulationEnrichmentSurvival(design,
-	    populations = 2,
 	    plannedEvents = c(40, 120),
 	    effectList = effectList,
 	    maxNumberOfIterations = 100,
@@ -125,20 +125,20 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 
 	## Comparison of the results of SimulationResultsEnrichmentSurvival object 'simResult2' with expected results
 	expect_equal(simResult2$iterations[1, ], c(100, 100, 100, 100, 100, 100, 100))
-	expect_equal(simResult2$iterations[2, ], c(100, 99, 97, 95, 90, 85, 70))
-	expect_equal(simResult2$rejectAtLeastOne, c(0.13, 0.19, 0.43, 0.57, 0.8, 0.86, 0.94), tolerance = 1e-07)
-	expect_equal(unlist(as.list(simResult2$rejectedPopulationsPerStage)), c(0, 0.02, 0.02, 0.07, 0.05, 0.15, 0.05, 0.28, 0.16, 0.51, 0.21, 0.62, 0.37, 0.54, 0.05, 0.07, 0.01, 0.15, 0.1, 0.31, 0.15, 0.4, 0.16, 0.56, 0.22, 0.57, 0.35, 0.54), tolerance = 1e-07)
+	expect_equal(simResult2$iterations[2, ], c(100, 99, 99, 98, 93, 98, 91))
+	expect_equal(simResult2$rejectAtLeastOne, c(0.25, 0.24, 0.4, 0.47, 0.62, 0.52, 0.79), tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult2$rejectedPopulationsPerStage)), c(0, 0.02, 0.02, 0.05, 0.04, 0.07, 0.03, 0.14, 0.11, 0.22, 0.06, 0.36, 0.2, 0.48, 0.08, 0.16, 0.02, 0.19, 0.09, 0.29, 0.1, 0.35, 0.14, 0.44, 0.09, 0.41, 0.15, 0.53), tolerance = 1e-07)
 	expect_equal(simResult2$futilityPerStage[1, ], c(0, 0, 0, 0, 0, 0, 0))
-	expect_equal(simResult2$earlyStop[1, ], c(0, 0.01, 0.03, 0.05, 0.1, 0.15, 0.3), tolerance = 1e-07)
-	expect_equal(simResult2$successPerStage[1, ], c(0, 0.01, 0.03, 0.05, 0.1, 0.15, 0.3), tolerance = 1e-07)
-	expect_equal(simResult2$successPerStage[2, ], c(0.01, 0.05, 0.15, 0.26, 0.49, 0.61, 0.56), tolerance = 1e-07)
-	expect_equal(unlist(as.list(simResult2$selectedPopulations)), c(1, 1, 1, 0.99, 1, 0.97, 1, 0.95, 1, 0.9, 1, 0.85, 1, 0.7, 1, 1, 1, 0.99, 1, 0.97, 1, 0.95, 1, 0.9, 1, 0.85, 1, 0.7), tolerance = 1e-07)
+	expect_equal(simResult2$earlyStop[1, ], c(0, 0.01, 0.01, 0.02, 0.07, 0.02, 0.09), tolerance = 1e-07)
+	expect_equal(simResult2$successPerStage[1, ], c(0, 0.01, 0.01, 0.02, 0.07, 0.02, 0.09), tolerance = 1e-07)
+	expect_equal(simResult2$successPerStage[2, ], c(0.01, 0.03, 0.08, 0.13, 0.22, 0.38, 0.48), tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult2$selectedPopulations)), c(1, 1, 1, 0.99, 1, 0.99, 1, 0.98, 1, 0.93, 1, 0.98, 1, 0.91, 1, 1, 1, 0.99, 1, 0.99, 1, 0.98, 1, 0.93, 1, 0.98, 1, 0.91), tolerance = 1e-07)
 	expect_equal(simResult2$numberOfPopulations[1, ], c(2, 2, 2, 2, 2, 2, 2))
 	expect_equal(simResult2$numberOfPopulations[2, ], c(2, 2, 2, 2, 2, 2, 2))
-	expect_equal(simResult2$expectedNumberOfEvents, c(120, 119.2, 117.6, 116, 112, 108, 96), tolerance = 1e-07)
-	expect_equal(unlist(as.list(simResult2$singleNumberOfEventsPerStage)), c(14.163599, 28.327198, 15.080284, 30.160567, 16, 32, 16.925752, 33.851505, 17.861157, 35.722315, 18.810731, 37.621462, 19.780244, 39.560487, 25.836401, 51.672802, 24.919716, 49.839433, 24, 48, 23.074248, 46.148495, 22.138843, 44.277685, 21.189269, 42.378538, 20.219756, 40.439513), tolerance = 1e-07)
+	expect_equal(simResult2$expectedNumberOfEvents, c(120, 119.2, 119.2, 118.4, 114.4, 118.4, 112.8), tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult2$singleNumberOfEventsPerStage)), c(6.4000002, 12.8, 6.9157979, 13.831596, 7.4434489, 14.886898, 7.9849789, 15.969958, 8.5428984, 17.085797, 9.1204104, 18.240821, 9.7216794, 19.443359, 33.6, 67.2, 33.084202, 66.168404, 32.556551, 65.113102, 32.015021, 64.030042, 31.457102, 62.914203, 30.87959, 61.759179, 30.278321, 60.556641), tolerance = 1e-07)
 	expect_equal(simResult2$conditionalPowerAchieved[1, ], c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_))
-	expect_equal(simResult2$conditionalPowerAchieved[2, ], c(0.13647132, 0.29139937, 0.31543636, 0.4252398, 0.58131066, 0.58903037, 0.63717343), tolerance = 1e-07)
+	expect_equal(simResult2$conditionalPowerAchieved[2, ], c(0.15269538, 0.28989266, 0.28620537, 0.37651752, 0.46167737, 0.47668973, 0.531968), tolerance = 1e-07)
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(simResult2), NA)))
 	    expect_output(print(simResult2)$show())
@@ -166,8 +166,10 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
+	effectList <- list(subGroups = c("S", "R"), prevalences = c(0.4, 0.6), 
+			hazardRatios = hazardRatios)
+
 	suppressWarnings(simResult3 <- getSimulationEnrichmentSurvival(design,
-	    populations = 2,
 	    plannedEvents = c(40, 120),
 	    effectList = effectList,
 	    maxNumberOfIterations = 100,
@@ -222,7 +224,6 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 	}
 
 	suppressWarnings(simResult4 <- getSimulationEnrichmentSurvival(design,
-	    populations = 2,
 	    plannedEvents = c(40, 120),
 	    effectList = effectList,
 	    maxNumberOfIterations = 100,
@@ -295,6 +296,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 3", {
 	# @refFS[Formula]{fs:adjustedPValueSidakEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueSimesEnrichment}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEvents}
+	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEventsWithControls}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalLogRanks}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalAdjustedPrevalances}
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
@@ -302,6 +304,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 3", {
 	# @refFS[Formula]{fs:enrichmentRejectionRule}
 	subGroups <- c("S1", "S12", "S2", "R")
 	prevalences <- c(0.20, 0.30, 0.40, 0.1)
+	piControls = rep(0.2, 4)
 	hazardRatios <- matrix(c(1.432, 1.432, 1.943, 1.943, 1.432, 1.432, 1.432, 1.432, 1.943, 1.943, 1.943, 1.943, 1.943, 2.569, 1.943, 2.569), ncol = 4)
 	effectList <- list(subGroups = subGroups, prevalences = prevalences, hazardRatios = hazardRatios)
 
@@ -495,6 +498,72 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 3", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
+	effectList <- list(subGroups = subGroups, prevalences = prevalences, 
+						piControls = piControls, hazardRatios = hazardRatios)
+
+	suppressWarnings(simResult5 <- getSimulationEnrichmentSurvival(design,
+			plannedEvents = c(20, 40, 50),
+			effectList = effectList,
+			maxNumberOfIterations = 100,
+			allocationRatioPlanned = 1,
+			typeOfSelection = "epsilon",
+			epsilonValue = 0.2,
+			intersectionTest = "Simes",
+			directionUpper = TRUE,
+			seed = 123
+	))
+
+	## Comparison of the results of SimulationResultsEnrichmentSurvival object 'simResult5' with expected results
+	expect_equal(simResult5$iterations[1, ], c(100, 100, 100, 100))
+	expect_equal(simResult5$iterations[2, ], c(100, 100, 100, 100))
+	expect_equal(simResult5$iterations[3, ], c(100, 100, 100, 100))
+	expect_equal(simResult5$rejectAtLeastOne, c(0.36, 0.33, 0.44, 0.4), tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult5$rejectedPopulationsPerStage)), c(0, 0, 0.06, 0, 0, 0.07, 0, 0, 0.13, 0, 0, 0.16, 0, 0, 0.27, 0, 0, 0.19, 0, 0, 0.17, 0, 0, 0.12, 0, 0, 0.05, 0, 0, 0.13, 0, 0, 0.16, 0, 0, 0.13), tolerance = 1e-07)
+	expect_equal(simResult5$futilityStop, c(0, 0, 0, 0))
+	expect_equal(simResult5$futilityPerStage[1, ], c(0, 0, 0, 0))
+	expect_equal(simResult5$futilityPerStage[2, ], c(0, 0, 0, 0))
+	expect_equal(simResult5$earlyStop[1, ], c(0, 0, 0, 0))
+	expect_equal(simResult5$earlyStop[2, ], c(0, 0, 0, 0))
+	expect_equal(simResult5$successPerStage[1, ], c(0, 0, 0, 0))
+	expect_equal(simResult5$successPerStage[2, ], c(0, 0, 0, 0))
+	expect_equal(simResult5$successPerStage[3, ], c(0.36, 0.33, 0.41, 0.38), tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult5$selectedPopulations)), c(1, 0.4, 0.31, 1, 0.32, 0.22, 1, 0.36, 0.32, 1, 0.54, 0.49, 1, 0.59, 0.52, 1, 0.54, 0.5, 1, 0.55, 0.48, 1, 0.37, 0.32, 1, 0.38, 0.27, 1, 0.51, 0.45, 1, 0.48, 0.42, 1, 0.38, 0.35), tolerance = 1e-07)
+	expect_equal(simResult5$numberOfPopulations[1, ], c(3, 3, 3, 3))
+	expect_equal(simResult5$numberOfPopulations[2, ], c(1.37, 1.37, 1.39, 1.29), tolerance = 1e-07)
+	expect_equal(simResult5$numberOfPopulations[3, ], c(1.1, 1.17, 1.22, 1.16), tolerance = 1e-07)
+	expect_equal(simResult5$expectedNumberOfEvents, c(50, 50, 50, 50))
+	expect_equal(unlist(as.list(simResult5$singleNumberOfEventsPerStage)), c(3.6945761, 3.7323515, 1.6794688, 3.6346639, 3.3378849, 1.5777994, 4.1778232, 4.109865, 2.0374383, 4.1120508, 5.0603333, 2.5559297, 8.6108478, 7.5016338, 3.8269345, 8.4712121, 8.1386608, 4.0963486, 8.3556464, 7.4828019, 3.6874504, 8.2241016, 5.8022236, 2.8385927, 5.5418642, 7.9479841, 4.2029806, 5.4519959, 7.2779689, 3.7763732, 5.3776189, 7.4046555, 3.8364399, 5.2929579, 8.236505, 4.1905719, 2.1527119, 0.81803054, 0.29061611, 2.4421281, 1.2454853, 0.54947882, 2.0889116, 1.0026776, 0.43867143, 2.3708897, 0.90093809, 0.4149057), tolerance = 1e-07)
+	expect_equal(simResult5$conditionalPowerAchieved[1, ], c(NA_real_, NA_real_, NA_real_, NA_real_))
+	expect_equal(simResult5$conditionalPowerAchieved[2, ], c(0, 0, 0, 0))
+	expect_equal(simResult5$conditionalPowerAchieved[3, ], c(0.38413966, 0.38845505, 0.4197785, 0.45252776), tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(simResult5), NA)))
+	    expect_output(print(simResult5)$show())
+	    invisible(capture.output(expect_error(summary(simResult5), NA)))
+	    expect_output(summary(simResult5)$show())
+	    suppressWarnings(simResult5CodeBased <- eval(parse(text = getObjectRCode(simResult5, stringWrapParagraphWidth = NULL))))
+	    expect_equal(simResult5CodeBased$eventsPerStage, simResult5$eventsPerStage, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$iterations, simResult5$iterations, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$rejectAtLeastOne, simResult5$rejectAtLeastOne, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$rejectedPopulationsPerStage, simResult5$rejectedPopulationsPerStage, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$futilityStop, simResult5$futilityStop, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$futilityPerStage, simResult5$futilityPerStage, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$earlyStop, simResult5$earlyStop, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$successPerStage, simResult5$successPerStage, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$selectedPopulations, simResult5$selectedPopulations, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$numberOfPopulations, simResult5$numberOfPopulations, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$expectedNumberOfEvents, simResult5$expectedNumberOfEvents, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$singleNumberOfEventsPerStage, simResult5$singleNumberOfEventsPerStage, tolerance = 1e-05)
+	    expect_equal(simResult5CodeBased$conditionalPowerAchieved, simResult5$conditionalPowerAchieved, tolerance = 1e-05)
+	    expect_type(names(simResult5), "character")
+	    df <- as.data.frame(simResult5)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(simResult5)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+
 })
 
 test_that("'getSimulationEnrichmentSurvival': gMax = 4", {
@@ -513,6 +582,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 4", {
 	# @refFS[Formula]{fs:adjustedPValueSidakEnrichment}
 	# @refFS[Formula]{fs:adjustedPValueSimesEnrichment}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEvents}
+	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEventsWithControls}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalLogRanks}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalAdjustedPrevalances}
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
@@ -636,6 +706,120 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 4", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
+	piControls <- (1:8)/10
+	effectList <- list(subGroups = subGroups, prevalences = prevalences, 
+			piControls = piControls, hazardRatios = hazardRatios)
+
+	suppressWarnings(simResult3 <- getSimulationEnrichmentSurvival(design,
+		plannedEvents = c(100, 200),
+		effectList = effectList,
+		maxNumberOfIterations = 100,
+		allocationRatioPlanned = 2,
+		typeOfSelection = "rBest",
+		rValue = 2,
+		adaptations = c(T),
+		intersectionTest = "Bonferroni",
+		seed = 123
+	))
+
+
+	## Comparison of the results of SimulationResultsEnrichmentSurvival object 'simResult3' with expected results
+	expect_equal(simResult3$iterations[1, ], 100)
+	expect_equal(simResult3$iterations[2, ], 88)
+	expect_equal(simResult3$rejectAtLeastOne, 0.47, tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult3$rejectedPopulationsPerStage)), c(0, 0.2, 0, 0.29, 0, 0.16, 0, 0.21), tolerance = 1e-07)
+	expect_equal(simResult3$futilityPerStage[1, ], 0.12, tolerance = 1e-07)
+	expect_equal(simResult3$earlyStop[1, ], 0.12, tolerance = 1e-07)
+	expect_equal(simResult3$successPerStage[1, ], 0)
+	expect_equal(simResult3$successPerStage[2, ], 0.39, tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult3$selectedPopulations)), c(1, 0.44, 1, 0.56, 1, 0.31, 1, 0.45), tolerance = 1e-07)
+	expect_equal(simResult3$numberOfPopulations[1, ], 4)
+	expect_equal(simResult3$numberOfPopulations[2, ], 2)
+	expect_equal(simResult3$expectedNumberOfEvents, 188)
+	expect_equal(unlist(as.list(simResult3$singleNumberOfEventsPerStage)), c(1.7600545, 1.5465305, 2.0147151, 1.9724525, 6.6217708, 5.219482, 13.921345, 14.858066, 8.8002727, 9.3924133, 17.28183, 18.444665, 41.737343, 44.545708, 7.8626685, 4.0206827), tolerance = 1e-07)
+	expect_equal(simResult3$conditionalPowerAchieved[1, ], NA_real_)
+	expect_equal(simResult3$conditionalPowerAchieved[2, ], 0.50609156, tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(simResult3), NA)))
+	    expect_output(print(simResult3)$show())
+	    invisible(capture.output(expect_error(summary(simResult3), NA)))
+	    expect_output(summary(simResult3)$show())
+	    suppressWarnings(simResult3CodeBased <- eval(parse(text = getObjectRCode(simResult3, stringWrapParagraphWidth = NULL))))
+	    expect_equal(simResult3CodeBased$eventsPerStage, simResult3$eventsPerStage, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$iterations, simResult3$iterations, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$rejectAtLeastOne, simResult3$rejectAtLeastOne, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$rejectedPopulationsPerStage, simResult3$rejectedPopulationsPerStage, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$futilityPerStage, simResult3$futilityPerStage, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$earlyStop, simResult3$earlyStop, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$successPerStage, simResult3$successPerStage, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$selectedPopulations, simResult3$selectedPopulations, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$numberOfPopulations, simResult3$numberOfPopulations, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$expectedNumberOfEvents, simResult3$expectedNumberOfEvents, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$singleNumberOfEventsPerStage, simResult3$singleNumberOfEventsPerStage, tolerance = 1e-05)
+	    expect_equal(simResult3CodeBased$conditionalPowerAchieved, simResult3$conditionalPowerAchieved, tolerance = 1e-05)
+	    expect_type(names(simResult3), "character")
+	    df <- as.data.frame(simResult3)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(simResult3)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
+	suppressWarnings(simResult4 <- getSimulationEnrichmentSurvival(design,
+		plannedEvents = c(100, 200),
+		effectList = effectList,
+		maxNumberOfIterations = 100,
+		allocationRatioPlanned = 2,
+		typeOfSelection = "rBest",
+		rValue = 2,
+		adaptations = c(T),
+		intersectionTest = "Bonferroni",
+		seed = 123
+	))
+
+
+	## Comparison of the results of SimulationResultsEnrichmentSurvival object 'simResult4' with expected results
+	expect_equal(simResult4$iterations[1, ], 100)
+	expect_equal(simResult4$iterations[2, ], 88)
+	expect_equal(simResult4$rejectAtLeastOne, 0.47, tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult4$rejectedPopulationsPerStage)), c(0, 0.2, 0, 0.29, 0, 0.16, 0, 0.21), tolerance = 1e-07)
+	expect_equal(simResult4$futilityPerStage[1, ], 0.12, tolerance = 1e-07)
+	expect_equal(simResult4$earlyStop[1, ], 0.12, tolerance = 1e-07)
+	expect_equal(simResult4$successPerStage[1, ], 0)
+	expect_equal(simResult4$successPerStage[2, ], 0.39, tolerance = 1e-07)
+	expect_equal(unlist(as.list(simResult4$selectedPopulations)), c(1, 0.44, 1, 0.56, 1, 0.31, 1, 0.45), tolerance = 1e-07)
+	expect_equal(simResult4$numberOfPopulations[1, ], 4)
+	expect_equal(simResult4$numberOfPopulations[2, ], 2)
+	expect_equal(simResult4$expectedNumberOfEvents, 188)
+	expect_equal(unlist(as.list(simResult4$singleNumberOfEventsPerStage)), c(1.7600545, 1.5465305, 2.0147151, 1.9724525, 6.6217708, 5.219482, 13.921345, 14.858066, 8.8002727, 9.3924133, 17.28183, 18.444665, 41.737343, 44.545708, 7.8626685, 4.0206827), tolerance = 1e-07)
+	expect_equal(simResult4$conditionalPowerAchieved[1, ], NA_real_)
+	expect_equal(simResult4$conditionalPowerAchieved[2, ], 0.50609156, tolerance = 1e-07)
+	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	    invisible(capture.output(expect_error(print(simResult4), NA)))
+	    expect_output(print(simResult4)$show())
+	    invisible(capture.output(expect_error(summary(simResult4), NA)))
+	    expect_output(summary(simResult4)$show())
+	    suppressWarnings(simResult4CodeBased <- eval(parse(text = getObjectRCode(simResult4, stringWrapParagraphWidth = NULL))))
+	    expect_equal(simResult4CodeBased$eventsPerStage, simResult4$eventsPerStage, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$iterations, simResult4$iterations, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$rejectAtLeastOne, simResult4$rejectAtLeastOne, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$rejectedPopulationsPerStage, simResult4$rejectedPopulationsPerStage, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$futilityPerStage, simResult4$futilityPerStage, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$earlyStop, simResult4$earlyStop, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$successPerStage, simResult4$successPerStage, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$selectedPopulations, simResult4$selectedPopulations, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$numberOfPopulations, simResult4$numberOfPopulations, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$expectedNumberOfEvents, simResult4$expectedNumberOfEvents, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$singleNumberOfEventsPerStage, simResult4$singleNumberOfEventsPerStage, tolerance = 1e-05)
+	    expect_equal(simResult4CodeBased$conditionalPowerAchieved, simResult4$conditionalPowerAchieved, tolerance = 1e-05)
+	    expect_type(names(simResult4), "character")
+	    df <- as.data.frame(simResult4)
+	    expect_s3_class(df, "data.frame")
+	    expect_true(nrow(df) > 0 && ncol(df) > 0)
+	    mtx <- as.matrix(simResult4)
+	    expect_true(is.matrix(mtx))
+	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
+	}
 })
 
 test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment for inverse normal", {
@@ -648,6 +832,7 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 	# @refFS[Sec.]{fs:sec:simulatingEnrichmentDesigns}
 	# @refFS[Sec.]{fs:sec:simulatingEnrichmentEffectSpecification}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEvents}
+	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEventsWithControls}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalLogRanks}
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
 	# @refFS[Formula]{fs:simulatingEnrichmentEffectSpecification}
@@ -657,7 +842,6 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 	design <- getDesignInverseNormal(informationRates = c(0.3, 0.7, 1), typeOfDesign = "asKD", gammaA = 2.4)
 
 	suppressWarnings(x1 <- getSimulationEnrichmentSurvival(design,
-	    populations = 1,
 	    plannedEvents = c(50, 100, 180), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 1,
 	    directionUpper = FALSE,
@@ -703,6 +887,7 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 	# @refFS[Sec.]{fs:sec:simulatingEnrichmentDesigns}
 	# @refFS[Sec.]{fs:sec:simulatingEnrichmentEffectSpecification}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEvents}
+	# @refFS[Formula]{fs:simulationEnrichmentSurvivalEventsWithControls}
 	# @refFS[Formula]{fs:simulationEnrichmentSurvivalLogRanks}
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
 	# @refFS[Formula]{fs:simulatingEnrichmentEffectSpecification}
@@ -712,7 +897,6 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 	design <- getDesignFisher(informationRates = c(0.3, 0.6, 1))
 
 	suppressWarnings(x1 <- getSimulationEnrichmentSurvival(design,
-	    populations = 1,
 	    plannedEvents = c(50, 100, 180), effectList = effectList,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 1,

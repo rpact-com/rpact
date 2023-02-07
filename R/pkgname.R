@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6283 $
-## |  Last changed: $Date: 2022-06-10 09:49:35 +0200 (Fri, 10 Jun 2022) $
+## |  File version: $Revision: 6784 $
+## |  Last changed: $Date: 2023-01-31 10:11:06 +0100 (Di, 31 Jan 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
 
@@ -71,6 +71,7 @@
 #' @import utils
 #' @import graphics
 #' @import tools
+#' @importFrom rlang .data
 #' 
 "_PACKAGE"
 #> [1] "_PACKAGE"

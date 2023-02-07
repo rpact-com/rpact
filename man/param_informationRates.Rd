@@ -4,7 +4,7 @@
 \alias{param_informationRates}
 \title{Parameter Description: Information Rates}
 \arguments{
-\item{informationRates}{The information rates (that must be fixed prior to the trial), 
+\item{informationRates}{The information rates (that must be fixed prior to the trial),
 default is \code{(1:kMax) / kMax}.}
 }
 \description{

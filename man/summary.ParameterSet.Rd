@@ -15,7 +15,7 @@
 \arguments{
 \item{object}{A \code{\link{ParameterSet}} object.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{digits}{Defines how many digits are to be used for numeric values. Must be a positive integer of length 1.}
@@ -24,8 +24,8 @@ that a warning will be displayed if unknown arguments are passed.}
 Returns a \code{\link{SummaryFactory}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object
 }
 }
 \description{
@@ -38,31 +38,31 @@ Summarizes the parameters and results of a parameter set.
 
 The following options can be set globally:
 \enumerate{
-  \item \code{rpact.summary.output.size}: one of \code{c("small", "medium", "large")}; 
-    defines how many details will be included into the summary; 
-    default is \code{"large"}, i.e., all available details are displayed.
-  \item \code{rpact.summary.justify}: one of \code{c("right", "left", "centre")}; 
-    shall the values be right-justified (the default), left-justified or centered.
-  \item \code{rpact.summary.width}: defines the maximum number of characters to be used per line (default is \code{83}).
-  \item \code{rpact.summary.intervalFormat}: defines how intervals will be displayed in the summary, 
-    default is \code{"[\%s; \%s]"}.
-  \item \code{rpact.summary.digits}: defines how many digits are to be used for numeric values (default is \code{3}).
-  \item \code{rpact.summary.digits.probs}: defines how many digits are to be used for numeric values 
-        (default is one more than value of \code{rpact.summary.digits}, i.e., \code{4}). 
-  \item \code{rpact.summary.trim.zeroes}: if \code{TRUE} (default) zeroes will always displayed as "0",
-    e.g. "0.000" will become "0". 
+\item \code{rpact.summary.output.size}: one of \code{c("small", "medium", "large")};
+defines how many details will be included into the summary;
+default is \code{"large"}, i.e., all available details are displayed.
+\item \code{rpact.summary.justify}: one of \code{c("right", "left", "centre")};
+shall the values be right-justified (the default), left-justified or centered.
+\item \code{rpact.summary.width}: defines the maximum number of characters to be used per line (default is \code{83}).
+\item \code{rpact.summary.intervalFormat}: defines how intervals will be displayed in the summary,
+default is \code{"[\%s; \%s]"}.
+\item \code{rpact.summary.digits}: defines how many digits are to be used for numeric values (default is \code{3}).
+\item \code{rpact.summary.digits.probs}: defines how many digits are to be used for numeric values
+(default is one more than value of \code{rpact.summary.digits}, i.e., \code{4}).
+\item \code{rpact.summary.trim.zeroes}: if \code{TRUE} (default) zeroes will always displayed as "0",
+e.g. "0.000" will become "0".
 }
 Example: \code{options("rpact.summary.intervalFormat" = "\%s - \%s")}
 }
 
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 

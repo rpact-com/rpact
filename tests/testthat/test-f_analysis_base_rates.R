@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_base_rates.R
-## |  Creation date: 12 August 2022, 09:05:33
-## |  File version: $Revision: 6658 $
-## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
+## |  Creation date: 06 February 2023, 12:05:27
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,10 +24,9 @@ test_plan_section("Testing the Analysis Rates Functionality for One Treatment")
 
 
 test_that("'getAnalysisResults' for a group sequential design and one treatment", {
-        
-    .skipTestIfDisabled()
-        
-    design0 <- getDesignGroupSequential(
+	.skipTestIfDisabled()
+
+	design0 <- getDesignGroupSequential(
 	    kMax = 2, alpha = 0.025, informationRates = c(0.2, 1),
 	    typeOfDesign = "asKD", gammaA = 2.8
 	)

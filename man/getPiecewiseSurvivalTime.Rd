@@ -20,10 +20,10 @@ getPiecewiseSurvivalTime(
 )
 }
 \arguments{
-\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise 
+\item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise
 definition of the exponential survival time cumulative distribution function (see details).}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
@@ -32,12 +32,12 @@ that a warning will be displayed if unknown arguments are passed.}
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
 \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
 
-\item{hazardRatio}{The vector of hazard ratios under consideration. 
-If the event or hazard rates in both treatment groups are defined, the hazard ratio needs 
+\item{hazardRatio}{The vector of hazard ratios under consideration.
+If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
 not to be specified as it is calculated, there is no default. Must be a positive numeric of length 1.}
 
-\item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group, 
-default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or 
+\item{pi1}{A numeric value or vector that represents the assumed event rate in the treatment group,
+default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 \code{seq(0.4, 0.6, 0.1)} (sample size calculations).}
 
 \item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
@@ -48,16 +48,16 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 
 \item{eventTime}{The assumed time under which the event rates are calculated, default is \code{12}.}
 
-\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification 
-of the shape of the Weibull distribution. 
+\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
+of the shape of the Weibull distribution.
 Default is \code{1}, i.e., the exponential survival distribution is used instead of the Weibull distribution.
-Note that the Weibull distribution cannot be used for the piecewise definition of 
-the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa} 
+Note that the Weibull distribution cannot be used for the piecewise definition of
+the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa}
 can be specified.
-This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)} 
+This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)}
 of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
-For example, 
-\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)} 
+For example,
+\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
 and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample result.}
 
 \item{delayedResponseAllowed}{If \code{TRUE}, delayed response is allowed;
@@ -67,36 +67,36 @@ otherwise it will be validated that the response is not delayed, default is \cod
 Returns a \code{\link{PiecewiseSurvivalTime}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
-Returns a \code{PiecewiseSurvivalTime} object that contains the all relevant parameters 
+Returns a \code{PiecewiseSurvivalTime} object that contains the all relevant parameters
 of an exponential survival time cumulative distribution function.
 Use \code{\link[base]{names}} to obtain the field names.
 }
 \section{Piecewise survival time}{
 
-The first element of the vector \code{piecewiseSurvivalTime} must be equal to \code{0}. 
-\code{piecewiseSurvivalTime} can also be a list that combines the definition of the 
-time intervals and hazard rates in the reference group. 
-The definition of the survival time in the treatment group is obtained by the specification 
+The first element of the vector \code{piecewiseSurvivalTime} must be equal to \code{0}.
+\code{piecewiseSurvivalTime} can also be a list that combines the definition of the
+time intervals and hazard rates in the reference group.
+The definition of the survival time in the treatment group is obtained by the specification
 of the hazard ratio (see examples for details).
 }
 
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 

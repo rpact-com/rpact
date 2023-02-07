@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_analysis_input_validation.R
-## |  Creation date: 12 August 2022, 09:09:00
-## |  File version: $Revision: 6658 $
-## |  Last changed: $Date: 2022-11-04 10:30:20 +0100 (Fr, 04 Nov 2022) $
+## |  Creation date: 06 February 2023, 12:10:00
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,7 +24,6 @@ test_plan_section("Testing the Correct Input Validation of All Analysis Function
 
 
 test_that("Errors and warnings for calculation of analysis results with dataset of means", {
-        
 	.skipTestIfDisabled()
 
 	design1 <- getDesignInverseNormal(

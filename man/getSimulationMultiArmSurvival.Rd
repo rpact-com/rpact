@@ -37,48 +37,48 @@ getSimulationMultiArmSurvival(
 )
 }
 \arguments{
-\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used. 
-In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower}, 
+\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used.
+In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
 and \code{sided} can be directly entered as argument where necessary.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{activeArms}{The number of active treatment arms to be compared with control, default is \code{3}.}
 
-\item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and number of rows 
+\item{effectMatrix}{Matrix of effect sizes with \code{activeArms} columns and number of rows
 reflecting the different situations to consider.}
 
-\item{typeOfShape}{The shape of the dose-response relationship over the treatment groups. 
+\item{typeOfShape}{The shape of the dose-response relationship over the treatment groups.
 This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"}.
-If \code{"sigmoidEmax"} is selected, \code{"gED50"} and \code{"slope"} has to be entered 
+If \code{"sigmoidEmax"} is selected, \code{"gED50"} and \code{"slope"} has to be entered
 to specify the ED50 and the slope of the sigmoid Emax model.
-For \code{"linear"} and \code{"sigmoidEmax"}, \code{"muMaxVector"} specifies the range 
-of effect sizes for the treatment group with highest response.    
+For \code{"linear"} and \code{"sigmoidEmax"}, \code{"muMaxVector"} specifies the range
+of effect sizes for the treatment group with highest response.
 If \code{"userDefined"} is selected, \code{"effectMatrix"} has to be entered.}
 
 \item{omegaMaxVector}{Range of hazard ratios with highest response for \code{"linear"} and
 \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.}
 
-\item{gED50}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"gED50"} has to be entered 
+\item{gED50}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"gED50"} has to be entered
 to specify the ED50 of the sigmoid Emax model.}
 
-\item{slope}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"slope"} can be entered 
+\item{slope}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"slope"} can be entered
 to specify the slope of the sigmoid Emax model, default is 1.}
 
-\item{intersectionTest}{Defines the multiple test for the intersection 
-hypotheses in the closed system of hypotheses. 
-Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"}, 
+\item{intersectionTest}{Defines the multiple test for the intersection
+hypotheses in the closed system of hypotheses.
+Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"},
 \code{"Sidak"}, and \code{"Hierarchical"}, default is \code{"Dunnett"}.}
 
-\item{directionUpper}{Logical. Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
-\item{adaptations}{A logical vector of length \code{kMax - 1} indicating whether or not an adaptation takes 
+\item{adaptations}{A logical vector of length \code{kMax - 1} indicating whether or not an adaptation takes
 place at interim k, default is \code{rep(TRUE, kMax - 1)}.}
 
-\item{typeOfSelection}{The way the treatment arms or populations are selected at interim. 
+\item{typeOfSelection}{The way the treatment arms or populations are selected at interim.
 Five options are available: \code{"best"}, \code{"rbest"}, \code{"epsilon"}, \code{"all"}, and \code{"userDefined"},
 default is \code{"best"}.\cr
 For \code{"rbest"} (select the \code{rValue} best treatment arms/populations), the parameter \code{rValue} has to be specified,
@@ -86,14 +86,14 @@ for \code{"epsilon"} (select treatment arm/population not worse than epsilon com
 \code{epsilonValue} has to be specified.
 If \code{"userDefined"} is selected, \code{"selectArmsFunction"} or \code{"selectPopulationsFunction"} has to be specified.}
 
-\item{effectMeasure}{Criterion for treatment arm/population selection, either based on test statistic 
-(\code{"testStatistic"}) or effect estimate (difference for means and rates or ratio for survival) (\code{"effectEstimate"}), 
+\item{effectMeasure}{Criterion for treatment arm/population selection, either based on test statistic
+(\code{"testStatistic"}) or effect estimate (difference for means and rates or ratio for survival) (\code{"effectEstimate"}),
 default is \code{"effectEstimate"}.}
 
-\item{successCriterion}{Defines when the study is stopped for efficacy at interim. 
-Two options are available: \code{"all"} stops the trial 
-if the efficacy criterion is fulfilled for all selected treatment arms/populations, 
-\code{"atLeastOne"} stops if at least one of the selected treatment arms/populations is shown to be 
+\item{successCriterion}{Defines when the study is stopped for efficacy at interim.
+Two options are available: \code{"all"} stops the trial
+if the efficacy criterion is fulfilled for all selected treatment arms/populations,
+\code{"atLeastOne"} stops if at least one of the selected treatment arms/populations is shown to be
 superior to control at interim, default is \code{"all"}.}
 
 \item{correlationComputation}{If \code{correlationComputation = "alternative"},
@@ -102,45 +102,47 @@ matrix according to Deng et al. (Biometrics, 2019) accounting for the
 respective alternative is used;
 if \code{correlationComputation = "null"}, a constant correlation matrix valid
 under the null, i.e., not accounting for the alternative is used,
- default is \code{"alternative"}.}
+default is \code{"alternative"}.}
 
-\item{epsilonValue}{For \code{typeOfSelection = "epsilon"} (select treatment arm / population not worse than 
+\item{epsilonValue}{For \code{typeOfSelection = "epsilon"} (select treatment arm / population not worse than
 epsilon compared to the best), the parameter \code{epsilonValue} has to be specified. Must be a numeric of length 1.}
 
-\item{rValue}{For \code{typeOfSelection = "rbest"} (select the \code{rValue} best treatment arms / populations), 
+\item{rValue}{For \code{typeOfSelection = "rbest"} (select the \code{rValue} best treatment arms / populations),
 the parameter \code{rValue} has to be specified.}
 
-\item{threshold}{Selection criterion: treatment arm / population is selected only if \code{effectMeasure} 
-exceeds \code{threshold}, default is \code{-Inf}. 
-\code{threshold} can also be a vector of length \code{activeArms} referring to 
+\item{threshold}{Selection criterion: treatment arm / population is selected only if \code{effectMeasure}
+exceeds \code{threshold}, default is \code{-Inf}.
+\code{threshold} can also be a vector of length \code{activeArms} referring to
 a separate threshold condition over the treatment arms.}
 
-\item{plannedEvents}{\code{plannedEvents} is a numeric vector of length \code{kMax} (the number of stages of the design) 
+\item{plannedEvents}{\code{plannedEvents} is a numeric vector of length \code{kMax} (the number of stages of the design)
 that determines the number of cumulated (overall) events in survival designs when the interim stages are planned.
-For two treatment arms, it is the number of events for both treatment arms. 
+For two treatment arms, it is the number of events for both treatment arms.
 For multi-arm designs, \code{plannedEvents} refers to the overall number of events for the selected arms plus control.}
 
-\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups 
-design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.}
+\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
+design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
+For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+In this case, a change of allocating subjects to treatment groups over the stages can be assessed.}
 
-\item{minNumberOfEventsPerStage}{When performing a data driven sample size recalculation, 
-the numeric vector \code{minNumberOfEventsPerStage} with length kMax determines the 
-minimum number of events per stage (i.e., not cumulated), the first element 
+\item{minNumberOfEventsPerStage}{When performing a data driven sample size recalculation,
+the numeric vector \code{minNumberOfEventsPerStage} with length kMax determines the
+minimum number of events per stage (i.e., not cumulated), the first element
 is not taken into account.}
 
-\item{maxNumberOfEventsPerStage}{When performing a data driven sample size recalculation, 
-the numeric vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number 
+\item{maxNumberOfEventsPerStage}{When performing a data driven sample size recalculation,
+the numeric vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number
 of events per stage (i.e., not cumulated), the first element is not taken into account.}
 
-\item{conditionalPower}{If \code{conditionalPower} together with \code{minNumberOfSubjectsPerStage} and 
+\item{conditionalPower}{If \code{conditionalPower} together with \code{minNumberOfSubjectsPerStage} and
 \code{maxNumberOfSubjectsPerStage} (or \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage}
 for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
-It is defined as the power for the subsequent stage given the current data. By default, 
+It is defined as the power for the subsequent stage given the current data. By default,
 the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
 \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
-\item{thetaH1}{If specified, the value of the alternative under which 
+\item{thetaH1}{If specified, the value of the alternative under which
 the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.}
 
 \item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
@@ -148,7 +150,7 @@ the conditional power or sample size recalculation calculation is performed. Mus
 \item{seed}{The seed to reproduce the simulation, default is a random seed.}
 
 \item{calcEventsFunction}{Optionally, a function can be entered that defines the way of performing the sample size
-recalculation. By default, sample size recalculation is performed with conditional power with specified
+recalculation. By default, event number recalculation is performed with conditional power and specified
 \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage} (see details and examples).}
 
 \item{selectArmsFunction}{Optionally, a function can be entered that defines the way of how treatment arms
@@ -163,12 +165,12 @@ is \code{FALSE}.}
 Returns a \code{\link{SimulationResults}} object.
 The following generics (R generic functions) are available for this object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.SimulationResults]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.SimulationResults]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -206,12 +208,12 @@ The function has to contain the three-dots argument '...' (see examples).
 }
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 
@@ -222,7 +224,6 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 # for futility if the test statistic is negative. 
 # Number of events at the second stage is adjusted based on conditional 
 # power 80\% and specified minimum and maximum number of Events.
-maxNumberOfIterations <- 50
 design <- getDesignInverseNormal(typeOfDesign = "asOF", futilityBounds = 0)
 
 y1 <- getSimulationMultiArmSurvival(design = design, activeArms = 4, 
@@ -231,7 +232,7 @@ y1 <- getSimulationMultiArmSurvival(design = design, activeArms = 4,
     typeOfSelection = "best", conditionalPower = 0.8, 
     minNumberOfEventsPerStage = c(NA_real_, 30), 
     maxNumberOfEventsPerStage = c(NA_real_, 90),
-    maxNumberOfIterations = maxNumberOfIterations, 
+    maxNumberOfIterations = 50, 
     plannedEvents = c(75, 120))
 
 y2 <- getSimulationMultiArmSurvival(design = design, activeArms = 4, 
@@ -241,7 +242,7 @@ y2 <- getSimulationMultiArmSurvival(design = design, activeArms = 4,
     effectMeasure = "effectEstimate",
     conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA_real_, 30), 
     maxNumberOfEventsPerStage = c(NA_real_, 90),
-    maxNumberOfIterations = maxNumberOfIterations, 
+    maxNumberOfIterations = 50, 
 	   plannedEvents = c(75, 120))
 
 y1$effectMatrix

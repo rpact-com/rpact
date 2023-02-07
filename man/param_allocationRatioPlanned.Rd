@@ -4,8 +4,10 @@
 \alias{param_allocationRatioPlanned}
 \title{Parameter Description: Allocation Ratio Planned}
 \arguments{
-\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups 
-design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.}
+\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
+design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
+For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+In this case, a change of allocating subjects to treatment groups over the stages can be assessed.}
 }
 \description{
 Parameter Description: Allocation Ratio Planned

@@ -9,7 +9,7 @@ getGroupSequentialProbabilities(decisionMatrix, informationRates)
 \arguments{
 \item{decisionMatrix}{A matrix with either 2 or 4 rows and kMax = length(informationRates) columns, see details.}
 
-\item{informationRates}{The information rates (that must be fixed prior to the trial), 
+\item{informationRates}{The information rates (that must be fixed prior to the trial),
 default is \code{(1:kMax) / kMax}.}
 }
 \description{

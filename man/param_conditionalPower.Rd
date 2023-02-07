@@ -4,7 +4,7 @@
 \alias{param_conditionalPower}
 \title{Parameter Description: Conditional Power}
 \arguments{
-\item{conditionalPower}{The conditional power for the subsequent stage 
+\item{conditionalPower}{The conditional power for the subsequent stage
 under which the sample size recalculation is performed. Must be a positive numeric of length 1.}
 }
 \description{

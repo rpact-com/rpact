@@ -17,11 +17,11 @@ getSampleSizeMeans(
 )
 }
 \arguments{
-\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used. 
-In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower}, 
+\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used.
+In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
 and \code{sided} can be directly entered as argument where necessary.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{groups}{The number of treatment groups (1 or 2), default is \code{2}.}
@@ -33,43 +33,43 @@ with the t distribution.}
 \item{meanRatio}{If \code{TRUE}, the sample size for
 one-sided testing of H0: \code{mu1 / mu2 = thetaH0} is calculated, default is \code{FALSE}.}
 
-\item{thetaH0}{The null hypothesis value, 
-default is \code{0} for the normal and the binary case (testing means and rates, respectively), 
-it is \code{1} for the survival case (testing the hazard ratio).\cr\cr 
+\item{thetaH0}{The null hypothesis value,
+default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
-  \item \emph{means}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the mean ratio) can be specified.
-  \item \emph{rates}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
-  \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{means}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the mean ratio) can be specified.
+\item \emph{rates}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
+\item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
 }
-For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for 
+For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
-\item{alternative}{The alternative hypothesis value for testing means. This can be a vector of assumed 
+\item{alternative}{The alternative hypothesis value for testing means. This can be a vector of assumed
 alternatives, default is \code{seq(0, 1, 0.2)} (power calculations) or \code{seq(0.2, 1, 0.2)} (sample size calculations).}
 
-\item{stDev}{The standard deviation under which the sample size or power 
-calculation is performed, default is \code{1}. 
-If \code{meanRatio = TRUE} is specified, \code{stDev} defines 
+\item{stDev}{The standard deviation under which the sample size or power
+calculation is performed, default is \code{1}.
+If \code{meanRatio = TRUE} is specified, \code{stDev} defines
 the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.}
 
-\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups 
-design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered, 
+\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
+design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered,
 the optimal allocation ratio yielding the smallest overall sample size is determined.}
 }
 \value{
 Returns a \code{\link{TrialDesignPlan}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.TrialDesignPlan]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.TrialDesignPlan]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.TrialDesignPlan]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.TrialDesignPlan]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -86,12 +86,12 @@ Critical bounds and stopping for futility bounds are provided at the effect scal
 }
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 

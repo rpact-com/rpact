@@ -28,11 +28,11 @@ getSimulationMeans(
 )
 }
 \arguments{
-\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used. 
-In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower}, 
+\item{design}{The trial design. If no trial design is specified, a fixed sample size design is used.
+In this case, Type I error rate \code{alpha}, Type II error rate \code{beta}, \code{twoSidedPower},
 and \code{sided} can be directly entered as argument where necessary.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{groups}{The number of treatment groups (1 or 2), default is \code{2}.}
@@ -45,67 +45,69 @@ i.e., t distributed test statistics are generated.}
 \item{meanRatio}{If \code{TRUE}, the design characteristics for
 one-sided testing of H0: \code{mu1 / mu2 = thetaH0} are simulated, default is \code{FALSE}.}
 
-\item{thetaH0}{The null hypothesis value, 
-default is \code{0} for the normal and the binary case (testing means and rates, respectively), 
-it is \code{1} for the survival case (testing the hazard ratio).\cr\cr 
+\item{thetaH0}{The null hypothesis value,
+default is \code{0} for the normal and the binary case (testing means and rates, respectively),
+it is \code{1} for the survival case (testing the hazard ratio).\cr\cr
 For non-inferiority designs, \code{thetaH0} is the non-inferiority bound.
 That is, in case of (one-sided) testing of
 \itemize{
-  \item \emph{means}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the mean ratio) can be specified.
-  \item \emph{rates}: a value \code{!= 0} 
-    (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
-  \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{means}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the mean ratio) can be specified.
+\item \emph{rates}: a value \code{!= 0}
+(or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
+\item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
 }
-For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for 
+For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
-\item{alternative}{The alternative hypothesis value for testing means under which the data is simulated. 
+\item{alternative}{The alternative hypothesis value for testing means under which the data is simulated.
 This can be a vector of assumed alternatives, default is \code{seq(0, 1, 0.2)}.}
 
-\item{stDev}{The standard deviation under which the data is simulated, 
-default is \code{1}. 
-If \code{meanRatio = TRUE} is specified, \code{stDev} defines 
+\item{stDev}{The standard deviation under which the data is simulated,
+default is \code{1}.
+If \code{meanRatio = TRUE} is specified, \code{stDev} defines
 the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.}
 
-\item{plannedSubjects}{\code{plannedSubjects} is a numeric vector of length \code{kMax} (the number of stages of the design) 
+\item{plannedSubjects}{\code{plannedSubjects} is a numeric vector of length \code{kMax} (the number of stages of the design)
 that determines the number of cumulated (overall) subjects when the interim stages are planned.
-For two treatment arms, it is the number of subjects for both treatment arms. 
+For two treatment arms, it is the number of subjects for both treatment arms.
 For multi-arm designs, \code{plannedSubjects} refers to the number of subjects per selected active arm.}
 
-\item{directionUpper}{Logical. Specifies the direction of the alternative, 
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}
 
-\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups 
-design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.}
+\item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
+design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
+For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+In this case, a change of allocating subjects to treatment groups over the stages can be assessed.}
 
-\item{minNumberOfSubjectsPerStage}{When performing a data driven sample size recalculation, 
-the numeric vector \code{minNumberOfSubjectsPerStage} with length kMax determines the 
-minimum number of subjects per stage (i.e., not cumulated), the first element 
-is not taken into account. For two treatment arms, it is the number of subjects for both treatment arms. 
+\item{minNumberOfSubjectsPerStage}{When performing a data driven sample size recalculation,
+the numeric vector \code{minNumberOfSubjectsPerStage} with length kMax determines the
+minimum number of subjects per stage (i.e., not cumulated), the first element
+is not taken into account. For two treatment arms, it is the number of subjects for both treatment arms.
 For multi-arm designs \code{minNumberOfSubjectsPerStage} refers
 to the minimum number of subjects per selected active arm.}
 
-\item{maxNumberOfSubjectsPerStage}{When performing a data driven sample size recalculation, 
-the numeric vector \code{maxNumberOfSubjectsPerStage} with length kMax determines the maximum number 
+\item{maxNumberOfSubjectsPerStage}{When performing a data driven sample size recalculation,
+the numeric vector \code{maxNumberOfSubjectsPerStage} with length kMax determines the maximum number
 of subjects per stage (i.e., not cumulated), the first element is not taken into account.
-For two treatment arms, it is the number of subjects for both treatment arms. 
+For two treatment arms, it is the number of subjects for both treatment arms.
 For multi-arm designs \code{maxNumberOfSubjectsPerStage} refers
 to the maximum number of subjects per selected active arm.}
 
-\item{conditionalPower}{If \code{conditionalPower} together with \code{minNumberOfSubjectsPerStage} and 
+\item{conditionalPower}{If \code{conditionalPower} together with \code{minNumberOfSubjectsPerStage} and
 \code{maxNumberOfSubjectsPerStage} (or \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage}
 for survival designs) is specified, a sample size recalculation based on the specified conditional power is performed.
-It is defined as the power for the subsequent stage given the current data. By default, 
+It is defined as the power for the subsequent stage given the current data. By default,
 the conditional power will be calculated under the observed effect size. Optionally, you can also specify \code{thetaH1} and
 \code{stDevH1} (for simulating means), \code{pi1H1} and \code{pi2H1} (for simulating rates), or \code{thetaH1} (for simulating
 hazard ratios) as parameters under which it is calculated and the sample size recalculation is performed.}
 
-\item{thetaH1}{If specified, the value of the alternative under which 
+\item{thetaH1}{If specified, the value of the alternative under which
 the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.}
 
-\item{stDevH1}{If specified, the value of the standard deviation under which 
+\item{stDevH1}{If specified, the value of the standard deviation under which
 the conditional power or sample size recalculation calculation is performed,
 default is the value of \code{stDev}. Must be a positive numeric of length 1.}
 
@@ -114,7 +116,7 @@ default is the value of \code{stDev}. Must be a positive numeric of length 1.}
 \item{seed}{The seed to reproduce the simulation, default is a random seed.}
 
 \item{calcSubjectsFunction}{Optionally, a function can be entered that defines the way of performing the sample size
-recalculation. By default, sample size recalculation is performed with conditional power with specified
+recalculation. By default, sample size recalculation is performed with conditional power and specified
 \code{minNumberOfSubjectsPerStage} and \code{maxNumberOfSubjectsPerStage} (see details and examples).}
 
 \item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
@@ -125,12 +127,12 @@ is \code{FALSE}.}
 Returns a \code{\link{SimulationResults}} object.
 The following generics (R generic functions) are available for this object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.SimulationResults]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.SimulationResults]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -168,7 +170,7 @@ The function has to contain the three-dots argument '...' (see examples).
 }
 \section{Simulation Data}{
 
-The summary statistics "Simulated data" contains the following parameters: median [range]; mean +/-sd\cr
+The summary statistics "Simulated data" contains the following parameters: median \link{range}; mean +/-sd\cr
 
 \code{$show(showStatistics = FALSE)} or \code{$setShowStatistics(FALSE)} can be used to disable
 the output of the aggregated simulated data.\cr
@@ -185,33 +187,33 @@ Example 2: \cr
 \code{\link[=getData]{getData()}} can be used to get the aggregated simulated data from the
 object as \code{\link[base]{data.frame}}. The data frame contains the following columns:
 \enumerate{
-  \item \code{iterationNumber}: The number of the simulation iteration.
-  \item \code{stageNumber}: The stage.
-  \item \code{alternative}: The alternative hypothesis value.
-  \item \code{numberOfSubjects}: The number of subjects under consideration when the
-        (interim) analysis takes place.
-  \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
-  \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
-  \item \code{testStatistic}: The test statistic that is used for the test decision,
-        depends on which design was chosen (group sequential, inverse normal, or Fisher's combination test).
-  \item \code{testStatisticsPerStage}: The test statistic for each stage if only data from
-        the considered stage is taken into account.
-  \item \code{effectEstimate}: Overall simulated standardized effect estimate.
-  \item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
-  \item \code{conditionalPowerAchieved}: The conditional power for the subsequent stage of the trial for
-        selected sample size and effect. The effect is either estimated from the data or can be
-        user defined with \code{thetaH1}.
+\item \code{iterationNumber}: The number of the simulation iteration.
+\item \code{stageNumber}: The stage.
+\item \code{alternative}: The alternative hypothesis value.
+\item \code{numberOfSubjects}: The number of subjects under consideration when the
+(interim) analysis takes place.
+\item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
+\item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
+\item \code{testStatistic}: The test statistic that is used for the test decision,
+depends on which design was chosen (group sequential, inverse normal, or Fisher's combination test).
+\item \code{testStatisticsPerStage}: The test statistic for each stage if only data from
+the considered stage is taken into account.
+\item \code{effectEstimate}: Overall simulated standardized effect estimate.
+\item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
+\item \code{conditionalPowerAchieved}: The conditional power for the subsequent stage of the trial for
+selected sample size and effect. The effect is either estimated from the data or can be
+user defined with \code{thetaH1}.
 }
 }
 
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 
@@ -250,26 +252,29 @@ getSimulationMeans(designIN, alternative = 0:4, stDev = 5,
 # place at the first interim. The sample size for the third stage is set equal 
 # to the second stage sample size.
 mySampleSizeCalculationFunction <- function(..., stage, 
-        minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage,
-        sampleSizesPerStage,
-        conditionalPower,
-        conditionalCriticalValue,
-        thetaH1) {
-    if (stage == 2) {
-        stageSubjects <- 4 * (max(0, conditionalCriticalValue + 
-            stats::qnorm(conditionalPower)))^2 / (max(1e-12, thetaH1))^2
-        stageSubjects <- min(max(minNumberOfSubjectsPerStage[stage], 
-            stageSubjects), maxNumberOfSubjectsPerStage[stage])
-    } else {
-        stageSubjects <- sampleSizesPerStage[stage - 1]
-    }
-    return(stageSubjects)
+		minNumberOfSubjectsPerStage,
+		maxNumberOfSubjectsPerStage,
+		sampleSizesPerStage,
+		conditionalPower,
+		conditionalCriticalValue,
+		allocationRatioPlanned,
+		thetaH1,
+		stDevH1) {
+	if (stage <= 2) {
+		stageSubjects <- (1 + allocationRatioPlanned)^2/allocationRatioPlanned * 
+			(max(0, conditionalCriticalValue + stats::qnorm(conditionalPower)))^2 / 
+         (max(1e-12, thetaH1/stDevH1))^2
+		stageSubjects <- min(max(minNumberOfSubjectsPerStage[stage], 
+         stageSubjects), maxNumberOfSubjectsPerStage[stage])
+	} else {
+		stageSubjects <- sampleSizesPerStage[stage - 1]
+	}
+	return(stageSubjects)
 }
-getSimulationMeans(designIN, alternative = 2:4, stDev = 5, 
+getSimulationMeans(designIN, alternative = 0:4, stDev = 5, 
     plannedSubjects = c(20, 40, 60), 
     minNumberOfSubjectsPerStage = c(NA, 20, 20), 
-    maxNumberOfSubjectsPerStage = c(NA, 160, 160),
+    maxNumberOfSubjectsPerStage = c(NA, 80, 80),
     conditionalPower = 0.8, 
     calcSubjectsFunction = mySampleSizeCalculationFunction, 
     maxNumberOfIterations = 50)

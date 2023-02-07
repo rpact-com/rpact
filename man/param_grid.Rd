@@ -4,14 +4,14 @@
 \alias{param_grid}
 \title{Parameter Description: Grid (Output Specification Of Multiple Plots)}
 \arguments{
-\item{grid}{An integer value specifying the output of multiple plots. 
-By default (\code{1}) a list of \code{ggplot} objects will be returned. 
-If a \code{grid} value > 1 was specified, a grid plot will be returned 
-if the number of plots is <= specified \code{grid} value; 
+\item{grid}{An integer value specifying the output of multiple plots.
+By default (\code{1}) a list of \code{ggplot} objects will be returned.
+If a \code{grid} value > 1 was specified, a grid plot will be returned
+if the number of plots is <= specified \code{grid} value;
 a list of \code{ggplot} objects will be returned otherwise.
-If \code{grid = 0} is specified, all plots will be created using \code{\link[base]{print}} command 
-and a list of \code{ggplot} objects will be returned invisible. 
-Note that one of the following packages must be installed to create a grid plot: 
+If \code{grid = 0} is specified, all plots will be created using \code{\link[base]{print}} command
+and a list of \code{ggplot} objects will be returned invisible.
+Note that one of the following packages must be installed to create a grid plot:
 'ggpubr', 'gridExtra', or 'cowplot'.}
 }
 \description{

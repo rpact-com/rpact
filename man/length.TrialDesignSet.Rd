@@ -17,7 +17,7 @@ representing the number of design in the \code{TrialDesignSet}.
 Returns the number of designs in a \code{TrialDesignSet}.
 }
 \details{
-Is helpful for iteration over all designs in a design set with "[index]"-syntax.
+Is helpful for iteration over all designs in a design set.
 }
 \examples{
 designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))

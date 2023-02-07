@@ -4,10 +4,10 @@
 \alias{param_varianceOption}
 \title{Parameter Description: Variance Option}
 \arguments{
-\item{varianceOption}{Defines the way to calculate the variance in multiple treatment arms (> 2) 
-or population enrichment designs for testing means. For multiple arms, three options are available: 
-\code{"overallPooled"}, \code{"pairwisePooled"}, and \code{"notPooled"}, default is \code{"overallPooled"}. 
-For enrichment designs, the options are: \code{"pooled"}, \code{"pooledFromFull"} (one subset only), 
+\item{varianceOption}{Defines the way to calculate the variance in multiple treatment arms (> 2)
+or population enrichment designs for testing means. For multiple arms, three options are available:
+\code{"overallPooled"}, \code{"pairwisePooled"}, and \code{"notPooled"}, default is \code{"overallPooled"}.
+For enrichment designs, the options are: \code{"pooled"}, \code{"pooledFromFull"} (one subset only),
 and \code{"notPooled"}, default is \code{"pooled"}.}
 }
 \description{

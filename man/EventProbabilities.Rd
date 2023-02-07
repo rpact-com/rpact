@@ -13,7 +13,7 @@ Class for the definition of event probabilities.
 \section{Fields}{
 
 \describe{
-\item{\code{overallEventProbabilities}}{Deprecated field which will be removed in one of the next releases. 
+\item{\code{overallEventProbabilities}}{Deprecated field which will be removed in one of the next releases.
 Use 'cumulativeEventProbabilities' instead.}
 }}
 

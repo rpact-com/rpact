@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6617 $
- * Last changed: $Date: 2022-10-18 13:06:16 +0200 (Di, 18 Okt 2022) $
+ * File version: $Revision: 6784 $
+ * Last changed: $Date: 2023-01-31 10:11:06 +0100 (Di, 31 Jan 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -26,6 +26,8 @@
 
 #include "f_utilities.h"
 #include "f_simulation_survival_utilities.h"
+#include "rpact_types.h"
+
 using namespace Rcpp;
 
 // Log Rank Test
@@ -159,7 +161,7 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 	);
 }
 
-NumericVector getIndependentIncrements(int stage, NumericVector eventsPerStage, NumericVector logRankOverStages) {
+NumericVector getIndependentIncrements(int stage, NumericVector eventsOverStages, NumericVector logRankOverStages) {
 	NumericVector independentIncrements = NumericVector(stage, NA_REAL);
 	independentIncrements[0] = logRankOverStages[0];
 
@@ -167,9 +169,9 @@ NumericVector getIndependentIncrements(int stage, NumericVector eventsPerStage, 
 	const IntegerVector indices2 = seq(1, stage - 1);
 
 	independentIncrements[indices2] = vectorDivide(
-		vectorMultiply(vectorSqrt(eventsPerStage[indices2]), logRankOverStages[indices2]) -
-		vectorMultiply(vectorSqrt(eventsPerStage[indices1]), logRankOverStages[indices1]),
-		vectorSqrt(eventsPerStage[indices2] - eventsPerStage[indices1]));
+		vectorMultiply(vectorSqrt(eventsOverStages[indices2]), logRankOverStages[indices2]) -
+		vectorMultiply(vectorSqrt(eventsOverStages[indices1]), logRankOverStages[indices1]),
+		vectorSqrt(eventsOverStages[indices2] - eventsOverStages[indices1]));
 
 	return independentIncrements;
 }
@@ -181,7 +183,7 @@ NumericVector getIndependentIncrements(int stage, NumericVector eventsPerStage, 
 //        3: Fisher design
 //
 NumericVector getTestStatistics(int stage, int designNumber, NumericVector informationRates,
-		NumericVector eventsPerStage, NumericVector logRankOverStages) {
+		NumericVector eventsOverStages, NumericVector logRankOverStages) {
 
 	// Group sequential design
 	if (designNumber == 1) {
@@ -195,7 +197,7 @@ NumericVector getTestStatistics(int stage, int designNumber, NumericVector infor
 			return NumericVector::create(logRankOverStages[0], 1 - getNormalDistribution((double) logRankOverStages[0]));
 		}
 
-		NumericVector independentIncrements = getIndependentIncrements(stage, eventsPerStage, logRankOverStages);
+		NumericVector independentIncrements = getIndependentIncrements(stage, eventsOverStages, logRankOverStages);
 
 		const IntegerVector indices1 = seq(0, stage - 2);
 		const IntegerVector indices2 = seq(1, stage - 1);
@@ -217,7 +219,7 @@ NumericVector getTestStatistics(int stage, int designNumber, NumericVector infor
 	weightFisher[0] = 1;
 
 	if (stage > 1) {
-		independentIncrements = getIndependentIncrements(stage, eventsPerStage, logRankOverStages);
+		independentIncrements = getIndependentIncrements(stage, eventsOverStages, logRankOverStages);
 
 		const IntegerVector indices1 = seq(0, stage - 2);
 		const IntegerVector indices2 = seq(1, stage - 1);
@@ -235,45 +237,19 @@ NumericVector getTestStatistics(int stage, int designNumber, NumericVector infor
 	return NumericVector::create(value, pValueSeparate);
 }
 
-// Get Recalculated Event Sizes
-// @param designNumber The design number:
-//        1: Group sequential design
-//        2: Inverse normal design
-//        3: Fisher design
-//
-NumericVector getRecalculatedEventSizes(int designNumber, int stage, int kMax,
-		NumericVector criticalValues, NumericVector informationRates,
-		double conditionalPower, NumericVector plannedEvents,
-		double thetaH1, NumericVector eventsPerStage, NumericVector logRankOverStages,
-		NumericVector testStatisticOverStages, NumericVector minNumberOfEventsPerStage,
-		NumericVector maxNumberOfEventsPerStage,
-		bool directionUpper, double allocation1, double allocation2) {
+/**
+ * Conditional critical value to reject the null hypotheses at the last stage of the trial
+ * @param designNumber The design number:
+ *        1: Group sequential design
+ *        2: Inverse normal design
+ *        3: Fisher design
+ *
+ */
+double getConditionalCriticalValue(int designNumber, int stage, NumericVector criticalValues,
+		NumericVector informationRates, NumericVector testStatisticOverStages) {
 
-	double requiredStageEvents = plannedEvents[stage - 1];
-
-	if (stage == 1) {
-		NumericVector result = NumericVector(3, NA_REAL);
-		result[0] = requiredStageEvents;
-		return result;
-	}
-
-	// Used effect size is either estimated from test statistic of pre-fixed
-	double estimatedTheta;
-	if (R_IsNA(thetaH1)) {
-		estimatedTheta = exp((double) logRankOverStages[stage - 2] *
-			(1 + allocation1 / allocation2) / sqrt(allocation1 /
-			allocation2 * eventsPerStage[stage - 2]));
-	} else {
-		estimatedTheta = thetaH1;
-		if (!directionUpper) {
-			estimatedTheta = 1 / estimatedTheta;
-		}
-	}
-
-	// Conditional critical value to reject the null hypotheses at the last stage of the trial
-	double conditionalCriticalValue;
 	if (designNumber == 3) { // Fisher design
-		conditionalCriticalValue = getNormalQuantile(
+		return getNormalQuantile(
 			1 - pow((double) criticalValues[stage - 1] / testStatisticOverStages[stage - 2],
 				1
 				/
@@ -283,32 +259,61 @@ NumericVector getRecalculatedEventSizes(int designNumber, int stage, int kMax,
 					informationRates[0]
 				)
 			));
-	} else {
-		conditionalCriticalValue = (sqrt((double) informationRates[stage - 1]) * criticalValues[stage - 1] -
-				testStatisticOverStages[stage - 2] * sqrt((double) informationRates[stage - 2])) /
-			sqrt((double) informationRates[stage - 1] - informationRates[stage - 2]);
 	}
 
-	if (!R_IsNA(conditionalPower)) {
-		double theta;
+	return (sqrt((double) informationRates[stage - 1]) * criticalValues[stage - 1] -
+			testStatisticOverStages[stage - 2] * sqrt((double) informationRates[stage - 2])) /
+		sqrt((double) informationRates[stage - 1] - informationRates[stage - 2]);
+}
 
-		theta = max(NumericVector::create(1 + 1E-12, estimatedTheta));
+// used effect size is either estimated from test statistic or pre-fixed
+double getEstimatedTheta(
+		int stage,
+		double thetaH1,
+		bool directionUpper,
+		NumericVector eventsOverStages,
+		NumericVector logRankOverStages,
+		double allocationRatioPlanned) {
 
-		requiredStageEvents = pow(max(NumericVector::create(0,
-			conditionalCriticalValue + getNormalQuantile(conditionalPower))), 2) *
-			pow(1 + allocation1 / allocation2, 2) * allocation2 / allocation1 /
-			pow(log(theta), 2);
-
-		requiredStageEvents = min(NumericVector::create(
-			max(NumericVector::create(minNumberOfEventsPerStage[stage - 1], requiredStageEvents)),
-			maxNumberOfEventsPerStage[stage - 1])) + eventsPerStage[stage - 2];
+	if (!R_IsNA(thetaH1)) {
+		return directionUpper ? thetaH1 : 1 / thetaH1;
 	}
 
-	NumericVector result = NumericVector(3, NA_REAL);
-	result[0] = requiredStageEvents;
-	result[1] = conditionalCriticalValue;
-	result[2] = estimatedTheta;
-	return result;
+	return exp((double) logRankOverStages[stage - 2] *
+		(1 + allocationRatioPlanned) / sqrt(allocationRatioPlanned * eventsOverStages[stage - 2]));
+}
+
+/**
+ * Get recalculated event sizes (only for stage > 1)
+ */
+double getSimulationSuvivalStageEventsCpp(
+		int stage,
+		double conditionalPower,
+		double thetaH0,
+		double estimatedTheta,
+		NumericVector plannedEvents,
+		NumericVector eventsOverStages,
+		NumericVector minNumberOfEventsPerStage,
+		NumericVector maxNumberOfEventsPerStage,
+		double allocationRatioPlanned,
+		double conditionalCriticalValue) {
+
+	double theta = max(NumericVector::create(1 + 1E-12, estimatedTheta));
+
+	double requiredStageEvents = pow(max(NumericVector::create(0,
+		conditionalCriticalValue + getNormalQuantile(conditionalPower))), 2) *
+		pow(1 + allocationRatioPlanned, 2) / (allocationRatioPlanned) /
+		pow(log(theta / thetaH0), 2);
+
+	requiredStageEvents = min(NumericVector::create(
+		max(NumericVector::create(minNumberOfEventsPerStage[stage - 1], requiredStageEvents)),
+		maxNumberOfEventsPerStage[stage - 1])) + eventsOverStages[stage - 2];
+
+	return requiredStageEvents;
+}
+
+Rcpp::XPtr<calcEventsFunctionSurvivalPtr> getSimulationSuvivalStageEventsXPtrCpp() {
+  return(Rcpp::XPtr<calcEventsFunctionSurvivalPtr>(new calcEventsFunctionSurvivalPtr(&getSimulationSuvivalStageEventsCpp)));
 }
 
 NumericMatrix getSimulationStepResultsSurvival(
@@ -323,17 +328,19 @@ NumericMatrix getSimulationStepResultsSurvival(
 		NumericVector minNumberOfEventsPerStage,
 		NumericVector maxNumberOfEventsPerStage,
 		bool directionUpper,
-		double allocation1,
-		double allocation2,
+		double allocationRatioPlanned,
 		NumericVector accrualTime,
 		NumericVector survivalTime,
 		NumericVector dropoutTime,
 		IntegerVector treatmentGroup,
 		double thetaH0,
 		NumericVector futilityBounds,
-		NumericVector alpha0Vec) {
+		NumericVector alpha0Vec,
+		int calcEventsFunctionType,
+		Nullable<Function> calcEventsFunctionR,
+		Rcpp::XPtr<calcEventsFunctionSurvivalPtr> calcEventsFunctionCpp) {
 
-	NumericVector eventsPerStage = NumericVector(kMax, 0.0);
+	NumericVector eventsOverStages = NumericVector(kMax, 0.0);
 	NumericVector logRankOverStages = NumericVector(kMax, 0.0);
 	NumericVector testStatisticOverStages = NumericVector(kMax, 0.0);
 
@@ -358,16 +365,44 @@ NumericMatrix getSimulationStepResultsSurvival(
 
 	for (int k = 1; k <= kMax; k++) {
 
-		NumericVector recalculatedEventSizes = getRecalculatedEventSizes(
-				designNumber, k, kMax, criticalValues, informationRates,
-				conditionalPower, plannedEvents,
-				thetaH1, eventsPerStage, logRankOverStages, testStatisticOverStages,
-				minNumberOfEventsPerStage, maxNumberOfEventsPerStage,
-				directionUpper, allocation1, allocation2);
+		double conditionalCriticalValue = getConditionalCriticalValue(designNumber, k, criticalValues,
+				informationRates, testStatisticOverStages);
 
-		double requiredStageEvents = recalculatedEventSizes[0];
+		double estimatedTheta = getEstimatedTheta(k, thetaH1, directionUpper,
+			eventsOverStages, logRankOverStages, allocationRatioPlanned);
+
+		double stageEvents = plannedEvents[k - 1];
+		if (!R_IsNA(conditionalPower) && k > 1) {
+			if (calcEventsFunctionType == 1 && calcEventsFunctionR.isNotNull()) {
+				stageEvents = Rf_asReal(
+					as<Function>(calcEventsFunctionR)(
+						_["stage"] = k,
+						_["conditionalPower"] = conditionalPower,
+						_["thetaH0"] = thetaH0,
+						_["estimatedTheta"] = estimatedTheta,
+						_["plannedEvents"] = plannedEvents,
+						_["eventsOverStages"] = eventsOverStages,
+						_["minNumberOfEventsPerStage"] = minNumberOfEventsPerStage,
+						_["maxNumberOfEventsPerStage"] = maxNumberOfEventsPerStage,
+						_["allocationRatioPlanned"] = allocationRatioPlanned,
+						_["conditionalCriticalValue"] = conditionalCriticalValue));
+			} else {
+				calcEventsFunctionSurvivalPtr fun = *calcEventsFunctionCpp;
+				stageEvents = fun(k,
+					conditionalPower,
+					thetaH0,
+					estimatedTheta,
+					plannedEvents,
+					eventsOverStages,
+					minNumberOfEventsPerStage,
+					maxNumberOfEventsPerStage,
+					allocationRatioPlanned,
+					conditionalCriticalValue);
+			}
+		}
+
 		double observationTime = findObservationTime(accrualTime,
-				survivalTime, dropoutTime, requiredStageEvents);
+				survivalTime, dropoutTime, stageEvents);
 
 		if (R_IsNA(observationTime)) {
 			eventsNotAchieved[k - 1]++;
@@ -375,12 +410,11 @@ NumericMatrix getSimulationStepResultsSurvival(
 		}
 
 		if (k > 1) {
-			double conditionalCriticalValue = recalculatedEventSizes[1];
-			double theta = recalculatedEventSizes[2];
-
 			conditionalPowerAchieved[k - 1] =
-				1 - getNormalDistribution(conditionalCriticalValue - log(theta) * sqrt(requiredStageEvents - eventsPerStage[k - 2]) *
-				sqrt(allocation1 / allocation2) / (1 + allocation1 / allocation2));
+				1 - getNormalDistribution(
+					conditionalCriticalValue - log(estimatedTheta) * sqrt(stageEvents - eventsOverStages[k - 2]) *
+					sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned)
+				);
 		} else {
 			conditionalPowerAchieved[k - 1] = NA_REAL;
 		}
@@ -401,11 +435,11 @@ NumericMatrix getSimulationStepResultsSurvival(
 		hazardRates2[k - 1] = NA_REAL;
 		hazardRatiosEstimate[k - 1] = NA_REAL;
 
-		eventsPerStage[k - 1] = events1 + events2;
+		eventsOverStages[k - 1] = events1 + events2;
 		logRankOverStages[k - 1] = logRank;
 
 		NumericVector testStatistic = getTestStatistics(k, designNumber,
-				informationRates, eventsPerStage, logRankOverStages);
+				informationRates, eventsOverStages, logRankOverStages);
 
 		testStatisticOverStages[k - 1] = testStatistic[0];
 
@@ -451,7 +485,7 @@ NumericMatrix getSimulationStepResultsSurvival(
 
 		double x = events1 + events2;
 		if (k > 1) {
-		  x -= eventsPerStage[k - 2];
+		  x -= eventsOverStages[k - 2];
 		}
 		expectedNumberOfEvents[k - 1] += x;
 
@@ -562,8 +596,7 @@ List getSimulationSurvivalCpp(
 		NumericVector minNumberOfEventsPerStage,
 		NumericVector maxNumberOfEventsPerStage,
 		bool directionUpper,
-		double allocation1,
-		double allocation2,
+		double allocationRatioPlanned,
 		NumericVector accrualTime,
 		IntegerVector treatmentGroup,
 		double thetaH0,
@@ -581,7 +614,19 @@ List getSimulationSurvivalCpp(
 		int maxNumberOfSubjects,
 		int maxNumberOfIterations,
 		int maxNumberOfRawDatasetsPerStage,
-		double kappa) {
+		double kappa,
+		int calcEventsFunctionType,
+		Nullable<Function> calcEventsFunctionR,
+		SEXP calcEventsFunctionCpp) {
+
+	Rcpp::XPtr<calcEventsFunctionSurvivalPtr> calcEventsFunctionCppXPtr = getSimulationSuvivalStageEventsXPtrCpp();
+	if (calcEventsFunctionType == 0) {
+		calcEventsFunctionR = NULL;
+	}
+	else if (calcEventsFunctionType == 2) {
+		calcEventsFunctionR = NULL;
+		calcEventsFunctionCppXPtr = Rcpp::XPtr<calcEventsFunctionSurvivalPtr>(calcEventsFunctionCpp);
+	}
 
 	bool pwExpEnabled = isPiecewiseExponentialSurvivalEnabled(lambdaVec2);
 
@@ -707,15 +752,17 @@ List getSimulationSurvivalCpp(
 				minNumberOfEventsPerStage,
 				maxNumberOfEventsPerStage,
 				directionUpper,
-				allocation1,
-				allocation2,
+				allocationRatioPlanned,
 				accrualTime,
 				survivalTime,
 				dropoutTime,
 				treatmentGroup,
 				thetaH0,
 				futilityBounds,
-				alpha0Vec);
+				alpha0Vec,
+				calcEventsFunctionType,
+				calcEventsFunctionR,
+				calcEventsFunctionCppXPtr);
 
 			vectorSumC(pi1Index, 0, kMax, REAL(analysisTimeSum), stepResults);
 			vectorSumC(pi1Index, 1, kMax, REAL(subjectsSum), stepResults);
@@ -872,7 +919,7 @@ List getSimulationSurvivalCpp(
 
 		if (!R_IsNA((double) events[i])) {
 			hazardRatioEstimateLR[i] = exp(logRankStatisticSign * logRankStatistics[i] *
-				(1 + allocation1 / allocation2) / sqrt(allocation1 / allocation2 *
+				(1 + allocationRatioPlanned) / sqrt(allocationRatioPlanned *
 					(events1[i] + events2[i])));
 		}
 	}

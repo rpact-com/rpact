@@ -10,7 +10,7 @@ test_plan_section(section)
 \item{section}{The section title or description.}
 }
 \description{
-The section title or description will be used in the formal validation documentation. 
+The section title or description will be used in the formal validation documentation.
 For more information visit \url{https://www.rpact.com}
 }
 \keyword{internal}

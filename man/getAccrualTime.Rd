@@ -13,13 +13,13 @@ getAccrualTime(
 )
 }
 \arguments{
-\item{accrualTime}{The assumed accrual time intervals for the study, default is 
+\item{accrualTime}{The assumed accrual time intervals for the study, default is
 \code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative 
+\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative
 intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
 
 \item{accrualIntensityType}{A character value specifying the accrual intensity input type.
@@ -32,12 +32,12 @@ i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code
 Returns an \code{\link{AccrualTime}} object.
 The following generics (R generic functions) are available for this result object:
 \itemize{
-  \item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
-  \item \code{\link[=print.FieldSet]{print()}} to print the object,
-  \item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
-  \item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
-  \item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-  \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=names.FieldSet]{names()}} to obtain the field names,
+\item \code{\link[=print.FieldSet]{print()}} to print the object,
+\item \code{\link[=summary.ParameterSet]{summary()}} to display a summary of the object,
+\item \code{\link[=plot.ParameterSet]{plot()}} to plot the object,
+\item \code{\link[=as.data.frame.ParameterSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{
@@ -45,43 +45,43 @@ Returns an \code{AccrualTime} object that contains the accrual time and the accr
 }
 \section{Staggered patient entry}{
 
-\code{accrualTime} is the time period of subjects' accrual in a study. 
+\code{accrualTime} is the time period of subjects' accrual in a study.
 It can be a value that defines the end of accrual or a vector.
-In this case, \code{accrualTime} can be used to define a non-constant accrual over time. 
-For this, \code{accrualTime} is a vector that defines the accrual intervals. 
-The first element of \code{accrualTime} must be equal to \code{0} and, additionally, 
-\code{accrualIntensity} needs to be specified. 
-\code{accrualIntensity} itself is a value or a vector (depending on the 
-length of \code{accrualtime}) that defines the intensity how subjects 
+In this case, \code{accrualTime} can be used to define a non-constant accrual over time.
+For this, \code{accrualTime} is a vector that defines the accrual intervals.
+The first element of \code{accrualTime} must be equal to \code{0} and, additionally,
+\code{accrualIntensity} needs to be specified.
+\code{accrualIntensity} itself is a value or a vector (depending on the
+length of \code{accrualtime}) that defines the intensity how subjects
 enter the trial in the intervals defined through \code{accrualTime}.
- 
-\code{accrualTime} can also be a list that combines the definition of the accrual time and 
+
+\code{accrualTime} can also be a list that combines the definition of the accrual time and
 accrual intensity (see below and examples for details).
 
-If the length of \code{accrualTime} and the length of \code{accrualIntensity} are the same 
-(i.e., the end of accrual is undefined), \code{maxNumberOfSubjects > 0} needs to be specified  
+If the length of \code{accrualTime} and the length of \code{accrualIntensity} are the same
+(i.e., the end of accrual is undefined), \code{maxNumberOfSubjects > 0} needs to be specified
 and the end of accrual is calculated.
 In that case, \code{accrualIntensity} is the number of subjects per time unit, i.e., the absolute accrual intensity.
 
-If the length of \code{accrualTime} equals the length of \code{accrualIntensity - 1}   
+If the length of \code{accrualTime} equals the length of \code{accrualIntensity - 1}
 (i.e., the end of accrual is defined), \code{maxNumberOfSubjects} is calculated if the absolute accrual intensity is given.
-If all elements in \code{accrualIntensity} are smaller than 1, \code{accrualIntensity} defines 
-the *relative* intensity how subjects enter the trial.
-For example, \code{accrualIntensity = c(0.1, 0.2)} specifies that in the second accrual interval 
-the intensity is doubled as compared to the first accrual interval. The actual (absolute) accrual intensity 
+If all elements in \code{accrualIntensity} are smaller than 1, \code{accrualIntensity} defines
+the \emph{relative} intensity how subjects enter the trial.
+For example, \code{accrualIntensity = c(0.1, 0.2)} specifies that in the second accrual interval
+the intensity is doubled as compared to the first accrual interval. The actual (absolute) accrual intensity
 is calculated for the calculated or given \code{maxNumberOfSubjects}.
-Note that the default is \code{accrualIntensity = 0.1} meaning that the *absolute* accrual intensity 
+Note that the default is \code{accrualIntensity = 0.1} meaning that the \emph{absolute} accrual intensity
 will be calculated.
 }
 
 \section{How to get help for generic functions}{
 
-Click on the link of a generic in the list above to go directly to the help documentation of 
-the \code{rpact} specific implementation of the generic. 
-Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and 
-to identify the object specific name of it, e.g., 
-use \code{methods("plot")} to get all the methods for the \code{plot} generic. 
-There you can find, e.g., \code{plot.AnalysisResults} and 
+Click on the link of a generic in the list above to go directly to the help documentation of
+the \code{rpact} specific implementation of the generic.
+Note that you can use the R function \code{\link[utils]{methods}} to get all the methods of a generic and
+to identify the object specific name of it, e.g.,
+use \code{methods("plot")} to get all the methods for the \code{plot} generic.
+There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 

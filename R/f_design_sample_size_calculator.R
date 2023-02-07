@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6650 $
-## |  Last changed: $Date: 2022-10-29 14:57:26 +0200 (Sa, 29 Okt 2022) $
+## |  File version: $Revision: 6669 $
+## |  Last changed: $Date: 2022-11-10 11:29:28 +0100 (Thu, 10 Nov 2022) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -4064,7 +4064,7 @@ getNumberOfSubjects <- function(time, ...,
             stop(C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, "'thetaH0' (", thetaH0, ") is out of bounds (0; 1)")
         }
 
-        if (!normalApproximation && design$sided == 2) {
+        if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "exact sample size calculation not available for two-sided testing"

@@ -1,1 +1,15 @@
-/MD5
+Meta
+doc
+.Rproj.user
+.Rhistory
+.RData
+/doc/
+/Meta/
+.Rdata
+.httr-oauth
+.DS_Store
+/.settings
+/_dev
+/_validation
+/_version
+lastMiKTeXException

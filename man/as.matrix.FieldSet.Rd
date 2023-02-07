@@ -9,14 +9,14 @@
 \arguments{
 \item{x}{A \code{\link{FieldSet}} object.}
 
-\item{...}{Ensures that all arguments (starting from the "...") are to be named and 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{enforceRowNames}{If \code{TRUE}, row names will be created
 depending on the object type, default is \code{TRUE}.}
 
-\item{niceColumnNamesEnabled}{Logical. If \code{TRUE}, nice looking column 
-names will be used; syntactic names (variable names) otherwise 
+\item{niceColumnNamesEnabled}{Logical. If \code{TRUE}, nice looking column
+names will be used; syntactic names (variable names) otherwise
 (see \code{\link[base]{make.names}}).}
 }
 \value{

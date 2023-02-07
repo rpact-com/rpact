@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_enrichment_means.R
-## |  Creation date: 12 August 2022, 09:11:47
-## |  File version: $Revision: 6485 $
-## |  Last changed: $Date: 2022-08-12 13:20:22 +0200 (Fr, 12 Aug 2022) $
+## |  Creation date: 06 February 2023, 12:13:59
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,9 +24,6 @@ test_plan_section("Testing Simulation Enrichment Means Function")
 
 
 test_that("'getSimulationEnrichmentMeans': gMax = 2", {
-        
-    .skipTestIfDisabled()
-        
 	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:subsec:intersectionTestsEnrichment}
@@ -62,7 +59,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 2", {
 	design <- getDesignInverseNormal(informationRates = c(0.3, 1), typeOfDesign = "asUser", userAlphaSpending = c(0.01, 0.025))
 
 	suppressWarnings(simResult1 <- getSimulationEnrichmentMeans(design,
-	    populations = 2,
 	    plannedSubjects = c(60, 160), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 0.5,
 	    typeOfSelection = "epsilon", epsilonValue = 0.1,
@@ -112,8 +108,9 @@ test_that("'getSimulationEnrichmentMeans': gMax = 2", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
+	.skipTestIfDisabled()
+
 	suppressWarnings(simResult2 <- getSimulationEnrichmentMeans(design,
-	    populations = 2,
 	    plannedSubjects = c(60, 160), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 0.5,
 	    typeOfSelection = "rBest", rValue = 2,
@@ -164,7 +161,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 2", {
 	}
 
 	suppressWarnings(simResult3 <- getSimulationEnrichmentMeans(design,
-	    populations = 2,
 	    plannedSubjects = c(60, 160), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 0.5,
 	    typeOfSelection = "all",
@@ -215,7 +211,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 2", {
 	}
 
 	suppressWarnings(simResult4 <- getSimulationEnrichmentMeans(design,
-	    populations = 2,
 	    plannedSubjects = c(60, 160), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 0.5,
 	    typeOfSelection = "epsilon", epsilonValue = 0.1,
@@ -302,7 +297,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 3", {
 	design <- getDesignInverseNormal(informationRates = c(0.4, 0.8, 1), typeOfDesign = "noEarlyEfficacy")
 
 	suppressWarnings(simResult1 <- getSimulationEnrichmentMeans(design,
-	    populations = 3,
 	    plannedSubjects = c(20, 40, 50), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 2,
 	    typeOfSelection = "rBest", rValue = 2,
@@ -360,7 +354,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 3", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 	suppressWarnings(simResult2 <- getSimulationEnrichmentMeans(design,
-	    populations = 3,
 	    plannedSubjects = c(20, 40, 50), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 2,
 	    typeOfSelection = "best",
@@ -418,7 +411,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 3", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 	suppressWarnings(simResult3 <- getSimulationEnrichmentMeans(design,
-	    populations = 3,
 	    plannedSubjects = c(20, 40, 50), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 2,
 	    typeOfSelection = "epsilon", epsilonValue = 0.1,
@@ -505,7 +497,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 4", {
 	design <- getDesignInverseNormal(informationRates = c(0.4, 1), typeOfDesign = "noEarlyEfficacy")
 
 	suppressWarnings(simResult1 <- getSimulationEnrichmentMeans(design,
-	    populations = 4, 
 		plannedSubjects = c(100, 200), 
 		effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 2, seed = 123,
@@ -558,7 +549,6 @@ test_that("'getSimulationEnrichmentMeans': gMax = 4", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 	suppressWarnings(simResult2 <- getSimulationEnrichmentMeans(design,
-	    populations = 4, 
 		plannedSubjects = c(100, 200), 
 		effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 2, seed = 123,
@@ -633,7 +623,6 @@ test_that("'getSimulationEnrichmentMeans': comparison of base and enrichment for
 	design <- getDesignInverseNormal(informationRates = c(0.3, 1), typeOfDesign = "OF", futilityBounds = c(0.1))
 
 	suppressWarnings(x1 <- getSimulationEnrichmentMeans(design,
-	    populations = 1, 
 		plannedSubjects = c(60, 180), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 2,
 	    conditionalPower = 0.8, minNumberOfSubjectsPerStage = c(NA, 10), maxNumberOfSubjectsPerStage = c(NA, 180), thetaH1 = 0.5,
@@ -686,7 +675,7 @@ test_that("'getSimulationEnrichmentMeans': comparison of base and enrichment for
 	design <- getDesignFisher(informationRates = c(0.3, 1), kMax = 2)
 
 	suppressWarnings(x1 <- getSimulationEnrichmentMeans(design,
-	    populations = 1, plannedSubjects = c(60, 180), effectList = effectList,
+	    plannedSubjects = c(60, 180), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 2,
 	    conditionalPower = 0.8, minNumberOfSubjectsPerStage = c(NA, 10), maxNumberOfSubjectsPerStage = c(NA, 180), thetaH1 = 0.5,
 	    seed = 123

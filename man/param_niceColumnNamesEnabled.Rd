@@ -4,8 +4,8 @@
 \alias{param_niceColumnNamesEnabled}
 \title{Parameter Description: Nice Column Names Enabled}
 \arguments{
-\item{niceColumnNamesEnabled}{Logical. If \code{TRUE}, nice looking column 
-names will be used; syntactic names (variable names) otherwise 
+\item{niceColumnNamesEnabled}{Logical. If \code{TRUE}, nice looking column
+names will be used; syntactic names (variable names) otherwise
 (see \code{\link[base]{make.names}}).}
 }
 \description{

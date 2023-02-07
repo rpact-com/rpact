@@ -4,7 +4,7 @@
 \alias{param_typeOfSelection}
 \title{Parameter Description: Type of Selection}
 \arguments{
-\item{typeOfSelection}{The way the treatment arms or populations are selected at interim. 
+\item{typeOfSelection}{The way the treatment arms or populations are selected at interim.
 Five options are available: \code{"best"}, \code{"rbest"}, \code{"epsilon"}, \code{"all"}, and \code{"userDefined"},
 default is \code{"best"}.\cr
 For \code{"rbest"} (select the \code{rValue} best treatment arms/populations), the parameter \code{rValue} has to be specified,

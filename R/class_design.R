@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 6801 $
+## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -312,7 +312,8 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
     }
     return(.getAsDataFrame(parameterSet = x, 
         parameterNames = parameterNamesToBeExcluded,
-        niceColumnNamesEnabled = niceColumnNamesEnabled, includeAllParameters = includeAllParameters,
+        niceColumnNamesEnabled = niceColumnNamesEnabled, 
+        includeAllParameters = includeAllParameters,
         handleParameterNamesAsToBeExcluded = TRUE,
         tableColumnNames = .getTableColumnNames(design = x$.design)
     ))
@@ -992,7 +993,8 @@ TrialDesignConditionalDunnett <- setRefClass(
 getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
         informationAtInterim = 0.5, secondStageConditioning = TRUE) {
     .assertIsValidAlpha(alpha)
-    .assertIsNumericVector(informationAtInterim, "informationAtInterim")
+    .assertIsSingleNumber(informationAtInterim, "informationAtInterim")
+    .assertIsInOpenInterval(informationAtInterim, "informationAtInterim", 0, 1)
     return(TrialDesignConditionalDunnett(
         alpha = alpha,
         informationAtInterim = informationAtInterim,
