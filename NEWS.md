@@ -9,6 +9,7 @@
 * Performance of simulation means improved for 1 and 2 groups
 * Two-sided O'Brien and Fleming beta-spending function corrected
 * Issue in plot type 5 for sample size means and rates fixed
+* Added dependency on R >= 3.6.0
 * Minor improvements
 
 # rpact 3.3.2
