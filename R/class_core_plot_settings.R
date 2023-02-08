@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 6805 $
+## |  Last changed: $Date: 2023-02-08 09:30:19 +0100 (Mi, 08 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -514,10 +514,17 @@ PlotSettings <- setRefClass("PlotSettings",
         },
         setLegendBorder = function(p) {
             "Sets the legend border"
-            p <- p + ggplot2::theme(
-                legend.background =
-                    ggplot2::element_rect(fill = "white", colour = "black", linewidth = scaleSize(0.4))
-            )
+            if (packageVersion("ggplot2") >= "3.4.0") {
+                p <- p + ggplot2::theme(
+                    legend.background =
+                        ggplot2::element_rect(fill = "white", colour = "black", linewidth = scaleSize(0.4))
+                )
+            } else {
+                p <- p + ggplot2::theme(
+                    legend.background =
+                        ggplot2::element_rect(fill = "white", colour = "black", size = scaleSize(0.4))
+                )
+            }
             return(p)
         },
         adjustPointSize = function(adjustingValue) {
@@ -679,7 +686,11 @@ PlotSettings <- setRefClass("PlotSettings",
         plotValues = function(p, ..., plotLineEnabled = TRUE,
                 plotPointsEnabled = TRUE, pointBorder = 4) {
             if (plotLineEnabled) {
-                p <- p + ggplot2::geom_line(size = scaleSize(.self$lineSize))
+                if (packageVersion("ggplot2") >= "3.4.0") {
+                    p <- p + ggplot2::geom_line(linewidth = scaleSize(.self$lineSize))
+                } else {
+                    p <- p + ggplot2::geom_line(size = scaleSize(.self$lineSize))
+                }
             }
             if (plotPointsEnabled) {
                 p <- plotPoints(p, pointBorder)
@@ -689,7 +700,11 @@ PlotSettings <- setRefClass("PlotSettings",
         mirrorYValues = function(p, yValues, plotLineEnabled = TRUE,
                 plotPointsEnabled = TRUE, pointBorder = 4) {
             if (plotLineEnabled) {
-                p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues), size = scaleSize(.self$lineSize))
+                if (packageVersion("ggplot2") >= "3.4.0") {
+                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues), linewidth = scaleSize(.self$lineSize))
+                } else {
+                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues), size = scaleSize(.self$lineSize))
+                }
             }
             if (plotPointsEnabled) {
                 p <- plotPoints(p, pointBorder, mapping = ggplot2::aes(y = -yValues))
