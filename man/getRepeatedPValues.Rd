@@ -41,7 +41,7 @@ to calculate the analysis results.
 }
 
 \examples{
-\donttest{
+\dontrun{
 design <- getDesignInverseNormal(kMax = 2)
 data <- getDataset(
     n      = c( 20,  30),

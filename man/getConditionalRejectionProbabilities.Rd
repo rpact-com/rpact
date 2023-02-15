@@ -39,7 +39,7 @@ The conditional rejection probabilities are provided up to the specified stage.
 For Fisher's combination test, you can check the validity of the CRP calculation via simulation.
 }
 \examples{
-\donttest{
+\dontrun{
 # Calculate CRP for a Fisher's combination test design with 
 # two remaining stages and check the results by simulation.
 design <- getDesignFisher(kMax = 4, 

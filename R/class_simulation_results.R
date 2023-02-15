@@ -14,8 +14,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 6810 $
+## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
 
@@ -2142,7 +2142,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
 #' @template return_object_ggplot
 #' 
 #' @examples 
-#' \donttest{
+#' \dontrun{
 #' results <- getSimulationMeans(alternative = 0:4, stDev = 5, 
 #'     plannedSubjects = 40, maxNumberOfIterations = 1000)
 #' plot(results, type = 5)
@@ -2413,7 +2413,7 @@ getData.SimulationResults <- function(x) {
 #' @template return_dataframe
 #' 
 #' @examples 
-#' \donttest{
+#' \dontrun{
 #' results <- getSimulationSurvival(pi1 = seq(0.3,0.6,0.1), pi2 = 0.3, eventTime = 12, 
 #'     accrualTime = 24, plannedEvents = 40, maxNumberOfSubjects = 200, 
 #'     maxNumberOfIterations = 50, maxNumberOfRawDatasetsPerStage = 5)

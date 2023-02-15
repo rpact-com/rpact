@@ -120,7 +120,7 @@ y <- getEventProbabilities(timeVector, accrualTime = c(0, 20, 60),
     lambda2 = c(0.02, 0.06, 0.1), 
     hazardRatio = 2
 )
-\donttest{
+\dontrun{
 plot(timeVector, y$cumulativeEventProbabilities, type = 'l')
 }
 }

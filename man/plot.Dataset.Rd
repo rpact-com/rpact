@@ -71,7 +71,7 @@ dataExample <- getDataset(
     stDevs1 = c(1, 2, 2, 1.3),
     stDevs2 = c(1, 2, 2, 1.3)
 )
-\donttest{
+\dontrun{
 if (require(ggplot2)) plot(dataExample, main = "Comparison of Means")
 }
 
@@ -82,7 +82,7 @@ dataExample <- getDataset(
     events1 = c(3, 5, 5, 6),
     events2 = c(8, 10, 12, 12)
 )
-\donttest{
+\dontrun{
 if (require(ggplot2)) plot(dataExample, main = "Comparison of Rates")
 }
 

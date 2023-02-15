@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 3.3.3
-Date: 2023-02-07
+Version: 3.3.4
+Date: 2023-02-14
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -23,7 +23,7 @@ URL: https://www.rpact.org, https://www.rpact.com, https://github.com/rpact-com/
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US
 Depends: 
-	R (>= 3.5.0)
+	R (>= 3.6.0)
 Imports:
 	methods,
 	stats,
@@ -33,7 +33,6 @@ Imports:
 	rlang,
 	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
-SystemRequirements: C++11
 Suggests: 
 	parallel,
 	ggplot2 (>= 2.2.0),	

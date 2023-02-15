@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6793 $
-## |  Last changed: $Date: 2023-02-03 14:37:15 +0100 (Fri, 03 Feb 2023) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6806 $
+## |  Last changed: $Date: 2023-02-08 09:52:08 +0100 (Mi, 08 Feb 2023) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -122,7 +122,9 @@ NULL
 #' a closed combination test is performed.
 #' That is, additionally the statistics to be used in a closed testing procedure are provided.
 #'
-#' The conditional power is calculated if the planned sample size for the subsequent stages is specified.\cr
+#' The conditional power is calculated if the planned sample size for the subsequent stages (\code{nPlanned}) 
+#' is specified. The conditional power is calculated either under the assumption of the observed effect or 
+#' under the assumption of an assumed effect, that has to be specified (see above).\cr
 #' For testing rates in a two-armed trial, pi1 and pi2 typically refer to the rates in the treatment 
 #' and the control group, respectively. This is not mandatory, however, and so pi1 and pi2 can be interchanged.
 #' In many-to-one multi-armed trials, piTreatments and piControl refer to the rates in the treatment arms and 

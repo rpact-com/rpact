@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_simulation_multiarm_means.R
 ## |  Creation date: 06 February 2023, 12:14:32
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 6810 $
+## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,7 +24,10 @@ test_plan_section("Testing Simulation Multi-Arm Means Function")
 
 
 test_that("'getSimulationMultiArmMeans': several configurations", {
-	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
+	
+    .skipTestIfDisabled()    
+        
+    # @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDesigns}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmDoseResponseRelationShips}
 	# @refFS[Sec.]{fs:sec:simulatingMultiArmSelections}
@@ -96,8 +99,6 @@ test_that("'getSimulationMultiArmMeans': several configurations", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	x2 <- getSimulationMultiArmMeans(
 	    seed = 1234, getDesignInverseNormal(informationRates = c(0.2, 0.6, 1)),

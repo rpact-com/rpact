@@ -117,7 +117,7 @@ Plots a trial design plan.
 Generic function to plot all kinds of trial design plans.
 }
 \examples{
-\donttest{
+\dontrun{
 if (require(ggplot2)) plot(getSampleSizeMeans())
 }
 

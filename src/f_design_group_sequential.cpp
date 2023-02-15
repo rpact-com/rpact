@@ -14,16 +14,15 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6721 $
- * Last changed: $Date: 2022-12-13 15:30:21 +0100 (Di, 13 Dez 2022) $
- * Last changed by: $Author: wassmer $
+ * File version: $Revision: 6812 $
+ * Last changed: $Date: 2023-02-15 09:50:31 +0100 (Mi, 15 Feb 2023) $
+ * Last changed by: $Author: pahlke $
  *
  */
 #include <Rcpp.h>
 
 // [[Rcpp::plugins(cpp11)]]
 
-#include <cmath>
 #include "f_utilities.h"
 #include "f_simulation_survival_utilities.h"
 

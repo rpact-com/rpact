@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_design_sample_size_calculator.R
 ## |  Creation date: 06 February 2023, 12:13:20
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 6810 $
+## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -53,7 +53,7 @@ test_that("'getSampleSizeMeans': Sample size calculation of testing means for on
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
+    
 	designGS1 <- getDesignGroupSequential(
 	    informationRates = c(0.2, 0.5, 1), sided = 1,
 	    beta = 0.1, typeOfDesign = "WT", deltaWT = 0.3
@@ -102,8 +102,8 @@ test_that("'getSampleSizeMeans': Sample size calculation of testing means for on
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
+    
+    .skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeMeans}
 	# @refFS[Formula]{fs:sampleSizeOneMeanVarianceKnownOnesided}
@@ -836,6 +836,8 @@ test_that("'getSampleSizeMeans': Sample size calculation of testing means for on
 
 test_that("'getSampleSizeMeans': Sample size calculation of testing means for two sided group sequential design", {
 
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:criticalValuesWangTiatis}
 	# @refFS[Formula]{fs:inflationFactor}
 	# @refFS[Formula]{fs:expectedReduction}
@@ -865,7 +867,7 @@ test_that("'getSampleSizeMeans': Sample size calculation of testing means for tw
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
+    
 	designGS2 <- getDesignGroupSequential(
 	    informationRates = c(0.2, 0.5, 1), alpha = 0.4,
 	    sided = 2, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.3
@@ -922,8 +924,6 @@ test_that("'getSampleSizeMeans': Sample size calculation of testing means for tw
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeMeans}
 	# @refFS[Formula]{fs:sampleSizeOneMeanVarianceKnownOnesided}
@@ -1223,6 +1223,9 @@ test_plan_section("Testing the Sample Size Calculation of Testing Rates for Diff
 
 
 test_that("'getSampleSizeRates': Sample size calculation of testing rates for one sided group sequential design", {
+        
+    .skipTestIfDisabled()
+        
 	designGS1 <- getDesignGroupSequential(informationRates = c(0.2, 0.5, 1), sided = 1, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.3)
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeRates}
@@ -2000,6 +2003,9 @@ test_plan_section("Testing the Sample Size Calculation of Survival Designs for D
 
 
 test_that("'getSampleSizeSurvival': Fixed sample size with minimum required definitions, pi1 = c(0.4, 0.5, 0.6) and pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default, only alpha = 0.01 is specified", {
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:sampleSizeSurvivalSchoenfeld}
 	# @refFS[Formula]{fs:sampleSizeSurvivalPatientNumber}
@@ -4732,7 +4738,9 @@ test_that("'getSampleSizeSurvival': sample size calculation of survival data for
 })
 
 test_that("'getSampleSizeSurvival': sample size calculation of survival data for two sided group sequential design and typeOfComputation = 'Freedman'", {
-
+        
+    .skipTestIfDisabled()
+        
 	designGS2 <- getDesignGroupSequential(
 	    informationRates = c(0.2, 0.5, 1), alpha = 0.25,
 	    sided = 2, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.3
@@ -4829,8 +4837,6 @@ test_that("'getSampleSizeSurvival': sample size calculation of survival data for
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:sampleSizeSurvivalFreedman}
@@ -6237,7 +6243,8 @@ test_plan_section("Testing the Sample Size Calculation of Survival Designs for O
 
 
 test_that("'getSampleSizeSurvival': For fixed sample design, determine necessary accrual time if 200 subjects and 30 subjects per time unit can be recruited", {
-	.skipTestIfDisabled()
+	
+    .skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
@@ -6297,7 +6304,9 @@ test_that("'getSampleSizeSurvival': For fixed sample design, determine necessary
 })
 
 test_that("'getSampleSizeSurvival': Determine necessary accrual time if 200 subjects and if the first 6 time units 20 subjects per time unit can be recruited, then 30 subjects per time unit", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
 	# @refFS[Formula]{fs:sampleSizeSurvivalPatientNumber}
@@ -7672,7 +7681,9 @@ test_that("'getSampleSizeSurvival': follow-up time is equal for different argume
 })
 
 test_that("'getSampleSizeSurvival': testing expected warnings and errors", {
-
+        
+    .skipTestIfDisabled()
+        
 	expect_error(getSampleSizeSurvival(
 	    accrualTime = c(0, 6), accrualIntensity = c(22, 53),
 	    lambda2 = 0.02, lambda1 = c(0.01, 0.015), followUpTime = 5
@@ -7795,6 +7806,7 @@ test_plan_section("Testing Other Functions of the Sample Size Calculator for Sur
 
 
 test_that("'getEventProbabilities': check expected events over time for overall survival (case 1)", {
+        
 	.skipTestIfDisabled()
 
 	design <- getDesignGroupSequential(
@@ -8435,7 +8447,9 @@ test_that("'getSampleSizeSurvival': check calculations for fixed design with rel
 })
 
 test_that("'.getLambdaStepFunctionByTime': return correct lambda for specified time and piecewise exponential bounds", {
-
+        
+    .skipTestIfDisabled()
+        
 	# @refFS[Formula]{fs:pieceWiseExponentialSurvival}
 	# @refFS[Formula]{fs:pieceWiseExponentialRandomVariable}
 	lambda1 <- .getLambdaStepFunctionByTime(time = 1, c(6, 9, 15, 21), c(0.025, 0.04, 0.015, 0.01, 0.007))

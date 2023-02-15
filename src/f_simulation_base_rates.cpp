@@ -24,7 +24,6 @@
 
 // [[Rcpp::plugins(cpp11)]]
 
-#include <cmath>
 #include "f_assertions.h"
 #include "f_utilities.h"
 #include "rpact_types.h"
@@ -824,10 +823,6 @@ List getSimulationRatesCpp(
 			}
 		}
 	}
-
-	sapply(sampleSizes, [](double x) {
-		return NumericVector::is_na(x) ? 0 : x;
-	});
 
 	for (int m = 0; m < sampleSizes.length(); m++) {
 		if (NumericVector::is_na((double) sampleSizes[m])) {

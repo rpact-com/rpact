@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6649 $
-## |  Last changed: $Date: 2022-10-28 10:46:32 +0200 (Fri, 28 Oct 2022) $
+## |  File version: $Revision: 6802 $
+## |  Last changed: $Date: 2023-02-07 17:07:25 +0100 (Di, 07 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -991,6 +991,7 @@ summary.AnalysisResults <- function(object, ..., type = 1, digits = NA_integer_)
 #' Returns the \code{\link{AnalysisResults}} object as data frame.
 #'
 #' @param x An \code{\link{AnalysisResults}} object created by \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
+#' @inheritParams param_niceColumnNamesEnabled
 #' @inheritParams param_three_dots
 #'
 #' @details

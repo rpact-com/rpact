@@ -13,3 +13,10 @@ doc
 /_validation
 /_version
 lastMiKTeXException
+/CRAN-SUBMISSION
+/.svn
+/.externalToolBuilders
+/docs
+/data-raw
+/.cproject
+/.project

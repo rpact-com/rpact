@@ -224,7 +224,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Simulate the power of the combination test with two interim stages and 
 # O'Brien & Fleming boundaries using Dunnett's intersection tests if the 
 # best treatment arm is selected at first interim. Selection only take 

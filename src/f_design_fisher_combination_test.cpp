@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6617 $
- * Last changed: $Date: 2022-10-18 13:06:16 +0200 (Di, 18 Okt 2022) $
+ * File version: $Revision: 6812 $
+ * Last changed: $Date: 2023-02-15 09:50:31 +0100 (Mi, 15 Feb 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -24,7 +24,6 @@
 
 // [[Rcpp::plugins(cpp11)]]
 
-#include <cmath>
 #include "f_utilities.h"
 
 using namespace Rcpp;
@@ -553,12 +552,12 @@ List getDesignFisherTryCpp(int kMax, double alpha, double tolerance,
         while (prec > tolerance && maxIter >= 0) {
             double alpha1 = (cLower + cUpper) * 0.5;
             if (method == C_FISHER_METHOD_EQUAL_ALPHA) {
-                criticalValues = sapply(seq_len(kMax), [=](int k) {
-                    return zeroin([&](double c) {
+                for (int k = 1; k <= kMax; k++) {
+                	criticalValues[k - 1] = zeroin([&](double c) {
                         return getFisherCombinationSizeCpp(
                                 k, rep(1.0, k - 1), rep(c, k), scale, cases) - alpha1;
                     }, tolerance, alpha, tolerance, 1000);
-                });
+                }
             } else if (method == C_FISHER_METHOD_FULL_ALPHA) {
                 for (int k = 0; k < kMax - 1; k++) {
                     double prec2 = 1;

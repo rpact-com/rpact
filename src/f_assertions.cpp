@@ -24,8 +24,6 @@
 
 // [[Rcpp::plugins(cpp11)]]
 
-#include <string>
-
 using namespace Rcpp;
 
 void assertIsInInterval(double x, Rcpp::CharacterVector xName, double lower, double upper,

@@ -81,7 +81,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 data <- getDataset(
    n1     = c(22, 13, 22, 13),
    n2     = c(22, 11, 22, 11),  

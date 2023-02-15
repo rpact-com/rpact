@@ -191,7 +191,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Assess a population selection strategy with one subset population and
 # a survival endpoint. The considered situations are defined through the 
 # event rates yielding a range of hazard ratios in the subsets. Design 

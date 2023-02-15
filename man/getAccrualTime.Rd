@@ -86,7 +86,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Assume that in a trial the accrual after the first 6 months is doubled 
 # and the total accrual time is 30 months.
 # Further assume that a total of 1000 subjects are entered in the trial.

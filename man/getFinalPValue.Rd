@@ -27,7 +27,7 @@ This enables the calculation for both the non-adaptive and the adaptive case.
 For Fisher's combination test, it is available for \code{kMax = 2} only.
 }
 \examples{
-\donttest{
+\dontrun{
 design <- getDesignInverseNormal(kMax = 2)
 data <- getDataset(
     n      = c( 20,  30),

@@ -17,6 +17,10 @@
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
+
+\item{niceColumnNamesEnabled}{Logical. If \code{TRUE}, nice looking column
+names will be used; syntactic names (variable names) otherwise
+(see \code{\link[base]{make.names}}).}
 }
 \value{
 Returns a \code{\link[base]{data.frame}}.

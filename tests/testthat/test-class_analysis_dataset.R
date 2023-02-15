@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-class_analysis_dataset.R
 ## |  Creation date: 06 February 2023, 12:04:06
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 6810 $
+## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,6 +24,7 @@ test_plan_section("Testing the Class 'Dataset'")
 
 
 test_that("Usage of 'getDataset'", {
+        
 	# @refFS[Tab.]{fs:tab:dataInputVariants}
 	# @refFS[Tab.]fs:tab:output:getDatasetMeans}
 	datasetOfMeans1 <- getDataset(
@@ -45,7 +46,10 @@ test_that("Usage of 'getDataset'", {
 	expect_equal(datasetOfMeans1$overallSampleSizes, c(22, 22, 33, 35, 55, 57, 66, 70))
 	expect_equal(datasetOfMeans1$overallMeans, c(1, 1.4, 1.0333333, 1.4371429, 1.02, 2.0403509, 1.0166667, 2.1257143), tolerance = 1e-07)
 	expect_equal(datasetOfMeans1$overallStDevs, c(1, 1, 1.3814998, 1.4254175, 1.6391506, 1.8228568, 1.5786638, 1.7387056), tolerance = 1e-07)
-	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
+	
+    .skipTestIfDisabled()
+    
+    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(datasetOfMeans1), NA)))
 	    expect_output(print(datasetOfMeans1)$show())
 	    invisible(capture.output(expect_error(summary(datasetOfMeans1), NA)))
@@ -88,8 +92,6 @@ test_that("Usage of 'getDataset'", {
 	expect_equal(datasetOfMeans1$overallSampleSizes, datasetOfMeans1$.data$overallSampleSize, tolerance = 1e-07)
 	expect_equal(datasetOfMeans1$overallMeans, datasetOfMeans1$.data$overallMean, tolerance = 1e-07)
 	expect_equal(datasetOfMeans1$overallStDevs, datasetOfMeans1$.data$overallStDev, tolerance = 1e-07)
-
-	.skipTestIfDisabled()
 
 	x <- getMultipleStageResultsForDataset(datasetOfMeans1)
 

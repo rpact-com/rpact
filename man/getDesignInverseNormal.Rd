@@ -157,7 +157,7 @@ getDesignInverseNormal(kMax = 4, alpha = 0.05, sided = 2,
 # The futility bound is non-binding.
 getDesignInverseNormal(kMax = 2, typeOfDesign = "noEarlyEfficacy", futilityBounds = 0)  
 
-\donttest{
+\dontrun{
 # Calculate one-sided critical values and binding futility bounds for a three-stage 
 # design with alpha- and beta-spending functions according to Kim & DeMets with gamma = 2.5
 # (planned informationRates as specified, default alpha = 0.025 and beta = 0.2)

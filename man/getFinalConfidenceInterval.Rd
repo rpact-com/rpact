@@ -85,7 +85,7 @@ stages, a warning informs that the validity of the confidence interval is theore
 no sample size change was performed.
 }
 \examples{
-\donttest{
+\dontrun{
 design <- getDesignInverseNormal(kMax = 2)
 data <- getDataset(
     n = c(20, 30),

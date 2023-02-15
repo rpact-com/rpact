@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_power_calculator.R
-## |  Creation date: 06 February 2023, 12:13:13
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  Creation date: 13 February 2023, 12:02:47
+## |  File version: $Revision: 6810 $
+## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -198,8 +198,6 @@ test_that("'getPowerMeans': Power calculation of means in one sample for one-sid
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	.skipTestIfDisabled()
-
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeMeans}
 	# @refFS[Formula]{fs:PowerGroupSequentialOneSided}
 	# @refFS[Formula]{fs:ShiftParameterOneSampleMean}
@@ -259,6 +257,8 @@ test_that("'getPowerMeans': Power calculation of means in one sample for one-sid
 
 test_that("'getPowerMeans': Power calculation of means in one sample for two-sided group sequential design", {
 
+	.skipTestIfDisabled()
+
 	designGS2 <- getDesignGroupSequential(
 	    informationRates = c(0.34, 0.66, 1), alpha = 0.12,
 	    sided = 2, beta = 0.15, typeOfDesign = "WT", deltaWT = 0.12
@@ -315,8 +315,6 @@ test_that("'getPowerMeans': Power calculation of means in one sample for two-sid
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeMeans}
 	# @refFS[Formula]{fs:PowerGroupSequentialTwoSided}
@@ -478,6 +476,8 @@ test_that("'getPowerMeans': Power calculation of means in one sample for two-sid
 
 test_that("'getPowerMeans': Power calculation of mean difference in two samples for one-sided group sequential design", {
 
+	.skipTestIfDisabled()
+
 	designGS1 <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.7, 1), sided = 1, alpha = 0.07,
 	    beta = 0.1, futilityBounds = c(-0.5, 0.5), typeOfDesign = "WT", deltaWT = 0.22
@@ -546,8 +546,6 @@ test_that("'getPowerMeans': Power calculation of mean difference in two samples 
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeMeans}
 	# @refFS[Formula]{fs:PowerGroupSequentialOneSided}
@@ -873,6 +871,8 @@ test_that("'getPowerMeans': Power calculation of mean difference in two samples 
 
 test_that("'getPowerMeans': Power calculation of mean difference in two samples for two-sided group sequential design", {
 
+	.skipTestIfDisabled()
+
 	designGS2 <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.7, 1), alpha = 0.4,
 	    sided = 2, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.22
@@ -938,8 +938,6 @@ test_that("'getPowerMeans': Power calculation of mean difference in two samples 
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeMeans}
 	# @refFS[Formula]{fs:PowerGroupSequentialTwoSided}
@@ -1130,6 +1128,8 @@ test_plan_section("Testing the Power Calculation of Testing Rates for Different 
 
 
 test_that("'getPowerRates': Power calculation of rate in one sample for one-sided group sequential design", {
+	.skipTestIfDisabled()
+
 	designGS1 <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.7, 1), sided = 1, alpha = 0.07,
 	    beta = 0.1, futilityBounds = c(-0.5, 0.5), typeOfDesign = "WT", deltaWT = 0.22
@@ -1190,8 +1190,6 @@ test_that("'getPowerRates': Power calculation of rate in one sample for one-side
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	.skipTestIfDisabled()
-
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeRates}
 	# @refFS[Formula]{fs:PowerGroupSequentialOneSided}
 	# @refFS[Formula]{fs:AdjShiftParameterOneSampleRate}
@@ -1250,6 +1248,8 @@ test_that("'getPowerRates': Power calculation of rate in one sample for one-side
 })
 
 test_that("'getPowerRates': Power calculation of rate in one sample for two-sided group sequential design", {
+
+	.skipTestIfDisabled()
 
 	designGS2 <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.7, 1), alpha = 0.4,
@@ -1311,6 +1311,8 @@ test_that("'getPowerRates': Power calculation of rate in one sample for two-side
 })
 
 test_that("'getPowerRates': Power calculation of rate in two samples for one-sided group sequential design, riskRatio = FALSE", {
+
+	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeRates}
 	# @refFS[Formula]{fs:PowerGroupSequentialOneSided}
@@ -1386,8 +1388,6 @@ test_that("'getPowerRates': Power calculation of rate in two samples for one-sid
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	.skipTestIfDisabled()
-
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeRates}
 	# @refFS[Formula]{fs:PowerGroupSequentialOneSided}
 	# @refFS[Formula]{fs:AdjShiftParameterTwoSamplesRateDiff}
@@ -1456,6 +1456,8 @@ test_that("'getPowerRates': Power calculation of rate in two samples for one-sid
 })
 
 test_that("'getPowerRates': Power calculation of rate in two samples for one-sided group sequential design, riskRatio = TRUE", {
+
+	.skipTestIfDisabled()
 
 	designGS1 <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.7, 1), sided = 1, alpha = 0.07,
@@ -1527,8 +1529,6 @@ test_that("'getPowerRates': Power calculation of rate in two samples for one-sid
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	.skipTestIfDisabled()
-
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeRates}
 	# @refFS[Formula]{fs:PowerGroupSequentialOneSided}
 	# @refFS[Formula]{fs:AdjShiftParameterTwoSamplesRateRatio}
@@ -1598,6 +1598,8 @@ test_that("'getPowerRates': Power calculation of rate in two samples for one-sid
 
 test_that("'getPowerRates': Power calculation of rate in two samples for two-sided group sequential design", {
 
+	.skipTestIfDisabled()
+
 	designGS2 <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.7, 1), alpha = 0.4,
 	    sided = 2, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.22
@@ -1663,8 +1665,6 @@ test_that("'getPowerRates': Power calculation of rate in two samples for two-sid
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeRates}
 	# @refFS[Formula]{fs:PowerGroupSequentialTwoSided}
@@ -1733,6 +1733,8 @@ test_plan_section("Testing the Power Calculation of Survival Designs for Differe
 
 
 test_that("'getPowerSurvival': Fixed sample size with minimum required definitions, pi1 = c(0.4, 0.5, 0.6) and pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default", {
+	.skipTestIfDisabled()
+
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:ShiftParameterSurvivalSchoenfeld}
 	# @refFS[Formula]{fs:sampleSizeSurvivalExpectedPatientAccrual}
@@ -1784,6 +1786,8 @@ test_that("'getPowerSurvival': Fixed sample size with minimum required definitio
 })
 
 test_that("'getPowerSurvival': Power calculation of survival designs for one-sided group sequential design", {
+
+	.skipTestIfDisabled()
 
 	designGS1 <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.7, 1), sided = 1, alpha = 0.07,
@@ -1875,8 +1879,6 @@ test_that("'getPowerSurvival': Power calculation of survival designs for one-sid
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:PowerGroupSequentialOneSided}
@@ -2304,6 +2306,8 @@ test_that("'getPowerSurvival': Power calculation of survival designs for one-sid
 
 test_that("'getPowerSurvival': Power calculation of survival designs for two-sided group sequential design", {
 
+	.skipTestIfDisabled()
+
 	designGS2 <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.7, 1), alpha = 0.11,
 	    sided = 2, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.32
@@ -2391,8 +2395,6 @@ test_that("'getPowerSurvival': Power calculation of survival designs for two-sid
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-
-	.skipTestIfDisabled()
 
 	# @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
 	# @refFS[Formula]{fs:PowerGroupSequentialTwoSided}
@@ -3722,6 +3724,8 @@ test_that("'getPowerSurvival': Specify effect size based on median survival time
 })
 
 test_that("'getPowerSurvival': Analysis time at last stage equals accrual time + follow-up time", {
+
+	.skipTestIfDisabled()
 
 	x1 <- getPowerSurvival(getDesignGroupSequential(typeOfDesign = "P"),
 	    accrualTime = 12,

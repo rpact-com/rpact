@@ -218,7 +218,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Assess different selection rules for a two-stage survival design with 
 # O'Brien & Fleming alpha spending boundaries and (non-binding) stopping 
 # for futility if the test statistic is negative. 

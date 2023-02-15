@@ -113,7 +113,7 @@ Plots simulation results.
 Generic function to plot all kinds of simulation results.
 }
 \examples{
-\donttest{
+\dontrun{
 results <- getSimulationMeans(alternative = 0:4, stDev = 5, 
     plannedSubjects = 40, maxNumberOfIterations = 1000)
 plot(results, type = 5)
