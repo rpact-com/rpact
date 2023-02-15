@@ -34,3 +34,4 @@ index\.txt
 ^rpact-Ex.*
 lastMiKTeXException
 ^\.github$
+^CRAN-SUBMISSION$

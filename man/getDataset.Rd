@@ -111,7 +111,7 @@ datasetOfMeans <- getDataset(
 )
 datasetOfMeans
 datasetOfMeans$show(showType = 2)
-\donttest{
+\dontrun{
 datasetOfMeans <- getDataset(
     cumulativeSampleSizes = c(22, 33, 55, 66),
     cumulativeMeans = c(1.000, 1.033, 1.020, 1.017),

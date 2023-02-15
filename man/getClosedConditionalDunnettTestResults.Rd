@@ -50,7 +50,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 # In a two-stage design a conditional Dunnett test should be performed
 # where the  unconditional second stage p-values should be used for the
 # test decision. 

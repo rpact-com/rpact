@@ -119,7 +119,7 @@ Plots the conditional power together with the likelihood function.
 The conditional power is calculated only if effect size and sample size is specified.
 }
 \examples{
-\donttest{
+\dontrun{
 design <- getDesignGroupSequential(kMax = 2)
 
 dataExample <- getDataset(

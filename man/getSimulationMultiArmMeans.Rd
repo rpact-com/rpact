@@ -217,7 +217,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Assess a treatment-arm selection strategy with three active arms, 
 # if the better of the arms is selected for the second stage, and 
 # compare it with the no-selection case. 

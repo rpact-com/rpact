@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6793 $
-## |  Last changed: $Date: 2023-02-03 14:37:15 +0100 (Fri, 03 Feb 2023) $
+## |  File version: $Revision: 6810 $
+## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -120,7 +120,7 @@ C_KEY_WORDS <- c(
 #' }
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' dataFileRates <- system.file("extdata",
 #'     "dataset_rates.csv",
 #'     package = "rpact"
@@ -2494,7 +2494,7 @@ DatasetMeans <- setRefClass("DatasetMeans",
 #'     stDevs1 = c(1, 2, 2, 1.3),
 #'     stDevs2 = c(1, 2, 2, 1.3)
 #' )
-#' \donttest{
+#' \dontrun{
 #' if (require(ggplot2)) plot(dataExample, main = "Comparison of Means")
 #' }
 #'
@@ -2505,7 +2505,7 @@ DatasetMeans <- setRefClass("DatasetMeans",
 #'     events1 = c(3, 5, 5, 6),
 #'     events2 = c(8, 10, 12, 12)
 #' )
-#' \donttest{
+#' \dontrun{
 #' if (require(ggplot2)) plot(dataExample, main = "Comparison of Rates")
 #' }
 #'

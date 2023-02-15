@@ -193,7 +193,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Assess a population selection strategy with one subset population.
 # If the subset is better than the full population, then the subset
 # is selected for the second stage, otherwise the full. Print and plot

@@ -203,7 +203,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Assess a population selection strategy with two subset populations and
 # a binary endpoint using a stratified analysis. No early efficacy stop,
 # weighted inverse normal method with weight sqrt(0.4).

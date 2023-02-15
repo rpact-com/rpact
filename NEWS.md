@@ -1,5 +1,10 @@
 
-# rpact 3.3.3 "Issos"
+# rpact 3.3.4
+
+* Rcpp sugar function `sapply` removed from C++ code to stop deprecated warnings on r-devel-linux-x86_64-fedora-clang 
+* Minor improvements
+
+# rpact 3.3.3
 
 * `allocationRatioPlanned` for simulating means and rates for a two treatment groups design can be a vector of length kMax, the number of stages 
 * `calcSubjectsFunction` can be used in C++ version for simulating means and rates

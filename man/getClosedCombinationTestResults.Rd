@@ -37,7 +37,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
-\donttest{
+\dontrun{
 # In a four-stage combination test design with O'Brien & Fleming boundaries 
 # at the first stage the second treatment arm was dropped. With the Bonferroni 
 # intersection test, the results of a closed adaptive test procedure are 

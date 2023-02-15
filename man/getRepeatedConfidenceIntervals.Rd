@@ -71,7 +71,7 @@ It can be calculated at each stage of the trial and can thus be used as a monito
 The repeated confidence intervals are provided up to the specified stage.
 }
 \examples{
-\donttest{
+\dontrun{
 design <- getDesignInverseNormal(kMax = 2)
 data <- getDataset(
     n      = c( 20,  30),

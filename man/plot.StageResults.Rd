@@ -124,7 +124,7 @@ dataExample <- getDataset(
 
 stageResults <- getStageResults(design, dataExample, thetaH0 = 20)
 
-\donttest{
+\dontrun{
 if (require(ggplot2)) plot(stageResults, nPlanned = c(30), thetaRange = c(0, 100))
 }
 

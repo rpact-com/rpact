@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6694 $
-## |  Last changed: $Date: 2022-11-18 09:04:47 +0100 (Fri, 18 Nov 2022) $
+## |  File version: $Revision: 6810 $
+## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -59,7 +59,7 @@ NULL
 #' )
 #' designSet <- getDesignSet()
 #' designSet$add(design = design, deltaWT = c(0.3, 0.4))
-#' \donttest{
+#' \dontrun{
 #' if (require(ggplot2)) plot(designSet, type = 1)
 #' }
 #'
@@ -69,7 +69,7 @@ NULL
 #'     sided = 2, typeOfDesign = "WT", deltaWT = 0.1
 #' )
 #' designSet <- getDesignSet(design = design, deltaWT = c(0.3, 0.4))
-#' \donttest{
+#' \dontrun{
 #' if (require(ggplot2)) plot(designSet, type = 1)
 #' }
 #'
@@ -88,7 +88,7 @@ NULL
 #'     designs = c(d1, d2),
 #'     variedParameters = c("typeOfDesign", "kMax")
 #' )
-#' \donttest{
+#' \dontrun{
 #' if (require(ggplot2)) plot(designSet, type = 8, nMax = 20)
 #' }
 #'
@@ -781,7 +781,7 @@ as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
 #' @template return_object_ggplot
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' design <- getDesignInverseNormal(
 #'     kMax = 3, alpha = 0.025,
 #'     typeOfDesign = "asKD", gammaA = 2,

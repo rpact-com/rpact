@@ -121,7 +121,7 @@ I.e., \code{\link[=param_nMax]{nMax}} is not an argument to ggplot2 but to
 which is called prior to plotting.
 }
 \examples{
-\donttest{
+\dontrun{
 design <- getDesignInverseNormal(
     kMax = 3, alpha = 0.025,
     typeOfDesign = "asKD", gammaA = 2,

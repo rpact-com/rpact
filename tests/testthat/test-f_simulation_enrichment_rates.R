@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_simulation_enrichment_rates.R
 ## |  Creation date: 06 February 2023, 12:14:06
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 6810 $
+## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,7 +24,10 @@ test_plan_section("Testing Simulation Enrichment Rates Function")
 
 
 test_that("'getSimulationEnrichmentRates': gMax = 2", {
-	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
+
+    .skipTestIfDisabled()    
+        
+    # @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:subsec:intersectionTestsEnrichment}
 	# @refFS[Sec.]{fs:subsec:adaptiveClosedTestProcedureEnrichment}
@@ -105,8 +108,8 @@ test_that("'getSimulationEnrichmentRates': gMax = 2", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-	.skipTestIfDisabled()
-	.skipTestIfNotX64()
+
+    .skipTestIfNotX64()
 
 	suppressWarnings(simResult2 <- getSimulationEnrichmentRates(design,
 	    plannedSubjects = c(150, 300), effectList = effectList,

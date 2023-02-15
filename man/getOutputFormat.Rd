@@ -52,7 +52,7 @@ following parameter names will be recognized amongst others:
 \examples{
 # show output format of p values
 getOutputFormat("p.value")
-\donttest{
+\dontrun{
 # set new p value output format
 setOutputFormat("p.value", digits = 5, nsmall = 5)
 

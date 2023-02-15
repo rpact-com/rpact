@@ -52,7 +52,7 @@ design <- getDesignGroupSequential(
 )
 designSet <- getDesignSet()
 designSet$add(design = design, deltaWT = c(0.3, 0.4))
-\donttest{
+\dontrun{
 if (require(ggplot2)) plot(designSet, type = 1)
 }
 
@@ -62,7 +62,7 @@ design <- getDesignGroupSequential(
     sided = 2, typeOfDesign = "WT", deltaWT = 0.1
 )
 designSet <- getDesignSet(design = design, deltaWT = c(0.3, 0.4))
-\donttest{
+\dontrun{
 if (require(ggplot2)) plot(designSet, type = 1)
 }
 
@@ -81,7 +81,7 @@ designSet <- getDesignSet(
     designs = c(d1, d2),
     variedParameters = c("typeOfDesign", "kMax")
 )
-\donttest{
+\dontrun{
 if (require(ggplot2)) plot(designSet, type = 8, nMax = 20)
 }
 

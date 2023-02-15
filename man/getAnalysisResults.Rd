@@ -135,7 +135,9 @@ For designs with more than two treatments arms (multi-arm designs) or enrichment
 a closed combination test is performed.
 That is, additionally the statistics to be used in a closed testing procedure are provided.
 
-The conditional power is calculated if the planned sample size for the subsequent stages is specified.\cr
+The conditional power is calculated if the planned sample size for the subsequent stages (\code{nPlanned})
+is specified. The conditional power is calculated either under the assumption of the observed effect or
+under the assumption of an assumed effect, that has to be specified (see above).\cr
 For testing rates in a two-armed trial, pi1 and pi2 typically refer to the rates in the treatment
 and the control group, respectively. This is not mandatory, however, and so pi1 and pi2 can be interchanged.
 In many-to-one multi-armed trials, piTreatments and piControl refer to the rates in the treatment arms and
@@ -174,7 +176,7 @@ to calculate the analysis results.
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Example 1 One-Sample t Test
 # Perform an analysis within a three-stage group sequential design with
 # O'Brien & Fleming boundaries and one-sample data with a continuous outcome

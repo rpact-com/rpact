@@ -24,7 +24,6 @@
 
 // [[Rcpp::plugins(cpp11)]]
 
-#include <cmath>
 #include "f_utilities.h"
 #include "rpact_types.h"
 

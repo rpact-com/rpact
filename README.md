@@ -1,12 +1,16 @@
- <!-- badges: start -->
-[![CRAN Status](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact)
+<!-- badges: start --> [![CRAN
+Status](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact)
 [![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml)
-[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
-[![Monthly downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Total
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
+[![Monthly
+downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
+[![Lifecycle:
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![License: LGPL
+v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![shinyapps.io](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://rpact.shinyapps.io/public/)
- <!-- badges: end -->
+<!-- badges: end -->
 
 # rpact
 
@@ -87,9 +91,10 @@ with `testPackage()`.
 > [www.rpact.org](https://www.rpact.org)
 
 -   **RPACT** is a company which offers
-    -   enterprise software development services
-    -   technical support for the `rpact` package
-    -   consultancy and user training for clinical research using R
+    -   enterprise R/Shiny software development services
+    -   technical support for the
+        [rpact](https://cran.r-project.org/package=rpact) package
+    -   consultancy and user training for scientists using R
     -   validated software solutions and R package development for
         clinical research
 

@@ -48,7 +48,7 @@ timeUnderObservation <- observationTime - accrualTime;\cr
 }
 }
 \examples{
-\donttest{
+\dontrun{
 results <- getSimulationSurvival(pi1 = seq(0.3,0.6,0.1), pi2 = 0.3, eventTime = 12, 
     accrualTime = 24, plannedEvents = 40, maxNumberOfSubjects = 200, 
     maxNumberOfIterations = 50, maxNumberOfRawDatasetsPerStage = 5)

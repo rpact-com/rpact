@@ -64,7 +64,7 @@ CSV file into a data frame, transfers it from long to wide format with \code{\li
 and puts the data to \code{\link[=getDataset]{getDataset()}}.
 }
 \examples{
-\donttest{
+\dontrun{
 dataFileRates <- system.file("extdata",
     "dataset_rates.csv",
     package = "rpact"
