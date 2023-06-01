@@ -2,6 +2,7 @@
 % Please edit documentation in R/class_design.R
 \name{plot.TrialDesign}
 \alias{plot.TrialDesign}
+\alias{plot.TrialDesignCharacteristics}
 \title{Trial Design Plotting}
 \usage{
 \method{plot}{TrialDesign}(
@@ -21,6 +22,8 @@
   grid = 1,
   plotSettings = NULL
 )
+
+\method{plot}{TrialDesignCharacteristics}(x, y, ...)
 }
 \arguments{
 \item{x}{The trial design, obtained from \cr

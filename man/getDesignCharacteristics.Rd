@@ -4,7 +4,7 @@
 \alias{getDesignCharacteristics}
 \title{Get Design Characteristics}
 \usage{
-getDesignCharacteristics(design)
+getDesignCharacteristics(design = NULL, ...)
 }
 \arguments{
 \item{design}{The trial design.}
