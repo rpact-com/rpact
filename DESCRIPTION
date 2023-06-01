@@ -47,7 +47,6 @@ Imports:
 	rlang,
 	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
-SystemRequirements: C++11
 Suggests: 
 	ggplot2 (>= 2.2.0),	
 	testthat (>= 3.0.0),
