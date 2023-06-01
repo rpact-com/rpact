@@ -66,6 +66,7 @@ getClosedCombinationTestResults(stageResults)
 }
 \seealso{
 Other analysis functions: 
+\code{\link{getAnalysisResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalPower}()},
 \code{\link{getConditionalRejectionProbabilities}()},

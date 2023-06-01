@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6414 $
-## |  Last changed: $Date: 2022-07-15 09:17:18 +0200 (Fr, 15 Jul 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6931 $
+## |  Last changed: $Date: 2023-04-11 15:40:33 +0200 (Di, 11 Apr 2023) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_simulation_utilities.R
@@ -314,7 +314,7 @@ NULL
 
     .assertIsSinglePositiveInteger(rValue, "rValue", naAllowed = TRUE, validateType = FALSE)
 
-    .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+	.assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE)
 
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
@@ -650,14 +650,32 @@ NULL
         simulationResults$calcEventsFunction <- calcEventsFunction
     }
 
-    if (is.na(allocationRatioPlanned)) {
-        allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
-    }
-    .setValueAndParameterType(
-        simulationResults, "allocationRatioPlanned",
-        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
-    )
-
+	if (any(is.na(allocationRatioPlanned))) {
+		allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
+	}	
+	
+	if (length(allocationRatioPlanned) == 1) {
+		allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
+	} else if (length(allocationRatioPlanned) != design$kMax) {
+		stop(
+				C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+				"'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+				"must have length 1 or ", design$kMax, " (kMax)"
+		)
+	}
+	
+	if (length(unique(allocationRatioPlanned)) == 1) {
+		.setValueAndParameterType(
+				simulationResults, "allocationRatioPlanned",
+				allocationRatioPlanned[1], defaultValue = 1
+		)
+	} else {
+		.setValueAndParameterType(
+				simulationResults, "allocationRatioPlanned",
+				allocationRatioPlanned, defaultValue = rep(1, design$kMax)
+		)
+	}	
+	
     if (endpoint %in% c("means", "rates")) {
         .setValueAndParameterType(simulationResults, "plannedSubjects", plannedSubjects, NA_real_)
         .setValueAndParameterType(simulationResults, "minNumberOfSubjectsPerStage",

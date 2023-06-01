@@ -8,29 +8,39 @@
 Basic class for stage results.
 }
 \details{
-\code{StageResults} is the basic class for \code{StageResultsMeans},
-\code{StageResultsRates}, and \code{StageResultsSurvival}.
+\code{StageResults} is the basic class for
+\itemize{
+\item \code{\link{StageResultsMeans}},
+\item \code{\link{StageResultsRates}},
+\item \code{\link{StageResultsSurvival}},
+\item \code{\link{StageResultsMultiArmMeans}},
+\item \code{\link{StageResultsMultiArmRates}},
+\item \code{\link{StageResultsMultiArmSurvival}},
+\item \code{\link{StageResultsEnrichmentMeans}},
+\item \code{\link{StageResultsEnrichmentRates}}, and
+\item \code{\link{StageResultsEnrichmentSurvival}}.
+}
 }
 \section{Fields}{
 
 \describe{
-\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
 \item{\code{testStatistics}}{The stage-wise test statistics. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{pValues}}{The stage-wise p-values. Is a numeric vector of length \code{kMax}.}
+\item{\code{pValues}}{The stage-wise p-values. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{combInverseNormal}}{The stage-wise test statistics for the inverse normal test. Is a numeric vector of length \code{kMax}.}
+\item{\code{combInverseNormal}}{The test statistics over stages for the inverse normal test. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{combFisher}}{Test statistic for Fisher's combination test. H~0~}
+\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test.}
 
-\item{\code{effectSizes}}{The stage-wise effect sizes. Is a numeric vector of length \code{kMax}.}
+\item{\code{effectSizes}}{The stage-wise effect sizes.}
 
-\item{\code{testActions}}{The action drawn from test result.}
+\item{\code{testActions}}{The test decisions at each stage of the trial. Is a character vector of length \code{kMax}.}
 
 \item{\code{weightsFisher}}{The weights for Fisher's combination test. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{weightsFisher}}{The weights for inverse normal statistic.. Is a numeric vector of length \code{kMax}.}
+\item{\code{weightsInverseNormal}}{The weights for the inverse normal statistic. Is a numeric vector of length \code{kMax}.}
 }}
 
 

@@ -84,6 +84,7 @@ getRepeatedConfidenceIntervals(design, dataInput = data)
 }
 \seealso{
 Other analysis functions: 
+\code{\link{getAnalysisResults}()},
 \code{\link{getClosedCombinationTestResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalPower}()},

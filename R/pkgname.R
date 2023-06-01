@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6784 $
-## |  Last changed: $Date: 2023-01-31 10:11:06 +0100 (Di, 31 Jan 2023) $
+## |  File version: $Revision: 6924 $
+## |  Last changed: $Date: 2023-04-05 17:06:40 +0200 (Mi, 05 Apr 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
 
@@ -82,14 +82,9 @@
 	}
 }
 
+
+
 .onUnload <- function(libpath) {
-	if (!is.null(.parallelComputingCluster)) {
-		tryCatch({	
-			parallel::stopCluster(.parallelComputingCluster)
-		}, error = function(e) {
-			.logWarn("Failed to stop parallel computing cluster", e)
-		})
-	}
 	tryCatch({	
 		library.dynam.unload("rpact", libpath)
 	}, error = function(e) {

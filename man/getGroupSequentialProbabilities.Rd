@@ -12,6 +12,9 @@ getGroupSequentialProbabilities(decisionMatrix, informationRates)
 \item{informationRates}{The information rates (that must be fixed prior to the trial),
 default is \code{(1:kMax) / kMax}.}
 }
+\value{
+Returns a numeric matrix containing the probabilities described in the details section.
+}
 \description{
 Calculates probabilities in the group sequential setting.
 }

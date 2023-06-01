@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6442 $
-## |  Last changed: $Date: 2022-07-21 16:35:54 +0200 (Do, 21 Jul 2022) $
+## |  File version: $Revision: 6931 $
+## |  Last changed: $Date: 2023-04-11 15:40:33 +0200 (Di, 11 Apr 2023) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -61,7 +61,7 @@ NULL
             if (conditionalCriticalValue[stage] > 8) {
                 newEvents <- maxNumberOfEventsPerStage[stage + 1]
             } else {
-                newEvents <- (1 + allocationRatioPlanned)^2 / allocationRatioPlanned *
+                newEvents <- (1 + allocationRatioPlanned[stage])^2 / allocationRatioPlanned[stage] *
                     (max(0, conditionalCriticalValue[stage] +
                         .getQNorm(conditionalPower), na.rm = TRUE))^2 / thetaStandardized^2
                 newEvents <- min(
@@ -129,29 +129,30 @@ NULL
         weights <- .getWeightsInverseNormal(design)
     }
 
-    const <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2
-
     for (k in 1:kMax) {
+		
+		const <- allocationRatioPlanned[k] / (1 + allocationRatioPlanned[k])^2
+		
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
         if (is.null(piControls) || length(piControls) == 0) {
             if (k == 1) {
-                eventsPerStage[, k] <- prevalences * (1 + allocationRatioPlanned * hazardRatios) /
-                    sum(prevalences * (1 + allocationRatioPlanned * hazardRatios), na.rm = TRUE) *
+                eventsPerStage[, k] <- prevalences * (1 + allocationRatioPlanned[k] * hazardRatios) /
+                    sum(prevalences * (1 + allocationRatioPlanned[k] * hazardRatios), na.rm = TRUE) *
                     plannedEvents[k]
             } else {
                 prevSelected <- prevalences / sum(prevalences[selectedSubsets[, k]])
                 prevSelected[!selectedSubsets[, k]] <- 0
                 if (sum(prevSelected, na.rm = TRUE) > 0) {
-                    eventsPerStage[, k] <- prevSelected * (1 + allocationRatioPlanned * hazardRatios) /
-                        sum(prevSelected * (1 + allocationRatioPlanned * hazardRatios), na.rm = TRUE) *
+                    eventsPerStage[, k] <- prevSelected * (1 + allocationRatioPlanned[k] * hazardRatios) /
+                        sum(prevSelected * (1 + allocationRatioPlanned[k] * hazardRatios), na.rm = TRUE) *
                         (plannedEvents[k] - plannedEvents[k - 1])
                 } else {
                     break
                 }
             }
         } else {
-            rho <- (allocationRatioPlanned * (1 - (1 - piControls)^hazardRatios) + piControls) /
-                (1 + allocationRatioPlanned)
+            rho <- (allocationRatioPlanned[k] * (1 - (1 - piControls)^hazardRatios) + piControls) /
+                (1 + allocationRatioPlanned[k])
             if (k == 1) {
                 eventsPerStage[, k] <- prevalences * rho / sum(prevalences * rho, na.rm = TRUE) *
                     plannedEvents[k]
@@ -512,6 +513,10 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
 
+	if (length(allocationRatioPlanned) == 1){
+		allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+	}	
+	
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
     cols <- nrow(effectList$hazardRatios)

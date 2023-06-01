@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6802 $
-## |  Last changed: $Date: 2023-02-07 17:07:25 +0100 (Di, 07 Feb 2023) $
+## |  File version: $Revision: 6862 $
+## |  Last changed: $Date: 2023-03-10 08:37:03 +0100 (Fr, 10 Mrz 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -372,8 +372,9 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
 #'   \item \code{capnum}:  list with caption and number
 #' }
 #'
-#' @return Depending on how the \code{output} is specified,
-#' a numeric vector, a character vector, or a list will be returned.
+#' @return Returns a list if \code{option} is either \code{capnum} or {numcap} 
+#' or returns a vector that is of  character type for \code{option=caption} or 
+#' of numeric type for \code{option=numeric}.
 #'
 #' @examples
 #' design <- getDesignInverseNormal(kMax = 2)

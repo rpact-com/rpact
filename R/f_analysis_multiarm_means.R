@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6649 $
-## |  Last changed: $Date: 2022-10-28 10:46:32 +0200 (Fri, 28 Oct 2022) $
+## |  File version: $Revision: 6943 $
+## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -881,9 +881,11 @@ NULL
     return(repeatedConfidenceIntervals)
 }
 
-#
-# RCIs based on inverse normal combination test
-#
+#'
+#' RCIs based on inverse normal combination test
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsMeansMultiArmInverseNormal <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -905,9 +907,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on Fisher's combination test
-#
+#'
+#' RCIs based on Fisher's combination test
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsMeansMultiArmFisher <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -929,9 +933,11 @@ NULL
     ))
 }
 
-#
-# CIs based on conditional Dunnett test
-#
+#'
+#' CIs based on conditional Dunnett test
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsMeansMultiArmConditionalDunnett <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -956,9 +962,11 @@ NULL
     ))
 }
 
-#
-#  Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Means
-#
+#'
+#' Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Means
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsMeansMultiArm <- function(..., design) {
     if (.isTrialDesignInverseNormal(design)) {
         return(.getRepeatedConfidenceIntervalsMeansMultiArmInverseNormal(design = design, ...))
@@ -972,9 +980,11 @@ NULL
     .stopWithWrongDesignMessage(design)
 }
 
-#
-#  Calculation of conditional power for Means
-#
+#'
+#' Calculation of conditional power for Means
+#'
+#' @noRd
+#' 
 .getConditionalPowerMeansMultiArm <- function(..., stageResults, stage = stageResults$stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaH1 = NA_real_, assumedStDevs = NA_real_,
@@ -1080,9 +1090,11 @@ NULL
     )
 }
 
-#
-# Calculation of conditional power based on inverse normal method
-#
+#'
+#' Calculation of conditional power based on inverse normal method
+#'
+#' @noRd
+#' 
 .getConditionalPowerMeansMultiArmInverseNormal <- function(..., results, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1, assumedStDevs) {
     design <- stageResults$.design
@@ -1171,9 +1183,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power based on Fisher's combination test
-#
+#'
+#' Calculation of conditional power based on Fisher's combination test
+#'
+#' @noRd
+#' 
 .getConditionalPowerMeansMultiArmFisher <- function(..., results, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1, assumedStDevs,
         iterations, seed) {
@@ -1275,9 +1289,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power based on conditional Dunnett test
-#
+#'
+#' Calculation of conditional power based on conditional Dunnett test
+#'
+#' @noRd
+#' 
 .getConditionalPowerMeansMultiArmConditionalDunnett <- function(..., results, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1, assumedStDevs) {
     design <- stageResults$.design
@@ -1332,9 +1348,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power and likelihood values for plotting the graph
-#
+#'
+#' Calculation of conditional power and likelihood values for plotting the graph
+#'
+#' @noRd
+#' 
 .getConditionalPowerLikelihoodMeansMultiArm <- function(..., stageResults, stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaRange, assumedStDevs = NA_real_,

@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6812 $
- * Last changed: $Date: 2023-02-15 09:50:31 +0100 (Mi, 15 Feb 2023) $
+ * File version: $Revision: 6890 $
+ * Last changed: $Date: 2023-03-24 09:23:55 +0100 (Fri, 24 Mar 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -29,9 +29,15 @@
 using namespace Rcpp;
 
 const int C_MAX_NUMBER_OF_ITERATIONS = 100;
-const double C_UPPER_BOUNDS_DEFAULT = 8;
-const double C_CONST_NEWTON_COTES = 15; // set to 5, 10, 15
-const int M = C_CONST_NEWTON_COTES * 6 + 1; // number of grid points with constant of Newton Cotes algorithm (n * 6 + 1)
+const int C_UPPER_BOUNDS_DEFAULT = 8;
+const int C_CONST_NEWTON_COTES_2 = 15; 
+const int C_CONST_NEWTON_COTES_4 = 8; 
+const int C_NEWTON_COTES_MULTIPLIER = 6;
+const int C_NUMBER_OF_GRID_POINTS_ONE_SIDED = C_CONST_NEWTON_COTES_2 * C_NEWTON_COTES_MULTIPLIER + 1;
+const int C_NUMBER_OF_GRID_POINTS_TWO_SIDED = C_CONST_NEWTON_COTES_4 * C_NEWTON_COTES_MULTIPLIER + 1;
+const NumericVector C_NEWTON_COTES_VEC_4 = NumericVector::create(14, 32, 12, 32);
+const NumericVector C_NEWTON_COTES_VEC_5 = NumericVector::create(38, 75, 50, 50, 75);
+const NumericVector C_NEWTON_COTES_VEC_6 = NumericVector::create(82, 216, 27, 272, 27, 216);
 const double C_FUTILITY_BOUNDS_DEFAULT = -6;
 const String C_TYPE_OF_DESIGN_AS_USER = "asUser";
 const String C_TYPE_OF_DESIGN_BS_USER = "bsUser";
@@ -54,84 +60,122 @@ double dnorm2(const double x, const double mean, const double stDev) {
 
 double getDensityValue(double x, int k, NumericVector informationRates,
 		NumericVector epsilonVec, NumericVector x2, NumericVector dn2, int n) {
+	try {
+		k--;
+		double part1 = sqrt((double) informationRates[k - 1] / (double) epsilonVec[k - 1]);
+		double sqrtInfRates1 = sqrt((double) informationRates[k - 1]);
+		double sqrtInfRates2 = sqrt((double) informationRates[k - 2]);
 
-	k--;
-	double part1 = sqrt((double) informationRates[k - 1] / (double) epsilonVec[k - 1]);
-	double sqrtInfRates1 = sqrt((double) informationRates[k - 1]);
-	double sqrtInfRates2 = sqrt((double) informationRates[k - 2]);
+		const double mean = 0;
+		const double stDev = 1;
 
-	const double mean = 0;
-	const double stDev = 1;
+		double prod1 = x * sqrtInfRates1;
+		double divisor = sqrt((double) epsilonVec[k - 1]);
+		double resultValue = 0;
+		for (int i = 0; i < n; i++) {
+			double dnormValue = dnorm2((prod1 - (x2[i] * sqrtInfRates2)) / divisor,
+					mean, stDev);
+			double prod = part1 * dnormValue * dn2[i];
+			resultValue += prod;
+		}
 
-	double prod1 = x * sqrtInfRates1;
-	double divisor = sqrt((double) epsilonVec[k - 1]);
-	double resultValue = 0;
-	for (int i = 0; i < n; i++) {
-		double dnormValue = dnorm2((prod1 - (x2[i] * sqrtInfRates2)) / divisor,
-				mean, stDev);
-		double prod = part1 * dnormValue * dn2[i];
-		resultValue += prod;
+		return resultValue;
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get density value (x = %f, k = %i, n = %i): %s", x, k, n, e.what());
 	}
-
-	return resultValue;
 }
 
 NumericVector getDensityValues(NumericVector x, int k,
 		NumericVector informationRates, NumericVector epsilonVec,
 		NumericVector x2, NumericVector dn2) {
-
-	int n = x.size();
-	NumericVector results = NumericVector(n, NA_REAL);
-	for (int i = 0; i < n; i++) {
-		if (k == 2) {
-			results[i] = dnorm2((double) x[i], 0.0, 1.0);
-		} else {
-			results[i] = getDensityValue((double) x[i], k, informationRates, epsilonVec, x2, dn2, n);
+	try {
+		int n = x.size();
+		NumericVector results = NumericVector(n, NA_REAL);
+		for (int i = 0; i < n; i++) {
+			if (k == 2) {
+				results[i] = dnorm2((double) x[i], 0.0, 1.0);
+			} else {
+				results[i] = getDensityValue((double) x[i], k, informationRates, epsilonVec, x2, dn2, n);
+			}
 		}
+		return results;
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get density values (k = %i): %s", k, e.what());
 	}
-	return results;
 }
 
-NumericVector getW(double dx) {
-	NumericVector vec = NumericVector::create(492, 1296, 162, 1632, 162, 1296);
-	vec = vectorMultiply(vec, dx / 840);
-	vec = rep(vec, C_CONST_NEWTON_COTES); // M %/% 6 = 91 %/% 6 = 15
-	double x = 246.0 * dx / 840.0;
-	NumericVector result = NumericVector(vec.size() + 1, NA_REAL);
-	result[0] = x;
-	for (int i = 1; i < vec.size(); i++) {
-		result[i] = vec[i];
+NumericVector getW(double dx, int constNewtonCotes) {
+	try {
+		NumericVector vec;
+		double x;
+		if (C_NEWTON_COTES_MULTIPLIER == 4) {
+			vec = vectorMultiply(C_NEWTON_COTES_VEC_4, dx / 90.0);
+			vec = 4 * rep(vec, constNewtonCotes);
+			x = 28.0 * dx / 90.0;
+		}
+		else if (C_NEWTON_COTES_MULTIPLIER == 5) {
+			vec = vectorMultiply(C_NEWTON_COTES_VEC_5, dx / 288.0);
+			vec = 5 * rep(vec, constNewtonCotes);
+			x = 95.0 * dx / 288.0;
+		}
+		else if (C_NEWTON_COTES_MULTIPLIER == 6) {
+			vec = vectorMultiply(C_NEWTON_COTES_VEC_6, dx / 840.0);
+			vec = 6 * rep(vec, constNewtonCotes);
+			x = 246.0 * dx / 840.0;
+		}
+		NumericVector result = NumericVector(vec.size() + 1, NA_REAL);
+		result[0] = x;
+		for (int i = 1; i < vec.size(); i++) {
+			result[i] = vec[i];
+		}
+		result[result.size() - 1] = x;
+		return result;
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get W (dx = %f, constNewtonCotes = %i): %s",
+			dx, constNewtonCotes, e.what());
 	}
-	result[result.size() - 1] = x;
-	return result;
 }
 
 double getSeqValue(int paramIndex, int k,
 		NumericVector dn, NumericVector x,
 		NumericMatrix decisionMatrix,
 		NumericVector informationRates, NumericVector epsilonVec) {
-
-	int kIndex = k - 1;
-	NumericVector vec = NumericVector(x.size(), NA_REAL);
-	for (int i = 0; i < x.size(); i++) {
-		vec[i] = (decisionMatrix(paramIndex, kIndex) * sqrt((double) informationRates[kIndex]) -
-			x[i] * sqrt((double) informationRates[kIndex - 1])) / sqrt((double) epsilonVec[kIndex]);
+	try {
+		int kIndex = k - 1;
+		NumericVector vec = NumericVector(x.size(), NA_REAL);
+		for (int i = 0; i < x.size(); i++) {
+			vec[i] = (decisionMatrix(paramIndex, kIndex) * sqrt((double) informationRates[kIndex]) -
+				x[i] * sqrt((double) informationRates[kIndex - 1])) / sqrt((double) epsilonVec[kIndex]);
+		}
+		vec = pnorm(as<NumericVector>(vec));
+		return vectorProduct(vec, dn);
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get sequence values (paramIndex = %i, k = %i): %s",
+			paramIndex, k, e.what());
 	}
-	vec = pnorm(as<NumericVector>(vec));
-	return vectorProduct(vec, dn);
 }
 
-double getDxValue(NumericMatrix decisionMatrix, int k, int M, int rowIndex) {
-	return (decisionMatrix(rowIndex + 1, k - 2) - decisionMatrix(rowIndex, k - 2)) / (M - 1);
+double getDxValue(NumericMatrix decisionMatrix, int k, int numberOfGridPoints, int rowIndex) {
+	try {
+		return (decisionMatrix(rowIndex + 1, k - 2) - decisionMatrix(rowIndex, k - 2)) / (numberOfGridPoints - 1);
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get dx value (k = %d, numberOfGridPoints = %d, rowIndex = %d): %s",
+			k, numberOfGridPoints, rowIndex, e.what());
+	}
 }
 
-NumericVector getXValues(NumericMatrix decisionMatrix, int k, int M, int rowIndex) {
-	NumericVector x = rep(decisionMatrix(rowIndex, k - 2), M);
-	double dx = getDxValue(decisionMatrix, k, M, rowIndex);
-	for (int i = 0; i < x.size(); i++) {
-		x[i] = x[i] + i * dx;
+NumericVector getXValues(NumericMatrix decisionMatrix, int k, int numberOfGridPoints, int rowIndex) {
+	try {
+		NumericVector x = rep(decisionMatrix(rowIndex, k - 2), numberOfGridPoints);
+		double dx = getDxValue(decisionMatrix, k, numberOfGridPoints, rowIndex);
+		for (int i = 0; i < x.size(); i++) {
+			x[i] = x[i] + i * dx;
+		}
+		return x;
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get x values (k = %d, numberOfGridPoints = %d, rowIndex = %d): %s",
+			k, numberOfGridPoints, rowIndex, e.what());
 	}
-	return x;
 }
 
 NumericVector getGroupSequentialProbabilitiesFast(
@@ -169,16 +213,16 @@ NumericVector getGroupSequentialProbabilitiesFast(
 	}
 
 	// density values in recursion
-	NumericVector dn2 = NumericVector(M, NA_REAL);
+	NumericVector dn2 = NumericVector(C_NUMBER_OF_GRID_POINTS_ONE_SIDED, NA_REAL);
 
 	// grid points in recursion
-	NumericVector x2  = NumericVector(M, NA_REAL);
+	NumericVector x2  = NumericVector(C_NUMBER_OF_GRID_POINTS_ONE_SIDED, NA_REAL);
 
 	for (int k = 2; k <= kMax; k++) {
-		double dx = getDxValue(decMatrix, k, M, 0);
+		double dx = getDxValue(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
 
-		NumericVector x = getXValues(decMatrix, k, M, 0);
-		NumericVector w = getW(dx);
+		NumericVector x = getXValues(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
+		NumericVector w = getW(dx, C_CONST_NEWTON_COTES_2);
 		NumericVector densityValues = getDensityValues(x, k, informationRates, epsilonVec, x2, dn2);
 		NumericVector dn = vectorMultiply(w, densityValues);
 
@@ -196,118 +240,122 @@ NumericVector getGroupSequentialProbabilitiesFast(
 NumericMatrix getGroupSequentialProbabilitiesCpp(
 		NumericMatrix decisionMatrix,
 		NumericVector informationRates) {
-
-	NumericMatrix decMatrix(Rcpp::clone(decisionMatrix));
-
-	for (int i = 0; i < decMatrix.nrow(); i++) {
-		for (int j = 0; j < decMatrix.ncol(); j++) {
-			if (decMatrix(i, j) >= C_UPPER_BOUNDS_DEFAULT) {
-				decMatrix(i, j) = C_UPPER_BOUNDS_DEFAULT;
+	try {
+		NumericMatrix decMatrix(Rcpp::clone(decisionMatrix));
+	
+		for (int i = 0; i < decMatrix.nrow(); i++) {
+			for (int j = 0; j < decMatrix.ncol(); j++) {
+				if (decMatrix(i, j) >= C_UPPER_BOUNDS_DEFAULT) {
+					decMatrix(i, j) = C_UPPER_BOUNDS_DEFAULT;
+				}
 			}
 		}
-	}
 
-	// maximum number of stages
-	int kMax = informationRates.size();
+		// maximum number of stages
+		int kMax = informationRates.size();
 
-	// probability matrix output
-	NumericMatrix probs(decMatrix.nrow() + 1, kMax);
+		// probability matrix output
+		NumericMatrix probs(decMatrix.nrow() + 1, kMax);
 
-	NumericVector pnormValues = pnorm(decMatrix(_, 0));
-	for (int i = 0; i < pnormValues.size(); i++) {
-		probs(i, 0) = pnormValues[i];
-	}
-	probs(probs.nrow() - 1, 0) = 1;
-	if (kMax <= 1) {
+		NumericVector pnormValues = pnorm(decMatrix(_, 0));
+		for (int i = 0; i < pnormValues.size(); i++) {
+			probs(i, 0) = pnormValues[i];
+		}
+		probs(probs.nrow() - 1, 0) = 1;
+		if (kMax <= 1) {
+			return probs;
+		}
+
+		NumericVector epsilonVec = NumericVector(informationRates.size(), NA_REAL);
+		epsilonVec[0] = informationRates[0];
+		for (int i = 1; i < epsilonVec.size(); i++) {
+			epsilonVec[i] = informationRates[i] - informationRates[i - 1];
+		}
+
+		if (decMatrix.nrow() == 2) {
+
+			for (int i = 0; i < decMatrix.nrow(); i++) {
+				for (int j = 0; j < decMatrix.ncol(); j++) {
+					if (decMatrix(i, j) <= C_FUTILITY_BOUNDS_DEFAULT) {
+						decMatrix(i, j) = C_FUTILITY_BOUNDS_DEFAULT;
+					}
+				}
+			}
+
+			// density values in recursion
+			NumericVector dn2 = NumericVector(C_NUMBER_OF_GRID_POINTS_ONE_SIDED, NA_REAL);
+
+			// grid points in recursion
+			NumericVector x2  = NumericVector(C_NUMBER_OF_GRID_POINTS_ONE_SIDED, NA_REAL);
+
+			for (int k = 2; k <= kMax; k++) {
+				double dx = getDxValue(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
+
+				NumericVector x = getXValues(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
+				NumericVector w = getW(dx, C_CONST_NEWTON_COTES_2);
+				NumericVector densityValues = getDensityValues(x, k, informationRates, epsilonVec, x2, dn2);
+				NumericVector dn = vectorMultiply(w, densityValues);
+
+				double seq1 = getSeqValue(0, k, dn, x, decMatrix, informationRates, epsilonVec);
+				double seq2 = getSeqValue(1, k, dn, x, decMatrix, informationRates, epsilonVec);
+
+				x2 = x;
+				dn2 = dn;
+				probs(0, k - 1) = seq1;
+				probs(1, k - 1) = seq2;
+				probs(2, k - 1) = probs(1, k - 2) - probs(0, k - 2);
+			}
+		}
+		else if (decMatrix.nrow() == 4) {
+
+			for (int i = 0; i < decMatrix.nrow(); i++) {
+				for (int j = 0; j < decMatrix.ncol(); j++) {
+					if (decMatrix(i, j) <= -C_UPPER_BOUNDS_DEFAULT) {
+						decMatrix(i, j) = -C_UPPER_BOUNDS_DEFAULT;
+					}
+				}
+			}
+
+			// density values in recursion
+			NumericVector dn2 = NumericVector(2 * C_NUMBER_OF_GRID_POINTS_TWO_SIDED, NA_REAL);
+
+			// grid points in recursion
+			NumericVector x2  = NumericVector(2 * C_NUMBER_OF_GRID_POINTS_TWO_SIDED, NA_REAL);
+
+			for (int k = 2; k <= kMax; k++) {
+				double dx0 = getDxValue(decMatrix, k, C_NUMBER_OF_GRID_POINTS_TWO_SIDED, 0);
+				double dx1 = getDxValue(decMatrix, k, C_NUMBER_OF_GRID_POINTS_TWO_SIDED, 2);
+
+				NumericVector x0 = getXValues(decMatrix, k, C_NUMBER_OF_GRID_POINTS_TWO_SIDED, 0);
+				NumericVector x1 = getXValues(decMatrix, k, C_NUMBER_OF_GRID_POINTS_TWO_SIDED, 2);
+				NumericVector x = concat(x0, x1);
+
+				NumericVector w0 = getW(dx0, C_CONST_NEWTON_COTES_4);
+				NumericVector w1 = getW(dx1, C_CONST_NEWTON_COTES_4);
+				NumericVector w = concat(w0, w1);
+
+				NumericVector densityValues = getDensityValues(x, k, informationRates, epsilonVec, x2, dn2);
+				NumericVector dn = vectorMultiply(w, densityValues);
+
+				double seq1 = getSeqValue(0, k, dn, x, decMatrix, informationRates, epsilonVec);
+				double seq2 = getSeqValue(1, k, dn, x, decMatrix, informationRates, epsilonVec);
+				double seq3 = getSeqValue(2, k, dn, x, decMatrix, informationRates, epsilonVec);
+				double seq4 = getSeqValue(3, k, dn, x, decMatrix, informationRates, epsilonVec);
+
+				x2 = x;
+				dn2 = dn;
+				probs(0, k - 1) = seq1;
+				probs(1, k - 1) = seq2;
+				probs(2, k - 1) = seq3;
+				probs(3, k - 1) = seq4;
+				probs(4, k - 1) = probs(3, k - 2) - probs(2, k - 2) + probs(1, k - 2) - probs(0, k - 2);
+			}
+		}
+
 		return probs;
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get group sequential probabilities: %s", e.what());
 	}
-
-	NumericVector epsilonVec = NumericVector(informationRates.size(), NA_REAL);
-	epsilonVec[0] = informationRates[0];
-	for (int i = 1; i < epsilonVec.size(); i++) {
-		epsilonVec[i] = informationRates[i] - informationRates[i - 1];
-	}
-
-	if (decMatrix.nrow() == 2) {
-		for (int i = 0; i < decMatrix.nrow(); i++) {
-			for (int j = 0; j < decMatrix.ncol(); j++) {
-				if (decMatrix(i, j) <= C_FUTILITY_BOUNDS_DEFAULT) {
-					decMatrix(i, j) = C_FUTILITY_BOUNDS_DEFAULT;
-				}
-			}
-		}
-
-		// density values in recursion
-		NumericVector dn2 = NumericVector(M, NA_REAL);
-
-		// grid points in recursion
-		NumericVector x2  = NumericVector(M, NA_REAL);
-
-		for (int k = 2; k <= kMax; k++) {
-			double dx = getDxValue(decMatrix, k, M, 0);
-
-			NumericVector x = getXValues(decMatrix, k, M, 0);
-			NumericVector w = getW(dx);
-			NumericVector densityValues = getDensityValues(x, k, informationRates, epsilonVec, x2, dn2);
-			NumericVector dn = vectorMultiply(w, densityValues);
-
-			double seq1 = getSeqValue(0, k, dn, x, decMatrix, informationRates, epsilonVec);
-			double seq2 = getSeqValue(1, k, dn, x, decMatrix, informationRates, epsilonVec);
-
-			x2 = x;
-			dn2 = dn;
-			probs(0, k - 1) = seq1;
-			probs(1, k - 1) = seq2;
-			probs(2, k - 1) = probs(1, k - 2) - probs(0, k - 2);
-		}
-	}
-	else if (decMatrix.nrow() == 4) {
-
-		for (int i = 0; i < decMatrix.nrow(); i++) {
-			for (int j = 0; j < decMatrix.ncol(); j++) {
-				if (decMatrix(i, j) <= -C_UPPER_BOUNDS_DEFAULT) {
-					decMatrix(i, j) = -C_UPPER_BOUNDS_DEFAULT;
-				}
-			}
-		}
-
-		// density values in recursion
-		NumericVector dn2 = NumericVector(2 * M, NA_REAL);
-
-		// grid points in recursion
-		NumericVector x2  = NumericVector(2 * M, NA_REAL);
-
-		for (int k = 2; k <= kMax; k++) {
-			double dx0 = getDxValue(decMatrix, k, M, 0);
-			double dx1 = getDxValue(decMatrix, k, M, 2);
-
-			NumericVector x0 = getXValues(decMatrix, k, M, 0);
-			NumericVector x1 = getXValues(decMatrix, k, M, 2);
-			NumericVector x = concat(x0, x1);
-
-			NumericVector w0 = getW(dx0);
-			NumericVector w1 = getW(dx1);
-			NumericVector w = concat(w0, w1);
-
-			NumericVector densityValues = getDensityValues(x, k, informationRates, epsilonVec, x2, dn2);
-			NumericVector dn = vectorMultiply(w, densityValues);
-
-			double seq1 = getSeqValue(0, k, dn, x, decMatrix, informationRates, epsilonVec);
-			double seq2 = getSeqValue(1, k, dn, x, decMatrix, informationRates, epsilonVec);
-			double seq3 = getSeqValue(2, k, dn, x, decMatrix, informationRates, epsilonVec);
-			double seq4 = getSeqValue(3, k, dn, x, decMatrix, informationRates, epsilonVec);
-
-			x2 = x;
-			dn2 = dn;
-			probs(0, k - 1) = seq1;
-			probs(1, k - 1) = seq2;
-			probs(2, k - 1) = seq3;
-			probs(3, k - 1) = seq4;
-			probs(4, k - 1) = probs(3, k - 2) - probs(2, k - 2) + probs(1, k - 2) - probs(0, k - 2);
-		}
-	}
-
-	return probs;
 }
 
 // [[Rcpp::export]]
@@ -511,7 +559,6 @@ double getZeroApproximation(NumericMatrix probs, double alpha, int sided) {
 	return sum(probs(2, _) - probs(1, _) + probs(0, _)) - alpha;
 }
 
-// [[Rcpp::export]]
 double getSpendingValueCpp(double alpha, double x, double sided, String typeOfDesign, double gamma) {
     
     if (typeOfDesign == C_TYPE_OF_DESIGN_AS_P || typeOfDesign == C_TYPE_OF_DESIGN_BS_P) {

@@ -28,6 +28,9 @@ Alternatively, a floating-point number > 0 and < 1 can be specified to define a 
 
 \item{stage}{The stage number (optional). Default: total number of existing stages in the data input.}
 }
+\value{
+Returns a list that summarizes the observed information rates.
+}
 \description{
 Recalculates the observed information rates from the specified dataset.
 }

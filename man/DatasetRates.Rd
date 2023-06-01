@@ -8,24 +8,23 @@
 Class for a dataset of rates.
 }
 \details{
-This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
+This object cannot be created directly; better use \code{\link{getDataset}}
 with suitable arguments to create a dataset of rates.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{groups}}{The group numbers. Is an integer vector of length number of stages times number of groups.}
+\item{\code{groups}}{The group numbers. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{sampleSizes}}{The sample sizes for each group and stage.
-Is an integer vector of length number of stages times number of groups.}
+\item{\code{sampleSizes}}{The sample sizes for each group and stage. Is a numeric vector of length number of stages times number of groups containing whole numbers.}
 
-\item{\code{events}}{The events. Is an integer vector of length number of groups times number of stages.}
+\item{\code{overallSampleSizes}}{The overall, i.e., cumulative sample sizes. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{overallSampleSizes}}{The cumulative sample sizes. Is an integer vector of length number of groups times number of stages.}
+\item{\code{events}}{The number of events in each group at each stage. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{overallEvents}}{The cumulative events. Is an integer vector of length number of groups times number of stages.}
+\item{\code{overallEvents}}{The overall, i.e., cumulative events. Is a numeric vector of length number of stages times number of groups containing whole numbers.}
 }}
 
 

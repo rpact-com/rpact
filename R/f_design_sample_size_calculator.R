@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6669 $
-## |  Last changed: $Date: 2022-11-10 11:29:28 +0100 (Thu, 10 Nov 2022) $
+## |  File version: $Revision: 6892 $
+## |  Last changed: $Date: 2023-03-24 09:39:52 +0100 (Fr, 24 Mrz 2023) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -1546,9 +1546,6 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         if (designPlan$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED ||
                 !identical(accrualTime, C_ACCRUAL_TIME_DEFAULT)) {
             designPlan$.warnInCaseArgumentExists(accrualSetup$accrualTime, "accrualTime")
-        }
-        if (!identical(eventTime, C_EVENT_TIME_DEFAULT)) {
-            designPlan$.warnInCaseArgumentExists(eventTime, "eventTime")
         }
         designPlan$.warnInCaseArgumentExists(dropoutRate1, "dropoutRate1")
         designPlan$.warnInCaseArgumentExists(dropoutRate2, "dropoutRate2")

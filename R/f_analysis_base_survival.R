@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6652 $
-## |  Last changed: $Date: 2022-11-01 08:59:51 +0100 (Tue, 01 Nov 2022) $
+## |  File version: $Revision: 6943 $
+## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -134,10 +134,12 @@ NULL
     return(results)
 }
 
-#
-# The following parameters will be taken from 'design':
-# stages, informationRate, criticalValues, futilityBounds, alphaSpent, stageLevels
-#
+#'
+#' The following parameters will be taken from 'design':
+#' stages, informationRate, criticalValues, futilityBounds, alphaSpent, stageLevels
+#'
+#' @noRd
+#' 
 .getAnalysisResultsSurvivalAll <- function(..., results, design, dataInput, stage,
         directionUpper, thetaH0, thetaH1, nPlanned, allocationRatioPlanned, tolerance,
         iterations, seed) {
@@ -276,18 +278,20 @@ NULL
     return(results)
 }
 
-# @title
-# Get Stage Results Survival
-#
-# @description
-# Returns a stage results object
-#
-# @param design the trial design.
-#
-# @return Returns a \code{StageResultsSurvival} object.
-#
-# @keywords internal
-#
+#' @title
+#' Get Stage Results Survival
+#'
+#' @description
+#' Returns a stage results object
+#'
+#' @param design the trial design.
+#'
+#' @return Returns a \code{StageResultsSurvival} object.
+#'
+#' @keywords internal
+#'
+#' @noRd
+#' 
 .getStageResultsSurvival <- function(..., design, dataInput,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -376,9 +380,11 @@ NULL
     return(stageResults)
 }
 
-#
-# Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Survival
-#
+#'
+#' Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Survival
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsSurvival <- function(..., design) {
     if (.isTrialDesignGroupSequential(design)) {
         return(.getRepeatedConfidenceIntervalsSurvivalGroupSequential(design = design, ...))
@@ -545,9 +551,11 @@ NULL
     return(repeatedConfidenceIntervals)
 }
 
-#
-# RCIs based on group sequential method
-#
+#'
+#' RCIs based on group sequential method
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsSurvivalGroupSequential <- function(..., design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT, tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
@@ -562,9 +570,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on inverse normal combination test
-#
+#'
+#' RCIs based on inverse normal combination test
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsSurvivalInverseNormal <- function(..., design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT, tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
@@ -579,9 +589,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on Fisher's combination test
-#
+#'
+#' RCIs based on Fisher's combination test
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsSurvivalFisher <- function(..., design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT, tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
@@ -596,9 +608,11 @@ NULL
     ))
 }
 
-#
-# Calculation of conditional power based on group sequential method
-#
+#'
+#' Calculation of conditional power based on group sequential method
+#'
+#' @noRd
+#' 
 .getConditionalPowerSurvivalGroupSequential <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_, thetaH1 = NA_real_) {
     design <- stageResults$.design
@@ -702,9 +716,11 @@ NULL
     ))
 }
 
-#
-# Calculation of conditional power based on inverse normal method
-#
+#'
+#' Calculation of conditional power based on inverse normal method
+#'
+#' @noRd
+#' 
 .getConditionalPowerSurvivalInverseNormal <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_, thetaH1 = NA_real_) {
     design <- stageResults$.design
@@ -809,9 +825,11 @@ NULL
     ))
 }
 
-#
-# Calculation of conditional power based on Fisher combination test
-#
+#'
+#' Calculation of conditional power based on Fisher combination test
+#'
+#' @noRd
+#' 
 .getConditionalPowerSurvivalFisher <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_, thetaH1 = NA_real_,
         iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
@@ -1032,10 +1050,12 @@ NULL
     ))
 }
 
-#
-# Calculation of final confidence interval
-# based on group sequential test without SSR (general case).
-#
+#'
+#' Calculation of final confidence interval
+#' based on group sequential test without SSR (general case).
+#'
+#' @noRd
+#' 
 .getFinalConfidenceIntervalSurvivalGroupSequential <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
@@ -1149,10 +1169,12 @@ NULL
     ))
 }
 
-#
-# Calculation of final confidence interval
-# based on inverse normal method, only valid for kMax <= 2 or no SSR.
-#
+#'
+#' Calculation of final confidence interval
+#' based on inverse normal method, only valid for kMax <= 2 or no SSR.
+#'
+#' @noRd
+#' 
 .getFinalConfidenceIntervalSurvivalInverseNormal <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
@@ -1262,10 +1284,12 @@ NULL
     ))
 }
 
-#
-# Calculation of final confidence interval
-# based on Fisher combination test, only valid for kMax <= 2.
-#
+#'
+#' Calculation of final confidence interval
+#' based on Fisher combination test, only valid for kMax <= 2.
+#'
+#' @noRd
+#' 
 .getFinalConfidenceIntervalSurvivalFisher <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {

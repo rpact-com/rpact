@@ -13,13 +13,15 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7022 $
+## |  Last changed: $Date: 2023-06-01 09:15:57 +0200 (Thu, 01 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
+#' @include f_core_assertions.R
 NULL
+
 
 SummaryItem <- setRefClass("SummaryItem",
     fields = list(
@@ -51,12 +53,22 @@ SummaryItem <- setRefClass("SummaryItem",
     )
 )
 
+.isSummaryPipe <- function(fCall) {
+    tryCatch({
+        xCall <- deparse(fCall$x)
+        return(grepl("^summary\\(", xCall[1]))
+    }, error = function(e) {
+      return(FALSE)
+    })
+}
+
 #'
 #' @title
 #' Summary Factory Plotting
 #'
 #' @param x The summary factory object.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
+#' @param showSummary Show the summary before creating the plot output, default is \code{FALSE}.
 #' @inheritParams param_three_dots_plot
 #'
 #' @description
@@ -69,8 +81,39 @@ SummaryItem <- setRefClass("SummaryItem",
 #'
 #' @export
 #'
-plot.SummaryFactory <- function(x, y, ...) {
-    plot(x$object)
+plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
+    fCall <- match.call(expand.dots = FALSE)
+    if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
+        x$show()
+    }
+    plot(x = x$object, y = y, ...)
+}
+
+#'
+#' @title
+#' Summary Factory Printing
+#'
+#' @param x The summary factory object.
+#' @param showSummary Show the summary before creating the print output, default is \code{FALSE}.
+#' @param sep The separator line between the summary and the print output.
+#' @inheritParams param_three_dots_plot
+#'
+#' @description
+#' Prints the result object stored inside a summary factory.
+#'
+#' @details
+#' Generic function to print all kinds of summary factories.
+#'
+#' @export
+#'
+print.SummaryFactory <- function(x, ..., showSummary = FALSE, sep = "\n-----\n\n") {
+    fCall <- match.call(expand.dots = FALSE)
+    if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
+        .assertIsSingleCharacter(sep, "sep")
+        x$show()
+        cat(sep)
+    }
+    print(x$object)
 }
 
 #' @name SummaryFactory
@@ -819,7 +862,9 @@ SummaryFactory <- setRefClass("SummaryFactory",
 .createSummaryTitleObject <- function(object) {
     design <- NULL
     designPlan <- NULL
-    if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
+    if (inherits(object, "TrialDesignCharacteristics")) {
+        design <- object$.design
+    } else if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
         design <- object$.design
         designPlan <- object
     } else if (inherits(object, "AnalysisResults")) {
@@ -1128,6 +1173,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
 }
 
 .createSummaryHeaderObject <- function(object, summaryFactory, digits = NA_integer_) {
+    if (inherits(object, "TrialDesignCharacteristics")) {
+        return(.createSummaryHeaderDesign(object$.design, NULL, summaryFactory))
+    } 
+        
     if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
         return(.createSummaryHeaderDesign(object$.design, object, summaryFactory))
     }
@@ -2172,7 +2221,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
 .createSummary <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
     output <- match.arg(output)
     if (inherits(object, "TrialDesignCharacteristics")) {
-        return(.createSummaryDesignPlan(object$.design, digits = digits, output = output, showStageLevels = TRUE))
+        return(.createSummaryDesignPlan(object, digits = digits, output = output, showStageLevels = TRUE))
     }
 
     if (.isTrialDesign(object) || .isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
@@ -2183,7 +2232,16 @@ SummaryFactory <- setRefClass("SummaryFactory",
         return(.createSummaryAnalysisResults(object, digits = digits, output = output))
     }
 
+    if (inherits(object, "PerformanceScore")) {
+        return(.createSummaryPerformanceScore(object, digits = digits, output = output))
+    }
+
     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "function 'summary' not implemented yet for class ", .getClassName(object))
+}
+
+.createSummaryPerformanceScore <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
+    .createSummaryDesignPlan(object$.simulationResults, digits = digits, output = output, showStageLevels = TRUE)
+    # TODO implement performance score summary
 }
 
 .getSummaryParameterCaptionCriticalValues <- function(design) {
@@ -2205,9 +2263,11 @@ SummaryFactory <- setRefClass("SummaryFactory",
     return(parameterCaption)
 }
 
-#
-# Main function for creating a summary of an analysis result
-#
+#'
+#' Main function for creating a summary of an analysis result
+#'
+#' @noRd
+#' 
 .createSummaryAnalysisResults <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
     output <- match.arg(output)
     if (!inherits(object, "AnalysisResults")) {
@@ -2727,9 +2787,11 @@ SummaryFactory <- setRefClass("SummaryFactory",
     return(summaryFactory)
 }
 
-#
-# Main function for creating a summary of a design or design plan
-#
+#'
+#' Main function for creating a summary of a design or design plan
+#'
+#' @noRd
+#' 
 .createSummaryDesignPlan <- function(object, digits = NA_integer_, 
         output = c("all", "title", "overview", "body"), showStageLevels = FALSE) {
         
@@ -2738,6 +2800,9 @@ SummaryFactory <- setRefClass("SummaryFactory",
     if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
         design <- object$.design
         designPlan <- object
+    } else if (inherits(object, "TrialDesignCharacteristics")) {
+        design <- object$.design
+        #designPlan <- object
     } else if (.isTrialDesign(object)) {
         design <- object
     } else {
@@ -2762,7 +2827,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
     summaryFactory <- SummaryFactory(object = object, intervalFormat = intervalFormat, output = output)
 
     if (output %in% c("all", "title", "overview")) {
-        .addDesignInformationToSummary(design, object, summaryFactory, output = output)
+        .addDesignInformationToSummary(design, designPlan, summaryFactory, output = output)
     }
 
     if (!(output %in% c("all", "body"))) {
@@ -2779,7 +2844,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
         if (showStageLevels) {
             summaryFactory$addParameter(design,
                 parameterName = "stageLevels",
-                parameterCaption = "Stage Levels",
+                parameterCaption = "Stage levels (one-sided)",
                 roundDigits = digitsProbabilities, 
                 smoothedZeroFormat = TRUE
             )

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6802 $
-## |  Last changed: $Date: 2023-02-07 17:07:25 +0100 (Di, 07 Feb 2023) $
+## |  File version: $Revision: 6943 $
+## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1176,12 +1176,18 @@ NULL
 }
 
 .assertIsValidSidedParameter <- function(sided) {
+    if (is.null(match.call(expand.dots = FALSE)[["sided"]])) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'sided' must be defined")
+    }
     if (sided != 1 && sided != 2) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'sided' (", sided, ") must be 1 or 2")
     }
 }
 
 .assertIsValidGroupsParameter <- function(groups) {
+    if (is.null(match.call(expand.dots = FALSE)[["groups"]])) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'groups' must be defined")
+    }
     if (groups != 1 && groups != 2) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'groups' (", groups, ") must be 1 or 2")
     }
@@ -1315,7 +1321,7 @@ NULL
     return(TRUE)
 }
 
-.warnInCaseOfUnknownArguments <- function(..., functionName, ignore = c(),
+.warnInCaseOfUnknownArguments <- function(..., functionName, ignore = character(0),
         numberOfAllowedUnnamedParameters = 0, exceptionEnabled = FALSE) {
     args <- list(...)
     if (length(args) == 0) {

@@ -13,290 +13,36 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6802 $
-## |  Last changed: $Date: 2023-02-07 17:07:25 +0100 (Di, 07 Feb 2023) $
+## |  File version: $Revision: 6860 $
+## |  Last changed: $Date: 2023-03-09 16:32:36 +0100 (Do, 09 Mrz 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-.getTestStatisticsRates <- function(...,
-        designNumber,
-        informationRates,
-        groups,
-        normalApproximation,
-        riskRatio,
-        thetaH0,
-        directionUpper,
-        eventsPerStage,
-        sampleSizesPerStage,
-        testStatisticsPerStage) {
-    stage <- ncol(sampleSizesPerStage)
-
-    if (groups == 1) {
-        stagewiseRates <- eventsPerStage[, stage] / sampleSizesPerStage[, stage]
-        overallRate <- sum(eventsPerStage[, 1:stage]) / sum(sampleSizesPerStage[, 1:stage])
-    } else {
-        stagewiseRates <- eventsPerStage[, stage] / sampleSizesPerStage[, stage]
-        if (stage == 1) {
-            overallRate <- eventsPerStage[, 1] / sampleSizesPerStage[, 1]
-        } else {
-            overallRate <- rowSums(eventsPerStage[, 1:stage]) / rowSums(sampleSizesPerStage[, 1:stage])
-        }
-    }
-
-    if (designNumber == 1L) {
-        n1 <- sum(sampleSizesPerStage[1, ])
-        e1 <- sum(eventsPerStage[1, ])
-        r1 <- e1 / n1
-        if (groups == 1) {
-            if (!normalApproximation) {
-                if (directionUpper) {
-                    value <- .getOneMinusQNorm(stats::pbinom(e1 - 1,
-                        n1, thetaH0,
-                        lower.tail = FALSE
-                    ))
-                } else {
-                    value <- .getOneMinusQNorm(stats::pbinom(e1,
-                        n1, thetaH0,
-                        lower.tail = TRUE
-                    ))
-                }
-            } else {
-                value <- (r1 - thetaH0) / sqrt(thetaH0 * (1 - thetaH0)) * sqrt(n1)
-            }
-        } else {
-            n2 <- sum(sampleSizesPerStage[2, ])
-            e2 <- sum(eventsPerStage[2, ])
-            r2 <- e2 / n2
-            if (!normalApproximation) {
-                if (directionUpper) {
-                    value <- .getOneMinusQNorm(stats::phyper(e1 - 1, e1 + e2,
-                        n1 + n2 - e1 - e2, n1,
-                        lower.tail = FALSE
-                    ))
-                } else {
-                    value <- .getOneMinusQNorm(stats::phyper(e1, e1 + e2,
-                        n1 + n2 - e1 - e2, n1,
-                        lower.tail = TRUE
-                    ))
-                }
-            } else {
-                if (!riskRatio) {
-                    if (r1 - r2 - thetaH0 == 0) {
-                        value <- 0
-                    } else {
-                        fm <- .getFarringtonManningValuesDiff(
-                            rate1 = r1, rate2 = r2,
-                            theta = thetaH0, allocation = n1 / n2
-                        )
-                        value <- (r1 - r2 - thetaH0) /
-                            sqrt(fm[1] * (1 - fm[1]) / n1 + fm[2] * (1 - fm[2]) / n2)
-                    }
-                } else {
-                    if (r1 - r2 * thetaH0 == 0) {
-                        value <- 0
-                    } else {
-                        fm <- .getFarringtonManningValuesRatio(
-                            rate1 = r1, rate2 = r2,
-                            theta = thetaH0, allocation = n1 / n2
-                        )
-                        value <- (r1 - r2 * thetaH0) /
-                            sqrt(fm[1] * (1 - fm[1]) / n1 + thetaH0^2 * fm[2] * (1 - fm[2]) / n2)
-                    }
-                }
-                value <- (2 * directionUpper - 1) * value
-            }
-        }
-
-        pValuesSeparate <- NA_real_
-        testStatisticsPerStage <- NA_real_
-    } else {
-        if (stage == 1) {
-            n1 <- sampleSizesPerStage[1, 1]
-            e1 <- eventsPerStage[1, 1]
-            r1 <- e1 / n1
-            if (groups == 1) {
-                if (!normalApproximation) {
-                    if (directionUpper) {
-                        testStatisticsPerStage <- .getOneMinusQNorm(
-                            stats::pbinom(e1 - 1, n1, thetaH0, lower.tail = FALSE)
-                        )
-                    } else {
-                        testStatisticsPerStage <- .getOneMinusQNorm(
-                            stats::pbinom(e1, n1, thetaH0, lower.tail = TRUE)
-                        )
-                    }
-                } else {
-                    testStatisticsPerStage <- (2 * directionUpper - 1) *
-                        (r1 - thetaH0) / sqrt(thetaH0 * (1 - thetaH0)) * sqrt(n1)
-                }
-            } else {
-                n2 <- sampleSizesPerStage[2, 1]
-                e2 <- eventsPerStage[2, 1]
-                r2 <- e2 / n2
-                if (!normalApproximation) {
-                    if (directionUpper) {
-                        testStatisticsPerStage <- .getOneMinusQNorm(stats::phyper(
-                            e1 - 1, e1 + e2, n1 + n2 - e1 - e2, n1,
-                            lower.tail = FALSE
-                        ))
-                    } else {
-                        testStatisticsPerStage <- .getOneMinusQNorm(stats::phyper(
-                            e1, e1 + e2, n1 + n2 - e1 - e2, n1,
-                            lower.tail = TRUE
-                        ))
-                    }
-                } else {
-                    if (!riskRatio) {
-                        if (r1 - r2 - thetaH0 == 0) {
-                            testStatisticsPerStage <- 0
-                        } else {
-                            fm <- .getFarringtonManningValuesDiff(
-                                rate1 = r1, rate2 = r2, theta = thetaH0, allocation = n1 / n2
-                            )
-                            testStatisticsPerStage <- (2 * directionUpper - 1) *
-                                (r1 - r2 - thetaH0) / sqrt(fm[1] * (1 - fm[1]) / n1 + fm[2] * (1 - fm[2]) / n2)
-                        }
-                    } else {
-                        if (r1 - r2 * thetaH0 == 0) {
-                            testStatisticsPerStage <- 0
-                        } else {
-                            fm <- .getFarringtonManningValuesRatio(
-                                rate1 = r1,
-                                rate2 = r2, theta = thetaH0, allocation = n1 / n2
-                            )
-                            testStatisticsPerStage <- (2 * directionUpper - 1) *
-                                (r1 - r2 * thetaH0) / sqrt(fm[1] *
-                                    (1 - fm[1]) / n1 + thetaH0^2 * fm[2] * (1 - fm[2]) / n2)
-                        }
-                    }
-                }
-            }
-        } else {
-            n1 <- sampleSizesPerStage[1, stage]
-            e1 <- eventsPerStage[1, stage]
-            r1 <- e1 / n1
-            if (groups == 1) {
-                if (!normalApproximation) {
-                    if (directionUpper) {
-                        testStatisticsPerStage <- c(
-                            testStatisticsPerStage,
-                            .getOneMinusQNorm(stats::pbinom(e1 - 1, n1, thetaH0, lower.tail = FALSE))
-                        )
-                    } else {
-                        testStatisticsPerStage <- c(
-                            testStatisticsPerStage,
-                            .getOneMinusQNorm(stats::pbinom(e1, n1, thetaH0, lower.tail = TRUE))
-                        )
-                    }
-                } else {
-                    testStatisticsPerStage <- c(
-                        testStatisticsPerStage,
-                        (2 * directionUpper - 1) * (r1 - thetaH0) / sqrt(thetaH0 * (1 - thetaH0)) * sqrt(n1)
-                    )
-                }
-            } else {
-                n2 <- sampleSizesPerStage[2, stage]
-                e2 <- eventsPerStage[2, stage]
-                r2 <- e2 / n2
-                if (!normalApproximation) {
-                    if (directionUpper) {
-                        testStatisticsPerStage <- c(
-                            testStatisticsPerStage,
-                            .getOneMinusQNorm(stats::phyper(e1 - 1, e1 + e2, n1 + n2 - e1 - e2, n1, lower.tail = FALSE))
-                        )
-                    } else {
-                        testStatisticsPerStage <- c(
-                            testStatisticsPerStage,
-                            .getOneMinusQNorm(stats::phyper(e1, e1 + e2, n1 + n2 - e1 - e2, n1, lower.tail = TRUE))
-                        )
-                    }
-                } else {
-                    if (!riskRatio) {
-                        if (r1 - r2 - thetaH0 == 0) {
-                            testStatisticsPerStage <- c(testStatisticsPerStage, 0)
-                        } else {
-                            fm <- .getFarringtonManningValuesDiff(
-                                rate1 = r1, rate2 = r2, theta = thetaH0, allocation = n1 / n2
-                            )
-                            testStatisticsPerStage <- c(testStatisticsPerStage, (2 * directionUpper - 1) *
-                                (r1 - r2 - thetaH0) / sqrt(fm[1] * (1 - fm[1]) / n1 + fm[2] * (1 - fm[2]) / n2))
-                        }
-                    } else {
-                        if (r1 - r2 * thetaH0 == 0) {
-                            testStatisticsPerStage <- c(testStatisticsPerStage, 0)
-                        } else {
-                            fm <- .getFarringtonManningValuesRatio(
-                                rate1 = r1, rate2 = r2, theta = thetaH0, allocation = n1 / n2
-                            )
-                            testStatisticsPerStage <- c(testStatisticsPerStage, (2 * directionUpper - 1) *
-                                (r1 - r2 * thetaH0) / sqrt(fm[1] * (1 - fm[1]) /
-                                    n1 + thetaH0^2 * fm[2] * (1 - fm[2]) / n2))
-                        }
-                    }
-                }
-            }
-        }
-
-        if (designNumber == 2L) {
-            if (stage == 1) {
-                value <- testStatisticsPerStage
-            } else {
-                value <- (sqrt(informationRates[1]) * testStatisticsPerStage[1] +
-                    sqrt(informationRates[2:stage] - informationRates[1:(stage - 1)]) %*%
-                    testStatisticsPerStage[2:stage]) / sqrt(informationRates[stage])
-            }
-        } else if (designNumber == 3L) {
-            if (stage == 1) {
-                value <- 1 - pnorm(testStatisticsPerStage)
-            } else {
-                weightsFisher <- rep(NA_real_, stage)
-                weightsFisher[1] <- 1
-                if (stage > 1) {
-                    weightsFisher[2:stage] <- sqrt(informationRates[2:stage] -
-                        informationRates[1:(stage - 1)]) / sqrt(informationRates[1])
-                }
-                value <- prod((1 - pnorm(testStatisticsPerStage[1:stage]))^weightsFisher[1:stage])
-            }
-        }
-
-        pValuesSeparate <- 1 - pnorm(testStatisticsPerStage)
-    }
-
-    return(list(
-        value = value,
-        stagewiseRates = stagewiseRates,
-        overallRate = overallRate,
-        sampleSizesPerStage = sampleSizesPerStage,
-        testStatisticsPerStage = testStatisticsPerStage,
-        pValuesSeparate = pValuesSeparate
-    ))
-}
-
 .getSimulationRatesStageSubjects <- function(..., 
-        stage,
-        riskRatio,
-        thetaH0,
-        groups,
-        plannedSubjects,
-        directionUpper,
-        allocationRatioPlanned,
-        minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage,
-        sampleSizesPerStage,
-        conditionalPower,
-        conditionalCriticalValue,
-        overallRate,
-        farringtonManningValue1,
-        farringtonManningValue2) {
+    stage,
+    riskRatio,
+    thetaH0,
+    groups,
+    plannedSubjects,
+    directionUpper,
+    allocationRatioPlanned,
+    minNumberOfSubjectsPerStage,
+    maxNumberOfSubjectsPerStage,
+    sampleSizesPerStage,
+    conditionalPower,
+    conditionalCriticalValue,
+    overallRate,
+    farringtonManningValue1,
+    farringtonManningValue2) {
     if (is.na(conditionalPower)) {
         return(plannedSubjects[stage] - plannedSubjects[stage - 1])
     }
-
+    
     if (groups == 1) {
         stageSubjects <-
             (max(0, conditionalCriticalValue * sqrt(thetaH0 * (1 - thetaH0)) +
-                .getQNorm(conditionalPower) * sqrt(overallRate[1] * (1 - overallRate[1]))))^2 /
-                (max(1e-12, (2 * directionUpper - 1) * (overallRate[1] - thetaH0)))^2
+                        .getQNorm(conditionalPower) * sqrt(overallRate[1] * (1 - overallRate[1]))))^2 /
+            (max(1e-12, (2 * directionUpper - 1) * (overallRate[1] - thetaH0)))^2
     } else {
         mult <- 1
         corr <- thetaH0
@@ -305,446 +51,16 @@
             corr <- 0
         }
         stageSubjects <- (1 + 1 / allocationRatioPlanned[stage]) * (max(0, conditionalCriticalValue *
-            sqrt(farringtonManningValue1 * (1 - farringtonManningValue1) +
-                farringtonManningValue2 * (1 - farringtonManningValue2) * allocationRatioPlanned[stage] * mult^2) +
-            .getQNorm(conditionalPower) * sqrt(overallRate[1] * (1 - overallRate[1]) + overallRate[2] *
-                (1 - overallRate[2]) * allocationRatioPlanned[stage] * mult^2)))^2 /
+                        sqrt(farringtonManningValue1 * (1 - farringtonManningValue1) +
+                                farringtonManningValue2 * (1 - farringtonManningValue2) * allocationRatioPlanned[stage] * mult^2) +
+                        .getQNorm(conditionalPower) * sqrt(overallRate[1] * (1 - overallRate[1]) + overallRate[2] *
+                                (1 - overallRate[2]) * allocationRatioPlanned[stage] * mult^2)))^2 /
             (max(1e-12, (2 * directionUpper - 1) * (overallRate[1] - mult * overallRate[2] - corr)))^2
     }
     stageSubjects <- ceiling(min(max(minNumberOfSubjectsPerStage[stage], stageSubjects), maxNumberOfSubjectsPerStage[stage]))
     
     return(stageSubjects)
 }
-
-.getSimulationStepRates <- function(...,
-        k,
-        kMax,
-        designNumber,
-        informationRates,
-        futilityBounds,
-        alpha0Vec,
-        criticalValues,
-        riskRatio,
-        thetaH0,
-        pi1,
-        pi2,
-        groups,
-        normalApproximation,
-        plannedSubjects,
-        directionUpper,
-        allocationRatioPlanned,
-        minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage,
-        conditionalPower,
-        pi1H1,
-        pi2H1,
-        sampleSizesPerStage,
-        eventsPerStage,
-        testStatisticsPerStage,
-        testStatistic,
-        calcSubjectsFunction) {
-    stageSubjects <- plannedSubjects[1]
-
-    # perform sample size recalculation for stages 2, ..., kMax
-    simulatedConditionalPower <- 0
-    conditionalCriticalValue <- NA_real_
-    if (k > 1) {
-        # used effect size is either estimated from test statistic or pre-fixed
-        overallRate <- testStatistic$overallRate
-        if (!is.na(pi1H1)) {
-            overallRate[1] <- pi1H1
-        }
-        if (groups == 2 && !is.na(pi2H1)) {
-            overallRate[2] <- pi2H1
-        }
-
-        # conditional critical value to reject the null hypotheses at the next stage of the trial
-        if (designNumber == 3L) {
-            conditionalCriticalValue <- .getOneMinusQNorm((criticalValues[k] /
-                testStatistic$value)^(1 / sqrt((informationRates[k] -
-                informationRates[k - 1]) / informationRates[1])))
-        } else {
-            if (criticalValues[k] >= 6) {
-                conditionalCriticalValue <- Inf
-            } else {
-                conditionalCriticalValue <- (criticalValues[k] *
-                    sqrt(informationRates[k]) - testStatistic$value * sqrt(informationRates[k - 1])) /
-                    sqrt(informationRates[k] - informationRates[k - 1])
-            }
-        }
-
-        if (groups == 2) {
-            if (!riskRatio) {
-                fm <- .getFarringtonManningValuesDiff(
-                    rate1 = overallRate[1], rate2 = overallRate[2],
-                    theta = thetaH0, allocation = allocationRatioPlanned[k]
-                )
-            } else {
-                fm <- .getFarringtonManningValuesRatio(
-                    rate1 = overallRate[1], rate2 = overallRate[2],
-                    theta = thetaH0, allocation = allocationRatioPlanned[k]
-                )
-            }
-        }
-
-        stageSubjects <- calcSubjectsFunction(
-            stage = k,
-            riskRatio = riskRatio,
-            thetaH0 = thetaH0,
-            groups = groups,
-            plannedSubjects = plannedSubjects,
-            directionUpper = directionUpper,
-            allocationRatioPlanned = allocationRatioPlanned,
-            minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage,
-            maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage,
-            sampleSizesPerStage = sampleSizesPerStage,
-            conditionalPower = conditionalPower,
-            overallRate = overallRate,
-            conditionalCriticalValue = conditionalCriticalValue,
-            farringtonManningValue1 = fm[1],
-            farringtonManningValue2 = fm[2]
-        )
-
-        # calculate conditional power for selected stageSubjects
-        if (groups == 1) {
-            if (overallRate[1] * (1 - overallRate[1]) == 0) {
-                theta <- 0
-            } else {
-                theta <- (overallRate[1] - thetaH0) / sqrt(overallRate[1] * (1 - overallRate[1])) +
-                    sign(overallRate[1] - thetaH0) * conditionalCriticalValue *
-                        (1 - sqrt(thetaH0 * (1 - thetaH0) / (overallRate[1] * (1 - overallRate[1])))) /
-                        sqrt(stageSubjects)
-            }
-        } else {
-            if (overallRate[1] * (1 - overallRate[1]) + overallRate[2] * (1 - overallRate[2]) == 0) {
-                theta <- 0
-            } else {
-                if (!riskRatio) {
-                    theta <- sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k]) * (
-                        (overallRate[1] - overallRate[2] - thetaH0) * sqrt(1 + allocationRatioPlanned[k]) /
-                            sqrt(overallRate[1] * (1 - overallRate[1]) + allocationRatioPlanned[k] *
-                                overallRate[2] * (1 - overallRate[2]))
-                            + sign(overallRate[1] - overallRate[2] - thetaH0) * conditionalCriticalValue *
-                                (1 - sqrt(fm[1] * (1 - fm[1]) + allocationRatioPlanned[k] *
-                                    fm[2] * (1 - fm[2])) / sqrt(overallRate[1] * (1 - overallRate[1]) +
-                                    allocationRatioPlanned[k] * overallRate[2] * (1 - overallRate[2]))) *
-                                (1 + allocationRatioPlanned[k]) / sqrt(allocationRatioPlanned[k] * stageSubjects)
-                    )
-                } else {
-                    theta <- sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k]) * (
-                        (overallRate[1] - thetaH0 * overallRate[2]) * sqrt(1 + allocationRatioPlanned[k]) /
-                            sqrt(overallRate[1] * (1 - overallRate[1]) + allocationRatioPlanned[k] *
-                                thetaH0^2 * overallRate[2] * (1 - overallRate[2])) +
-                            sign(overallRate[1] - thetaH0 * overallRate[2]) * conditionalCriticalValue *
-                                (1 - sqrt(fm[1] * (1 - fm[1]) + allocationRatioPlanned[k] * thetaH0^2 *
-                                    fm[2] * (1 - fm[2])) / sqrt(overallRate[1] * (1 - overallRate[1]) +
-                                    allocationRatioPlanned[k] * thetaH0^2 * overallRate[2] * (1 - overallRate[2]))) *
-                                (1 + allocationRatioPlanned[k]) / sqrt(allocationRatioPlanned[k] * stageSubjects))
-                }
-            }
-        }
-        if (!directionUpper) {
-            theta <- -theta
-        }
-        simulatedConditionalPower <-
-            1 - stats::pnorm(conditionalCriticalValue - theta * sqrt(stageSubjects))
-    }
-
-    # simulate events with achieved sample size
-    if (groups == 1) {
-        n1 <- stageSubjects
-        eventsPerStage <- cbind(eventsPerStage, matrix(c(stats::rbinom(1, n1, pi1)), nrow = 1))
-        sampleSizesPerStage <- cbind(sampleSizesPerStage, matrix(n1, nrow = 1))
-    } else {
-        n1 <- ceiling(allocationRatioPlanned[k] * stageSubjects / (1 + allocationRatioPlanned[k]))
-        n2 <- stageSubjects - n1
-        eventsPerStage <- cbind(
-            eventsPerStage,
-            matrix(c(stats::rbinom(1, n1, pi1), stats::rbinom(1, n2, pi2)), nrow = 2)
-        )
-        sampleSizesPerStage <- cbind(sampleSizesPerStage, matrix(c(n1, n2), nrow = 2))
-    }
-
-    testStatistic <- .getTestStatisticsRates(
-        designNumber = designNumber,
-        informationRates = informationRates,
-        groups = groups, normalApproximation = normalApproximation,
-        riskRatio = riskRatio, thetaH0 = thetaH0,
-        directionUpper = directionUpper, eventsPerStage = eventsPerStage,
-        sampleSizesPerStage = sampleSizesPerStage,
-        testStatisticsPerStage = testStatisticsPerStage
-    )
-    testStatisticsPerStage <- c(testStatisticsPerStage, testStatistic$testStatisticsPerStage[k])
-
-    simulatedRejections <- 0
-    simulatedFutilityStop <- 0
-    trialStop <- FALSE
-    if (k == kMax) {
-        trialStop <- TRUE
-    }
-    if (designNumber <= 2) {
-        if (!is.na(testStatistic$value) && !is.na(criticalValues[k]) &&
-                testStatistic$value >= criticalValues[k]) {
-            simulatedRejections <- 1
-            trialStop <- TRUE
-        }
-        if (!is.na(testStatistic$value) && !is.na(futilityBounds[k]) &&
-                k < kMax && testStatistic$value <= futilityBounds[k]) {
-            simulatedFutilityStop <- 1
-            trialStop <- TRUE
-        }
-    } else {
-        if (!is.na(testStatistic$value) && !is.na(criticalValues[k]) &&
-                testStatistic$value <= criticalValues[k]) {
-            simulatedRejections <- 1
-            trialStop <- TRUE
-        }
-        if (!is.na(testStatistic$pValuesSeparate[k]) && !is.na(alpha0Vec[k]) &&
-                k < kMax && testStatistic$pValuesSeparate[k] >= alpha0Vec[k]) {
-            simulatedFutilityStop <- 1
-            trialStop <- TRUE
-        }
-    }
-
-    return(list(
-        trialStop = trialStop,
-        sampleSizesPerStage = sampleSizesPerStage,
-        eventsPerStage = eventsPerStage,
-        testStatisticsPerStage = testStatisticsPerStage,
-        testStatistic = testStatistic,
-        simulatedSubjects = stageSubjects,
-        simulatedRejections = simulatedRejections,
-        simulatedFutilityStop = simulatedFutilityStop,
-        simulatedConditionalPower = simulatedConditionalPower
-    ))
-}
-
-.getSimulationRatesLoop <- function(kMax,
-        informationRates,
-        criticalValues,
-        pi1,
-        pi2,
-        maxNumberOfIterations,
-        designNumber,
-        groups,
-        futilityBounds,
-        alpha0Vec,
-        minNumberOfSubjectsPerStage,
-        maxNumberOfSubjectsPerStage,
-        conditionalPower,
-        pi1H1,
-        pi2H1,
-        normalApproximation,
-        plannedSubjects,
-        directionUpper,
-        allocationRatioPlanned,
-        riskRatio,
-        thetaH0,
-        calcSubjectsFunctionType,
-        calcSubjectsFunctionR,
-        calcSubjectsFunctionCpp) {
-    len <- length(pi1) * maxNumberOfIterations * kMax
-    dataIterationNumber <- rep(NA_real_, len)
-    dataStageNumber <- rep(NA_real_, len)
-    dataPi1 <- rep(NA_real_, len)
-    dataPi2 <- rep(pi2, len)
-    dataNumberOfSubjects <- rep(NA_real_, len)
-    dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
-    dataRejectPerStage <- rep(NA_real_, len)
-    dataFutilityPerStage <- rep(NA_real_, len)
-    dataTestStatistic <- rep(NA_real_, len)
-    dataTestStatisticsPerStage <- rep(NA_real_, len)
-    dataOverallRate1 <- rep(NA_real_, len)
-    dataOverallRate2 <- rep(NA_real_, len)
-    dataStagewiseRates1 <- rep(NA_real_, len)
-    dataStagewiseRates2 <- rep(NA_real_, len)
-    dataSampleSizesPerStage1 <- rep(NA_real_, len)
-    dataSampleSizesPerStage2 <- rep(NA_real_, len)
-    dataTrialStop <- rep(NA, len)
-    dataConditionalPowerAchieved <- rep(NA_real_, len)
-    if (designNumber != 1L) {
-        dataPValuesSeparate <- rep(NA_real_, len)
-    }
-
-    cols <- length(pi1)
-    sampleSizes <- matrix(0, nrow = kMax, ncol = cols)
-    rejectPerStage <- matrix(0, nrow = kMax, ncol = cols)
-    overallReject <- rep(0, cols)
-    futilityPerStage <- matrix(0, kMax - 1, cols)
-    futilityStop <- rep(0, cols)
-    iterations <- matrix(0, nrow = kMax, ncol = cols)
-    expectedNumberOfSubjects <- rep(0, cols)
-    conditionalPowerAchieved <- matrix(NA_real_, nrow = kMax, ncol = cols)
-
-    index <- 1
-    for (i in 1:length(pi1)) {
-        simulatedSubjects <- rep(0, kMax)
-        simulatedOverallSubjects <- rep(0, kMax)
-        simulatedRejections <- rep(0, kMax)
-        simulatedFutilityStop <- rep(0, kMax - 1)
-        simulatedOverallSubjects <- 0
-        simulatedConditionalPower <- rep(0, kMax)
-
-        for (j in 1:maxNumberOfIterations) {
-            trialStop <- FALSE
-            sampleSizesPerStage <- matrix(rep(numeric(0), 2), nrow = groups)
-            eventsPerStage <- matrix(rep(numeric(0), 2), nrow = groups)
-            testStatisticsPerStage <- c()
-            testStatistic <- NULL
-
-            for (k in 1:kMax) {
-                if (!trialStop) {
-                    stepResult <- .getSimulationStepRates(
-                        k = k,
-                        kMax = kMax,
-                        designNumber = designNumber,
-                        informationRates = informationRates,
-                        futilityBounds = futilityBounds,
-                        alpha0Vec = alpha0Vec,
-                        criticalValues = criticalValues,
-                        riskRatio = riskRatio,
-                        thetaH0 = thetaH0,
-                        pi1 = pi1[i],
-                        pi2 = pi2,
-                        groups = groups,
-                        normalApproximation = normalApproximation,
-                        plannedSubjects = plannedSubjects,
-                        directionUpper = directionUpper,
-                        allocationRatioPlanned = allocationRatioPlanned,
-                        minNumberOfSubjectsPerStage = minNumberOfSubjectsPerStage,
-                        maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage,
-                        conditionalPower = conditionalPower,
-                        pi1H1 = pi1H1,
-                        pi2H1 = pi2H1,
-                        sampleSizesPerStage = sampleSizesPerStage,
-                        eventsPerStage = eventsPerStage,
-                        testStatisticsPerStage = testStatisticsPerStage,
-                        testStatistic = testStatistic,
-                        calcSubjectsFunction = calcSubjectsFunctionR
-                    )
-
-                    trialStop <- stepResult$trialStop
-                    sampleSizesPerStage <- stepResult$sampleSizesPerStage
-                    eventsPerStage <- stepResult$eventsPerStage
-                    testStatisticsPerStage <- stepResult$testStatisticsPerStage
-                    testStatistic <- stepResult$testStatistic
-
-                    simulatedSubjectsStep <- stepResult$simulatedSubjects
-                    simulatedRejectionsStep <- stepResult$simulatedRejections
-                    simulatedFutilityStopStep <- stepResult$simulatedFutilityStop
-                    simulatedConditionalPowerStep <- NA_real_
-                    if (k > 1) {
-                        simulatedConditionalPowerStep <- stepResult$simulatedConditionalPower
-                    }
-                    iterations[k, i] <- iterations[k, i] + 1
-                    simulatedSubjects[k] <- simulatedSubjects[k] + simulatedSubjectsStep
-                    simulatedRejections[k] <- simulatedRejections[k] + simulatedRejectionsStep
-                    if (k < kMax) {
-                        simulatedFutilityStop[k] <- simulatedFutilityStop[k] + simulatedFutilityStopStep
-                    }
-                    simulatedConditionalPower[k] <- simulatedConditionalPower[k] +
-                        simulatedConditionalPowerStep
-
-                    dataIterationNumber[index] <- j
-                    dataStageNumber[index] <- k
-                    dataPi1[index] <- pi1[i]
-                    dataNumberOfSubjects[index] <- simulatedSubjectsStep
-                    dataNumberOfCumulatedSubjects[index] <- sum(sampleSizesPerStage[, ])
-                    dataRejectPerStage[index] <- simulatedRejectionsStep
-                    dataFutilityPerStage[index] <- simulatedFutilityStopStep
-                    dataTestStatistic[index] <- testStatistic$value
-                    dataTestStatisticsPerStage[index] <- testStatisticsPerStage[k]
-                    dataOverallRate1[index] <- testStatistic$overallRate[1]
-                    dataStagewiseRates1[index] <- testStatistic$stagewiseRates[1]
-                    dataSampleSizesPerStage1[index] <- testStatistic$sampleSizesPerStage[1, k]
-                    if (length(testStatistic$stagewiseRates) > 1) {
-                        dataOverallRate2[index] <- testStatistic$overallRate[2]
-                        dataStagewiseRates2[index] <- testStatistic$stagewiseRates[2]
-                        dataSampleSizesPerStage2[index] <- testStatistic$sampleSizesPerStage[2, k]
-                    } else {
-                        dataStagewiseRates2[index] <- NA_real_
-                        dataOverallRate2[index] <- NA_real_
-                        dataSampleSizesPerStage2[index] <- NA_real_
-                    }
-                    dataTrialStop[index] <- trialStop
-                    dataConditionalPowerAchieved[index] <- simulatedConditionalPowerStep
-                    if (designNumber != 1L) {
-                        dataPValuesSeparate[index] <- testStatistic$pValuesSeparate[k]
-                    }
-                    index <- index + 1
-                }
-            }
-        }
-
-        simulatedOverallSubjects <- sum(simulatedSubjects[1:k])
-
-        sampleSizes[, i] <- simulatedSubjects / iterations[, i]
-        rejectPerStage[, i] <- simulatedRejections / maxNumberOfIterations
-        overallReject[i] <- sum(simulatedRejections / maxNumberOfIterations)
-        futilityPerStage[, i] <- simulatedFutilityStop / maxNumberOfIterations
-        futilityStop[i] <- sum(simulatedFutilityStop / maxNumberOfIterations)
-        expectedNumberOfSubjects[i] <- simulatedOverallSubjects / maxNumberOfIterations
-        if (kMax > 1) {
-            conditionalPowerAchieved[2:kMax, i] <-
-                simulatedConditionalPower[2:kMax] / iterations[2:kMax, i]
-        }
-    }
-
-    sampleSizes[is.na(sampleSizes)] <- 0
-
-    data <- data.frame(
-        iterationNumber = dataIterationNumber,
-        stageNumber = dataStageNumber,
-        pi1 = dataPi1,
-        pi2 = dataPi2,
-        numberOfSubjects = dataNumberOfSubjects,
-        numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,
-        rejectPerStage = dataRejectPerStage,
-        futilityPerStage = dataFutilityPerStage,
-        testStatistic = dataTestStatistic,
-        testStatisticsPerStage = dataTestStatisticsPerStage,
-        overallRate1 = dataOverallRate1,
-        overallRate2 = dataOverallRate2,
-        stagewiseRates1 = dataStagewiseRates1,
-        stagewiseRates2 = dataStagewiseRates2,
-        sampleSizesPerStage1 = dataSampleSizesPerStage1,
-        sampleSizesPerStage2 = dataSampleSizesPerStage2,
-        trialStop = dataTrialStop,
-        conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6)
-    )
-    if (designNumber != 1L) {
-        data$pValue <- dataPValuesSeparate
-    }
-    data <- data[!is.na(data$pi1), ]
-
-    earlyStop <- rep(0, length(pi1))
-    if (kMax > 1) {
-        if (length(pi1) == 1) {
-            earlyStop <- sum(futilityPerStage) + sum(rejectPerStage[1:(kMax - 1)])
-        } else {
-            if (kMax > 2) {
-                rejectPerStageColSum <- colSums(rejectPerStage[1:(kMax - 1), ])
-            } else {
-                rejectPerStageColSum <- rejectPerStage[1, ]
-            }
-            earlyStop <- colSums(futilityPerStage) + rejectPerStageColSum
-        }
-    }
-
-    return(list(
-        sampleSizes = sampleSizes,
-        iterations = iterations,
-        rejectPerStage = rejectPerStage,
-        overallReject = overallReject,
-        futilityPerStage = futilityPerStage,
-        futilityStop = futilityStop,
-        expectedNumberOfSubjects = expectedNumberOfSubjects,
-        conditionalPowerAchieved = conditionalPowerAchieved,
-        earlyStop = earlyStop,
-        data = data
-    ))
-}
-
 
 #' @title
 #' Get Simulation Rates
@@ -883,14 +199,14 @@ getSimulationRates <- function(design = NULL, ...,
             functionName = "getSimulationRates",
             ignore = c(
                 .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE),
-                "showStatistics", "cppEnabled"
+                "showStatistics"
             ), ...
         )
     } else {
         .assertIsTrialDesign(design)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationRates",
-            ignore = c("showStatistics", "cppEnabled"), ...
+            ignore = c("showStatistics"), ...
         )
         .warnInCaseOfTwoSidedPowerArgument(...)
     }
@@ -1148,20 +464,17 @@ getSimulationRates <- function(design = NULL, ...,
         futilityBounds <- design$futilityBounds
     }
 
-    cppEnabled <- .getOptionalArgument("cppEnabled", ..., optionalArgumentDefaultValue = TRUE)
     calcSubjectsFunctionList <- .getCalcSubjectsFunction(
         design = design,
         simulationResults = simulationResults,
         calcFunction = calcSubjectsFunction,
-        expectedFunction = .getSimulationRatesStageSubjects,
-        cppEnabled = cppEnabled
+        expectedFunction = .getSimulationRatesStageSubjects
     )
     calcSubjectsFunctionType <- calcSubjectsFunctionList$calcSubjectsFunctionType
     calcSubjectsFunctionR <- calcSubjectsFunctionList$calcSubjectsFunctionR
     calcSubjectsFunctionCpp <- calcSubjectsFunctionList$calcSubjectsFunctionCpp
     
-    fun <- if (cppEnabled) getSimulationRatesCpp else .getSimulationRatesLoop
-    cppResult <- fun(
+    cppResult <- getSimulationRatesCpp(
         kMax                        = design$kMax,
         informationRates            = design$informationRates,
         criticalValues              = design$criticalValues,

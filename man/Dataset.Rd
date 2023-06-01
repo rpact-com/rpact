@@ -11,8 +11,9 @@ Basic class for datasets.
 \code{Dataset} is the basic class for
 \itemize{
 \item \code{\link{DatasetMeans}},
-\item \code{\link{DatasetRates}}, and
-\item \code{\link{DatasetSurvival}}.
+\item \code{\link{DatasetRates}},
+\item \code{\link{DatasetSurvival}}, and
+\item \code{\link{DatasetEnrichmentSurvival}}.
 }
 This basic class contains the fields \code{stages} and \code{groups} and several commonly used
 functions.
@@ -20,9 +21,9 @@ functions.
 \section{Fields}{
 
 \describe{
-\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{groups}}{The group numbers. Is an integer vector of length number of stages times number of groups.}
+\item{\code{groups}}{The group numbers. Is a numeric vector of length number of stages times number of groups.}
 }}
 
 

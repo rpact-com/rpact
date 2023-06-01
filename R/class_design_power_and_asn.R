@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 6862 $
+## |  Last changed: $Date: 2023-03-10 08:37:03 +0100 (Fr, 10 Mrz 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -30,6 +30,14 @@
 #' 
 #' @template field_nMax
 #' @template field_theta
+#' @template field_averageSampleNumber
+#' @template field_calculatedPower
+#' @template field_overallEarlyStop
+#' @template field_earlyStop
+#' @template field_overallReject
+#' @template field_rejectPerStage
+#' @template field_overallFutility
+#' @template field_futilityPerStage
 #'
 #' @details
 #' This object cannot be created directly; use \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}

@@ -13,45 +13,63 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 7019 $
+## |  Last changed: $Date: 2023-05-31 07:23:47 +0200 (Mi, 31 Mai 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
+
 #'
-#' @title 
+#' @title
 #' Get Performance Score
-#' 
+#'
 #' @description
-#' Calculates the performance score for a given simulation result.
-#' 
+#' Calculates the conditional performance score, its sub-scores and components according to 
+#' Herrmann et al. (2020) for a given simulation result from a two-stage design. 
+#' Larger (sub-)score and component values refer to a better performance.
+#'
 #' @param simulationResult A simulation result.
 #'
+#' @details
+#' The conditional performance score consists of two sub-scores, one for the sample size 
+#' (subscoreSampleSize) and one for the conditional power (subscoreConditionalPower).
+#' Each of those are composed of a location (locationSampleSize, locationConditionalPower) 
+#' and variation component (variationSampleSize, variationConditionalPower).
+#' The term conditional refers to an evaluation perspective where the interim results 
+#' suggest a trial continuation with a second stage.
+#' The score can take values between 0 and 1. More details on the performance score
+#' can be found in Herrmann et al. (2020).
+#'
 #' @author Stephen Schüürhuis
-#' 
+#'
 #' @keywords internal
 #'
-#' @export 
-#' 
+#' @export
+#'
 getPerformanceScore <- function(simulationResult) {
     .assertIsSimulationResults(simulationResult)
 
     design <- simulationResult$.design
 
-    if (!inherits(simulationResult, "SimulationResultsMeans")) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "performance score so far only implemented for continuous endpoints")
+    if (!inherits(simulationResult, "SimulationResultsMeans") && 
+            !inherits(simulationResult, "SimulationResultsRates")) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "performance score so far only implemented for continuous and binary endpoints"
+        )
     }
     if (!design$bindingFutility) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "performance score so far only implemented for binding futility boundaries")
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "performance score so far only implemented for binding futility boundaries"
+        )
     }
     if (design$kMax != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "performance score so far only implemented for two-stage designs")
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "performance score so far only implemented for two-stage designs"
+        )
     }
-
-    alternative <- simulationResult$alternative
 
     # initialize necessary sample size values
     plannedSubjects <- simulationResult$plannedSubjects
@@ -60,35 +78,66 @@ getPerformanceScore <- function(simulationResult) {
         simulationResult$maxNumberOfSubjectsPerStage[2]
     )
 
+    # number of iterations
     iterations <- simulationResult$maxNumberOfIterations
 
+    # target CP
     targetConditionalPower <- ifelse(is.na(simulationResult$conditionalPower),
         1 - design$beta,
         simulationResult$conditionalPower
     )
-
-    fixedDesign <- getDesignGroupSequential(
-        kMax = 1,
-        alpha = design$alpha,
-        beta = design$beta
+    args <- list(
+        design = getDesignGroupSequential(
+            kMax = 1,
+            alpha = design$alpha,
+            beta = design$beta
+        ),
+        thetaH0 = 0,
+        normalApproximation = TRUE,
+        groups = simulationResult$groups
     )
-    simulatedData <- simulationResult$.data
-    resultMatrix <- sapply(1:length(alternative), FUN = function(k) {
-        data <- simulatedData[which(simulatedData$alternative == alternative[k]), ]
-
-        # compute sample size necessary for an analogously planned single stage design
-        fixedSampleSizeResult <- getSampleSizeMeans(
-            design = fixedDesign,
-            normalApproximation = simulationResult$normalApproximation,
-            groups = simulationResult$groups,
-            thetaH0 = 0,
-            alternative = alternative[k],
-            stDev = simulationResult$stDev
+    
+    alternativeParamName <- NA_character_
+    referenceValue <- NA_real_
+    
+    # simulated alternative values
+    if (methods::is(simulationResult, "SimulationResultsMeans")) {
+        alternativeParamName <- "alternative"
+        referenceValue <- 0
+    }
+    else if (methods::is(simulationResult, "SimulationResultsRates")) {
+        alternativeParamName <- "pi1"
+        referenceValue <- simulationResult$pi2
+        args$pi2 <- referenceValue
+    }
+    else {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "performance score is not available for class ",
+            class(simulationResult)[1]
         )
-        fixedSampleSize <- as.numeric(fixedSampleSizeResult$numberOfSubjects)
+    }
+    alternativeValues <- simulationResult[[alternativeParamName]]
+    
+    simClass <- class(simulationResult)[1]
+    simData <- simulationResult$.data
+    resultMatrix <- sapply(alternativeValues, FUN = function(alternativeValue) {
+        
+        args[[alternativeParamName]] <- alternativeValue
+        
+        if (alternativeValue == referenceValue) { 
+            singleStageSampleSize <- plannedSubjects[1]
+        }
+        else if (methods::is(simulationResult, "SimulationResultsMeans")) {
+            singleStageSampleSize <- do.call(getSampleSizeMeans, args)$numberOfSubjects
+        }
+        else if (methods::is(simulationResult, "SimulationResultsRates")) {
+            singleStageSampleSize <- do.call(getSampleSizeRates, args)$numberOfSubjects
+        } 
 
         # iterations in which the trial has proceed to stage two
-        secondStageIterations <- data[which(data$stageNumber == 2), ]
+        secondStageIterations <- simData[
+            simData$stageNumber == 2 & simData[[alternativeParamName]] == alternativeValue, ]
 
         # mean and variance estimates for sample size and conditional power
         meanSampleSize <- mean(secondStageIterations$numberOfCumulatedSubjects)
@@ -97,10 +146,10 @@ getPerformanceScore <- function(simulationResult) {
         meanConditionalPower <- mean(secondStageIterations$conditionalPowerAchieved)
         varConditionalPower <- var(secondStageIterations$conditionalPowerAchieved)
 
-        # target sample size: single stage sample size if it doesn't exceed maximum 
-        # admissible sample size, otherwise only first stage sample size
-        targetSampleSize <- ifelse(fixedSampleSize <= maxAdditionalNumberOfSubjects + plannedSubjects[1],
-            fixedSampleSize, plannedSubjects[1]
+        # target sample size: single stage sample size if it doesn't exceed maximum admissible 
+        # sample size, otherwise only first stage sample size
+        targetSampleSize <- ifelse(singleStageSampleSize <= (maxAdditionalNumberOfSubjects + plannedSubjects[1]),
+            singleStageSampleSize, plannedSubjects[1]
         )
 
         # sample size components
@@ -119,7 +168,8 @@ getPerformanceScore <- function(simulationResult) {
         performanceScore <- mean(c(subscoreSampleSize, subscoreConditionalPower))
 
         return(c(
-            alternative = alternative[k],
+            alternative = alternativeValue,
+            reference = referenceValue,
             locationSampleSize = locationSampleSize,
             variationSampleSize = variationSampleSize,
             subscoreSampleSize = subscoreSampleSize,
@@ -130,15 +180,18 @@ getPerformanceScore <- function(simulationResult) {
         ))
     })
 
-    resultList <- list()
+    performanceScore <- PerformanceScore(simulationResult)
+    paramNames <- rownames(resultMatrix)
     for (k in 1:nrow(resultMatrix)) {
-        resultList[[rownames(resultMatrix)[k]]] <- resultMatrix[k, ]
+        paramName <- paramNames[k]
+        performanceScore[[paramName]] <- resultMatrix[k, ]
+        performanceScore$.setParameterType(paramName, C_PARAM_GENERATED)
     }
 
     warning("The performance score function is experimental and hence not fully validated ",
-        "(see www.rpact.com/experimental)", call. = FALSE)
-    
-    return(resultList)
+        "(see www.rpact.com/experimental)",
+        call. = FALSE
+    )
+
+    return(performanceScore)
 }
-
-

@@ -13,26 +13,28 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6652 $
-## |  Last changed: $Date: 2022-11-01 08:59:51 +0100 (Tue, 01 Nov 2022) $
+## |  File version: $Revision: 6943 $
+## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_logger.R
 NULL
 
-# @title
-# Get Analysis Results Rates
-#
-# @description
-# Returns an analysis result object.
-#
-# @param design The trial design.
-#
-# @return Returns a \code{AnalysisResultsRates} object.
-#
-# @keywords internal
-#
+#' @title
+#' Get Analysis Results Rates
+#'
+#' @description
+#' Returns an analysis result object.
+#'
+#' @param design The trial design.
+#'
+#' @return Returns a \code{AnalysisResultsRates} object.
+#'
+#' @keywords internal
+#'
+#' @noRd
+#' 
 .getAnalysisResultsRates <- function(..., design, dataInput) {
     if (.isTrialDesignGroupSequential(design)) {
         return(.getAnalysisResultsRatesGroupSequential(
@@ -150,10 +152,12 @@ NULL
     return(results)
 }
 
-#
-# The following parameters will be taken from 'design':
-# stages, informationRates, criticalValues, futilityBounds, alphaSpent, stageLevels
-#
+#'
+#' The following parameters will be taken from 'design':
+#' stages, informationRates, criticalValues, futilityBounds, alphaSpent, stageLevels
+#'
+#' @noRd
+#' 
 .getAnalysisResultsRatesAll <- function(..., results, design, dataInput, stage,
         directionUpper, normalApproximation, thetaH0, pi1, pi2,
         nPlanned, allocationRatioPlanned, tolerance,
@@ -321,18 +325,20 @@ NULL
     return(results)
 }
 
-# @title
-# Get Stage Results Rates
-#
-# @description
-# Returns a stage results object.
-#
-# @param design the trial design.
-#
-# @return Returns a \code{StageResultsRates} object.
-#
-# @keywords internal
-#
+#' @title
+#' Get Stage Results Rates
+#'
+#' @description
+#' Returns a stage results object.
+#'
+#' @param design the trial design.
+#'
+#' @return Returns a \code{StageResultsRates} object.
+#'
+#' @keywords internal
+#'
+#' @noRd
+#' 
 .getStageResultsRates <- function(..., design, dataInput, thetaH0 = NA_real_,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -611,9 +617,11 @@ NULL
     return(stageResults)
 }
 
-#
-#  Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Rates
-#
+#'
+#' Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Rates
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsRates <- function(..., design) {
     if (.isTrialDesignGroupSequential(design)) {
         return(.getRepeatedConfidenceIntervalsRatesGroupSequential(design = design, ...))
@@ -767,9 +775,11 @@ NULL
     return(repeatedConfidenceIntervals)
 }
 
-#
-# RCIs based on group sequential method
-#
+#'
+#' RCIs based on group sequential method
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsRatesGroupSequential <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -791,9 +801,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on inverse normal combination test
-#
+#'
+#' RCIs based on inverse normal combination test
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsRatesInverseNormal <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -815,9 +827,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on Fisher's combination test
-#
+#'
+#' RCIs based on Fisher's combination test
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsRatesFisher <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -893,9 +907,11 @@ NULL
     return(list(thetaH1 = thetaH1, nPlanned = nPlanned))
 }
 
-#
-# Calculation of conditional power based on group sequential / inverse normal method
-#
+#'
+#' Calculation of conditional power based on group sequential / inverse normal method
+#'
+#' @noRd
+#' 
 .getConditionalPowerRatesInverseNormalOrGroupSequential <- function(..., stageResults, stage = stageResults$stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, pi1, pi2) {
     design <- stageResults$.design
@@ -990,9 +1006,11 @@ NULL
     ))
 }
 
-#
-# Calculation of conditional power based on Fisher combination test
-#
+#'
+#' Calculation of conditional power based on Fisher combination test
+#'
+#' @noRd
+#' 
 .getConditionalPowerRatesFisher <- function(..., stageResults, stage = stageResults$stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         pi1, pi2, iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
@@ -1255,10 +1273,12 @@ NULL
     ))
 }
 
-#
-# Calculation of final confidence interval
-# based on group sequential test without SSR (general case).
-#
+#'
+#' Calculation of final confidence interval
+#' based on group sequential test without SSR (general case).
+#'
+#' @noRd
+#' 
 .getFinalConfidenceIntervalRatesGroupSequential <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_RATES_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -1426,10 +1446,12 @@ NULL
     ))
 }
 
-#
-# Calculation of final confidence interval
-# based on inverse normal method, only valid for kMax <= 2 or no SSR.
-#
+#'
+#' Calculation of final confidence interval
+#' based on inverse normal method, only valid for kMax <= 2 or no SSR.
+#'
+#' @noRd
+#' 
 .getFinalConfidenceIntervalRatesInverseNormal <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_RATES_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -1604,10 +1626,12 @@ NULL
     ))
 }
 
-#
-# Calculation of final confidence interval
-# based on Fisher combination test, only valid for kMax <= 2.
-#
+#'
+#' Calculation of final confidence interval
+#' based on Fisher combination test, only valid for kMax <= 2.
+#'
+#' @noRd
+#' 
 .getFinalConfidenceIntervalRatesFisher <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_RATES_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,

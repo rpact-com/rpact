@@ -8,8 +8,48 @@
 Class for multi-arm analysis results based on a inverse normal design.
 }
 \details{
-This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+This object cannot be created directly; use \code{\link{getAnalysisResults}}
 with suitable arguments to create the multi-arm analysis results of an inverse normal design.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a logical vector of length 1.}
+
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+
+\item{\code{pi1}}{The assumed probability or probabilities in the active treatment group in two-group designs, or the alternative probability for a one-group design.}
+
+\item{\code{pi2}}{The assumed probability in the reference group for two-group designs. Is a numeric vector of length 1 containing a value between 0 and 1.}
+
+\item{\code{nPlanned}}{The sample size planned for each of the subsequent stages. Is a numeric vector of length \code{kMax} containing whole numbers.}
+
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
+
+\item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio. Is a numeric vector.}
+
+\item{\code{assumedStDevs}}{Assumed standard deviations to calculate conditional power in multi-arm trials or enrichment designs. Is a numeric vector.}
+
+\item{\code{piTreatments}}{The assumed rates in the treatment groups for multi-arm and enrichment designs, i.e., designs with multiple subsets.}
+
+\item{\code{intersectionTest}}{The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a character vector of length 1.}
+
+\item{\code{varianceOption}}{Defines the way to calculate the variance in multiple (i.e., >2) treatment arms or population enrichment designs when testing means. Available options for multiple arms: \code{"overallPooled", "pairwisePooled", "notPooled"}. Available options for enrichment designs: \code{"pooled", "pooledFromFull", "notPooled"}.}
+
+\item{\code{conditionalRejectionProbabilities}}{The probabilities of rejecting the null hypothesis at each stage, given the stage has been reached. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+
+\item{\code{repeatedConfidenceIntervalLowerBounds}}{The lower bound of the confidence intervals that are calculated at any stage of the trial.}
+
+\item{\code{repeatedConfidenceIntervalUpperBounds}}{The upper bound of the confidence interval that are calculated at any stage of the trial.}
+
+\item{\code{repeatedPValues}}{The p-values that are calculated at any stage of the trial.}
+
+\item{\code{piControl}}{The assumed probability in the control arm for simulation and under which the sample size recalculation is performed. Is a numeric vector of length 1 containing a value between 0 and 1.}
+}}
+
 
 \keyword{internal}

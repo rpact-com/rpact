@@ -14,9 +14,11 @@ with suitable arguments to create a set of designs.
 \section{Fields}{
 
 \describe{
-\item{\code{designs}}{The designs (optional).}
+\item{\code{designs}}{The trial designs to be compared.}
 
-\item{\code{design}}{The master design (optional).}
+\item{\code{design}}{The trial design.}
+
+\item{\code{variedParameters}}{A character vector containing the names of the parameters that vary between designs.}
 }}
 
 \section{Methods}{

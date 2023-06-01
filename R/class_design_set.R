@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6810 $
-## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
+## |  File version: $Revision: 6862 $
+## |  Last changed: $Date: 2023-03-10 08:37:03 +0100 (Fr, 10 Mrz 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -146,8 +146,9 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 #' @description
 #' \code{TrialDesignSet} is a class for creating a collection of different trial designs.
 #'
-#' @field designs The designs (optional).
-#' @field design The master design (optional).
+#' @template field_designs
+#' @template field_design
+#' @template field_variedParameters
 #'
 #' @details
 #' This object cannot be created directly; better use \code{\link[=getDesignSet]{getDesignSet()}}

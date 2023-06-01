@@ -27,7 +27,9 @@ getObjectRCode(
   postfix = "",
   stringWrapPrefix = "",
   newArgumentValues = list(),
-  tolerance = 1e-07
+  tolerance = 1e-07,
+  pipeOperator = c("none", "magrittr", "R"),
+  output = c("vector", "cat", "test")
 )
 }
 \arguments{
@@ -55,6 +57,8 @@ set to \code{NULL} to insert no line breaks.}
 \code{newArgumentValues = list(informationRates = c(0.5, 1))}.}
 
 \item{tolerance}{The tolerance for defining a value as default.}
+
+\item{pipeOperator}{The pipe operator to use in the R code, default is "none".}
 }
 \value{
 A \code{\link[base]{character}} value or vector will be returned.

@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6806 $
-## |  Last changed: $Date: 2023-02-08 09:52:08 +0100 (Mi, 08 Feb 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 6909 $
+## |  Last changed: $Date: 2023-03-31 14:33:51 +0200 (Fr, 31 Mrz 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -70,15 +70,16 @@ NULL
 #' @inheritParams param_informationEpsilon
 #' @param ... Further arguments to be passed to methods (cf., separate functions in "See Also" below), e.g.,
 #' \describe{
-#'   \item{\code{thetaH1} and \code{assumedStDevs}, \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
+#'   	\item{\code{thetaH1} and \code{stDevH1} (or \code{assumedStDev} / \code{assumedStDevs}), 
+#' 		 \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
 #'       The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned} 
 #' 		 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio. 
 #' 		 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome, 
 #' 		 \code{pi1} and \code{pi2} can be specified referring to the assumed treatment and control rate, respectively. 
 #' 		 In multi-armed or enrichment designs, you can 
 #'   	 specify a value or a vector with elements referring to the treatment arms or the sub-populations, 
-#'   	 respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl} (multi-arm 
-#'   	 designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr 
+#'   	 respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl} 
+#' 		 (multi-arm designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr 
 #'   	 If not specified, the conditional power is calculated under the assumption of observed effect sizes, 
 #'   	 standard deviations, rates, or hazard ratios.}
 #'   \item{\code{iterations}}{Iterations for simulating the power for Fisher's combination test.
@@ -159,11 +160,9 @@ NULL
 #' @template details_analysis_base_mnormt_dependency
 #'
 #' @seealso
-#' \itemize{
-#'   \item \code{\link[=getObservedInformationRates]{getObservedInformationRates()}} 
-#'         for recalculation the observed information rates.
-#'   \item @family analysis functions
-#' }
+#' \code{\link[=getObservedInformationRates]{getObservedInformationRates()}} 
+#' 
+#' @family analysis functions
 #'
 #' @template examples_get_analysis_results
 #'
@@ -854,7 +853,8 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
 #' @inheritParams param_allocationRatioPlanned
 #' @param ... Further (optional) arguments to be passed:
 #' \describe{
-#'   \item{\code{thetaH1} and \code{assumedStDevs}, \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
+#'   \item{\code{thetaH1} and \code{stDevH1} (or \code{assumedStDev} / \code{assumedStDevs}), 
+#' 		 \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
 #'       The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned} 
 #' 		 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio. 
 #' 		 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome, 

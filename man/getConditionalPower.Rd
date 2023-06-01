@@ -11,7 +11,8 @@ getConditionalPower(stageResults, ..., nPlanned, allocationRatioPlanned = 1)
 
 \item{...}{Further (optional) arguments to be passed:
 \describe{
-\item{\code{thetaH1} and \code{assumedStDevs}, \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
+\item{\code{thetaH1} and \code{stDevH1} (or \code{assumedStDev} / \code{assumedStDevs}),
+\code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
 The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned}
 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio.
 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome,
@@ -40,7 +41,8 @@ For enrichment designs, it is the (combined) sample size for the considered sub-
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
 For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
-In this case, a change of allocating subjects to treatment groups over the stages can be assessed.}
+It can be a vector of length kMax, too, for multi-arm and enrichment designs.
+In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.}
 }
 \value{
 Returns a \code{\link{ConditionalPowerResults}} object.
@@ -102,6 +104,7 @@ getConditionalPower(stageResults, thetaH1 = -0.4,
 for plotting the conditional power.
 
 Other analysis functions: 
+\code{\link{getAnalysisResults}()},
 \code{\link{getClosedCombinationTestResults}()},
 \code{\link{getClosedConditionalDunnettTestResults}()},
 \code{\link{getConditionalRejectionProbabilities}()},

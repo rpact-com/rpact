@@ -14,9 +14,25 @@ with suitable arguments to create it.
 \section{Fields}{
 
 \describe{
-\item{\code{nMax}}{The maximum sample size. Is a positive integer of length 1.}
+\item{\code{nMax}}{The maximum sample size. Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{theta}}{A vector of standardized effect sizes (theta values), default is a sequence from -1 to 1.}
+\item{\code{theta}}{A vector of standardized effect sizes (theta values). Is a numeric vector.}
+
+\item{\code{averageSampleNumber}}{The average sample number calculated for each value of \code{theta} or \code{nMax}, if the specified maximum sample size would be exceeded. Is a numeric vector.}
+
+\item{\code{calculatedPower}}{The calculated power for the given scenario. Is a numeric vector of length 1 containing a value between 0 and 1.}
+
+\item{\code{overallEarlyStop}}{The overall early stopping probability.}
+
+\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility.}
+
+\item{\code{overallReject}}{The overall rejection probability.}
+
+\item{\code{rejectPerStage}}{The probability to reject a hypothesis per stage of the trial.}
+
+\item{\code{overallFutility}}{The overall stopping for futility probability.}
+
+\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility.}
 }}
 
 

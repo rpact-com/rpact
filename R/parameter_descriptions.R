@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6780 $
-## |  Last changed: $Date: 2023-01-24 17:36:17 +0100 (Di, 24 Jan 2023) $
+## |  File version: $Revision: 6931 $
+## |  Last changed: $Date: 2023-04-11 15:40:33 +0200 (Di, 11 Apr 2023) $
 ## |  Last changed by: $Author: wassmer $
 ## | 
 
@@ -313,8 +313,9 @@ NULL
 #' Parameter Description: Allocation Ratio Planned
 #' @param allocationRatioPlanned The planned allocation ratio \code{n1 / n2} for a two treatment groups 
 #'   design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
-#'   For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages. 
-#' 	 In this case, a change of allocating subjects to treatment groups over the stages can be assessed.  
+#'   For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+#'   It can be a vector of length kMax, too, for multi-arm and enrichment designs. 
+#' 	 In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.  
 #' @name param_allocationRatioPlanned
 #' @keywords internal
 NULL

@@ -8,8 +8,30 @@
 Class for multi-arm analysis results based on a closed combination test.
 }
 \details{
-This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+This object cannot be created directly; use \code{\link{getAnalysisResults}}
 with suitable arguments to create the multi-arm analysis results of a closed combination test design.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{intersectionTest}}{The multiple test used for intersection hypotheses in closed systems of hypotheses. Is a character vector of length 1.}
+
+\item{\code{indices}}{Indicates which stages are available for analysis.}
+
+\item{\code{adjustedStageWisePValues}}{The multiplicity adjusted p-values from the separate stages.}
+
+\item{\code{overallAdjustedTestStatistics}}{The overall adjusted test statistics.}
+
+\item{\code{separatePValues}}{The p-values from the separate stages.}
+
+\item{\code{conditionalErrorRate}}{The calculated conditional error rate.}
+
+\item{\code{secondStagePValues}}{For conditional Dunnett test, the conditional or un-conditional p-value calculated for the second stage.}
+
+\item{\code{rejected}}{Indicates whether a hypothesis is rejected or not.}
+
+\item{\code{rejectedIntersections}}{The simulated number of rejected arms in the closed testing procedure..}
+}}
+
 
 \keyword{internal}

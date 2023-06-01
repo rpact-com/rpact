@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 6862 $
+## |  Last changed: $Date: 2023-03-10 08:37:03 +0100 (Fr, 10 Mrz 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
 
@@ -336,6 +336,20 @@ getAccrualTime <- function(accrualTime = NA_real_,
 #' 
 #' @description 
 #' Class for the definition of piecewise survival times.
+#' 
+#' @template field_piecewiseSurvivalTime
+#' @template field_lambda1
+#' @template field_lambda2
+#' @template field_hazardRatio
+#' @template field_pi1_survival
+#' @template field_pi2_survival
+#' @template field_median1
+#' @template field_median2
+#' @template field_eventTime
+#' @template field_kappa
+#' @template field_piecewiseSurvivalEnabled
+#' @template field_delayedResponseAllowed
+#' @template field_delayedResponseEnabled
 #' 
 #' @details
 #' \code{PiecewiseSurvivalTime} is a class for the definition of piecewise survival times.
@@ -665,6 +679,10 @@ PiecewiseSurvivalTime <- setRefClass("PiecewiseSurvivalTime",
 				stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
 					"'piecewiseSurvivalTime' must contain at least one entry")
 			}
+            
+            if (is.null(names(pwSurvTimeList))) {
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'piecewiseSurvivalTime' must be a named list")
+            }
 			
 			if (!all(is.na(lambda2))) {
 				warning("'lambda2' (", .arrayToString(lambda2), 
@@ -1217,6 +1235,18 @@ PiecewiseSurvivalTime <- setRefClass("PiecewiseSurvivalTime",
 #' @description 
 #' Class for the definition of accrual time and accrual intensity.
 #' 
+#' @template field_endOfAccrualIsUserDefined
+#' @template field_followUpTimeMustBeUserDefined
+#' @template field_maxNumberOfSubjectsIsUserDefined
+#' @template field_maxNumberOfSubjectsCanBeCalculatedDirectly
+#' @template field_absoluteAccrualIntensityEnabled
+#' @template field_accrualTime 
+#' @template field_accrualIntensity
+#' @template field_accrualIntensityRelative
+#' @template field_maxNumberOfSubjects
+#' @template field_remainingTime
+#' @template field_piecewiseAccrualEnabled
+#' 
 #' @details
 #' \code{AccrualTime} is a class for the definition of accrual time and accrual intensity.
 #' 
@@ -1671,11 +1701,17 @@ AccrualTime <- setRefClass("AccrualTime",
 			if (!is.list(accrualTimeList)) {
 				stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'accrualTime' must be a list")
 			}
-			
+            
 			if (length(accrualTimeList) == 0) {
 				stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'accrualTime' must contain at least one entry")
 			}
-			
+            
+            if (is.null(names(accrualTimeList))) {
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+                    "'accrualTime' must be a named list where the names specify ",
+                    "the time regions and the values the accrual time")
+            }
+            
 			if (.showWarnings && !all(is.na(accrualIntensity))&& (length(accrualIntensity) != 1 || 
 					accrualIntensity != C_ACCRUAL_INTENSITY_DEFAULT)) { 
 				warning("'accrualIntensity' (", .arrayToString(accrualIntensity), 

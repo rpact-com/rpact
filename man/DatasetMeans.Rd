@@ -8,22 +8,27 @@
 Class for a dataset of means.
 }
 \details{
-This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
+This object cannot be created directly; better use \code{\link{getDataset}}
 with suitable arguments to create a dataset of means.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{groups}}{The group numbers. Is an integer vector of length number of stages times number of groups.}
+\item{\code{groups}}{The group numbers. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{sampleSizes}}{The sample sizes for each group and stage.
-Is an integer vector of length number of stages times number of groups.}
+\item{\code{sampleSizes}}{The sample sizes for each group and stage. Is a numeric vector of length number of stages times number of groups containing whole numbers.}
 
 \item{\code{means}}{The means. Is a numeric vector of length number of stages times number of groups.}
 
 \item{\code{stDevs}}{The standard deviations. Is a numeric vector of length number of stages times number of groups.}
+
+\item{\code{overallSampleSizes}}{The overall, i.e., cumulative sample sizes. Is a numeric vector of length number of stages times number of groups.}
+
+\item{\code{overallMeans}}{The overall, i.e., cumulative means. Is a numeric vector of length number of stages times number of groups.}
+
+\item{\code{overallStDevs}}{The overall, i.e., cumulative standard deviations. Is a numeric vector of length number of stages times number of groups.}
 }}
 
 

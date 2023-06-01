@@ -11,6 +11,7 @@
 ^_version$
 ^doc$
 ^docs$
+^man-raw$
 ^bin$
 ^cran-comments\.md$
 ^README\.Rmd$
@@ -35,3 +36,5 @@ index\.txt
 lastMiKTeXException
 ^\.github$
 ^CRAN-SUBMISSION$
+^_pkgdown\.yml$
+^pkgdown$

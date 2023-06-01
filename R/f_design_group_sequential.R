@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 7022 $
+## |  Last changed: $Date: 2023-06-01 09:15:57 +0200 (Thu, 01 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -50,6 +50,8 @@ NULL
 #' @family design functions
 #'
 #' @template examples_get_group_sequential_probabilities
+#'
+#' @return Returns a numeric matrix containing the probabilities described in the details section.
 #'
 #' @export
 #'
@@ -238,7 +240,6 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     return(invisible(design))
 }
-
 
 .validateBaseParameters <- function(design, twoSidedWarningForDefaultValues = TRUE) {
     if (.isDefinedArgument(design$kMax)) {
@@ -564,9 +565,11 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     )
 }
 
-#
-# Haybittle & Peto design
-#
+#'
+#' Haybittle & Peto design
+#'
+#' @noRd
+#'
 .getDesignGroupSequentialHaybittleAndPeto <- function(design) {
     scale <- .getOneDimensionalRoot(
         function(scale) {
@@ -601,7 +604,6 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     return(invisible(design))
 }
-
 
 .getOptimumDesign <- function(deltaWT, design) {
     scale <- .getOneDimensionalRoot(
@@ -647,9 +649,11 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     return(y)
 }
 
-#
-# Optimum design within Wang and Tsiatis class
-#
+#'
+#' Optimum design within Wang and Tsiatis class
+#'
+#' @noRd
+#'
 .getDesignGroupSequentialWangAndTsiatisOptimum <- function(design) {
     .assertDesignParameterExists(design, "optimizationCriterion", C_OPTIMIZATION_CRITERION_DEFAULT)
     .assertIsOptimizationCriterion(design$optimizationCriterion)
@@ -682,9 +686,11 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     return(invisible(design))
 }
 
-#
-# alpha spending approaches
-#
+#'
+#' Alpha spending approaches
+#'
+#' @noRd
+#'
 .getDesignGroupSequentialAlphaSpending <- function(design, userFunctionCallEnabled) {
     design$criticalValues <- getDesignGroupSequentialAlphaSpendingCpp(
         design$kMax,
@@ -701,9 +707,11 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     return(.getDesignGroupSequentialBetaSpendingApproaches(design, userFunctionCallEnabled))
 }
 
-#
-# User defined alpha spending approach
-#
+#'
+#' User defined alpha spending approach
+#'
+#' @noRd
+#'
 .getDesignGroupSequentialUserDefinedAlphaSpending <- function(design, userFunctionCallEnabled) {
     design$criticalValues <- rep(NA_real_, design$kMax)
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY) {
@@ -728,11 +736,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     return(invisible(.getDesignGroupSequentialBetaSpendingApproaches(design, userFunctionCallEnabled)))
 }
 
-#
-# Only for alpha spending approaches
-#
+#'
+#' Only for alpha spending approaches
+#'
+#' @noRd
+#'
 .getDesignGroupSequentialBetaSpendingApproaches <- function(design, userFunctionCallEnabled) {
-
     # beta spending approaches (additional to alpha spending)!
     if (.isBetaSpendingDesignType(design$typeBetaSpending,
             userDefinedBetaSpendingIncluded = FALSE, noneIncluded = FALSE
@@ -752,10 +761,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     return(c(vec, rep(NA_real_, n - length(vec))))
 }
 
-#
-# Beta spending approaches (additional to alpha spending)
-# Find shift with beta spending such that last critical values coincide
-#
+#'
+#' Beta spending approaches (additional to alpha spending)
+#' Find shift with beta spending such that last critical values coincide
+#'
+#' @noRd
+#'
 .getDesignGroupSequentialBetaSpending <- function(design, userFunctionCallEnabled) {
     cppResult <- getDesignGroupSequentialBetaSpendingCpp(
         design$criticalValues,
@@ -792,11 +803,13 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     return(invisible(design))
 }
 
-#
-# User defined beta spending.
-#
-# Find shift with beta spending such that last critical values coincide
-#
+#'
+#' User defined beta spending
+#'
+#' Find shift with beta spending such that last critical values coincide
+#'
+#' @noRd
+#'
 .getDesignGroupSequentialUserDefinedBetaSpending <- function(design) {
     if (design$typeBetaSpending != C_TYPE_OF_DESIGN_BS_USER) {
         stop(
@@ -836,7 +849,11 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     return(invisible(design))
 }
 
-# calculate stopping, rejection and futility probabilities for delayed response design
+#'
+#' Calculate stopping, rejection and futility probabilities for delayed response design
+#'
+#' @noRd
+#'
 .calculateDecisionProbabilities <- function(sqrtShift, informationRates, delayedInformation,
         contRegionUpper, contRegionLower, decisionCriticalValues) {
     kMax <- length(informationRates)
@@ -855,20 +872,22 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             )
             if (stage == 1) {
                 probs1 <- .getGroupSequentialProbabilities(
-                    matrix(c(
-                        contRegionUpper[stage] - sqrtShift * sqrt(informationRatesUponDelay[1]),
-                        decisionCriticalValues[stage] - sqrtShift * sqrt(informationRatesUponDelay[2]),
-                        C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
-                    ),
-                    nrow = 2, byrow = TRUE
+                    matrix(
+                        c(
+                            contRegionUpper[stage] - sqrtShift * sqrt(informationRatesUponDelay[1]),
+                            decisionCriticalValues[stage] - sqrtShift * sqrt(informationRatesUponDelay[2]),
+                            C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
+                        ),
+                        nrow = 2, byrow = TRUE
                     ), informationRatesUponDelay
                 )
                 probs2 <- .getGroupSequentialProbabilities(
-                    matrix(c(
-                        -C_UPPER_BOUNDS_DEFAULT, decisionCriticalValues[stage] - sqrtShift * sqrt(informationRatesUponDelay[2]),
-                        contRegionLower[stage] - sqrtShift * sqrt(informationRatesUponDelay[1]), C_UPPER_BOUNDS_DEFAULT
-                    ),
-                    nrow = 2, byrow = TRUE
+                    matrix(
+                        c(
+                            -C_UPPER_BOUNDS_DEFAULT, decisionCriticalValues[stage] - sqrtShift * sqrt(informationRatesUponDelay[2]),
+                            contRegionLower[stage] - sqrtShift * sqrt(informationRatesUponDelay[1]), C_UPPER_BOUNDS_DEFAULT
+                        ),
+                        nrow = 2, byrow = TRUE
                     ), informationRatesUponDelay
                 )
                 rejectionProbabilities[stage] <- probs1[2, stage + 1] - probs1[1, stage + 1] +
@@ -878,25 +897,27 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
                 stoppingProbabilities[stage] <- probs2[2, stage] + 1 - probs1[1, stage]
             } else if (stage < kMax) {
                 probs1 <- .getGroupSequentialProbabilities(
-                    matrix(c(
-                        contRegionLower[1:(stage - 1)] - sqrtShift * sqrt(informationRatesUponDelay[1:(stage - 1)]),
-                        contRegionUpper[stage] - sqrtShift * sqrt(informationRatesUponDelay[stage]),
-                        decisionCriticalValues[stage] - sqrtShift * sqrt(informationRatesUponDelay[stage + 1]),
-                        contRegionUpper[1:(stage - 1)] - sqrtShift * sqrt(informationRatesUponDelay[1:(stage - 1)]),
-                        C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
-                    ),
-                    nrow = 2, byrow = TRUE
+                    matrix(
+                        c(
+                            contRegionLower[1:(stage - 1)] - sqrtShift * sqrt(informationRatesUponDelay[1:(stage - 1)]),
+                            contRegionUpper[stage] - sqrtShift * sqrt(informationRatesUponDelay[stage]),
+                            decisionCriticalValues[stage] - sqrtShift * sqrt(informationRatesUponDelay[stage + 1]),
+                            contRegionUpper[1:(stage - 1)] - sqrtShift * sqrt(informationRatesUponDelay[1:(stage - 1)]),
+                            C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
+                        ),
+                        nrow = 2, byrow = TRUE
                     ), informationRatesUponDelay
                 )
                 probs2 <- .getGroupSequentialProbabilities(
-                    matrix(c(
-                        contRegionLower[1:(stage - 1)] - sqrtShift *
-                            sqrt(informationRatesUponDelay[1:(stage - 1)]), -C_UPPER_BOUNDS_DEFAULT,
-                        decisionCriticalValues[stage] - sqrtShift * sqrt(informationRatesUponDelay[stage + 1]),
-                        contRegionUpper[1:(stage - 1)] - sqrtShift * sqrt(informationRatesUponDelay[1:(stage - 1)]),
-                        contRegionLower[stage] - sqrtShift * sqrt(informationRatesUponDelay[stage]), C_UPPER_BOUNDS_DEFAULT
-                    ),
-                    nrow = 2, byrow = TRUE
+                    matrix(
+                        c(
+                            contRegionLower[1:(stage - 1)] - sqrtShift *
+                                sqrt(informationRatesUponDelay[1:(stage - 1)]), -C_UPPER_BOUNDS_DEFAULT,
+                            decisionCriticalValues[stage] - sqrtShift * sqrt(informationRatesUponDelay[stage + 1]),
+                            contRegionUpper[1:(stage - 1)] - sqrtShift * sqrt(informationRatesUponDelay[1:(stage - 1)]),
+                            contRegionLower[stage] - sqrtShift * sqrt(informationRatesUponDelay[stage]), C_UPPER_BOUNDS_DEFAULT
+                        ),
+                        nrow = 2, byrow = TRUE
                     ), informationRatesUponDelay
                 )
                 rejectionProbabilities[stage] <- probs1[2, stage + 1] - probs1[1, stage + 1] +
@@ -906,13 +927,14 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
                 stoppingProbabilities[stage] <- probs2[2, stage] + probs1[2, stage] - probs1[1, stage]
             } else {
                 probs <- .getGroupSequentialProbabilities(
-                    matrix(c(
-                        contRegionLower[1:(stage - 1)] - sqrtShift * sqrt(informationRates[1:(stage - 1)]),
-                        decisionCriticalValues[stage] - sqrtShift * sqrt(informationRates[stage]),
-                        contRegionUpper[1:(stage - 1)] - sqrtShift * sqrt(informationRates[1:(stage - 1)]),
-                        C_UPPER_BOUNDS_DEFAULT
-                    ),
-                    nrow = 2, byrow = TRUE
+                    matrix(
+                        c(
+                            contRegionLower[1:(stage - 1)] - sqrtShift * sqrt(informationRates[1:(stage - 1)]),
+                            decisionCriticalValues[stage] - sqrtShift * sqrt(informationRates[stage]),
+                            contRegionUpper[1:(stage - 1)] - sqrtShift * sqrt(informationRates[1:(stage - 1)]),
+                            C_UPPER_BOUNDS_DEFAULT
+                        ),
+                        nrow = 2, byrow = TRUE
                     ), informationRates
                 )
                 rejectionProbabilities[stage] <- probs[2, stage] - probs[1, stage]
@@ -921,22 +943,24 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         } else {
             if (stage == 1) {
                 probs <- .getGroupSequentialProbabilities(
-                    matrix(c(
-                        contRegionLower[stage] - sqrtShift * sqrt(informationRates[stage]),
-                        contRegionUpper[stage] - sqrtShift * sqrt(informationRates[stage])
-                    ),
-                    nrow = 2, byrow = TRUE
+                    matrix(
+                        c(
+                            contRegionLower[stage] - sqrtShift * sqrt(informationRates[stage]),
+                            contRegionUpper[stage] - sqrtShift * sqrt(informationRates[stage])
+                        ),
+                        nrow = 2, byrow = TRUE
                     ), informationRates[1]
                 )
             } else {
                 probs <- .getGroupSequentialProbabilities(
-                    matrix(c(
-                        contRegionLower[1:(stage - 1)] - sqrtShift * sqrt(informationRates[1:(stage - 1)]),
-                        contRegionLower[stage] - sqrtShift * sqrt(informationRates[stage]),
-                        contRegionUpper[1:(stage - 1)] - sqrtShift * sqrt(informationRates[1:(stage - 1)]),
-                        contRegionUpper[stage] - sqrtShift * sqrt(informationRates[stage])
-                    ),
-                    nrow = 2, byrow = TRUE
+                    matrix(
+                        c(
+                            contRegionLower[1:(stage - 1)] - sqrtShift * sqrt(informationRates[1:(stage - 1)]),
+                            contRegionLower[stage] - sqrtShift * sqrt(informationRates[stage]),
+                            contRegionUpper[1:(stage - 1)] - sqrtShift * sqrt(informationRates[1:(stage - 1)]),
+                            contRegionUpper[stage] - sqrtShift * sqrt(informationRates[stage])
+                        ),
+                        nrow = 2, byrow = TRUE
                     ), informationRates[1:stage]
                 )
             }
@@ -1002,13 +1026,7 @@ getDesignInverseNormal <- function(...,
         twoSidedPower = NA,
         tolerance = 1e-08 # C_DESIGN_TOLERANCE_DEFAULT
         ) {
-    .warnInCaseOfUnknownArguments(functionName = "getDesignInverseNormal", ignore = c("cppEnabled"), ...)
-
-    cppEnabled <- .getOptionalArgument("cppEnabled", ..., optionalArgumentDefaultValue = TRUE)
-    if (!cppEnabled) {
-        stop("The cppEnabled option of  getDesignInverseNormal() is deprecated and no longer available in rpact")
-    }
-
+    .warnInCaseOfUnknownArguments(functionName = "getDesignInverseNormal", ...)
     return(.getDesignGroupSequential(
         designClass = C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL,
         kMax = kMax,
@@ -1258,7 +1276,6 @@ getDesignInverseNormal <- function(...,
     if (design$kMax == 1) {
         .getDesignGroupSequentialKMax1(design)
     } else {
-
         # Wang and Tsiatis design
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT ||
                 design$typeOfDesign == C_TYPE_OF_DESIGN_P ||
@@ -1338,14 +1355,6 @@ getDesignInverseNormal <- function(...,
         }
         design$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
         design$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
-    }
-
-    if (design$sided == 2 && design$typeOfDesign != C_TYPE_OF_DESIGN_PT &&
-            .isBetaSpendingDesignType(design$typeBetaSpending)) {
-        warning("The two-sided beta-spending approach is experimental and ",
-            "hence not fully validated (see www.rpact.com/experimental)",
-            call. = FALSE
-        )
     }
 
     .assertIsNumericVector(delayedInformation, "delayedInformation", naAllowed = TRUE)
@@ -1433,51 +1442,56 @@ getDesignInverseNormal <- function(...,
                         ), informationRatesUponDelay
                     )
                     probs2 <- .getGroupSequentialProbabilities(
-                        matrix(c(
-                            -C_UPPER_BOUNDS_DEFAULT, secondCriticalValue,
-                            contRegionLower[stage], C_UPPER_BOUNDS_DEFAULT
-                        ),
-                        nrow = 2, byrow = TRUE
+                        matrix(
+                            c(
+                                -C_UPPER_BOUNDS_DEFAULT, secondCriticalValue,
+                                contRegionLower[stage], C_UPPER_BOUNDS_DEFAULT
+                            ),
+                            nrow = 2, byrow = TRUE
                         ), informationRatesUponDelay
                     )
                     return(probs1[1, stage + 1] - probs2[2, stage + 1] + probs2[1, stage + 1])
                 }, lower = -C_UPPER_BOUNDS_DEFAULT, upper = C_UPPER_BOUNDS_DEFAULT, tolerance = design$tolerance)
 
                 probs <- .getGroupSequentialProbabilities(
-                    matrix(c(
-                        contRegionUpper[stage], decisionCriticalValues[stage],
-                        C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
-                    ),
-                    nrow = 2, byrow = TRUE
+                    matrix(
+                        c(
+                            contRegionUpper[stage], decisionCriticalValues[stage],
+                            C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
+                        ),
+                        nrow = 2, byrow = TRUE
                     ), informationRatesUponDelay
                 )
             } else {
                 decisionCriticalValues[stage] <- .getOneDimensionalRoot(function(secondCriticalValue) {
                     probs1 <- .getGroupSequentialProbabilities(
-                        matrix(c(
-                            contRegionLower[1:(stage - 1)], contRegionUpper[stage], secondCriticalValue,
-                            contRegionUpper[1:(stage - 1)], C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
-                        ),
-                        nrow = 2, byrow = TRUE
+                        matrix(
+                            c(
+                                contRegionLower[1:(stage - 1)], contRegionUpper[stage], secondCriticalValue,
+                                contRegionUpper[1:(stage - 1)], C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
+                            ),
+                            nrow = 2, byrow = TRUE
                         ), informationRatesUponDelay
                     )
                     probs2 <- .getGroupSequentialProbabilities(
-                        matrix(c(
-                            contRegionLower[1:(stage - 1)], -C_UPPER_BOUNDS_DEFAULT, secondCriticalValue,
-                            contRegionUpper[1:(stage - 1)], contRegionLower[stage], C_UPPER_BOUNDS_DEFAULT
-                        ),
-                        nrow = 2, byrow = TRUE
+                        matrix(
+                            c(
+                                contRegionLower[1:(stage - 1)], -C_UPPER_BOUNDS_DEFAULT, secondCriticalValue,
+                                contRegionUpper[1:(stage - 1)], contRegionLower[stage], C_UPPER_BOUNDS_DEFAULT
+                            ),
+                            nrow = 2, byrow = TRUE
                         ), informationRatesUponDelay
                     )
                     return(probs1[1, stage + 1] - probs2[2, stage + 1] + probs2[1, stage + 1])
                 }, lower = -C_UPPER_BOUNDS_DEFAULT, upper = C_UPPER_BOUNDS_DEFAULT, tolerance = design$tolerance)
 
                 probs <- .getGroupSequentialProbabilities(
-                    matrix(c(
-                        contRegionLower[1:(stage - 1)], contRegionUpper[stage], decisionCriticalValues[stage],
-                        contRegionUpper[1:(stage - 1)], C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
-                    ),
-                    nrow = 2, byrow = TRUE
+                    matrix(
+                        c(
+                            contRegionLower[1:(stage - 1)], contRegionUpper[stage], decisionCriticalValues[stage],
+                            contRegionUpper[1:(stage - 1)], C_UPPER_BOUNDS_DEFAULT, C_UPPER_BOUNDS_DEFAULT
+                        ),
+                        nrow = 2, byrow = TRUE
                     ), informationRatesUponDelay
                 )
             }
@@ -1634,13 +1648,7 @@ getDesignGroupSequential <- function(...,
         delayedInformation = NA_real_,
         tolerance = 1e-08 # C_DESIGN_TOLERANCE_DEFAULT
         ) {
-    .warnInCaseOfUnknownArguments(functionName = "getDesignGroupSequential", ignore = c("cppEnabled"), ...)
-
-    cppEnabled <- .getOptionalArgument("cppEnabled", ..., optionalArgumentDefaultValue = TRUE)
-    if (!cppEnabled) {
-        stop("The cppEnabled option of  getDesignGroupSequential() is deprecated and no longer available in rpact")
-    }
-
+    .warnInCaseOfUnknownArguments(functionName = "getDesignGroupSequential", ...)
     return(.getDesignGroupSequential(
         designClass = C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL,
         kMax = kMax,
@@ -1724,7 +1732,19 @@ getDesignGroupSequential <- function(...,
 #'
 #' @export
 #'
-getDesignCharacteristics <- function(design) {
+getDesignCharacteristics <- function(design = NULL, ...) {
+    if (is.null(design)) {
+        design <- .getDefaultDesign(..., type = "characteristics")
+        .warnInCaseOfUnknownArguments(
+            functionName = "getDesignCharacteristics",
+            ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = FALSE), ...
+        )
+    } else {
+        .assertIsTrialDesign(design)
+        .warnInCaseOfUnknownArguments(functionName = "getDesignCharacteristics", ...)
+        .warnInCaseOfTwoSidedPowerArgument(...)
+    }
+    
     return(.getDesignCharacteristics(design = design, userFunctionCallEnabled = TRUE))
 }
 
@@ -2136,13 +2156,14 @@ getPowerAndAverageSampleNumber <- function(design, theta = seq(-1, 1, 0.02), nMa
     ))
 }
 
+
 #'
 #' Simulates the rejection probability of a delayed response group sequential design with specified parameters.
 #' By default, delta = 0, i.e., the Type error rate is simulated.
 #'
-#' @keywords internal
+#' @return Returns a list summarizing the rejection probabilities.
 #'
-#' @export
+#' @noRd
 #'
 getSimulatedRejectionsDelayedResponse <- function(design, ..., delta = 0, iterations = 10000, seed = NA_real_) {
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)

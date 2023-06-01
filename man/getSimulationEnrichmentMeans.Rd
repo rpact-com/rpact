@@ -92,7 +92,8 @@ For multi-arm designs, \code{plannedSubjects} refers to the number of subjects p
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
 For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
-In this case, a change of allocating subjects to treatment groups over the stages can be assessed.}
+It can be a vector of length kMax, too, for multi-arm and enrichment designs.
+In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.}
 
 \item{minNumberOfSubjectsPerStage}{When performing a data driven sample size recalculation,
 the numeric vector \code{minNumberOfSubjectsPerStage} with length kMax determines the
@@ -216,11 +217,11 @@ effects <- matrix(m, byrow = TRUE, ncol = 2)
 stDev <- c(0.4, 0.8)
 
 # Define effect list
-el <- list(subGroups=subGroups, prevalences=prevalences, stDevs = stDev, effects = effects)
+effectList <- list(subGroups=subGroups, prevalences=prevalences, stDevs = stDev, effects = effects)
 
 # Perform simulation
 simResultsPE <- getSimulationEnrichmentMeans(design = designIN,
-    effectList = el, plannedSubjects = c(50, 100),
+    effectList = effectList, plannedSubjects = c(50, 100),
     maxNumberOfIterations = 100)
 print(simResultsPE)
 
@@ -259,12 +260,12 @@ effects <- matrix(m, byrow = TRUE, ncol = 4)
 stDev <- 10
 
 # Define effect list
-el <- list(subGroups=subGroups, prevalences=prevalences, stDevs = stDev, effects = effects)
+effectList <- list(subGroups=subGroups, prevalences=prevalences, stDevs = stDev, effects = effects)
 
 # Perform simulation
 simResultsPE <- getSimulationEnrichmentMeans(
     design = designIN2,
-    effectList = el,
+    effectList = effectList,
     typeOfSelection = "userDefined",
     selectPopulationsFunction = mySelection,
     intersectionTest = "Simes",

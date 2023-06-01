@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6619 $
-## |  Last changed: $Date: 2022-10-20 11:41:21 +0200 (Thu, 20 Oct 2022) $
+## |  File version: $Revision: 6943 $
+## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -164,7 +164,6 @@ NULL
         testStatistics = testStatistics
     ))
 }
-
 
 .getStageResultsRatesEnrichment <- function(..., design, dataInput,
         thetaH0 = C_THETA_H0_RATES_DEFAULT,
@@ -593,7 +592,6 @@ NULL
     return(result)
 }
 
-
 .getRepeatedConfidenceIntervalsRatesEnrichmentAll <- function(...,
         design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -704,9 +702,11 @@ NULL
     return(repeatedConfidenceIntervals)
 }
 
-#
-# RCIs based on inverse normal combination test
-#
+#'
+#' RCIs based on inverse normal combination test
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsRatesEnrichmentInverseNormal <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -736,9 +736,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on Fisher's combination test
-#
+#'
+#' RCIs based on Fisher's combination test
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsRatesEnrichmentFisher <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -768,9 +770,11 @@ NULL
     ))
 }
 
-#
-#  Calculation of repeated confidence intervals (RCIs) for Rates
-#
+#'
+#' Calculation of repeated confidence intervals (RCIs) for Rates
+#'
+#' @noRd
+#' 
 .getRepeatedConfidenceIntervalsRatesEnrichment <- function(..., design) {
     if (.isTrialDesignInverseNormal(design)) {
         return(.getRepeatedConfidenceIntervalsRatesEnrichmentInverseNormal(design = design, ...))
@@ -783,9 +787,11 @@ NULL
     .stopWithWrongDesignMessageEnrichment(design)
 }
 
-#
-#  Calculation of conditional power for Rates
-#
+#'
+#' Calculation of conditional power for Rates
+#'
+#' @noRd
+#' 
 .getConditionalPowerRatesEnrichment <- function(..., stageResults, stage = stageResults$stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         piTreatments = NA_real_, piControls = NA_real_, useAdjustment = TRUE,
@@ -905,9 +911,11 @@ NULL
     )
 }
 
-#
-# Calculation of conditional power based on inverse normal method
-#
+#'
+#' Calculation of conditional power based on inverse normal method
+#'
+#' @noRd
+#' 
 .getConditionalPowerRatesEnrichmentInverseNormal <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, piTreatments, piControls) {
     .assertIsTrialDesignInverseNormal(design)
@@ -1008,9 +1016,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power based on Fisher's combination test
-#
+#'
+#' Calculation of conditional power based on Fisher's combination test
+#'
+#' @noRd
+#' 
 .getConditionalPowerRatesEnrichmentFisher <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, piTreatments, piControls, useAdjustment = TRUE,
         iterations, seed) {
@@ -1123,9 +1133,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power and likelihood values for plotting the graph
-#
+#'
+#' Calculation of conditional power and likelihood values for plotting the graph
+#'
+#' @noRd
+#' 
 .getConditionalPowerLikelihoodRatesEnrichment <- function(..., stageResults, stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         piTreatmentRange, piControls = NA_real_,

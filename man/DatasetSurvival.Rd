@@ -3,30 +3,34 @@
 \docType{class}
 \name{DatasetSurvival}
 \alias{DatasetSurvival}
+\alias{DatasetEnrichmentSurvival-class}
+\alias{DatasetEnrichmentSurvival}
 \title{Dataset of Survival Data}
 \description{
 Class for a dataset of survival data.
 }
 \details{
-This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
+This object cannot be created directly; better use \code{\link{getDataset}}
 with suitable arguments to create a dataset of survival data.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{groups}}{The group numbers. Is an integer vector of length number of stages times number of groups.}
+\item{\code{groups}}{The group numbers. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{overallEvents}}{The cumulative events.}
+\item{\code{events}}{The number of events in each group at each stage. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{overallAllocationRatios}}{The cumulative allocations ratios.}
+\item{\code{overallEvents}}{The overall, i.e., cumulative events. Is a numeric vector of length number of stages times number of groups containing whole numbers.}
 
-\item{\code{overallLogRanks}}{The overall logrank test statistics.}
+\item{\code{allocationRatios}}{The observed allocation ratios. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{allocationRatios}}{The allocation ratios.}
+\item{\code{overallAllocationRatios}}{The cumulative allocation ratios. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{logRanks}}{The logrank test statistics.}
+\item{\code{logRanks}}{The logrank test statistics at each stage of the trial. Is a numeric vector of length number of stages times number of groups.}
+
+\item{\code{overallLogRanks}}{The overall, i.e., cumulative logrank test statistics. Is a numeric vector of length number of stages times number of groups.}
 }}
 
 

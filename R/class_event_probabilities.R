@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6517 $
-## |  Last changed: $Date: 2022-08-22 16:26:44 +0200 (Mo, 22 Aug 2022) $
+## |  File version: $Revision: 6862 $
+## |  Last changed: $Date: 2023-03-10 08:37:03 +0100 (Fr, 10 Mrz 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
 
@@ -24,8 +24,23 @@
 #' @title
 #' Event Probabilities
 #' 
-#' @field overallEventProbabilities Deprecated field which will be removed in one of the next releases. 
-#'        Use 'cumulativeEventProbabilities' instead.
+#' @template field_time
+#' @template field_accrualTime
+#' @template field_accrualIntensity
+#' @template field_kappa
+#' @template field_piecewiseSurvivalTime
+#' @template field_lambda1
+#' @template field_lambda2
+#' @template field_allocationRatioPlanned
+#' @template field_hazardRatio
+#' @template field_dropoutRate1
+#' @template field_dropoutRate2
+#' @template field_dropoutTime
+#' @template field_maxNumberOfSubjects
+#' @template field_overallEventProbabilities 
+#' @template field_cumulativeEventProbabilities
+#' @template field_eventProbabilities1
+#' @template field_eventProbabilities2
 #' 
 #' @description 
 #' Class for the definition of event probabilities.
@@ -117,6 +132,12 @@ EventProbabilities <- setRefClass("EventProbabilities",
 #' 
 #' @description 
 #' Class for the definition of number of subjects results.
+#' 
+#' @template field_time 
+#' @template field_accrualTime
+#' @template field_accrualIntensity
+#' @template field_maxNumberOfSubjects
+#' @template field_numberOfSubjects
 #' 
 #' @details
 #' \code{NumberOfSubjects} is a class for the definition of number of subjects results.

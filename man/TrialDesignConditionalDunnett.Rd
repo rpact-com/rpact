@@ -8,56 +8,41 @@
 Trial design for conditional Dunnett tests.
 }
 \details{
-This object should not be created directly; use \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}
+This object should not be created directly; use \code{\link{getDesignConditionalDunnett}}
 with suitable arguments to create a conditional Dunnett test design.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{kMax}}{The maximum number of stages \code{K}.
-Is a positive integer of length 1 (default value is \code{3}).
-The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
-\code{6} for Fisher combination test designs.}
+\item{\code{kMax}}{The maximum number of stages \code{K}. Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{alpha}}{The significance level alpha, default is \code{0.025}.
-Is a positive numeric of length 1.}
+\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{informationRates}}{The information rates (that must be fixed prior to the trial),
-default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} (the maximum number of stages).}
+\item{\code{informationRates}}{The information rates (that must be fixed prior to the trial), default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{userAlphaSpending}}{The user defined alpha spending.
-Numeric vector of length \code{kMax} containing the cumulative
-alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 <= ... <= alpha_K <= alpha}.}
+\item{\code{userAlphaSpending}}{The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage.}
 
-\item{\code{criticalValues}}{The critical values for each stage of the trial.
-Is a numeric vector of length \code{kMax} (the maximum number of stages).}
+\item{\code{criticalValues}}{The critical values for each stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{stageLevels}}{The levels for each stage.}
+\item{\code{stageLevels}}{The adjusted significance levels to reach significance in a group sequential design.}
 
-\item{\code{alphaSpent}}{The cumulative alpha spent at each stage.
-Is a numeric vector with length \code{kMax} (the maximum number of stages).}
+\item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{bindingFutility}}{Logical. If \code{bindingFutility = TRUE} is specified the calculation of
-the critical values is affected by the futility bounds and the futility threshold is binding in the
-sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
+\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a logical vector of length 1.}
 
-\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a positive numeric of length 1.}
+\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
 
-\item{\code{informationAtInterim}}{The information to be expected at interim,
-default is informationAtInterim = 0.5. Is a numeric vector of length 1.}
+\item{\code{informationAtInterim}}{The information to be expected at interim, default is informationAtInterim = 0.5. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{secondStageConditioning}}{Logical. The way the second stage p-values are calculated within
-the closed system of hypotheses. If secondStageConditioning = FALSE is specified, the unconditional adjusted p-values are used,
-otherwise conditional adjusted p-values are calculated, default is secondStageConditioning = TRUE.}
+\item{\code{secondStageConditioning}}{The way the second stage p-values are calculated within the closed system of hypotheses. If \code{FALSE}, the unconditional adjusted p-values are used, otherwise conditional adjusted p-values are calculated. Is a logical vector of length 1.}
 
-\item{\code{sided}}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}.
-Is a positive integer of length 1.}
+\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a numeric vector of length 1 containing a whole number.}
 }}
 
 
 \seealso{
-\code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}} for creating a conditional Dunnett test design.
+\code{\link{getDesignConditionalDunnett}} for creating a conditional Dunnett test design.
 }
 \keyword{internal}

@@ -13,12 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 6902 $
+## |  Last changed: $Date: 2023-03-29 10:01:19 +0200 (Mi, 29 Mrz 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_constants.R
+#' @include f_core_assertions.R
 NULL
 
 #'
@@ -1629,7 +1630,8 @@ summary.ParameterSet <- function(object, ..., type = 1, digits = NA_integer_, ou
 
     if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesignPlan") ||
             inherits(object, "SimulationResults") || inherits(object, "AnalysisResults") ||
-            inherits(object, "TrialDesignCharacteristics"))) {
+            inherits(object, "TrialDesignCharacteristics") ||
+            inherits(object, "PerformanceScore"))) {
         output <- match.arg(output)
         return(.createSummary(object, digits = digits, output = output))
     }

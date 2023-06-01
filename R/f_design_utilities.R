@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6631 $
-## |  Last changed: $Date: 2022-10-25 13:49:41 +0200 (Tue, 25 Oct 2022) $
+## |  File version: $Revision: 7022 $
+## |  Last changed: $Date: 2023-06-01 09:15:57 +0200 (Thu, 01 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -27,7 +27,7 @@ NULL
 }
 
 .getDefaultDesign <- function(...,
-        type = c("sampleSize", "power", "simulation", "analysis"),
+        type = c("sampleSize", "power", "simulation", "analysis", "characteristics"),
         ignore = c()) {
     type <- match.arg(type)
 

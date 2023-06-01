@@ -14,101 +14,65 @@ with suitable arguments to create a inverse normal design.
 \section{Fields}{
 
 \describe{
-\item{\code{kMax}}{The maximum number of stages \code{K}.
-Is a positive integer of length 1 (default value is \code{3}).
-The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
-\code{6} for Fisher combination test designs.}
+\item{\code{kMax}}{The maximum number of stages \code{K}. Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{alpha}}{The significance level alpha, default is \code{0.025}.
-Is a positive numeric of length 1.}
+\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{informationRates}}{The information rates (that must be fixed prior to the trial),
-default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} (the maximum number of stages).}
+\item{\code{informationRates}}{The information rates (that must be fixed prior to the trial), default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{userAlphaSpending}}{The user defined alpha spending.
-Numeric vector of length \code{kMax} containing the cumulative
-alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 <= ... <= alpha_K <= alpha}.}
+\item{\code{userAlphaSpending}}{The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage.}
 
-\item{\code{criticalValues}}{The critical values for each stage of the trial.
-Is a numeric vector of length \code{kMax} (the maximum number of stages).}
+\item{\code{criticalValues}}{The critical values for each stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{stageLevels}}{The levels for each stage.}
+\item{\code{stageLevels}}{The adjusted significance levels to reach significance in a group sequential design.}
 
-\item{\code{alphaSpent}}{The cumulative alpha spent at each stage.
-Is a numeric vector with length \code{kMax} (the maximum number of stages).}
+\item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{bindingFutility}}{Logical. If \code{bindingFutility = TRUE} is specified the calculation of
-the critical values is affected by the futility bounds and the futility threshold is binding in the
-sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
+\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a logical vector of length 1.}
 
-\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a positive numeric of length 1.}
+\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
 
-\item{\code{typeOfDesign}}{The type of design. Type of design is one of the following:
-O'Brien & Fleming (\code{"OF"}), Pocock (\code{"P"}), Wang & Tsiatis Delta class (\code{"WT"}),
-Pampallona & Tsiatis (\code{"PT"}), Haybittle & Peto ("HP"),
-Optimum design within Wang & Tsiatis class (\code{"WToptimum"}),
-O'Brien & Fleming type alpha spending (\code{"asOF"}), Pocock type alpha spending (\code{"asP"}),
-Kim & DeMets alpha spending (\code{"asKD"}), Hwang, Shi & DeCani alpha spending (\code{"asHSD"}),
-user defined alpha spending (\code{"asUser"}), no early efficacy stop (\code{"noEarlyEfficacy"}),
-default is \code{"OF"}.}
+\item{\code{typeOfDesign}}{The type of design. Is a character vector of length 1.}
 
-\item{\code{beta}}{Type II error rate, necessary for providing sample size calculations \cr
-(e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs,
-or optimum designs, default is \code{0.20}. Is a positive numeric of length 1.}
+\item{\code{beta}}{The Type II error rate necessary for providing sample size calculations  (e.g., in \code{getSampleSizeMeans}), beta spending function designs, or optimum designs, default is \code{0.20}. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{deltaWT}}{Delta for Wang & Tsiatis Delta class.
-Is a numeric vector of length 1.}
+\item{\code{deltaWT}}{Delta for Wang & Tsiatis Delta class. Is a numeric vector of length 1.}
 
-\item{\code{deltaPT1}}{Delta1 for Pampallona & Tsiatis class rejecting H0 boundaries.
-Is a numeric vector of length 1.}
+\item{\code{deltaPT1}}{Delta1 for Pampallona & Tsiatis class rejecting H0 boundaries. Is a numeric vector of length 1.}
 
-\item{\code{deltaPT0}}{Delta0 for Pampallona & Tsiatis class rejecting H1 boundaries.
-Is a numeric vector of length 1.}
+\item{\code{deltaPT0}}{Delta0 for Pampallona & Tsiatis class rejecting H1 (accepting H0) boundaries. Is a numeric vector of length 1.}
 
-\item{\code{futilityBounds}}{The futility bounds for each stage of the trial.
-Is a numeric vector of length \code{kMax} - 1, where \code{kMax} is the maximum number of stages.}
+\item{\code{futilityBounds}}{The futility bounds for each stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{gammaA}}{Parameter for alpha spending function.
-Is a numeric vector of length 1.}
+\item{\code{gammaA}}{The parameter for the alpha spending function. Is a numeric vector of length 1.}
 
-\item{\code{gammaB}}{Parameter for beta spending function.
-Is a numeric vector of length 1.}
+\item{\code{gammaB}}{The parameter for the beta spending function. Is a numeric vector of length 1.}
 
-\item{\code{optimizationCriterion}}{Optimization criterion for optimum design within Wang & Tsiatis class ("ASNH1", "ASNIFH1", "ASNsum"), default is "ASNH1".}
+\item{\code{optimizationCriterion}}{The optimization criterion for optimum design within the Wang & Tsiatis class (\code{"ASNH1"}, \code{"ASNIFH1"}, \code{"ASNsum"}), default is \code{"ASNH1"}.}
 
-\item{\code{sided}}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}.
-Is a positive integer of length 1.}
+\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{betaSpent}}{The cumulative beta level spent at each stage of the trial.
-For beta-spending designs, is a numeric vector of length \code{kMax} (the maximum number of stages).}
+\item{\code{betaSpent}}{The cumulative beta level spent at each stage of the trial. Only applicable for beta-spending designs. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{typeBetaSpending}}{Type of beta spending. Type of of beta spending is one of the following: O'Brien & Fleming type beta spending,
-Pocock type beta spending, Kim & DeMets beta spending, Hwang, Shi & DeCani beta spending,
-user defined beta spending ("bsOF", "bsP", "bsKD", "bsHSD", "bsUser", default is "none").}
+\item{\code{typeBetaSpending}}{The type of beta spending. Is a character vector of length 1.}
 
-\item{\code{userBetaSpending}}{The user defined beta spending. Vector of length \code{kMax} containing the cumulative beta-spending up to each interim stage.}
+\item{\code{userBetaSpending}}{The user defined beta spending. Contains the cumulative beta-spending up to each interim stage.}
 
-\item{\code{power}}{The one-sided power at each stage of the trial.
-Is a numeric vector of length \code{kMax} (the maximum number of stages).}
+\item{\code{power}}{The one-sided power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{twoSidedPower}}{Two-sided power at each stage of the trial.
-Is a numeric vector of length \code{kMax} (the maximum number of stages).}
+\item{\code{twoSidedPower}}{Specifies if power is defined two-sided at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{constantBoundsHP}}{The constant bounds up to stage kMax - 1 for the Haybittle & Peto design (default is 3).}
+\item{\code{constantBoundsHP}}{The constant bounds up to stage kMax - 1 for the Haybittle & Peto design (default is 3). Is a numeric vector of length 1.}
 
-\item{\code{betaAdjustment}}{Logical. If \code{TRUE}, beta spending values are
-linearly adjusted if an overlapping of decision regions for futility
-stopping at earlier stages occurs.
-Only applicable for two-sided beta-spending designs.}
+\item{\code{betaAdjustment}}{If \code{TRUE}, beta spending values are linearly adjusted if an overlapping of decision regions for futility stopping at earlier stages occurs. Only applicable for two-sided beta-spending designs. Is a logical vector of length 1.}
 
-\item{\code{delayedInformation}}{Delay of information for delayed response designs.
-Is a numeric value or a numeric vector of length \code{kMax} - 1.}
+\item{\code{delayedInformation}}{Delay of information for delayed response designs.}
 
-\item{\code{decisionCriticalValues}}{TODO}
+\item{\code{decisionCriticalValues}}{The decision critical values for each stage of the trial in a delayed response design.}
 
-\item{\code{reversalProbabilities}}{TODO}
+\item{\code{reversalProbabilities}}{The probability to switch from stopping the trial for success (or futility) and reaching non-rejection (or rejection) in a delayed response design.}
 }}
 
 

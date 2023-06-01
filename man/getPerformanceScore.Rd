@@ -10,7 +10,19 @@ getPerformanceScore(simulationResult)
 \item{simulationResult}{A simulation result.}
 }
 \description{
-Calculates the performance score for a given simulation result.
+Calculates the conditional performance score, its sub-scores and components according to
+Herrmann et al. (2020) for a given simulation result from a two-stage design.
+Larger (sub-)score and component values refer to a better performance.
+}
+\details{
+The conditional performance score consists of two sub-scores, one for the sample size
+(subscoreSampleSize) and one for the conditional power (subscoreConditionalPower).
+Each of those are composed of a location (locationSampleSize, locationConditionalPower)
+and variation component (variationSampleSize, variationConditionalPower).
+The term conditional refers to an evaluation perspective where the interim results
+suggest a trial continuation with a second stage.
+The score can take values between 0 and 1. More details on the performance score
+can be found in Herrmann et al. (2020).
 }
 \author{
 Stephen Schüürhuis

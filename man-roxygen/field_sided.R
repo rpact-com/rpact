@@ -1,5 +1,3 @@
-#' Field Description: Sided
-#' @field sided Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. 
-#' Is a positive integer of length 1.
+#' Field description: sided
+#' @field sided Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a numeric vector of length 1 containing a whole number.
 #' @keywords internal
-

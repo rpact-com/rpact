@@ -13,22 +13,14 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6802 $
-## |  Last changed: $Date: 2023-02-07 17:07:25 +0100 (Di, 07 Feb 2023) $
+## |  File version: $Revision: 7022 $
+## |  Last changed: $Date: 2023-06-01 09:15:57 +0200 (Thu, 01 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_constants.R
 #' @include f_logger.R
 NULL
-
-utils::globalVariables(".parallelComputingCluster")
-utils::globalVariables(".parallelComputingCaseNumbers")
-utils::globalVariables(".parallelComputingArguments")
-
-.parallelComputingCluster <- NULL
-.parallelComputingCaseNumbers <- NULL
-.parallelComputingArguments <- NULL
 
 .getLogicalEnvironmentVariable <- function(variableName) {
     result <- as.logical(Sys.getenv(variableName))
@@ -45,33 +37,6 @@ utils::globalVariables(".parallelComputingArguments")
             return(NA_character_)
         }
     )
-}
-
-.createParallelComputingCluster <- function() {
-    if (!is.null(.parallelComputingCluster)) {
-        return(TRUE)
-    }
-
-    if (requireNamespace("parallel", quietly = TRUE)) {
-        startTime <- Sys.time()
-        cores <- parallel::detectCores(logical = FALSE)
-        if (is.na(cores) || cores < 2) {
-            return(FALSE)
-        }
-
-        tryCatch(
-            {
-                .parallelComputingCluster <<- parallel::makeCluster(cores)
-                .logProgress("Parallel computing cluster created with " + cores + " cores", startTime = startTime)
-                return(TRUE)
-            },
-            error = function(e) {
-                .logWarn("Failed to create parallel computing cluster", e)
-            }
-        )
-    }
-
-    return(FALSE)
 }
 
 .toCapitalized <- function(x, ignoreBlackList = FALSE) {
@@ -153,34 +118,36 @@ utils::globalVariables(".parallelComputingArguments")
     return(sum(result) > 0)
 }
 
-#
-# @title
-# Get Optional Argument
-#
-# @description
-# Returns the value of an optional argument if it exists.
-#
-# @param optionalArgumentName the name of the optional argument.
-#
-# @details
-# Internal function.
-#
-# @return the value of the optional argument if it exists; NULL otherwise.
-#
-# @examples
-#
-# f = function(...) {
-# 	print(.getOptionalArgument("x", ...))
-# }
-#
-# > f(x = 1)
-# [1] 1
-#
-# > f(y = 1)
-# NULL
-#
-# @keywords internal
-#
+#'
+#' @title
+#' Get Optional Argument
+#'
+#' @description
+#' Returns the value of an optional argument if it exists.
+#'
+#' @param optionalArgumentName the name of the optional argument.
+#'
+#' @details
+#' Internal function.
+#'
+#' @return the value of the optional argument if it exists; NULL otherwise.
+#'
+#' @examples
+#'
+#' f = function(...) {
+#' 	print(.getOptionalArgument("x", ...))
+#' }
+#'
+#' > f(x = 1)
+#' [1] 1
+#'
+#' > f(y = 1)
+#' NULL
+#'
+#' @keywords internal
+#' 
+#' @noRd
+#'
 .getOptionalArgument <- function(optionalArgumentName, ..., optionalArgumentDefaultValue = NULL) {
     args <- list(...)
     if (optionalArgumentName %in% names(args)) {
@@ -287,22 +254,26 @@ utils::globalVariables(".parallelComputingArguments")
     return(paste0(paste(part1, collapse = separator), separator, space, mode, " ", part2))
 }
 
-# .getConcatenatedValues(1)
-# .getConcatenatedValues(1:2)
-# .getConcatenatedValues(1:3)
-# .getConcatenatedValues(1, mode = "vector")
-# .getConcatenatedValues(1:2, mode = "vector")
-# .getConcatenatedValues(1:3, mode = "vector")
-# .getConcatenatedValues(1, mode = "and")
-# .getConcatenatedValues(1:2, mode = "and")
-# .getConcatenatedValues(1:3, mode = "and")
-# .getConcatenatedValues(1, mode = "or")
-# .getConcatenatedValues(1:2, mode = "or")
-# .getConcatenatedValues(1:3, mode = "or")
-# .getConcatenatedValues(1, mode = "or", separator = ";")
-# .getConcatenatedValues(1:2, mode = "or", separator = ";")
-# .getConcatenatedValues(1:3, mode = "or", separator = ";")
-
+#'
+#' @examples 
+#' .getConcatenatedValues(1)
+#' .getConcatenatedValues(1:2)
+#' .getConcatenatedValues(1:3)
+#' .getConcatenatedValues(1, mode = "vector")
+#' .getConcatenatedValues(1:2, mode = "vector")
+#' .getConcatenatedValues(1:3, mode = "vector")
+#' .getConcatenatedValues(1, mode = "and")
+#' .getConcatenatedValues(1:2, mode = "and")
+#' .getConcatenatedValues(1:3, mode = "and")
+#' .getConcatenatedValues(1, mode = "or")
+#' .getConcatenatedValues(1:2, mode = "or")
+#' .getConcatenatedValues(1:3, mode = "or")
+#' .getConcatenatedValues(1, mode = "or", separator = ";")
+#' .getConcatenatedValues(1:2, mode = "or", separator = ";")
+#' .getConcatenatedValues(1:3, mode = "or", separator = ";")
+#' 
+#' @noRd
+#' 
 .arrayToString <- function(x, ..., separator = ", ",
         vectorLookAndFeelEnabled = FALSE,
         encapsulate = FALSE,
@@ -310,10 +281,8 @@ utils::globalVariables(".parallelComputingArguments")
         maxLength = 80L,
         maxCharacters = 160L,
         mode = c("csv", "vector", "and", "or")) {
-    if (!is.na(digits) && digits < 0) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'digits' (", digits, ") must be >= 0")
-    }
-
+    .assertIsSingleInteger(digits, "digits", naAllowed = TRUE, validateType = FALSE)
+    .assertIsInClosedInterval(digits, "digits", lower = 0, upper = NULL)
     .assertIsSingleInteger(maxLength, "maxLength", naAllowed = FALSE, validateType = FALSE)
     .assertIsInClosedInterval(maxLength, "maxLength", lower = 1, upper = NULL)
     .assertIsSingleInteger(maxCharacters, "maxCharacters", naAllowed = FALSE, validateType = FALSE)
@@ -478,23 +447,25 @@ utils::globalVariables(".parallelComputingArguments")
     return(.getInputForZeroOutputInsideTolerance(input2, output2, tolerance))
 }
 
-#
-# @title
-# Get One Dimensional Root
-#
-# @description
-# Searches and returns the one dimensional root of a function using \code{uniroot}.
-#
-# @param acceptResultsOutOfTolerance if \code{TRUE}, results will be accepted in any case;
-#        if \code{FALSE}, \code{NA_real_} will be returned in case of tolerance discrepancy
-#
-# @details
-# Internal function.
-#
-# @return the root.
-#
-# @keywords internal
-#
+#'
+#' @title
+#' Get One Dimensional Root
+#'
+#' @description
+#' Searches and returns the one dimensional root of a function using \code{uniroot}.
+#'
+#' @param acceptResultsOutOfTolerance if \code{TRUE}, results will be accepted in any case;
+#'        if \code{FALSE}, \code{NA_real_} will be returned in case of tolerance discrepancy
+#'
+#' @details
+#' Internal function.
+#'
+#' @return the root.
+#'
+#' @keywords internal
+#' 
+#' @noRd
+#'
 .getOneDimensionalRoot <- function(fun,
         ...,
         lower,
@@ -606,79 +577,6 @@ utils::globalVariables(".parallelComputingArguments")
 
     return(unirootResult$root)
 }
-# .getOneDimensionalRoot <- function(
-# 		fun,
-# 		...,
-# 		lower,
-# 		upper,
-# 		tolerance = .Machine$double.eps^0.25,
-# 		acceptResultsOutOfTolerance = FALSE,
-# 		suppressWarnings = TRUE,
-# 		callingFunctionInformation = NA_character_) {
-#
-# 	.assertIsSingleNumber(lower, "lower")
-# 	.assertIsSingleNumber(upper, "upper")
-# 	.assertIsSingleNumber(tolerance, "tolerance")
-#
-# 	resultLower <- fun(lower, ...)
-# 	resultUpper <- fun(upper, ...)
-# 	result <- .getInputProducingZeroOutput(lower, resultLower, upper, resultUpper, tolerance)
-# 	if (!is.na(result)) {
-# 		return(result)
-# 	}
-#
-# 	unirootResult <- NULL
-# 	tryCatch({
-# 		unirootResult <- stats::uniroot(f = fun, lower = lower, upper = upper,
-# 			tol = tolerance, trace = 2, extendInt = "no", ...)
-# 	}, warning = function(w) {
-# 		.logWarn(.getCallingFunctionInformation(callingFunctionInformation),
-# 			"uniroot(f, lower = %s, upper = %s, tol = %s) produced a warning: %s",
-# 			lower, upper, tolerance, w)
-# 	}, error = function(e) {
-# 		msg <- "Failed to run uniroot(f, lower = %s, upper = %s, tol = %s): %s"
-# 		if (getLogLevel() == C_LOG_LEVEL_DEBUG) {
-# 			.logError(msg, lower, upper, tolerance, e)
-# 		} else {
-# 			.logWarn(msg, lower, upper, tolerance, e)
-# 		}
-# 	})
-#
-# 	if (is.null(unirootResult)) {
-# 		direction <- ifelse(fun(lower) < fun(upper), 1, -1)
-# 		if (is.na(direction)) {
-# 			return(NA_real_)
-# 		}
-#
-# 		return(.getOneDimensionalRootBisectionMethod(fun = fun,
-# 			lower = lower, upper = upper, tolerance = tolerance,
-# 			acceptResultsOutOfTolerance = acceptResultsOutOfTolerance, direction = direction,
-# 			suppressWarnings = suppressWarnings, callingFunctionInformation = callingFunctionInformation))
-# 	}
-#
-# 	if (is.infinite(unirootResult$f.root) || abs(unirootResult$f.root) > max(tolerance * 100, 1e-07)) {
-# 		if (!acceptResultsOutOfTolerance) {
-# 			if (!suppressWarnings) {
-# 				warning(.getCallingFunctionInformation(callingFunctionInformation),
-# 					"NA returned because root search by 'uniroot' produced a function result (",
-# 					unirootResult$f.root, ") that differs from target 0 ",
-# 					"(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
-# 					", last function argument was ", unirootResult$root, ")",
-# 					call. = FALSE)
-# 			}
-# 			return(NA_real_)
-# 		} else if (!suppressWarnings) {
-# 			warning(.getCallingFunctionInformation(callingFunctionInformation),
-# 				"Root search by 'uniroot' produced a function result (", unirootResult$f.root, ") ",
-# 				"that differs from target 0 ",
-# 				"(lower = ", lower, ", upper = ", upper, ", tolerance = ", tolerance,
-# 				", last function argument was ", unirootResult$root, ")",
-# 				call. = FALSE)
-# 		}
-# 	}
-#
-# 	return(unirootResult$root)
-# }
 
 .getCallingFunctionInformation <- function(x) {
     if (is.na(x)) {
@@ -688,21 +586,23 @@ utils::globalVariables(".parallelComputingArguments")
     return(paste0(x, ": "))
 }
 
-#
-# @title
-# Get One Dimensional Root Bisection Method
-#
-# @description
-# Searches and returns the one dimensional root of a function using the bisection method.
-#
-# @param acceptResultsOutOfTolerance if \code{TRUE}, results will be accepted in any case;
-#        if \code{FALSE}, \code{NA_real_} will be returned in case of tolerance discrepancy
-#
-# @details
-# Internal function.
-#
-# @keywords internal
-#
+#'
+#' @title
+#' Get One Dimensional Root Bisection Method
+#'
+#' @description
+#' Searches and returns the one dimensional root of a function using the bisection method.
+#'
+#' @param acceptResultsOutOfTolerance if \code{TRUE}, results will be accepted in any case;
+#'        if \code{FALSE}, \code{NA_real_} will be returned in case of tolerance discrepancy
+#'
+#' @details
+#' Internal function.
+#'
+#' @keywords internal
+#' 
+#' @noRd
+#'
 .getOneDimensionalRootBisectionMethod <- function(fun, ..., lower, upper,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
         acceptResultsOutOfTolerance = FALSE,
@@ -990,6 +890,7 @@ utils::globalVariables(".parallelComputingArguments")
 #' How to cite \code{rpact} and \code{R} in publications.
 #'
 #' @param inclusiveR If \code{TRUE} (default) the information on how to cite the base R system in publications will be added.
+#' @param language Language code to use for the output, default is "en".
 #'
 #' @details
 #' This function shows how to cite \code{rpact} and \code{R} (\code{inclusiveR = TRUE}) in publications.
@@ -1001,18 +902,29 @@ utils::globalVariables(".parallelComputingArguments")
 #'
 #' @export
 #'
-printCitation <- function(inclusiveR = TRUE) {
-    if (inclusiveR) {
-        citR <- capture.output(print(citation("base"), bibtex = FALSE))
-        indices <- which(citR == "")
-        indices <- indices[indices != 1 & indices != length(citR)]
-        if (length(indices) > 1) {
-            index <- indices[length(indices)]
-            citR <- citR[1:min(index, length(citR))]
+printCitation <- function(inclusiveR = TRUE, language = "en") {
+    currentLanguage <- Sys.getenv("LANGUAGE")
+    tryCatch(
+        {
+            Sys.setenv(LANGUAGE = language)
+            
+            if (inclusiveR) {
+                citR <- capture.output(print(citation("base"), bibtex = FALSE))
+                indices <- which(citR == "")
+                indices <- indices[indices != 1 & indices != length(citR)]
+                if (length(indices) > 1) {
+                    index <- indices[length(indices)]
+                    citR <- citR[1:min(index, length(citR))]
+                }
+                cat("\n", trimws(paste(citR, collapse = "\n")), "\n", sep = "")
+            }
+            
+            print(citation("rpact"), bibtex = FALSE)
+        },
+        finally = {
+            Sys.setenv(LANGUAGE = currentLanguage)
         }
-        cat("\n", trimws(paste(citR, collapse = "\n")), "\n", sep = "")
-    }
-    print(citation("rpact"), bibtex = FALSE)
+    )
 }
 
 .writeLinesToFile <- function(lines, fileName) {
@@ -1033,12 +945,15 @@ printCitation <- function(inclusiveR = TRUE) {
     invisible(fileName)
 }
 
+#'
+#' Windows: CR (Carriage Return \r) and LF (LineFeed \n) pair
+#' 
+#' OSX, Linux: LF (LineFeed \n)
+#' 
+#' @noRd
+#' 
 .readLinesFromFile <- function(inputFileName) {
     content <- .readContentFromFile(inputFileName)
-
-    # Windows: CR (Carriage Return \r) and LF (LineFeed \n) pair
-    # OSX, Linux: LF (LineFeed \n)
-
     return(strsplit(content, split = "(\r?\n)|(\r\n?)")[[1]])
 }
 
@@ -1256,33 +1171,35 @@ getParameterName <- function(obj, parameterCaption) {
     return(data)
 }
 
-# Example:
-# or1 <- list(
-# 	and1 = FALSE,
-# 	and2 = TRUE,
-# 	and3 = list(
-# 		or1 = list(
-# 			and1 = TRUE,
-# 			and2 = TRUE
-# 		),
-# 		or2 = list(
-# 			and1 = TRUE,
-# 			and2 = TRUE,
-# 			and3 = TRUE
-# 		),
-# 		or3 = list(
-# 			and1 = TRUE,
-# 			and2 = TRUE,
-# 			and3 = TRUE,
-# 			and4 = TRUE,
-# 			and5 = TRUE
-# 		)
-# 	)
-# )
+#' @examples 
+#' or1 <- list(
+#' 	and1 = FALSE,
+#' 	and2 = TRUE,
+#' 	and3 = list(
+#' 		or1 = list(
+#' 			and1 = TRUE,
+#' 			and2 = TRUE
+#' 		),
+#' 		or2 = list(
+#' 			and1 = TRUE,
+#' 			and2 = TRUE,
+#' 			and3 = TRUE
+#' 		),
+#' 		or3 = list(
+#' 			and1 = TRUE,
+#' 			and2 = TRUE,
+#' 			and3 = TRUE,
+#' 			and4 = TRUE,
+#' 			and5 = TRUE
+#' 		)
+#' 	)
+#' )
+#' 
+#' @noRd
+#' 
 .isConditionTrue <- function(x, condType = c("and", "or"), xName = NA_character_,
         level = 0, showDebugMessages = FALSE) {
     if (is.logical(x)) {
-        # message("logical: ", x)
         if (showDebugMessages) {
             message(rep("\t", level), x, "")
         }
@@ -1293,7 +1210,6 @@ getParameterName <- function(obj, parameterCaption) {
 
     if (is.list(x)) {
         listNames <- names(x)
-        # message("listNames: ", .arrayToString(listNames))
         if (is.null(listNames) || any(is.na(listNames)) || any(trimws(listNames) == "")) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "list (", .arrayToString(unlist(x)), ") must be named")
         }
@@ -1373,7 +1289,7 @@ getParameterName <- function(obj, parameterCaption) {
     }
 
     if (is.function(x) || isS4(x)) {
-        return("NULL") # function(...)
+        return("NULL")
     }
 
     if (length(x) == 1 && is.na(x)) {
@@ -1463,6 +1379,10 @@ rcmd <- function(obj, ...,
     return(as.character(class(x))[1])
 }
 
+.isPackageInstalled <- function(packageName) {
+    return(nzchar(try(system.file(package = packageName), silent = TRUE)))
+}
+
 #'
 #' @title
 #' Get Object R Code
@@ -1483,6 +1403,9 @@ rcmd <- function(obj, ...,
 #' @param newArgumentValues A named list with arguments that shall be renewed in the R command, e.g.,
 #'        \code{newArgumentValues = list(informationRates = c(0.5, 1))}.
 #' @param tolerance The tolerance for defining a value as default.
+#' @param pipeOperator The pipe operator to use in the R code, default is "none".
+#' @param output The output format, default is a character "vector".
+#' @param explicitPrint Show an explicit \code{print} command, default is \code{FALSE}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -1502,12 +1425,53 @@ getObjectRCode <- function(obj, ...,
         postfix = "",
         stringWrapPrefix = "",
         newArgumentValues = list(),
-        tolerance = 1e-07) {
+        tolerance = 1e-07,
+        pipeOperator = c("auto", "none", "magrittr", "R"),
+        output = c("vector", "cat", "test", "internal"),
+        explicitPrint = FALSE) {
     functionName <- deparse(substitute(obj))
     functionName <- sub("\\(.*\\)$", "", functionName)
 
+    .assertIsSingleLogical(includeDefaultParameters, "includeDefaultParameters")
+    .assertIsSingleLogical(explicitPrint, "explicitPrint")
+    .assertIsSingleInteger(stringWrapParagraphWidth, "stringWrapParagraphWidth", validateType = FALSE)
+    .assertIsInClosedInterval(stringWrapParagraphWidth, "stringWrapParagraphWidth", lower = 10, upper = 50000)
+    .assertIsSingleCharacter(prefix, "prefix")
+    .assertIsCharacter(postfix, "postfix")
+    .assertIsSingleCharacter(stringWrapPrefix, "stringWrapPrefix")
     .assertIsSingleNumber(tolerance, "tolerance")
     .assertIsInClosedInterval(tolerance, "tolerance", lower = 1e-15, upper = 1e-03)
+    
+    output <- match.arg(output)
+    if (output == "test") {
+        stringWrapParagraphWidth <- NULL
+    }
+    else if (output == "cat") {
+        if (stringWrapPrefix == "") {
+            stringWrapPrefix <- "    "
+        }
+    }
+    
+    pipeOperator <- match.arg(pipeOperator)
+    if (pipeOperator == "auto") {
+        rVersion <- R.Version()
+        if (rVersion$major >= 4 && rVersion$minor >= 1) {
+            pipeOperator <- "R"
+        }
+        else if (.isPackageInstalled("magrittr")) {
+            pipeOperator <- "magrittr"
+        }
+        else {
+            pipeOperator <- "none"
+        }
+    }
+    pipeOperatorPostfix <- ""
+    if (pipeOperator == "magrittr") {
+        pipeOperatorPostfix <- " %>% "
+    }
+    else if (pipeOperator == "R") {
+        pipeOperatorPostfix <- " |> "
+    }
 
     if (!is.null(obj) && is.function(obj)) {
         lines <- .getFunctionAsString(obj,
@@ -1519,12 +1483,19 @@ getObjectRCode <- function(obj, ...,
         }
 
         lines[1] <- paste0(prefix, lines[1])
-        if (postfix != "") {
-            lines <- c(lines, postfix)
+        if (any(postfix != "")) {
+            if (grepl("(\\|>)|(%>%)", postfix[1])) {
+                lines[length(lines)] <- paste0(lines[length(lines)], postfix[1])
+                if (length(postfix) > 1) {
+                    lines <- c(lines, paste0(postfix[2:length(postfix)], collapse = ""))
+                }
+            } else {
+                lines <- c(lines, paste0(postfix, collapse = ""))
+            }
         }
         return(lines)
     }
-
+    
     .assertIsParameterSetClass(obj, "ParameterSet")
 
     if (!is.list(newArgumentValues)) {
@@ -1539,26 +1510,39 @@ getObjectRCode <- function(obj, ...,
         leadingArguments <- character(0)
     }
     if (!inherits(obj, "ConditionalPowerResults") &&
-            !is.null(obj[[".design"]]) && (is.null(leadingArguments) || !any(grepl("design", leadingArguments)))) {
+            !is.null(obj[[".design"]]) && 
+            (is.null(leadingArguments) || !any(grepl("design", leadingArguments)))) {
         preconditionDesign <- getObjectRCode(obj$.design,
-            prefix = "design <- ",
+            prefix = ifelse(pipeOperator == "none", "design <- ", ""),
+            postfix = pipeOperatorPostfix,
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
-            newArgumentValues = newArgumentValues
+            stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
+            pipeOperator = pipeOperator,
+            output = "internal"
         )
-        if (paste0(preconditionDesign, collapse = " ") != "design <- getDesignGroupSequential(kMax = 1)") {
+        if (!grepl("getDesignGroupSequential\\(kMax = 1\\)", paste0(preconditionDesign, collapse = " "))) {
             precondition <- c(precondition, preconditionDesign)
-            leadingArguments <- c(leadingArguments, "design = design")
+            if (pipeOperator == "none") {
+                leadingArguments <- c(leadingArguments, "design = design")
+            }
         }
     }
     if (!is.null(obj[[".dataInput"]]) && (is.null(leadingArguments) || !any(grepl("data", leadingArguments)))) {
         precondition <- c(precondition, getObjectRCode(obj$.dataInput,
-            prefix = "data <- ",
+            prefix = ifelse(pipeOperator == "none", "data <- ", ""),
+            postfix = pipeOperatorPostfix,
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
-            newArgumentValues = newArgumentValues
+            stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
+            pipeOperator = pipeOperator,
+            output = "internal"
         ))
-        leadingArguments <- c(leadingArguments, "dataInput = data")
+        if (pipeOperator == "none") {
+            leadingArguments <- c(leadingArguments, "dataInput = data")
+        }
     }
     if (!is.null(obj[["calcSubjectsFunction"]]) &&
             (is.null(leadingArguments) || !any(grepl("calcSubjectsFunction", leadingArguments))) &&
@@ -1567,7 +1551,10 @@ getObjectRCode <- function(obj, ...,
             prefix = "calcSubjectsFunction <- ",
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
-            newArgumentValues = newArgumentValues
+            stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
+            pipeOperator = pipeOperator,
+            output = "internal"
         ))
     }
     if (!is.null(obj[["calcEventsFunction"]]) &&
@@ -1577,7 +1564,10 @@ getObjectRCode <- function(obj, ...,
             prefix = "calcEventsFunction <- ",
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
-            newArgumentValues = newArgumentValues
+            stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
+            pipeOperator = pipeOperator,
+            output = "internal"
         ))
     }
     if (!is.null(obj[["selectArmsFunction"]]) &&
@@ -1585,9 +1575,12 @@ getObjectRCode <- function(obj, ...,
             !is.null(obj[["typeOfSelection"]]) && obj$typeOfSelection == "userDefined") {
         precondition <- c(precondition, getObjectRCode(obj$selectArmsFunction,
             prefix = "selectArmsFunction <- ",
-            includeDefaultParameters = includeDefaultParameters, ,
+            includeDefaultParameters = includeDefaultParameters, 
             stringWrapParagraphWidth = stringWrapParagraphWidth,
-            newArgumentValues = newArgumentValues
+            stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
+            pipeOperator = pipeOperator,
+            output = "internal"
         ))
         leadingArguments <- c(leadingArguments, "selectArmsFunction = selectArmsFunction")
     }
@@ -1595,10 +1588,14 @@ getObjectRCode <- function(obj, ...,
             !is.null(obj[[".stageResults"]]) &&
             (is.null(leadingArguments) || !any(grepl("stageResults", leadingArguments)))) {
         precondition <- c(precondition, getObjectRCode(obj$.stageResults,
-            prefix = "stageResults <- ",
+            prefix = ifelse(pipeOperator == "none", "stageResults <- ", ""),
+            postfix = pipeOperatorPostfix,
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
-            newArgumentValues = newArgumentValues
+            stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
+            pipeOperator = pipeOperator,
+            output = "internal"
         ))
         leadingArguments <- c(leadingArguments, "stageResults = stageResults")
     }
@@ -1638,8 +1635,6 @@ getObjectRCode <- function(obj, ...,
         functionName <- "getDesignSet"
     } else if ("TrialDesignCharacteristics" == .getClassName(obj)) {
         functionName <- "getDesignCharacteristics"
-    } else if ("SummaryFactory" == .getClassName(obj)) {
-        functionName <- "summary"
     } else if (inherits(obj, "SimulationResultsMeans")) {
         functionName <- "getSimulationMeans"
     } else if (inherits(obj, "SimulationResultsRates")) {
@@ -1672,12 +1667,17 @@ getObjectRCode <- function(obj, ...,
         functionName <- "getEventProbabilities"
     } else if (inherits(obj, "NumberOfSubjects")) {
         functionName <- "getNumberOfSubjects"
-    } else if (inherits(obj, "SummaryFactory")) {
+    } else if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
         return(getObjectRCode(obj$object,
-            prefix = "summary(", postfix = ")",
-            includeDefaultParameters = includeDefaultParameters, ,
+            prefix = ifelse(pipeOperator == "none", "summary(", ""), 
+            postfix = { if (pipeOperator == "none") ")" else c(pipeOperatorPostfix, "summary()") }, 
+            includeDefaultParameters = includeDefaultParameters, 
             stringWrapParagraphWidth = stringWrapParagraphWidth,
-            newArgumentValues = newArgumentValues
+            stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
+            pipeOperator = pipeOperator,
+            output = output,
+            explicitPrint = explicitPrint
         ))
     } else {
         stop("Runtime issue: function 'getObjectRCode' is not implemented for class ", .getClassName(obj))
@@ -1759,7 +1759,8 @@ getObjectRCode <- function(obj, ...,
         objNames <- c(objNames, defaultParams)
     }
 
-    if (inherits(obj, "TrialDesign") && "informationRates" %in% objNames && !("informationRates" %in% newArgumentValueNames)) {
+    if (inherits(obj, "TrialDesign") && "informationRates" %in% objNames && 
+            !("informationRates" %in% newArgumentValueNames)) {
         informationRates <- obj[["informationRates"]]
         if (!is.null(informationRates) && length(informationRates) > 0) {
             kMax <- obj[["kMax"]]
@@ -1774,6 +1775,8 @@ getObjectRCode <- function(obj, ...,
             }
         }
     }
+    
+    # TODO implement PerformanceScore
 
     if (inherits(obj, "Dataset")) {
         lines <- .getDatasetArgumentsRCodeLines(obj, complete = FALSE, digits = NA_integer_)
@@ -1925,29 +1928,78 @@ getObjectRCode <- function(obj, ...,
             argumentsRCode <- leadingArguments
         }
     }
-
-    rCode <- paste0(prefix, functionName, "(", argumentsRCode, ")", postfix)
+    
+    rCode <- paste0(prefix, functionName, "(", argumentsRCode, ")")
+    if (any(postfix != "")) {
+        if (length(postfix) > 1 && grepl("(\\|>)|(%>%)", postfix[1])) {
+            if (!grepl("(\\|>)|(%>%) *$", rCode[length(rCode)])) {
+                rCode <- paste0(rCode, postfix[1])
+            }
+            if (length(postfix) > 1) {
+                rCode <- c(rCode, paste0(postfix[2:length(postfix)], collapse = ""))
+            }
+        } else {
+            rCode <- paste0(rCode, paste0(postfix, collapse = ""))
+        }
+    }
+    
+    if (output != "internal" && explicitPrint) {
+        if (pipeOperator == "none") {
+            rCode <- paste0("print(", rCode, ")")
+        } else {
+            rCode[length(rCode)] <- paste0(rCode[length(rCode)], pipeOperatorPostfix)
+            rCode <- c(rCode, "print()")
+        }
+    }
 
     rCode <- c(precondition, rCode)
 
-    if (is.null(stringWrapParagraphWidth) ||
-            length(stringWrapParagraphWidth) != 1 ||
-            is.na(stringWrapParagraphWidth) ||
-            !is.numeric(stringWrapParagraphWidth) ||
-            stringWrapParagraphWidth < 10) {
+    if (!is.null(stringWrapParagraphWidth) &&
+            length(stringWrapParagraphWidth) == 1 &&
+            !is.na(stringWrapParagraphWidth) &&
+            is.numeric(stringWrapParagraphWidth) &&
+            stringWrapParagraphWidth >= 10 && 
+            !is.null(stringWrapPrefix) && 
+            length(stringWrapPrefix) == 1 &&
+            !is.na(stringWrapPrefix) && 
+            is.character(stringWrapPrefix)) {
+        rCodeNew <- character(0)
+        for (rCodeLine in rCode) {
+            rCodeLine <- gsub("   ", "___", rCodeLine)
+            rCodeLine <- gsub("  ", "__", rCodeLine)
+            rCodeLine <- strwrap(rCodeLine, width = stringWrapParagraphWidth)
+            if (length(rCodeLine) > 1) {
+                for (i in 2:length(rCodeLine)) {
+                    if (!grepl("^ *([a-zA-Z0-9]+ *<-)|(^ *get[a-zA-Z]+\\()|summary\\(", rCodeLine[i])) {
+                        rCodeLine[i] <- paste0(stringWrapPrefix, rCodeLine[i])
+                    }
+                }
+            }
+            rCodeLine <- gsub("___", "   ", rCodeLine)
+            rCodeLine <- gsub("__", "  ", rCodeLine)
+            rCodeNew <- c(rCodeNew, rCodeLine)
+        }
+        rCode <- rCodeNew
+    }
+    
+    if (output %in% c("vector", "internal")) {
         return(rCode)
     }
-
-    rCode <- strwrap(rCode, width = stringWrapParagraphWidth)
-    if (length(rCode) > 1 && !is.null(stringWrapPrefix) && length(stringWrapPrefix) == 1 &&
-            !is.na(stringWrapPrefix) && is.character(stringWrapPrefix)) {
-        for (i in 2:length(rCode)) {
-            if (!grepl("^ *([a-zA-Z0-9]+ *<-)|(^ *get[a-zA-Z]+\\()", rCode[i])) {
-                rCode[i] <- paste0(stringWrapPrefix, rCode[i])
-            }
+    
+    if (output == "cat") {
+        collapse <- "\n"
+        if (pipeOperator != "none") {
+            collapse <- paste0("\n", stringWrapPrefix)
         }
+        cat(paste0(rCode, collapse = collapse), "\n")
+        return(invisible(rCode))
     }
-    return(rCode)
+    
+    if (output == "test") {
+        eval(parse(text = rCode))
+    }
+    
+    return(invisible(rCode))
 }
 
 .getQNorm <- function(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE, epsilon = C_QNORM_EPSILON) {

@@ -14,24 +14,21 @@ with suitable arguments to create the results of a group sequential or a combina
 \section{Fields}{
 
 \describe{
-\item{\code{nPlanned}}{The new sample size planned for each of the subsequent stages.}
+\item{\code{nPlanned}}{The sample size planned for each of the subsequent stages. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio \code{n1/n2} for a
-two treatment groups design, default is \code{1}. Is a numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is an integer of length 1.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
 
 \item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
 
-\item{\code{simulated}}{Logical. Describes if the power for Fisher's combination test
-has been simulated. Only applicable when using Fisher designs.}
+\item{\code{simulated}}{Describes if the power for Fisher's combination test has been simulated. Only applicable when using Fisher designs. Is a logical vector of length 1.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial.
-Is a numeric vector of length \code{kMax}.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{thetaH1}}{For survival designs, refers to the hazard ratio. Is a numeric vector of length 1.}
+\item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio. Is a numeric vector.}
 
-\item{\code{assumedStDev}}{The assumed standard deviation. Is a numeric vector of length 1.}
+\item{\code{assumedStDev}}{The assumed standard deviation(s) for means analysis. Is a numeric vector.}
 }}
 
 

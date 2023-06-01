@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6414 $
-## |  Last changed: $Date: 2022-07-15 09:17:18 +0200 (Fr, 15 Jul 2022) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6931 $
+## |  Last changed: $Date: 2023-04-11 15:40:33 +0200 (Di, 11 Apr 2023) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_simulation_enrichment.R
@@ -48,7 +48,7 @@ NULL
             if (conditionalCriticalValue[stage] > 8) {
                 newSubjects <- maxNumberOfSubjectsPerStage[stage + 1]
             } else {
-                newSubjects <- (1 + allocationRatioPlanned)^2 / allocationRatioPlanned *
+                newSubjects <- (1 + allocationRatioPlanned[stage])^2 / allocationRatioPlanned[stage] *
                     (max(0, conditionalCriticalValue[stage] +
                         .getQNorm(conditionalPower)))^2 / thetaStandardized^2
                 newSubjects <- min(
@@ -115,9 +115,10 @@ NULL
         weights <- .getWeightsInverseNormal(design)
     }
 
-    const <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2
-
+    
     for (k in 1:kMax) {
+		const <- allocationRatioPlanned[k] / (1 + allocationRatioPlanned[k])^2
+		
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
 
         if (k == 1) {
@@ -321,7 +322,7 @@ NULL
 
             conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
                 thetaStandardized * sqrt(plannedSubjects[k + 1] - plannedSubjects[k]) *
-                    sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned))
+                    sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k]))
         }
     }
 
@@ -480,6 +481,7 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
     successCriterion <- simulationResults$successCriterion
     effectMeasure <- simulationResults$effectMeasure
     adaptations <- simulationResults$adaptations
+	gMax <- simulationResults$populations	
     kMax <- simulationResults$.design$kMax
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection
@@ -491,7 +493,10 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
-    gMax <- simulationResults$populations
+	
+	if (length(allocationRatioPlanned) == 1){
+		allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+	}
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 

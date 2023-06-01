@@ -9,11 +9,37 @@ Class for trial design characteristics.
 }
 \details{
 \code{TrialDesignCharacteristics} contains all fields required to collect the characteristics of a design.
-This object should not be created directly; use \code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}}
+This object should not be created directly; use \code{getDesignCharacteristics}
 with suitable arguments to create it.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{nFixed}}{The sample size in a fixed (one-stage) design.}
+
+\item{\code{shift}}{The shift value for group sequential test characteristics.}
+
+\item{\code{inflationFactor}}{The relative increase of maximum sample size in a group sequential design as compared to the fixed sample size case.}
+
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
+
+\item{\code{information}}{The information over stages needed to achieve power of the specified design.}
+
+\item{\code{power}}{The one-sided power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+
+\item{\code{rejectionProbabilities}}{The rejection probabilities over treatments arms or populations and stages.}
+
+\item{\code{futilityProbabilities}}{The overall probabilities of stopping the trial for futility.}
+
+\item{\code{averageSampleNumber1}}{The expected sample size under H1. Is a numeric vector of length 1.}
+
+\item{\code{averageSampleNumber01}}{The expected sample size for a value between H0 and H1. Is a numeric vector of length 1.}
+
+\item{\code{averageSampleNumber0}}{The expected sample size under H0. Is a numeric vector of length 1.}
+}}
+
 
 \seealso{
-\code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}} for getting the design characteristics.
+\code{\link{getDesignCharacteristics}} for getting the design characteristics.
 }
 \keyword{internal}

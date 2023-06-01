@@ -44,49 +44,50 @@ We recommend three ways to learn how to use `rpact`:
 
 > 1. Use the Shiny app: [shiny.rpact.com](https://www.rpact.com/products#public-rpact-shiny-app)
 > 2. Use the Vignettes:
->    [www.rpact.com/vignettes](https://www.rpact.com/vignettes)
+>    [www.rpact.org/vignettes](https://www.rpact.org/vignettes)
 > 3. Book a training:
 >    [www.rpact.com](https://www.rpact.com/services#learning-and-training)
 
 ### Vignettes
 
 The vignettes are hosted at
-[www.rpact.com/vignettes](https://www.rpact.com/vignettes) and cover the
+[www.rpact.org/vignettes](https://www.rpact.org/vignettes) and cover the
 following topics:
 
-1. Defining group-sequential boundaries
-2. Designing group-sequential trials with two groups and a continuous endpoint
-3. Designing group-sequential trials with a binary endpoint
-4. Designing group-sequential trials with two groups and a survival endpoint
-5. Simulation-based design of group-sequential trials with a survival endpoint
-6. An example to illustrate boundary re-calculations during the trial
-7. Analysis of a group-sequential trial with a survival endpoint
-8. Defining accrual time and accrual intensity
-9. How to use R generics with `rpact`
-10. How to create admirable plots with `rpact`
-11. Comparing sample size and power calculation results for a group-sequential
-    trial with a survival endpoint:
-    [rpact](https://cran.r-project.org/package=rpact) vs.
-    [gsDesign](https://cran.r-project.org/package=gsDesign)
-12. Supplementing and enhancing rpact's graphical capabilities with
-    [ggplot2](https://cran.r-project.org/package=ggplot2)
-13.  Using the inverse normal combination test for analyzing a trial with
-     continuous endpoint and potential sample size reassessment
-14. Planning a trial with binary endpoints
-15. Planning a survival trial
-16. Simulation of a trial with a binary endpoint and unblinded sample size
-    re-calculation 
-17. How to create summaries
-18. How to create analysis result (one- and multi-arm) plots
-19. How to create simulation result (one- and multi-arm) plots
-20. Simulating multi-arm designs with a continuous endpoint
-21. Analysis of a multi-arm design with a binary endpoint
+1. Defining Group Sequential Boundaries with rpact
+2. Designing Group Sequential Trials with Two Groups and a Continuous Endpoint
+   with rpact
+3. Designing Group Sequential Trials with a Binary Endpoint with rpact
+4. Designing Group Sequential Trials with Two Groups and a Survival Endpoint
+   with rpact
+5. Simulation-Based Design of Group Sequential Trials with a Survival Endpoint
+   with rpact
+6. An Example to Illustrate Boundary Re-Calculations during the Trial with rpact
+7. Analysis of a Group Sequential Trial with a Survival Endpoint using rpact
+8. Defining Accrual Time and Accrual Intensity with rpact
+9. How to use R Generics with rpact
+10. How to Create Admirable Plots with rpact
+11. Comparing Sample Size and Power Calculation Results for a Group Sequential
+    Trial with a Survival Endpoint: rpact vs. gsDesign
+12. Supplementing and Enhancing rpact’s Graphical Capabilities with ggplot2
+13. Using the Inverse Normal Combination Test for Analysing a Trial with
+    Continuous Endpoint and Potential Sample Size Re-Assessment with rpact
+14. Planning a Trial with Binary Endpoints with rpact
+15. Planning a Survival Trial with rpact
+16. Simulation of a Trial with a Binary Endpoint and Unblinded Sample Size
+    Re-Calculation with rpact
+17. How to Create Summaries with rpact
+18. How to Create One- and Multi-Arm Analysis Result Plots with rpact
+19. How to Create One- and Multi-Arm Simulation Result Plots with rpact
+20. Simulating Multi-Arm Designs with a Continuous Endpoint using rpact
+21. Analysis of a Multi-Arm Design with a Binary Endpoint using rpact
 22. Step-by-Step rpact Tutorial
-23. Planning and Analyzing a Group-Sequential Multi-Arm-Multi-Stage Design with
-    Binary Endpoint using rpact
+23. Planning and Analyzing a Group-Sequential Multi-Arm Multi-Stage Design with
+    Binary Endpoint using rpact   
 24. Two-arm analysis for continuous data with covariates from raw data
     (*exclusive*)
 25. How to install the latest developer version (*exclusive*)
+26. Delayed Response Designs with rpact
 
 ## User Concept
 

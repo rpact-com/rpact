@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 6902 $
+## |  Last changed: $Date: 2023-03-29 10:01:19 +0200 (Mi, 29 Mrz 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -687,7 +687,15 @@ C_PARAMETER_NAMES <- list(
     situation = "Situation",
     delayedInformation = "Delayed information",
     decisionCriticalValues = "Decision critical values",
-    reversalProbabilities = "Reversal probabilities"
+    reversalProbabilities = "Reversal probabilities",
+    
+    locationSampleSize = "Location sample sizes",
+    variationSampleSize = "Variation sample sizes",
+    subscoreSampleSize = "Sub-score sample sizes",
+    locationConditionalPower = "Location conditional power",
+    variationConditionalPower = "Variation conditional power",
+    subscoreConditionalPower = "Sub-score conditional power",
+    performanceScore = "Performance scores"
 )
 
 C_TABLE_COLUMN_NAMES <- list(
@@ -979,7 +987,15 @@ C_TABLE_COLUMN_NAMES <- list(
     situation = "Situation",
     delayedInformation = "Delayed information",
     decisionCriticalValues = "Decision critical value",
-    reversalProbabilities = "Reversal probability"
+    reversalProbabilities = "Reversal probability",
+    
+    locationSampleSize = "Location sample size",
+    variationSampleSize = "Variation sample size",
+    subscoreSampleSize = "Sub-score sample size",
+    locationConditionalPower = "Location conditional power",
+    variationConditionalPower = "Variation conditional power",
+    subscoreConditionalPower = "Sub-score conditional power",
+    performanceScore = "Performance score"
 )
 
 .getParameterCaptions <- function(captionList, ...,
@@ -1293,5 +1309,13 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     informationEpsilon = ".formatProbabilities",
     delayedInformation = ".formatRates",
     decisionCriticalValues = ".formatCriticalValues",
-    reversalProbabilities = ".formatProbabilities"
+    reversalProbabilities = ".formatProbabilities",
+    
+    locationSampleSize = ".formatProbabilities",
+    variationSampleSize = ".formatProbabilities",
+    subscoreSampleSize = ".formatProbabilities",
+    locationConditionalPower = ".formatProbabilities",
+    variationConditionalPower = ".formatProbabilities",
+    subscoreConditionalPower = ".formatProbabilities",
+    performanceScore = ".formatProbabilities"
 )

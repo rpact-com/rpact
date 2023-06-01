@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 6862 $
+## |  Last changed: $Date: 2023-03-10 08:37:03 +0100 (Fr, 10 Mrz 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1047,6 +1047,8 @@ getLongFormat <- function(dataInput) {
 #' getObservedInformationRates(data,
 #'     maxInformation = 46, informationEpsilon = 0.03
 #' )
+#' 
+#' @return Returns a list that summarizes the observed information rates.
 #' 
 #' @export
 #'

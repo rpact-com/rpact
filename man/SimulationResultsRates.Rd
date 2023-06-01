@@ -9,18 +9,68 @@ A class for simulation results rates.
 }
 \details{
 Use \code{\link[=getSimulationRates]{getSimulationRates()}} to create an object of this type.
+
+\code{SimulationResultsRates} is the basic class for
+\itemize{
+\item \code{\link{SimulationResultsRates}},
+\item \code{\link{SimulationResultsMultiArmRates}}, and
+\item \code{\link{SimulationResultsEnrichmentRates}}.
+}
 }
 \section{Fields}{
 
 \describe{
-\item{\code{groups}}{The number of groups. Is an integer vector of length 1.}
+\item{\code{maxNumberOfIterations}}{The number of simulation iterations. Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{directionUpper}}{Logical. Specifies the direction of the alternative,
-only applicable for one-sided testing, default is TRUE which means that larger values
-of the test statistics yield smaller p-values.}
+\item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
 
-\item{\code{normalApproximation}}{Logical. Describes if a normal approximation was used when calculating p-values.
-Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
+
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+
+\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
+
+\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility.}
+
+\item{\code{futilityStop}}{In simulation results data set: indicates whether trial is stopped for futility or not.}
+
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+
+\item{\code{plannedSubjects}}{Determines the number of cumulated (overall) subjects when the interim stages are planned. For two treatment arms, is the number of subjects for both treatment arms. For multi-arm designs, refers to the number of subjects per selected active arm. Is a numeric vector of length \code{kMax} containing whole numbers.}
+
+\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations.}
+
+\item{\code{calcSubjectsFunction}}{An optional function that can be entered to define how sample size is recalculated. By default, recalculation is performed with conditional power with specified \code{minNumberOfSubjectsPerStage} and \code{maxNumberOfSubjectsPerStage}.}
+
+\item{\code{expectedNumberOfSubjects}}{The expected number of subjects under specified alternative.}
+
+\item{\code{riskRatio}}{Specifies if the sample size for one-sided testing of H0: \code{pi1 / pi2 = thetaH0} has been calculated. Is a logical vector of length 1.}
+
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+
+\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a logical vector of length 1.}
+
+\item{\code{pi1}}{The assumed probability or probabilities in the active treatment group in two-group designs, or the alternative probability for a one-group design.}
+
+\item{\code{pi2}}{The assumed probability in the reference group for two-group designs. Is a numeric vector of length 1 containing a value between 0 and 1.}
+
+\item{\code{groups}}{The group numbers. Is a numeric vector of length number of stages times number of groups.}
+
+\item{\code{pi1H1}}{The assumed probability in the active treatment group for two-group designs, or the assumed probability for a one treatment group design, for which the conditional power was calculated. Is a numeric vector of length 1 containing a value between 0 and 1.}
+
+\item{\code{pi2H1}}{The assumed probability in the reference group for two-group designs, for which the conditional power was calculated. Is a numeric vector of length 1 containing a value between 0 and 1.}
+
+\item{\code{effect}}{The effect for randomly creating normally distributed responses.}
+
+\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility.}
+
+\item{\code{sampleSizes}}{The sample sizes for each group and stage. Is a numeric vector of length number of stages times number of groups containing whole numbers.}
+
+\item{\code{overallReject}}{The overall rejection probability.}
+
+\item{\code{rejectPerStage}}{The probability to reject a hypothesis per stage of the trial.}
+
+\item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes.}
 }}
 
 

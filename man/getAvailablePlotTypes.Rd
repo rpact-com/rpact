@@ -27,8 +27,9 @@ getAvailablePlotTypes(
 caption, default is \code{FALSE}.}
 }
 \value{
-Depending on how the \code{output} is specified,
-a numeric vector, a character vector, or a list will be returned.
+Returns a list if \code{option} is either \code{capnum} or {numcap}
+or returns a vector that is of  character type for \code{option=caption} or
+of numeric type for \code{option=numeric}.
 }
 \description{
 Function to identify the available plot types of an object.

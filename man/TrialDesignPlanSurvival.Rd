@@ -11,5 +11,131 @@ Trial design plan for survival data.
 This object cannot be created directly; use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 with suitable arguments to create a design plan for a dataset of survival data.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{thetaH0}}{The difference or assumed effect under H0. Is a numeric vector of length 1.}
+
+\item{\code{typeOfComputation}}{The type of computation used, either \code{"Schoenfeld", "Freedman"}, or \code{"HsiehFreedman"}.}
+
+\item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
+
+\item{\code{pi1}}{The assumed event rate in the treatment group. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+
+\item{\code{pi2}}{The assumed event rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.}
+
+\item{\code{median1}}{The assumed median survival time in the treatment group. Is a numeric vector of length 1.}
+
+\item{\code{median2}}{The assumed median survival time in the reference group. Is a numeric vector of length 1.}
+
+\item{\code{lambda1}}{The assumed hazard rate in the treatment group. Is a numeric vector of length \code{kMax}.}
+
+\item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a numeric vector of length 1.}
+
+\item{\code{hazardRatio}}{The hazard ratios under consideration. Is a numeric vector of length \code{kMax}.}
+
+\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations.}
+
+\item{\code{maxNumberOfSubjects1}}{The maximum number of subjects in treatment arm 1.}
+
+\item{\code{maxNumberOfSubjects2}}{The maximum number of subjects in treatment arm 2.}
+
+\item{\code{maxNumberOfEvents}}{The maximum number of events for power calculations.}
+
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
+
+\item{\code{optimumAllocationRatio}}{The allocation ratio that is optimum with respect to the overall sample size at given power.}
+
+\item{\code{accountForObservationTimes}}{If \code{FALSE}, only the event rates are used for the calculation of the maximum number of subjects. Is a logical vector of length 1.}
+
+\item{\code{eventTime}}{The assumed time under which the event rates are calculated. Is a numeric vector of length 1.}
+
+\item{\code{accrualTime}}{The assumed accrual time intervals for the study. Is a numeric vector.}
+
+\item{\code{totalAccrualTime}}{The total accrual time, i.e., the maximum of \code{accrualTime}. Is a positive numeric vector of length 1.}
+
+\item{\code{accrualIntensity}}{The absolute accrual intensities. Is a numeric vector of length \code{kMax}.}
+
+\item{\code{accrualIntensityRelative}}{The relative accrual intensities.}
+
+\item{\code{kappa}}{The shape of the Weibull distribution if \code{kappa!=1}. Is a numeric vector of length 1.}
+
+\item{\code{piecewiseSurvivalTime}}{The time intervals for the piecewise definition of the exponential survival time cumulative distribution function. Is a numeric vector.}
+
+\item{\code{followUpTime}}{The assumed follow-up time for the study. Is a numeric vector of length 1.}
+
+\item{\code{dropoutRate1}}{The assumed drop-out rate in the treatment group. Is a numeric vector of length 1.}
+
+\item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a numeric vector of length 1.}
+
+\item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a numeric vector of length 1.}
+
+\item{\code{omega}}{The assumed hazard ratio.}
+
+\item{\code{expectedNumberOfEvents}}{The expected number of events under specified alternative.}
+
+\item{\code{eventsFixed}}{The number of events in a fixed sample size design.}
+
+\item{\code{nFixed}}{The sample size in a fixed (one-stage) design.}
+
+\item{\code{nFixed1}}{The sample size in treatment arm 1 in a fixed (one-stage) design.}
+
+\item{\code{nFixed2}}{The sample size in treatment arm 2 in a fixed (one-stage) design.}
+
+\item{\code{overallReject}}{The overall rejection probability.}
+
+\item{\code{rejectPerStage}}{The probability to reject a hypothesis per stage of the trial.}
+
+\item{\code{futilityStop}}{In simulation results data set: indicates whether trial is stopped for futility or not.}
+
+\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility.}
+
+\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility.}
+
+\item{\code{informationRates}}{The information rates (that must be fixed prior to the trial), default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+
+\item{\code{analysisTime}}{The estimated time of analysis.}
+
+\item{\code{studyDurationH1}}{The study duration under the alternative hypothesis.}
+
+\item{\code{studyDuration}}{The study duration for speciifed effect size.}
+
+\item{\code{maxStudyDuration}}{The maximum study duration in survival designs.}
+
+\item{\code{eventsPerStage}}{The number of events per stage.}
+
+\item{\code{expectedEventsH0}}{The expected number of events under H0.}
+
+\item{\code{expectedEventsH01}}{The expected number of events under a value between H0 and H1.}
+
+\item{\code{expectedEventsH1}}{The expected number of events under H1.}
+
+\item{\code{numberOfSubjects}}{In simulation results data set: The number of subjects under consideration when the interim analysis takes place.}
+
+\item{\code{numberOfSubjects1}}{In simulation results data set: The number of subjects under consideration in treatment arm 1 when the interim analysis takes place.}
+
+\item{\code{numberOfSubjects2}}{In simulation results data set: The number of subjects under consideration in treatment arm 2 when the interim analysis takes place.}
+
+\item{\code{expectedNumberOfSubjectsH1}}{The expected number of subjects under H1. Is a positive numeric vector of length 1.}
+
+\item{\code{expectedNumberOfSubjects}}{The expected number of subjects under specified alternative.}
+
+\item{\code{criticalValuesEffectScale}}{The critical values for each stage of the trial on the effect size scale.}
+
+\item{\code{criticalValuesEffectScaleLower}}{The lower critical values for each stage of the trial on the effect size scale.}
+
+\item{\code{criticalValuesEffectScaleUpper}}{The upper critical values for each stage of the trial on the effect size scale.}
+
+\item{\code{criticalValuesPValueScale}}{The critical values for each stage of the trial on the p-valuie scale.}
+
+\item{\code{futilityBoundsEffectScale}}{The futility bounds for each stage of the trial on the effect size scale.}
+
+\item{\code{futilityBoundsEffectScaleLower}}{The lower futility bounds for each stage of the trial on the effect size scale.}
+
+\item{\code{futilityBoundsEffectScaleUpper}}{The upper futility bounds for each stage of the trial on the effect size scale.}
+
+\item{\code{futilityBoundsPValueScale}}{The futility bounds for each stage of the trial on the p-value scale.}
+}}
+
 
 \keyword{internal}

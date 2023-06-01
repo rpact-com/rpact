@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6810 $
-## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
+## |  File version: $Revision: 7022 $
+## |  Last changed: $Date: 2023-06-01 09:15:57 +0200 (Thu, 01 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -48,8 +48,9 @@ NULL
 #' \code{TrialDesign} is the basic class for
 #' \itemize{
 #'   \item \code{\link{TrialDesignFisher}},
-#'   \item \code{\link{TrialDesignGroupSequential}}, and
-#'   \item \code{\link{TrialDesignInverseNormal}}.
+#'   \item \code{\link{TrialDesignGroupSequential}},
+#'   \item \code{\link{TrialDesignInverseNormal}}, and
+#'   \item \code{\link{TrialDesignConditionalDunnett}}.
 #' }
 #'
 #' @include class_core_parameter_set.R
@@ -198,12 +199,24 @@ TrialDesign <- setRefClass("TrialDesign",
 #' @description
 #' Class for trial design characteristics.
 #'
+#' @template field_nFixed
+#' @template field_shift
+#' @template field_inflationFactor
+#' @template field_stages
+#' @template field_information
+#' @template field_power
+#' @template field_rejectionProbabilities
+#' @template field_futilityProbabilities
+#' @template field_averageSampleNumber1
+#' @template field_averageSampleNumber01
+#' @template field_averageSampleNumber0
+#' 
 #' @details
 #' \code{TrialDesignCharacteristics} contains all fields required to collect the characteristics of a design.
-#' This object should not be created directly; use \code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}}
+#' This object should not be created directly; use \code{getDesignCharacteristics}
 #' with suitable arguments to create it.
 #'
-#' @seealso \code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}} for getting the design characteristics.
+#' @seealso \code{\link{getDesignCharacteristics}} for getting the design characteristics.
 #'
 #' @include class_core_parameter_set.R
 #' @include f_core_constants.R
@@ -281,6 +294,29 @@ TrialDesignCharacteristics <- setRefClass("TrialDesignCharacteristics",
 
 #'
 #' @title
+#' Trial Design Characteristics Printing
+#'
+#' @param x The trial design characteristics object.
+#' @param showDesign Show the design print output above the design characteristics, default is \code{TRUE}.
+#' @inheritParams param_three_dots_plot
+#'
+#' @description
+#' Prints the design characteristics object.
+#'
+#' @details
+#' Generic function to print all kinds of design characteristics.
+#'
+#' @export
+#'
+print.TrialDesignCharacteristics <- function(x, ..., showDesign = TRUE) {
+    if (showDesign) {
+        x$.design$show()
+    }
+    x$show()
+}
+
+#'
+#' @title
 #' Coerce TrialDesignCharacteristics to a Data Frame
 #'
 #' @description
@@ -338,20 +374,20 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
 #' @template field_alphaSpent
 #' @template field_bindingFutility
 #' @template field_tolerance
-#' @field method "equalAlpha", "fullAlpha", "noInteraction", or "userDefinedAlpha", default is "equalAlpha" (for details, see Wassmer, 1999)
-#' @field alpha0Vec Stopping for futility bounds for stage-wise p-values.
-#' @field scale Is a numeric vector of length \code{kMax}-1 that applies to Fisher's design with unequally spaced information rates.
-#' @field nonStochasticCurtailment Logical. If \code{TRUE}, the stopping rule is based on the phenomenon of non-stochastic curtailment rather than stochastic reasoning.
+#' @template field_method
+#' @template field_alpha0Vec
+#' @template field_scale
+#' @template field_nonStochasticCurtailment
 #' @template field_sided
-#' @field simAlpha The observed alpha error, if simulations have been performed. Is a numeric vector of length 1.
+#' @template field_simAlpha
 #' @template field_iterations
 #' @template field_seed
 #'
 #' @details
-#' This object should not be created directly; use \code{\link[=getDesignFisher]{getDesignFisher()}}
+#' This object should not be created directly; use \code{\link{getDesignFisher}}
 #' with suitable arguments to create a Fisher combination test design.
 #'
-#' @seealso \code{\link[=getDesignFisher]{getDesignFisher()}} for creating a Fisher combination test design.
+#' @seealso \code{\link{getDesignFisher}} for creating a Fisher combination test design.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -894,13 +930,11 @@ TrialDesignGroupSequential <- setRefClass(
 #' @template field_bindingFutility
 #' @template field_tolerance
 #' @template field_informationAtInterim 
-#' @field secondStageConditioning Logical. The way the second stage p-values are calculated within 
-#' the closed system of hypotheses. If secondStageConditioning = FALSE is specified, the unconditional adjusted p-values are used, 
-#' otherwise conditional adjusted p-values are calculated, default is secondStageConditioning = TRUE.
+#' @template field_secondStageConditioning
 #' @template field_sided
 #'
 #' @details
-#' This object should not be created directly; use \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}
+#' This object should not be created directly; use \code{\link{getDesignConditionalDunnett}}
 #' with suitable arguments to create a conditional Dunnett test design.
 #'
 #' @include class_core_parameter_set.R
@@ -911,8 +945,8 @@ TrialDesignGroupSequential <- setRefClass(
 #'
 #' @importFrom methods new
 #'
-#' @seealso \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}} for creating a conditional Dunnett test design.
-
+#' @seealso \code{\link{getDesignConditionalDunnett}} for creating a conditional Dunnett test design.
+#' 
 TrialDesignConditionalDunnett <- setRefClass(
     C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT,
     contains = "TrialDesign",
@@ -1115,6 +1149,12 @@ plot.TrialDesign <- function(x, y, ..., main = NA_character_,
     }
 
     return(.createPlotResultObject(plotList, grid))
+}
+
+#' @rdname plot.TrialDesign
+#' @export
+plot.TrialDesignCharacteristics <- function(x, y, ...) {
+    plot(x = x$.design, y = y, ...)
 }
 
 .plotTrialDesign <- function(..., x, y, main,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6810 $
-## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
+## |  File version: $Revision: 7015 $
+## |  Last changed: $Date: 2023-05-26 10:10:10 +0200 (Fri, 26 May 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -77,9 +77,9 @@ C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_SURVIVAL <- list(
 #' @details
 #' \code{TrialDesignPlan} is the basic class for
 #' \itemize{
-#'   \item \code{TrialDesignPlanMeans},
-#'   \item \code{TrialDesignPlanRates}, and
-#'   \item \code{TrialDesignPlanSurvival}.
+#'   \item \code{\link{TrialDesignPlanMeans}},
+#'   \item \code{\link{TrialDesignPlanRates}}, and
+#'   \item \code{\link{TrialDesignPlanSurvival}}.
 #' }
 #'
 #' @include f_core_constants.R
@@ -283,6 +283,44 @@ as.data.frame.TrialDesignPlan <- function(x, row.names = NULL,
 #'
 #' @description
 #' Trial design plan for means.
+#' 
+#' @template field_meanRatio
+#' @template field_thetaH0
+#' @template field_normalApproximation
+#' @template field_alternative 
+#' @template field_stDev
+#' @template field_groups
+#' @template field_allocationRatioPlanned
+#' @template field_optimumAllocationRatio
+#' @template field_directionUpper
+#' @template field_effect
+#' @template field_overallReject
+#' @template field_rejectPerStage
+#' @template field_futilityStop
+#' @template field_futilityPerStage
+#' @template field_earlyStop
+#' @template field_expectedNumberOfSubjects
+#' @template field_nFixed
+#' @template field_nFixed1
+#' @template field_nFixed2
+#' @template field_informationRates
+#' @template field_maxNumberOfSubjects
+#' @template field_maxNumberOfSubjects1
+#' @template field_maxNumberOfSubjects2
+#' @template field_numberOfSubjects
+#' @template field_numberOfSubjects1
+#' @template field_numberOfSubjects2
+#' @template field_expectedNumberOfSubjectsH0
+#' @template field_expectedNumberOfSubjectsH01
+#' @template field_expectedNumberOfSubjectsH1
+#' @template field_criticalValuesEffectScale
+#' @template field_criticalValuesEffectScaleLower
+#' @template field_criticalValuesEffectScaleUpper
+#' @template field_criticalValuesPValueScale
+#' @template field_futilityBoundsEffectScale
+#' @template field_futilityBoundsEffectScaleLower
+#' @template field_futilityBoundsEffectScaleUpper
+#' @template field_futilityBoundsPValueScale
 #'
 #' @details
 #' This object cannot be created directly; use \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}
@@ -428,6 +466,44 @@ TrialDesignPlanMeans <- setRefClass("TrialDesignPlanMeans",
 #'
 #' @description
 #' Trial design plan for rates.
+#' 
+#' @template field_riskRatio
+#' @template field_thetaH0
+#' @template field_normalApproximation
+#' @template field_pi1
+#' @template field_pi2
+#' @template field_groups
+#' @template field_allocationRatioPlanned
+#' @template field_optimumAllocationRatio
+#' @template field_directionUpper
+#' @template field_effect
+#' @template field_overallReject
+#' @template field_rejectPerStage
+#' @template field_futilityStop
+#' @template field_futilityPerStage
+#' @template field_earlyStop
+#' @template field_expectedNumberOfSubjects
+#' @template field_nFixed
+#' @template field_nFixed1
+#' @template field_nFixed2
+#' @template field_informationRates
+#' @template field_maxNumberOfSubjects
+#' @template field_maxNumberOfSubjects1
+#' @template field_maxNumberOfSubjects2
+#' @template field_numberOfSubjects
+#' @template field_numberOfSubjects1
+#' @template field_numberOfSubjects2
+#' @template field_expectedNumberOfSubjectsH0
+#' @template field_expectedNumberOfSubjectsH01
+#' @template field_expectedNumberOfSubjectsH1
+#' @template field_criticalValuesEffectScale
+#' @template field_criticalValuesEffectScaleLower
+#' @template field_criticalValuesEffectScaleUpper
+#' @template field_criticalValuesPValueScale
+#' @template field_futilityBoundsEffectScale
+#' @template field_futilityBoundsEffectScaleLower
+#' @template field_futilityBoundsEffectScaleUpper
+#' @template field_futilityBoundsPValueScale
 #'
 #' @details
 #' This object cannot be created directly; use \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
@@ -570,6 +646,68 @@ TrialDesignPlanRates <- setRefClass("TrialDesignPlanRates",
 #'
 #' @description
 #' Trial design plan for survival data.
+#' 
+#' @template field_thetaH0
+#' @template field_typeOfComputation
+#' @template field_directionUpper                
+#' @template field_pi1_survival
+#' @template field_pi2_survival
+#' @template field_median1
+#' @template field_median2
+#' @template field_lambda1
+#' @template field_lambda2                       
+#' @template field_hazardRatio
+#' @template field_maxNumberOfSubjects           
+#' @template field_maxNumberOfSubjects1          
+#' @template field_maxNumberOfSubjects2          
+#' @template field_maxNumberOfEvents
+#' @template field_allocationRatioPlanned        
+#' @template field_optimumAllocationRatio        
+#' @template field_accountForObservationTimes
+#' @template field_eventTime                  
+#' @template field_accrualTime 
+#' @template field_totalAccrualTime
+#' @template field_accrualIntensity
+#' @template field_accrualIntensityRelative
+#' @template field_kappa
+#' @template field_piecewiseSurvivalTime
+#' @template field_followUpTime                   
+#' @template field_dropoutRate1                   
+#' @template field_dropoutRate2
+#' @template field_dropoutTime
+#' @template field_omega
+#' @template field_expectedNumberOfEvents
+#' @template field_eventsFixed
+#' @template field_nFixed                        
+#' @template field_nFixed1                       
+#' @template field_nFixed2                       
+#' @template field_overallReject                 
+#' @template field_rejectPerStage                
+#' @template field_futilityStop                  
+#' @template field_futilityPerStage              
+#' @template field_earlyStop                     
+#' @template field_informationRates              
+#' @template field_analysisTime
+#' @template field_studyDurationH1
+#' @template field_studyDuration
+#' @template field_maxStudyDuration
+#' @template field_eventsPerStage
+#' @template field_expectedEventsH0
+#' @template field_expectedEventsH01
+#' @template field_expectedEventsH1
+#' @template field_numberOfSubjects              
+#' @template field_numberOfSubjects1             
+#' @template field_numberOfSubjects2             
+#' @template field_expectedNumberOfSubjectsH1    
+#' @template field_expectedNumberOfSubjects      
+#' @template field_criticalValuesEffectScale
+#' @template field_criticalValuesEffectScaleLower
+#' @template field_criticalValuesEffectScaleUpper
+#' @template field_criticalValuesPValueScale     
+#' @template field_futilityBoundsEffectScale     
+#' @template field_futilityBoundsEffectScaleLower
+#' @template field_futilityBoundsEffectScaleUpper
+#' @template field_futilityBoundsPValueScale
 #'
 #' @details
 #' This object cannot be created directly; use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
@@ -1677,15 +1815,22 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
 }
 
 # Cumulative Distribution Function / Survival function
-.plotSurvivalFunction <- function(designPlan, ..., designMaster, type = 1L, main = NA_character_,
+.plotSurvivalFunction <- function(designPlan, ..., designMaster, type = c(13, 14), main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, palette = "Set1",
         legendPosition = NA_integer_, showSource = FALSE,
         designPlanName = NA_character_, plotSettings = NULL) {
+        
+    startTime <- Sys.time()
     if (is.null(designPlan$piecewiseSurvivalTime) ||
             length(designPlan$piecewiseSurvivalTime) == 0) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'piecewiseSurvivalTime' must be specified")
     }
-
+        
+    type <- type[1]
+    if (!(type %in% c(13, 14))) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' must be 13 or 14")
+    }
+    
     lambda1 <- designPlan[["lambda1"]]
     lambda2 <- designPlan[["lambda2"]]
     if (is.null(lambda2) || length(lambda2) == 0) {
@@ -1732,8 +1877,10 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
         # warning("Unable to determine upper bound of time values", call. = FALSE)
         timeTo <- 0
     }
-
-    timeValues <- seq(0, timeTo + 10, 0.1)
+    
+    timeTo <- timeTo + 10
+    by <- timeTo / 1000
+    timeValues <- seq(from = 0, to = timeTo, by = by)
 
     data <- data.frame(
         time = timeValues,

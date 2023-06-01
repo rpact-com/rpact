@@ -13,36 +13,38 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6708 $
-## |  Last changed: $Date: 2022-12-02 08:50:56 +0100 (Fr, 02 Dez 2022) $
+## |  File version: $Revision: 6943 $
+## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
 NULL
 
-#
-# @title
-# Set Seed
-#
-# @description
-# Sets the seed, generates it if \code{is.na(seed) == TRUE} and returns it.
-#
-# @param seed the seed to set.
-#
-# @details
-# Internal function.
-#
-# @return the (generated) seed.
-#
-# @examples
-#
-# .setSeed(12345)
-#
-# mySeed <- .setSeed()
-#
-# @keywords internal
-#
+#'
+#' @title
+#' Set Seed
+#'
+#' @description
+#' Sets the seed, generates it if \code{is.na(seed) == TRUE} and returns it.
+#'
+#' @param seed the seed to set.
+#'
+#' @details
+#' Internal function.
+#'
+#' @return the (generated) seed.
+#'
+#' @examples
+#'
+#' .setSeed(12345)
+#'
+#' mySeed <- .setSeed()
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
 .setSeed <- function(seed = NA_real_) {
     if (!is.null(seed) && !is.na(seed)) {
         if (is.na(as.integer(seed))) {

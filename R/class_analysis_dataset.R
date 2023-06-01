@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6810 $
-## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
+## |  File version: $Revision: 6943 $
+## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1337,8 +1337,9 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #' \code{Dataset} is the basic class for
 #' \itemize{
 #'   \item \code{\link{DatasetMeans}},
-#'   \item \code{\link{DatasetRates}}, and
-#'   \item \code{\link{DatasetSurvival}}.
+#'   \item \code{\link{DatasetRates}}, 
+#'   \item \code{\link{DatasetSurvival}}, and
+#'   \item \code{\link{DatasetEnrichmentSurvival}}.
 #' }
 #' This basic class contains the fields \code{stages} and \code{groups} and several commonly used
 #' functions.
@@ -1805,11 +1806,14 @@ Dataset <- setRefClass("Dataset",
 #' @template field_groups
 #' @template field_stages
 #' @template field_sampleSizes
-#' @field means The means. Is a numeric vector of length number of stages times number of groups.
-#' @field stDevs The standard deviations. Is a numeric vector of length number of stages times number of groups.
+#' @template field_means
+#' @template field_stDevs
+#' @template field_overallSampleSizes
+#' @template field_overallMeans
+#' @template field_overallStDevs
 #'
 #' @details
-#' This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
+#' This object cannot be created directly; better use \code{\link{getDataset}}
 #' with suitable arguments to create a dataset of means.
 #'
 #' @include class_core_parameter_set.R
@@ -2236,22 +2240,24 @@ DatasetMeans <- setRefClass("DatasetMeans",
     )
 )
 
-## Example:
-##
-## datasetExample <- getDataset(
-##     means1 = c(112.3, 105.1, 121.3),
-##     means2 = c(98.1, 99.3, 100.1),
-##     means3 = c(98.1, 99.3, 100.1),
-##     stDevs1 = c(44.4, 42.9, 41.4),
-##     stDevs2 = c(46.7, 41.1, 39.5),
-##     stDevs3 = c(46.7, 41.1, 39.5),
-##     n1 = c(84, 81, 82),
-##     n2 = c(87, 83, 81),
-##     n3 = c(87, 82, 84)
-## )
-## .getRandomDataMeans(datasetExample, randomDataParamName = "outcome", numberOfVisits = 3,
-##     fixedCovariates = list(gender = c("f", "m"), bmi = c(17, 40)))
-##
+#' @examples 
+#'
+#' datasetExample <- getDataset(
+#'     means1 = c(112.3, 105.1, 121.3),
+#'     means2 = c(98.1, 99.3, 100.1),
+#'     means3 = c(98.1, 99.3, 100.1),
+#'     stDevs1 = c(44.4, 42.9, 41.4),
+#'     stDevs2 = c(46.7, 41.1, 39.5),
+#'     stDevs3 = c(46.7, 41.1, 39.5),
+#'     n1 = c(84, 81, 82),
+#'     n2 = c(87, 83, 81),
+#'     n3 = c(87, 82, 84)
+#' )
+#' .getRandomDataMeans(datasetExample, randomDataParamName = "outcome", numberOfVisits = 3,
+#'     fixedCovariates = list(gender = c("f", "m"), bmi = c(17, 40)))
+#' 
+#' @noRd
+#'
 .getRandomDataMeans <- function(dataset, ...,
         treatmentName = "Treatment group",
         controlName = "Control group",
@@ -2678,12 +2684,12 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
 #' @template field_groups
 #' @template field_stages
 #' @template field_sampleSizes
-#' @field events The events. Is an integer vector of length number of groups times number of stages.
-#' @field overallSampleSizes The cumulative sample sizes. Is an integer vector of length number of groups times number of stages.
-#' @field overallEvents The cumulative events. Is an integer vector of length number of groups times number of stages.
+#' @template field_overallSampleSizes
+#' @template field_events
+#' @template field_overallEvents
 #'
 #' @details
-#' This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
+#' This object cannot be created directly; better use \code{\link{getDataset}}
 #' with suitable arguments to create a dataset of rates.
 #'
 #' @include class_core_parameter_set.R
@@ -3146,14 +3152,16 @@ DatasetRates <- setRefClass("DatasetRates",
 #'
 #' @template field_groups
 #' @template field_stages
-#' @field overallEvents The cumulative events.
-#' @field overallAllocationRatios The cumulative allocations ratios.
-#' @field overallLogRanks The overall logrank test statistics.
-#' @field allocationRatios The allocation ratios.
-#' @field logRanks The logrank test statistics.
+#' @template field_events 
+#' @template field_overallEvents
+#' @template field_allocationRatios
+#' @template field_overallAllocationRatios
+#' @template field_logRanks
+#' @template field_overallLogRanks
+#' 
 #'
 #' @details
-#' This object cannot be created directly; better use \code{\link[=getDataset]{getDataset()}}
+#' This object cannot be created directly; better use \code{\link{getDataset}}
 #' with suitable arguments to create a dataset of survival data.
 #'
 #' @include class_core_parameter_set.R
@@ -3712,7 +3720,11 @@ DatasetSurvival <- setRefClass("DatasetSurvival",
     )
 )
 
-# Dataset for non-stratified analysis
+#'
+#' @rdname DatasetSurvival
+#' 
+#' @keywords internal
+#' 
 DatasetEnrichmentSurvival <- setRefClass("DatasetEnrichmentSurvival",
     contains = "DatasetSurvival",
     fields = list(
