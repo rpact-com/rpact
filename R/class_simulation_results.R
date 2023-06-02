@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6909 $
-## |  Last changed: $Date: 2023-03-31 14:33:51 +0200 (Fr, 31 Mrz 2023) $
+## |  File version: $Revision: 7035 $
+## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2269,7 +2269,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
                     palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings, ylim = ylim, ...
+                    plotSettings = plotSettings, ylim = ylim #, ...
                 )) # ratioEnabled = TRUE
             } else {
                 return(.plotParameterSet(
@@ -2279,7 +2279,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
                     palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings, ...
+                    plotSettings = plotSettings #, ...
                 ))
             }
         }
@@ -2496,7 +2496,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
         yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
         palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition, variedParameters = variedParameters,
-        qnormAlphaLineEnabled = (type != 2), ratioEnabled = TRUE, plotSettings = plotSettings, ...
+        qnormAlphaLineEnabled = (type != 2), ratioEnabled = TRUE, plotSettings = plotSettings #, ...
     ))
 }
 

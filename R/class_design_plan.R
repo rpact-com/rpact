@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7015 $
-## |  Last changed: $Date: 2023-05-26 10:10:10 +0200 (Fri, 26 May 2023) $
+## |  File version: $Revision: 7035 $
+## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1199,7 +1199,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
                 palette = palette, theta = theta, nMax = nMax,
                 plotPointsEnabled = plotPointsEnabled, legendPosition = legendPosition,
                 designSetName = designPlanName, showSource = showSource,
-                plotSettings = plotSettings, ...
+                plotSettings = plotSettings #, ...
             ))
         }
     } else if (type == 2) { # Effect Scale Boundary plot
@@ -1495,7 +1495,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
                 palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                 legendPosition = legendPosition, variedParameters = variedParameters,
                 qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                plotSettings = plotSettings, ...
+                plotSettings = plotSettings #, ...
             ))
         } else {
             if (is.na(main)) {
@@ -1539,7 +1539,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
                     palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings, ylim = ylim, ...
+                    plotSettings = plotSettings, ylim = ylim #, ...
                 ))
             } else {
                 return(.plotParameterSet(
@@ -1549,7 +1549,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
                     palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings, ...
+                    plotSettings = plotSettings #, ...
                 ))
             }
         }
@@ -1775,7 +1775,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
         palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition, variedParameters = variedParameters,
         qnormAlphaLineEnabled = (type != 2), ratioEnabled = ratioEnabled,
-        plotSettings = plotSettings, ...
+        plotSettings = plotSettings #, ...
     )
 
     if (type == 1 && survivalDesignPlanEnabled) {

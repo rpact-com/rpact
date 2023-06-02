@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7022 $
-## |  Last changed: $Date: 2023-06-01 09:15:57 +0200 (Thu, 01 Jun 2023) $
+## |  File version: $Revision: 7035 $
+## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -297,6 +297,8 @@ TrialDesignCharacteristics <- setRefClass("TrialDesignCharacteristics",
 #' Trial Design Characteristics Printing
 #'
 #' @param x The trial design characteristics object.
+#' @param markdown If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
+#'        normal representation will be used otherwise (default is \code{FALSE})
 #' @param showDesign Show the design print output above the design characteristics, default is \code{TRUE}.
 #' @inheritParams param_three_dots_plot
 #'
@@ -308,11 +310,11 @@ TrialDesignCharacteristics <- setRefClass("TrialDesignCharacteristics",
 #'
 #' @export
 #'
-print.TrialDesignCharacteristics <- function(x, ..., showDesign = TRUE) {
+print.TrialDesignCharacteristics <- function(x, ..., markdown = FALSE, showDesign = TRUE) {
     if (showDesign) {
-        x$.design$show()
+        print.ParameterSet(x$.design, ..., markdown = markdown)
     }
-    x$show()
+    print.ParameterSet(x, ..., markdown = markdown)
 }
 
 #'

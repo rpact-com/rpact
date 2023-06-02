@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6902 $
-## |  Last changed: $Date: 2023-03-29 10:01:19 +0200 (Mi, 29 Mrz 2023) $
+## |  File version: $Revision: 7035 $
+## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1495,7 +1495,11 @@ kable.ParameterSet <- function(x, ...) {
             }
         }
         
-        return(print(x, markdown = TRUE))
+        if (.isSummaryPipe(fCall)) {
+            return(print(x, markdown = TRUE, showSummary = TRUE))
+        } else {
+            return(print(x, markdown = TRUE))
+        }
     }
 
     .assertPackageIsInstalled("knitr")

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7022 $
-## |  Last changed: $Date: 2023-06-01 09:15:57 +0200 (Thu, 01 Jun 2023) $
+## |  File version: $Revision: 7035 $
+## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -84,7 +84,12 @@ SummaryItem <- setRefClass("SummaryItem",
 plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
     fCall <- match.call(expand.dots = FALSE)
     if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
-        x$show()
+        markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = FALSE)
+        if (markdown) {
+            x$.catMarkdownText()
+        } else {
+            x$show()
+        }
     }
     plot(x = x$object, y = y, ...)
 }
@@ -110,10 +115,16 @@ print.SummaryFactory <- function(x, ..., showSummary = FALSE, sep = "\n-----\n\n
     fCall <- match.call(expand.dots = FALSE)
     if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
         .assertIsSingleCharacter(sep, "sep")
-        x$show()
+        
+        markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = FALSE)
+        if (markdown) {
+            x$.catMarkdownText()
+        } else {
+            x$show()
+        }
         cat(sep)
     }
-    print(x$object)
+    print(x$object, ...)
 }
 
 #' @name SummaryFactory
