@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7022 $
-## |  Last changed: $Date: 2023-06-01 09:15:57 +0200 (Thu, 01 Jun 2023) $
+## |  File version: $Revision: 7026 $
+## |  Last changed: $Date: 2023-06-01 15:11:56 +0200 (Thu, 01 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1427,26 +1427,29 @@ getObjectRCode <- function(obj, ...,
         newArgumentValues = list(),
         tolerance = 1e-07,
         pipeOperator = c("auto", "none", "magrittr", "R"),
-        output = c("vector", "cat", "test", "internal"),
+        output = c("vector", "cat", "test", "markdown", "internal"),
         explicitPrint = FALSE) {
     functionName <- deparse(substitute(obj))
     functionName <- sub("\\(.*\\)$", "", functionName)
+    
+    output <- match.arg(output)
 
     .assertIsSingleLogical(includeDefaultParameters, "includeDefaultParameters")
     .assertIsSingleLogical(explicitPrint, "explicitPrint")
-    .assertIsSingleInteger(stringWrapParagraphWidth, "stringWrapParagraphWidth", validateType = FALSE)
-    .assertIsInClosedInterval(stringWrapParagraphWidth, "stringWrapParagraphWidth", lower = 10, upper = 50000)
+    if (!is.null(stringWrapParagraphWidth)) {
+        .assertIsSingleInteger(stringWrapParagraphWidth, "stringWrapParagraphWidth", validateType = FALSE)
+        .assertIsInClosedInterval(stringWrapParagraphWidth, "stringWrapParagraphWidth", lower = 10, upper = 50000)
+    }
     .assertIsSingleCharacter(prefix, "prefix")
     .assertIsCharacter(postfix, "postfix")
     .assertIsSingleCharacter(stringWrapPrefix, "stringWrapPrefix")
     .assertIsSingleNumber(tolerance, "tolerance")
     .assertIsInClosedInterval(tolerance, "tolerance", lower = 1e-15, upper = 1e-03)
     
-    output <- match.arg(output)
     if (output == "test") {
         stringWrapParagraphWidth <- NULL
     }
-    else if (output == "cat") {
+    else if (output %in% c("cat", "markdown")) {
         if (stringWrapPrefix == "") {
             stringWrapPrefix <- "    "
         }
@@ -1522,7 +1525,7 @@ getObjectRCode <- function(obj, ...,
             pipeOperator = pipeOperator,
             output = "internal"
         )
-        if (!grepl("getDesignGroupSequential\\(kMax = 1\\)", paste0(preconditionDesign, collapse = " "))) {
+        if (!grepl("getDesign(GroupSequential|InverseNormal)\\(kMax = 1\\)", paste0(preconditionDesign, collapse = " "))) {
             precondition <- c(precondition, preconditionDesign)
             if (pipeOperator == "none") {
                 leadingArguments <- c(leadingArguments, "design = design")
@@ -1995,8 +1998,26 @@ getObjectRCode <- function(obj, ...,
         return(invisible(rCode))
     }
     
+    if (output == "markdown") {
+        collapse <- "\n"
+        if (pipeOperator != "none") {
+            collapse <- paste0("\n", stringWrapPrefix)
+            if (explicitPrint) {
+                rCode <- gsub("print\\(\\)", "print(markdown = TRUE)", rCode)
+            } else if (!any(grepl("kable\\(", rCode))) {
+                rCode[length(rCode)] <- paste0(rCode[length(rCode)], pipeOperatorPostfix)
+                rCode <- c(rCode, "kable()")
+            }
+        }
+        
+        return(paste0(rCode, collapse = collapse))
+    }
+    
     if (output == "test") {
-        eval(parse(text = rCode))
+        message("Evaluate and parse the following code:")
+        cat(rCode, "\n")
+        x <- eval(parse(text = rCode))
+        return(invisible(x))
     }
     
     return(invisible(rCode))
