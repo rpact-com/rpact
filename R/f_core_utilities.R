@@ -1970,17 +1970,22 @@ getObjectRCode <- function(obj, ...,
         for (rCodeLine in rCode) {
             rCodeLine <- gsub("   ", "___", rCodeLine)
             rCodeLine <- gsub("  ", "__", rCodeLine)
-            rCodeLine <- strwrap(rCodeLine, width = stringWrapParagraphWidth)
-            if (length(rCodeLine) > 1) {
-                for (i in 2:length(rCodeLine)) {
-                    if (!grepl("^ *([a-zA-Z0-9]+ *<-)|(^ *get[a-zA-Z]+\\()|summary\\(", rCodeLine[i])) {
-                        rCodeLine[i] <- paste0(stringWrapPrefix, rCodeLine[i])
+            rCodeLines <- strwrap(rCodeLine, width = stringWrapParagraphWidth)
+            if (length(rCodeLines) > 1) {
+                for (i in 2:length(rCodeLines)) {
+                    if (grepl("^ *(\\|>|%>%) *", rCodeLines[i])) {
+                        rCodeLines[i - 1] <- paste0(rCodeLines[i - 1], pipeOperatorPostfix)
+                        rCodeLines[i] <- sub("^ *(\\|>|%>%) *", "", rCodeLines[i])
+                    }
+                    else if (!grepl("^ *([a-zA-Z0-9]+ *<-)|(^ *get[a-zA-Z]+\\()|summary\\(", rCodeLines[i])) {
+                        rCodeLines[i] <- paste0(stringWrapPrefix, rCodeLines[i])
                     }
                 }
             }
-            rCodeLine <- gsub("___", "   ", rCodeLine)
-            rCodeLine <- gsub("__", "  ", rCodeLine)
-            rCodeNew <- c(rCodeNew, rCodeLine)
+            rCodeLines <- gsub("___", "   ", rCodeLines)
+            rCodeLines <- gsub("__", "  ", rCodeLines)
+            rCodeLines <- rCodeLines[nchar(trimws(rCodeLines)) > 0]
+            rCodeNew <- c(rCodeNew, rCodeLines)
         }
         rCode <- rCodeNew
     }
