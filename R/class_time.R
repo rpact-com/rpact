@@ -310,6 +310,11 @@ getAccrualTime <- function(accrualTime = NA_real_,
 	absoluteAccrualIntensityEnabled <- NA
 	if (accrualIntensityType == "absolute") {
 		absoluteAccrualIntensityEnabled <- TRUE
+        if (!all(is.na(accrualIntensity)) && any(na.omit(accrualIntensity) < 1)) {
+            stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, 
+                "'accrualIntensityType' is 'absolute' and the 'accrualIntensity' (", 
+                .arrayToString(accrualIntensity), ") therefore must be >= 1")
+        }
 	}
 	else if (accrualIntensityType == "relative") {
 		absoluteAccrualIntensityEnabled <- FALSE
