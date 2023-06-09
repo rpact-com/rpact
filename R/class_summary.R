@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7035 $
-## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
+## |  File version: $Revision: 7060 $
+## |  Last changed: $Date: 2023-06-08 09:59:57 +0200 (Thu, 08 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -517,7 +517,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                                 numberOfVariants <- length(variedParameterValues)
                             }
                         } else {
-                            variedParameterName <- .getSummaryVariedParameterSimulationMultiArm(parameterSet)
+                            variedParameterName <- .getVariedParameterSimulationMultiArm(parameterSet)
                             variedParameterValues <- parameterSet[[variedParameterName]]
                             variedParameterCaption <- C_PARAMETER_NAMES[[variedParameterName]]
                             numberOfVariants <- length(variedParameterValues)
@@ -3359,7 +3359,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             variedParameterCaption <- sub("s$", "", variedParameterCaption)
         }
     } else {
-        variedParameterName <- .getSummaryVariedParameterSimulationMultiArm(designPlan)
+        variedParameterName <- .getVariedParameterSimulationMultiArm(designPlan)
         variedParameterValues <- designPlan[[variedParameterName]]
         variedParameterCaption <- C_PARAMETER_NAMES[[variedParameterName]]
     }
@@ -3522,24 +3522,3 @@ SummaryFactory <- setRefClass("SummaryFactory",
     }
 }
 
-.getSummaryVariedParameterSimulationMultiArm <- function(designPlan) {
-    if (!grepl("SimulationResultsMultiArm", .getClassName(designPlan))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designPlan' (",
-            .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'"
-        )
-    }
-
-    if (grepl("Means", .getClassName(designPlan))) {
-        return("muMaxVector")
-    } else if (grepl("Rates", .getClassName(designPlan))) {
-        return("piMaxVector")
-    } else if (grepl("Survival", .getClassName(designPlan))) {
-        return("omegaMaxVector")
-    }
-
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designPlan' (",
-        .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'"
-    )
-}

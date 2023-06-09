@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6656 $
-## |  Last changed: $Date: 2022-11-03 08:41:40 +0100 (Thu, 03 Nov 2022) $
+## |  File version: $Revision: 7065 $
+## |  Last changed: $Date: 2023-06-09 11:04:44 +0200 (Fr, 09 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -461,6 +461,7 @@ testPackage <- function(outDir = ".", ...,
     .assertTestthatIsInstalled()
     .assertMnormtIsInstalled()
 
+    .assertIsSingleCharacter(outDir, "outDir", naAllowed = FALSE)
     if (!dir.exists(outDir)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -624,6 +625,7 @@ testPackage <- function(outDir = ".", ...,
 }
 
 .testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", outDir = ".", Ropts = "") {
+    .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = FALSE)
     if (!dir.exists(testFileDirectory)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'testFileDirectory' (", testFileDirectory, ") does not exist")
     }

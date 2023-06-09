@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7042 $
-## |  Last changed: $Date: 2023-06-06 08:18:18 +0200 (Tue, 06 Jun 2023) $
+## |  File version: $Revision: 7071 $
+## |  Last changed: $Date: 2023-06-09 13:42:59 +0200 (Fri, 09 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1550,7 +1550,7 @@ getObjectRCode <- function(obj, ...,
     if (!is.null(obj[["calcSubjectsFunction"]]) &&
             (is.null(leadingArguments) || !any(grepl("calcSubjectsFunction", leadingArguments))) &&
             obj$.getParameterType("calcSubjectsFunction") == C_PARAM_USER_DEFINED) {
-        precondition <- c(precondition, getObjectRCode(obj$calcSubjectsFunction,
+        precond <- getObjectRCode(obj$calcSubjectsFunction,
             prefix = "calcSubjectsFunction <- ",
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
@@ -1558,12 +1558,17 @@ getObjectRCode <- function(obj, ...,
             newArgumentValues = newArgumentValues,
             pipeOperator = pipeOperator,
             output = "internal"
-        ))
+        )
+        if (pipeOperator == "none") {
+            precondition <- c(precondition, precond)
+        } else {
+            precondition <- c(precond, precondition)
+        }
     }
     if (!is.null(obj[["calcEventsFunction"]]) &&
             (is.null(leadingArguments) || !any(grepl("calcEventsFunction", leadingArguments))) &&
             obj$.getParameterType("calcEventsFunction") == C_PARAM_USER_DEFINED) {
-        precondition <- c(precondition, getObjectRCode(obj$calcEventsFunction,
+        precond <- getObjectRCode(obj$calcEventsFunction,
             prefix = "calcEventsFunction <- ",
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
@@ -1571,12 +1576,17 @@ getObjectRCode <- function(obj, ...,
             newArgumentValues = newArgumentValues,
             pipeOperator = pipeOperator,
             output = "internal"
-        ))
+        )
+        if (pipeOperator == "none") {
+            precondition <- c(precondition, precond)
+        } else {
+            precondition <- c(precond, precondition)
+        }
     }
     if (!is.null(obj[["selectArmsFunction"]]) &&
             (is.null(leadingArguments) || !any(grepl("selectArmsFunction", leadingArguments))) &&
             !is.null(obj[["typeOfSelection"]]) && obj$typeOfSelection == "userDefined") {
-        precondition <- c(precondition, getObjectRCode(obj$selectArmsFunction,
+        precond <- getObjectRCode(obj$selectArmsFunction,
             prefix = "selectArmsFunction <- ",
             includeDefaultParameters = includeDefaultParameters, 
             stringWrapParagraphWidth = stringWrapParagraphWidth,
@@ -1584,13 +1594,18 @@ getObjectRCode <- function(obj, ...,
             newArgumentValues = newArgumentValues,
             pipeOperator = pipeOperator,
             output = "internal"
-        ))
+        )
+        if (pipeOperator == "none") {
+            precondition <- c(precondition, precond)
+        } else {
+            precondition <- c(precond, precondition)
+        }
         leadingArguments <- c(leadingArguments, "selectArmsFunction = selectArmsFunction")
     }
     if (inherits(obj, "ConditionalPowerResults") &&
             !is.null(obj[[".stageResults"]]) &&
             (is.null(leadingArguments) || !any(grepl("stageResults", leadingArguments)))) {
-        precondition <- c(precondition, getObjectRCode(obj$.stageResults,
+        precond <- getObjectRCode(obj$.stageResults,
             prefix = ifelse(pipeOperator == "none", "stageResults <- ", ""),
             postfix = pipeOperatorPostfix,
             includeDefaultParameters = includeDefaultParameters,
@@ -1599,15 +1614,25 @@ getObjectRCode <- function(obj, ...,
             newArgumentValues = newArgumentValues,
             pipeOperator = pipeOperator,
             output = "internal"
-        ))
+        )
+        if (pipeOperator == "none") {
+            precondition <- c(precondition, precond)
+        } else {
+            precondition <- c(precond, precondition)
+        }
         leadingArguments <- c(leadingArguments, "stageResults = stageResults")
     }
 
     if (grepl("SimulationResultsEnrichment(Means|Rates|Survival)", .getClassName(obj))) {
-        precondition <- c(precondition, paste0(
+        precond <- paste0(
             "effectList <- ",
             .getArgumentValueRCode(obj$effectList, "effectList")
-        ))
+        )
+        if (pipeOperator == "none") {
+            precondition <- c(precondition, precond)
+        } else {
+            precondition <- c(precond, precondition)
+        }
     }
 
     if ("TrialDesignPlanMeans" == .getClassName(obj)) {
@@ -2026,6 +2051,23 @@ getObjectRCode <- function(obj, ...,
     }
     
     return(invisible(rCode))
+}
+
+.getInnerValue <- function(s, bracketOpen = "{", bracketClose = "}", escape = TRUE) {
+    if (escape) {
+        bracketOpen <- paste0("\\", bracketOpen)
+        bracketClose <- paste0("\\", bracketClose)
+    }
+    indices <- gregexpr(pattern = paste0(
+            "\\", bracketOpen,
+            "(?:(?!", bracketClose, ").)*", bracketClose
+        ), s, perl = TRUE)
+    
+    if (length(indices) == 0) {
+        return(NA_character_)
+    }
+    
+    return(.getPartsByIndices(s, indices, corr1 = nchar(bracketOpen), corr2 = nchar(bracketClose)))
 }
 
 .getQNorm <- function(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE, epsilon = C_QNORM_EPSILON) {

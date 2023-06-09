@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7060 $
+## |  Last changed: $Date: 2023-06-08 09:59:57 +0200 (Thu, 08 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -616,6 +616,28 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     effectData <- .getEffectData(effectList, endpoint = endpoint, gMax = gMax, nullAllowed = nullAllowed)
     return(.getEffectList(effectData))
+}
+
+.getVariedParameterSimulationMultiArm <- function(designPlan) {
+    if (!grepl("SimulationResultsMultiArm", .getClassName(designPlan))) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designPlan' (",
+            .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'"
+        )
+    }
+    
+    if (grepl("Means", .getClassName(designPlan))) {
+        return("muMaxVector")
+    } else if (grepl("Rates", .getClassName(designPlan))) {
+        return("piMaxVector")
+    } else if (grepl("Survival", .getClassName(designPlan))) {
+        return("omegaMaxVector")
+    }
+    
+    stop(
+        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designPlan' (",
+        .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'"
+    )
 }
 
 

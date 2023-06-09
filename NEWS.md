@@ -11,6 +11,7 @@
 * Improved speed of numerical computation of group sequential designs and test characteristics
 * Multivariate t distribution restricted to `df <= 500` because of erroneous results in `mnormt` package otherwise. For `df > 500`, multivariate normal distribution is used 
 * Performance of cumulative distribution function and survival function plot improved
+* Test coverage improved
 * Minor improvements
 
 

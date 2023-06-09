@@ -13,12 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 7067 $
+## |  Last changed: $Date: 2023-06-09 12:58:32 +0200 (Fr, 09 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 .logBase <- function(s, ..., logLevel) {
+    .assertIsSingleCharacter(s, "s")
     if (length(list(...)) > 0) {
         cat(paste0("[", logLevel, "]"), sprintf(s, ...), "\n")
     } else {

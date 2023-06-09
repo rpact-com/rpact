@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6862 $
-## |  Last changed: $Date: 2023-03-10 08:37:03 +0100 (Fr, 10 Mrz 2023) $
+## |  File version: $Revision: 7060 $
+## |  Last changed: $Date: 2023-06-08 09:59:57 +0200 (Thu, 08 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -310,8 +310,8 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
     if (plotType > 12) {
         return(TRUE)
     }
-
-    for (param in c("alternative", "pi1", "hazardRatio")) {
+    
+    for (param in c("alternative", "pi1", "hazardRatio", "muMaxVector", "piMaxVector", "omegaMaxVector")) {
         if (!is.null(resultObject[[param]]) &&
                 resultObject$.getParameterType(param) != C_PARAM_NOT_APPLICABLE &&
                 (any(is.na(resultObject[[param]])) ||
@@ -449,7 +449,11 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         if (inherits(obj, "SimulationResultsSurvival")) {
             types <- c(types, 10:14)
         }
-        types <- .removeInvalidPlotTypes(obj, types, c(4:14))
+        plotTypesToCheck <- c(4:14)
+        if (grepl("MultiArm", .getClassName(obj))) {
+            plotTypesToCheck <- c(1:14)
+        }
+        types <- .removeInvalidPlotTypes(obj, types, plotTypesToCheck)
     } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignSet")) {
         design <- obj
         if (inherits(obj, "TrialDesignSet")) {
