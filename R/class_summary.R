@@ -1632,24 +1632,31 @@ SummaryFactory <- setRefClass("SummaryFactory",
 
         if (design$kMax > 1 && .isTrialDesignInverseNormalOrGroupSequential(design)) {
             outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
-            designCharacteristics <- getDesignCharacteristics(design)
-            header <- .concatenateSummaryText(
-                header,
-                paste0("inflation factor ", round(designCharacteristics$inflationFactor, 4))
-            )
-            if (outputSize == "large") {
+            designCharacteristics <- NULL
+            tryCatch({
+                designCharacteristics <- getDesignCharacteristics(design)
+            }, error = function(e) {
+                .logError("Cannot add design characteristics to summary: ", e$message)
+            })
+            if (!is.null(designCharacteristics)) {
                 header <- .concatenateSummaryText(
                     header,
-                    paste0("ASN H1 ", round(designCharacteristics$averageSampleNumber1, 4))
+                    paste0("inflation factor ", round(designCharacteristics$inflationFactor, 4))
                 )
-                header <- .concatenateSummaryText(
-                    header,
-                    paste0("ASN H01 ", round(designCharacteristics$averageSampleNumber01, 4))
-                )
-                header <- .concatenateSummaryText(
-                    header,
-                    paste0("ASN H0 ", round(designCharacteristics$averageSampleNumber0, 4))
-                )
+                if (outputSize == "large") {
+                    header <- .concatenateSummaryText(
+                        header,
+                        paste0("ASN H1 ", round(designCharacteristics$averageSampleNumber1, 4))
+                    )
+                    header <- .concatenateSummaryText(
+                        header,
+                        paste0("ASN H01 ", round(designCharacteristics$averageSampleNumber01, 4))
+                    )
+                    header <- .concatenateSummaryText(
+                        header,
+                        paste0("ASN H0 ", round(designCharacteristics$averageSampleNumber0, 4))
+                    )
+                }
             }
         }
 
@@ -2751,8 +2758,13 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
         if (design$kMax > 1 && .isTrialDesignInverseNormalOrGroupSequential(design)) {
-            designCharacteristics <- getDesignCharacteristics(design)
-            if (!any(is.na(designCharacteristics$futilityProbabilities)) &&
+            tryCatch({
+                designCharacteristics <- getDesignCharacteristics(design)
+            }, error = function(e) {
+                designCharacteristics <- NULL
+            })
+            if (!is.null(designCharacteristics) && 
+                    !any(is.na(designCharacteristics$futilityProbabilities)) &&
                     any(designCharacteristics$futilityProbabilities > 0)) {
                 summaryFactory$addParameter(designCharacteristics,
                     parameterName = "futilityProbabilities",
@@ -2882,13 +2894,21 @@ SummaryFactory <- setRefClass("SummaryFactory",
 
     designCharacteristics <- NULL
     if (design$kMax > 1 && .isTrialDesignInverseNormalOrGroupSequential(design)) {
-        designCharacteristics <- getDesignCharacteristics(design)
+        tryCatch({
+            designCharacteristics <- getDesignCharacteristics(design)
+        }, error = function(e) {
+            designCharacteristics <- NULL
+        })
     }
 
     if (is.null(designPlan)) {
         return(.addDesignParameterToSummary(
-            design, designPlan,
-            designCharacteristics, summaryFactory, digitsGeneral, digitsProbabilities
+            design, 
+            designPlan,
+            designCharacteristics, 
+            summaryFactory, 
+            digitsGeneral, 
+            digitsProbabilities
         ))
     }
 
@@ -2903,7 +2923,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
     probsH0 <- NULL
     probsH1 <- NULL
     if (design$kMax > 1) {
-        if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
+        if (!is.null(designCharacteristics) && 
+                .isTrialDesignInverseNormalOrGroupSequential(design) &&
                 length(designCharacteristics$shift) == 1 &&
                 !is.na(designCharacteristics$shift) &&
                 designCharacteristics$shift >= 1) {

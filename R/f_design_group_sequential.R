@@ -1756,12 +1756,14 @@ getDesignCharacteristics <- function(design = NULL, ...) {
     if (userFunctionCallEnabled) {
         .validateAlphaAndBeta(design = design)
     }
+    
+    # TODO mit Aufruf dieser Funktion werden diverse Werte im Design geaendert; ist das sinnvoll?
 
     design$informationRates <- .getValidatedInformationRates(design, writeToDesign = FALSE)
 
     if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
             .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2 && design$kMax == 2) {
-        design$futilityBounds[is.na(design$futilityBounds)] <- 0 ##  otherwise .getValidatedFutilityBounds returns -6 !
+        design$futilityBounds[is.na(design$futilityBounds)] <- 0 
     }
 
     design$futilityBounds <- .getValidatedFutilityBounds(design,

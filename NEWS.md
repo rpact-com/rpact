@@ -3,6 +3,7 @@
 
 # New features
 
+* The new function `getPerformanceScore()` calculates the conditional performance score, its sub-scores and components according to Herrmann et al. (2020) for a given simulation result from a two-stage design
 * `allocationRatioPlanned` for simulating multiarm and enrichment designs can be a vector of length kMax, the number of stages 
 * `getObjectRCode()` (short: `rcmd()`): with the new arguments `pipeOperator` and `output` many new output variants can be specified, e.g., the native R pipe operator or the magrittr pipe operator can be used
 
