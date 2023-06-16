@@ -13,8 +13,8 @@
 ## | 
 ## |  Contact us for information about our services: info@rpact.com
 ## | 
-## |  File version: $Revision: 6931 $
-## |  Last changed: $Date: 2023-04-11 15:40:33 +0200 (Di, 11 Apr 2023) $
+## |  File version: $Revision: 7079 $
+## |  Last changed: $Date: 2023-06-13 11:39:02 +0200 (Di, 13 Jun 2023) $
 ## |  Last changed by: $Author: wassmer $
 ## | 
 
@@ -728,11 +728,14 @@ NULL
 
 #' Parameter Description: Type Of Shape
 #' @param typeOfShape The shape of the dose-response relationship over the treatment groups. 
-#'   This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"}.
+#'   This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"},
+#'   default is \code{"linear"}.\cr
+#'   For \code{"linear"}, \code{"muMaxVector"} specifies the range 
+#'   of effect sizes for the treatment group with highest response.
 #'   If \code{"sigmoidEmax"} is selected, \code{"gED50"} and \code{"slope"} has to be entered 
 #'   to specify the ED50 and the slope of the sigmoid Emax model.
-#'   For \code{"linear"} and \code{"sigmoidEmax"}, \code{"muMaxVector"} specifies the range 
-#'   of effect sizes for the treatment group with highest response.	
+#'   For \code{"sigmoidEmax"}, \code{"muMaxVector"} specifies the range 
+#'   of effect sizes for the treatment group with response according to infinite dose.	
 #'   If \code{"userDefined"} is selected, \code{"effectMatrix"} has to be entered.
 #' @name param_typeOfShape
 #' @keywords internal

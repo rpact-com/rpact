@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7099 $
+## |  Last changed: $Date: 2023-06-16 09:40:22 +0200 (Fri, 16 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -82,7 +82,7 @@ getDesignFisher <- function(...,
     .assertIsValidTolerance(tolerance)
     .assertIsValidIterationsAndSeed(iterations, seed)
     .warnInCaseOfUnknownArguments(functionName = "getDesignFisher", ...)
-
+    
     return(.getDesignFisher(
         kMax = kMax, alpha = alpha, method = method,
         userAlphaSpending = userAlphaSpending, alpha0Vec = alpha0Vec, informationRates = informationRates,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7102 $
+## |  Last changed: $Date: 2023-06-16 12:57:56 +0200 (Fr, 16 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2357,9 +2357,7 @@ NULL
 
 .assertIsValidTolerance <- function(tolerance) {
     .assertIsSingleNumber(tolerance, "tolerance")
-    if (tolerance > 0.1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' (", tolerance, ") must be <= 0.1")
-    }
+    .assertIsInOpenInterval(tolerance, "tolerance", lower = 0, upper = 0.1)
 }
 
 .isValidVarianceOptionMultiArmed <- function(varianceOption) {
