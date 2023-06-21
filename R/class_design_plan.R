@@ -1881,7 +1881,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
     timeTo <- timeTo + 10
     by <- timeTo / 1000
     timeValues <- seq(from = 0, to = timeTo, by = by)
-
+    
     data <- data.frame(
         time = timeValues,
         lambdaGroup1 = rep(-1, length(timeValues)),
@@ -1891,7 +1891,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
         survivalGroup1 = rep(-1, length(timeValues)),
         survivalGroup2 = rep(-1, length(timeValues))
     )
-
+    
     signPrefix <- ifelse(type == 13, "", "-")
     if (piecewiseSurvivalEnabled) {
         data$survival2 <- .getPiecewiseExponentialDistribution(
@@ -1967,7 +1967,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
             .warnInCaseOfUnusedValuesForPlottingRates(designPlan$pi1)
         }
 
-        if (!is.na(designPlan$pi1) && !is.na(designPlan$pi2)) {
+        if (!is.na(designPlan$pi1[1]) && !is.na(designPlan$pi2) && !is.na(designPlan$eventTime)) {
             lambda2 <- (-log(1 - designPlan$pi2))^(1 / designPlan$kappa) / designPlan$eventTime
             lambda1 <- (-log(1 - designPlan$pi1[1]))^(1 / designPlan$kappa) / designPlan$eventTime
         }
@@ -2007,7 +2007,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
             )
         )
     }
-
+    
     # two groups: 1 = treatment, 2 = control
     if (type == 14) {
         data$survival1 <- 1 - data$survival1
