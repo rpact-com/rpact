@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6902 $
-## |  Last changed: $Date: 2023-03-29 10:01:19 +0200 (Mi, 29 Mrz 2023) $
+## |  File version: $Revision: 7124 $
+## |  Last changed: $Date: 2023-06-23 12:19:05 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -539,7 +539,7 @@ C_PARAMETER_NAMES <- list(
     expectedNumberOfSubjectsH01 = "Expected number of subjects under H0/H1",
     expectedNumberOfSubjectsH1 = "Expected number of subjects under H1",
     expectedNumberOfSubjects = "Expected number of subjects",
-    omega = "Probability of an event",
+    chi = "Probability of an event",
     hazardRatio = "Hazard ratio",
     hazardRatios = "Hazard ratios",
     typeOfComputation = "Type of computation",
@@ -847,7 +847,7 @@ C_TABLE_COLUMN_NAMES <- list(
     expectedNumberOfSubjectsH01 = "Expected # subjects under H0/H1",
     expectedNumberOfSubjectsH1 = "Expected # subjects under H1",
     expectedNumberOfSubjects = "Expected # subjects",
-    omega = "Probability of an event",
+    chi = "Probability of an event",
     hazardRatio = "Hazard ratio",
     hazardRatios = "Hazard ratios",
     typeOfComputation = "Type of computation",
@@ -1207,7 +1207,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     expectedNumberOfSubjectsH01 = ".formatSampleSizes",
     expectedNumberOfSubjectsH1 = ".formatSampleSizes",
     expectedNumberOfSubjects = ".formatSampleSizes",
-    omega = ".formatRates",
+    chi = ".formatRates",
     hazardRatio = ".formatRates",
     hazardRatios = ".formatRates",
     pi1 = ".formatRates",

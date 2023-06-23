@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7081 $
-## |  Last changed: $Date: 2023-06-13 17:38:17 +0200 (Tue, 13 Jun 2023) $
+## |  File version: $Revision: 7124 $
+## |  Last changed: $Date: 2023-06-23 12:19:05 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -52,15 +52,6 @@ SummaryItem <- setRefClass("SummaryItem",
         }
     )
 )
-
-.isSummaryPipe <- function(fCall) {
-    tryCatch({
-        xCall <- deparse(fCall$x)
-        return(grepl("^summary\\(", xCall[1]))
-    }, error = function(e) {
-      return(FALSE)
-    })
-}
 
 #'
 #' @title

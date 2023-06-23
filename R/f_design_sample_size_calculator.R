@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6892 $
-## |  Last changed: $Date: 2023-03-24 09:39:52 +0100 (Fr, 24 Mrz 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7124 $
+## |  Last changed: $Date: 2023-06-23 12:19:05 +0200 (Fr, 23 Jun 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -1665,7 +1665,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         }
     }
 
-    designPlan$.setParameterType("omega", C_PARAM_NOT_APPLICABLE)
+    designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
 
     if (designPlan$.isSampleSizeObject()) {
         designPlan$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
@@ -1940,7 +1940,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         if (designPlan$.getParameterType("accountForObservationTimes") != C_PARAM_USER_DEFINED) {
             designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
         }
-        designPlan$.setParameterType("omega", C_PARAM_NOT_APPLICABLE)
+        designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
 
         .addStudyDurationToDesignPlan(designPlan)
 
@@ -3354,7 +3354,7 @@ getNumberOfSubjects <- function(time, ...,
 
     designPlan$eventsFixed <- rep(NA_real_, numberOfResults) # number of events
     designPlan$nFixed <- rep(NA_real_, numberOfResults) # number of subjects
-    designPlan$omega <- rep(NA_real_, numberOfResults) # probability of an event
+    designPlan$chi <- rep(NA_real_, numberOfResults) # probability of an event
 
     calculateAllocationRatioPlanned <- FALSE
     if (allocationRatioPlanned == 0) {
@@ -3425,10 +3425,10 @@ getNumberOfSubjects <- function(time, ...,
             )
 
             if (!accountForObservationTimes) {
-                designPlan$omega[i] <- (allocationRatioPlanned * pi1[i] + pi2) /
+                designPlan$chi[i] <- (allocationRatioPlanned * pi1[i] + pi2) /
                     (1 + allocationRatioPlanned)
             } else {
-                designPlan$omega[i] <- .getEventProbabilities(
+                designPlan$chi[i] <- .getEventProbabilities(
                     time = accrualTime[length(accrualTime)] + designPlan$followUpTime,
                     accrualTimeVector = accrualTime,
                     accrualIntensity = designPlan$accrualIntensity,
@@ -3438,9 +3438,9 @@ getNumberOfSubjects <- function(time, ...,
                     allocationRatioPlanned = allocationRatioPlanned, hazardRatio = hazardRatio[i]
                 )
             }
-            designPlan$.setParameterType("omega", C_PARAM_GENERATED)
+            designPlan$.setParameterType("chi", C_PARAM_GENERATED)
 
-            designPlan$nFixed[i] <- designPlan$eventsFixed[i] / designPlan$omega[i]
+            designPlan$nFixed[i] <- designPlan$eventsFixed[i] / designPlan$chi[i]
         } else {
             if (length(maxNumberOfSubjects) > 1) {
                 stop(
@@ -3521,7 +3521,7 @@ getNumberOfSubjects <- function(time, ...,
             )
 
             if (!is.na(timeVector[i])) {
-                designPlan$omega[i] <- .getEventProbabilities(
+                designPlan$chi[i] <- .getEventProbabilities(
                     time = timeVector[i],
                     accrualTimeVector = accrualTime,
                     accrualIntensity = designPlan$accrualIntensity, lambda2 = designPlan$lambda2,
@@ -3529,7 +3529,7 @@ getNumberOfSubjects <- function(time, ...,
                     piecewiseSurvivalTime = piecewiseSurvivalTime, phi = phi, kappa = kappa,
                     allocationRatioPlanned = allocationRatioPlanned, hazardRatio = hazardRatio[i]
                 )
-                designPlan$.setParameterType("omega", C_PARAM_GENERATED)
+                designPlan$.setParameterType("chi", C_PARAM_GENERATED)
             }
         }
     }
@@ -3599,7 +3599,7 @@ getNumberOfSubjects <- function(time, ...,
     designPlan$expectedEventsH1 <- rep(NA_real_, numberOfResults)
     expectedNumberOfSubjectsH1 <- rep(NA_real_, numberOfResults)
     studyDuration <- rep(NA_real_, numberOfResults)
-    designPlan$omega <- rep(NA_real_, numberOfResults)
+    designPlan$chi <- rep(NA_real_, numberOfResults)
 
     informationRates <- designCharacteristics$information / designCharacteristics$shift
 
@@ -3622,10 +3622,10 @@ getNumberOfSubjects <- function(time, ...,
             } else {
                 allocationRatioPlanned <- designPlan$allocationRatioPlanned
             }
-            designPlan$omega[i] <- (allocationRatioPlanned * designPlan$pi1[i] + designPlan$pi2) /
+            designPlan$chi[i] <- (allocationRatioPlanned * designPlan$pi1[i] + designPlan$pi2) /
                 (1 + allocationRatioPlanned)
-            designPlan$.setParameterType("omega", C_PARAM_GENERATED)
-            numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$omega[i]
+            designPlan$.setParameterType("chi", C_PARAM_GENERATED)
+            numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$chi[i]
         } else {
             phi <- -c(log(1 - designPlan$dropoutRate1), log(1 - designPlan$dropoutRate2)) /
                 designPlan$dropoutTime
@@ -3732,7 +3732,7 @@ getNumberOfSubjects <- function(time, ...,
                     )
                 }
 
-                designPlan$omega[i] <- .getEventProbabilities(
+                designPlan$chi[i] <- .getEventProbabilities(
                     time = designPlan$accrualTime[length(designPlan$accrualTime)] + designPlan$followUpTime,
                     accrualTimeVector = designPlan$accrualTime,
                     accrualIntensity = designPlan$accrualIntensity,
@@ -3743,8 +3743,8 @@ getNumberOfSubjects <- function(time, ...,
                     allocationRatioPlanned = allocationRatioPlanned,
                     hazardRatio = designPlan$hazardRatio[i]
                 )
-                designPlan$.setParameterType("omega", C_PARAM_GENERATED)
-                numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$omega[i]
+                designPlan$.setParameterType("chi", C_PARAM_GENERATED)
+                numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$chi[i]
 
                 #   Analysis times
                 for (j in 1:(kMax - 1)) {

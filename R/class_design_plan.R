@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7035 $
-## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
+## |  File version: $Revision: 7124 $
+## |  Last changed: $Date: 2023-06-23 12:19:05 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -675,7 +675,7 @@ TrialDesignPlanRates <- setRefClass("TrialDesignPlanRates",
 #' @template field_dropoutRate1                   
 #' @template field_dropoutRate2
 #' @template field_dropoutTime
-#' @template field_omega
+#' @template field_chi
 #' @template field_expectedNumberOfEvents
 #' @template field_eventsFixed
 #' @template field_nFixed                        
@@ -757,7 +757,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
         dropoutRate1 = "numeric",
         dropoutRate2 = "numeric",
         dropoutTime = "numeric",
-        omega = "numeric",
+        chi = "numeric",
         expectedNumberOfEvents = "numeric",
         eventsFixed = "numeric",
         nFixed = "numeric",
@@ -808,7 +808,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
             .setParameterType("median1", C_PARAM_NOT_APPLICABLE)
             .setParameterType("median2", C_PARAM_NOT_APPLICABLE)
             .setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
-            .setParameterType("omega", C_PARAM_NOT_APPLICABLE)
+            .setParameterType("chi", C_PARAM_NOT_APPLICABLE)
             .setParameterType("maxStudyDuration", C_PARAM_NOT_APPLICABLE)
             .setParameterType("accrualIntensityRelative", C_PARAM_NOT_APPLICABLE)
 
