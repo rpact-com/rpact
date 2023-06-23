@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7035 $
-## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -664,8 +664,8 @@ ParameterSet <- setRefClass("ParameterSet",
             }
             if (is.function(paramValue) || grepl("Function$", paramName)) {
                 paramValueFormatted <- ifelse(
-                    .getParameterType(paramName) == C_PARAM_USER_DEFINED, 
-                    ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"), 
+                    .getParameterType(paramName) == C_PARAM_USER_DEFINED,
+                    ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"),
                     "default"
                 )
             }
@@ -674,7 +674,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 name = paramCaption,
                 n = .getNChar(), prefix = prefix
             )
-            
+
             output <- paste(variableNameFormatted, paramValueFormatted, "\n")
             .cat(output, consoleOutputEnabled = consoleOutputEnabled)
             invisible(output)
@@ -714,7 +714,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
                 includeAllParameters = includeAllParameters,
                 handleParameterNamesAsToBeExcluded = handleParameterNamesAsToBeExcluded,
-                returnParametersAsCharacter = TRUE, 
+                returnParametersAsCharacter = TRUE,
                 tableColumnNames = tableColumnNames
             )
             result <- as.matrix(dataFrame)
@@ -765,7 +765,6 @@ ParameterSet <- setRefClass("ParameterSet",
             return(n)
         },
         .getVariedParameter = function(parameterNames, numberOfVariants) {
-
             # search for user defined parameters
             for (parameterName in parameterNames) {
                 parameterValues <- .self[[parameterName]]
@@ -931,12 +930,12 @@ ParameterSet <- setRefClass("ParameterSet",
         numberOfStages,
         includeAllParameters,
         mandatoryParameterNames) {
-    if (parameterSet$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN && 
+    if (parameterSet$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN &&
             parameterName != "futilityStop") {
         return(NULL)
     }
 
-    if (!includeAllParameters && 
+    if (!includeAllParameters &&
             parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE &&
             !(parameterName %in% mandatoryParameterNames)) {
         return(NULL)
@@ -974,11 +973,11 @@ ParameterSet <- setRefClass("ParameterSet",
             return(rep(parameterValues, numberOfStages))
         }
 
-        if (length(parameterValues) == numberOfStages && 
+        if (length(parameterValues) == numberOfStages &&
                 parameterName %in% c(
                     "plannedEvents", "plannedSubjects",
                     "minNumberOfEventsPerStage", "maxNumberOfEventsPerStage",
-                    "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage", 
+                    "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage",
                     "allocationRatioPlanned"
                 )) {
             values <- c()
@@ -987,7 +986,7 @@ ParameterSet <- setRefClass("ParameterSet",
             }
             return(values)
         }
-        
+
         if (parameterName %in% c(
                 "accrualTime", "accrualIntensity",
                 "plannedEvents", "plannedSubjects",
@@ -1136,7 +1135,7 @@ ParameterSet <- setRefClass("ParameterSet",
                         (is.null(variedParameter) || parameterName != variedParameter)) {
                     columnValues <- .getDataFrameColumnValues(
                         parameterSet, parameterName,
-                        numberOfVariants, numberOfStages, 
+                        numberOfVariants, numberOfStages,
                         includeAllParameters, mandatoryParameterNames
                     )
                     if (!is.null(columnValues)) {
@@ -1178,38 +1177,40 @@ ParameterSet <- setRefClass("ParameterSet",
             }
         )
     }
-    
+
     if (includeAllParameters) {
         extraParameterNames <- names(parameterSet)
         extraParameterNames <- extraParameterNames[!grepl("^\\.", extraParameterNames)]
         extraParameterNames <- extraParameterNames[!(extraParameterNames %in% parameterNames)]
         extraParameterNames <- unique(c(parameterNames[!(parameterNames %in% usedParameterNames)], extraParameterNames))
         for (extraParameter in extraParameterNames) {
-            tryCatch({
-                if (parameterSet$.getParameterType(extraParameter) != C_PARAM_TYPE_UNKNOWN) {
-                    value <- parameterSet[[extraParameter]] 
-                    if (!is.null(value) && length(value) > 0 && 
-                            !is.matrix(value) && !is.array(value) && !is.data.frame(value) && 
-                            (is.numeric(value) || is.character(value) || is.logical(value))) {
-                            
-                        columnCaption <- parameterSet$.getDataFrameColumnCaption(
-                            extraParameter,
-                            tableColumnNames, niceColumnNamesEnabled
-                        )
-                            
-                        if (length(value) == 1) {
-                            dataFrame[[columnCaption]] <- rep(value, nrow(dataFrame))
-                        } else {
-                            dataFrame[[columnCaption]] <- rep(.arrayToString(value, maxLength = 10), nrow(dataFrame))
+            tryCatch(
+                {
+                    if (parameterSet$.getParameterType(extraParameter) != C_PARAM_TYPE_UNKNOWN) {
+                        value <- parameterSet[[extraParameter]]
+                        if (!is.null(value) && length(value) > 0 &&
+                                !is.matrix(value) && !is.array(value) && !is.data.frame(value) &&
+                                (is.numeric(value) || is.character(value) || is.logical(value))) {
+                            columnCaption <- parameterSet$.getDataFrameColumnCaption(
+                                extraParameter,
+                                tableColumnNames, niceColumnNamesEnabled
+                            )
+
+                            if (length(value) == 1) {
+                                dataFrame[[columnCaption]] <- rep(value, nrow(dataFrame))
+                            } else {
+                                dataFrame[[columnCaption]] <- rep(.arrayToString(value, maxLength = 10), nrow(dataFrame))
+                            }
                         }
                     }
+                },
+                error = function(e) {
+                    warning(
+                        ".getAsDataFrameMultidimensional: failed to add extra parameter ",
+                        sQuote(parameterName), " to data.frame; ", e$message
+                    )
                 }
-            }, error = function(e) {
-                warning(
-                    ".getAsDataFrameMultidimensional: failed to add extra parameter ",
-                    sQuote(parameterName), " to data.frame; ", e$message
-                )
-            })
+            )
         }
     }
 
@@ -1265,15 +1266,14 @@ ParameterSet <- setRefClass("ParameterSet",
 }
 
 .getAsDataFrame <- function(...,
-        parameterSet, 
-        parameterNames, 
+        parameterSet,
+        parameterNames,
         niceColumnNamesEnabled = FALSE,
-        includeAllParameters = FALSE, 
+        includeAllParameters = FALSE,
         handleParameterNamesAsToBeExcluded = FALSE,
-        returnParametersAsCharacter = FALSE, 
+        returnParametersAsCharacter = FALSE,
         tableColumnNames = C_TABLE_COLUMN_NAMES,
         mandatoryParameterNames = character(0)) {
-      
     parameterNamesToBeExcluded <- c()
     if (handleParameterNamesAsToBeExcluded) {
         parameterNamesToBeExcluded <- parameterNames
@@ -1289,12 +1289,14 @@ ParameterSet <- setRefClass("ParameterSet",
     parametersToIgnore <- character(0)
     if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
             parameterSet$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
-        parametersToIgnore <- c(parametersToIgnore, 
-            "lambda1", "lambda2", "median1", "median2", 
-            "pi1", "pi2", "piecewiseSurvivalTime")
+        parametersToIgnore <- c(
+            parametersToIgnore,
+            "lambda1", "lambda2", "median1", "median2",
+            "pi1", "pi2", "piecewiseSurvivalTime"
+        )
         parametersToIgnore <- intersect(parametersToIgnore, parameterNames)
-    } 
-    
+    }
+
     if (parameterSet$.getParameterType("hazardRatio") == C_PARAM_GENERATED &&
             !is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
             isTRUE(parameterSet$.piecewiseSurvivalTime$piecewiseSurvivalEnabled)) {
@@ -1307,7 +1309,7 @@ ParameterSet <- setRefClass("ParameterSet",
             parametersToIgnore <- c(parametersToIgnore, c("accrualTime", "accrualIntensity"))
         }
     }
-    
+
     if (length(parametersToIgnore) > 0) {
         parameterNames <- parameterNames[!(parameterNames %in% parametersToIgnore)]
     }
@@ -1426,9 +1428,9 @@ as.data.frame.ParameterSet <- function(x, row.names = NULL,
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame", ...)
 
     return(.getAsDataFrame(
-        parameterSet = x, 
+        parameterSet = x,
         parameterNames = NULL,
-        niceColumnNamesEnabled = niceColumnNamesEnabled, 
+        niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters
     ))
 }
@@ -1487,14 +1489,14 @@ kable.ParameterSet <- function(x, ...) {
                 "Use ", sub("print", "kable", objName), " without 'print' instead or ", sub("\\)", ", markdown = TRUE)", objName)
             )
         }
-        
+
         if (.isSimulationResults(x)) {
             showStatistics <- .getOptionalArgument("showStatistics", optionalArgumentDefaultValue = FALSE, ...)
             if (isTRUE(showStatistics)) {
                 return(print(x, markdown = TRUE, showStatistics = TRUE))
             }
         }
-        
+
         if (.isSummaryPipe(fCall)) {
             return(print(x, markdown = TRUE, showSummary = TRUE))
         } else {

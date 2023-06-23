@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7019 $
-## |  Last changed: $Date: 2023-05-31 07:23:47 +0200 (Mi, 31 Mai 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -25,11 +25,11 @@
 #' Performance Score
 #'
 #' @description
-#' Contains the conditional performance score, its sub-scores and components according to 
-#' Herrmann et al. (2020) for a given simulation result. 
-#' 
-#' @details 
-#' Use \link{getPerformanceScore} to calculate the performance score. 
+#' Contains the conditional performance score, its sub-scores and components according to
+#' Herrmann et al. (2020) for a given simulation result.
+#'
+#' @details
+#' Use \link{getPerformanceScore} to calculate the performance score.
 #'
 #' @include f_core_constants.R
 #' @include f_core_assertions.R
@@ -57,7 +57,7 @@ PerformanceScore <- setRefClass("PerformanceScore",
     methods = list(
         initialize = function(simulationResults, ...) {
             callSuper(.simulationResults = simulationResults, ...)
-            
+
             .plotSettings <<- PlotSettings()
             .parameterNames <<- C_PARAMETER_NAMES
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
@@ -68,10 +68,11 @@ PerformanceScore <- setRefClass("PerformanceScore",
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing performance score objects"
             .resetCat()
-            .simulationResults$.show(showType = showType, digits = digits, 
+            .simulationResults$.show(
+                showType = showType, digits = digits,
                 showStatistics = FALSE, consoleOutputEnabled = consoleOutputEnabled,
-                performanceScore = .self)
+                performanceScore = .self
+            )
         }
     )
 )
-

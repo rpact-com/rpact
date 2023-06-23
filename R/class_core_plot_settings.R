@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7102 $
-## |  Last changed: $Date: 2023-06-16 12:57:56 +0200 (Fr, 16 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -547,12 +547,12 @@ PlotSettings <- setRefClass("PlotSettings",
             if (isFALSE(.self$.scalingEnabled)) {
                 return(size)
             }
-            
+
             if (pointEnabled) {
                 if (isFALSE(.pointScalingCorrectionEnabled)) {
                     return(size)
                 }
-                
+
                 return(size * .self$scalingFactor^2)
             }
 
@@ -672,16 +672,15 @@ PlotSettings <- setRefClass("PlotSettings",
             return(p)
         },
         plotPoints = function(p, pointBorder, ..., mapping = NULL) {
-
             # plot white border around the points
             if (pointBorder > 0 && .pointBorderEnabled) {
                 p <- p + ggplot2::geom_point(
                     mapping = mapping,
-                    color = "white", 
-                    size = scaleSize(.self$pointSize, TRUE), 
+                    color = "white",
+                    size = scaleSize(.self$pointSize, TRUE),
                     alpha = 1,
-                    shape = 21, 
-                    stroke = pointBorder / 2.25, 
+                    shape = 21,
+                    stroke = pointBorder / 2.25,
                     show.legend = FALSE
                 )
             }
@@ -689,10 +688,10 @@ PlotSettings <- setRefClass("PlotSettings",
             if (!is.null(.self$pointColor) && length(.self$pointColor) == 1 && !is.na(.self$pointColor)) {
                 p <- p + ggplot2::geom_point(
                     mapping = mapping,
-                    color = .self$pointColor, 
-                    size = scaleSize(.self$pointSize, TRUE), 
+                    color = .self$pointColor,
+                    size = scaleSize(.self$pointSize, TRUE),
                     alpha = 1,
-                    shape = 19, 
+                    shape = 19,
                     show.legend = FALSE
                 )
             } else {

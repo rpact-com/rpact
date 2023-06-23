@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7035 $
-## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -32,7 +32,7 @@ NULL
 #'
 #' @description
 #' Basic class for trial designs.
-#' 
+#'
 #' @template field_kMax
 #' @template field_alpha
 #' @template field_stages
@@ -210,7 +210,7 @@ TrialDesign <- setRefClass("TrialDesign",
 #' @template field_averageSampleNumber1
 #' @template field_averageSampleNumber01
 #' @template field_averageSampleNumber0
-#' 
+#'
 #' @details
 #' \code{TrialDesignCharacteristics} contains all fields required to collect the characteristics of a design.
 #' This object should not be created directly; use \code{getDesignCharacteristics}
@@ -348,9 +348,10 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
     } else {
         parameterNamesToBeExcluded <- c("inflationFactor")
     }
-    return(.getAsDataFrame(parameterSet = x, 
+    return(.getAsDataFrame(
+        parameterSet = x,
         parameterNames = parameterNamesToBeExcluded,
-        niceColumnNamesEnabled = niceColumnNamesEnabled, 
+        niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters,
         handleParameterNamesAsToBeExcluded = TRUE,
         tableColumnNames = .getTableColumnNames(design = x$.design)
@@ -365,7 +366,7 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
 #'
 #' @description
 #' Trial design for Fisher's combination test.
-#' 
+#'
 #' @template field_kMax
 #' @template field_alpha
 #' @template field_stages
@@ -525,7 +526,7 @@ TrialDesignFisher <- setRefClass(C_CLASS_NAME_TRIAL_DESIGN_FISHER,
 #'
 #' @description
 #' Trial design for inverse normal method.
-#' 
+#'
 #' @template field_kMax
 #' @template field_alpha
 #' @template field_stages
@@ -850,7 +851,7 @@ TrialDesignInverseNormal <- setRefClass(C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL
 #'
 #' @description
 #' Trial design for group sequential design.
-#' 
+#'
 #' @template field_kMax
 #' @template field_alpha
 #' @template field_stages
@@ -920,7 +921,7 @@ TrialDesignGroupSequential <- setRefClass(
 #'
 #' @description
 #' Trial design for conditional Dunnett tests.
-#' 
+#'
 #' @template field_kMax
 #' @template field_alpha
 #' @template field_stages
@@ -931,7 +932,7 @@ TrialDesignGroupSequential <- setRefClass(
 #' @template field_alphaSpent
 #' @template field_bindingFutility
 #' @template field_tolerance
-#' @template field_informationAtInterim 
+#' @template field_informationAtInterim
 #' @template field_secondStageConditioning
 #' @template field_sided
 #'
@@ -948,7 +949,7 @@ TrialDesignGroupSequential <- setRefClass(
 #' @importFrom methods new
 #'
 #' @seealso \code{\link{getDesignConditionalDunnett}} for creating a conditional Dunnett test design.
-#' 
+#'
 TrialDesignConditionalDunnett <- setRefClass(
     C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT,
     contains = "TrialDesign",
@@ -1015,7 +1016,7 @@ TrialDesignConditionalDunnett <- setRefClass(
 #' For performing the conditional Dunnett test the design must be defined through this function.
 #' You can define the information fraction and the way of how to compute the second stage
 #' p-values only in the design definition, and not in the analysis call.\cr
-#' See \code{\link[=getClosedConditionalDunnettTestResults]{getClosedConditionalDunnettTestResults()}} 
+#' See \code{\link[=getClosedConditionalDunnettTestResults]{getClosedConditionalDunnettTestResults()}}
 #' for an example and Koenig et al. (2008) and
 #' Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
 #'
@@ -1083,9 +1084,9 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #'
 #' Note that \code{\link[=param_nMax]{nMax}} is not an argument that it passed to \code{ggplot2}.
 #' Rather, the underlying calculations (e.g. power for different theta's or average sample size) are based
-#' on calls to function \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}} 
+#' on calls to function \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 #' which has argument \code{\link[=param_nMax]{nMax}}.
-#' I.e., \code{\link[=param_nMax]{nMax}} is not an argument to ggplot2 but to 
+#' I.e., \code{\link[=param_nMax]{nMax}} is not an argument to ggplot2 but to
 #' \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 #' which is called prior to plotting.
 #'
@@ -1246,7 +1247,8 @@ as.data.frame.TrialDesign <- function(x, row.names = NULL,
     } else {
         parameterNames <- x$.getParametersToShow()
     }
-    return(.getAsDataFrame(parameterSet = x, 
+    return(.getAsDataFrame(
+        parameterSet = x,
         parameterNames = parameterNames,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters,

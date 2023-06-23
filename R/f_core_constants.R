@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7124 $
-## |  Last changed: $Date: 2023-06-23 12:19:05 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -688,7 +688,6 @@ C_PARAMETER_NAMES <- list(
     delayedInformation = "Delayed information",
     decisionCriticalValues = "Decision critical values",
     reversalProbabilities = "Reversal probabilities",
-    
     locationSampleSize = "Location sample sizes",
     variationSampleSize = "Variation sample sizes",
     subscoreSampleSize = "Sub-score sample sizes",
@@ -988,7 +987,6 @@ C_TABLE_COLUMN_NAMES <- list(
     delayedInformation = "Delayed information",
     decisionCriticalValues = "Decision critical value",
     reversalProbabilities = "Reversal probability",
-    
     locationSampleSize = "Location sample size",
     variationSampleSize = "Variation sample size",
     subscoreSampleSize = "Sub-score sample size",
@@ -1310,7 +1308,6 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     delayedInformation = ".formatRates",
     decisionCriticalValues = ".formatCriticalValues",
     reversalProbabilities = ".formatProbabilities",
-    
     locationSampleSize = ".formatProbabilities",
     variationSampleSize = ".formatProbabilities",
     subscoreSampleSize = ".formatProbabilities",

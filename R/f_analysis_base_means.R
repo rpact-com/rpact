@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -48,9 +48,9 @@ NULL
 
 .getAnalysisResultsMeansInverseNormal <- function(...,
         design, dataInput, directionUpper = C_DIRECTION_UPPER_DEFAULT,
-        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, 
+        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT, thetaH1 = NA_real_, 
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT, thetaH1 = NA_real_,
         nPlanned = NA_real_, assumedStDev = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
@@ -94,7 +94,7 @@ NULL
     )
 
     results <- AnalysisResultsGroupSequential(design = design, dataInput = dataInput)
-    
+
     stDevH1 <- .getOptionalArgument("stDevH1", ...)
     if (!is.null(stDevH1)) {
         .assertIsSingleNumber(assumedStDev, "assumedStDev", naAllowed = TRUE)
@@ -156,7 +156,7 @@ NULL
 #' stages, informationRates, criticalValues, futilityBounds, alphaSpent, stageLevels
 #'
 #' @noRd
-#' 
+#'
 .getAnalysisResultsMeansAll <- function(..., results, design, dataInput, stage,
         directionUpper, normalApproximation = normalApproximation,
         equalVariances = equalVariances, thetaH0, thetaH1, assumedStDev,
@@ -254,7 +254,7 @@ NULL
         stageResults = stageResults, tolerance = tolerance
     )
     .logProgress("Repeated p-values calculated", startTime = startTime)
-        
+
     results$.setParameterType("repeatedConfidenceIntervalLowerBounds", C_PARAM_GENERATED)
     results$.setParameterType("repeatedConfidenceIntervalUpperBounds", C_PARAM_GENERATED)
     results$.setParameterType("repeatedPValues", C_PARAM_GENERATED)
@@ -319,7 +319,7 @@ NULL
 #' @keywords internal
 #'
 #' @export
-#' 
+#'
 .getAnalysisResultsMeansParallelComputing <- function(caseNumber, arguments) {
     results <- arguments$results
     design <- arguments$design
@@ -616,7 +616,7 @@ NULL
 #' Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Means
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsMeans <- function(design, ...) {
     if (.isTrialDesignGroupSequential(design)) {
         return(.getRepeatedConfidenceIntervalsMeansGroupSequential(design = design, ...))
@@ -816,7 +816,7 @@ NULL
 #' RCIs based on group sequential combination test
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsMeansGroupSequential <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -843,7 +843,7 @@ NULL
 #' RCIs based on inverse normal combination test
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsMeansInverseNormal <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -871,7 +871,7 @@ NULL
 #' RCIs based on Fisher's combination test
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsMeansFisher <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -898,7 +898,7 @@ NULL
 #' Calculation of conditional power based on group sequential method
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerMeansGroupSequential <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_,
         thetaH1 = NA_real_, assumedStDev = NA_real_) {
@@ -1016,7 +1016,7 @@ NULL
 #' Calculation of conditional power based on inverse normal method
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerMeansInverseNormal <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_,
         thetaH1 = NA_real_, assumedStDev = NA_real_) {
@@ -1132,7 +1132,7 @@ NULL
 #' Calculation of conditional power based on Fisher combination test
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerMeansFisher <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_,
         thetaH1 = NA_real_, assumedStDev = NA_real_,
@@ -1394,7 +1394,7 @@ NULL
 #' based on group sequential test without SSR (general case).
 #'
 #' @noRd
-#' 
+#'
 .getFinalConfidenceIntervalMeansGroupSequential <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1424,9 +1424,8 @@ NULL
     ))
 }
 
-.getFinalConfidenceIntervalMeansValues <- function(design, dataInput, 
+.getFinalConfidenceIntervalMeansValues <- function(design, dataInput,
         stageResults, directionUpper, thetaH0, stage, tolerance) {
-        
     finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
     medianUnbiasedGeneral <- NA_real_
 
@@ -1563,7 +1562,7 @@ NULL
 #' based on inverse normal method, only theoretically shown to be valid for kMax <= 2 or no SSR.
 #'
 #' @noRd
-#' 
+#'
 .getFinalConfidenceIntervalMeansInverseNormal <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,
@@ -1621,7 +1620,7 @@ NULL
 #' based on Fisher combination test, only valid for kMax <= 2.
 #'
 #' @noRd
-#' 
+#'
 .getFinalConfidenceIntervalMeansFisher <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,

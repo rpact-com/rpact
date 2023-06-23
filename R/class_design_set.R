@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7035 $
-## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -959,7 +959,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         xParameterName = xParameterName,
         yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
         palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
-        legendPosition = legendPosition, plotSettings = plotSettings #, ...
+        legendPosition = legendPosition, plotSettings = plotSettings # , ...
     )
 
     p <- .addDecistionCriticalValuesToPlot(p = p, designMaster = designMaster, type = type, nMax = nMax)
@@ -1003,7 +1003,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         ),
         size = plotSettings$scaleSize(plotSettings$pointSize, TRUE),
         shape = 4, stroke = 1.25, show.legend = FALSE
-    ) 
+    )
 
     for (i in 1:nrow(data)) {
         label <- paste0("(", round(data[i, 1], 3), ", ", round(data[i, 2], 3), ")")

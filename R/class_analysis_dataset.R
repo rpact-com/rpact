@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -47,19 +47,22 @@ C_KEY_WORDS_OVERALL_EXPECTED_EVENTS <- .getAllParameterNameVariants(c("overallEx
 C_KEY_WORDS_OVERALL_VARIANCE_EVENTS <- .getAllParameterNameVariants(c("overallVarianceEvents", "overallVarianceEvent"))
 
 C_KEY_WORDS_OVERALL_SAMPLE_SIZES <- .getAllParameterNameVariants(c(
-    "overallN", "overallSampleSizes", "overallSampleSize"))
+    "overallN", "overallSampleSizes", "overallSampleSize"
+))
 
 C_KEY_WORDS_OVERALL_MEANS <- .getAllParameterNameVariants(c("overallMeans", "overallMean"))
 
 C_KEY_WORDS_OVERALL_ST_DEVS <- .getAllParameterNameVariants(c(
-    "overallStDevs", "overallStDev", "overall.sd", "overall_sd"))
+    "overallStDevs", "overallStDev", "overall.sd", "overall_sd"
+))
 
 C_KEY_WORDS_ALLOCATION_RATIOS <- .getAllParameterNameVariants(c("ar", "allocationRatios", "allocationRatio"))
 
 C_KEY_WORDS_LOG_RANKS <- .getAllParameterNameVariants(c("logRanks", "logRank", "lr"))
 
 C_KEY_WORDS_OVERALL_ALLOCATION_RATIOS <- .getAllParameterNameVariants(c(
-    "oar", "car", "overallAllocationRatios", "overallAllocationRatio"))
+    "oar", "car", "overallAllocationRatios", "overallAllocationRatio"
+))
 
 C_KEY_WORDS_OVERALL_LOG_RANKS <- .getAllParameterNameVariants(c("olr", "clr", "overallLogRanks", "overallLogRank"))
 
@@ -157,7 +160,7 @@ C_KEY_WORDS <- c(
 #'     datasetSurvivalMultiArm
 #' }
 #' }
-#' 
+#'
 #' @export
 #'
 readDataset <- function(file, ..., header = TRUE, sep = ",", quote = "\"",
@@ -443,12 +446,12 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
     if (length(args) == 0) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "data.frame, data vectors, or datasets expected")
     }
-    
+
     if (.optionalArgsContainsDatasets(...)) {
         if (length(args) == 1) {
             return(args[[1]])
         }
-        
+
         design <- .getDesignFromArgs(...)
         if (length(args) == 2 && !is.null(design)) {
             dataset <- .getDatasetFromArgs(...)
@@ -458,88 +461,88 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
                 return(dataset)
             }
         }
-        
+
         return(.getEnrichmentDatasetFromArgs(...))
     }
-    
+
     exampleType <- args[["example"]]
     if (!is.null(exampleType) && exampleType %in% c("means", "rates", "survival")) {
         return(.getDatasetExample(exampleType = exampleType))
     }
-    
+
     if (length(args) == 1 && !is.null(args[[1]]) && is.list(args[[1]]) && !is.data.frame(args[[1]])) {
         return(.getDatasetMeansFromModelsByStage(emmeansResults = args[[1]]))
     }
-    
+
     emmeansResults <- .getDatasetMeansModelObjectsList(args)
     if (!is.null(emmeansResults) && length(emmeansResults) > 0) {
         return(.getDatasetMeansFromModelsByStage(emmeansResults = emmeansResults))
     }
-    
+
     dataFrame <- .getDataFrameFromArgs(...)
-    
+
     design <- .getDesignFromArgs(...)
-    
+
     if (is.null(dataFrame)) {
         args <- .removeDesignFromArgs(args)
-        
+
         paramNames <- names(args)
         paramNames <- paramNames[paramNames != ""]
-        
+
         numberOfParameters <- length(args)
         if (numberOfParameters > 0 && names(args)[1] == "" && .isTrialDesign(args[[1]])) {
             numberOfParameters <- numberOfParameters - 1
         }
-        
+
         if (length(paramNames) != numberOfParameters) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all parameters must be named")
         }
-        
+
         if (length(paramNames) != length(unique(paramNames))) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "the parameter names must be unique")
         }
-        
+
         dataFrame <- .createDataFrame(...)
     }
-    
+
     enrichmentEnabled <- .isDataObjectEnrichment(...)
-    
+
     if (.isDataObjectMeans(...)) {
         return(DatasetMeans(
-                dataFrame = dataFrame,
-                floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-                enrichmentEnabled = enrichmentEnabled,
-                .design = design
-            ))
+            dataFrame = dataFrame,
+            floatingPointNumbersEnabled = floatingPointNumbersEnabled,
+            enrichmentEnabled = enrichmentEnabled,
+            .design = design
+        ))
     }
-    
+
     if (.isDataObjectRates(...)) {
         return(DatasetRates(
-                dataFrame = dataFrame,
-                floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-                enrichmentEnabled = enrichmentEnabled,
-                .design = design
-            ))
+            dataFrame = dataFrame,
+            floatingPointNumbersEnabled = floatingPointNumbersEnabled,
+            enrichmentEnabled = enrichmentEnabled,
+            .design = design
+        ))
     }
-    
+
     if (.isDataObjectNonStratifiedEnrichmentSurvival(...)) {
         return(DatasetEnrichmentSurvival(
-                dataFrame = dataFrame,
-                floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-                enrichmentEnabled = enrichmentEnabled,
-                .design = design
-            ))
+            dataFrame = dataFrame,
+            floatingPointNumbersEnabled = floatingPointNumbersEnabled,
+            enrichmentEnabled = enrichmentEnabled,
+            .design = design
+        ))
     }
-    
+
     if (.isDataObjectSurvival(...)) {
         return(DatasetSurvival(
-                dataFrame = dataFrame,
-                floatingPointNumbersEnabled = floatingPointNumbersEnabled,
-                enrichmentEnabled = enrichmentEnabled,
-                .design = design
-            ))
+            dataFrame = dataFrame,
+            floatingPointNumbersEnabled = floatingPointNumbersEnabled,
+            enrichmentEnabled = enrichmentEnabled,
+            .design = design
+        ))
     }
-    
+
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "failed to identify dataset type")
 }
 
@@ -590,8 +593,8 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
 #' }
 #' Prefix \code{overall[Capital case of first letter of variable name]...} for the variable
 #' names enables entering the overall (cumulative) results and calculates stage-wise statistics.
-#' Since rpact version 3.2, the prefix \code{cumulative[Capital case of first letter of variable name]...} or 
-#' \code{cum[Capital case of first letter of variable name]...} can alternatively be used for this. 
+#' Since rpact version 3.2, the prefix \code{cumulative[Capital case of first letter of variable name]...} or
+#' \code{cum[Capital case of first letter of variable name]...} can alternatively be used for this.
 #'
 #' \code{n} can be used in place of \code{samplesizes}.
 #'
@@ -634,12 +637,14 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
 #'
 #' @export
 #'
-getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {  
+getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
     dataset <- .getDataset(floatingPointNumbersEnabled = floatingPointNumbersEnabled, ...)
     if (dataset$.enrichmentEnabled && dataset$getNumberOfGroups() != 2) {
-        warning("Only population enrichment data with 2 groups can be analyzed but ", 
-            dataset$getNumberOfGroups(), " group", 
-            ifelse(dataset$getNumberOfGroups() == 1, " is", "s are"), " defined", call. = FALSE)
+        warning("Only population enrichment data with 2 groups can be analyzed but ",
+            dataset$getNumberOfGroups(), " group",
+            ifelse(dataset$getNumberOfGroups() == 1, " is", "s are"), " defined",
+            call. = FALSE
+        )
     }
     return(dataset)
 }
@@ -714,7 +719,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                     "where x is a linear model result (one object per stage; class is %s at stage %s)"
                 ),
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote("emmeansResults"), sQuote("emmGrid"),
-                    .getClassName(emmeansResults[[stage]]), stage
+                .getClassName(emmeansResults[[stage]]), stage
             ))
         }
     }
@@ -1337,7 +1342,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #' \code{Dataset} is the basic class for
 #' \itemize{
 #'   \item \code{\link{DatasetMeans}},
-#'   \item \code{\link{DatasetRates}}, 
+#'   \item \code{\link{DatasetRates}},
 #'   \item \code{\link{DatasetSurvival}}, and
 #'   \item \code{\link{DatasetEnrichmentSurvival}}.
 #' }
@@ -1415,7 +1420,7 @@ Dataset <- setRefClass("Dataset",
                     title = .toString(startWithUpperCase = TRUE), orderByParameterName = FALSE,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
-                
+
                 .showParametersOfOneGroup(.getGeneratedParameters(),
                     title = "Calculated data", orderByParameterName = FALSE,
                     consoleOutputEnabled = consoleOutputEnabled
@@ -2179,10 +2184,12 @@ DatasetMeans <- setRefClass("DatasetMeans",
             value <- (numK - numBeforeK + numSumBeforeK - numSumK) / denom
             if (is.null(value) || length(value) != 1 || is.na(value) || value < 0) {
                 warning("No calculation of stage-wise standard deviation from ",
-                    "overall standard deviations possible at stage ", k, call. = FALSE)
+                    "overall standard deviations possible at stage ", k,
+                    call. = FALSE
+                )
                 return(NA_real_)
-            } 
-            
+            }
+
             return(sqrt(value))
         },
         .getStageWiseStDevs = function(overallStDevs, sampleSizes, overallSampleSizes, means, overallMeans) {
@@ -2191,7 +2198,7 @@ DatasetMeans <- setRefClass("DatasetMeans",
                 return(result)
             }
 
-            for (k in 2:length(overallStDevs)) { 
+            for (k in 2:length(overallStDevs)) {
                 result[k] <- .getStageWiseStDev(overallStDevs, sampleSizes, overallSampleSizes, means, overallMeans, k)
             }
             return(result)
@@ -2240,7 +2247,7 @@ DatasetMeans <- setRefClass("DatasetMeans",
     )
 )
 
-#' @examples 
+#' @examples
 #'
 #' datasetExample <- getDataset(
 #'     means1 = c(112.3, 105.1, 121.3),
@@ -2253,9 +2260,11 @@ DatasetMeans <- setRefClass("DatasetMeans",
 #'     n2 = c(87, 83, 81),
 #'     n3 = c(87, 82, 84)
 #' )
-#' .getRandomDataMeans(datasetExample, randomDataParamName = "outcome", numberOfVisits = 3,
-#'     fixedCovariates = list(gender = c("f", "m"), bmi = c(17, 40)))
-#' 
+#' .getRandomDataMeans(datasetExample,
+#'     randomDataParamName = "outcome", numberOfVisits = 3,
+#'     fixedCovariates = list(gender = c("f", "m"), bmi = c(17, 40))
+#' )
+#'
 #' @noRd
 #'
 .getRandomDataMeans <- function(dataset, ...,
@@ -2613,11 +2622,12 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
             p <- ggplot2::ggplot(show.legend = FALSE)
 
             # plot sample size
-            p <- p + ggplot2::geom_bar(ggplot2::aes(
-                y = .data[["sampleSize"]],
-                x = factor(.data[["stage"]]), fill = factor(.data[["group"]])
-            ),
-            data = data, position = "dodge", stat = "identity", alpha = 0.4
+            p <- p + ggplot2::geom_bar(
+                ggplot2::aes(
+                    y = .data[["sampleSize"]],
+                    x = factor(.data[["stage"]]), fill = factor(.data[["group"]])
+                ),
+                data = data, position = "dodge", stat = "identity", alpha = 0.4
             )
 
             # plot events
@@ -2751,7 +2761,7 @@ DatasetRates <- setRefClass("DatasetRates",
             # case: one rate - stage wise
             if (.paramExists(dataFrame, C_KEY_WORDS_SAMPLE_SIZES)) {
                 .inputType <<- "stagewise"
-                
+
                 sampleSizes <<- .getValidatedFloatingPointNumbers(
                     .getValuesByParameterName(dataFrame, C_KEY_WORDS_SAMPLE_SIZES),
                     parameterName = "Sample sizes"
@@ -2915,9 +2925,11 @@ DatasetRates <- setRefClass("DatasetRates",
                 for (group in 1:numberOfTreatmentGroups) {
                     overallSampleSizesTemp <- .getValidatedFloatingPointNumbers(
                         .getValuesByParameterName(
-                        dataFrame, C_KEY_WORDS_OVERALL_SAMPLE_SIZES,
-                        suffix = group
-                    ), parameterName = "Cumulative sample sizes")
+                            dataFrame, C_KEY_WORDS_OVERALL_SAMPLE_SIZES,
+                            suffix = group
+                        ),
+                        parameterName = "Cumulative sample sizes"
+                    )
                     .validateValues(overallSampleSizesTemp, paste0("overallSampleSizes", group))
                     .assertValuesAreStrictlyIncreasing(overallSampleSizesTemp,
                         paste0("overallSampleSizes", group),
@@ -2927,9 +2939,11 @@ DatasetRates <- setRefClass("DatasetRates",
 
                     overallEventsTemp <- .getValidatedFloatingPointNumbers(
                         .getValuesByParameterName(dataFrame,
-                        C_KEY_WORDS_OVERALL_EVENTS,
-                        suffix = group
-                    ), parameterName = "Cumulative events")
+                            C_KEY_WORDS_OVERALL_EVENTS,
+                            suffix = group
+                        ),
+                        parameterName = "Cumulative events"
+                    )
                     .validateValues(overallEventsTemp, paste0("overallEvents", group))
                     .assertValuesAreMonotoneIncreasing(overallEventsTemp,
                         paste0("overallEvents", group),
@@ -3152,13 +3166,13 @@ DatasetRates <- setRefClass("DatasetRates",
 #'
 #' @template field_groups
 #' @template field_stages
-#' @template field_events 
+#' @template field_events
 #' @template field_overallEvents
 #' @template field_allocationRatios
 #' @template field_overallAllocationRatios
 #' @template field_logRanks
 #' @template field_overallLogRanks
-#' 
+#'
 #'
 #' @details
 #' This object cannot be created directly; better use \code{\link{getDataset}}
@@ -3722,9 +3736,9 @@ DatasetSurvival <- setRefClass("DatasetSurvival",
 
 #'
 #' @rdname DatasetSurvival
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 DatasetEnrichmentSurvival <- setRefClass("DatasetEnrichmentSurvival",
     contains = "DatasetSurvival",
     fields = list(

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7099 $
-## |  Last changed: $Date: 2023-06-16 09:40:22 +0200 (Fri, 16 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -82,7 +82,7 @@ getDesignFisher <- function(...,
     .assertIsValidTolerance(tolerance)
     .assertIsValidIterationsAndSeed(iterations, seed)
     .warnInCaseOfUnknownArguments(functionName = "getDesignFisher", ...)
-    
+
     return(.getDesignFisher(
         kMax = kMax, alpha = alpha, method = method,
         userAlphaSpending = userAlphaSpending, alpha0Vec = alpha0Vec, informationRates = informationRates,
@@ -115,7 +115,7 @@ getDesignFisher <- function(...,
 #' @param userFunctionCallEnabled if \code{TRUE}, additional parameter validation methods will be called.
 #'
 #' @noRd
-#' 
+#'
 .getDesignFisher <- function(kMax = NA_integer_, alpha = NA_real_, method = C_FISHER_METHOD_DEFAULT,
         userAlphaSpending = NA_real_, alpha0Vec = NA_real_, informationRates = NA_real_,
         sided = 1, bindingFutility = C_BINDING_FUTILITY_FISHER_DEFAULT,
@@ -323,9 +323,11 @@ getDesignFisher <- function(...,
         if (design$kMax > 1) {
             diff <- na.omit(design$criticalValues[2:design$kMax] - design$criticalValues[1:(design$kMax - 1)])
             if (length(diff) > 0 && any(diff > 1e-12)) {
-                .logDebug("Stop creation of Fisher design because critical values are ", 
+                .logDebug(
+                    "Stop creation of Fisher design because critical values are ",
                     .arrayToString(criticalValues, vectorLookAndFeelEnabled = TRUE), ", ",
-                    "i.e., differences are ", .arrayToString(diff, vectorLookAndFeelEnabled = TRUE))
+                    "i.e., differences are ", .arrayToString(diff, vectorLookAndFeelEnabled = TRUE)
+                )
                 stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "no calculation possible")
             }
 

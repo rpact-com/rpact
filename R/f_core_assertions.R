@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7102 $
-## |  Last changed: $Date: 2023-06-16 12:57:56 +0200 (Fr, 16 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -303,12 +303,14 @@ NULL
     if (!is.null(design)) {
         .assertIsTrialDesign(design)
     }
-    
+
     if (dataInput$.enrichmentEnabled && dataInput$getNumberOfGroups() != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-            "only population enrichment data with 2 groups can be analyzed but ", 
-            dataInput$getNumberOfGroups(), " group", 
-            ifelse(dataInput$getNumberOfGroups() == 1, " is", "s are"), " defined")
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+            "only population enrichment data with 2 groups can be analyzed but ",
+            dataInput$getNumberOfGroups(), " group",
+            ifelse(dataInput$getNumberOfGroups() == 1, " is", "s are"), " defined"
+        )
     }
 
     stages <- dataInput$stages
@@ -1972,9 +1974,8 @@ NULL
     }
 }
 
-.assertIsValidPlannedSubjectsOrEvents <- function(
-        design,
-        plannedValues, 
+.assertIsValidPlannedSubjectsOrEvents <- function(design,
+        plannedValues,
         parameterName = c("plannedSubjects", "plannedEvents")) {
     parameterName <- match.arg(parameterName)
     .assertIsIntegerVector(plannedValues, parameterName, validateType = FALSE)

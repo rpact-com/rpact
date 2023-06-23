@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7124 $
-## |  Last changed: $Date: 2023-06-23 12:19:05 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1250,23 +1250,6 @@ getParameterName <- function(obj, parameterCaption) {
 
 .isPackageInstalled <- function(packageName) {
     return(nzchar(try(system.file(package = packageName), silent = TRUE)))
-}
-
-.getInnerValue <- function(s, bracketOpen = "{", bracketClose = "}", escape = TRUE) {
-    if (escape) {
-        bracketOpen <- paste0("\\", bracketOpen)
-        bracketClose <- paste0("\\", bracketClose)
-    }
-    indices <- gregexpr(pattern = paste0(
-        "\\", bracketOpen,
-        "(?:(?!", bracketClose, ").)*", bracketClose
-    ), s, perl = TRUE)
-
-    if (length(indices) == 0) {
-        return(NA_character_)
-    }
-
-    return(.getPartsByIndices(s, indices, corr1 = nchar(bracketOpen), corr2 = nchar(bracketClose)))
 }
 
 .getQNorm <- function(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE, epsilon = C_QNORM_EPSILON) {

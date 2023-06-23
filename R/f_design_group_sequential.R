@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7081 $
-## |  Last changed: $Date: 2023-06-13 17:38:17 +0200 (Tue, 13 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1707,6 +1707,7 @@ getDesignGroupSequential <- function(...,
 #' Calculates the characteristics of a design and returns it.
 #'
 #' @inheritParams param_design
+#' @inheritParams param_three_dots
 #'
 #' @details
 #' Calculates the inflation factor (IF),
@@ -1744,7 +1745,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         .warnInCaseOfUnknownArguments(functionName = "getDesignCharacteristics", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
     }
-    
+
     return(.getDesignCharacteristics(design = design, userFunctionCallEnabled = TRUE))
 }
 
@@ -1756,14 +1757,14 @@ getDesignCharacteristics <- function(design = NULL, ...) {
     if (userFunctionCallEnabled) {
         .validateAlphaAndBeta(design = design)
     }
-    
+
     # TODO mit Aufruf dieser Funktion werden diverse Werte im Design geaendert; ist das sinnvoll?
 
     design$informationRates <- .getValidatedInformationRates(design, writeToDesign = FALSE)
 
     if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
             .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2 && design$kMax == 2) {
-        design$futilityBounds[is.na(design$futilityBounds)] <- 0 
+        design$futilityBounds[is.na(design$futilityBounds)] <- 0
     }
 
     design$futilityBounds <- .getValidatedFutilityBounds(design,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -89,9 +89,10 @@ NULL
 
         if (varianceOption == "pooledFromFull") {
             pv <- ((n[1] - 1) * v[1] + (n[2] - 1) * v[2]) / (n[1] + n[2] - 2)
-            testStatistics <- sum((dataInput$getMeans(stage = stage, subset = subset, group = 1) -
-                dataInput$getMeans(stage = stage, subset = subset, group = 2) - thetaH0) * weights,
-            na.rm = TRUE
+            testStatistics <- sum(
+                (dataInput$getMeans(stage = stage, subset = subset, group = 1) -
+                    dataInput$getMeans(stage = stage, subset = subset, group = 2) - thetaH0) * weights,
+                na.rm = TRUE
             ) / sqrt(sum(pv * weights, na.rm = TRUE))
         } else if (varianceOption == "pooled") {
             pv <- ((dataInput$getSampleSizes(stage = stage, subset = subset, group = 1) - 1) *
@@ -100,18 +101,20 @@ NULL
                     dataInput$getStDevs(stage = stage, subset = subset, group = 2)^2) /
                 (dataInput$getSampleSizes(stage = stage, subset = subset, group = 1) +
                     dataInput$getSampleSizes(stage = stage, subset = subset, group = 2) - 2)
-            testStatistics <- sum((dataInput$getMeans(stage = stage, subset = subset, group = 1) -
-                dataInput$getMeans(stage = stage, subset = subset, group = 2) - thetaH0) * weights,
-            na.rm = TRUE
+            testStatistics <- sum(
+                (dataInput$getMeans(stage = stage, subset = subset, group = 1) -
+                    dataInput$getMeans(stage = stage, subset = subset, group = 2) - thetaH0) * weights,
+                na.rm = TRUE
             ) / sqrt(sum(pv * weights, na.rm = TRUE))
         } else {
             pv <- dataInput$getStDevs(stage = stage, subset = subset, group = 1)^2 /
                 dataInput$getSampleSizes(stage = stage, subset = subset, group = 1) +
                 dataInput$getStDevs(stage = stage, subset = subset, group = 2)^2 /
                     dataInput$getSampleSizes(stage = stage, subset = subset, group = 2)
-            testStatistics <- sum((dataInput$getMeans(stage = stage, subset = subset, group = 1) -
-                dataInput$getMeans(stage = stage, subset = subset, group = 2) - thetaH0) * weights,
-            na.rm = TRUE
+            testStatistics <- sum(
+                (dataInput$getMeans(stage = stage, subset = subset, group = 1) -
+                    dataInput$getMeans(stage = stage, subset = subset, group = 2) - thetaH0) * weights,
+                na.rm = TRUE
             ) / sqrt(sum(pv * weights^2, na.rm = TRUE))
         }
         df <- sum(dataInput$getSampleSizes(stage = stage, subset = subset, group = 1), na.rm = TRUE) +
@@ -486,7 +489,7 @@ NULL
     results <- AnalysisResultsEnrichmentFisher(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
-    
+
     results <- .getAnalysisResultsMeansEnrichmentAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -552,7 +555,6 @@ NULL
     .logProgress("Closed test calculated", startTime = startTime)
 
     if (design$kMax > 1) {
-
         # conditional power
         startTime <- Sys.time()
         if (.isTrialDesignFisher(design)) {
@@ -744,7 +746,6 @@ NULL
         startTime <- Sys.time()
         for (population in 1:gMax) {
             if (!is.na(stageResults$testStatistics[population, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
-
                 # finding maximum upper and minimum lower bounds for RCIs
                 thetaLow <- .getUpperLowerThetaMeansEnrichment(
                     design = design, dataInput = dataInput,
@@ -794,7 +795,7 @@ NULL
                 )
 
                 # adjustment for binding futility bounds
-				if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
+                if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
                     parameterName <- ifelse(.isTrialDesignFisher(design),
                         "singleStepAdjustedPValues", firstParameterName
                     )
@@ -869,7 +870,7 @@ NULL
 #' RCIs based on inverse normal combination test
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsMeansEnrichmentInverseNormal <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -899,7 +900,7 @@ NULL
 #' RCIs based on Fisher's combination test
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsMeansEnrichmentFisher <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -930,16 +931,16 @@ NULL
 #' Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Means
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsMeansEnrichment <- function(..., design) {
     if (.isTrialDesignInverseNormal(design)) {
         return(.getRepeatedConfidenceIntervalsMeansEnrichmentInverseNormal(design = design, ...))
     }
-    
+
     if (.isTrialDesignFisher(design)) {
         return(.getRepeatedConfidenceIntervalsMeansEnrichmentFisher(design = design, ...))
     }
-    
+
     .stopWithWrongDesignMessageEnrichment(design)
 }
 
@@ -947,7 +948,7 @@ NULL
 #' Calculation of conditional power for Means
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerMeansEnrichment <- function(..., stageResults, stage = stageResults$stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaH1 = NA_real_, assumedStDevs = NA_real_,
@@ -1060,7 +1061,7 @@ NULL
 #' Calculation of conditional power based on inverse normal method
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerMeansEnrichmentInverseNormal <- function(..., results, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1, assumedStDevs) {
     design <- stageResults$.design
@@ -1156,7 +1157,7 @@ NULL
 #' Calculation of conditional power based on Fisher's combination test
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerMeansEnrichmentFisher <- function(..., results, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1, assumedStDevs,
         iterations, seed) {
@@ -1258,7 +1259,7 @@ NULL
 #' Calculation of conditional power and likelihood values for plotting the graph
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerLikelihoodMeansEnrichment <- function(..., stageResults, stage,
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,

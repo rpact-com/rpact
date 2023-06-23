@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7065 $
-## |  Last changed: $Date: 2023-06-09 11:04:44 +0200 (Fr, 09 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -653,11 +653,12 @@ testPackage <- function(outDir = ".", ...,
 
         savefile <- paste(outfile, "save", sep = ".")
         if (file.exists(savefile)) {
-            message(gettextf(
-                "  comparing %s to %s ...",
-                sQuote(outfile), sQuote(savefile)
-            ),
-            appendLF = FALSE, domain = NA
+            message(
+                gettextf(
+                    "  comparing %s to %s ...",
+                    sQuote(outfile), sQuote(savefile)
+                ),
+                appendLF = FALSE, domain = NA
             )
             res <- Rdiff(outfile, savefile)
             if (!res) message(" OK")
@@ -677,20 +678,20 @@ testPackage <- function(outDir = ".", ...,
     return(isTRUE(completeUnitTestSetEnabled))
 }
 
-#' 
-#' @title 
+#'
+#' @title
 #' Test Plan Section
-#' 
+#'
 #' @param section The section title or description.
-#' 
-#' @description 
-#' The section title or description will be used in the formal validation documentation. 
+#'
+#' @description
+#' The section title or description will be used in the formal validation documentation.
 #' For more information visit \url{https://www.rpact.com}
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 #' @keywords internal
-#' 
+#'
 test_plan_section <- function(section) {
     cat("\n\n--- ", section, " ---\n", sep = "")
 }

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6862 $
-## |  Last changed: $Date: 2023-03-10 08:37:03 +0100 (Fr, 10 Mrz 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -27,7 +27,7 @@
 #'
 #' @description
 #' Class for power and average sample number (ASN) results.
-#' 
+#'
 #' @template field_nMax
 #' @template field_theta
 #' @template field_averageSampleNumber
@@ -203,7 +203,7 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
                 .futilityPerStage <- probs$futilityProbabilities
             } else {
                 if (sided == 2) {
-					if (.design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(.design$typeBetaSpending) && .design$typeBetaSpending != "none") {
+                    if (.design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(.design$typeBetaSpending) && .design$typeBetaSpending != "none") {
                         futilityBounds[is.na(futilityBounds)] <- 0
                         decisionMatrix <- matrix(c(
                             -criticalValues - theta * sqrt(nMax * informationRates),
@@ -227,7 +227,7 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
                 }
 
                 probs <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
-					
+
                 if (nrow(probs) == 3) {
                     .averageSampleNumber <- nMax - sum((probs[3, 1:(kMax - 1)] - probs[2, 1:(kMax - 1)] + probs[1, 1:(kMax - 1)]) *
                         (informationRates[kMax] - informationRates[1:(kMax - 1)]) * nMax)
@@ -319,9 +319,9 @@ as.data.frame.PowerAndAverageSampleNumberResult <- function(x, row.names = NULL,
     parameterNames <- x$.getVisibleFieldNames()
     parameterNames <- parameterNames[parameterNames != "nMax"]
     dataFrame <- .getAsDataFrame(
-        parameterSet = x, 
+        parameterSet = x,
         parameterNames = parameterNames,
-        niceColumnNamesEnabled = niceColumnNamesEnabled, 
+        niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters,
         tableColumnNames = .getTableColumnNames(design = x$.design)
     )

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -194,7 +194,6 @@ NULL
     .logProgress("Closed test calculated", startTime = startTime)
 
     if (design$kMax > 1) {
-
         # conditional power
         startTime <- Sys.time()
         if (.isTrialDesignFisher(design)) {
@@ -605,8 +604,7 @@ NULL
         for (k in stages) {
             startTime <- Sys.time()
             for (treatmentArm in 1:gMax) {
-				if (!is.na(stageResults$testStatistics[treatmentArm, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
-
+                if (!is.na(stageResults$testStatistics[treatmentArm, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
                     # Finding maximum upper and minimum lower bounds for RCIs
                     thetaLow <- exp(.getUpperLowerThetaSurvivalMultiArm(
                         design = design, dataInput = dataInput,
@@ -640,7 +638,7 @@ NULL
                     )
 
                     # adjustment for binding futility bounds
-					if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
+                    if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
                         parameterName <- ifelse(.isTrialDesignFisher(design),
                             "singleStepAdjustedPValues", firstParameterName
                         )
@@ -1115,7 +1113,7 @@ NULL
 
 #'
 #' Calculation of conditional power and likelihood values for plotting the graph
-#' 
+#'
 #' @noRd
 #'
 .getConditionalPowerLikelihoodSurvivalMultiArm <- function(..., stageResults, stage,

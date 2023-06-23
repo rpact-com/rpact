@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7035 $
-## |  Last changed: $Date: 2023-06-02 16:10:17 +0200 (Fr, 02 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -118,13 +118,15 @@ SimulationResults <- setRefClass("SimulationResults",
             .showStatistics <<- showStatistics
         },
         show = function(showType = 1, digits = NA_integer_, showStatistics = FALSE) {
-            .show(showType = showType, digits = digits, showStatistics = showStatistics, 
-                consoleOutputEnabled = TRUE)
+            .show(
+                showType = showType, digits = digits, showStatistics = showStatistics,
+                consoleOutputEnabled = TRUE
+            )
         },
-        .show = function(..., showType = 1, digits = NA_integer_, 
+        .show = function(..., showType = 1, digits = NA_integer_,
                 showStatistics = FALSE, consoleOutputEnabled = TRUE, performanceScore = NULL) {
             "Method for automatically printing simulation result objects"
-            
+
             .resetCat()
             if (showType == 3) {
                 .createSummary(.self, digits = digits)$.show(
@@ -316,7 +318,7 @@ SimulationResults <- setRefClass("SimulationResults",
                 twoGroupsEnabled <- !inherits(.self, "SimulationResultsMeans")
                 multiArmSurvivalEnabled <- inherits(.self, "SimulationResultsMultiArmSurvival")
                 enrichmentEnabled <- grepl("SimulationResultsEnrichment", .getClassName(.self))
-                
+
                 if (!is.null(performanceScore)) {
                     performanceScore$.showParametersOfOneGroup(
                         performanceScore$.getGeneratedParameters(), "Performance",
@@ -628,7 +630,7 @@ SimulationResultsBaseMeans <- setRefClass("SimulationResultsBaseMeans",
 #'
 #' @details
 #' Use \code{\link[=getSimulationMeans]{getSimulationMeans()}} to create an object of this type.
-#' 
+#'
 #' \code{SimulationResultsMeans} is the basic class for
 #' \itemize{
 #'   \item \code{\link{SimulationResultsMeans}},
@@ -849,11 +851,11 @@ SimulationResultsBaseRates <- setRefClass("SimulationResultsBaseRates",
 #'
 #' @details
 #' Use \code{\link[=getSimulationRates]{getSimulationRates()}} to create an object of this type.
-#' 
+#'
 #' \code{SimulationResultsRates} is the basic class for
 #' \itemize{
 #'   \item \code{\link{SimulationResultsRates}},
-#'   \item \code{\link{SimulationResultsMultiArmRates}}, and 
+#'   \item \code{\link{SimulationResultsMultiArmRates}}, and
 #'   \item \code{\link{SimulationResultsEnrichmentRates}}.
 #' }
 #'
@@ -1121,7 +1123,7 @@ SimulationResultsBaseSurvival <- setRefClass("SimulationResultsBaseSurvival",
 #'   \item \code{\link{SimulationResultsMultiArmSurvival}}, and
 #'   \item \code{\link{SimulationResultsEnrichmentSurvival}}.
 #' }
-#' 
+#'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
 #' @include class_design.R
@@ -1774,8 +1776,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
     ))
 }
 
-.plotSimulationResults <- function(
-        simulationResults, designMaster, type = 5L, main = NA_character_,
+.plotSimulationResults <- function(simulationResults, designMaster, type = 5L, main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, palette = "Set1",
         theta = seq(-1, 1, 0.02), plotPointsEnabled = NA,
         legendPosition = NA_integer_, showSource = FALSE,
@@ -2269,7 +2270,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
                     palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings, ylim = ylim #, ...
+                    plotSettings = plotSettings, ylim = ylim # , ...
                 )) # ratioEnabled = TRUE
             } else {
                 return(.plotParameterSet(
@@ -2279,7 +2280,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
                     palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings #, ...
+                    plotSettings = plotSettings # , ...
                 ))
             }
         }
@@ -2496,7 +2497,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
         yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
         palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition, variedParameters = variedParameters,
-        qnormAlphaLineEnabled = (type != 2), ratioEnabled = TRUE, plotSettings = plotSettings #, ...
+        qnormAlphaLineEnabled = (type != 2), ratioEnabled = TRUE, plotSettings = plotSettings # , ...
     ))
 }
 
@@ -2557,8 +2558,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
 #'
 #' @export
 #'
-plot.SimulationResults <- function(
-        x, y, ..., main = NA_character_,
+plot.SimulationResults <- function(x, y, ..., main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
         theta = seq(-1, 1, 0.01), plotPointsEnabled = NA,
         legendPosition = NA_integer_, showSource = FALSE,

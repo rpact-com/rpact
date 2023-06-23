@@ -13,36 +13,37 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6860 $
-## |  Last changed: $Date: 2023-03-09 16:32:36 +0100 (Do, 09 Mrz 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-.getSimulationRatesStageSubjects <- function(..., 
-    stage,
-    riskRatio,
-    thetaH0,
-    groups,
-    plannedSubjects,
-    directionUpper,
-    allocationRatioPlanned,
-    minNumberOfSubjectsPerStage,
-    maxNumberOfSubjectsPerStage,
-    sampleSizesPerStage,
-    conditionalPower,
-    conditionalCriticalValue,
-    overallRate,
-    farringtonManningValue1,
-    farringtonManningValue2) {
+.getSimulationRatesStageSubjects <- function(
+        ...,
+        stage,
+        riskRatio,
+        thetaH0,
+        groups,
+        plannedSubjects,
+        directionUpper,
+        allocationRatioPlanned,
+        minNumberOfSubjectsPerStage,
+        maxNumberOfSubjectsPerStage,
+        sampleSizesPerStage,
+        conditionalPower,
+        conditionalCriticalValue,
+        overallRate,
+        farringtonManningValue1,
+        farringtonManningValue2) {
     if (is.na(conditionalPower)) {
         return(plannedSubjects[stage] - plannedSubjects[stage - 1])
     }
-    
+
     if (groups == 1) {
         stageSubjects <-
             (max(0, conditionalCriticalValue * sqrt(thetaH0 * (1 - thetaH0)) +
-                        .getQNorm(conditionalPower) * sqrt(overallRate[1] * (1 - overallRate[1]))))^2 /
-            (max(1e-12, (2 * directionUpper - 1) * (overallRate[1] - thetaH0)))^2
+                .getQNorm(conditionalPower) * sqrt(overallRate[1] * (1 - overallRate[1]))))^2 /
+                (max(1e-12, (2 * directionUpper - 1) * (overallRate[1] - thetaH0)))^2
     } else {
         mult <- 1
         corr <- thetaH0
@@ -51,14 +52,14 @@
             corr <- 0
         }
         stageSubjects <- (1 + 1 / allocationRatioPlanned[stage]) * (max(0, conditionalCriticalValue *
-                        sqrt(farringtonManningValue1 * (1 - farringtonManningValue1) +
-                                farringtonManningValue2 * (1 - farringtonManningValue2) * allocationRatioPlanned[stage] * mult^2) +
-                        .getQNorm(conditionalPower) * sqrt(overallRate[1] * (1 - overallRate[1]) + overallRate[2] *
-                                (1 - overallRate[2]) * allocationRatioPlanned[stage] * mult^2)))^2 /
+            sqrt(farringtonManningValue1 * (1 - farringtonManningValue1) +
+                farringtonManningValue2 * (1 - farringtonManningValue2) * allocationRatioPlanned[stage] * mult^2) +
+            .getQNorm(conditionalPower) * sqrt(overallRate[1] * (1 - overallRate[1]) + overallRate[2] *
+                (1 - overallRate[2]) * allocationRatioPlanned[stage] * mult^2)))^2 /
             (max(1e-12, (2 * directionUpper - 1) * (overallRate[1] - mult * overallRate[2] - corr)))^2
     }
     stageSubjects <- ceiling(min(max(minNumberOfSubjectsPerStage[stage], stageSubjects), maxNumberOfSubjectsPerStage[stage]))
-    
+
     return(stageSubjects)
 }
 
@@ -241,7 +242,7 @@ getSimulationRates <- function(design = NULL, ...,
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
-    .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects") 
+    .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
     if (design$sided == 2) {
         stop(
@@ -380,16 +381,18 @@ getSimulationRates <- function(design = NULL, ...,
                 "must have length 1 or ", design$kMax, " (kMax)"
             )
         }
-        
+
         if (length(unique(allocationRatioPlanned)) == 1) {
             .setValueAndParameterType(
                 simulationResults, "allocationRatioPlanned",
-                allocationRatioPlanned[1], defaultValue = 1
+                allocationRatioPlanned[1],
+                defaultValue = 1
             )
         } else {
             .setValueAndParameterType(
                 simulationResults, "allocationRatioPlanned",
-                allocationRatioPlanned, defaultValue = rep(1, design$kMax)
+                allocationRatioPlanned,
+                defaultValue = rep(1, design$kMax)
             )
         }
     }
@@ -473,7 +476,7 @@ getSimulationRates <- function(design = NULL, ...,
     calcSubjectsFunctionType <- calcSubjectsFunctionList$calcSubjectsFunctionType
     calcSubjectsFunctionR <- calcSubjectsFunctionList$calcSubjectsFunctionR
     calcSubjectsFunctionCpp <- calcSubjectsFunctionList$calcSubjectsFunctionCpp
-    
+
     cppResult <- getSimulationRatesCpp(
         kMax                        = design$kMax,
         informationRates            = design$informationRates,

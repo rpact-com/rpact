@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -29,7 +29,7 @@ NULL
 #' Calculates and returns the analysis results for the specified design and data.
 #'
 #' @noRd
-#' 
+#'
 .getAnalysisResultsEnrichment <- function(design, dataInput, ...,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -87,9 +87,9 @@ NULL
 
 #'
 #' Get Stage Results
-#' 
+#'
 #' Returns summary statistics and p-values for a given data set and a given enrichment design.
-#' 
+#'
 #' @noRd
 #'
 .getStageResultsEnrichment <- function(design, dataInput, ...) {
@@ -115,9 +115,9 @@ NULL
 
 #'
 #' Get Repeated Confidence Intervals for enrichment case
-#' 
+#'
 #' Calculates and returns the lower and upper limit of the repeated confidence intervals of the trial for enrichment designs.
-#' 
+#'
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsEnrichment <- function(design, dataInput, ...) {
@@ -149,9 +149,9 @@ NULL
 
 #'
 #' Get Conditional Power for enrichment case
-#' 
+#'
 #' Calculates and returns the conditional power for enrichment case.
-#' 
+#'
 #' @noRd
 #'
 .getConditionalPowerEnrichment <- function(..., stageResults, nPlanned,
@@ -194,7 +194,7 @@ NULL
 
 #'
 #' Repeated p-values for enrichment designs
-#' 
+#'
 #' @noRd
 #'
 .getRepeatedPValuesEnrichment <- function(stageResults, ..., tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
@@ -205,7 +205,7 @@ NULL
 
 #'
 #' Calculation of conditional rejection probability (CRP)
-#' 
+#'
 #' @noRd
 #'
 .getConditionalRejectionProbabilitiesEnrichment <- function(stageResults, ...,
@@ -231,7 +231,7 @@ NULL
 
 #'
 #' Calculation of CRP based on inverse normal method
-#' 
+#'
 #' @noRd
 #'
 .getConditionalRejectionProbabilitiesEnrichmentInverseNormal <- function(..., stageResults, stage) {
@@ -301,7 +301,7 @@ NULL
 #' Calculation of conditional rejection probability based on Fisher's combination test
 #'
 #' @noRd
-#' 
+#'
 .getConditionalRejectionProbabilitiesEnrichmentFisher <- function(..., stageResults, stage) {
     design <- stageResults$.design
     .assertIsTrialDesignFisher(design)
@@ -373,7 +373,7 @@ NULL
 
 #'
 #' Plotting conditional power and likelihood
-#' 
+#'
 #' @noRd
 #'
 .getConditionalPowerPlotEnrichment <- function(stageResults, ...,
@@ -402,7 +402,7 @@ NULL
     .assertIsValidNPlanned(nPlanned = nPlanned, kMax = kMax, stage = stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
-    
+
     if (stageResults$isDatasetMeans()) {
         .warnInCaseOfUnusedArgument(piTreatmentRange, "piTreatmentRange", NA_real_, "plot")
         .warnInCaseOfUnusedArgument(piControls, "piControls", NA_real_, "plot")

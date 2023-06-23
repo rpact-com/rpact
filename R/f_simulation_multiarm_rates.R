@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6931 $
-## |  Last changed: $Date: 2023-04-11 15:40:33 +0200 (Di, 11 Apr 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_multiarm.R
@@ -255,8 +255,8 @@ NULL
             if (piAssumedH1 * (1 - piAssumedH1) + piAssumedControlH1 * (1 - piAssumedControlH1) == 0) {
                 thetaStandardized <- 0
             } else {
-                thetaStandardized <- sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k]) * 
-					((piAssumedH1 - piAssumedControlH1) * sqrt(1 + allocationRatioPlanned[k]) /
+                thetaStandardized <- sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k]) *
+                    ((piAssumedH1 - piAssumedControlH1) * sqrt(1 + allocationRatioPlanned[k]) /
                         sqrt(piAssumedH1 * (1 - piAssumedH1) + allocationRatioPlanned[k] *
                             piAssumedControlH1 * (1 - piAssumedControlH1)) +
                         sign(piAssumedH1 - piAssumedControlH1) * conditionalCriticalValue[k] *
@@ -264,7 +264,7 @@ NULL
                                 sqrt(piAssumedH1 * (1 - piAssumedH1) + allocationRatioPlanned[k] *
                                     piAssumedControlH1 * (1 - piAssumedControlH1))) *
                             sqrt((1 + allocationRatioPlanned[k]) / (plannedSubjects[k + 1] - plannedSubjects[k]))
-                )
+                    )
             }
 
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
@@ -394,7 +394,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
         conditionalPower = NA_real_,
-        piTreatmentsH1 = NA_real_, 
+        piTreatmentsH1 = NA_real_,
         piControlH1 = NA_real_,
         maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
@@ -474,10 +474,10 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
-	
-	if (length(allocationRatioPlanned) == 1){
-		allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
-	}
+
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+    }
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -139,7 +139,7 @@ NULL
 #' stages, informationRate, criticalValues, futilityBounds, alphaSpent, stageLevels
 #'
 #' @noRd
-#' 
+#'
 .getAnalysisResultsSurvivalAll <- function(..., results, design, dataInput, stage,
         directionUpper, thetaH0, thetaH1, nPlanned, allocationRatioPlanned, tolerance,
         iterations, seed) {
@@ -291,7 +291,7 @@ NULL
 #' @keywords internal
 #'
 #' @noRd
-#' 
+#'
 .getStageResultsSurvival <- function(..., design, dataInput,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -384,7 +384,7 @@ NULL
 #' Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Survival
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsSurvival <- function(..., design) {
     if (.isTrialDesignGroupSequential(design)) {
         return(.getRepeatedConfidenceIntervalsSurvivalGroupSequential(design = design, ...))
@@ -555,7 +555,7 @@ NULL
 #' RCIs based on group sequential method
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsSurvivalGroupSequential <- function(..., design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT, tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
@@ -574,7 +574,7 @@ NULL
 #' RCIs based on inverse normal combination test
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsSurvivalInverseNormal <- function(..., design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT, tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
@@ -593,7 +593,7 @@ NULL
 #' RCIs based on Fisher's combination test
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsSurvivalFisher <- function(..., design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT, tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
@@ -612,7 +612,7 @@ NULL
 #' Calculation of conditional power based on group sequential method
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerSurvivalGroupSequential <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_, thetaH1 = NA_real_) {
     design <- stageResults$.design
@@ -720,7 +720,7 @@ NULL
 #' Calculation of conditional power based on inverse normal method
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerSurvivalInverseNormal <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_, thetaH1 = NA_real_) {
     design <- stageResults$.design
@@ -829,7 +829,7 @@ NULL
 #' Calculation of conditional power based on Fisher combination test
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerSurvivalFisher <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_, thetaH1 = NA_real_,
         iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
@@ -1055,7 +1055,7 @@ NULL
 #' based on group sequential test without SSR (general case).
 #'
 #' @noRd
-#' 
+#'
 .getFinalConfidenceIntervalSurvivalGroupSequential <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
@@ -1174,7 +1174,7 @@ NULL
 #' based on inverse normal method, only valid for kMax <= 2 or no SSR.
 #'
 #' @noRd
-#' 
+#'
 .getFinalConfidenceIntervalSurvivalInverseNormal <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
@@ -1289,7 +1289,7 @@ NULL
 #' based on Fisher combination test, only valid for kMax <= 2.
 #'
 #' @noRd
-#' 
+#'
 .getFinalConfidenceIntervalSurvivalFisher <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {

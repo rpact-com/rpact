@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7060 $
-## |  Last changed: $Date: 2023-06-08 09:59:57 +0200 (Thu, 08 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -310,7 +310,7 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
     if (plotType > 12) {
         return(TRUE)
     }
-    
+
     for (param in c("alternative", "pi1", "hazardRatio", "muMaxVector", "piMaxVector", "omegaMaxVector")) {
         if (!is.null(resultObject[[param]]) &&
                 resultObject$.getParameterType(param) != C_PARAM_NOT_APPLICABLE &&
@@ -372,8 +372,8 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
 #'   \item \code{capnum}:  list with caption and number
 #' }
 #'
-#' @return Returns a list if \code{option} is either \code{capnum} or {numcap} 
-#' or returns a vector that is of  character type for \code{option=caption} or 
+#' @return Returns a list if \code{option} is either \code{capnum} or {numcap}
+#' or returns a vector that is of  character type for \code{option=caption} or
 #' of numeric type for \code{option=numeric}.
 #'
 #' @examples
@@ -382,7 +382,7 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
 #' plotTypes(design, "caption")
 #' getAvailablePlotTypes(design, "numcap")
 #' plotTypes(design, "capnum")
-#' 
+#'
 #' @export
 #'
 getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
@@ -694,15 +694,14 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(invisible(FALSE))
 }
 
-.getParameterSetAsDataFrame <- function(... , 
-        parameterSet, 
+.getParameterSetAsDataFrame <- function(...,
+        parameterSet,
         designMaster,
         addPowerAndAverageSampleNumber = FALSE,
-        theta = seq(-1, 1, 0.02), 
+        theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
         mandatoryParameterNames = character(0),
         yParameterNames = character(0)) {
-        
     if (.isTrialDesignSet(parameterSet) && parameterSet$getSize() > 1 &&
             (is.null(parameterSet$variedParameters) || length(parameterSet$variedParameters) == 0)) {
         stop(
@@ -714,7 +713,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (inherits(parameterSet, "TrialDesignSet")) {
         suppressWarnings(data <- as.data.frame(parameterSet,
             niceColumnNamesEnabled = FALSE,
-            includeAllParameters = TRUE, 
+            includeAllParameters = TRUE,
             addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
             theta = theta, nMax = nMax
         ))
@@ -723,15 +722,16 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         suppressWarnings(data <- .getAsDataFrame(
             parameterSet = parameterSet,
             parameterNames = parameterNames,
-            niceColumnNamesEnabled = FALSE, 
+            niceColumnNamesEnabled = FALSE,
             includeAllParameters = FALSE,
-            mandatoryParameterNames = mandatoryParameterNames))
+            mandatoryParameterNames = mandatoryParameterNames
+        ))
     }
 
     if (!.isTrialDesignSet(parameterSet)) {
         variedParameters <- logical(0)
         if ("stages" %in% colnames(data)) {
-            if ((!.isTrialDesignPlan(parameterSet) && !("overallReject" %in% yParameterNames)) || 
+            if ((!.isTrialDesignPlan(parameterSet) && !("overallReject" %in% yParameterNames)) ||
                     any(grepl("rejectPerStage|numberOfSubjects", yParameterNames))) {
                 variedParameters <- "stages"
                 names(variedParameters) <- "Stage"
@@ -819,7 +819,6 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         qnormAlphaLineEnabled = TRUE,
         yAxisScalingEnabled = TRUE,
         ratioEnabled = NA, plotSettings = NULL) {
-        
     simulationEnrichmentEnmabled <- grepl("SimulationResultsEnrichment", .getClassName(parameterSet))
     if (.isParameterSet(parameterSet) || .isTrialDesignSet(parameterSet)) {
         parameterNames <- c(xParameterName, yParameterNames)
@@ -876,16 +875,16 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     if (.isParameterSet(parameterSet) || .isTrialDesignSet(parameterSet)) {
         df <- .getParameterSetAsDataFrame(
-            parameterSet = parameterSet, 
+            parameterSet = parameterSet,
             designMaster = designMaster,
             addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
-            theta = theta, 
-            nMax = nMax, 
+            theta = theta,
+            nMax = nMax,
             mandatoryParameterNames = c(xParameterName, yParameterNames),
             yParameterNames = yParameterNames
         )
         data <- df$data
-        
+
         variedParameters <- df$variedParameters
         variedParameters <- na.omit(variedParameters)
         variedParameters <- variedParameters[variedParameters != "NA"]
@@ -956,21 +955,24 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             yAxisLabel1 <- paste0(yAxisLabel1, " (", .getAxisLabel(yParameterName1, tableColumnNames), ")")
         }
     }
-    
-    yAxisLabel1 <- sub(paste0(C_PARAMETER_NAMES[["futilityBoundsDelayedInformation"]], " and"), 
-        "Lower and", yAxisLabel1, fixed = TRUE)
-    yAxisLabel1 <- sub(paste0(C_PARAMETER_NAMES[["futilityBoundsDelayedInformationNonBinding"]], " and"), 
-        "Lower and", yAxisLabel1, fixed = TRUE)
+
+    yAxisLabel1 <- sub(paste0(C_PARAMETER_NAMES[["futilityBoundsDelayedInformation"]], " and"),
+        "Lower and", yAxisLabel1,
+        fixed = TRUE
+    )
+    yAxisLabel1 <- sub(paste0(C_PARAMETER_NAMES[["futilityBoundsDelayedInformationNonBinding"]], " and"),
+        "Lower and", yAxisLabel1,
+        fixed = TRUE
+    )
 
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
-        
         if (!(xParameterName %in% colnames(data))) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset")
         }
         if (!(yParameterName1 %in% colnames(data))) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName1), " is not available in dataset")
         }
-        
+
         data$xValues <- data[[xParameterName]]
         data$yValues <- data[[yParameterName1]]
         if (yParameterName1 == "futilityBounds") {
@@ -1034,7 +1036,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             categories = uc
         ), data)
     }
-    
+
     scalingFactor1 <- 1
     scalingFactor2 <- 1
     if (!is.null(yParameterName2) && "yValues2" %in% colnames(data) && "yValues3" %in% colnames(data)) {
@@ -1059,7 +1061,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
                 categories = .getCategories(data, yParameterName2, tableColumnNames)
             )
         }
-        if (!is.null(yParameterName3)) {           
+        if (!is.null(yParameterName3)) {
             df3 <- data.frame(
                 xValues = data$xValues,
                 yValues = data$yValues3 * scalingFactor2,
@@ -1097,7 +1099,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             (.isTrialDesignPlanMeans(parameterSet) && parameterSet$meanRatio) ||
             (.isTrialDesignPlanRates(parameterSet) && parameterSet$riskRatio)
     }
-    
+
     plotDashedHorizontalLine <- "criticalValuesEffectScale" %in% yParameterNames && designMaster$sided == 2
     p <- .plotDataFrame(data,
         mainTitle = mainTitle, xlab = xlab, ylab = ylab,

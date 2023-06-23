@@ -8,6 +8,9 @@ getDesignCharacteristics(design = NULL, ...)
 }
 \arguments{
 \item{design}{The trial design.}
+
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
+that a warning will be displayed if unknown arguments are passed.}
 }
 \value{
 Returns a \code{\link{TrialDesignCharacteristics}} object.

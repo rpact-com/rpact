@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -29,7 +29,7 @@
 #'
 #' @template field_stages
 #' @template field_testStatistics
-#' @template field_pValues 
+#' @template field_pValues
 #' @template field_combInverseNormal
 #' @template field_combFisher
 #' @template field_effectSizes
@@ -141,11 +141,12 @@ StageResults <- setRefClass("StageResults",
                     .cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                 } else if (grepl("MultiArm", .getClassName(.self))) {
                     .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(paste0(
-                        "  (i): results of treatment arm i vs. control group ",
-                        .dataInput$getNumberOfGroups(), "\n"
-                    ),
-                    consoleOutputEnabled = consoleOutputEnabled
+                    .cat(
+                        paste0(
+                            "  (i): results of treatment arm i vs. control group ",
+                            .dataInput$getNumberOfGroups(), "\n"
+                        ),
+                        consoleOutputEnabled = consoleOutputEnabled
                     )
                 } else if (.dataInput$getNumberOfGroups(survivalCorrectionEnabled = FALSE) >= 2) {
                     .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
@@ -269,7 +270,7 @@ StageResults <- setRefClass("StageResults",
 #' @template field_combInverseNormal
 #' @template field_weightsInverseNormal
 #' @field ... Names of \code{dataInput}.
-#' 
+#'
 #' @details
 #' This object cannot be created directly; use \code{getStageResults}
 #' with suitable arguments to create the stage results of a dataset of means.
@@ -404,7 +405,7 @@ StageResultsMeans <- setRefClass("StageResultsMeans",
 #'
 #' @template field_stages
 #' @template field_testStatistics
-#' @template field_pValues 
+#' @template field_pValues
 #' @template field_combInverseNormal
 #' @template field_combFisher
 #' @template field_effectSizes
@@ -429,7 +430,7 @@ StageResultsMeans <- setRefClass("StageResultsMeans",
 #' @details
 #' This object cannot be created directly; use \code{getStageResults}
 #' with suitable arguments to create the stage results of a dataset of multi arm means.
-#' 
+#'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
 #' @include class_analysis_dataset.R
@@ -537,7 +538,7 @@ StageResultsMultiArmMeans <- setRefClass("StageResultsMultiArmMeans",
 #'
 #' @description
 #' Class for stage results of rates.
-#' 
+#'
 #' @template field_stages
 #' @template field_testStatistics
 #' @template field_overallTestStatistics
@@ -680,7 +681,7 @@ StageResultsRates <- setRefClass("StageResultsRates",
 #'
 #' @template field_stages
 #' @template field_testStatistics
-#' @template field_pValues 
+#' @template field_pValues
 #' @template field_combInverseNormal
 #' @template field_combFisher
 #' @template field_effectSizes
@@ -702,7 +703,7 @@ StageResultsRates <- setRefClass("StageResultsRates",
 #' @details
 #' This object cannot be created directly; use \code{getStageResults}
 #' with suitable arguments to create the stage results of a dataset of multi arm rates.
-#' 
+#'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
 #' @include class_analysis_dataset.R
@@ -804,7 +805,7 @@ StageResultsMultiArmRates <- setRefClass("StageResultsMultiArmRates",
 #'
 #' @description
 #' Class for stage results survival data.
-#' 
+#'
 #' @template field_stages
 #' @template field_testStatistics
 #' @template field_overallTestStatistics
@@ -918,7 +919,7 @@ StageResultsSurvival <- setRefClass("StageResultsSurvival",
 #'
 #' @template field_stages
 #' @template field_testStatistics
-#' @template field_pValues 
+#' @template field_pValues
 #' @template field_combInverseNormal
 #' @template field_combFisher
 #' @template field_effectSizes
@@ -939,7 +940,7 @@ StageResultsSurvival <- setRefClass("StageResultsSurvival",
 #' @details
 #' This object cannot be created directly; use \code{getStageResults}
 #' with suitable arguments to create the stage results of a dataset of multi arm survival.
-#' 
+#'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
 #' @include class_analysis_dataset.R
@@ -1040,7 +1041,7 @@ StageResultsMultiArmSurvival <- setRefClass("StageResultsMultiArmSurvival",
 #' @template field_intersectionTest
 #' @template field_testStatistics
 #' @template field_overallTestStatistics
-#' @template field_pValues 
+#' @template field_pValues
 #' @template field_overallPValues
 #' @template field_overallStDevs
 #' @template field_overallPooledStDevs
@@ -1086,7 +1087,7 @@ StageResultsEnrichmentMeans <- setRefClass("StageResultsEnrichmentMeans",
 #'
 #' @template field_stages
 #' @template field_testStatistics
-#' @template field_pValues 
+#' @template field_pValues
 #' @template field_combInverseNormal
 #' @template field_combFisher
 #' @template field_effectSizes
@@ -1131,7 +1132,7 @@ StageResultsEnrichmentRates <- setRefClass("StageResultsEnrichmentRates",
 #'
 #' @template field_stages
 #' @template field_testStatistics
-#' @template field_pValues 
+#' @template field_pValues
 #' @template field_combInverseNormal
 #' @template field_combFisher
 #' @template field_effectSizes
@@ -1210,9 +1211,9 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         parametersToShow <- x$.getParametersToShow()
 
         return(.getAsDataFrame(
-            parameterSet = x, 
+            parameterSet = x,
             parameterNames = parametersToShow,
-            niceColumnNamesEnabled = niceColumnNamesEnabled, 
+            niceColumnNamesEnabled = niceColumnNamesEnabled,
             includeAllParameters = includeAllParameters,
             tableColumnNames = .getTableColumnNames(design = x$.design)
         ))
@@ -1319,7 +1320,7 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #' @description
 #' Plots the conditional power together with the likelihood function.
 #'
-#' @param x The stage results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}} or 
+#' @param x The stage results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}} or
 #'        \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
 #' @inheritParams param_stage
@@ -1371,11 +1372,11 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #' )
 #'
 #' stageResults <- getStageResults(design, dataExample, thetaH0 = 20)
-#' 
+#'
 #' \dontrun{
 #' if (require(ggplot2)) plot(stageResults, nPlanned = c(30), thetaRange = c(0, 100))
 #' }
-#' 
+#'
 #' @export
 #'
 plot.StageResults <- function(x, y, ..., type = 1L,

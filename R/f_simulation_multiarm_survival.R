@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6931 $
-## |  Last changed: $Date: 2023-04-11 15:40:33 +0200 (Di, 11 Apr 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_multiarm.R
@@ -467,10 +467,10 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
 
-	if (length(allocationRatioPlanned) == 1){
-		allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
-	}	
-	
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+    }
+
     simulationResults$correlationComputation <- correlationComputation
     if (correlationComputation != "alternative") {
         simulationResults$.setParameterType("correlationComputation", C_PARAM_USER_DEFINED)

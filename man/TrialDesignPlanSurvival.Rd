@@ -70,7 +70,7 @@ with suitable arguments to create a design plan for a dataset of survival data.
 
 \item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a numeric vector of length 1.}
 
-\item{\code{omega}}{The assumed hazard ratio.}
+\item{\code{chi}}{The calculated event probability at end of trial.}
 
 \item{\code{expectedNumberOfEvents}}{The expected number of events under specified alternative.}
 

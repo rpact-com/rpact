@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6931 $
-## |  Last changed: $Date: 2023-04-11 15:40:33 +0200 (Di, 11 Apr 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_enrichment.R
@@ -130,8 +130,8 @@ NULL
     }
 
     for (k in 1:kMax) {
-		const <- allocationRatioPlanned[k]
-		
+        const <- allocationRatioPlanned[k]
+
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
 
         if (k == 1) {
@@ -893,10 +893,10 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
-	
-	if (length(allocationRatioPlanned) == 1){
-		allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
-	}	
+
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+    }
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
@@ -1040,10 +1040,11 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
                 if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
                     # rejected hypotheses remain rejected also in case of early stopping
                     simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
-                        matrix((closedTest$rejected[, k] &
-                            closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore),
-                        kMax - k, gMax,
-                        byrow = TRUE
+                        matrix(
+                            (closedTest$rejected[, k] &
+                                closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore),
+                            kMax - k, gMax,
+                            byrow = TRUE
                         )
                     break
                 }

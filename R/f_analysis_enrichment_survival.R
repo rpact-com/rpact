@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 ## |
@@ -34,7 +34,7 @@ NULL
 #' @return Returns a \code{AnalysisResultsSurvival} object.
 #'
 #' @keywords internal
-#' 
+#'
 #' @noRd
 #'
 .calcSurvivalTestStatistics <- function(dataInput, subset, stage, thetaH0,
@@ -376,7 +376,7 @@ NULL
     results <- AnalysisResultsEnrichmentFisher(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
-    
+
     results <- .getAnalysisResultsSurvivalEnrichmentAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -422,7 +422,6 @@ NULL
     .logProgress("Closed test calculated", startTime = startTime)
 
     if (design$kMax > 1) {
-
         # conditional power
         startTime <- Sys.time()
         if (.isTrialDesignFisher(design)) {
@@ -607,8 +606,7 @@ NULL
     for (k in stages) {
         startTime <- Sys.time()
         for (population in 1:gMax) {
-			if (!is.na(stageResults$testStatistics[population, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
-				
+            if (!is.na(stageResults$testStatistics[population, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
                 # Finding maximum upper and minimum lower bounds for RCIs
                 thetaLow <- exp(.getUpperLowerThetaSurvivalEnrichment(
                     design = design, dataInput = dataInput,
@@ -644,7 +642,7 @@ NULL
                 )
 
                 # adjustment for binding futility bounds
-				if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
+                if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
                     parameterName <- ifelse(.isTrialDesignFisher(design),
                         "singleStepAdjustedPValues", firstParameterName
                     )
@@ -699,7 +697,7 @@ NULL
 
 #'
 #' RCIs based on inverse normal combination test
-#' 
+#'
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsSurvivalEnrichmentInverseNormal <- function(...,
@@ -729,7 +727,7 @@ NULL
 #' RCIs based on Fisher's combination test
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsSurvivalEnrichmentFisher <- function(...,
         design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -757,7 +755,7 @@ NULL
 #' Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Survival
 #'
 #' @noRd
-#' 
+#'
 .getRepeatedConfidenceIntervalsSurvivalEnrichment <- function(..., design) {
     if (.isTrialDesignInverseNormal(design)) {
         return(.getRepeatedConfidenceIntervalsSurvivalEnrichmentInverseNormal(design = design, ...))
@@ -774,7 +772,7 @@ NULL
 #' Calculation of conditional power for Survival
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerSurvivalEnrichment <- function(..., stageResults, stage = stageResults$stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaH1 = NA_real_,
@@ -859,7 +857,7 @@ NULL
 #' Calculation of conditional power based on inverse normal method
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerSurvivalEnrichmentInverseNormal <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1) {
     .assertIsTrialDesignInverseNormal(design)
@@ -945,7 +943,7 @@ NULL
 #' Calculation of conditional power based on Fisher's combination test
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerSurvivalEnrichmentFisher <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1, iterations, seed) {
     .assertIsTrialDesignFisher(design)
@@ -1031,7 +1029,7 @@ NULL
 #' Calculation of conditional power and likelihood values for plotting the graph
 #'
 #' @noRd
-#' 
+#'
 .getConditionalPowerLikelihoodSurvivalEnrichment <- function(..., stageResults, stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaRange, iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {

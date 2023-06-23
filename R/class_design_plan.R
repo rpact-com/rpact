@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7124 $
-## |  Last changed: $Date: 2023-06-23 12:19:05 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -268,9 +268,9 @@ TrialDesignPlan <- setRefClass("TrialDesignPlan",
 as.data.frame.TrialDesignPlan <- function(x, row.names = NULL,
         optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
     return(.getAsDataFrame(
-        parameterSet = x, 
+        parameterSet = x,
         parameterNames = NULL,
-        niceColumnNamesEnabled = niceColumnNamesEnabled, 
+        niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters
     ))
 }
@@ -283,11 +283,11 @@ as.data.frame.TrialDesignPlan <- function(x, row.names = NULL,
 #'
 #' @description
 #' Trial design plan for means.
-#' 
+#'
 #' @template field_meanRatio
 #' @template field_thetaH0
 #' @template field_normalApproximation
-#' @template field_alternative 
+#' @template field_alternative
 #' @template field_stDev
 #' @template field_groups
 #' @template field_allocationRatioPlanned
@@ -466,7 +466,7 @@ TrialDesignPlanMeans <- setRefClass("TrialDesignPlanMeans",
 #'
 #' @description
 #' Trial design plan for rates.
-#' 
+#'
 #' @template field_riskRatio
 #' @template field_thetaH0
 #' @template field_normalApproximation
@@ -646,47 +646,47 @@ TrialDesignPlanRates <- setRefClass("TrialDesignPlanRates",
 #'
 #' @description
 #' Trial design plan for survival data.
-#' 
+#'
 #' @template field_thetaH0
 #' @template field_typeOfComputation
-#' @template field_directionUpper                
+#' @template field_directionUpper
 #' @template field_pi1_survival
 #' @template field_pi2_survival
 #' @template field_median1
 #' @template field_median2
 #' @template field_lambda1
-#' @template field_lambda2                       
+#' @template field_lambda2
 #' @template field_hazardRatio
-#' @template field_maxNumberOfSubjects           
-#' @template field_maxNumberOfSubjects1          
-#' @template field_maxNumberOfSubjects2          
+#' @template field_maxNumberOfSubjects
+#' @template field_maxNumberOfSubjects1
+#' @template field_maxNumberOfSubjects2
 #' @template field_maxNumberOfEvents
-#' @template field_allocationRatioPlanned        
-#' @template field_optimumAllocationRatio        
+#' @template field_allocationRatioPlanned
+#' @template field_optimumAllocationRatio
 #' @template field_accountForObservationTimes
-#' @template field_eventTime                  
-#' @template field_accrualTime 
+#' @template field_eventTime
+#' @template field_accrualTime
 #' @template field_totalAccrualTime
 #' @template field_accrualIntensity
 #' @template field_accrualIntensityRelative
 #' @template field_kappa
 #' @template field_piecewiseSurvivalTime
-#' @template field_followUpTime                   
-#' @template field_dropoutRate1                   
+#' @template field_followUpTime
+#' @template field_dropoutRate1
 #' @template field_dropoutRate2
 #' @template field_dropoutTime
 #' @template field_chi
 #' @template field_expectedNumberOfEvents
 #' @template field_eventsFixed
-#' @template field_nFixed                        
-#' @template field_nFixed1                       
-#' @template field_nFixed2                       
-#' @template field_overallReject                 
-#' @template field_rejectPerStage                
-#' @template field_futilityStop                  
-#' @template field_futilityPerStage              
-#' @template field_earlyStop                     
-#' @template field_informationRates              
+#' @template field_nFixed
+#' @template field_nFixed1
+#' @template field_nFixed2
+#' @template field_overallReject
+#' @template field_rejectPerStage
+#' @template field_futilityStop
+#' @template field_futilityPerStage
+#' @template field_earlyStop
+#' @template field_informationRates
 #' @template field_analysisTime
 #' @template field_studyDurationH1
 #' @template field_studyDuration
@@ -695,16 +695,16 @@ TrialDesignPlanRates <- setRefClass("TrialDesignPlanRates",
 #' @template field_expectedEventsH0
 #' @template field_expectedEventsH01
 #' @template field_expectedEventsH1
-#' @template field_numberOfSubjects              
-#' @template field_numberOfSubjects1             
-#' @template field_numberOfSubjects2             
-#' @template field_expectedNumberOfSubjectsH1    
-#' @template field_expectedNumberOfSubjects      
+#' @template field_numberOfSubjects
+#' @template field_numberOfSubjects1
+#' @template field_numberOfSubjects2
+#' @template field_expectedNumberOfSubjectsH1
+#' @template field_expectedNumberOfSubjects
 #' @template field_criticalValuesEffectScale
 #' @template field_criticalValuesEffectScaleLower
 #' @template field_criticalValuesEffectScaleUpper
-#' @template field_criticalValuesPValueScale     
-#' @template field_futilityBoundsEffectScale     
+#' @template field_criticalValuesPValueScale
+#' @template field_futilityBoundsEffectScale
 #' @template field_futilityBoundsEffectScaleLower
 #' @template field_futilityBoundsEffectScaleUpper
 #' @template field_futilityBoundsPValueScale
@@ -1047,7 +1047,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
     theta <- .assertIsValidThetaRange(thetaRange = theta)
 
     survivalDesignPlanEnabled <- .isTrialDesignPlanSurvival(designPlan)
-    
+
     nMax <- ifelse(survivalDesignPlanEnabled, designPlan$maxNumberOfEvents[1],
         designPlan$maxNumberOfSubjects[1]
     ) # use first value for plotting
@@ -1199,7 +1199,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
                 palette = palette, theta = theta, nMax = nMax,
                 plotPointsEnabled = plotPointsEnabled, legendPosition = legendPosition,
                 designSetName = designPlanName, showSource = showSource,
-                plotSettings = plotSettings #, ...
+                plotSettings = plotSettings # , ...
             ))
         }
     } else if (type == 2) { # Effect Scale Boundary plot
@@ -1495,7 +1495,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
                 palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                 legendPosition = legendPosition, variedParameters = variedParameters,
                 qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                plotSettings = plotSettings #, ...
+                plotSettings = plotSettings # , ...
             ))
         } else {
             if (is.na(main)) {
@@ -1539,7 +1539,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
                     palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings, ylim = ylim #, ...
+                    plotSettings = plotSettings, ylim = ylim # , ...
                 ))
             } else {
                 return(.plotParameterSet(
@@ -1549,7 +1549,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
                     palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                    plotSettings = plotSettings #, ...
+                    plotSettings = plotSettings # , ...
                 ))
             }
         }
@@ -1775,7 +1775,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
         palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition, variedParameters = variedParameters,
         qnormAlphaLineEnabled = (type != 2), ratioEnabled = ratioEnabled,
-        plotSettings = plotSettings #, ...
+        plotSettings = plotSettings # , ...
     )
 
     if (type == 1 && survivalDesignPlanEnabled) {
@@ -1819,18 +1819,17 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
         xlab = NA_character_, ylab = NA_character_, palette = "Set1",
         legendPosition = NA_integer_, showSource = FALSE,
         designPlanName = NA_character_, plotSettings = NULL) {
-        
     startTime <- Sys.time()
     if (is.null(designPlan$piecewiseSurvivalTime) ||
             length(designPlan$piecewiseSurvivalTime) == 0) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'piecewiseSurvivalTime' must be specified")
     }
-        
+
     type <- type[1]
     if (!(type %in% c(13, 14))) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' must be 13 or 14")
     }
-    
+
     lambda1 <- designPlan[["lambda1"]]
     lambda2 <- designPlan[["lambda2"]]
     if (is.null(lambda2) || length(lambda2) == 0) {
@@ -1877,11 +1876,11 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
         # warning("Unable to determine upper bound of time values", call. = FALSE)
         timeTo <- 0
     }
-    
+
     timeTo <- timeTo + 10
     by <- timeTo / 1000
     timeValues <- seq(from = 0, to = timeTo, by = by)
-    
+
     data <- data.frame(
         time = timeValues,
         lambdaGroup1 = rep(-1, length(timeValues)),
@@ -1891,7 +1890,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
         survivalGroup1 = rep(-1, length(timeValues)),
         survivalGroup2 = rep(-1, length(timeValues))
     )
-    
+
     signPrefix <- ifelse(type == 13, "", "-")
     if (piecewiseSurvivalEnabled) {
         data$survival2 <- .getPiecewiseExponentialDistribution(
@@ -2007,7 +2006,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
             )
         )
     }
-    
+
     # two groups: 1 = treatment, 2 = control
     if (type == 14) {
         data$survival1 <- 1 - data$survival1

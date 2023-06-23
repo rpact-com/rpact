@@ -51,11 +51,14 @@ that a warning will be displayed if unknown arguments are passed.}
 reflecting the different situations to consider.}
 
 \item{typeOfShape}{The shape of the dose-response relationship over the treatment groups.
-This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"}.
+This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"},
+default is \code{"linear"}.\cr
+For \code{"linear"}, \code{"muMaxVector"} specifies the range
+of effect sizes for the treatment group with highest response.
 If \code{"sigmoidEmax"} is selected, \code{"gED50"} and \code{"slope"} has to be entered
 to specify the ED50 and the slope of the sigmoid Emax model.
-For \code{"linear"} and \code{"sigmoidEmax"}, \code{"muMaxVector"} specifies the range
-of effect sizes for the treatment group with highest response.
+For \code{"sigmoidEmax"}, \code{"muMaxVector"} specifies the range
+of effect sizes for the treatment group with response according to infinite dose.
 If \code{"userDefined"} is selected, \code{"effectMatrix"} has to be entered.}
 
 \item{piMaxVector}{Range of assumed probabilities for the treatment group with

@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6931 $
-## |  Last changed: $Date: 2023-04-11 15:40:33 +0200 (Di, 11 Apr 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_enrichment.R
@@ -130,9 +130,8 @@ NULL
     }
 
     for (k in 1:kMax) {
-		
-		const <- allocationRatioPlanned[k] / (1 + allocationRatioPlanned[k])^2
-		
+        const <- allocationRatioPlanned[k] / (1 + allocationRatioPlanned[k])^2
+
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
         if (is.null(piControls) || length(piControls) == 0) {
             if (k == 1) {
@@ -513,10 +512,10 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
 
-	if (length(allocationRatioPlanned) == 1){
-		allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
-	}	
-	
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+    }
+
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
     cols <- nrow(effectList$hazardRatios)

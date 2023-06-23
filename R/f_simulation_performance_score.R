@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7019 $
-## |  Last changed: $Date: 2023-05-31 07:23:47 +0200 (Mi, 31 Mai 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -24,18 +24,18 @@
 #' Get Performance Score
 #'
 #' @description
-#' Calculates the conditional performance score, its sub-scores and components according to 
-#' Herrmann et al. (2020) for a given simulation result from a two-stage design. 
+#' Calculates the conditional performance score, its sub-scores and components according to
+#' Herrmann et al. (2020) for a given simulation result from a two-stage design.
 #' Larger (sub-)score and component values refer to a better performance.
 #'
 #' @param simulationResult A simulation result.
 #'
 #' @details
-#' The conditional performance score consists of two sub-scores, one for the sample size 
+#' The conditional performance score consists of two sub-scores, one for the sample size
 #' (subscoreSampleSize) and one for the conditional power (subscoreConditionalPower).
-#' Each of those are composed of a location (locationSampleSize, locationConditionalPower) 
+#' Each of those are composed of a location (locationSampleSize, locationConditionalPower)
 #' and variation component (variationSampleSize, variationConditionalPower).
-#' The term conditional refers to an evaluation perspective where the interim results 
+#' The term conditional refers to an evaluation perspective where the interim results
 #' suggest a trial continuation with a second stage.
 #' The score can take values between 0 and 1. More details on the performance score
 #' can be found in Herrmann et al. (2020).
@@ -51,7 +51,7 @@ getPerformanceScore <- function(simulationResult) {
 
     design <- simulationResult$.design
 
-    if (!inherits(simulationResult, "SimulationResultsMeans") && 
+    if (!inherits(simulationResult, "SimulationResultsMeans") &&
             !inherits(simulationResult, "SimulationResultsRates")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -96,21 +96,19 @@ getPerformanceScore <- function(simulationResult) {
         normalApproximation = TRUE,
         groups = simulationResult$groups
     )
-    
+
     alternativeParamName <- NA_character_
     referenceValue <- NA_real_
-    
+
     # simulated alternative values
     if (methods::is(simulationResult, "SimulationResultsMeans")) {
         alternativeParamName <- "alternative"
         referenceValue <- 0
-    }
-    else if (methods::is(simulationResult, "SimulationResultsRates")) {
+    } else if (methods::is(simulationResult, "SimulationResultsRates")) {
         alternativeParamName <- "pi1"
         referenceValue <- simulationResult$pi2
         args$pi2 <- referenceValue
-    }
-    else {
+    } else {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "performance score is not available for class ",
@@ -118,26 +116,24 @@ getPerformanceScore <- function(simulationResult) {
         )
     }
     alternativeValues <- simulationResult[[alternativeParamName]]
-    
+
     simClass <- class(simulationResult)[1]
     simData <- simulationResult$.data
     resultMatrix <- sapply(alternativeValues, FUN = function(alternativeValue) {
-        
         args[[alternativeParamName]] <- alternativeValue
-        
-        if (alternativeValue == referenceValue) { 
+
+        if (alternativeValue == referenceValue) {
             singleStageSampleSize <- plannedSubjects[1]
-        }
-        else if (methods::is(simulationResult, "SimulationResultsMeans")) {
+        } else if (methods::is(simulationResult, "SimulationResultsMeans")) {
             singleStageSampleSize <- do.call(getSampleSizeMeans, args)$numberOfSubjects
-        }
-        else if (methods::is(simulationResult, "SimulationResultsRates")) {
+        } else if (methods::is(simulationResult, "SimulationResultsRates")) {
             singleStageSampleSize <- do.call(getSampleSizeRates, args)$numberOfSubjects
-        } 
+        }
 
         # iterations in which the trial has proceed to stage two
         secondStageIterations <- simData[
-            simData$stageNumber == 2 & simData[[alternativeParamName]] == alternativeValue, ]
+            simData$stageNumber == 2 & simData[[alternativeParamName]] == alternativeValue,
+        ]
 
         # mean and variance estimates for sample size and conditional power
         meanSampleSize <- mean(secondStageIterations$numberOfCumulatedSubjects)
@@ -146,7 +142,7 @@ getPerformanceScore <- function(simulationResult) {
         meanConditionalPower <- mean(secondStageIterations$conditionalPowerAchieved)
         varConditionalPower <- var(secondStageIterations$conditionalPowerAchieved)
 
-        # target sample size: single stage sample size if it doesn't exceed maximum admissible 
+        # target sample size: single stage sample size if it doesn't exceed maximum admissible
         # sample size, otherwise only first stage sample size
         targetSampleSize <- ifelse(singleStageSampleSize <= (maxAdditionalNumberOfSubjects + plannedSubjects[1]),
             singleStageSampleSize, plannedSubjects[1]

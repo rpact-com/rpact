@@ -4,13 +4,16 @@
 \alias{print.TrialDesignCharacteristics}
 \title{Trial Design Characteristics Printing}
 \usage{
-\method{print}{TrialDesignCharacteristics}(x, ..., showDesign = TRUE)
+\method{print}{TrialDesignCharacteristics}(x, ..., markdown = FALSE, showDesign = TRUE)
 }
 \arguments{
 \item{x}{The trial design characteristics object.}
 
 \item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented
 for changing x or y axis limits without dropping data observations.}
+
+\item{markdown}{If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
+normal representation will be used otherwise (default is \code{FALSE})}
 
 \item{showDesign}{Show the design print output above the design characteristics, default is \code{TRUE}.}
 }

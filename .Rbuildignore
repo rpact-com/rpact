@@ -38,3 +38,4 @@ lastMiKTeXException
 ^CRAN-SUBMISSION$
 ^_pkgdown\.yml$
 ^pkgdown$
+^rpact-tests$
