@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7132 $
+## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1758,8 +1758,6 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         .validateAlphaAndBeta(design = design)
     }
 
-    # TODO mit Aufruf dieser Funktion werden diverse Werte im Design geaendert; ist das sinnvoll?
-
     design$informationRates <- .getValidatedInformationRates(design, writeToDesign = FALSE)
 
     if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
@@ -1870,7 +1868,8 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 
         designCharacteristics$rejectionProbabilities <- rejectionProbabilities
         designCharacteristics$futilityProbabilities <- futilityProbabilities
-    } else if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT || .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2) {
+    } else if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT || 
+            .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2) {
         design$futilityBounds[is.na(design$futilityBounds)] <- 0
 
         shift <- .getOneDimensionalRoot(

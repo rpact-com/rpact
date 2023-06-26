@@ -34,8 +34,8 @@ with suitable arguments to create a Fisher combination test design.
 
 \item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
 
-\item{\code{method}}{"equalAlpha", "fullAlpha", "noInteraction", or "userDefinedAlpha", default is "equalAlpha"
-(for details, see Wassmer, 1999, \url{https://doi.org/10.1002/(SICI)1521-4036(199906)41:3\%3C279::AID-BIMJ279\%3E3.0.CO;2-V)}).
+\item{\code{method}}{"equalAlpha", "fullAlpha", "noInteraction", or "userDefinedAlpha", default is "equalAlpha".
+For details, see Wassmer, 1999, \url{doi:10.1002/(SICI)1521-4036(199906)41:3\%3C279::AID-BIMJ279\%3E3.0.CO;2-V}.
 Is a character vector of length 1.}
 
 \item{\code{alpha0Vec}}{The stopping for futility bounds for stage-wise p-values in Fisher's combination test. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}

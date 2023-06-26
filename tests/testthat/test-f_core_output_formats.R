@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_core_output_formats.R
 ## |  Creation date: 06 February 2023, 12:11:55
-## |  File version: $Revision: 7065 $
-## |  Last changed: $Date: 2023-06-09 11:04:44 +0200 (Fr, 09 Jun 2023) $
+## |  File version: $Revision: 7132 $
+## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -133,7 +133,7 @@ test_that("Internal output format functions throw errors when arguments are miss
     expect_error(.addFieldsToOutputFormatList())
     expect_error(.getOutputFormatParameterNames())
     expect_error(.getOutputFormatFunctionName())
-    expect_null(.getOutputFormatKeyByFieldName())
+    expect_null(.getOutputFormatKeyByFieldName("xxx"))
     expect_error(.getOutputFormatKeyByFunctionName())
 })
 

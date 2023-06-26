@@ -12,9 +12,9 @@
 * Improved speed of numerical computation of group sequential designs and test characteristics
 * Multivariate t distribution restricted to `df <= 500` because of erroneous results in `mnormt` package otherwise. For `df > 500`, multivariate normal distribution is used 
 * Performance of cumulative distribution function and survival function plot improved
-* Test coverage improved
+* Test coverage extended and improved
 * Renamed field `omega` to `chi` in class `TrialDesignPlanSurvival`
-* Minor improvements
+* Several minor improvements
 
 
 # rpact 3.3.4

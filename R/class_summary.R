@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7132 $
+## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -568,6 +568,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 } else {
                     if (inherits(parameterSet, "Dataset")) {
                         variedParameter <- "groups"
+                    } else if (inherits(parameterSet, "PerformanceScore")) {
+                        variedParameter <- ".alternative"
                     } else {
                         variedParameter <- parameterSet$.getVariedParameter(parameterNames, numberOfVariants)
                     }
@@ -584,7 +586,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     )
                     variedParameterCaption <- tolower(variedParameterCaption)
 
-                    if (variedParameterCaption == "alternative") {
+                    if (variedParameterCaption == "alternative" || variedParameterCaption == ".alternative") {
                         legendEntry[["alt."]] <- "alternative"
                         variedParameterCaption <- "alt."
                     } else if (variedParameterCaption == "hazard ratio") {
@@ -2258,8 +2260,9 @@ SummaryFactory <- setRefClass("SummaryFactory",
 }
 
 .createSummaryPerformanceScore <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
-    .createSummaryDesignPlan(object$.simulationResults, digits = digits, output = output, showStageLevels = TRUE)
-    # TODO implement performance score summary
+    .createSummaryDesignPlan(object$.simulationResults, 
+        digits = digits, output = output, 
+        showStageLevels = TRUE, performanceScore = object)
 }
 
 .getSummaryParameterCaptionCriticalValues <- function(design) {
@@ -2821,7 +2824,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
 #' @noRd
 #'
 .createSummaryDesignPlan <- function(object, digits = NA_integer_,
-        output = c("all", "title", "overview", "body"), showStageLevels = FALSE) {
+        output = c("all", "title", "overview", "body"), showStageLevels = FALSE, 
+        performanceScore = NULL) {
     output <- match.arg(output)
     designPlan <- NULL
     if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
@@ -3347,6 +3351,15 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 )
             }
         }
+    }
+    
+    if (!is.null(performanceScore)) {
+        print(performanceScore)
+        summaryFactory$addParameter(performanceScore,
+            parameterName = "performanceScore",
+            parameterCaption = "Performance score",
+            roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
+        )
     }
 
     return(summaryFactory)

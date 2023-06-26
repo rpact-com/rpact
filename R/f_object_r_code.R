@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7132 $
+## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -194,7 +194,7 @@ getObjectRCode <- function(obj, ...,
         explicitPrint = FALSE) {
     functionName <- deparse(substitute(obj))
     functionName <- sub("\\(.*\\)$", "", functionName)
-
+    
     output <- match.arg(output)
 
     .assertIsSingleLogical(includeDefaultParameters, "includeDefaultParameters")
@@ -289,6 +289,22 @@ getObjectRCode <- function(obj, ...,
             if (pipeOperator == "none") {
                 leadingArguments <- c(leadingArguments, "design = design")
             }
+        }
+    }
+    if (inherits(obj, "PerformanceScore")) {
+        preconditionSimulationResults <- getObjectRCode(obj$.simulationResults,
+            prefix = ifelse(pipeOperator == "none", "simulationResults <- ", ""),
+            postfix = pipeOperatorPostfix,
+            includeDefaultParameters = includeDefaultParameters,
+            stringWrapParagraphWidth = stringWrapParagraphWidth,
+            stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
+            pipeOperator = pipeOperator,
+            output = "internal"
+        )
+        precondition <- c(precondition, preconditionSimulationResults)
+        if (pipeOperator == "none") {
+            leadingArguments <- c(leadingArguments, "simulationResults = simulationResults")
         }
     }
     if (!is.null(obj[[".dataInput"]]) && (is.null(leadingArguments) || !any(grepl("data", leadingArguments)))) {
@@ -393,7 +409,9 @@ getObjectRCode <- function(obj, ...,
             precondition <- c(precond, precondition)
         }
     }
-
+    
+    precondition <- unique(precondition)
+    
     if ("TrialDesignPlanMeans" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             functionName <- "getSampleSizeMeans"
@@ -454,6 +472,8 @@ getObjectRCode <- function(obj, ...,
         functionName <- "getEventProbabilities"
     } else if (inherits(obj, "NumberOfSubjects")) {
         functionName <- "getNumberOfSubjects"
+    } else if (inherits(obj, "PerformanceScore")) {
+        functionName <- "gePerformanceScore"
     } else if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
         return(getObjectRCode(obj$object,
             prefix = ifelse(pipeOperator == "none", "summary(", ""),
@@ -564,8 +584,6 @@ getObjectRCode <- function(obj, ...,
             }
         }
     }
-
-    # TODO implement PerformanceScore
 
     if (inherits(obj, "Dataset")) {
         lines <- .getDatasetArgumentsRCodeLines(obj, complete = FALSE, digits = NA_integer_)

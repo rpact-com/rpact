@@ -13,11 +13,12 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 7132 $
+## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
+#' @include f_core_constants.R
 #' @include f_core_utilities.R
 NULL
 
@@ -1201,6 +1202,14 @@ getOutputFormat <- function(parameterName = NA_character_, ...,
 }
 
 .getOutputFormatKeyByFieldName <- function(fieldName) {
+    if (is.null(fieldName) || length(fieldName) != 1 || is.na(fieldName)) {
+        return(NULL)
+    }
+    
+    if (!(fieldName %in% names(C_PARAMETER_FORMAT_FUNCTIONS))) {
+        return(NULL)
+    }
+    
     functionName <- C_PARAMETER_FORMAT_FUNCTIONS[[fieldName]]
     if (is.null(functionName)) {
         return(NULL)

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7132 $
+## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -177,6 +177,7 @@ getPerformanceScore <- function(simulationResult) {
     })
 
     performanceScore <- PerformanceScore(simulationResult)
+    performanceScore$.alternative <- alternativeValues
     paramNames <- rownames(resultMatrix)
     for (k in 1:nrow(resultMatrix)) {
         paramName <- paramNames[k]

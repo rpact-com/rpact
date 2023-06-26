@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7133 $
+## |  Last changed: $Date: 2023-06-26 15:57:24 +0200 (Mo, 26 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1023,7 +1023,7 @@ getLongFormat <- function(dataInput) {
 #' \itemize{
 #'   \item \code{\link[=getAnalysisResults]{getAnalysisResults()}} for using
 #'         \code{getObservedInformationRates()} implicit,
-#'   \item https://www.rpact.com/vignettes/rpact_boundary_update_example
+#'   \item \href{https://www.rpact.org/vignettes/planning/rpact_boundary_update_example/}{www.rpact.org/vignettes/planning/rpact_boundary_update_example}
 #' }
 #'
 #' @examples

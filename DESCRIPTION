@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 3.3.9.9223
-Date: 2023-06-23
+Version: 3.3.9.9224
+Date: 2023-06-26
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -33,7 +33,10 @@ Description: Design and analysis of confirmatory adaptive clinical trials with c
 License: LGPL-3
 Encoding: UTF-8
 LazyData: true
-URL: https://www.rpact.org, https://www.rpact.com, https://github.com/rpact-com/rpact
+URL: https://www.rpact.org,
+    https://www.rpact.com,
+    https://github.com/rpact-com/rpact,
+    https://rpact-com.github.io/rpact/
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US
 Depends: 
