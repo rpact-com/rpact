@@ -1,4 +1,24 @@
 
+# rpact 3.4.0
+
+## New features
+
+* The new function `getPerformanceScore()` calculates the conditional performance score, its sub-scores and components according to Herrmann et al. (2020) for a given simulation result from a two-stage design
+* `allocationRatioPlanned` for simulating multi-arm and enrichment designs can be a vector of length kMax, the number of stages 
+* `getObjectRCode()` (short: `rcmd()`): with the new arguments `pipeOperator` and `output` many new output variants can be specified, e.g., the native R pipe operator or the magrittr pipe operator can be used
+* Generic function `knitr::knit_print` for all result objects implemented and automatic code chunk option `results = 'asis'` activated
+
+## Improvements, issues, and changes
+
+* Improved speed of numerical computation of group sequential designs and test characteristics
+* Multivariate t distribution restricted to `df <= 500` because of erroneous results in `mnormt` package otherwise. For `df > 500`, multivariate normal distribution is used 
+* Performance of cumulative distribution function and survival function plot improved
+* Test coverage extended and improved
+* Descriptions for all class fields added
+* Renamed field `omega` to `chi` in class `TrialDesignPlanSurvival`
+* Several minor improvements
+
+
 # rpact 3.3.4
 
 * Rcpp sugar function `sapply` removed from C++ code to stop deprecated warnings on r-devel-linux-x86_64-fedora-clang 

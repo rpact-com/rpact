@@ -49,6 +49,7 @@ Useful links:
   \item \url{https://www.rpact.org}
   \item \url{https://www.rpact.com}
   \item \url{https://github.com/rpact-com/rpact}
+  \item \url{https://rpact-com.github.io/rpact/}
   \item Report bugs at \url{https://github.com/rpact-com/rpact/issues}
 }
 

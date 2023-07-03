@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 7133 $
+## |  Last changed: $Date: 2023-06-26 15:57:24 +0200 (Mo, 26 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -598,7 +598,7 @@ NULL
     if (length(args) == 0) {
         return(character(0))
     }
-    
+
     args <- .removeDesignFromArgs(args)
 
     return(names(args))
@@ -717,7 +717,7 @@ NULL
     if (length(argNames) == 0) {
         return(FALSE)
     }
-    
+
     dataObjectkeyWords <- .getAllParameterNameVariants(dataObjectkeyWords)
     matching <- intersect(argNames, dataObjectkeyWords)
     return(length(matching) > 0)
@@ -730,7 +730,7 @@ NULL
     if (!enrichmentEnabled) {
         return(FALSE)
     }
-    
+
     args <- list(...)
     if (length(args) == 1 && is.data.frame(args[[1]])) {
         data <- args[[1]]
@@ -738,7 +738,7 @@ NULL
             return(FALSE)
         }
     }
-    
+
     return(enrichmentEnabled)
 }
 
@@ -824,7 +824,7 @@ getWideFormat <- function(dataInput) {
     if (!dataInput$.enrichmentEnabled) {
         paramNames <- paramNames[!(paramNames %in% c("subsets"))]
     }
-    
+
     numberOfSubsets <- dataInput$getNumberOfSubsets()
     numberOfGroups <- dataInput$getNumberOfGroups(survivalCorrectionEnabled = FALSE)
     if (numberOfSubsets <= 1) {
@@ -1021,9 +1021,9 @@ getLongFormat <- function(dataInput) {
 #'
 #' @seealso
 #' \itemize{
-#'   \item \code{\link[=getAnalysisResults]{getAnalysisResults()}} for using 
+#'   \item \code{\link[=getAnalysisResults]{getAnalysisResults()}} for using
 #'         \code{getObservedInformationRates()} implicit,
-#'   \item https://www.rpact.com/vignettes/rpact_boundary_update_example
+#'   \item \href{https://www.rpact.org/vignettes/planning/rpact_boundary_update_example/}{www.rpact.org/vignettes/planning/rpact_boundary_update_example}
 #' }
 #'
 #' @examples
@@ -1047,7 +1047,9 @@ getLongFormat <- function(dataInput) {
 #' getObservedInformationRates(data,
 #'     maxInformation = 46, informationEpsilon = 0.03
 #' )
-#' 
+#'
+#' @return Returns a list that summarizes the observed information rates.
+#'
 #' @export
 #'
 getObservedInformationRates <- function(dataInput, ...,
@@ -1177,22 +1179,25 @@ getObservedInformationRates <- function(dataInput, ...,
 
 .synchronizeIterationsAndSeed <- function(results) {
     if (is.null(results[[".conditionalPowerResults"]])) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(.getClassName(results)), 
-            " does not contain field ", sQuote(".conditionalPowerResults"))
+        stop(
+            C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(.getClassName(results)),
+            " does not contain field ", sQuote(".conditionalPowerResults")
+        )
     }
-    
+
     if (results$.design$kMax == 1) {
         return(invisible(results))
     }
-    
+
     if (results$.conditionalPowerResults$simulated) {
         results$conditionalPowerSimulated <- results$.conditionalPowerResults$conditionalPower
         results$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
         results$.setParameterType("conditionalPowerSimulated", C_PARAM_GENERATED)
-    
+
         results$.setParameterType("seed", results$.conditionalPowerResults$.getParameterType("seed"))
         results$seed <- results$.conditionalPowerResults$seed
-        results$.setParameterType("iterations",
+        results$.setParameterType(
+            "iterations",
             results$.conditionalPowerResults$.getParameterType("iterations")
         )
         results$iterations <- results$.conditionalPowerResults$iterations
@@ -1205,11 +1210,11 @@ getObservedInformationRates <- function(dataInput, ...,
         }
         results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
         results$.setParameterType("conditionalPowerSimulated", C_PARAM_NOT_APPLICABLE)
-        
+
         results$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
         results$.setParameterType("iterations", C_PARAM_NOT_APPLICABLE)
     }
-    
+
     return(invisible(results))
 }
 
@@ -1221,17 +1226,17 @@ getObservedInformationRates <- function(dataInput, ...,
         results$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
         return(invisible(results))
     }
-    
+
     iterations <- .getOptionalArgument("iterations", ...)
-    results$.setParameterType("iterations", ifelse(is.null(iterations) || is.na(iterations) || 
-            identical(iterations, C_ITERATIONS_DEFAULT),
-        C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+    results$.setParameterType("iterations", ifelse(is.null(iterations) || is.na(iterations) ||
+        identical(iterations, C_ITERATIONS_DEFAULT),
+    C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
     ))
-    
+
     seed <- .getOptionalArgument("seed", ...)
     results$.setParameterType("seed", ifelse(!is.null(seed) && !is.na(seed),
         C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE
     ))
-    
+
     return(invisible(results))
 }

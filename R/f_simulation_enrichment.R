@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6414 $
-## |  Last changed: $Date: 2022-07-15 09:17:18 +0200 (Fr, 15 Jul 2022) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -62,7 +62,7 @@ NULL
         selectedVector[4] <- selectedPopulations[1, stage] || selectedPopulations[2, stage] || selectedPopulations[4, stage]
         selectedVector[5] <- selectedPopulations[1, stage] || selectedPopulations[3, stage] || selectedPopulations[4, stage]
         selectedVector[6] <- selectedPopulations[2, stage] || selectedPopulations[3, stage] || selectedPopulations[4, stage]
-        selectedVector[7] <- selectedPopulations[1, stage] || selectedPopulations[2, stage] || selectedPopulations[3, stage] || 
+        selectedVector[7] <- selectedPopulations[1, stage] || selectedPopulations[2, stage] || selectedPopulations[3, stage] ||
             selectedPopulations[4, stage]
         selectedVector[8] <- selectedPopulations[4, stage]
     }
@@ -314,7 +314,7 @@ NULL
 
     .assertIsSinglePositiveInteger(rValue, "rValue", naAllowed = TRUE, validateType = FALSE)
 
-    .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE)
 
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
@@ -357,7 +357,7 @@ NULL
     } else if (endpoint == "survival") {
         simulationResults <- SimulationResultsEnrichmentSurvival(design, showStatistics = showStatistics)
     }
-    
+
     effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
     gMax <- .getGMaxFromSubGroups(effectList$subGroups)
     if (gMax > 4) {
@@ -393,11 +393,11 @@ NULL
     if (endpoint %in% c("rates", "survival")) {
         .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, TRUE)
     }
-    
+
     if (!stratifiedAnalysis && endpoint %in% c("means", "survival")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "For testing ", endpoint, ifelse(endpoint == "survival", " designs", ""), 
+            "For testing ", endpoint, ifelse(endpoint == "survival", " designs", ""),
             ", only stratified analysis is supported"
         )
     }
@@ -450,21 +450,21 @@ NULL
     }
 
     if (endpoint == "means") {
-# 		if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !is.na(thetaH1)) {
-# 			warning("'thetaH1' will be ignored because neither 'conditionalPower' nor ",
-# 				"'calcSubjectsFunction' is defined", call. = FALSE)
-# 		}
-# 		if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !is.na(stDevH1)) {
-# 			warning("'stDevH1' will be ignored because neither 'conditionalPower' nor ",
-# 				"'calcSubjectsFunction' is defined", call. = FALSE)
-# 		}
+        # 		if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !is.na(thetaH1)) {
+        # 			warning("'thetaH1' will be ignored because neither 'conditionalPower' nor ",
+        # 				"'calcSubjectsFunction' is defined", call. = FALSE)
+        # 		}
+        # 		if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !is.na(stDevH1)) {
+        # 			warning("'stDevH1' will be ignored because neither 'conditionalPower' nor ",
+        # 				"'calcSubjectsFunction' is defined", call. = FALSE)
+        # 		}
     }
 
     if (endpoint == "survival") {
-# 		if (is.na(conditionalPower) && is.null(calcEventsFunction) && !is.na(thetaH1)) {
-# 			warning("'thetaH1' will be ignored because neither 'conditionalPower' nor ",
-# 				"'calcEventsFunction' is defined", call. = FALSE)
-# 		}
+        # 		if (is.na(conditionalPower) && is.null(calcEventsFunction) && !is.na(thetaH1)) {
+        # 			warning("'thetaH1' will be ignored because neither 'conditionalPower' nor ",
+        # 				"'calcEventsFunction' is defined", call. = FALSE)
+        # 		}
     }
 
     conditionalPower <- .ignoreParameterIfNotUsed(
@@ -650,13 +650,33 @@ NULL
         simulationResults$calcEventsFunction <- calcEventsFunction
     }
 
-    if (is.na(allocationRatioPlanned)) {
+    if (any(is.na(allocationRatioPlanned))) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
-    .setValueAndParameterType(
-        simulationResults, "allocationRatioPlanned",
-        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
-    )
+
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
+    } else if (length(allocationRatioPlanned) != design$kMax) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1 or ", design$kMax, " (kMax)"
+        )
+    }
+
+    if (length(unique(allocationRatioPlanned)) == 1) {
+        .setValueAndParameterType(
+            simulationResults, "allocationRatioPlanned",
+            allocationRatioPlanned[1],
+            defaultValue = 1
+        )
+    } else {
+        .setValueAndParameterType(
+            simulationResults, "allocationRatioPlanned",
+            allocationRatioPlanned,
+            defaultValue = rep(1, design$kMax)
+        )
+    }
 
     if (endpoint %in% c("means", "rates")) {
         .setValueAndParameterType(simulationResults, "plannedSubjects", plannedSubjects, NA_real_)
@@ -706,10 +726,10 @@ NULL
 
     simulationResults$effectList <- effectList
     simulationResults$.setParameterType("effectList", C_PARAM_USER_DEFINED)
-    
+
     simulationResults$populations <- as.integer(gMax)
     simulationResults$.setParameterType("populations", C_PARAM_DERIVED)
-    
+
     .setValueAndParameterType(
         simulationResults, "stratifiedAnalysis", stratifiedAnalysis,
         C_STRATIFIED_ANALYSIS_DEFAULT
@@ -726,6 +746,6 @@ NULL
     .setValueAndParameterType(simulationResults, "effectMeasure", effectMeasure, C_EFFECT_MEASURE_DEFAULT)
 
     warning("Simulation of enrichment designs is experimental and hence not fully validated (see www.rpact.com/experimental)", call. = FALSE)
-    
+
     return(simulationResults)
 }

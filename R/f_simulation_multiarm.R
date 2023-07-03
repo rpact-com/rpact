@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 6991 $
+## |  Last changed: $Date: 2023-05-16 14:50:11 +0200 (Di, 16 Mai 2023) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -129,7 +129,7 @@ NULL
 
     for (k in 1:kMax) {
         if (intersectionTest == "Dunnett") {
-            allocationRatiosPerStage <- rep(stageResults$allocationRatioPlanned, gMax)
+            allocationRatiosPerStage <- rep(stageResults$allocationRatioPlanned[k], gMax)
             allocationRatiosPerStage[is.na(subjectsPerStage[1:gMax, k])] <- NA_real_
         }
         for (i in 1:(2^gMax - 1)) {
@@ -241,8 +241,16 @@ NULL
 }
 
 .getCriticalValuesDunnettForSimulation <- function(alpha, indices, allocationRatioPlanned) {
+    if (allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "The conditional Dunnett test assumes equal allocation ratios over the stages"
+        )
+    }
+
+
     gMax <- ncol(indices)
-    frac <- rep(allocationRatioPlanned, gMax) / (1 + allocationRatioPlanned)
+    frac <- rep(allocationRatioPlanned[1], gMax) / (1 + allocationRatioPlanned[1])
     criticalValuesDunnett <- rep(NA_real_, 2^gMax - 1)
 
     for (i in 1:(2^gMax - 1)) {
@@ -268,7 +276,7 @@ NULL
     secondStageConditioning <- design$secondStageConditioning
     kMax <- 2
 
-    frac <- rep(stageResults$allocationRatioPlanned, gMax) / (1 + stageResults$allocationRatioPlanned)
+    frac <- rep(stageResults$allocationRatioPlanned[1], gMax) / (1 + stageResults$allocationRatioPlanned[1])
 
     conditionalErrorRate <- matrix(NA_real_, nrow = 2^gMax - 1, ncol = 2)
     secondStagePValues <- matrix(NA_real_, nrow = 2^gMax - 1, ncol = 2)
@@ -422,7 +430,7 @@ NULL
 
     .assertIsSinglePositiveInteger(rValue, "rValue", naAllowed = TRUE, validateType = FALSE)
 
-    .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE)
 
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
@@ -501,7 +509,7 @@ NULL
             muMaxVector = muMaxVector, gED50 = gED50, gMax = gMax, slope = slope
         )
         if (typeOfShape == "userDefined") {
-            muMaxVector <- effectMatrix[, 1]
+            muMaxVector <- effectMatrix[, gMax]
         } else {
             .assertIsNumericVector(muMaxVector, "muMaxVector")
         }
@@ -541,7 +549,7 @@ NULL
         )
 
         if (typeOfShape == "userDefined") {
-            piMaxVector <- effectMatrix[, 1]
+            piMaxVector <- effectMatrix[, gMax]
         }
         .setValueAndParameterType(simulationResults, "piMaxVector", piMaxVector, C_PI_1_DEFAULT)
         if (typeOfShape == "userDefined") {
@@ -550,7 +558,7 @@ NULL
     } else if (endpoint == "survival") {
         effectMatrix <- .assertIsValidEffectMatrixSurvival(typeOfShape, effectMatrix, omegaMaxVector, gED50, gMax, slope)
         if (typeOfShape == "userDefined") {
-            omegaMaxVector <- effectMatrix[, 1]
+            omegaMaxVector <- effectMatrix[, gMax]
         }
         .setValueAndParameterType(simulationResults, "omegaMaxVector", omegaMaxVector, C_RANGE_OF_HAZARD_RATIOS_DEFAULT)
         if (typeOfShape == "userDefined") {
@@ -777,13 +785,34 @@ NULL
         .setValueAndParameterType(simulationResults, "stDev", stDev, C_STDEV_DEFAULT)
     }
 
-    if (is.na(allocationRatioPlanned)) {
+    if (any(is.na(allocationRatioPlanned))) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
-    .setValueAndParameterType(
-        simulationResults, "allocationRatioPlanned",
-        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
-    )
+
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
+    } else if (length(allocationRatioPlanned) != design$kMax) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
+            "must have length 1 or ", design$kMax, " (kMax)"
+        )
+    }
+
+    if (length(unique(allocationRatioPlanned)) == 1) {
+        .setValueAndParameterType(
+            simulationResults, "allocationRatioPlanned",
+            allocationRatioPlanned[1],
+            defaultValue = 1
+        )
+    } else {
+        .setValueAndParameterType(
+            simulationResults, "allocationRatioPlanned",
+            allocationRatioPlanned,
+            defaultValue = rep(1, design$kMax)
+        )
+    }
+
     .setValueAndParameterType(simulationResults, "effectMatrix", t(effectMatrix), NULL)
     if (endpoint %in% c("means", "rates")) {
         .setValueAndParameterType(simulationResults, "plannedSubjects", plannedSubjects, NA_real_)

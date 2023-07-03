@@ -13,12 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7148 $
+## |  Last changed: $Date: 2023-07-03 15:50:22 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_constants.R
+#' @include f_core_assertions.R
 NULL
 
 #'
@@ -663,8 +664,8 @@ ParameterSet <- setRefClass("ParameterSet",
             }
             if (is.function(paramValue) || grepl("Function$", paramName)) {
                 paramValueFormatted <- ifelse(
-                    .getParameterType(paramName) == C_PARAM_USER_DEFINED, 
-                    ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"), 
+                    .getParameterType(paramName) == C_PARAM_USER_DEFINED,
+                    ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"),
                     "default"
                 )
             }
@@ -673,7 +674,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 name = paramCaption,
                 n = .getNChar(), prefix = prefix
             )
-            
+
             output <- paste(variableNameFormatted, paramValueFormatted, "\n")
             .cat(output, consoleOutputEnabled = consoleOutputEnabled)
             invisible(output)
@@ -713,7 +714,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
                 includeAllParameters = includeAllParameters,
                 handleParameterNamesAsToBeExcluded = handleParameterNamesAsToBeExcluded,
-                returnParametersAsCharacter = TRUE, 
+                returnParametersAsCharacter = TRUE,
                 tableColumnNames = tableColumnNames
             )
             result <- as.matrix(dataFrame)
@@ -764,7 +765,6 @@ ParameterSet <- setRefClass("ParameterSet",
             return(n)
         },
         .getVariedParameter = function(parameterNames, numberOfVariants) {
-
             # search for user defined parameters
             for (parameterName in parameterNames) {
                 parameterValues <- .self[[parameterName]]
@@ -930,12 +930,12 @@ ParameterSet <- setRefClass("ParameterSet",
         numberOfStages,
         includeAllParameters,
         mandatoryParameterNames) {
-    if (parameterSet$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN && 
+    if (parameterSet$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN &&
             parameterName != "futilityStop") {
         return(NULL)
     }
 
-    if (!includeAllParameters && 
+    if (!includeAllParameters &&
             parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE &&
             !(parameterName %in% mandatoryParameterNames)) {
         return(NULL)
@@ -973,11 +973,11 @@ ParameterSet <- setRefClass("ParameterSet",
             return(rep(parameterValues, numberOfStages))
         }
 
-        if (length(parameterValues) == numberOfStages && 
+        if (length(parameterValues) == numberOfStages &&
                 parameterName %in% c(
                     "plannedEvents", "plannedSubjects",
                     "minNumberOfEventsPerStage", "maxNumberOfEventsPerStage",
-                    "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage", 
+                    "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage",
                     "allocationRatioPlanned"
                 )) {
             values <- c()
@@ -986,7 +986,7 @@ ParameterSet <- setRefClass("ParameterSet",
             }
             return(values)
         }
-        
+
         if (parameterName %in% c(
                 "accrualTime", "accrualIntensity",
                 "plannedEvents", "plannedSubjects",
@@ -1135,7 +1135,7 @@ ParameterSet <- setRefClass("ParameterSet",
                         (is.null(variedParameter) || parameterName != variedParameter)) {
                     columnValues <- .getDataFrameColumnValues(
                         parameterSet, parameterName,
-                        numberOfVariants, numberOfStages, 
+                        numberOfVariants, numberOfStages,
                         includeAllParameters, mandatoryParameterNames
                     )
                     if (!is.null(columnValues)) {
@@ -1177,38 +1177,40 @@ ParameterSet <- setRefClass("ParameterSet",
             }
         )
     }
-    
+
     if (includeAllParameters) {
         extraParameterNames <- names(parameterSet)
         extraParameterNames <- extraParameterNames[!grepl("^\\.", extraParameterNames)]
         extraParameterNames <- extraParameterNames[!(extraParameterNames %in% parameterNames)]
         extraParameterNames <- unique(c(parameterNames[!(parameterNames %in% usedParameterNames)], extraParameterNames))
         for (extraParameter in extraParameterNames) {
-            tryCatch({
-                if (parameterSet$.getParameterType(extraParameter) != C_PARAM_TYPE_UNKNOWN) {
-                    value <- parameterSet[[extraParameter]] 
-                    if (!is.null(value) && length(value) > 0 && 
-                            !is.matrix(value) && !is.array(value) && !is.data.frame(value) && 
-                            (is.numeric(value) || is.character(value) || is.logical(value))) {
-                            
-                        columnCaption <- parameterSet$.getDataFrameColumnCaption(
-                            extraParameter,
-                            tableColumnNames, niceColumnNamesEnabled
-                        )
-                            
-                        if (length(value) == 1) {
-                            dataFrame[[columnCaption]] <- rep(value, nrow(dataFrame))
-                        } else {
-                            dataFrame[[columnCaption]] <- rep(.arrayToString(value, maxLength = 10), nrow(dataFrame))
+            tryCatch(
+                {
+                    if (parameterSet$.getParameterType(extraParameter) != C_PARAM_TYPE_UNKNOWN) {
+                        value <- parameterSet[[extraParameter]]
+                        if (!is.null(value) && length(value) > 0 &&
+                                !is.matrix(value) && !is.array(value) && !is.data.frame(value) &&
+                                (is.numeric(value) || is.character(value) || is.logical(value))) {
+                            columnCaption <- parameterSet$.getDataFrameColumnCaption(
+                                extraParameter,
+                                tableColumnNames, niceColumnNamesEnabled
+                            )
+
+                            if (length(value) == 1) {
+                                dataFrame[[columnCaption]] <- rep(value, nrow(dataFrame))
+                            } else {
+                                dataFrame[[columnCaption]] <- rep(.arrayToString(value, maxLength = 10), nrow(dataFrame))
+                            }
                         }
                     }
+                },
+                error = function(e) {
+                    warning(
+                        ".getAsDataFrameMultidimensional: failed to add extra parameter ",
+                        sQuote(parameterName), " to data.frame; ", e$message
+                    )
                 }
-            }, error = function(e) {
-                warning(
-                    ".getAsDataFrameMultidimensional: failed to add extra parameter ",
-                    sQuote(parameterName), " to data.frame; ", e$message
-                )
-            })
+            )
         }
     }
 
@@ -1264,15 +1266,14 @@ ParameterSet <- setRefClass("ParameterSet",
 }
 
 .getAsDataFrame <- function(...,
-        parameterSet, 
-        parameterNames, 
+        parameterSet,
+        parameterNames,
         niceColumnNamesEnabled = FALSE,
-        includeAllParameters = FALSE, 
+        includeAllParameters = FALSE,
         handleParameterNamesAsToBeExcluded = FALSE,
-        returnParametersAsCharacter = FALSE, 
+        returnParametersAsCharacter = FALSE,
         tableColumnNames = C_TABLE_COLUMN_NAMES,
         mandatoryParameterNames = character(0)) {
-      
     parameterNamesToBeExcluded <- c()
     if (handleParameterNamesAsToBeExcluded) {
         parameterNamesToBeExcluded <- parameterNames
@@ -1288,12 +1289,14 @@ ParameterSet <- setRefClass("ParameterSet",
     parametersToIgnore <- character(0)
     if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
             parameterSet$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
-        parametersToIgnore <- c(parametersToIgnore, 
-            "lambda1", "lambda2", "median1", "median2", 
-            "pi1", "pi2", "piecewiseSurvivalTime")
+        parametersToIgnore <- c(
+            parametersToIgnore,
+            "lambda1", "lambda2", "median1", "median2",
+            "pi1", "pi2", "piecewiseSurvivalTime"
+        )
         parametersToIgnore <- intersect(parametersToIgnore, parameterNames)
-    } 
-    
+    }
+
     if (parameterSet$.getParameterType("hazardRatio") == C_PARAM_GENERATED &&
             !is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
             isTRUE(parameterSet$.piecewiseSurvivalTime$piecewiseSurvivalEnabled)) {
@@ -1306,7 +1309,7 @@ ParameterSet <- setRefClass("ParameterSet",
             parametersToIgnore <- c(parametersToIgnore, c("accrualTime", "accrualIntensity"))
         }
     }
-    
+
     if (length(parametersToIgnore) > 0) {
         parameterNames <- parameterNames[!(parameterNames %in% parametersToIgnore)]
     }
@@ -1425,9 +1428,9 @@ as.data.frame.ParameterSet <- function(x, row.names = NULL,
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame", ...)
 
     return(.getAsDataFrame(
-        parameterSet = x, 
+        parameterSet = x,
         parameterNames = NULL,
-        niceColumnNamesEnabled = niceColumnNamesEnabled, 
+        niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters
     ))
 }
@@ -1455,68 +1458,6 @@ setMethod(
         return(t(x))
     }
 )
-
-#'
-#' @title
-#' Create output in Markdown
-#'
-#' @description
-#' The \code{kable()} function returns the output of the specified object formatted in Markdown.
-#'
-#' @param x A \code{ParameterSet}. If x does not inherit from class \code{\link{ParameterSet}},
-#'        \code{knitr::kable(x)} will be returned.
-#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
-#'
-#' @details
-#' Generic function to represent a parameter set in Markdown.
-#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
-#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
-#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
-#' that all headings will be written bold but are not explicit defined as header.
-#'
-#' @export
-#'
-kable.ParameterSet <- function(x, ...) {
-    fCall <- match.call(expand.dots = FALSE)
-    if (inherits(x, "ParameterSet")) {
-        objName <- deparse(fCall$x)
-        if (all(grepl("^ *print\\(", objName))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") does not work correctly. ",
-                "Use ", sub("print", "kable", objName), " without 'print' instead or ", sub("\\)", ", markdown = TRUE)", objName)
-            )
-        }
-        
-        if (.isSimulationResults(x)) {
-            showStatistics <- .getOptionalArgument("showStatistics", optionalArgumentDefaultValue = FALSE, ...)
-            if (isTRUE(showStatistics)) {
-                return(print(x, markdown = TRUE, showStatistics = TRUE))
-            }
-        }
-        
-        return(print(x, markdown = TRUE))
-    }
-
-    .assertPackageIsInstalled("knitr")
-    knitr::kable(x, ...)
-}
-
-#'
-#' @title
-#' Create tables in Markdown
-#'
-#' @description
-#' The \code{kable()} function returns a single table for a single object that inherits from class \code{\link{ParameterSet}}.
-#'
-#' @details
-#' Generic to represent a parameter set in Markdown.
-#'
-#' @param x The object that inherits from \code{\link{ParameterSet}}.
-#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
-#'
-#' @export
-#'
-setGeneric("kable", kable.ParameterSet)
 
 #'
 #' @title
@@ -1629,7 +1570,8 @@ summary.ParameterSet <- function(object, ..., type = 1, digits = NA_integer_, ou
 
     if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesignPlan") ||
             inherits(object, "SimulationResults") || inherits(object, "AnalysisResults") ||
-            inherits(object, "TrialDesignCharacteristics"))) {
+            inherits(object, "TrialDesignCharacteristics") ||
+            inherits(object, "PerformanceScore"))) {
         output <- match.arg(output)
         return(.createSummary(object, digits = digits, output = output))
     }
@@ -1724,3 +1666,109 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
         "sorry, function 'plot' is not implemented yet for class '", .getClassName(x), "'"
     )
 }
+
+.getKnitPrintVersion <- function(x, ...) {
+    fCall <- match.call(expand.dots = FALSE)
+
+    .assertPackageIsInstalled("knitr")
+
+    args <- list(x = x, markdown = TRUE)
+    if (.isSimulationResults(x)) {
+        showStatistics <- .getOptionalArgument("showStatistics", optionalArgumentDefaultValue = FALSE, ...)
+        if (isTRUE(showStatistics)) {
+            args$showStatistics <- TRUE
+        }
+    }
+    if (inherits(x, "SummaryFactory") || .isSummaryPipe(fCall)) {
+        args$showSummary <- TRUE
+    }
+
+    return(do.call(what = print, args = args))
+}
+
+#'
+#' @title
+#' Print Parameter Set in Markdown Code Chunks
+#'
+#' @description
+#' The function `knit_print.ParameterSet` is the default printing function for rpact result objects in knitr.
+#' The chunk option `render` uses this function by default.
+#' To fall back to the normal printing behavior set the chunk option `render = normal_print`.
+#' For more information see \code{\link[knitr]{knit_print}}.
+#'
+#' @param x A \code{ParameterSet}.
+#' @param  ... Other arguments (see \code{\link[knitr]{knit_print}}).
+#'
+#' @details
+#' Generic function to print a parameter set in Markdown.
+#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
+#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
+#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
+#' that all headings will be written bold but are not explicit defined as header.
+#'
+#' @export
+#'
+knit_print.ParameterSet <- function(x, ...) {
+    result <- paste0(utils::capture.output(.getKnitPrintVersion(x = x, ...)), collapse = "\n")
+    return(knitr::asis_output(result))
+}
+
+#'
+#' @title
+#' Create output in Markdown
+#'
+#' @description
+#' The \code{kable()} function returns the output of the specified object formatted in Markdown.
+#'
+#' @param x A \code{ParameterSet}. If x does not inherit from class \code{\link{ParameterSet}},
+#'        \code{knitr::kable(x)} will be returned.
+#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
+#'
+#' @details
+#' Generic function to represent a parameter set in Markdown.
+#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
+#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
+#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
+#' that all headings will be written bold but are not explicit defined as header.
+#'
+#' @export
+#'
+kable.ParameterSet <- function(x, ...) {
+    fCall <- match.call(expand.dots = FALSE)
+    if (inherits(x, "ParameterSet")) {
+        objName <- deparse(fCall$x)
+        if (length(objName) > 0) {
+            if (length(objName) > 1) {
+                objName <- paste0(objName[1], "...")
+            }
+            if (grepl("^ *print\\(", objName)) {
+                stop(
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") does not work correctly. ",
+                    "Use ", sub("print", "kable", objName), " without 'print' instead or ", sub("\\)", ", markdown = TRUE)", objName)
+                )
+            }
+        }
+
+        return(knit_print.ParameterSet(x = x, ...))
+    }
+
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(x, ...)
+}
+
+#'
+#' @title
+#' Create tables in Markdown
+#'
+#' @description
+#' The \code{kable()} function returns a single table for a single object that inherits from class \code{\link{ParameterSet}}.
+#'
+#' @details
+#' Generic to represent a parameter set in Markdown.
+#'
+#' @param x The object that inherits from \code{\link{ParameterSet}}.
+#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
+#'
+#' @export
+#'
+setGeneric("kable", kable.ParameterSet)

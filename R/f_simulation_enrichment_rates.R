@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6466 $
-## |  Last changed: $Date: 2022-08-08 14:32:20 +0200 (Mo, 08 Aug 2022) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -52,15 +52,15 @@ NULL
                 pi1H1 <- piTreatmentH1
             }
 
-            pim <- (allocationRatioPlanned * pi1H1 + pi2H1) / (1 + allocationRatioPlanned)
+            pim <- (allocationRatioPlanned[stage] * pi1H1 + pi2H1) / (1 + allocationRatioPlanned[stage])
 
             if (conditionalCriticalValue[stage] > 8) {
                 newSubjects <- maxNumberOfSubjectsPerStage[stage + 1]
             } else {
-                newSubjects <- (1 + 1 / allocationRatioPlanned) * (max(0, conditionalCriticalValue[stage] *
-                    sqrt(pim * (1 - pim) * (1 + allocationRatioPlanned)) +
+                newSubjects <- (1 + 1 / allocationRatioPlanned[stage]) * (max(0, conditionalCriticalValue[stage] *
+                    sqrt(pim * (1 - pim) * (1 + allocationRatioPlanned[stage])) +
                     .getQNorm(conditionalPower) * sqrt(pi1H1 * (1 - pi1H1) +
-                        pi2H1 * (1 - pi2H1) * allocationRatioPlanned), na.rm = TRUE))^2 /
+                        pi2H1 * (1 - pi2H1) * allocationRatioPlanned[stage]), na.rm = TRUE))^2 /
                     (max(1e-7, (2 * directionUpper - 1) * (pi1H1 - pi2H1), na.rm = TRUE))^2
 
                 newSubjects <- min(
@@ -129,9 +129,9 @@ NULL
         weights <- .getWeightsInverseNormal(design)
     }
 
-    const <- allocationRatioPlanned
-
     for (k in 1:kMax) {
+        const <- allocationRatioPlanned[k]
+
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
 
         if (k == 1) {
@@ -690,18 +690,18 @@ NULL
                 pi1H1 <- piTreatmentH1
             }
 
-            pim <- (allocationRatioPlanned * pi1H1 + pi2H1) / (1 + allocationRatioPlanned)
+            pim <- (allocationRatioPlanned[k] * pi1H1 + pi2H1) / (1 + allocationRatioPlanned[k])
 
             if (any(pi1H1 * (1 - pi1H1) + pi2H1 * (1 - pi2H1) == 0)) {
                 thetaStandardized <- 0
             } else {
-                thetaStandardized <- sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned) * (
-                    (pi1H1 - pi2H1) * sqrt(1 + allocationRatioPlanned) /
-                        sqrt(pi1H1 * (1 - pi1H1) + allocationRatioPlanned * pi2H1 * (1 - pi2H1)) +
+                thetaStandardized <- sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k]) * (
+                    (pi1H1 - pi2H1) * sqrt(1 + allocationRatioPlanned[k]) /
+                        sqrt(pi1H1 * (1 - pi1H1) + allocationRatioPlanned[k] * pi2H1 * (1 - pi2H1)) +
                         sign(pi1H1 - pi2H1) * conditionalCriticalValue[k] *
-                            (1 - sqrt(pim * (1 - pim) + allocationRatioPlanned * pim * (1 - pim)) /
-                                sqrt(pi1H1 * (1 - pi1H1) + allocationRatioPlanned * pi2H1 * (1 - pi2H1))) *
-                            (1 + allocationRatioPlanned) / sqrt(allocationRatioPlanned * (plannedSubjects[k + 1] - plannedSubjects[k]))
+                            (1 - sqrt(pim * (1 - pim) + allocationRatioPlanned[k] * pim * (1 - pim)) /
+                                sqrt(pi1H1 * (1 - pi1H1) + allocationRatioPlanned[k] * pi2H1 * (1 - pi2H1))) *
+                            (1 + allocationRatioPlanned[k]) / sqrt(allocationRatioPlanned[k] * (plannedSubjects[k + 1] - plannedSubjects[k]))
                 )
             }
 
@@ -894,6 +894,10 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
 
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+    }
+
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
     cols <- nrow(effectList$piTreatments)
@@ -1036,10 +1040,11 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
                 if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
                     # rejected hypotheses remain rejected also in case of early stopping
                     simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
-                        matrix((closedTest$rejected[, k] &
-                            closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore),
-                        kMax - k, gMax,
-                        byrow = TRUE
+                        matrix(
+                            (closedTest$rejected[, k] &
+                                closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore),
+                            kMax - k, gMax,
+                            byrow = TRUE
                         )
                     break
                 }

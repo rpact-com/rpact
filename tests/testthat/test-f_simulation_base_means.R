@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_simulation_base_means.R
 ## |  Creation date: 06 February 2023, 12:13:46
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7067 $
+## |  Last changed: $Date: 2023-06-09 12:58:32 +0200 (Fr, 09 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -554,7 +554,7 @@ test_that("'getSimulationMeans': several configurations", {
 	    conditionalPower = 0.8, minNumberOfSubjectsPerStage = c(NA, 40, 40), maxNumberOfSubjectsPerStage = c(NA, 400, 400),
 	    allocationRatioPlanned = 3, directionUpper = FALSE, seed = seed, calcSubjectsFunction = calcSubjectsFunctionSimulationBaseMeans
 	)
-
+    
 	## Comparison of the results of SimulationResultsMeans object 'x10' with expected results
 	expect_equal(x10$effect, c(-0.8, -0.6, -0.4, -0.2, 0), tolerance = 1e-07)
 	expect_equal(x10$iterations[1, ], c(100, 100, 100, 100, 100))
@@ -2439,3 +2439,6 @@ test_that("'getSimulationMeans': comparison with getPowerMeans() results", {
 	expect_equal(futilityStopDiff7, c(-1e-04, -4e-04, -0.003, 0.0059, -4e-04, 0.0033), tolerance = 1e-07)
 })
 
+test_that("Internal simulation base means functions throw errors when arguments are missing or wrong", {
+    expect_error(.getSimulationMeansStageSubjects())
+})

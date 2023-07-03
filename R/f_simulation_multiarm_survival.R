@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6275 $
-## |  Last changed: $Date: 2022-06-09 13:35:36 +0200 (Thu, 09 Jun 2022) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -60,7 +60,7 @@ NULL
             if (conditionalCriticalValue[stage] > 8) {
                 newEvents <- maxNumberOfEventsPerStage[stage + 1]
             } else {
-                newEvents <- (1 + allocationRatioPlanned)^2 / allocationRatioPlanned *
+                newEvents <- (1 + allocationRatioPlanned[stage])^2 / allocationRatioPlanned[stage] *
                     (max(0, conditionalCriticalValue[stage] +
                         .getQNorm(conditionalPower), na.rm = TRUE))^2 / thetaStandardized^2
                 newEvents <- min(
@@ -83,10 +83,10 @@ NULL
         k,
         omegaVector) {
     selectedArmsVec <- selectedArms[, k]
-    probabilityVector <- allocationRatioPlanned * omegaVector[selectedArmsVec] /
-        (1 + allocationRatioPlanned * sum(omegaVector[selectedArmsVec]))
+    probabilityVector <- allocationRatioPlanned[k] * omegaVector[selectedArmsVec] /
+        (1 + allocationRatioPlanned[k] * sum(omegaVector[selectedArmsVec]))
     armsSelected <- sum(selectedArmsVec)
-    p0 <- 1 / (1 + allocationRatioPlanned * sum(omegaVector[selectedArmsVec]))
+    p0 <- 1 / (1 + allocationRatioPlanned[k] * sum(omegaVector[selectedArmsVec]))
     covMatrix <- matrix(rep(1 / p0, armsSelected^2), ncol = armsSelected, nrow = armsSelected)
     diag(covMatrix) <- 1 / p0 + 1 / probabilityVector
     corrMatrix <- cov2cor(covMatrix)
@@ -142,12 +142,12 @@ NULL
             if (selectedArms[treatmentArm, k]) {
                 if (k == 1) {
                     eventsPerStage[treatmentArm, k] <- plannedEvents[k] *
-                        (allocationRatioPlanned * omegaVector[treatmentArm] + 1) /
-                        (allocationRatioPlanned * sum(omegaVector) + 1)
+                        (allocationRatioPlanned[k] * omegaVector[treatmentArm] + 1) /
+                        (allocationRatioPlanned[k] * sum(omegaVector) + 1)
                 } else {
                     eventsPerStage[treatmentArm, k] <- (plannedEvents[k] - plannedEvents[k - 1]) *
-                        (allocationRatioPlanned * omegaVector[treatmentArm] + 1) /
-                        (allocationRatioPlanned * sum(omegaVector[selectedArms[, k]]) + 1)
+                        (allocationRatioPlanned[k] * omegaVector[treatmentArm] + 1) /
+                        (allocationRatioPlanned[k] * sum(omegaVector[selectedArms[, k]]) + 1)
                 }
                 if (eventsPerStage[treatmentArm, k] > 0) {
                     testStatistics[treatmentArm, k] <- stats::rnorm(1, 0, 1)
@@ -175,7 +175,7 @@ NULL
             if (selectedArms[treatmentArm, k]) {
                 testStatistics[treatmentArm, k] <- testStatistics[treatmentArm, k] +
                     (2 * directionUpper - 1) * log(omegaVector[treatmentArm]) * sqrt(eventsPerStage[treatmentArm, k]) *
-                        sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned)
+                        sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k])
 
                 separatePValues[treatmentArm, k] <- 1 - stats::pnorm(testStatistics[treatmentArm, k])
 
@@ -183,7 +183,7 @@ NULL
                     testStatistics[treatmentArm, 1:k] / sqrt(sum(eventsPerStage[treatmentArm, 1:k]))
 
                 overallEffects[treatmentArm, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[treatmentArm, k] *
-                    (1 + allocationRatioPlanned) / sqrt(allocationRatioPlanned) /
+                    (1 + allocationRatioPlanned[k]) / sqrt(allocationRatioPlanned[k]) /
                     sqrt(sum(eventsPerStage[treatmentArm, 1:k])))
             }
         }
@@ -269,7 +269,7 @@ NULL
 
             conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
                 thetaStandardized * sqrt(plannedEvents[k + 1] - plannedEvents[k]) *
-                    sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned))
+                    sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k]))
         }
     }
 
@@ -467,6 +467,10 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
 
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+    }
+
     simulationResults$correlationComputation <- correlationComputation
     if (correlationComputation != "alternative") {
         simulationResults$.setParameterType("correlationComputation", C_PARAM_USER_DEFINED)
@@ -601,13 +605,13 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
                         if (closedTest$selectedArms[g, k]) {
                             simulatedSingleEventsPerStage[k, i, g] <- simulatedSingleEventsPerStage[k, i, g] +
                                 stageResults$plannedEvents[k] *
-                                    allocationRatioPlanned * effectMatrix[i, g] / (1 + allocationRatioPlanned *
+                                    allocationRatioPlanned[k] * effectMatrix[i, g] / (1 + allocationRatioPlanned[k] *
                                         sum(effectMatrix[i, closedTest$selectedArms[, k]]))
                         }
                     }
                     simulatedSingleEventsPerStage[k, i, gMax + 1] <- simulatedSingleEventsPerStage[k, i, gMax + 1] +
                         stageResults$plannedEvents[k] /
-                            (1 + allocationRatioPlanned * sum(effectMatrix[i, closedTest$selectedArms[, k]]))
+                            (1 + allocationRatioPlanned[k] * sum(effectMatrix[i, closedTest$selectedArms[, k]]))
                 } else {
                     simulatedOverallEventsPerStage[k, i] <- simulatedOverallEventsPerStage[k, i] +
                         stageResults$plannedEvents[k] - stageResults$plannedEvents[k - 1]
@@ -615,13 +619,13 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
                         if (closedTest$selectedArms[g, k]) {
                             simulatedSingleEventsPerStage[k, i, g] <- simulatedSingleEventsPerStage[k, i, g] +
                                 (stageResults$plannedEvents[k] - stageResults$plannedEvents[k - 1]) *
-                                    allocationRatioPlanned * effectMatrix[i, g] / (1 + allocationRatioPlanned *
+                                    allocationRatioPlanned[k] * effectMatrix[i, g] / (1 + allocationRatioPlanned[k] *
                                         sum(effectMatrix[i, closedTest$selectedArms[, k]]))
                         }
                     }
                     simulatedSingleEventsPerStage[k, i, gMax + 1] <- simulatedSingleEventsPerStage[k, i, gMax + 1] +
                         (stageResults$plannedEvents[k] - stageResults$plannedEvents[k - 1]) /
-                            (1 + allocationRatioPlanned * sum(effectMatrix[i, closedTest$selectedArms[, k]]))
+                            (1 + allocationRatioPlanned[k] * sum(effectMatrix[i, closedTest$selectedArms[, k]]))
                 }
 
                 for (g in 1:gMax) {

@@ -1,4 +1,3 @@
-
 ## |
 ## |  *Simulation of multi-arm design with continuous data*
 ## |
@@ -14,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 5594 $
-## |  Last changed: $Date: 2021-11-26 15:24:35 +0100 (Fr, 26 Nov 2021) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -49,7 +48,7 @@ NULL
             if (conditionalCriticalValue[stage] > 8) {
                 newSubjects <- maxNumberOfSubjectsPerStage[stage + 1]
             } else {
-                newSubjects <- (1 + allocationRatioPlanned) *
+                newSubjects <- (1 + allocationRatioPlanned[stage]) *
                     (max(0, conditionalCriticalValue[stage] +
                         .getQNorm(conditionalPower)))^2 / thetaStandardized^2
                 newSubjects <- min(
@@ -93,9 +92,9 @@ NULL
 
     for (k in 1:kMax) {
         if (k == 1) {
-            subjectsPerStage[gMax + 1, k] <- plannedSubjects[k] / allocationRatioPlanned
+            subjectsPerStage[gMax + 1, k] <- plannedSubjects[k] / allocationRatioPlanned[k]
         } else {
-            subjectsPerStage[gMax + 1, k] <- (plannedSubjects[k] - plannedSubjects[k - 1]) / allocationRatioPlanned
+            subjectsPerStage[gMax + 1, k] <- (plannedSubjects[k] - plannedSubjects[k - 1]) / allocationRatioPlanned[k]
         }
 
         if (subjectsPerStage[gMax + 1, k] > 0) {
@@ -193,8 +192,8 @@ NULL
                     )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
-                    plannedSubjects[(k + 1):kMax] <- sum(subjectsPerStage[gMax + 1, 1:k]) *
-                        allocationRatioPlanned + cumsum(rep(newSubjects, kMax - k))
+                    plannedSubjects[(k + 1):kMax] <- sum(subjectsPerStage[gMax + 1, 1:k] *
+                        allocationRatioPlanned[1:k]) + cumsum(rep(newSubjects, kMax - k))
                 }
             } else {
                 selectedArms[, k + 1] <- selectedArms[, k]
@@ -208,7 +207,7 @@ NULL
 
             conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
                 thetaStandardized * sqrt(plannedSubjects[k + 1] - plannedSubjects[k]) *
-                    sqrt(1 / (1 + allocationRatioPlanned)))
+                    sqrt(1 / (1 + allocationRatioPlanned[k])))
         }
     }
 
@@ -397,6 +396,10 @@ getSimulationMultiArmMeans <- function(design = NULL, ...,
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
+
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+    }
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 

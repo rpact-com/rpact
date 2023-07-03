@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6810 $
-## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -146,8 +146,9 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 #' @description
 #' \code{TrialDesignSet} is a class for creating a collection of different trial designs.
 #'
-#' @field designs The designs (optional).
-#' @field design The master design (optional).
+#' @template field_designs
+#' @template field_design
+#' @template field_variedParameters
 #'
 #' @details
 #' This object cannot be created directly; better use \code{\link[=getDesignSet]{getDesignSet()}}
@@ -958,7 +959,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         xParameterName = xParameterName,
         yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
         palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
-        legendPosition = legendPosition, plotSettings = plotSettings, ...
+        legendPosition = legendPosition, plotSettings = plotSettings # , ...
     )
 
     p <- .addDecistionCriticalValuesToPlot(p = p, designMaster = designMaster, type = type, nMax = nMax)
@@ -1002,7 +1003,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         ),
         size = plotSettings$scaleSize(plotSettings$pointSize, TRUE),
         shape = 4, stroke = 1.25, show.legend = FALSE
-    ) 
+    )
 
     for (i in 1:nrow(data)) {
         label <- paste0("(", round(data[i, 1], 3), ", ", round(data[i, 2], 3), ")")

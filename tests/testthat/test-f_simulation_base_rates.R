@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_simulation_base_rates.R
 ## |  Creation date: 06 February 2023, 12:13:50
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7065 $
+## |  Last changed: $Date: 2023-06-09 11:04:44 +0200 (Fr, 09 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -861,3 +861,6 @@ test_that("'getSimulationRates': check results for a Fisher design", {
 
 })
 
+test_that("Simulation base rates functions throw errors when arguments are missing or wrong", {
+    expect_error(getSimulationRates())
+})

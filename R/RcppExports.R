@@ -25,10 +25,6 @@ getDesignGroupSequentialPampallonaTsiatisCpp <- function(tolerance, beta, alpha,
     .Call(`_rpact_getDesignGroupSequentialPampallonaTsiatisCpp`, tolerance, beta, alpha, kMax, deltaPT0, deltaPT1, informationRates, sided, bindingFutility)
 }
 
-getSpendingValueCpp <- function(alpha, x, sided, typeOfDesign, gamma) {
-    .Call(`_rpact_getSpendingValueCpp`, alpha, x, sided, typeOfDesign, gamma)
-}
-
 getDesignGroupSequentialUserDefinedAlphaSpendingCpp <- function(kMax, userAlphaSpending, sided, informationRates, bindingFutility, futilityBounds, tolerance) {
     .Call(`_rpact_getDesignGroupSequentialUserDefinedAlphaSpendingCpp`, kMax, userAlphaSpending, sided, informationRates, bindingFutility, futilityBounds, tolerance)
 }

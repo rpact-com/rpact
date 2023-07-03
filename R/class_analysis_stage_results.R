@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6810 $
-## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -29,17 +29,27 @@
 #'
 #' @template field_stages
 #' @template field_testStatistics
-#' @template field_pValues 
+#' @template field_pValues
 #' @template field_combInverseNormal
 #' @template field_combFisher
 #' @template field_effectSizes
-#' @field testActions The action drawn from test result.
+#' @template field_testActions
 #' @template field_weightsFisher
 #' @template field_weightsInverseNormal
 #'
 #' @details
-#' \code{StageResults} is the basic class for \code{StageResultsMeans},
-#' \code{StageResultsRates}, and \code{StageResultsSurvival}.
+#' \code{StageResults} is the basic class for
+#' \itemize{
+#'   \item \code{\link{StageResultsMeans}},
+#'   \item \code{\link{StageResultsRates}},
+#'   \item \code{\link{StageResultsSurvival}},
+#'   \item \code{\link{StageResultsMultiArmMeans}},
+#'   \item \code{\link{StageResultsMultiArmRates}},
+#'   \item \code{\link{StageResultsMultiArmSurvival}},
+#'   \item \code{\link{StageResultsEnrichmentMeans}},
+#'   \item \code{\link{StageResultsEnrichmentRates}}, and
+#'   \item \code{\link{StageResultsEnrichmentSurvival}}.
+#' }
 #'
 #' @include f_core_utilities.R
 #' @include class_core_parameter_set.R
@@ -131,11 +141,12 @@ StageResults <- setRefClass("StageResults",
                     .cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                 } else if (grepl("MultiArm", .getClassName(.self))) {
                     .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(paste0(
-                        "  (i): results of treatment arm i vs. control group ",
-                        .dataInput$getNumberOfGroups(), "\n"
-                    ),
-                    consoleOutputEnabled = consoleOutputEnabled
+                    .cat(
+                        paste0(
+                            "  (i): results of treatment arm i vs. control group ",
+                            .dataInput$getNumberOfGroups(), "\n"
+                        ),
+                        consoleOutputEnabled = consoleOutputEnabled
                     )
                 } else if (.dataInput$getNumberOfGroups(survivalCorrectionEnabled = FALSE) >= 2) {
                     .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
@@ -249,18 +260,19 @@ StageResults <- setRefClass("StageResults",
 #' @template field_overallTestStatistics
 #' @template field_pValues
 #' @template field_overallPValues
-#' @template field_combInverseNormal
-#' @template field_combFisher
 #' @template field_effectSizes
-#' @field testActions The action drawn from test result.
-#' @template field_weightsFisher
-#' @template field_weightsInverseNormal
+#' @template field_testActions
+#' @template field_direction
 #' @template field_normalApproximation
-#' @field equalVariances Logical. Describes if variances are assumed equal between groups. 
-#'        Specified via \code{equalVariances} in \code{\link[=getStageResults]{getStageResults()}}, default is \code{TRUE}.
+#' @template field_equalVariances
+#' @template field_combFisher
+#' @template field_weightsFisher
+#' @template field_combInverseNormal
+#' @template field_weightsInverseNormal
+#' @field ... Names of \code{dataInput}.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getStageResults]{getStageResults()}}
+#' This object cannot be created directly; use \code{getStageResults}
 #' with suitable arguments to create the stage results of a dataset of means.
 #'
 #' @include class_core_parameter_set.R
@@ -383,6 +395,42 @@ StageResultsMeans <- setRefClass("StageResultsMeans",
     )
 )
 
+#' @name StageResultsMultiArmMeans
+#'
+#' @title
+#' Stage Results Multi Arm Means
+#'
+#' @description
+#' Class for stage results of multi arm means data
+#'
+#' @template field_stages
+#' @template field_testStatistics
+#' @template field_pValues
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_effectSizes
+#' @template field_testActions
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_overallTestStatistics
+#' @template field_overallStDevs
+#' @template field_overallPooledStDevs
+#' @template field_overallPValues
+#' @template field_testStatistics
+#' @template field_separatePValues
+#' @template field_effectSizes
+#' @template field_singleStepAdjustedPValues
+#' @template field_intersectionTest
+#' @template field_varianceOption
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#'
+#' @details
+#' This object cannot be created directly; use \code{getStageResults}
+#' with suitable arguments to create the stage results of a dataset of multi arm means.
+#'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
 #' @include class_analysis_dataset.R
@@ -490,22 +538,25 @@ StageResultsMultiArmMeans <- setRefClass("StageResultsMultiArmMeans",
 #'
 #' @description
 #' Class for stage results of rates.
-#' 
+#'
 #' @template field_stages
 #' @template field_testStatistics
 #' @template field_overallTestStatistics
 #' @template field_pValues
 #' @template field_overallPValues
-#' @template field_combInverseNormal
-#' @template field_combFisher
 #' @template field_effectSizes
-#' @field testActions The action drawn from test result.
+#' @template field_direction
+#' @template field_testActions
+#' @template field_thetaH0
+#' @template field_normalApproximation
 #' @template field_weightsFisher
 #' @template field_weightsInverseNormal
-#' @template field_normalApproximation
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @field ... Names of \code{dataInput}.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getStageResults]{getStageResults()}}
+#' This object cannot be created directly; use \code{getStageResults}
 #' with suitable arguments to create the stage results of a dataset of rates.
 #'
 #' @include class_core_parameter_set.R
@@ -620,6 +671,39 @@ StageResultsRates <- setRefClass("StageResultsRates",
     )
 )
 
+#' @name StageResultsMultiArmRates
+#'
+#' @title
+#' Stage Results Multi Arm Rates
+#'
+#' @description
+#' Class for stage results of multi arm rates data
+#'
+#' @template field_stages
+#' @template field_testStatistics
+#' @template field_pValues
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_effectSizes
+#' @template field_testActions
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_overallTestStatistics
+#' @template field_overallPValues
+#' @template field_testStatistics
+#' @template field_separatePValues
+#' @template field_effectSizes
+#' @template field_singleStepAdjustedPValues
+#' @template field_intersectionTest
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#'
+#' @details
+#' This object cannot be created directly; use \code{getStageResults}
+#' with suitable arguments to create the stage results of a dataset of multi arm rates.
+#'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
 #' @include class_analysis_dataset.R
@@ -721,22 +805,28 @@ StageResultsMultiArmRates <- setRefClass("StageResultsMultiArmRates",
 #'
 #' @description
 #' Class for stage results survival data.
-#' 
+#'
 #' @template field_stages
 #' @template field_testStatistics
 #' @template field_overallTestStatistics
-#' @template field_pValues
+#' @template field_separatePValues
+#' @template field_singleStepAdjustedPValues
 #' @template field_overallPValues
+#' @template field_direction
+#' @template field_directionUpper
+#' @template field_intersectionTest
 #' @template field_combInverseNormal
 #' @template field_combFisher
 #' @template field_effectSizes
-#' @field testActions The action drawn from test result.
+#' @template field_testActions
+#' @template field_thetaH0
 #' @template field_weightsFisher
 #' @template field_weightsInverseNormal
 #' @template field_normalApproximation
+#' @field ... Names of \code{dataInput}.
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getStageResults]{getStageResults()}}
+#' This object cannot be created directly; use \code{getStageResults}
 #' with suitable arguments to create the stage results of a dataset of survival data.
 #'
 #' @include class_core_parameter_set.R
@@ -819,7 +909,38 @@ StageResultsSurvival <- setRefClass("StageResultsSurvival",
     )
 )
 
-
+#' @name StageResultsMultiArmSurvival
+#'
+#' @title
+#' Stage Results Multi Arm Survival
+#'
+#' @description
+#' Class for stage results of multi arm survival data
+#'
+#' @template field_stages
+#' @template field_testStatistics
+#' @template field_pValues
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_effectSizes
+#' @template field_testActions
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_overallTestStatistics
+#' @template field_overallPValues
+#' @template field_testStatistics
+#' @template field_separatePValues
+#' @template field_effectSizes
+#' @template field_singleStepAdjustedPValues
+#' @template field_intersectionTest
+#' @template field_directionUpper
+#'
+#' @details
+#' This object cannot be created directly; use \code{getStageResults}
+#' with suitable arguments to create the stage results of a dataset of multi arm survival.
+#'
 #' @include class_core_parameter_set.R
 #' @include class_design.R
 #' @include class_analysis_dataset.R
@@ -902,6 +1023,45 @@ StageResultsMultiArmSurvival <- setRefClass("StageResultsMultiArmSurvival",
     )
 )
 
+#'
+#' @name StageResultsEnrichmentMeans
+#'
+#' @title
+#' Stage Results Enrichment Means
+#'
+#' @description
+#' Class for stage results of enrichment means data
+#'
+#' @template field_stages
+#' @template field_thetaH0
+#' @template field_direction
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#' @template field_varianceOption
+#' @template field_intersectionTest
+#' @template field_testStatistics
+#' @template field_overallTestStatistics
+#' @template field_pValues
+#' @template field_overallPValues
+#' @template field_overallStDevs
+#' @template field_overallPooledStDevs
+#' @template field_separatePValues
+#' @template field_effectSizes
+#' @template field_singleStepAdjustedPValues
+#' @template field_stratifiedAnalysis
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#'
+#' @details
+#' This object cannot be created directly; use \code{getStageResults}
+#' with suitable arguments to create the stage results of a dataset of enrichment means.
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
 StageResultsEnrichmentMeans <- setRefClass("StageResultsEnrichmentMeans",
     contains = "StageResultsMultiArmMeans",
     fields = list(
@@ -916,6 +1076,33 @@ StageResultsEnrichmentMeans <- setRefClass("StageResultsEnrichmentMeans",
     )
 )
 
+#'
+#' @name StageResultsEnrichmentRates
+#'
+#' @title
+#' Stage Results Enrichment Rates
+#'
+#' @description
+#' Class for stage results of enrichment rates data.
+#'
+#' @template field_stages
+#' @template field_testStatistics
+#' @template field_pValues
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_effectSizes
+#' @template field_testActions
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#'
+#' @details
+#' This object cannot be created directly; use \code{getStageResults}
+#' with suitable arguments to create the stage results of a dataset of enrichment rates.
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
 StageResultsEnrichmentRates <- setRefClass("StageResultsEnrichmentRates",
     contains = "StageResultsMultiArmRates",
     fields = list(
@@ -934,6 +1121,33 @@ StageResultsEnrichmentRates <- setRefClass("StageResultsEnrichmentRates",
     )
 )
 
+#'
+#' @name StageResultsEnrichmentSurvival
+#'
+#' @title
+#' Stage Results Enrichment Survival
+#'
+#' @description
+#' Class for stage results of enrichment survival data.
+#'
+#' @template field_stages
+#' @template field_testStatistics
+#' @template field_pValues
+#' @template field_combInverseNormal
+#' @template field_combFisher
+#' @template field_effectSizes
+#' @template field_testActions
+#' @template field_weightsFisher
+#' @template field_weightsInverseNormal
+#'
+#' @details
+#' This object cannot be created directly; use \code{getStageResults}
+#' with suitable arguments to create the stage results of a dataset of enrichment survival.
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
 StageResultsEnrichmentSurvival <- setRefClass("StageResultsEnrichmentSurvival",
     contains = "StageResultsMultiArmSurvival",
     fields = list(
@@ -997,9 +1211,9 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         parametersToShow <- x$.getParametersToShow()
 
         return(.getAsDataFrame(
-            parameterSet = x, 
+            parameterSet = x,
             parameterNames = parametersToShow,
-            niceColumnNamesEnabled = niceColumnNamesEnabled, 
+            niceColumnNamesEnabled = niceColumnNamesEnabled,
             includeAllParameters = includeAllParameters,
             tableColumnNames = .getTableColumnNames(design = x$.design)
         ))
@@ -1106,7 +1320,7 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #' @description
 #' Plots the conditional power together with the likelihood function.
 #'
-#' @param x The stage results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}} or 
+#' @param x The stage results at given stage, obtained from \code{\link[=getStageResults]{getStageResults()}} or
 #'        \code{\link[=getAnalysisResults]{getAnalysisResults()}}.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
 #' @inheritParams param_stage
@@ -1158,11 +1372,11 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #' )
 #'
 #' stageResults <- getStageResults(design, dataExample, thetaH0 = 20)
-#' 
+#'
 #' \dontrun{
 #' if (require(ggplot2)) plot(stageResults, nPlanned = c(30), thetaRange = c(0, 100))
 #' }
-#' 
+#'
 #' @export
 #'
 plot.StageResults <- function(x, y, ..., type = 1L,

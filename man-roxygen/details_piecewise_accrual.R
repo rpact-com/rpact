@@ -6,7 +6,7 @@
 #' The first element of \code{accrualTime} must be equal to \code{0} and, additionally, 
 #' \code{accrualIntensity} needs to be specified. 
 #' \code{accrualIntensity} itself is a value or a vector (depending on the 
-#' length of \code{accrualtime}) that defines the intensity how subjects 
+#' length of \code{accrualTime}) that defines the intensity how subjects 
 #' enter the trial in the intervals defined through \code{accrualTime}.
 #'  
 #' \code{accrualTime} can also be a list that combines the definition of the accrual time and 

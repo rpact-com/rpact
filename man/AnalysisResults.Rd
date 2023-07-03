@@ -11,8 +11,13 @@ A basic class for analysis results.
 \code{AnalysisResults} is the basic class for
 \itemize{
 \item \code{\link{AnalysisResultsFisher}},
-\item \code{\link{AnalysisResultsGroupSequential}}, and
-\item \code{\link{AnalysisResultsInverseNormal}}.
+\item \code{\link{AnalysisResultsGroupSequential}},
+\item \code{\link{AnalysisResultsInverseNormal}},
+\item \code{\link{AnalysisResultsMultiArmFisher}},
+\item \code{\link{AnalysisResultsMultiArmInverseNormal}},
+\item \code{\link{AnalysisResultsConditionalDunnett}},
+\item \code{\link{AnalysisResultsEnrichmentFisher}},
+\item \code{\link{AnalysisResultsEnrichmentInverseNormal}}.
 }
 }
 

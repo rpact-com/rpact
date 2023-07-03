@@ -3,8 +3,13 @@ helper-f_analysis_base_means.R
 helper-f_analysis_base_rates.R
 helper-f_analysis_base_survival.R
 helper-f_core_assertions.R
+helper-f_core_output_formats.R
 helper-f_core_utilities.R
 test-class_analysis_dataset.R
+test-class_core_plot_settings.R
+test-class_design_plan.R
+test-class_design_set.R
+test-class_simulation_results.R
 test-class_summary.R
 test-class_time.R
 test-f_analysis_base_means.R
@@ -28,7 +33,9 @@ test-f_design_group_sequential_beta_spending.R
 test-f_design_power_calculator.R
 test-f_design_sample_size_calculator.R
 test-f_design_utilities.R
+test-f_logger.R
 test-f_parameter_set_utilities.R
+test-f_quality_assurance.R
 test-f_simulation_base_means.R
 test-f_simulation_base_rates.R
 test-f_simulation_base_survival.R
@@ -38,4 +45,6 @@ test-f_simulation_enrichment_survival.R
 test-f_simulation_multiarm_means.R
 test-f_simulation_multiarm_rates.R
 test-f_simulation_multiarm_survival.R
+test-f_simulation_performance_score.R
 test-generic_functions.R
+test-pkgname.R

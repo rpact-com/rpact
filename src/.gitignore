@@ -1,5 +1,2 @@
-/RcppExports.o
-/f_design_group_sequential_probabilities.o
-/f_simulation_survival.o
-/f_utilities.o
-/rpact.dll
+/*.o
+/*.dll

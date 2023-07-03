@@ -13,13 +13,15 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7148 $
+## |  Last changed: $Date: 2023-07-03 15:50:22 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
+#' @include f_core_assertions.R
 NULL
+
 
 SummaryItem <- setRefClass("SummaryItem",
     fields = list(
@@ -57,6 +59,7 @@ SummaryItem <- setRefClass("SummaryItem",
 #'
 #' @param x The summary factory object.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
+#' @param showSummary Show the summary before creating the plot output, default is \code{FALSE}.
 #' @inheritParams param_three_dots_plot
 #'
 #' @description
@@ -69,8 +72,51 @@ SummaryItem <- setRefClass("SummaryItem",
 #'
 #' @export
 #'
-plot.SummaryFactory <- function(x, y, ...) {
-    plot(x$object)
+plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
+    fCall <- match.call(expand.dots = FALSE)
+    if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
+        markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = FALSE)
+        if (markdown) {
+            x$.catMarkdownText()
+        } else {
+            x$show()
+        }
+    }
+    plot(x = x$object, y = y, ...)
+}
+
+#'
+#' @title
+#' Summary Factory Printing
+#'
+#' @param x The summary factory object.
+#' @param markdown If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
+#'        normal representation will be used otherwise (default is \code{FALSE})
+#' @param showSummary Show the summary before creating the print output, default is \code{FALSE}.
+#' @param sep The separator line between the summary and the print output.
+#' @inheritParams param_three_dots_plot
+#'
+#' @description
+#' Prints the result object stored inside a summary factory.
+#'
+#' @details
+#' Generic function to print all kinds of summary factories.
+#'
+#' @export
+#'
+print.SummaryFactory <- function(x, ..., markdown = FALSE, showSummary = FALSE, sep = "\n-----\n\n") {
+    fCall <- match.call(expand.dots = FALSE)
+    if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
+        .assertIsSingleCharacter(sep, "sep")
+
+        if (markdown) {
+            x$.catMarkdownText()
+        } else {
+            x$show()
+        }
+        cat(sep)
+    }
+    print(x$object, markdown = markdown)
 }
 
 #' @name SummaryFactory
@@ -105,7 +151,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
         show = function(showType = 1, digits = NA_integer_) {
             .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
-        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
+        .show = function(showType = 1, digits = NA_integer_, ..., consoleOutputEnabled = TRUE) {
             if (output %in% c("all", "title")) {
                 if (is.null(title) || length(title) == 0) {
                     title <<- .createSummaryTitleObject(object)
@@ -463,7 +509,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                                 numberOfVariants <- length(variedParameterValues)
                             }
                         } else {
-                            variedParameterName <- .getSummaryVariedParameterSimulationMultiArm(parameterSet)
+                            variedParameterName <- .getVariedParameterSimulationMultiArm(parameterSet)
                             variedParameterValues <- parameterSet[[variedParameterName]]
                             variedParameterCaption <- C_PARAMETER_NAMES[[variedParameterName]]
                             numberOfVariants <- length(variedParameterValues)
@@ -523,6 +569,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 } else {
                     if (inherits(parameterSet, "Dataset")) {
                         variedParameter <- "groups"
+                    } else if (inherits(parameterSet, "PerformanceScore")) {
+                        variedParameter <- ".alternative"
                     } else {
                         variedParameter <- parameterSet$.getVariedParameter(parameterNames, numberOfVariants)
                     }
@@ -539,7 +587,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     )
                     variedParameterCaption <- tolower(variedParameterCaption)
 
-                    if (variedParameterCaption == "alternative") {
+                    if (variedParameterCaption == "alternative" || variedParameterCaption == ".alternative") {
                         legendEntry[["alt."]] <- "alternative"
                         variedParameterCaption <- "alt."
                     } else if (variedParameterCaption == "hazard ratio") {
@@ -819,7 +867,9 @@ SummaryFactory <- setRefClass("SummaryFactory",
 .createSummaryTitleObject <- function(object) {
     design <- NULL
     designPlan <- NULL
-    if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
+    if (inherits(object, "TrialDesignCharacteristics")) {
+        design <- object$.design
+    } else if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
         design <- object$.design
         designPlan <- object
     } else if (inherits(object, "AnalysisResults")) {
@@ -995,7 +1045,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
     if (is.null(directionUpper) || length(directionUpper) != 1 || is.na(directionUpper)) {
         directionUpper <- TRUE
     }
-    
+
     comparisonH0 <- " = "
     comparisonH1 <- NA_character_
     if (inherits(object, "AnalysisResults") && !is.null(directionUpper)) {
@@ -1128,6 +1178,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
 }
 
 .createSummaryHeaderObject <- function(object, summaryFactory, digits = NA_integer_) {
+    if (inherits(object, "TrialDesignCharacteristics")) {
+        return(.createSummaryHeaderDesign(object$.design, NULL, summaryFactory))
+    }
+
     if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
         return(.createSummaryHeaderDesign(object$.design, object, summaryFactory))
     }
@@ -1173,8 +1227,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
 
     if (!all(is.na(allocationRatioPlanned))) {
         return(.concatenateSummaryText(header,
-			paste0(prefix, "planned allocation ratio = ", 
-			.arrayToString(allocationRatioPlanned, vectorLookAndFeelEnabled = length(allocationRatioPlanned) > 1)),						
+            paste0(
+                prefix, "planned allocation ratio = ",
+                .arrayToString(allocationRatioPlanned, vectorLookAndFeelEnabled = length(allocationRatioPlanned) > 1)
+            ),
             sep = sep
         ))
     } else {
@@ -1230,8 +1286,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
         }
     }
 
-    header <- .concatenateSummaryText(header, 
-        paste0("(", ifelse(design$sided == 1, "one", "two"), "-sided, alpha = ", round(design$alpha, 4), ")"), sep = " ")
+    header <- .concatenateSummaryText(header,
+        paste0("(", ifelse(design$sided == 1, "one", "two"), "-sided, alpha = ", round(design$alpha, 4), ")"),
+        sep = " "
+    )
 
     if (!.isTrialDesignConditionalDunnett(design) && multiHypothesesEnabled) {
         if (stageResults$intersectionTest == "Dunnett") {
@@ -1388,16 +1446,18 @@ SummaryFactory <- setRefClass("SummaryFactory",
     if (!case1 && !case2) {
         return(header)
     }
-    
-    if (.isTrialDesignFisher(analysisResults$.design) && 
+
+    if (.isTrialDesignFisher(analysisResults$.design) &&
             length(analysisResults$nPlanned[!is.na(analysisResults$nPlanned)]) > 1) {
         header <- .concatenateSummaryText(header, paste0(
             "The conditional power simulation with planned sample size and ",
             analysisResults$iterations, " iterations is based on"
         ), sep = ". ")
     } else {
-        header <- .concatenateSummaryText(header, 
-            "The conditional power calculation with planned sample size is based on", sep = ". ")
+        header <- .concatenateSummaryText(header,
+            "The conditional power calculation with planned sample size is based on",
+            sep = ". "
+        )
     }
 
     header <- .addAllocationRatioToHeader(analysisResults, header, sep = " ")
@@ -1572,24 +1632,34 @@ SummaryFactory <- setRefClass("SummaryFactory",
 
         if (design$kMax > 1 && .isTrialDesignInverseNormalOrGroupSequential(design)) {
             outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
-            designCharacteristics <- getDesignCharacteristics(design)
-            header <- .concatenateSummaryText(
-                header,
-                paste0("inflation factor ", round(designCharacteristics$inflationFactor, 4))
+            designCharacteristics <- NULL
+            tryCatch(
+                {
+                    designCharacteristics <- getDesignCharacteristics(design)
+                },
+                error = function(e) {
+                    .logError("Cannot add design characteristics to summary: ", e$message)
+                }
             )
-            if (outputSize == "large") {
+            if (!is.null(designCharacteristics)) {
                 header <- .concatenateSummaryText(
                     header,
-                    paste0("ASN H1 ", round(designCharacteristics$averageSampleNumber1, 4))
+                    paste0("inflation factor ", round(designCharacteristics$inflationFactor, 4))
                 )
-                header <- .concatenateSummaryText(
-                    header,
-                    paste0("ASN H01 ", round(designCharacteristics$averageSampleNumber01, 4))
-                )
-                header <- .concatenateSummaryText(
-                    header,
-                    paste0("ASN H0 ", round(designCharacteristics$averageSampleNumber0, 4))
-                )
+                if (outputSize == "large") {
+                    header <- .concatenateSummaryText(
+                        header,
+                        paste0("ASN H1 ", round(designCharacteristics$averageSampleNumber1, 4))
+                    )
+                    header <- .concatenateSummaryText(
+                        header,
+                        paste0("ASN H01 ", round(designCharacteristics$averageSampleNumber01, 4))
+                    )
+                    header <- .concatenateSummaryText(
+                        header,
+                        paste0("ASN H0 ", round(designCharacteristics$averageSampleNumber0, 4))
+                    )
+                }
             }
         }
 
@@ -2172,7 +2242,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
 .createSummary <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
     output <- match.arg(output)
     if (inherits(object, "TrialDesignCharacteristics")) {
-        return(.createSummaryDesignPlan(object$.design, digits = digits, output = output, showStageLevels = TRUE))
+        return(.createSummaryDesignPlan(object, digits = digits, output = output, showStageLevels = TRUE))
     }
 
     if (.isTrialDesign(object) || .isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
@@ -2183,7 +2253,18 @@ SummaryFactory <- setRefClass("SummaryFactory",
         return(.createSummaryAnalysisResults(object, digits = digits, output = output))
     }
 
+    if (inherits(object, "PerformanceScore")) {
+        return(.createSummaryPerformanceScore(object, digits = digits, output = output))
+    }
+
     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "function 'summary' not implemented yet for class ", .getClassName(object))
+}
+
+.createSummaryPerformanceScore <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
+    .createSummaryDesignPlan(object$.simulationResults,
+        digits = digits, output = output,
+        showStageLevels = TRUE, performanceScore = object
+    )
 }
 
 .getSummaryParameterCaptionCriticalValues <- function(design) {
@@ -2205,9 +2286,11 @@ SummaryFactory <- setRefClass("SummaryFactory",
     return(parameterCaption)
 }
 
-#
-# Main function for creating a summary of an analysis result
-#
+#'
+#' Main function for creating a summary of an analysis result
+#'
+#' @noRd
+#'
 .createSummaryAnalysisResults <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
     output <- match.arg(output)
     if (!inherits(object, "AnalysisResults")) {
@@ -2500,7 +2583,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
     }
-    
+
     ciLevel <- round((1 - design$alpha * (3 - design$sided)) * 100, 2)
     if (.isTrialDesignConditionalDunnett(design)) {
         parameterCaptionRepeatedPValues <- "Overall p-value"
@@ -2508,21 +2591,23 @@ SummaryFactory <- setRefClass("SummaryFactory",
     } else {
         parameterCaptionRepeatedPValues <- ifelse(design$kMax == 1,
             ifelse(design$sided == 1, "One-sided p-value", "Two-sided p-value"),
-            "Repeated p-value")
-        parameterCaptionRepeatedCI <- paste0(ciLevel, "% ",
+            "Repeated p-value"
+        )
+        parameterCaptionRepeatedCI <- paste0(
+            ciLevel, "% ",
             ifelse(design$kMax == 1, "confidence interval", "repeated confidence interval")
         )
     }
-    
+
     summaryFactory$addParameter(analysisResults,
         parameterName = c("repeatedConfidenceIntervalLowerBounds", "repeatedConfidenceIntervalUpperBounds"),
         parameterCaption = parameterCaptionRepeatedCI,
         roundDigits = digitsGeneral
     )
-    
+
     summaryFactory$addParameter(analysisResults,
         parameterName = "repeatedPValues",
-        parameterCaption = parameterCaptionRepeatedPValues, 
+        parameterCaption = parameterCaptionRepeatedPValues,
         roundDigits = digitsProbabilities, formatRepeatedPValues = TRUE
     )
 
@@ -2680,8 +2765,16 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
         if (design$kMax > 1 && .isTrialDesignInverseNormalOrGroupSequential(design)) {
-            designCharacteristics <- getDesignCharacteristics(design)
-            if (!any(is.na(designCharacteristics$futilityProbabilities)) &&
+            tryCatch(
+                {
+                    designCharacteristics <- getDesignCharacteristics(design)
+                },
+                error = function(e) {
+                    designCharacteristics <- NULL
+                }
+            )
+            if (!is.null(designCharacteristics) &&
+                    !any(is.na(designCharacteristics$futilityProbabilities)) &&
                     any(designCharacteristics$futilityProbabilities > 0)) {
                 summaryFactory$addParameter(designCharacteristics,
                     parameterName = "futilityProbabilities",
@@ -2727,17 +2820,22 @@ SummaryFactory <- setRefClass("SummaryFactory",
     return(summaryFactory)
 }
 
-#
-# Main function for creating a summary of a design or design plan
-#
-.createSummaryDesignPlan <- function(object, digits = NA_integer_, 
-        output = c("all", "title", "overview", "body"), showStageLevels = FALSE) {
-        
+#'
+#' Main function for creating a summary of a design or design plan
+#'
+#' @noRd
+#'
+.createSummaryDesignPlan <- function(object, digits = NA_integer_,
+        output = c("all", "title", "overview", "body"), showStageLevels = FALSE,
+        performanceScore = NULL) {
     output <- match.arg(output)
     designPlan <- NULL
     if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
         design <- object$.design
         designPlan <- object
+    } else if (inherits(object, "TrialDesignCharacteristics")) {
+        design <- object$.design
+        # designPlan <- object
     } else if (.isTrialDesign(object)) {
         design <- object
     } else {
@@ -2762,7 +2860,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
     summaryFactory <- SummaryFactory(object = object, intervalFormat = intervalFormat, output = output)
 
     if (output %in% c("all", "title", "overview")) {
-        .addDesignInformationToSummary(design, object, summaryFactory, output = output)
+        .addDesignInformationToSummary(design, designPlan, summaryFactory, output = output)
     }
 
     if (!(output %in% c("all", "body"))) {
@@ -2775,12 +2873,12 @@ SummaryFactory <- setRefClass("SummaryFactory",
             parameterCaption = .getSummaryParameterCaptionCriticalValues(design),
             roundDigits = digitsGeneral
         )
-        
+
         if (showStageLevels) {
             summaryFactory$addParameter(design,
                 parameterName = "stageLevels",
-                parameterCaption = "Stage Levels",
-                roundDigits = digitsProbabilities, 
+                parameterCaption = "Stage levels (one-sided)",
+                roundDigits = digitsProbabilities,
                 smoothedZeroFormat = TRUE
             )
         }
@@ -2806,13 +2904,24 @@ SummaryFactory <- setRefClass("SummaryFactory",
 
     designCharacteristics <- NULL
     if (design$kMax > 1 && .isTrialDesignInverseNormalOrGroupSequential(design)) {
-        designCharacteristics <- getDesignCharacteristics(design)
+        tryCatch(
+            {
+                designCharacteristics <- getDesignCharacteristics(design)
+            },
+            error = function(e) {
+                designCharacteristics <- NULL
+            }
+        )
     }
 
     if (is.null(designPlan)) {
         return(.addDesignParameterToSummary(
-            design, designPlan,
-            designCharacteristics, summaryFactory, digitsGeneral, digitsProbabilities
+            design,
+            designPlan,
+            designCharacteristics,
+            summaryFactory,
+            digitsGeneral,
+            digitsProbabilities
         ))
     }
 
@@ -2827,7 +2936,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
     probsH0 <- NULL
     probsH1 <- NULL
     if (design$kMax > 1) {
-        if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
+        if (!is.null(designCharacteristics) &&
+                .isTrialDesignInverseNormalOrGroupSequential(design) &&
                 length(designCharacteristics$shift) == 1 &&
                 !is.na(designCharacteristics$shift) &&
                 designCharacteristics$shift >= 1) {
@@ -2854,7 +2964,6 @@ SummaryFactory <- setRefClass("SummaryFactory",
     }
 
     if (simulationEnabled && (multiArmEnabled || enrichmentEnabled)) {
-
         # simulation multi-arm #1:rejectAtLeastOne per mu_max
         summaryFactory$addParameter(designPlan,
             parameterName = "rejectAtLeastOne",
@@ -3246,6 +3355,15 @@ SummaryFactory <- setRefClass("SummaryFactory",
         }
     }
 
+    if (!is.null(performanceScore)) {
+        print(performanceScore)
+        summaryFactory$addParameter(performanceScore,
+            parameterName = "performanceScore",
+            parameterCaption = "Performance score",
+            roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
+        )
+    }
+
     return(summaryFactory)
 }
 
@@ -3283,7 +3401,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             variedParameterCaption <- sub("s$", "", variedParameterCaption)
         }
     } else {
-        variedParameterName <- .getSummaryVariedParameterSimulationMultiArm(designPlan)
+        variedParameterName <- .getVariedParameterSimulationMultiArm(designPlan)
         variedParameterValues <- designPlan[[variedParameterName]]
         variedParameterCaption <- C_PARAMETER_NAMES[[variedParameterName]]
     }
@@ -3444,26 +3562,4 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
     }
-}
-
-.getSummaryVariedParameterSimulationMultiArm <- function(designPlan) {
-    if (!grepl("SimulationResultsMultiArm", .getClassName(designPlan))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designPlan' (",
-            .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'"
-        )
-    }
-
-    if (grepl("Means", .getClassName(designPlan))) {
-        return("muMaxVector")
-    } else if (grepl("Rates", .getClassName(designPlan))) {
-        return("piMaxVector")
-    } else if (grepl("Survival", .getClassName(designPlan))) {
-        return("omegaMaxVector")
-    }
-
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designPlan' (",
-        .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'"
-    )
 }

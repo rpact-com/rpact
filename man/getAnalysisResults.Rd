@@ -27,15 +27,16 @@ For more information see \code{\link[=getDataset]{getDataset()}}.}
 
 \item{...}{Further arguments to be passed to methods (cf., separate functions in "See Also" below), e.g.,
 \describe{
-\item{\code{thetaH1} and \code{assumedStDevs}, \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
+\item{\code{thetaH1} and \code{stDevH1} (or \code{assumedStDev} / \code{assumedStDevs}),
+\code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
 The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned}
 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio.
 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome,
 \code{pi1} and \code{pi2} can be specified referring to the assumed treatment and control rate, respectively.
 In multi-armed or enrichment designs, you can
 specify a value or a vector with elements referring to the treatment arms or the sub-populations,
-respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl} (multi-arm
-designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr
+respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl}
+(multi-arm designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr
 If not specified, the conditional power is calculated under the assumption of observed effect sizes,
 standard deviations, rates, or hazard ratios.}
 \item{\code{iterations}}{Iterations for simulating the power for Fisher's combination test.
@@ -97,7 +98,8 @@ For enrichment designs, it is the (combined) sample size for the considered sub-
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
 For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
-In this case, a change of allocating subjects to treatment groups over the stages can be assessed.}
+It can be a vector of length kMax, too, for multi-arm and enrichment designs.
+In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.}
 
 \item{stage}{The stage number (optional). Default: total number of existing stages in the data input.}
 
@@ -273,9 +275,18 @@ if (require(ggplot2)) plot(x, type = 2)
 
 }
 \seealso{
-\itemize{
-\item \code{\link[=getObservedInformationRates]{getObservedInformationRates()}}
-for recalculation the observed information rates.
-\item @family analysis functions
+\code{\link[=getObservedInformationRates]{getObservedInformationRates()}}
+
+Other analysis functions: 
+\code{\link{getClosedCombinationTestResults}()},
+\code{\link{getClosedConditionalDunnettTestResults}()},
+\code{\link{getConditionalPower}()},
+\code{\link{getConditionalRejectionProbabilities}()},
+\code{\link{getFinalConfidenceInterval}()},
+\code{\link{getFinalPValue}()},
+\code{\link{getRepeatedConfidenceIntervals}()},
+\code{\link{getRepeatedPValues}()},
+\code{\link{getStageResults}()},
+\code{\link{getTestActions}()}
 }
-}
+\concept{analysis functions}

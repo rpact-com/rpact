@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6631 $
-## |  Last changed: $Date: 2022-10-25 13:49:41 +0200 (Tue, 25 Oct 2022) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -27,7 +27,7 @@ NULL
 }
 
 .getDefaultDesign <- function(...,
-        type = c("sampleSize", "power", "simulation", "analysis"),
+        type = c("sampleSize", "power", "simulation", "analysis", "characteristics"),
         ignore = c()) {
     type <- match.arg(type)
 
@@ -1072,7 +1072,7 @@ getMedianByPi <- function(piValue,
         values[1:(design$kMax - 1)] <- 0
     } else if (design$typeOfDesign == "asUser") {
         for (k in 1:(design$kMax - 1)) {
-            if (!is.na(design$userAlphaSpending[k]) && 
+            if (!is.na(design$userAlphaSpending[k]) &&
                     abs(design$userAlphaSpending[k]) < 1e-16) {
                 values[k] <- 0
             }
@@ -1080,4 +1080,3 @@ getMedianByPi <- function(piValue,
     }
     return(values)
 }
-

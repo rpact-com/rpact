@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6802 $
-## |  Last changed: $Date: 2023-02-07 17:07:25 +0100 (Di, 07 Feb 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -23,21 +23,18 @@
 #'
 #' @title
 #' Conditional Power Results
-#' 
-#' @field nPlanned The new sample size planned for each of the subsequent stages.
-#' @field allocationRatioPlanned The planned allocation ratio \code{n1/n2} for a 
-#'        two treatment groups design, default is \code{1}. Is a numeric vector of length 1.
-#' @template field_iterations
-#' @template field_seed
-#' @field simulated Logical. Describes if the power for Fisher's combination test 
-#'        has been simulated. Only applicable when using Fisher designs.
-#' @field conditionalPower The conditional power at each stage of the trial. 
-#'        Is a numeric vector of length \code{kMax}.
-#' @field thetaH1 For survival designs, refers to the hazard ratio. Is a numeric vector of length 1.
-#' @field assumedStDev The assumed standard deviation. Is a numeric vector of length 1.
 #'
 #' @description
 #' Class for conditional power calculations
+#'
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_iterations
+#' @template field_seed
+#' @template field_simulated
+#' @template field_conditionalPower
+#' @template field_thetaH1
+#' @template field_assumedStDev
 #'
 #' @details
 #' This object cannot be created directly; use \code{\link[=getConditionalPower]{getConditionalPower()}}
@@ -125,6 +122,32 @@ ConditionalPowerResults <- setRefClass("ConditionalPowerResults",
     )
 )
 
+#'
+#' @name ConditionalPowerResultsMeans
+#'
+#' @title
+#' Conditional Power Results Means
+#'
+#' @description
+#' Class for conditional power calculations of means data
+#'
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_iterations
+#' @template field_seed
+#' @template field_simulated
+#' @template field_conditionalPower
+#' @template field_thetaH1
+#' @template field_assumedStDev
+#'
+#' @details
+#' This object cannot be created directly; use \code{\link{getConditionalPower}}
+#' with suitable arguments to create the results of a group sequential or a combination test design.
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
 ConditionalPowerResultsMeans <- setRefClass("ConditionalPowerResultsMeans",
     contains = "ConditionalPowerResults",
     fields = list(
@@ -231,6 +254,32 @@ ConditionalPowerResultsMultiArmMeans <- setRefClass("ConditionalPowerResultsMult
     )
 )
 
+#'
+#' @name ConditionalPowerResultsRates
+#'
+#' @title
+#' Conditional Power Results Rates
+#'
+#' @description
+#' Class for conditional power calculations of rates data
+#'
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_iterations
+#' @template field_seed
+#' @template field_simulated
+#' @template field_conditionalPower
+#' @template field_pi1
+#' @template field_pi2
+#'
+#' @details
+#' This object cannot be created directly; use \code{\link{getConditionalPower}}
+#' with suitable arguments to create the results of a group sequential or a combination test design.
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
 ConditionalPowerResultsRates <- setRefClass("ConditionalPowerResultsRates",
     contains = "ConditionalPowerResults",
     fields = list(
@@ -283,6 +332,31 @@ ConditionalPowerResultsMultiArmRates <- setRefClass("ConditionalPowerResultsMult
     )
 )
 
+#'
+#' @name ConditionalPowerResultsSurvival
+#'
+#' @title
+#' Conditional Power Results Survival
+#'
+#' @description
+#' Class for conditional power calculations of survival data
+#'
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_iterations
+#' @template field_seed
+#' @template field_simulated
+#' @template field_conditionalPower
+#' @template field_thetaH1_survival
+#'
+#' @details
+#' This object cannot be created directly; use \code{\link{getConditionalPower}}
+#' with suitable arguments to create the results of a group sequential or a combination test design.
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
 ConditionalPowerResultsSurvival <- setRefClass("ConditionalPowerResultsSurvival",
     contains = "ConditionalPowerResults",
     fields = list(
@@ -327,11 +401,62 @@ ConditionalPowerResultsMultiArmSurvival <- setRefClass("ConditionalPowerResultsM
     )
 )
 
+#'
+#' @name ConditionalPowerResultsEnrichmentMeans
+#'
+#' @title
+#' Conditional Power Results Enrichment Means
+#'
+#' @description
+#' Class for conditional power calculations of enrichment means data
+#'
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_iterations
+#' @template field_seed
+#' @template field_simulated
+#' @template field_conditionalPower
+#' @template field_thetaH1
+#' @template field_assumedStDevs
+#'
+#' @details
+#' This object cannot be created directly; use \code{\link{getConditionalPower}}
+#' with suitable arguments to create the results of a group sequential or a combination test design.
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
 ConditionalPowerResultsEnrichmentMeans <- setRefClass("ConditionalPowerResultsEnrichmentMeans",
     contains = "ConditionalPowerResultsMultiArmMeans"
 )
 
-
+#'
+#' @name ConditionalPowerResultsEnrichmentRates
+#'
+#' @title
+#' Conditional Power Results Enrichment Rates
+#'
+#' @description
+#' Class for conditional power calculations of enrichment rates data
+#'
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_iterations
+#' @template field_seed
+#' @template field_simulated
+#' @template field_conditionalPower
+#' @template field_piTreatments
+#' @template field_piControls
+#'
+#' @details
+#' This object cannot be created directly; use \code{\link{getConditionalPower}}
+#' with suitable arguments to create the results of a group sequential or a combination test design.
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
 ConditionalPowerResultsEnrichmentRates <- setRefClass("ConditionalPowerResultsEnrichmentRates",
     contains = "ConditionalPowerResultsMultiHypotheses",
     fields = list(
@@ -369,8 +494,18 @@ ConditionalPowerResultsEnrichmentSurvival <- setRefClass("ConditionalPowerResult
 #' @description
 #' Class for multi-arm analysis results based on a closed combination test.
 #'
+#' @template field_intersectionTest
+#' @template field_indices
+#' @template field_adjustedStageWisePValues
+#' @template field_overallAdjustedTestStatistics
+#' @template field_separatePValues
+#' @template field_conditionalErrorRate
+#' @template field_secondStagePValues
+#' @template field_rejected
+#' @template field_rejectedIntersections
+#'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
 #' with suitable arguments to create the multi-arm analysis results of a closed combination test design.
 #'
 #' @keywords internal
@@ -538,8 +673,13 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
 #' \code{AnalysisResults} is the basic class for
 #' \itemize{
 #'   \item \code{\link{AnalysisResultsFisher}},
-#'   \item \code{\link{AnalysisResultsGroupSequential}}, and
-#'   \item \code{\link{AnalysisResultsInverseNormal}}.
+#'   \item \code{\link{AnalysisResultsGroupSequential}},
+#'   \item \code{\link{AnalysisResultsInverseNormal}},
+#'   \item \code{\link{AnalysisResultsMultiArmFisher}},
+#'   \item \code{\link{AnalysisResultsMultiArmInverseNormal}},
+#'   \item \code{\link{AnalysisResultsConditionalDunnett}},
+#'   \item \code{\link{AnalysisResultsEnrichmentFisher}},
+#'   \item \code{\link{AnalysisResultsEnrichmentInverseNormal}}.
 #' }
 #'
 #' @include class_core_parameter_set.R
@@ -697,12 +837,13 @@ AnalysisResults <- setRefClass("AnalysisResults",
                     c("assumedStDevs", "thetaH1", "pi1", "pi2", "piTreatments", "piTreatments", "piControl", "piControls"))]
 
                 if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(.self))) {
-                    
                     if (all(c("conditionalPowerSimulated", "conditionalRejectionProbabilities") %in% generatedParams)) {
-                        generatedParams <- .moveValue(generatedParams, 
-                            "conditionalPowerSimulated", "conditionalRejectionProbabilities")
+                        generatedParams <- .moveValue(
+                            generatedParams,
+                            "conditionalPowerSimulated", "conditionalRejectionProbabilities"
+                        )
                     }
-                    
+
                     .showParametersOfOneGroup(generatedParams, "Further analysis results",
                         orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                     )
@@ -716,11 +857,12 @@ AnalysisResults <- setRefClass("AnalysisResults",
 
                 if (grepl("(MultiArm|Dunnett)", .getClassName(.self))) {
                     .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(paste0(
-                        "  (i): results of treatment arm i vs. control group ",
-                        .dataInput$getNumberOfGroups(), "\n"
-                    ),
-                    consoleOutputEnabled = consoleOutputEnabled
+                    .cat(
+                        paste0(
+                            "  (i): results of treatment arm i vs. control group ",
+                            .dataInput$getNumberOfGroups(), "\n"
+                        ),
+                        consoleOutputEnabled = consoleOutputEnabled
                     )
                 } else if (.isEnrichmentAnalysisResults(.self)) {
                     .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
@@ -1003,9 +1145,8 @@ summary.AnalysisResults <- function(object, ..., type = 1, digits = NA_integer_)
 #'
 #' @keywords internal
 #'
-as.data.frame.AnalysisResults <- function(x, row.names = NULL, optional = FALSE, ..., 
+as.data.frame.AnalysisResults <- function(x, row.names = NULL, optional = FALSE, ...,
         niceColumnNamesEnabled = FALSE) {
-        
     parametersToShow <- .getDesignParametersToShow(x)
     if (inherits(x, "AnalysisResultsMultiArm")) {
         parametersToShow <- c(parametersToShow, ".closedTestResults$rejected")
@@ -1019,7 +1160,7 @@ as.data.frame.AnalysisResults <- function(x, row.names = NULL, optional = FALSE,
         "finalStage", "allocationRatioPlanned", "thetaH0", "thetaH1", "pi1", "pi2"
     ))]
     return(.getAsDataFrame(
-        parameterSet = x, 
+        parameterSet = x,
         parameterNames = parametersToShow,
         tableColumnNames = .getTableColumnNames(design = x$.design),
         niceColumnNamesEnabled = niceColumnNamesEnabled
@@ -1062,8 +1203,32 @@ names.AnalysisResults <- function(x) {
 #' @description
 #' Class for analysis results results based on a group sequential design.
 #'
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#' @template field_thetaH0
+#' @template field_pi1
+#' @template field_pi2
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_thetaH1
+#' @template field_assumedStDev
+#' @template field_equalVariances
+#' @template field_testActions
+#' @template field_conditionalRejectionProbabilities
+#' @template field_conditionalPower
+#' @template field_repeatedConfidenceIntervalLowerBounds
+#' @template field_repeatedConfidenceIntervalUpperBounds
+#' @template field_repeatedPValues
+#' @template field_finalStage
+#' @template field_finalPValues
+#' @template field_finalConfidenceIntervalLowerBounds
+#' @template field_finalConfidenceIntervalUpperBounds
+#' @template field_medianUnbiasedEstimates
+#' @template field_maxInformation
+#' @template field_informationEpsilon
+#'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
 #' with suitable arguments to create the analysis results of a group sequential design.
 #'
 #' @include class_core_parameter_set.R
@@ -1100,8 +1265,30 @@ AnalysisResultsGroupSequential <- setRefClass("AnalysisResultsGroupSequential",
 #' @description
 #' Class for analysis results results based on an inverse normal design.
 #'
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#' @template field_thetaH0
+#' @template field_pi1
+#' @template field_pi2
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_thetaH1
+#' @template field_assumedStDev
+#' @template field_equalVariances
+#' @template field_testActions
+#' @template field_conditionalRejectionProbabilities
+#' @template field_conditionalPower
+#' @template field_repeatedConfidenceIntervalLowerBounds
+#' @template field_repeatedConfidenceIntervalUpperBounds
+#' @template field_repeatedPValues
+#' @template field_finalStage
+#' @template field_finalPValues
+#' @template field_finalConfidenceIntervalLowerBounds
+#' @template field_finalConfidenceIntervalUpperBounds
+#' @template field_medianUnbiasedEstimates
+#'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
 #' with suitable arguments to create the analysis results of a inverse normal design.
 #'
 #' @include class_core_parameter_set.R
@@ -1127,8 +1314,27 @@ AnalysisResultsInverseNormal <- setRefClass("AnalysisResultsInverseNormal",
 #' @description
 #' Class for multi-arm analysis results based on a inverse normal design.
 #'
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#' @template field_thetaH0
+#' @template field_pi1
+#' @template field_pi2
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_thetaH1
+#' @template field_assumedStDevs
+#' @template field_piTreatments
+#' @template field_intersectionTest
+#' @template field_varianceOption
+#' @template field_conditionalRejectionProbabilities
+#' @template field_conditionalPower
+#' @template field_repeatedConfidenceIntervalLowerBounds
+#' @template field_repeatedConfidenceIntervalUpperBounds
+#' @template field_repeatedPValues
+#' @template field_piControl
+#'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
 #' with suitable arguments to create the multi-arm analysis results of an inverse normal design.
 #'
 #' @include class_core_parameter_set.R
@@ -1154,8 +1360,28 @@ AnalysisResultsMultiArmInverseNormal <- setRefClass("AnalysisResultsMultiArmInve
 #' @description
 #' Class for enrichment analysis results based on a inverse normal design.
 #'
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#' @template field_thetaH0
+#' @template field_pi1
+#' @template field_pi2
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_thetaH1
+#' @template field_assumedStDevs
+#' @template field_piTreatments
+#' @template field_intersectionTest
+#' @template field_varianceOption
+#' @template field_conditionalRejectionProbabilities
+#' @template field_conditionalPower
+#' @template field_repeatedConfidenceIntervalLowerBounds
+#' @template field_repeatedConfidenceIntervalUpperBounds
+#' @template field_repeatedPValues
+#' @template field_piControls
+#' @template field_stratifiedAnalysis
+#'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
 #' with suitable arguments to create the enrichment analysis results of an inverse normal design.
 #'
 #' @include class_core_parameter_set.R
@@ -1184,8 +1410,33 @@ AnalysisResultsEnrichmentInverseNormal <- setRefClass("AnalysisResultsEnrichment
 #' @description
 #' Class for analysis results based on a Fisher combination test design.
 #'
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#' @template field_thetaH0
+#' @template field_pi1
+#' @template field_pi2
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_thetaH1
+#' @template field_assumedStDev
+#' @template field_equalVariances
+#' @template field_testActions
+#' @template field_conditionalRejectionProbabilities
+#' @template field_conditionalPower
+#' @template field_repeatedConfidenceIntervalLowerBounds
+#' @template field_repeatedConfidenceIntervalUpperBounds
+#' @template field_repeatedPValues
+#' @template field_finalStage
+#' @template field_finalPValues
+#' @template field_finalConfidenceIntervalLowerBounds
+#' @template field_finalConfidenceIntervalUpperBounds
+#' @template field_medianUnbiasedEstimates
+#' @template field_conditionalPowerSimulated
+#' @template field_iterations
+#' @template field_seed
+#'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
 #' with suitable arguments to create the analysis results of a Fisher combination test design.
 #'
 #' @include class_core_parameter_set.R
@@ -1214,16 +1465,36 @@ AnalysisResultsFisher <- setRefClass("AnalysisResultsFisher",
 )
 
 #'
-#' @name AnalysisResultsMultiArmFisher
-#'
 #' @title
 #' Analysis Results Multi-Arm Fisher
 #'
 #' @description
 #' Class for multi-arm analysis results based on a Fisher combination test design.
 #'
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#' @template field_thetaH0
+#' @template field_pi1
+#' @template field_pi2
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_thetaH1
+#' @template field_assumedStDevs
+#' @template field_piTreatments
+#' @template field_intersectionTest
+#' @template field_varianceOption
+#' @template field_conditionalRejectionProbabilities
+#' @template field_conditionalPower
+#' @template field_repeatedConfidenceIntervalLowerBounds
+#' @template field_repeatedConfidenceIntervalUpperBounds
+#' @template field_repeatedPValues
+#' @template field_piControl
+#' @template field_conditionalPowerSimulated
+#' @template field_iterations
+#' @template field_seed
+#'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
 #' with suitable arguments to create the multi-arm analysis results of a Fisher combination test design.
 #'
 #' @include class_core_parameter_set.R
@@ -1246,16 +1517,38 @@ AnalysisResultsMultiArmFisher <- setRefClass("AnalysisResultsMultiArmFisher",
 )
 
 #'
-#' @name AnalysisResultsMultiArmFisher
+#' @name AnalysisResultsEnrichmentFisher
 #'
 #' @title
-#' Analysis Results Multi-Arm Fisher
+#' Analysis Results Enrichment Fisher
 #'
 #' @description
-#' Class for multi-arm analysis results based on a Fisher combination test design.
+#' Class for enrichment analysis results based on a Fisher combination test design.
+#'
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#' @template field_thetaH0
+#' @template field_pi1
+#' @template field_pi2
+#' @template field_nPlanned
+#' @template field_thetaH1
+#' @template field_assumedStDevs
+#' @template field_piTreatments
+#' @template field_intersectionTest
+#' @template field_varianceOption
+#' @template field_conditionalRejectionProbabilities
+#' @template field_repeatedConfidenceIntervalLowerBounds
+#' @template field_repeatedConfidenceIntervalUpperBounds
+#' @template field_repeatedPValues
+#' @template field_piControls
+#' @template field_conditionalPowerSimulated
+#' @template field_iterations
+#' @template field_seed
+#' @template field_stratifiedAnalysis
+#'
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
 #' with suitable arguments to create the multi-arm analysis results of a Fisher combination test design.
 #'
 #' @include class_core_parameter_set.R
@@ -1287,8 +1580,27 @@ AnalysisResultsEnrichmentFisher <- setRefClass("AnalysisResultsEnrichmentFisher"
 #' @description
 #' Class for multi-arm analysis results based on a conditional Dunnett test design.
 #'
+#' @template field_normalApproximation
+#' @template field_directionUpper
+#' @template field_thetaH0
+#' @template field_pi1
+#' @template field_pi2
+#' @template field_nPlanned
+#' @template field_allocationRatioPlanned
+#' @template field_thetaH1
+#' @template field_assumedStDevs
+#' @template field_piTreatments
+#' @template field_intersectionTest
+#' @template field_varianceOption
+#' @template field_conditionalRejectionProbabilities
+#' @template field_conditionalPower
+#' @template field_repeatedConfidenceIntervalLowerBounds
+#' @template field_repeatedConfidenceIntervalUpperBounds
+#' @template field_repeatedPValues
+#' @template field_piControl
+#'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getAnalysisResults]{getAnalysisResults()}}
+#' This object cannot be created directly; use \code{\link{getAnalysisResults}}
 #' with suitable arguments to create the multi-arm analysis results of a conditional Dunnett test design.
 #'
 #' @keywords internal
@@ -1619,10 +1931,10 @@ plot.AnalysisResults <- function(x, y, ..., type = 1L,
             if (is.null(assumedStDevs)) {
                 assumedStDevs <- as.numeric(x$assumedStDevs)
             }
-            
+
             gMax <- x$.stageResults$getGMax()
             .assertIsValidAssumedStDevs(assumedStDevs, gMax)
-            
+
             functionCall$assumedStDevs <- assumedStDevs
         } else {
             assumedStDev <- eval.parent(functionCall$assumedStDev)

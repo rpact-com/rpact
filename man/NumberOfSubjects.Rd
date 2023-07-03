@@ -10,5 +10,19 @@ Class for the definition of number of subjects results.
 \details{
 \code{NumberOfSubjects} is a class for the definition of number of subjects results.
 }
+\section{Fields}{
+
+\describe{
+\item{\code{time}}{The time values. Is a numeric vector.}
+
+\item{\code{accrualTime}}{The assumed accrual time intervals for the study. Is a numeric vector.}
+
+\item{\code{accrualIntensity}}{The absolute accrual intensities. Is a numeric vector of length \code{kMax}.}
+
+\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations. Is a numeric vector.}
+
+\item{\code{numberOfSubjects}}{In simulation results data set: The number of subjects under consideration when the interim analysis takes place.}
+}}
+
 
 \keyword{internal}

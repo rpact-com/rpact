@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6802 $
- * Last changed: $Date: 2023-02-07 17:07:25 +0100 (Di, 07 Feb 2023) $
+ * File version: $Revision: 6902 $
+ * Last changed: $Date: 2023-03-29 10:01:19 +0200 (Mi, 29 Mrz 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -31,6 +31,21 @@ const double C_QNORM_MAXIMUM = -R::qnorm(C_QNORM_EPSILON, 0, 1, 1, 0);
 const double C_QNORM_MINIMUM = -C_QNORM_MAXIMUM;
 const double C_QNORM_THRESHOLD = floor(C_QNORM_MAXIMUM);
 const double C_FUNCTION_ROOT_TOLERANCE_FACTOR = 100.0;
+
+struct Exception : std::exception {
+    char text[1000];
+
+    Exception(char const* fmt, ...) __attribute__((format(printf,2,3))) {
+        va_list ap;
+        va_start(ap, fmt);
+        vsnprintf(text, sizeof text, fmt, ap);
+        va_end(ap);
+    }
+
+    char const* what() const throw() {
+    	return text;
+    }
+};
 
 double getQNormEpsilon() {
 	return C_QNORM_EPSILON;
@@ -233,6 +248,11 @@ NumericVector vectorMultiply(NumericVector x, double multiplier) {
 }
 
 NumericVector vectorMultiply(NumericVector x, NumericVector y) {
+	if (x.size() != y.size()) {
+		throw Exception("Failed to multiply vectors: size is different (%i != %i)",
+			(int) x.size(), (int) y.size());
+	}
+
     int n = x.size();
     NumericVector result = NumericVector(n, NA_REAL);
     for (int i = 0; i < n; i++) {

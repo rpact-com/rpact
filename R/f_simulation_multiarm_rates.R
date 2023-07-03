@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -54,15 +54,15 @@ NULL
             } else {
                 piAssumedH1 <- piTreatmentsH1
             }
-            pim <- (allocationRatioPlanned * piAssumedH1 + piAssumedControlH1) / (1 + allocationRatioPlanned)
+            pim <- (allocationRatioPlanned[stage] * piAssumedH1 + piAssumedControlH1) / (1 + allocationRatioPlanned[stage])
 
             if (conditionalCriticalValue[stage] > 8) {
                 newSubjects <- maxNumberOfSubjectsPerStage[stage + 1]
             } else {
                 newSubjects <- (max(0, conditionalCriticalValue[stage] *
-                    sqrt(pim * (1 - pim) * (1 + allocationRatioPlanned)) +
+                    sqrt(pim * (1 - pim) * (1 + allocationRatioPlanned[stage])) +
                     .getQNorm(conditionalPower) * sqrt(piAssumedH1 * (1 - piAssumedH1) +
-                        piAssumedControlH1 * (1 - piAssumedControlH1) * allocationRatioPlanned)))^2 /
+                        piAssumedControlH1 * (1 - piAssumedControlH1) * allocationRatioPlanned[stage])))^2 /
                     (max(1e-7, (2 * directionUpper - 1) * (piAssumedH1 - piAssumedControlH1)))^2
                 newSubjects <- min(
                     max(minNumberOfSubjectsPerStage[stage + 1], newSubjects),
@@ -107,9 +107,9 @@ NULL
 
     for (k in (1:kMax)) {
         if (k == 1) {
-            subjectsPerStage[gMax + 1, k] <- trunc(plannedSubjects[k] / allocationRatioPlanned)
+            subjectsPerStage[gMax + 1, k] <- trunc(plannedSubjects[k] / allocationRatioPlanned[k])
         } else {
-            subjectsPerStage[gMax + 1, k] <- trunc((plannedSubjects[k] - plannedSubjects[k - 1]) / allocationRatioPlanned)
+            subjectsPerStage[gMax + 1, k] <- trunc((plannedSubjects[k] - plannedSubjects[k - 1]) / allocationRatioPlanned[k])
         }
         simRates[gMax + 1, k] <- stats::rbinom(1, subjectsPerStage[gMax + 1, k], piControl) / subjectsPerStage[gMax + 1, k]
 
@@ -147,8 +147,8 @@ NULL
                 overallEffectSizes[treatmentArm, k] <- (2 * directionUpper - 1) *
                     (overallRates[treatmentArm, k] - overallRatesControl[k])
 
-                rmOverall <- (allocationRatioPlanned * overallRates[treatmentArm, k] +
-                    overallRatesControl[k]) / (allocationRatioPlanned + 1)
+                rmOverall <- (allocationRatioPlanned[k] * overallRates[treatmentArm, k] +
+                    overallRatesControl[k]) / (allocationRatioPlanned[k] + 1)
 
                 if (overallEffectSizes[treatmentArm, k] == 0) {
                     overallTestStatistics[treatmentArm, k] <- 0
@@ -227,8 +227,8 @@ NULL
                 }
 
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
-                    plannedSubjects[(k + 1):kMax] <- ceiling(sum(subjectsPerStage[gMax + 1, 1:k]) *
-                        allocationRatioPlanned + cumsum(rep(newSubjects, kMax - k)))
+                    plannedSubjects[(k + 1):kMax] <- ceiling(sum(subjectsPerStage[gMax + 1, 1:k] *
+                        allocationRatioPlanned[1:k]) + cumsum(rep(newSubjects, kMax - k)))
                 }
             } else {
                 selectedArms[, k + 1] <- selectedArms[, k]
@@ -250,27 +250,27 @@ NULL
                 piAssumedH1 <- piTreatmentsH1
             }
 
-            pim <- (allocationRatioPlanned * piAssumedH1 + piAssumedControlH1) / (1 + allocationRatioPlanned)
+            pim <- (allocationRatioPlanned[k] * piAssumedH1 + piAssumedControlH1) / (1 + allocationRatioPlanned[k])
 
             if (piAssumedH1 * (1 - piAssumedH1) + piAssumedControlH1 * (1 - piAssumedControlH1) == 0) {
                 thetaStandardized <- 0
             } else {
-                thetaStandardized <- sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned) * (
-                    (piAssumedH1 - piAssumedControlH1) * sqrt(1 + allocationRatioPlanned) /
-                        sqrt(piAssumedH1 * (1 - piAssumedH1) + allocationRatioPlanned *
+                thetaStandardized <- sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k]) *
+                    ((piAssumedH1 - piAssumedControlH1) * sqrt(1 + allocationRatioPlanned[k]) /
+                        sqrt(piAssumedH1 * (1 - piAssumedH1) + allocationRatioPlanned[k] *
                             piAssumedControlH1 * (1 - piAssumedControlH1)) +
                         sign(piAssumedH1 - piAssumedControlH1) * conditionalCriticalValue[k] *
-                            (1 - sqrt(pim * (1 - pim) + allocationRatioPlanned * pim * (1 - pim)) /
-                                sqrt(piAssumedH1 * (1 - piAssumedH1) + allocationRatioPlanned *
+                            (1 - sqrt(pim * (1 - pim) + allocationRatioPlanned[k] * pim * (1 - pim)) /
+                                sqrt(piAssumedH1 * (1 - piAssumedH1) + allocationRatioPlanned[k] *
                                     piAssumedControlH1 * (1 - piAssumedControlH1))) *
-                            sqrt((1 + allocationRatioPlanned) / (plannedSubjects[k + 1] - plannedSubjects[k]))
-                )
+                            sqrt((1 + allocationRatioPlanned[k]) / (plannedSubjects[k + 1] - plannedSubjects[k]))
+                    )
             }
 
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
 
             conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
-                thetaStandardized * sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
+                thetaStandardized * sqrt((1 + allocationRatioPlanned[k]) / allocationRatioPlanned[k]) *
                     sqrt(plannedSubjects[k + 1] - plannedSubjects[k]))
         }
     }
@@ -394,7 +394,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
         conditionalPower = NA_real_,
-        piTreatmentsH1 = NA_real_, 
+        piTreatmentsH1 = NA_real_,
         piControlH1 = NA_real_,
         maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
@@ -474,6 +474,10 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
+
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+    }
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 

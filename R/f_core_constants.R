@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -539,7 +539,7 @@ C_PARAMETER_NAMES <- list(
     expectedNumberOfSubjectsH01 = "Expected number of subjects under H0/H1",
     expectedNumberOfSubjectsH1 = "Expected number of subjects under H1",
     expectedNumberOfSubjects = "Expected number of subjects",
-    omega = "Probability of an event",
+    chi = "Probability of an event",
     hazardRatio = "Hazard ratio",
     hazardRatios = "Hazard ratios",
     typeOfComputation = "Type of computation",
@@ -687,7 +687,14 @@ C_PARAMETER_NAMES <- list(
     situation = "Situation",
     delayedInformation = "Delayed information",
     decisionCriticalValues = "Decision critical values",
-    reversalProbabilities = "Reversal probabilities"
+    reversalProbabilities = "Reversal probabilities",
+    locationSampleSize = "Location sample sizes",
+    variationSampleSize = "Variation sample sizes",
+    subscoreSampleSize = "Sub-score sample sizes",
+    locationConditionalPower = "Location conditional power",
+    variationConditionalPower = "Variation conditional power",
+    subscoreConditionalPower = "Sub-score conditional power",
+    performanceScore = "Performance scores"
 )
 
 C_TABLE_COLUMN_NAMES <- list(
@@ -839,7 +846,7 @@ C_TABLE_COLUMN_NAMES <- list(
     expectedNumberOfSubjectsH01 = "Expected # subjects under H0/H1",
     expectedNumberOfSubjectsH1 = "Expected # subjects under H1",
     expectedNumberOfSubjects = "Expected # subjects",
-    omega = "Probability of an event",
+    chi = "Probability of an event",
     hazardRatio = "Hazard ratio",
     hazardRatios = "Hazard ratios",
     typeOfComputation = "Type of computation",
@@ -979,7 +986,14 @@ C_TABLE_COLUMN_NAMES <- list(
     situation = "Situation",
     delayedInformation = "Delayed information",
     decisionCriticalValues = "Decision critical value",
-    reversalProbabilities = "Reversal probability"
+    reversalProbabilities = "Reversal probability",
+    locationSampleSize = "Location sample size",
+    variationSampleSize = "Variation sample size",
+    subscoreSampleSize = "Sub-score sample size",
+    locationConditionalPower = "Location conditional power",
+    variationConditionalPower = "Variation conditional power",
+    subscoreConditionalPower = "Sub-score conditional power",
+    performanceScore = "Performance score"
 )
 
 .getParameterCaptions <- function(captionList, ...,
@@ -1191,7 +1205,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     expectedNumberOfSubjectsH01 = ".formatSampleSizes",
     expectedNumberOfSubjectsH1 = ".formatSampleSizes",
     expectedNumberOfSubjects = ".formatSampleSizes",
-    omega = ".formatRates",
+    chi = ".formatRates",
     hazardRatio = ".formatRates",
     hazardRatios = ".formatRates",
     pi1 = ".formatRates",
@@ -1293,5 +1307,12 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     informationEpsilon = ".formatProbabilities",
     delayedInformation = ".formatRates",
     decisionCriticalValues = ".formatCriticalValues",
-    reversalProbabilities = ".formatProbabilities"
+    reversalProbabilities = ".formatProbabilities",
+    locationSampleSize = ".formatProbabilities",
+    variationSampleSize = ".formatProbabilities",
+    subscoreSampleSize = ".formatProbabilities",
+    locationConditionalPower = ".formatProbabilities",
+    variationConditionalPower = ".formatProbabilities",
+    subscoreConditionalPower = ".formatProbabilities",
+    performanceScore = ".formatProbabilities"
 )

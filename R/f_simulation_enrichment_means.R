@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6414 $
-## |  Last changed: $Date: 2022-07-15 09:17:18 +0200 (Fr, 15 Jul 2022) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -48,7 +48,7 @@ NULL
             if (conditionalCriticalValue[stage] > 8) {
                 newSubjects <- maxNumberOfSubjectsPerStage[stage + 1]
             } else {
-                newSubjects <- (1 + allocationRatioPlanned)^2 / allocationRatioPlanned *
+                newSubjects <- (1 + allocationRatioPlanned[stage])^2 / allocationRatioPlanned[stage] *
                     (max(0, conditionalCriticalValue[stage] +
                         .getQNorm(conditionalPower)))^2 / thetaStandardized^2
                 newSubjects <- min(
@@ -115,9 +115,10 @@ NULL
         weights <- .getWeightsInverseNormal(design)
     }
 
-    const <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2
 
     for (k in 1:kMax) {
+        const <- allocationRatioPlanned[k] / (1 + allocationRatioPlanned[k])^2
+
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
 
         if (k == 1) {
@@ -321,7 +322,7 @@ NULL
 
             conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
                 thetaStandardized * sqrt(plannedSubjects[k + 1] - plannedSubjects[k]) *
-                    sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned))
+                    sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k]))
         }
     }
 
@@ -480,6 +481,7 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
     successCriterion <- simulationResults$successCriterion
     effectMeasure <- simulationResults$effectMeasure
     adaptations <- simulationResults$adaptations
+    gMax <- simulationResults$populations
     kMax <- simulationResults$.design$kMax
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection
@@ -491,7 +493,10 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
-    gMax <- simulationResults$populations
+
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
+    }
 
     indices <- .getIndicesOfClosedHypothesesSystemForSimulation(gMax = gMax)
 
@@ -640,10 +645,11 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
                 if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
                     # rejected hypotheses remain rejected also in case of early stopping
                     simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
-                        matrix((closedTest$rejected[, k] &
-                            closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore),
-                        kMax - k, gMax,
-                        byrow = TRUE
+                        matrix(
+                            (closedTest$rejected[, k] &
+                                closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore),
+                            kMax - k, gMax,
+                            byrow = TRUE
                         )
                     break
                 }

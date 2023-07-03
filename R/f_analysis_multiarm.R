@@ -13,21 +13,23 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6585 $
-## |  Last changed: $Date: 2022-09-23 14:23:08 +0200 (Fr, 23 Sep 2022) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
 NULL
 
-#
-#  @title
-#  Get Multi-Armed Analysis Results
-#
-#  @description
-#  Calculates and returns the analysis results for the specified design and data.
-#
+#'
+#' @title
+#' Get Multi-Armed Analysis Results
+#'
+#' @description
+#' Calculates and returns the analysis results for the specified design and data.
+#'
+#' @noRd
+#'
 .getAnalysisResultsMultiArm <- function(design, dataInput, ...,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -85,10 +87,12 @@ NULL
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
 }
 
-#
-# Get Stage Results
-# Returns summary statistics and p-values for a given data set and a given multi-arm design.
-#
+#'
+#' Get Stage Results
+#' Returns summary statistics and p-values for a given data set and a given multi-arm design.
+#'
+#' @noRd
+#'
 .getStageResultsMultiArm <- function(design, dataInput, ...) {
     .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -110,9 +114,12 @@ NULL
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not supported")
 }
 
-# Get Repeated Confidence Intervals for multi-arm case
-# Calculates and returns the lower and upper limit of the repeated confidence intervals of the trial for multi-arm designs.
-#
+#'
+#' Get Repeated Confidence Intervals for multi-arm case
+#' Calculates and returns the lower and upper limit of the repeated confidence intervals of the trial for multi-arm designs.
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsMultiArm <- function(design, dataInput, ...) {
     .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -140,10 +147,14 @@ NULL
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
 }
 
-#
-# Get Conditional Power for multi-arm case
-# Calculates and returns the conditional power for multi-arm case.
-#
+#'
+#' Get Conditional Power for multi-arm case
+#' Calculates and returns the conditional power for multi-arm case.
+#' 
+#' @keywords internal
+#' 
+#' @noRd 
+#'
 .getConditionalPowerMultiArm <- function(..., stageResults, nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
     .assertIsStageResults(stageResults)
@@ -198,19 +209,42 @@ NULL
     return(as.matrix(indices))
 }
 
-.getMultivariateDistribution <- function(..., type = c("normal", "t", "quantile"), upper, sigma,
+.getMultivariateDistribution <- function(...,
+        type = c("normal", "t", "quantile"),
+        upper,
+        sigma,
         df = NA_real_, alpha = NA_real_) {
     .assertMnormtIsInstalled()
-
     type <- match.arg(type)
+
+    dimensionSigma <- length(base::diag(sigma))
     if (type == "normal") {
+        if (dimensionSigma == 1) {
+            return(stats::pnorm(upper))
+        }
+
         return(mnormt::sadmvn(lower = -Inf, upper = upper, mean = 0, varcov = sigma))
-    } else if (type == "t") {
+    }
+
+    if (type == "t") {
+        if (dimensionSigma == 1) {
+            return(stats::pt(upper, df))
+        }
+        if (df > 500) {
+            return(mnormt::sadmvn(lower = -Inf, upper = upper, mean = 0, varcov = sigma))
+        }
+
         return(mnormt::sadmvt(lower = -Inf, upper = upper, mean = 0, S = sigma, df = df))
-    } else if (type == "quantile") {
+    }
+
+    if (type == "quantile") {
+        if (dimensionSigma == 1) {
+            return(.getOneMinusQNorm(alpha))
+        }
+
         return(.getOneDimensionalRoot(
             function(x) {
-                return(mnormt::pmnorm(x, varcov = sigma) - (1 - alpha))
+                return(mnormt::sadmvn(lower = -Inf, upper = x, mean = 0, varcov = sigma) - (1 - alpha))
             },
             lower = -8,
             upper = 8,
@@ -230,6 +264,7 @@ NULL
 
     adjustedStageWisePValues <- matrix(NA_real_, nrow = 2^gMax - 1, ncol = kMax)
     adjustedOverallPValues <- matrix(NA_real_, nrow = 2^gMax - 1, ncol = kMax)
+
     overallAdjustedTestStatistics <- matrix(NA_real_, nrow = 2^gMax - 1, ncol = kMax)
     rejected <- matrix(NA, nrow = gMax, ncol = kMax)
 
@@ -445,9 +480,11 @@ getClosedCombinationTestResults <- function(stageResults) {
     ))
 }
 
-#
-# Repeated p-values for multi-arm designs
-#
+#'
+#' Repeated p-values for multi-arm designs
+#'
+#' @noRd
+#'
 .getRepeatedPValuesMultiArm <- function(stageResults, ..., tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(functionName = "getRepeatedPValuesMultiArm", ...)
 
@@ -875,12 +912,12 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
     if (stageResults$directionUpper) {
         signedTestStatistics <- stageResults$testStatistics
         signedOverallTestStatistics <- stageResults$overallTestStatistics
-        signedOverallTestStatistics[, 2] <- sqrt(informationAtInterim) * 
+        signedOverallTestStatistics[, 2] <- sqrt(informationAtInterim) *
             stageResults$testStatistics[, 1] + sqrt(1 - informationAtInterim) * stageResults$testStatistics[, 2]
     } else {
         signedTestStatistics <- -stageResults$testStatistics
         signedOverallTestStatistics <- -stageResults$overallTestStatistics
-        signedOverallTestStatistics[, 2] <- -(sqrt(informationAtInterim) * 
+        signedOverallTestStatistics[, 2] <- -(sqrt(informationAtInterim) *
             stageResults$testStatistics[, 1] + sqrt(1 - informationAtInterim) * stageResults$testStatistics[, 2])
     }
 
@@ -937,9 +974,11 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
     return(secondStagePValues <= conditionalErrorRate)
 }
 
-#
-#  Calculation of conditional rejection probability (CRP)
-#
+#'
+#' Calculation of conditional rejection probability (CRP)
+#'
+#' @noRd
+#'
 .getConditionalRejectionProbabilitiesMultiArm <- function(stageResults, ...,
         stage = stageResults$stage, iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
     .assertIsValidStage(stage, stageResults$.design$kMax)
@@ -965,9 +1004,11 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
     )
 }
 
-#
-# Calculation of CRP based on inverse normal method
-#
+#'
+#' Calculation of CRP based on inverse normal method
+#'
+#' @noRd
+#'
 .getConditionalRejectionProbabilitiesMultiArmInverseNormal <- function(..., stageResults, stage) {
     design <- stageResults$.design
     .assertIsTrialDesignInverseNormal(design)
@@ -1031,9 +1072,11 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
     return(conditionalRejectionProbabilities)
 }
 
-#
-# Calculation of conditional rejection probability based on Fisher's combination test
-#
+#'
+#' Calculation of conditional rejection probability based on Fisher's combination test
+#'
+#' @noRd
+#'
 .getConditionalRejectionProbabilitiesMultiArmFisher <- function(..., stageResults, stage) {
     design <- stageResults$.design
     .assertIsTrialDesignFisher(design)
@@ -1103,9 +1146,11 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
     return(conditionalRejectionProbabilities)
 }
 
-#
-# Calculation of CRP based on conditional Dunnett
-#
+#'
+#' Calculation of CRP based on conditional Dunnett
+#'
+#' @noRd
+#'
 .getConditionalRejectionProbabilitiesMultiArmConditionalDunnett <- function(..., stageResults) {
     design <- stageResults$.design
     .assertIsTrialDesignConditionalDunnett(design)
@@ -1132,9 +1177,11 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
     return(conditionalRejectionProbabilities)
 }
 
-#
-#   Plotting conditional power and likelihood
-#
+#'
+#' Plotting conditional power and likelihood
+#'
+#' @noRd
+#'
 .getConditionalPowerPlotMultiArm <- function(stageResults, ...,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaRange = NA_real_, assumedStDevs = NA_real_,

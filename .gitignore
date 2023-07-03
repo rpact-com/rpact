@@ -1,5 +1,6 @@
 Meta
 doc
+/man-raw
 .Rproj.user
 .Rhistory
 .RData
@@ -20,3 +21,5 @@ lastMiKTeXException
 /data-raw
 /.cproject
 /.project
+docs
+rpact-tests

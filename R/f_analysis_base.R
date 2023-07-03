@@ -13,13 +13,14 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6806 $
-## |  Last changed: $Date: 2023-02-08 09:52:08 +0100 (Mi, 08 Feb 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7139 $
+## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
 #' @include f_logger.R
+#' @include f_object_r_code.R
 NULL
 
 .getDesignAndDataInput <- function(..., design, dataInput) {
@@ -70,16 +71,17 @@ NULL
 #' @inheritParams param_informationEpsilon
 #' @param ... Further arguments to be passed to methods (cf., separate functions in "See Also" below), e.g.,
 #' \describe{
-#'   \item{\code{thetaH1} and \code{assumedStDevs}, \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
-#'       The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned} 
-#' 		 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio. 
-#' 		 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome, 
-#' 		 \code{pi1} and \code{pi2} can be specified referring to the assumed treatment and control rate, respectively. 
-#' 		 In multi-armed or enrichment designs, you can 
-#'   	 specify a value or a vector with elements referring to the treatment arms or the sub-populations, 
-#'   	 respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl} (multi-arm 
-#'   	 designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr 
-#'   	 If not specified, the conditional power is calculated under the assumption of observed effect sizes, 
+#'   	\item{\code{thetaH1} and \code{stDevH1} (or \code{assumedStDev} / \code{assumedStDevs}),
+#' 		 \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
+#'       The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned}
+#' 		 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio.
+#' 		 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome,
+#' 		 \code{pi1} and \code{pi2} can be specified referring to the assumed treatment and control rate, respectively.
+#' 		 In multi-armed or enrichment designs, you can
+#'   	 specify a value or a vector with elements referring to the treatment arms or the sub-populations,
+#'   	 respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl}
+#' 		 (multi-arm designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr
+#'   	 If not specified, the conditional power is calculated under the assumption of observed effect sizes,
 #'   	 standard deviations, rates, or hazard ratios.}
 #'   \item{\code{iterations}}{Iterations for simulating the power for Fisher's combination test.
 #'       If the power for more than one remaining stages is to be determined for
@@ -118,20 +120,20 @@ NULL
 #' repeated overall p-values, and final stage p-values, median unbiased effect estimates,
 #' and final confidence intervals.
 #'
-#' For designs with more than two treatments arms (multi-arm designs) or enrichment designs 
+#' For designs with more than two treatments arms (multi-arm designs) or enrichment designs
 #' a closed combination test is performed.
 #' That is, additionally the statistics to be used in a closed testing procedure are provided.
 #'
-#' The conditional power is calculated if the planned sample size for the subsequent stages (\code{nPlanned}) 
-#' is specified. The conditional power is calculated either under the assumption of the observed effect or 
+#' The conditional power is calculated if the planned sample size for the subsequent stages (\code{nPlanned})
+#' is specified. The conditional power is calculated either under the assumption of the observed effect or
 #' under the assumption of an assumed effect, that has to be specified (see above).\cr
-#' For testing rates in a two-armed trial, pi1 and pi2 typically refer to the rates in the treatment 
+#' For testing rates in a two-armed trial, pi1 and pi2 typically refer to the rates in the treatment
 #' and the control group, respectively. This is not mandatory, however, and so pi1 and pi2 can be interchanged.
-#' In many-to-one multi-armed trials, piTreatments and piControl refer to the rates in the treatment arms and 
+#' In many-to-one multi-armed trials, piTreatments and piControl refer to the rates in the treatment arms and
 #' the one control arm, and so they cannot be interchanged. piTreatments and piControls in enrichment designs
-#' can principally be interchanged, but we use the plural form to indicate that the rates can be differently 
-#' specified for the sub-populations.     
-#' 
+#' can principally be interchanged, but we use the plural form to indicate that the rates can be differently
+#' specified for the sub-populations.
+#'
 #' Median unbiased effect estimates and confidence intervals are calculated if
 #' a group sequential design or an inverse normal combination test design was chosen, i.e., it is not applicable
 #' for Fisher's p-value combination test design.
@@ -159,11 +161,9 @@ NULL
 #' @template details_analysis_base_mnormt_dependency
 #'
 #' @seealso
-#' \itemize{
-#'   \item \code{\link[=getObservedInformationRates]{getObservedInformationRates()}} 
-#'         for recalculation the observed information rates.
-#'   \item @family analysis functions
-#' }
+#' \code{\link[=getObservedInformationRates]{getObservedInformationRates()}}
+#'
+#' @family analysis functions
 #'
 #' @template examples_get_analysis_results
 #'
@@ -496,40 +496,40 @@ getStageResults <- function(design, dataInput, ..., stage = NA_integer_) {
     design <- designAndDataInput$design
     dataInput <- designAndDataInput$dataInput
 
-	if (.isEnrichmentDataset(dataInput)) {
-		return(.getStageResultsEnrichment(
-			design = design, dataInput = dataInput, stage = stage, ...
-		))
-	} else if (.isMultiArmDataset(dataInput)) {
+    if (.isEnrichmentDataset(dataInput)) {
+        return(.getStageResultsEnrichment(
+            design = design, dataInput = dataInput, stage = stage, ...
+        ))
+    } else if (.isMultiArmDataset(dataInput)) {
         return(.getStageResultsMultiArm(
             design = design, dataInput = dataInput, stage = stage, ...
         ))
     } else {
-	    stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
-	    .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
-	    on.exit(dataInput$.trim())
-	
-	    if (dataInput$isDatasetMeans()) {
-	        return(.getStageResultsMeans(
-	            design = design, dataInput = dataInput, stage = stage,
-	            userFunctionCallEnabled = TRUE, ...
-	        ))
-	    }
-	
-	    if (dataInput$isDatasetRates()) {
-	        return(.getStageResultsRates(
-	            design = design, dataInput = dataInput, stage = stage,
-	            userFunctionCallEnabled = TRUE, ...
-	        ))
-	    }
-	
-	    if (dataInput$isDatasetSurvival()) {
-	        return(.getStageResultsSurvival(
-	            design = design, dataInput = dataInput, stage = stage,
-	            userFunctionCallEnabled = TRUE, ...
-	        ))
-	    }
-	}	
+        stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
+        .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
+        on.exit(dataInput$.trim())
+
+        if (dataInput$isDatasetMeans()) {
+            return(.getStageResultsMeans(
+                design = design, dataInput = dataInput, stage = stage,
+                userFunctionCallEnabled = TRUE, ...
+            ))
+        }
+
+        if (dataInput$isDatasetRates()) {
+            return(.getStageResultsRates(
+                design = design, dataInput = dataInput, stage = stage,
+                userFunctionCallEnabled = TRUE, ...
+            ))
+        }
+
+        if (dataInput$isDatasetSurvival()) {
+            return(.getStageResultsSurvival(
+                design = design, dataInput = dataInput, stage = stage,
+                userFunctionCallEnabled = TRUE, ...
+            ))
+        }
+    }
 
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not supported")
 }
@@ -759,7 +759,6 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
         directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
         tolerance = 1e-06, # C_ANALYSIS_TOLERANCE_DEFAULT
         stage = NA_integer_) {
-        
     .assertIsValidTolerance(tolerance)
 
     designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
@@ -810,9 +809,9 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
     if (missing(stageResults)) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined")
     }
-    
+
     .stopInCaseOfIllegalStageDefinition(stageResults, ...)
-    
+
     args <- list(...)
     if (.isTrialDesign(stageResults)) {
         if (length(args) == 0) {
@@ -825,7 +824,7 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
             "because the 'stageResults' object contains the design already"
         )
     }
-    
+
     if (.isDataset(stageResults)) {
         stageResults <- getStageResults(dataInput = stageResults, ...)
     }
@@ -854,16 +853,17 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
 #' @inheritParams param_allocationRatioPlanned
 #' @param ... Further (optional) arguments to be passed:
 #' \describe{
-#'   \item{\code{thetaH1} and \code{assumedStDevs}, \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
-#'       The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned} 
-#' 		 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio. 
-#' 		 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome, 
-#' 		 \code{pi1} and \code{pi2} can be specified referring to the assumed treatment and control rate, respectively. 
-#' 		 In multi-armed or enrichment designs, you can 
-#'   	 specify a value or a vector with elements referring to the treatment arms or the sub-populations, 
-#'   	 respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl} (multi-arm 
-#'   	 designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr 
-#'   	 If not specified, the conditional power is calculated under the assumption of observed effect sizes, 
+#'   \item{\code{thetaH1} and \code{stDevH1} (or \code{assumedStDev} / \code{assumedStDevs}),
+#' 		 \code{pi1}, \code{pi2}, or \code{piTreatments}, \code{piControl(s)}}{
+#'       The assumed effect size, standard deviation or rates to calculate the conditional power if \code{nPlanned}
+#' 		 is specified. For survival designs, \code{thetaH1} refers to the hazard ratio.
+#' 		 For one-armed trials with binary outcome, only \code{pi1} can be specified, for two-armed trials with binary outcome,
+#' 		 \code{pi1} and \code{pi2} can be specified referring to the assumed treatment and control rate, respectively.
+#' 		 In multi-armed or enrichment designs, you can
+#'   	 specify a value or a vector with elements referring to the treatment arms or the sub-populations,
+#'   	 respectively. For testing rates, the parameters to be specified are \code{piTreatments} and \code{piControl} (multi-arm
+#'   	 designs) and \code{piTreatments} and \code{piControls} (enrichment designs).\cr
+#'   	 If not specified, the conditional power is calculated under the assumption of observed effect sizes,
 #'   	 standard deviations, rates, or hazard ratios.}
 #'   \item{\code{iterations}}{Iterations for simulating the power for Fisher's combination test.
 #'       If the power for more than one remaining stages is to be determined for
@@ -875,18 +875,18 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
 #'
 #' @details
 #' The conditional power is calculated if the planned sample size for the subsequent stages is specified.\cr
-#' For testing rates in a two-armed trial, pi1 and pi2 typically refer to the rates in the treatment 
+#' For testing rates in a two-armed trial, pi1 and pi2 typically refer to the rates in the treatment
 #' and the control group, respectively. This is not mandatory, however, and so pi1 and pi2 can be interchanged.
-#' In many-to-one multi-armed trials, piTreatments and piControl refer to the rates in the treatment arms and 
+#' In many-to-one multi-armed trials, piTreatments and piControl refer to the rates in the treatment arms and
 #' the one control arm, and so they cannot be interchanged. piTreatments and piControls in enrichment designs
-#' can principally be interchanged, but we use the plural form to indicate that the rates can be differently 
-#' specified for the sub-populations.     
+#' can principally be interchanged, but we use the plural form to indicate that the rates can be differently
+#' specified for the sub-populations.
 #'
 #' For Fisher's combination test, the conditional power for more than one remaining stages is
 #' estimated via simulation.
 #'
 #' @seealso
-#' \code{\link[=plot.StageResults]{plot.StageResults()}} or \code{\link[=plot.AnalysisResults]{plot.AnalysisResults()}} 
+#' \code{\link[=plot.StageResults]{plot.StageResults()}} or \code{\link[=plot.AnalysisResults]{plot.AnalysisResults()}}
 #' for plotting the conditional power.
 #'
 #' @return Returns a \code{\link{ConditionalPowerResults}} object.
@@ -910,10 +910,10 @@ getRepeatedConfidenceIntervals <- function(design, dataInput, ...,
 getConditionalPower <- function(stageResults, ..., nPlanned,
         allocationRatioPlanned = 1 # C_ALLOCATION_RATIO_DEFAULT
         ) {
-    #.stopInCaseOfIllegalStageDefinition(stageResults, ...)
+    # .stopInCaseOfIllegalStageDefinition(stageResults, ...)
     stageResults <- .getStageResultsObject(stageResults = stageResults, functionName = "getConditionalPower", ...)
     .assertIsValidAllocationRatioPlanned(allocationRatioPlanned, stageResults$.dataInput$getNumberOfGroups())
-    
+
     conditionalPower <- NULL
     if (.isEnrichmentStageResults(stageResults)) {
         conditionalPower <- .getConditionalPowerEnrichment(
@@ -1084,7 +1084,7 @@ getRepeatedPValues <- function(stageResults, ...,
         ))
     }
 
-    if (.isTrialDesignInverseNormalOrGroupSequential(design) && 
+    if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
             design$typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER, C_TYPE_OF_DESIGN_WT_OPTIMUM)) {
         showWarnings <- as.logical(getOption("rpact.analyis.repeated.p.values.warnings.enabled", "TRUE"))
         if (showWarnings) {
@@ -1095,7 +1095,7 @@ getRepeatedPValues <- function(stageResults, ...,
         }
         return(rep(NA_real_, design$kMax))
     }
-    
+
     if (.isTrialDesignInverseNormal(design)) {
         return(.getRepeatedPValuesInverseNormal(
             stageResults = stageResults, tolerance = tolerance, ...
@@ -1116,7 +1116,7 @@ getRepeatedPValues <- function(stageResults, ...,
             )
             return(rep(NA_real_, design$kMax))
         }
-        
+
         return(.getRepeatedPValuesFisher(
             stageResults = stageResults, tolerance = tolerance, ...
         ))
@@ -1152,34 +1152,38 @@ getRepeatedPValues <- function(stageResults, ...,
         } else {
             if (design$bindingFutility) {
                 if (.isTrialDesignInverseNormal(design)) {
-                    decisionMatrix <- matrix(c(
-                        design$futilityBounds[1:(finalStage - 1)], C_FUTILITY_BOUNDS_DEFAULT,
-                        c(design$criticalValues[1:(finalStage - 1)], stageResults$combInverseNormal[finalStage])
-                    ),
-                    nrow = 2, byrow = TRUE
+                    decisionMatrix <- matrix(
+                        c(
+                            design$futilityBounds[1:(finalStage - 1)], C_FUTILITY_BOUNDS_DEFAULT,
+                            c(design$criticalValues[1:(finalStage - 1)], stageResults$combInverseNormal[finalStage])
+                        ),
+                        nrow = 2, byrow = TRUE
                     )
                 } else {
-                    decisionMatrix <- matrix(c(
-                        design$futilityBounds[1:(finalStage - 1)], C_FUTILITY_BOUNDS_DEFAULT,
-                        c(design$criticalValues[1:(finalStage - 1)], .getOneMinusQNorm(stageResults$overallPValues[finalStage]))
-                    ),
-                    nrow = 2, byrow = TRUE
+                    decisionMatrix <- matrix(
+                        c(
+                            design$futilityBounds[1:(finalStage - 1)], C_FUTILITY_BOUNDS_DEFAULT,
+                            c(design$criticalValues[1:(finalStage - 1)], .getOneMinusQNorm(stageResults$overallPValues[finalStage]))
+                        ),
+                        nrow = 2, byrow = TRUE
                     )
                 }
             } else {
                 if (.isTrialDesignInverseNormal(design)) {
-                    decisionMatrix <- matrix(c(
-                        rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
-                        c(design$criticalValues[1:(finalStage - 1)], stageResults$combInverseNormal[finalStage])
-                    ),
-                    nrow = 2, byrow = TRUE
+                    decisionMatrix <- matrix(
+                        c(
+                            rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
+                            c(design$criticalValues[1:(finalStage - 1)], stageResults$combInverseNormal[finalStage])
+                        ),
+                        nrow = 2, byrow = TRUE
                     )
                 } else {
-                    decisionMatrix <- matrix(c(
-                        rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
-                        c(design$criticalValues[1:(finalStage - 1)], .getOneMinusQNorm(stageResults$overallPValues[finalStage]))
-                    ),
-                    nrow = 2, byrow = TRUE
+                    decisionMatrix <- matrix(
+                        c(
+                            rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
+                            c(design$criticalValues[1:(finalStage - 1)], .getOneMinusQNorm(stageResults$overallPValues[finalStage]))
+                        ),
+                        nrow = 2, byrow = TRUE
                     )
                 }
             }
@@ -1195,19 +1199,23 @@ getRepeatedPValues <- function(stageResults, ...,
                     pFinalOtherDirection <- 1 - stageResults$pValues[1]
                 } else {
                     if (.isTrialDesignInverseNormal(design)) {
-                        decisionMatrix <- matrix(c(
-                            rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
-                            c(design$criticalValues[1:(finalStage - 1)], -stageResults$combInverseNormal[finalStage])
-                        ),
-                        nrow = 2, byrow = TRUE
+                        decisionMatrix <- matrix(
+                            c(
+                                rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
+                                c(design$criticalValues[1:(finalStage - 1)], -stageResults$combInverseNormal[finalStage])
+                            ),
+                            nrow = 2, byrow = TRUE
                         )
                     } else {
-                        decisionMatrix <- matrix(c(
-                            rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
-                            c(design$criticalValues[1:(finalStage - 1)], 
-                                -.getOneMinusQNorm(stageResults$overallPValues[finalStage]))
-                        ),
-                        nrow = 2, byrow = TRUE
+                        decisionMatrix <- matrix(
+                            c(
+                                rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
+                                c(
+                                    design$criticalValues[1:(finalStage - 1)],
+                                    -.getOneMinusQNorm(stageResults$overallPValues[finalStage])
+                                )
+                            ),
+                            nrow = 2, byrow = TRUE
                         )
                     }
                     probs <- .getGroupSequentialProbabilities(
@@ -1300,7 +1308,7 @@ getRepeatedPValues <- function(stageResults, ...,
         if (.getOneMinusQNorm(stageResults$overallPValues[k]) >= design$criticalValues[k]) {
             return(k)
         }
-        
+
         if (design$sided == 2) {
             if (.getOneMinusQNorm(stageResults$overallPValues[k]) <= -design$criticalValues[k]) {
                 return(k)
@@ -1481,32 +1489,32 @@ getFinalPValue <- function(stageResults, ...) {
     stageResults <- .getStageResultsObject(stageResults, functionName = "getFinalPValue", ...)
 
     .assertIsStageResultsNonMultiHypotheses(stageResults)
-    
+
     if (stageResults$.design$kMax == 1) {
         warning("Final p-value is not available for fixed designs", call. = FALSE)
         return(list(finalStage = NA_integer_, pFinal = NA_real_))
     }
-    
+
     finalPValue <- NULL
     if (.isTrialDesignInverseNormalOrGroupSequential(stageResults$.design)) {
         finalPValue <- .getFinalPValueInverseNormalOrGroupSequential(stageResults)
-    }
-    else if (.isTrialDesignFisher(stageResults$.design)) {
+    } else if (.isTrialDesignFisher(stageResults$.design)) {
         finalPValue <- .getFinalPValueFisher(stageResults)
     }
-    
+
     if (is.null(finalPValue)) {
-        .stopWithWrongDesignMessage(stageResults$.design, 
-            inclusiveConditionalDunnett = .isMultiArmStageResults(stageResults))
+        .stopWithWrongDesignMessage(stageResults$.design,
+            inclusiveConditionalDunnett = .isMultiArmStageResults(stageResults)
+        )
     }
-    
-    if (stageResults$.design$kMax > 1 && is.na(finalPValue$finalStage) && 
+
+    if (stageResults$.design$kMax > 1 && is.na(finalPValue$finalStage) &&
             (length(finalPValue$pFinal) == 0 || all(is.na(finalPValue$pFinal)))) {
-        if(.getOptionalArgument("showWarnings", optionalArgumentDefaultValue = TRUE, ...)) {
+        if (.getOptionalArgument("showWarnings", optionalArgumentDefaultValue = TRUE, ...)) {
             warning("Final p-value not calculated because final stage not reached", call. = FALSE)
         }
     }
-    
+
     return(finalPValue)
 }
 
@@ -1591,7 +1599,7 @@ getFinalConfidenceInterval <- function(design, dataInput, ...,
 
     .assertIsDatasetNonMultiHypotheses(dataInput)
     on.exit(dataInput$.trim())
-    
+
     if (design$kMax == 1) {
         warning("Final confidence interval is not available for fixed designs", call. = FALSE)
     }
@@ -1609,26 +1617,24 @@ getFinalConfidenceInterval <- function(design, dataInput, ...,
             design = design, dataInput = dataInput, directionUpper = directionUpper,
             thetaH0 = thetaH0, tolerance = tolerance, stage = stage, ...
         )
-    }
-    else if (dataInput$isDatasetRates()) {
+    } else if (dataInput$isDatasetRates()) {
         finalConfidenceInterval <- .getFinalConfidenceIntervalRates(
             design = design, dataInput = dataInput, directionUpper = directionUpper,
             thetaH0 = thetaH0, tolerance = tolerance, stage = stage, ...
         )
-    }
-    else if (dataInput$isDatasetSurvival()) {
+    } else if (dataInput$isDatasetSurvival()) {
         finalConfidenceInterval <- .getFinalConfidenceIntervalSurvival(
             design = design, dataInput = dataInput, directionUpper = directionUpper,
             thetaH0 = thetaH0, tolerance = tolerance, stage = stage
         )
     }
-    
+
     if (is.null(finalConfidenceInterval)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
     }
-    
-    if (design$kMax > 1 && is.na(finalConfidenceInterval$finalStage) && 
-            (length(finalConfidenceInterval$finalConfidenceInterval) == 0 || 
+
+    if (design$kMax > 1 && is.na(finalConfidenceInterval$finalStage) &&
+            (length(finalConfidenceInterval$finalConfidenceInterval) == 0 ||
                 all(is.na(finalConfidenceInterval$finalConfidenceInterval)))) {
         warning("Final confidence interval not calculated because final stage not reached", call. = FALSE)
     }
@@ -2239,8 +2245,9 @@ getConditionalRejectionProbabilities <- function(stageResults, ...) {
         ))
     }
 
-    .stopWithWrongDesignMessage(stageResults$.design, 
-        inclusiveConditionalDunnett = .isMultiArmStageResults(stageResults))
+    .stopWithWrongDesignMessage(stageResults$.design,
+        inclusiveConditionalDunnett = .isMultiArmStageResults(stageResults)
+    )
 }
 
 .getDecisionMatrixRoot <- function(..., design, stage, stageResults, tolerance, firstParameterName,

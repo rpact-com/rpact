@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6802 $
-## |  Last changed: $Date: 2023-02-07 17:07:25 +0100 (Di, 07 Feb 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -108,7 +108,7 @@ NULL
 #' @inheritParams param_conditionalPowerSimulation
 #' @inheritParams param_thetaH1
 #' @inheritParams param_maxNumberOfIterations
-#' @inheritParams param_calcEventsFunction 
+#' @inheritParams param_calcEventsFunction
 #' @inheritParams param_showStatistics
 #' @param maxNumberOfRawDatasetsPerStage The number of raw datasets per stage that shall
 #'        be extracted and saved as \code{\link[base]{data.frame}}, default is \code{0}.
@@ -126,11 +126,11 @@ NULL
 #' and constant or non-constant piecewise accrual).
 #' Additionally, integers \code{allocation1} and \code{allocation2} can be specified that determine the number allocated
 #' to treatment group 1 and treatment group 2, respectively.
-#' More precisely, unequal randomization ratios must be specified via the two integer arguments \code{allocation1} and 
-#' \code{allocation2} which describe how many subjects are consecutively enrolled in each group, respectively, before a 
-#' subject is assigned to the other group. For example, the arguments \code{allocation1 = 2}, \code{allocation2 = 1}, 
-#' \code{maxNumberOfSubjects = 300} specify 2:1 randomization with 200 subjects randomized to intervention and 100 to 
-#' control. (Caveat: Do not use \code{allocation1 = 200}, \code{allocation2 = 100}, \code{maxNumberOfSubjects = 300} 
+#' More precisely, unequal randomization ratios must be specified via the two integer arguments \code{allocation1} and
+#' \code{allocation2} which describe how many subjects are consecutively enrolled in each group, respectively, before a
+#' subject is assigned to the other group. For example, the arguments \code{allocation1 = 2}, \code{allocation2 = 1},
+#' \code{maxNumberOfSubjects = 300} specify 2:1 randomization with 200 subjects randomized to intervention and 100 to
+#' control. (Caveat: Do not use \code{allocation1 = 200}, \code{allocation2 = 100}, \code{maxNumberOfSubjects = 300}
 #' as this would imply that the 200 intervention subjects are enrolled prior to enrollment of any control subjects.)
 #'
 #' \code{conditionalPower}\cr
@@ -576,18 +576,20 @@ getSimulationSurvival <- function(design = NULL, ...,
     .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, C_DROP_OUT_RATE_2_DEFAULT)
     .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, C_DROP_OUT_TIME_DEFAULT)
     .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, C_THETA_H0_SURVIVAL_DEFAULT)
-    
+
     allocationFraction <- getFraction(allocation1 / allocation2)
     if (allocationFraction[1] != allocation1 || allocationFraction[2] != allocation2) {
-        warning(sprintf("allocation1 = %s and allocation2 = %s was replaced by allocation1 = %s and allocation2 = %s", 
-            allocation1, allocation2, allocationFraction[1], allocationFraction[2]), call. = FALSE)
+        warning(sprintf(
+            "allocation1 = %s and allocation2 = %s was replaced by allocation1 = %s and allocation2 = %s",
+            allocation1, allocation2, allocationFraction[1], allocationFraction[2]
+        ), call. = FALSE)
         allocation1 <- allocationFraction[1]
         allocation2 <- allocationFraction[2]
     }
-    
+
     .setValueAndParameterType(simulationResults, "allocation1", allocation1, C_ALLOCATION_1_DEFAULT)
     .setValueAndParameterType(simulationResults, "allocation2", allocation2, C_ALLOCATION_2_DEFAULT)
-    
+
     allocationRatioPlanned <- allocation1 / allocation2
     .setValueAndParameterType(
         simulationResults, "allocationRatioPlanned",
@@ -631,14 +633,16 @@ getSimulationSurvival <- function(design = NULL, ...,
             intensityReplications[1]
         ))
         if (length(accrualIntensity) > 1 && length(intensityReplications) > 1) {
-            for (i in 2:min(length(accrualIntensity), length(intensityReplications))) { 
+            for (i in 2:min(length(accrualIntensity), length(intensityReplications))) {
                 if (intensityReplications[i] > 0) {
-                    accrualTimeValue <- c(accrualTimeValue, 
+                    accrualTimeValue <- c(
+                        accrualTimeValue,
                         accrualTime[i - 1] +
-                        cumsum(rep(
-                            1 / (densityVector[i] * accrualSetup$maxNumberOfSubjects),
-                            intensityReplications[i]
-                        )))
+                            cumsum(rep(
+                                1 / (densityVector[i] * accrualSetup$maxNumberOfSubjects),
+                                intensityReplications[i]
+                            ))
+                    )
                 }
             }
         }
@@ -658,7 +662,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         ceiling(accrualSetup$maxNumberOfSubjects /
             (allocation1 + allocation2))
     )[1:accrualSetup$maxNumberOfSubjects]
-    
+
     if (.isTrialDesignFisher(design)) {
         alpha0Vec <- design$alpha0Vec
         futilityBounds <- rep(NA_real_, design$kMax - 1)
@@ -674,23 +678,23 @@ getSimulationSurvival <- function(design = NULL, ...,
     } else if (.isTrialDesignFisher(design)) {
         designNumber <- 3L
     }
-    
+
     calcSubjectsFunctionList <- .getCalcSubjectsFunction(
         design = design,
         simulationResults = simulationResults,
         calcFunction = calcEventsFunction,
-        expectedFunction = function(
-            stage,
-            conditionalPower,
-            thetaH0,
-            estimatedTheta,
-            plannedEvents,
-            eventsOverStages,
-            minNumberOfEventsPerStage,
-            maxNumberOfEventsPerStage,
-            allocationRatioPlanned,
-            conditionalCriticalValue) { NULL },
-        cppEnabled = TRUE
+        expectedFunction = function(stage,
+                conditionalPower,
+                thetaH0,
+                estimatedTheta,
+                plannedEvents,
+                eventsOverStages,
+                minNumberOfEventsPerStage,
+                maxNumberOfEventsPerStage,
+                allocationRatioPlanned,
+                conditionalCriticalValue) {
+            NULL
+        }
     )
     calcEventsFunctionType <- calcSubjectsFunctionList$calcSubjectsFunctionType
     calcEventsFunctionR <- calcSubjectsFunctionList$calcSubjectsFunctionR
@@ -800,11 +804,12 @@ getSimulationSurvival <- function(design = NULL, ...,
                 nrow = design$kMax - 1
             )
         } else {
-            simulationResults$futilityPerStage <- matrix(matrix(
-                overview$futilityPerStage,
-                nrow = design$kMax
-            )[1:(design$kMax - 1), ],
-            nrow = design$kMax - 1
+            simulationResults$futilityPerStage <- matrix(
+                matrix(
+                    overview$futilityPerStage,
+                    nrow = design$kMax
+                )[1:(design$kMax - 1), ],
+                nrow = design$kMax - 1
             )
         }
     }
@@ -832,7 +837,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         if (!is.null(simulationResults$eventsPerStage) &&
                 nrow(simulationResults$eventsPerStage) > 0 &&
                 ncol(simulationResults$eventsPerStage) > 0) {
-			simulationResults$overallEventsPerStage <- .convertStageWiseToOverallValues(
+            simulationResults$overallEventsPerStage <- .convertStageWiseToOverallValues(
                 simulationResults$eventsPerStage
             )
             simulationResults$.setParameterType("overallEventsPerStage", C_PARAM_GENERATED)
@@ -845,7 +850,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         if (!is.null(simulationResults$eventsPerStage) &&
                 nrow(simulationResults$eventsPerStage) > 0 &&
                 ncol(simulationResults$eventsPerStage) > 0) {
-			simulationResults$overallEventsPerStage <- simulationResults$eventsPerStage
+            simulationResults$overallEventsPerStage <- simulationResults$eventsPerStage
             simulationResults$expectedNumberOfEvents <-
                 as.numeric(simulationResults$overallEventsPerStage)
         }
@@ -863,10 +868,9 @@ getSimulationSurvival <- function(design = NULL, ...,
         rawData <- rawData[!is.na(rawData$iterationNumber), ]
     }
     if (!is.null(rawData) && nrow(rawData) > 0 && ncol(rawData) > 0) {
-        
-        rawData <- rawData[order(rawData$iterationNumber, rawData$subjectId),]
+        rawData <- rawData[order(rawData$iterationNumber, rawData$subjectId), ]
         rownames(rawData) <- NULL
-        
+
         stopStageNumbers <- rawData$stopStage
         missingStageNumbers <- c()
         if (length(stopStageNumbers) > 0) {

@@ -22,11 +22,11 @@
 #' stDev <- c(0.4, 0.8)
 #'
 #' # Define effect list
-#' el <- list(subGroups=subGroups, prevalences=prevalences, stDevs = stDev, effects = effects)
+#' effectList <- list(subGroups=subGroups, prevalences=prevalences, stDevs = stDev, effects = effects)
 #'
 #' # Perform simulation
 #' simResultsPE <- getSimulationEnrichmentMeans(design = designIN,
-#'     effectList = el, plannedSubjects = c(50, 100),
+#'     effectList = effectList, plannedSubjects = c(50, 100),
 #'     maxNumberOfIterations = 100)
 #' print(simResultsPE)
 #'
@@ -65,12 +65,12 @@
 #' stDev <- 10
 #'
 #' # Define effect list
-#' el <- list(subGroups=subGroups, prevalences=prevalences, stDevs = stDev, effects = effects)
+#' effectList <- list(subGroups=subGroups, prevalences=prevalences, stDevs = stDev, effects = effects)
 #'
 #' # Perform simulation
 #' simResultsPE <- getSimulationEnrichmentMeans(
 #'     design = designIN2,
-#'     effectList = el,
+#'     effectList = effectList,
 #'     typeOfSelection = "userDefined",
 #'     selectPopulationsFunction = mySelection,
 #'     intersectionTest = "Simes",

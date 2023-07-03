@@ -8,39 +8,41 @@
 Class for stage results of means.
 }
 \details{
-This object cannot be created directly; use \code{\link[=getStageResults]{getStageResults()}}
+This object cannot be created directly; use \code{getStageResults}
 with suitable arguments to create the stage results of a dataset of means.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
 \item{\code{testStatistics}}{The stage-wise test statistics. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{overallTestStatistics}}{The overall i.e. cumulated test statistics. Is a numeric vector of length \code{kMax}.}
+\item{\code{overallTestStatistics}}{The overall, i.e., cumulated test statistics. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{pValues}}{The stage-wise p-values. Is a numeric vector of length \code{kMax}.}
+\item{\code{pValues}}{The stage-wise p-values. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{overallPValues}}{The overall i.e. cumulated p-values. Is a numeric vector of length \code{kMax}.}
-
-\item{\code{combInverseNormal}}{The stage-wise test statistics for the inverse normal test. Is a numeric vector of length \code{kMax}.}
-
-\item{\code{combFisher}}{Test statistic for Fisher's combination test. H~0~}
+\item{\code{overallPValues}}{The overall, i.e., cumulated p-values. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{effectSizes}}{The stage-wise effect sizes. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{testActions}}{The action drawn from test result.}
+\item{\code{testActions}}{The test decisions at each stage of the trial. Is a character vector of length \code{kMax}.}
+
+\item{\code{direction}}{Specifies the direction of the alternative, is either "upper" or "lower". Only applicable for one-sided testing.}
+
+\item{\code{normalApproximation}}{Describes if a normal approximation was used when calculating p-values. Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio. Is a logical vector of length 1.}
+
+\item{\code{equalVariances}}{Describes if the variances in two treatment groups are assumed to be the same. Is a logical vector of length 1.}
+
+\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{weightsFisher}}{The weights for Fisher's combination test. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{weightsFisher}}{The weights for inverse normal statistic.. Is a numeric vector of length \code{kMax}.}
+\item{\code{combInverseNormal}}{The test statistics over stages for the inverse normal test. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{normalApproximation}}{Logical. Describes if a normal approximation was used when calculating p-values.
-Default for means is \code{FALSE} and \code{TRUE} for rates and hazard ratio.}
+\item{\code{weightsInverseNormal}}{The weights for the inverse normal statistic. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{equalVariances}}{Logical. Describes if variances are assumed equal between groups.
-Specified via \code{equalVariances} in \code{\link[=getStageResults]{getStageResults()}}, default is \code{TRUE}.}
+\item{\code{...}}{Names of \code{dataInput}.}
 }}
 
 

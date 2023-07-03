@@ -14,8 +14,11 @@ A class for simulation results.
 \item \code{\link{SimulationResultsRates}},
 \item \code{\link{SimulationResultsSurvival}},
 \item \code{\link{SimulationResultsMultiArmMeans}},
-\item \code{\link{SimulationResultsMultiArmRates}}, and
-\item \code{\link{SimulationResultsMultiArmSurvival}}.
+\item \code{\link{SimulationResultsMultiArmRates}},
+\item \code{\link{SimulationResultsMultiArmSurvival}},
+\item \code{\link{SimulationResultsEnrichmentMeans}},
+\item \code{\link{SimulationResultsEnrichmentRates}}, and
+\item \code{\link{SimulationResultsEnrichmentSurvival}}.
 }
 }
 \section{Fields}{
@@ -23,7 +26,7 @@ A class for simulation results.
 \describe{
 \item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is an integer of length 1.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
 }}
 
 

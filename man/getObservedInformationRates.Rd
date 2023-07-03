@@ -28,6 +28,9 @@ Alternatively, a floating-point number > 0 and < 1 can be specified to define a 
 
 \item{stage}{The stage number (optional). Default: total number of existing stages in the data input.}
 }
+\value{
+Returns a list that summarizes the observed information rates.
+}
 \description{
 Recalculates the observed information rates from the specified dataset.
 }
@@ -64,6 +67,6 @@ getObservedInformationRates(data,
 \itemize{
 \item \code{\link[=getAnalysisResults]{getAnalysisResults()}} for using
 \code{getObservedInformationRates()} implicit,
-\item https://www.rpact.com/vignettes/rpact_boundary_update_example
+\item \href{https://www.rpact.org/vignettes/planning/rpact_boundary_update_example/}{www.rpact.org/vignettes/planning/rpact_boundary_update_example}
 }
 }

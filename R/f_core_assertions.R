@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6802 $
-## |  Last changed: $Date: 2023-02-07 17:07:25 +0100 (Di, 07 Feb 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -303,12 +303,14 @@ NULL
     if (!is.null(design)) {
         .assertIsTrialDesign(design)
     }
-    
+
     if (dataInput$.enrichmentEnabled && dataInput$getNumberOfGroups() != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-            "only population enrichment data with 2 groups can be analyzed but ", 
-            dataInput$getNumberOfGroups(), " group", 
-            ifelse(dataInput$getNumberOfGroups() == 1, " is", "s are"), " defined")
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+            "only population enrichment data with 2 groups can be analyzed but ",
+            dataInput$getNumberOfGroups(), " group",
+            ifelse(dataInput$getNumberOfGroups() == 1, " is", "s are"), " defined"
+        )
     }
 
     stages <- dataInput$stages
@@ -1176,12 +1178,18 @@ NULL
 }
 
 .assertIsValidSidedParameter <- function(sided) {
+    if (is.null(match.call(expand.dots = FALSE)[["sided"]])) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'sided' must be defined")
+    }
     if (sided != 1 && sided != 2) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'sided' (", sided, ") must be 1 or 2")
     }
 }
 
 .assertIsValidGroupsParameter <- function(groups) {
+    if (is.null(match.call(expand.dots = FALSE)[["groups"]])) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'groups' must be defined")
+    }
     if (groups != 1 && groups != 2) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'groups' (", groups, ") must be 1 or 2")
     }
@@ -1315,7 +1323,7 @@ NULL
     return(TRUE)
 }
 
-.warnInCaseOfUnknownArguments <- function(..., functionName, ignore = c(),
+.warnInCaseOfUnknownArguments <- function(..., functionName, ignore = character(0),
         numberOfAllowedUnnamedParameters = 0, exceptionEnabled = FALSE) {
     args <- list(...)
     if (length(args) == 0) {
@@ -1966,9 +1974,8 @@ NULL
     }
 }
 
-.assertIsValidPlannedSubjectsOrEvents <- function(
-        design,
-        plannedValues, 
+.assertIsValidPlannedSubjectsOrEvents <- function(design,
+        plannedValues,
         parameterName = c("plannedSubjects", "plannedEvents")) {
     parameterName <- match.arg(parameterName)
     .assertIsIntegerVector(plannedValues, parameterName, validateType = FALSE)
@@ -2351,9 +2358,7 @@ NULL
 
 .assertIsValidTolerance <- function(tolerance) {
     .assertIsSingleNumber(tolerance, "tolerance")
-    if (tolerance > 0.1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' (", tolerance, ") must be <= 0.1")
-    }
+    .assertIsInOpenInterval(tolerance, "tolerance", lower = 0, upper = 0.1)
 }
 
 .isValidVarianceOptionMultiArmed <- function(varianceOption) {

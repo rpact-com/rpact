@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6805 $
-## |  Last changed: $Date: 2023-02-08 09:30:19 +0100 (Mi, 08 Feb 2023) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -296,6 +296,9 @@ PlotSettings <- setRefClass("PlotSettings",
         .pointSize = "numeric",
         .legendFontSize = "numeric",
         .htmlTitle = "character",
+        .scalingEnabled = "logical",
+        .pointScalingCorrectionEnabled = "logical",
+        .pointBorderEnabled = "logical",
         lineSize = "numeric",
         pointSize = "numeric",
         pointColor = "character",
@@ -327,6 +330,9 @@ PlotSettings <- setRefClass("PlotSettings",
             .pointSize <<- pointSize
             .legendFontSize <<- legendFontSize
             .htmlTitle <<- NA_character_
+            .scalingEnabled <<- TRUE
+            .pointScalingCorrectionEnabled <<- TRUE
+            .pointBorderEnabled <<- TRUE
 
             .parameterNames <<- list(
                 "lineSize" = "Line size",
@@ -538,7 +544,15 @@ PlotSettings <- setRefClass("PlotSettings",
             legendFontSize <<- .self$.legendFontSize * adjustingValue
         },
         scaleSize = function(size, pointEnabled = FALSE) {
+            if (isFALSE(.self$.scalingEnabled)) {
+                return(size)
+            }
+
             if (pointEnabled) {
+                if (isFALSE(.pointScalingCorrectionEnabled)) {
+                    return(size)
+                }
+
                 return(size * .self$scalingFactor^2)
             }
 
@@ -658,21 +672,27 @@ PlotSettings <- setRefClass("PlotSettings",
             return(p)
         },
         plotPoints = function(p, pointBorder, ..., mapping = NULL) {
-
             # plot white border around the points
-            if (pointBorder > 0) {
+            if (pointBorder > 0 && .pointBorderEnabled) {
                 p <- p + ggplot2::geom_point(
                     mapping = mapping,
-                    color = "white", size = scaleSize(.self$pointSize, TRUE), alpha = 1,
-                    shape = 21, stroke = pointBorder / 2.25, show.legend = FALSE
+                    color = "white",
+                    size = scaleSize(.self$pointSize, TRUE),
+                    alpha = 1,
+                    shape = 21,
+                    stroke = pointBorder / 2.25,
+                    show.legend = FALSE
                 )
             }
 
             if (!is.null(.self$pointColor) && length(.self$pointColor) == 1 && !is.na(.self$pointColor)) {
                 p <- p + ggplot2::geom_point(
                     mapping = mapping,
-                    color = .self$pointColor, size = scaleSize(.self$pointSize, TRUE), alpha = 1,
-                    shape = 19, show.legend = FALSE
+                    color = .self$pointColor,
+                    size = scaleSize(.self$pointSize, TRUE),
+                    alpha = 1,
+                    shape = 19,
+                    show.legend = FALSE
                 )
             } else {
                 p <- p + ggplot2::geom_point(

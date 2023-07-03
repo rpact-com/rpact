@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6652 $
-## |  Last changed: $Date: 2022-11-01 08:59:51 +0100 (Tue, 01 Nov 2022) $
+## |  File version: $Revision: 7147 $
+## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -48,13 +48,12 @@ NULL
 
 .getAnalysisResultsMeansInverseNormal <- function(...,
         design, dataInput, directionUpper = C_DIRECTION_UPPER_DEFAULT,
-        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, 
+        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT, thetaH1 = NA_real_, 
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT, thetaH1 = NA_real_,
         nPlanned = NA_real_, assumedStDev = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        parallelComputingEnabled = FALSE) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .assertIsTrialDesignInverseNormal(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
@@ -72,8 +71,7 @@ NULL
         stage = stage, directionUpper = directionUpper, normalApproximation = normalApproximation,
         equalVariances = equalVariances, thetaH0 = thetaH0, thetaH1 = thetaH1, nPlanned = nPlanned,
         assumedStDev = assumedStDev, allocationRatioPlanned = allocationRatioPlanned,
-        tolerance = tolerance,
-        parallelComputingEnabled = parallelComputingEnabled
+        tolerance = tolerance
     )
 
     return(results)
@@ -84,8 +82,7 @@ NULL
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT, thetaH1 = NA_real_, nPlanned = NA_real_, assumedStDev = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        parallelComputingEnabled = FALSE) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .assertIsTrialDesignGroupSequential(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
@@ -93,18 +90,28 @@ NULL
         ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
             design,
             powerCalculationEnabled = TRUE
-        ), "stage"), ...
+        ), c("stage", "stDevH1")), ...
     )
 
     results <- AnalysisResultsGroupSequential(design = design, dataInput = dataInput)
+
+    stDevH1 <- .getOptionalArgument("stDevH1", ...)
+    if (!is.null(stDevH1)) {
+        .assertIsSingleNumber(assumedStDev, "assumedStDev", naAllowed = TRUE)
+        if (!is.na(assumedStDev)) {
+            if (!identical(assumedStDev, stDevH1)) {
+                stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, "either 'assumedStDev' or 'stDevH1' must be defined")
+            }
+        }
+        assumedStDev <- stDevH1
+    }
 
     .getAnalysisResultsMeansAll(
         results = results, design = design, dataInput = dataInput,
         stage = stage, directionUpper = directionUpper, normalApproximation = normalApproximation,
         equalVariances = equalVariances, thetaH0 = thetaH0, thetaH1 = thetaH1, nPlanned = nPlanned,
         assumedStDev = assumedStDev, allocationRatioPlanned = allocationRatioPlanned,
-        tolerance = tolerance,
-        parallelComputingEnabled = parallelComputingEnabled
+        tolerance = tolerance
     )
 
     return(results)
@@ -116,8 +123,7 @@ NULL
         thetaH0 = C_THETA_H0_MEANS_DEFAULT, thetaH1 = NA_real_, nPlanned = NA_real_, assumedStDev = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_,
-        parallelComputingEnabled = FALSE) {
+        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -139,21 +145,23 @@ NULL
         equalVariances = equalVariances, thetaH0 = thetaH0, thetaH1 = thetaH1, nPlanned = nPlanned,
         assumedStDev = assumedStDev, allocationRatioPlanned = allocationRatioPlanned,
         tolerance = tolerance, iterations = iterations,
-        seed = seed, parallelComputingEnabled = parallelComputingEnabled
+        seed = seed
     )
 
     return(results)
 }
 
-#
-# The following parameters will be taken from 'design':
-# stages, informationRates, criticalValues, futilityBounds, alphaSpent, stageLevels
-#
+#'
+#' The following parameters will be taken from 'design':
+#' stages, informationRates, criticalValues, futilityBounds, alphaSpent, stageLevels
+#'
+#' @noRd
+#'
 .getAnalysisResultsMeansAll <- function(..., results, design, dataInput, stage,
         directionUpper, normalApproximation = normalApproximation,
         equalVariances = equalVariances, thetaH0, thetaH1, assumedStDev,
         nPlanned, allocationRatioPlanned, tolerance,
-        iterations, seed, parallelComputingEnabled = FALSE) {
+        iterations, seed) {
     startTime <- Sys.time()
     .assertIsValidTolerance(tolerance)
     stageResults <- .getStageResultsMeans(
@@ -229,58 +237,24 @@ NULL
         .logProgress("Conditional rejection probabilities (CRP) calculated", startTime = startTime)
     }
 
-    if (parallelComputingEnabled && .createParallelComputingCluster()) {
-        startTime <- Sys.time()
+    # RCI - repeated confidence interval
+    startTime <- Sys.time()
+    repeatedConfidenceIntervals <- .getRepeatedConfidenceIntervalsMeans(
+        design = design, dataInput = dataInput, stage = stage,
+        normalApproximation = normalApproximation, equalVariances = equalVariances,
+        tolerance = tolerance
+    )
+    results$repeatedConfidenceIntervalLowerBounds <- repeatedConfidenceIntervals[1, ]
+    results$repeatedConfidenceIntervalUpperBounds <- repeatedConfidenceIntervals[2, ]
+    .logProgress("Repeated confidence interval calculated", startTime = startTime)
 
-        .parallelComputingCaseNumbers <<- c(1, 2)
+    # repeated p-value
+    startTime <- Sys.time()
+    results$repeatedPValues <- getRepeatedPValues(
+        stageResults = stageResults, tolerance = tolerance
+    )
+    .logProgress("Repeated p-values calculated", startTime = startTime)
 
-        .parallelComputingArguments <<- list(
-            results             = results,
-            design              = design,
-            dataInput           = dataInput,
-            stage               = stage,
-            normalApproximation = normalApproximation,
-            equalVariances      = equalVariances,
-            tolerance           = tolerance,
-            stageResults        = stageResults
-        )
-
-        parallel::clusterExport(
-            .parallelComputingCluster,
-            c(
-                ".getAnalysisResultsMeansParallelComputing",
-                ".parallelComputingCaseNumbers", ".parallelComputingArguments"
-            )
-        )
-
-        parallelComputingResults <- .runAnalysisResultsMeansParallelComputing()
-        results$repeatedConfidenceIntervalLowerBounds <-
-            parallelComputingResults[[1]]$repeatedConfidenceIntervalLowerBounds
-        results$repeatedConfidenceIntervalUpperBounds <-
-            parallelComputingResults[[1]]$repeatedConfidenceIntervalUpperBounds
-        results$repeatedPValues <- parallelComputingResults[[2]]$repeatedPValues
-        .logProgress("Repeated confidence interval and repeated p-values calculated",
-            startTime = startTime
-        )
-    } else {
-        # RCI - repeated confidence interval
-        startTime <- Sys.time()
-        repeatedConfidenceIntervals <- .getRepeatedConfidenceIntervalsMeans(
-            design = design, dataInput = dataInput, stage = stage,
-            normalApproximation = normalApproximation, equalVariances = equalVariances,
-            tolerance = tolerance
-        )
-        results$repeatedConfidenceIntervalLowerBounds <- repeatedConfidenceIntervals[1, ]
-        results$repeatedConfidenceIntervalUpperBounds <- repeatedConfidenceIntervals[2, ]
-        .logProgress("Repeated confidence interval calculated", startTime = startTime)
-
-        # repeated p-value
-        startTime <- Sys.time()
-        results$repeatedPValues <- getRepeatedPValues(
-            stageResults = stageResults, tolerance = tolerance
-        )
-        .logProgress("Repeated p-values calculated", startTime = startTime)
-    }
     results$.setParameterType("repeatedConfidenceIntervalLowerBounds", C_PARAM_GENERATED)
     results$.setParameterType("repeatedConfidenceIntervalUpperBounds", C_PARAM_GENERATED)
     results$.setParameterType("repeatedPValues", C_PARAM_GENERATED)
@@ -330,62 +304,6 @@ NULL
     }
 
     return(results)
-}
-
-.runAnalysisResultsMeansParallelComputing <- function() {
-    results <- parallel::parLapply(
-        .parallelComputingCluster, .parallelComputingCaseNumbers,
-        function(i) {
-            .getAnalysisResultsMeansParallelComputing(i, .parallelComputingArguments)
-        }
-    )
-    return(results)
-}
-
-# @title
-# Get Analysis Results Means Parallel Computing
-#
-# @description
-# Internal usage for parallel computing only.
-#
-# @details
-# Cluster based parallel computing requires exported functions.
-#
-# @keywords internal
-#
-#' @export
-.getAnalysisResultsMeansParallelComputing <- function(caseNumber, arguments) {
-    results <- arguments$results
-    design <- arguments$design
-    dataInput <- arguments$dataInput
-    stage <- arguments$stage
-    normalApproximation <- arguments$normalApproximation
-    equalVariances <- arguments$equalVariances
-    tolerance <- arguments$tolerance
-    stageResults <- arguments$stageResults
-
-    # RCI - repeated confidence interval
-    if (caseNumber == 1) {
-        repeatedConfidenceIntervals <- .getRepeatedConfidenceIntervalsMeans(
-            design = design, dataInput = dataInput, stage = stage,
-            normalApproximation = normalApproximation,
-            equalVariances = equalVariances, tolerance = tolerance
-        )
-        return(list(
-            repeatedConfidenceIntervalLowerBounds = repeatedConfidenceIntervals[1, ],
-            repeatedConfidenceIntervalUpperBounds = repeatedConfidenceIntervals[2, ]
-        ))
-    }
-
-    # repeated p-value
-    else if (caseNumber == 2) {
-        return(list(repeatedPValues = getRepeatedPValues(
-            design = design,
-            stageResults = stageResults, stage = stage, tolerance = tolerance
-        )))
-    }
-
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'caseNumber' (", caseNumber, ") must be 1 or 2")
 }
 
 .getStageResultsMeans <- function(..., design, dataInput,
@@ -646,9 +564,11 @@ NULL
     return(x[1:kMax])
 }
 
-#
-#  Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Means
-#
+#'
+#' Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Means
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsMeans <- function(design, ...) {
     if (.isTrialDesignGroupSequential(design)) {
         return(.getRepeatedConfidenceIntervalsMeansGroupSequential(design = design, ...))
@@ -844,9 +764,11 @@ NULL
     return(repeatedConfidenceIntervals)
 }
 
-#
-# RCIs based on group sequential combination test
-#
+#'
+#' RCIs based on group sequential combination test
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsMeansGroupSequential <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -869,9 +791,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on inverse normal combination test
-#
+#'
+#' RCIs based on inverse normal combination test
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsMeansInverseNormal <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -895,9 +819,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on Fisher's combination test
-#
+#'
+#' RCIs based on Fisher's combination test
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsMeansFisher <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -920,9 +846,11 @@ NULL
     ))
 }
 
-#
-# Calculation of conditional power based on group sequential method
-#
+#'
+#' Calculation of conditional power based on group sequential method
+#'
+#' @noRd
+#'
 .getConditionalPowerMeansGroupSequential <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_,
         thetaH1 = NA_real_, assumedStDev = NA_real_) {
@@ -1036,9 +964,11 @@ NULL
     ))
 }
 
-#
-# Calculation of conditional power based on inverse normal method
-#
+#'
+#' Calculation of conditional power based on inverse normal method
+#'
+#' @noRd
+#'
 .getConditionalPowerMeansInverseNormal <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_,
         thetaH1 = NA_real_, assumedStDev = NA_real_) {
@@ -1150,9 +1080,11 @@ NULL
     ))
 }
 
-#
-# Calculation of conditional power based on Fisher combination test
-#
+#'
+#' Calculation of conditional power based on Fisher combination test
+#'
+#' @noRd
+#'
 .getConditionalPowerMeansFisher <- function(..., stageResults, stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_,
         thetaH1 = NA_real_, assumedStDev = NA_real_,
@@ -1409,10 +1341,12 @@ NULL
     ))
 }
 
-#
-# Calculation of final confidence interval
-# based on group sequential test without SSR (general case).
-#
+#'
+#' Calculation of final confidence interval
+#' based on group sequential test without SSR (general case).
+#'
+#' @noRd
+#'
 .getFinalConfidenceIntervalMeansGroupSequential <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1442,9 +1376,8 @@ NULL
     ))
 }
 
-.getFinalConfidenceIntervalMeansValues <- function(design, dataInput, 
+.getFinalConfidenceIntervalMeansValues <- function(design, dataInput,
         stageResults, directionUpper, thetaH0, stage, tolerance) {
-        
     finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
     medianUnbiasedGeneral <- NA_real_
 
@@ -1576,10 +1509,12 @@ NULL
     ))
 }
 
-#
-# Calculation of final confidence interval
-# based on inverse normal method, only theoretically shown to be valid for kMax <= 2 or no SSR.
-#
+#'
+#' Calculation of final confidence interval
+#' based on inverse normal method, only theoretically shown to be valid for kMax <= 2 or no SSR.
+#'
+#' @noRd
+#'
 .getFinalConfidenceIntervalMeansInverseNormal <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,
@@ -1632,10 +1567,12 @@ NULL
     ))
 }
 
-#
-# Calculation of final confidence interval
-# based on Fisher combination test, only valid for kMax <= 2.
-#
+#'
+#' Calculation of final confidence interval
+#' based on Fisher combination test, only valid for kMax <= 2.
+#'
+#' @noRd
+#'
 .getFinalConfidenceIntervalMeansFisher <- function(..., design, dataInput, stage,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,

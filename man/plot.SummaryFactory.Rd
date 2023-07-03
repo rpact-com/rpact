@@ -4,7 +4,7 @@
 \alias{plot.SummaryFactory}
 \title{Summary Factory Plotting}
 \usage{
-\method{plot}{SummaryFactory}(x, y, ...)
+\method{plot}{SummaryFactory}(x, y, ..., showSummary = FALSE)
 }
 \arguments{
 \item{x}{The summary factory object.}
@@ -13,6 +13,8 @@
 
 \item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented
 for changing x or y axis limits without dropping data observations.}
+
+\item{showSummary}{Show the summary before creating the plot output, default is \code{FALSE}.}
 }
 \value{
 Returns a \code{ggplot2} object.

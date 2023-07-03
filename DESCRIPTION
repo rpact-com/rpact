@@ -1,25 +1,42 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 3.3.4
-Date: 2023-02-14
+Version: 3.4.0
+Date: 2023-07-03
 Authors@R: c(
 	person(
 		given = "Gernot", 
 		family = "Wassmer", 
 		email = "gernot.wassmer@rpact.com", 
-		role = c("aut")),
+		comment = c(ORCID = "0000-0001-9397-1794"), 
+		role = c("aut")
+	),
     person(
     	given = "Friedrich", 
     	family = "Pahlke", 
     	email = "friedrich.pahlke@rpact.com",
     	comment = c(ORCID = "0000-0003-2105-2582"), 
-    	role = c("aut", "cre"))
-    )
+    	role = c("aut", "cre")
+    ),
+    person(
+    	given = "Till", 
+    	family = "Jensen", 
+    	email = "till.jensen@rpact.com",
+    	role = c("ctb")
+	),
+    person(
+    	given = "Stephen", 
+    	family = "Schueuerhuis", 
+    	email = "stephen.schueuerhuis@charite.de",
+    	role = c("ctb")
+	))
 Description: Design and analysis of confirmatory adaptive clinical trials with continuous, binary, and survival endpoints according to the methods described in the monograph by Wassmer and Brannath (2016) <doi:10.1007/978-3-319-32562-0>. This includes classical group sequential as well as multi-stage adaptive hypotheses tests that are based on the combination testing principle.
 License: LGPL-3
 Encoding: UTF-8
 LazyData: true
-URL: https://www.rpact.org, https://www.rpact.com, https://github.com/rpact-com/rpact
+URL: https://www.rpact.org,
+    https://www.rpact.com,
+    https://github.com/rpact-com/rpact,
+    https://rpact-com.github.io/rpact/
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US
 Depends: 
@@ -31,14 +48,13 @@ Imports:
 	graphics,
 	tools,
 	rlang,
+	knitr (>= 1.19), 
 	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
 Suggests: 
-	parallel,
 	ggplot2 (>= 2.2.0),	
 	testthat (>= 3.0.0),
 	mnormt (>= 1.5-7),
-	knitr (>= 1.19), 
 	rmarkdown (>= 1.10)
 VignetteBuilder: knitr, rmarkdown
 RoxygenNote: 7.2.3
@@ -58,6 +74,7 @@ Collate:
     'class_core_plot_settings.R'
     'f_core_plot.R'
     'class_design.R'
+    'f_object_r_code.R'
     'f_analysis_base.R'
     'class_analysis_dataset.R'
     'class_analysis_stage_results.R'
@@ -71,6 +88,7 @@ Collate:
     'f_simulation_utilities.R'
     'f_simulation_base_survival.R'
     'class_simulation_results.R'
+    'class_performance_score.R'
     'class_summary.R'
     'data.R'
     'f_analysis_base_means.R'

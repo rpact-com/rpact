@@ -1,5 +1,3 @@
-#' Field Description: Type II error rate Beta
-#' @field beta Type II error rate, necessary for providing sample size calculations \cr
-#'   (e.g., \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}), beta spending function designs, 
-#'   or optimum designs, default is \code{0.20}. Is a positive numeric of length 1.
+#' Field description: beta
+#' @field beta The Type II error rate necessary for providing sample size calculations  (e.g., in \code{getSampleSizeMeans}), beta spending function designs, or optimum designs, default is \code{0.20}. Is a numeric vector of length 1 containing a value between 0 and 1.
 #' @keywords internal

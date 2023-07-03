@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6669 $
-## |  Last changed: $Date: 2022-11-10 11:29:28 +0100 (Thu, 10 Nov 2022) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -118,8 +118,8 @@ NULL
         numberOfNAs <- sum(as.vector(criticalValues) > 50, na.rm = TRUE)
         criticalValues[criticalValues > 50] <- NA_real_
         if (any(is.na(criticalValues) & (design$criticalValues < 8))) {
-            warning("The computation of ", .integerToWrittenNumber(numberOfNAs), 
-                " efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " on ", 
+            warning("The computation of ", .integerToWrittenNumber(numberOfNAs),
+                " efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " on ",
                 "treatment effect scale not performed presumably due to too small df",
                 call. = FALSE
             )
@@ -162,8 +162,8 @@ NULL
                     design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
         if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-				(design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
-                futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * stDev *
+                (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+            futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * stDev *
                 (1 + allocationRatioPlanned) / (sqrt(allocationRatioPlanned *
                     design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
@@ -182,7 +182,7 @@ NULL
                 (sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
         if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-				(design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * stDev *
                 sqrt(1 + 1 / allocationRatioPlanned + thetaH0^2 * (1 + allocationRatioPlanned)) /
                 (sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
@@ -248,9 +248,9 @@ NULL
                 futilityBoundsEffectScaleUpper[, j] <- thetaH0 + (2 * directionUpper[j] - 1) *
                     futilityBounds * sqrt(thetaH0 * (1 - thetaH0)) /
                     sqrt(n1[1:(design$kMax - 1), j])
-            } 
+            }
             if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-					(design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                    (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
                 futilityBoundsEffectScaleLower[, j] <- thetaH0 - (2 * directionUpper[j] - 1) *
                     futilityBounds * sqrt(thetaH0 * (1 - thetaH0)) /
                     sqrt(n1[1:(design$kMax - 1), j])
@@ -351,7 +351,7 @@ NULL
         }
 
         if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-				(design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             boundaries <- -futilityBounds
             for (j in (1:nParameters)) {
                 n1 <- allocationRatioPlanned[j] * design$informationRates *
@@ -473,7 +473,7 @@ NULL
             }
         }
         if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-			(design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             boundaries <- -futilityBounds
             for (j in (1:nParameters)) {
                 n1 <- allocationRatioPlanned[j] * design$informationRates * maxNumberOfSubjects[j] /
@@ -563,7 +563,7 @@ NULL
                     eventsPerStage[1:(design$kMax - 1), j])))
         }
         if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-				(design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower[, j] <- thetaH0 * (exp(-(2 * directionUpper[j] - 1) * futilityBounds *
                 (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
                     eventsPerStage[1:(design$kMax - 1), j])))
@@ -942,7 +942,6 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         maxNumberOfSubjectsTarget <- NA_real_
         withCallingHandlers(
             {
-
                 # search for accrual time that provides a result
                 at <- accrualSetup$accrualTime
                 additionalAccrual <- 1
@@ -1063,7 +1062,6 @@ getSampleSizeSurvival <- function(design = NULL, ...,
 
                 # use maxNumberOfSubjectsLower and maxNumberOfSubjectsUpper to find end of accrual
                 if (dropoutRate1 != 0 || dropoutRate2 != 0) {
-
                     #  Adjust lower bound for given dropouts assuming exponential distribution
                     if (is.na(allocationRatioPlanned)) {
                         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
@@ -1547,9 +1545,6 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                 !identical(accrualTime, C_ACCRUAL_TIME_DEFAULT)) {
             designPlan$.warnInCaseArgumentExists(accrualSetup$accrualTime, "accrualTime")
         }
-        if (!identical(eventTime, C_EVENT_TIME_DEFAULT)) {
-            designPlan$.warnInCaseArgumentExists(eventTime, "eventTime")
-        }
         designPlan$.warnInCaseArgumentExists(dropoutRate1, "dropoutRate1")
         designPlan$.warnInCaseArgumentExists(dropoutRate2, "dropoutRate2")
         if (!identical(dropoutTime, C_DROP_OUT_TIME_DEFAULT)) {
@@ -1668,7 +1663,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         }
     }
 
-    designPlan$.setParameterType("omega", C_PARAM_NOT_APPLICABLE)
+    designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
 
     if (designPlan$.isSampleSizeObject()) {
         designPlan$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
@@ -1836,7 +1831,6 @@ getSampleSizeSurvival <- function(design = NULL, ...,
 
         return(designPlan)
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
-
         # Fixed
         designPlan <- .getSampleSizeFixedSurvival(designPlan)
 
@@ -1943,7 +1937,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         if (designPlan$.getParameterType("accountForObservationTimes") != C_PARAM_USER_DEFINED) {
             designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
         }
-        designPlan$.setParameterType("omega", C_PARAM_NOT_APPLICABLE)
+        designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
 
         .addStudyDurationToDesignPlan(designPlan)
 
@@ -2066,7 +2060,6 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                             ((theta - thetaH0) / stDev)^2
                     }
                 } else {
-
                     # allocationRatioPlanned = 0 provides optimum sample size
                     if (allocationRatioPlanned == 0) {
                         allocationRatioPlanned <- 1 / thetaH0
@@ -3005,8 +2998,8 @@ getEventProbabilities <- function(time, ...,
             eventProbabilities$cumulativeEventProbabilities,
             .getEventProbabilitiesOverall(eventProbs, allocationRatioPlanned)
         )
-        
-        eventProbabilities$overallEventProbabilities <- 
+
+        eventProbabilities$overallEventProbabilities <-
             eventProbabilities$cumulativeEventProbabilities # deprecated
 
         eventProbabilities$eventProbabilities1 <- c(
@@ -3357,7 +3350,7 @@ getNumberOfSubjects <- function(time, ...,
 
     designPlan$eventsFixed <- rep(NA_real_, numberOfResults) # number of events
     designPlan$nFixed <- rep(NA_real_, numberOfResults) # number of subjects
-    designPlan$omega <- rep(NA_real_, numberOfResults) # probability of an event
+    designPlan$chi <- rep(NA_real_, numberOfResults) # probability of an event
 
     calculateAllocationRatioPlanned <- FALSE
     if (allocationRatioPlanned == 0) {
@@ -3428,10 +3421,10 @@ getNumberOfSubjects <- function(time, ...,
             )
 
             if (!accountForObservationTimes) {
-                designPlan$omega[i] <- (allocationRatioPlanned * pi1[i] + pi2) /
+                designPlan$chi[i] <- (allocationRatioPlanned * pi1[i] + pi2) /
                     (1 + allocationRatioPlanned)
             } else {
-                designPlan$omega[i] <- .getEventProbabilities(
+                designPlan$chi[i] <- .getEventProbabilities(
                     time = accrualTime[length(accrualTime)] + designPlan$followUpTime,
                     accrualTimeVector = accrualTime,
                     accrualIntensity = designPlan$accrualIntensity,
@@ -3441,9 +3434,9 @@ getNumberOfSubjects <- function(time, ...,
                     allocationRatioPlanned = allocationRatioPlanned, hazardRatio = hazardRatio[i]
                 )
             }
-            designPlan$.setParameterType("omega", C_PARAM_GENERATED)
+            designPlan$.setParameterType("chi", C_PARAM_GENERATED)
 
-            designPlan$nFixed[i] <- designPlan$eventsFixed[i] / designPlan$omega[i]
+            designPlan$nFixed[i] <- designPlan$eventsFixed[i] / designPlan$chi[i]
         } else {
             if (length(maxNumberOfSubjects) > 1) {
                 stop(
@@ -3524,7 +3517,7 @@ getNumberOfSubjects <- function(time, ...,
             )
 
             if (!is.na(timeVector[i])) {
-                designPlan$omega[i] <- .getEventProbabilities(
+                designPlan$chi[i] <- .getEventProbabilities(
                     time = timeVector[i],
                     accrualTimeVector = accrualTime,
                     accrualIntensity = designPlan$accrualIntensity, lambda2 = designPlan$lambda2,
@@ -3532,7 +3525,7 @@ getNumberOfSubjects <- function(time, ...,
                     piecewiseSurvivalTime = piecewiseSurvivalTime, phi = phi, kappa = kappa,
                     allocationRatioPlanned = allocationRatioPlanned, hazardRatio = hazardRatio[i]
                 )
-                designPlan$.setParameterType("omega", C_PARAM_GENERATED)
+                designPlan$.setParameterType("chi", C_PARAM_GENERATED)
             }
         }
     }
@@ -3602,7 +3595,7 @@ getNumberOfSubjects <- function(time, ...,
     designPlan$expectedEventsH1 <- rep(NA_real_, numberOfResults)
     expectedNumberOfSubjectsH1 <- rep(NA_real_, numberOfResults)
     studyDuration <- rep(NA_real_, numberOfResults)
-    designPlan$omega <- rep(NA_real_, numberOfResults)
+    designPlan$chi <- rep(NA_real_, numberOfResults)
 
     informationRates <- designCharacteristics$information / designCharacteristics$shift
 
@@ -3625,10 +3618,10 @@ getNumberOfSubjects <- function(time, ...,
             } else {
                 allocationRatioPlanned <- designPlan$allocationRatioPlanned
             }
-            designPlan$omega[i] <- (allocationRatioPlanned * designPlan$pi1[i] + designPlan$pi2) /
+            designPlan$chi[i] <- (allocationRatioPlanned * designPlan$pi1[i] + designPlan$pi2) /
                 (1 + allocationRatioPlanned)
-            designPlan$.setParameterType("omega", C_PARAM_GENERATED)
-            numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$omega[i]
+            designPlan$.setParameterType("chi", C_PARAM_GENERATED)
+            numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$chi[i]
         } else {
             phi <- -c(log(1 - designPlan$dropoutRate1), log(1 - designPlan$dropoutRate2)) /
                 designPlan$dropoutTime
@@ -3735,7 +3728,7 @@ getNumberOfSubjects <- function(time, ...,
                     )
                 }
 
-                designPlan$omega[i] <- .getEventProbabilities(
+                designPlan$chi[i] <- .getEventProbabilities(
                     time = designPlan$accrualTime[length(designPlan$accrualTime)] + designPlan$followUpTime,
                     accrualTimeVector = designPlan$accrualTime,
                     accrualIntensity = designPlan$accrualIntensity,
@@ -3746,8 +3739,8 @@ getNumberOfSubjects <- function(time, ...,
                     allocationRatioPlanned = allocationRatioPlanned,
                     hazardRatio = designPlan$hazardRatio[i]
                 )
-                designPlan$.setParameterType("omega", C_PARAM_GENERATED)
-                numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$omega[i]
+                designPlan$.setParameterType("chi", C_PARAM_GENERATED)
+                numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$chi[i]
 
                 #   Analysis times
                 for (j in 1:(kMax - 1)) {
@@ -4734,7 +4727,6 @@ getPowerSurvival <- function(design = NULL, ...,
     }
 
     for (i in 1:numberOfResults) {
-
         # Analysis times
         up <- 2
         iterate <- 1

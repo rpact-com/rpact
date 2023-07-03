@@ -8,63 +8,53 @@
 Trial design for Fisher's combination test.
 }
 \details{
-This object should not be created directly; use \code{\link[=getDesignFisher]{getDesignFisher()}}
+This object should not be created directly; use \code{\link{getDesignFisher}}
 with suitable arguments to create a Fisher combination test design.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{kMax}}{The maximum number of stages \code{K}.
-Is a positive integer of length 1 (default value is \code{3}).
-The maximum selectable \code{kMax} is \code{20} for group sequential or inverse normal and
-\code{6} for Fisher combination test designs.}
+\item{\code{kMax}}{The maximum number of stages \code{K}. Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{alpha}}{The significance level alpha, default is \code{0.025}.
-Is a positive numeric of length 1.}
+\item{\code{alpha}}{The significance level alpha, default is 0.025. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{stages}}{The stage numbers of the trial. Is an integer vector of length \code{kMax}.}
+\item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{informationRates}}{The information rates (that must be fixed prior to the trial),
-default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} (the maximum number of stages).}
+\item{\code{informationRates}}{The information rates (that must be fixed prior to the trial), default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{userAlphaSpending}}{The user defined alpha spending.
-Numeric vector of length \code{kMax} containing the cumulative
-alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 <= ... <= alpha_K <= alpha}.}
+\item{\code{userAlphaSpending}}{The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{criticalValues}}{The critical values for each stage of the trial.
-Is a numeric vector of length \code{kMax} (the maximum number of stages).}
+\item{\code{criticalValues}}{The critical values for each stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{stageLevels}}{The levels for each stage.}
+\item{\code{stageLevels}}{The adjusted significance levels to reach significance in a group sequential design. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{alphaSpent}}{The cumulative alpha spent at each stage.
-Is a numeric vector with length \code{kMax} (the maximum number of stages).}
+\item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{bindingFutility}}{Logical. If \code{bindingFutility = TRUE} is specified the calculation of
-the critical values is affected by the futility bounds and the futility threshold is binding in the
-sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
+\item{\code{bindingFutility}}{If \code{TRUE}, the calculation of the critical values is affected by the futility bounds and the futility threshold is binding in the sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}) Is a logical vector of length 1.}
 
-\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a positive numeric of length 1.}
+\item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
 
-\item{\code{method}}{"equalAlpha", "fullAlpha", "noInteraction", or "userDefinedAlpha", default is "equalAlpha" (for details, see Wassmer, 1999)}
+\item{\code{method}}{"equalAlpha", "fullAlpha", "noInteraction", or "userDefinedAlpha", default is "equalAlpha".
+For details, see Wassmer, 1999, doi: 10.1002/(SICI)1521-4036(199906)41:3\%3C279::AID-BIMJ279\%3E3.0.CO;2-V.
+Is a character vector of length 1.}
 
-\item{\code{alpha0Vec}}{Stopping for futility bounds for stage-wise p-values.}
+\item{\code{alpha0Vec}}{The stopping for futility bounds for stage-wise p-values in Fisher's combination test. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}
 
-\item{\code{scale}}{Is a numeric vector of length \code{kMax}-1 that applies to Fisher's design with unequally spaced information rates.}
+\item{\code{scale}}{The scale for Fisher's combination test. Numeric vector of length \code{kMax-1} that applies to Fisher's design with unequally spaced information rates. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}
 
-\item{\code{nonStochasticCurtailment}}{Logical. If \code{TRUE}, the stopping rule is based on the phenomenon of non-stochastic curtailment rather than stochastic reasoning.}
+\item{\code{nonStochasticCurtailment}}{If \code{TRUE}, the stopping rule is based on the phenomenon of non-stochastic curtailment rather than stochastic reasoning. Is a logical vector of length 1.}
 
-\item{\code{sided}}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}.
-Is a positive integer of length 1.}
+\item{\code{sided}}{Describes if the alternative is one-sided (\code{1}) or two-sided (\code{2}). Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{simAlpha}}{The observed alpha error, if simulations have been performed. Is a numeric vector of length 1.}
+\item{\code{simAlpha}}{The observed alpha error if simulations have been performed. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{iterations}}{The number of iterations used for simulations. Is an integer of length 1.}
+\item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
 
 \item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
 }}
 
 
 \seealso{
-\code{\link[=getDesignFisher]{getDesignFisher()}} for creating a Fisher combination test design.
+\code{\link{getDesignFisher}} for creating a Fisher combination test design.
 }
 \keyword{internal}

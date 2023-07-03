@@ -80,6 +80,7 @@ getClosedConditionalDunnettTestResults(stageResults)
 }
 \seealso{
 Other analysis functions: 
+\code{\link{getAnalysisResults}()},
 \code{\link{getClosedCombinationTestResults}()},
 \code{\link{getConditionalPower}()},
 \code{\link{getConditionalRejectionProbabilities}()},

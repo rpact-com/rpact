@@ -13,26 +13,28 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6488 $
-## |  Last changed: $Date: 2022-08-15 10:28:13 +0200 (Mon, 15 Aug 2022) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_logger.R
 NULL
 
-# @title
-# Get Analysis Results Survival
-#
-# @description
-# Returns an analysis result object.
-#
-# @param design The trial design.
-#
-# @return Returns a \code{AnalysisResultsSurvival} object.
-#
-# @keywords internal
-#
+#' @title
+#' Get Analysis Results Survival
+#'
+#' @description
+#' Returns an analysis result object.
+#'
+#' @param design The trial design.
+#'
+#' @return Returns a \code{AnalysisResultsSurvival} object.
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
 .getAnalysisResultsSurvivalMultiArm <- function(..., design, dataInput) {
     if (.isTrialDesignInverseNormal(design)) {
         return(.getAnalysisResultsSurvivalInverseNormalMultiArm(
@@ -192,7 +194,6 @@ NULL
     .logProgress("Closed test calculated", startTime = startTime)
 
     if (design$kMax > 1) {
-
         # conditional power
         startTime <- Sys.time()
         if (.isTrialDesignFisher(design)) {
@@ -603,8 +604,7 @@ NULL
         for (k in stages) {
             startTime <- Sys.time()
             for (treatmentArm in 1:gMax) {
-				if (!is.na(stageResults$testStatistics[treatmentArm, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
-
+                if (!is.na(stageResults$testStatistics[treatmentArm, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
                     # Finding maximum upper and minimum lower bounds for RCIs
                     thetaLow <- exp(.getUpperLowerThetaSurvivalMultiArm(
                         design = design, dataInput = dataInput,
@@ -638,7 +638,7 @@ NULL
                     )
 
                     # adjustment for binding futility bounds
-					if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
+                    if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
                         parameterName <- ifelse(.isTrialDesignFisher(design),
                             "singleStepAdjustedPValues", firstParameterName
                         )
@@ -692,9 +692,11 @@ NULL
     return(repeatedConfidenceIntervals)
 }
 
-#
-# RCIs based on inverse normal combination test
-#
+#'
+#' RCIs based on inverse normal combination test
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsSurvivalMultiArmInverseNormal <- function(...,
         design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -716,9 +718,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on Fisher's combination test
-#
+#'
+#' RCIs based on Fisher's combination test
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsSurvivalMultiArmFisher <- function(...,
         design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -740,9 +744,11 @@ NULL
     ))
 }
 
-#
-# CIs based on conditional Dunnett test
-#
+#'
+#' CIs based on conditional Dunnett test
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsSurvivalMultiArmConditionalDunnett <- function(...,
         design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -764,9 +770,11 @@ NULL
     ))
 }
 
-#
-#  Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Survival
-#
+#'
+#' Calculation of lower and upper limits of repeated confidence intervals (RCIs) for Survival
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsSurvivalMultiArm <- function(..., design) {
     if (.isTrialDesignInverseNormal(design)) {
         return(.getRepeatedConfidenceIntervalsSurvivalMultiArmInverseNormal(design = design, ...))
@@ -780,9 +788,11 @@ NULL
     .stopWithWrongDesignMessage(design)
 }
 
-#
-#  Calculation of conditional power for Survival
-#
+#'
+#' Calculation of conditional power for Survival
+#'
+#' @noRd
+#'
 .getConditionalPowerSurvivalMultiArm <- function(..., stageResults, stage = stageResults$stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaH1 = NA_real_,
@@ -867,9 +877,11 @@ NULL
     )
 }
 
-#
-# Calculation of conditional power based on inverse normal method
-#
+#'
+#' Calculation of conditional power based on inverse normal method
+#'
+#' @noRd
+#'
 .getConditionalPowerSurvivalMultiArmInverseNormal <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1) {
     .assertIsTrialDesignInverseNormal(design)
@@ -949,9 +961,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power based on Fisher's combination test
-#
+#'
+#' Calculation of conditional power based on Fisher's combination test
+#'
+#' @noRd
+#'
 .getConditionalPowerSurvivalMultiArmFisher <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1, iterations, seed) {
     .assertIsTrialDesignFisher(design)
@@ -1043,9 +1057,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power based on conditional Dunnett test
-#
+#'
+#' Calculation of conditional power based on conditional Dunnett test
+#'
+#' @noRd
+#'
 .getConditionalPowerSurvivalMultiArmConditionalDunnett <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, thetaH1) {
     .assertIsTrialDesignConditionalDunnett(design)
@@ -1095,9 +1111,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power and likelihood values for plotting the graph
-#
+#'
+#' Calculation of conditional power and likelihood values for plotting the graph
+#'
+#' @noRd
+#'
 .getConditionalPowerLikelihoodSurvivalMultiArm <- function(..., stageResults, stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaRange, iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {

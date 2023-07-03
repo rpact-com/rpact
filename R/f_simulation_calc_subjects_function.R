@@ -13,16 +13,16 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6695 $
-## |  Last changed: $Date: 2022-11-18 09:15:48 +0100 (Fri, 18 Nov 2022) $
+## |  File version: $Revision: 7019 $
+## |  Last changed: $Date: 2023-05-31 07:23:47 +0200 (Mi, 31 Mai 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS_ARGUMENTS <- list(
     stage = "int",
-    meanRatio = "bool", 
-    thetaH0 = "double", 
-    groups = "int", 
+    meanRatio = "bool",
+    thetaH0 = "double",
+    groups = "int",
     plannedSubjects = "NumericVector",
     allocationRatioPlanned = "NumericVector",
     minNumberOfSubjectsPerStage = "NumericVector",
@@ -36,7 +36,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS_ARGUMENTS <- list(
 
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS_CPP_CODE <- c(
     "#include <Rcpp.h>",
-    "#include <cmath>",
+    #    "#include <cmath>",
     "using namespace Rcpp;",
     "typedef double (*calcSubjectsFunctionMeansPtrTemp)(",
     "    int stage, ",
@@ -77,11 +77,11 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS_CPP_CODE <- c(
 
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES_ARGUMENTS <- list(
     stage = "int",
-    riskRatio = "bool", 
-    thetaH0 = "double", 
-    groups = "int", 
+    riskRatio = "bool",
+    thetaH0 = "double",
+    groups = "int",
     plannedSubjects = "NumericVector",
-    directionUpper = "bool", 
+    directionUpper = "bool",
     allocationRatioPlanned = "NumericVector",
     minNumberOfSubjectsPerStage = "NumericVector",
     maxNumberOfSubjectsPerStage = "NumericVector",
@@ -95,7 +95,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES_ARGUMENTS <- list(
 
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES_CPP_CODE <- c(
     "#include <Rcpp.h>",
-    "#include <cmath>",
+    #    "#include <cmath>",
     "using namespace Rcpp;",
     "typedef double (*calcSubjectsFunctionRatesPtrTemp)(",
     "    int stage, ",
@@ -140,11 +140,11 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES_CPP_CODE <- c(
 
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL_ARGUMENTS <- list(
     stage = "int",
-    conditionalPower = "double", 
-    thetaH0 = "double", 
-    estimatedTheta = "double", 
+    conditionalPower = "double",
+    thetaH0 = "double",
+    estimatedTheta = "double",
     plannedEvents = "NumericVector",
-    eventsOverStages = "NumericVector", 
+    eventsOverStages = "NumericVector",
     minNumberOfEventsPerStage = "NumericVector",
     maxNumberOfEventsPerStage = "NumericVector",
     allocationRatioPlanned = "double",
@@ -153,7 +153,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL_ARGUMENTS <- list(
 
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL_CPP_CODE <- c(
     "#include <Rcpp.h>",
-    "#include <cmath>",
+    #    "#include <cmath>",
     "using namespace Rcpp;",
     "typedef double (*calcEventsFunctionSurvivalPtrTemp)(",
     "    int stage, ",
@@ -191,19 +191,19 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES <- "base_rates"
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL <- "base_survival"
 
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_CPP_CODE <- list()
-C_SIMULATION_CALC_SUBJECTS_FUNCTION_CPP_CODE[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS]] <- 
+C_SIMULATION_CALC_SUBJECTS_FUNCTION_CPP_CODE[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS]] <-
     C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS_CPP_CODE
-C_SIMULATION_CALC_SUBJECTS_FUNCTION_CPP_CODE[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES]] <- 
+C_SIMULATION_CALC_SUBJECTS_FUNCTION_CPP_CODE[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES]] <-
     C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES_CPP_CODE
-C_SIMULATION_CALC_SUBJECTS_FUNCTION_CPP_CODE[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL]] <- 
+C_SIMULATION_CALC_SUBJECTS_FUNCTION_CPP_CODE[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL]] <-
     C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL_CPP_CODE
 
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS <- list()
-C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS]] <- 
+C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS]] <-
     C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS_ARGUMENTS
-C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES]] <- 
+C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES]] <-
     C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES_ARGUMENTS
-C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL]] <- 
+C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL]] <-
     C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL_ARGUMENTS
 
 .regexprCalcSubjectsFunction <- function(pattern, cmd, ..., language = c("cpp", "R")) {
@@ -233,10 +233,10 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
 .getCalcSubjectsFunctionRCode <- function(cmd, cppCodeBodyType) {
     .assertIsCharacter(cmd, "cmd")
     .assertIsCharacter(cppCodeBodyType, "cppCodeBodyType")
-    
+
     cmd <- paste0(cmd, collapse = "\n")
     cmd <- trimws(cmd)
-    
+
     validArgsList <- C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[cppCodeBodyType]]
     validArgs <- names(validArgsList)
 
@@ -337,9 +337,10 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
             class(simulationResults)[1]
         )
     }
-    
-    functionFieldName <- ifelse(inherits(simulationResults, "SimulationResultsSurvival"), 
-        "calcEventsFunction", "calcSubjectsFunction")
+
+    functionFieldName <- ifelse(inherits(simulationResults, "SimulationResultsSurvival"),
+        "calcEventsFunction", "calcSubjectsFunction"
+    )
 
     if (design$kMax == 1) {
         if (!is.null(calcFunction)) {
@@ -396,19 +397,43 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
     if (.isCppCode(calcFunction)) {
         tryCatch(
             {
+                survivalEnabled <- inherits(simulationResults, "SimulationResultsSurvival")
+                expectedFunctionName <- ifelse(survivalEnabled,
+                    "calcEventsFunctionCppTemp", "calcSubjectsFunctionCppTemp"
+                )
                 calcSubjectsFunctionCppTemp <- NULL
                 calcEventsFunctionCppTemp <- NULL
-                Rcpp::sourceCpp(code = .getCalcSubjectsFunctionCppCode(
+                result <- Rcpp::sourceCpp(code = .getCalcSubjectsFunctionCppCode(
                     calcFunction, cppCodeBodyType
                 ))
+                functionName <- result$functions
+                if (length(functionName) == 0) {
+                    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "C++ compilation returned an unexpected value")
+                }
+                if (functionName != expectedFunctionName) {
+                    stop(
+                        C_EXCEPTION_TYPE_RUNTIME_ISSUE, "C++ compilation returned an unexpected ",
+                        "function name (", sQuote(functionName), " instead of ", sQuote(expectedFunctionName), ")"
+                    )
+                }
+
                 simulationResults[[functionFieldName]] <- calcFunction
-                tempFunction <- if (inherits(simulationResults, "SimulationResultsSurvival")) 
-                        calcEventsFunctionCppTemp else calcSubjectsFunctionCppTemp 
-                return(list(
-                    calcSubjectsFunctionR = NULL,
-                    calcSubjectsFunctionCpp = tempFunction(),
-                    calcSubjectsFunctionType = 2
-                ))
+                if (!exists(functionName)) {
+                    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(functionName), " is missing")
+                }
+                if (survivalEnabled) {
+                    return(list(
+                        calcSubjectsFunctionR = NULL,
+                        calcSubjectsFunctionCpp = calcEventsFunctionCppTemp(),
+                        calcSubjectsFunctionType = 2
+                    ))
+                } else {
+                    return(list(
+                        calcSubjectsFunctionR = NULL,
+                        calcSubjectsFunctionCpp = calcSubjectsFunctionCppTemp(),
+                        calcSubjectsFunctionType = 2
+                    ))
+                }
             },
             error = function(e) {
                 cat(.getCalcSubjectsFunctionCppCode(
@@ -446,4 +471,3 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
         calcSubjectsFunctionType = 0
     ))
 }
-

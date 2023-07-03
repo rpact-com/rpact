@@ -13,54 +13,56 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6708 $
-## |  Last changed: $Date: 2022-12-02 08:50:56 +0100 (Fr, 02 Dez 2022) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
 NULL
 
-#
-# @title
-# Set Seed
-#
-# @description
-# Sets the seed, generates it if \code{is.na(seed) == TRUE} and returns it.
-#
-# @param seed the seed to set.
-#
-# @details
-# Internal function.
-#
-# @return the (generated) seed.
-#
-# @examples
-#
-# .setSeed(12345)
-#
-# mySeed <- .setSeed()
-#
-# @keywords internal
-#
+#'
+#' @title
+#' Set Seed
+#'
+#' @description
+#' Sets the seed, generates it if \code{is.na(seed) == TRUE} and returns it.
+#'
+#' @param seed the seed to set.
+#'
+#' @details
+#' Internal function.
+#'
+#' @return the (generated) seed.
+#'
+#' @examples
+#'
+#' .setSeed(12345)
+#'
+#' mySeed <- .setSeed()
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
 .setSeed <- function(seed = NA_real_) {
     if (!is.null(seed) && !is.na(seed)) {
         if (is.na(as.integer(seed))) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'seed' must be a valid integer")
         }
-        
+
         set.seed(seed = seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
         return(seed)
     }
-    
+
     if (exists(".Random.seed") && length(.Random.seed) > 0) {
         seed <- .Random.seed[length(.Random.seed)]
     } else {
         seed <- round(stats::runif(1) * 1e8)
     }
-    
+
     .logDebug("Set seed to %s", seed)
-    
+
     tryCatch(
         {
             set.seed(seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
@@ -71,7 +73,7 @@ NULL
             traceback()
         }
     )
-    
+
     invisible(seed)
 }
 
@@ -89,19 +91,18 @@ NULL
 }
 
 .getSimulationParametersFromRawData <- function(data, ..., variantName, maxNumberOfIterations = NA_integer_) {
-    
     if (is.null(data) || length(data) != 1) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'data' must be a valid data.frame or a simulation result object")
     }
-        
+
     if (inherits(data, "SimulationResults")) {
         data <- data[[".data"]]
     }
-        
+
     if (!is.data.frame(data)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'data' (", .getClassName(data), ") must be a data.frame or a simulation result object")
     }
-    
+
     if (is.na(maxNumberOfIterations)) {
         maxNumberOfIterations <- max(data$iterationNumber)
     }
@@ -195,12 +196,11 @@ C_EFFECT_LIST_NAMES_EXPECTED_MEANS <- c("subGroups", "prevalences", "effects", "
 C_EFFECT_LIST_NAMES_EXPECTED_RATES <- c("subGroups", "prevalences", "piControls", "piTreatments")
 C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piControls", "hazardRatios")
 
-.getEffectData <- function(effectList, ..., 
-        endpoint = NA_character_, 
-        gMax = NA_integer_, 
+.getEffectData <- function(effectList, ...,
+        endpoint = NA_character_,
+        gMax = NA_integer_,
         nullAllowed = TRUE,
         parameterNameWarningsEnabled = TRUE) {
-        
     if (nullAllowed && is.null(effectList)) {
         return(NULL)
     }
@@ -255,13 +255,13 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         }
         if ("F" %in% subGroups) {
             stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "definition of full population 'F' ", 
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "definition of full population 'F' ",
                 "together with sub-groups", ifelse(length(subGroups) == 2, "", "s"), " ",
-                .arrayToString(subGroups[subGroups != "F"], encapsulate = TRUE, mode = "and"), 
+                .arrayToString(subGroups[subGroups != "F"], encapsulate = TRUE, mode = "and"),
                 " makes no sense and is not allowed (use remaining population 'R' instead of 'F')"
             )
         }
-        expectedSubGroups <- .createSubsetsByGMax(gMax, stratifiedInput = TRUE, all = FALSE) 
+        expectedSubGroups <- .createSubsetsByGMax(gMax, stratifiedInput = TRUE, all = FALSE)
         if (gMax < 3) {
             expectedSubGroups <- gsub("\\d", "", expectedSubGroups)
         }
@@ -286,26 +286,24 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 
     matrixName <- NA_character_
     matrixNames <- c("effects", "piTreatments", "hazardRatios")
-    
+
     if (!is.na(endpoint)) {
         if (endpoint == "means") {
             matrixNames <- "effects"
-        }
-        else if (endpoint == "rates") {
+        } else if (endpoint == "rates") {
             matrixNames <- "piTreatments"
-        }
-        else if (endpoint == "survival") {
+        } else if (endpoint == "survival") {
             matrixNames <- "hazardRatios"
         }
     }
-    
+
     for (m in matrixNames) {
         if (m %in% effectListNames) {
             matrixName <- m
             break
         }
     }
-    
+
     if (is.na(matrixName)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote("effectList"), " must contain ",
@@ -418,20 +416,20 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     }
 
     longData <- longData[, colnames(longData) != "subGroupNumber"]
-    
+
     if (parameterNameWarningsEnabled && !is.na(endpoint)) {
         if (endpoint == "means") {
             ignore <- effectListNames[!(effectListNames %in% C_EFFECT_LIST_NAMES_EXPECTED_MEANS)]
-        }
-        else if (endpoint == "rates") {
+        } else if (endpoint == "rates") {
             ignore <- effectListNames[!(effectListNames %in% C_EFFECT_LIST_NAMES_EXPECTED_RATES)]
-        }
-        else if (endpoint == "survival") {
+        } else if (endpoint == "survival") {
             ignore <- effectListNames[!(effectListNames %in% C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL)]
         }
         if (length(ignore) > 0) {
             warning("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
-                " will be ignored", call. = FALSE)
+                " will be ignored",
+                call. = FALSE
+            )
         }
     }
 
@@ -491,11 +489,10 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     ))
 }
 
-.getEffectList <- function(effectData, ..., 
-        parameterName = "effectData", 
+.getEffectList <- function(effectData, ...,
+        parameterName = "effectData",
         endpoint = NA_character_,
         parameterNameWarningsEnabled = TRUE) {
-        
     if (is.null(effectData) || length(effectData) == 0 || !is.data.frame(effectData)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(parameterName), " must be a non-empty data.frame")
     }
@@ -515,9 +512,10 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (is.na(matrixName)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(parameterName), " must contain ",
-            ifelse(!is.na(expectedMatrixName), 
-                sQuote(expectedMatrixName), 
-                .arrayToString(matrixNames, mode = "or", encapsulate = TRUE))
+            ifelse(!is.na(expectedMatrixName),
+                sQuote(expectedMatrixName),
+                .arrayToString(matrixNames, mode = "or", encapsulate = TRUE)
+            )
         )
     }
 
@@ -552,26 +550,27 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (!is.matrix(effectList[[matrixNameNew]])) {
         effectList[[matrixNameNew]] <- matrix(effectList[[matrixNameNew]], ncol = 1)
     }
-    
+
     if (parameterNameWarningsEnabled && !is.na(endpoint)) {
         if (endpoint == "means") {
             ignore <- effectDataNames[!(effectDataNames %in% gsub("s$", "", C_EFFECT_LIST_NAMES_EXPECTED_MEANS))]
-        }
-        else if (endpoint == "rates") {
+        } else if (endpoint == "rates") {
             ignore <- effectDataNames[!(effectDataNames %in% gsub("s$", "", C_EFFECT_LIST_NAMES_EXPECTED_RATES))]
-        }
-        else if (endpoint == "survival") {
+        } else if (endpoint == "survival") {
             ignore <- effectDataNames[!(effectDataNames %in% gsub("s$", "", C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL))]
         }
         if (length(ignore) > 0) {
             warning("The parameter", ifelse(length(ignore) == 1, "", "s"), " ", .arrayToString(ignore, encapsulate = TRUE),
-                " will be ignored", call. = FALSE)
+                " will be ignored",
+                call. = FALSE
+            )
         }
     }
-    
+
     if (!is.null(effectList[["prevalences"]])) {
-        .assertIsInClosedInterval(effectList$prevalences, "effectList$prevalences", 
-            lower = 0, upper = 1, call. = FALSE)
+        .assertIsInClosedInterval(effectList$prevalences, "effectList$prevalences",
+            lower = 0, upper = 1, call. = FALSE
+        )
     }
     if (!is.null(effectList[["effects"]])) {
         .assertIsNumericVector(effectList$effects, "effectList$effects", call. = FALSE)
@@ -580,22 +579,25 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         if (!is.null(effectList[[piParam]])) {
             if (piParam == matrixNameNew && is.matrix(effectList[[piParam]])) {
                 for (i in 1:nrow(effectList[[piParam]])) {
-                    .assertIsInOpenInterval(effectList[[piParam]][i, ], paste0("effectList$", piParam), 
-                        lower = 0, upper = 1, call. = FALSE)
+                    .assertIsInOpenInterval(effectList[[piParam]][i, ], paste0("effectList$", piParam),
+                        lower = 0, upper = 1, call. = FALSE
+                    )
                 }
             } else {
-                .assertIsInOpenInterval(effectList[[piParam]], paste0("effectList$", piParam), 
-                    lower = 0, upper = 1, call. = FALSE)
+                .assertIsInOpenInterval(effectList[[piParam]], paste0("effectList$", piParam),
+                    lower = 0, upper = 1, call. = FALSE
+                )
             }
         }
     }
     for (ratioParam in c("hazardRatios", "stDevs")) {
         if (!is.null(effectList[[ratioParam]])) {
-            .assertIsInOpenInterval(effectList[[ratioParam]], paste0("effectList$", ratioParam), 
-                lower = 0, upper = NULL, call. = FALSE)
+            .assertIsInOpenInterval(effectList[[ratioParam]], paste0("effectList$", ratioParam),
+                lower = 0, upper = NULL, call. = FALSE
+            )
         }
     }
-    
+
     return(effectList)
 }
 
@@ -603,11 +605,11 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (is.null(endpoint) || !(endpoint %in% c("means", "rates", "survival"))) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'endpoint' (", endpoint, ") must be one of 'means', 'rates', or 'survival'")
     }
-    
+
     if (is.null(effectList) || length(effectList) == 0 || (!is.list(effectList) && !is.data.frame(effectList))) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'effectList' must be a valid list or data.frame")
     }
-    
+
     if (is.data.frame(effectList)) {
         return(.getEffectList(effectList, parameterName = "effectList", endpoint = endpoint))
     }
@@ -616,4 +618,24 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     return(.getEffectList(effectData))
 }
 
+.getVariedParameterSimulationMultiArm <- function(designPlan) {
+    if (!grepl("SimulationResultsMultiArm", .getClassName(designPlan))) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designPlan' (",
+            .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'"
+        )
+    }
 
+    if (grepl("Means", .getClassName(designPlan))) {
+        return("muMaxVector")
+    } else if (grepl("Rates", .getClassName(designPlan))) {
+        return("piMaxVector")
+    } else if (grepl("Survival", .getClassName(designPlan))) {
+        return("omegaMaxVector")
+    }
+
+    stop(
+        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designPlan' (",
+        .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'"
+    )
+}

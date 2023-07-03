@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 4248 $
- * Last changed: $Date: 2021-01-22 15:57:53 +0100 (Fri, 22 Jan 2021) $
+ * File version: $Revision: 7019 $
+ * Last changed: $Date: 2023-05-31 07:23:47 +0200 (Mi, 31 Mai 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -28,6 +28,21 @@ using namespace Rcpp;
 
 #ifndef PKG_RPACT_H
 #define PKG_RPACT_H
+
+struct Exception : std::exception {
+    char text[1000];
+
+    Exception(char const* fmt, ...) __attribute__((format(printf,2,3))) {
+        va_list ap;
+        va_start(ap, fmt);
+        vsnprintf(text, sizeof text, fmt, ap);
+        va_end(ap);
+    }
+
+    char const* what() const throw() {
+    	return text;
+    }
+};
 
 double getQNormEpsilon();
 

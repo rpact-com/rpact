@@ -13,26 +13,29 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6488 $
-## |  Last changed: $Date: 2022-08-15 10:28:13 +0200 (Mon, 15 Aug 2022) $
+## |  File version: $Revision: 7126 $
+## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_logger.R
 NULL
 
-# @title
-# Get Analysis Results Rates
-#
-# @description
-# Returns an analysis result object.
-#
-# @param design The trial design.
-#
-# @return Returns a \code{AnalysisResultsRates} object.
-#
-# @keywords internal
-#
+#'
+#' @title
+#' Get Analysis Results Rates
+#'
+#' @description
+#' Returns an analysis result object.
+#'
+#' @param design The trial design.
+#'
+#' @return Returns a \code{AnalysisResultsRates} object.
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
 .getAnalysisResultsRatesMultiArm <- function(..., design, dataInput) {
     if (.isTrialDesignInverseNormal(design)) {
         return(.getAnalysisResultsRatesInverseNormalMultiArm(
@@ -220,7 +223,6 @@ NULL
     .logProgress("Closed test calculated", startTime = startTime)
 
     if (design$kMax > 1) {
-
         # conditional power
         startTime <- Sys.time()
         if (.isTrialDesignFisher(design)) {
@@ -602,7 +604,6 @@ NULL
     return(result)
 }
 
-
 .getRepeatedConfidenceIntervalsRatesMultiArmAll <- function(...,
         design, dataInput,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -712,7 +713,7 @@ NULL
         for (k in stages) {
             startTime <- Sys.time()
             for (treatmentArm in 1:gMax) {
-				if (!is.na(stageResults$testStatistics[treatmentArm, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
+                if (!is.na(stageResults$testStatistics[treatmentArm, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
                     thetaLow <- -1 + tolerance
                     thetaUp <- 1 - tolerance
                     # finding upper and lower RCI limits through root function
@@ -735,7 +736,7 @@ NULL
                     )
 
                     # adjustment for binding futility bounds
-					if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
+                    if (k > 1 && !is.na(bounds[k - 1]) && conditionFunction(bounds[k - 1], border) && design$bindingFutility) {
                         parameterName <- ifelse(.isTrialDesignFisher(design),
                             "singleStepAdjustedPValues", firstParameterName
                         )
@@ -776,9 +777,11 @@ NULL
     return(repeatedConfidenceIntervals)
 }
 
-#
-# RCIs based on inverse normal combination test
-#
+#'
+#' RCIs based on inverse normal combination test
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsRatesMultiArmInverseNormal <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -804,9 +807,11 @@ NULL
     ))
 }
 
-#
-# RCIs based on Fisher's combination test
-#
+#'
+#' RCIs based on Fisher's combination test
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsRatesMultiArmFisher <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -835,9 +840,11 @@ NULL
     ))
 }
 
-#
-# CIs based on conditional Dunnett test
-#
+#'
+#' CIs based on conditional Dunnett test
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsRatesMultiArmConditionalDunnett <- function(...,
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -858,9 +865,11 @@ NULL
     ))
 }
 
-#
-#  Calculation of repeated confidence intervals (RCIs) for Rates
-#
+#'
+#' Calculation of repeated confidence intervals (RCIs) for Rates
+#'
+#' @noRd
+#'
 .getRepeatedConfidenceIntervalsRatesMultiArm <- function(..., design) {
     if (.isTrialDesignInverseNormal(design)) {
         return(.getRepeatedConfidenceIntervalsRatesMultiArmInverseNormal(design = design, ...))
@@ -874,9 +883,11 @@ NULL
     .stopWithWrongDesignMessage(design)
 }
 
-#
-#  Calculation of conditional power for Rates
-#
+#'
+#' Calculation of conditional power for Rates
+#'
+#' @noRd
+#'
 .getConditionalPowerRatesMultiArm <- function(..., stageResults, stage = stageResults$stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         piTreatments = NA_real_, piControl = NA_real_, useAdjustment = TRUE,
@@ -998,9 +1009,11 @@ NULL
     )
 }
 
-#
-# Calculation of conditional power based on inverse normal method
-#
+#'
+#' Calculation of conditional power based on inverse normal method
+#'
+#' @noRd
+#'
 .getConditionalPowerRatesMultiArmInverseNormal <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, piTreatments, piControl) {
     .assertIsTrialDesignInverseNormal(design)
@@ -1097,9 +1110,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power based on Fisher's combination test
-#
+#'
+#' Calculation of conditional power based on Fisher's combination test
+#'
+#' @noRd
+#'
 .getConditionalPowerRatesMultiArmFisher <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, piTreatments, piControl, useAdjustment = TRUE,
         iterations, seed) {
@@ -1215,9 +1230,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power based on conditional Dunnett test
-#
+#'
+#' Calculation of conditional power based on conditional Dunnett test
+#'
+#' @noRd
+#'
 .getConditionalPowerRatesMultiArmConditionalDunnett <- function(..., results, design, stageResults, stage,
         allocationRatioPlanned, nPlanned, piTreatments, piControl) {
     .assertIsTrialDesignConditionalDunnett(design)
@@ -1278,9 +1295,11 @@ NULL
     return(results)
 }
 
-#
-# Calculation of conditional power and likelihood values for plotting the graph
-#
+#'
+#' Calculation of conditional power and likelihood values for plotting the graph
+#'
+#' @noRd
+#'
 .getConditionalPowerLikelihoodRatesMultiArm <- function(..., stageResults, stage,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         piTreatmentRange, piControl = NA_real_,
