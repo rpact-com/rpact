@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 3.3.9.9224
-Date: 2023-06-26
+Version: 3.4.0
+Date: 2023-07-03
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -48,13 +48,13 @@ Imports:
 	graphics,
 	tools,
 	rlang,
+	knitr (>= 1.19), 
 	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
 Suggests: 
 	ggplot2 (>= 2.2.0),	
 	testthat (>= 3.0.0),
 	mnormt (>= 1.5-7),
-	knitr (>= 1.19), 
 	rmarkdown (>= 1.10)
 VignetteBuilder: knitr, rmarkdown
 RoxygenNote: 7.2.3
@@ -74,6 +74,7 @@ Collate:
     'class_core_plot_settings.R'
     'f_core_plot.R'
     'class_design.R'
+    'f_object_r_code.R'
     'f_analysis_base.R'
     'class_analysis_dataset.R'
     'class_analysis_stage_results.R'
@@ -105,7 +106,6 @@ Collate:
     'f_design_fisher_combination_test.R'
     'f_design_group_sequential.R'
     'f_design_sample_size_calculator.R'
-    'f_object_r_code.R'
     'f_quality_assurance.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'

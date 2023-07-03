@@ -13,11 +13,10 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7132 $
-## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
+## |  File version: $Revision: 7147 $
+## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
-
 
 #'
 #' @title
@@ -39,10 +38,10 @@
 #' suggest a trial continuation with a second stage.
 #' The score can take values between 0 and 1. More details on the performance score
 #' can be found in Herrmann et al. (2020).
+#' 
+#' @template examples_get_performance_score
 #'
-#' @author Stephen Schüürhuis
-#'
-#' @keywords internal
+#' @author Stephen Schueuerhuis
 #'
 #' @export
 #'
@@ -51,23 +50,17 @@ getPerformanceScore <- function(simulationResult) {
 
     design <- simulationResult$.design
 
-    if (!inherits(simulationResult, "SimulationResultsMeans") &&
-            !inherits(simulationResult, "SimulationResultsRates")) {
+    if (!inherits(simulationResult, "SimulationResultsMeans")) { 
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "performance score so far only implemented for continuous and binary endpoints"
+            "performance score so far implemented only for single comparisons with continuous endpoints"
         )
     }
-    if (!design$bindingFutility) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "performance score so far only implemented for binding futility boundaries"
-        )
-    }
+
     if (design$kMax != 2) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "performance score so far only implemented for two-stage designs"
+            "performance score so far implemented only for two-stage designs"
         )
     }
 
@@ -117,7 +110,6 @@ getPerformanceScore <- function(simulationResult) {
     }
     alternativeValues <- simulationResult[[alternativeParamName]]
 
-    simClass <- class(simulationResult)[1]
     simData <- simulationResult$.data
     resultMatrix <- sapply(alternativeValues, FUN = function(alternativeValue) {
         args[[alternativeParamName]] <- alternativeValue
@@ -136,11 +128,11 @@ getPerformanceScore <- function(simulationResult) {
         ]
 
         # mean and variance estimates for sample size and conditional power
-        meanSampleSize <- mean(secondStageIterations$numberOfCumulatedSubjects)
-        varSampleSize <- var(secondStageIterations$numberOfCumulatedSubjects)
+        meanSampleSize <- mean(secondStageIterations$numberOfCumulatedSubjects, na.rm = TRUE)
+        varSampleSize <- stats::var(secondStageIterations$numberOfCumulatedSubjects, na.rm = TRUE)
 
-        meanConditionalPower <- mean(secondStageIterations$conditionalPowerAchieved)
-        varConditionalPower <- var(secondStageIterations$conditionalPowerAchieved)
+        meanConditionalPower <- mean(secondStageIterations$conditionalPowerAchieved, na.rm = TRUE)
+        varConditionalPower <- stats::var(secondStageIterations$conditionalPowerAchieved, na.rm = TRUE)
 
         # target sample size: single stage sample size if it doesn't exceed maximum admissible
         # sample size, otherwise only first stage sample size
@@ -149,19 +141,19 @@ getPerformanceScore <- function(simulationResult) {
         )
 
         # sample size components
-        locationSampleSize <- 1 - abs(meanSampleSize - targetSampleSize) / (maxAdditionalNumberOfSubjects)
+        locationSampleSize <- 1 - abs(meanSampleSize - targetSampleSize) / maxAdditionalNumberOfSubjects
         maxVariationSampleSize <- (maxAdditionalNumberOfSubjects / 2)^2 * iterations / (iterations - 1)
         variationSampleSize <- 1 - sqrt(varSampleSize / maxVariationSampleSize)
-        subscoreSampleSize <- mean(c(locationSampleSize, variationSampleSize))
+        subscoreSampleSize <- mean(c(locationSampleSize, variationSampleSize), na.rm = TRUE)
 
         # conditional power components
         locationConditionalPower <- 1 - abs(meanConditionalPower - targetConditionalPower) / (1 - design$alpha)
         maxVariationConditionalPower <- (1 / 2)^2 * iterations / (iterations - 1)
         variationConditionalPower <- 1 - sqrt(varConditionalPower / maxVariationConditionalPower)
-        subscoreConditionalPower <- mean(c(locationConditionalPower, variationConditionalPower))
+        subscoreConditionalPower <- mean(c(locationConditionalPower, variationConditionalPower), na.rm = TRUE)
 
         # performance score calculation
-        performanceScore <- mean(c(subscoreSampleSize, subscoreConditionalPower))
+        performanceScore <- mean(c(subscoreSampleSize, subscoreConditionalPower), na.rm = TRUE)
 
         return(c(
             alternative = alternativeValue,

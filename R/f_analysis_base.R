@@ -13,13 +13,14 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7139 $
+## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
 #' @include f_logger.R
+#' @include f_object_r_code.R
 NULL
 
 .getDesignAndDataInput <- function(..., design, dataInput) {

@@ -25,7 +25,7 @@ Class for the definition of piecewise survival times.
 
 \item{\code{pi2}}{The assumed event rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{median1}}{The assumed median survival time in the treatment group. Is a numeric vector of length 1.}
+\item{\code{median1}}{The assumed median survival time in the treatment group. Is a numeric vector.}
 
 \item{\code{median2}}{The assumed median survival time in the reference group. Is a numeric vector of length 1.}
 
@@ -33,9 +33,9 @@ Class for the definition of piecewise survival times.
 
 \item{\code{kappa}}{The shape of the Weibull distribution if \code{kappa!=1}. Is a numeric vector of length 1.}
 
-\item{\code{piecewiseSurvivalEnabled}}{Indicates whether specification of piecewise definition of survival time is selected.}
+\item{\code{piecewiseSurvivalEnabled}}{Indicates whether specification of piecewise definition of survival time is selected. Is a logical vector of length 1.}
 
-\item{\code{delayedResponseAllowed}}{If \code{TRUE}, delayed response is allowed, if \code{FALSE} the response is not daleayed.}
+\item{\code{delayedResponseAllowed}}{If \code{TRUE}, delayed response is allowed, if \code{FALSE} the response is not delayed.}
 
 \item{\code{delayedResponseEnabled}}{If \code{TRUE}, delayed response is enabled, if \code{FALSE} delayed response is not enabled.}
 }}

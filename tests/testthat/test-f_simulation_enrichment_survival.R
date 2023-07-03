@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_simulation_enrichment_survival.R
-## |  Creation date: 06 February 2023, 12:14:22
-## |  File version: $Revision: 6810 $
-## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
+## |  Creation date: 27 June 2023, 14:05:57
+## |  File version: $Revision: 7139 $
+## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,10 +24,9 @@ test_plan_section("Testing Simulation Enrichment Survival Function")
 
 
 test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
+	.skipTestIfDisabled()
 
-    .skipTestIfDisabled()    
-        
-    # @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
+	# @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
 	# @refFS[Sec.]{fs:sec:enrichmentDesigns}
 	# @refFS[Sec.]{fs:subsec:intersectionTestsEnrichment}
 	# @refFS[Sec.]{fs:subsec:adaptiveClosedTestProcedureEnrichment}
@@ -52,14 +51,19 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 	    1.432188, 1.432188, 1.432188, 1.432188, 1.432188, 1.432188, 1.432188
 	), ncol = 2)
 
-	effectList <- list(subGroups = c("S", "R"), prevalences = c(0.4, 0.6), 
-			hazardRatios = hazardRatios, piControls = c(0.1, 0.3))
+	effectList1 <- list(
+	    subGroups = c("S", "R"), prevalences = c(0.4, 0.6),
+	    hazardRatios = hazardRatios, piControls = c(0.1, 0.3)
+	)
 
-	design <- getDesignInverseNormal(informationRates = c(0.3, 1), typeOfDesign = "asUser", userAlphaSpending = c(0.01, 0.025))
+	design <- getDesignInverseNormal(
+	    informationRates = c(0.3, 1),
+	    typeOfDesign = "asUser", userAlphaSpending = c(0.01, 0.025)
+	)
 
 	suppressWarnings(simResult1 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(40, 120),
-	    effectList = effectList,
+	    effectList = effectList1,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 1,
 	    typeOfSelection = "rbest",
@@ -114,7 +118,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 
 	suppressWarnings(simResult2 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(40, 120),
-	    effectList = effectList,
+	    effectList = effectList1,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 1,
 	    typeOfSelection = "rbest",
@@ -167,12 +171,14 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	effectList <- list(subGroups = c("S", "R"), prevalences = c(0.4, 0.6), 
-			hazardRatios = hazardRatios)
+	effectList2 <- list(
+	    subGroups = c("S", "R"), prevalences = c(0.4, 0.6),
+	    hazardRatios = hazardRatios
+	)
 
 	suppressWarnings(simResult3 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(40, 120),
-	    effectList = effectList,
+	    effectList = effectList2,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 1,
 	    typeOfSelection = "best",
@@ -226,7 +232,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
 
 	suppressWarnings(simResult4 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(40, 120),
-	    effectList = effectList,
+	    effectList = effectList2,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 1,
 	    typeOfSelection = "epsilon",
@@ -305,15 +311,18 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 3", {
 	# @refFS[Formula]{fs:enrichmentRejectionRule}
 	subGroups <- c("S1", "S12", "S2", "R")
 	prevalences <- c(0.20, 0.30, 0.40, 0.1)
-	piControls = rep(0.2, 4)
-	hazardRatios <- matrix(c(1.432, 1.432, 1.943, 1.943, 1.432, 1.432, 1.432, 1.432, 1.943, 1.943, 1.943, 1.943, 1.943, 2.569, 1.943, 2.569), ncol = 4)
-	effectList <- list(subGroups = subGroups, prevalences = prevalences, hazardRatios = hazardRatios)
+	piControls <- rep(0.2, 4)
+	hazardRatios <- matrix(c(
+	    1.432, 1.432, 1.943, 1.943, 1.432, 1.432, 1.432, 1.432, 1.943,
+	    1.943, 1.943, 1.943, 1.943, 2.569, 1.943, 2.569
+	), ncol = 4)
+	effectList1 <- list(subGroups = subGroups, prevalences = prevalences, hazardRatios = hazardRatios)
 
 	design <- getDesignInverseNormal(informationRates = c(0.4, 0.8, 1), typeOfDesign = "noEarlyEfficacy")
 
 	suppressWarnings(simResult1 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(20, 40, 50),
-	    effectList = effectList,
+	    effectList = effectList1,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 1,
 	    typeOfSelection = "best",
@@ -375,7 +384,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 3", {
 
 	suppressWarnings(simResult2 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(20, 40, 50),
-	    effectList = effectList,
+	    effectList = effectList1,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 1,
 	    typeOfSelection = "rbest",
@@ -438,7 +447,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 3", {
 
 	suppressWarnings(simResult3 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(20, 40, 50),
-	    effectList = effectList,
+	    effectList = effectList1,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 1,
 	    typeOfSelection = "epsilon",
@@ -499,19 +508,21 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 3", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	effectList <- list(subGroups = subGroups, prevalences = prevalences, 
-						piControls = piControls, hazardRatios = hazardRatios)
+	effectList2 <- list(
+	    subGroups = subGroups, prevalences = prevalences,
+	    piControls = piControls, hazardRatios = hazardRatios
+	)
 
 	suppressWarnings(simResult5 <- getSimulationEnrichmentSurvival(design,
-			plannedEvents = c(20, 40, 50),
-			effectList = effectList,
-			maxNumberOfIterations = 100,
-			allocationRatioPlanned = 1,
-			typeOfSelection = "epsilon",
-			epsilonValue = 0.2,
-			intersectionTest = "Simes",
-			directionUpper = TRUE,
-			seed = 123
+	    plannedEvents = c(20, 40, 50),
+	    effectList = effectList2,
+	    maxNumberOfIterations = 100,
+	    allocationRatioPlanned = 1,
+	    typeOfSelection = "epsilon",
+	    epsilonValue = 0.2,
+	    intersectionTest = "Simes",
+	    directionUpper = TRUE,
+	    seed = 123
 	))
 
 	## Comparison of the results of SimulationResultsEnrichmentSurvival object 'simResult5' with expected results
@@ -593,13 +604,13 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 4", {
 	prevalences <- c(0.1, 0.05, 0.1, 0.15, 0.1, 0.15, 0.3, 0.05)
 	hazardRatios <- matrix(c(seq(1, 1.75, 0.25), seq(1, 1.75, 0.25)), ncol = 8)
 
-	effectList <- list(subGroups = subGroups, prevalences = prevalences, hazardRatios = hazardRatios)
+	effectList1 <- list(subGroups = subGroups, prevalences = prevalences, hazardRatios = hazardRatios)
 
 	design <- getDesignInverseNormal(informationRates = c(0.4, 1), typeOfDesign = "noEarlyEfficacy")
 
 	suppressWarnings(simResult1 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(100, 200),
-	    effectList = effectList,
+	    effectList = effectList1,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 2,
 	    typeOfSelection = "epsilon",
@@ -654,7 +665,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 4", {
 	}
 	suppressWarnings(simResult2 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(100, 200),
-	    effectList = effectList,
+	    effectList = effectList1,
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 2,
 	    typeOfSelection = "rBest",
@@ -707,20 +718,22 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 4", {
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
-	piControls <- (1:8)/10
-	effectList <- list(subGroups = subGroups, prevalences = prevalences, 
-			piControls = piControls, hazardRatios = hazardRatios)
+	piControls <- (1:8) / 10
+	effectList2 <- list(
+	    subGroups = subGroups, prevalences = prevalences,
+	    piControls = piControls, hazardRatios = hazardRatios
+	)
 
 	suppressWarnings(simResult3 <- getSimulationEnrichmentSurvival(design,
-		plannedEvents = c(100, 200),
-		effectList = effectList,
-		maxNumberOfIterations = 100,
-		allocationRatioPlanned = 2,
-		typeOfSelection = "rBest",
-		rValue = 2,
-		adaptations = c(T),
-		intersectionTest = "Bonferroni",
-		seed = 123
+	    plannedEvents = c(100, 200),
+	    effectList = effectList2,
+	    maxNumberOfIterations = 100,
+	    allocationRatioPlanned = 2,
+	    typeOfSelection = "rBest",
+	    rValue = 2,
+	    adaptations = c(T),
+	    intersectionTest = "Bonferroni",
+	    seed = 123
 	))
 
 
@@ -767,15 +780,15 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 4", {
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 	suppressWarnings(simResult4 <- getSimulationEnrichmentSurvival(design,
-		plannedEvents = c(100, 200),
-		effectList = effectList,
-		maxNumberOfIterations = 100,
-		allocationRatioPlanned = 2,
-		typeOfSelection = "rBest",
-		rValue = 2,
-		adaptations = c(T),
-		intersectionTest = "Bonferroni",
-		seed = 123
+	    plannedEvents = c(100, 200),
+	    effectList = effectList2,
+	    maxNumberOfIterations = 100,
+	    allocationRatioPlanned = 2,
+	    typeOfSelection = "rBest",
+	    rValue = 2,
+	    adaptations = c(T),
+	    intersectionTest = "Bonferroni",
+	    seed = 123
 	))
 
 
@@ -838,15 +851,22 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
 	# @refFS[Formula]{fs:simulatingEnrichmentEffectSpecification}
 	# @refFS[Formula]{fs:enrichmentRejectionRule}
-	effectList <- list(subGroups = "F", prevalences = 1, stDevs = 1.3, hazardRatios = matrix(seq(0.6, 1, 0.05), ncol = 1))
+	effectList <- list(
+	    subGroups = "F", prevalences = 1, stDevs = 1.3,
+	    hazardRatios = matrix(seq(0.6, 1, 0.05), ncol = 1)
+	)
 
-	design <- getDesignInverseNormal(informationRates = c(0.3, 0.7, 1), typeOfDesign = "asKD", gammaA = 2.4)
+	design <- getDesignInverseNormal(
+	    informationRates = c(0.3, 0.7, 1),
+	    typeOfDesign = "asKD", gammaA = 2.4
+	)
 
 	suppressWarnings(x1 <- getSimulationEnrichmentSurvival(design,
 	    plannedEvents = c(50, 100, 180), effectList = effectList,
 	    maxNumberOfIterations = 100, allocationRatioPlanned = 1,
 	    directionUpper = FALSE,
-	    conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA, 10, 10), maxNumberOfEventsPerStage = c(NA, 100, 100),
+	    conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA, 10, 10),
+	    maxNumberOfEventsPerStage = c(NA, 100, 100),
 	    seed = 123
 	))
 
@@ -855,7 +875,8 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 	    directionUpper = FALSE,
 	    maxNumberOfSubjects = 1500, maxNumberOfIterations = 100,
 	    allocation1 = 1, allocation2 = 1, longTimeSimulationAllowed = TRUE,
-	    conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA, 10, 10), maxNumberOfEventsPerStage = c(NA, 100, 100),
+	    conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA, 10, 10),
+	    maxNumberOfEventsPerStage = c(NA, 100, 100),
 	    seed = 123
 	)
 
@@ -893,7 +914,10 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 	# @refFS[Formula]{fs:simulationEnrichmentSelections}
 	# @refFS[Formula]{fs:simulatingEnrichmentEffectSpecification}
 	# @refFS[Formula]{fs:enrichmentRejectionRule}
-	effectList <- list(subGroups = "F", prevalences = 1, stDevs = 1.3, hazardRatios = matrix(seq(0.6, 1, 0.05), ncol = 1))
+	effectList <- list(
+	    subGroups = "F", prevalences = 1, stDevs = 1.3,
+	    hazardRatios = matrix(seq(0.6, 1, 0.05), ncol = 1)
+	)
 
 	design <- getDesignFisher(informationRates = c(0.3, 0.6, 1))
 
@@ -902,7 +926,9 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 	    maxNumberOfIterations = 100,
 	    allocationRatioPlanned = 1,
 	    directionUpper = FALSE,
-	    conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA, 10, 10), maxNumberOfEventsPerStage = c(NA, 100, 100),
+	    conditionalPower = 0.8,
+	    minNumberOfEventsPerStage = c(NA, 10, 10),
+	    maxNumberOfEventsPerStage = c(NA, 100, 100),
 	    seed = 123
 	))
 
@@ -911,7 +937,9 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 	    directionUpper = FALSE,
 	    maxNumberOfSubjects = 1500, maxNumberOfIterations = 100,
 	    allocation1 = 1, allocation2 = 1,
-	    conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA, 10, 10), maxNumberOfEventsPerStage = c(NA, 100, 100),
+	    conditionalPower = 0.8,
+	    minNumberOfEventsPerStage = c(NA, 10, 10),
+	    maxNumberOfEventsPerStage = c(NA, 100, 100),
 	    seed = 123
 	)
 
@@ -931,6 +959,5 @@ test_that("'getSimulationEnrichmentSurvival': comparison of base and enrichment 
 
 	## Comparison of the results of numeric object 'comp6' with expected results
 	expect_equal(comp6, c(5.1347448, 9.1286427, -16.823834, -1.3136156, 0.71128925, 1.9694657, -7.1208497, -0.94699441, -0.085337992), tolerance = 1e-07)
-
 })
 

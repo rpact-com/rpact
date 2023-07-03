@@ -22,11 +22,11 @@ with suitable arguments to create a group sequential design.
 
 \item{\code{informationRates}}{The information rates (that must be fixed prior to the trial), default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{userAlphaSpending}}{The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage.}
+\item{\code{userAlphaSpending}}{The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{criticalValues}}{The critical values for each stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{stageLevels}}{The adjusted significance levels to reach significance in a group sequential design.}
+\item{\code{stageLevels}}{The adjusted significance levels to reach significance in a group sequential design. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
@@ -58,21 +58,21 @@ with suitable arguments to create a group sequential design.
 
 \item{\code{typeBetaSpending}}{The type of beta spending. Is a character vector of length 1.}
 
-\item{\code{userBetaSpending}}{The user defined beta spending. Contains the cumulative beta-spending up to each interim stage.}
+\item{\code{userBetaSpending}}{The user defined beta spending. Contains the cumulative beta-spending up to each interim stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{power}}{The one-sided power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{twoSidedPower}}{Specifies if power is defined two-sided at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+\item{\code{twoSidedPower}}{Specifies if power is defined two-sided at each stage of the trial. Is a logical vector of length 1.}
 
 \item{\code{constantBoundsHP}}{The constant bounds up to stage kMax - 1 for the Haybittle & Peto design (default is 3). Is a numeric vector of length 1.}
 
 \item{\code{betaAdjustment}}{If \code{TRUE}, beta spending values are linearly adjusted if an overlapping of decision regions for futility stopping at earlier stages occurs. Only applicable for two-sided beta-spending designs. Is a logical vector of length 1.}
 
-\item{\code{delayedInformation}}{Delay of information for delayed response designs.}
+\item{\code{delayedInformation}}{Delay of information for delayed response designs. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}
 
-\item{\code{decisionCriticalValues}}{The decision critical values for each stage of the trial in a delayed response design.}
+\item{\code{decisionCriticalValues}}{The decision critical values for each stage of the trial in a delayed response design. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{reversalProbabilities}}{The probability to switch from stopping the trial for success (or futility) and reaching non-rejection (or rejection) in a delayed response design.}
+\item{\code{reversalProbabilities}}{The probability to switch from stopping the trial for success (or futility) and reaching non-rejection (or rejection) in a delayed response design. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}
 }}
 
 

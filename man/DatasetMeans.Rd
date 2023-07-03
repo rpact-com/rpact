@@ -14,7 +14,7 @@ with suitable arguments to create a dataset of means.
 \section{Fields}{
 
 \describe{
-\item{\code{groups}}{The group numbers. Is a numeric vector of length number of stages times number of groups.}
+\item{\code{groups}}{The group numbers. Is a numeric vector.}
 
 \item{\code{stages}}{The stage numbers of the trial. Is a numeric vector of length \code{kMax} containing whole numbers.}
 

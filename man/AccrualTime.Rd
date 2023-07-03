@@ -15,11 +15,11 @@ Class for the definition of accrual time and accrual intensity.
 \describe{
 \item{\code{endOfAccrualIsUserDefined}}{If \code{TRUE}, the end of accrual has to be defined by the user (i.e., the length of \code{accrualTime} is equal to the length of \code{accrualIntensity -1}). Is a logical vector of length 1.}
 
-\item{\code{followUpTimeMustBeUserDefined}}{Specifies whether follow up time needs to be defined or not.}
+\item{\code{followUpTimeMustBeUserDefined}}{Specifies whether follow up time needs to be defined or not. Is a logical vector of length 1.}
 
 \item{\code{maxNumberOfSubjectsIsUserDefined}}{If \code{TRUE}, the maximum number of subjects has been specified by the user, if \code{FALSE}, it was calculated.}
 
-\item{\code{maxNumberOfSubjectsCanBeCalculatedDirectly}}{If \code{TRUE}, the maximum number of subjects can directly be calculated.}
+\item{\code{maxNumberOfSubjectsCanBeCalculatedDirectly}}{If \code{TRUE}, the maximum number of subjects can directly be calculated. Is a logical vector of length 1.}
 
 \item{\code{absoluteAccrualIntensityEnabled}}{If \code{TRUE}, absolute accrual intensity is enabled. Is a logical vector of length 1.}
 
@@ -29,11 +29,11 @@ Class for the definition of accrual time and accrual intensity.
 
 \item{\code{accrualIntensityRelative}}{The relative accrual intensities.}
 
-\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations.}
+\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations. Is a numeric vector.}
 
-\item{\code{remainingTime}}{In survival designs, the remaining time for observation.}
+\item{\code{remainingTime}}{In survival designs, the remaining time for observation. Is a numeric vector of length 1.}
 
-\item{\code{piecewiseAccrualEnabled}}{Indicates whether piecewise accrual is selected.}
+\item{\code{piecewiseAccrualEnabled}}{Indicates whether piecewise accrual is selected. Is a logical vector of length 1.}
 }}
 
 

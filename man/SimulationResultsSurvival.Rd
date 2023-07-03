@@ -24,13 +24,13 @@ Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} to create an o
 
 \item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
 \item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility.}
+\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility. Is a numeric matrix.}
 
 \item{\code{futilityStop}}{In simulation results data set: indicates whether trial is stopped for futility or not.}
 
@@ -46,25 +46,25 @@ Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} to create an o
 
 \item{\code{calcEventsFunction}}{An optional function that can be entered to define how event size is recalculated. By default, recalculation is performed with conditional power with specified \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage}.}
 
-\item{\code{expectedNumberOfEvents}}{The expected number of events under specified alternative.}
+\item{\code{expectedNumberOfEvents}}{The expected number of events under specified alternative. Is a numeric vector.}
 
 \item{\code{pi1}}{The assumed event rate in the treatment group. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{pi2}}{The assumed event rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{median1}}{The assumed median survival time in the treatment group. Is a numeric vector of length 1.}
+\item{\code{median1}}{The assumed median survival time in the treatment group. Is a numeric vector.}
 
 \item{\code{median2}}{The assumed median survival time in the reference group. Is a numeric vector of length 1.}
 
-\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations.}
+\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations. Is a numeric vector.}
 
 \item{\code{accrualTime}}{The assumed accrual time intervals for the study. Is a numeric vector.}
 
 \item{\code{accrualIntensity}}{The absolute accrual intensities. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{dropoutRate1}}{The assumed drop-out rate in the treatment group. Is a numeric vector of length 1.}
+\item{\code{dropoutRate1}}{The assumed drop-out rate in the treatment group. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a numeric vector of length 1.}
+\item{\code{dropoutRate2}}{The assumed drop-out rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
 \item{\code{dropoutTime}}{The assumed time for drop-out rates in the control and treatment group. Is a numeric vector of length 1.}
 
@@ -84,13 +84,13 @@ Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} to create an o
 
 \item{\code{lambda2}}{The assumed hazard rate in the reference group. Is a numeric vector of length 1.}
 
-\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility.}
+\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
 \item{\code{hazardRatio}}{The hazard ratios under consideration. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{studyDuration}}{The study duration for speciifed effect size.}
+\item{\code{studyDuration}}{The study duration for specified effect size. Is a positive numeric vector.}
 
-\item{\code{eventsNotAchieved}}{The simulated number of cases how often the number of events was not reached.}
+\item{\code{eventsNotAchieved}}{The simulated number of cases how often the number of events was not reached. Is a numeric matrix.}
 
 \item{\code{numberOfSubjects}}{In simulation results data set: The number of subjects under consideration when the interim analysis takes place.}
 
@@ -98,17 +98,17 @@ Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} to create an o
 
 \item{\code{numberOfSubjects2}}{In simulation results data set: The number of subjects under consideration in treatment arm 2 when the interim analysis takes place.}
 
-\item{\code{eventsPerStage}}{The number of events per stage.}
+\item{\code{eventsPerStage}}{The number of events per stage. Is a numeric matrix.}
 
-\item{\code{overallEventsPerStage}}{The cumulative events over stages.}
+\item{\code{overallEventsPerStage}}{The cumulative events over stages. Is a numeric matrix.}
 
 \item{\code{expectedNumberOfSubjects}}{The expected number of subjects under specified alternative.}
 
-\item{\code{rejectPerStage}}{The probability to reject a hypothesis per stage of the trial.}
+\item{\code{rejectPerStage}}{The probability to reject a hypothesis per stage of the trial. Is a numeric matrix.}
 
-\item{\code{overallReject}}{The overall rejection probability.}
+\item{\code{overallReject}}{The overall rejection probability. Is a numeric vector.}
 
-\item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes.}
+\item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.}
 }}
 
 

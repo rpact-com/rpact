@@ -17,13 +17,13 @@ Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}} to c
 
 \item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
 \item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility.}
+\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility. Is a numeric matrix.}
 
 \item{\code{futilityStop}}{In simulation results data set: indicates whether trial is stopped for futility or not.}
 
@@ -31,7 +31,7 @@ Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}} to c
 
 \item{\code{plannedSubjects}}{Determines the number of cumulated (overall) subjects when the interim stages are planned. For two treatment arms, is the number of subjects for both treatment arms. For multi-arm designs, refers to the number of subjects per selected active arm. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations.}
+\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations. Is a numeric vector.}
 
 \item{\code{calcSubjectsFunction}}{An optional function that can be entered to define how sample size is recalculated. By default, recalculation is performed with conditional power with specified \code{minNumberOfSubjectsPerStage} and \code{maxNumberOfSubjectsPerStage}.}
 
@@ -73,21 +73,21 @@ Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}} to c
 
 \item{\code{selectArmsFunction}}{An optional function that can be entered to define how treatment arms are selected.}
 
-\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility.}
+\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
 \item{\code{selectedArms}}{The selected arms in multi-armed designs.}
 
-\item{\code{numberOfActiveArms}}{The number of active arms in a multi-armed design.}
+\item{\code{numberOfActiveArms}}{The number of active arms in a multi-armed design. Is a numeric matrix.}
 
-\item{\code{rejectAtLeastOne}}{The probability to reject at least one of the (multiple) hypotheses.}
+\item{\code{rejectAtLeastOne}}{The probability to reject at least one of the (multiple) hypotheses. Is a numeric vector.}
 
 \item{\code{rejectedArmsPerStage}}{The simulated number of rejected arms per stage.}
 
-\item{\code{successPerStage}}{The simulated success probabilities per stage where success is defined by user.}
+\item{\code{successPerStage}}{The simulated success probabilities per stage where success is defined by user. Is a numeric matrix.}
 
 \item{\code{sampleSizes}}{The sample sizes for each group and stage. Is a numeric vector of length number of stages times number of groups containing whole numbers.}
 
-\item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes.}
+\item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.}
 }}
 
 

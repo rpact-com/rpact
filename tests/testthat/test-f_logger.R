@@ -15,10 +15,12 @@
 ## |  
 ## |  File name: test-f_design_utilities.R
 ## |  Creation date: 06 February 2023, 12:13:45
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7139 $
+## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
+
+test_plan_section("Testing Logger Functions")
 
 test_that("Logger functions throw errors when arguments are missing or wrong", {
   currentLogLevel <- getLogLevel()

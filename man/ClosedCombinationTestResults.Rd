@@ -18,19 +18,19 @@ with suitable arguments to create the multi-arm analysis results of a closed com
 
 \item{\code{indices}}{Indicates which stages are available for analysis.}
 
-\item{\code{adjustedStageWisePValues}}{The multiplicity adjusted p-values from the separate stages.}
+\item{\code{adjustedStageWisePValues}}{The multiplicity adjusted p-values from the separate stages. Is a numeric matrix.}
 
 \item{\code{overallAdjustedTestStatistics}}{The overall adjusted test statistics.}
 
-\item{\code{separatePValues}}{The p-values from the separate stages.}
+\item{\code{separatePValues}}{The p-values from the separate stages. Is a numeric matrix.}
 
 \item{\code{conditionalErrorRate}}{The calculated conditional error rate.}
 
-\item{\code{secondStagePValues}}{For conditional Dunnett test, the conditional or un-conditional p-value calculated for the second stage.}
+\item{\code{secondStagePValues}}{For conditional Dunnett test, the conditional or unconditional p-value calculated for the second stage.}
 
 \item{\code{rejected}}{Indicates whether a hypothesis is rejected or not.}
 
-\item{\code{rejectedIntersections}}{The simulated number of rejected arms in the closed testing procedure..}
+\item{\code{rejectedIntersections}}{The simulated number of rejected arms in the closed testing procedure.. Is a logical matrix.}
 }}
 
 

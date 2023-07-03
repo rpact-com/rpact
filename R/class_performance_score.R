@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7132 $
-## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
+## |  File version: $Revision: 7148 $
+## |  Last changed: $Date: 2023-07-03 15:50:22 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -63,17 +63,21 @@ PerformanceScore <- setRefClass("PerformanceScore",
             .parameterNames <<- C_PARAMETER_NAMES
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
         },
-        show = function(showType = 1, digits = NA_integer_) {
-            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
-        },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing performance score objects"
             .resetCat()
-            .simulationResults$.show(
-                showType = showType, digits = digits,
-                showStatistics = FALSE, consoleOutputEnabled = consoleOutputEnabled,
-                performanceScore = .self
-            )
+            if (!is.null(.simulationResults)) {
+                .simulationResults$.show(
+                    showType = showType,
+                    digits = digits,
+                    showStatistics = FALSE,
+                    consoleOutputEnabled = consoleOutputEnabled,
+                    performanceScore = .self
+                )
+            }
+        },
+        show = function(showType = 1, digits = NA_integer_) {
+            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         }
     )
 )

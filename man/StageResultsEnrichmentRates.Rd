@@ -22,9 +22,9 @@ with suitable arguments to create the stage results of a dataset of enrichment r
 
 \item{\code{combInverseNormal}}{The test statistics over stages for the inverse normal test. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test.}
+\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{effectSizes}}{The stage-wise effect sizes.}
+\item{\code{effectSizes}}{The stage-wise effect sizes. Is a numeric vector of length \code{kMax}.}
 
 \item{\code{testActions}}{The test decisions at each stage of the trial. Is a character vector of length \code{kMax}.}
 

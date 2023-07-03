@@ -38,11 +38,11 @@ with suitable arguments to create the multi-arm analysis results of a Fisher com
 
 \item{\code{conditionalRejectionProbabilities}}{The probabilities of rejecting the null hypothesis at each stage, given the stage has been reached. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{repeatedConfidenceIntervalLowerBounds}}{The lower bound of the confidence intervals that are calculated at any stage of the trial.}
+\item{\code{repeatedConfidenceIntervalLowerBounds}}{The lower bound of the confidence intervals that are calculated at any stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{repeatedConfidenceIntervalUpperBounds}}{The upper bound of the confidence interval that are calculated at any stage of the trial.}
+\item{\code{repeatedConfidenceIntervalUpperBounds}}{The upper bound of the confidence interval that are calculated at any stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{repeatedPValues}}{The p-values that are calculated at any stage of the trial.}
+\item{\code{repeatedPValues}}{The p-values that are calculated at any stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{piControls}}{The assumed rates in the control group for enrichment designs, i.e., designs with multiple subsets.}
 

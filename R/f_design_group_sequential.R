@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7132 $
-## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
+## |  File version: $Revision: 7139 $
+## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2160,7 +2160,18 @@ getPowerAndAverageSampleNumber <- function(design, theta = seq(-1, 1, 0.02), nMa
 
 
 #'
+#' @title 
+#' Simulated Rejections Delayed Response
+#' 
+#' @description 
 #' Simulates the rejection probability of a delayed response group sequential design with specified parameters.
+#' 
+#' @inheritParams param_design
+#' @param delta The delay value.
+#' @param iterations The number of simulation iterations.
+#' @inheritParams param_seed
+#' 
+#' @details 
 #' By default, delta = 0, i.e., the Type error rate is simulated.
 #'
 #' @return Returns a list summarizing the rejection probabilities.

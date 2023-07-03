@@ -22,11 +22,11 @@ with suitable arguments to create a Fisher combination test design.
 
 \item{\code{informationRates}}{The information rates (that must be fixed prior to the trial), default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{userAlphaSpending}}{The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage.}
+\item{\code{userAlphaSpending}}{The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{criticalValues}}{The critical values for each stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{stageLevels}}{The adjusted significance levels to reach significance in a group sequential design.}
+\item{\code{stageLevels}}{The adjusted significance levels to reach significance in a group sequential design. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
@@ -35,12 +35,12 @@ with suitable arguments to create a Fisher combination test design.
 \item{\code{tolerance}}{The numerical tolerance, default is \code{1e-06}. Is a numeric vector of length 1.}
 
 \item{\code{method}}{"equalAlpha", "fullAlpha", "noInteraction", or "userDefinedAlpha", default is "equalAlpha".
-For details, see Wassmer, 1999, \url{doi:10.1002/(SICI)1521-4036(199906)41:3\%3C279::AID-BIMJ279\%3E3.0.CO;2-V}.
+For details, see Wassmer, 1999, doi: 10.1002/(SICI)1521-4036(199906)41:3\%3C279::AID-BIMJ279\%3E3.0.CO;2-V.
 Is a character vector of length 1.}
 
 \item{\code{alpha0Vec}}{The stopping for futility bounds for stage-wise p-values in Fisher's combination test. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}
 
-\item{\code{scale}}{The scale for Fisher's combination test. Numeric vector of length \code{kMax-1} that applies to Fisher's design with unequally spaced information rates. Is a numeric vector.}
+\item{\code{scale}}{The scale for Fisher's combination test. Numeric vector of length \code{kMax-1} that applies to Fisher's design with unequally spaced information rates. Is a numeric vector of length \code{kMax} minus 1 containing values between 0 and 1.}
 
 \item{\code{nonStochasticCurtailment}}{If \code{TRUE}, the stopping rule is based on the phenomenon of non-stochastic curtailment rather than stochastic reasoning. Is a logical vector of length 1.}
 

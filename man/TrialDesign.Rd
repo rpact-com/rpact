@@ -27,11 +27,11 @@ Basic class for trial designs.
 
 \item{\code{informationRates}}{The information rates (that must be fixed prior to the trial), default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{userAlphaSpending}}{The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage.}
+\item{\code{userAlphaSpending}}{The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{criticalValues}}{The critical values for each stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{stageLevels}}{The adjusted significance levels to reach significance in a group sequential design.}
+\item{\code{stageLevels}}{The adjusted significance levels to reach significance in a group sequential design. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{alphaSpent}}{The cumulative alpha spent at each stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 

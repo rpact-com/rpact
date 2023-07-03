@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7147 $
+## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -902,7 +902,7 @@ printCitation <- function(inclusiveR = TRUE, language = "en") {
             Sys.setenv(LANGUAGE = language)
 
             if (inclusiveR) {
-                citR <- capture.output(print(citation("base"), bibtex = FALSE))
+                citR <- utils::capture.output(print(citation("base"), bibtex = FALSE))
                 indices <- which(citR == "")
                 indices <- indices[indices != 1 & indices != length(citR)]
                 if (length(indices) > 1) {
@@ -970,7 +970,7 @@ printCitation <- function(inclusiveR = TRUE, language = "en") {
 .getFunctionAsString <- function(fun, stringWrapPrefix = " ", stringWrapParagraphWidth = 90) {
     .assertIsFunction(fun)
 
-    s <- capture.output(print(fun))
+    s <- utils::capture.output(print(fun))
     s <- s[!grepl("bytecode", s)]
     s <- s[!grepl("environment", s)]
     if (is.null(stringWrapPrefix) || is.na(stringWrapPrefix) || nchar(stringWrapPrefix) == 0) {

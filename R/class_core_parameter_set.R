@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7148 $
+## |  Last changed: $Date: 2023-07-03 15:50:22 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1461,72 +1461,6 @@ setMethod(
 
 #'
 #' @title
-#' Create output in Markdown
-#'
-#' @description
-#' The \code{kable()} function returns the output of the specified object formatted in Markdown.
-#'
-#' @param x A \code{ParameterSet}. If x does not inherit from class \code{\link{ParameterSet}},
-#'        \code{knitr::kable(x)} will be returned.
-#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
-#'
-#' @details
-#' Generic function to represent a parameter set in Markdown.
-#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
-#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
-#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
-#' that all headings will be written bold but are not explicit defined as header.
-#'
-#' @export
-#'
-kable.ParameterSet <- function(x, ...) {
-    fCall <- match.call(expand.dots = FALSE)
-    if (inherits(x, "ParameterSet")) {
-        objName <- deparse(fCall$x)
-        if (all(grepl("^ *print\\(", objName))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") does not work correctly. ",
-                "Use ", sub("print", "kable", objName), " without 'print' instead or ", sub("\\)", ", markdown = TRUE)", objName)
-            )
-        }
-
-        if (.isSimulationResults(x)) {
-            showStatistics <- .getOptionalArgument("showStatistics", optionalArgumentDefaultValue = FALSE, ...)
-            if (isTRUE(showStatistics)) {
-                return(print(x, markdown = TRUE, showStatistics = TRUE))
-            }
-        }
-
-        if (.isSummaryPipe(fCall)) {
-            return(print(x, markdown = TRUE, showSummary = TRUE))
-        } else {
-            return(print(x, markdown = TRUE))
-        }
-    }
-
-    .assertPackageIsInstalled("knitr")
-    knitr::kable(x, ...)
-}
-
-#'
-#' @title
-#' Create tables in Markdown
-#'
-#' @description
-#' The \code{kable()} function returns a single table for a single object that inherits from class \code{\link{ParameterSet}}.
-#'
-#' @details
-#' Generic to represent a parameter set in Markdown.
-#'
-#' @param x The object that inherits from \code{\link{ParameterSet}}.
-#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
-#'
-#' @export
-#'
-setGeneric("kable", kable.ParameterSet)
-
-#'
-#' @title
 #' Coerce Field Set to a Matrix
 #'
 #' @description
@@ -1732,3 +1666,109 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
         "sorry, function 'plot' is not implemented yet for class '", .getClassName(x), "'"
     )
 }
+
+.getKnitPrintVersion <- function(x, ...) {
+    fCall <- match.call(expand.dots = FALSE)
+
+    .assertPackageIsInstalled("knitr")
+
+    args <- list(x = x, markdown = TRUE)
+    if (.isSimulationResults(x)) {
+        showStatistics <- .getOptionalArgument("showStatistics", optionalArgumentDefaultValue = FALSE, ...)
+        if (isTRUE(showStatistics)) {
+            args$showStatistics <- TRUE
+        }
+    }
+    if (inherits(x, "SummaryFactory") || .isSummaryPipe(fCall)) {
+        args$showSummary <- TRUE
+    }
+
+    return(do.call(what = print, args = args))
+}
+
+#'
+#' @title
+#' Print Parameter Set in Markdown Code Chunks
+#'
+#' @description
+#' The function `knit_print.ParameterSet` is the default printing function for rpact result objects in knitr.
+#' The chunk option `render` uses this function by default.
+#' To fall back to the normal printing behavior set the chunk option `render = normal_print`.
+#' For more information see \code{\link[knitr]{knit_print}}.
+#'
+#' @param x A \code{ParameterSet}.
+#' @param  ... Other arguments (see \code{\link[knitr]{knit_print}}).
+#'
+#' @details
+#' Generic function to print a parameter set in Markdown.
+#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
+#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
+#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
+#' that all headings will be written bold but are not explicit defined as header.
+#'
+#' @export
+#'
+knit_print.ParameterSet <- function(x, ...) {
+    result <- paste0(utils::capture.output(.getKnitPrintVersion(x = x, ...)), collapse = "\n")
+    return(knitr::asis_output(result))
+}
+
+#'
+#' @title
+#' Create output in Markdown
+#'
+#' @description
+#' The \code{kable()} function returns the output of the specified object formatted in Markdown.
+#'
+#' @param x A \code{ParameterSet}. If x does not inherit from class \code{\link{ParameterSet}},
+#'        \code{knitr::kable(x)} will be returned.
+#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
+#'
+#' @details
+#' Generic function to represent a parameter set in Markdown.
+#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
+#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
+#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
+#' that all headings will be written bold but are not explicit defined as header.
+#'
+#' @export
+#'
+kable.ParameterSet <- function(x, ...) {
+    fCall <- match.call(expand.dots = FALSE)
+    if (inherits(x, "ParameterSet")) {
+        objName <- deparse(fCall$x)
+        if (length(objName) > 0) {
+            if (length(objName) > 1) {
+                objName <- paste0(objName[1], "...")
+            }
+            if (grepl("^ *print\\(", objName)) {
+                stop(
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") does not work correctly. ",
+                    "Use ", sub("print", "kable", objName), " without 'print' instead or ", sub("\\)", ", markdown = TRUE)", objName)
+                )
+            }
+        }
+
+        return(knit_print.ParameterSet(x = x, ...))
+    }
+
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(x, ...)
+}
+
+#'
+#' @title
+#' Create tables in Markdown
+#'
+#' @description
+#' The \code{kable()} function returns a single table for a single object that inherits from class \code{\link{ParameterSet}}.
+#'
+#' @details
+#' Generic to represent a parameter set in Markdown.
+#'
+#' @param x The object that inherits from \code{\link{ParameterSet}}.
+#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
+#'
+#' @export
+#'
+setGeneric("kable", kable.ParameterSet)

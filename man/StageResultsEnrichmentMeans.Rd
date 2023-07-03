@@ -38,11 +38,11 @@ with suitable arguments to create the stage results of a dataset of enrichment m
 
 \item{\code{overallStDevs}}{The overall, i.e., cumulative standard deviations. Is a numeric vector of length number of stages times number of groups.}
 
-\item{\code{overallPooledStDevs}}{The overall pooled standard deviations.}
+\item{\code{overallPooledStDevs}}{The overall pooled standard deviations. Is a numeric matrix.}
 
-\item{\code{separatePValues}}{The p-values from the separate stages.}
+\item{\code{separatePValues}}{The p-values from the separate stages. Is a numeric matrix.}
 
-\item{\code{effectSizes}}{The stage-wise effect sizes.}
+\item{\code{effectSizes}}{The stage-wise effect sizes. Is a numeric vector of length \code{kMax}.}
 
 \item{\code{singleStepAdjustedPValues}}{The adjusted p-value for testing multiple hypotheses per stage of the trial.}
 
@@ -50,7 +50,7 @@ with suitable arguments to create the stage results of a dataset of enrichment m
 
 \item{\code{combInverseNormal}}{The test statistics over stages for the inverse normal test. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test.}
+\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{weightsFisher}}{The weights for Fisher's combination test. Is a numeric vector of length \code{kMax}.}
 

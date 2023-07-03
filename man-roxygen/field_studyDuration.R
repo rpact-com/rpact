@@ -1,3 +1,3 @@
 #' Field description: study duration
-#' @field studyDuration The study duration for speciifed effect size.
+#' @field studyDuration The study duration for specified effect size. Is a positive numeric vector.
 #' @keywords internal

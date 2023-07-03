@@ -16,7 +16,7 @@ with suitable arguments to create the results of a group sequential or a combina
 \describe{
 \item{\code{nPlanned}}{The sample size planned for each of the subsequent stages. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
 
 \item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
 
@@ -24,9 +24,9 @@ with suitable arguments to create the results of a group sequential or a combina
 
 \item{\code{simulated}}{Describes if the power for Fisher's combination test has been simulated. Only applicable when using Fisher designs. Is a logical vector of length 1.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio.}
+\item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio. Is a numeric vector.}
 }}
 
 

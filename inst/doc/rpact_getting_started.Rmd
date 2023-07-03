@@ -44,14 +44,14 @@ We recommend three ways to learn how to use `rpact`:
 
 > 1. Use the Shiny app: [shiny.rpact.com](https://www.rpact.com/products#public-rpact-shiny-app)
 > 2. Use the Vignettes:
->    [www.rpact.org/vignettes](https://www.rpact.org/vignettes)
+>    [www.rpact.org/vignettes](https://www.rpact.org/vignettes/)
 > 3. Book a training:
 >    [www.rpact.com](https://www.rpact.com/services#learning-and-training)
 
 ### Vignettes
 
 The vignettes are hosted at
-[www.rpact.org/vignettes](https://www.rpact.org/vignettes) and cover the
+[www.rpact.org/vignettes](https://www.rpact.org/vignettes/) and cover the
 following topics:
 
 1. Defining Group Sequential Boundaries with rpact

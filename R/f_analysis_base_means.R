@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7147 $
+## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -304,54 +304,6 @@ NULL
     }
 
     return(results)
-}
-
-#'
-#' @title
-#' Get Analysis Results Means Parallel Computing
-#'
-#' @description
-#' Internal usage for parallel computing only.
-#'
-#' @details
-#' Cluster based parallel computing requires exported functions.
-#'
-#' @keywords internal
-#'
-#' @export
-#'
-.getAnalysisResultsMeansParallelComputing <- function(caseNumber, arguments) {
-    results <- arguments$results
-    design <- arguments$design
-    dataInput <- arguments$dataInput
-    stage <- arguments$stage
-    normalApproximation <- arguments$normalApproximation
-    equalVariances <- arguments$equalVariances
-    tolerance <- arguments$tolerance
-    stageResults <- arguments$stageResults
-
-    # RCI - repeated confidence interval
-    if (caseNumber == 1) {
-        repeatedConfidenceIntervals <- .getRepeatedConfidenceIntervalsMeans(
-            design = design, dataInput = dataInput, stage = stage,
-            normalApproximation = normalApproximation,
-            equalVariances = equalVariances, tolerance = tolerance
-        )
-        return(list(
-            repeatedConfidenceIntervalLowerBounds = repeatedConfidenceIntervals[1, ],
-            repeatedConfidenceIntervalUpperBounds = repeatedConfidenceIntervals[2, ]
-        ))
-    }
-
-    # repeated p-value
-    else if (caseNumber == 2) {
-        return(list(repeatedPValues = getRepeatedPValues(
-            design = design,
-            stageResults = stageResults, stage = stage, tolerance = tolerance
-        )))
-    }
-
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'caseNumber' (", caseNumber, ") must be 1 or 2")
 }
 
 .getStageResultsMeans <- function(..., design, dataInput,

@@ -24,7 +24,7 @@ with suitable arguments to create the stage results of a dataset of means.
 
 \item{\code{overallPValues}}{The overall, i.e., cumulated p-values. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{effectSizes}}{The stage-wise effect sizes.}
+\item{\code{effectSizes}}{The stage-wise effect sizes. Is a numeric vector of length \code{kMax}.}
 
 \item{\code{testActions}}{The test decisions at each stage of the trial. Is a character vector of length \code{kMax}.}
 
@@ -34,7 +34,7 @@ with suitable arguments to create the stage results of a dataset of means.
 
 \item{\code{equalVariances}}{Describes if the variances in two treatment groups are assumed to be the same. Is a logical vector of length 1.}
 
-\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test.}
+\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{weightsFisher}}{The weights for Fisher's combination test. Is a numeric vector of length \code{kMax}.}
 

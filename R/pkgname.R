@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7147 $
+## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -72,6 +72,8 @@
 #' @import graphics
 #' @import tools
 #' @importFrom rlang .data
+#' @importFrom knitr kable
+#' @importFrom knitr knit_print
 #'
 "_PACKAGE"
 #> [1] "_PACKAGE"
@@ -81,8 +83,6 @@
         packageStartupMessage(paste0("rpact developer version ", packageVersion("rpact"), " loaded"))
     }
 }
-
-
 
 .onUnload <- function(libpath) {
     tryCatch(

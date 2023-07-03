@@ -24,41 +24,41 @@ with suitable arguments to create a design plan for a dataset of means.
 
 \item{\code{stDev}}{The standard deviation used for sample size and power calculation. Is a numeric vector of length 1.}
 
-\item{\code{groups}}{The group numbers. Is a numeric vector of length number of stages times number of groups.}
+\item{\code{groups}}{The group numbers. Is a numeric vector.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
 
-\item{\code{optimumAllocationRatio}}{The allocation ratio that is optimum with respect to the overall sample size at given power.}
+\item{\code{optimumAllocationRatio}}{The allocation ratio that is optimum with respect to the overall sample size at given power. Is a logical vector of length 1.}
 
 \item{\code{directionUpper}}{Specifies the direction of the alternative, only applicable for one-sided testing. Default is \code{TRUE} which means that larger values of the test statistics yield smaller p-values. Is a logical vector of length 1.}
 
-\item{\code{effect}}{The effect for randomly creating normally distributed responses.}
+\item{\code{effect}}{The effect for randomly creating normally distributed responses. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{overallReject}}{The overall rejection probability.}
+\item{\code{overallReject}}{The overall rejection probability. Is a numeric vector.}
 
-\item{\code{rejectPerStage}}{The probability to reject a hypothesis per stage of the trial.}
+\item{\code{rejectPerStage}}{The probability to reject a hypothesis per stage of the trial. Is a numeric matrix.}
 
 \item{\code{futilityStop}}{In simulation results data set: indicates whether trial is stopped for futility or not.}
 
-\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility.}
+\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility. Is a numeric matrix.}
 
-\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility.}
+\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
 \item{\code{expectedNumberOfSubjects}}{The expected number of subjects under specified alternative.}
 
-\item{\code{nFixed}}{The sample size in a fixed (one-stage) design.}
+\item{\code{nFixed}}{The sample size in a fixed (one-stage) design. Is a positive numeric vector.}
 
-\item{\code{nFixed1}}{The sample size in treatment arm 1 in a fixed (one-stage) design.}
+\item{\code{nFixed1}}{The sample size in treatment arm 1 in a fixed (one-stage) design. Is a positive numeric vector.}
 
-\item{\code{nFixed2}}{The sample size in treatment arm 2 in a fixed (one-stage) design.}
+\item{\code{nFixed2}}{The sample size in treatment arm 2 in a fixed (one-stage) design. Is a positive numeric vector.}
 
 \item{\code{informationRates}}{The information rates (that must be fixed prior to the trial), default is \code{(1:kMax) / kMax}. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations.}
+\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations. Is a numeric vector.}
 
-\item{\code{maxNumberOfSubjects1}}{The maximum number of subjects in treatment arm 1.}
+\item{\code{maxNumberOfSubjects1}}{The maximum number of subjects in treatment arm 1. Is a numeric vector.}
 
-\item{\code{maxNumberOfSubjects2}}{The maximum number of subjects in treatment arm 2.}
+\item{\code{maxNumberOfSubjects2}}{The maximum number of subjects in treatment arm 2. Is a numeric vector.}
 
 \item{\code{numberOfSubjects}}{In simulation results data set: The number of subjects under consideration when the interim analysis takes place.}
 
@@ -66,27 +66,27 @@ with suitable arguments to create a design plan for a dataset of means.
 
 \item{\code{numberOfSubjects2}}{In simulation results data set: The number of subjects under consideration in treatment arm 2 when the interim analysis takes place.}
 
-\item{\code{expectedNumberOfSubjectsH0}}{The expected number of subjects under H0. Is a positive numeric vector of length 1.}
+\item{\code{expectedNumberOfSubjectsH0}}{The expected number of subjects under H0. Is a numeric vector.}
 
-\item{\code{expectedNumberOfSubjectsH01}}{The expected number of subjects under a value between H0 and H1. Is a positive numeric vector of length 1.}
+\item{\code{expectedNumberOfSubjectsH01}}{The expected number of subjects under a value between H0 and H1. Is a numeric vector.}
 
-\item{\code{expectedNumberOfSubjectsH1}}{The expected number of subjects under H1. Is a positive numeric vector of length 1.}
+\item{\code{expectedNumberOfSubjectsH1}}{The expected number of subjects under H1. Is a numeric vector.}
 
 \item{\code{criticalValuesEffectScale}}{The critical values for each stage of the trial on the effect size scale.}
 
-\item{\code{criticalValuesEffectScaleLower}}{The lower critical values for each stage of the trial on the effect size scale.}
+\item{\code{criticalValuesEffectScaleLower}}{The lower critical values for each stage of the trial on the effect size scale. Is a numeric matrix.}
 
-\item{\code{criticalValuesEffectScaleUpper}}{The upper critical values for each stage of the trial on the effect size scale.}
+\item{\code{criticalValuesEffectScaleUpper}}{The upper critical values for each stage of the trial on the effect size scale. Is a numeric matrix.}
 
-\item{\code{criticalValuesPValueScale}}{The critical values for each stage of the trial on the p-valuie scale.}
+\item{\code{criticalValuesPValueScale}}{The critical values for each stage of the trial on the p-value scale.}
 
-\item{\code{futilityBoundsEffectScale}}{The futility bounds for each stage of the trial on the effect size scale.}
+\item{\code{futilityBoundsEffectScale}}{The futility bounds for each stage of the trial on the effect size scale. Is a numeric matrix.}
 
-\item{\code{futilityBoundsEffectScaleLower}}{The lower futility bounds for each stage of the trial on the effect size scale.}
+\item{\code{futilityBoundsEffectScaleLower}}{The lower futility bounds for each stage of the trial on the effect size scale. Is a numeric matrix.}
 
-\item{\code{futilityBoundsEffectScaleUpper}}{The upper futility bounds for each stage of the trial on the effect size scale.}
+\item{\code{futilityBoundsEffectScaleUpper}}{The upper futility bounds for each stage of the trial on the effect size scale. Is a numeric matrix.}
 
-\item{\code{futilityBoundsPValueScale}}{The futility bounds for each stage of the trial on the p-value scale.}
+\item{\code{futilityBoundsPValueScale}}{The futility bounds for each stage of the trial on the p-value scale. Is a numeric matrix.}
 }}
 
 

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7132 $
-## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
+## |  File version: $Revision: 7148 $
+## |  Last changed: $Date: 2023-07-03 15:50:22 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -90,6 +90,8 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
 #' Summary Factory Printing
 #'
 #' @param x The summary factory object.
+#' @param markdown If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
+#'        normal representation will be used otherwise (default is \code{FALSE})
 #' @param showSummary Show the summary before creating the print output, default is \code{FALSE}.
 #' @param sep The separator line between the summary and the print output.
 #' @inheritParams param_three_dots_plot
@@ -102,12 +104,11 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
 #'
 #' @export
 #'
-print.SummaryFactory <- function(x, ..., showSummary = FALSE, sep = "\n-----\n\n") {
+print.SummaryFactory <- function(x, ..., markdown = FALSE, showSummary = FALSE, sep = "\n-----\n\n") {
     fCall <- match.call(expand.dots = FALSE)
     if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
         .assertIsSingleCharacter(sep, "sep")
 
-        markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = FALSE)
         if (markdown) {
             x$.catMarkdownText()
         } else {
@@ -115,7 +116,7 @@ print.SummaryFactory <- function(x, ..., showSummary = FALSE, sep = "\n-----\n\n
         }
         cat(sep)
     }
-    print(x$object, ...)
+    print(x$object, markdown = markdown)
 }
 
 #' @name SummaryFactory
@@ -150,7 +151,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
         show = function(showType = 1, digits = NA_integer_) {
             .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
-        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
+        .show = function(showType = 1, digits = NA_integer_, ..., consoleOutputEnabled = TRUE) {
             if (output %in% c("all", "title")) {
                 if (is.null(title) || length(title) == 0) {
                     title <<- .createSummaryTitleObject(object)
@@ -2260,9 +2261,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
 }
 
 .createSummaryPerformanceScore <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
-    .createSummaryDesignPlan(object$.simulationResults, 
-        digits = digits, output = output, 
-        showStageLevels = TRUE, performanceScore = object)
+    .createSummaryDesignPlan(object$.simulationResults,
+        digits = digits, output = output,
+        showStageLevels = TRUE, performanceScore = object
+    )
 }
 
 .getSummaryParameterCaptionCriticalValues <- function(design) {
@@ -2824,7 +2826,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
 #' @noRd
 #'
 .createSummaryDesignPlan <- function(object, digits = NA_integer_,
-        output = c("all", "title", "overview", "body"), showStageLevels = FALSE, 
+        output = c("all", "title", "overview", "body"), showStageLevels = FALSE,
         performanceScore = NULL) {
     output <- match.arg(output)
     designPlan <- NULL
@@ -3352,7 +3354,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             }
         }
     }
-    
+
     if (!is.null(performanceScore)) {
         print(performanceScore)
         summaryFactory$addParameter(performanceScore,

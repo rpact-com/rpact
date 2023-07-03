@@ -15,10 +15,12 @@
 ## |  
 ## |  File name: test-class_analysis_dataset.R
 ## |  Creation date: 06 February 2023, 12:04:06
-## |  File version: $Revision: 6810 $
-## |  Last changed: $Date: 2023-02-13 12:58:47 +0100 (Mo, 13 Feb 2023) $
+## |  File version: $Revision: 7139 $
+## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## | 
+
+test_plan_section("Testing the Class 'SimulationResults'")
 
 test_that("Test that simulation result class generics and utility functions throw errors outside of context", {
   expect_error(.assertIsValidVariedParameterVectorForSimulationResultsPlotting())

@@ -15,10 +15,12 @@
 ## |  
 ## |  File name: test-f_simulation_multiarm_survival.R
 ## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7147 $
+## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
+
+test_plan_section("Testing Performance Score Functions")
 
 test_that("Simulation performance score functions throw errors when arguments are missing or wrong", {
     expect_error(getPerformanceScore())
@@ -33,7 +35,8 @@ createCorrectSimulationResultObject <- function() {
             alpha = 0.05,
             beta = 0.2
         ),
-        show = function(showStatistics) {},
+        show = function(...) {},
+        .show = function(...) {},
         alternative = c(0.5, 1, 1.5),
         plannedSubjects = c(30, 60),
         maxNumberOfSubjectsPerStage = c(30, 60),
@@ -71,7 +74,7 @@ test_that("getPerformanceScore handles SimulationResultsMeans", {
     simulationResult <- createNonMeansSimulationResultObject()
     expect_error(
         getPerformanceScore(simulationResult),
-        "Illegal argument: performance score so far only implemented for continuous and binary endpoints"
+        "Illegal argument: performance score so far implemented only for single comparisons with continuous endpoints"
     )
 })
 
@@ -83,7 +86,8 @@ createCorrectSimulationResultObject <- function() {
             alpha = 0.05,
             beta = 0.2
         ),
-        show = function(showStatistics) {},
+        show = function(...) {},
+        .show = function(...) {},
         alternative = c(0.5, 1, 1.5),
         plannedSubjects = c(30, 60),
         maxNumberOfSubjectsPerStage = c(30, 60),
@@ -104,15 +108,11 @@ createCorrectSimulationResultObject <- function() {
     return(simulationResult)
 }
 
-
 # 1. Test for a simulationResult that does not have `bindingFutility = TRUE`.
 test_that("getPerformanceScore handles non-binding futility", {
     simulationResult <- createCorrectSimulationResultObject()
     simulationResult$.design$bindingFutility <- FALSE
-    expect_error(
-        getPerformanceScore(simulationResult),
-        "Illegal argument: performance score so far only implemented for binding futility boundaries"
-    )
+    expect_warning(getPerformanceScore(simulationResult))
 })
 
 # 2. Test for a simulationResult that does not have `kMax = 2`.
@@ -121,7 +121,7 @@ test_that("getPerformanceScore handles non-two-stage designs", {
     simulationResult$.design$kMax <- 3
     expect_error(
         getPerformanceScore(simulationResult),
-        "Illegal argument: performance score so far only implemented for two-stage designs"
+        "Illegal argument: performance score so far implemented only for two-stage designs"
     )
 })
 

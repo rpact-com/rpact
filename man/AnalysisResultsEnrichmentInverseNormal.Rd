@@ -26,7 +26,7 @@ with suitable arguments to create the enrichment analysis results of an inverse 
 
 \item{\code{nPlanned}}{The sample size planned for each of the subsequent stages. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
 
 \item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio. Is a numeric vector.}
 
@@ -40,13 +40,13 @@ with suitable arguments to create the enrichment analysis results of an inverse 
 
 \item{\code{conditionalRejectionProbabilities}}{The probabilities of rejecting the null hypothesis at each stage, given the stage has been reached. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
-\item{\code{repeatedConfidenceIntervalLowerBounds}}{The lower bound of the confidence intervals that are calculated at any stage of the trial.}
+\item{\code{repeatedConfidenceIntervalLowerBounds}}{The lower bound of the confidence intervals that are calculated at any stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{repeatedConfidenceIntervalUpperBounds}}{The upper bound of the confidence interval that are calculated at any stage of the trial.}
+\item{\code{repeatedConfidenceIntervalUpperBounds}}{The upper bound of the confidence interval that are calculated at any stage of the trial. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{repeatedPValues}}{The p-values that are calculated at any stage of the trial.}
+\item{\code{repeatedPValues}}{The p-values that are calculated at any stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{piControls}}{The assumed rates in the control group for enrichment designs, i.e., designs with multiple subsets.}
 

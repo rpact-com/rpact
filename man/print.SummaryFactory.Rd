@@ -4,13 +4,16 @@
 \alias{print.SummaryFactory}
 \title{Summary Factory Printing}
 \usage{
-\method{print}{SummaryFactory}(x, ..., showSummary = FALSE, sep = "\\n-----\\n\\n")
+\method{print}{SummaryFactory}(x, ..., markdown = FALSE, showSummary = FALSE, sep = "\\n-----\\n\\n")
 }
 \arguments{
 \item{x}{The summary factory object.}
 
 \item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented
 for changing x or y axis limits without dropping data observations.}
+
+\item{markdown}{If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
+normal representation will be used otherwise (default is \code{FALSE})}
 
 \item{showSummary}{Show the summary before creating the print output, default is \code{FALSE}.}
 

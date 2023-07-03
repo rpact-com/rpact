@@ -17,13 +17,13 @@ Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurviva
 
 \item{\code{seed}}{The seed used for random number generation. Is a numeric vector of length 1.}
 
-\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.}
+\item{\code{allocationRatioPlanned}}{The planned allocation ratio (\code{n1 / n2}) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.}
 
-\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
+\item{\code{conditionalPower}}{The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.}
 
 \item{\code{iterations}}{The number of iterations used for simulations. Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility.}
+\item{\code{futilityPerStage}}{The per-stage probabilities of stopping the trial for futility. Is a numeric matrix.}
 
 \item{\code{futilityStop}}{In simulation results data set: indicates whether trial is stopped for futility or not.}
 
@@ -35,13 +35,13 @@ Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurviva
 
 \item{\code{maxNumberOfSubjectsPerStage}}{Determines the maximum number of subjects per stage for data-driven sample size recalculation. For two treatment arms, is the number of subjects for both treatment arms. For multi-arm designs, is the minimum number of subjects per selected active arm. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio.}
+\item{\code{thetaH1}}{The assumed effect under the alternative hypothesis. For survival designs, refers to the hazard ratio. Is a numeric vector.}
 
 \item{\code{calcEventsFunction}}{An optional function that can be entered to define how event size is recalculated. By default, recalculation is performed with conditional power with specified \code{minNumberOfEventsPerStage} and \code{maxNumberOfEventsPerStage}.}
 
-\item{\code{expectedNumberOfEvents}}{The expected number of events under specified alternative.}
+\item{\code{expectedNumberOfEvents}}{The expected number of events under specified alternative. Is a numeric vector.}
 
-\item{\code{populations}}{The number of populations in an enrichment design.}
+\item{\code{populations}}{The number of populations in an enrichment design. Is a numeric vector of length 1 containing a whole number.}
 
 \item{\code{effectList}}{The list of subsets, prevalences and effect sizes with columns and number of rows reflecting the different situations to be considered.}
 
@@ -67,23 +67,23 @@ Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurviva
 
 \item{\code{correlationComputation}}{If \code{"alternative"}, a correlation matrix according to Deng et al. (Biometrics, 2019) accounting for the respective alternative is used for simulating log-rank statistics in the many-to-one design. If \code{"null"}, a constant correlation matrix valid under the null hypothesis is used.}
 
-\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility.}
+\item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
 \item{\code{selectedPopulations}}{The selected populations in enrichment designs.}
 
-\item{\code{numberOfPopulations}}{The number of populations in an enrichment design.}
+\item{\code{numberOfPopulations}}{The number of populations in an enrichment design. Is a numeric matrix.}
 
-\item{\code{rejectAtLeastOne}}{The probability to reject at least one of the (multiple) hypotheses.}
+\item{\code{rejectAtLeastOne}}{The probability to reject at least one of the (multiple) hypotheses. Is a numeric vector.}
 
 \item{\code{rejectedPopulationsPerStage}}{The simulated number of rejected populations per stage.}
 
-\item{\code{successPerStage}}{The simulated success probabilities per stage where success is defined by user.}
+\item{\code{successPerStage}}{The simulated success probabilities per stage where success is defined by user. Is a numeric matrix.}
 
-\item{\code{eventsPerStage}}{The number of events per stage.}
+\item{\code{eventsPerStage}}{The number of events per stage. Is a numeric matrix.}
 
 \item{\code{singleNumberOfEventsPerStage}}{In simulation results data set: the number of events per stage that is used for the analysis.}
 
-\item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes.}
+\item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.}
 }}
 
 

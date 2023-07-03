@@ -24,7 +24,7 @@ with suitable arguments to create the stage results of a dataset of rates.
 
 \item{\code{overallPValues}}{The overall, i.e., cumulated p-values. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
-\item{\code{effectSizes}}{The stage-wise effect sizes.}
+\item{\code{effectSizes}}{The stage-wise effect sizes. Is a numeric vector of length \code{kMax}.}
 
 \item{\code{direction}}{Specifies the direction of the alternative, is either "upper" or "lower". Only applicable for one-sided testing.}
 
@@ -40,7 +40,7 @@ with suitable arguments to create the stage results of a dataset of rates.
 
 \item{\code{combInverseNormal}}{The test statistics over stages for the inverse normal test. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test.}
+\item{\code{combFisher}}{The test statistics over stages for Fisher's combination test. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{...}}{Names of \code{dataInput}.}
 }}

@@ -19,7 +19,7 @@ Class for the definition of number of subjects results.
 
 \item{\code{accrualIntensity}}{The absolute accrual intensities. Is a numeric vector of length \code{kMax}.}
 
-\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations.}
+\item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations. Is a numeric vector.}
 
 \item{\code{numberOfSubjects}}{In simulation results data set: The number of subjects under consideration when the interim analysis takes place.}
 }}
