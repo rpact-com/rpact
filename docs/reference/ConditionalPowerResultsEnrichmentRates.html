@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@ with suitable arguments to create the results of a group sequential or a combina
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
 
 
 <dt><code>iterations</code></dt>
@@ -86,7 +86,7 @@ with suitable arguments to create the results of a group sequential or a combina
 
 
 <dt><code>conditionalPower</code></dt>
-<dd><p>The conditional power at each stage of the trial. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
+<dd><p>The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
 
 
 <dt><code>piTreatments</code></dt>

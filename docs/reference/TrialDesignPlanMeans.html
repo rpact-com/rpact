@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,15 +86,15 @@ with suitable arguments to create a design plan for a dataset of means.</p>
 
 
 <dt><code>groups</code></dt>
-<dd><p>The group numbers. Is a numeric vector of length number of stages times number of groups.</p></dd>
+<dd><p>The group numbers. Is a numeric vector.</p></dd>
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
 
 
 <dt><code>optimumAllocationRatio</code></dt>
-<dd><p>The allocation ratio that is optimum with respect to the overall sample size at given power.</p></dd>
+<dd><p>The allocation ratio that is optimum with respect to the overall sample size at given power. Is a logical vector of length 1.</p></dd>
 
 
 <dt><code>directionUpper</code></dt>
@@ -102,15 +102,15 @@ with suitable arguments to create a design plan for a dataset of means.</p>
 
 
 <dt><code>effect</code></dt>
-<dd><p>The effect for randomly creating normally distributed responses.</p></dd>
+<dd><p>The effect for randomly creating normally distributed responses. Is a numeric vector of length <code>kMax</code>.</p></dd>
 
 
 <dt><code>overallReject</code></dt>
-<dd><p>The overall rejection probability.</p></dd>
+<dd><p>The overall rejection probability. Is a numeric vector.</p></dd>
 
 
 <dt><code>rejectPerStage</code></dt>
-<dd><p>The probability to reject a hypothesis per stage of the trial.</p></dd>
+<dd><p>The probability to reject a hypothesis per stage of the trial. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityStop</code></dt>
@@ -118,11 +118,11 @@ with suitable arguments to create a design plan for a dataset of means.</p>
 
 
 <dt><code>futilityPerStage</code></dt>
-<dd><p>The per-stage probabilities of stopping the trial for futility.</p></dd>
+<dd><p>The per-stage probabilities of stopping the trial for futility. Is a numeric matrix.</p></dd>
 
 
 <dt><code>earlyStop</code></dt>
-<dd><p>The probability to stopping the trial either for efficacy or futility.</p></dd>
+<dd><p>The probability to stopping the trial either for efficacy or futility. Is a numeric vector.</p></dd>
 
 
 <dt><code>expectedNumberOfSubjects</code></dt>
@@ -130,15 +130,15 @@ with suitable arguments to create a design plan for a dataset of means.</p>
 
 
 <dt><code>nFixed</code></dt>
-<dd><p>The sample size in a fixed (one-stage) design.</p></dd>
+<dd><p>The sample size in a fixed (one-stage) design. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>nFixed1</code></dt>
-<dd><p>The sample size in treatment arm 1 in a fixed (one-stage) design.</p></dd>
+<dd><p>The sample size in treatment arm 1 in a fixed (one-stage) design. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>nFixed2</code></dt>
-<dd><p>The sample size in treatment arm 2 in a fixed (one-stage) design.</p></dd>
+<dd><p>The sample size in treatment arm 2 in a fixed (one-stage) design. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>informationRates</code></dt>
@@ -146,15 +146,15 @@ with suitable arguments to create a design plan for a dataset of means.</p>
 
 
 <dt><code>maxNumberOfSubjects</code></dt>
-<dd><p>The maximum number of subjects for power calculations.</p></dd>
+<dd><p>The maximum number of subjects for power calculations. Is a numeric vector.</p></dd>
 
 
 <dt><code>maxNumberOfSubjects1</code></dt>
-<dd><p>The maximum number of subjects in treatment arm 1.</p></dd>
+<dd><p>The maximum number of subjects in treatment arm 1. Is a numeric vector.</p></dd>
 
 
 <dt><code>maxNumberOfSubjects2</code></dt>
-<dd><p>The maximum number of subjects in treatment arm 2.</p></dd>
+<dd><p>The maximum number of subjects in treatment arm 2. Is a numeric vector.</p></dd>
 
 
 <dt><code>numberOfSubjects</code></dt>
@@ -170,15 +170,15 @@ with suitable arguments to create a design plan for a dataset of means.</p>
 
 
 <dt><code>expectedNumberOfSubjectsH0</code></dt>
-<dd><p>The expected number of subjects under H0. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The expected number of subjects under H0. Is a numeric vector.</p></dd>
 
 
 <dt><code>expectedNumberOfSubjectsH01</code></dt>
-<dd><p>The expected number of subjects under a value between H0 and H1. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The expected number of subjects under a value between H0 and H1. Is a numeric vector.</p></dd>
 
 
 <dt><code>expectedNumberOfSubjectsH1</code></dt>
-<dd><p>The expected number of subjects under H1. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The expected number of subjects under H1. Is a numeric vector.</p></dd>
 
 
 <dt><code>criticalValuesEffectScale</code></dt>
@@ -186,31 +186,31 @@ with suitable arguments to create a design plan for a dataset of means.</p>
 
 
 <dt><code>criticalValuesEffectScaleLower</code></dt>
-<dd><p>The lower critical values for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The lower critical values for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>criticalValuesEffectScaleUpper</code></dt>
-<dd><p>The upper critical values for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The upper critical values for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>criticalValuesPValueScale</code></dt>
-<dd><p>The critical values for each stage of the trial on the p-valuie scale.</p></dd>
+<dd><p>The critical values for each stage of the trial on the p-value scale.</p></dd>
 
 
 <dt><code>futilityBoundsEffectScale</code></dt>
-<dd><p>The futility bounds for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The futility bounds for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityBoundsEffectScaleLower</code></dt>
-<dd><p>The lower futility bounds for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The lower futility bounds for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityBoundsEffectScaleUpper</code></dt>
-<dd><p>The upper futility bounds for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The upper futility bounds for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityBoundsPValueScale</code></dt>
-<dd><p>The futility bounds for each stage of the trial on the p-value scale.</p></dd>
+<dd><p>The futility bounds for each stage of the trial on the p-value scale. Is a numeric matrix.</p></dd>
 
 
 </dl></div>

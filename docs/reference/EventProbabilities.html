@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +93,7 @@
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
 
 
 <dt><code>hazardRatio</code></dt>
@@ -101,11 +101,11 @@
 
 
 <dt><code>dropoutRate1</code></dt>
-<dd><p>The assumed drop-out rate in the treatment group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed drop-out rate in the treatment group. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
 
 
 <dt><code>dropoutRate2</code></dt>
-<dd><p>The assumed drop-out rate in the control group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed drop-out rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
 
 
 <dt><code>dropoutTime</code></dt>
@@ -113,7 +113,7 @@
 
 
 <dt><code>maxNumberOfSubjects</code></dt>
-<dd><p>The maximum number of subjects for power calculations.</p></dd>
+<dd><p>The maximum number of subjects for power calculations. Is a numeric vector.</p></dd>
 
 
 <dt><code>overallEventProbabilities</code></dt>
@@ -121,15 +121,15 @@
 
 
 <dt><code>cumulativeEventProbabilities</code></dt>
-<dd><p>The cumulative event probabilities in survival designs.</p></dd>
+<dd><p>The cumulative event probabilities in survival designs. Is a numeric vector.</p></dd>
 
 
 <dt><code>eventProbabilities1</code></dt>
-<dd><p>The event probabilities in treatment group 1.</p></dd>
+<dd><p>The event probabilities in treatment group 1. Is a numeric vector.</p></dd>
 
 
 <dt><code>eventProbabilities2</code></dt>
-<dd><p>The event probabilities in treatment group 2.</p></dd>
+<dd><p>The event probabilities in treatment group 2. Is a numeric vector.</p></dd>
 
 
 </dl></div>

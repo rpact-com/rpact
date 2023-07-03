@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,9 +56,10 @@
 <h3 id="new-features-3-4-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-4-0"></a></h3>
 <ul><li>The new function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> calculates the conditional performance score, its sub-scores and components according to Herrmann et al. (2020) for a given simulation result from a two-stage design</li>
 <li>
-<code>allocationRatioPlanned</code> for simulating multiarm and enrichment designs can be a vector of length kMax, the number of stages</li>
+<code>allocationRatioPlanned</code> for simulating multi-arm and enrichment designs can be a vector of length kMax, the number of stages</li>
 <li>
 <code><a href="../reference/getObjectRCode.html">getObjectRCode()</a></code> (short: <code><a href="../reference/getObjectRCode.html">rcmd()</a></code>): with the new arguments <code>pipeOperator</code> and <code>output</code> many new output variants can be specified, e.g., the native R pipe operator or the magrittr pipe operator can be used</li>
+<li>Generic function <code><a href="https://rdrr.io/pkg/knitr/man/knit_print.html" class="external-link">knitr::knit_print</a></code> for all result objects implemented and automatic code chunk option <code>results = 'asis'</code> activated</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-3-4-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-3-4-0"></a></h3>
@@ -66,6 +67,7 @@
 <li>Multivariate t distribution restricted to <code>df &lt;= 500</code> because of erroneous results in <code>mnormt</code> package otherwise. For <code>df &gt; 500</code>, multivariate normal distribution is used</li>
 <li>Performance of cumulative distribution function and survival function plot improved</li>
 <li>Test coverage extended and improved</li>
+<li>Descriptions for all class fields added</li>
 <li>Renamed field <code>omega</code> to <code>chi</code> in class <code>TrialDesignPlanSurvival</code>
 </li>
 <li>Several minor improvements</li>

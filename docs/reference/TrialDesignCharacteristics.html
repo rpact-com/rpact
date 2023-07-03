@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,15 +67,15 @@ with suitable arguments to create it.</p>
     
 
 <dl><dt><code>nFixed</code></dt>
-<dd><p>The sample size in a fixed (one-stage) design.</p></dd>
+<dd><p>The sample size in a fixed (one-stage) design. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>shift</code></dt>
-<dd><p>The shift value for group sequential test characteristics.</p></dd>
+<dd><p>The shift value for group sequential test characteristics. Is a numeric vector of length 1.</p></dd>
 
 
 <dt><code>inflationFactor</code></dt>
-<dd><p>The relative increase of maximum sample size in a group sequential design as compared to the fixed sample size case.</p></dd>
+<dd><p>The relative increase of maximum sample size in a group sequential design as compared to the fixed sample size case. Is a positive numeric vector of length 1.</p></dd>
 
 
 <dt><code>stages</code></dt>
@@ -83,7 +83,7 @@ with suitable arguments to create it.</p>
 
 
 <dt><code>information</code></dt>
-<dd><p>The information over stages needed to achieve power of the specified design.</p></dd>
+<dd><p>The information over stages needed to achieve power of the specified design. Is a numeric vector of length <code>kMax</code>.</p></dd>
 
 
 <dt><code>power</code></dt>
@@ -91,23 +91,23 @@ with suitable arguments to create it.</p>
 
 
 <dt><code>rejectionProbabilities</code></dt>
-<dd><p>The rejection probabilities over treatments arms or populations and stages.</p></dd>
+<dd><p>The rejection probabilities over treatments arms or populations and stages. Is a numeric vector.</p></dd>
 
 
 <dt><code>futilityProbabilities</code></dt>
-<dd><p>The overall probabilities of stopping the trial for futility.</p></dd>
+<dd><p>The overall probabilities of stopping the trial for futility. Is a numeric vector of length <code>kMax</code> minus 1 containing values between 0 and 1.</p></dd>
 
 
 <dt><code>averageSampleNumber1</code></dt>
-<dd><p>The expected sample size under H1. Is a numeric vector of length 1.</p></dd>
+<dd><p>The expected sample size under H1. Is a positive numeric vector of length 1.</p></dd>
 
 
 <dt><code>averageSampleNumber01</code></dt>
-<dd><p>The expected sample size for a value between H0 and H1. Is a numeric vector of length 1.</p></dd>
+<dd><p>The expected sample size for a value between H0 and H1. Is a positive numeric vector of length 1.</p></dd>
 
 
 <dt><code>averageSampleNumber0</code></dt>
-<dd><p>The expected sample size under H0. Is a numeric vector of length 1.</p></dd>
+<dd><p>The expected sample size under H0. Is a positive numeric vector of length 1.</p></dd>
 
 
 </dl></div>

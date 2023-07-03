@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,7 +86,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>median1</code></dt>
-<dd><p>The assumed median survival time in the treatment group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed median survival time in the treatment group. Is a numeric vector.</p></dd>
 
 
 <dt><code>median2</code></dt>
@@ -106,27 +106,27 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>maxNumberOfSubjects</code></dt>
-<dd><p>The maximum number of subjects for power calculations.</p></dd>
+<dd><p>The maximum number of subjects for power calculations. Is a numeric vector.</p></dd>
 
 
 <dt><code>maxNumberOfSubjects1</code></dt>
-<dd><p>The maximum number of subjects in treatment arm 1.</p></dd>
+<dd><p>The maximum number of subjects in treatment arm 1. Is a numeric vector.</p></dd>
 
 
 <dt><code>maxNumberOfSubjects2</code></dt>
-<dd><p>The maximum number of subjects in treatment arm 2.</p></dd>
+<dd><p>The maximum number of subjects in treatment arm 2. Is a numeric vector.</p></dd>
 
 
 <dt><code>maxNumberOfEvents</code></dt>
-<dd><p>The maximum number of events for power calculations.</p></dd>
+<dd><p>The maximum number of events for power calculations. Is a positive numeric vector of length <code>kMax</code>.</p></dd>
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
 
 
 <dt><code>optimumAllocationRatio</code></dt>
-<dd><p>The allocation ratio that is optimum with respect to the overall sample size at given power.</p></dd>
+<dd><p>The allocation ratio that is optimum with respect to the overall sample size at given power. Is a logical vector of length 1.</p></dd>
 
 
 <dt><code>accountForObservationTimes</code></dt>
@@ -166,11 +166,11 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>dropoutRate1</code></dt>
-<dd><p>The assumed drop-out rate in the treatment group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed drop-out rate in the treatment group. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
 
 
 <dt><code>dropoutRate2</code></dt>
-<dd><p>The assumed drop-out rate in the control group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed drop-out rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
 
 
 <dt><code>dropoutTime</code></dt>
@@ -178,35 +178,35 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>chi</code></dt>
-<dd><p>The calculated event probability at end of trial.</p></dd>
+<dd><p>The calculated event probability at end of trial. Is a numeric vector.</p></dd>
 
 
 <dt><code>expectedNumberOfEvents</code></dt>
-<dd><p>The expected number of events under specified alternative.</p></dd>
+<dd><p>The expected number of events under specified alternative. Is a numeric vector.</p></dd>
 
 
 <dt><code>eventsFixed</code></dt>
-<dd><p>The number of events in a fixed sample size design.</p></dd>
+<dd><p>The number of events in a fixed sample size design. Is a numeric vector.</p></dd>
 
 
 <dt><code>nFixed</code></dt>
-<dd><p>The sample size in a fixed (one-stage) design.</p></dd>
+<dd><p>The sample size in a fixed (one-stage) design. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>nFixed1</code></dt>
-<dd><p>The sample size in treatment arm 1 in a fixed (one-stage) design.</p></dd>
+<dd><p>The sample size in treatment arm 1 in a fixed (one-stage) design. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>nFixed2</code></dt>
-<dd><p>The sample size in treatment arm 2 in a fixed (one-stage) design.</p></dd>
+<dd><p>The sample size in treatment arm 2 in a fixed (one-stage) design. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>overallReject</code></dt>
-<dd><p>The overall rejection probability.</p></dd>
+<dd><p>The overall rejection probability. Is a numeric vector.</p></dd>
 
 
 <dt><code>rejectPerStage</code></dt>
-<dd><p>The probability to reject a hypothesis per stage of the trial.</p></dd>
+<dd><p>The probability to reject a hypothesis per stage of the trial. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityStop</code></dt>
@@ -214,11 +214,11 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>futilityPerStage</code></dt>
-<dd><p>The per-stage probabilities of stopping the trial for futility.</p></dd>
+<dd><p>The per-stage probabilities of stopping the trial for futility. Is a numeric matrix.</p></dd>
 
 
 <dt><code>earlyStop</code></dt>
-<dd><p>The probability to stopping the trial either for efficacy or futility.</p></dd>
+<dd><p>The probability to stopping the trial either for efficacy or futility. Is a numeric vector.</p></dd>
 
 
 <dt><code>informationRates</code></dt>
@@ -226,35 +226,35 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>analysisTime</code></dt>
-<dd><p>The estimated time of analysis.</p></dd>
+<dd><p>The estimated time of analysis. Is a numeric matrix.</p></dd>
 
 
 <dt><code>studyDurationH1</code></dt>
-<dd><p>The study duration under the alternative hypothesis.</p></dd>
+<dd><p>The study duration under the alternative hypothesis. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>studyDuration</code></dt>
-<dd><p>The study duration for speciifed effect size.</p></dd>
+<dd><p>The study duration for specified effect size. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>maxStudyDuration</code></dt>
-<dd><p>The maximum study duration in survival designs.</p></dd>
+<dd><p>The maximum study duration in survival designs. Is a numeric vector.</p></dd>
 
 
 <dt><code>eventsPerStage</code></dt>
-<dd><p>The number of events per stage.</p></dd>
+<dd><p>The number of events per stage. Is a numeric matrix.</p></dd>
 
 
 <dt><code>expectedEventsH0</code></dt>
-<dd><p>The expected number of events under H0.</p></dd>
+<dd><p>The expected number of events under H0. Is a numeric vector.</p></dd>
 
 
 <dt><code>expectedEventsH01</code></dt>
-<dd><p>The expected number of events under a value between H0 and H1.</p></dd>
+<dd><p>The expected number of events under a value between H0 and H1. Is a numeric vector.</p></dd>
 
 
 <dt><code>expectedEventsH1</code></dt>
-<dd><p>The expected number of events under H1.</p></dd>
+<dd><p>The expected number of events under H1. Is a numeric vector.</p></dd>
 
 
 <dt><code>numberOfSubjects</code></dt>
@@ -270,7 +270,7 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>expectedNumberOfSubjectsH1</code></dt>
-<dd><p>The expected number of subjects under H1. Is a positive numeric vector of length 1.</p></dd>
+<dd><p>The expected number of subjects under H1. Is a numeric vector.</p></dd>
 
 
 <dt><code>expectedNumberOfSubjects</code></dt>
@@ -282,31 +282,31 @@ with suitable arguments to create a design plan for a dataset of survival data.<
 
 
 <dt><code>criticalValuesEffectScaleLower</code></dt>
-<dd><p>The lower critical values for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The lower critical values for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>criticalValuesEffectScaleUpper</code></dt>
-<dd><p>The upper critical values for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The upper critical values for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>criticalValuesPValueScale</code></dt>
-<dd><p>The critical values for each stage of the trial on the p-valuie scale.</p></dd>
+<dd><p>The critical values for each stage of the trial on the p-value scale.</p></dd>
 
 
 <dt><code>futilityBoundsEffectScale</code></dt>
-<dd><p>The futility bounds for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The futility bounds for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityBoundsEffectScaleLower</code></dt>
-<dd><p>The lower futility bounds for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The lower futility bounds for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityBoundsEffectScaleUpper</code></dt>
-<dd><p>The upper futility bounds for each stage of the trial on the effect size scale.</p></dd>
+<dd><p>The upper futility bounds for each stage of the trial on the effect size scale. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityBoundsPValueScale</code></dt>
-<dd><p>The futility bounds for each stage of the trial on the p-value scale.</p></dd>
+<dd><p>The futility bounds for each stage of the trial on the p-value scale. Is a numeric matrix.</p></dd>
 
 
 </dl></div>

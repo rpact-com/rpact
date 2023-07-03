@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,11 +76,11 @@
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
 
 
 <dt><code>conditionalPower</code></dt>
-<dd><p>The conditional power at each stage of the trial. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
+<dd><p>The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
 
 
 <dt><code>iterations</code></dt>
@@ -88,7 +88,7 @@
 
 
 <dt><code>futilityPerStage</code></dt>
-<dd><p>The per-stage probabilities of stopping the trial for futility.</p></dd>
+<dd><p>The per-stage probabilities of stopping the trial for futility. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityStop</code></dt>
@@ -120,7 +120,7 @@
 
 
 <dt><code>expectedNumberOfEvents</code></dt>
-<dd><p>The expected number of events under specified alternative.</p></dd>
+<dd><p>The expected number of events under specified alternative. Is a numeric vector.</p></dd>
 
 
 <dt><code>pi1</code></dt>
@@ -132,7 +132,7 @@
 
 
 <dt><code>median1</code></dt>
-<dd><p>The assumed median survival time in the treatment group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed median survival time in the treatment group. Is a numeric vector.</p></dd>
 
 
 <dt><code>median2</code></dt>
@@ -140,7 +140,7 @@
 
 
 <dt><code>maxNumberOfSubjects</code></dt>
-<dd><p>The maximum number of subjects for power calculations.</p></dd>
+<dd><p>The maximum number of subjects for power calculations. Is a numeric vector.</p></dd>
 
 
 <dt><code>accrualTime</code></dt>
@@ -152,11 +152,11 @@
 
 
 <dt><code>dropoutRate1</code></dt>
-<dd><p>The assumed drop-out rate in the treatment group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed drop-out rate in the treatment group. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
 
 
 <dt><code>dropoutRate2</code></dt>
-<dd><p>The assumed drop-out rate in the control group. Is a numeric vector of length 1.</p></dd>
+<dd><p>The assumed drop-out rate in the control group. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
 
 
 <dt><code>dropoutTime</code></dt>
@@ -196,7 +196,7 @@
 
 
 <dt><code>earlyStop</code></dt>
-<dd><p>The probability to stopping the trial either for efficacy or futility.</p></dd>
+<dd><p>The probability to stopping the trial either for efficacy or futility. Is a numeric vector.</p></dd>
 
 
 <dt><code>hazardRatio</code></dt>
@@ -204,11 +204,11 @@
 
 
 <dt><code>studyDuration</code></dt>
-<dd><p>The study duration for speciifed effect size.</p></dd>
+<dd><p>The study duration for specified effect size. Is a positive numeric vector.</p></dd>
 
 
 <dt><code>eventsNotAchieved</code></dt>
-<dd><p>The simulated number of cases how often the number of events was not reached.</p></dd>
+<dd><p>The simulated number of cases how often the number of events was not reached. Is a numeric matrix.</p></dd>
 
 
 <dt><code>numberOfSubjects</code></dt>
@@ -224,11 +224,11 @@
 
 
 <dt><code>eventsPerStage</code></dt>
-<dd><p>The number of events per stage.</p></dd>
+<dd><p>The number of events per stage. Is a numeric matrix.</p></dd>
 
 
 <dt><code>overallEventsPerStage</code></dt>
-<dd><p>The cumulative events over stages.</p></dd>
+<dd><p>The cumulative events over stages. Is a numeric matrix.</p></dd>
 
 
 <dt><code>expectedNumberOfSubjects</code></dt>
@@ -236,15 +236,15 @@
 
 
 <dt><code>rejectPerStage</code></dt>
-<dd><p>The probability to reject a hypothesis per stage of the trial.</p></dd>
+<dd><p>The probability to reject a hypothesis per stage of the trial. Is a numeric matrix.</p></dd>
 
 
 <dt><code>overallReject</code></dt>
-<dd><p>The overall rejection probability.</p></dd>
+<dd><p>The overall rejection probability. Is a numeric vector.</p></dd>
 
 
 <dt><code>conditionalPowerAchieved</code></dt>
-<dd><p>The calculated conditional power, under the assumption of observed or assumed effect sizes.</p></dd>
+<dd><p>The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.</p></dd>
 
 
 </dl></div>

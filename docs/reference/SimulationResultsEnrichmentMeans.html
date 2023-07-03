@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,11 +73,11 @@
 
 
 <dt><code>allocationRatioPlanned</code></dt>
-<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a numeric vector of length 1.</p></dd>
+<dd><p>The planned allocation ratio (<code>n1 / n2</code>) for the groups. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control. Is a positive numeric vector of length 1.</p></dd>
 
 
 <dt><code>conditionalPower</code></dt>
-<dd><p>The conditional power at each stage of the trial. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
+<dd><p>The conditional power at each stage of the trial. Is a numeric vector of length 1 containing a value between 0 and 1.</p></dd>
 
 
 <dt><code>iterations</code></dt>
@@ -85,7 +85,7 @@
 
 
 <dt><code>futilityPerStage</code></dt>
-<dd><p>The per-stage probabilities of stopping the trial for futility.</p></dd>
+<dd><p>The per-stage probabilities of stopping the trial for futility. Is a numeric matrix.</p></dd>
 
 
 <dt><code>futilityStop</code></dt>
@@ -125,7 +125,7 @@
 
 
 <dt><code>populations</code></dt>
-<dd><p>The number of populations in an enrichment design.</p></dd>
+<dd><p>The number of populations in an enrichment design. Is a numeric vector of length 1 containing a whole number.</p></dd>
 
 
 <dt><code>effectList</code></dt>
@@ -173,7 +173,7 @@
 
 
 <dt><code>earlyStop</code></dt>
-<dd><p>The probability to stopping the trial either for efficacy or futility.</p></dd>
+<dd><p>The probability to stopping the trial either for efficacy or futility. Is a numeric vector.</p></dd>
 
 
 <dt><code>selectedPopulations</code></dt>
@@ -181,11 +181,11 @@
 
 
 <dt><code>numberOfPopulations</code></dt>
-<dd><p>The number of populations in an enrichment design.</p></dd>
+<dd><p>The number of populations in an enrichment design. Is a numeric matrix.</p></dd>
 
 
 <dt><code>rejectAtLeastOne</code></dt>
-<dd><p>The probability to reject at least one of the (multiple) hypotheses.</p></dd>
+<dd><p>The probability to reject at least one of the (multiple) hypotheses. Is a numeric vector.</p></dd>
 
 
 <dt><code>rejectedPopulationsPerStage</code></dt>
@@ -193,7 +193,7 @@
 
 
 <dt><code>successPerStage</code></dt>
-<dd><p>The simulated success probabilities per stage where success is defined by user.</p></dd>
+<dd><p>The simulated success probabilities per stage where success is defined by user. Is a numeric matrix.</p></dd>
 
 
 <dt><code>sampleSizes</code></dt>
@@ -201,7 +201,7 @@
 
 
 <dt><code>conditionalPowerAchieved</code></dt>
-<dd><p>The calculated conditional power, under the assumption of observed or assumed effect sizes.</p></dd>
+<dd><p>The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.</p></dd>
 
 
 </dl></div>

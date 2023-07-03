@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@ with suitable arguments to create a group sequential design.</p>
 
 
 <dt><code>userAlphaSpending</code></dt>
-<dd><p>The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage.</p></dd>
+<dd><p>The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
 
 
 <dt><code>criticalValues</code></dt>
@@ -90,7 +90,7 @@ with suitable arguments to create a group sequential design.</p>
 
 
 <dt><code>stageLevels</code></dt>
-<dd><p>The adjusted significance levels to reach significance in a group sequential design.</p></dd>
+<dd><p>The adjusted significance levels to reach significance in a group sequential design. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
 
 
 <dt><code>alphaSpent</code></dt>
@@ -154,7 +154,7 @@ with suitable arguments to create a group sequential design.</p>
 
 
 <dt><code>userBetaSpending</code></dt>
-<dd><p>The user defined beta spending. Contains the cumulative beta-spending up to each interim stage.</p></dd>
+<dd><p>The user defined beta spending. Contains the cumulative beta-spending up to each interim stage. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
 
 
 <dt><code>power</code></dt>
@@ -162,7 +162,7 @@ with suitable arguments to create a group sequential design.</p>
 
 
 <dt><code>twoSidedPower</code></dt>
-<dd><p>Specifies if power is defined two-sided at each stage of the trial. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
+<dd><p>Specifies if power is defined two-sided at each stage of the trial. Is a logical vector of length 1.</p></dd>
 
 
 <dt><code>constantBoundsHP</code></dt>
@@ -174,15 +174,15 @@ with suitable arguments to create a group sequential design.</p>
 
 
 <dt><code>delayedInformation</code></dt>
-<dd><p>Delay of information for delayed response designs.</p></dd>
+<dd><p>Delay of information for delayed response designs. Is a numeric vector of length <code>kMax</code> minus 1 containing values between 0 and 1.</p></dd>
 
 
 <dt><code>decisionCriticalValues</code></dt>
-<dd><p>The decision critical values for each stage of the trial in a delayed response design.</p></dd>
+<dd><p>The decision critical values for each stage of the trial in a delayed response design. Is a numeric vector of length <code>kMax</code>.</p></dd>
 
 
 <dt><code>reversalProbabilities</code></dt>
-<dd><p>The probability to switch from stopping the trial for success (or futility) and reaching non-rejection (or rejection) in a delayed response design.</p></dd>
+<dd><p>The probability to switch from stopping the trial for success (or futility) and reaching non-rejection (or rejection) in a delayed response design. Is a numeric vector of length <code>kMax</code> minus 1 containing values between 0 and 1.</p></dd>
 
 
 </dl></div>

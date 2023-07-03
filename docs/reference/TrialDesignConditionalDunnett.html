@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@ with suitable arguments to create a conditional Dunnett test design.</p>
 
 
 <dt><code>userAlphaSpending</code></dt>
-<dd><p>The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage.</p></dd>
+<dd><p>The user defined alpha spending. Contains the cumulative alpha-spending (type I error rate) up to each interim stage. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
 
 
 <dt><code>criticalValues</code></dt>
@@ -90,7 +90,7 @@ with suitable arguments to create a conditional Dunnett test design.</p>
 
 
 <dt><code>stageLevels</code></dt>
-<dd><p>The adjusted significance levels to reach significance in a group sequential design.</p></dd>
+<dd><p>The adjusted significance levels to reach significance in a group sequential design. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
 
 
 <dt><code>alphaSpent</code></dt>

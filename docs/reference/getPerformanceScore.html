@@ -14,7 +14,7 @@ Larger (sub-)score and component values refer to a better performance."><!-- mat
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.3.9.9224</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,9 +85,51 @@ can be found in Herrmann et al. (2020).</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
-    <p>Stephen Schüürhuis</p>
+    <p>Stephen Schueuerhuis</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># Example from Table 3 in "A new conditional performance score for </span></span></span>
+<span class="r-in"><span><span class="co"># the evaluation of adaptive group sequential designs with samplesize </span></span></span>
+<span class="r-in"><span><span class="co"># recalculation from Herrmann et al 2023", p.2097 for </span></span></span>
+<span class="r-in"><span><span class="co"># Observed Conditional Power approach and Delta = 0.5</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Create two-stage Pocock design with binding futility boundary at 0</span></span></span>
+<span class="r-in"><span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    kMax <span class="op">=</span> <span class="fl">2</span>, typeOfDesign <span class="op">=</span> <span class="st">"P"</span>, </span></span>
+<span class="r-in"><span>    futilityBounds <span class="op">=</span> <span class="fl">0</span>, bindingFutility <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Initialize sample sizes and effect; </span></span></span>
+<span class="r-in"><span><span class="co"># Sample sizes are referring to overall stage-wise sample sizes</span></span></span>
+<span class="r-in"><span><span class="va">n1</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span><span class="va">n2</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span><span class="va">nMax</span> <span class="op">&lt;-</span> <span class="va">n1</span> <span class="op">+</span> <span class="va">n2</span></span></span>
+<span class="r-in"><span><span class="va">alternative</span> <span class="op">&lt;-</span> <span class="fl">0.5</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Perform Simulation; nMax*1.5 defines the maximum </span></span></span>
+<span class="r-in"><span><span class="co"># sample size for the additional stage</span></span></span>
+<span class="r-in"><span><span class="va">simulationResult</span> <span class="op">&lt;-</span> <span class="fu"><a href="getSimulationMeans.html">getSimulationMeans</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    design <span class="op">=</span> <span class="va">design</span>,</span></span>
+<span class="r-in"><span>    normalApproximation <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    thetaH0 <span class="op">=</span> <span class="fl">0</span>,</span></span>
+<span class="r-in"><span>    alternative <span class="op">=</span> <span class="va">alternative</span>,</span></span>
+<span class="r-in"><span>    plannedSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">n1</span>, <span class="va">nMax</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    minNumberOfSubjectsPerStage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfSubjectsPerStage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="va">nMax</span> <span class="op">*</span> <span class="fl">1.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    conditionalPower <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
+<span class="r-in"><span>    directionUpper <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfIterations <span class="op">=</span> <span class="fl">1e05</span>,</span></span>
+<span class="r-in"><span>    seed <span class="op">=</span> <span class="fl">140</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Calculate performance score</span></span></span>
+<span class="r-in"><span><span class="fu">getPerformanceScore</span><span class="op">(</span><span class="va">simulationResult</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
