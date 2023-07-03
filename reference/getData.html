@@ -120,33 +120,33 @@ log-rank statistic.</p></li>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">getData</span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   iterationNumber stageNumber pi1 pi2 hazardRatio analysisTime numberOfSubjects</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1               1           1 0.3 0.3           1     20.52004              171</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2               2           1 0.3 0.3           1     20.12857              167</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3               3           1 0.3 0.3           1     17.89188              149</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4               4           1 0.3 0.3           1     20.40131              170</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5               5           1 0.3 0.3           1     19.08096              159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6               6           1 0.3 0.3           1     20.97649              174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1               1           1 0.3 0.3           1     20.39452              169</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2               2           1 0.3 0.3           1     19.75876              164</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3               3           1 0.3 0.3           1     20.04497              167</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4               4           1 0.3 0.3           1     18.74970              156</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5               5           1 0.3 0.3           1     21.91084              182</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6               6           1 0.3 0.3           1     20.20995              168</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   overallEvents1 overallEvents2 eventsPerStage rejectPerStage eventsNotAchieved</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1             23             17             40              0                 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2             19             21             40              0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1             17             23             40              0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2             23             17             40              0                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3             20             20             40              0                 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4             21             19             40              0                 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5             23             17             40              0                 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6             21             19             40              0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4             26             14             40              1                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5             18             22             40              0                 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6             20             20             40              0                 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   futilityPerStage testStatistic logRankStatistic conditionalPowerAchieved</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                0   0.986872843      0.986872843                       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                0  -0.352824273     -0.352824273                       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                0  -0.005032732     -0.005032732                       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                0   0.499801192      0.499801192                       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                0   1.002836609      1.002836609                       NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                0   0.408536822      0.408536822                       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                0   -1.02189184      -1.02189184                       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                0    1.17915109       1.17915109                       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                0   -0.30466915      -0.30466915                       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                0    2.30950492       2.30950492                       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                0   -0.71125579      -0.71125579                       NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                0    0.03315397       0.03315397                       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   pValuesSeparate trialStop hazardRatioEstimateLR</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.1618525      TRUE             1.3662593</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       0.6378899      TRUE             0.8944262</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       0.5020078      TRUE             0.9984098</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       0.3086075      TRUE             1.1712259</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       0.1579699      TRUE             1.3731739</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       0.3414398      TRUE             1.1379071</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      0.84658395      TRUE             0.7238649</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      0.11916901      TRUE             1.4519106</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      0.61969092      TRUE             0.9081508</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      0.01045779      TRUE             2.0757646</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      0.76153713      TRUE             0.7985810</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      0.48677590      TRUE             1.0105394</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 200  19</span>
 <span class="r-in"><span></span></span>
