@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7268 $
+## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1799,7 +1799,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
             designPlan$.setParameterType("nFixed2", C_PARAM_NOT_APPLICABLE)
             designPlan$.setParameterType("nFixed", C_PARAM_NOT_APPLICABLE)
 
-            if (designPlan$allocationRatioPlanned[1] == 1) {
+            if (all(designPlan$allocationRatioPlanned == 1)) {
                 designPlan$.setParameterType("numberOfSubjects1", C_PARAM_NOT_APPLICABLE)
                 designPlan$.setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
             }
@@ -1959,7 +1959,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
 
         if (groups == 1) {
             if (sided == 1 || !twoSidedPower) {
-                if (normalApproximation == FALSE) {
+                if (!normalApproximation) {
                     up <- 2
                     while (stats::pt(
                         stats::qt(1 - alpha / sided, up - 1), max(0.001, up - 1),
@@ -1993,7 +1993,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                     ) > beta) {
                     up <- 2 * up
                 }
-                if (normalApproximation == FALSE) {
+                if (!normalApproximation) {
                     nFixed[i] <- .getOneDimensionalRoot(
                         function(n) {
                             return(stats::pt(
@@ -2026,7 +2026,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                     if (allocationRatioPlanned == 0) {
                         allocationRatioPlanned <- 1
                     }
-                    if (normalApproximation == FALSE) {
+                    if (!normalApproximation) {
                         up <- 2
                         while (stats::pt(
                             stats::qt(1 - alpha / sided, up *
@@ -2214,7 +2214,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
 
     informationRates <- designCharacteristics$information / designCharacteristics$shift
 
-    for (i in (1:length(fixedSampleSize$alternative))) {
+    for (i in 1:length(fixedSampleSize$alternative)) {
         maxNumberOfSubjects[i] <- fixedSampleSize$nFixed[i] * designCharacteristics$inflationFactor
 
         numberOfSubjects[, i] <- maxNumberOfSubjects[i] *
@@ -3802,8 +3802,8 @@ getNumberOfSubjects <- function(time, ...,
         designPlan$.setParameterType("expectedEventsH1", C_PARAM_GENERATED)
 
         designPlan$numberOfSubjects2 <- numberOfSubjects / (1 + designPlan$allocationRatioPlanned)
-        designPlan$numberOfSubjects1 <-
-            designPlan$numberOfSubjects2 * designPlan$allocationRatioPlanned
+        designPlan$numberOfSubjects1 <- designPlan$numberOfSubjects2 * 
+            designPlan$allocationRatioPlanned
         designPlan$.setParameterType("numberOfSubjects1", C_PARAM_GENERATED)
         designPlan$.setParameterType("numberOfSubjects2", C_PARAM_GENERATED)
     }
@@ -3878,7 +3878,7 @@ getNumberOfSubjects <- function(time, ...,
     designPlan$.setParameterType("nFixed2", C_PARAM_NOT_APPLICABLE)
     designPlan$.setParameterType("nFixed", C_PARAM_NOT_APPLICABLE)
 
-    if (designPlan$allocationRatioPlanned[1] == 1) {
+    if (all(designPlan$allocationRatioPlanned == 1)) {
         designPlan$.setParameterType("numberOfSubjects1", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
     }
@@ -4155,7 +4155,7 @@ getNumberOfSubjects <- function(time, ...,
     } else {
         .setValueAndParameterType(designPlan, "pi1", pi1, C_PI_1_SAMPLE_SIZE_DEFAULT)
     }
-    .setValueAndParameterType(designPlan, "pi2", pi2, 0.2)
+    .setValueAndParameterType(designPlan, "pi2", pi2, 0.2, notApplicableIfNA = TRUE)
     if (groups == 1) {
         if (designPlan$.getParameterType("pi2") == C_PARAM_USER_DEFINED) {
             warning("'pi2' (", pi2, ") will be ignored ",
@@ -4910,8 +4910,7 @@ getPowerSurvival <- function(design = NULL, ...,
     } else {
         designPlan$.setParameterType("numberOfSubjects", C_PARAM_GENERATED)
 
-        if ((designPlan$groups == 1) ||
-                designPlan$allocationRatioPlanned == 1) {
+        if (designPlan$groups == 1 || all(designPlan$allocationRatioPlanned == 1)) {
             designPlan$.setParameterType("numberOfSubjects1", C_PARAM_NOT_APPLICABLE)
             designPlan$.setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
         } else {

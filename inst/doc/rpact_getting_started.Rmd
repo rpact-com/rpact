@@ -70,7 +70,7 @@ following topics:
 11. Comparing Sample Size and Power Calculation Results for a Group Sequential
     Trial with a Survival Endpoint: rpact vs. gsDesign
 12. Supplementing and Enhancing rpact’s Graphical Capabilities with ggplot2
-13. Using the Inverse Normal Combination Test for Analysing a Trial with
+13. Using the Inverse Normal Combination Test for Analyzing a Trial with
     Continuous Endpoint and Potential Sample Size Re-Assessment with rpact
 14. Planning a Trial with Binary Endpoints with rpact
 15. Planning a Survival Trial with rpact

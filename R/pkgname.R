@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7147 $
-## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
+## |  File version: $Revision: 7268 $
+## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -63,7 +63,7 @@
 #' @docType package
 #' @author Gernot Wassmer, Friedrich Pahlke
 #' @importFrom Rcpp evalCpp
-#' @useDynLib rpact, .registration = TRUE
+#' @useDynLib rpact,.registration = TRUE
 #' @name rpact
 #'
 #' @import methods
@@ -74,6 +74,8 @@
 #' @importFrom rlang .data
 #' @importFrom knitr kable
 #' @importFrom knitr knit_print
+#' 
+#' @exportPattern "^[[:alpha:]]+"
 #'
 "_PACKAGE"
 #> [1] "_PACKAGE"

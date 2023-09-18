@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7206 $
+## |  Last changed: $Date: 2023-07-25 14:55:05 +0200 (Tue, 25 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -306,7 +306,7 @@ NULL
     kMax <- design$kMax
 
     if (.isTrialDesignConditionalDunnett(design)) {
-        if (normalApproximation == FALSE) {
+        if (!normalApproximation) {
             if (userFunctionCallEnabled) {
                 warning("'normalApproximation' was set to TRUE ",
                     "because conditional Dunnett test was specified as design",

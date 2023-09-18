@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7148 $
-## |  Last changed: $Date: 2023-07-03 15:50:22 +0200 (Mo, 03 Jul 2023) $
+## |  File version: $Revision: 7268 $
+## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -209,6 +209,27 @@ ParameterSet <- setRefClass("ParameterSet",
             .parameterNames <<- list()
             .parameterFormatFunctions <<- list()
             .catLines <<- character(0)
+        },
+        clone = function() {
+            paramNames <- names(.self$getRefClass()$fields())
+            plotSettingsEnabled <- ".plotSettings" %in% paramNames
+            designEnabled <- ".design" %in% paramNames
+            paramNames <- paramNames[!grepl("^\\.|^stages$", paramNames)]
+            args <- list()
+            if (designEnabled) {
+                args$design <- .self$.design
+            }
+            for (paramName in paramNames) {
+                if (.self$.getParameterType(paramName) == C_PARAM_USER_DEFINED) {
+                    args[[paramName]] <- .self[[paramName]]
+                }
+            }
+            what <- .getGeneratorFunctionName(.self)
+            result <- do.call(what = what, args = args)
+            if (plotSettingsEnabled && !is.null(.self$.plotSettings)) {
+                result$.plotSettings <- .self$.plotSettings$clone()
+            }
+            return(result)
         },
         .toString = function(startWithUpperCase = FALSE) {
             s <- .formatCamelCase(.getClassName(.self))
@@ -1561,15 +1582,22 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 #'
 #' @keywords internal
 #'
-summary.ParameterSet <- function(object, ..., type = 1, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
+summary.ParameterSet <- function(object, ..., 
+        type = 1, 
+        digits = NA_integer_, 
+        output = c("all", "title", "overview", "body")) {
+        
     .warnInCaseOfUnknownArguments(functionName = "summary", ...)
 
     if (type == 1 && inherits(object, "SummaryFactory")) {
         return(object)
     }
 
-    if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesignPlan") ||
-            inherits(object, "SimulationResults") || inherits(object, "AnalysisResults") ||
+    if (type == 1 && (
+            inherits(object, "TrialDesign") || 
+            inherits(object, "TrialDesignPlan") ||
+            inherits(object, "SimulationResults") || 
+            inherits(object, "AnalysisResults") ||
             inherits(object, "TrialDesignCharacteristics") ||
             inherits(object, "PerformanceScore"))) {
         output <- match.arg(output)

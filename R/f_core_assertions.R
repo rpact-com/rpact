@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7254 $
+## |  Last changed: $Date: 2023-08-28 11:34:27 +0200 (Mo, 28 Aug 2023) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -1377,6 +1377,21 @@ NULL
             call. = FALSE
         )
     }
+}
+
+.warnInCaseOfTwoSidedPowerArgument <- function(...) {
+	args <- list(...)
+	argNames <- names(args)
+	if ("twoSidedPower" %in% argNames) {
+		warning("'twoSidedPower' can only be defined in 'design'", call. = FALSE)
+	}
+}
+
+.warnInCaseOfTwoSidedPowerIsDisabled <- function(design) {
+	if (design$sided == 2 && !is.na(design$twoSidedPower) && !design$twoSidedPower &&
+			design$.getParameterType("twoSidedPower") == C_PARAM_USER_DEFINED) {
+		warning("design$twoSidedPower = FALSE will be ignored because design$sided = 2", call. = FALSE)
+	}
 }
 
 .isTrialDesignWithValidFutilityBounds <- function(design) {

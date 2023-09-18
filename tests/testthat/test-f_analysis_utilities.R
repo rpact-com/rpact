@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_utilities.R
 ## |  Creation date: 06 February 2023, 12:11:54
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  File version: $Revision: 7268 $
+## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -97,5 +97,18 @@ test_that("'getObservedInformationRates': under-running with relative informatio
 	expect_equal(result5$informationRates, c(0.48888889, 1), tolerance = 1e-07)
 	expect_equal(result5$status, "under-running")
 
+})
+
+test_that(".sigmaToBPD works correctly", {
+    bpd <- c(0.3, 0.4, 0.5) 
+    sigma <- bpd %*% t(bpd)
+    diag(sigma) <- 1
+    for (i in 1:10000) {
+        n <- 9
+        bpd <- runif(n, 0, 5)
+        sigma <- bpd %*% t(bpd)
+        diag(sigma) <- 1  
+        expect_equal(.sigmaToBPD(sigma), bpd, tolerance = 1e-12)
+    }
 })
 

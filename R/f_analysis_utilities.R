@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7133 $
-## |  Last changed: $Date: 2023-06-26 15:57:24 +0200 (Mo, 26 Jun 2023) $
+## |  File version: $Revision: 7268 $
+## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1240,3 +1240,4 @@ getObservedInformationRates <- function(dataInput, ...,
 
     return(invisible(results))
 }
+

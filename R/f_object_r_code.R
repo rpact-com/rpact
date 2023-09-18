@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7132 $
-## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
+## |  File version: $Revision: 7268 $
+## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -122,6 +122,126 @@ NULL
     }
 
     return(expectedResult)
+}
+
+.getGeneratorFunctionName <- function(obj) {
+    if ("TrialDesignPlanMeans" == .getClassName(obj)) {
+        if (obj$.isSampleSizeObject()) {
+            return("getSampleSizeMeans")
+        }
+        
+        return("getPowerMeans")
+    }
+    
+    if ("TrialDesignPlanRates" == .getClassName(obj)) {
+        if (obj$.isSampleSizeObject()) {
+            return("getSampleSizeRates")
+        } 
+        
+        return("getPowerRates")
+    } 
+    
+    if ("TrialDesignPlanSurvival" == .getClassName(obj)) {
+        if (obj$.isSampleSizeObject()) {
+            return("getSampleSizeSurvival")
+        } 
+        
+        return("getPowerSurvival")
+    }  
+    
+    if (inherits(obj, "TrialDesign")) {
+        return(paste0("get", sub("^Trial", "", .getClassName(obj))))
+    }  
+    
+    if (inherits(obj, "Dataset")) {
+        return("getDataset")
+    }  
+    
+    if (inherits(obj, "AnalysisResults")) {
+        return("getAnalysisResults")
+    }  
+    
+    if ("TrialDesignSet" == .getClassName(obj)) {
+        return("getDesignSet")
+    }  
+    
+    if ("TrialDesignCharacteristics" == .getClassName(obj)) {
+        return("getDesignCharacteristics")
+    }  
+    
+    if (inherits(obj, "SimulationResultsMeans")) {
+        return("getSimulationMeans")
+    }  
+    
+    if (inherits(obj, "SimulationResultsRates")) {
+        return("getSimulationRates")
+    }  
+    
+    if (inherits(obj, "SimulationResultsSurvival")) {
+        return("getSimulationSurvival")
+    }  
+    
+    if (inherits(obj, "SimulationResultsMultiArmMeans")) {
+        return("getSimulationMultiArmMeans")
+    }  
+    
+    if (inherits(obj, "SimulationResultsMultiArmRates")) {
+        return("getSimulationMultiArmRates")
+    }  
+    
+    if (inherits(obj, "SimulationResultsMultiArmSurvival")) {
+        return("getSimulationMultiArmSurvival")
+    }  
+    
+    if (inherits(obj, "SimulationResultsEnrichmentMeans")) {
+        return("getSimulationEnrichmentMeans")
+    }  
+    
+    if (inherits(obj, "SimulationResultsEnrichmentRates")) {
+        return("getSimulationEnrichmentRates")
+    }  
+    
+    if (inherits(obj, "SimulationResultsEnrichmentSurvival")) {
+        return("getSimulationEnrichmentSurvival")
+    }  
+    
+    if (inherits(obj, "PiecewiseSurvivalTime")) {
+        return("getPiecewiseSurvivalTime")
+    }  
+    
+    if (inherits(obj, "AccrualTime")) {
+        return("getAccrualTime")
+    }  
+    
+    if (inherits(obj, "StageResults")) {
+        return("getStageResults")
+    }  
+    
+    if (inherits(obj, "ConditionalPowerResults")) {
+        return("getConditionalPower")
+    }  
+    
+    if (inherits(obj, "PowerAndAverageSampleNumberResult")) {
+        return("getPowerAndAverageSampleNumber")
+    }  
+    
+    if (inherits(obj, "EventProbabilities")) {
+        return("getEventProbabilities")
+    }  
+    
+    if (inherits(obj, "NumberOfSubjects")) {
+        return("getNumberOfSubjects")
+    }  
+    
+    if (inherits(obj, "PerformanceScore")) {
+        return("gePerformanceScore")
+    }  
+    
+    if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
+        return(.getGeneratorFunctionName(obj$object))
+    } 
+    
+    stop("Runtime issue: function '.getGeneratorFunctionName' is not implemented for class ", .getClassName(obj))
 }
 
 #' @rdname getObjectRCode
@@ -412,69 +532,7 @@ getObjectRCode <- function(obj, ...,
     
     precondition <- unique(precondition)
     
-    if ("TrialDesignPlanMeans" == .getClassName(obj)) {
-        if (obj$.isSampleSizeObject()) {
-            functionName <- "getSampleSizeMeans"
-        } else {
-            functionName <- "getPowerMeans"
-        }
-    } else if ("TrialDesignPlanRates" == .getClassName(obj)) {
-        if (obj$.isSampleSizeObject()) {
-            functionName <- "getSampleSizeRates"
-        } else {
-            functionName <- "getPowerRates"
-        }
-    } else if ("TrialDesignPlanSurvival" == .getClassName(obj)) {
-        if (obj$.isSampleSizeObject()) {
-            functionName <- "getSampleSizeSurvival"
-        } else {
-            functionName <- "getPowerSurvival"
-        }
-    } else if (inherits(obj, "TrialDesign")) {
-        functionName <- paste0("get", sub("^Trial", "", .getClassName(obj)))
-    } else if (inherits(obj, "Dataset")) {
-        functionName <- "getDataset"
-    } else if (inherits(obj, "AnalysisResults")) {
-        functionName <- "getAnalysisResults"
-    } else if ("TrialDesignSet" == .getClassName(obj)) {
-        functionName <- "getDesignSet"
-    } else if ("TrialDesignCharacteristics" == .getClassName(obj)) {
-        functionName <- "getDesignCharacteristics"
-    } else if (inherits(obj, "SimulationResultsMeans")) {
-        functionName <- "getSimulationMeans"
-    } else if (inherits(obj, "SimulationResultsRates")) {
-        functionName <- "getSimulationRates"
-    } else if (inherits(obj, "SimulationResultsSurvival")) {
-        functionName <- "getSimulationSurvival"
-    } else if (inherits(obj, "SimulationResultsMultiArmMeans")) {
-        functionName <- "getSimulationMultiArmMeans"
-    } else if (inherits(obj, "SimulationResultsMultiArmRates")) {
-        functionName <- "getSimulationMultiArmRates"
-    } else if (inherits(obj, "SimulationResultsMultiArmSurvival")) {
-        functionName <- "getSimulationMultiArmSurvival"
-    } else if (inherits(obj, "SimulationResultsEnrichmentMeans")) {
-        functionName <- "getSimulationEnrichmentMeans"
-    } else if (inherits(obj, "SimulationResultsEnrichmentRates")) {
-        functionName <- "getSimulationEnrichmentRates"
-    } else if (inherits(obj, "SimulationResultsEnrichmentSurvival")) {
-        functionName <- "getSimulationEnrichmentSurvival"
-    } else if (inherits(obj, "PiecewiseSurvivalTime")) {
-        functionName <- "getPiecewiseSurvivalTime"
-    } else if (inherits(obj, "AccrualTime")) {
-        functionName <- "getAccrualTime"
-    } else if (inherits(obj, "StageResults")) {
-        functionName <- "getStageResults"
-    } else if (inherits(obj, "ConditionalPowerResults")) {
-        functionName <- "getConditionalPower"
-    } else if (inherits(obj, "PowerAndAverageSampleNumberResult")) {
-        functionName <- "getPowerAndAverageSampleNumber"
-    } else if (inherits(obj, "EventProbabilities")) {
-        functionName <- "getEventProbabilities"
-    } else if (inherits(obj, "NumberOfSubjects")) {
-        functionName <- "getNumberOfSubjects"
-    } else if (inherits(obj, "PerformanceScore")) {
-        functionName <- "gePerformanceScore"
-    } else if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
+    if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
         return(getObjectRCode(obj$object,
             prefix = ifelse(pipeOperator == "none", "summary(", ""),
             postfix = {
@@ -489,7 +547,7 @@ getObjectRCode <- function(obj, ...,
             explicitPrint = explicitPrint
         ))
     } else {
-        stop("Runtime issue: function 'getObjectRCode' is not implemented for class ", .getClassName(obj))
+        functionName <- .getGeneratorFunctionName(obj)
     }
 
     objNames <- names(obj)
@@ -811,9 +869,6 @@ getObjectRCode <- function(obj, ...,
             collapse <- paste0("\n", stringWrapPrefix)
             if (explicitPrint) {
                 rCode <- gsub("print\\(\\)", "print(markdown = TRUE)", rCode)
-            } else if (!any(grepl("kable\\(", rCode))) {
-                rCode[length(rCode)] <- paste0(rCode[length(rCode)], pipeOperatorPostfix)
-                rCode <- c(rCode, "kable()")
             }
         }
 

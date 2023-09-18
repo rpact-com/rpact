@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7147 $
-## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7283 $
+## |  Last changed: $Date: 2023-09-08 14:35:54 +0200 (Fr, 08 Sep 2023) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #'
@@ -89,7 +89,7 @@ getPerformanceScore <- function(simulationResult) {
         normalApproximation = TRUE,
         groups = simulationResult$groups
     )
-
+	
     alternativeParamName <- NA_character_
     referenceValue <- NA_real_
 
@@ -115,7 +115,7 @@ getPerformanceScore <- function(simulationResult) {
         args[[alternativeParamName]] <- alternativeValue
 
         if (alternativeValue == referenceValue) {
-            singleStageSampleSize <- plannedSubjects[1]
+            singleStageSampleSize <- plannedSubjects[2] - plannedSubjects[1]
         } else if (methods::is(simulationResult, "SimulationResultsMeans")) {
             singleStageSampleSize <- do.call(getSampleSizeMeans, args)$numberOfSubjects
         } else if (methods::is(simulationResult, "SimulationResultsRates")) {
@@ -137,7 +137,7 @@ getPerformanceScore <- function(simulationResult) {
         # target sample size: single stage sample size if it doesn't exceed maximum admissible
         # sample size, otherwise only first stage sample size
         targetSampleSize <- ifelse(singleStageSampleSize <= (maxAdditionalNumberOfSubjects + plannedSubjects[1]),
-            singleStageSampleSize, plannedSubjects[1]
+            singleStageSampleSize, plannedSubjects[2] - plannedSubjects[1]
         )
 
         # sample size components

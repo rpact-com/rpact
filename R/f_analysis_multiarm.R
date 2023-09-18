@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7309 $
+## |  Last changed: $Date: 2023-09-15 11:14:05 +0200 (Fr, 15 Sep 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -150,10 +150,10 @@ NULL
 #'
 #' Get Conditional Power for multi-arm case
 #' Calculates and returns the conditional power for multi-arm case.
-#' 
+#'
 #' @keywords internal
-#' 
-#' @noRd 
+#'
+#' @noRd
 #'
 .getConditionalPowerMultiArm <- function(..., stageResults, nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
@@ -210,11 +210,11 @@ NULL
 }
 
 .getMultivariateDistribution <- function(...,
-        type = c("normal", "t", "quantile"),
+        type = c("normal", "t", "quantile", "tQuantile"),
         upper,
         sigma,
+        eps = 1e-05,
         df = NA_real_, alpha = NA_real_) {
-    .assertMnormtIsInstalled()
     type <- match.arg(type)
 
     dimensionSigma <- length(base::diag(sigma))
@@ -222,29 +222,48 @@ NULL
         if (dimensionSigma == 1) {
             return(stats::pnorm(upper))
         }
-
-        return(mnormt::sadmvn(lower = -Inf, upper = upper, mean = 0, varcov = sigma))
+        
+        return(as251Normal(lower = -Inf, upper = upper, sigma = sigma)[1])
     }
 
     if (type == "t") {
         if (dimensionSigma == 1) {
             return(stats::pt(upper, df))
         }
-        if (df > 500) {
-            return(mnormt::sadmvn(lower = -Inf, upper = upper, mean = 0, varcov = sigma))
-        }
-
-        return(mnormt::sadmvt(lower = -Inf, upper = upper, mean = 0, S = sigma, df = df))
+        
+        return(as251StudentT(
+            lower = -Inf, upper = upper,
+            sigma = sigma, eps = eps, df = df
+        )[1])
     }
 
     if (type == "quantile") {
         if (dimensionSigma == 1) {
             return(.getOneMinusQNorm(alpha))
         }
-
+        
         return(.getOneDimensionalRoot(
             function(x) {
-                return(mnormt::sadmvn(lower = -Inf, upper = x, mean = 0, varcov = sigma) - (1 - alpha))
+                return(as251Normal(lower = -Inf, upper = x, sigma = sigma)[1] - (1 - alpha))
+            },
+            lower = -8,
+            upper = 8,
+            tolerance = 1e-08,
+            callingFunctionInformation = ".getMultivariateDistribution"
+        ))
+    }
+
+    if (type == "tQuantile") {
+        if (dimensionSigma == 1) {
+            return(stats::qt(1 - alpha, df))
+        }
+        
+        return(.getOneDimensionalRoot(
+            function(x) {
+                return(as251StudentT(
+                    lower = -Inf, upper = x,
+                    eps = eps, sigma = sigma, df = df
+                )[1] - (1 - alpha))
             },
             lower = -8,
             upper = 8,

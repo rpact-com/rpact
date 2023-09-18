@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7274 $
+## |  Last changed: $Date: 2023-09-07 10:58:29 +0200 (Do, 07 Sep 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1656,7 +1656,8 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
     }
 }
 
-.getSimulationPlotXAxisParameterName <- function(simulationResults, showSource = FALSE, simulationResultsName = NA_character_) {
+.getSimulationPlotXAxisParameterName <- function(simulationResults, 
+        showSource = FALSE, simulationResultsName = NA_character_) {
     if (grepl("SimulationResultsEnrichment", .getClassName(simulationResults))) {
         effectDataList <- .getSimulationEnrichmentEffectData(simulationResults)
         if (ncol(effectDataList$effectData) == 1) {
