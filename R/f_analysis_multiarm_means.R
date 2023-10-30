@@ -59,7 +59,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmInverseNormalR6$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design, dataInput = dataInput,
@@ -327,7 +327,7 @@ NULL
 						select 'varianceOption' = \"overallPooled\"", call. = FALSE)
     }
 
-    stageResults <- StageResultsMultiArmMeans(
+    stageResults <- StageResultsMultiArmMeansR6$new(
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
@@ -1001,7 +1001,7 @@ NULL
     gMax <- stageResults$getGMax()
     kMax <- design$kMax
 
-    results <- ConditionalPowerResultsMultiArmMeans(
+    results <- ConditionalPowerResultsMultiArmMeansR6$new(
         .design = design,
         .stageResults = stageResults,
         thetaH1 = thetaH1,

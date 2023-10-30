@@ -756,32 +756,33 @@ NULL
 }
 
 .setValueAndParameterType <- function(parameterSet, parameterName, value, defaultValue,
-        notApplicableIfNA = FALSE) {
-    .assertIsParameterSetClass(parameterSet, "parameterSet")
-
-    if (is.null(parameterSet)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null")
-    }
-
-    if (!(parameterName %in% names(parameterSet$getRefClass()$fields()))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'"
-        )
-    }
-
-    parameterSet[[parameterName]] <- value
-
-    if (notApplicableIfNA && all(is.na(value))) {
-        parameterSet$.setParameterType(parameterName, C_PARAM_NOT_APPLICABLE)
-    } else if (!is.null(value) && length(value) == length(defaultValue) && (
-            (all(is.na(value)) && all(is.na(value) == is.na(defaultValue))) ||
-                (!is.na(all(value == defaultValue)) && all(value == defaultValue))
-        )) {
-        parameterSet$.setParameterType(parameterName, C_PARAM_DEFAULT_VALUE)
-    } else {
-        parameterSet$.setParameterType(parameterName, C_PARAM_USER_DEFINED)
-    }
+                                      notApplicableIfNA = FALSE) {
+  .assertIsParameterSetClass(parameterSet, "parameterSet")
+  
+  if (is.null(parameterSet)) {
+    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null")
+  }
+  
+  if (!ifelse(is.R6(parameterSet), parameterName %in% names(parameterSet), parameterName %in% names(getClass(class(parameterSet))@fieldClasses))) { #names(.self$getRefClass()$fields())
+    
+    stop(
+      C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+      "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'"
+    )
+  }
+  
+  parameterSet[[parameterName]] <- value
+  
+  if (notApplicableIfNA && all(is.na(value))) {
+    parameterSet$.setParameterType(parameterName, C_PARAM_NOT_APPLICABLE)
+  } else if (!is.null(value) && length(value) == length(defaultValue) && (
+    (all(is.na(value)) && all(is.na(value) == is.na(defaultValue))) ||
+    (!is.na(all(value == defaultValue)) && all(value == defaultValue))
+  )) {
+    parameterSet$.setParameterType(parameterName, C_PARAM_DEFAULT_VALUE)
+  } else {
+    parameterSet$.setParameterType(parameterName, C_PARAM_USER_DEFINED)
+  }
 }
 
 .isDefaultVector <- function(x, default) {
