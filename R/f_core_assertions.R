@@ -1,3 +1,5 @@
+library(R6)
+
 ## |
 ## |  *Core assertions*
 ## |
