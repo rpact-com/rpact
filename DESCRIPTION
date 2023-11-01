@@ -55,7 +55,8 @@ Imports:
 	tools,
 	rlang,
 	knitr (>= 1.19), 
-	Rcpp (>= 1.0.3)
+	Rcpp (>= 1.0.3),
+	R6
 LinkingTo: Rcpp
 Suggests: 
 	ggplot2 (>= 2.2.0),	
@@ -85,6 +86,9 @@ Collate:
     'class_analysis_dataset.R'
     'class_analysis_stage_results.R'
     'class_analysis_results.R'
+    'class_analysis_results_r6.R'
+    'class_analysis_stage_results_r6.R'
+    'class_core_parameter_set_r6.R'
     'class_time.R'
     'class_design_set.R'
     'f_design_utilities.R'

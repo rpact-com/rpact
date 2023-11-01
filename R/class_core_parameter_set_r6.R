@@ -1,3 +1,4 @@
+library("R6")
 ## |
 ## |  *Parameter set classes*
 ## |

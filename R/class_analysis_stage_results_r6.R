@@ -1,3 +1,4 @@
+library("R6")
 ## |
 ## |  *Stage results classes*
 ## |

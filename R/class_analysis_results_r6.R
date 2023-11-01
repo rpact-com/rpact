@@ -1,3 +1,4 @@
+library("R6")
 ## |
 ## |  *Analysis result classes*
 ## |
