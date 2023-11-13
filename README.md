@@ -41,6 +41,16 @@ Install the latest CRAN release via
 install.packages("rpact")
 ```
 
+## Development version
+
+To use a feature from the development version, you can
+install the development version of rpact from GitHub.
+
+```{r installation, eval=FALSE, include=TRUE, echo=TRUE, results='hide'}
+# install.packages("devtools")
+devtools::install_github("rpact-com/rpact", ref = "dev/3.5.0")
+```
+
 ## Documentation
 
 The documentation is hosted at <https://www.rpact.org>
