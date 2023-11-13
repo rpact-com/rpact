@@ -5,7 +5,7 @@
 [![Monthly downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-[![shinyapps.io](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://rpact.shinyapps.io/public/)
+[![shinyapps.io](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://rpact.shinyapps.io/cloud/)
 <!-- badges: end -->
 
 # rpact

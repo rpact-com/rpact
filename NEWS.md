@@ -10,6 +10,7 @@
 * Original Fortran 77 code of AS 251 included into the package, see functions `mvnprd`, `mvstud`, `as251Normal`, and `as251StudentT`
 * R package `mnormt` dependency has been removed 
 * Pipe operator usage improved
+* Shiny app link changed to https://rpact.shinyapps.io/cloud
 
 
 # rpact 3.4.0

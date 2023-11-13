@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7435 $
-## |  Last changed: $Date: 2023-11-13 13:27:51 +0100 (Mo, 13 Nov 2023) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7436 $
+## |  Last changed: $Date: 2023-11-13 17:08:37 +0100 (Mo, 13 Nov 2023) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #'
@@ -24,13 +24,13 @@
 #' @export
 #'
 getSimulationCounts <- function(design = NULL, ...,
-        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
         plannedMaxSubjects = NA_real_,
         plannedCalendarTime = NA_real_,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
         lambda = NA_real_,
         theta = NA_real_,
+		directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT		
         thetaH0 = 1,
         overDispersion = 0,
         fixedExposureTime = NA_real_,
@@ -159,31 +159,31 @@ getSimulationCounts <- function(design = NULL, ...,
             if (kMax == 1) {
                 recruit1 <- seq(0, accrualTime, length.out = n1)
                 recruit2 <- seq(0, accrualTime, length.out = n2)
-                if (!is.na(fixedExposureTime)) {
-                    timeUnderObservation1 <- pmax(pmin(accrualTime + followUpTime - recruit1, fixedExposureTime), 0)
-                    timeUnderObservation2 <- pmax(pmin(accrualTime + followUpTime - recruit2, fixedExposureTime), 0)
+                if (is.na(fixedExposureTime)) {
+					timeUnderObservation1 <- pmax(accrualTime + followUpTime - recruit1, 0)
+					timeUnderObservation2 <- pmax(accrualTime + followUpTime - recruit2, 0)
                 } else {
-                    timeUnderObservation1 <- pmax(accrualTime + followUpTime - recruit1, 0)
-                    timeUnderObservation2 <- pmax(accrualTime + followUpTime - recruit2, 0)
+					timeUnderObservation1 <- pmax(pmin(accrualTime + followUpTime - recruit1, 
+									fixedExposureTime), 0)
+					timeUnderObservation2 <- pmax(pmin(accrualTime + followUpTime - recruit2, 
+									fixedExposureTime), 0)
                 }
-                counts1 <- rnbinom(n = n1, mu = lambda1[iCase] * timeUnderObservation1, size = 1 / overDispersion)
-                counts2 <- rnbinom(n = n2, mu = lambda2 * timeUnderObservation2, size = 1 / overDispersion)
-                if (sum(counts1) > 0 && sum(counts2) > 0) {
-                    nb <- .getNegativeBinomialEstimates(
-                        counts1 = counts1, counts2 = counts2,
-                        t1 = timeUnderObservation1, t2 = timeUnderObservation2
-                    )
-                    info_interim <- .getInformation(
-                        lambda1 = nb[1],
-                        lambda2 = nb[2],
-                        overDispersion = nb[3],
-                        recruit1 = timeUnderObservation1,
-                        recruit2 = timeUnderObservation2
-                    )
-                    z <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(info_interim)
-                } else {
-                    z <- 0
-                }
+                counts1 <- rnbinom(n = n1, mu = lambda1[iCase] * timeUnderObservation1, 
+									size = 1 / overDispersion)
+                counts2 <- rnbinom(n = n2, mu = lambda2 * timeUnderObservation2, 
+									size = 1 / overDispersion)
+                nb <- .getNegativeBinomialEstimates(
+                    counts1 = counts1, counts2 = counts2,
+                    t1 = timeUnderObservation1, t2 = timeUnderObservation2
+                )
+                info_interim <- .getInformation(
+                    lambda1 = nb[1],
+                    lambda2 = nb[2],
+                    overDispersion = nb[3],
+                    recruit1 = timeUnderObservation1,
+                    recruit2 = timeUnderObservation2
+                )
+                z <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(info_interim)
                 if (z > design$criticalValues[1]) {
                     reject[1] <- reject[1] + 1
                 }
@@ -199,7 +199,6 @@ getSimulationCounts <- function(design = NULL, ...,
                     overDispersion = overDispersion,
                     fixedFollowUp = !is.na(fixedExposureTime)
                 )
-
                 for (k in 1:kMax) {
                     if (is.na(fixedExposureTime)) {
                         timeUnderObservation1 <- (plannedCalendarTime[k] -
@@ -209,7 +208,7 @@ getSimulationCounts <- function(design = NULL, ...,
                     } else {
                         timeUnderObservation1 <- pmin(
                             plannedCalendarTime[k] - recruit1,
-                            fixedExposureTime
+							fixedExposureTime
                         )[plannedCalendarTime[k] - recruit1 >= 0]
                         timeUnderObservation2 <- pmin(
                             plannedCalendarTime[k] - recruit2,
@@ -232,22 +231,18 @@ getSimulationCounts <- function(design = NULL, ...,
                         counts1 <- dfStartStop$nEvents[1:n1]
                         counts2 <- dfStartStop$nEvents[(n1 + 1):(n1 + n2)]
                     }
-                    if (sum(counts1) > 0 && sum(counts2) > 0) {
-                        nb <- .getNegativeBinomialEstimates(
-                            counts1 = counts1, counts2 = counts2,
-                            t1 = timeUnderObservation1, t2 = timeUnderObservation2
-                        )
-                        info_interim <- .getInformation(
-                            lambda1 = nb[1],
-                            lambda2 = nb[2],
-                            overDispersion = nb[3],
-                            recruit1 = timeUnderObservation1,
-                            recruit2 = timeUnderObservation2
-                        )
-                        z <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(info_interim)
-                    } else {
-                        z <- 0
-                    }
+                    nb <- .getNegativeBinomialEstimates(
+                        counts1 = counts1, counts2 = counts2,
+                        t1 = timeUnderObservation1, t2 = timeUnderObservation2
+                    )
+                    info_interim <- .getInformation(
+                        lambda1 = nb[1],
+                        lambda2 = nb[2],
+                        overDispersion = nb[3],
+                        recruit1 = timeUnderObservation1,
+                        recruit2 = timeUnderObservation2
+                    )
+                    z <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(info_interim)
                     if (z > design$criticalValues[k]) {
                         reject[k] <- reject[k] + 1
                         break
