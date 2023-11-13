@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7139 $
-## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
+## |  File version: $Revision: 7408 $
+## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -22,7 +22,7 @@
 NULL
 
 .getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
-    return(getGroupSequentialProbabilitiesCpp(decisionMatrix, informationRates))
+    return(.getGroupSequentialProbabilitiesCpp(decisionMatrix, informationRates))
 }
 
 #' @title
@@ -444,7 +444,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #
 .getDesignGroupSequentialWangAndTsiatis <- function(design) {
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_P) {
-        design$criticalValues <- getDesignGroupSequentialPocockCpp(
+        design$criticalValues <- .getDesignGroupSequentialPocockCpp(
             design$kMax,
             design$alpha,
             design$sided,
@@ -454,7 +454,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             design$tolerance
         )
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_OF) {
-        design$criticalValues <- getDesignGroupSequentialOBrienAndFlemingCpp(
+        design$criticalValues <- .getDesignGroupSequentialOBrienAndFlemingCpp(
             design$kMax,
             design$alpha,
             design$sided,
@@ -464,7 +464,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             design$tolerance
         )
     } else {
-        design$criticalValues <- getDesignGroupSequentialDeltaWTCpp(
+        design$criticalValues <- .getDesignGroupSequentialDeltaWTCpp(
             design$kMax,
             design$alpha,
             design$sided,
@@ -481,7 +481,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 }
 
 .getDesignGroupSequentialPampallonaTsiatis <- function(design) {
-    cppResult <- getDesignGroupSequentialPampallonaTsiatisCpp(
+    cppResult <- .getDesignGroupSequentialPampallonaTsiatisCpp(
         design$tolerance, design$beta, design$alpha, design$kMax,
         design$deltaPT0, design$deltaPT1, design$informationRates,
         design$sided, design$bindingFutility
@@ -667,7 +667,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     design$.setParameterType("deltaWT", C_PARAM_GENERATED)
 
     # Recalculation of design characteristics with rounded design$deltaWT
-    design$criticalValues <- getDesignGroupSequentialDeltaWTCpp(
+    design$criticalValues <- .getDesignGroupSequentialDeltaWTCpp(
         design$kMax,
         design$alpha,
         design$sided,
@@ -692,7 +692,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #' @noRd
 #'
 .getDesignGroupSequentialAlphaSpending <- function(design, userFunctionCallEnabled) {
-    design$criticalValues <- getDesignGroupSequentialAlphaSpendingCpp(
+    design$criticalValues <- .getDesignGroupSequentialAlphaSpendingCpp(
         design$kMax,
         design$alpha,
         design$gammaA,
@@ -722,7 +722,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         design$criticalValues[1:(design$kMax - 1)] <- C_QNORM_THRESHOLD
         design$criticalValues[design$kMax] <- .getOneMinusQNorm(design$alpha / design$sided)
     } else {
-        design$criticalValues <- getDesignGroupSequentialUserDefinedAlphaSpendingCpp(
+        design$criticalValues <- .getDesignGroupSequentialUserDefinedAlphaSpendingCpp(
             design$kMax, design$userAlphaSpending, design$sided,
             design$informationRates, design$bindingFutility, design$futilityBounds, design$tolerance
         )
@@ -768,7 +768,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #' @noRd
 #'
 .getDesignGroupSequentialBetaSpending <- function(design, userFunctionCallEnabled) {
-    cppResult <- getDesignGroupSequentialBetaSpendingCpp(
+    cppResult <- .getDesignGroupSequentialBetaSpendingCpp(
         design$criticalValues,
         design$kMax,
         design$userAlphaSpending,
@@ -818,7 +818,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         )
     }
 
-    cppResult <- getDesignGroupSequentialUserDefinedBetaSpendingCpp(
+    cppResult <- .getDesignGroupSequentialUserDefinedBetaSpendingCpp(
         design$criticalValues,
         design$kMax,
         design$userAlphaSpending,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7132 $
-## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
+## |  File version: $Revision: 7383 $
+## |  Last changed: $Date: 2023-11-02 15:18:21 +0100 (Do, 02 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -137,7 +137,7 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
         return(4)
     }
 
-    fv <- .getFormattedValue(value[value >= 1e-4], digits = 4, nsmall = 4)
+    fv <- .getFormattedValue(value[value >= 1e-04], digits = 4, nsmall = 4)
     fv <- fv[!((1:length(fv)) %in% grep("e", fv))]
     numberOfCharacters <- ifelse(length(fv) > 0, nchar(fv[1]), 6)
     numberOfCharacters <- ifelse(numberOfCharacters < 6, 6, numberOfCharacters)

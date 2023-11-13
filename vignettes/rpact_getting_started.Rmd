@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
+**Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis**
 
 ## Functional Range
 
@@ -24,19 +24,20 @@ Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
     +	means (continuous endpoint)
     +	rates (binary endpoint)
     +	survival trials with
-        -	piecewise accrual time and intensity
-        -	piecewise exponential survival time
-        -	survival times that follow a Weibull distribution
-*	Fixed sample design and designs with interim analysis stages
+        - flexible survival time distributions
+        -	user defined patient recruitment
+    + count data    
+*	Fixed sample size design and designs with interim analysis stages
 *	Simulation tool for means, rates, and survival data
     +	Assessment of adaptive sample size/event number recalculations based on
-        conditional power
-    +   Assessment of treatment selection strategies in multi-arm trials
-*	Adaptive analysis of means, rates, and survival data
-*	Adaptive designs and analysis for multi-arm trials
-*   Simulation and analysis for enrichment designs testing means, rates,
-    and hazard ratios
-
+        conditional power using predefined and user-defined formulas
+    + Assessment of treatment selection rules in multi-arm trials
+    + Assessment of adaptive strategies in population enrichment designs
+*	Adaptive analysis for means, rates, and survival data
+  + One- and two-armed trials testing a single hypothesis
+  + Closed testing procedure for testing multiple hypotheses in 
+    multi-arm and population enrichment designs
+  
 
 ## Learn to use rpact
 
@@ -88,6 +89,7 @@ following topics:
     (*exclusive*)
 25. How to install the latest developer version (*exclusive*)
 26. Delayed Response Designs with rpact
+27. Sample Size Calculation for Count Data
 
 ## User Concept
 

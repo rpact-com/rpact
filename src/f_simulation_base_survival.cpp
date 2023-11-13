@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6784 $
- * Last changed: $Date: 2023-01-31 10:11:06 +0100 (Di, 31 Jan 2023) $
+ * File version: $Revision: 7408 $
+ * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -583,7 +583,7 @@ NumericMatrix getExtendedSurvivalDataSet(IntegerVector treatmentGroup,
  *  @param kappa The kappa value for the Weibull distribution;
  *               if kappa = 1, then the exponential distribution will be used for simulation.
  */
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getSimulationSurvivalCpp")]]
 List getSimulationSurvivalCpp(
 		int designNumber,
 		int kMax,

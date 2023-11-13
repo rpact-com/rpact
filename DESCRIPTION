@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 3.4.1.9216
-Date: 2023-09-18
+Version: 3.5.0.9222
+Date: 2023-11-13
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -33,6 +33,7 @@ Authors@R: c(
     	given = "Tobias", 
     	family = "Muetze", 
     	email = "tobias.muetze@novartis.com",
+    	comment = c(ORCID = "0000-0002-4111-1941"), 
     	role = c("ctb")
 	))
 Description: Design and analysis of confirmatory adaptive clinical trials with continuous, binary, and survival endpoints according to the methods described in the monograph by Wassmer and Brannath (2016) <doi:10.1007/978-3-319-32562-0>. This includes classical group sequential as well as multi-stage adaptive hypotheses tests that are based on the combination testing principle.
@@ -60,7 +61,6 @@ LinkingTo: Rcpp
 Suggests: 
 	ggplot2 (>= 2.2.0),	
 	testthat (>= 3.0.0),
-	mnormt (>= 1.5-7),
 	rmarkdown (>= 1.10)
 VignetteBuilder: knitr, rmarkdown
 RoxygenNote: 7.2.3
@@ -110,7 +110,9 @@ Collate:
     'f_analysis_multiarm_survival.R'
     'f_as251.R'
     'f_core_output_formats.R'
-    'f_count_data.R'
+    'f_count_data_sample_size.R'
+    'f_count_data_simulation.R'
+    'f_count_data_utilities.R'
     'f_design_fisher_combination_test.R'
     'f_design_group_sequential.R'
     'f_design_sample_size_calculator.R'

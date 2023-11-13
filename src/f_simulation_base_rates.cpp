@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7171 $
- * Last changed: $Date: 2023-07-11 14:21:25 +0200 (Di, 11 Jul 2023) $
+ * File version: $Revision: 7408 $
+ * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -631,7 +631,7 @@ List getSimulationStepRatesCpp(int k, int kMax, int designNumber, NumericVector 
 	);
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getSimulationRatesCpp")]]
 List getSimulationRatesCpp(
 		int kMax,
 		NumericVector informationRates,

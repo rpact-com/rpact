@@ -9,7 +9,9 @@
   ...,
   type = 1,
   digits = NA_integer_,
-  output = c("all", "title", "overview", "body")
+  output = c("all", "title", "overview", "body"),
+  printObject = FALSE,
+  sep = "\\n-----\\n\\n"
 )
 }
 \arguments{
@@ -19,6 +21,12 @@
 that a warning will be displayed if unknown arguments are passed.}
 
 \item{digits}{Defines how many digits are to be used for numeric values. Must be a positive integer of length 1.}
+
+\item{output}{The output parts, default is \code{"all"}.}
+
+\item{printObject}{Show also the print output after the summary, default is \code{FALSE}.}
+
+\item{sep}{The separator line between the summary and the optional print output.}
 }
 \value{
 Returns a \code{\link{SummaryFactory}} object.

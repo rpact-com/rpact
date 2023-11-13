@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7268 $
-## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
+## |  File version: $Revision: 7408 $
+## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -74,8 +74,6 @@
 #' @importFrom rlang .data
 #' @importFrom knitr kable
 #' @importFrom knitr knit_print
-#' 
-#' @exportPattern "^[[:alpha:]]+"
 #'
 "_PACKAGE"
 #> [1] "_PACKAGE"

@@ -41,7 +41,7 @@ extern "C" {
 		int* ifault);
 }
 
-// [[Rcpp::export(".mvnprd")]]
+// [[Rcpp::export(name = ".mvnprd")]]
 NumericVector mvnprd(
 	NumericVector a,
 	NumericVector b,
@@ -70,8 +70,7 @@ NumericVector mvnprd(
   float bound = 0;
   int ifault = 0;
 
-  int infValue = inf[0];
-  mvnprd_(&(af[0]), &(bf[0]), &(bpdf[0]), &eps, &n, &infValue, &ierc, &hinc, &prob, &bound, &ifault);
+  mvnprd_(&(af[0]), &(bf[0]), &(bpdf[0]), &eps, &n, (int*) &(inf[0]), &ierc, &hinc, &prob, &bound, &ifault);
 
   // free allocated memory
   delete[] af;
@@ -98,7 +97,7 @@ extern "C" {
 		int* iflt);
 }
 
-// [[Rcpp::export(".mvstud")]]
+// [[Rcpp::export(name = ".mvstud")]]
 NumericVector mvstud(
 	int ndf,
 	NumericVector a,
@@ -131,8 +130,8 @@ NumericVector mvstud(
   float bnd = 0;
   int iflt = 0;
 
-  int infValue = inf[0];
-  mvstud_(&ndf, &(af[0]), &(bf[0]), &(bpdf[0]), &eps, &n, &infValue, &(df[0]), &ierc, &hnc, &prob, &bnd, &iflt);
+  // MVSTUD(NDF, A, B, BPD, ERRB, N, INF, D, IERC, HNC, PROB, BND, IFLT)
+  mvstud_(&ndf, &(af[0]), &(bf[0]), &(bpdf[0]), &eps, &n, (int*) &(inf[0]), &(df[0]), &ierc, &hnc, &prob, &bnd, &iflt);
 
   // free allocated memory
   delete[] af;

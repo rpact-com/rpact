@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_core_output_formats.R
-## |  Creation date: 06 February 2023, 12:11:55
-## |  File version: $Revision: 7132 $
-## |  Last changed: $Date: 2023-06-26 14:15:08 +0200 (Mon, 26 Jun 2023) $
+## |  Creation date: 08 November 2023, 09:09:35
+## |  File version: $Revision: 7408 $
+## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -29,32 +29,32 @@ test_that("'.formatPValues'", {
     x <- .formatPValues(0.0000234)
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, "<0.0001")
+    expect_equal(x, "<0.0001", label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .formatPValues(c(0.0000234, 0.0000134, 0.1234))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("<0.0001", "<0.0001", "0.1234"))
+    expect_equal(x, c("<0.0001", "<0.0001", "0.1234"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .formatPValues(c(0.0002345678, 0.0000134, 0.1234, 0.000000000001, .00000009999))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("0.0002346", "0.0000134", "0.1234000", "<0.000001", "<0.000001"))
+    expect_equal(x, c("0.0002346", "0.0000134", "0.1234000", "<0.000001", "<0.000001"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .formatPValues(c(0.00234, 0.000013, 0.1234, 0.000000000001, .00000009999))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("0.00234", "<0.0001", "0.12340", "<0.0001", "<0.0001"))
+    expect_equal(x, c("0.00234", "<0.0001", "0.12340", "<0.0001", "<0.0001"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .formatPValues(c(6.244e-05, 4.906e-02, 1.446e-02, NA_real_))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("<0.0001", "0.04906", "0.01446", "NA"))
+    expect_equal(x, c("<0.0001", "0.04906", "0.01446", "NA"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .formatPValues(c(6.24408201934656e-05, 7.55449751868031e-05, 1.23207030919836e-05, NA_real_))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("<0.0001", "<0.0001", "<0.0001", "NA"))
+    expect_equal(x, c("<0.0001", "<0.0001", "<0.0001", "NA"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 })
 
 test_that("'.formatRepeatedPValues'", {
@@ -63,17 +63,17 @@ test_that("'.formatRepeatedPValues'", {
     x <- .formatRepeatedPValues(c(0.0000234, 0.0000134, 0.1234))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("<0.0001", "<0.0001", "0.1234"))
+    expect_equal(x, c("<0.0001", "<0.0001", "0.1234"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .formatRepeatedPValues(c(0.0000234, 0.0000134, 0.5234))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("<0.0001", "<0.0001", ">0.5"))
+    expect_equal(x, c("<0.0001", "<0.0001", ">0.5"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .formatRepeatedPValues(c(0.0000234, 0.0000134, 0.5234, NA_real_))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("<0.0001", "<0.0001", ">0.5", "NA"))
+    expect_equal(x, c("<0.0001", "<0.0001", ">0.5", "NA"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 })
 
 test_that("'.formatConditionalPower'", {
@@ -82,12 +82,12 @@ test_that("'.formatConditionalPower'", {
     x <- .formatConditionalPower(c(0.0000234, 0.0000134, 0.5234, NA_real_))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("0", "0", "0.5234", "NA"))
+    expect_equal(x, c("0", "0", "0.5234", "NA"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .formatConditionalPower(c(0.234, 0.123456, 0.6, 0.000001))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("0.2340", "0.1235", "0.6000", "0"))
+    expect_equal(x, c("0.2340", "0.1235", "0.6000", "0"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 })
 
 test_that("'.formatProbabilities'", {
@@ -96,7 +96,7 @@ test_that("'.formatProbabilities'", {
     x <- .formatProbabilities(c(NA_real_, NA_real_, 0.4536623, 0.7713048))
 
     ## Comparison of the results of character object 'x' with expected results
-    expect_equal(x, c("NA", "NA", "0.4537", "0.7713"))
+    expect_equal(x, c("NA", "NA", "0.4537", "0.7713"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 })
 
 test_that("'.getDecimalPlaces'", {
@@ -105,25 +105,25 @@ test_that("'.getDecimalPlaces'", {
     x <- .getDecimalPlaces(NA)
 
     ## Comparison of the results of integer object 'x' with expected results
-    expect_equal(x, 0)
+    expect_equal(x, 0, label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .getDecimalPlaces(12.123)
 
     ## Comparison of the results of integer object 'x' with expected results
-    expect_equal(x, 3)
+    expect_equal(x, 3, label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .getDecimalPlaces(c(6.661338e-16, 8.000000e-01, NA_real_))
 
     ## Comparison of the results of integer object 'x' with expected results
-    expect_equal(x, c(15, 1, 0))
+    expect_equal(x, c(15, 1, 0), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 
     x <- .getDecimalPlaces(c(6.661338e-16, 8.12300000e-02))
 
     ## Comparison of the results of integer object 'x' with expected results
-    expect_equal(x, c(15, 5))
+    expect_equal(x, c(15, 5), label = paste0("c(", paste0(x, collapse = ", "), ")"))
 })
 
-test_that("Internal output format functions throw errors when arguments are missing or wrong", {
+test_that(" Internal output format functions throw errors when arguments are missing or wrong", {
     expect_equal(.getFormattedValue(), "NA")
     expect_error(.assertIsValitOutputFormatOptionValue())
     expect_error(.getOutputFormatOptions())
@@ -133,11 +133,11 @@ test_that("Internal output format functions throw errors when arguments are miss
     expect_error(.addFieldsToOutputFormatList())
     expect_error(.getOutputFormatParameterNames())
     expect_error(.getOutputFormatFunctionName())
-    expect_null(.getOutputFormatKeyByFieldName("xxx"))
+    expect_error(.getOutputFormatKeyByFieldName())
     expect_error(.getOutputFormatKeyByFunctionName())
 })
 
-test_that(".assertIsValidOutputFormatOptionValue handles valid option value", {
+test_that(".assertIsValidOutputFormatOptionValue handles valid option value'", {
     # Valid option value
     optionKey <- "exampleKey"
     optionValue <- "roundFunction = ceiling"
@@ -149,7 +149,7 @@ test_that(".assertIsValidOutputFormatOptionValue handles valid option value", {
     expect_null(result)
 })
 
-test_that(".assertIsValidOutputFormatOptionValue handles invalid empty option value", {
+test_that(".assertIsValidOutputFormatOptionValue handles invalid empty option value'", {
     # Invalid empty option value
     optionKey <- "exampleKey"
     optionValue <- ""

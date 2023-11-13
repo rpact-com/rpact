@@ -1,0 +1,9 @@
+R/pkgname.R
+R/class_core_plot_settings.R
+R/f_quality_assurance.R
+R/f_core_plot.R
+R/class_design_plan.R
+R/class_event_probabilities.R
+R/class_simulation_results.R
+R/f_assertions.cpp
+src/f_utilities.h

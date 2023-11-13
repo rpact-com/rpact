@@ -4,7 +4,7 @@
 ## |  This file is part of the R package rpact:
 ## |  Confirmatory Adaptive Clinical Trial Design and Analysis
 ## |
-## |  Author: Gernot Wassmer, PhD, and Friedrich Pahlke, PhD
+## |  Author: Gernot Wassmer, PhD, Tobias Muetze, PhD, and Friedrich Pahlke, PhD
 ## |  Licensed under "GNU Lesser General Public License" version 3
 ## |  License text can be found here: https://www.r-project.org/Licenses/LGPL-3
 ## |
@@ -13,24 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7315 $
-## |  Last changed: $Date: 2023-09-16 13:03:32 +0200 (Sat, 16 Sep 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7428 $
+## |  Last changed: $Date: 2023-11-13 10:42:22 +0100 (Mo, 13 Nov 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
-.getInformation <- function(lambda1,
-        lambda2,
-        overDispersion,
-        recruit1,
-        recruit2) {
-    sumLambda1 <- sum(recruit1 * lambda1 /
-        (1 + overDispersion * recruit1 * lambda1))
-    sumLambda2 <- sum(recruit2 * lambda2 /
-        (1 + overDispersion * recruit2 * lambda2))
-    return(1 / (1 / sumLambda1 + 1 / sumLambda2))
-}
-
-.getCalendarTime <- function(n1, n2,
+.getCalendarTime <- function(
+        n1, n2,
         information,
         shift,
         accrualTime,
@@ -67,14 +56,15 @@
         },
         interval = c(0, 10 * min(1, accrualTime)),
         extendInt = "yes",
-        tol = 1e-7
+        tol = 1e-07
     )$root
 }
 
-.getMaximumSampleSize2 <- function(allocationRatioPlanned,
+.getMaximumSampleSizeTwoGroups <- function(
+        allocationRatioPlanned,
         shift,
         accrualTime,
-        studyTime,
+        followUpTime,
         lambda1,
         lambda2,
         thetaH0,
@@ -83,243 +73,41 @@
         n2 <- y
         n1 <- allocationRatioPlanned * n2
         timeUnderObservation1 <-
-            pmax(studyTime - seq(0, accrualTime, length.out = n1), 0)
+            pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n1), 0)
         timeUnderObservation2 <-
-            pmax(studyTime - seq(0, accrualTime, length.out = n2), 0)
+            pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n2), 0)
         sumLambda1 <- sum(timeUnderObservation1 * lambda1 /
             (1 + overDispersion * timeUnderObservation1 * lambda1))
         sumLambda2 <- sum(timeUnderObservation2 * lambda2 /
             (1 + overDispersion * timeUnderObservation2 * lambda2))
         return(1 / (1 / sumLambda1 + 1 / sumLambda2) -
             shift / log(lambda1 / lambda2 / thetaH0)^2)
-    }, interval = c(0, 10^3), extendInt = "yes", tol = 1e-2)$root
+    }, interval = c(0, 10^4), extendInt = "yes", tol = 1e-02)$root
     n1 <- ceiling(allocationRatioPlanned * n2)
     n2 <- ceiling(n2)
-    
+
     # ensure that information is reached (necessary, gscounts does not check!)
-	timeUnderObservation1 <- pmax(studyTime - seq(0, accrualTime, length.out = n1), 0)
-	timeUnderObservation2 <- pmax(studyTime - seq(0, accrualTime, length.out = n2), 0)
-	sumLambda1 <- sum(timeUnderObservation1 * lambda1 / (1 + overDispersion * timeUnderObservation1 * lambda1))
-	sumLambda2 <- sum(timeUnderObservation2 * lambda2 / (1 + overDispersion * timeUnderObservation2 * lambda2))
-	if (1 / (1 / sumLambda1 + 1 / sumLambda2) <	shift / log(lambda1 / lambda2 / thetaH0)^2 ){
-		n2 <- n2 + 1
-		n1 <- n1 + 1
-	}
-    
+    timeUnderObservation1 <- pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n1), 0)
+    timeUnderObservation2 <- pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n2), 0)
+    sumLambda1 <- sum(timeUnderObservation1 * lambda1 / (1 + overDispersion * timeUnderObservation1 * lambda1))
+    sumLambda2 <- sum(timeUnderObservation2 * lambda2 / (1 + overDispersion * timeUnderObservation2 * lambda2))
+    if (1 / (1 / sumLambda1 + 1 / sumLambda2) < shift / log(lambda1 / lambda2 / thetaH0)^2) {
+        n2 <- n2 + 1
+        n1 <- n1 + 1
+    }
     return(list(
         n1 = n1,
         n2 = n2
     ))
 }
 
-.assertIsValidEffectCountData <- function(
-        sided,
-        lambda1,
-        lambda2,
-        lambda,
-        theta,
-        thetaH0,
-        overDispersion) {
-        
-    .assertIsSingleInteger(sided, "sided", validateType = FALSE)
-    if (sided != 1 && sided != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'sided' (", sided, ") must be defined as 1 or 2")
-    }
-    
-    .assertIsSingleNumber(lambda, "lambda", naAllowed = TRUE)
-    .assertIsInOpenInterval(lambda, "lambda", lower = 0, upper = NULL, naAllowed = TRUE)
-    
-    .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)
-    .assertIsInOpenInterval(lambda1, "lambda1", lower = 0, upper = NULL, naAllowed = TRUE)
-    
-    .assertIsSingleNumber(lambda2, "lambda2", naAllowed = TRUE)
-    .assertIsInOpenInterval(lambda2, "lambda2", lower = 0, upper = NULL, naAllowed = TRUE)
-    
-    .assertIsNumericVector(theta, "theta", naAllowed = TRUE)
-    .assertIsInOpenInterval(theta, "theta", lower = 0, upper = NULL, naAllowed = TRUE)
-    
-    .assertIsSingleNumber(thetaH0, "thetaH0")
-    .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
-    
-    .assertIsSingleNumber(overDispersion, "overDispersion", naAllowed = TRUE)
-    .assertIsInClosedInterval(overDispersion, "overDispersion", lower = 0, upper = NULL, naAllowed = TRUE)
-    
-
-	if (!is.na(lambda) && all(!is.na(theta))) {
-        if (all(!is.na(lambda1)) || !is.na(lambda2)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda1' and/or 'lambda2' need not to be specified if 'lambda' and 'theta' are specified"
-            )
-        }
-		if (length(theta) > 1){
-			stop(
-				C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-				"theta cannot be specified as vector if lambda is specified"
-			)
-		}
-    } else if (!is.na(lambda2) && all(!is.na(theta))) {
-        if (all(!is.na(lambda1)) || !is.na(lambda)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda1' and/or 'lambda' need not to be specified if 'lambda2' and 'theta' are specified"
-            )
-        }
-    } else if (all(!is.na(lambda1)) && all(!is.na(theta))) {
-        if (!is.na(lambda2) || !is.na(lambda)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda2' and/or 'lambda' need not to be specified if 'lambda1' and 'theta' are specified"
-            )
-        }
-		if (length(theta) > 1){
-			stop(
-				C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-				"theta cannot be specified as vector if lambda1 is specified"
-			)
-		}
-    } else if (all(!is.na(lambda1)) && !is.na(lambda2)) {
-        if (!is.na(lambda) || all(!is.na(theta))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda' and/or 'theta' need not to be specified if 'lambda1' and 'lambda2' are specified"
-            )
-        }
-    } else if (!is.na(lambda) && all(!is.na(lambda1))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'lambda2' and/or 'theta' need not to be specified if 'lambda' and 'lambda1' are specified"
-        )
-    } else if (!is.na(lambda) && !is.na(lambda2)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'lambda1' and/or 'theta' need not to be specified if 'lambda' and 'lambda2' are specified"
-        )
-    } else if (sum(is.na(lambda2), any(is.na(lambda1)), is.na(lambda), any(is.na(theta))) != 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "this parameter configuration is not possible: exactly two of the ",
-            "parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified"
-        )
-    } 
-}
-
-.assertIsValidParametersCountData <- function(
-        sampleSizeEnabled,
-        fixedExposureTime,
-        studyTime,
-        accrualTime,
-        accrualIntensity,
-        maxNumberOfSubjects) {
-    
-    .assertIsSingleLogical(sampleSizeEnabled, "sampleSizeEnabled")
-        
-    .assertIsSingleNumber(fixedExposureTime, "fixedExposureTime", naAllowed = TRUE)
-    .assertIsInOpenInterval(fixedExposureTime, "fixedExposureTime", lower = 0, upper = NULL, naAllowed = TRUE)
-
-    .assertIsSingleNumber(studyTime, "studyTime", naAllowed = TRUE)
-    
-    .assertIsNumericVector(accrualTime, "accrualTime", naAllowed = TRUE)
-    .assertIsInClosedInterval(accrualTime, "accrualTime", lower = 0, upper = NULL, naAllowed = TRUE)
-    
-    .assertIsNumericVector(accrualIntensity, "accrualIntensity", naAllowed = TRUE)
-    .assertIsInClosedInterval(accrualIntensity, "accrualIntensity", lower = 0, upper = NULL, naAllowed = TRUE)
-    
-    .assertIsSingleInteger(maxNumberOfSubjects, "maxNumberOfSubjects", validateType = FALSE, naAllowed = TRUE)
-        
-    if (sampleSizeEnabled) {
-        if (is.na(maxNumberOfSubjects) && any(is.na(accrualIntensity))) {
-            if (!is.na(fixedExposureTime) && !is.na(studyTime)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'fixedExposureTime' and 'studyTime' cannot together be specified"
-                )
-            }
-            if (is.na(fixedExposureTime) && is.na(studyTime)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "either 'fixedExposureTime' or 'studyTime' needs to be specified"
-                )
-            }
-        }
-    } else {
-        if (!is.na(fixedExposureTime) && !is.na(studyTime)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'fixedExposureTime' or 'studyTime' cannot together be specified"
-            )
-        }
-        if (is.na(fixedExposureTime) && is.na(studyTime)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "either 'fixedExposureTime' or 'studyTime' needs to be specified"
-            )
-        }
-        if (is.na(maxNumberOfSubjects) && any(is.na(accrualIntensity))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "either 'maxNumberOfSubjects' or 'accrualIntensity' needs to be specified"
-            )
-        }
-    }
-    if (any(is.na(accrualTime)) && !is.na(studyTime)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' needs to be specified if 'studyTime' is given"
-        )
-    }
-    if (!is.na(studyTime) && any(accrualTime > studyTime)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' needs to be smaller than (total) 'studyTime'"
-        )
-    }
-    if (sampleSizeEnabled) {
-        if ((!is.na(maxNumberOfSubjects) || !any(is.na(accrualIntensity))) &&
-                (!is.na(studyTime) || !is.na(fixedExposureTime))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'studyTime' and/or 'fixedExposureTime' is not allowed to be specified"
-            )
-        }
-        if (!is.na(maxNumberOfSubjects) && any(is.na(accrualTime))){
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'accrualTime' needs to be specified if 'maxNumberOfSubjects' is specified")
-        }
-    }
-    if (!is.na(maxNumberOfSubjects) && any(is.na(accrualTime))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' needs to be specified if 'maxNumberOfSubjects' is specified"
-        )
-    }
-    if (!is.na(maxNumberOfSubjects) && !any(is.na(accrualIntensity))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'maxNumberOfSubjects' and 'accrualIntensity' cannot be specified together"
-        )
-    }
-    if (!any(is.na(accrualIntensity)) && (length(accrualIntensity) < 2)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualIntensity' needs to be a vector with at least two elements"
-        )
-    }
-    if (!any(is.na(accrualIntensity)) &&
-            ((accrualTime[1] != 0) && (length(accrualTime) != length(accrualIntensity)) ||
-                (accrualTime[1] == 0) && (length(accrualTime) - 1 != length(accrualIntensity)))
-        ) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' and 'accrualIntensity' does not match"
-        )
-    }
-}
-
+#'
+#' TODO @Gernot: document
 #'
 #' @export
 #'
-getSampleSizeCounts <- function(design = NULL, ...,
+getSampleSizeCounts <- function(
+        design = NULL, ...,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
         lambda = NA_real_,
@@ -329,10 +117,9 @@ getSampleSizeCounts <- function(design = NULL, ...,
         fixedExposureTime = NA_real_,
         accrualTime = NA_real_,
         accrualIntensity = NA_real_,
-        studyTime = NA_real_,
+        followUpTime = NA_real_,
         maxNumberOfSubjects = NA_real_,
         allocationRatioPlanned = NA_real_) {
-        
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "sampleSize")
         .warnInCaseOfUnknownArguments(
@@ -355,8 +142,9 @@ getSampleSizeCounts <- function(design = NULL, ...,
     beta <- design$beta
     designCharacteristics <- getDesignCharacteristics(design)
     shift <- designCharacteristics$shift
+    sampleSizeEnabled <- TRUE
 
-	if (!is.na(lambda2) && !any(is.na(theta))) {
+    if (!is.na(lambda2) && !any(is.na(theta))) {
         totalCases <- length(theta)
         lambda1 <- rep(NA_real_, totalCases)
     } else if (!any(is.na(lambda1))) {
@@ -364,38 +152,33 @@ getSampleSizeCounts <- function(design = NULL, ...,
     } else {
         totalCases <- 1
     }
-
     if (any(is.na(allocationRatioPlanned))) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
-
     .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
-
     .assertIsValidEffectCountData(
-        sided, lambda1, lambda2, lambda, theta,
+        sampleSizeEnabled, sided, lambda1, lambda2, lambda, theta,
         thetaH0, overDispersion
     )
-
     if (!is.na(lambda2) && !any(is.na(theta))) {
         lambda1 <- lambda2 * theta
     } else if (!any(is.na(lambda1)) && !any(is.na(theta))) {
         lambda2 <- lambda1 / theta
     }
-
     .assertIsValidParametersCountData(
-        TRUE, fixedExposureTime, studyTime,
+        sampleSizeEnabled, fixedExposureTime, followUpTime,
         accrualTime, accrualIntensity, maxNumberOfSubjects
     )
-
     if ((length(accrualTime) > 1) && (accrualTime[1] == 0)) {
         accrualTime <- accrualTime[-1]
     }
-
     calendarTime <- matrix(NA_real_, kMax, totalCases)
     studySubjects <- matrix(NA_real_, kMax, totalCases)
     informationOverStages <- matrix(NA_real_, kMax, totalCases)
-    if (is.na(studyTime)) {
+    if (is.na(followUpTime)) {
         studyTime <- rep(NA_real_, totalCases)
+    } else {
+        studyTime <- accrualTime + followUpTime
     }
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, totalCases)
@@ -421,7 +204,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
                         n2[iCase] <- (qnorm(1 - alpha / sided) + qnorm(1 - beta))^2 *
                             varianceEstimate / log(lambda1[iCase] / lambda2 / thetaH0)^2
                         return(x * n2[iCase] + n2[iCase])
-                    }, interval = c(0, 5), tol = 1e-5)$minimum
+                    }, interval = c(0, 5), tol = 1e-05)$minimum
             }
 
             if (!is.na(lambda) && !any(is.na(theta))) {
@@ -534,12 +317,12 @@ getSampleSizeCounts <- function(design = NULL, ...,
                         lambda2 <- (1 + x) * lambda / (1 + x * theta[iCase])
                         lambda1[iCase] <- lambda2 * theta[iCase]
                     }
-                    n2[iCase] <- .getMaximumSampleSize2(
-                        x, shift, accrualTime, studyTime,
+                    n2[iCase] <- .getMaximumSampleSizeTwoGroups(
+                        x, shift, accrualTime, followUpTime,
                         lambda1[iCase], lambda2, thetaH0, overDispersion
                     )$n2
                     return(x * n2[iCase] + n2[iCase])
-                }, interval = c(0, 5), tol = 1e-5)$minimum
+                }, interval = c(0, 5), tol = 1e-05)$minimum
             }
 
             if (!(is.na(lambda)) && !any(is.na(theta))) {
@@ -548,8 +331,8 @@ getSampleSizeCounts <- function(design = NULL, ...,
                 lambda1[iCase] <- lambda2 * theta[iCase]
             }
 
-            sampleSizes <- .getMaximumSampleSize2(
-                allocationRatioPlanned[iCase], shift, accrualTime, studyTime,
+            sampleSizes <- .getMaximumSampleSizeTwoGroups(
+                allocationRatioPlanned[iCase], shift, accrualTime, followUpTime,
                 lambda1[iCase], lambda2, thetaH0, overDispersion
             )
             n1[iCase] <- sampleSizes$n1
@@ -566,7 +349,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
                     )
                 }
             }
-            calendarTime[kMax, iCase] <- studyTime
+            calendarTime[kMax, iCase] <- accrualTime + followUpTime
         }
 
         if (!any(is.na(calendarTime[, iCase]))) {
@@ -610,6 +393,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
         overDispersion = overDispersion,
         fixedExposureTime = fixedExposureTime,
         accrualTime = accrualTime,
+        followUpTime = followUpTime,
         accrualIntensity = accrualIntensity,
         studyTime = studyTime,
         calendarTime = calendarTime,
@@ -631,10 +415,13 @@ getSampleSizeCounts <- function(design = NULL, ...,
 }
 
 #'
+#' TODO @Gernot: document
+#'
 #' @export
 #'
-getPowerCounts <- function(design = NULL, ...,
-        directionUpper = NA,
+getPowerCounts <- function(
+        design = NULL, ...,
+        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
         maxNumberOfSubjects = NA_real_,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
@@ -645,12 +432,11 @@ getPowerCounts <- function(design = NULL, ...,
         fixedExposureTime = NA_real_,
         accrualTime = NA_real_,
         accrualIntensity = NA_real_,
-        studyTime = NA_real_,
+        followUpTime = NA_real_,
         allocationRatioPlanned = NA_real_) {
     if (is.na(directionUpper)) {
         directionUpper <- TRUE
     }
-
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "power")
         .warnInCaseOfUnknownArguments(
@@ -666,7 +452,6 @@ getPowerCounts <- function(design = NULL, ...,
         .warnInCaseOfTwoSidedPowerArgument(...)
         .warnInCaseOfTwoSidedPowerIsDisabled(design)
     }
-
     if (!any(is.na(theta))) {
         totalCases <- length(theta)
         lambda1 <- rep(NA_real_, totalCases)
@@ -682,44 +467,37 @@ getPowerCounts <- function(design = NULL, ...,
     sided <- design$sided
     designCharacteristics <- getDesignCharacteristics(design)
     shift <- designCharacteristics$shift
+    sampleSizeEnabled <- FALSE
 
     if (any(is.na(allocationRatioPlanned))) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
-
     .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
-
     .assertIsValidEffectCountData(
-        sided, lambda1, lambda2, lambda, theta,
+        sampleSizeEnabled, sided, lambda1, lambda2, lambda, theta,
         thetaH0, overDispersion
     )
-
     if (!is.na(lambda2) && !any(is.na(theta))) {
         lambda1 <- lambda2 * theta
     } else if (!any(is.na(lambda1)) && !any(is.na(theta))) {
         lambda2 <- lambda1 / theta
     }
-
     .assertIsValidParametersCountData(
-        FALSE, fixedExposureTime, studyTime,
+        sampleSizeEnabled, fixedExposureTime, followUpTime,
         accrualTime, accrualIntensity, maxNumberOfSubjects
     )
-
     if ((length(accrualTime) > 1) && (accrualTime[1] == 0)) {
         accrualTime <- accrualTime[-1]
     }
-
     futilityPerStage <- matrix(NA_real_, kMax - 1, totalCases)
     rejectPerStage <- matrix(NA_real_, kMax, totalCases)
     earlyStop <- matrix(NA_real_, kMax, totalCases)
     overallReject <- rep(NA_real_, totalCases)
-
     for (iCase in (1:totalCases)) {
         if (!(is.na(lambda)) && !any(is.na(theta))) {
             lambda2 <- (1 + allocationRatioPlanned) * lambda / (1 + allocationRatioPlanned * theta[iCase])
             lambda1[iCase] <- lambda2 * theta[iCase]
         }
-
         if (!any(is.na(accrualIntensity))) {
             const <- allocationRatioPlanned / (1 + allocationRatioPlanned)
             if (sd(accrualIntensity) < 1E-10) {
@@ -762,23 +540,21 @@ getPowerCounts <- function(design = NULL, ...,
                 overDispersion * (1 + 1 / allocationRatioPlanned))
         } else {
             timeUnderObservation1 <-
-                pmax(studyTime - recruit1, 0)
+                pmax(accrualTime + followUpTime - recruit1, 0)
             timeUnderObservation2 <-
-                pmax(studyTime - recruit2, 0)
+                pmax(accrualTime + followUpTime - recruit2, 0)
             sumLambda1 <- sum(timeUnderObservation1 * lambda1[iCase] /
                 (1 + overDispersion * timeUnderObservation1 * lambda1[iCase]))
             sumLambda2 <- sum(timeUnderObservation2 * lambda2 /
                 (1 + overDispersion * timeUnderObservation2 * lambda2))
             varianceEstimate <- nTotal * (1 / sumLambda1 + 1 / sumLambda2)
         }
-
         powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
             design = design,
             (2 * directionUpper - 1) * log(lambda1[iCase] / lambda2 / thetaH0) /
                 sqrt(varianceEstimate),
             nMax = nTotal
         )
-
         futilityPerStage[, iCase] <- powerAndAverageSampleNumber$futilityPerStage
         rejectPerStage[, iCase] <- powerAndAverageSampleNumber$rejectPerStage
         earlyStop[, iCase] <- powerAndAverageSampleNumber$earlyStop
@@ -799,7 +575,7 @@ getPowerCounts <- function(design = NULL, ...,
         fixedExposureTime = fixedExposureTime,
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
-        studyTime = studyTime,
+        followUpTime = followUpTime,
         n1 = n1,
         n2 = n2,
         nTotal = nTotal,
@@ -809,4 +585,3 @@ getPowerCounts <- function(design = NULL, ...,
         overallReject = overallReject
     ))
 }
-

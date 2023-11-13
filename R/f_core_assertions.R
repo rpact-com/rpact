@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7254 $
-## |  Last changed: $Date: 2023-08-28 11:34:27 +0200 (Mo, 28 Aug 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7359 $
+## |  Last changed: $Date: 2023-10-13 11:39:39 +0200 (Fri, 13 Oct 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -1448,10 +1448,6 @@ NULL
 
 .assertTestthatIsInstalled <- function() {
     .assertPackageIsInstalled("testthat")
-}
-
-.assertMnormtIsInstalled <- function() {
-    .assertPackageIsInstalled("mnormt")
 }
 
 .assertIsValidThetaH0 <- function(thetaH0, ..., endpoint = c("means", "rates", "survival"),

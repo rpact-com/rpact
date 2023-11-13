@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7352 $
+## |  Last changed: $Date: 2023-10-12 07:56:59 +0200 (Do, 12 Okt 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1903,7 +1903,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
             timeValues, lambda2, designPlan, type, piecewiseSurvivalEnabled
         )
 
-        if (!is.null(lambda1) && !is.na(lambda1) &&
+        if (!is.null(lambda1) && !all(is.na(lambda1)) &&
                 length(lambda1) == length(lambda2)) {
             data$survival1 <- .getPiecewiseExponentialDistribution(
                 timeValues,
@@ -1935,7 +1935,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
                 timeValues, lambda2, designPlan, type, piecewiseSurvivalEnabled
             )
         )
-        if (!is.null(lambda1) && !is.na(lambda1) &&
+        if (!is.null(lambda1) && !all(is.na(lambda1)) &&
                 length(lambda1) == length(lambda2)) {
             yParameterNames <- c(
                 yParameterNames,

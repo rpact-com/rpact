@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7428 $
+## |  Last changed: $Date: 2023-11-13 10:42:22 +0100 (Mo, 13 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -459,7 +459,6 @@ testPackage <- function(outDir = ".", ...,
         types = "tests",
         connection = list(token = NULL, secret = NULL)) {
     .assertTestthatIsInstalled()
-    .assertMnormtIsInstalled()
 
     .assertIsSingleCharacter(outDir, "outDir", naAllowed = FALSE)
     if (!dir.exists(outDir)) {
@@ -494,7 +493,7 @@ testPackage <- function(outDir = ".", ...,
 
     if (completeUnitTestSetEnabled && fullTestEnabled) {
         cat("Run all tests. Please wait...\n")
-        cat("Have a break - it takes about 15 minutes.\n")
+        cat("Have a break - it takes about 30 minutes.\n")
         cat("Exceution of all available unit tests startet at ",
             format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
             sep = ""

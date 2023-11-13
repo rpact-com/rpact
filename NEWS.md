@@ -1,4 +1,17 @@
 
+# rpact 3.5.0
+
+## New features
+
+* TODO Count Data
+
+## Improvements, issues, and changes
+
+* Original Fortran 77 code of AS 251 included into the package, see functions `mvnprd`, `mvstud`, `as251Normal`, and `as251StudentT`
+* R package `mnormt` dependency has been removed 
+* Pipe operator usage improved
+
+
 # rpact 3.4.0
 
 ## New features

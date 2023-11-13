@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7309 $
-## |  Last changed: $Date: 2023-09-15 11:14:05 +0200 (Fr, 15 Sep 2023) $
+## |  File version: $Revision: 7379 $
+## |  Last changed: $Date: 2023-10-30 16:19:12 +0100 (Mo, 30 Okt 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -30,7 +30,8 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsMultiArm <- function(design, dataInput, ...,
+.getAnalysisResultsMultiArm <- function(
+        design, dataInput, ...,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
         thetaH0 = NA_real_,
@@ -155,7 +156,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMultiArm <- function(..., stageResults, nPlanned,
+.getConditionalPowerMultiArm <- function(
+        ..., stageResults, nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
     .assertIsStageResults(stageResults)
 
@@ -209,71 +211,9 @@ NULL
     return(as.matrix(indices))
 }
 
-.getMultivariateDistribution <- function(...,
-        type = c("normal", "t", "quantile", "tQuantile"),
-        upper,
-        sigma,
-        eps = 1e-05,
-        df = NA_real_, alpha = NA_real_) {
-    type <- match.arg(type)
 
-    dimensionSigma <- length(base::diag(sigma))
-    if (type == "normal") {
-        if (dimensionSigma == 1) {
-            return(stats::pnorm(upper))
-        }
-        
-        return(as251Normal(lower = -Inf, upper = upper, sigma = sigma)[1])
-    }
-
-    if (type == "t") {
-        if (dimensionSigma == 1) {
-            return(stats::pt(upper, df))
-        }
-        
-        return(as251StudentT(
-            lower = -Inf, upper = upper,
-            sigma = sigma, eps = eps, df = df
-        )[1])
-    }
-
-    if (type == "quantile") {
-        if (dimensionSigma == 1) {
-            return(.getOneMinusQNorm(alpha))
-        }
-        
-        return(.getOneDimensionalRoot(
-            function(x) {
-                return(as251Normal(lower = -Inf, upper = x, sigma = sigma)[1] - (1 - alpha))
-            },
-            lower = -8,
-            upper = 8,
-            tolerance = 1e-08,
-            callingFunctionInformation = ".getMultivariateDistribution"
-        ))
-    }
-
-    if (type == "tQuantile") {
-        if (dimensionSigma == 1) {
-            return(stats::qt(1 - alpha, df))
-        }
-        
-        return(.getOneDimensionalRoot(
-            function(x) {
-                return(as251StudentT(
-                    lower = -Inf, upper = x,
-                    eps = eps, sigma = sigma, df = df
-                )[1] - (1 - alpha))
-            },
-            lower = -8,
-            upper = 8,
-            tolerance = 1e-08,
-            callingFunctionInformation = ".getMultivariateDistribution"
-        ))
-    }
-}
-
-.performClosedCombinationTest <- function(..., stageResults, design = stageResults$.design,
+.performClosedCombinationTest <- function(
+        ..., stageResults, design = stageResults$.design,
         intersectionTest = stageResults$intersectionTest) {
     dataInput <- stageResults$.dataInput
     stage <- stageResults$stage
@@ -756,7 +696,8 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
     ))
 }
 
-.getClosedConditionalDunnettTestResults <- function(...,
+.getClosedConditionalDunnettTestResults <- function(
+        ...,
         stageResults,
         design = stageResults$.design,
         stage = stageResults$stage) {
@@ -817,64 +758,73 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
     }
 
     for (i in 1:(2^gMax - 1)) {
-        zeta <- sqrt(frac1[indices[i, ] == 1])
-        sigma <- zeta %*% t(zeta)
-        diag(sigma) <- 1
-        crit <- .getMultivariateDistribution(
-            type = "quantile",
-            upper = NA_real_, sigma = sigma, alpha = alpha
-        )
-
-        integrand <- function(x) {
-            innerProduct <- 1
-            for (g in (1:gMax)) {
-                if (indices[i, g] == 1) {
-                    innerProduct <- innerProduct * stats::pnorm(((crit -
-                        sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
-                        sqrt(1 - informationAtInterim) * sqrt(frac1[g]) * x)) /
-                        sqrt((1 - informationAtInterim) * (1 - frac1[g])))
+        tryCatch({
+        	
+            zeta <- sqrt(frac1[indices[i, ] == 1])
+            sigma <- zeta %*% t(zeta)
+            diag(sigma) <- 1
+            crit <- .getMultivariateDistribution(
+                type = "quantile",
+                upper = NA_real_, sigma = sigma, alpha = alpha
+            )
+    
+            integrandFunction <- function(x) {
+                innerProduct <- 1
+                for (g in (1:gMax)) {
+                    if (indices[i, g] == 1) {
+                        innerProduct <- innerProduct * stats::pnorm(((crit -
+                            sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
+                            sqrt(1 - informationAtInterim) * sqrt(frac1[g]) * x)) /
+                            sqrt((1 - informationAtInterim) * (1 - frac1[g])))
+                    }
+                }
+                return(innerProduct * dnorm(x))
+            }
+            conditionalErrorRate[i, 1] <- 1 - stats::integrate(integrandFunction, lower = -Inf, upper = Inf)$value
+    
+        }, error = function(e) {
+            warning("Failed to calculate conditionalErrorRate[", i, ", 1]: ", e$message)
+        })
+    
+        tryCatch({
+            if (stage == 2) {
+                if (!all(is.na(stageResults$separatePValues[indices[i, ] == 1, 2]))) {
+                    if (secondStageConditioning) {
+                        maxOverallTestStatistic <- max(
+                            signedOverallTestStatistics[indices[i, ] == 1, 2],
+                            na.rm = TRUE
+                        )
+                        integrandFunctionStage2 <- function(x) {
+                            innerProduct <- 1
+                            for (g in (1:gMax)) {
+                                if ((indices[i, g] == 1) && !is.na(stageResults$overallTestStatistics[g, 2])) {
+                                    innerProduct <- innerProduct * stats::pnorm(((maxOverallTestStatistic -
+                                        sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
+                                        sqrt(1 - informationAtInterim) * sqrt(frac2[g]) * x)) /
+                                        sqrt((1 - informationAtInterim) * (1 - frac2[g])))
+                                }
+                            }
+                            return(innerProduct * dnorm(x))
+                        }
+                    } else {
+                        maxTestStatistic <- max(signedTestStatistics[indices[i, ] == 1, 2], na.rm = TRUE)
+                        integrandFunctionStage2 <- function(x) {
+                            innerProduct <- 1
+                            for (g in (1:gMax)) {
+                                if ((indices[i, g] == 1) && !is.na(stageResults$separatePValues[g, 2])) {
+                                    innerProduct <- innerProduct *
+                                        stats::pnorm(((maxTestStatistic + sqrt(frac2[g]) * x)) / sqrt(1 - frac2[g]))
+                                }
+                            }
+                            return(innerProduct * dnorm(x))
+                        }
+                    }
+                    secondStagePValues[i, 2] <- 1 - stats::integrate(integrandFunctionStage2, lower = -Inf, upper = Inf)$value
                 }
             }
-            return(innerProduct * dnorm(x))
-        }
-        conditionalErrorRate[i, 1] <- 1 - integrate(integrand, lower = -Inf, upper = Inf)$value
-
-        if (stage == 2) {
-            if (!all(is.na(stageResults$separatePValues[indices[i, ] == 1, 2]))) {
-                if (secondStageConditioning) {
-                    maxOverallTestStatistic <- max(
-                        signedOverallTestStatistics[indices[i, ] == 1, 2],
-                        na.rm = TRUE
-                    )
-                    integrand <- function(x) {
-                        innerProduct <- 1
-                        for (g in (1:gMax)) {
-                            if ((indices[i, g] == 1) && !is.na(stageResults$overallTestStatistics[g, 2])) {
-                                innerProduct <- innerProduct * stats::pnorm(((maxOverallTestStatistic -
-                                    sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
-                                    sqrt(1 - informationAtInterim) * sqrt(frac2[g]) * x)) /
-                                    sqrt((1 - informationAtInterim) * (1 - frac2[g])))
-                            }
-                        }
-                        return(innerProduct * dnorm(x))
-                    }
-                    secondStagePValues[i, 2] <- 1 - integrate(integrand, lower = -Inf, upper = Inf)$value
-                } else {
-                    maxTestStatistic <- max(signedTestStatistics[indices[i, ] == 1, 2], na.rm = TRUE)
-                    integrand <- function(x) {
-                        innerProduct <- 1
-                        for (g in (1:gMax)) {
-                            if ((indices[i, g] == 1) && !is.na(stageResults$separatePValues[g, 2])) {
-                                innerProduct <- innerProduct *
-                                    stats::pnorm(((maxTestStatistic + sqrt(frac2[g]) * x)) / sqrt(1 - frac2[g]))
-                            }
-                        }
-                        return(innerProduct * dnorm(x))
-                    }
-                    secondStagePValues[i, 2] <- 1 - integrate(integrand, lower = -Inf, upper = Inf)$value
-                }
-            }
-        }
+        }, error = function(e) {
+            warning("Failed to calculate secondStagePValues[", i, ", 2]: ", e$message)
+        })
     }
 
     if (stage == 2) {
@@ -998,7 +948,8 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
 #'
 #' @noRd
 #'
-.getConditionalRejectionProbabilitiesMultiArm <- function(stageResults, ...,
+.getConditionalRejectionProbabilitiesMultiArm <- function(
+        stageResults, ...,
         stage = stageResults$stage, iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
     .assertIsValidStage(stage, stageResults$.design$kMax)
     gMax <- stageResults$getGMax()
@@ -1201,7 +1152,8 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
 #'
 #' @noRd
 #'
-.getConditionalPowerPlotMultiArm <- function(stageResults, ...,
+.getConditionalPowerPlotMultiArm <- function(
+        stageResults, ...,
         nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaRange = NA_real_, assumedStDevs = NA_real_,
         piTreatmentRange = NA_real_, piControl = NA_real_,
