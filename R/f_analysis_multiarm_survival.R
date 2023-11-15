@@ -79,7 +79,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmInverseNormalR6$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsSurvivalMultiArmAll(
         results = results, design = design, dataInput = dataInput,
@@ -113,7 +113,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmFisherR6$new(design = design, dataInput = dataInput)
     results <- .getAnalysisResultsSurvivalMultiArmAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -145,7 +145,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsConditionalDunnett(design = design, dataInput = dataInput)
+    results <- AnalysisResultsConditionalDunnettR6$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsSurvivalMultiArmAll(
         results = results, design = design,
@@ -286,7 +286,7 @@ NULL
     )
     .assertIsValidIntersectionTestMultiArm(design, intersectionTest)
 
-    stageResults <- StageResultsMultiArmSurvival(
+    stageResults <- StageResultsMultiArmSurvivalR6$new(
         design = design,
         dataInput = dataInput,
         intersectionTest = intersectionTest,
@@ -801,7 +801,7 @@ NULL
     gMax <- stageResults$getGMax()
     kMax <- design$kMax
 
-    results <- ConditionalPowerResultsMultiArmSurvival(
+    results <- ConditionalPowerResultsMultiArmSurvivalR6$new(
         .design = design,
         .stageResults = stageResults,
         thetaH1 = thetaH1,
@@ -1144,7 +1144,7 @@ NULL
 
     stdErr <- 2 / sqrt(stageResults$.dataInput$getOverallEvents(stage = stage, group = (1:gMax)))
 
-    results <- ConditionalPowerResultsMultiArmSurvival(
+    results <- ConditionalPowerResultsMultiArmSurvivalR6$new(
         .design = design,
         .stageResults = stageResults,
         nPlanned = nPlanned,

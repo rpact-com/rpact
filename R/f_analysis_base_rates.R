@@ -76,7 +76,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsInverseNormalR6$new(design = design, dataInput = dataInput)
 
     .getAnalysisResultsRatesAll(
         results = results, design = design, dataInput = dataInput,
@@ -105,7 +105,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsGroupSequential(design = design, dataInput = dataInput)
+    results <- AnalysisResultsGroupSequentialR6$new(design = design, dataInput = dataInput)
 
     .getAnalysisResultsRatesAll(
         results = results, design = design, dataInput = dataInput,
@@ -136,7 +136,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsFisherR6$new(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
@@ -570,7 +570,7 @@ NULL
 
     direction <- ifelse(directionUpper, C_DIRECTION_UPPER, C_DIRECTION_LOWER)
 
-    stageResults <- StageResultsRates(
+    stageResults <- StageResultsRatesR6$new(
         design = design,
         dataInput = dataInput,
         stage = as.integer(stage),
@@ -1102,7 +1102,7 @@ NULL
         pi2 <- .assertIsValidPi2(pi2, stageResults, stage)
     }
 
-    results <- ConditionalPowerResultsRates(
+    results <- ConditionalPowerResultsRatesR6$new(
         .stageResults = stageResults,
         .design = stageResults$.design, nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned, pi1 = pi1, pi2 = pi2

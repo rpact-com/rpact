@@ -80,7 +80,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmInverseNormalR6$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsRatesMultiArmAll(
         results = results, design = design, dataInput = dataInput,
@@ -115,7 +115,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmFisherR6$new(design = design, dataInput = dataInput)
     results <- .getAnalysisResultsRatesMultiArmAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -147,7 +147,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsConditionalDunnett(design = design, dataInput = dataInput)
+    results <- AnalysisResultsConditionalDunnettR6$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsRatesMultiArmAll(
         results = results, design = design,
@@ -328,7 +328,7 @@ NULL
         )
     }
 
-    stageResults <- StageResultsMultiArmRates(
+    stageResults <- StageResultsMultiArmRatesR6$new(
         design = design,
         dataInput = dataInput,
         intersectionTest = intersectionTest,
@@ -923,7 +923,7 @@ NULL
         piControl <- piControlH1
     }
 
-    results <- ConditionalPowerResultsMultiArmRates(
+    results <- ConditionalPowerResultsMultiArmRatesR6$new(
         .design = design,
         .stageResults = stageResults,
         piControl = piControl,
@@ -1331,7 +1331,7 @@ NULL
     stdErr <- sqrt(stageResults$overallPiTreatments[, stage] * (1 - stageResults$overallPiTreatments[, stage])) /
         sqrt(stageResults$.dataInput$getOverallSampleSizes(stage = stage, group = (1:gMax)))
 
-    results <- ConditionalPowerResultsMultiArmRates(
+    results <- ConditionalPowerResultsMultiArmRatesR6$new(
         .design = design,
         .stageResults = stageResults,
         piControl = piControl,

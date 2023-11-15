@@ -707,6 +707,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
                                   returnParametersAsCharacter = TRUE, 
                                   tableColumnNames = tableColumnNames
                                 )
+                                
                                 result <- as.matrix(dataFrame)
                                 if (.isTrialDesignPlan(self)) {
                                   dimnames(result)[[1]] <- paste("  ", c(1:nrow(dataFrame)))
@@ -1303,6 +1304,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
   }
   
   if (parameterSet$.containsMultidimensionalParameters(parameterNames)) {
+    
     return(.addDelayedInformationRates(.getAsDataFrameMultidimensional(
       parameterSet, parameterNames, niceColumnNamesEnabled,
       includeAllParameters, returnParametersAsCharacter, tableColumnNames,
@@ -1321,7 +1323,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
   if (length(parameterNames) == 0) {
     return(data.frame())
   }
-  
+
   return(.addDelayedInformationRates(.getAsDataFrameUnidimensional(
     parameterSet, parameterNames, niceColumnNamesEnabled,
     includeAllParameters, returnParametersAsCharacter, tableColumnNames

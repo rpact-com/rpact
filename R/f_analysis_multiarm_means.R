@@ -97,7 +97,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmFisherR6$new(design = design, dataInput = dataInput)
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -133,7 +133,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsConditionalDunnett(design = design, dataInput = dataInput)
+    results <- AnalysisResultsConditionalDunnettR6$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design,
@@ -1380,7 +1380,7 @@ NULL
         sqrt(1 / stageResults$.dataInput$getOverallSampleSizes(stage = stage, group = gMax + 1) +
             1 / stageResults$.dataInput$getOverallSampleSizes(stage = stage, group = (1:gMax)))
 
-    results <- ConditionalPowerResultsMultiArmMeans(
+    results <- ConditionalPowerResultsMultiArmMeansR6$new(
         .design = design,
         .stageResults = stageResults,
         assumedStDevs = assumedStDevs,

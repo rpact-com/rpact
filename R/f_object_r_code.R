@@ -157,7 +157,7 @@ NULL
         return("getDataset")
     }  
     
-    if (inherits(obj, "AnalysisResults")) {
+    if (inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResultsR6")) {
         return("getAnalysisResults")
     }  
     
@@ -213,11 +213,11 @@ NULL
         return("getAccrualTime")
     }  
     
-    if (inherits(obj, "StageResults")) {
+    if (inherits(obj, "StageResults") || inherits(obj, "StageResultsR6")) {
         return("getStageResults")
     }  
     
-    if (inherits(obj, "ConditionalPowerResults")) {
+    if (inherits(obj, "ConditionalPowerResults") || inherits(obj, "ConditionalPowerResultsR6")) {
         return("getConditionalPower")
     }  
     
@@ -391,7 +391,7 @@ getObjectRCode <- function(obj, ...,
     if (is.null(leadingArguments)) {
         leadingArguments <- character(0)
     }
-    if (!inherits(obj, "ConditionalPowerResults") &&
+    if (!(inherits(obj, "ConditionalPowerResults") || inherits(obj, "ConditionalPowerResultsR6")) &&
             !is.null(obj[[".design"]]) &&
             (is.null(leadingArguments) || !any(grepl("design", leadingArguments)))) {
         preconditionDesign <- getObjectRCode(obj$.design,
@@ -497,7 +497,7 @@ getObjectRCode <- function(obj, ...,
         }
         leadingArguments <- c(leadingArguments, "selectArmsFunction = selectArmsFunction")
     }
-    if (inherits(obj, "ConditionalPowerResults") &&
+    if ((inherits(obj, "ConditionalPowerResults") || inherits(obj, "ConditionalPowerResultsR6")) &&
             !is.null(obj[[".stageResults"]]) &&
             (is.null(leadingArguments) || !any(grepl("stageResults", leadingArguments)))) {
         precond <- getObjectRCode(obj$.stageResults,
@@ -554,7 +554,7 @@ getObjectRCode <- function(obj, ...,
 
     objNames <- objNames[objNames != "effectList"]
 
-    if (inherits(obj, "ParameterSet")) {
+    if (inherits(obj, "ParameterSet") || inherits(obj, "ParameterSetR6")) {
         if (includeDefaultParameters) {
             objNames <- obj$.getInputParameters()
         } else {
@@ -579,7 +579,7 @@ getObjectRCode <- function(obj, ...,
         objNames <- objNames[objNames != "allocationRatioPlanned"] # allocation1 and allocation2 are used instead
     }
 
-    if (inherits(obj, "AnalysisResults") && grepl("Fisher", .getClassName(obj))) {
+    if ((inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResultsR6")) && grepl("Fisher", .getClassName(obj))) {
         if (!is.null(obj[["seed"]]) && length(obj$seed) == 1 && !is.na(obj$seed)) {
             if (!("iterations" %in% objNames)) {
                 objNames <- c(objNames, "iterations")
@@ -684,7 +684,7 @@ getObjectRCode <- function(obj, ...,
                     optimumAllocationRatio <- obj[["optimumAllocationRatio"]]
                     if (!is.null(optimumAllocationRatio) && isTRUE(optimumAllocationRatio)) {
                         value <- 0
-                    } else if (inherits(obj, "ParameterSet")) {
+                    } else if ((inherits(obj, "ParameterSet") || inherits(obj, "ParameterSetR6"))) {
                         if (obj$.getParameterType("allocationRatioPlanned") == "g") {
                             value <- 0
                         }
@@ -772,9 +772,9 @@ getObjectRCode <- function(obj, ...,
                     .getArgumentValueRCode(obj$maxNumberOfSubjects[1], "maxNumberOfSubjects")
                 ))
             }
-        } else if (inherits(obj, "AnalysisResults")) {
+        } else if (inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResultsR6")) {
             arguments <- c(arguments, paste0("stage = ", obj$.stageResults$stage))
-        } else if (inherits(obj, "StageResults")) {
+        } else if (inherits(obj, "StageResults") || inherits(obj, "StageResultsR6")) {
             arguments <- c(arguments, paste0("stage = ", obj$stage))
         }
 

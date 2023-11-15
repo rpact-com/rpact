@@ -1,4 +1,4 @@
-library(R6)
+library("R6")
 
 ## |
 ## |  *Core utilities*
@@ -765,7 +765,7 @@ NULL
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null")
   }
   
-  if (!ifelse(is.R6(parameterSet), parameterName %in% names(parameterSet), parameterName %in% names(getClass(class(parameterSet))@fieldClasses))) { #names(.self$getRefClass()$fields())
+  if (!ifelse(R6::is.R6(parameterSet), parameterName %in% names(parameterSet), parameterName %in% names(getClass(class(parameterSet))@fieldClasses))) { #names(.self$getRefClass()$fields())
     
     stop(
       C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,

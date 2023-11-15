@@ -309,8 +309,40 @@ StageResultsMeansR6 <- R6Class("StageResultsMeansR6",
                                    overallSampleSizes2 = NULL,
                                    equalVariances = NULL,
                                    normalApproximation = NULL,
-                                   initialize = function(design, dataInput, ..., equalVariances = TRUE, normalApproximation = FALSE) {
-                                     callSuper(.design = design, .dataInput = dataInput, ...)#TODO
+                                   initialize = function(design, dataInput, ...,
+                                                         combInverseNormal = NULL,
+                                                         combFisher = NULL,
+                                                         overallTestStatistics = NULL,
+                                                         overallPValues = NULL,
+                                                         effectSizes = NULL,
+                                                         testStatistics = NULL,
+                                                         overallMeans = NULL,
+                                                         overallMeans1 = NULL,
+                                                         overallMeans2 = NULL,
+                                                         overallStDevs = NULL,
+                                                         overallStDevs1 = NULL,
+                                                         overallStDevs2 = NULL,
+                                                         overallSampleSizes = NULL,
+                                                         overallSampleSizes1 = NULL,
+                                                         overallSampleSizes2 = NULL,
+                                                         equalVariances = TRUE, normalApproximation = FALSE) {
+                                     super$initialize(.design = design, .dataInput = dataInput, ...)#TODO
+                                     
+                                     self$combInverseNormal <- combInverseNormal
+                                     self$combFisher <- combFisher
+                                     self$overallTestStatistics <- overallTestStatistics
+                                     self$overallPValues <- overallPValues
+                                     self$effectSizes <- effectSizes
+                                     self$testStatistics <- testStatistics
+                                     self$overallMeans <- overallMeans
+                                     self$overallMeans1 <- overallMeans1
+                                     self$overallMeans2 <- overallMeans2
+                                     self$overallStDevs <- overallStDevs
+                                     self$overallStDevs1 <- overallStDevs1
+                                     self$overallStDevs2 <- overallStDevs2
+                                     self$overallSampleSizes <- overallSampleSizes
+                                     self$overallSampleSizes1 <- overallSampleSizes1
+                                     self$overallSampleSizes2 <- overallSampleSizes2
                                      
                                      self$equalVariances <- equalVariances
                                      self$normalApproximation <- normalApproximation
@@ -461,10 +493,30 @@ StageResultsMultiArmMeansR6 <- R6Class("StageResultsMultiArmMeansR6",
                                            varianceOption = NULL,
                                            normalApproximation = NULL,
                                            directionUpper = NULL,
-                                           initialize = function(design, dataInput, ..., varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
+                                           initialize = function(design, dataInput, ...,
+                                                                 combInverseNormal = NULL,
+                                                                 combFisher = NULL,
+                                                                 overallTestStatistics = NULL,
+                                                                 overallStDevs = NULL,
+                                                                 overallPooledStDevs = NULL,
+                                                                 overallPValues = NULL,
+                                                                 testStatistics = NULL,
+                                                                 separatePValues = NULL,
+                                                                 effectSizes = NULL,
+                                                                 singleStepAdjustedPValues = NULL,
+                                                                 intersectionTest = NULL,varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
                                                                  normalApproximation = FALSE, directionUpper = NULL) {
                                              super$initialize(...)
-                                             
+                                             self$combInverseNormal <- combInverseNormal
+                                             self$combFisher <- combFisher
+                                             self$overallTestStatistics <- overallTestStatistics
+                                             self$overallStDevs <- overallStDevs
+                                             self$overallPooledStDevs <- overallPooledStDevs
+                                             self$overallPValues <- overallPValues
+                                             self$testStatistics <- testStatistics
+                                             self$separatePValues <- separatePValues
+                                             self$effectSizes <- effectSizes
+                                             self$singleStepAdjustedPValues <- singleStepAdjustedPValues
                                              self$varianceOption <- varianceOption 
                                              self$normalApproximation <- normalApproximation
                                              self$directionUpper <- directionUpper
@@ -590,8 +642,38 @@ StageResultsRatesR6 <- R6Class("StageResultsRatesR6",
                                    overallSampleSizes1 = NULL,
                                    overallSampleSizes2 = NULL,
                                    normalApproximation = NULL,
-                                   initialize = function(design, dataInput, ..., normalApproximation = TRUE) {
-                                     callSuper(.design = design, .dataInput = dataInput, ...)#TODO
+                                   initialize = function(design, dataInput, ...,
+                                                         combInverseNormal = NULL,
+                                                         combFisher = NULL,
+                                                         overallTestStatistics = NULL,
+                                                         overallPValues = NULL,
+                                                         effectSizes = NULL,
+                                                         testStatistics = NULL,
+                                                         overallPi1 = NULL,
+                                                         overallPi2 = NULL,
+                                                         overallEvents = NULL,
+                                                         overallEvents1 = NULL,
+                                                         overallEvents2 = NULL,
+                                                         overallSampleSizes = NULL,
+                                                         overallSampleSizes1 = NULL,
+                                                         overallSampleSizes2 = NULL,
+                                                         normalApproximation = TRUE) {
+                                     super$initialize(.design = design, .dataInput = dataInput, ...)#TODO
+                                     
+                                     self$combInverseNormal <- combInverseNormal
+                                     self$combFisher <- combFisher
+                                     self$overallTestStatistics <- overallTestStatistics
+                                     self$overallPValues <- overallPValues
+                                     self$effectSizes <- effectSizes
+                                     self$testStatistics <- testStatistics
+                                     self$overallPi1 <- overallPi1
+                                     self$overallPi2 <- overallPi2
+                                     self$overallEvents <- overallEvents
+                                     self$overallEvents1 <- overallEvents1
+                                     self$overallEvents2 <- overallEvents2
+                                     self$overallSampleSizes <- overallSampleSizes
+                                     self$overallSampleSizes1 <- overallSampleSizes1
+                                     self$overallSampleSizes2 <- overallSampleSizes2
                                      
                                      self$normalApproximation <- normalApproximation 
                                      
@@ -733,10 +815,34 @@ StageResultsMultiArmRatesR6 <- R6Class("StageResultsMultiArmRatesR6",
                                            normalApproximation = NULL,
                                            directionUpper = NULL,
                                            initialize = function(design, dataInput, ...,
-                                                                 normalApproximation = FALSE) {
-                                             callSuper(.design = design, .dataInput = dataInput, ...)#TODO
+                                                                 overallPiTreatments = NULL,
+                                                                 overallPiControl = NULL,
+                                                                 combInverseNormal = NULL,
+                                                                 combFisher = NULL,
+                                                                 overallTestStatistics = NULL,
+                                                                 overallPValues = NULL,
+                                                                 testStatistics = NULL,
+                                                                 separatePValues = NULL,
+                                                                 effectSizes = NULL,
+                                                                 singleStepAdjustedPValues = NULL,
+                                                                 intersectionTest = NULL,
+                                                                 normalApproximation = FALSE,
+                                                                 directionUpper = NULL) {
+                                             super$initialize(.design = design, .dataInput = dataInput, ...)#TODO
                                              
+                                             self$overallPiTreatments <- overallPiTreatments 
+                                             self$overallPiControl <- overallPiControl 
+                                             self$combInverseNormal <- combInverseNormal 
+                                             self$combFisher <- combFisher 
+                                             self$overallTestStatistics <- overallTestStatistics 
+                                             self$overallPValues <- overallPValues 
+                                             self$testStatistics <- testStatistics 
+                                             self$separatePValues <- separatePValues 
+                                             self$effectSizes <- effectSizes 
+                                             self$singleStepAdjustedPValues <- singleStepAdjustedPValues 
+                                             self$intersectionTest <- intersectionTest
                                              self$normalApproximation <- normalApproximation
+                                             self$directionUpper <- directionUpper 
                                              
                                              self$init(design = design, dataInput = dataInput)
                                              
@@ -851,8 +957,29 @@ StageResultsSurvivalR6 <- R6Class("StageResultsSurvivalR6",
                                       events = NULL,
                                       allocationRatios = NULL,
                                       testStatistics = NULL,
-                                      initialize = function(design, dataInput, ...) {
-                                        callSuper(.design = design, .dataInput = dataInput, ...)#TODO
+                                      initialize = function(design, dataInput, ...,
+                                                            combInverseNormal = NULL,
+                                                            combFisher = NULL,
+                                                            overallPValues = NULL,
+                                                            effectSizes = NULL,
+                                                            overallTestStatistics = NULL,
+                                                            overallEvents = NULL,
+                                                            overallAllocationRatios = NULL,
+                                                            events = NULL,
+                                                            allocationRatios = NULL,
+                                                            testStatistics = NULL) {
+                                        super$initialize(.design = design, .dataInput = dataInput, ...)#TODO
+                                        
+                                        self$combInverseNormal <- combInverseNormal
+                                        self$combFisher <- combFisher
+                                        self$overallPValues <- overallPValues
+                                        self$effectSizes <- effectSizes
+                                        self$overallTestStatistics <- overallTestStatistics
+                                        self$overallEvents <- overallEvents
+                                        self$overallAllocationRatios <- overallAllocationRatios
+                                        self$events <- events
+                                        self$allocationRatios <- allocationRatios
+                                        self$testStatistics <- testStatistics
                                         
                                         self$init(design = design, dataInput = dataInput)
                                         
@@ -964,8 +1091,28 @@ StageResultsMultiArmSurvivalR6 <- R6Class("StageResultsMultiArmSurvivalR6",
                                               intersectionTest = NULL,
                                               directionUpper = NULL,
                                               initialize = function(design, dataInput, ...,
-                                                                    normalApproximation = FALSE) {
-                                                callSuper(.design = design, .dataInput = dataInput, ...) #TODO
+                                                                    combInverseNormal = NULL,
+                                                                    combFisher = NULL,
+                                                                    overallTestStatistics = NULL,
+                                                                    overallPValues = NULL,
+                                                                    testStatistics = NULL,
+                                                                    separatePValues = NULL,
+                                                                    effectSizes = NULL,
+                                                                    singleStepAdjustedPValues = NULL,
+                                                                    intersectionTest = NULL,
+                                                                    directionUpper = NULL) {
+                                                super$initialize(.design = design, .dataInput = dataInput, ...) #TODO
+                                                
+                                                self$combInverseNormal <- combInverseNormal
+                                                self$combFisher <- combFisher
+                                                self$overallTestStatistics <- overallTestStatistics
+                                                self$overallPValues <- overallPValues
+                                                self$testStatistics <- testStatistics
+                                                self$separatePValues <- separatePValues
+                                                self$effectSizes <- effectSizes
+                                                self$singleStepAdjustedPValues <- singleStepAdjustedPValues
+                                                self$intersectionTest <- intersectionTest
+                                                self$directionUpper <- directionUpper
                                                 
                                                 self$init(design = design, dataInput = dataInput)
                                                 

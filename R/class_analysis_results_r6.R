@@ -302,7 +302,7 @@ ConditionalPowerResultsRatesR6 <- R6Class("ConditionalPowerResultsRatesR6",
                                                 self$pi1 <- pi1
                                                 self$pi2 <- pi2
                                                 
-                                                super$initalize(...)
+                                                super$initialize(...)
                                                 
                                                 if ((is.null(self$conditionalPower) || length(self$conditionalPower) == 0) &&
                                                     !is.null(self$.design) && !is.null(self$.design$kMax) && length(self$.design$kMax) > 0) {
@@ -1330,7 +1330,7 @@ AnalysisResultsGroupSequentialR6 <- R6Class("AnalysisResultsGroupSequentialR6",
                                                   self$maxInformation <- maxInformation
                                                   self$informationEpsilon <- informationEpsilon
                                                   
-                                                  super$initalize(design = design, dataInput = dataInput, ...)
+                                                  super$initialize(design = design, dataInput = dataInput, ...)
                                                   
                                                   self$.setParameterType("maxInformation", C_PARAM_NOT_APPLICABLE)
                                                   self$.setParameterType("informationEpsilon", C_PARAM_NOT_APPLICABLE)

@@ -1054,6 +1054,7 @@ getMedianByPi <- function(piValue,
 }
 
 .addDelayedInformationRates <- function(dataFrame) {
+    #print(dataFrame)
     if (all(c("informationRates", "delayedInformation", "kMax", "stages") %in% colnames(dataFrame))) {
         kMax <- max(dataFrame$kMax)
         if (kMax > 1) {

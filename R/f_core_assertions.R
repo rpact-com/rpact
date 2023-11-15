@@ -1,4 +1,4 @@
-library(R6)
+library("R6")
 
 ## |
 ## |  *Core assertions*
@@ -39,7 +39,7 @@ NULL
 }
 
 .isParameterSet <- function(x) {
-    return((isS4(x) || is.R6(x)) && (inherits(x, "ParameterSet") || inherits(x, "ParameterSetR6")))
+    return((isS4(x) || R6::is.R6(x)) && (inherits(x, "ParameterSet") || inherits(x, "ParameterSetR6")))
 }
 
 .assertIsParameterSetClass <- function(x, objectName = "x") {
