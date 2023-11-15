@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7403 $
+## |  Last changed: $Date: 2023-11-08 16:12:00 +0100 (Mi, 08 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -966,8 +966,7 @@ StageResultsMultiArmSurvival <- setRefClass("StageResultsMultiArmSurvival",
         directionUpper = "logical"
     ),
     methods = list(
-        initialize = function(design, dataInput, ...,
-                normalApproximation = FALSE) {
+        initialize = function(design, dataInput, ...) {
             callSuper(.design = design, .dataInput = dataInput, ...)
             init(design = design, dataInput = dataInput)
 

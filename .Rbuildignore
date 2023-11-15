@@ -39,3 +39,6 @@ lastMiKTeXException
 ^_pkgdown\.yml$
 ^pkgdown$
 ^rpact-tests$
+^tests-complete$
+testthat-problems\.rds
+^\.covrignore$

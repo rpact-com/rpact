@@ -12,7 +12,7 @@ Note that the specified C++11 is essential for this package to work.
 
 ## Unit tests: testthat results (complete test)
 
-OK:       28917
+OK:       33511
 Failed:   0
 Warnings: 0
 Skipped:  0

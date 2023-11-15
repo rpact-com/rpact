@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7206 $
-## |  Last changed: $Date: 2023-07-25 14:55:05 +0200 (Tue, 25 Jul 2023) $
+## |  File version: $Revision: 7379 $
+## |  Last changed: $Date: 2023-10-30 16:19:12 +0100 (Mo, 30 Okt 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -307,7 +307,7 @@ NULL
             }
             return(innerProduct * dnorm(x))
         }
-        conditionalErrorRate[i, 1] <- 1 - integrate(integrand, lower = -Inf, upper = Inf)$value
+        conditionalErrorRate[i, 1] <- 1 - stats::integrate(integrand, lower = -Inf, upper = Inf)$value
 
         if (!all(is.na(separatePValues[indices[i, ] == 1, 2]))) {
             if (secondStageConditioning) {
@@ -327,7 +327,7 @@ NULL
                     }
                     return(innerProduct * dnorm(x))
                 }
-                secondStagePValues[i, 2] <- 1 - integrate(integrand, lower = -Inf, upper = Inf)$value
+                secondStagePValues[i, 2] <- 1 - stats::integrate(integrand, lower = -Inf, upper = Inf)$value
             } else {
                 maxTestStatistic <- max(signedTestStatistics[indices[i, ] == 1, 2], na.rm = TRUE)
                 integrand <- function(x) {
@@ -340,7 +340,7 @@ NULL
                     }
                     return(innerProduct * dnorm(x))
                 }
-                secondStagePValues[i, 2] <- 1 - integrate(integrand, lower = -Inf, upper = Inf)$value
+                secondStagePValues[i, 2] <- 1 - stats::integrate(integrand, lower = -Inf, upper = Inf)$value
             }
         }
 

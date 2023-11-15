@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7186 $
-## |  Last changed: $Date: 2023-07-18 16:28:26 +0200 (Di, 18 Jul 2023) $
+## |  File version: $Revision: 7383 $
+## |  Last changed: $Date: 2023-11-02 15:18:21 +0100 (Do, 02 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -63,7 +63,7 @@ NULL
                     sqrt(pim * (1 - pim) * (1 + allocationRatioPlanned[stage])) +
                     .getQNorm(conditionalPower) * sqrt(piAssumedH1 * (1 - piAssumedH1) +
                         piAssumedControlH1 * (1 - piAssumedControlH1) * allocationRatioPlanned[stage])))^2 /
-                    (max(1e-7, (2 * directionUpper - 1) * (piAssumedH1 - piAssumedControlH1)))^2
+                    (max(1e-07, (2 * directionUpper - 1) * (piAssumedH1 - piAssumedControlH1)))^2
                 newSubjects <- min(
                     max(minNumberOfSubjectsPerStage[stage + 1], newSubjects),
                     maxNumberOfSubjectsPerStage[stage + 1]
@@ -177,7 +177,7 @@ NULL
             } else {
                 if (.isTrialDesignFisher(design)) {
                     conditionalCriticalValue[k] <- .getOneMinusQNorm(min((design$criticalValues[k + 1] /
-                        prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-7))
+                        prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-07))
                 } else {
                     if (design$criticalValues[k + 1] >= 6) {
                         conditionalCriticalValue[k] <- Inf

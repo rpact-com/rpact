@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7268 $
-## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
+## |  File version: $Revision: 7359 $
+## |  Last changed: $Date: 2023-10-13 11:39:39 +0200 (Fri, 13 Oct 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1568,6 +1568,9 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 #'
 #' @param object A \code{\link{ParameterSet}} object.
 #' @inheritParams param_digits
+#' @param output The output parts, default is \code{"all"}.
+#' @param printObject Show also the print output after the summary, default is \code{FALSE}.
+#' @param sep The separator line between the summary and the optional print output.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -1585,9 +1588,14 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 summary.ParameterSet <- function(object, ..., 
         type = 1, 
         digits = NA_integer_, 
-        output = c("all", "title", "overview", "body")) {
+        output = c("all", "title", "overview", "body"),
+        printObject = FALSE,
+        sep = "\n-----\n\n") {
         
-    .warnInCaseOfUnknownArguments(functionName = "summary", ...)
+    .warnInCaseOfUnknownArguments(functionName = "summary", ignore = c("printObject"), ...)
+    
+    base::attr(object, "printObject") <- printObject
+    base::attr(object, "printObjectSeparator") <- sep
 
     if (type == 1 && inherits(object, "SummaryFactory")) {
         return(object)
@@ -1648,14 +1656,19 @@ summary.ParameterSet <- function(object, ...,
 #'
 #' @keywords internal
 #'
-print.ParameterSet <- function(x, ..., markdown = FALSE) {
+print.ParameterSet <- function(x, ..., markdown = NA) {
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
     if (markdown) {
         x$.catMarkdownText()
-        return(invisible(x))
+        cat("\n\n")
+    } else {
+        x$show()
     }
-
-    x$show()
-    invisible(x)
+    
+    return(invisible(x))
 }
 
 #'
@@ -1695,25 +1708,6 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
     )
 }
 
-.getKnitPrintVersion <- function(x, ...) {
-    fCall <- match.call(expand.dots = FALSE)
-
-    .assertPackageIsInstalled("knitr")
-
-    args <- list(x = x, markdown = TRUE)
-    if (.isSimulationResults(x)) {
-        showStatistics <- .getOptionalArgument("showStatistics", optionalArgumentDefaultValue = FALSE, ...)
-        if (isTRUE(showStatistics)) {
-            args$showStatistics <- TRUE
-        }
-    }
-    if (inherits(x, "SummaryFactory") || .isSummaryPipe(fCall)) {
-        args$showSummary <- TRUE
-    }
-
-    return(do.call(what = print, args = args))
-}
-
 #'
 #' @title
 #' Print Parameter Set in Markdown Code Chunks
@@ -1737,7 +1731,7 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
 #' @export
 #'
 knit_print.ParameterSet <- function(x, ...) {
-    result <- paste0(utils::capture.output(.getKnitPrintVersion(x = x, ...)), collapse = "\n")
+    result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
     return(knitr::asis_output(result))
 }
 
@@ -1771,8 +1765,10 @@ kable.ParameterSet <- function(x, ...) {
             }
             if (grepl("^ *print\\(", objName)) {
                 stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") does not work correctly. ",
-                    "Use ", sub("print", "kable", objName), " without 'print' instead or ", sub("\\)", ", markdown = TRUE)", objName)
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") ",
+                    "does not work correctly. ",
+                    "Use ", sub("print", "kable", objName), " without 'print' ",
+                    "instead or ", sub("\\)", ", markdown = TRUE)", objName)
                 )
             }
         }

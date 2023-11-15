@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7383 $
+## |  Last changed: $Date: 2023-11-02 15:18:21 +0100 (Do, 02 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -61,7 +61,7 @@ NULL
                     sqrt(pim * (1 - pim) * (1 + allocationRatioPlanned[stage])) +
                     .getQNorm(conditionalPower) * sqrt(pi1H1 * (1 - pi1H1) +
                         pi2H1 * (1 - pi2H1) * allocationRatioPlanned[stage]), na.rm = TRUE))^2 /
-                    (max(1e-7, (2 * directionUpper - 1) * (pi1H1 - pi2H1), na.rm = TRUE))^2
+                    (max(1e-07, (2 * directionUpper - 1) * (pi1H1 - pi2H1), na.rm = TRUE))^2
 
                 newSubjects <- min(
                     max(minNumberOfSubjectsPerStage[stage + 1], newSubjects),
@@ -621,7 +621,7 @@ NULL
             # conditional critical value to reject the null hypotheses at the next stage of the trial
             if (.isTrialDesignFisher(design)) {
                 conditionalCriticalValue[k] <- .getOneMinusQNorm(min((design$criticalValues[k + 1] /
-                    prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-7))
+                    prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-07))
             } else {
                 if (design$criticalValues[k + 1] >= 6) {
                     conditionalCriticalValue[k] <- Inf

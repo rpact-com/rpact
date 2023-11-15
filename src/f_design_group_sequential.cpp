@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6890 $
- * Last changed: $Date: 2023-03-24 09:23:55 +0100 (Fri, 24 Mar 2023) $
+ * File version: $Revision: 7408 $
+ * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -236,7 +236,7 @@ NumericVector getGroupSequentialProbabilitiesFast(
 	return probs;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getGroupSequentialProbabilitiesCpp")]]
 NumericMatrix getGroupSequentialProbabilitiesCpp(
 		NumericMatrix decisionMatrix,
 		NumericVector informationRates) {
@@ -358,7 +358,7 @@ NumericMatrix getGroupSequentialProbabilitiesCpp(
 	}
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getDesignGroupSequentialPampallonaTsiatisCpp")]]
 List getDesignGroupSequentialPampallonaTsiatisCpp(
         double tolerance, double beta, double alpha, double kMax, double deltaPT0,
         double deltaPT1, NumericVector informationRates, int sided,
@@ -657,7 +657,7 @@ NumericVector getDesignGroupSequentialAlphaSpending(
     return criticalValues;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedAlphaSpendingCpp")]]
 NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(
 		int kMax,
 		NumericVector userAlphaSpending,
@@ -679,7 +679,7 @@ NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(
 		tolerance);
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getDesignGroupSequentialAlphaSpendingCpp")]]
 NumericVector getDesignGroupSequentialAlphaSpendingCpp(
 		int kMax,
 		double alpha,
@@ -703,7 +703,7 @@ NumericVector getDesignGroupSequentialAlphaSpendingCpp(
 		tolerance);
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getDesignGroupSequentialDeltaWTCpp")]]
 NumericVector getDesignGroupSequentialDeltaWTCpp(
 		int kMax,
 		double alpha,
@@ -734,7 +734,7 @@ NumericVector getDesignGroupSequentialDeltaWTCpp(
     return criticalValues;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getDesignGroupSequentialPocockCpp")]]
 NumericVector getDesignGroupSequentialPocockCpp(
 		int kMax,
 		double alpha,
@@ -754,7 +754,7 @@ NumericVector getDesignGroupSequentialPocockCpp(
 		0.5);
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getDesignGroupSequentialOBrienAndFlemingCpp")]]
 NumericVector getDesignGroupSequentialOBrienAndFlemingCpp(
 		int kMax,
 		double alpha,
@@ -1247,7 +1247,7 @@ List getDesignGroupSequentialBetaSpendingTwoSidedCpp(
 	);
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getDesignGroupSequentialBetaSpendingCpp")]]
 List getDesignGroupSequentialBetaSpendingCpp(
 		NumericVector criticalValues,
 		int kMax,
@@ -1303,7 +1303,7 @@ List getDesignGroupSequentialBetaSpendingCpp(
 	);
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedBetaSpendingCpp")]]
 List getDesignGroupSequentialUserDefinedBetaSpendingCpp(
 		NumericVector criticalValues,
 		int kMax,

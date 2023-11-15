@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7309 $
-## |  Last changed: $Date: 2023-09-15 11:14:05 +0200 (Fr, 15 Sep 2023) $
+## |  File version: $Revision: 7359 $
+## |  Last changed: $Date: 2023-10-13 11:39:39 +0200 (Fri, 13 Oct 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -31,8 +31,15 @@
 }
 
 #'
-#' Algorithm AS 251.1  appl.statist. (1989), vol.38, no.3
+#' @title
+#' Original Algorithm AS 251: Normal Distribution
 #'
+#' @description
+#' Calculates the Multivariate Normal Distribution with Product Correlation Structure published
+#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 <https://doi.org/10.2307/2347754>.
+#'
+#' @details
+#' This is a wrapper function for the original Fortran 77 code.
 #' For a multivariate normal vector with correlation structure
 #' defined by RHO(I,J) = BPD(I) * BPD(J), computes the probability
 #' that the vector falls in a rectangle in n-space with error
@@ -70,18 +77,26 @@ mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
 }
 
 #'
-#' Algorithm AS 251.1  appl.statist. (1989), vol.38, no.3
+#' @title
+#' Algorithm AS 251: Normal Distribution
 #'
+#' @description
+#' Calculates the Multivariate Normal Distribution with Product Correlation Structure published
+#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 <https://doi.org/10.2307/2347754>.
+#'
+#' @details
 #' For a multivariate normal vector with correlation structure
 #' defined by rho(i,j) = bpd(i) * bpd(j), computes the probability
 #' that the vector falls in a rectangle in n-space with error
 #' less than eps.
 #'
+#' This function calculates the `bdp` value from `sigma`, determines the right `inf` value and calls \code{\link{mvnprd}}.
+#'
 #' @param lower Lower limits of integration. Array of N dimensions
 #' @param upper Upper limits of integration. Array of N dimensions
 #' @param sigma Values defining correlation structure. Array of N dimensions
 #' @inheritParams param_three_dots
-#' @param eps desired accuracy.  Defaults to 1e-06
+#' @param eps desired accuracy. Defaults to 1e-06
 #' @param errorControl error control. If set to 1, strict error control based on
 #'        fourth derivative is used. If set to zero, error control based on halving intervals is used
 #' @param intervalSimpsonsRule Interval width for Simpson's rule. Value of zero caused a default .24 to be used
@@ -93,7 +108,6 @@ as251Normal <- function(
         eps = 1e-06,
         errorControl = c("strict", "halvingIntervals"),
         intervalSimpsonsRule = 0) {
-        
     errorControl <- match.arg(errorControl)
     if (errorControl == "strict") {
         errorControl <- 1
@@ -111,16 +125,28 @@ as251Normal <- function(
     inf[is.infinite(lower) & lower < 0] <- 1
 
     result <- mvnprd(
-        A = upper, B = lower, BPD = bpd, EPS = eps, INF = inf,
-        IERC = errorControl, HINC = intervalSimpsonsRule
+        A = upper,
+        B = lower,
+        BPD = bpd,
+        EPS = eps,
+        INF = inf,
+        IERC = errorControl,
+        HINC = intervalSimpsonsRule
     )
     iFault <- attr(result, "iFault")
     return(result)
 }
 
 #'
-#' Algorithm AS 251.1  appl.statist. (1989), vol.38, no.3
+#' @title
+#' Original Algorithm AS 251: Student T Distribution
 #'
+#' @description
+#' Calculates the Multivariate Normal Distribution with Product Correlation Structure published
+#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 <https://doi.org/10.2307/2347754>.
+#'
+#' @details
+#' This is a wrapper function for the original Fortran 77 code.
 #' For a multivariate normal vector with correlation structure
 #' defined by RHO(I,J) = BPD(I) * BPD(J), computes the probability
 #' that the vector falls in a rectangle in n-space with error
@@ -144,13 +170,13 @@ as251Normal <- function(
 #'
 #' @examples
 #' N <- 3
-#' rho <- 0.5
+#' RHO <- 0.5
 #' B <- rep(-5.0, length = N)
 #' A <- rep(5.0, length = N)
 #' INF <- rep(2, length = N)
-#' BPD <- rep(sqrt(rho), length = N)
+#' BPD <- rep(sqrt(RHO), length = N)
 #' D <- rep(0.0, length = N)
-#' result <- mvstud(NDF = 0, A = A, B = B, BPD = BPD, D = D, INF = INF)
+#' result <- mvstud(NDF = 0, A = A, B = B, BPD = BPD, INF = INF, D = D)
 #' result
 #'
 #' @export
@@ -171,19 +197,27 @@ mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0)
 }
 
 #'
-#' Algorithm AS 251.1  appl.statist. (1989), vol.38, no.3
+#' @title
+#' Algorithm AS 251: Student T Distribution
 #'
+#' @description
+#' Calculates the Multivariate Normal Distribution with Product Correlation Structure published
+#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 <https://doi.org/10.2307/2347754>.
+#'
+#' @details
 #' For a multivariate normal vector with correlation structure
 #' defined by rho(i,j) = bpd(i) * bpd(j), computes the probability
 #' that the vector falls in a rectangle in n-space with error
 #' less than eps.
+#'
+#' This function calculates the `bdp` value from `sigma`, determines the right `inf` value and calls \code{\link{mvstud}}.
 #'
 #' @param lower Lower limits of integration. Array of N dimensions
 #' @param upper Upper limits of integration. Array of N dimensions
 #' @param sigma Values defining correlation structure. Array of N dimensions
 #' @inheritParams param_three_dots
 #' @param df Degrees of Freedom. Use 0 for infinite D.F.
-#' @param eps desired accuracy.  Defaults to 1e-06
+#' @param eps desired accuracy. Defaults to 1e-06
 #' @param errorControl error control. If set to 1, strict error control based on
 #'        fourth derivative is used. If set to zero, error control based on halving intervals is used
 #' @param intervalSimpsonsRule Interval width for Simpson's rule. Value of zero caused a default .24 to be used
@@ -196,7 +230,6 @@ as251StudentT <- function(
         eps = 1e-06,
         errorControl = c("strict", "halvingIntervals"),
         intervalSimpsonsRule = 0) {
-        
     errorControl <- match.arg(errorControl)
     if (errorControl == "strict") {
         errorControl <- 1
@@ -216,8 +249,15 @@ as251StudentT <- function(
     d <- rep(0.0, n)
 
     result <- mvstud(
-        NDF = df, A = upper, B = lower, BPD = bpd, D = d, EPS = eps, INF = inf,
-        IERC = errorControl, HINC = intervalSimpsonsRule
+        NDF = df,
+        A = upper,
+        B = lower,
+        BPD = bpd,
+        D = d,
+        EPS = eps,
+        INF = inf,
+        IERC = errorControl,
+        HINC = intervalSimpsonsRule
     )
     iFault <- attr(result, "iFault")
     return(result)

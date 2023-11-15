@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7148 $
-## |  Last changed: $Date: 2023-07-03 15:50:22 +0200 (Mo, 03 Jul 2023) $
+## |  File version: $Revision: 7408 $
+## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -75,8 +75,15 @@ SummaryItem <- setRefClass("SummaryItem",
 plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
     fCall <- match.call(expand.dots = FALSE)
     if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
-        markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = FALSE)
+        markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+        if (is.na(markdown)) {
+            markdown <- .isMarkdownEnabled()
+        }
         if (markdown) {
+            if (.isQuartoEnabled()) {
+                #cat("#| results: 'asis'\n\n")
+            }
+      
             x$.catMarkdownText()
         } else {
             x$show()
@@ -87,12 +94,48 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
 
 #'
 #' @title
+#' Print Summary Factory in Markdown Code Chunks
+#'
+#' @description
+#' The function `knit_print.SummaryFactory` is the default printing function for rpact summary objects in knitr.
+#' The chunk option `render` uses this function by default.
+#' To fall back to the normal printing behavior set the chunk option `render = normal_print`.
+#' For more information see \code{\link[knitr]{knit_print}}.
+#'
+#' @param x A \code{SummaryFactory}.
+#' @param  ... Other arguments (see \code{\link[knitr]{knit_print}}).
+#'
+#' @details
+#' Generic function to print a summary object in Markdown.
+#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
+#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
+#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
+#' that all headings will be written bold but are not explicit defined as header.
+#'
+#' @export
+#'
+knit_print.SummaryFactory <- function(x, ...) {
+    result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+    
+    if (isTRUE(base::attr(x$object, "printObject"))) {
+        sep <- base::attr(x$object, "printObjectSeparator")
+        if (is.null(sep) || !is.character(sep)) {
+            sep <- "\n-----\n\n"
+        }
+        result <- paste0(result, sep, 
+            paste0(utils::capture.output(x$object$.catMarkdownText()), collapse = "\n"))
+    }
+    
+    return(knitr::asis_output(result))
+}
+
+#'
+#' @title
 #' Summary Factory Printing
 #'
 #' @param x The summary factory object.
 #' @param markdown If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
 #'        normal representation will be used otherwise (default is \code{FALSE})
-#' @param showSummary Show the summary before creating the print output, default is \code{FALSE}.
 #' @param sep The separator line between the summary and the print output.
 #' @inheritParams param_three_dots_plot
 #'
@@ -104,19 +147,21 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
 #'
 #' @export
 #'
-print.SummaryFactory <- function(x, ..., markdown = FALSE, showSummary = FALSE, sep = "\n-----\n\n") {
-    fCall <- match.call(expand.dots = FALSE)
-    if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
-        .assertIsSingleCharacter(sep, "sep")
-
-        if (markdown) {
-            x$.catMarkdownText()
-        } else {
-            x$show()
-        }
-        cat(sep)
+print.SummaryFactory <- function(x, ..., 
+        markdown = NA, 
+        sep = "\n-----\n\n") {
+    
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
     }
-    print(x$object, markdown = markdown)
+       
+    if (markdown) {
+        result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+        cat(result, "\n")
+        return(invisible())
+    }
+    
+    x$show()
 }
 
 #' @name SummaryFactory

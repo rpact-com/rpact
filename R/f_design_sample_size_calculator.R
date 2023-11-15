@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7268 $
-## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
+## |  File version: $Revision: 7379 $
+## |  Last changed: $Date: 2023-10-30 16:19:12 +0100 (Mo, 30 Okt 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -3183,12 +3183,12 @@ getNumberOfSubjects <- function(time, ...,
                     timeValue1 <- time - accrualTimeVector[1]
                 }
 
-                eventProbs[groupNumber] <- densityVector[1] * integrate(inner, timeValue1, time)$value
+                eventProbs[groupNumber] <- densityVector[1] * stats::integrate(inner, timeValue1, time)$value
 
                 if (k > 2) {
                     for (j in 2:(k - 1)) {
                         eventProbs[groupNumber] <- eventProbs[groupNumber] +
-                            densityVector[j] * integrate(
+                            densityVector[j] * stats::integrate(
                                 inner, time - accrualTimeVector[j],
                                 time - accrualTimeVector[j - 1]
                             )$value
@@ -3196,7 +3196,7 @@ getNumberOfSubjects <- function(time, ...,
                 }
                 if (k > 1) {
                     eventProbs[groupNumber] <- eventProbs[groupNumber] +
-                        densityVector[k] * integrate(inner, 0, time - accrualTimeVector[k - 1])$value
+                        densityVector[k] * stats::integrate(inner, 0, time - accrualTimeVector[k - 1])$value
                 }
             }
 
@@ -3221,11 +3221,11 @@ getNumberOfSubjects <- function(time, ...,
         }
 
         eventProbs[groupNumber] <- densityVector[1] *
-            integrate(inner, time - accrualTimeVector[1], time)$value
+            stats::integrate(inner, time - accrualTimeVector[1], time)$value
         if (accrualTimeVectorLength > 1) {
             for (j in (2:accrualTimeVectorLength)) {
                 eventProbs[groupNumber] <- eventProbs[groupNumber] +
-                    densityVector[j] * integrate(
+                    densityVector[j] * stats::integrate(
                         inner, time - accrualTimeVector[j],
                         time - accrualTimeVector[j - 1]
                     )$value

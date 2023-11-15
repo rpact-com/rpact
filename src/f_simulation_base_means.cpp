@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7019 $
- * Last changed: $Date: 2023-05-31 07:23:47 +0200 (Mi, 31 Mai 2023) $
+ * File version: $Revision: 7408 $
+ * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -378,7 +378,7 @@ Rcpp::XPtr<calcSubjectsFunctionMeansPtr> getSimulationMeansStageSubjectsXPtr() {
   return Rcpp::XPtr<calcSubjectsFunctionMeansPtr>(new calcSubjectsFunctionMeansPtr(&getSimulationMeansStageSubjects));
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getSimulationMeansLoopCpp")]]
 List getSimulationMeansLoopCpp(
 		NumericVector alternative,
 		int kMax,
