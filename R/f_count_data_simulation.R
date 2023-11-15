@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7436 $
-## |  Last changed: $Date: 2023-11-13 17:08:37 +0100 (Mo, 13 Nov 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7440 $
+## |  Last changed: $Date: 2023-11-15 07:06:06 +0100 (Mi, 15 Nov 2023) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #'
@@ -30,7 +30,7 @@ getSimulationCounts <- function(design = NULL, ...,
         lambda2 = NA_real_,
         lambda = NA_real_,
         theta = NA_real_,
-		directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT		
+        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
         thetaH0 = 1,
         overDispersion = 0,
         fixedExposureTime = NA_real_,
@@ -96,9 +96,12 @@ getSimulationCounts <- function(design = NULL, ...,
         sampleSizeEnabled, fixedExposureTime, followUpTime,
         accrualTime, accrualIntensity, plannedMaxSubjects
     )
+    .assertAreValidCalendarTimes(plannedCalendarTime, kMax)
+
     if ((length(accrualTime) > 1) && (accrualTime[1] == 0)) {
         accrualTime <- accrualTime[-1]
     }
+
     if (kMax == 1) {
         futilityPerStage <- NULL
         rejectPerStage <- NULL
@@ -160,18 +163,26 @@ getSimulationCounts <- function(design = NULL, ...,
                 recruit1 <- seq(0, accrualTime, length.out = n1)
                 recruit2 <- seq(0, accrualTime, length.out = n2)
                 if (is.na(fixedExposureTime)) {
-					timeUnderObservation1 <- pmax(accrualTime + followUpTime - recruit1, 0)
-					timeUnderObservation2 <- pmax(accrualTime + followUpTime - recruit2, 0)
+                    timeUnderObservation1 <- pmax(accrualTime + followUpTime - recruit1, 0)
+                    timeUnderObservation2 <- pmax(accrualTime + followUpTime - recruit2, 0)
                 } else {
-					timeUnderObservation1 <- pmax(pmin(accrualTime + followUpTime - recruit1, 
-									fixedExposureTime), 0)
-					timeUnderObservation2 <- pmax(pmin(accrualTime + followUpTime - recruit2, 
-									fixedExposureTime), 0)
+                    timeUnderObservation1 <- pmax(pmin(
+                        accrualTime + followUpTime - recruit1,
+                        fixedExposureTime
+                    ), 0)
+                    timeUnderObservation2 <- pmax(pmin(
+                        accrualTime + followUpTime - recruit2,
+                        fixedExposureTime
+                    ), 0)
                 }
-                counts1 <- rnbinom(n = n1, mu = lambda1[iCase] * timeUnderObservation1, 
-									size = 1 / overDispersion)
-                counts2 <- rnbinom(n = n2, mu = lambda2 * timeUnderObservation2, 
-									size = 1 / overDispersion)
+                counts1 <- rnbinom(
+                    n = n1, mu = lambda1[iCase] * timeUnderObservation1,
+                    size = 1 / overDispersion
+                )
+                counts2 <- rnbinom(
+                    n = n2, mu = lambda2 * timeUnderObservation2,
+                    size = 1 / overDispersion
+                )
                 nb <- .getNegativeBinomialEstimates(
                     counts1 = counts1, counts2 = counts2,
                     t1 = timeUnderObservation1, t2 = timeUnderObservation2
@@ -184,7 +195,7 @@ getSimulationCounts <- function(design = NULL, ...,
                     recruit2 = timeUnderObservation2
                 )
                 z <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(info_interim)
-                if (z > design$criticalValues[1]) {
+                if (!is.na(z) && z > design$criticalValues[1]) {
                     reject[1] <- reject[1] + 1
                 }
             } else {
@@ -208,7 +219,7 @@ getSimulationCounts <- function(design = NULL, ...,
                     } else {
                         timeUnderObservation1 <- pmin(
                             plannedCalendarTime[k] - recruit1,
-							fixedExposureTime
+                            fixedExposureTime
                         )[plannedCalendarTime[k] - recruit1 >= 0]
                         timeUnderObservation2 <- pmin(
                             plannedCalendarTime[k] - recruit2,
@@ -217,7 +228,8 @@ getSimulationCounts <- function(design = NULL, ...,
                     }
                     if (k < kMax) {
                         kthStageWithEvents <- dfStartStop$output[
-                            dfStartStop$output[, "recruitTime"] <= plannedCalendarTime[k] &
+                            dfStartStop$output[, "status"] == 1 &
+                                dfStartStop$output[, "recruitTime"] <= plannedCalendarTime[k] &
                                 dfStartStop$output[, "stopCalendar"] <= plannedCalendarTime[k],
                         ]
                         if (length(kthStageWithEvents) > 0 && nrow(kthStageWithEvents) > 0) {
@@ -243,13 +255,15 @@ getSimulationCounts <- function(design = NULL, ...,
                         recruit2 = timeUnderObservation2
                     )
                     z <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(info_interim)
-                    if (z > design$criticalValues[k]) {
-                        reject[k] <- reject[k] + 1
-                        break
-                    }
-                    if (z < design$futilityBounds[k] && k < kMax) {
-                        futility[k] <- futility[k] + 1
-                        break
+                    if (!is.na(z)) {
+                        if (z > design$criticalValues[k]) {
+                            reject[k] <- reject[k] + 1
+                            break
+                        }
+                        if (z < design$futilityBounds[k] && k < kMax) {
+                            futility[k] <- futility[k] + 1
+                            break
+                        }
                     }
                 }
             }

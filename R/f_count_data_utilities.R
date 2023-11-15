@@ -13,13 +13,12 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7428 $
-## |  Last changed: $Date: 2023-11-13 10:42:22 +0100 (Mo, 13 Nov 2023) $
+## |  File version: $Revision: 7440 $
+## |  Last changed: $Date: 2023-11-15 07:06:06 +0100 (Mi, 15 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-.assertIsValidEffectCountData <- function(
-        sampleSizeEnabled,
+.assertIsValidEffectCountData <- function(sampleSizeEnabled,
         sided,
         lambda1,
         lambda2,
@@ -114,8 +113,7 @@
     }
 }
 
-.assertIsValidParametersCountData <- function(
-        sampleSizeEnabled,
+.assertIsValidParametersCountData <- function(sampleSizeEnabled,
         fixedExposureTime,
         followUpTime,
         accrualTime,
@@ -217,8 +215,34 @@
     }
 }
 
-.generateEventTimes <- function(
-        recruit1, recruit2, accrualTime, followUpTime,
+.assertAreValidCalendarTimes <- function(plannedCalendarTime, kMax) {
+    .assertIsNumericVector(plannedCalendarTime, "plannedCalendarTime", naAllowed = FALSE)
+    .assertValuesAreStrictlyIncreasing(plannedCalendarTime, "plannedCalendarTime")
+    .assertIsInOpenInterval(plannedCalendarTime, "plannedCalendarTime", lower = 0, upper = NULL, naAllowed = FALSE)
+    if (length(plannedCalendarTime) != kMax) {
+        stop(sprintf(
+            paste0(
+                C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+                "length of 'plannedCalendarTime' (%s) must be equal to 'kMax' (%s)"
+            ),
+            length(plannedCalendarTime), kMax
+        ))
+    }
+}
+
+.getInformation <- function(lambda1,
+        lambda2,
+        overDispersion,
+        recruit1,
+        recruit2) {
+    sumLambda1 <- sum(recruit1 * lambda1 /
+        (1 + overDispersion * recruit1 * lambda1))
+    sumLambda2 <- sum(recruit2 * lambda2 /
+        (1 + overDispersion * recruit2 * lambda2))
+    return(1 / (1 / sumLambda1 + 1 / sumLambda2))
+}
+
+.generateEventTimes <- function(recruit1, recruit2, accrualTime, followUpTime,
         lambda1, lambda2, overDispersion, fixedFollowUp = FALSE) {
     n1 <- length(recruit1)
     n2 <- length(recruit2)
@@ -269,17 +293,4 @@
     output[, "stopCalendar"] <- output[, "recruitTime"] + output[, "stopEvent"]
 
     return(list(output = output, nEvents = nEvents))
-}
-
-.getInformation <- function(
-        lambda1,
-        lambda2,
-        overDispersion,
-        recruit1,
-        recruit2) {
-    sumLambda1 <- sum(recruit1 * lambda1 /
-        (1 + overDispersion * recruit1 * lambda1))
-    sumLambda2 <- sum(recruit2 * lambda2 /
-        (1 + overDispersion * recruit2 * lambda2))
-    return(1 / (1 / sumLambda1 + 1 / sumLambda2))
 }
