@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7440 $
-## |  Last changed: $Date: 2023-11-15 07:06:06 +0100 (Mi, 15 Nov 2023) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7441 $
+## |  Last changed: $Date: 2023-11-16 13:19:18 +0100 (Do, 16 Nov 2023) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 .assertIsValidEffectCountData <- function(sampleSizeEnabled,
@@ -185,12 +185,6 @@
                 "'accrualTime' needs to be specified if 'maxNumberOfSubjects' is specified"
             )
         }
-    }
-    if (!is.na(maxNumberOfSubjects) && any(is.na(accrualTime))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' needs to be specified if 'maxNumberOfSubjects' is specified"
-        )
     }
     if (!is.na(maxNumberOfSubjects) && !any(is.na(accrualIntensity))) {
         stop(

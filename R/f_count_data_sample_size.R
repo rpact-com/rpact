@@ -13,13 +13,12 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7428 $
-## |  Last changed: $Date: 2023-11-13 10:42:22 +0100 (Mo, 13 Nov 2023) $
+## |  File version: $Revision: 7444 $
+## |  Last changed: $Date: 2023-11-16 14:40:38 +0100 (Do, 16 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-.getCalendarTime <- function(
-        n1, n2,
+.getCalendarTime <- function(n1, n2,
         information,
         shift,
         accrualTime,
@@ -60,8 +59,7 @@
     )$root
 }
 
-.getMaximumSampleSizeTwoGroups <- function(
-        allocationRatioPlanned,
+.getMaximumSampleSizeTwoGroups <- function(allocationRatioPlanned,
         shift,
         accrualTime,
         followUpTime,
@@ -106,8 +104,7 @@
 #'
 #' @export
 #'
-getSampleSizeCounts <- function(
-        design = NULL, ...,
+getSampleSizeCounts <- function(design = NULL, ...,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
         lambda = NA_real_,
@@ -337,9 +334,10 @@ getSampleSizeCounts <- function(
             )
             n1[iCase] <- sampleSizes$n1
             n2[iCase] <- sampleSizes$n2
-            recruit1 <- seq(0, accrualTime, length.out = n1[iCase])
-            recruit2 <- seq(0, accrualTime, length.out = n2[iCase])
-
+            if (!any(is.na(accrualTime))) {
+                recruit1 <- seq(0, accrualTime, length.out = n1[iCase])
+                recruit2 <- seq(0, accrualTime, length.out = n2[iCase])
+            }
             if (kMax > 1) {
                 for (k in (1:(kMax - 1))) {
                     calendarTime[k, iCase] <- .getCalendarTime(
@@ -419,8 +417,7 @@ getSampleSizeCounts <- function(
 #'
 #' @export
 #'
-getPowerCounts <- function(
-        design = NULL, ...,
+getPowerCounts <- function(design = NULL, ...,
         directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
         maxNumberOfSubjects = NA_real_,
         lambda1 = NA_real_,
@@ -530,8 +527,10 @@ getPowerCounts <- function(
             n2 <- maxNumberOfSubjects / (1 + allocationRatioPlanned)
             n1 <- allocationRatioPlanned * n2
             nTotal <- n1 + n2
-            recruit1 <- seq(0, accrualTime, length.out = n1)
-            recruit2 <- seq(0, accrualTime, length.out = n2)
+            if (!any(is.na(accrualTime))) {
+                recruit1 <- seq(0, accrualTime, length.out = n1)
+                recruit2 <- seq(0, accrualTime, length.out = n2)
+            }
         }
 
         if (!is.na(fixedExposureTime)) {

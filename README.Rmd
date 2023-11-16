@@ -51,7 +51,7 @@ Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
 
 Install the latest CRAN release via
 
-```{r installation, eval=FALSE, include=TRUE, echo=TRUE, results='hide'}
+```{r installation_cran, eval=FALSE, include=TRUE, echo=TRUE, results='hide'}
 install.packages("rpact")
 ```
 
@@ -60,7 +60,7 @@ install.packages("rpact")
 To use a feature from the development version, you can
 install the development version of rpact from GitHub.
 
-```{r installation, eval=FALSE, include=TRUE, echo=TRUE, results='hide'}
+```{r installation_github, eval=FALSE, include=TRUE, echo=TRUE, results='hide'}
 # install.packages("devtools")
 devtools::install_github("rpact-com/rpact", ref = "dev/3.5.0")
 ```
