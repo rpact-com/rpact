@@ -2373,7 +2373,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         }
     }
     
-    summaryFactory <- c()
+    summaryFactory <- NULL
     if(is.R6(object)) {
       summaryFactory <- SummaryFactoryR6$new(object = object, intervalFormat = intervalFormat, output = output)
     } else {
@@ -2907,7 +2907,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
     intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
     .assertIsValidSummaryIntervalFormat(intervalFormat)
     
-    summaryFactory <- c()
+    summaryFactory <- NULL
     if(is.R6(object)) {
       summaryFactory <- SummaryFactoryR6$new(object = object, intervalFormat = intervalFormat, output = output)
     } else {
