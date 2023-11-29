@@ -1621,7 +1621,7 @@ summary.ParameterSetR6 <- function(object, ..., type = 1, digits = NA_integer_, 
   }
   
   if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesignPlan") ||
-                    inherits(object, "SimulationResults") || inherits(object, "AnalysisResults") ||
+                    inherits(object, "SimulationResults") || (inherits(object, "AnalysisResults") || inherits(object, "AnalysisResultsR6")) ||
                     inherits(object, "TrialDesignCharacteristics") ||
                     inherits(object, "PerformanceScore"))) {
     output <- match.arg(output)

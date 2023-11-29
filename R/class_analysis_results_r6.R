@@ -1201,7 +1201,7 @@ AnalysisResultsEnrichmentR6 <- R6Class("AnalysisResultsEnrichmentR6",
 #' @keywords internal
 #'
 summary.AnalysisResultsR6 <- function(object, ..., type = 1, digits = NA_integer_) {
-  return(summary.ParameterSet(object = object, ..., type = type, digits = digits))
+  return(summary.ParameterSetR6(object = object, ..., type = type, digits = digits))
 }
 
 #'
