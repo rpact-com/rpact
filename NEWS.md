@@ -3,7 +3,7 @@
 
 ## New features
 
-* TODO Count Data
+* TODO @Gernot: describe the new count data features
 
 ## Improvements, issues, and changes
 

@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7408 $
- * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
+ * File version: $Revision: 7450 $
+ * Last changed: $Date: 2023-11-27 15:01:59 +0100 (Mon, 27 Nov 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -269,6 +269,7 @@ double getConditionalCriticalValue(int designNumber, int stage, NumericVector cr
 // used effect size is either estimated from test statistic or pre-fixed
 double getEstimatedTheta(
 		int stage,
+		double thetaH0,
 		double thetaH1,
 		bool directionUpper,
 		NumericVector eventsOverStages,
@@ -280,7 +281,8 @@ double getEstimatedTheta(
 	}
 
 	return exp((double) logRankOverStages[stage - 2] *
-		(1 + allocationRatioPlanned) / sqrt(allocationRatioPlanned * eventsOverStages[stage - 2]));
+		(1 + allocationRatioPlanned) /
+		sqrt(allocationRatioPlanned * eventsOverStages[stage - 2])) * thetaH0;
 }
 
 /**
@@ -368,7 +370,7 @@ NumericMatrix getSimulationStepResultsSurvival(
 		double conditionalCriticalValue = getConditionalCriticalValue(designNumber, k, criticalValues,
 				informationRates, testStatisticOverStages);
 
-		double estimatedTheta = getEstimatedTheta(k, thetaH1, directionUpper,
+		double estimatedTheta = getEstimatedTheta(k, thetaH0, thetaH1, directionUpper,
 			eventsOverStages, logRankOverStages, allocationRatioPlanned);
 
 		double stageEvents = plannedEvents[k - 1];
@@ -412,7 +414,7 @@ NumericMatrix getSimulationStepResultsSurvival(
 		if (k > 1) {
 			conditionalPowerAchieved[k - 1] =
 				1 - getNormalDistribution(
-					conditionalCriticalValue - log(estimatedTheta) * sqrt(stageEvents - eventsOverStages[k - 2]) *
+					conditionalCriticalValue - log(estimatedTheta / thetaH0) * sqrt(stageEvents - eventsOverStages[k - 2]) *
 					sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned)
 				);
 		} else {
@@ -914,13 +916,13 @@ List getSimulationSurvivalCpp(
 	LogicalVector trialStop = LogicalVector(simResultsVectorLength, NA_LOGICAL);
 	NumericVector hazardRatioEstimateLR = NumericVector(simResultsVectorLength, NA_REAL);
     double logRankStatisticSign = directionUpper ? 1 : -1;
-	for (int i = 0; i < rejections.length(); i++) {
+	for (int i = 0; i < simResultsVectorLength; i++) {
 		trialStop[i] = (rejections[i] == 1 || futilityStops[i] == 1 || stageNumbers[i] == kMax);
 
 		if (!R_IsNA((double) events[i])) {
 			hazardRatioEstimateLR[i] = exp(logRankStatisticSign * logRankStatistics[i] *
 				(1 + allocationRatioPlanned) / sqrt(allocationRatioPlanned *
-					(events1[i] + events2[i])));
+					(events1[i] + events2[i]))) * thetaH0;
 		}
 	}
 

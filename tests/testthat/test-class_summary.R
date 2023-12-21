@@ -16,7 +16,7 @@
 ## |  File name: test-class_summary.R
 ## |  Creation date: 08 November 2023, 08:49:48
 ## |  File version: $Revision: 7403 $
-## |  Last changed: $Date: 2023-11-08 16:12:00 +0100 (Mi, 08 Nov 2023) $
+## |  Last changed: $Date: 2023-11-08 16:12:00 +0100 (Wed, 08 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 

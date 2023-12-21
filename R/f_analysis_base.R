@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7139 $
-## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
+## |  File version: $Revision: 7526 $
+## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -157,8 +157,6 @@ NULL
 #'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
-#'
-#' @template details_analysis_base_mnormt_dependency
 #'
 #' @seealso
 #' \code{\link[=getObservedInformationRates]{getObservedInformationRates()}}
@@ -1047,8 +1045,6 @@ getConditionalPower <- function(stageResults, ..., nPlanned,
 #'
 #' In multi-arm trials, the repeated p-values are defined separately for each
 #' treatment comparison within the closed testing procedure.
-#'
-#' @template details_analysis_base_mnormt_dependency
 #'
 #' @return Returns a \code{\link[base]{numeric}} vector of length \code{kMax} or in case of multi-arm stage results
 #' a \code{\link[base]{matrix}} (each column represents a stage, each row a comparison)

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7359 $
-## |  Last changed: $Date: 2023-10-13 11:39:39 +0200 (Fri, 13 Oct 2023) $
+## |  File version: $Revision: 7496 $
+## |  Last changed: $Date: 2023-12-15 10:42:15 +0100 (Fr, 15 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1335,7 +1335,8 @@ ParameterSet <- setRefClass("ParameterSet",
         parameterNames <- parameterNames[!(parameterNames %in% parametersToIgnore)]
     }
 
-    if (parameterSet$.containsMultidimensionalParameters(parameterNames)) {
+    if (parameterSet$.containsMultidimensionalParameters(parameterNames) ||
+            (.isTrialDesignPlanCountData(parameterSet) && length(parameterSet$theta) > 1)) {
         return(.addDelayedInformationRates(.getAsDataFrameMultidimensional(
             parameterSet, parameterNames, niceColumnNamesEnabled,
             includeAllParameters, returnParametersAsCharacter, tableColumnNames,
@@ -1585,15 +1586,14 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 #'
 #' @keywords internal
 #'
-summary.ParameterSet <- function(object, ..., 
-        type = 1, 
-        digits = NA_integer_, 
+summary.ParameterSet <- function(object, ...,
+        type = 1,
+        digits = NA_integer_,
         output = c("all", "title", "overview", "body"),
         printObject = FALSE,
         sep = "\n-----\n\n") {
-        
     .warnInCaseOfUnknownArguments(functionName = "summary", ignore = c("printObject"), ...)
-    
+
     base::attr(object, "printObject") <- printObject
     base::attr(object, "printObjectSeparator") <- sep
 
@@ -1602,12 +1602,12 @@ summary.ParameterSet <- function(object, ...,
     }
 
     if (type == 1 && (
-            inherits(object, "TrialDesign") || 
-            inherits(object, "TrialDesignPlan") ||
-            inherits(object, "SimulationResults") || 
-            inherits(object, "AnalysisResults") ||
-            inherits(object, "TrialDesignCharacteristics") ||
-            inherits(object, "PerformanceScore"))) {
+            inherits(object, "TrialDesign") ||
+                inherits(object, "TrialDesignPlan") ||
+                inherits(object, "SimulationResults") ||
+                inherits(object, "AnalysisResults") ||
+                inherits(object, "TrialDesignCharacteristics") ||
+                inherits(object, "PerformanceScore"))) {
         output <- match.arg(output)
         return(.createSummary(object, digits = digits, output = output))
     }
@@ -1660,14 +1660,14 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled()
     }
-    
+
     if (markdown) {
         x$.catMarkdownText()
         cat("\n\n")
     } else {
         x$show()
     }
-    
+
     return(invisible(x))
 }
 

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7526 $
+## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -694,7 +694,22 @@ C_PARAMETER_NAMES <- list(
     locationConditionalPower = "Location conditional power",
     variationConditionalPower = "Variation conditional power",
     subscoreConditionalPower = "Sub-score conditional power",
-    performanceScore = "Performance scores"
+    performanceScore = "Performance scores",
+    
+    overDispersion = "Over dispersion",
+    lambda = "Lambda",
+    fixedExposureTime = "Fixed exposure time",
+    calendarTime = "Calendar time",
+    studyTime = "Study time",
+    studySubjects = "Study subjects",
+    expectedStudyDurationH1 = "Expected study duration under H1",
+    informationOverStages = "Information over stages",
+    maxInformation = "Maximum information",
+    expectedInformationH0 = "Expected information under H0",
+    expectedInformationH01 = "Expected information under H0/H1",
+    expectedInformationH1 = "Expected information under H1",
+    plannedMaxSubjects = "Planned maximum number of subjects",
+    plannedCalendarTime = "Planned calendar time"
 )
 
 C_TABLE_COLUMN_NAMES <- list(
@@ -993,7 +1008,22 @@ C_TABLE_COLUMN_NAMES <- list(
     locationConditionalPower = "Location conditional power",
     variationConditionalPower = "Variation conditional power",
     subscoreConditionalPower = "Sub-score conditional power",
-    performanceScore = "Performance score"
+    performanceScore = "Performance score",
+    
+    overDispersion = "Over dispersion",
+    lambda = "Lambda",
+    fixedExposureTime = "Fixed exposure time",
+    calendarTime = "Calendar time",
+    studyTime = "Study time",
+    studySubjects = "Study subjects",
+    expectedStudyDurationH1 = "Expected study duration under H1",
+    informationOverStages = "Information over stages",
+    maxInformation = "Maximum information",
+    expectedInformationH0 = "Expected information under H0",
+    expectedInformationH01 = "Expected information under H0/H1",
+    expectedInformationH1 = "Expected information under H1",
+    plannedMaxSubjects = "Planned max. number of subjects",
+    plannedCalendarTime = "Planned calendar time"
 )
 
 .getParameterCaptions <- function(captionList, ...,
@@ -1003,6 +1033,7 @@ C_TABLE_COLUMN_NAMES <- list(
         analysisResults = NULL,
         dataset = NULL,
         designCharacteristics = NULL,
+        designSet = NULL,
         tableColumns = FALSE) {
     parameterNames <- captionList
 
@@ -1023,6 +1054,15 @@ C_TABLE_COLUMN_NAMES <- list(
             parameterNameFutilityBounds <- "futilityBoundsNonBinding"
         }
         parameterNames$futilityBounds <- captionList[[parameterNameFutilityBounds]]
+        if (!is.null(designSet) && length(designSet$designs) > 1) {
+            bindingFutilityValues <- logical(0)
+            for (design in designSet$designs) {
+                bindingFutilityValues <- unique(c(bindingFutilityValues, design$bindingFutility))
+            }
+            if (length(bindingFutilityValues) > 1) {
+                parameterNames$futilityBounds <- "Futility bound"
+            }
+        }
     }
 
     if (!is.null(designPlan) && inherits(designPlan, "TrialDesignPlanSurvival") &&
@@ -1101,7 +1141,8 @@ C_TABLE_COLUMN_NAMES <- list(
         stageResults = NULL,
         analysisResults = NULL,
         dataset = NULL,
-        designCharacteristics = NULL) {
+        designCharacteristics = NULL,
+        designSet = NULL) {
     .getParameterCaptions(
         captionList = C_TABLE_COLUMN_NAMES,
         design = design,
@@ -1110,6 +1151,7 @@ C_TABLE_COLUMN_NAMES <- list(
         analysisResults = analysisResults,
         dataset = dataset,
         designCharacteristics = designCharacteristics,
+        designSet = designSet,
         tableColumns = TRUE
     )
 }
@@ -1314,5 +1356,19 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     locationConditionalPower = ".formatProbabilities",
     variationConditionalPower = ".formatProbabilities",
     subscoreConditionalPower = ".formatProbabilities",
-    performanceScore = ".formatProbabilities"
+    performanceScore = ".formatProbabilities",
+    
+    overDispersion = ".formatStDevs",
+    lambda = ".formatRates",
+    fixedExposureTime = ".formatTime",
+    calendarTime = ".formatTime",
+    studyTime = ".formatTime",
+    studySubjects = ".formatSampleSizes",
+    expectedStudyDurationH1 = ".formatTime",
+    informationOverStages = ".formatRatesDynamic",
+    maxInformation = ".formatRatesDynamic",
+    expectedInformationH0 = ".formatRatesDynamic",
+    expectedInformationH01 = ".formatRatesDynamic",
+    expectedInformationH1 = ".formatRatesDynamic",
+    plannedMaxSubjects = ".formatSampleSizes"
 )

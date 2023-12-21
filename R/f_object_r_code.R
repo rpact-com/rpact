@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7268 $
-## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
+## |  File version: $Revision: 7526 $
+## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -149,6 +149,14 @@ NULL
         return("getPowerSurvival")
     }  
     
+    if ("TrialDesignPlanCountData" == .getClassName(obj)) {
+        if (obj$.isSampleSizeObject()) {
+            return("getSampleSizeCounts")
+        } 
+        
+        return("getPowerCounts")
+    }  
+    
     if (inherits(obj, "TrialDesign")) {
         return(paste0("get", sub("^Trial", "", .getClassName(obj))))
     }  
@@ -241,7 +249,8 @@ NULL
         return(.getGeneratorFunctionName(obj$object))
     } 
     
-    stop("Runtime issue: function '.getGeneratorFunctionName' is not implemented for class ", .getClassName(obj))
+    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+        "function '.getGeneratorFunctionName' is not implemented for class ", .getClassName(obj))
 }
 
 #' @rdname getObjectRCode

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7526 $
+## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -80,7 +80,11 @@ PlotSubTitleItems <- setRefClass("PlotSubTitleItems",
         addItem = function(item) {
             items <<- c(items, item)
         },
-        add = function(title, value, subscript = NA_character_, ..., digits = 3L) {
+        add = function(title, value, subscript = NA_character_, ..., digits = 3L, condition = TRUE) {
+            if (isFALSE(condition)) {
+                return(invisible())
+            }
+            
             titleTemp <- title
             if (length(items) == 0) {
                 titleTemp <- .formatCamelCase(titleTemp, title = TRUE)

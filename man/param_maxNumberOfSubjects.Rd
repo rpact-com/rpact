@@ -4,8 +4,8 @@
 \alias{param_maxNumberOfSubjects}
 \title{Parameter Description: Maximum Number Of Subjects}
 \arguments{
-\item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified.
-For two treatment arms, it is the maximum number of subjects for both treatment arms.}
+\item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified for power calculations or calculation
+of necessary follow-up (count data). For two treatment arms, it is the maximum number of subjects for both treatment arms.}
 }
 \description{
 Parameter Description: Maximum Number Of Subjects

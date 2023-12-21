@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7526 $
+## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -633,6 +633,24 @@ length.TrialDesignSet <- function(x) {
     return(length(x$designs))
 }
 
+.getHarmonizedColumnNames <- function(df1, df2) {
+    colNames1 <- colnames(df1)
+    colNames2 <- colnames(df2)
+    colNames <- character(0)
+    for (i in 1:length(colNames1)) {
+        colName1 <- colNames1[i]
+        colName2 <- colNames2[i]
+        if (!identical(colName1, colName2)) {
+            vec1 <- unlist(strsplit(colName1, " "))
+            vec2 <- unlist(strsplit(colName2, " "))
+            colNames <- c(colNames, paste(base::intersect(vec1, vec2), collapse = " "))
+        } else {
+            colNames <- c(colNames, colName1)
+        }
+    }
+    return(colNames)
+}
+
 #'
 #' @title
 #' Coerce Trial Design Set to a Data Frame
@@ -734,6 +752,9 @@ as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
             } else {
                 df <- cbind(designNumber = rep(max(dataFrame$designNumber) + 1, nrow(df)), df)
             }
+            colNames <- .getHarmonizedColumnNames(dataFrame, df)
+            colnames(dataFrame) <- colNames
+            colnames(df) <- colNames
             dataFrame <- rbind(dataFrame, df)
         }
     }

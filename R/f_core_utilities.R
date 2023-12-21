@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7387 $
-## |  Last changed: $Date: 2023-11-03 14:39:37 +0100 (Fr, 03 Nov 2023) $
+## |  File version: $Revision: 7526 $
+## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1481,48 +1481,3 @@ getParameterName <- function(obj, parameterCaption) {
     }
 }
 
-# TODO remove old function
-#.getMultivariateDistribution <- function(...,
-#        type = c("normal", "t", "quantile"),
-#        upper,
-#        sigma,
-#        df = NA_real_, alpha = NA_real_) {
-#    # .assertMnormtIsInstalled()
-#    type <- match.arg(type)
-#
-#    dimensionSigma <- length(base::diag(sigma))
-#    if (type == "normal") {
-#        if (dimensionSigma == 1) {
-#            return(stats::pnorm(upper))
-#        }
-#
-#        return(mnormt::sadmvn(lower = -Inf, upper = upper, mean = 0, varcov = sigma))
-#    }
-#
-#    if (type == "t") {
-#        if (dimensionSigma == 1) {
-#            return(stats::pt(upper, df))
-#        }
-#        if (df > 500) {
-#            return(mnormt::sadmvn(lower = -Inf, upper = upper, mean = 0, varcov = sigma))
-#        }
-#
-#        return(mnormt::sadmvt(lower = -Inf, upper = upper, mean = 0, S = sigma, df = df))
-#    }
-#
-#    if (type == "quantile") {
-#        if (dimensionSigma == 1) {
-#            return(.getOneMinusQNorm(alpha))
-#        }
-#
-#        return(.getOneDimensionalRoot(
-#            function(x) {
-#                return(mnormt::sadmvn(lower = -Inf, upper = x, mean = 0, varcov = sigma) - (1 - alpha))
-#            },
-#            lower = -8,
-#            upper = 8,
-#            tolerance = 1e-08,
-#            callingFunctionInformation = ".getMultivariateDistribution"
-#        ))
-#    }
-#}

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7471 $
+## |  Last changed: $Date: 2023-12-05 15:19:36 +0100 (Di, 05 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -638,4 +638,235 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designPlan' (",
         .getClassName(designPlan), ") must be of class 'SimulationResultsMultiArm'"
     )
+}
+
+#'
+#' @title
+#' Get Simulation Data
+#'
+#' @description
+#' Returns the aggregated simulation data.
+#'
+#' @param x A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationMeans]{getSimulationMeans()}},\cr
+#'  \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr
+#'  \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
+#'
+#' @details
+#' This function can be used to get the aggregated simulated data from an simulation results
+#' object, for example, obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
+#' In this case, the data frame contains the following columns:
+#' \enumerate{
+#'   \item \code{iterationNumber}: The number of the simulation iteration.
+#'   \item \code{stageNumber}: The stage.
+#'   \item \code{pi1}: The assumed or derived event rate in the treatment group.
+#'   \item \code{pi2}: The assumed or derived event rate in the control group.
+#'   \item \code{hazardRatio}: The hazard ratio under consideration (if available).
+#'   \item \code{analysisTime}: The analysis time.
+#'   \item \code{numberOfSubjects}: The number of subjects under consideration when the
+#'         (interim) analysis takes place.
+#'   \item \code{eventsPerStage1}: The observed number of events per stage
+#'         in treatment group 1.
+#'   \item \code{eventsPerStage2}: The observed number of events per stage
+#'         in treatment group 2.
+#'   \item \code{eventsPerStage}: The observed number of events per stage
+#'         in both treatment groups.
+#'   \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
+#'   \item \code{eventsNotAchieved}: 1 if number of events could not be reached with
+#'         observed number of subjects, 0 otherwise.
+#'   \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
+#'   \item \code{testStatistic}: The test statistic that is used for the test decision,
+#'         depends on which design was chosen (group sequential, inverse normal,
+#'         or Fisher combination test)'
+#'   \item \code{logRankStatistic}: Z-score statistic which corresponds to a one-sided
+#'         log-rank test at considered stage.
+#'   \item \code{conditionalPowerAchieved}: The conditional power for the subsequent stage of the trial for
+#'         selected sample size and effect. The effect is either estimated from the data or can be
+#'         user defined with \code{thetaH1} or \code{pi1H1} and \code{pi2H1}.
+#'   \item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
+#'   \item \code{hazardRatioEstimateLR}: The estimated hazard ratio, derived from the
+#'         log-rank statistic.
+#' }
+#' A subset of variables is provided for \code{\link[=getSimulationMeans]{getSimulationMeans()}}, \code{\link[=getSimulationRates]{getSimulationRates()}}, \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}},\cr
+#'  \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}, or \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}.
+#'
+#' @template return_dataframe
+#'
+#' @examples
+#' results <- getSimulationSurvival(
+#'     pi1 = seq(0.3, 0.6, 0.1), pi2 = 0.3, eventTime = 12,
+#'     accrualTime = 24, plannedEvents = 40, maxNumberOfSubjects = 200,
+#'     maxNumberOfIterations = 50
+#' )
+#' data <- getData(results)
+#' head(data)
+#' dim(data)
+#'
+#' @export
+#'
+getData <- function(x) {
+    if (!inherits(x, "SimulationResults")) { #  or 'Dataset'
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'x' must be a 'SimulationResults' object; for example, use getSimulationMeans() to create one"
+        )
+    }
+    
+    return(x$.data)
+}
+
+#' @rdname getData
+#' @export
+getData.SimulationResults <- function(x) {
+    return(x$.data)
+}
+
+.getAggregatedDataByIterationNumber <- function(rawData, iterationNumber, pi1 = NA_real_) {
+    if (!is.na(pi1)) {
+        if (is.null(rawData[["pi1"]])) {
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'rawData' does not contains a 'pi1' column")
+        }
+        subData <- rawData[rawData$iterationNumber == iterationNumber & rawData$pi1 == pi1, ]
+        if (nrow(subData) == 0) {
+            return(NULL)
+        }
+    } else {
+        subData <- rawData[rawData$iterationNumber == iterationNumber, ]
+    }
+    
+    eventsPerStage1 <- sum(subData$event[subData$treatmentGroup == 1])
+    eventsPerStage2 <- sum(subData$event[subData$treatmentGroup == 2])
+    
+    result <- data.frame(
+        iterationNumber = iterationNumber,
+        pi1 = pi1,
+        stageNumber = subData$stopStage[1],
+        analysisTime = max(subData$observationTime),
+        numberOfSubjects = nrow(subData),
+        eventsPerStage1 = eventsPerStage1,
+        eventsPerStage2 = eventsPerStage2,
+        eventsPerStage = eventsPerStage1 + eventsPerStage2
+    )
+    
+    if (is.na(pi1)) {
+        result <- result[, colnames(result) != "pi1"]
+    }
+    
+    return(result)
+}
+
+.getAggregatedData <- function(rawData) {
+    iterationNumbers <- sort(unique(rawData$iterationNumber))
+    pi1Vec <- rawData[["pi1"]]
+    if (!is.null(pi1Vec)) {
+        pi1Vec <- sort(unique(na.omit(rawData$pi1)))
+    }
+    
+    data <- NULL
+    if (!is.null(pi1Vec) && length(pi1Vec) > 0) {
+        for (iterationNumber in iterationNumbers) {
+            for (pi1 in pi1Vec) {
+                row <- .getAggregatedDataByIterationNumber(rawData, iterationNumber, pi1)
+                if (!is.null(row)) {
+                    if (is.null(data)) {
+                        data <- row
+                    } else {
+                        data <- rbind(data, row)
+                    }
+                }
+            }
+        }
+    } else {
+        for (iterationNumber in iterationNumbers) {
+            row <- .getAggregatedDataByIterationNumber(rawData, iterationNumber)
+            if (!is.null(row)) {
+                if (is.null(data)) {
+                    data <- row
+                } else {
+                    data <- rbind(data, row)
+                }
+            }
+        }
+    }
+    return(data)
+}
+
+#'
+#' @title
+#' Get Simulation Raw Data for Survival
+#'
+#' @description
+#' Returns the raw survival data which was generated for simulation.
+#'
+#' @param x A \code{\link{SimulationResults}} object created by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
+#' @param aggregate Logical. If \code{TRUE} the raw data will be aggregated similar to
+#'        the result of \code{\link[=getData]{getData()}}, default is \code{FALSE}.
+#'
+#' @details
+#' This function works only if \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} was called with a \cr
+#' \code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}).
+#'
+#' This function can be used to get the simulated raw data from a simulation results
+#' object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}. Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
+#' must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
+#' The data frame contains the following columns:
+#' \enumerate{
+#'   \item \code{iterationNumber}: The number of the simulation iteration.
+#'   \item \code{stopStage}: The stage of stopping.
+#'   \item \code{subjectId}: The subject id (increasing number 1, 2, 3, ...)
+#'   \item \code{accrualTime}: The accrual time, i.e., the time when the subject entered the trial.
+#'   \item \code{treatmentGroup}: The treatment group number (1 or 2).
+#'   \item \code{survivalTime}: The survival time of the subject.
+#'   \item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
+#'   \item \code{observationTime}: The specific observation time.
+#'   \item \code{timeUnderObservation}: The time under observation is defined as follows:\cr
+#'         if (event == TRUE) {\cr
+#'             timeUnderObservation <- survivalTime;\cr
+#'         } else if (dropoutEvent == TRUE) {\cr
+#'             timeUnderObservation <- dropoutTime;\cr
+#'         } else {\cr
+#'             timeUnderObservation <- observationTime - accrualTime;\cr
+#'         }
+#'   \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
+#'   \item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
+#' }
+#'
+#' @template return_dataframe
+#'
+#' @examples
+#' \dontrun{
+#' results <- getSimulationSurvival(
+#'     pi1 = seq(0.3, 0.6, 0.1), pi2 = 0.3, eventTime = 12,
+#'     accrualTime = 24, plannedEvents = 40, maxNumberOfSubjects = 200,
+#'     maxNumberOfIterations = 50, maxNumberOfRawDatasetsPerStage = 5
+#' )
+#' rawData <- getRawData(results)
+#' head(rawData)
+#' dim(rawData)
+#' }
+#'
+#' @export
+#'
+getRawData <- function(x, aggregate = FALSE) {
+    if (!inherits(x, "SimulationResultsSurvival")) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'x' must be a 'SimulationResultsSurvival' object; use getSimulationSurvival() to create one"
+        )
+    }
+    
+    rawData <- x$.rawData
+    if (is.null(rawData) || ncol(rawData) == 0 || nrow(rawData) == 0) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "simulation results contain no raw data; ",
+            "choose a 'maxNumberOfRawDatasetsPerStage' > 0, e.g., ",
+            "getSimulationSurvival(..., maxNumberOfRawDatasetsPerStage = 1)"
+        )
+    }
+    
+    if (!aggregate) {
+        return(rawData)
+    }
+    
+    return(.getAggregatedData(rawData))
 }

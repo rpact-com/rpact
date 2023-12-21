@@ -84,6 +84,7 @@ That is, in case of (one-sided) testing of
 \item \emph{rates}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
 \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{count data}: a bound for testing H0: \code{lambda1 / lambda2 = thetaH0 != 1} can be specified.
 }
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
@@ -168,13 +169,6 @@ to identify the object specific name of it, e.g.,
 use \code{methods("plot")} to get all the methods for the \code{plot} generic.
 There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
-}
-
-\section{Note on the dependency of \code{mnormt}}{
-
-If \code{intersectionTest = "Dunnett"} or \code{intersectionTest = "SpiessensDebois"}, or the design is a conditional Dunnett design and
-the dataset is a multi-arm or enrichment dataset, \code{rpact} uses the R package \href{https://cran.r-project.org/package=mnormt}{mnormt}
-to calculate the analysis results.
 }
 
 \examples{

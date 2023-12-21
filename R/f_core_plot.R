@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7526 $
+## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -401,15 +401,31 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     types <- integer(0)
     if (inherits(obj, "TrialDesignPlan")) {
         if (obj$.design$kMax > 1) {
-            types <- c(types, 1:4)
+            types <- c(types, 1)
+            if (!.isTrialDesignPlanCountData(obj)) {
+                types <- c(types, 2)
+            }
+            types <- c(types, 3:4)
         }
-        types <- c(types, 5)
         if (obj$.isSampleSizeObject()) {
+            if (!.isTrialDesignPlanCountData(obj) || length(obj[["theta"]]) > 1) {
+                types <- c(types, 5)
+            }
             if (.isTrialDesignPlanSurvival(obj)) {
                 types <- c(types, 13, 14)
             }
         } else {
-            types <- c(types, 6:9)
+            if (obj$.design$kMax > 1) {
+                types <- c(types, 5, 6)
+            }
+            types <- c(types, 7)
+            if (obj$.design$kMax > 1) {
+                types <- c(types, 8)
+                if (!.isTrialDesignPlanCountData(obj) ||
+                        obj$.getParameterType("expectedNumberOfSubjectsH1") == C_PARAM_GENERATED) {
+                    types <- c(types, 9)
+                }
+            }
             if (.isTrialDesignPlanSurvival(obj)) {
                 types <- c(types, 10:14)
             }
@@ -924,7 +940,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     mirrorModeEnabled <- any(grepl("Mirrored$", yParameterNames))
 
-    tableColumnNames <- .getTableColumnNames(design = designMaster)
+    tableColumnNames <- .getTableColumnNames(design = designMaster, 
+        designSet = if (.isTrialDesignSet(parameterSet)) parameterSet else NULL)
 
     xAxisLabel <- .getAxisLabel(xParameterName, tableColumnNames)
     yAxisLabel1 <- .getAxisLabel(yParameterName1, tableColumnNames)
@@ -1267,7 +1284,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     data$yValues[!is.na(data$yValues) & is.infinite(data$yValues)] <- NA_real_
     data <- data[!is.na(data$yValues), ]
-
+    
     if (categoryEnabled && groupEnabled) {
         p <- ggplot2::ggplot(data, ggplot2::aes(
             x = .data[["xValues"]], y = .data[["yValues"]],

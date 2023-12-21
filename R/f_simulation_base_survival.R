@@ -13,14 +13,26 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7408 $
-## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
+## |  File version: $Revision: 7471 $
+## |  Last changed: $Date: 2023-12-05 15:19:36 +0100 (Di, 05 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include class_simulation_results.R
 #' @include f_core_utilities.R
 NULL
+
+.warnInCaseOfDefinedPiValue <- function(designPlan, piValueName) {
+    piValue <- designPlan[[piValueName]]
+    if (!is.null(piValue) && !is.na(piValue) && length(piValue) > 0) {
+        designPlan$.setParameterType(piValueName, C_PARAM_NOT_APPLICABLE)
+        warning("'pi2' (", .arrayToString(piValue), ") will be ignored ",
+            "because piecewise exponential survival function is enabled",
+            call. = FALSE
+        )
+        designPlan[[piValueName]] <- NA_real_
+    }
+}
 
 .isLambdaBasedSimulationEnabled <- function(pwsTimeObject) {
     if (!pwsTimeObject$.isLambdaBased()) {
@@ -307,9 +319,10 @@ getSimulationSurvival <- function(design = NULL, ...,
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)
     .assertIsNumericVector(lambda2, "lambda2", naAllowed = TRUE)
-    .assertIsSinglePositiveInteger(maxNumberOfSubjects, "maxNumberOfSubjects",
-        validateType = FALSE, naAllowed = TRUE
-    )
+#    .assertIsSinglePositiveInteger(maxNumberOfSubjects, "maxNumberOfSubjects",
+#        validateType = FALSE, naAllowed = TRUE
+#    ) # TODO use assertIsValidMaxNumberOfSubjects?
+    .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)    
     .assertIsIntegerVector(allocation1, "allocation1", validateType = FALSE)
     .assertIsIntegerVector(allocation2, "allocation2", validateType = FALSE)
     .assertIsInClosedInterval(allocation1, "allocation1", lower = 1L, upper = NULL)

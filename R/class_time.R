@@ -13,10 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7476 $
+## |  Last changed: $Date: 2023-12-07 11:57:03 +0100 (Do, 07 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
+
+#' @include f_design_general_utilities.R
+NULL
 
 C_REGEXP_GREATER_OR_EQUAL <- ">= ?"
 C_REGEXP_SMALLER <- "< ?"
@@ -2015,8 +2018,8 @@ AccrualTime <- setRefClass("AccrualTime",
                         "'accrualTime' must contain at least one time value"
                     )
                 }
-
-                if (accrualTime[1] != 0) {
+                
+                if (accrualTime[1] != 0) { 
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "the first value of 'accrualTime' (", .arrayToString(accrualTime), ") must be 0"
