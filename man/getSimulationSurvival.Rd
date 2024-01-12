@@ -326,27 +326,6 @@ user defined with \code{thetaH1}.
 \code{\link[=getRawData]{getRawData()}} can be used to get the simulated raw data from the
 object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival()}
 must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
-The data frame contains the following columns:
-\enumerate{
-\item \code{iterationNumber}: The number of the simulation iteration.
-\item \code{stopStage}: The stage of stopping.
-\item \code{subjectId}: The subject id (increasing number 1, 2, 3, ...)
-\item \code{accrualTime}: The accrual time, i.e., the time when the subject entered the trial.
-\item \code{treatmentGroup}: The treatment group number (1 or 2).
-\item \code{survivalTime}: The survival time of the subject.
-\item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
-\item \code{observationTime}: The specific observation time.
-\item \code{timeUnderObservation}: The time under observation is defined as follows:\cr
-if (event == TRUE) {\cr
-timeUnderObservation <- survivalTime;\cr
-} else if (dropoutEvent == TRUE) {\cr
-timeUnderObservation <- dropoutTime;\cr
-} else {\cr
-timeUnderObservation <- observationTime - accrualTime;\cr
-}
-\item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
-\item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
-}
 }
 
 \section{How to get help for generic functions}{

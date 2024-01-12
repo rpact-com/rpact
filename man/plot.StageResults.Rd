@@ -98,7 +98,7 @@ returned as character vector (function stops if an error occurs)
 }
 Note: no plot object will be returned if \code{showSource} is a character.}
 
-\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.}
+\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSettings()}}.}
 }
 \value{
 Returns a \code{ggplot2} object.

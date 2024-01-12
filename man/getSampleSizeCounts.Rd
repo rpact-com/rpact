@@ -90,12 +90,16 @@ The following generics (R generic functions) are available for this result objec
 }
 \description{
 Returns the sample size for testing the ratio of mean rates
-for negative binomial distributed event numbers in two samples at given sample sizes.
+of negative binomial distributed event numbers in two samples at given effect.
 }
 \details{
-At given design the function calculates the stage-wise (non-cumulated) and maximum sample size for testing mean rates
-for negative binomial distributed event numbers in two samples at given sample sizes.
-Additionally, an allocation ratio = n1/n2 and a null hypothesis value thetaH0 can be specified.
+At given design the function calculates the information, and stage-wise and maximum sample size for testing mean rates
+of negative binomial distributed event numbers in two samples at given effect.
+The sample size calculation is performed either for a fixed exposure time or a variable exposure time with fixed follow-up.
+For the variable exposure time case, at given maximum sample size the necessary follow-up time is calculated.
+The planned calendar time of interim stages is calculated, too.
+Additionally, an allocation ratio = \code{n1 / n2} can be specified where \code{n1} and \code{n2} are the number
+of subjects in the two treatment groups. A null hypothesis value \code{thetaH0} can also be specified.
 }
 \section{How to get help for generic functions}{
 

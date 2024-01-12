@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7526 $
-## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
+## |  File version: $Revision: 7551 $
+## |  Last changed: $Date: 2024-01-11 08:50:37 +0100 (Do, 11 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -142,11 +142,18 @@
 }
 
 .plotTrialDesignPlan <- function(
-        designPlan, type = 1L, main = NA_character_,
-        xlab = NA_character_, ylab = NA_character_, palette = "Set1",
-        theta = seq(-1, 1, 0.02), plotPointsEnabled = NA,
-        legendPosition = NA_integer_, showSource = FALSE,
-        designPlanName = NA_character_, plotSettings = NULL, ...) {
+        designPlan, 
+        type = 1L, 
+        main = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        palette = "Set1",
+        theta = seq(-1, 1, 0.02), 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        designPlanName = NA_character_, 
+        plotSettings = NULL, ...) {
     .assertGgplotIsInstalled()
     .assertIsTrialDesignPlan(designPlan)
     .assertIsValidLegendPosition(legendPosition)
@@ -1314,9 +1321,11 @@
 #'        \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}, \cr
 #'        \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}, \cr
 #'        \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}, \cr
+#'        \code{\link[=getSampleSizeCounts]{getSampleSizeCounts()}}, \cr
 #'        \code{\link[=getPowerMeans]{getPowerMeans()}}, \cr
 #'        \code{\link[=getPowerRates]{getPowerRates()}} or \cr
-#'        \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
+#'        \code{\link[=getPowerSurvival]{getPowerSurvival()}} or \cr
+#'        \code{\link[=getPowerCounts]{getPowerCounts()}}.
 #' @param y Not available for this kind of plot (is only defined to be compatible to the generic plot function).
 #' @param main The main title.
 #' @param xlab The x-axis label.

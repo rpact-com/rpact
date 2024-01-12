@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7471 $
-## |  Last changed: $Date: 2023-12-05 15:19:36 +0100 (Di, 05 Dez 2023) $
+## |  File version: $Revision: 7547 $
+## |  Last changed: $Date: 2024-01-10 08:13:40 +0100 (Mi, 10 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -806,7 +806,8 @@ getData.SimulationResults <- function(x) {
 #' \code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}).
 #'
 #' This function can be used to get the simulated raw data from a simulation results
-#' object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}. Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
+#' object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}. 
+#' Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
 #' must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
 #' The data frame contains the following columns:
 #' \enumerate{
@@ -818,14 +819,16 @@ getData.SimulationResults <- function(x) {
 #'   \item \code{survivalTime}: The survival time of the subject.
 #'   \item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
 #'   \item \code{observationTime}: The specific observation time.
-#'   \item \code{timeUnderObservation}: The time under observation is defined as follows:\cr
-#'         if (event == TRUE) {\cr
-#'             timeUnderObservation <- survivalTime;\cr
-#'         } else if (dropoutEvent == TRUE) {\cr
-#'             timeUnderObservation <- dropoutTime;\cr
-#'         } else {\cr
-#'             timeUnderObservation <- observationTime - accrualTime;\cr
-#'         }
+#'   \item \code{timeUnderObservation}: The time under observation is defined as follows:
+#' ```
+#' if (event == TRUE) {
+#'     timeUnderObservation <- survivalTime
+#' } else if (dropoutEvent == TRUE) {
+#'     timeUnderObservation <- dropoutTime
+#' } else {
+#'     timeUnderObservation <- observationTime - accrualTime
+#' }
+#' ```
 #'   \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
 #'   \item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
 #' }

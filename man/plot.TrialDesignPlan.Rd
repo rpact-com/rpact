@@ -26,9 +26,11 @@
 \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}}, \cr
 \code{\link[=getSampleSizeRates]{getSampleSizeRates()}}, \cr
 \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}, \cr
+\code{\link[=getSampleSizeCounts]{getSampleSizeCounts()}}, \cr
 \code{\link[=getPowerMeans]{getPowerMeans()}}, \cr
 \code{\link[=getPowerRates]{getPowerRates()}} or \cr
-\code{\link[=getPowerSurvival]{getPowerSurvival()}}.}
+\code{\link[=getPowerSurvival]{getPowerSurvival()}} or \cr
+\code{\link[=getPowerCounts]{getPowerCounts()}}.}
 
 \item{y}{Not available for this kind of plot (is only defined to be compatible to the generic plot function).}
 
@@ -105,7 +107,7 @@ and a list of \code{ggplot} objects will be returned invisible.
 Note that one of the following packages must be installed to create a grid plot:
 'ggpubr', 'gridExtra', or 'cowplot'.}
 
-\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.}
+\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSettings()}}.}
 }
 \value{
 Returns a \code{ggplot2} object.

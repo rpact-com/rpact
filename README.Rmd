@@ -28,14 +28,12 @@ Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
 
 ## Functional Range
 
+*	Fixed sample design and designs with interim analysis stages
 *	Sample size and power calculation for
     +	means (continuous endpoint)
     +	rates (binary endpoint)
-    +	survival trials with
-        -	piecewise accrual time and intensity
-        -	piecewise exponential survival time
-        -	survival times that follow a Weibull distribution
-*	Fixed sample design and designs with interim analysis stages
+    +	survival trials with flexible recruitment and survival time options
+    +	count data 
 *	Simulation tool for means, rates, and survival data
     +	Assessment of adaptive sample size/event number recalculations based on
         conditional power

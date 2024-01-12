@@ -90,9 +90,10 @@ testing means in one or two samples at given maximum sample size.
 }
 \details{
 At given design the function calculates the power, stopping probabilities,
-and expected sample size, for testing means at given sample size.
-In a two treatment groups design, additionally, an
-allocation ratio = \code{n1 / n2} can be specified.
+and expected sample size for testing means at given sample size.
+In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2}
+can be specified where \code{n1} and \code{n2} are the number
+of subjects in the two treatment groups.
 A null hypothesis value thetaH0 != 0 for testing the difference of two means
 or \code{thetaH0 != 1} for testing the ratio of two means can be specified.
 For the specified sample size, critical bounds and stopping for futility

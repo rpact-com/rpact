@@ -1652,7 +1652,7 @@ plot.StageResults <- function(x, y, ..., type = 1L,
         p <- p + ggplot2::geom_errorbar(
             data = data,
             ggplot2::aes(ymin = .data[["lower"]], ymax = .data[["upper"]]),
-            width = 0.15, position = pd, size = 0.8
+            width = 0.15, position = pd, linewidth = 0.8
         )
         p <- p + ggplot2::geom_line(position = pd, linetype = "longdash")
         p <- p + ggplot2::geom_point(position = pd, size = 2.0)

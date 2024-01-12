@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7535 $
+## |  Last changed: $Date: 2024-01-08 09:39:31 +0100 (Mo, 08 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -760,7 +760,6 @@ NULL
     } else {
         thetaH1 <- -log(thetaH1 / stageResults$thetaH0)
     }
-
 
     # Shifted decision region for use in getGroupSeqProbs
     # Inverse normal method

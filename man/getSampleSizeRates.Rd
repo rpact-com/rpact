@@ -78,8 +78,9 @@ The following generics (R generic functions) are available for this result objec
 Returns the sample size for testing rates in one or two samples.
 }
 \details{
-At given design the function calculates the stage-wise (non-cumulated) and maximum sample size for testing rates.
-In a two treatment groups design, additionally, an allocation ratio = n1/n2 can be specified.
+At given design the function calculates the stage-wise and maximum sample size for testing rates.
+In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2} can be specified
+where \code{n1} and \code{n2} are the number of subjects in the two treatment groups.
 If a null hypothesis value thetaH0 != 0 for testing the difference of two rates or
 thetaH0 != 1 for testing the risk ratio is specified, the sample size
 formula according to Farrington & Manning (Statistics in Medicine, 1990) is used.

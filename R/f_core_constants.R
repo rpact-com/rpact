@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7526 $
-## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
+## |  File version: $Revision: 7540 $
+## |  Last changed: $Date: 2024-01-08 16:06:46 +0100 (Mo, 08 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1366,7 +1366,6 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     studySubjects = ".formatSampleSizes",
     expectedStudyDurationH1 = ".formatTime",
     informationOverStages = ".formatRatesDynamic",
-    maxInformation = ".formatRatesDynamic",
     expectedInformationH0 = ".formatRatesDynamic",
     expectedInformationH01 = ".formatRatesDynamic",
     expectedInformationH1 = ".formatRatesDynamic",

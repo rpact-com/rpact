@@ -7,7 +7,7 @@
 getPowerCounts(
   design = NULL,
   ...,
-  directionUpper = TRUE,
+  directionUpper = NA,
   maxNumberOfSubjects = NA_real_,
   lambda1 = NA_real_,
   lambda2 = NA_real_,
@@ -100,11 +100,13 @@ Returns the power, stopping probabilities, and expected sample size for testing 
 for negative binomial distributed event numbers in two samples at given sample sizes.
 }
 \details{
-At given design the function calculates the power, stopping probabilities, and expected sample size,
-for testing the ratio of two mean rates at given maximum sample size.
-The sample sizes over the stages are calculated according to the specified information rate in the design.
-Additionally, an allocation ratio = n1/n2 and a null hypothesis value thetaH0 can be specified.
-Note that the power calculation for count data is always based on the normal approximation.
+At given design the function calculates the power, stopping probabilities, and expected sample size
+for testing the ratio of two mean rates of negative binomial distributed event numbers in two samples
+at given maximum sample size and effect.
+The power calculation is performed either for a fixed exposure time or a variable exposure time with fixed follow-up
+where the information over the stages is calculated according to the specified information rate in the design.
+Additionally, an allocation ratio = \code{n1 / n2} can be specified where \code{n1} and \code{n2} are the number
+of subjects in the two treatment groups. A null hypothesis value \code{thetaH0} can also be specified.
 }
 \section{How to get help for generic functions}{
 

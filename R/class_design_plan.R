@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7505 $
-## |  Last changed: $Date: 2023-12-19 16:49:44 +0100 (Di, 19 Dez 2023) $
+## |  File version: $Revision: 7551 $
+## |  Last changed: $Date: 2024-01-11 08:50:37 +0100 (Do, 11 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -935,6 +935,65 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
     )
 )
 
+#'
+#' @name TrialDesignPlanCountData
+#'
+#' @title
+#' Trial Design Plan Count Data
+#'
+#' @description
+#' Trial design plan for count data.
+#'
+#' @template field_thetaH0
+#' @template field_groups
+#' @template field_allocationRatioPlanned
+#' @template field_optimumAllocationRatio
+#' @template field_directionUpper
+#' @template field_lambda1
+#' @template field_lambda2
+#' @template field_lambda
+#' @template field_theta
+#' @template field_nFixed
+#' @template field_nFixed1
+#' @template field_nFixed2
+#' @template field_maxNumberOfSubjects
+#' @template field_maxNumberOfSubjects1
+#' @template field_maxNumberOfSubjects2
+#' @template field_overallReject
+#' @template field_rejectPerStage
+#' @template field_futilityStop
+#' @template field_futilityPerStage
+#' @template field_earlyStop
+#' @template field_overDispersion
+#' @template field_fixedExposureTime
+#' @template field_accrualTime
+#' @template field_accrualIntensity
+#' @template field_followUpTime
+#' @template field_calendarTime
+#' @template field_expectedStudyDurationH1
+#' @template field_studyTime
+#' @template field_numberOfSubjects
+#' @template field_expectedNumberOfSubjectsH1
+#' @template field_informationOverStages
+#' @template field_expectedInformationH0
+#' @template field_expectedInformationH01
+#' @template field_expectedInformationH1
+#' @template field_maxInformation
+#' @template field_futilityBoundsPValueScale
+#'
+#' @details
+#' This object cannot be created directly; use \code{\link[=getSampleSizeCounts]{getSampleSizeCounts()}}
+#' with suitable arguments to create a design plan for a dataset of rates.
+#'
+#' @include class_core_parameter_set.R
+#' @include class_design.R
+#' @include class_design_set.R
+#' @include f_core_constants.R
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
 TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
     contains = "TrialDesignPlan",
     fields = list(
@@ -989,7 +1048,6 @@ TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
                 accrualTime = NA_real_,
                 accrualIntensity = NA_real_,
                 followUpTime = NA_real_,
-                # maxNumberOfSubjects = NA_real_,
                 allocationRatioPlanned = NA_real_) {
             callSuper(...,
                 .designCharacteristics = designCharacteristics,
@@ -1003,12 +1061,12 @@ TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
                 accrualTime = accrualTime,
                 accrualIntensity = accrualIntensity,
                 followUpTime = followUpTime,
-                # maxNumberOfSubjects = maxNumberOfSubjects,
                 allocationRatioPlanned = allocationRatioPlanned
             )
 
             groups <<- 2L
             optimumAllocationRatio <<- FALSE
+            .parameterFormatFunctions$maxInformation <<- ".formatRatesDynamic"
             .self$.setParameterType("groups", C_PARAM_NOT_APPLICABLE)
             .self$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
             .self$.setParameterType("optimumAllocationRatio", C_PARAM_NOT_APPLICABLE)

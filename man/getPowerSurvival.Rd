@@ -152,7 +152,7 @@ sample size at given number of events and number of subjects.
 It also calculates the time when the required events are expected under the given
 assumptions (exponentially, piecewise exponentially, or Weibull distributed survival times
 and constant or non-constant piecewise accrual).
-Additionally, an allocation ratio = n1/n2 can be specified where n1 and n2 are the number
+Additionally, an allocation ratio = \code{n1 / n2} can be specified where \code{n1} and \code{n2} are the number
 of subjects in the two treatment groups.
 
 The formula of Kim & Tsiatis (Biometrics, 1990)

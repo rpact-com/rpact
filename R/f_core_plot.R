@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7526 $
-## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
+## |  File version: $Revision: 7551 $
+## |  Last changed: $Date: 2024-01-11 08:50:37 +0100 (Do, 11 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -372,7 +372,7 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
 #'   \item \code{capnum}:  list with caption and number
 #' }
 #'
-#' @return Returns a list if \code{option} is either \code{capnum} or {numcap}
+#' @return Returns a list if \code{option} is either \code{capnum} or \code{numcap}
 #' or returns a vector that is of  character type for \code{option=caption} or
 #' of numeric type for \code{option=numeric}.
 #'
@@ -727,11 +727,13 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (inherits(parameterSet, "TrialDesignSet")) {
-        suppressWarnings(data <- as.data.frame(parameterSet,
+        suppressWarnings(data <- as.data.frame(
+            parameterSet,
             niceColumnNamesEnabled = FALSE,
             includeAllParameters = TRUE,
             addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
-            theta = theta, nMax = nMax
+            theta = theta, 
+            nMax = nMax
         ))
     } else {
         parameterNames <- parameterSet$.getVisibleFieldNamesOrdered()

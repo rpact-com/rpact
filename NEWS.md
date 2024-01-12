@@ -3,7 +3,7 @@
 
 ## New features
 
-* TODO @Gernot: describe the new count data features
+* The new functions `getSampleSizeCounts()` and `getPowerCounts()` can be used to perform sample size calculations and the assessment of test characteristics for clinical trials with negative binomial distributed count data. This is possible for fixed sample size and group sequential designs. For the latter, the methodology described in Muetze et al. (2019) is implemented. These functions can also be used to perform blinded sample size reassessments according to Friede and Schmidli (2010).
 
 ## Improvements, issues, and changes
 
@@ -11,6 +11,7 @@
 * R package `mnormt` dependency has been removed 
 * Pipe operator usage improved
 * Shiny app link changed to https://rpact.shinyapps.io/cloud
+* Several minor improvements
 
 
 # rpact 3.4.0

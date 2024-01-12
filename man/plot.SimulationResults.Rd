@@ -101,7 +101,7 @@ and a list of \code{ggplot} objects will be returned invisible.
 Note that one of the following packages must be installed to create a grid plot:
 'ggpubr', 'gridExtra', or 'cowplot'.}
 
-\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.}
+\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSettings()}}.}
 }
 \value{
 Returns a \code{ggplot2} object.

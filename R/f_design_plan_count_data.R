@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7507 $
-## |  Last changed: $Date: 2023-12-20 15:36:40 +0100 (Mi, 20 Dez 2023) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7552 $
+## |  Last changed: $Date: 2024-01-11 09:18:50 +0100 (Do, 11 Jan 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 .getCalendarTime <- function(n1, n2,
@@ -35,28 +35,38 @@
     if (any(is.na(recruit2))) {
         recruit2 <- seq(0, accrualTime, length.out = n2)
     }
-    stats::uniroot(
-        function(x) {
-            if (!is.na(fixedExposureTime)) {
-                timeUnderObservation1 <-
-                    pmax(pmin(x - recruit1, fixedExposureTime), 0)
-                timeUnderObservation2 <-
-                    pmax(pmin(x - recruit2, fixedExposureTime), 0)
-            } else {
-                timeUnderObservation1 <- pmax(x - recruit1, 0)
-                timeUnderObservation2 <- pmax(x - recruit2, 0)
-            }
-            sumLambda1 <- sum(timeUnderObservation1 * lambda1 /
-                (1 + overDispersion * timeUnderObservation1 * lambda1))
-            sumLambda2 <- sum(timeUnderObservation2 * lambda2 /
-                (1 + overDispersion * timeUnderObservation2 * lambda2))
-            return(1 / (1 / sumLambda1 + 1 / sumLambda2) -
-                information * shift / log(lambda1 / lambda2 / thetaH0)^2)
+    tryCatch(
+        {
+            return(stats::uniroot(
+                function(x) {
+                    if (!is.na(fixedExposureTime)) {
+                        timeUnderObservation1 <-
+                            pmax(pmin(x - recruit1, fixedExposureTime), 0)
+                        timeUnderObservation2 <-
+                            pmax(pmin(x - recruit2, fixedExposureTime), 0)
+                    } else {
+                        timeUnderObservation1 <- pmax(x - recruit1, 0)
+                        timeUnderObservation2 <- pmax(x - recruit2, 0)
+                    }
+                    sumLambda1 <- sum(timeUnderObservation1 * lambda1 /
+                        (1 + overDispersion * timeUnderObservation1 * lambda1))
+                    sumLambda2 <- sum(timeUnderObservation2 * lambda2 /
+                        (1 + overDispersion * timeUnderObservation2 * lambda2))
+                    return(1 / (1 / sumLambda1 + 1 / sumLambda2) -
+                        information * shift / log(lambda1 / lambda2 / thetaH0)^2)
+                },
+                interval = c(0, 10 * min(1, max(accrualTime))),
+                extendInt = "yes",
+                tol = 1e-07
+            )$root)
         },
-        interval = c(0, 10 * min(1, max(accrualTime))),
-        extendInt = "yes",
-        tol = 1e-07
-    )$root
+        error = function(e) {
+            stop("Failed to calculate the calendar time. ",
+                "Fisher information might be bounded, e.g., due to overdispersion > 0",
+                call. = FALSE
+            )
+        }
+    )
 }
 
 .getMaximumSampleSizeTwoGroups <- function(allocationRatioPlanned,
@@ -157,6 +167,13 @@
         overDispersion = overDispersion
     )
 
+    if (design$sided == 2 && thetaH0 != 1) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)"
+        )
+    }
+
     if (!is.na(lambda2) && !any(is.na(theta))) {
         totalCases <- length(theta)
     } else if (!any(is.na(lambda1))) {
@@ -237,7 +254,7 @@
 #'
 #' @description
 #' Returns the sample size for testing the ratio of mean rates
-#' for negative binomial distributed event numbers in two samples at given sample sizes.
+#' of negative binomial distributed event numbers in two samples at given effect.
 #'
 #'
 #' @inheritParams param_design_with_default
@@ -256,9 +273,13 @@
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' At given design the function calculates the stage-wise (non-cumulated) and maximum sample size for testing mean rates
-#' for negative binomial distributed event numbers in two samples at given sample sizes.
-#' Additionally, an allocation ratio = n1/n2 and a null hypothesis value thetaH0 can be specified.
+#' At given design the function calculates the information, and stage-wise and maximum sample size for testing mean rates
+#' of negative binomial distributed event numbers in two samples at given effect.
+#' The sample size calculation is performed either for a fixed exposure time or a variable exposure time with fixed follow-up.
+#' For the variable exposure time case, at given maximum sample size the necessary follow-up time is calculated.
+#' The planned calendar time of interim stages is calculated if an accrual time is defined.
+#' Additionally, an allocation ratio = \code{n1 / n2} can be specified where \code{n1} and \code{n2} are the number
+#' of subjects in the two treatment groups. A null hypothesis value \code{thetaH0} can also be specified.
 #'
 #' @template return_object_trial_design_plan
 #' @template how_to_get_help_for_generics
@@ -340,13 +361,33 @@ getSampleSizeCounts <- function(design = NULL, ...,
         designPlan$.setParameterType("rejectPerStage", C_PARAM_GENERATED)
 
         designPlan$futilityPerStage <- matrix(designCharacteristics$futilityProbabilities, ncol = 1)
-        designPlan$.setParameterType("futilityPerStage", C_PARAM_GENERATED)
+        designPlan$.setParameterType(
+            "futilityPerStage",
+            ifelse(!all(is.na(designPlan$futilityPerStage)) &&
+                any(designPlan$futilityPerStage > 1e-06, na.rm = TRUE),
+            C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE
+            )
+        )
 
         designPlan$futilityStop <- sum(designCharacteristics$futilityProbabilities)
-        designPlan$.setParameterType("futilityStop", C_PARAM_GENERATED)
+        designPlan$.setParameterType(
+            "futilityStop",
+            ifelse(!all(is.na(designPlan$futilityStop)) &&
+                any(designPlan$futilityStop > 1e-06, na.rm = TRUE),
+            C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE
+            )
+        )
 
         designPlan$earlyStop <- sum(c(designCharacteristics$rejectionProbabilities[1:(design$kMax - 1)], designPlan$futilityStop))
         designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
+
+        if (is.na(maxNumberOfSubjects)) {
+            designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
+        } else {
+            designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_USER_DEFINED)
+        }
+    } else {
+        designPlan$.setParameterType("nFixed", C_PARAM_GENERATED)
     }
 
     calendarTime <- matrix(NA_real_, kMax, totalCases)
@@ -606,28 +647,27 @@ getSampleSizeCounts <- function(design = NULL, ...,
     )
 
     if (design$kMax > 1) {
-        if (is.null(designPlan$maxNumberOfSubjects) || all(is.na(designPlan$maxNumberOfSubjects))) {
+        if (designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED) {
             designPlan$maxNumberOfSubjects <- n1 + n2
-            designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_NOT_APPLICABLE)
         }
 
         designPlan$maxNumberOfSubjects1 <- n1
         designPlan$.setParameterType(
             "maxNumberOfSubjects1",
-            ifelse(all(allocationRatioPlanned == 1), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+            C_PARAM_GENERATED
         )
 
         designPlan$maxNumberOfSubjects2 <- n2
         designPlan$.setParameterType(
             "maxNumberOfSubjects2",
-            ifelse(all(allocationRatioPlanned == 1), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+            C_PARAM_GENERATED
         )
 
         designPlan$informationOverStages <- informationOverStages
         designPlan$.setParameterType("informationOverStages", C_PARAM_GENERATED)
 
         designPlan$maxInformation <- designCharacteristics$shift / log(lambda1 / lambda2 / thetaH0)^2
-        designPlan$.setParameterType("maxInformation", C_PARAM_GENERATED) 
+        designPlan$.setParameterType("maxInformation", C_PARAM_GENERATED)
 
         designPlan$expectedInformationH0 <- designCharacteristics$averageSampleNumber0 *
             designCharacteristics$nFixed / log(lambda1 / lambda2 / thetaH0)^2
@@ -661,21 +701,11 @@ getSampleSizeCounts <- function(design = NULL, ...,
         designPlan$.setParameterType("nFixed", C_PARAM_NOT_APPLICABLE)
     } else {
         designPlan$nFixed <- n1 + n2
-        designPlan$.setParameterType("nFixed", C_PARAM_GENERATED)
-
         designPlan$nFixed1 <- n1
-        designPlan$.setParameterType(
-            "nFixed1",
-            ifelse(all(allocationRatioPlanned == 1), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
-        )
-
+        designPlan$.setParameterType("nFixed1", C_PARAM_GENERATED)
         designPlan$nFixed2 <- n2
-        designPlan$.setParameterType(
-            "nFixed2",
-            ifelse(all(allocationRatioPlanned == 1), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
-        )
-        designPlan$maxNumberOfSubjects <- n1 + n2
-        designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_NOT_APPLICABLE)
+        designPlan$.setParameterType("nFixed2", C_PARAM_GENERATED)
+
         designPlan$maxNumberOfSubjects1 <- n1
         designPlan$.setParameterType("maxNumberOfSubjects1", C_PARAM_NOT_APPLICABLE)
         designPlan$maxNumberOfSubjects2 <- n2
@@ -722,11 +752,13 @@ getSampleSizeCounts <- function(design = NULL, ...,
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' At given design the function calculates the power, stopping probabilities, and expected sample size,
-#' for testing the ratio of two mean rates at given maximum sample size.
-#' The sample sizes over the stages are calculated according to the specified information rate in the design.
-#' Additionally, an allocation ratio = n1/n2 and a null hypothesis value thetaH0 can be specified.
-#' Note that the power calculation for count data is always based on the normal approximation.
+#' At given design the function calculates the power, stopping probabilities, and expected sample size
+#' for testing the ratio of two mean rates of negative binomial distributed event numbers in two samples
+#' at given maximum sample size and effect.
+#' The power calculation is performed either for a fixed exposure time or a variable exposure time with fixed follow-up
+#' where the information over the stages is calculated according to the specified information rate in the design.
+#' Additionally, an allocation ratio = \code{n1 / n2} can be specified where \code{n1} and \code{n2} are the number
+#' of subjects in the two treatment groups. A null hypothesis value \code{thetaH0} can also be specified.
 #'
 #' @template return_object_trial_design_plan
 #' @template how_to_get_help_for_generics
@@ -738,7 +770,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
 #' @export
 #'
 getPowerCounts <- function(design = NULL, ...,
-        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
@@ -801,17 +833,19 @@ getPowerCounts <- function(design = NULL, ...,
     if (length(accrualTime) > 1) {
         accrualTime <- accrualTime[-1]
     }
-    if (is.na(directionUpper)) {
-        directionUpper <- TRUE
-    }
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        sided = design$sided,
+        objectType = "power",
+        userFunctionCallEnabled = TRUE
+    )
     .setValueAndParameterType(designPlan, "directionUpper", directionUpper, TRUE)
 
     futilityPerStage <- matrix(NA_real_, kMax - 1, totalCases)
     rejectPerStage <- matrix(NA_real_, kMax, totalCases)
     earlyStop <- rep(NA_real_, totalCases)
     overallReject <- rep(NA_real_, totalCases)
-    for (iCase in (1:totalCases)) {
-        if (!(is.na(lambda)) && !any(is.na(theta))) {
+    for (iCase in 1:totalCases) {
+        if (!is.na(lambda) && !any(is.na(theta))) {
             lambda2 <- (1 + allocationRatioPlanned) * lambda / (1 + allocationRatioPlanned * theta[iCase])
             lambda1[iCase] <- lambda2 * theta[iCase]
         }
@@ -857,18 +891,20 @@ getPowerCounts <- function(design = NULL, ...,
                 overDispersion * (1 + 1 / allocationRatioPlanned))
         } else {
             timeUnderObservation1 <-
-                pmax(accrualTime + followUpTime - recruit1, 0)
+                pmax(accrualTime[length(accrualTime)] + followUpTime - recruit1, 0)
             timeUnderObservation2 <-
-                pmax(accrualTime + followUpTime - recruit2, 0)
+                pmax(accrualTime[length(accrualTime)] + followUpTime - recruit2, 0)
             sumLambda1 <- sum(timeUnderObservation1 * lambda1[iCase] /
                 (1 + overDispersion * timeUnderObservation1 * lambda1[iCase]))
             sumLambda2 <- sum(timeUnderObservation2 * lambda2 /
                 (1 + overDispersion * timeUnderObservation2 * lambda2))
             varianceEstimate <- nTotal * (1 / sumLambda1 + 1 / sumLambda2)
         }
+
+        oneSidedFactor <- ifelse(sided == 1, 2 * directionUpper - 1, 1)
         powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
             design = design,
-            (2 * directionUpper - 1) * log(lambda1[iCase] / lambda2 / thetaH0) /
+            theta = oneSidedFactor * log(lambda1[iCase] / lambda2 / thetaH0) /
                 sqrt(varianceEstimate),
             nMax = nTotal
         )
@@ -878,32 +914,40 @@ getPowerCounts <- function(design = NULL, ...,
         earlyStop[iCase] <- sum(powerAndAverageSampleNumber$earlyStop[1:(design$kMax - 1), ], na.rm = TRUE)
     }
 
+    designPlan$maxNumberOfSubjects <- n1 + n2
+    designPlan$.setParameterType(
+        "maxNumberOfSubjects",
+        ifelse(any(is.na(accrualIntensity)), C_PARAM_USER_DEFINED, C_PARAM_GENERATED)
+    )
+    designPlan$maxNumberOfSubjects1 <- n1
+    designPlan$.setParameterType(
+        "maxNumberOfSubjects1",
+        ifelse(allocationRatioPlanned == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
+
+    designPlan$maxNumberOfSubjects2 <- n2
+    designPlan$.setParameterType(
+        "maxNumberOfSubjects2",
+        ifelse(allocationRatioPlanned == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
+
     if (design$kMax > 1) {
-        designPlan$maxNumberOfSubjects <- n1 + n2
-        designPlan$.setParameterType(
-            "maxNumberOfSubjects",
-            ifelse(any(is.na(accrualIntensity)), C_PARAM_USER_DEFINED, C_PARAM_GENERATED)
-        )
-        designPlan$maxNumberOfSubjects1 <- n1
-        designPlan$.setParameterType(
-            "maxNumberOfSubjects1",
-            ifelse(allocationRatioPlanned == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
-        )
-
-        designPlan$maxNumberOfSubjects2 <- n2
-        designPlan$.setParameterType(
-            "maxNumberOfSubjects2",
-            ifelse(allocationRatioPlanned == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
-        )
-
         designPlan$futilityPerStage <- futilityPerStage
         designPlan$.setParameterType(
             "futilityPerStage",
-            ifelse(!all(is.na(futilityPerStage)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
+            ifelse(!all(is.na(futilityPerStage)) && any(futilityPerStage > 1e-06, na.rm = TRUE),
+                C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE
+            )
         )
 
         designPlan$futilityStop <- base::colSums(futilityPerStage, na.rm = TRUE)
-        designPlan$.setParameterType("futilityStop", C_PARAM_GENERATED)
+        designPlan$.setParameterType(
+            "futilityStop",
+            ifelse(!all(is.na(designPlan$futilityStop)) &&
+                any(designPlan$futilityStop > 1e-06, na.rm = TRUE),
+            C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE
+            )
+        )
 
         designPlan$rejectPerStage <- rejectPerStage
         designPlan$.setParameterType("rejectPerStage", C_PARAM_GENERATED)

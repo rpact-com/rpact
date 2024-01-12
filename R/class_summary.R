@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7507 $
-## |  Last changed: $Date: 2023-12-20 15:36:40 +0100 (Mi, 20 Dez 2023) $
+## |  File version: $Revision: 7547 $
+## |  Last changed: $Date: 2024-01-10 08:13:40 +0100 (Mi, 10 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -464,7 +464,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
                             "futilityBoundsEffectScale",
                             "futilityBoundsEffectScaleLower",
                             "futilityBoundsEffectScaleUpper",
-                            "futilityPerStage"
+                            "futilityPerStage",
+                            "earlyStop"
                         )
                     )
                 )
@@ -566,8 +567,12 @@ SummaryFactory <- setRefClass("SummaryFactory",
                         transposed <- TRUE
                         variedParameterCaption <- "populations"
                         if (parameterName1 %in% c(
-                                "indices", "conditionalErrorRate", "secondStagePValues",
-                                "adjustedStageWisePValues", "overallAdjustedTestStatistics", "rejectedIntersections"
+                                "indices", 
+                                "conditionalErrorRate", 
+                                "secondStagePValues",
+                                "adjustedStageWisePValues", 
+                                "overallAdjustedTestStatistics", 
+                                "rejectedIntersections"
                             )) {
                             if (.isEnrichmentAnalysisResults(parameterSet)) {
                                 variedParameterValues <- parameterSet$.closedTestResults$.getHypothesisPopulationVariants()
@@ -3271,7 +3276,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedStudyDurationH1",
                 parameterCaption = "Expected study duration under H1",
-                roundDigits = digitsGeneral
+                roundDigits = digitsGeneral,
+                transpose = TRUE
             )
         }
 
@@ -3337,17 +3343,20 @@ SummaryFactory <- setRefClass("SummaryFactory",
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedInformationH0",
                 parameterCaption = "Expected information under H0",
-                roundDigits = digitsSampleSize
+                roundDigits = digitsSampleSize,
+                transpose = TRUE
             )
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedInformationH01",
                 parameterCaption = "Expected information under H0/H1",
-                roundDigits = digitsSampleSize
+                roundDigits = digitsSampleSize,
+                transpose = TRUE
             )
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedInformationH1",
                 parameterCaption = "Expected information under H1",
-                roundDigits = digitsSampleSize
+                roundDigits = digitsSampleSize,
+                transpose = TRUE
             )
         }
 
@@ -3355,7 +3364,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
             summaryFactory$addParameter(designPlan,
                 parameterName = "maxInformation",
                 parameterCaption = "Maximum information",
-                roundDigits = digitsSampleSize
+                roundDigits = digitsSampleSize,
+                transpose = TRUE
             )
         }
 
@@ -3508,7 +3518,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 summaryFactory$addParameter(probsH0,
                     parameterName = "earlyStop",
                     parameterCaption = "Overall exit probability (under H0)",
-                    roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
+                    roundDigits = digitsProbabilities, 
+                    smoothedZeroFormat = TRUE
                 )
                 x <- designPlan
                 if (is.null(x)) {
@@ -3518,26 +3529,30 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     parameterName = "earlyStop",
                     values = probsH1$earlyStop,
                     parameterCaption = "Overall exit probability (under H1)",
-                    roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
+                    roundDigits = digitsProbabilities, 
+                    smoothedZeroFormat = TRUE 
                 )
             }
             summaryFactory$addParameter(probsH0,
                 parameterName = "rejectPerStage",
                 parameterCaption = "Exit probability for efficacy (under H0)",
-                roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
+                roundDigits = digitsProbabilities, 
+                smoothedZeroFormat = TRUE
             )
             if (designPlan$.isPowerObject()) {
                 summaryFactory$addParameter(designPlan,
                     parameterName = "rejectPerStage",
                     values = probsH1$rejectPerStage,
                     parameterCaption = "Exit probability for efficacy (under H1)",
-                    roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
+                    roundDigits = digitsProbabilities, 
+                    smoothedZeroFormat = TRUE
                 )
             } else {
                 summaryFactory$addParameter(probsH1,
                     parameterName = "rejectPerStage",
                     parameterCaption = "Exit probability for efficacy (under H1)",
-                    roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
+                    roundDigits = digitsProbabilities, 
+                    smoothedZeroFormat = TRUE
                 )
             }
 
@@ -3681,6 +3696,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
 
     numberOfVariedParams <- dim(arrayData)[2]
     numberOfGroups <- dim(arrayData)[3]
+    
     for (variedParamNumber in 1:numberOfVariedParams) {
         summaryGroup <- .getSummaryGroup(
             parameterCaption,
@@ -3722,8 +3738,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
         )]])[3]
 
         numberOfGroups <- dim(arrayData)[3]
-        if (parameterName == "selectedArms" && !grepl("Survival", .getClassName(designPlan))) { # remove control group
-            numberOfGroups <- numberOfGroups - 1
+        if (parameterName == "selectedArms" && !grepl("Survival", .getClassName(designPlan))) { 
+            numberOfGroups <- numberOfGroups - 1 # remove control group
         }
         numberOfVariedParams <- dim(arrayData)[2]
 

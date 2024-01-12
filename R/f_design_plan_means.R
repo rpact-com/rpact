@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7473 $
-## |  Last changed: $Date: 2023-12-06 15:27:07 +0100 (Mi, 06 Dez 2023) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7543 $
+## |  Last changed: $Date: 2024-01-09 11:57:18 +0100 (Di, 09 Jan 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -636,9 +636,9 @@ NULL
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' At given design the function calculates the stage-wise (non-cumulated) and maximum
-#' sample size for testing means.
-#' In a two treatment groups design, additionally, an allocation ratio = n1/n2 can be specified.
+#' At given design the function calculates the stage-wise and maximum sample size for testing means.
+#' In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2} 
+#' can be specified where \code{n1} and \code{n2} are the number of subjects in the two treatment groups.
 #' A null hypothesis value thetaH0 != 0 for testing the difference of two means or
 #' thetaH0 != 1 for testing the ratio of two means can be specified.
 #' Critical bounds and stopping for futility bounds are provided at the effect scale
@@ -709,9 +709,10 @@ getSampleSizeMeans <- function(
 #'
 #' @details
 #' At given design the function calculates the power, stopping probabilities,
-#' and expected sample size, for testing means at given sample size.
-#' In a two treatment groups design, additionally, an
-#' allocation ratio = \code{n1 / n2} can be specified.
+#' and expected sample size for testing means at given sample size.
+#' In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2}
+#' can be specified where \code{n1} and \code{n2} are the number
+#' of subjects in the two treatment groups.
 #' A null hypothesis value thetaH0 != 0 for testing the difference of two means
 #' or \code{thetaH0 != 1} for testing the ratio of two means can be specified.
 #' For the specified sample size, critical bounds and stopping for futility

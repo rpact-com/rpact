@@ -89,4 +89,3 @@ test_that("'getObservedInformationRates': under-running with relative informatio
     expect_equal(result5$informationRates, c(0.48888889, 1), tolerance = 1e-07, label = paste0("c(", paste0(result5$informationRates, collapse = ", "), ")"))
     expect_equal(result5$status, "under-running", label = paste0("c(", paste0(result5$status, collapse = ", "), ")"))
 })
-

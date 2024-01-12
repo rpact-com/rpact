@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7507 $
-## |  Last changed: $Date: 2023-12-20 15:36:40 +0100 (Mi, 20 Dez 2023) $
+## |  File version: $Revision: 7540 $
+## |  Last changed: $Date: 2024-01-08 16:06:46 +0100 (Mo, 08 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1458,7 +1458,7 @@ NULL
     .assertPackageIsInstalled("testthat")
 }
 
-.assertIsValidThetaH0 <- function(thetaH0, ..., endpoint = c("means", "rates", "survival"),
+.assertIsValidThetaH0 <- function(thetaH0, ..., endpoint = c("means", "rates", "survival", "counts"),
         groups, ratioEnabled = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsValidThetaH0", ...)
 
@@ -1496,7 +1496,7 @@ NULL
                 )
             }
         }
-    } else if (endpoint == "survival") {
+    } else if (endpoint %in% c("survival", "counts")) {
         if (thetaH0 <= 0) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'thetaH0' (", thetaH0, ") must be > 0")
         }
@@ -2773,8 +2773,7 @@ NULL
     .assertIsInOpenInterval(lambda2, "lambda2", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsNumericVector(theta, "theta", naAllowed = TRUE)
     .assertIsInOpenInterval(theta, "theta", lower = 0, upper = NULL, naAllowed = TRUE)
-    .assertIsSingleNumber(thetaH0, "thetaH0")
-    .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
+    .assertIsValidThetaH0(thetaH0, endpoint = "counts", groups = 2)    
     .assertIsSingleNumber(overDispersion, "overDispersion", naAllowed = TRUE)
     .assertIsInClosedInterval(overDispersion, "overDispersion", lower = 0, upper = NULL, naAllowed = TRUE)
     if (!is.na(lambda) && all(!is.na(theta))) {
@@ -2849,7 +2848,7 @@ NULL
 }
 
 .assertParametersAreSpecifiedCorrectlyTogether <- function(..., 
-        case = c("notTogether", "eitherOr", "required"), # TODO implement "required"
+        case = c("notTogether", "eitherOr"), 
         .paramNames = NULL) {
     params <- list(...)
     if (length(params) != 2) {
@@ -2892,7 +2891,8 @@ NULL
         followUpTime,
         accrualTime,
         accrualIntensity,
-        maxNumberOfSubjects) {
+        maxNumberOfSubjects
+        ) {
     .assertIsSingleLogical(sampleSizeEnabled, "sampleSizeEnabled")
     .assertIsSingleNumber(fixedExposureTime, "fixedExposureTime", naAllowed = TRUE)
     .assertIsInOpenInterval(fixedExposureTime, "fixedExposureTime", lower = 0, upper = NULL, naAllowed = TRUE)
@@ -2902,6 +2902,7 @@ NULL
     .assertIsNumericVector(accrualIntensity, "accrualIntensity", naAllowed = TRUE)
     .assertIsInClosedInterval(accrualIntensity, "accrualIntensity", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
+
     if (sampleSizeEnabled) {
         if (is.na(maxNumberOfSubjects) && any(is.na(accrualIntensity))) {
             .assertParametersAreSpecifiedCorrectlyTogether(
@@ -2957,6 +2958,12 @@ NULL
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified"
             )
+        }
+        if (any(is.na(accrualIntensity)) && !any(is.na(accrualTime)) && !is.na(fixedExposureTime) ) {
+          warning(
+            "Specification of 'accrualTime' has no influence of calculation and will be ignored",
+            call. = FALSE
+          )
         }
     }  
     

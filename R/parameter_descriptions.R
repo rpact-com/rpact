@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7506 $
-## |  Last changed: $Date: 2023-12-19 17:23:07 +0100 (Di, 19 Dez 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7551 $
+## |  Last changed: $Date: 2024-01-11 08:50:37 +0100 (Do, 11 Jan 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' Parameter Description: "..."
@@ -900,7 +900,7 @@ NULL
 NULL
 
 #' Parameter Description: Plot Settings
-#' @param plotSettings An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.
+#' @param plotSettings An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSettings()}}.
 #' @name param_plotSettings
 #' @keywords internal
 NULL

@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7507 $
-## |  Last changed: $Date: 2023-12-20 15:36:40 +0100 (Mi, 20 Dez 2023) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7543 $
+## |  Last changed: $Date: 2024-01-09 11:57:18 +0100 (Di, 09 Jan 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -2337,7 +2337,7 @@ getSampleSizeSurvival <- function(
 #' It also calculates the time when the required events are expected under the given
 #' assumptions (exponentially, piecewise exponentially, or Weibull distributed survival times
 #' and constant or non-constant piecewise accrual).
-#' Additionally, an allocation ratio = n1/n2 can be specified where n1 and n2 are the number
+#' Additionally, an allocation ratio = \code{n1 / n2} can be specified where \code{n1} and \code{n2} are the number
 #' of subjects in the two treatment groups.
 #'
 #' The formula of Kim & Tsiatis (Biometrics, 1990)
