@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7551 $
-## |  Last changed: $Date: 2024-01-11 08:50:37 +0100 (Do, 11 Jan 2024) $
+## |  File version: $Revision: 7557 $
+## |  Last changed: $Date: 2024-01-12 13:41:28 +0100 (Fr, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -530,6 +530,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 }
 
 .getVariedParameterHint <- function(variedParameter, variedParameterName) {
+    if (length(variedParameter) != 2) {
+        return("")
+    }
+    
     return(paste0(
         "Note: interim values between ", round(variedParameter[1], 4), " and ",
         round(variedParameter[2], 4), " were calculated to get smoother lines; use, e.g., '",

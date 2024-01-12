@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7551 $
-## |  Last changed: $Date: 2024-01-11 08:50:37 +0100 (Do, 11 Jan 2024) $
+## |  File version: $Revision: 7557 $
+## |  Last changed: $Date: 2024-01-12 13:41:28 +0100 (Fr, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -141,6 +141,35 @@
     }
 }
 
+.getTrialDesignPlanTheta <- function(designPlan, theta) {   
+    thetaName <- NA_character_
+    if (.isTrialDesignPlanMeans(designPlan) && 
+            designPlan$.getParameterType("alternative") == C_PARAM_USER_DEFINED) {
+        thetaName <- "alternative"
+    } else if ((.isTrialDesignPlanRates(designPlan) || .isTrialDesignPlanSurvival(designPlan)) &&
+            designPlan$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
+        thetaName <- "pi1"
+    } else if (.isTrialDesignPlanCountData(designPlan) && 
+            designPlan$.getParameterType("theta") == C_PARAM_USER_DEFINED) {
+        thetaName <- "theta"
+    } else if (.isTrialDesignPlanCountData(designPlan) && 
+            designPlan$.getParameterType("lambda1") == C_PARAM_USER_DEFINED) {
+        thetaName <- "lambda1"
+    } else if (survivalDesignPlanEnabled && 
+            designPlan$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
+        thetaName <- "hazardRatio"
+    }
+    if (is.na(thetaName)) {
+        return(list(theta = NA_real_, thetaName = thetaName))
+    }
+    
+    if (!is.null(theta) && length(theta) > 1 && !all(is.na(theta))) {
+        return(list(theta = theta, thetaName = thetaName))
+    }
+    
+    return(list(theta = designPlan[[thetaName]], thetaName = thetaName))
+}
+
 .plotTrialDesignPlan <- function(
         designPlan, 
         type = 1L, 
@@ -148,7 +177,7 @@
         xlab = NA_character_, 
         ylab = NA_character_, 
         palette = "Set1",
-        theta = seq(-1, 1, 0.02), 
+        theta = NA_real_, 
         plotPointsEnabled = NA,
         legendPosition = NA_integer_, 
         showSource = FALSE,
@@ -158,7 +187,6 @@
     .assertIsTrialDesignPlan(designPlan)
     .assertIsValidLegendPosition(legendPosition)
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-    theta <- .assertIsValidThetaRange(thetaRange = theta)
     
     availablePlotTypes <- getAvailablePlotTypes(designPlan, output = "numeric", numberInCaptionEnabled = FALSE)
     if (!(type %in% availablePlotTypes)) {
@@ -197,48 +225,14 @@
 
     showSourceHint <- ""
     if (type %in% c(5:12)) {
-        if (.isTrialDesignPlanMeans(designPlan) && length(designPlan$alternative) == 2 &&
-                designPlan$.getParameterType("alternative") == C_PARAM_USER_DEFINED) {
+        result <- .getTrialDesignPlanTheta(designPlan, theta)
+        if (!all(is.na(result$theta)) && length(result$theta) == 2 && !is.na(result$thetaName)) {
             if (!is.logical(showSource) || isTRUE(showSource)) {
-                showSourceHint <- .getVariedParameterHint(designPlan$alternative, "alternative")
+                showSourceHint <- .getVariedParameterHint(result$theta, result$thetaName)
             }
-            designPlan <- designPlan$clone(
-                alternative = .getVariedParameterVector(designPlan$alternative, "alternative")
-            )
-        } else if ((.isTrialDesignPlanRates(designPlan) || survivalDesignPlanEnabled) &&
-                length(designPlan$pi1) == 2 &&
-                designPlan$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
-            if (!is.logical(showSource) || isTRUE(showSource)) {
-                showSourceHint <- .getVariedParameterHint(designPlan$pi1, "pi1")
-            }
-            designPlan <- designPlan$clone(
-                pi1 = .getVariedParameterVector(designPlan$pi1, "pi1")
-            )
-        } else if (.isTrialDesignPlanCountData(designPlan) && length(designPlan$theta) == 2 &&
-                designPlan$.getParameterType("theta") == C_PARAM_USER_DEFINED) {
-            if (!is.logical(showSource) || isTRUE(showSource)) {
-                showSourceHint <- .getVariedParameterHint(designPlan$theta, "theta")
-            }
-            designPlan <- designPlan$clone(
-                theta = .getVariedParameterVector(designPlan$theta, "theta")
-            )
-        } else if (.isTrialDesignPlanCountData(designPlan) && length(designPlan$lambda1) == 2 &&
-                designPlan$.getParameterType("lambda1") == C_PARAM_USER_DEFINED) {
-            if (!is.logical(showSource) || isTRUE(showSource)) {
-                showSourceHint <- .getVariedParameterHint(designPlan$lambda1, "lambda1")
-            }
-            designPlan <- designPlan$clone(
-                lambda1 = .getVariedParameterVector(designPlan$lambda1, "lambda1")
-            )
-        } else if (survivalDesignPlanEnabled && length(designPlan$hazardRatio) == 2 &&
-                designPlan$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
-            if (!is.logical(showSource) || isTRUE(showSource)) {
-                showSourceHint <- .getVariedParameterHint(designPlan$hazardRatio, "hazardRatio")
-            }
-            designPlan <- designPlan$clone(
-                hazardRatio =
-                    .getVariedParameterVector(designPlan$hazardRatio, "hazardRatio")
-            )
+            parameterList <- list()
+            parameterList[[result$thetaName]] <- .getVariedParameterVector(result$theta, result$thetaName)
+            designPlan <- do.call(designPlan$clone, parameterList)
         }
     }
 
@@ -312,7 +306,7 @@
             return(.plotTrialDesignSet(
                 x = designSet, y = NULL, main = main,
                 xlab = xlab, ylab = ylab, type = type,
-                palette = palette, theta = theta, nMax = nMax,
+                palette = palette, theta = .plotTheta(theta), nMax = nMax,
                 plotPointsEnabled = plotPointsEnabled, legendPosition = legendPosition,
                 designSetName = designPlanName, showSource = showSource,
                 plotSettings = plotSettings # , ...
@@ -624,7 +618,8 @@
                 parameterSet = designPlan, designMaster = designMaster,
                 xParameterName = xParameterName,
                 yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-                palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
+                palette = palette, theta = .plotTheta(theta), 
+                nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                 legendPosition = legendPosition, variedParameters = variedParameters,
                 qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
                 plotSettings = plotSettings # , ...
@@ -670,7 +665,8 @@
                     parameterSet = designPlan, designMaster = designMaster,
                     xParameterName = xParameterName,
                     yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-                    palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
+                    palette = palette, theta = .plotTheta(theta), 
+                    nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
                     plotSettings = plotSettings, ylim = ylim # , ...
@@ -680,7 +676,8 @@
                     parameterSet = designPlan, designMaster = designMaster,
                     xParameterName = xParameterName,
                     yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-                    palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
+                    palette = palette, theta = .plotTheta(theta), 
+                    nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
                     plotSettings = plotSettings # , ...
@@ -933,7 +930,8 @@
         parameterSet = designPlan, designMaster = designMaster,
         xParameterName = xParameterName,
         yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-        palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
+        palette = palette, theta = .plotTheta(theta), 
+        nMax = nMax, plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition, variedParameters = variedParameters,
         qnormAlphaLineEnabled = (type != 2), ratioEnabled = ratioEnabled,
         plotSettings = plotSettings # , ...
@@ -1376,7 +1374,7 @@ plot.TrialDesignPlan <- function(
         x, y, ..., main = NA_character_,
         xlab = NA_character_, ylab = NA_character_,
         type = ifelse(x$.design$kMax == 1, 5L, 1L), palette = "Set1",
-        theta = seq(-1, 1, 0.01), plotPointsEnabled = NA,
+        theta = NA_real_, plotPointsEnabled = NA,
         legendPosition = NA_integer_, showSource = FALSE,
         grid = 1, plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)

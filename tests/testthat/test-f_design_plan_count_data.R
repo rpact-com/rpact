@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_design_plan_count_data.R
 ## |  Creation date: 08 January 2024, 11:50:12
-## |  File version: $Revision: 7547 $
-## |  Last changed: $Date: 2024-01-10 08:13:40 +0100 (Mi, 10 Jan 2024) $
+## |  File version: $Revision: 7554 $
+## |  Last changed: $Date: 2024-01-12 10:19:05 +0100 (Fr, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 

@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-class_design_set.R
 ## |  Creation date: 08 January 2024, 11:50:12
-## |  File version: $Revision: 7540 $
-## |  Last changed: $Date: 2024-01-08 16:06:46 +0100 (Mo, 08 Jan 2024) $
+## |  File version: $Revision: 7554 $
+## |  Last changed: $Date: 2024-01-12 10:19:05 +0100 (Fr, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 

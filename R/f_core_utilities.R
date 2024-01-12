@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7526 $
-## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
+## |  File version: $Revision: 7557 $
+## |  Last changed: $Date: 2024-01-12 13:41:28 +0100 (Fr, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -825,6 +825,14 @@ NULL
 
 .getVariedParameterVectorByValue <- function(variedParameter) {
     return((variedParameter[2] - variedParameter[1]) / C_VARIED_PARAMETER_SEQUENCE_LENGTH_DEFAULT)
+}
+
+.plotTheta <- function(theta) {
+    if (is.null(theta) || length(theta) == 0 || all(is.na(theta))) {
+        theta <- seq(-1, 1, 0.02)
+    }
+    theta <- .assertIsValidThetaRange(thetaRange = theta)
+    return(theta)
 }
 
 .getVariedParameterVector <- function(variedParameter, variedParameterName) {
