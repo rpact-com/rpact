@@ -1070,7 +1070,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
 }
 
 .createSummaryHypothesisText <- function(object, summaryFactory) {
-    if (!(inherits(object, "AnalysisResults") || inherits(object, "AnalysisResultsR6")) && !inherits(object, "TrialDesignPlan") &&
+    if (!(inherits(object, "AnalysisResults") || inherits(object, "AnalysisResultsR6")) && !(inherits(object, "TrialDesignPlan") || inherits(object, "TrialDesignPlanR6")) &&
             !inherits(object, "SimulationResults")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -1245,7 +1245,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
 .addAllocationRatioToHeader <- function(parameterSet, header, sep = ", ") {
     if (!.isTrialDesignPlanSurvival(parameterSet) && !grepl("Simulation", .getClassName(parameterSet))) {
         numberOfGroups <- 1
-        if (inherits(parameterSet, "TrialDesignPlan")) {
+        if (inherits(parameterSet, "TrialDesignPlan") || inherits(parameterSet, "TrialDesignPlanR6")) {
             numberOfGroups <- parameterSet$groups
         } else if (inherits(parameterSet, "AnalysisResults") || inherits(parameterSet, "AnalysisResultsR6")) {
             numberOfGroups <- parameterSet$.dataInput$getNumberOfGroups()
@@ -2883,7 +2883,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
     if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
         design <- object$.design
         designPlan <- object
-    } else if (inherits(object, "TrialDesignCharacteristics")) {
+    } else if (inherits(object, "TrialDesignCharacteristics") || inherits(object, "TrialDesignCharacteristicsR6")) {
         design <- object$.design
         # designPlan <- object
     } else if (.isTrialDesign(object)) {
@@ -3191,7 +3191,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
 
         if (design$kMax > 1) {
             summaryFactory$addParameter(designPlan,
-                parameterName = ifelse(inherits(designPlan, "TrialDesignPlan") && designPlan$.isSampleSizeObject(),
+                parameterName = ifelse((inherits(designPlan, "TrialDesignPlan") || inherits(designPlan, "TrialDesignPlanR6")) && designPlan$.isSampleSizeObject(),
                     "expectedNumberOfSubjectsH1", "expectedNumberOfSubjects"
                 ),
                 parameterCaption = "Expected number of subjects",
@@ -3209,7 +3209,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         }
 
         if (survivalEnabled) {
-            if (design$kMax > 1 && !(inherits(designPlan, "TrialDesignPlanSurvival") && designPlan$.isSampleSizeObject())) {
+            if (design$kMax > 1 && !((inherits(designPlan, "TrialDesignPlanSurvival") || inherits(designPlan, "TrialDesignPlanSurvivalR6")) && designPlan$.isSampleSizeObject())) {
                 summaryFactory$addParameter(designPlan,
                     parameterName = "expectedNumberOfEvents",
                     parameterCaption = "Expected number of events",

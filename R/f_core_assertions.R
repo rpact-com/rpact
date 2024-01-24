@@ -61,23 +61,23 @@ NULL
 }
 
 .isTrialDesignSet <- function(x) {
-    return(.getClassName(x) == "TrialDesignSet")
+    return(.getClassName(x) == "TrialDesignSet" || .getClassName(x) == "TrialDesignSetR6")
 }
 
 .isTrialDesignGroupSequential <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL)
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL || .getClassName(design) == "TrialDesignGroupSequentialR6")
 }
 
 .isTrialDesignInverseNormal <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL)
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL || .getClassName(design) == "TrialDesignInverseNormalR6")
 }
 
 .isTrialDesignFisher <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_FISHER)
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_FISHER || .getClassName(design) == "TrialDesignFisherR6")
 }
 
 .isTrialDesignConditionalDunnett <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT)
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT || .getClassName(design) == "TrialDesignConditionalDunnettR6")
 }
 
 .isTrialDesignInverseNormalOrGroupSequential <- function(design) {
@@ -94,15 +94,15 @@ NULL
 }
 
 .isTrialDesignPlanMeans <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanMeans")
+    return(.getClassName(designPlan) == "TrialDesignPlanMeans" || .getClassName(designPlan) == "TrialDesignPlanMeansR6")
 }
 
 .isTrialDesignPlanRates <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanRates")
+    return(.getClassName(designPlan) == "TrialDesignPlanRates" || .getClassName(designPlan) == "TrialDesignPlanRatesR6")
 }
 
 .isTrialDesignPlanSurvival <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanSurvival")
+    return(.getClassName(designPlan) == "TrialDesignPlanSurvival" || .getClassName(designPlan) == "TrialDesignPlanSurvivalR6")
 }
 
 .isTrialDesignPlan <- function(designPlan) {

@@ -69,7 +69,7 @@ ConditionalPowerResultsR6 <- R6Class("ConditionalPowerResultsR6",
                                            
                                            super$initialize(...)
                                            
-                                           self$.plotSettings <- PlotSettings()
+                                           self$.plotSettings <- PlotSettingsR6$new()
                                            self$.parameterNames <- C_PARAMETER_NAMES
                                            self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                            
@@ -564,7 +564,7 @@ ClosedCombinationTestResultsR6 <- R6Class("ClosedCombinationTestResultsR6",
                                                 
                                                 super$initialize(...)
                                                 
-                                                self$.plotSettings <- PlotSettings()
+                                                self$.plotSettings <- PlotSettingsR6$new()
                                                 self$.parameterNames <- C_PARAMETER_NAMES
                                                 self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                                 
@@ -750,7 +750,7 @@ AnalysisResultsR6 <- R6Class("AnalysisResultsR6",
                                    
                                    super$initialize(...)
                                    
-                                   self$.plotSettings <- PlotSettings()
+                                   self$.plotSettings <- PlotSettingsR6$new()
                                    self$.parameterNames <- .getParameterNames(design = design, analysisResults = self)
                                    self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                  },

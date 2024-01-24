@@ -61,7 +61,7 @@ EventProbabilities <- setRefClass("EventProbabilities",
     fields = list(
         .piecewiseSurvivalTime = "PiecewiseSurvivalTime",
         .accrualTime = "AccrualTime",
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         time = "numeric",
         accrualTime = "numeric",
         accrualIntensity = "numeric",
@@ -83,7 +83,7 @@ EventProbabilities <- setRefClass("EventProbabilities",
     methods = list(
         initialize = function(...) {
             callSuper(...)
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
             .parameterNames <<- C_PARAMETER_NAMES
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
             .setParameterType("overallEventProbabilities", C_PARAM_NOT_APPLICABLE) # deprecated
@@ -156,7 +156,7 @@ NumberOfSubjects <- setRefClass("NumberOfSubjects",
     contains = "ParameterSet",
     fields = list(
         .accrualTime = "AccrualTime",
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         time = "numeric",
         accrualTime = "numeric",
         accrualIntensity = "numeric",
@@ -166,7 +166,7 @@ NumberOfSubjects <- setRefClass("NumberOfSubjects",
     methods = list(
         initialize = function(...) {
             callSuper(...)
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
             .parameterNames <<- C_PARAMETER_NAMES
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
         },

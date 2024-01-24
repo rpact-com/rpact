@@ -89,7 +89,7 @@ names.SimulationResults <- function(x) {
 SimulationResults <- setRefClass("SimulationResults",
     contains = "ParameterSet",
     fields = list(
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         .design = "TrialDesign",
         .data = "data.frame",
         .rawData = "data.frame",
@@ -106,7 +106,7 @@ SimulationResults <- setRefClass("SimulationResults",
         initialize = function(design, ..., showStatistics = FALSE) {
             callSuper(.design = design, .showStatistics = showStatistics, ...)
 
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
             .parameterNames <<- .getParameterNames(design = design, designPlan = .self)
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
         },

@@ -242,14 +242,13 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 }
 
 .validateBaseParameters <- function(design, twoSidedWarningForDefaultValues = TRUE) {
-    if (.isDefinedArgument(design$kMax)) {
+  if (.isDefinedArgument(design$kMax)) {
         .assertDesignParameterExists(design, "kMax", C_KMAX_DEFAULT)
         .assertIsValidKMax(design$kMax)
 
         if (.isDefinedArgument(design$informationRates)) {
             .assertAreValidInformationRates(design$informationRates, design$kMax)
         }
-
         if (.isDefinedArgument(design$futilityBounds)) {
             .assertAreValidFutilityBounds(design$futilityBounds, design$kMax)
         }
@@ -325,12 +324,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     .assertIsInClosedInterval(delayedInformation, "delayedInformation", lower = 0, upper = NULL, naAllowed = TRUE)
 
     if (designClass == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL) {
-        design <- TrialDesignInverseNormal(
+        design <- TrialDesignInverseNormalR6$new(
             kMax = kMax, bindingFutility = bindingFutility,
             delayedInformation = delayedInformation
         )
     } else if (designClass == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL) {
-        design <- TrialDesignGroupSequential(
+        design <- TrialDesignGroupSequentialR6$new(
             kMax = kMax, bindingFutility = bindingFutility,
             delayedInformation = delayedInformation
         )
@@ -1769,7 +1768,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         writeToDesign = FALSE, twoSidedWarningForDefaultValues = FALSE
     )
 
-    designCharacteristics <- TrialDesignCharacteristics(design = design)
+    designCharacteristics <- TrialDesignCharacteristicsR6$new(design = design)
 
     designCharacteristics$rejectionProbabilities <- rep(NA_real_, design$kMax)
     designCharacteristics$.setParameterType("rejectionProbabilities", C_PARAM_NOT_APPLICABLE)

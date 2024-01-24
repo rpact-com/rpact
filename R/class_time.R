@@ -213,7 +213,7 @@ getPiecewiseSurvivalTime <- function(piecewiseSurvivalTime = NA_real_,
         ignore = c(".pi1Default", ".lambdaBased", ".silent"), exceptionEnabled = TRUE
     )
 
-    if (inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvival")) {
+    if (inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvival") || inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvivalR6")) {
         piecewiseSurvivalTime <- piecewiseSurvivalTime$.piecewiseSurvivalTime
     }
 
@@ -307,7 +307,7 @@ getAccrualTime <- function(accrualTime = NA_real_,
     )
 
     if (inherits(accrualTime, "AccrualTime") ||
-            inherits(accrualTime, "TrialDesignPlanSurvival")) {
+            inherits(accrualTime, "TrialDesignPlanSurvival") || inherits(accrualTime, "TrialDesignPlanSurvivalR6")) {
         if (!identical(accrualIntensity, C_ACCRUAL_INTENSITY_DEFAULT)) {
             .warnInCaseOfUnusedArgument(accrualIntensity, "accrualIntensity", NA_real_, "getAccrualTime")
         }
@@ -318,7 +318,7 @@ getAccrualTime <- function(accrualTime = NA_real_,
         return(accrualTime)
     }
 
-    if (inherits(accrualTime, "TrialDesignPlanSurvival")) {
+    if (inherits(accrualTime, "TrialDesignPlanSurvival") || inherits(accrualTime, "TrialDesignPlanSurvivalR6")) {
         return(accrualTime$.accrualTime)
     }
 

@@ -1020,12 +1020,12 @@ getMedianByPi <- function(piValue,
             designParametersToShow <- c(designParametersToShow, ".design$stageLevels")
         }
         if (design$sided == 2 && !grepl("Analysis|Simulation", .getClassName(parameterSet)) &&
-                (!inherits(parameterSet, "TrialDesignPlan") || parameterSet$.isSampleSizeObject())) {
+                (!(inherits(parameterSet, "TrialDesignPlan") || inherits(parameterSet, "TrialDesignPlanR6")) || parameterSet$.isSampleSizeObject())) {
             designParametersToShow <- c(designParametersToShow, ".design$twoSidedPower")
         }
         designParametersToShow <- c(designParametersToShow, ".design$alpha")
         if (!grepl("Analysis|Simulation", .getClassName(parameterSet)) &&
-                (!inherits(parameterSet, "TrialDesignPlan") || parameterSet$.isSampleSizeObject())) {
+                (!(inherits(parameterSet, "TrialDesignPlan") || inherits(parameterSet, "TrialDesignPlanR6")) || parameterSet$.isSampleSizeObject())) {
             designParametersToShow <- c(designParametersToShow, ".design$beta")
         }
 

@@ -125,7 +125,7 @@ NULL
 }
 
 .getGeneratorFunctionName <- function(obj) {
-    if ("TrialDesignPlanMeans" == .getClassName(obj)) {
+    if ("TrialDesignPlanMeans" == .getClassName(obj) || "TrialDesignPlanMeansR6" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeMeans")
         }
@@ -133,7 +133,7 @@ NULL
         return("getPowerMeans")
     }
     
-    if ("TrialDesignPlanRates" == .getClassName(obj)) {
+    if ("TrialDesignPlanRates" == .getClassName(obj) || "TrialDesignPlanRatesR6" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeRates")
         } 
@@ -141,7 +141,7 @@ NULL
         return("getPowerRates")
     } 
     
-    if ("TrialDesignPlanSurvival" == .getClassName(obj)) {
+    if ("TrialDesignPlanSurvival" == .getClassName(obj) || "TrialDesignPlanSurvivalR6" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeSurvival")
         } 
@@ -149,10 +149,10 @@ NULL
         return("getPowerSurvival")
     }  
     
-    if (inherits(obj, "TrialDesign")) {
-        return(paste0("get", sub("^Trial", "", .getClassName(obj))))
+    if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignR6")) {
+        return(paste0("get", sub("^Trial", "", sub("R6","",.getClassName(obj)))))
     }  
-    
+  
     if (inherits(obj, "Dataset")) {
         return("getDataset")
     }  
@@ -161,11 +161,11 @@ NULL
         return("getAnalysisResults")
     }  
     
-    if ("TrialDesignSet" == .getClassName(obj)) {
+    if ("TrialDesignSet" == .getClassName(obj) || "TrialDesignSetR6" == .getClassName(obj)) {
         return("getDesignSet")
     }  
     
-    if ("TrialDesignCharacteristics" == .getClassName(obj)) {
+    if ("TrialDesignCharacteristics" == .getClassName(obj) || "TrialDesignCharacteristicsR6" == .getClassName(obj)) {
         return("getDesignCharacteristics")
     }  
     
@@ -237,7 +237,7 @@ NULL
         return("gePerformanceScore")
     }  
     
-    if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
+    if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj) || inherits(obj, "SummaryFactoryR6") || "SummaryFactoryR6" == .getClassName(obj)) {
         return(.getGeneratorFunctionName(obj$object))
     } 
     
@@ -728,7 +728,7 @@ getObjectRCode <- function(obj, ...,
             }
         }
 
-        if (inherits(obj, "TrialDesignPlanSurvival")) {
+        if (inherits(obj, "TrialDesignPlanSurvival") || inherits(obj, "TrialDesignPlanSurvivalR6")) {
             if (!("accrualTime" %in% objNames) &&
                     obj$.getParameterType("accrualTime") == "g" && !all(is.na(obj$accrualTime))) {
                 # case 2: follow-up time and absolute intensity given

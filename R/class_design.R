@@ -65,7 +65,7 @@ NULL
 TrialDesign <- setRefClass("TrialDesign",
     contains = "ParameterSet",
     fields = list(
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         kMax = "integer",
         alpha = "numeric",
         stages = "integer",
@@ -99,7 +99,7 @@ TrialDesign <- setRefClass("TrialDesign",
                 tolerance = tolerance
             )
 
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
 
             if (inherits(.self, "TrialDesignConditionalDunnett")) {
                 .parameterNames <<- C_PARAMETER_NAMES
@@ -1160,59 +1160,6 @@ plot.TrialDesignCharacteristics <- function(x, y, ...) {
     plot(x = x$.design, y = y, ...)
 }
 
-.plotTrialDesign <- function(..., x, y, main,
-        xlab, ylab, type, palette,
-        theta, nMax, plotPointsEnabled,
-        legendPosition, showSource, designName, plotSettings = NULL) {
-    .assertGgplotIsInstalled()
-
-    .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-    if (any(.isTrialDesignFisher(x)) && !(type %in% c(1, 3, 4))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4"
-        )
-    }
-
-    .warnInCaseOfUnknownArguments(
-        functionName = "plot",
-        ignore = c("xlim", "ylim", "companyAnnotationEnabled", "variedParameters"), ...
-    )
-
-    if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {
-        warning("'theta' (", .reconstructSequenceCommand(theta), ") will be ignored for plot type ", type, call. = FALSE)
-    }
-
-    if (!missing(y) && !is.null(y) && length(y) == 1 && inherits(y, "TrialDesign")) {
-        args <- list(...)
-        variedParameters <- args[["variedParameters"]]
-        if (is.null(variedParameters)) {
-            if (.isTrialDesignInverseNormalOrGroupSequential(x) &&
-                    .isTrialDesignInverseNormalOrGroupSequential(y) &&
-                    x$typeOfDesign != y$typeOfDesign) {
-                variedParameters <- "typeOfDesign"
-            } else {
-                stop(
-                    C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                    "'variedParameters' needs to be specified, e.g., variedParameters = \"typeOfDesign\""
-                )
-            }
-        }
-        designSet <- getDesignSet(designs = c(x, y), variedParameters = variedParameters)
-    } else {
-        designSet <- TrialDesignSet(design = x, singleDesign = TRUE)
-        if (!is.null(plotSettings)) {
-            designSet$.plotSettings <- plotSettings
-        }
-    }
-
-    .plotTrialDesignSet(
-        x = designSet, y = y, main = main, xlab = xlab, ylab = ylab, type = type,
-        palette = palette, theta = theta, nMax = nMax,
-        plotPointsEnabled = plotPointsEnabled, legendPosition = legendPosition,
-        showSource = showSource, designSetName = designName, ...
-    )
-}
 
 #'
 #' @title

@@ -45,7 +45,7 @@ PerformanceScore <- setRefClass("PerformanceScore",
     contains = "ParameterSet",
     fields = list(
         .simulationResults = "ANY",
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         .alternative = "numeric",
         locationSampleSize = "numeric",
         variationSampleSize = "numeric",
@@ -59,7 +59,7 @@ PerformanceScore <- setRefClass("PerformanceScore",
         initialize = function(simulationResults, ...) {
             callSuper(.simulationResults = simulationResults, ...)
 
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
             .parameterNames <<- C_PARAMETER_NAMES
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
         },

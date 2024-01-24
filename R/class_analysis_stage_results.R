@@ -65,7 +65,7 @@
 StageResults <- setRefClass("StageResults",
     contains = "ParameterSet",
     fields = list(
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         .design = "TrialDesign",
         .dataInput = "Dataset",
         stage = "integer",
@@ -84,7 +84,7 @@ StageResults <- setRefClass("StageResults",
             .design <<- design
             .dataInput <<- dataInput
 
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
             if (!missing(design)) {
                 stages <<- c(1:design$kMax)
                 if (design$kMax == C_KMAX_DEFAULT) {
@@ -1243,75 +1243,6 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
     return(stageResults)
 }
 
-.getTreatmentArmsToShow <- function(x, ...) {
-    dataInput <- x
-    if (!inherits(dataInput, "Dataset")) {
-        dataInput <- x[[".dataInput"]]
-    }
-    if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "failed to get 'dataInput' from ", .getClassName(x))
-    }
-
-    numberOfTreatments <- dataInput$getNumberOfGroups()
-    if (numberOfTreatments > 1) {
-        validComparisons <- 1L:as.integer(numberOfTreatments - 1)
-    } else {
-        validComparisons <- 1L
-    }
-
-    treatmentArmsToShow <- .getOptionalArgument("treatmentArms", ...)
-    if (!is.null(treatmentArmsToShow)) {
-        treatmentArmsToShow <- as.integer(na.omit(treatmentArmsToShow))
-    }
-    if (is.null(treatmentArmsToShow) || length(treatmentArmsToShow) == 0 ||
-            all(is.na(treatmentArmsToShow)) || !is.numeric(treatmentArmsToShow)) {
-        treatmentArmsToShow <- validComparisons
-    } else if (!all(treatmentArmsToShow %in% validComparisons)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'treatmentArms' (",
-            .arrayToString(treatmentArmsToShow), ") must be a vector ",
-            "containing one or more values of ", .arrayToString(validComparisons)
-        )
-    }
-    treatmentArmsToShow <- sort(unique(treatmentArmsToShow))
-    return(treatmentArmsToShow)
-}
-
-.getPopulationsToShow <- function(x, ..., gMax) {
-    dataInput <- x
-    if (!inherits(dataInput, "Dataset")) {
-        dataInput <- x[[".dataInput"]]
-    }
-    if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "failed to get 'dataInput' from ", .getClassName(x))
-    }
-
-    numberOfPopulations <- gMax
-    if (numberOfPopulations > 1) {
-        validComparisons <- 1L:as.integer(numberOfPopulations)
-    } else {
-        validComparisons <- 1L
-    }
-
-    populationsToShow <- .getOptionalArgument("populations", ...)
-
-    if (!is.null(populationsToShow)) {
-        populationsToShow <- as.integer(na.omit(populationsToShow))
-    }
-    if (is.null(populationsToShow) || length(populationsToShow) == 0 ||
-            all(is.na(populationsToShow)) || !is.numeric(populationsToShow)) {
-        populationsToShow <- validComparisons
-    } else if (!all(populationsToShow %in% validComparisons)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (",
-            .arrayToString(populationsToShow), ") must be a vector ",
-            "containing one or more values of ", .arrayToString(validComparisons)
-        )
-    }
-    populationsToShow <- sort(unique(populationsToShow))
-    return(populationsToShow)
-}
-
 #'
 #' @title
 #' Stage Results Plotting
@@ -1567,117 +1498,4 @@ plot.StageResults <- function(x, y, ..., type = 1L,
         legendTitle = legendTitle, palette = palette, legendPosition = legendPosition, numberOfPairedLines = 2L,
         plotSettings = plotSettings
     ))
-}
-
-.createAnalysisResultsPlotObject <- function(x, ..., data, plotData,
-        main = NA_character_, xlab = NA_character_, ylab = NA_character_,
-        legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
-        numberOfPairedLines = NA_integer_, plotSettings = NULL) {
-    ciModeEnabled <- !is.null(data[["lower"]]) && !is.null(data[["upper"]])
-
-    if (!ciModeEnabled) {
-        p <- ggplot2::ggplot(data, ggplot2::aes(
-            x = .data[["xValues"]], y = .data[["yValues"]],
-            colour = factor(.data[["categories"]]),
-            linetype = factor(.data[["categories"]])
-        ))
-    } else {
-        p <- ggplot2::ggplot(data, ggplot2::aes(
-            x = .data[["xValues"]], y = .data[["yValues"]],
-            colour = factor(.data[["categories"]])
-        ))
-    }
-
-    if (is.null(plotSettings)) {
-        plotSettings <- x$getPlotSettings()
-    }
-
-    p <- plotSettings$setTheme(p)
-    p <- plotSettings$hideGridLines(p)
-
-    # set main title
-    mainTitle <- ifelse(!is.call(main) && !isS4(main) && is.na(main), plotData$main, main)
-    p <- plotSettings$setMainTitle(p, mainTitle, subtitle = plotData$sub)
-
-    # set legend
-    if (is.na(legendPosition)) {
-        legendPosition <- C_POSITION_LEFT_TOP
-    }
-    p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition)
-    p <- plotSettings$setLegendBorder(p)
-    p <- plotSettings$setLegendTitle(p, legendTitle)
-    p <- plotSettings$setLegendLabelSize(p)
-
-    # set axes labels
-    p <- plotSettings$setAxesLabels(p,
-        xAxisLabel = plotData$xlab, yAxisLabel1 = plotData$ylab,
-        xlab = xlab, ylab = ylab
-    )
-
-    # plot lines and points
-    if (!ciModeEnabled) {
-        if (is.na(numberOfPairedLines)) {
-            numberOfPairedLines <- 2
-            if (x$.isMultiArm()) {
-                numberOfPairedLines <- length(unique(data$treatmentArms)) - 1
-            } else if (x$.isEnrichment()) {
-                numberOfPairedLines <- length(unique(data$populations)) - 1
-            }
-        }
-
-        p <- plotSettings$plotValues(p, plotPointsEnabled = FALSE, pointBorder = 1)
-        n <- length(unique(data$categories)) / numberOfPairedLines
-        if (n > 1) {
-            lineTypeValues <- rep(1:numberOfPairedLines, n)
-            colorTypes <- sort(rep(1:n, numberOfPairedLines))
-            for (i in c(1, 3)) {
-                colorTypes[colorTypes >= i] <- colorTypes[colorTypes >= i] + 1
-            }
-            p <- p + ggplot2::scale_color_manual(name = legendTitle, values = colorTypes)
-            p <- p + ggplot2::scale_linetype_manual(name = legendTitle, values = lineTypeValues)
-        } else {
-            colorValues <- c(2, 4)
-            if (!x$.isMultiArm()) {
-                colorValues <- c(2, 2) # use only one color
-            }
-            p <- p + ggplot2::scale_color_manual(name = legendTitle, values = colorValues)
-            p <- p + ggplot2::scale_linetype_manual(name = legendTitle, values = c(1, 2))
-        }
-    }
-
-    # plot confidence intervall
-    else {
-        pd <- ggplot2::position_dodge(0.15)
-
-        p <- p + ggplot2::geom_errorbar(
-            data = data,
-            ggplot2::aes(ymin = .data[["lower"]], ymax = .data[["upper"]]),
-            width = 0.15, position = pd, size = 0.8
-        )
-        p <- p + ggplot2::geom_line(position = pd, linetype = "longdash")
-        p <- p + ggplot2::geom_point(position = pd, size = 2.0)
-
-
-        stage <- unique(data$xValues)
-        kMax <- list(...)[["kMax"]]
-        if (length(stage) == 1 && !is.null(kMax)) {
-            stages <- 1:kMax
-            p <- p + ggplot2::scale_x_continuous(breaks = stages)
-        } else if (length(stage) > 1 && all(stage %in% 1:10)) {
-            p <- p + ggplot2::scale_x_continuous(breaks = stage)
-        }
-    }
-
-    p <- plotSettings$setAxesAppearance(p)
-    p <- plotSettings$enlargeAxisTicks(p)
-
-    companyAnnotationEnabled <- .getOptionalArgument("companyAnnotationEnabled", ...)
-    if (is.null(companyAnnotationEnabled) || !is.logical(companyAnnotationEnabled)) {
-        companyAnnotationEnabled <- FALSE
-    }
-
-    p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
-
-    # start plot generation
-    return(p)
 }

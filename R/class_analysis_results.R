@@ -47,7 +47,7 @@
 ConditionalPowerResults <- setRefClass("ConditionalPowerResults",
     contains = "ParameterSet",
     fields = list(
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         .design = "TrialDesign",
         .stageResults = "StageResults",
         .plotData = "list",
@@ -61,7 +61,7 @@ ConditionalPowerResults <- setRefClass("ConditionalPowerResults",
         initialize = function(...) {
             callSuper(...)
 
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
             .parameterNames <<- C_PARAMETER_NAMES
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
 
@@ -515,7 +515,7 @@ ConditionalPowerResultsEnrichmentSurvival <- setRefClass("ConditionalPowerResult
 ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
     contains = "ParameterSet",
     fields = list(
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         .design = "TrialDesign",
         .enrichment = "logical",
         intersectionTest = "character",
@@ -532,7 +532,7 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
         initialize = function(...) {
             callSuper(...)
 
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
             .parameterNames <<- C_PARAMETER_NAMES
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
 
@@ -696,7 +696,7 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
 AnalysisResults <- setRefClass("AnalysisResults",
     contains = "ParameterSet",
     fields = list(
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         .design = "TrialDesign",
         .dataInput = "Dataset",
         .stageResults = "StageResults",
@@ -713,7 +713,7 @@ AnalysisResults <- setRefClass("AnalysisResults",
         initialize = function(design, dataInput, ...) {
             callSuper(.design = design, .dataInput = dataInput, ...)
 
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
             .parameterNames <<- .getParameterNames(design = design, analysisResults = .self)
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
         },

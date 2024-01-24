@@ -1025,7 +1025,7 @@ C_TABLE_COLUMN_NAMES <- list(
         parameterNames$futilityBounds <- captionList[[parameterNameFutilityBounds]]
     }
 
-    if (!is.null(designPlan) && inherits(designPlan, "TrialDesignPlanSurvival") &&
+    if (!is.null(designPlan) && (inherits(designPlan, "TrialDesignPlanSurvival") || inherits(designPlan, "TrialDesignPlanSurvivalR6")) &&
             !is.null(designPlan$.piecewiseSurvivalTime) &&
             designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
         parameterNames$lambda2 <- "Piecewise survival lambda (2)"
@@ -1033,12 +1033,12 @@ C_TABLE_COLUMN_NAMES <- list(
     }
 
     if (!is.null(designPlan) &&
-            inherits(designPlan, "TrialDesignPlanSurvival") &&
+            (inherits(designPlan, "TrialDesignPlanSurvival") || inherits(designPlan, "TrialDesignPlanSurvivalR6")) &&
             identical(designPlan$.design$kMax, 1L)) {
         parameterNames$maxNumberOfEvents <- "Number of events"
     }
 
-    if (!is.null(designPlan) && inherits(designPlan, "TrialDesignPlan") &&
+    if (!is.null(designPlan) && (inherits(designPlan, "TrialDesignPlan") || inherits(designPlan, "TrialDesignPlanR6")) &&
             identical(designPlan$.design$kMax, 1L)) {
         parameterNames$studyDuration <- "Study duration"
     }
@@ -1059,7 +1059,7 @@ C_TABLE_COLUMN_NAMES <- list(
     }
 
     if (!is.null(designPlan) &&
-            (inherits(designPlan, "TrialDesignPlanMeans") ||
+            ((inherits(designPlan, "TrialDesignPlanMeans") || inherits(designPlan, "TrialDesignPlanMeansR6")) ||
                 inherits(designPlan, "SimulationResultsMeans")) &&
             isTRUE(designPlan$meanRatio)) {
         parameterNames$stDev <- "Coefficient of variation"

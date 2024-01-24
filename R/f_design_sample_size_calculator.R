@@ -1256,6 +1256,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         dropoutTime = dropoutTime,
         hazardRatio = hazardRatio
     )
+    
     return(.getSampleSize(designPlan))
 }
 
@@ -1365,8 +1366,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
     }
 
     .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
-
-    designPlan <- TrialDesignPlanSurvival(
+    designPlan <- TrialDesignPlanSurvivalR6$new(
         design = design,
         typeOfComputation = typeOfComputation,
         thetaH0 = thetaH0,
@@ -3255,7 +3255,6 @@ getNumberOfSubjects <- function(time, ...,
 .getEventsFixed <- function(..., typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
         twoSidedPower, alpha, beta, sided, hazardRatio, thetaH0, allocationRatioPlanned) {
     typeOfComputation <- match.arg(typeOfComputation)
-
     if (typeOfComputation == "Schoenfeld") {
         eventsFixed <- (.getOneMinusQNorm(alpha / sided) + .getOneMinusQNorm(beta))^2 /
             (log(hazardRatio) - log(thetaH0))^2 *
@@ -3934,7 +3933,7 @@ getNumberOfSubjects <- function(time, ...,
         }
     }
 
-    designPlan <- TrialDesignPlanMeans(design = design, meanRatio = meanRatio)
+    designPlan <- TrialDesignPlanMeansR6$new(design = design, meanRatio = meanRatio)
     designPlan$.setSampleSizeObject(objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
@@ -4125,7 +4124,7 @@ getNumberOfSubjects <- function(time, ...,
         }
     }
 
-    designPlan <- TrialDesignPlanRates(design = design)
+    designPlan <- TrialDesignPlanRatesR6$new(design = design)
     designPlan$.setSampleSizeObject(objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)

@@ -1364,7 +1364,7 @@ Dataset <- setRefClass("Dataset",
     contains = "ParameterSet",
     fields = list(
         .data = "data.frame",
-        .plotSettings = "PlotSettings",
+        .plotSettings = "ANY",
         .id = "integer",
         .description = "character",
         .floatingPointNumbersEnabled = "logical",
@@ -1382,7 +1382,7 @@ Dataset <- setRefClass("Dataset",
                 .floatingPointNumbersEnabled = floatingPointNumbersEnabled,
                 .enrichmentEnabled = enrichmentEnabled, ...
             )
-            .plotSettings <<- PlotSettings()
+            .plotSettings <<- PlotSettingsR6$new()
             .parameterNames <<- .getParameterNames(dataset = .self)
             .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
 

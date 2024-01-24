@@ -53,7 +53,7 @@
 PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberResult",
     contains = "ParameterSet",
     fields = list(
-        .design = "TrialDesign",
+        .design = "ANY",
         nMax = "numeric",
         theta = "numeric",
         averageSampleNumber = "numeric",

@@ -90,7 +90,7 @@ StageResultsR6 <- R6Class("StageResultsR6",
                                 self$.design <- design
                                 self$.dataInput <- dataInput
                                 
-                                self$.plotSettings <- PlotSettings()
+                                self$.plotSettings <- PlotSettingsR6$new()
                                 if (!missing(design)) {
                                   self$stages <- c(1:design$kMax)
                                   if (design$kMax == C_KMAX_DEFAULT) {

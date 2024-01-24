@@ -36,7 +36,7 @@ NULL
 
     .assertIsSingleInteger(type, "type", validateType = FALSE)
 
-    if (inherits(obj, "TrialDesignPlan")) {
+    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlanR6")) {
         if (type == 1) {
             if (.isTrialDesignPlanSurvival(obj)) {
                 return(.addNumberToPlotCaption("Boundaries Z Scale", type, numberInCaptionEnabled))
@@ -80,7 +80,7 @@ NULL
         return(.addNumberToPlotCaption("Reject per Stage", type, numberInCaptionEnabled))
     }
 
-    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "SimulationResults")) {
+    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlanR6") || inherits(obj, "SimulationResults")) {
         if (type == 5) {
             if (obj$.isSampleSizeObject()) {
                 return(.addNumberToPlotCaption("Sample Size", type, numberInCaptionEnabled))
@@ -117,7 +117,7 @@ NULL
         } else if (type == 14) {
             return(.addNumberToPlotCaption("Survival Function", type, numberInCaptionEnabled))
         }
-    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignSet")) {
+    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignSet") || inherits(obj, "TrialDesignR6") || inherits(obj, "TrialDesignSetR6")) {
         if (type == 1) {
             return(.addNumberToPlotCaption("Boundaries", type, numberInCaptionEnabled))
         } else if (type == 3) {
@@ -399,7 +399,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     types <- integer(0)
-    if (inherits(obj, "TrialDesignPlan")) {
+    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlanR6")) {
         if (obj$.design$kMax > 1) {
             types <- c(types, 1:4)
         }
@@ -454,9 +454,9 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             plotTypesToCheck <- c(1:14)
         }
         types <- .removeInvalidPlotTypes(obj, types, plotTypesToCheck)
-    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignSet")) {
+    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignR6") || inherits(obj, "TrialDesignSet") || inherits(obj, "TrialDesignSetR6")) {
         design <- obj
-        if (inherits(obj, "TrialDesignSet")) {
+        if (inherits(obj, "TrialDesignSet") || inherits(obj, "TrialDesignSetR6")) {
             design <- obj$getDesignMaster()
         }
         if (design$kMax > 1) {
@@ -710,7 +710,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         )
     }
 
-    if (inherits(parameterSet, "TrialDesignSet")) {
+    if (inherits(parameterSet, "TrialDesignSet") || inherits(parameterSet, "TrialDesignSetR6")) {
         suppressWarnings(data <- as.data.frame(parameterSet,
             niceColumnNamesEnabled = FALSE,
             includeAllParameters = TRUE,
@@ -827,8 +827,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             "overallEarlyStop", "calculatedPower"
         ))]
         fieldNames <- c(
-            names(parameterSet$getRefClass()$fields()),
-            names(designMaster$getRefClass()$fields())
+            names(parameterSet),#TODO
+            names(designMaster)#TODO
         )
         if (simulationEnrichmentEnmabled) {
             fieldNames <- c(fieldNames, gsub("s$", "", names(parameterSet$effectList)), "situation")
@@ -842,12 +842,12 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
                 )
             }
         }
-        if (is.null(plotSettings) || !inherits(plotSettings, "PlotSettings")) {
+        if (is.null(plotSettings) || !inherits(plotSettings, "PlotSettingsR6")) {
             plotSettings <- parameterSet$getPlotSettings()
         }
     } else {
-        if (is.null(plotSettings) || !inherits(plotSettings, "PlotSettings")) {
-            plotSettings <- PlotSettings()
+        if (is.null(plotSettings) || !inherits(plotSettings, "PlotSettingsR6")) {
+            plotSettings <- PlotSettingsR6$new()
         }
     }
 
@@ -1235,7 +1235,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (is.null(plotSettings)) {
-        plotSettings <- PlotSettings()
+        plotSettings <- PlotSettingsR6$new()
     }
 
     nRow <- nrow(data)
@@ -1592,7 +1592,7 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
 
     plotSettings <- x$.plotSettings
     if (is.null(plotSettings)) {
-        plotSettings <- PlotSettings()
+        plotSettings <- PlotSettingsR6$new()
     } else {
         plotSettings <- plotSettings$clone()
     }

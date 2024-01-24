@@ -1441,13 +1441,13 @@ as.data.frame.ParameterSetR6 <- function(x, row.names = NULL,
 #'
 #' @export
 #'
-setMethod(
-  "t", "FieldSet",#TODO
-  function(x) {
-    x <- as.matrix(x, niceColumnNamesEnabled = TRUE)
-    return(t(x))
-  }
-)
+#setMethod(
+#  "t", "FieldSet",#TODO
+#  function(x) {
+#    x <- as.matrix(x, niceColumnNamesEnabled = TRUE)
+#    return(t(x))
+#  }
+#)
 
 #'
 #' @title
@@ -1616,13 +1616,13 @@ as.matrix.FieldSetR6 <- function(x, ..., enforceRowNames = TRUE, niceColumnNames
 summary.ParameterSetR6 <- function(object, ..., type = 1, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
   .warnInCaseOfUnknownArguments(functionName = "summary", ...)
   
-  if (type == 1 && inherits(object, "SummaryFactory")) {
+  if (type == 1 && (inherits(object, "SummaryFactory") || inherits(object, "SummaryFactoryR6"))) {
     return(object)
   }
   
-  if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesignPlan") ||
+  if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesignR6") || inherits(object, "TrialDesignPlan") || inherits(object, "TrialDesignPlanR6") ||
                     inherits(object, "SimulationResults") || (inherits(object, "AnalysisResults") || inherits(object, "AnalysisResultsR6")) ||
-                    inherits(object, "TrialDesignCharacteristics") ||
+                    inherits(object, "TrialDesignCharacteristics") || inherits(object, "TrialDesignCharacteristicsR6") ||
                     inherits(object, "PerformanceScore"))) {
     output <- match.arg(output)
     return(.createSummary(object, digits = digits, output = output))
