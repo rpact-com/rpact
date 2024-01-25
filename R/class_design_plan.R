@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7551 $
-## |  Last changed: $Date: 2024-01-11 08:50:37 +0100 (Do, 11 Jan 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7592 $
+## |  Last changed: $Date: 2024-01-24 10:48:09 +0100 (Mi, 24 Jan 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_constants.R
@@ -67,7 +67,7 @@ C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_SURVIVAL <- list(
 
 C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_COUNT_DATA <- list(
     thetaH0 = 1,
-    overDispersion = 0,
+    overdispersion = 0,
     allocationRatioPlanned = 1
 )
 
@@ -964,7 +964,7 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
 #' @template field_futilityStop
 #' @template field_futilityPerStage
 #' @template field_earlyStop
-#' @template field_overDispersion
+#' @template field_overdispersion
 #' @template field_fixedExposureTime
 #' @template field_accrualTime
 #' @template field_accrualIntensity
@@ -1018,7 +1018,7 @@ TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
         futilityStop = "numeric",
         futilityPerStage = "matrix",
         earlyStop = "numeric",
-        overDispersion = "numeric",
+        overdispersion = "numeric",
         fixedExposureTime = "numeric",
         accrualTime = "numeric",
         accrualIntensity = "numeric",
@@ -1043,7 +1043,7 @@ TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
                 lambda = NA_real_,
                 theta = NA_real_,
                 thetaH0 = 1,
-                overDispersion = 0,
+                overdispersion = 0,
                 fixedExposureTime = NA_real_,
                 accrualTime = NA_real_,
                 accrualIntensity = NA_real_,
@@ -1056,7 +1056,7 @@ TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
                 lambda = lambda,
                 theta = theta,
                 thetaH0 = thetaH0,
-                overDispersion = overDispersion,
+                overdispersion = overdispersion,
                 fixedExposureTime = fixedExposureTime,
                 accrualTime = accrualTime,
                 accrualIntensity = accrualIntensity,
@@ -1100,7 +1100,7 @@ TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
                     lambda = .self$.getParameterValueIfUserDefinedOrDefault("lambda"),
                     theta = thetaTemp,
                     thetaH0 = .self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
-                    overDispersion = .self$.getParameterValueIfUserDefinedOrDefault("overDispersion"),
+                    overdispersion = .self$.getParameterValueIfUserDefinedOrDefault("overdispersion"),
                     fixedExposureTime = .self$.getParameterValueIfUserDefinedOrDefault("fixedExposureTime"),
                     accrualTime = .self$.getParameterValueIfUserDefinedOrDefault("accrualTime"),
                     accrualIntensity = .self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity"),
@@ -1118,7 +1118,7 @@ TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
                     lambda = .self$.getParameterValueIfUserDefinedOrDefault("lambda"),
                     theta = thetaTemp,
                     thetaH0 = .self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
-                    overDispersion = .self$.getParameterValueIfUserDefinedOrDefault("overDispersion"),
+                    overdispersion = .self$.getParameterValueIfUserDefinedOrDefault("overdispersion"),
                     fixedExposureTime = .self$.getParameterValueIfUserDefinedOrDefault("fixedExposureTime"),
                     accrualTime = .self$.getParameterValueIfUserDefinedOrDefault("accrualTime"),
                     accrualIntensity = .self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity"),

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7557 $
-## |  Last changed: $Date: 2024-01-12 13:41:28 +0100 (Fr, 12 Jan 2024) $
+## |  File version: $Revision: 7565 $
+## |  Last changed: $Date: 2024-01-15 15:07:02 +0100 (Mo, 15 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -144,19 +144,19 @@
 .getTrialDesignPlanTheta <- function(designPlan, theta) {   
     thetaName <- NA_character_
     if (.isTrialDesignPlanMeans(designPlan) && 
-            designPlan$.getParameterType("alternative") == C_PARAM_USER_DEFINED) {
+            designPlan$.getParameterType("alternative") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "alternative"
     } else if ((.isTrialDesignPlanRates(designPlan) || .isTrialDesignPlanSurvival(designPlan)) &&
-            designPlan$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
+            designPlan$.getParameterType("pi1") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "pi1"
     } else if (.isTrialDesignPlanCountData(designPlan) && 
-            designPlan$.getParameterType("theta") == C_PARAM_USER_DEFINED) {
+            designPlan$.getParameterType("theta") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "theta"
     } else if (.isTrialDesignPlanCountData(designPlan) && 
-            designPlan$.getParameterType("lambda1") == C_PARAM_USER_DEFINED) {
+            designPlan$.getParameterType("lambda1") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "lambda1"
-    } else if (survivalDesignPlanEnabled && 
-            designPlan$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
+    } else if (.isTrialDesignPlanSurvival(designPlan) && 
+            designPlan$.getParameterType("hazardRatio") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "hazardRatio"
     }
     if (is.na(thetaName)) {
@@ -226,7 +226,8 @@
     showSourceHint <- ""
     if (type %in% c(5:12)) {
         result <- .getTrialDesignPlanTheta(designPlan, theta)
-        if (!all(is.na(result$theta)) && length(result$theta) == 2 && !is.na(result$thetaName)) {
+        if (!all(is.na(result$theta)) && !is.na(result$thetaName) && 
+                (length(result$theta) == 2 || !identical(result$theta, designPlan[[result$thetaName]]))) {
             if (!is.logical(showSource) || isTRUE(showSource)) {
                 showSourceHint <- .getVariedParameterHint(result$theta, result$thetaName)
             }

@@ -13,12 +13,14 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7552 $
-## |  Last changed: $Date: 2024-01-11 09:18:50 +0100 (Do, 11 Jan 2024) $
+## |  File version: $Revision: 7592 $
+## |  Last changed: $Date: 2024-01-24 10:48:09 +0100 (Mi, 24 Jan 2024) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
-.getCalendarTime <- function(n1, n2,
+.getCalendarTime <- function(
+        n1, 
+        n2,
         information,
         shift,
         accrualTime,
@@ -28,7 +30,7 @@
         lambda1,
         lambda2,
         thetaH0,
-        overDispersion) {
+        overdispersion) {
     if (any(is.na(recruit1))) {
         recruit1 <- seq(0, accrualTime, length.out = n1)
     }
@@ -49,9 +51,9 @@
                         timeUnderObservation2 <- pmax(x - recruit2, 0)
                     }
                     sumLambda1 <- sum(timeUnderObservation1 * lambda1 /
-                        (1 + overDispersion * timeUnderObservation1 * lambda1))
+                        (1 + overdispersion * timeUnderObservation1 * lambda1))
                     sumLambda2 <- sum(timeUnderObservation2 * lambda2 /
-                        (1 + overDispersion * timeUnderObservation2 * lambda2))
+                        (1 + overdispersion * timeUnderObservation2 * lambda2))
                     return(1 / (1 / sumLambda1 + 1 / sumLambda2) -
                         information * shift / log(lambda1 / lambda2 / thetaH0)^2)
                 },
@@ -76,7 +78,7 @@
         lambda1,
         lambda2,
         thetaH0,
-        overDispersion) {
+        overdispersion) {
     n2 <- stats::uniroot(function(y) {
         n2 <- y
         n1 <- allocationRatioPlanned * n2
@@ -85,9 +87,9 @@
         timeUnderObservation2 <-
             pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n2), 0)
         sumLambda1 <- sum(timeUnderObservation1 * lambda1 /
-            (1 + overDispersion * timeUnderObservation1 * lambda1))
+            (1 + overdispersion * timeUnderObservation1 * lambda1))
         sumLambda2 <- sum(timeUnderObservation2 * lambda2 /
-            (1 + overDispersion * timeUnderObservation2 * lambda2))
+            (1 + overdispersion * timeUnderObservation2 * lambda2))
         return(1 / (1 / sumLambda1 + 1 / sumLambda2) -
             shift / log(lambda1 / lambda2 / thetaH0)^2)
     }, interval = c(0, 10^4), extendInt = "yes", tol = 1e-02)$root
@@ -97,8 +99,8 @@
     # ensure that information is reached (necessary, gscounts does not check!)
     timeUnderObservation1 <- pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n1), 0)
     timeUnderObservation2 <- pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n2), 0)
-    sumLambda1 <- sum(timeUnderObservation1 * lambda1 / (1 + overDispersion * timeUnderObservation1 * lambda1))
-    sumLambda2 <- sum(timeUnderObservation2 * lambda2 / (1 + overDispersion * timeUnderObservation2 * lambda2))
+    sumLambda1 <- sum(timeUnderObservation1 * lambda1 / (1 + overdispersion * timeUnderObservation1 * lambda1))
+    sumLambda2 <- sum(timeUnderObservation2 * lambda2 / (1 + overdispersion * timeUnderObservation2 * lambda2))
     if (1 / (1 / sumLambda1 + 1 / sumLambda2) < shift / log(lambda1 / lambda2 / thetaH0)^2) {
         n2 <- n2 + 1
         n1 <- n1 + 1
@@ -118,7 +120,7 @@
         lambda,
         theta,
         thetaH0,
-        overDispersion,
+        overdispersion,
         fixedExposureTime,
         accrualTime,
         accrualIntensity,
@@ -164,7 +166,7 @@
         lambda = lambda,
         theta = theta,
         thetaH0 = thetaH0,
-        overDispersion = overDispersion
+        overdispersion = overdispersion
     )
 
     if (design$sided == 2 && thetaH0 != 1) {
@@ -187,9 +189,12 @@
     .setValueAndParameterType(designPlan, "lambda", lambda, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "theta", theta, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "thetaH0", thetaH0, 1, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(designPlan, "overDispersion", overDispersion, 0)
+    .setValueAndParameterType(designPlan, "overdispersion", overdispersion, 0)
     .setValueAndParameterType(designPlan, "fixedExposureTime", fixedExposureTime, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "accrualTime", accrualTime, NA_real_, notApplicableIfNA = TRUE)
+    if (designPlan$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
+        designPlan$.parameterFormatFunctions$accrualTime <- ".formatHowItIs"
+    }
     .setValueAndParameterType(designPlan, "accrualIntensity", accrualIntensity, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "followUpTime", followUpTime, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "maxNumberOfSubjects", as.integer(maxNumberOfSubjects), NA_integer_, notApplicableIfNA = TRUE)
@@ -268,7 +273,7 @@
 #' @inheritParams param_accrualIntensity_counts
 #' @inheritParams param_followUpTime_counts
 #' @inheritParams param_maxNumberOfSubjects
-#' @inheritParams param_overDispersion_counts
+#' @inheritParams param_overdispersion_counts
 #' @inheritParams param_allocationRatioPlanned_sampleSize
 #' @inheritParams param_three_dots
 #'
@@ -296,7 +301,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
         lambda = NA_real_,
         theta = NA_real_,
         thetaH0 = 1,
-        overDispersion = 0,
+        overdispersion = 0,
         fixedExposureTime = NA_real_,
         accrualTime = NA_real_,
         accrualIntensity = NA_real_,
@@ -336,7 +341,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
         lambda,
         theta,
         thetaH0,
-        overDispersion,
+        overdispersion,
         fixedExposureTime,
         accrualTime,
         accrualIntensity,
@@ -355,7 +360,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
     if (length(accrualTime) > 1) {
         accrualTime <- accrualTime[-1]
     }
-
+    
     if (design$kMax > 1) {
         designPlan$rejectPerStage <- matrix(designCharacteristics$rejectionProbabilities, ncol = 1)
         designPlan$.setParameterType("rejectPerStage", C_PARAM_GENERATED)
@@ -381,11 +386,6 @@ getSampleSizeCounts <- function(design = NULL, ...,
         designPlan$earlyStop <- sum(c(designCharacteristics$rejectionProbabilities[1:(design$kMax - 1)], designPlan$futilityStop))
         designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
 
-        if (is.na(maxNumberOfSubjects)) {
-            designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
-        } else {
-            designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_USER_DEFINED)
-        }
     } else {
         designPlan$.setParameterType("nFixed", C_PARAM_GENERATED)
     }
@@ -419,7 +419,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
                         }
                         varianceEstimate <- 1 / fixedExposureTime *
                             (1 / lambda2 + 1 / (lambda1[iCase] * x)) +
-                            overDispersion * (1 + 1 / x)
+                            overdispersion * (1 + 1 / x)
                         n2[iCase] <- (qnorm(1 - alpha / sided) + qnorm(1 - beta))^2 *
                             varianceEstimate / log(lambda1[iCase] / lambda2 / thetaH0)^2
                         return(x * n2[iCase] + n2[iCase])
@@ -435,7 +435,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
             # method 2 of Zhu & Lakkis (2013), coincides with Friede & Schmidli (2010)
             varianceEstimate <- 1 / fixedExposureTime *
                 (1 / lambda2 + 1 / (lambda1[iCase] * allocationRatioPlanned[iCase])) +
-                overDispersion * (1 + 1 / allocationRatioPlanned[iCase])
+                overdispersion * (1 + 1 / allocationRatioPlanned[iCase])
             n2[iCase] <- designCharacteristics$inflationFactor *
                 (qnorm(1 - alpha / sided) + qnorm(1 - beta))^2 * varianceEstimate /
                 log(lambda1[iCase] / lambda2 / thetaH0)^2
@@ -448,11 +448,11 @@ getSampleSizeCounts <- function(design = NULL, ...,
                 recruit1 <- seq(0, accrualTime, length.out = n1[iCase])
                 recruit2 <- seq(0, accrualTime, length.out = n2[iCase])
                 if (kMax > 1) {
-                    for (k in (1:(kMax - 1))) {
+                    for (k in 1:(kMax - 1)) {
                         calendarTime[k, iCase] <- .getCalendarTime(
                             n1[iCase], n2[iCase], informationRates[k], shift,
                             accrualTime, NA_real_, NA_real_, fixedExposureTime,
-                            lambda1[iCase], lambda2, thetaH0, overDispersion
+                            lambda1[iCase], lambda2, thetaH0, overdispersion
                         )
                     }
                 }
@@ -494,15 +494,15 @@ getSampleSizeCounts <- function(design = NULL, ...,
                 studyTime[iCase] <- .getCalendarTime(
                     n1[iCase], n2[iCase], informationRates[kMax], shift,
                     accrualTime, recruit1, recruit2, NA_real_,
-                    lambda1[iCase], lambda2, thetaH0, overDispersion
+                    lambda1[iCase], lambda2, thetaH0, overdispersion
                 )
 
                 if (kMax > 1) {
-                    for (k in (1:(kMax - 1))) {
+                    for (k in 1:(kMax - 1)) {
                         calendarTime[k, iCase] <- .getCalendarTime(
                             n1[iCase], n2[iCase], informationRates[k], shift,
                             accrualTime, recruit1, recruit2, NA_real_,
-                            lambda1[iCase], lambda2, thetaH0, overDispersion
+                            lambda1[iCase], lambda2, thetaH0, overdispersion
                         )
                     }
                 }
@@ -515,15 +515,15 @@ getSampleSizeCounts <- function(design = NULL, ...,
                 studyTime[iCase] <- .getCalendarTime(
                     n1[iCase], n2[iCase], informationRates[kMax], shift,
                     accrualTime, NA_real_, NA_real_, NA_real_,
-                    lambda1[iCase], lambda2, thetaH0, overDispersion
+                    lambda1[iCase], lambda2, thetaH0, overdispersion
                 )
 
                 if (kMax > 1) {
-                    for (k in (1:(kMax - 1))) {
+                    for (k in 1:(kMax - 1)) {
                         calendarTime[k, iCase] <- .getCalendarTime(
                             n1[iCase], n2[iCase], informationRates[k], shift,
                             accrualTime, NA_real_, NA_real_, NA_real_,
-                            lambda1[iCase], lambda2, thetaH0, overDispersion
+                            lambda1[iCase], lambda2, thetaH0, overdispersion
                         )
                     }
                 }
@@ -539,7 +539,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
                     }
                     n2[iCase] <- .getMaximumSampleSizeTwoGroups(
                         x, shift, accrualTime, followUpTime,
-                        lambda1[iCase], lambda2, thetaH0, overDispersion
+                        lambda1[iCase], lambda2, thetaH0, overdispersion
                     )$n2
                     return(x * n2[iCase] + n2[iCase])
                 }, interval = c(0, 5), tol = 1e-05)$minimum
@@ -553,7 +553,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
 
             sampleSizes <- .getMaximumSampleSizeTwoGroups(
                 allocationRatioPlanned[iCase], shift, accrualTime, followUpTime,
-                lambda1[iCase], lambda2, thetaH0, overDispersion
+                lambda1[iCase], lambda2, thetaH0, overdispersion
             )
             n1[iCase] <- sampleSizes$n1
             n2[iCase] <- sampleSizes$n2
@@ -562,11 +562,11 @@ getSampleSizeCounts <- function(design = NULL, ...,
                 recruit2 <- seq(0, accrualTime, length.out = n2[iCase])
             }
             if (kMax > 1) {
-                for (k in (1:(kMax - 1))) {
+                for (k in 1:(kMax - 1)) {
                     calendarTime[k, iCase] <- .getCalendarTime(
                         n1[iCase], n2[iCase], informationRates[k], shift,
                         accrualTime, NA_real_, NA_real_, NA_real_,
-                        lambda1[iCase], lambda2, thetaH0, overDispersion
+                        lambda1[iCase], lambda2, thetaH0, overdispersion
                     )
                 }
             }
@@ -645,23 +645,21 @@ getSampleSizeCounts <- function(design = NULL, ...,
             C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE
         )
     )
-
+    
+    if (!is.na(maxNumberOfSubjects)) {
+        designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_USER_DEFINED)
+    } else {
+        designPlan$maxNumberOfSubjects <- n1 + n2
+        designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
+    }
+  
+    designPlan$maxNumberOfSubjects1 <- n1
+    designPlan$.setParameterType("maxNumberOfSubjects1", C_PARAM_GENERATED)
+    
+    designPlan$maxNumberOfSubjects2 <- n2
+    designPlan$.setParameterType("maxNumberOfSubjects2", C_PARAM_GENERATED)
+ 
     if (design$kMax > 1) {
-        if (designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED) {
-            designPlan$maxNumberOfSubjects <- n1 + n2
-        }
-
-        designPlan$maxNumberOfSubjects1 <- n1
-        designPlan$.setParameterType(
-            "maxNumberOfSubjects1",
-            C_PARAM_GENERATED
-        )
-
-        designPlan$maxNumberOfSubjects2 <- n2
-        designPlan$.setParameterType(
-            "maxNumberOfSubjects2",
-            C_PARAM_GENERATED
-        )
 
         designPlan$informationOverStages <- informationOverStages
         designPlan$.setParameterType("informationOverStages", C_PARAM_GENERATED)
@@ -745,7 +743,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
 #' @inheritParams param_accrualIntensity_counts
 #' @inheritParams param_followUpTime_counts
 #' @inheritParams param_maxNumberOfSubjects
-#' @inheritParams param_overDispersion_counts
+#' @inheritParams param_overdispersion_counts
 #' @inheritParams param_directionUpper
 #' @inheritParams param_maxNumberOfSubjects
 #' @inheritParams param_allocationRatioPlanned
@@ -777,7 +775,7 @@ getPowerCounts <- function(design = NULL, ...,
         lambda = NA_real_,
         theta = NA_real_,
         thetaH0 = 1,
-        overDispersion = 0,
+        overdispersion = 0,
         fixedExposureTime = NA_real_,
         accrualTime = NA_real_,
         accrualIntensity = NA_real_,
@@ -816,7 +814,7 @@ getPowerCounts <- function(design = NULL, ...,
         lambda,
         theta,
         thetaH0,
-        overDispersion,
+        overdispersion,
         fixedExposureTime,
         accrualTime,
         accrualIntensity,
@@ -888,16 +886,16 @@ getPowerCounts <- function(design = NULL, ...,
         if (!is.na(fixedExposureTime)) {
             varianceEstimate <- (1 + allocationRatioPlanned) * (1 / fixedExposureTime *
                 (1 / lambda2 + 1 / (lambda1[iCase] * allocationRatioPlanned)) +
-                overDispersion * (1 + 1 / allocationRatioPlanned))
+                overdispersion * (1 + 1 / allocationRatioPlanned))
         } else {
             timeUnderObservation1 <-
                 pmax(accrualTime[length(accrualTime)] + followUpTime - recruit1, 0)
             timeUnderObservation2 <-
                 pmax(accrualTime[length(accrualTime)] + followUpTime - recruit2, 0)
             sumLambda1 <- sum(timeUnderObservation1 * lambda1[iCase] /
-                (1 + overDispersion * timeUnderObservation1 * lambda1[iCase]))
+                (1 + overdispersion * timeUnderObservation1 * lambda1[iCase]))
             sumLambda2 <- sum(timeUnderObservation2 * lambda2 /
-                (1 + overDispersion * timeUnderObservation2 * lambda2))
+                (1 + overdispersion * timeUnderObservation2 * lambda2))
             varianceEstimate <- nTotal * (1 / sumLambda1 + 1 / sumLambda2)
         }
 

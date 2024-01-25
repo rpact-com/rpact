@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7540 $
-## |  Last changed: $Date: 2024-01-08 16:06:46 +0100 (Mo, 08 Jan 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7590 $
+## |  Last changed: $Date: 2024-01-23 11:32:01 +0100 (Di, 23 Jan 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -2760,7 +2760,7 @@ NULL
         lambda,
         theta,
         thetaH0,
-        overDispersion) {
+        overdispersion) {
     .assertIsSingleInteger(sided, "sided", validateType = FALSE)
     if (sided != 1 && sided != 2) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'sided' (", sided, ") must be defined as 1 or 2")
@@ -2774,8 +2774,8 @@ NULL
     .assertIsNumericVector(theta, "theta", naAllowed = TRUE)
     .assertIsInOpenInterval(theta, "theta", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsValidThetaH0(thetaH0, endpoint = "counts", groups = 2)    
-    .assertIsSingleNumber(overDispersion, "overDispersion", naAllowed = TRUE)
-    .assertIsInClosedInterval(overDispersion, "overDispersion", lower = 0, upper = NULL, naAllowed = TRUE)
+    .assertIsSingleNumber(overdispersion, "overdispersion", naAllowed = TRUE)
+    .assertIsInClosedInterval(overdispersion, "overdispersion", lower = 0, upper = NULL, naAllowed = TRUE)
     if (!is.na(lambda) && all(!is.na(theta))) {
         if (all(!is.na(lambda1)) || !is.na(lambda2)) {
             stop(

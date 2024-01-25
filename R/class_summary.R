@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7547 $
-## |  Last changed: $Date: 2024-01-10 08:13:40 +0100 (Mi, 10 Jan 2024) $
+## |  File version: $Revision: 7595 $
+## |  Last changed: $Date: 2024-01-25 13:19:41 +0100 (Do, 25 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -567,11 +567,11 @@ SummaryFactory <- setRefClass("SummaryFactory",
                         transposed <- TRUE
                         variedParameterCaption <- "populations"
                         if (parameterName1 %in% c(
-                                "indices", 
-                                "conditionalErrorRate", 
+                                "indices",
+                                "conditionalErrorRate",
                                 "secondStagePValues",
-                                "adjustedStageWisePValues", 
-                                "overallAdjustedTestStatistics", 
+                                "adjustedStageWisePValues",
+                                "overallAdjustedTestStatistics",
                                 "rejectedIntersections"
                             )) {
                             if (.isEnrichmentAnalysisResults(parameterSet)) {
@@ -1114,7 +1114,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
     }
 
     if (!is.null(object[["thetaH0"]])) {
-        thetaH0 <- round(object$thetaH0, 3)
+        thetaH0 <- object$thetaH0
     } else {
         thetaH0 <- ifelse(settings$survivalEnabled, 1, 0)
     }
@@ -1729,7 +1729,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
         header <- paste0(header, ".")
         return(header)
     }
-    
+
     settings <- .getSummaryObjectSettings(designPlan)
 
     header <- ""
@@ -1751,7 +1751,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
     header <- .concatenateSummaryText(header, ifelse(design$sided == 1, "(one-sided).", "(two-sided)."), sep = " ")
 
     header <- paste0(header, "\n")
-    
+
     header <- paste0(header, "The results were ")
     header <- paste0(header, ifelse(inherits(designPlan, "SimulationResults"), "simulated", "calculated"))
     header <- paste0(header, " for a ")
@@ -2032,21 +2032,21 @@ SummaryFactory <- setRefClass("SummaryFactory",
             length(designPlan$lambda1) == 1 &&
             designPlan$.getParameterType("lambda1") == C_PARAM_USER_DEFINED) {
         header <- .concatenateSummaryText(header, paste0(
-            "lambda(1) = ", ceiling(designPlan$lambda1)
+            "lambda(1) = ", designPlan$lambda1
         ))
     }
 
     if (settings$countDataEnabled && !is.null(designPlan[["lambda2"]]) &&
             designPlan$.getParameterType("lambda2") == C_PARAM_USER_DEFINED) {
         header <- .concatenateSummaryText(header, paste0(
-            "lambda(2) = ", ceiling(designPlan$lambda2[1])
+            "lambda(2) = ", designPlan$lambda2[1]
         ))
     }
 
     if (settings$countDataEnabled && !is.null(designPlan[["lambda"]]) &&
             designPlan$.getParameterType("lambda") == C_PARAM_USER_DEFINED) {
         header <- .concatenateSummaryText(header, paste0(
-            "lambda = ", ceiling(designPlan$lambda)
+            "lambda = ", designPlan$lambda
         ))
     }
 
@@ -2140,10 +2140,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 )
             ))
         }
-        if (settings$countDataEnabled && !is.null(designPlan[["overDispersion"]]) &&
-                !is.na(designPlan[["overDispersion"]])) {
+        if (settings$countDataEnabled && !is.null(designPlan[["overdispersion"]]) &&
+                !is.na(designPlan[["overdispersion"]])) {
             header <- .concatenateSummaryText(header, paste0(
-                "over-dispersion = ", designPlan$overDispersion[1]
+                "overdispersion = ", designPlan$overdispersion[1]
             ))
         }
         if (settings$countDataEnabled && !is.null(designPlan[["fixedExposureTime"]]) &&
@@ -2160,8 +2160,18 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 )
             ))
         }
-        if (!is.null(designPlan[["accrualTime"]]) && !is.null(designPlan[["accrualIntensity"]]) &&
-                !all(is.na(designPlan$accrualIntensity)) &&
+        if (settings$countDataEnabled && !is.null(designPlan[["accrualTime"]]) &&
+                !is.null(designPlan[["accrualIntensity"]]) && !all(is.na(designPlan$accrualIntensity))) {
+            header <- .concatenateSummaryText(header, paste0(
+                "accrual intensity = ",
+                .arrayToString(designPlan$accrualIntensity,
+                    digits = 1,
+                    vectorLookAndFeelEnabled = (length(designPlan$accrualIntensity) > 1)
+                )
+            ))
+        }
+        if (settings$survivalEnabled && !is.null(designPlan[["accrualTime"]]) &&
+                !is.null(designPlan[["accrualIntensity"]]) && !all(is.na(designPlan$accrualIntensity)) &&
                 length(designPlan$accrualIntensity) == length(designPlan$accrualTime)) {
             header <- .concatenateSummaryText(header, paste0(
                 "accrual intensity = ",
@@ -3133,13 +3143,13 @@ SummaryFactory <- setRefClass("SummaryFactory",
         if (survivalEnabled) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedNumberOfEvents",
-                parameterCaption = "Expected number of events",
+                parameterCaption = "Expected number of events under H1",
                 roundDigits = digitsSampleSize, transpose = TRUE
             )
         } else {
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedNumberOfSubjects",
-                parameterCaption = "Expected number of subjects",
+                parameterCaption = "Expected number of subjects under H1",
                 roundDigits = digitsSampleSize, transpose = TRUE
             )
         }
@@ -3262,7 +3272,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             }
         }
 
-        if (countDataEnabled & !is.null(designPlan[["calendarTime"]]) &&
+        if (countDataEnabled && !is.null(designPlan[["calendarTime"]]) &&
                 designPlan$.getParameterType("calendarTime") == C_PARAM_GENERATED) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "calendarTime",
@@ -3271,7 +3281,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
 
-        if (countDataEnabled & !is.null(designPlan[["expectedStudyDurationH1"]]) &&
+        if (countDataEnabled && !is.null(designPlan[["expectedStudyDurationH1"]]) &&
                 designPlan$.getParameterType("expectedStudyDurationH1") == C_PARAM_GENERATED) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedStudyDurationH1",
@@ -3281,7 +3291,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
 
-        if (countDataEnabled & !is.null(designPlan[["studyTime"]]) &&
+        if (countDataEnabled && !is.null(designPlan[["studyTime"]]) &&
                 designPlan$.getParameterType("studyTime") == C_PARAM_GENERATED) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "studyTime",
@@ -3290,17 +3300,6 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
 
-        if (design$kMax > 1) {
-            summaryFactory$addParameter(designPlan,
-                parameterName = ifelse(inherits(designPlan, "TrialDesignPlan") &&
-                    (designPlan$.isSampleSizeObject() || countDataEnabled),
-                "expectedNumberOfSubjectsH1", "expectedNumberOfSubjects"
-                ),
-                parameterCaption = "Expected number of subjects",
-                roundDigits = digitsSampleSize, transpose = TRUE,
-                validateParameterType = !countDataEnabled
-            )
-        }
 
         if (outputSize %in% c("medium", "large")) {
             subjectsCaption <- ifelse(design$kMax > 1 && inherits(designPlan, "SimulationResults") &&
@@ -3312,7 +3311,29 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
 
-        if (countDataEnabled & !is.null(designPlan[["lambda1"]]) &&
+        if (design$kMax > 1) {
+            summaryFactory$addParameter(designPlan,
+                parameterName = ifelse(inherits(designPlan, "TrialDesignPlan") &&
+                    (designPlan$.isSampleSizeObject() || countDataEnabled),
+                "expectedNumberOfSubjectsH1", "expectedNumberOfSubjects"
+                ),
+                parameterCaption = "Expected number of subjects under H1",
+                roundDigits = digitsSampleSize, transpose = TRUE,
+                validateParameterType = !countDataEnabled
+            )
+        }
+
+        if (countDataEnabled && design$kMax > 1 && 
+                !is.null(designPlan[["maxNumberOfSubjects"]]) && 
+                designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED) {
+            summaryFactory$addParameter(designPlan,
+                parameterName = "maxNumberOfSubjects",
+                parameterCaption = "Maximum number of subjects",
+                roundDigits = digitsSampleSize
+            )
+        }
+
+        if (countDataEnabled && !is.null(designPlan[["lambda1"]]) &&
                 designPlan$.getParameterType("lambda1") == C_PARAM_GENERATED) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "lambda1",
@@ -3321,7 +3342,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             )
         }
 
-        if (countDataEnabled & !is.null(designPlan[["lambda2"]]) &&
+        if (countDataEnabled && !is.null(designPlan[["lambda2"]]) &&
                 designPlan$.getParameterType("lambda2") == C_PARAM_GENERATED) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "lambda2",
@@ -3392,7 +3413,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             if (outputSize == "large") {
                 summaryFactory$addParameter(designPlan,
                     parameterName = "analysisTime",
-                    parameterCaption = "Analysis time", roundDigits = digitsSampleSize
+                    parameterCaption = "Analysis time", roundDigits = digitsGeneral
                 )
             }
 
@@ -3518,7 +3539,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 summaryFactory$addParameter(probsH0,
                     parameterName = "earlyStop",
                     parameterCaption = "Overall exit probability (under H0)",
-                    roundDigits = digitsProbabilities, 
+                    roundDigits = digitsProbabilities,
                     smoothedZeroFormat = TRUE
                 )
                 x <- designPlan
@@ -3529,14 +3550,14 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     parameterName = "earlyStop",
                     values = probsH1$earlyStop,
                     parameterCaption = "Overall exit probability (under H1)",
-                    roundDigits = digitsProbabilities, 
-                    smoothedZeroFormat = TRUE 
+                    roundDigits = digitsProbabilities,
+                    smoothedZeroFormat = TRUE
                 )
             }
             summaryFactory$addParameter(probsH0,
                 parameterName = "rejectPerStage",
                 parameterCaption = "Exit probability for efficacy (under H0)",
-                roundDigits = digitsProbabilities, 
+                roundDigits = digitsProbabilities,
                 smoothedZeroFormat = TRUE
             )
             if (designPlan$.isPowerObject()) {
@@ -3544,14 +3565,14 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     parameterName = "rejectPerStage",
                     values = probsH1$rejectPerStage,
                     parameterCaption = "Exit probability for efficacy (under H1)",
-                    roundDigits = digitsProbabilities, 
+                    roundDigits = digitsProbabilities,
                     smoothedZeroFormat = TRUE
                 )
             } else {
                 summaryFactory$addParameter(probsH1,
                     parameterName = "rejectPerStage",
                     parameterCaption = "Exit probability for efficacy (under H1)",
-                    roundDigits = digitsProbabilities, 
+                    roundDigits = digitsProbabilities,
                     smoothedZeroFormat = TRUE
                 )
             }
@@ -3696,7 +3717,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
 
     numberOfVariedParams <- dim(arrayData)[2]
     numberOfGroups <- dim(arrayData)[3]
-    
+
     for (variedParamNumber in 1:numberOfVariedParams) {
         summaryGroup <- .getSummaryGroup(
             parameterCaption,
@@ -3738,7 +3759,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
         )]])[3]
 
         numberOfGroups <- dim(arrayData)[3]
-        if (parameterName == "selectedArms" && !grepl("Survival", .getClassName(designPlan))) { 
+        if (parameterName == "selectedArms" && !grepl("Survival", .getClassName(designPlan))) {
             numberOfGroups <- numberOfGroups - 1 # remove control group
         }
         numberOfVariedParams <- dim(arrayData)[2]

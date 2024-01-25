@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7551 $
-## |  Last changed: $Date: 2024-01-11 08:50:37 +0100 (Do, 11 Jan 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7592 $
+## |  Last changed: $Date: 2024-01-24 10:48:09 +0100 (Mi, 24 Jan 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' Parameter Description: "..."
@@ -309,10 +309,10 @@ NULL
 #' @keywords internal
 NULL
 
-#' Parameter Description: overDispersion for Counts
-#' @param overDispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution, 
+#' Parameter Description: overdispersion for Counts
+#' @param overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution, 
 #' default is \code{0}. 
-#' @name param_overDispersion_counts
+#' @name param_overdispersion_counts
 #' @keywords internal
 NULL
 

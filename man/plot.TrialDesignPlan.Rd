@@ -13,7 +13,7 @@
   ylab = NA_character_,
   type = ifelse(x$.design$kMax == 1, 5L, 1L),
   palette = "Set1",
-  theta = seq(-1, 1, 0.01),
+  theta = NA_real_,
   plotPointsEnabled = NA,
   legendPosition = NA_integer_,
   showSource = FALSE,

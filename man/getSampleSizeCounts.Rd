@@ -97,7 +97,7 @@ At given design the function calculates the information, and stage-wise and maxi
 of negative binomial distributed event numbers in two samples at given effect.
 The sample size calculation is performed either for a fixed exposure time or a variable exposure time with fixed follow-up.
 For the variable exposure time case, at given maximum sample size the necessary follow-up time is calculated.
-The planned calendar time of interim stages is calculated, too.
+The planned calendar time of interim stages is calculated if an accrual time is defined.
 Additionally, an allocation ratio = \code{n1 / n2} can be specified where \code{n1} and \code{n2} are the number
 of subjects in the two treatment groups. A null hypothesis value \code{thetaH0} can also be specified.
 }

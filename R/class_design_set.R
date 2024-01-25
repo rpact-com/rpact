@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7551 $
-## |  Last changed: $Date: 2024-01-11 08:50:37 +0100 (Do, 11 Jan 2024) $
+## |  File version: $Revision: 7558 $
+## |  Last changed: $Date: 2024-01-12 15:29:16 +0100 (Fri, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -763,7 +763,7 @@ as.data.frame.TrialDesignSet <- function(x,
             niceColumnNamesEnabled = niceColumnNamesEnabled,
             includeAllParameters = includeAllParameters
         ))
-
+    
         if (.isTrialDesignWithValidFutilityBounds(design)) {
             futilityBoundsName <- "futilityBounds"
             if (niceColumnNamesEnabled) {
@@ -782,15 +782,16 @@ as.data.frame.TrialDesignSet <- function(x,
             kMax <- design$kMax
             df[[alpha0VecName]][kMax] <- design$criticalValues[kMax]
         }
-
+        
         if (addPowerAndAverageSampleNumber) {
             results <- PowerAndAverageSampleNumberResult(design, theta = theta, nMax = nMax)
             suppressWarnings(df2 <- as.data.frame(results,
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
-                includeAllParameters = includeAllParameters
+                includeAllParameters = FALSE #includeAllParameters
             ))
             df <- merge(df, df2, all.y = TRUE)
         }
+        
         if (is.null(dataFrame)) {
             if (niceColumnNamesEnabled) {
                 dataFrame <- cbind("Design number" = rep(1, nrow(df)), df)

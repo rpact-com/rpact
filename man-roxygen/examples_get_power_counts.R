@@ -7,7 +7,7 @@
 #' # for a range of lambda1 values if the overdispersion is assumed to be 
 #' # equal to 0.5, is obtained by
 #' getPowerCounts(alpha = 0.025, lambda1 = seq(1, 1.4, 0.05), lambda2 = 1.4, 
-#'     maxNumberOfSubjects = 180, overDispersion = 0.5, fixedExposureTime = 1)
+#'     maxNumberOfSubjects = 180, overdispersion = 0.5, fixedExposureTime = 1)
 #' \dontrun{
 #' # Group sequential alpha and beta spending function design with O'Brien and 
 #' # Fleming type boundaries: Power and test characteristics for N = 286, 
@@ -17,7 +17,7 @@
 #'         kMax = 3, alpha = 0.025, beta = 0.2, 
 #'         typeOfDesign = "asOF", typeBetaSpending = "bsOF"), 
 #'     lambda1 = seq(0.17, 0.23, 0.01), lambda2 = 0.3, 
-#'     directionUpper = FALSE, overDispersion = 1, maxNumberOfSubjects = 286, 
+#'     directionUpper = FALSE, overdispersion = 1, maxNumberOfSubjects = 286, 
 #'     fixedExposureTime = 12, accrualTime = 6)
 #' 
 #' # Group sequential design alpha spending function design with O'Brien and 
@@ -28,7 +28,7 @@
 #' getPowerCounts(design = getDesignGroupSequential(
 #'         kMax = 3, alpha = 0.025, beta = 0.2, typeOfDesign = "asOF"),
 #'     lambda1 = seq(0.08, 0.09, 0.0025), lambda2 = 0.125, 
-#'     overDispersion = 5, directionUpper = FALSE, maxNumberOfSubjects = 1976, 
+#'     overdispersion = 5, directionUpper = FALSE, maxNumberOfSubjects = 1976, 
 #'     followUpTime = 2.75, accrualTime = 1.25)
 #' }
 #' 

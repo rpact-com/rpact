@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7540 $
-## |  Last changed: $Date: 2024-01-08 16:06:46 +0100 (Mo, 08 Jan 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7590 $
+## |  Last changed: $Date: 2024-01-23 11:32:01 +0100 (Di, 23 Jan 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -696,7 +696,7 @@ C_PARAMETER_NAMES <- list(
     subscoreConditionalPower = "Sub-score conditional power",
     performanceScore = "Performance scores",
     
-    overDispersion = "Over dispersion",
+    overdispersion = "Overdispersion",
     lambda = "Lambda",
     fixedExposureTime = "Fixed exposure time",
     calendarTime = "Calendar time",
@@ -1010,7 +1010,7 @@ C_TABLE_COLUMN_NAMES <- list(
     subscoreConditionalPower = "Sub-score conditional power",
     performanceScore = "Performance score",
     
-    overDispersion = "Over dispersion",
+    overdispersion = "Overdispersion",
     lambda = "Lambda",
     fixedExposureTime = "Fixed exposure time",
     calendarTime = "Calendar time",
@@ -1358,7 +1358,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     subscoreConditionalPower = ".formatProbabilities",
     performanceScore = ".formatProbabilities",
     
-    overDispersion = ".formatStDevs",
+    overdispersion = ".formatStDevs",
     lambda = ".formatRates",
     fixedExposureTime = ".formatTime",
     calendarTime = ".formatTime",

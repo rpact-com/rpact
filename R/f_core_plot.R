@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7557 $
-## |  Last changed: $Date: 2024-01-12 13:41:28 +0100 (Fr, 12 Jan 2024) $
+## |  File version: $Revision: 7558 $
+## |  Last changed: $Date: 2024-01-12 15:29:16 +0100 (Fri, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -906,7 +906,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             yParameterNames = yParameterNames
         )
         data <- df$data
-
+        
         variedParameters <- df$variedParameters
         variedParameters <- na.omit(variedParameters)
         variedParameters <- variedParameters[variedParameters != "NA"]
@@ -987,7 +987,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         "Lower and", yAxisLabel1,
         fixed = TRUE
     )
-
+    
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
         if (!(xParameterName %in% colnames(data))) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset")
@@ -1034,7 +1034,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$categories <- rep(NA_character_, nrow(data))
         }
     }
-
+    
     if (!is.na(nMax) && is.null(yParameterName3) && xParameterName == "informationRates") {
         xAxisLabel <- "Sample Size"
         data$xValues <- data$xValues * nMax
@@ -1109,7 +1109,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             legendTitle <- paste(legendTitle, "Type of error", sep = sep)
         }
     }
-
+    
     if (is.na(legendPosition)) {
         legendPosition <- .getLegendPosition(
             plotSettings, designMaster, data, yParameterName1,
