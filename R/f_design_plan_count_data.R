@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7592 $
-## |  Last changed: $Date: 2024-01-24 10:48:09 +0100 (Mi, 24 Jan 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7596 $
+## |  Last changed: $Date: 2024-01-25 14:33:51 +0100 (Do, 25 Jan 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 .getCalendarTime <- function(
@@ -767,7 +767,8 @@ getSampleSizeCounts <- function(design = NULL, ...,
 #'
 #' @export
 #'
-getPowerCounts <- function(design = NULL, ...,
+getPowerCounts <- function(
+        design = NULL, ...,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
         lambda1 = NA_real_,

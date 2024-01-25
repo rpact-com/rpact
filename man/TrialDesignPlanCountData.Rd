@@ -54,7 +54,7 @@ with suitable arguments to create a design plan for a dataset of rates.
 
 \item{\code{earlyStop}}{The probability to stopping the trial either for efficacy or futility. Is a numeric vector.}
 
-\item{\code{overDispersion}}{A numeric value that represents the assumed overdispersion of the negative binomial distribution Is a numeric vector.}
+\item{\code{overdispersion}}{A numeric value that represents the assumed overdispersion of the negative binomial distribution Is a numeric vector.}
 
 \item{\code{fixedExposureTime}}{If specified, the fixed time of exposure per subject for count data Is a numeric vector.}
 

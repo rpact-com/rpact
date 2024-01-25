@@ -14,7 +14,7 @@ getPowerCounts(
   lambda = NA_real_,
   theta = NA_real_,
   thetaH0 = 1,
-  overDispersion = 0,
+  overdispersion = 0,
   fixedExposureTime = NA_real_,
   accrualTime = NA_real_,
   accrualIntensity = NA_real_,
@@ -65,7 +65,7 @@ That is, in case of (one-sided) testing of
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
-\item{overDispersion}{A numeric value that represents the assumed overdispersion of the negative binomial distribution,
+\item{overdispersion}{A numeric value that represents the assumed overdispersion of the negative binomial distribution,
 default is \code{0}.}
 
 \item{fixedExposureTime}{If specified, the fixed time of exposure per subject for count data, there is no default.}
@@ -128,7 +128,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 # for a range of lambda1 values if the overdispersion is assumed to be 
 # equal to 0.5, is obtained by
 getPowerCounts(alpha = 0.025, lambda1 = seq(1, 1.4, 0.05), lambda2 = 1.4, 
-    maxNumberOfSubjects = 180, overDispersion = 0.5, fixedExposureTime = 1)
+    maxNumberOfSubjects = 180, overdispersion = 0.5, fixedExposureTime = 1)
 \dontrun{
 # Group sequential alpha and beta spending function design with O'Brien and 
 # Fleming type boundaries: Power and test characteristics for N = 286, 
@@ -138,7 +138,7 @@ getPowerCounts(design = getDesignGroupSequential(
         kMax = 3, alpha = 0.025, beta = 0.2, 
         typeOfDesign = "asOF", typeBetaSpending = "bsOF"), 
     lambda1 = seq(0.17, 0.23, 0.01), lambda2 = 0.3, 
-    directionUpper = FALSE, overDispersion = 1, maxNumberOfSubjects = 286, 
+    directionUpper = FALSE, overdispersion = 1, maxNumberOfSubjects = 286, 
     fixedExposureTime = 12, accrualTime = 6)
 
 # Group sequential design alpha spending function design with O'Brien and 
@@ -149,7 +149,7 @@ getPowerCounts(design = getDesignGroupSequential(
 getPowerCounts(design = getDesignGroupSequential(
         kMax = 3, alpha = 0.025, beta = 0.2, typeOfDesign = "asOF"),
     lambda1 = seq(0.08, 0.09, 0.0025), lambda2 = 0.125, 
-    overDispersion = 5, directionUpper = FALSE, maxNumberOfSubjects = 1976, 
+    overdispersion = 5, directionUpper = FALSE, maxNumberOfSubjects = 1976, 
     followUpTime = 2.75, accrualTime = 1.25)
 }
 

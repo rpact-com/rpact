@@ -12,7 +12,7 @@ getSampleSizeCounts(
   lambda = NA_real_,
   theta = NA_real_,
   thetaH0 = 1,
-  overDispersion = 0,
+  overdispersion = 0,
   fixedExposureTime = NA_real_,
   accrualTime = NA_real_,
   accrualIntensity = NA_real_,
@@ -57,7 +57,7 @@ That is, in case of (one-sided) testing of
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
 
-\item{overDispersion}{A numeric value that represents the assumed overdispersion of the negative binomial distribution,
+\item{overdispersion}{A numeric value that represents the assumed overdispersion of the negative binomial distribution,
 default is \code{0}.}
 
 \item{fixedExposureTime}{If specified, the fixed time of exposure per subject for count data, there is no default.}
@@ -120,12 +120,12 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 # detecting such a difference, if the overdispersion is assumed to be 
 # equal to 0.5, is obtained by
 getSampleSizeCounts(alpha = 0.025, beta = 0.1, lambda2 = 1.4, 
-    theta = 0.75, overDispersion = 0.5, fixedExposureTime = 1)
+    theta = 0.75, overdispersion = 0.5, fixedExposureTime = 1)
 \dontrun{
 # Noninferiority test with blinded sample size reassessment to reproduce 
 # Table 2 from Friede and Schmidli (2010):
 getSampleSizeCounts(alpha = 0.025, beta = 0.2, lambda = 1, theta = 1,
-    thetaH0 = 1.15, overDispersion = 0.4, fixedExposureTime = 1)
+    thetaH0 = 1.15, overdispersion = 0.4, fixedExposureTime = 1)
 
 # Group sequential alpha and beta spending function design with O'Brien and 
 # Fleming type boundaries: Estimate observation time under uniform 
@@ -134,7 +134,7 @@ getSampleSizeCounts(alpha = 0.025, beta = 0.2, lambda = 1, theta = 1,
 getSampleSizeCounts(design = getDesignGroupSequential(
         kMax = 3, alpha = 0.025, beta = 0.2, 
         typeOfDesign = "asOF", typeBetaSpending = "bsOF"), 
-    lambda1 = 0.2, lambda2 = 0.3, overDispersion = 1, 
+    lambda1 = 0.2, lambda2 = 0.3, overdispersion = 1, 
     fixedExposureTime = 12, accrualTime = 6)
 
 # Group sequential alpha spending function design with O'Brien and Fleming 
@@ -143,7 +143,7 @@ getSampleSizeCounts(design = getDesignGroupSequential(
 # (lambda1, lambda2, and overdispersion as specified, no futility stopping):
 getSampleSizeCounts(design = getDesignGroupSequential(
         kMax = 3, alpha = 0.025, beta = 0.2, typeOfDesign = "asOF"),
-    lambda1 = 0.0875, lambda2 = 0.125, overDispersion = 5, 
+    lambda1 = 0.0875, lambda2 = 0.125, overdispersion = 5, 
     followUpTime = 2.75, accrualTime = 1.25)
 }
 

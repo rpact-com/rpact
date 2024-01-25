@@ -2,8 +2,8 @@
 % Please edit documentation in R/pkgname.R
 \docType{package}
 \name{rpact}
-\alias{rpact}
 \alias{rpact-package}
+\alias{rpact}
 \title{rpact - Confirmatory Adaptive Clinical Trial Design and Analysis}
 \description{
 rpact (R Package for Adaptive Clinical Trials) is a comprehensive package that enables
