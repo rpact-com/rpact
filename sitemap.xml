@@ -199,6 +199,9 @@
     <loc>https://rpact-com.github.io/rpact/reference/TrialDesignPlan.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/TrialDesignPlanCountData.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/TrialDesignPlanMeans.html</loc>
   </url>
   <url>
@@ -236,6 +239,12 @@
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/as251Normal.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/as251StudentT.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/dataEnrichmentMeans.html</loc>
@@ -370,6 +379,9 @@
     <loc>https://rpact-com.github.io/rpact/reference/getPowerAndAverageSampleNumber.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/getPowerCounts.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/getPowerMeans.html</loc>
   </url>
   <url>
@@ -386,6 +398,9 @@
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/getRepeatedPValues.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/getSampleSizeCounts.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/getSampleSizeMeans.html</loc>
@@ -445,7 +460,16 @@
     <loc>https://rpact-com.github.io/rpact/reference/knit_print.ParameterSet.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/knit_print.SummaryFactory.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/length.TrialDesignSet.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/mvnprd.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/mvstud.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/names.AnalysisResults.html</loc>
@@ -469,7 +493,13 @@
     <loc>https://rpact-com.github.io/rpact/reference/param_accrualIntensityType.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_accrualIntensity_counts.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_accrualTime.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_accrualTime_counts.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_activeArms.html</loc>
@@ -550,6 +580,12 @@
     <loc>https://rpact-com.github.io/rpact/reference/param_eventTime.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_fixedExposureTime_counts.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_followUpTime_counts.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_gED50.html</loc>
   </url>
   <url>
@@ -586,7 +622,16 @@
     <loc>https://rpact-com.github.io/rpact/reference/param_lambda1.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_lambda1_counts.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_lambda2.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_lambda2_counts.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_lambda_counts.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_legendPosition.html</loc>
@@ -632,6 +677,9 @@
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_normalApproximation.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_overDispersion_counts.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_palette.html</loc>
@@ -719,6 +767,9 @@
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_thetaH1.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_theta_counts.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_three_dots.html</loc>
