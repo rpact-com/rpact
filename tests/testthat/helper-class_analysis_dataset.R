@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6117 $
-## |  Last changed: $Date: 2022-05-04 15:55:23 +0200 (Mi, 04 Mai 2022) $
+## |  File version: $Revision: 7403 $
+## |  Last changed: $Date: 2023-11-08 16:12:00 +0100 (Mi, 08 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -36,4 +36,3 @@ getMultipleStageResultsForDataset <- function(dataset, thetaH0 = NA_real_) {
         stageResults3 = stageResults3
     ))
 }
-

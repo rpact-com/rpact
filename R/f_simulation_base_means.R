@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7408 $
+## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -455,7 +455,7 @@ getSimulationMeans <- function(design = NULL, ...,
     calcSubjectsFunctionR <- calcSubjectsFunctionList$calcSubjectsFunctionR
     calcSubjectsFunctionCpp <- calcSubjectsFunctionList$calcSubjectsFunctionCpp
 
-    cppResult <- getSimulationMeansLoopCpp(
+    cppResult <- .getSimulationMeansLoopCpp(
         alternative = alternative,
         kMax = design$kMax,
         maxNumberOfIterations = maxNumberOfIterations,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7383 $
+## |  Last changed: $Date: 2023-11-02 15:18:21 +0100 (Do, 02 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -63,7 +63,7 @@ NULL
                     sqrt(pim * (1 - pim) * (1 + allocationRatioPlanned[stage])) +
                     .getQNorm(conditionalPower) * sqrt(piAssumedH1 * (1 - piAssumedH1) +
                         piAssumedControlH1 * (1 - piAssumedControlH1) * allocationRatioPlanned[stage])))^2 /
-                    (max(1e-7, (2 * directionUpper - 1) * (piAssumedH1 - piAssumedControlH1)))^2
+                    (max(1e-07, (2 * directionUpper - 1) * (piAssumedH1 - piAssumedControlH1)))^2
                 newSubjects <- min(
                     max(minNumberOfSubjectsPerStage[stage + 1], newSubjects),
                     maxNumberOfSubjectsPerStage[stage + 1]
@@ -177,7 +177,7 @@ NULL
             } else {
                 if (.isTrialDesignFisher(design)) {
                     conditionalCriticalValue[k] <- .getOneMinusQNorm(min((design$criticalValues[k + 1] /
-                        prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-7))
+                        prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-07))
                 } else {
                     if (design$criticalValues[k + 1] >= 6) {
                         conditionalCriticalValue[k] <- Inf
@@ -342,7 +342,7 @@ NULL
 #' An allocation ratio can be specified referring to the ratio of number of
 #' subjects in the active treatment groups as compared to the control group.
 #'
-#' The definition of \code{pi1H1} and/or \code{piControl} makes only sense if \code{kMax} > 1
+#' The definition of \code{piTreatmentsH1} and/or \code{piControlH1} makes only sense if \code{kMax} > 1
 #' and if \code{conditionalPower}, \code{minNumberOfSubjectsPerStage}, and
 #' \code{maxNumberOfSubjectsPerStage} (or \code{calcSubjectsFunction}) are defined.
 #'

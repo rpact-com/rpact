@@ -13,20 +13,30 @@
 ## |  
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
-## |  File name: test-class_analysis_dataset.R
-## |  Creation date: 06 February 2023, 12:04:06
-## |  File version: $Revision: 7139 $
-## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
+## |  File name: test-class_design_set.R
+## |  Creation date: 08 January 2024, 11:50:12
+## |  File version: $Revision: 7560 $
+## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
-## | 
+## |  
 
-test_plan_section("Testing the Class 'TrialDesignSet'")
+test_plan_section("Testing Class 'TrialDesignSet'")
 
-test_that("Test that design set class generics and utility functions throw errors outside of context", {
-  expect_error(summary.TrialDesignSet())
-  expect_error(as.data.frame.TrialDesignSet())
-  expect_error(plot.TrialDesignSet())
-  expect_error(.plotTrialDesignSet())
-  expect_error(.addDecistionCriticalValuesToPlot())
+
+test_that("Testing '.getHarmonizedColumnNames'", {
+	df1 <- data.frame(
+	    x = 4:6,
+	    y = 1:3,
+	    z = rep(1, 3)
+	)
+	colnames(df1) <- c("x", "Futility bound (non-binding)", "z")
+	df2 <- data.frame(
+	    x = 4:6,
+	    y = 1:3,
+	    z = rep(1, 3)
+	)
+	colnames(df2) <- c("x", "Futility bound (binding)", "z")
+
+	expect_equal(.getHarmonizedColumnNames(df1, df2), c("x", "Futility bound", "z"))
 })
 

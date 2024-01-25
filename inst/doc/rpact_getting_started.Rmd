@@ -16,27 +16,27 @@ knitr::opts_chunk$set(
 )
 ```
 
-Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
+**Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis**
 
 ## Functional Range
 
+*	Fixed sample design and designs with interim analysis stages
 *	Sample size and power calculation for
     +	means (continuous endpoint)
     +	rates (binary endpoint)
-    +	survival trials with
-        -	piecewise accrual time and intensity
-        -	piecewise exponential survival time
-        -	survival times that follow a Weibull distribution
-*	Fixed sample design and designs with interim analysis stages
+    +	survival trials with flexible recruitment and survival time options
+    +	count data 
 *	Simulation tool for means, rates, and survival data
     +	Assessment of adaptive sample size/event number recalculations based on
         conditional power
     +   Assessment of treatment selection strategies in multi-arm trials
 *	Adaptive analysis of means, rates, and survival data
 *	Adaptive designs and analysis for multi-arm trials
-*   Simulation and analysis for enrichment designs testing means, rates,
-    and hazard ratios
-
+*	Adaptive analysis and simulation tools for enrichment design testing means,
+    rates, and hazard ratios
+*	Automatic boundary recalculations during the trial for analysis with alpha
+    spending approach, including under- and over-running
+  
 
 ## Learn to use rpact
 
@@ -70,7 +70,7 @@ following topics:
 11. Comparing Sample Size and Power Calculation Results for a Group Sequential
     Trial with a Survival Endpoint: rpact vs. gsDesign
 12. Supplementing and Enhancing rpact’s Graphical Capabilities with ggplot2
-13. Using the Inverse Normal Combination Test for Analysing a Trial with
+13. Using the Inverse Normal Combination Test for Analyzing a Trial with
     Continuous Endpoint and Potential Sample Size Re-Assessment with rpact
 14. Planning a Trial with Binary Endpoints with rpact
 15. Planning a Survival Trial with rpact
@@ -84,10 +84,11 @@ following topics:
 22. Step-by-Step rpact Tutorial
 23. Planning and Analyzing a Group-Sequential Multi-Arm Multi-Stage Design with
     Binary Endpoint using rpact   
-24. Two-arm analysis for continuous data with covariates from raw data
-    (*exclusive*)
-25. How to install the latest developer version (*exclusive*)
+24. Two-arm Analysis for Continuous Data with Covariates from Raw Data using
+    rpact (*exclusive*)
+25. How to Install the Latest rpact Developer Version (*exclusive*)
 26. Delayed Response Designs with rpact
+27. Sample Size Calculation for Count Data
 
 ## User Concept
 
@@ -111,8 +112,8 @@ The most important `rpact` functions have intuitive names:
 
 * `getDesign`[`GroupSequential`/`InverseNormal`/`Fisher`]`()`
 * `getDesignCharacteristics()`
-* `getSampleSize`[`Means`/`Rates`/`Survival`]`()`
-* `getPower`[`Means`/`Rates`/`Survival`]`()`
+* `getSampleSize`[`Means`/`Rates`/`Survival`/`Counts`]`()`
+* `getPower`[`Means`/`Rates`/`Survival`/`Counts`]`()`
 * `getSimulation`[`MultiArm`/`Enrichment`]``[`Means`/`Rates`/`Survival`]`()`
 * `getDataSet()`
 * `getAnalysisResults()`

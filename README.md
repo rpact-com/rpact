@@ -1,12 +1,13 @@
-<!-- badges: start --> 
-[![CRAN Status](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact)
+ <!-- badges: start -->
+[![](https://img.shields.io/badge/CRAN-3.5.0-green.svg)](https://cran.r-project.org/package=rpact)
 [![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml)
 [![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
 [![Monthly downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-[![shinyapps.io](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://rpact.shinyapps.io/public/)
-<!-- badges: end -->
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)[![](https://img.shields.io/badge/doi-10.1007/978--3--319--32562--0-yellow.svg)](https://doi.org/10.1007/978-3-319-32562-0)
+[![shinyapps.io](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://rpact.shinyapps.io/public)
+[![](https://img.shields.io/badge/RPACT-Cloud-blue.svg)](https://rpact.shinyapps.io/cloud)
+ <!-- badges: end -->
 
 # rpact
 
@@ -14,14 +15,13 @@ Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
 
 ## Functional Range
 
+-   Fixed sample design and designs with interim analysis stages
 -   Sample size and power calculation for
     -   means (continuous endpoint)
     -   rates (binary endpoint)
-    -   survival trials with
-        -   piecewise accrual time and intensity
-        -   piecewise exponential survival time
-        -   survival times that follow a Weibull distribution
--   Fixed sample design and designs with interim analysis stages
+    -   survival trials with flexible recruitment and survival time
+        options
+    -   count data
 -   Simulation tool for means, rates, and survival data
     -   Assessment of adaptive sample size/event number recalculations
         based on conditional power
@@ -41,9 +41,20 @@ Install the latest CRAN release via
 install.packages("rpact")
 ```
 
+### Development version
+
+To use a feature from the development version, you can install the
+development version of rpact from
+[GitHub](https://github.com/rpact-com/rpact).
+
+``` r
+# install.packages("pak")
+pak::pak("rpact-com/rpact")
+```
+
 ## Documentation
 
-The documentation is hosted at <https://www.rpact.org>
+The documentation is hosted at [www.rpact.org](https://www.rpact.org)
 
 ## Vignettes
 

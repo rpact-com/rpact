@@ -19,7 +19,7 @@ readDataset(
 \arguments{
 \item{file}{A CSV file (see \code{\link[utils]{read.table}}).}
 
-\item{...}{Further arguments to be passed to code{\link[utils]{read.table}}.}
+\item{...}{Further arguments to be passed to \code{\link[utils]{read.table}}.}
 
 \item{header}{A logical value indicating whether the file contains the names of
 the variables as its first line.}

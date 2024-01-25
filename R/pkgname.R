@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7147 $
-## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
+## |  File version: $Revision: 7408 $
+## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -63,7 +63,7 @@
 #' @docType package
 #' @author Gernot Wassmer, Friedrich Pahlke
 #' @importFrom Rcpp evalCpp
-#' @useDynLib rpact, .registration = TRUE
+#' @useDynLib rpact,.registration = TRUE
 #' @name rpact
 #'
 #' @import methods

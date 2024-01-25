@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7461 $
+## |  Last changed: $Date: 2023-12-01 10:24:25 +0100 (Fr, 01 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -974,16 +974,16 @@ getMedianByPi <- function(piValue,
     return(.convertStageWiseToOverallValuesInner(valuesPerStage))
 }
 
-.getDesignParametersToShow <- function(paramaterSet) {
-    if (is.null(paramaterSet[[".design"]])) {
+.getDesignParametersToShow <- function(parameterSet) {
+    if (is.null(parameterSet[[".design"]])) {
         stop(
             C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "'paramaterSet' (", .getClassName(paramaterSet), ") does not contain '.design' field"
+            "'parameterSet' (", .getClassName(parameterSet), ") does not contain '.design' field"
         )
     }
 
     designParametersToShow <- c(".design$stages")
-    if (grepl("Dunnett", .getClassName(paramaterSet))) {
+    if (grepl("Dunnett", .getClassName(parameterSet))) {
         designParametersToShow <- c(
             designParametersToShow,
             ".design$alpha",
@@ -992,10 +992,10 @@ getMedianByPi <- function(piValue,
             ".design$sided"
         )
     } else {
-        design <- paramaterSet$.design
+        design <- parameterSet$.design
         designParametersToShow <- c()
         if (design$kMax > 1) {
-            if (is.null(paramaterSet[[".stageResults"]]) || .isTrialDesignGroupSequential(design)) {
+            if (is.null(parameterSet[[".stageResults"]]) || .isTrialDesignGroupSequential(design)) {
                 designParametersToShow <- c(designParametersToShow, ".design$informationRates")
             } else if (.isTrialDesignInverseNormal(design)) {
                 designParametersToShow <- c(designParametersToShow, ".stageResults$weightsInverseNormal")
@@ -1019,13 +1019,13 @@ getMedianByPi <- function(piValue,
             designParametersToShow <- c(designParametersToShow, ".design$alphaSpent")
             designParametersToShow <- c(designParametersToShow, ".design$stageLevels")
         }
-        if (design$sided == 2 && !grepl("Analysis|Simulation", .getClassName(paramaterSet)) &&
-                (!inherits(paramaterSet, "TrialDesignPlan") || paramaterSet$.isSampleSizeObject())) {
+        if (design$sided == 2 && !grepl("Analysis|Simulation", .getClassName(parameterSet)) &&
+                (!inherits(parameterSet, "TrialDesignPlan") || parameterSet$.isSampleSizeObject())) {
             designParametersToShow <- c(designParametersToShow, ".design$twoSidedPower")
         }
         designParametersToShow <- c(designParametersToShow, ".design$alpha")
-        if (!grepl("Analysis|Simulation", .getClassName(paramaterSet)) &&
-                (!inherits(paramaterSet, "TrialDesignPlan") || paramaterSet$.isSampleSizeObject())) {
+        if (!grepl("Analysis|Simulation", .getClassName(parameterSet)) &&
+                (!inherits(parameterSet, "TrialDesignPlan") || parameterSet$.isSampleSizeObject())) {
             designParametersToShow <- c(designParametersToShow, ".design$beta")
         }
 

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7554 $
+## |  Last changed: $Date: 2024-01-12 10:19:05 +0100 (Fr, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -966,8 +966,7 @@ StageResultsMultiArmSurvival <- setRefClass("StageResultsMultiArmSurvival",
         directionUpper = "logical"
     ),
     methods = list(
-        initialize = function(design, dataInput, ...,
-                normalApproximation = FALSE) {
+        initialize = function(design, dataInput, ...) {
             callSuper(.design = design, .dataInput = dataInput, ...)
             init(design = design, dataInput = dataInput)
 
@@ -1653,7 +1652,7 @@ plot.StageResults <- function(x, y, ..., type = 1L,
         p <- p + ggplot2::geom_errorbar(
             data = data,
             ggplot2::aes(ymin = .data[["lower"]], ymax = .data[["upper"]]),
-            width = 0.15, position = pd, size = 0.8
+            width = 0.15, position = pd, linewidth = 0.8
         )
         p <- p + ggplot2::geom_line(position = pd, linetype = "longdash")
         p <- p + ggplot2::geom_point(position = pd, size = 2.0)

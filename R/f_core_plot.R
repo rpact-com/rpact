@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7558 $
+## |  Last changed: $Date: 2024-01-12 15:29:16 +0100 (Fri, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -372,7 +372,7 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
 #'   \item \code{capnum}:  list with caption and number
 #' }
 #'
-#' @return Returns a list if \code{option} is either \code{capnum} or {numcap}
+#' @return Returns a list if \code{option} is either \code{capnum} or \code{numcap}
 #' or returns a vector that is of  character type for \code{option=caption} or
 #' of numeric type for \code{option=numeric}.
 #'
@@ -401,15 +401,31 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     types <- integer(0)
     if (inherits(obj, "TrialDesignPlan")) {
         if (obj$.design$kMax > 1) {
-            types <- c(types, 1:4)
+            types <- c(types, 1)
+            if (!.isTrialDesignPlanCountData(obj)) {
+                types <- c(types, 2)
+            }
+            types <- c(types, 3:4)
         }
-        types <- c(types, 5)
         if (obj$.isSampleSizeObject()) {
+            if (!.isTrialDesignPlanCountData(obj) || length(obj[["theta"]]) > 1) {
+                types <- c(types, 5)
+            }
             if (.isTrialDesignPlanSurvival(obj)) {
                 types <- c(types, 13, 14)
             }
         } else {
-            types <- c(types, 6:9)
+            if (obj$.design$kMax > 1) {
+                types <- c(types, 5, 6)
+            }
+            types <- c(types, 7)
+            if (obj$.design$kMax > 1) {
+                types <- c(types, 8)
+                if (!.isTrialDesignPlanCountData(obj) ||
+                        obj$.getParameterType("expectedNumberOfSubjectsH1") == C_PARAM_GENERATED) {
+                    types <- c(types, 9)
+                }
+            }
             if (.isTrialDesignPlanSurvival(obj)) {
                 types <- c(types, 10:14)
             }
@@ -514,6 +530,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 }
 
 .getVariedParameterHint <- function(variedParameter, variedParameterName) {
+    if (length(variedParameter) != 2) {
+        return("")
+    }
+    
     return(paste0(
         "Note: interim values between ", round(variedParameter[1], 4), " and ",
         round(variedParameter[2], 4), " were calculated to get smoother lines; use, e.g., '",
@@ -711,11 +731,13 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (inherits(parameterSet, "TrialDesignSet")) {
-        suppressWarnings(data <- as.data.frame(parameterSet,
+        suppressWarnings(data <- as.data.frame(
+            parameterSet,
             niceColumnNamesEnabled = FALSE,
             includeAllParameters = TRUE,
             addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
-            theta = theta, nMax = nMax
+            theta = theta, 
+            nMax = nMax
         ))
     } else {
         parameterNames <- parameterSet$.getVisibleFieldNamesOrdered()
@@ -884,7 +906,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             yParameterNames = yParameterNames
         )
         data <- df$data
-
+        
         variedParameters <- df$variedParameters
         variedParameters <- na.omit(variedParameters)
         variedParameters <- variedParameters[variedParameters != "NA"]
@@ -924,7 +946,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     mirrorModeEnabled <- any(grepl("Mirrored$", yParameterNames))
 
-    tableColumnNames <- .getTableColumnNames(design = designMaster)
+    tableColumnNames <- .getTableColumnNames(design = designMaster, 
+        designSet = if (.isTrialDesignSet(parameterSet)) parameterSet else NULL)
 
     xAxisLabel <- .getAxisLabel(xParameterName, tableColumnNames)
     yAxisLabel1 <- .getAxisLabel(yParameterName1, tableColumnNames)
@@ -964,7 +987,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         "Lower and", yAxisLabel1,
         fixed = TRUE
     )
-
+    
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
         if (!(xParameterName %in% colnames(data))) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset")
@@ -1011,7 +1034,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$categories <- rep(NA_character_, nrow(data))
         }
     }
-
+    
     if (!is.na(nMax) && is.null(yParameterName3) && xParameterName == "informationRates") {
         xAxisLabel <- "Sample Size"
         data$xValues <- data$xValues * nMax
@@ -1086,7 +1109,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             legendTitle <- paste(legendTitle, "Type of error", sep = sep)
         }
     }
-
+    
     if (is.na(legendPosition)) {
         legendPosition <- .getLegendPosition(
             plotSettings, designMaster, data, yParameterName1,
@@ -1267,7 +1290,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     data$yValues[!is.na(data$yValues) & is.infinite(data$yValues)] <- NA_real_
     data <- data[!is.na(data$yValues), ]
-
+    
     if (categoryEnabled && groupEnabled) {
         p <- ggplot2::ggplot(data, ggplot2::aes(
             x = .data[["xValues"]], y = .data[["yValues"]],

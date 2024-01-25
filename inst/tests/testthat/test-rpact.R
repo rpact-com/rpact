@@ -15,13 +15,11 @@
 ## |
 ## |  File name: test-rpact.R
 ## |  Creation date: 21 April 2021, 15:04:49
-## |  File version: $Revision: 6825 $
-## |  Last changed: $Date: 2023-02-22 15:45:12 +0100 (Mi, 22 Feb 2023) $
+## |  File version: $Revision: 7403 $
+## |  Last changed: $Date: 2023-11-08 16:12:00 +0100 (Mi, 08 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-
-context("Testing the rpact package")
 
 test_that("'getDesignInverseNormal' with default parameters: parameters and results are as expected", {
     designInverseNormal <- getDesignInverseNormal()
@@ -29,12 +27,6 @@ test_that("'getDesignInverseNormal' with default parameters: parameters and resu
     expect_equal(designInverseNormal$alphaSpent, c(0.00025917372, 0.0071600594, 0.02499999), tolerance = 1e-07)
     expect_equal(designInverseNormal$criticalValues, c(3.4710914, 2.4544323, 2.0040356), tolerance = 1e-07)
     expect_equal(designInverseNormal$stageLevels, c(0.00025917372, 0.0070553616, 0.022533125), tolerance = 1e-07)
-    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(designInverseNormal), NA)))
-        expect_output(print(designInverseNormal)$show())
-        invisible(capture.output(expect_error(summary(designInverseNormal), NA)))
-        expect_output(summary(designInverseNormal)$show())
-    }
 })
 
 test_that("'getDesignFisher' with default parameters: parameters and results are as expected", {
@@ -45,12 +37,6 @@ test_that("'getDesignFisher' with default parameters: parameters and results are
     expect_equal(designFisher$stageLevels, c(0.012308547, 0.012308547, 0.012308547), tolerance = 1e-07)
     expect_equal(designFisher$scale, c(1, 1))
     expect_equal(designFisher$nonStochasticCurtailment, FALSE)
-    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(designFisher), NA)))
-        expect_output(print(designFisher)$show())
-        invisible(capture.output(expect_error(summary(designFisher), NA)))
-        expect_output(summary(designFisher)$show())
-    }
 })
 
 test_that("Testing 'getPiecewiseSurvivalTime': simple vector based definition", {
@@ -69,12 +55,6 @@ test_that("Testing 'getPiecewiseSurvivalTime': simple vector based definition", 
     expect_equal(pwSurvivalTime1$piecewiseSurvivalEnabled, FALSE)
     expect_equal(pwSurvivalTime1$delayedResponseAllowed, FALSE)
     expect_equal(pwSurvivalTime1$delayedResponseEnabled, FALSE)
-    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(pwSurvivalTime1), NA)))
-        expect_output(print(pwSurvivalTime1)$show())
-        invisible(capture.output(expect_error(summary(pwSurvivalTime1), NA)))
-        expect_output(summary(pwSurvivalTime1)$show())
-    }
 })
 
 test_that("'getSampleSizeMeans': Sample size calculation of testing means for one sided group sequential design", {
@@ -86,12 +66,6 @@ test_that("'getSampleSizeMeans': Sample size calculation of testing means for on
     expect_equal(designGS1pretest$alphaSpent, c(0.0020595603, 0.0098772988, 0.02499999), tolerance = 1e-07)
     expect_equal(designGS1pretest$criticalValues, c(2.8688923, 2.3885055, 2.0793148), tolerance = 1e-07)
     expect_equal(designGS1pretest$stageLevels, c(0.0020595603, 0.0084585282, 0.018794214), tolerance = 1e-07)
-    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(designGS1pretest), NA)))
-        expect_output(print(designGS1pretest)$show())
-        invisible(capture.output(expect_error(summary(designGS1pretest), NA)))
-        expect_output(summary(designGS1pretest)$show())
-    }
 
     designGS1 <- getDesignGroupSequential(
         informationRates = c(0.2, 0.5, 1), sided = 1,
@@ -116,25 +90,22 @@ test_that("'getSampleSizeMeans': Sample size calculation of testing means for on
     expect_equal(sampleSizeResult$criticalValuesEffectScale[1, ], 1.090771, tolerance = 1e-07)
     expect_equal(sampleSizeResult$criticalValuesEffectScale[2, ], 0.80583608, tolerance = 1e-07)
     expect_equal(sampleSizeResult$criticalValuesEffectScale[3, ], 0.68748891, tolerance = 1e-07)
-    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(sampleSizeResult), NA)))
-        expect_output(print(sampleSizeResult)$show())
-        invisible(capture.output(expect_error(summary(sampleSizeResult), NA)))
-        expect_output(summary(sampleSizeResult)$show())
-    }
 })
 
 test_that("Testing generic functions: no errors occur", {
-    .skipTestIfDisabled()
-
     design <- getDesignGroupSequential(
-        alpha = 0.05, kMax = 4,
-        sided = 1, typeOfDesign = "WT", deltaWT = 0.1
+        alpha = 0.05, 
+        kMax = 4,
+        sided = 1, 
+        typeOfDesign = "WT", 
+        deltaWT = 0.1
     )
 
     designFisher <- getDesignFisher(
-        kMax = 4, alpha = 0.025,
-        informationRates = c(0.2, 0.5, 0.8, 1), alpha0Vec = rep(0.4, 3)
+        kMax = 4, 
+        alpha = 0.025,
+        informationRates = c(0.2, 0.5, 0.8, 1), 
+        alpha0Vec = rep(0.4, 3)
     )
 
     designCharacteristics <- getDesignCharacteristics(design)
@@ -154,11 +125,14 @@ test_that("Testing generic functions: no errors occur", {
 
     stageResults <- getStageResults(design, dataset)
 
-    suppressWarnings(designPlan <- getSampleSizeMeans(design))
+    designPlan <- getSampleSizeMeans(design)
 
-    simulationResults <- getSimulationSurvival(design,
-        maxNumberOfSubjects = 1200, plannedEvents = c(50, 100, 150, 200), seed = 12345
-    )
+    suppressWarnings(simulationResults <- getSimulationSurvival(
+        design,
+        maxNumberOfSubjects = 100, 
+        plannedEvents = c(50, 100, 150, 200), 
+        seed = 12345
+    ))
 
     piecewiseSurvivalTime <- getPiecewiseSurvivalTime(list(
         "0 - <6"   = 0.025,
@@ -188,7 +162,7 @@ test_that("Testing generic functions: no errors occur", {
     expect_vector(names(simulationResults))
     expect_vector(names(piecewiseSurvivalTime))
     expect_vector(names(accrualTime))
-
+    
     expect_output(print(design))
     expect_output(print(designFisher))
     expect_output(print(designCharacteristics))
@@ -200,7 +174,7 @@ test_that("Testing generic functions: no errors occur", {
     expect_output(print(simulationResults))
     expect_output(print(piecewiseSurvivalTime))
     expect_output(print(accrualTime))
-
+    
     expect_output(summary(design)$show())
     expect_output(summary(designFisher)$show())
     expect_output(summary(designCharacteristics)$show())
@@ -212,7 +186,7 @@ test_that("Testing generic functions: no errors occur", {
     expect_output(summary(simulationResults)$show())
     expect_output(summary(piecewiseSurvivalTime))
     expect_output(summary(accrualTime))
-
+    
     expect_named(as.data.frame(design))
     expect_named(as.data.frame(designFisher))
     expect_named(as.data.frame(designCharacteristics))
@@ -224,36 +198,36 @@ test_that("Testing generic functions: no errors occur", {
     expect_named(as.data.frame(simulationResults))
     expect_named(as.data.frame(piecewiseSurvivalTime))
     expect_named(as.data.frame(accrualTime))
-
-    expect_is(as.data.frame(design, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(designFisher, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(designCharacteristics, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(powerAndASN, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(designSet, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(dataset, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(stageResults, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(designPlan, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(simulationResults, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(piecewiseSurvivalTime, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.data.frame(accrualTime, niceColumnNamesEnabled = FALSE), "data.frame")
-
-    expect_is(as.matrix(design), "matrix")
-    expect_is(as.matrix(designFisher), "matrix")
-    expect_is(as.matrix(designCharacteristics), "matrix")
-    expect_is(as.matrix(powerAndASN), "matrix")
-    expect_is(as.matrix(designSet), "matrix")
-    expect_is(as.matrix(dataset), "matrix")
-    expect_is(as.matrix(stageResults), "matrix")
-    expect_is(as.matrix(designPlan), "matrix")
-    expect_is(as.matrix(simulationResults), "matrix")
-    expect_is(as.matrix(piecewiseSurvivalTime), "matrix")
-    expect_is(as.matrix(accrualTime), "matrix")
-
+    
+    expect_s3_class(as.data.frame(design, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(designFisher, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(designCharacteristics, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(powerAndASN, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(designSet, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(dataset, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(stageResults, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(designPlan, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(simulationResults, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(piecewiseSurvivalTime, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_s3_class(as.data.frame(accrualTime, niceColumnNamesEnabled = FALSE), "data.frame")
+    
+    expect_type(as.matrix(design), "character")
+    expect_type(as.matrix(designFisher), "character")
+    expect_type(as.matrix(designCharacteristics), "double")
+    expect_type(as.matrix(powerAndASN), "double")
+    expect_type(as.matrix(designSet), "character")
+    expect_type(as.matrix(dataset), "double")
+    expect_type(as.matrix(stageResults), "character")
+    expect_type(as.matrix(designPlan), "double")
+    expect_type(as.matrix(simulationResults), "double")
+    expect_type(as.matrix(piecewiseSurvivalTime), "double")
+    expect_type(as.matrix(accrualTime), "double")
+    
     suppressWarnings(analysisResults <- getAnalysisResults(design, dataset))
     expect_vector(names(analysisResults))
     expect_output(print(analysisResults))
     expect_output(summary(analysisResults)$show())
     expect_named(as.data.frame(analysisResults))
-    expect_is(as.data.frame(analysisResults, niceColumnNamesEnabled = FALSE), "data.frame")
-    expect_is(as.matrix(analysisResults), "matrix")
+    expect_s3_class(as.data.frame(analysisResults, niceColumnNamesEnabled = FALSE), "data.frame")
+    expect_type(as.matrix(analysisResults), "character")
 })

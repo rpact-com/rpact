@@ -15,6 +15,7 @@ That is, in case of (one-sided) testing of
 \item \emph{rates}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
 \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{count data}: a bound for testing H0: \code{lambda1 / lambda2 = thetaH0 != 1} can be specified.
 }
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}

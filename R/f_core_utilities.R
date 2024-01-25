@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7147 $
-## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
+## |  File version: $Revision: 7557 $
+## |  Last changed: $Date: 2024-01-12 13:41:28 +0100 (Fr, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -541,6 +541,7 @@ NULL
         if (is.na(direction)) {
             return(NA_real_)
         }
+        
         return(.getOneDimensionalRootBisectionMethod(
             fun = fun,
             lower = lower, upper = upper, tolerance = tolerance,
@@ -824,6 +825,14 @@ NULL
 
 .getVariedParameterVectorByValue <- function(variedParameter) {
     return((variedParameter[2] - variedParameter[1]) / C_VARIED_PARAMETER_SEQUENCE_LENGTH_DEFAULT)
+}
+
+.plotTheta <- function(theta) {
+    if (is.null(theta) || length(theta) == 0 || all(is.na(theta))) {
+        theta <- seq(-1, 1, 0.02)
+    }
+    theta <- .assertIsValidThetaRange(thetaRange = theta)
+    return(theta)
 }
 
 .getVariedParameterVector <- function(variedParameter, variedParameterName) {
@@ -1383,3 +1392,100 @@ getParameterName <- function(obj, parameterCaption) {
         }
     )
 }
+
+.isMarkdownEnabled <- function() {
+    return(!is.null(knitr::current_input()))
+}
+
+.isRMarkdownEnabled <- function() {
+    fileName <- knitr::current_input()
+    return(!is.null(fileName) && grepl("\\.rmd$", tolower(fileName)))
+}
+
+.isQuartoEnabled <- function() {
+    fileName <- knitr::current_input()
+    return(!is.null(fileName) && grepl("\\.(qmd|rmarkdown)$", tolower(fileName)))
+}
+
+#'
+#' options("rpact.multivar.dist.eps" = 1e-06)
+#'
+#' @noRd
+.getMultivariateDistribution <- function(...,
+        type = c("normal", "t", "quantile", "tQuantile"),
+        upper,
+        sigma,
+        eps = NA_real_,
+        df = NA_real_, alpha = NA_real_) {
+    type <- match.arg(type)
+
+    if (is.null(eps) || length(eps) != 1 || is.na(eps)) {
+        epsilon <- getOption("rpact.multivar.dist.eps", 1e-05)
+        if (is.numeric(epsilon) && epsilon < 0.1) {
+            eps <- epsilon
+        }
+    }
+
+    dimensionSigma <- length(base::diag(sigma))
+    if (type == "normal") {
+        if (dimensionSigma == 1) {
+            return(stats::pnorm(upper))
+        }
+
+        return(as251Normal(lower = -Inf, upper = upper, sigma = sigma, eps = 1e-06)[1])
+    }
+
+    if (type == "t") {
+        if (dimensionSigma == 1) {
+            return(stats::pt(upper, df))
+        }
+
+        return(as251StudentT(
+            lower = -Inf, upper = upper,
+            sigma = sigma, eps = eps, df = df
+        )[1])
+    }
+
+    if (type == "quantile") {
+        if (dimensionSigma == 1) {
+            return(.getOneMinusQNorm(alpha))
+        }
+
+        return(.getOneDimensionalRoot(
+            function(x) {
+                return(as251Normal(
+                    lower = -Inf, upper = x,
+                    sigma = sigma, eps = 1e-06
+                )[1] - (1 - alpha))
+            },
+            lower = -8,
+            upper = 8,
+            tolerance = 1e-06,
+            callingFunctionInformation = ".getMultivariateDistribution",
+            suppressWarnings = FALSE,
+            acceptResultsOutOfTolerance = TRUE
+        ))
+    }
+
+    if (type == "tQuantile") {
+        if (dimensionSigma == 1) {
+            return(stats::qt(1 - alpha, df))
+        }
+
+        return(.getOneDimensionalRoot(
+            function(x) {
+                return(as251StudentT(
+                    lower = -Inf, upper = x,
+                    eps = eps, sigma = sigma, df = df
+                )[1] - (1 - alpha))
+            },
+            lower = -8,
+            upper = 8,
+            tolerance = 1e-06,
+            callingFunctionInformation = ".getMultivariateDistribution",
+            suppressWarnings = FALSE,
+            acceptResultsOutOfTolerance = TRUE
+        ))
+    }
+}
+

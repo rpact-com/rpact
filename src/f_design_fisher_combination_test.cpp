@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6812 $
- * Last changed: $Date: 2023-02-15 09:50:31 +0100 (Mi, 15 Feb 2023) $
+ * File version: $Revision: 7408 $
+ * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -409,7 +409,7 @@ double getFisherCombinationSizeApproximatelyKmax6Cpp(NumericVector alpha0Vec,
             alpha0Vec, criticalValues, tVec, piValue, getFisherCombinationCaseKmax6Cpp(tVec));
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getFisherCombinationSizeCpp")]]
 double getFisherCombinationSizeCpp(double kMax, NumericVector alpha0Vec,
 	   NumericVector criticalValues, NumericVector tVec, NumericVector cases) {
     if (criticalValues.length() < 1 || criticalValues.length() > C_KMAX_UPPER_BOUND_FISHER) {
@@ -450,7 +450,7 @@ int getRejectValueForOneTrialCpp(int kMax, NumericVector alpha0,
     return p < criticalValues[stage - 1] ? 1 : -1;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getSimulatedAlphaCpp")]]
 double getSimulatedAlphaCpp(int kMax, NumericVector alpha0,
 		NumericVector criticalValues, NumericVector tVec, int iterations) {
 
@@ -481,7 +481,7 @@ double getSimulatedAlphaCpp(int kMax, NumericVector alpha0,
     return var / iterations;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getFisherCombinationCases")]]
 NumericVector getFisherCombinationCasesCpp(int kMax, NumericVector tVec) {
     if (kMax == 1) {
         return NumericVector(0);
@@ -511,7 +511,7 @@ double getFisherCombinationSizeCpp(double kMax, NumericVector alpha0Vec,
     return getFisherCombinationSizeCpp(kMax, alpha0Vec, criticalValues, tVec, getFisherCombinationCasesCpp(kMax, tVec));
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name = ".getDesignFisherInner")]]
 List getDesignFisherTryCpp(int kMax, double alpha, double tolerance,
 		NumericVector criticalValues, NumericVector scale,
 		NumericVector alpha0Vec, NumericVector userAlphaSpending, String method) {

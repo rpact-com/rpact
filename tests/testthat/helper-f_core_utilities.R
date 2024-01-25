@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6291 $
-## |  Last changed: $Date: 2022-06-13 08:36:13 +0200 (Mo, 13 Jun 2022) $
+## |  File version: $Revision: 7403 $
+## |  Last changed: $Date: 2023-11-08 16:12:00 +0100 (Mi, 08 Nov 2023) $
 ## |
 
 getTestInformationRatesDefault <- function(kMax) {
@@ -33,18 +33,18 @@ getTestInformationRates <- function(kMax) {
     if (kMax == 1L) {
         return(1)
     }
-    
+
     if (kMax == 6L) {
         return(c(0.1333, 0.26667, 0.4, 0.53333, 0.8667, 1))
     }
-    
+
     a <- 0.8 / kMax
-    
+
     b <- c()
     for (i in 1:(kMax - 1)) {
         b <- c(b, a * i)
     }
-    
+
     return(c(b, 1))
 }
 

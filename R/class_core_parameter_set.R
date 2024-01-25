@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7148 $
-## |  Last changed: $Date: 2023-07-03 15:50:22 +0200 (Mo, 03 Jul 2023) $
+## |  File version: $Revision: 7496 $
+## |  Last changed: $Date: 2023-12-15 10:42:15 +0100 (Fr, 15 Dez 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -209,6 +209,27 @@ ParameterSet <- setRefClass("ParameterSet",
             .parameterNames <<- list()
             .parameterFormatFunctions <<- list()
             .catLines <<- character(0)
+        },
+        clone = function() {
+            paramNames <- names(.self$getRefClass()$fields())
+            plotSettingsEnabled <- ".plotSettings" %in% paramNames
+            designEnabled <- ".design" %in% paramNames
+            paramNames <- paramNames[!grepl("^\\.|^stages$", paramNames)]
+            args <- list()
+            if (designEnabled) {
+                args$design <- .self$.design
+            }
+            for (paramName in paramNames) {
+                if (.self$.getParameterType(paramName) == C_PARAM_USER_DEFINED) {
+                    args[[paramName]] <- .self[[paramName]]
+                }
+            }
+            what <- .getGeneratorFunctionName(.self)
+            result <- do.call(what = what, args = args)
+            if (plotSettingsEnabled && !is.null(.self$.plotSettings)) {
+                result$.plotSettings <- .self$.plotSettings$clone()
+            }
+            return(result)
         },
         .toString = function(startWithUpperCase = FALSE) {
             s <- .formatCamelCase(.getClassName(.self))
@@ -1314,7 +1335,8 @@ ParameterSet <- setRefClass("ParameterSet",
         parameterNames <- parameterNames[!(parameterNames %in% parametersToIgnore)]
     }
 
-    if (parameterSet$.containsMultidimensionalParameters(parameterNames)) {
+    if (parameterSet$.containsMultidimensionalParameters(parameterNames) ||
+            (.isTrialDesignPlanCountData(parameterSet) && length(parameterSet$theta) > 1)) {
         return(.addDelayedInformationRates(.getAsDataFrameMultidimensional(
             parameterSet, parameterNames, niceColumnNamesEnabled,
             includeAllParameters, returnParametersAsCharacter, tableColumnNames,
@@ -1547,6 +1569,9 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 #'
 #' @param object A \code{\link{ParameterSet}} object.
 #' @inheritParams param_digits
+#' @param output The output parts, default is \code{"all"}.
+#' @param printObject Show also the print output after the summary, default is \code{FALSE}.
+#' @param sep The separator line between the summary and the optional print output.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -1561,17 +1586,28 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 #'
 #' @keywords internal
 #'
-summary.ParameterSet <- function(object, ..., type = 1, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
-    .warnInCaseOfUnknownArguments(functionName = "summary", ...)
+summary.ParameterSet <- function(object, ...,
+        type = 1,
+        digits = NA_integer_,
+        output = c("all", "title", "overview", "body"),
+        printObject = FALSE,
+        sep = "\n-----\n\n") {
+    .warnInCaseOfUnknownArguments(functionName = "summary", ignore = c("printObject"), ...)
+
+    base::attr(object, "printObject") <- printObject
+    base::attr(object, "printObjectSeparator") <- sep
 
     if (type == 1 && inherits(object, "SummaryFactory")) {
         return(object)
     }
 
-    if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesignPlan") ||
-            inherits(object, "SimulationResults") || inherits(object, "AnalysisResults") ||
-            inherits(object, "TrialDesignCharacteristics") ||
-            inherits(object, "PerformanceScore"))) {
+    if (type == 1 && (
+            inherits(object, "TrialDesign") ||
+                inherits(object, "TrialDesignPlan") ||
+                inherits(object, "SimulationResults") ||
+                inherits(object, "AnalysisResults") ||
+                inherits(object, "TrialDesignCharacteristics") ||
+                inherits(object, "PerformanceScore"))) {
         output <- match.arg(output)
         return(.createSummary(object, digits = digits, output = output))
     }
@@ -1620,14 +1656,19 @@ summary.ParameterSet <- function(object, ..., type = 1, digits = NA_integer_, ou
 #'
 #' @keywords internal
 #'
-print.ParameterSet <- function(x, ..., markdown = FALSE) {
-    if (markdown) {
-        x$.catMarkdownText()
-        return(invisible(x))
+print.ParameterSet <- function(x, ..., markdown = NA) {
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
     }
 
-    x$show()
-    invisible(x)
+    if (markdown) {
+        x$.catMarkdownText()
+        cat("\n\n")
+    } else {
+        x$show()
+    }
+
+    return(invisible(x))
 }
 
 #'
@@ -1667,25 +1708,6 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
     )
 }
 
-.getKnitPrintVersion <- function(x, ...) {
-    fCall <- match.call(expand.dots = FALSE)
-
-    .assertPackageIsInstalled("knitr")
-
-    args <- list(x = x, markdown = TRUE)
-    if (.isSimulationResults(x)) {
-        showStatistics <- .getOptionalArgument("showStatistics", optionalArgumentDefaultValue = FALSE, ...)
-        if (isTRUE(showStatistics)) {
-            args$showStatistics <- TRUE
-        }
-    }
-    if (inherits(x, "SummaryFactory") || .isSummaryPipe(fCall)) {
-        args$showSummary <- TRUE
-    }
-
-    return(do.call(what = print, args = args))
-}
-
 #'
 #' @title
 #' Print Parameter Set in Markdown Code Chunks
@@ -1709,7 +1731,7 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
 #' @export
 #'
 knit_print.ParameterSet <- function(x, ...) {
-    result <- paste0(utils::capture.output(.getKnitPrintVersion(x = x, ...)), collapse = "\n")
+    result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
     return(knitr::asis_output(result))
 }
 
@@ -1743,8 +1765,10 @@ kable.ParameterSet <- function(x, ...) {
             }
             if (grepl("^ *print\\(", objName)) {
                 stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") does not work correctly. ",
-                    "Use ", sub("print", "kable", objName), " without 'print' instead or ", sub("\\)", ", markdown = TRUE)", objName)
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") ",
+                    "does not work correctly. ",
+                    "Use ", sub("print", "kable", objName), " without 'print' ",
+                    "instead or ", sub("\\)", ", markdown = TRUE)", objName)
                 )
             }
         }

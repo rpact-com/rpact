@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_utilities.R
-## |  Creation date: 06 February 2023, 12:13:45
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  Creation date: 08 November 2023, 09:10:53
+## |  File version: $Revision: 7560 $
+## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -317,39 +317,39 @@ test_that("'.convertStageWiseToOverallValues': test that function is working as 
 	x1 <- .convertStageWiseToOverallValues(c(1:5))
 
 	## Comparison of the results of matrixarray object 'x1' with expected results
-	expect_equal(x1[1, ], 1)
-	expect_equal(x1[2, ], 3)
-	expect_equal(x1[3, ], 6)
-	expect_equal(x1[4, ], 10)
-	expect_equal(x1[5, ], 15)
+	expect_equal(x1[1, ], 1, label = paste0("c(", paste0(x1[1, ], collapse = ", "), ")"))
+	expect_equal(x1[2, ], 3, label = paste0("c(", paste0(x1[2, ], collapse = ", "), ")"))
+	expect_equal(x1[3, ], 6, label = paste0("c(", paste0(x1[3, ], collapse = ", "), ")"))
+	expect_equal(x1[4, ], 10, label = paste0("c(", paste0(x1[4, ], collapse = ", "), ")"))
+	expect_equal(x1[5, ], 15, label = paste0("c(", paste0(x1[5, ], collapse = ", "), ")"))
 
 	x2 <- .convertStageWiseToOverallValues(matrix(c(1:5), ncol = 1))
 
 	## Comparison of the results of matrixarray object 'x2' with expected results
-	expect_equal(x2[1, ], 1)
-	expect_equal(x2[2, ], 3)
-	expect_equal(x2[3, ], 6)
-	expect_equal(x2[4, ], 10)
-	expect_equal(x2[5, ], 15)
+	expect_equal(x2[1, ], 1, label = paste0("c(", paste0(x2[1, ], collapse = ", "), ")"))
+	expect_equal(x2[2, ], 3, label = paste0("c(", paste0(x2[2, ], collapse = ", "), ")"))
+	expect_equal(x2[3, ], 6, label = paste0("c(", paste0(x2[3, ], collapse = ", "), ")"))
+	expect_equal(x2[4, ], 10, label = paste0("c(", paste0(x2[4, ], collapse = ", "), ")"))
+	expect_equal(x2[5, ], 15, label = paste0("c(", paste0(x2[5, ], collapse = ", "), ")"))
 
 	x3 <- .convertStageWiseToOverallValues(matrix(c(1:5), nrow = 1))
 
 	## Comparison of the results of matrixarray object 'x3' with expected results
-	expect_equal(x3[1, ], c(1, 2, 3, 4, 5))
+	expect_equal(x3[1, ], c(1, 2, 3, 4, 5), label = paste0("c(", paste0(x3[1, ], collapse = ", "), ")"))
 
 	x4 <- .convertStageWiseToOverallValues(matrix(c(1:5, 1:5), ncol = 2))
 
 	## Comparison of the results of matrixarray object 'x4' with expected results
-	expect_equal(x4[1, ], c(1, 1))
-	expect_equal(x4[2, ], c(3, 3))
-	expect_equal(x4[3, ], c(6, 6))
-	expect_equal(x4[4, ], c(10, 10))
-	expect_equal(x4[5, ], c(15, 15))
+	expect_equal(x4[1, ], c(1, 1), label = paste0("c(", paste0(x4[1, ], collapse = ", "), ")"))
+	expect_equal(x4[2, ], c(3, 3), label = paste0("c(", paste0(x4[2, ], collapse = ", "), ")"))
+	expect_equal(x4[3, ], c(6, 6), label = paste0("c(", paste0(x4[3, ], collapse = ", "), ")"))
+	expect_equal(x4[4, ], c(10, 10), label = paste0("c(", paste0(x4[4, ], collapse = ", "), ")"))
+	expect_equal(x4[5, ], c(15, 15), label = paste0("c(", paste0(x4[5, ], collapse = ", "), ")"))
 
 	x5 <- .convertStageWiseToOverallValues(matrix(sort(rep(1:5, 2)), nrow = 2))
 
 	## Comparison of the results of matrixarray object 'x5' with expected results
-	expect_equal(x5[1, ], c(1, 2, 3, 4, 5))
-	expect_equal(x5[2, ], c(2, 4, 6, 8, 10))
+	expect_equal(x5[1, ], c(1, 2, 3, 4, 5), label = paste0("c(", paste0(x5[1, ], collapse = ", "), ")"))
+	expect_equal(x5[2, ], c(2, 4, 6, 8, 10), label = paste0("c(", paste0(x5[2, ], collapse = ", "), ")"))
 })
 

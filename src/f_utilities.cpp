@@ -14,17 +14,21 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6902 $
- * Last changed: $Date: 2023-03-29 10:01:19 +0200 (Mi, 29 Mrz 2023) $
+ * File version: $Revision: 7471 $
+ * Last changed: $Date: 2023-12-05 15:19:36 +0100 (Di, 05 Dez 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
 
+#include <algorithm>
+#include <cmath>
+#include <iostream>
 #include <Rcpp.h>
 
 // [[Rcpp::plugins(cpp11)]]
 
 using namespace Rcpp;
+using namespace std;
 
 const double C_QNORM_EPSILON = 1.0e-100; // a value between 1e-323 and 1e-16
 const double C_QNORM_MAXIMUM = -R::qnorm(C_QNORM_EPSILON, 0, 1, 1, 0);

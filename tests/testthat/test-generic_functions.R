@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-generic_functions.R
-## |  Creation date: 06 February 2023, 12:14:59
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  Creation date: 08 November 2023, 09:12:05
+## |  File version: $Revision: 7560 $
+## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 

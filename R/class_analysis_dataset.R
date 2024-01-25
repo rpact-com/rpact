@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7139 $
-## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
+## |  File version: $Revision: 7554 $
+## |  Last changed: $Date: 2024-01-12 10:19:05 +0100 (Fr, 12 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -107,7 +107,7 @@ C_KEY_WORDS <- c(
 #' @param fileEncoding character string: if non-empty declares the encoding used on a file
 #'        (not a connection) so the character data can be re-encoded.
 #'        See the 'Encoding' section of the help for file, the 'R Data Import/Export Manual' and 'Note'.
-#' @param ... Further arguments to be passed to code{\link[utils]{read.table}}.
+#' @param ... Further arguments to be passed to \code{\link[utils]{read.table}}.
 #'
 #' @details
 #' \code{readDataset} is a wrapper function that uses \code{\link[utils]{read.table}} to read the

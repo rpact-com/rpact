@@ -13,14 +13,26 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7547 $
+## |  Last changed: $Date: 2024-01-10 08:13:40 +0100 (Mi, 10 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include class_simulation_results.R
 #' @include f_core_utilities.R
 NULL
+
+.warnInCaseOfDefinedPiValue <- function(designPlan, piValueName) {
+    piValue <- designPlan[[piValueName]]
+    if (!is.null(piValue) && !is.na(piValue) && length(piValue) > 0) {
+        designPlan$.setParameterType(piValueName, C_PARAM_NOT_APPLICABLE)
+        warning("'pi2' (", .arrayToString(piValue), ") will be ignored ",
+            "because piecewise exponential survival function is enabled",
+            call. = FALSE
+        )
+        designPlan[[piValueName]] <- NA_real_
+    }
+}
 
 .isLambdaBasedSimulationEnabled <- function(pwsTimeObject) {
     if (!pwsTimeObject$.isLambdaBased()) {
@@ -212,27 +224,6 @@ NULL
 #' \code{\link[=getRawData]{getRawData()}} can be used to get the simulated raw data from the
 #' object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival()}
 #' must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
-#' The data frame contains the following columns:
-#' \enumerate{
-#'   \item \code{iterationNumber}: The number of the simulation iteration.
-#'   \item \code{stopStage}: The stage of stopping.
-#'   \item \code{subjectId}: The subject id (increasing number 1, 2, 3, ...)
-#'   \item \code{accrualTime}: The accrual time, i.e., the time when the subject entered the trial.
-#'   \item \code{treatmentGroup}: The treatment group number (1 or 2).
-#'   \item \code{survivalTime}: The survival time of the subject.
-#'   \item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
-#'   \item \code{observationTime}: The specific observation time.
-#'   \item \code{timeUnderObservation}: The time under observation is defined as follows:\cr
-#'         if (event == TRUE) {\cr
-#'             timeUnderObservation <- survivalTime;\cr
-#'         } else if (dropoutEvent == TRUE) {\cr
-#'             timeUnderObservation <- dropoutTime;\cr
-#'         } else {\cr
-#'             timeUnderObservation <- observationTime - accrualTime;\cr
-#'         }
-#'   \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
-#'   \item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
-#' }
 #'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
@@ -307,9 +298,7 @@ getSimulationSurvival <- function(design = NULL, ...,
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)
     .assertIsNumericVector(lambda2, "lambda2", naAllowed = TRUE)
-    .assertIsSinglePositiveInteger(maxNumberOfSubjects, "maxNumberOfSubjects",
-        validateType = FALSE, naAllowed = TRUE
-    )
+    .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)    
     .assertIsIntegerVector(allocation1, "allocation1", validateType = FALSE)
     .assertIsIntegerVector(allocation2, "allocation2", validateType = FALSE)
     .assertIsInClosedInterval(allocation1, "allocation1", lower = 1L, upper = NULL)
@@ -700,7 +689,7 @@ getSimulationSurvival <- function(design = NULL, ...,
     calcEventsFunctionR <- calcSubjectsFunctionList$calcSubjectsFunctionR
     calcEventsFunctionCpp <- calcSubjectsFunctionList$calcSubjectsFunctionCpp
 
-    resultData <- getSimulationSurvivalCpp(
+    resultData <- .getSimulationSurvivalCpp(
         designNumber                   = designNumber,
         kMax                           = design$kMax,
         sided                          = design$sided,

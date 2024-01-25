@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7206 $
+## |  Last changed: $Date: 2023-07-25 14:55:05 +0200 (Tue, 25 Jul 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -256,7 +256,7 @@ NULL
 
         if (k < kMax) {
             futilityStop[k] <- all(futility[stageResults$selectedPopulations[1:gMax, k], k])
-            if (all(stageResults$selectedPopulations[1:gMax, k + 1] == FALSE)) {
+            if (all(isFALSE(stageResults$selectedPopulations[1:gMax, k + 1]))) {
                 futilityStop[k] <- TRUE
             }
         }

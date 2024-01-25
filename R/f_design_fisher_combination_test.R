@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7408 $
+## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -25,7 +25,7 @@ NULL
 
 .getFisherCombinationSize <- function(kMax, alpha0Vec, criticalValues, tVec,
         cases = .getFisherCombinationCases(kMax = kMax, tVec = tVec)) {
-    return(getFisherCombinationSizeCpp(kMax, alpha0Vec, criticalValues, tVec, cases))
+    return(.getFisherCombinationSizeCpp(kMax, alpha0Vec, criticalValues, tVec, cases))
 }
 
 #' @title
@@ -105,10 +105,6 @@ getDesignFisher <- function(...,
         iterations = 0,
         seed = NA_real_
     ))
-}
-
-.getFisherCombinationCases <- function(kMax, tVec) {
-    return(getFisherCombinationCasesCpp(kMax, tVec))
 }
 
 #'
@@ -257,9 +253,10 @@ getDesignFisher <- function(...,
     tryCatch(
         {
             cases <- .getFisherCombinationCases(kMax = design$kMax, tVec = design$scale)
-            result <- getDesignFisherTryCpp(
+            result <- .getDesignFisherInner(
                 design$kMax, design$alpha, design$tolerance,
-                design$criticalValues, design$scale, alpha0Vec, design$userAlphaSpending, design$method
+                design$criticalValues, design$scale, alpha0Vec, 
+                design$userAlphaSpending, design$method
             )
             design$criticalValues <- result$criticalValues
             design$alphaSpent <- result$alphaSpent
@@ -357,7 +354,7 @@ getDesignFisher <- function(...,
             C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE
         ))
         design$seed <- .setSeed(design$seed)
-        design$simAlpha <- getSimulatedAlphaCpp(
+        design$simAlpha <- .getSimulatedAlphaCpp(
             kMax = design$kMax,
             alpha0 = design$alpha0Vec,
             criticalValues = design$criticalValues,

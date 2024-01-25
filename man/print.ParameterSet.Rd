@@ -4,7 +4,7 @@
 \alias{print.ParameterSet}
 \title{Print Parameter Set Values}
 \usage{
-\method{print}{ParameterSet}(x, ..., markdown = FALSE)
+\method{print}{ParameterSet}(x, ..., markdown = NA)
 }
 \arguments{
 \item{x}{The \code{\link{ParameterSet}} object to print.}

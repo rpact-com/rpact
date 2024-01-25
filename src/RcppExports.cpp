@@ -11,6 +11,56 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// mvnprd
+NumericVector mvnprd(NumericVector a, NumericVector b, NumericVector bpd, float eps, IntegerVector inf, int ierc, float hinc);
+RcppExport SEXP _rpact_mvnprd(SEXP aSEXP, SEXP bSEXP, SEXP bpdSEXP, SEXP epsSEXP, SEXP infSEXP, SEXP iercSEXP, SEXP hincSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type a(aSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type b(bSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type bpd(bpdSEXP);
+    Rcpp::traits::input_parameter< float >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type inf(infSEXP);
+    Rcpp::traits::input_parameter< int >::type ierc(iercSEXP);
+    Rcpp::traits::input_parameter< float >::type hinc(hincSEXP);
+    rcpp_result_gen = Rcpp::wrap(mvnprd(a, b, bpd, eps, inf, ierc, hinc));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mvstud
+NumericVector mvstud(int ndf, NumericVector a, NumericVector b, NumericVector bpd, NumericVector d, float eps, IntegerVector inf, int ierc, float hnc);
+RcppExport SEXP _rpact_mvstud(SEXP ndfSEXP, SEXP aSEXP, SEXP bSEXP, SEXP bpdSEXP, SEXP dSEXP, SEXP epsSEXP, SEXP infSEXP, SEXP iercSEXP, SEXP hncSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type ndf(ndfSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type a(aSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type b(bSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type bpd(bpdSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type d(dSEXP);
+    Rcpp::traits::input_parameter< float >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type inf(infSEXP);
+    Rcpp::traits::input_parameter< int >::type ierc(iercSEXP);
+    Rcpp::traits::input_parameter< float >::type hnc(hncSEXP);
+    rcpp_result_gen = Rcpp::wrap(mvstud(ndf, a, b, bpd, d, eps, inf, ierc, hnc));
+    return rcpp_result_gen;
+END_RCPP
+}
+// estimate_nb
+SEXP estimate_nb(NumericVector counts1, NumericVector counts2, NumericVector t1, NumericVector t2);
+RcppExport SEXP _rpact_estimate_nb(SEXP counts1SEXP, SEXP counts2SEXP, SEXP t1SEXP, SEXP t2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type counts1(counts1SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type counts2(counts2SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type t1(t1SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type t2(t2SEXP);
+    rcpp_result_gen = Rcpp::wrap(estimate_nb(counts1, counts2, t1, t2));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getFisherCombinationSizeCpp
 double getFisherCombinationSizeCpp(double kMax, NumericVector alpha0Vec, NumericVector criticalValues, NumericVector tVec, NumericVector cases);
 RcppExport SEXP _rpact_getFisherCombinationSizeCpp(SEXP kMaxSEXP, SEXP alpha0VecSEXP, SEXP criticalValuesSEXP, SEXP tVecSEXP, SEXP casesSEXP) {
@@ -407,6 +457,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_rpact_mvnprd", (DL_FUNC) &_rpact_mvnprd, 7},
+    {"_rpact_mvstud", (DL_FUNC) &_rpact_mvstud, 9},
+    {"_rpact_estimate_nb", (DL_FUNC) &_rpact_estimate_nb, 4},
     {"_rpact_getFisherCombinationSizeCpp", (DL_FUNC) &_rpact_getFisherCombinationSizeCpp, 5},
     {"_rpact_getSimulatedAlphaCpp", (DL_FUNC) &_rpact_getSimulatedAlphaCpp, 5},
     {"_rpact_getFisherCombinationCasesCpp", (DL_FUNC) &_rpact_getFisherCombinationCasesCpp, 2},

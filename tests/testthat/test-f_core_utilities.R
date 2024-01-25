@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_core_utilities.R
-## |  Creation date: 06 February 2023, 12:11:55
-## |  File version: $Revision: 6801 $
-## |  Last changed: $Date: 2023-02-06 15:29:57 +0100 (Mon, 06 Feb 2023) $
+## |  Creation date: 08 November 2023, 09:09:36
+## |  File version: $Revision: 7560 $
+## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -1359,8 +1359,8 @@ test_that("Testing '.getOneDimensionalRoot'", {
 	result1 <- getRepeatedConfidenceIntervals(design1, dataExample1, stage = 3)
 
 	## Comparison of the results of matrixarray object 'result1' with expected results
-	expect_equal(result1[1, ], c(0.54923831, 0.77922365, 1.0261298), tolerance = 1e-07)
-	expect_equal(result1[2, ], c(3.7041718, 2.7014099, 2.5669073), tolerance = 1e-07)
+	expect_equal(result1[1, ], c(0.54923831, 0.77922365, 1.0261298), tolerance = 1e-07, label = paste0("c(", paste0(result1[1, ], collapse = ", "), ")"))
+	expect_equal(result1[2, ], c(3.7041718, 2.7014099, 2.5669073), tolerance = 1e-07, label = paste0("c(", paste0(result1[2, ], collapse = ", "), ")"))
 
 	design2 <- getDesignGroupSequential(
 	    kMax = 3, alpha = 0.025, informationRates = c(0.4, 0.7, 1),
@@ -1378,8 +1378,8 @@ test_that("Testing '.getOneDimensionalRoot'", {
 	)
 
 	## Comparison of the results of matrixarray object 'result2' with expected results
-	expect_equal(result2[1, ], c(-0.17491833, -0.048575314, 0.018957987), tolerance = 1e-07)
-	expect_equal(result2[2, ], c(0.41834377, 0.2916876, 0.31353674), tolerance = 1e-07)
+	expect_equal(result2[1, ], c(-0.17491833, -0.048575314, 0.018957987), tolerance = 1e-07, label = paste0("c(", paste0(result2[1, ], collapse = ", "), ")"))
+	expect_equal(result2[2, ], c(0.41834377, 0.2916876, 0.31353674), tolerance = 1e-07, label = paste0("c(", paste0(result2[2, ], collapse = ", "), ")"))
 
 	design3 <- getDesignInverseNormal(
 	    kMax = 2, alpha = 0.025, informationRates = c(0.5, 1),
@@ -1394,8 +1394,8 @@ test_that("Testing '.getOneDimensionalRoot'", {
 	result3 <- getRepeatedConfidenceIntervals(design3, dataExample3)
 
 	## Comparison of the results of matrixarray object 'result3' with expected results
-	expect_equal(result3[1, ], c(-0.26729325, -0.071746001), tolerance = 1e-07)
-	expect_equal(result3[2, ], c(0.26729325, 0.071746001), tolerance = 1e-07)
+	expect_equal(result3[1, ], c(-0.26729325, -0.071746001), tolerance = 1e-07, label = paste0("c(", paste0(result3[1, ], collapse = ", "), ")"))
+	expect_equal(result3[2, ], c(0.26729325, 0.071746001), tolerance = 1e-07, label = paste0("c(", paste0(result3[2, ], collapse = ", "), ")"))
 
 	design4 <- getDesignInverseNormal(
 	    kMax = 2, alpha = 0.025, informationRates = c(0.5, 1),
@@ -1410,7 +1410,7 @@ test_that("Testing '.getOneDimensionalRoot'", {
 	result4 <- getRepeatedConfidenceIntervals(design4, dataExample4)
 
 	## Comparison of the results of matrixarray object 'result4' with expected results
-	expect_equal(result4[1, ], c(-0.23589449, -0.043528426), tolerance = 1e-07)
-	expect_equal(result4[2, ], c(0.23589449, 0.088472144), tolerance = 1e-07)
+	expect_equal(result4[1, ], c(-0.23589449, -0.043528426), tolerance = 1e-07, label = paste0("c(", paste0(result4[1, ], collapse = ", "), ")"))
+	expect_equal(result4[2, ], c(0.23589449, 0.088472144), tolerance = 1e-07, label = paste0("c(", paste0(result4[2, ], collapse = ", "), ")"))
 })
 

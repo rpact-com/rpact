@@ -14,10 +14,10 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |  
 ## |  File name: test-f_design_group_sequential.R
-## |  Creation date: 06 February 2023, 12:12:02
-## |  File version: $Revision: 6888 $
-## |  Last changed: $Date: 2023-03-23 12:01:00 +0100 (Do, 23 Mrz 2023) $
-## |  Last changed by: $Author: wassmer $
+## |  Creation date: 08 November 2023, 09:09:43
+## |  File version: $Revision: 7560 $
+## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |  
 
 test_plan_section("Testing the Group Sequential and Inverse Normal Design Functionality")
@@ -28,18 +28,18 @@ test_that("'getGroupSequentialProbabilities' with one and two continuation regio
 	xa <- getGroupSequentialProbabilities(matrix(c(rep(-qnorm(0.95), 4), rep(qnorm(0.95), 4)), nrow = 2, byrow = TRUE), (1:4) / 4)
 
 	## Comparison of the results of matrixarray object 'xa' with expected results
-	expect_equal(xa[1, ], c(0.05, 0.030074925, 0.020961248, 0.01595848), tolerance = 1e-07)
-	expect_equal(xa[2, ], c(0.95, 0.86992507, 0.8188889, 0.78196917), tolerance = 1e-07)
-	expect_equal(xa[3, ], c(1, 0.9, 0.83985015, 0.79792765), tolerance = 1e-07)
+	expect_equal(xa[1, ], c(0.05, 0.030074925, 0.020961248, 0.01595848), tolerance = 1e-07, label = paste0("c(", paste0(xa[1, ], collapse = ", "), ")"))
+	expect_equal(xa[2, ], c(0.95, 0.86992507, 0.8188889, 0.78196917), tolerance = 1e-07, label = paste0("c(", paste0(xa[2, ], collapse = ", "), ")"))
+	expect_equal(xa[3, ], c(1, 0.9, 0.83985015, 0.79792765), tolerance = 1e-07, label = paste0("c(", paste0(xa[3, ], collapse = ", "), ")"))
 
 	xb <- getGroupSequentialProbabilities(matrix(c(rep(-qnorm(0.95), 4), rep(-1, 4), rep(1, 4), rep(qnorm(0.95), 4)), nrow = 4, byrow = TRUE), (1:4) / 4)
 
 	## Comparison of the results of matrixarray object 'xb' with expected results
-	expect_equal(xb[1, ], c(0.05, 0.016446517, 0.005264288, 0.0019569508), tolerance = 1e-07)
-	expect_equal(xb[2, ], c(0.15865525, 0.048950554, 0.017478997, 0.0072417024), tolerance = 1e-07)
-	expect_equal(xb[3, ], c(0.84134475, 0.16835995, 0.047529077, 0.017187717), tolerance = 1e-07)
-	expect_equal(xb[4, ], c(0.95, 0.20086399, 0.059743786, 0.022472468), tolerance = 1e-07)
-	expect_equal(xb[5, ], c(1, 0.21731051, 0.065008074, 0.024429419), tolerance = 1e-07)
+	expect_equal(xb[1, ], c(0.05, 0.016446517, 0.005264288, 0.0019569508), tolerance = 1e-07, label = paste0("c(", paste0(xb[1, ], collapse = ", "), ")"))
+	expect_equal(xb[2, ], c(0.15865525, 0.048950554, 0.017478997, 0.0072417024), tolerance = 1e-07, label = paste0("c(", paste0(xb[2, ], collapse = ", "), ")"))
+	expect_equal(xb[3, ], c(0.84134475, 0.16835995, 0.047529077, 0.017187717), tolerance = 1e-07, label = paste0("c(", paste0(xb[3, ], collapse = ", "), ")"))
+	expect_equal(xb[4, ], c(0.95, 0.20086399, 0.059743786, 0.022472468), tolerance = 1e-07, label = paste0("c(", paste0(xb[4, ], collapse = ", "), ")"))
+	expect_equal(xb[5, ], c(1, 0.21731051, 0.065008074, 0.024429419), tolerance = 1e-07, label = paste0("c(", paste0(xb[5, ], collapse = ", "), ")"))
 
 })
 
@@ -50,9 +50,9 @@ test_that("'getDesignInverseNormal' with default parameters: parameters and resu
 	x0 <- getDesignInverseNormal()
 
 	## Comparison of the results of TrialDesignInverseNormal object 'x0' with expected results
-	expect_equal(x0$alphaSpent, c(0.00025917372, 0.0071600594, 0.02499999), tolerance = 1e-07)
-	expect_equal(x0$criticalValues, c(3.4710914, 2.4544323, 2.0040356), tolerance = 1e-07)
-	expect_equal(x0$stageLevels, c(0.00025917372, 0.0070553616, 0.022533125), tolerance = 1e-07)
+	expect_equal(x0$alphaSpent, c(0.00025917372, 0.0071600594, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(x0$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x0$criticalValues, c(3.4710914, 2.4544323, 2.0040356), tolerance = 1e-07, label = paste0("c(", paste0(x0$criticalValues, collapse = ", "), ")"))
+	expect_equal(x0$stageLevels, c(0.00025917372, 0.0070553616, 0.022533125), tolerance = 1e-07, label = paste0("c(", paste0(x0$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x0), NA)))
 	    expect_output(print(x0)$show())
@@ -86,9 +86,9 @@ test_that("'getDesignInverseNormal' with type of design = 'asHSD', 'bsHSD', 'asK
 	)
 
 	## Comparison of the results of TrialDesignInverseNormal object 'x1' with expected results
-	expect_equal(x1$alphaSpent, c(0.006, 0.012, 0.03), tolerance = 1e-07)
-	expect_equal(x1$criticalValues, c(2.5121443, 2.4228747, 2.0280392), tolerance = 1e-07)
-	expect_equal(x1$stageLevels, c(0.006, 0.0076991188, 0.021278125), tolerance = 1e-07)
+	expect_equal(x1$alphaSpent, c(0.006, 0.012, 0.03), tolerance = 1e-07, label = paste0("c(", paste0(x1$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x1$criticalValues, c(2.5121443, 2.4228747, 2.0280392), tolerance = 1e-07, label = paste0("c(", paste0(x1$criticalValues, collapse = ", "), ")"))
+	expect_equal(x1$stageLevels, c(0.006, 0.0076991188, 0.021278125), tolerance = 1e-07, label = paste0("c(", paste0(x1$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x1), NA)))
 	    expect_output(print(x1)$show())
@@ -113,16 +113,16 @@ test_that("'getDesignInverseNormal' with type of design = 'asHSD', 'bsHSD', 'asK
 	y1 <- getDesignCharacteristics(x1)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y1' with expected results
-	expect_equal(y1$nFixed, 8.7681899, tolerance = 1e-07)
-	expect_equal(y1$shift, 9.4594101, tolerance = 1e-07)
-	expect_equal(y1$inflationFactor, 1.0788327, tolerance = 1e-07)
-	expect_equal(y1$information, c(1.891882, 3.7837641, 9.4594101), tolerance = 1e-07)
-	expect_equal(y1$power, c(0.12783451, 0.34055165, 0.86), tolerance = 1e-07)
-	expect_equal(y1$rejectionProbabilities, c(0.12783451, 0.21271713, 0.51944835), tolerance = 1e-07)
-	expect_equal(y1$futilityProbabilities, c(0, 0))
-	expect_equal(y1$averageSampleNumber1, 0.83081135, tolerance = 1e-07)
-	expect_equal(y1$averageSampleNumber01, 1.0142116, tolerance = 1e-07)
-	expect_equal(y1$averageSampleNumber0, 1.0697705, tolerance = 1e-07)
+	expect_equal(y1$nFixed, 8.7681899, tolerance = 1e-07, label = paste0("c(", paste0(y1$nFixed, collapse = ", "), ")"))
+	expect_equal(y1$shift, 9.4594101, tolerance = 1e-07, label = paste0("c(", paste0(y1$shift, collapse = ", "), ")"))
+	expect_equal(y1$inflationFactor, 1.0788327, tolerance = 1e-07, label = paste0("c(", paste0(y1$inflationFactor, collapse = ", "), ")"))
+	expect_equal(y1$information, c(1.891882, 3.7837641, 9.4594101), tolerance = 1e-07, label = paste0("c(", paste0(y1$information, collapse = ", "), ")"))
+	expect_equal(y1$power, c(0.12783451, 0.34055165, 0.86), tolerance = 1e-07, label = paste0("c(", paste0(y1$power, collapse = ", "), ")"))
+	expect_equal(y1$rejectionProbabilities, c(0.12783451, 0.21271713, 0.51944835), tolerance = 1e-07, label = paste0("c(", paste0(y1$rejectionProbabilities, collapse = ", "), ")"))
+	expect_equal(y1$futilityProbabilities, c(0, 0), label = paste0("c(", paste0(y1$futilityProbabilities, collapse = ", "), ")"))
+	expect_equal(y1$averageSampleNumber1, 0.83081135, tolerance = 1e-07, label = paste0("c(", paste0(y1$averageSampleNumber1, collapse = ", "), ")"))
+	expect_equal(y1$averageSampleNumber01, 1.0142116, tolerance = 1e-07, label = paste0("c(", paste0(y1$averageSampleNumber01, collapse = ", "), ")"))
+	expect_equal(y1$averageSampleNumber0, 1.0697705, tolerance = 1e-07, label = paste0("c(", paste0(y1$averageSampleNumber0, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(y1), NA)))
 	    expect_output(print(y1)$show())
@@ -160,12 +160,12 @@ test_that("'getDesignInverseNormal' with type of design = 'asHSD', 'bsHSD', 'asK
 	)
 
 	## Comparison of the results of TrialDesignInverseNormal object 'x2' with expected results
-	expect_equal(x2$power, c(0.12038953, 0.32895265, 0.86), tolerance = 1e-07)
-	expect_equal(x2$futilityBounds, c(-1.1063623, -0.35992439), tolerance = 1e-07)
-	expect_equal(x2$alphaSpent, c(0.0090195874, 0.020036136, 0.07), tolerance = 1e-07)
-	expect_equal(x2$betaSpent, c(0.010777094, 0.026854629, 0.14), tolerance = 1e-07)
-	expect_equal(x2$criticalValues, c(2.364813, 2.1928805, 1.5660474), tolerance = 1e-07)
-	expect_equal(x2$stageLevels, c(0.0090195874, 0.014157994, 0.058668761), tolerance = 1e-07)
+	expect_equal(x2$power, c(0.12038953, 0.32895265, 0.86), tolerance = 1e-07, label = paste0("c(", paste0(x2$power, collapse = ", "), ")"))
+	expect_equal(x2$futilityBounds, c(-1.1063623, -0.35992439), tolerance = 1e-07, label = paste0("c(", paste0(x2$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x2$alphaSpent, c(0.0090195874, 0.020036136, 0.07), tolerance = 1e-07, label = paste0("c(", paste0(x2$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x2$betaSpent, c(0.010777094, 0.026854629, 0.14), tolerance = 1e-07, label = paste0("c(", paste0(x2$betaSpent, collapse = ", "), ")"))
+	expect_equal(x2$criticalValues, c(2.364813, 2.1928805, 1.5660474), tolerance = 1e-07, label = paste0("c(", paste0(x2$criticalValues, collapse = ", "), ")"))
+	expect_equal(x2$stageLevels, c(0.0090195874, 0.014157994, 0.058668761), tolerance = 1e-07, label = paste0("c(", paste0(x2$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x2), NA)))
 	    expect_output(print(x2)$show())
@@ -193,16 +193,16 @@ test_that("'getDesignInverseNormal' with type of design = 'asHSD', 'bsHSD', 'asK
 	y2 <- getDesignCharacteristics(x2)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y2' with expected results
-	expect_equal(y2$nFixed, 6.5337002, tolerance = 1e-07)
-	expect_equal(y2$shift, 7.1015942, tolerance = 1e-07)
-	expect_equal(y2$inflationFactor, 1.0869177, tolerance = 1e-07)
-	expect_equal(y2$information, c(1.4203188, 2.8406377, 7.1015942), tolerance = 1e-07)
-	expect_equal(y2$power, c(0.12038953, 0.32895265, 0.86), tolerance = 1e-07)
-	expect_equal(y2$rejectionProbabilities, c(0.12038953, 0.20856311, 0.53104735), tolerance = 1e-07)
-	expect_equal(y2$futilityProbabilities, c(0.010777094, 0.016077535), tolerance = 1e-07)
-	expect_equal(y2$averageSampleNumber1, 0.82636428, tolerance = 1e-07)
-	expect_equal(y2$averageSampleNumber01, 0.916142, tolerance = 1e-07)
-	expect_equal(y2$averageSampleNumber0, 0.79471657, tolerance = 1e-07)
+	expect_equal(y2$nFixed, 6.5337002, tolerance = 1e-07, label = paste0("c(", paste0(y2$nFixed, collapse = ", "), ")"))
+	expect_equal(y2$shift, 7.1015942, tolerance = 1e-07, label = paste0("c(", paste0(y2$shift, collapse = ", "), ")"))
+	expect_equal(y2$inflationFactor, 1.0869177, tolerance = 1e-07, label = paste0("c(", paste0(y2$inflationFactor, collapse = ", "), ")"))
+	expect_equal(y2$information, c(1.4203188, 2.8406377, 7.1015942), tolerance = 1e-07, label = paste0("c(", paste0(y2$information, collapse = ", "), ")"))
+	expect_equal(y2$power, c(0.12038953, 0.32895265, 0.86), tolerance = 1e-07, label = paste0("c(", paste0(y2$power, collapse = ", "), ")"))
+	expect_equal(y2$rejectionProbabilities, c(0.12038953, 0.20856311, 0.53104735), tolerance = 1e-07, label = paste0("c(", paste0(y2$rejectionProbabilities, collapse = ", "), ")"))
+	expect_equal(y2$futilityProbabilities, c(0.010777094, 0.016077535), tolerance = 1e-07, label = paste0("c(", paste0(y2$futilityProbabilities, collapse = ", "), ")"))
+	expect_equal(y2$averageSampleNumber1, 0.82636428, tolerance = 1e-07, label = paste0("c(", paste0(y2$averageSampleNumber1, collapse = ", "), ")"))
+	expect_equal(y2$averageSampleNumber01, 0.916142, tolerance = 1e-07, label = paste0("c(", paste0(y2$averageSampleNumber01, collapse = ", "), ")"))
+	expect_equal(y2$averageSampleNumber0, 0.79471657, tolerance = 1e-07, label = paste0("c(", paste0(y2$averageSampleNumber0, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(y2), NA)))
 	    expect_output(print(y2)$show())
@@ -240,12 +240,12 @@ test_that("'getDesignInverseNormal' with type of design = 'asHSD', 'bsHSD', 'asK
 	)
 
 	## Comparison of the results of TrialDesignInverseNormal object 'x3' with expected results
-	expect_equal(x3$power, c(0.058336437, 0.398246, 0.66), tolerance = 1e-07)
-	expect_equal(x3$futilityBounds, c(-1.1558435, 0.72836893), tolerance = 1e-07)
-	expect_equal(x3$alphaSpent, c(0.0021222083, 0.013687904, 0.03), tolerance = 1e-07)
-	expect_equal(x3$betaSpent, c(0.0072155083, 0.1085907, 0.34), tolerance = 1e-07)
-	expect_equal(x3$criticalValues, c(2.8594012, 2.2435708, 1.9735737), tolerance = 1e-07)
-	expect_equal(x3$stageLevels, c(0.0021222083, 0.012430014, 0.02421512), tolerance = 1e-07)
+	expect_equal(x3$power, c(0.058336437, 0.398246, 0.66), tolerance = 1e-07, label = paste0("c(", paste0(x3$power, collapse = ", "), ")"))
+	expect_equal(x3$futilityBounds, c(-1.1558435, 0.72836893), tolerance = 1e-07, label = paste0("c(", paste0(x3$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x3$alphaSpent, c(0.0021222083, 0.013687904, 0.03), tolerance = 1e-07, label = paste0("c(", paste0(x3$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x3$betaSpent, c(0.0072155083, 0.1085907, 0.34), tolerance = 1e-07, label = paste0("c(", paste0(x3$betaSpent, collapse = ", "), ")"))
+	expect_equal(x3$criticalValues, c(2.8594012, 2.2435708, 1.9735737), tolerance = 1e-07, label = paste0("c(", paste0(x3$criticalValues, collapse = ", "), ")"))
+	expect_equal(x3$stageLevels, c(0.0021222083, 0.012430014, 0.02421512), tolerance = 1e-07, label = paste0("c(", paste0(x3$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x3), NA)))
 	    expect_output(print(x3)$show())
@@ -273,16 +273,16 @@ test_that("'getDesignInverseNormal' with type of design = 'asHSD', 'bsHSD', 'asK
 	y3 <- getDesignCharacteristics(x3)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y3' with expected results
-	expect_equal(y3$nFixed, 5.2590265, tolerance = 1e-07)
-	expect_equal(y3$shift, 5.551371, tolerance = 1e-07)
-	expect_equal(y3$inflationFactor, 1.0555891, tolerance = 1e-07)
-	expect_equal(y3$information, c(1.6654113, 3.8859597, 5.551371), tolerance = 1e-07)
-	expect_equal(y3$power, c(0.058336437, 0.398246, 0.66), tolerance = 1e-07)
-	expect_equal(y3$rejectionProbabilities, c(0.058336437, 0.33990957, 0.261754), tolerance = 1e-07)
-	expect_equal(y3$futilityProbabilities, c(0.0072155083, 0.1013752), tolerance = 1e-07)
-	expect_equal(y3$averageSampleNumber1, 0.86740735, tolerance = 1e-07)
-	expect_equal(y3$averageSampleNumber01, 0.87361707, tolerance = 1e-07)
-	expect_equal(y3$averageSampleNumber0, 0.75480974, tolerance = 1e-07)
+	expect_equal(y3$nFixed, 5.2590265, tolerance = 1e-07, label = paste0("c(", paste0(y3$nFixed, collapse = ", "), ")"))
+	expect_equal(y3$shift, 5.551371, tolerance = 1e-07, label = paste0("c(", paste0(y3$shift, collapse = ", "), ")"))
+	expect_equal(y3$inflationFactor, 1.0555891, tolerance = 1e-07, label = paste0("c(", paste0(y3$inflationFactor, collapse = ", "), ")"))
+	expect_equal(y3$information, c(1.6654113, 3.8859597, 5.551371), tolerance = 1e-07, label = paste0("c(", paste0(y3$information, collapse = ", "), ")"))
+	expect_equal(y3$power, c(0.058336437, 0.398246, 0.66), tolerance = 1e-07, label = paste0("c(", paste0(y3$power, collapse = ", "), ")"))
+	expect_equal(y3$rejectionProbabilities, c(0.058336437, 0.33990957, 0.261754), tolerance = 1e-07, label = paste0("c(", paste0(y3$rejectionProbabilities, collapse = ", "), ")"))
+	expect_equal(y3$futilityProbabilities, c(0.0072155083, 0.1013752), tolerance = 1e-07, label = paste0("c(", paste0(y3$futilityProbabilities, collapse = ", "), ")"))
+	expect_equal(y3$averageSampleNumber1, 0.86740735, tolerance = 1e-07, label = paste0("c(", paste0(y3$averageSampleNumber1, collapse = ", "), ")"))
+	expect_equal(y3$averageSampleNumber01, 0.87361707, tolerance = 1e-07, label = paste0("c(", paste0(y3$averageSampleNumber01, collapse = ", "), ")"))
+	expect_equal(y3$averageSampleNumber0, 0.75480974, tolerance = 1e-07, label = paste0("c(", paste0(y3$averageSampleNumber0, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(y3), NA)))
 	    expect_output(print(y3)$show())
@@ -321,9 +321,9 @@ test_that("'getDesignInverseNormal' with binding futility bounds", {
 	)
 
 	## Comparison of the results of TrialDesignInverseNormal object 'x4' with expected results
-	expect_equal(x4$alphaSpent, c(0.0099446089, 0.020756912, 0.029001537, 0.03499999), tolerance = 1e-07)
-	expect_equal(x4$criticalValues, c(2.3284312, 2.1725031, 2.0861776, 2.0270171), tolerance = 1e-07)
-	expect_equal(x4$stageLevels, c(0.0099446089, 0.014908866, 0.018481267, 0.021330332), tolerance = 1e-07)
+	expect_equal(x4$alphaSpent, c(0.0099446089, 0.020756912, 0.029001537, 0.03499999), tolerance = 1e-07, label = paste0("c(", paste0(x4$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x4$criticalValues, c(2.3284312, 2.1725031, 2.0861776, 2.0270171), tolerance = 1e-07, label = paste0("c(", paste0(x4$criticalValues, collapse = ", "), ")"))
+	expect_equal(x4$stageLevels, c(0.0099446089, 0.014908866, 0.018481267, 0.021330332), tolerance = 1e-07, label = paste0("c(", paste0(x4$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x4), NA)))
 	    expect_output(print(x4)$show())
@@ -356,9 +356,9 @@ test_that("'getDesignGroupSequential' with type of design = 'asUser'", {
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x5' with expected results
-	expect_equal(x5$alphaSpent, c(0.01, 0.02, 0.03, 0.04999999), tolerance = 1e-07)
-	expect_equal(x5$criticalValues, c(2.3263479, 2.2192994, 2.1201347, 1.8189562), tolerance = 1e-07)
-	expect_equal(x5$stageLevels, c(0.01, 0.01323318, 0.016997342, 0.034459057), tolerance = 1e-07)
+	expect_equal(x5$alphaSpent, c(0.01, 0.02, 0.03, 0.04999999), tolerance = 1e-07, label = paste0("c(", paste0(x5$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x5$criticalValues, c(2.3263479, 2.2192994, 2.1201347, 1.8189562), tolerance = 1e-07, label = paste0("c(", paste0(x5$criticalValues, collapse = ", "), ")"))
+	expect_equal(x5$stageLevels, c(0.01, 0.01323318, 0.016997342, 0.034459057), tolerance = 1e-07, label = paste0("c(", paste0(x5$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x5), NA)))
 	    expect_output(print(x5)$show())
@@ -394,12 +394,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsUser' a
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x6a' with expected results
-	expect_equal(x6a$power, c(0.31774348, 0.5598179, 0.7), tolerance = 1e-07)
-	expect_equal(x6a$futilityBounds, c(-1.2557044, -0.16828659), tolerance = 1e-07)
-	expect_equal(x6a$alphaSpent, c(0.061214062, 0.10266465, 0.13), tolerance = 1e-07)
-	expect_equal(x6a$betaSpent, c(0.01, 0.05, 0.3), tolerance = 1e-07)
-	expect_equal(x6a$criticalValues, c(1.5446617, 1.4828682, 1.4620058), tolerance = 1e-07)
-	expect_equal(x6a$stageLevels, c(0.061214062, 0.069054712, 0.071869812), tolerance = 1e-07)
+	expect_equal(x6a$power, c(0.31774348, 0.5598179, 0.7), tolerance = 1e-07, label = paste0("c(", paste0(x6a$power, collapse = ", "), ")"))
+	expect_equal(x6a$futilityBounds, c(-1.2557044, -0.16828659), tolerance = 1e-07, label = paste0("c(", paste0(x6a$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x6a$alphaSpent, c(0.061214062, 0.10266465, 0.13), tolerance = 1e-07, label = paste0("c(", paste0(x6a$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x6a$betaSpent, c(0.01, 0.05, 0.3), tolerance = 1e-07, label = paste0("c(", paste0(x6a$betaSpent, collapse = ", "), ")"))
+	expect_equal(x6a$criticalValues, c(1.5446617, 1.4828682, 1.4620058), tolerance = 1e-07, label = paste0("c(", paste0(x6a$criticalValues, collapse = ", "), ")"))
+	expect_equal(x6a$stageLevels, c(0.061214062, 0.069054712, 0.071869812), tolerance = 1e-07, label = paste0("c(", paste0(x6a$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x6a), NA)))
 	    expect_output(print(x6a)$show())
@@ -431,9 +431,9 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and informatio
 	x6b <- getDesignGroupSequential(informationRates = c(0.4, 0.7), typeOfDesign = "asP")
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x6b' with expected results
-	expect_equal(x6b$alphaSpent, c(0.013078429, 0.0197432), tolerance = 1e-07)
-	expect_equal(x6b$criticalValues, c(2.223875, 2.3050796), tolerance = 1e-07)
-	expect_equal(x6b$stageLevels, c(0.013078429, 0.010581057), tolerance = 1e-07)
+	expect_equal(x6b$alphaSpent, c(0.013078429, 0.0197432), tolerance = 1e-07, label = paste0("c(", paste0(x6b$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x6b$criticalValues, c(2.223875, 2.3050796), tolerance = 1e-07, label = paste0("c(", paste0(x6b$criticalValues, collapse = ", "), ")"))
+	expect_equal(x6b$stageLevels, c(0.013078429, 0.010581057), tolerance = 1e-07, label = paste0("c(", paste0(x6b$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x6b), NA)))
 	    expect_output(print(x6b)$show())
@@ -471,12 +471,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x7a' with expected results
-	expect_equal(x7a$power, c(0.10903632, 0.42541278, 0.59), tolerance = 1e-07)
-	expect_equal(x7a$futilityBounds, c(-0.83725762, 0.35992547), tolerance = 1e-07)
-	expect_equal(x7a$alphaSpent, c(0.016665509, 0.080406163, 0.12999999), tolerance = 1e-07)
-	expect_equal(x7a$betaSpent, c(0.041489083, 0.19972711, 0.41), tolerance = 1e-07)
-	expect_equal(x7a$criticalValues, c(2.1280732, 1.4368565, 1.2468994), tolerance = 1e-07)
-	expect_equal(x7a$stageLevels, c(0.016665509, 0.075379384, 0.1062172), tolerance = 1e-07)
+	expect_equal(x7a$power, c(0.10903632, 0.42541278, 0.59), tolerance = 1e-07, label = paste0("c(", paste0(x7a$power, collapse = ", "), ")"))
+	expect_equal(x7a$futilityBounds, c(-0.83725762, 0.35992547), tolerance = 1e-07, label = paste0("c(", paste0(x7a$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x7a$alphaSpent, c(0.016665509, 0.080406163, 0.12999999), tolerance = 1e-07, label = paste0("c(", paste0(x7a$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x7a$betaSpent, c(0.041489083, 0.19972711, 0.41), tolerance = 1e-07, label = paste0("c(", paste0(x7a$betaSpent, collapse = ", "), ")"))
+	expect_equal(x7a$criticalValues, c(2.1280732, 1.4368565, 1.2468994), tolerance = 1e-07, label = paste0("c(", paste0(x7a$criticalValues, collapse = ", "), ")"))
+	expect_equal(x7a$stageLevels, c(0.016665509, 0.075379384, 0.1062172), tolerance = 1e-07, label = paste0("c(", paste0(x7a$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x7a), NA)))
 	    expect_output(print(x7a)$show())
@@ -517,12 +517,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x7a' with expected results
-	expect_equal(x7a$power, c(0.1110095, 0.43099683, 0.50326205, 0.59), tolerance = 1e-07)
-	expect_equal(x7a$futilityBounds, c(-0.82676531, 0.3743303, 0.65077266), tolerance = 1e-07)
-	expect_equal(x7a$alphaSpent, c(0.016665509, 0.080406163, 0.10053322, 0.13), tolerance = 1e-07)
-	expect_equal(x7a$betaSpent, c(0.041489083, 0.19972711, 0.27310596, 0.41), tolerance = 1e-07)
-	expect_equal(x7a$criticalValues, c(2.1280732, 1.4368565, 1.422873, 1.2970881), tolerance = 1e-07)
-	expect_equal(x7a$stageLevels, c(0.016665509, 0.075379384, 0.077386492, 0.097300444), tolerance = 1e-07)
+	expect_equal(x7a$power, c(0.1110095, 0.43099683, 0.50326205, 0.59), tolerance = 1e-07, label = paste0("c(", paste0(x7a$power, collapse = ", "), ")"))
+	expect_equal(x7a$futilityBounds, c(-0.82676531, 0.3743303, 0.65077266), tolerance = 1e-07, label = paste0("c(", paste0(x7a$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x7a$alphaSpent, c(0.016665509, 0.080406163, 0.10053322, 0.13), tolerance = 1e-07, label = paste0("c(", paste0(x7a$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x7a$betaSpent, c(0.041489083, 0.19972711, 0.27310596, 0.41), tolerance = 1e-07, label = paste0("c(", paste0(x7a$betaSpent, collapse = ", "), ")"))
+	expect_equal(x7a$criticalValues, c(2.1280732, 1.4368565, 1.422873, 1.2970881), tolerance = 1e-07, label = paste0("c(", paste0(x7a$criticalValues, collapse = ", "), ")"))
+	expect_equal(x7a$stageLevels, c(0.016665509, 0.075379384, 0.077386492, 0.097300444), tolerance = 1e-07, label = paste0("c(", paste0(x7a$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x7a), NA)))
 	    expect_output(print(x7a)$show())
@@ -561,12 +561,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsUser' a
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x6b' with expected results
-	expect_equal(x6b$power, c(0.31728597, 0.55917233, 0.7), tolerance = 1e-07)
-	expect_equal(x6b$futilityBounds, c(-1.2569879, -0.17011271), tolerance = 1e-07)
-	expect_equal(x6b$alphaSpent, c(0.061214062, 0.10266465, 0.13), tolerance = 1e-07)
-	expect_equal(x6b$betaSpent, c(0.01, 0.05, 0.3), tolerance = 1e-07)
-	expect_equal(x6b$criticalValues, c(1.5446617, 1.4827312, 1.4588737), tolerance = 1e-07)
-	expect_equal(x6b$stageLevels, c(0.061214062, 0.069072925, 0.072299935), tolerance = 1e-07)
+	expect_equal(x6b$power, c(0.31728597, 0.55917233, 0.7), tolerance = 1e-07, label = paste0("c(", paste0(x6b$power, collapse = ", "), ")"))
+	expect_equal(x6b$futilityBounds, c(-1.2569879, -0.17011271), tolerance = 1e-07, label = paste0("c(", paste0(x6b$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x6b$alphaSpent, c(0.061214062, 0.10266465, 0.13), tolerance = 1e-07, label = paste0("c(", paste0(x6b$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x6b$betaSpent, c(0.01, 0.05, 0.3), tolerance = 1e-07, label = paste0("c(", paste0(x6b$betaSpent, collapse = ", "), ")"))
+	expect_equal(x6b$criticalValues, c(1.5446617, 1.4827312, 1.4588737), tolerance = 1e-07, label = paste0("c(", paste0(x6b$criticalValues, collapse = ", "), ")"))
+	expect_equal(x6b$stageLevels, c(0.061214062, 0.069072925, 0.072299935), tolerance = 1e-07, label = paste0("c(", paste0(x6b$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x6b), NA)))
 	    expect_output(print(x6b)$show())
@@ -607,12 +607,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x7b' with expected results
-	expect_equal(x7b$power, c(0.1067887, 0.41918821, 0.59), tolerance = 1e-07)
-	expect_equal(x7b$futilityBounds, c(-0.84937686, 0.34328914), tolerance = 1e-07)
-	expect_equal(x7b$alphaSpent, c(0.016665509, 0.080406163, 0.12999999), tolerance = 1e-07)
-	expect_equal(x7b$betaSpent, c(0.041489083, 0.19972711, 0.41), tolerance = 1e-07)
-	expect_equal(x7b$criticalValues, c(2.1280732, 1.4362896, 1.2218662), tolerance = 1e-07)
-	expect_equal(x7b$stageLevels, c(0.016665509, 0.075459972, 0.11087911), tolerance = 1e-07)
+	expect_equal(x7b$power, c(0.1067887, 0.41918821, 0.59), tolerance = 1e-07, label = paste0("c(", paste0(x7b$power, collapse = ", "), ")"))
+	expect_equal(x7b$futilityBounds, c(-0.84937686, 0.34328914), tolerance = 1e-07, label = paste0("c(", paste0(x7b$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x7b$alphaSpent, c(0.016665509, 0.080406163, 0.12999999), tolerance = 1e-07, label = paste0("c(", paste0(x7b$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x7b$betaSpent, c(0.041489083, 0.19972711, 0.41), tolerance = 1e-07, label = paste0("c(", paste0(x7b$betaSpent, collapse = ", "), ")"))
+	expect_equal(x7b$criticalValues, c(2.1280732, 1.4362896, 1.2218662), tolerance = 1e-07, label = paste0("c(", paste0(x7b$criticalValues, collapse = ", "), ")"))
+	expect_equal(x7b$stageLevels, c(0.016665509, 0.075459972, 0.11087911), tolerance = 1e-07, label = paste0("c(", paste0(x7b$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x7b), NA)))
 	    expect_output(print(x7b)$show())
@@ -653,12 +653,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x7b' with expected results
-	expect_equal(x7b$power, c(0.10806422, 0.422855, 0.4950578, 0.59), tolerance = 1e-07)
-	expect_equal(x7b$futilityBounds, c(-0.84247693, 0.35276055, 0.62744509), tolerance = 1e-07)
-	expect_equal(x7b$alphaSpent, c(0.016665509, 0.080406163, 0.10053322, 0.13), tolerance = 1e-07)
-	expect_equal(x7b$betaSpent, c(0.041489083, 0.19972711, 0.27310596, 0.41), tolerance = 1e-07)
-	expect_equal(x7b$criticalValues, c(2.1280732, 1.4362706, 1.4203748, 1.2576258), tolerance = 1e-07)
-	expect_equal(x7b$stageLevels, c(0.016665509, 0.075462674, 0.077749297, 0.10426357), tolerance = 1e-07)
+	expect_equal(x7b$power, c(0.10806422, 0.422855, 0.4950578, 0.59), tolerance = 1e-07, label = paste0("c(", paste0(x7b$power, collapse = ", "), ")"))
+	expect_equal(x7b$futilityBounds, c(-0.84247693, 0.35276055, 0.62744509), tolerance = 1e-07, label = paste0("c(", paste0(x7b$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x7b$alphaSpent, c(0.016665509, 0.080406163, 0.10053322, 0.13), tolerance = 1e-07, label = paste0("c(", paste0(x7b$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x7b$betaSpent, c(0.041489083, 0.19972711, 0.27310596, 0.41), tolerance = 1e-07, label = paste0("c(", paste0(x7b$betaSpent, collapse = ", "), ")"))
+	expect_equal(x7b$criticalValues, c(2.1280732, 1.4362706, 1.4203748, 1.2576258), tolerance = 1e-07, label = paste0("c(", paste0(x7b$criticalValues, collapse = ", "), ")"))
+	expect_equal(x7b$stageLevels, c(0.016665509, 0.075462674, 0.077749297, 0.10426357), tolerance = 1e-07, label = paste0("c(", paste0(x7b$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x7b), NA)))
 	    expect_output(print(x7b)$show())
@@ -699,12 +699,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x7c' with expected results
-	expect_equal(x7c$power, c(0.0013105743, 0.39377047, 0.889997), tolerance = 1e-07)
-	expect_equal(x7c$futilityBounds, c(NA_real_, 0.30419861), tolerance = 1e-07)
-	expect_equal(x7c$alphaSpent, c(1.475171e-05, 0.013740227, 0.09), tolerance = 1e-07)
-	expect_equal(x7c$betaSpent, c(0, 0.023123303, 0.11), tolerance = 1e-07)
-	expect_equal(x7c$criticalValues, c(4.3323635, 2.4641251, 1.7013171), tolerance = 1e-07)
-	expect_equal(x7c$stageLevels, c(7.375855e-06, 0.006867409, 0.044441733), tolerance = 1e-07)
+	expect_equal(x7c$power, c(0.0013105743, 0.39377047, 0.889997), tolerance = 1e-07, label = paste0("c(", paste0(x7c$power, collapse = ", "), ")"))
+	expect_equal(x7c$futilityBounds, c(NA_real_, 0.30419861), tolerance = 1e-07, label = paste0("c(", paste0(x7c$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x7c$alphaSpent, c(1.475171e-05, 0.013740227, 0.09), tolerance = 1e-07, label = paste0("c(", paste0(x7c$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x7c$betaSpent, c(0, 0.023123303, 0.11), tolerance = 1e-07, label = paste0("c(", paste0(x7c$betaSpent, collapse = ", "), ")"))
+	expect_equal(x7c$criticalValues, c(4.3323635, 2.4641251, 1.7013171), tolerance = 1e-07, label = paste0("c(", paste0(x7c$criticalValues, collapse = ", "), ")"))
+	expect_equal(x7c$stageLevels, c(7.375855e-06, 0.006867409, 0.044441733), tolerance = 1e-07, label = paste0("c(", paste0(x7c$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x7c), NA)))
 	    expect_output(print(x7c)$show())
@@ -734,12 +734,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x7d' with expected results
-	expect_equal(x7d$power, c(0.063122463, 0.41229849, 0.79999885), tolerance = 1e-07)
-	expect_equal(x7d$futilityBounds, c(0.32391511, 0.9194681), tolerance = 1e-07)
-	expect_equal(x7d$alphaSpent, c(0.00078830351, 0.010867832, 0.04999999), tolerance = 1e-07)
-	expect_equal(x7d$betaSpent, c(0.050596443, 0.10480935, 0.2), tolerance = 1e-07)
-	expect_equal(x7d$criticalValues, c(3.3568694, 2.5549656, 1.9350784), tolerance = 1e-07)
-	expect_equal(x7d$stageLevels, c(0.00039415176, 0.0053099152, 0.026490337), tolerance = 1e-07)
+	expect_equal(x7d$power, c(0.063122463, 0.41229849, 0.79999885), tolerance = 1e-07, label = paste0("c(", paste0(x7d$power, collapse = ", "), ")"))
+	expect_equal(x7d$futilityBounds, c(0.32391511, 0.91946811), tolerance = 1e-07, label = paste0("c(", paste0(x7d$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x7d$alphaSpent, c(0.00078830351, 0.010867832, 0.04999999), tolerance = 1e-07, label = paste0("c(", paste0(x7d$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x7d$betaSpent, c(0.050596443, 0.10480935, 0.2), tolerance = 1e-07, label = paste0("c(", paste0(x7d$betaSpent, collapse = ", "), ")"))
+	expect_equal(x7d$criticalValues, c(3.3568694, 2.5549656, 1.9350784), tolerance = 1e-07, label = paste0("c(", paste0(x7d$criticalValues, collapse = ", "), ")"))
+	expect_equal(x7d$stageLevels, c(0.00039415176, 0.0053099152, 0.026490337), tolerance = 1e-07, label = paste0("c(", paste0(x7d$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x7d), NA)))
 	    expect_output(print(x7d)$show())
@@ -781,12 +781,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsKD' an
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x7e' with expected results
-	expect_equal(x7e$power, c(0.14268064, 0.57037981, 0.88999701), tolerance = 1e-07)
-	expect_equal(x7e$futilityBounds, c(NA_real_, 0.64692592), tolerance = 1e-07)
-	expect_equal(x7e$alphaSpent, c(0.0030525896, 0.025803646, 0.09), tolerance = 1e-07)
-	expect_equal(x7e$betaSpent, c(0, 0.037469343, 0.11), tolerance = 1e-07)
-	expect_equal(x7e$criticalValues, c(2.9623919, 2.2442359, 1.7391729), tolerance = 1e-07)
-	expect_equal(x7e$stageLevels, c(0.0015262948, 0.012408614, 0.041002179), tolerance = 1e-07)
+	expect_equal(x7e$power, c(0.14268064, 0.57037981, 0.88999701), tolerance = 1e-07, label = paste0("c(", paste0(x7e$power, collapse = ", "), ")"))
+	expect_equal(x7e$futilityBounds, c(NA_real_, 0.64692592), tolerance = 1e-07, label = paste0("c(", paste0(x7e$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x7e$alphaSpent, c(0.0030525896, 0.025803646, 0.09), tolerance = 1e-07, label = paste0("c(", paste0(x7e$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x7e$betaSpent, c(0, 0.037469343, 0.11), tolerance = 1e-07, label = paste0("c(", paste0(x7e$betaSpent, collapse = ", "), ")"))
+	expect_equal(x7e$criticalValues, c(2.9623919, 2.2442359, 1.7391729), tolerance = 1e-07, label = paste0("c(", paste0(x7e$criticalValues, collapse = ", "), ")"))
+	expect_equal(x7e$stageLevels, c(0.0015262948, 0.012408614, 0.041002179), tolerance = 1e-07, label = paste0("c(", paste0(x7e$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x7e), NA)))
 	    expect_output(print(x7e)$show())
@@ -829,14 +829,14 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', b
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'dl1' with expected results
-	expect_equal(dl1$power, c(0.15998522, 0.59313184, 0.9), tolerance = 1e-07)
-	expect_equal(dl1$futilityBounds, c(-0.46043472, 0.64445014), tolerance = 1e-07)
-	expect_equal(dl1$alphaSpent, c(0.001941913, 0.015055713, 0.05), tolerance = 1e-07)
-	expect_equal(dl1$betaSpent, c(0.00930224, 0.041331422, 0.1), tolerance = 1e-07)
-	expect_equal(dl1$criticalValues, c(2.8874465, 2.1853011, 1.6575593), tolerance = 1e-07)
-	expect_equal(dl1$stageLevels, c(0.001941913, 0.014433388, 0.048703222), tolerance = 1e-07)
-	expect_equal(dl1$decisionCriticalValues, c(1.3388855, 1.5378695, 1.6575593), tolerance = 1e-07)
-	expect_equal(dl1$reversalProbabilities, c(1.7563249e-06, 0.0014674026), tolerance = 1e-07)
+	expect_equal(dl1$power, c(0.15998522, 0.59313184, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl1$power, collapse = ", "), ")"))
+	expect_equal(dl1$futilityBounds, c(-0.46043472, 0.64445014), tolerance = 1e-07, label = paste0("c(", paste0(dl1$futilityBounds, collapse = ", "), ")"))
+	expect_equal(dl1$alphaSpent, c(0.001941913, 0.015055713, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(dl1$alphaSpent, collapse = ", "), ")"))
+	expect_equal(dl1$betaSpent, c(0.00930224, 0.041331422, 0.1), tolerance = 1e-07, label = paste0("c(", paste0(dl1$betaSpent, collapse = ", "), ")"))
+	expect_equal(dl1$criticalValues, c(2.8874465, 2.1853011, 1.6575593), tolerance = 1e-07, label = paste0("c(", paste0(dl1$criticalValues, collapse = ", "), ")"))
+	expect_equal(dl1$stageLevels, c(0.001941913, 0.014433388, 0.048703222), tolerance = 1e-07, label = paste0("c(", paste0(dl1$stageLevels, collapse = ", "), ")"))
+	expect_equal(dl1$decisionCriticalValues, c(1.3388855, 1.5378695, 1.6575593), tolerance = 1e-07, label = paste0("c(", paste0(dl1$decisionCriticalValues, collapse = ", "), ")"))
+	expect_equal(dl1$reversalProbabilities, c(1.7563249e-06, 0.0014674026), tolerance = 1e-07, label = paste0("c(", paste0(dl1$reversalProbabilities, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl1), NA)))
 	    expect_output(print(dl1)$show())
@@ -863,16 +863,16 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', b
 	dl2 <- getDesignCharacteristics(dl1)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'dl2' with expected results
-	expect_equal(dl2$nFixed, 8.5638474, tolerance = 1e-07)
-	expect_equal(dl2$shift, 8.8633082, tolerance = 1e-07)
-	expect_equal(dl2$inflationFactor, 1.034968, tolerance = 1e-07)
-	expect_equal(dl2$information, c(3.5453233, 5.7611503, 8.8633082), tolerance = 1e-07)
-	expect_equal(dl2$power, c(0.15755984, 0.59089729, 0.9), tolerance = 1e-07)
-	expect_equal(dl2$rejectionProbabilities, c(0.15755984, 0.43333745, 0.30910271), tolerance = 1e-07)
-	expect_equal(dl2$futilityProbabilities, c(0.0095560402, 0.032904105), tolerance = 1e-07)
-	expect_equal(dl2$averageSampleNumber1, 0.87652961, tolerance = 1e-07)
-	expect_equal(dl2$averageSampleNumber01, 0.92477729, tolerance = 1e-07)
-	expect_equal(dl2$averageSampleNumber0, 0.79932679, tolerance = 1e-07)
+	expect_equal(dl2$nFixed, 8.5638474, tolerance = 1e-07, label = paste0("c(", paste0(dl2$nFixed, collapse = ", "), ")"))
+	expect_equal(dl2$shift, 8.8633082, tolerance = 1e-07, label = paste0("c(", paste0(dl2$shift, collapse = ", "), ")"))
+	expect_equal(dl2$inflationFactor, 1.034968, tolerance = 1e-07, label = paste0("c(", paste0(dl2$inflationFactor, collapse = ", "), ")"))
+	expect_equal(dl2$information, c(3.5453233, 5.7611503, 8.8633082), tolerance = 1e-07, label = paste0("c(", paste0(dl2$information, collapse = ", "), ")"))
+	expect_equal(dl2$power, c(0.15755984, 0.59089729, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl2$power, collapse = ", "), ")"))
+	expect_equal(dl2$rejectionProbabilities, c(0.15755984, 0.43333745, 0.30910271), tolerance = 1e-07, label = paste0("c(", paste0(dl2$rejectionProbabilities, collapse = ", "), ")"))
+	expect_equal(dl2$futilityProbabilities, c(0.0095560402, 0.032904105), tolerance = 1e-07, label = paste0("c(", paste0(dl2$futilityProbabilities, collapse = ", "), ")"))
+	expect_equal(dl2$averageSampleNumber1, 0.87652961, tolerance = 1e-07, label = paste0("c(", paste0(dl2$averageSampleNumber1, collapse = ", "), ")"))
+	expect_equal(dl2$averageSampleNumber01, 0.92477729, tolerance = 1e-07, label = paste0("c(", paste0(dl2$averageSampleNumber01, collapse = ", "), ")"))
+	expect_equal(dl2$averageSampleNumber0, 0.79932679, tolerance = 1e-07, label = paste0("c(", paste0(dl2$averageSampleNumber0, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl2), NA)))
 	    expect_output(print(dl2)$show())
@@ -907,14 +907,14 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', b
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'dl3' with expected results
-	expect_equal(dl3$power, c(0.15998522, 0.59313184, 0.9), tolerance = 1e-07)
-	expect_equal(dl3$futilityBounds, c(-0.46043472, 0.64445014), tolerance = 1e-07)
-	expect_equal(dl3$alphaSpent, c(0.001941913, 0.015055713, 0.05), tolerance = 1e-07)
-	expect_equal(dl3$betaSpent, c(0.00930224, 0.041331422, 0.1), tolerance = 1e-07)
-	expect_equal(dl3$criticalValues, c(2.8874465, 2.1853011, 1.6575593), tolerance = 1e-07)
-	expect_equal(dl3$stageLevels, c(0.001941913, 0.014433388, 0.048703222), tolerance = 1e-07)
-	expect_equal(dl3$decisionCriticalValues, c(NA_real_, 1.5378695, 1.6575593), tolerance = 1e-07)
-	expect_equal(dl3$reversalProbabilities, c(NA_real_, 0.0014674026), tolerance = 1e-07)
+	expect_equal(dl3$power, c(0.15998522, 0.59313184, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl3$power, collapse = ", "), ")"))
+	expect_equal(dl3$futilityBounds, c(-0.46043472, 0.64445014), tolerance = 1e-07, label = paste0("c(", paste0(dl3$futilityBounds, collapse = ", "), ")"))
+	expect_equal(dl3$alphaSpent, c(0.001941913, 0.015055713, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(dl3$alphaSpent, collapse = ", "), ")"))
+	expect_equal(dl3$betaSpent, c(0.00930224, 0.041331422, 0.1), tolerance = 1e-07, label = paste0("c(", paste0(dl3$betaSpent, collapse = ", "), ")"))
+	expect_equal(dl3$criticalValues, c(2.8874465, 2.1853011, 1.6575593), tolerance = 1e-07, label = paste0("c(", paste0(dl3$criticalValues, collapse = ", "), ")"))
+	expect_equal(dl3$stageLevels, c(0.001941913, 0.014433388, 0.048703222), tolerance = 1e-07, label = paste0("c(", paste0(dl3$stageLevels, collapse = ", "), ")"))
+	expect_equal(dl3$decisionCriticalValues, c(NA_real_, 1.5378695, 1.6575593), tolerance = 1e-07, label = paste0("c(", paste0(dl3$decisionCriticalValues, collapse = ", "), ")"))
+	expect_equal(dl3$reversalProbabilities, c(NA_real_, 0.0014674026), tolerance = 1e-07, label = paste0("c(", paste0(dl3$reversalProbabilities, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl3), NA)))
 	    expect_output(print(dl3)$show())
@@ -941,16 +941,16 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', b
 	dl4 <- getDesignCharacteristics(dl3)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'dl4' with expected results
-	expect_equal(dl4$nFixed, 8.5638474, tolerance = 1e-07)
-	expect_equal(dl4$shift, 8.8633608, tolerance = 1e-07)
-	expect_equal(dl4$inflationFactor, 1.0349742, tolerance = 1e-07)
-	expect_equal(dl4$information, c(3.5453443, 5.7611845, 8.8633608), tolerance = 1e-07)
-	expect_equal(dl4$power, c(0.15755967, 0.59089852, 0.9), tolerance = 1e-07)
-	expect_equal(dl4$rejectionProbabilities, c(0.15755967, 0.43333886, 0.30910148), tolerance = 1e-07)
-	expect_equal(dl4$futilityProbabilities, c(0.0095558971, 0.032903612), tolerance = 1e-07)
-	expect_equal(dl4$averageSampleNumber1, 0.85923802, tolerance = 1e-07)
-	expect_equal(dl4$averageSampleNumber01, 0.91378094, tolerance = 1e-07)
-	expect_equal(dl4$averageSampleNumber0, 0.76574207, tolerance = 1e-07)
+	expect_equal(dl4$nFixed, 8.5638474, tolerance = 1e-07, label = paste0("c(", paste0(dl4$nFixed, collapse = ", "), ")"))
+	expect_equal(dl4$shift, 8.8633608, tolerance = 1e-07, label = paste0("c(", paste0(dl4$shift, collapse = ", "), ")"))
+	expect_equal(dl4$inflationFactor, 1.0349742, tolerance = 1e-07, label = paste0("c(", paste0(dl4$inflationFactor, collapse = ", "), ")"))
+	expect_equal(dl4$information, c(3.5453443, 5.7611845, 8.8633608), tolerance = 1e-07, label = paste0("c(", paste0(dl4$information, collapse = ", "), ")"))
+	expect_equal(dl4$power, c(0.15755967, 0.59089852, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl4$power, collapse = ", "), ")"))
+	expect_equal(dl4$rejectionProbabilities, c(0.15755967, 0.43333886, 0.30910148), tolerance = 1e-07, label = paste0("c(", paste0(dl4$rejectionProbabilities, collapse = ", "), ")"))
+	expect_equal(dl4$futilityProbabilities, c(0.0095558971, 0.032903612), tolerance = 1e-07, label = paste0("c(", paste0(dl4$futilityProbabilities, collapse = ", "), ")"))
+	expect_equal(dl4$averageSampleNumber1, 0.85923802, tolerance = 1e-07, label = paste0("c(", paste0(dl4$averageSampleNumber1, collapse = ", "), ")"))
+	expect_equal(dl4$averageSampleNumber01, 0.91378094, tolerance = 1e-07, label = paste0("c(", paste0(dl4$averageSampleNumber01, collapse = ", "), ")"))
+	expect_equal(dl4$averageSampleNumber0, 0.76574207, tolerance = 1e-07, label = paste0("c(", paste0(dl4$averageSampleNumber0, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl4), NA)))
 	    expect_output(print(dl4)$show())
@@ -985,14 +985,14 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', b
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'dl5' with expected results
-	expect_equal(dl5$power, c(0.15998522, 0.59313184, 0.9), tolerance = 1e-07)
-	expect_equal(dl5$futilityBounds, c(-0.46043472, 0.64445014), tolerance = 1e-07)
-	expect_equal(dl5$alphaSpent, c(0.001941913, 0.015055713, 0.05), tolerance = 1e-07)
-	expect_equal(dl5$betaSpent, c(0.00930224, 0.041331422, 0.1), tolerance = 1e-07)
-	expect_equal(dl5$criticalValues, c(2.8874465, 2.1853011, 1.6575593), tolerance = 1e-07)
-	expect_equal(dl5$stageLevels, c(0.001941913, 0.014433388, 0.048703222), tolerance = 1e-07)
-	expect_equal(dl5$decisionCriticalValues, c(1.505831, 1.5735979, 1.6575593), tolerance = 1e-07)
-	expect_equal(dl5$reversalProbabilities, c(0.00018341474, 0.0027022502), tolerance = 1e-07)
+	expect_equal(dl5$power, c(0.15998522, 0.59313184, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl5$power, collapse = ", "), ")"))
+	expect_equal(dl5$futilityBounds, c(-0.46043472, 0.64445014), tolerance = 1e-07, label = paste0("c(", paste0(dl5$futilityBounds, collapse = ", "), ")"))
+	expect_equal(dl5$alphaSpent, c(0.001941913, 0.015055713, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(dl5$alphaSpent, collapse = ", "), ")"))
+	expect_equal(dl5$betaSpent, c(0.00930224, 0.041331422, 0.1), tolerance = 1e-07, label = paste0("c(", paste0(dl5$betaSpent, collapse = ", "), ")"))
+	expect_equal(dl5$criticalValues, c(2.8874465, 2.1853011, 1.6575593), tolerance = 1e-07, label = paste0("c(", paste0(dl5$criticalValues, collapse = ", "), ")"))
+	expect_equal(dl5$stageLevels, c(0.001941913, 0.014433388, 0.048703222), tolerance = 1e-07, label = paste0("c(", paste0(dl5$stageLevels, collapse = ", "), ")"))
+	expect_equal(dl5$decisionCriticalValues, c(1.505831, 1.5735979, 1.6575593), tolerance = 1e-07, label = paste0("c(", paste0(dl5$decisionCriticalValues, collapse = ", "), ")"))
+	expect_equal(dl5$reversalProbabilities, c(0.00018341474, 0.0027022502), tolerance = 1e-07, label = paste0("c(", paste0(dl5$reversalProbabilities, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl5), NA)))
 	    expect_output(print(dl5)$show())
@@ -1019,16 +1019,16 @@ test_that("'getDesignGroupSequential' with type of design = 'asOF' and 'bsOF', b
 	dl6 <- getDesignCharacteristics(dl5)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'dl6' with expected results
-	expect_equal(dl6$nFixed, 8.5638474, tolerance = 1e-07)
-	expect_equal(dl6$shift, 8.7180222, tolerance = 1e-07)
-	expect_equal(dl6$inflationFactor, 1.018003, tolerance = 1e-07)
-	expect_equal(dl6$information, c(3.4872089, 5.6667144, 8.7180222), tolerance = 1e-07)
-	expect_equal(dl6$power, c(0.15429254, 0.58752252, 0.9), tolerance = 1e-07)
-	expect_equal(dl6$rejectionProbabilities, c(0.15429254, 0.43322998, 0.31247748), tolerance = 1e-07)
-	expect_equal(dl6$futilityProbabilities, c(0.0099602552, 0.03429374), tolerance = 1e-07)
-	expect_equal(dl6$averageSampleNumber1, 0.94451255, tolerance = 1e-07)
-	expect_equal(dl6$averageSampleNumber01, 0.96721799, tolerance = 1e-07)
-	expect_equal(dl6$averageSampleNumber0, 0.89669187, tolerance = 1e-07)
+	expect_equal(dl6$nFixed, 8.5638474, tolerance = 1e-07, label = paste0("c(", paste0(dl6$nFixed, collapse = ", "), ")"))
+	expect_equal(dl6$shift, 8.7180222, tolerance = 1e-07, label = paste0("c(", paste0(dl6$shift, collapse = ", "), ")"))
+	expect_equal(dl6$inflationFactor, 1.018003, tolerance = 1e-07, label = paste0("c(", paste0(dl6$inflationFactor, collapse = ", "), ")"))
+	expect_equal(dl6$information, c(3.4872089, 5.6667144, 8.7180222), tolerance = 1e-07, label = paste0("c(", paste0(dl6$information, collapse = ", "), ")"))
+	expect_equal(dl6$power, c(0.15429254, 0.58752252, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl6$power, collapse = ", "), ")"))
+	expect_equal(dl6$rejectionProbabilities, c(0.15429254, 0.43322998, 0.31247748), tolerance = 1e-07, label = paste0("c(", paste0(dl6$rejectionProbabilities, collapse = ", "), ")"))
+	expect_equal(dl6$futilityProbabilities, c(0.0099602552, 0.03429374), tolerance = 1e-07, label = paste0("c(", paste0(dl6$futilityProbabilities, collapse = ", "), ")"))
+	expect_equal(dl6$averageSampleNumber1, 0.94451255, tolerance = 1e-07, label = paste0("c(", paste0(dl6$averageSampleNumber1, collapse = ", "), ")"))
+	expect_equal(dl6$averageSampleNumber01, 0.96721799, tolerance = 1e-07, label = paste0("c(", paste0(dl6$averageSampleNumber01, collapse = ", "), ")"))
+	expect_equal(dl6$averageSampleNumber0, 0.89669187, tolerance = 1e-07, label = paste0("c(", paste0(dl6$averageSampleNumber0, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl6), NA)))
 	    expect_output(print(dl6)$show())
@@ -1075,14 +1075,14 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsP', non
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'dl1' with expected results
-	expect_equal(dl1$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07)
-	expect_equal(dl1$futilityBounds, c(0.5448398, 1.0899149), tolerance = 1e-07)
-	expect_equal(dl1$alphaSpent, c(0.026156858, 0.037497241, 0.05), tolerance = 1e-07)
-	expect_equal(dl1$betaSpent, c(0.052313716, 0.074994481, 0.099999999), tolerance = 1e-07)
-	expect_equal(dl1$criticalValues, c(1.9405431, 2.0327662, 1.9734104), tolerance = 1e-07)
-	expect_equal(dl1$stageLevels, c(0.026156858, 0.021038075, 0.02422441), tolerance = 1e-07)
-	expect_equal(dl1$decisionCriticalValues, c(1.3362296, 1.657468, 1.9734104), tolerance = 1e-07)
-	expect_equal(dl1$reversalProbabilities, c(0.0020439695, 0.0026967589), tolerance = 1e-07)
+	expect_equal(dl1$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl1$power, collapse = ", "), ")"))
+	expect_equal(dl1$futilityBounds, c(0.5448398, 1.0899149), tolerance = 1e-07, label = paste0("c(", paste0(dl1$futilityBounds, collapse = ", "), ")"))
+	expect_equal(dl1$alphaSpent, c(0.026156858, 0.037497241, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(dl1$alphaSpent, collapse = ", "), ")"))
+	expect_equal(dl1$betaSpent, c(0.052313716, 0.074994481, 0.099999999), tolerance = 1e-07, label = paste0("c(", paste0(dl1$betaSpent, collapse = ", "), ")"))
+	expect_equal(dl1$criticalValues, c(1.9405431, 2.0327662, 1.9734104), tolerance = 1e-07, label = paste0("c(", paste0(dl1$criticalValues, collapse = ", "), ")"))
+	expect_equal(dl1$stageLevels, c(0.026156858, 0.021038075, 0.02422441), tolerance = 1e-07, label = paste0("c(", paste0(dl1$stageLevels, collapse = ", "), ")"))
+	expect_equal(dl1$decisionCriticalValues, c(1.3362296, 1.657468, 1.9734104), tolerance = 1e-07, label = paste0("c(", paste0(dl1$decisionCriticalValues, collapse = ", "), ")"))
+	expect_equal(dl1$reversalProbabilities, c(0.0020439695, 0.0026967589), tolerance = 1e-07, label = paste0("c(", paste0(dl1$reversalProbabilities, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl1), NA)))
 	    expect_output(print(dl1)$show())
@@ -1109,16 +1109,16 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsP', non
 	dl2 <- getDesignCharacteristics(dl1)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'dl2' with expected results
-	expect_equal(dl2$nFixed, 8.5638474, tolerance = 1e-07)
-	expect_equal(dl2$shift, 11.345796, tolerance = 1e-07)
-	expect_equal(dl2$inflationFactor, 1.324848, tolerance = 1e-07)
-	expect_equal(dl2$information, c(4.5383183, 7.3747672, 11.345796), tolerance = 1e-07)
-	expect_equal(dl2$power, c(0.57788702, 0.78847934, 0.9), tolerance = 1e-07)
-	expect_equal(dl2$rejectionProbabilities, c(0.57788702, 0.21059232, 0.11152066), tolerance = 1e-07)
-	expect_equal(dl2$futilityProbabilities, c(0.056427171, 0.024888086), tolerance = 1e-07)
-	expect_equal(dl2$averageSampleNumber1, 0.86088771, tolerance = 1e-07)
-	expect_equal(dl2$averageSampleNumber01, 0.9483049, tolerance = 1e-07)
-	expect_equal(dl2$averageSampleNumber0, 0.80259202, tolerance = 1e-07)
+	expect_equal(dl2$nFixed, 8.5638474, tolerance = 1e-07, label = paste0("c(", paste0(dl2$nFixed, collapse = ", "), ")"))
+	expect_equal(dl2$shift, 11.345796, tolerance = 1e-07, label = paste0("c(", paste0(dl2$shift, collapse = ", "), ")"))
+	expect_equal(dl2$inflationFactor, 1.324848, tolerance = 1e-07, label = paste0("c(", paste0(dl2$inflationFactor, collapse = ", "), ")"))
+	expect_equal(dl2$information, c(4.5383183, 7.3747672, 11.345796), tolerance = 1e-07, label = paste0("c(", paste0(dl2$information, collapse = ", "), ")"))
+	expect_equal(dl2$power, c(0.57788702, 0.78847934, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl2$power, collapse = ", "), ")"))
+	expect_equal(dl2$rejectionProbabilities, c(0.57788702, 0.21059232, 0.11152066), tolerance = 1e-07, label = paste0("c(", paste0(dl2$rejectionProbabilities, collapse = ", "), ")"))
+	expect_equal(dl2$futilityProbabilities, c(0.056427171, 0.024888086), tolerance = 1e-07, label = paste0("c(", paste0(dl2$futilityProbabilities, collapse = ", "), ")"))
+	expect_equal(dl2$averageSampleNumber1, 0.86088771, tolerance = 1e-07, label = paste0("c(", paste0(dl2$averageSampleNumber1, collapse = ", "), ")"))
+	expect_equal(dl2$averageSampleNumber01, 0.9483049, tolerance = 1e-07, label = paste0("c(", paste0(dl2$averageSampleNumber01, collapse = ", "), ")"))
+	expect_equal(dl2$averageSampleNumber0, 0.80259202, tolerance = 1e-07, label = paste0("c(", paste0(dl2$averageSampleNumber0, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl2), NA)))
 	    expect_output(print(dl2)$show())
@@ -1153,14 +1153,14 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsP', non
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'dl3' with expected results
-	expect_equal(dl3$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07)
-	expect_equal(dl3$futilityBounds, c(0.5448398, 1.0899149), tolerance = 1e-07)
-	expect_equal(dl3$alphaSpent, c(0.026156858, 0.037497241, 0.05), tolerance = 1e-07)
-	expect_equal(dl3$betaSpent, c(0.052313716, 0.074994481, 0.099999999), tolerance = 1e-07)
-	expect_equal(dl3$criticalValues, c(1.9405431, 2.0327662, 1.9734104), tolerance = 1e-07)
-	expect_equal(dl3$stageLevels, c(0.026156858, 0.021038075, 0.02422441), tolerance = 1e-07)
-	expect_equal(dl3$decisionCriticalValues, c(NA_real_, 1.657468, 1.9734104), tolerance = 1e-07)
-	expect_equal(dl3$reversalProbabilities, c(NA_real_, 0.0026967589), tolerance = 1e-07)
+	expect_equal(dl3$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl3$power, collapse = ", "), ")"))
+	expect_equal(dl3$futilityBounds, c(0.5448398, 1.0899149), tolerance = 1e-07, label = paste0("c(", paste0(dl3$futilityBounds, collapse = ", "), ")"))
+	expect_equal(dl3$alphaSpent, c(0.026156858, 0.037497241, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(dl3$alphaSpent, collapse = ", "), ")"))
+	expect_equal(dl3$betaSpent, c(0.052313716, 0.074994481, 0.099999999), tolerance = 1e-07, label = paste0("c(", paste0(dl3$betaSpent, collapse = ", "), ")"))
+	expect_equal(dl3$criticalValues, c(1.9405431, 2.0327662, 1.9734104), tolerance = 1e-07, label = paste0("c(", paste0(dl3$criticalValues, collapse = ", "), ")"))
+	expect_equal(dl3$stageLevels, c(0.026156858, 0.021038075, 0.02422441), tolerance = 1e-07, label = paste0("c(", paste0(dl3$stageLevels, collapse = ", "), ")"))
+	expect_equal(dl3$decisionCriticalValues, c(NA_real_, 1.657468, 1.9734104), tolerance = 1e-07, label = paste0("c(", paste0(dl3$decisionCriticalValues, collapse = ", "), ")"))
+	expect_equal(dl3$reversalProbabilities, c(NA_real_, 0.0026967589), tolerance = 1e-07, label = paste0("c(", paste0(dl3$reversalProbabilities, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl3), NA)))
 	    expect_output(print(dl3)$show())
@@ -1187,16 +1187,16 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsP', non
 	dl4 <- getDesignCharacteristics(dl3)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'dl4' with expected results
-	expect_equal(dl4$nFixed, 8.5638474, tolerance = 1e-07)
-	expect_equal(dl4$shift, 11.462579, tolerance = 1e-07)
-	expect_equal(dl4$inflationFactor, 1.3384848, tolerance = 1e-07)
-	expect_equal(dl4$information, c(4.5850317, 7.4506765, 11.462579), tolerance = 1e-07)
-	expect_equal(dl4$power, c(0.57954342, 0.78973163, 0.9), tolerance = 1e-07)
-	expect_equal(dl4$rejectionProbabilities, c(0.57954342, 0.21018821, 0.11026837), tolerance = 1e-07)
-	expect_equal(dl4$futilityProbabilities, c(0.055196532, 0.024225352), tolerance = 1e-07)
-	expect_equal(dl4$averageSampleNumber1, 0.7829433, tolerance = 1e-07)
-	expect_equal(dl4$averageSampleNumber01, 0.89251343, tolerance = 1e-07)
-	expect_equal(dl4$averageSampleNumber0, 0.71271214, tolerance = 1e-07)
+	expect_equal(dl4$nFixed, 8.5638474, tolerance = 1e-07, label = paste0("c(", paste0(dl4$nFixed, collapse = ", "), ")"))
+	expect_equal(dl4$shift, 11.462579, tolerance = 1e-07, label = paste0("c(", paste0(dl4$shift, collapse = ", "), ")"))
+	expect_equal(dl4$inflationFactor, 1.3384848, tolerance = 1e-07, label = paste0("c(", paste0(dl4$inflationFactor, collapse = ", "), ")"))
+	expect_equal(dl4$information, c(4.5850317, 7.4506765, 11.462579), tolerance = 1e-07, label = paste0("c(", paste0(dl4$information, collapse = ", "), ")"))
+	expect_equal(dl4$power, c(0.57954342, 0.78973163, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl4$power, collapse = ", "), ")"))
+	expect_equal(dl4$rejectionProbabilities, c(0.57954342, 0.21018821, 0.11026837), tolerance = 1e-07, label = paste0("c(", paste0(dl4$rejectionProbabilities, collapse = ", "), ")"))
+	expect_equal(dl4$futilityProbabilities, c(0.055196532, 0.024225352), tolerance = 1e-07, label = paste0("c(", paste0(dl4$futilityProbabilities, collapse = ", "), ")"))
+	expect_equal(dl4$averageSampleNumber1, 0.7829433, tolerance = 1e-07, label = paste0("c(", paste0(dl4$averageSampleNumber1, collapse = ", "), ")"))
+	expect_equal(dl4$averageSampleNumber01, 0.89251343, tolerance = 1e-07, label = paste0("c(", paste0(dl4$averageSampleNumber01, collapse = ", "), ")"))
+	expect_equal(dl4$averageSampleNumber0, 0.71271214, tolerance = 1e-07, label = paste0("c(", paste0(dl4$averageSampleNumber0, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl4), NA)))
 	    expect_output(print(dl4)$show())
@@ -1233,12 +1233,12 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsP', non
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'dl5' with expected results
-	expect_equal(dl5$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07)
-	expect_equal(dl5$futilityBounds, c(0.5448398, 1.0899149), tolerance = 1e-07)
-	expect_equal(dl5$alphaSpent, c(0.026156858, 0.037497241, 0.05), tolerance = 1e-07)
-	expect_equal(dl5$betaSpent, c(0.052313716, 0.074994481, 0.099999999), tolerance = 1e-07)
-	expect_equal(dl5$criticalValues, c(1.9405431, 2.0327662, 1.9734104), tolerance = 1e-07)
-	expect_equal(dl5$stageLevels, c(0.026156858, 0.021038075, 0.02422441), tolerance = 1e-07)
+	expect_equal(dl5$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl5$power, collapse = ", "), ")"))
+	expect_equal(dl5$futilityBounds, c(0.5448398, 1.0899149), tolerance = 1e-07, label = paste0("c(", paste0(dl5$futilityBounds, collapse = ", "), ")"))
+	expect_equal(dl5$alphaSpent, c(0.026156858, 0.037497241, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(dl5$alphaSpent, collapse = ", "), ")"))
+	expect_equal(dl5$betaSpent, c(0.052313716, 0.074994481, 0.099999999), tolerance = 1e-07, label = paste0("c(", paste0(dl5$betaSpent, collapse = ", "), ")"))
+	expect_equal(dl5$criticalValues, c(1.9405431, 2.0327662, 1.9734104), tolerance = 1e-07, label = paste0("c(", paste0(dl5$criticalValues, collapse = ", "), ")"))
+	expect_equal(dl5$stageLevels, c(0.026156858, 0.021038075, 0.02422441), tolerance = 1e-07, label = paste0("c(", paste0(dl5$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl5), NA)))
 	    expect_output(print(dl5)$show())
@@ -1263,16 +1263,16 @@ test_that("'getDesignGroupSequential' with type of design = 'asP' and 'bsP', non
 	dl6 <- getDesignCharacteristics(dl5)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'dl6' with expected results
-	expect_equal(dl6$nFixed, 8.5638474, tolerance = 1e-07)
-	expect_equal(dl6$shift, 11.746896, tolerance = 1e-07)
-	expect_equal(dl6$inflationFactor, 1.3716844, tolerance = 1e-07)
-	expect_equal(dl6$information, c(4.6987583, 7.6354822, 11.746896), tolerance = 1e-07)
-	expect_equal(dl6$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07)
-	expect_equal(dl6$rejectionProbabilities, c(0.58983431, 0.20296375, 0.10720193), tolerance = 1e-07)
-	expect_equal(dl6$futilityProbabilities, c(0.052313716, 0.022680765), tolerance = 1e-07)
-	expect_equal(dl6$averageSampleNumber1, 0.73486016, tolerance = 1e-07)
-	expect_equal(dl6$averageSampleNumber01, 0.8455149, tolerance = 1e-07)
-	expect_equal(dl6$averageSampleNumber0, 0.67993383, tolerance = 1e-07)
+	expect_equal(dl6$nFixed, 8.5638474, tolerance = 1e-07, label = paste0("c(", paste0(dl6$nFixed, collapse = ", "), ")"))
+	expect_equal(dl6$shift, 11.746896, tolerance = 1e-07, label = paste0("c(", paste0(dl6$shift, collapse = ", "), ")"))
+	expect_equal(dl6$inflationFactor, 1.3716844, tolerance = 1e-07, label = paste0("c(", paste0(dl6$inflationFactor, collapse = ", "), ")"))
+	expect_equal(dl6$information, c(4.6987583, 7.6354822, 11.746896), tolerance = 1e-07, label = paste0("c(", paste0(dl6$information, collapse = ", "), ")"))
+	expect_equal(dl6$power, c(0.58983431, 0.79279807, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(dl6$power, collapse = ", "), ")"))
+	expect_equal(dl6$rejectionProbabilities, c(0.58983431, 0.20296375, 0.10720193), tolerance = 1e-07, label = paste0("c(", paste0(dl6$rejectionProbabilities, collapse = ", "), ")"))
+	expect_equal(dl6$futilityProbabilities, c(0.052313716, 0.022680765), tolerance = 1e-07, label = paste0("c(", paste0(dl6$futilityProbabilities, collapse = ", "), ")"))
+	expect_equal(dl6$averageSampleNumber1, 0.73486016, tolerance = 1e-07, label = paste0("c(", paste0(dl6$averageSampleNumber1, collapse = ", "), ")"))
+	expect_equal(dl6$averageSampleNumber01, 0.8455149, tolerance = 1e-07, label = paste0("c(", paste0(dl6$averageSampleNumber01, collapse = ", "), ")"))
+	expect_equal(dl6$averageSampleNumber0, 0.67993383, tolerance = 1e-07, label = paste0("c(", paste0(dl6$averageSampleNumber0, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(dl6), NA)))
 	    expect_output(print(dl6)$show())
@@ -1313,9 +1313,9 @@ test_that("'getDesignGroupSequential' with binding futility bounds", {
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x8a' with expected results
-	expect_equal(x8a$alphaSpent, c(0.0062828133, 0.013876673, 0.02015684, 0.02499999), tolerance = 1e-07)
-	expect_equal(x8a$criticalValues, c(2.4958485, 2.328709, 2.2361766, 2.1727623), tolerance = 1e-07)
-	expect_equal(x8a$stageLevels, c(0.0062828133, 0.0099372444, 0.012670104, 0.014899106), tolerance = 1e-07)
+	expect_equal(x8a$alphaSpent, c(0.0062828133, 0.013876673, 0.02015684, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(x8a$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x8a$criticalValues, c(2.4958485, 2.328709, 2.2361766, 2.1727623), tolerance = 1e-07, label = paste0("c(", paste0(x8a$criticalValues, collapse = ", "), ")"))
+	expect_equal(x8a$stageLevels, c(0.0062828133, 0.0099372444, 0.012670104, 0.014899106), tolerance = 1e-07, label = paste0("c(", paste0(x8a$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x8a), NA)))
 	    expect_output(print(x8a)$show())
@@ -1342,9 +1342,9 @@ test_that("'getDesignGroupSequential' with binding futility bounds", {
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x8b' with expected results
-	expect_equal(x8b$alphaSpent, c(0.0013603353, 0.013978861, 0.02499999), tolerance = 1e-07)
-	expect_equal(x8b$criticalValues, c(3.2029374, 2.4819703, 2.3420706), tolerance = 1e-07)
-	expect_equal(x8b$stageLevels, c(0.00068016766, 0.0065329078, 0.0095885436), tolerance = 1e-07)
+	expect_equal(x8b$alphaSpent, c(0.0013603353, 0.013978861, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(x8b$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x8b$criticalValues, c(3.2029374, 2.4819703, 2.3420706), tolerance = 1e-07, label = paste0("c(", paste0(x8b$criticalValues, collapse = ", "), ")"))
+	expect_equal(x8b$stageLevels, c(0.00068016766, 0.0065329078, 0.0095885436), tolerance = 1e-07, label = paste0("c(", paste0(x8b$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x8b), NA)))
 	    expect_output(print(x8b)$show())
@@ -1371,11 +1371,11 @@ test_that("'getDesignGroupSequential' with binding futility bounds", {
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x8c' with expected results
-	expect_equal(x8c$power, c(0.17785982, 0.63184407, 0.77), tolerance = 1e-07)
-	expect_equal(x8c$deltaWT, 0.393, tolerance = 1e-07)
-	expect_equal(x8c$alphaSpent, c(0.0067542296, 0.01805085, 0.025), tolerance = 1e-07)
-	expect_equal(x8c$criticalValues, c(2.4700754, 2.2239834, 2.1715117), tolerance = 1e-07)
-	expect_equal(x8c$stageLevels, c(0.0067542296, 0.013074779, 0.014946256), tolerance = 1e-07)
+	expect_equal(x8c$power, c(0.17785982, 0.63184407, 0.77), tolerance = 1e-07, label = paste0("c(", paste0(x8c$power, collapse = ", "), ")"))
+	expect_equal(x8c$deltaWT, 0.393, tolerance = 1e-07, label = paste0("c(", paste0(x8c$deltaWT, collapse = ", "), ")"))
+	expect_equal(x8c$alphaSpent, c(0.0067542296, 0.01805085, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(x8c$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x8c$criticalValues, c(2.4700754, 2.2239834, 2.1715117), tolerance = 1e-07, label = paste0("c(", paste0(x8c$criticalValues, collapse = ", "), ")"))
+	expect_equal(x8c$stageLevels, c(0.0067542296, 0.013074779, 0.014946256), tolerance = 1e-07, label = paste0("c(", paste0(x8c$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x8c), NA)))
 	    expect_output(print(x8c)$show())
@@ -1404,11 +1404,11 @@ test_that("'getDesignGroupSequential' with binding futility bounds", {
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x8d' with expected results
-	expect_equal(x8d$power, c(0.27905065, 0.63899817, 0.80432197, 0.9), tolerance = 1e-07)
-	expect_equal(x8d$deltaWT, 0.479, tolerance = 1e-07)
-	expect_equal(x8d$alphaSpent, c(0.0082066211, 0.015417447, 0.020576899, 0.025), tolerance = 1e-07)
-	expect_equal(x8d$criticalValues, c(2.6434487, 2.6052491, 2.5895574, 2.577451), tolerance = 1e-07)
-	expect_equal(x8d$stageLevels, c(0.0041033106, 0.0045903747, 0.0048049705, 0.0049765989), tolerance = 1e-07)
+	expect_equal(x8d$power, c(0.27905065, 0.63899817, 0.80432197, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(x8d$power, collapse = ", "), ")"))
+	expect_equal(x8d$deltaWT, 0.479, tolerance = 1e-07, label = paste0("c(", paste0(x8d$deltaWT, collapse = ", "), ")"))
+	expect_equal(x8d$alphaSpent, c(0.0082066211, 0.015417447, 0.020576899, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(x8d$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x8d$criticalValues, c(2.6434487, 2.6052491, 2.5895574, 2.577451), tolerance = 1e-07, label = paste0("c(", paste0(x8d$criticalValues, collapse = ", "), ")"))
+	expect_equal(x8d$stageLevels, c(0.0041033106, 0.0045903747, 0.0048049705, 0.0049765989), tolerance = 1e-07, label = paste0("c(", paste0(x8d$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x8d), NA)))
 	    expect_output(print(x8d)$show())
@@ -1437,11 +1437,11 @@ test_that("'getDesignGroupSequential' with binding futility bounds", {
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x8e' with expected results
-	expect_equal(x8e$power, c(0.068425642, 0.50677837, 0.76253381, 0.9), tolerance = 1e-07)
-	expect_equal(x8e$deltaWT, 0.181, tolerance = 1e-07)
-	expect_equal(x8e$alphaSpent, c(0.00055484217, 0.0059655413, 0.01417086, 0.02499999), tolerance = 1e-07)
-	expect_equal(x8e$criticalValues, c(3.4527796, 2.7678356, 2.5251363, 2.3516384), tolerance = 1e-07)
-	expect_equal(x8e$stageLevels, c(0.00027742108, 0.0028214959, 0.0057826708, 0.0093454685), tolerance = 1e-07)
+	expect_equal(x8e$power, c(0.068425642, 0.50677837, 0.76253381, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(x8e$power, collapse = ", "), ")"))
+	expect_equal(x8e$deltaWT, 0.181, tolerance = 1e-07, label = paste0("c(", paste0(x8e$deltaWT, collapse = ", "), ")"))
+	expect_equal(x8e$alphaSpent, c(0.00055484217, 0.0059655413, 0.01417086, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(x8e$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x8e$criticalValues, c(3.4527796, 2.7678356, 2.5251363, 2.3516384), tolerance = 1e-07, label = paste0("c(", paste0(x8e$criticalValues, collapse = ", "), ")"))
+	expect_equal(x8e$stageLevels, c(0.00027742108, 0.0028214959, 0.0057826708, 0.0093454685), tolerance = 1e-07, label = paste0("c(", paste0(x8e$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x8e), NA)))
 	    expect_output(print(x8e)$show())
@@ -1473,9 +1473,9 @@ test_that("'getDesignGroupSequential' with Haybittle Peto boundaries", {
 	x9 <- getDesignGroupSequential(kMax = 4, alpha = 0.025, typeOfDesign = "HP")
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x9' with expected results
-	expect_equal(x9$alphaSpent, c(0.001349898, 0.0024617416, 0.0033695882, 0.025), tolerance = 1e-07)
-	expect_equal(x9$criticalValues, c(3, 3, 3, 1.9827514), tolerance = 1e-07)
-	expect_equal(x9$stageLevels, c(0.001349898, 0.001349898, 0.001349898, 0.023697604), tolerance = 1e-07)
+	expect_equal(x9$alphaSpent, c(0.001349898, 0.0024617416, 0.0033695882, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(x9$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x9$criticalValues, c(3, 3, 3, 1.9827514), tolerance = 1e-07, label = paste0("c(", paste0(x9$criticalValues, collapse = ", "), ")"))
+	expect_equal(x9$stageLevels, c(0.001349898, 0.001349898, 0.001349898, 0.023697604), tolerance = 1e-07, label = paste0("c(", paste0(x9$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x9), NA)))
 	    expect_output(print(x9)$show())
@@ -1509,12 +1509,12 @@ test_that("'getDesignGroupSequential' with Pampallona Tsiatis boundaries, bindin
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x10' with expected results
-	expect_equal(x10$power, c(0.19834666, 0.83001122, 0.9), tolerance = 1e-07)
-	expect_equal(x10$futilityBounds, c(-0.042079545, 1.4407359), tolerance = 1e-07)
-	expect_equal(x10$alphaSpent, c(0.0038332428, 0.024917169, 0.035), tolerance = 1e-07)
-	expect_equal(x10$betaSpent, c(0.031375368, 0.080734151, 0.1), tolerance = 1e-07)
-	expect_equal(x10$criticalValues, c(2.6664156, 1.9867225, 1.8580792), tolerance = 1e-07)
-	expect_equal(x10$stageLevels, c(0.0038332428, 0.023476576, 0.031578886), tolerance = 1e-07)
+	expect_equal(x10$power, c(0.19834666, 0.83001122, 0.9), tolerance = 1e-07, label = paste0("c(", paste0(x10$power, collapse = ", "), ")"))
+	expect_equal(x10$futilityBounds, c(-0.042079545, 1.4407359), tolerance = 1e-07, label = paste0("c(", paste0(x10$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x10$alphaSpent, c(0.0038332428, 0.024917169, 0.035), tolerance = 1e-07, label = paste0("c(", paste0(x10$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x10$betaSpent, c(0.031375368, 0.080734151, 0.1), tolerance = 1e-07, label = paste0("c(", paste0(x10$betaSpent, collapse = ", "), ")"))
+	expect_equal(x10$criticalValues, c(2.6664156, 1.9867225, 1.8580792), tolerance = 1e-07, label = paste0("c(", paste0(x10$criticalValues, collapse = ", "), ")"))
+	expect_equal(x10$stageLevels, c(0.0038332428, 0.023476576, 0.031578886), tolerance = 1e-07, label = paste0("c(", paste0(x10$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x10), NA)))
 	    expect_output(print(x10)$show())
@@ -1545,12 +1545,12 @@ test_that("'getDesignGroupSequential' with Pampallona Tsiatis boundaries, bindin
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x11' with expected results
-	expect_equal(x11$power, c(0.16615376, 0.88013007, 0.94999991), tolerance = 1e-07)
-	expect_equal(x11$futilityBounds, c(NA_real_, 1.671433), tolerance = 1e-07)
-	expect_equal(x11$alphaSpent, c(0.0019236202, 0.022017713, 0.035), tolerance = 1e-07)
-	expect_equal(x11$betaSpent, c(0, 0.035025978, 0.05), tolerance = 1e-07)
-	expect_equal(x11$criticalValues, c(3.1017782, 2.3111074, 2.1614596), tolerance = 1e-07)
-	expect_equal(x11$stageLevels, c(0.00096181012, 0.010413463, 0.015329928), tolerance = 1e-07)
+	expect_equal(x11$power, c(0.16615376, 0.88013007, 0.94999991), tolerance = 1e-07, label = paste0("c(", paste0(x11$power, collapse = ", "), ")"))
+	expect_equal(x11$futilityBounds, c(NA_real_, 1.671433), tolerance = 1e-07, label = paste0("c(", paste0(x11$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x11$alphaSpent, c(0.0019236202, 0.022017713, 0.035), tolerance = 1e-07, label = paste0("c(", paste0(x11$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x11$betaSpent, c(0, 0.035025978, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(x11$betaSpent, collapse = ", "), ")"))
+	expect_equal(x11$criticalValues, c(3.1017782, 2.3111074, 2.1614596), tolerance = 1e-07, label = paste0("c(", paste0(x11$criticalValues, collapse = ", "), ")"))
+	expect_equal(x11$stageLevels, c(0.00096181012, 0.010413463, 0.015329928), tolerance = 1e-07, label = paste0("c(", paste0(x11$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x11), NA)))
 	    expect_output(print(x11)$show())
@@ -1581,12 +1581,12 @@ test_that("'getDesignGroupSequential' with Pampallona Tsiatis boundaries, bindin
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x12' with expected results
-	expect_equal(x12$power, c(0.15712278, 0.87874666, 0.94999994), tolerance = 1e-07)
-	expect_equal(x12$futilityBounds, c(NA_real_, 1.7090472), tolerance = 1e-07)
-	expect_equal(x12$alphaSpent, c(0.0015647742, 0.019435851, 0.035), tolerance = 1e-07)
-	expect_equal(x12$betaSpent, c(0, 0.034947415, 0.05), tolerance = 1e-07)
-	expect_equal(x12$criticalValues, c(3.1623945, 2.356272, 2.2036998), tolerance = 1e-07)
-	expect_equal(x12$stageLevels, c(0.00078238709, 0.0092296971, 0.013772733), tolerance = 1e-07)
+	expect_equal(x12$power, c(0.15712278, 0.87874666, 0.94999994), tolerance = 1e-07, label = paste0("c(", paste0(x12$power, collapse = ", "), ")"))
+	expect_equal(x12$futilityBounds, c(NA_real_, 1.7090472), tolerance = 1e-07, label = paste0("c(", paste0(x12$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x12$alphaSpent, c(0.0015647742, 0.019435851, 0.035), tolerance = 1e-07, label = paste0("c(", paste0(x12$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x12$betaSpent, c(0, 0.034947415, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(x12$betaSpent, collapse = ", "), ")"))
+	expect_equal(x12$criticalValues, c(3.1623945, 2.356272, 2.2036998), tolerance = 1e-07, label = paste0("c(", paste0(x12$criticalValues, collapse = ", "), ")"))
+	expect_equal(x12$stageLevels, c(0.00078238709, 0.0092296971, 0.013772733), tolerance = 1e-07, label = paste0("c(", paste0(x12$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x12), NA)))
 	    expect_output(print(x12)$show())
@@ -1617,12 +1617,12 @@ test_that("'getDesignGroupSequential' with Pampallona Tsiatis boundaries, bindin
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x13' with expected results
-	expect_equal(x13$power, c(0.029518378, 0.38853658, 0.90760886, 0.95), tolerance = 1e-07)
-	expect_equal(x13$futilityBounds, c(-0.41499566, 0.38106631, 1.4738957), tolerance = 1e-07)
-	expect_equal(x13$alphaSpent, c(0.00014050218, 0.0030266381, 0.0199021, 0.035), tolerance = 1e-07)
-	expect_equal(x13$betaSpent, c(0.015413989, 0.028721092, 0.043215976, 0.049999999), tolerance = 1e-07)
-	expect_equal(x13$criticalValues, c(3.6322099, 2.7527004, 2.0861568, 1.9080201), tolerance = 1e-07)
-	expect_equal(x13$stageLevels, c(0.00014050218, 0.002955298, 0.018482211, 0.02819431), tolerance = 1e-07)
+	expect_equal(x13$power, c(0.029518378, 0.38853658, 0.90760886, 0.95), tolerance = 1e-07, label = paste0("c(", paste0(x13$power, collapse = ", "), ")"))
+	expect_equal(x13$futilityBounds, c(-0.41499566, 0.38106631, 1.4738957), tolerance = 1e-07, label = paste0("c(", paste0(x13$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x13$alphaSpent, c(0.00014050218, 0.0030266381, 0.0199021, 0.035), tolerance = 1e-07, label = paste0("c(", paste0(x13$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x13$betaSpent, c(0.015413989, 0.028721092, 0.043215976, 0.049999999), tolerance = 1e-07, label = paste0("c(", paste0(x13$betaSpent, collapse = ", "), ")"))
+	expect_equal(x13$criticalValues, c(3.6322099, 2.7527004, 2.0861568, 1.9080201), tolerance = 1e-07, label = paste0("c(", paste0(x13$criticalValues, collapse = ", "), ")"))
+	expect_equal(x13$stageLevels, c(0.00014050218, 0.002955298, 0.018482211, 0.02819431), tolerance = 1e-07, label = paste0("c(", paste0(x13$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x13), NA)))
 	    expect_output(print(x13)$show())
@@ -1653,12 +1653,12 @@ test_that("'getDesignGroupSequential' with Pampallona Tsiatis boundaries, bindin
 	)
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x14' with expected results
-	expect_equal(x14$power, c(0.076493626, 0.52863814, 0.83456395, 0.94950066, 0.98346861, 0.99), tolerance = 1e-07)
-	expect_equal(x14$futilityBounds, c(NA_real_, NA_real_, 0.12661836, 0.55308248, 0.92800873), tolerance = 1e-07)
-	expect_equal(x14$alphaSpent, c(0.0027626806, 0.03301126, 0.088857236, 0.15440485, 0.2156594, 0.25), tolerance = 1e-07)
-	expect_equal(x14$betaSpent, c(0, 0, 0.0026196847, 0.0066701045, 0.008949341, 0.01), tolerance = 1e-07)
-	expect_equal(x14$criticalValues, c(2.9929798, 2.1458995, 1.7663859, 1.5385619, 1.3822869, 1.2664591), tolerance = 1e-07)
-	expect_equal(x14$stageLevels, c(0.0013813403, 0.015940498, 0.038665568, 0.061955638, 0.08344182, 0.10267438), tolerance = 1e-07)
+	expect_equal(x14$power, c(0.076493626, 0.52863814, 0.83456395, 0.94950066, 0.98346861, 0.99), tolerance = 1e-07, label = paste0("c(", paste0(x14$power, collapse = ", "), ")"))
+	expect_equal(x14$futilityBounds, c(NA_real_, NA_real_, 0.12661836, 0.55308248, 0.92800873), tolerance = 1e-07, label = paste0("c(", paste0(x14$futilityBounds, collapse = ", "), ")"))
+	expect_equal(x14$alphaSpent, c(0.0027626806, 0.03301126, 0.088857236, 0.15440485, 0.2156594, 0.25), tolerance = 1e-07, label = paste0("c(", paste0(x14$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x14$betaSpent, c(0, 0, 0.0026196848, 0.0066701046, 0.0089493411, 0.01), tolerance = 1e-07, label = paste0("c(", paste0(x14$betaSpent, collapse = ", "), ")"))
+	expect_equal(x14$criticalValues, c(2.9929798, 2.1458995, 1.7663859, 1.5385619, 1.3822869, 1.2664591), tolerance = 1e-07, label = paste0("c(", paste0(x14$criticalValues, collapse = ", "), ")"))
+	expect_equal(x14$stageLevels, c(0.0013813403, 0.015940498, 0.038665568, 0.061955638, 0.08344182, 0.10267438), tolerance = 1e-07, label = paste0("c(", paste0(x14$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x14), NA)))
 	    expect_output(print(x14)$show())
@@ -1695,9 +1695,9 @@ test_that("'getDesignGroupSequential' with type of design = 'noEarlyEfficacy'", 
 
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x15' with expected results
-	expect_equal(x15$alphaSpent, c(6.6613381e-16, -1.3145041e-13, 0.025), tolerance = 1e-07)
-	expect_equal(x15$criticalValues, c(Inf, Inf, 1.959964), tolerance = 1e-07)
-	expect_equal(x15$stageLevels, c(0, 0, 0.025), tolerance = 1e-07)
+	expect_equal(x15$alphaSpent, c(6.6613381e-16, -1.3145041e-13, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(x15$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x15$criticalValues, c(Inf, Inf, 1.959964), tolerance = 1e-07, label = paste0("c(", paste0(x15$criticalValues, collapse = ", "), ")"))
+	expect_equal(x15$stageLevels, c(0, 0, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(x15$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x15), NA)))
 	    expect_output(print(x15)$show())
@@ -1723,9 +1723,9 @@ test_that("'getDesignGroupSequential' with type of design = 'noEarlyEfficacy'", 
 
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x16' with expected results
-	expect_equal(x16$alphaSpent, c(6.6613381e-16, 1.110223e-15, 4.8067383e-11, 0.02499999), tolerance = 1e-07)
-	expect_equal(x16$criticalValues, c(Inf, Inf, Inf, 1.8848634), tolerance = 1e-07)
-	expect_equal(x16$stageLevels, c(0, 0, 0, 0.029724142), tolerance = 1e-07)
+	expect_equal(x16$alphaSpent, c(6.6613381e-16, 1.110223e-15, 4.8067383e-11, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(x16$alphaSpent, collapse = ", "), ")"))
+	expect_equal(x16$criticalValues, c(Inf, Inf, Inf, 1.8848634), tolerance = 1e-07, label = paste0("c(", paste0(x16$criticalValues, collapse = ", "), ")"))
+	expect_equal(x16$stageLevels, c(0, 0, 0, 0.029724142), tolerance = 1e-07, label = paste0("c(", paste0(x16$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
 	    invisible(capture.output(expect_error(print(x16), NA)))
 	    expect_output(print(x16)$show())

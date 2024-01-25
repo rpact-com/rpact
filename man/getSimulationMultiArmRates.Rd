@@ -193,7 +193,7 @@ parameter configuration, and treatment arm selection rule in the multi-arm situa
 An allocation ratio can be specified referring to the ratio of number of
 subjects in the active treatment groups as compared to the control group.
 
-The definition of \code{pi1H1} and/or \code{piControl} makes only sense if \code{kMax} > 1
+The definition of \code{piTreatmentsH1} and/or \code{piControlH1} makes only sense if \code{kMax} > 1
 and if \code{conditionalPower}, \code{minNumberOfSubjectsPerStage}, and
 \code{maxNumberOfSubjectsPerStage} (or \code{calcSubjectsFunction}) are defined.
 
