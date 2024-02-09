@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7596 $
-## |  Last changed: $Date: 2024-01-25 14:33:51 +0100 (Do, 25 Jan 2024) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -57,7 +57,7 @@
                     return(1 / (1 / sumLambda1 + 1 / sumLambda2) -
                         information * shift / log(lambda1 / lambda2 / thetaH0)^2)
                 },
-                interval = c(0, 10 * min(1, max(accrualTime))),
+                interval = c(0, 10 * max(1, max(accrualTime))),
                 extendInt = "yes",
                 tol = 1e-07
             )$root)
@@ -192,12 +192,10 @@
     .setValueAndParameterType(designPlan, "overdispersion", overdispersion, 0)
     .setValueAndParameterType(designPlan, "fixedExposureTime", fixedExposureTime, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "accrualTime", accrualTime, NA_real_, notApplicableIfNA = TRUE)
-    if (designPlan$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
-        designPlan$.parameterFormatFunctions$accrualTime <- ".formatHowItIs"
-    }
     .setValueAndParameterType(designPlan, "accrualIntensity", accrualIntensity, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "followUpTime", followUpTime, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(designPlan, "maxNumberOfSubjects", as.integer(maxNumberOfSubjects), NA_integer_, notApplicableIfNA = TRUE)
+    .setValueAndParameterType(designPlan, "maxNumberOfSubjects", 
+        as.integer(maxNumberOfSubjects), NA_integer_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(
         designPlan, "allocationRatioPlanned",
         allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
@@ -383,7 +381,8 @@ getSampleSizeCounts <- function(design = NULL, ...,
             )
         )
 
-        designPlan$earlyStop <- sum(c(designCharacteristics$rejectionProbabilities[1:(design$kMax - 1)], designPlan$futilityStop))
+        designPlan$earlyStop <- sum(c(
+            designCharacteristics$rejectionProbabilities[1:(design$kMax - 1)], designPlan$futilityStop))
         designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
 
     } else {

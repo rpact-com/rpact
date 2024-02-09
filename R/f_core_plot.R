@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7558 $
-## |  Last changed: $Date: 2024-01-12 15:29:16 +0100 (Fri, 12 Jan 2024) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -792,23 +792,24 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     for (variedParameter in variedParameters) {
         variedParameterNames <- c(
             variedParameterNames,
-            .getTableColumnNames(design = designMaster)[[variedParameter]]
+            .getParameterCaption(variedParameter, designMaster, tableOutputEnabled = TRUE)
         )
     }
     names(variedParameters) <- variedParameterNames
     return(list(data = data, variedParameters = variedParameters))
 }
 
-.getCategories <- function(data, yParameterName, tableColumnNames) {
+.getCategories <- function(data, yParameterName, parameterSet) {
+    axisLabel <- .getAxisLabel(yParameterName, parameterSet)
     if (is.null(data$categories) || sum(is.na(data$categories)) > 0) {
-        return(rep(.getAxisLabel(yParameterName, tableColumnNames), nrow(data)))
+        return(rep(axisLabel, nrow(data)))
     }
 
-    return(paste(data$categories, .getAxisLabel(yParameterName, tableColumnNames), sep = ", "))
+    return(paste(data$categories, axisLabel, sep = ", "))
 }
 
-.getAxisLabel <- function(parameterName, tableColumnNames) {
-    axisLabel <- tableColumnNames[[parameterName]]
+.getAxisLabel <- function(parameterName, parameterSet) {
+    axisLabel <- .getParameterCaption(parameterName, parameterSet, tableOutputEnabled = TRUE)
     if (is.null(axisLabel)) {
         return(paste0("%", parameterName, "%"))
     }
@@ -945,45 +946,41 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     mirrorModeEnabled <- any(grepl("Mirrored$", yParameterNames))
-
-    tableColumnNames <- .getTableColumnNames(design = designMaster, 
-        designSet = if (.isTrialDesignSet(parameterSet)) parameterSet else NULL)
-
-    xAxisLabel <- .getAxisLabel(xParameterName, tableColumnNames)
-    yAxisLabel1 <- .getAxisLabel(yParameterName1, tableColumnNames)
+    xAxisLabel <- .getAxisLabel(xParameterName, parameterSet)
+    yAxisLabel1 <- .getAxisLabel(yParameterName1, parameterSet)
     yAxisLabel2 <- NULL
     if (!is.null(yParameterName2) && !is.null(yParameterName3)) {
         if (!is.na(yParameterName2)) {
-            pn2 <- .getAxisLabel(yParameterName2, tableColumnNames)
+            pn2 <- .getAxisLabel(yParameterName2, parameterSet)
             if (yParameterName2 == "overallEarlyStop") {
                 pn2 <- "Stopping Probability"
             }
-            yAxisLabel2 <- paste(pn2, .getAxisLabel(yParameterName3, tableColumnNames), sep = " and ")
+            yAxisLabel2 <- paste(pn2, .getAxisLabel(yParameterName3, parameterSet), sep = " and ")
         } else {
-            yAxisLabel2 <- .getAxisLabel(yParameterName3, tableColumnNames)
+            yAxisLabel2 <- .getAxisLabel(yParameterName3, parameterSet)
         }
     } else if (xParameterName == "effectMatrix" && !is.null(yParameterName2) && !is.na(yParameterName2) &&
             yParameterName1 %in% c("expectedNumberOfEvents", "expectedNumberOfSubjects") &&
             yParameterName2 == "rejectAtLeastOne") {
         # special case: simulation results, plot type 6 (expected number of subjects and power)
-        yAxisLabel2 <- .getAxisLabel(yParameterName2, tableColumnNames)
+        yAxisLabel2 <- .getAxisLabel(yParameterName2, parameterSet)
         yParameterName3 <- yParameterName2
         yParameterName2 <- NA_character_
     } else if (!is.null(yParameterName2) && !mirrorModeEnabled) {
-        yAxisLabel1 <- paste(yAxisLabel1, .getAxisLabel(yParameterName2, tableColumnNames), sep = " and ")
+        yAxisLabel1 <- paste(yAxisLabel1, .getAxisLabel(yParameterName2, parameterSet), sep = " and ")
     }
     if (yParameterName1 %in% c("alphaSpent", "betaSpent")) {
         yAxisLabel1 <- "Cumulative Error"
         if (is.null(yParameterName2)) {
-            yAxisLabel1 <- paste0(yAxisLabel1, " (", .getAxisLabel(yParameterName1, tableColumnNames), ")")
+            yAxisLabel1 <- paste0(yAxisLabel1, " (", .getAxisLabel(yParameterName1, parameterSet), ")")
         }
     }
 
-    yAxisLabel1 <- sub(paste0(C_PARAMETER_NAMES[["futilityBoundsDelayedInformation"]], " and"),
+    yAxisLabel1 <- sub(paste0(.getParameterCaption("futilityBoundsDelayedInformation"), " and"),
         "Lower and", yAxisLabel1,
         fixed = TRUE
     )
-    yAxisLabel1 <- sub(paste0(C_PARAMETER_NAMES[["futilityBoundsDelayedInformationNonBinding"]], " and"),
+    yAxisLabel1 <- sub(paste0(.getParameterCaption("futilityBoundsDelayedInformationNonBinding"), " and"),
         "Lower and", yAxisLabel1,
         fixed = TRUE
     )
@@ -1075,20 +1072,20 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         df1 <- data.frame(
             xValues = data$xValues,
             yValues = data$yValues * scalingFactor1,
-            categories = .getCategories(data, yParameterName1, tableColumnNames)
+            categories = .getCategories(data, yParameterName1, parameterSet)
         )
         if (!is.na(yParameterName2)) {
             df2 <- data.frame(
                 xValues = data$xValues,
                 yValues = data$yValues2 * scalingFactor2,
-                categories = .getCategories(data, yParameterName2, tableColumnNames)
+                categories = .getCategories(data, yParameterName2, parameterSet)
             )
         }
         if (!is.null(yParameterName3)) {
             df3 <- data.frame(
                 xValues = data$xValues,
                 yValues = data$yValues3 * scalingFactor2,
-                categories = .getCategories(data, yParameterName3, tableColumnNames)
+                categories = .getCategories(data, yParameterName3, parameterSet)
             )
             if (is.na(yParameterName2)) {
                 data <- rbind(df1, df3)

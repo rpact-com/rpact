@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7558 $
-## |  Last changed: $Date: 2024-01-12 15:29:16 +0100 (Fri, 12 Jan 2024) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -767,7 +767,7 @@ as.data.frame.TrialDesignSet <- function(x,
         if (.isTrialDesignWithValidFutilityBounds(design)) {
             futilityBoundsName <- "futilityBounds"
             if (niceColumnNamesEnabled) {
-                futilityBoundsName <- .getTableColumnNames(design = design)[["futilityBounds"]]
+                futilityBoundsName <- .getParameterCaption("futilityBounds", design, tableOutputEnabled = TRUE)
             }
 
             kMax <- design$kMax
@@ -776,7 +776,7 @@ as.data.frame.TrialDesignSet <- function(x,
         if (.isTrialDesignWithValidAlpha0Vec(design)) {
             alpha0VecName <- "alpha0Vec"
             if (niceColumnNamesEnabled) {
-                alpha0VecName <- .getTableColumnNames(design = design)[["alpha0Vec"]]
+                alpha0VecName <- .getParameterCaption("alpha0Vec", design, tableOutputEnabled = TRUE)
             }
 
             kMax <- design$kMax

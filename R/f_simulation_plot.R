@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7492 $
-## |  Last changed: $Date: 2023-12-13 08:31:58 +0100 (Mi, 13 Dez 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -101,7 +101,7 @@ NULL
     if (grepl("SimulationResultsEnrichment", .getClassName(simulationResults))) {
         effectDataList <- .getSimulationEnrichmentEffectData(simulationResults)
         if (ncol(effectDataList$effectData) == 1) {
-            xLabel <- simulationResults$.parameterNames[[effectDataList$effectMatrixName]]
+            xLabel <- .getParameterCaption(effectDataList$effectMatrixName, simulationResults)
             return(sub("s$", "", xLabel))
         }
 
@@ -141,7 +141,7 @@ NULL
 
     data <- NULL
     for (yParameterName in yParameterNames) {
-        category <- simulationResults$.parameterNames[[yParameterName]]
+        category <- .getParameterCaption(yParameterName, simulationResults)
         part <- data.frame(
             categories = rep(category, length(xValues)),
             xValues = xValues,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -100,25 +100,6 @@ TrialDesign <- setRefClass("TrialDesign",
             )
 
             .plotSettings <<- PlotSettings()
-
-            if (inherits(.self, "TrialDesignConditionalDunnett")) {
-                .parameterNames <<- C_PARAMETER_NAMES
-            } else {
-                .parameterNames <<- .getSubListByNames(.getParameterNames(design = .self), c(
-                    "stages",
-                    "kMax",
-                    "alpha",
-                    "informationRates",
-                    "userAlphaSpending",
-                    "criticalValues",
-                    "stageLevels",
-                    "alphaSpent",
-                    "bindingFutility",
-                    "tolerance"
-                ))
-            }
-
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
 
             .initStages()
         },
@@ -245,9 +226,6 @@ TrialDesignCharacteristics <- setRefClass("TrialDesignCharacteristics",
     methods = list(
         initialize = function(design, ...) {
             callSuper(.design = design, ...)
-            .parameterNames <<- .getParameterNames(design = design)
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
-            .parameterFormatFunctions[["nFixed"]] <<- ".formatProbabilities"
             .initStages()
         },
         show = function(showType = 1, digits = NA_integer_) {
@@ -353,8 +331,7 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
         parameterNames = parameterNamesToBeExcluded,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
         includeAllParameters = includeAllParameters,
-        handleParameterNamesAsToBeExcluded = TRUE,
-        tableColumnNames = .getTableColumnNames(design = x$.design)
+        handleParameterNamesAsToBeExcluded = TRUE
     ))
 }
 
@@ -434,21 +411,6 @@ TrialDesignFisher <- setRefClass(C_CLASS_NAME_TRIAL_DESIGN_FISHER,
                 seed = seed,
                 tolerance = tolerance
             )
-
-            .parameterNames <<- c(.parameterNames, .getSubListByNames(
-                .getParameterNames(design = .self), c(
-                    "method",
-                    "alpha0Vec",
-                    "scale",
-                    "nonStochasticCurtailment",
-                    "sided",
-                    "simAlpha",
-                    "iterations",
-                    "seed"
-                )
-            ))
-
-            .parameterFormatFunctions$criticalValues <<- ".formatCriticalValuesFisher"
 
             .initParameterTypes()
             .setParameterType("iterations", C_PARAM_NOT_APPLICABLE)
@@ -637,8 +599,6 @@ TrialDesignInverseNormal <- setRefClass(C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL
                 delayedInformation = delayedInformation
             )
 
-            .initParameterNames()
-            .parameterFormatFunctions$criticalValues <<- ".formatCriticalValues"
             .initParameterTypes()
             .initStages()
 
@@ -646,32 +606,6 @@ TrialDesignInverseNormal <- setRefClass(C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL
             .setParameterType("delayedInformation", C_PARAM_NOT_APPLICABLE)
             .setParameterType("decisionCriticalValues", C_PARAM_NOT_APPLICABLE)
             .setParameterType("reversalProbabilities", C_PARAM_NOT_APPLICABLE)
-        },
-        .initParameterNames = function() {
-            .parameterNames <<- c(.parameterNames, .getSubListByNames(
-                .getParameterNames(design = .self), c(
-                    "beta",
-                    "betaSpent",
-                    "sided",
-                    "futilityBounds",
-                    "typeOfDesign",
-                    "deltaWT",
-                    "deltaPT1",
-                    "deltaPT0",
-                    "optimizationCriterion",
-                    "gammaA",
-                    "gammaB",
-                    "typeBetaSpending",
-                    "userBetaSpending",
-                    "power",
-                    "twoSidedPower",
-                    "constantBoundsHP",
-                    "betaAdjustment",
-                    "delayedInformation",
-                    "decisionCriticalValues",
-                    "reversalProbabilities"
-                )
-            ))
         },
         .formatComparisonResult = function(x) {
             if (is.null(x) || length(x) == 0 || !is.numeric(x)) {
@@ -903,7 +837,6 @@ TrialDesignGroupSequential <- setRefClass(
     methods = list(
         initialize = function(...) {
             callSuper(...)
-            .parameterFormatFunctions$criticalValues <<- ".formatCriticalValues"
             .initStages()
         },
         show = function(showType = 1, digits = NA_integer_) {
@@ -1251,7 +1184,6 @@ as.data.frame.TrialDesign <- function(x, row.names = NULL,
         parameterSet = x,
         parameterNames = parameterNames,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
-        includeAllParameters = includeAllParameters,
-        tableColumnNames = .getTableColumnNames(design = x)
+        includeAllParameters = includeAllParameters
     ))
 }

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7554 $
-## |  Last changed: $Date: 2024-01-12 10:19:05 +0100 (Fr, 12 Jan 2024) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -92,9 +92,7 @@ StageResults <- setRefClass("StageResults",
                 } else {
                     .setParameterType("stages", C_PARAM_USER_DEFINED)
                 }
-                .parameterNames <<- .getParameterNames(design = design)
             }
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
 
             .setParameterType("stage", C_PARAM_NOT_APPLICABLE)
 
@@ -1213,8 +1211,7 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
             parameterSet = x,
             parameterNames = parametersToShow,
             niceColumnNamesEnabled = niceColumnNamesEnabled,
-            includeAllParameters = includeAllParameters,
-            tableColumnNames = .getTableColumnNames(design = x$.design)
+            includeAllParameters = includeAllParameters
         ))
     }
 

@@ -13,11 +13,12 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7496 $
-## |  Last changed: $Date: 2023-12-15 10:42:15 +0100 (Fr, 15 Dez 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
+#' @include class_dictionary.R
 #' @include f_core_constants.R
 #' @include f_core_assertions.R
 NULL
@@ -43,8 +44,6 @@ NULL
 FieldSet <- setRefClass("FieldSet",
     fields = list(
         .parameterTypes = "list",
-        .parameterNames = "list",
-        .parameterFormatFunctions = "list",
         .showParameterTypeEnabled = "logical",
         .catLines = "character"
     ),
@@ -103,7 +102,7 @@ FieldSet <- setRefClass("FieldSet",
                     if (is.na(headingBaseNumber)) {
                         headingBaseNumber <- 0L
                     }
-                    if (headingBaseNumber < -1) {
+                    if (headingBaseNumber < -2) {
                         warning(
                             "Illegal option ", sQuote("rpact.print.heading.base.number"),
                             " (", headingBaseNumber, ") was set to 0"
@@ -119,12 +118,13 @@ FieldSet <- setRefClass("FieldSet",
                     }
 
                     if (heading > 0) {
-                        if (headingBaseNumber == -1) {
+                        if (headingBaseNumber %in% c(-1, -2)) {
                             lineBreak <- ""
                             if (grepl("\n *$", line)) {
                                 lineBreak <- "\n\n"
                             }
-                            line <- paste0("**", sub(": *", "", trimws(line)), "**", lineBreak)
+                            fontStyle <- ifelse(headingBaseNumber == -1, "**", "*")
+                            line <- paste0(fontStyle, sub(": *", "", trimws(line)), fontStyle, lineBreak)
                         } else {
                             headingCmd <- paste0(rep("#", heading + headingBaseNumber + 1), collapse = "")
                             lineBreak <- ""
@@ -192,13 +192,6 @@ FieldSet <- setRefClass("FieldSet",
 #'
 ParameterSet <- setRefClass("ParameterSet",
     contains = "FieldSet",
-    fields = list(
-        .parameterTypes = "list",
-        .parameterNames = "list",
-        .parameterFormatFunctions = "list",
-        .showParameterTypeEnabled = "logical",
-        .catLines = "character"
-    ),
     methods = list(
         initialize = function(...,
                 .showParameterTypeEnabled = TRUE) {
@@ -206,8 +199,6 @@ ParameterSet <- setRefClass("ParameterSet",
                 .showParameterTypeEnabled = .showParameterTypeEnabled
             )
             .parameterTypes <<- list()
-            .parameterNames <<- list()
-            .parameterFormatFunctions <<- list()
             .catLines <<- character(0)
         },
         clone = function() {
@@ -236,7 +227,8 @@ ParameterSet <- setRefClass("ParameterSet",
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         },
         .initParameterTypes = function() {
-            for (parameterName in names(.parameterNames)) {
+            .parameterTypes <<- list()
+            for (parameterName in .self$.getVisibleFieldNames()) {
                 .parameterTypes[[parameterName]] <<- C_PARAM_TYPE_UNKNOWN
             }
         },
@@ -459,7 +451,7 @@ ParameterSet <- setRefClass("ParameterSet",
                             param$paramName <- parameterName
 
                             category <- parts[2]
-                            categoryCaption <- .parameterNames[[category]]
+                            categoryCaption <- .getParameterCaption(category, .self)
                             if (is.null(categoryCaption)) {
                                 categoryCaption <- paste0("%", category, "%")
                             }
@@ -492,7 +484,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 category = NULL,
                 showParameterType = FALSE,
                 consoleOutputEnabled = TRUE) {
-            if (is.null(param)) {
+            if (is.null(param) || is.null(param$paramValue) || length(param$paramValue) == 0) {
                 return(invisible(""))
             }
 
@@ -568,9 +560,12 @@ ParameterSet <- setRefClass("ParameterSet",
             return(invisible(output))
         },
         .extractParameterNameAndValue = function(parameterName) {
-            d <- regexpr(paste0("\\..+\\$"), parameterName)
+            d <- regexpr("\\..+\\$", parameterName)
             if (d[1] != 1) {
-                return(list(parameterName = parameterName, paramValue = get(parameterName)))
+                return(list(
+                    parameterName = parameterName, 
+                    paramValue = base::get(parameterName, envir = .self)
+                ))
             }
 
             index <- attr(d, "match.length")
@@ -601,10 +596,10 @@ ParameterSet <- setRefClass("ParameterSet",
                 showParameterType = FALSE, category = NULL, matrixRow = NA_integer_, consoleOutputEnabled = TRUE,
                 paramNameRaw = NA_character_, numberOfCategories = NA_integer_) {
             if (!is.na(paramNameRaw)) {
-                paramCaption <- .parameterNames[[paramNameRaw]]
+                paramCaption <- .getParameterCaption(paramNameRaw, .self)
             }
             if (is.null(paramCaption)) {
-                paramCaption <- .parameterNames[[paramName]]
+                paramCaption <- .getParameterCaption(paramName, .self)
             }
             if (is.null(paramCaption)) {
                 paramCaption <- paste0("%", paramName, "%")
@@ -701,11 +696,16 @@ ParameterSet <- setRefClass("ParameterSet",
             invisible(output)
         },
         .getNChar = function() {
-            if (length(.parameterNames) == 0) {
+            fieldNames <- .getVisibleFieldNames()
+            if (length(fieldNames) == 0) {
                 return(40)
             }
-
-            return(min(40, max(nchar(.parameterNames))) + 4)
+            
+            fieldCaptions <- character()
+            for (parameterName in fieldNames) {
+                fieldCaptions <- c(fieldCaptions, .getParameterCaption(parameterName, .self))
+            }
+            return(min(40, max(nchar(fieldCaptions))) + 4)
         },
         .showParameterTypeDescription = function(consoleOutputEnabled = consoleOutputEnabled) {
             .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
@@ -719,11 +719,6 @@ ParameterSet <- setRefClass("ParameterSet",
         .printAsDataFrame = function(parameterNames, niceColumnNamesEnabled = FALSE,
                 includeAllParameters = FALSE, handleParameterNamesAsToBeExcluded = FALSE,
                 lineBreakEnabled = FALSE) {
-            if (.isTrialDesign(.self)) {
-                tableColumnNames <- .getTableColumnNames(design = .self)
-            } else {
-                tableColumnNames <- C_TABLE_COLUMN_NAMES
-            }
 
             if (.isTrialDesignPlan(.self)) {
                 parameterNames <- NULL
@@ -735,8 +730,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
                 includeAllParameters = includeAllParameters,
                 handleParameterNamesAsToBeExcluded = handleParameterNamesAsToBeExcluded,
-                returnParametersAsCharacter = TRUE,
-                tableColumnNames = tableColumnNames
+                returnParametersAsCharacter = TRUE
             )
             result <- as.matrix(dataFrame)
             if (.isTrialDesignPlan(.self)) {
@@ -810,15 +804,17 @@ ParameterSet <- setRefClass("ParameterSet",
 
             return(NULL)
         },
-        .getDataFrameColumnCaption = function(parameterName, tableColumnNames, niceColumnNamesEnabled) {
+        .getDataFrameColumnCaption = function(parameterName, niceColumnNamesEnabled) {
             if (length(parameterName) == 0 || parameterName == "") {
                 stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterName' must be a valid parameter name")
             }
+            
+            if (!niceColumnNamesEnabled) {
+                return(parameterName)
+            }
 
-            tableColumnName <- tableColumnNames[[parameterName]]
-            return(ifelse(niceColumnNamesEnabled && !is.null(tableColumnName),
-                tableColumnName, parameterName
-            ))
+            tableColumnName <- .getParameterCaption(parameterName, .self, tableOutputEnabled = TRUE)
+            return(ifelse(!is.null(tableColumnName), tableColumnName, parameterName))
         },
         .getUnidimensionalNumberOfStages = function(parameterNames) {
             kMax <- .self[["kMax"]]
@@ -843,7 +839,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 parameterName, parameterValues, parameterCaption) {
             tryCatch(
                 {
-                    formatFunctionName <- .parameterFormatFunctions[[parameterName]]
+                    formatFunctionName <- .getParameterFormatFunction(parameterName, .self)
                     if (!is.null(formatFunctionName)) {
                         parameterValuesFormatted <- eval(call(formatFunctionName, parameterValues))
                     } else {
@@ -885,12 +881,16 @@ ParameterSet <- setRefClass("ParameterSet",
         #
         .getSubListByNames = function(x, listEntryNames) {
             "Returns a sub-list."
-            if (!is.list(x)) {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'x' must be a list")
+            if (!is.list(x) && !inherits(x, "Dictionary")) { 
+                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'x' must be a list or Dictionary (is ", .getClassName(x), ")")
             }
 
             if (!is.character(listEntryNames)) {
                 stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'listEntryNames' must be a character vector")
+            }
+            
+            if (inherits(x, "Dictionary")) {
+                return(getDictionarySubset(x, listEntryNames))
             }
 
             return(x[which(names(x) %in% listEntryNames)])
@@ -1100,15 +1100,11 @@ ParameterSet <- setRefClass("ParameterSet",
         niceColumnNamesEnabled,
         includeAllParameters,
         returnParametersAsCharacter,
-        tableColumnNames,
         mandatoryParameterNames) {
     numberOfVariants <- .getMultidimensionalNumberOfVariants(parameterSet, parameterNames)
     numberOfStages <- parameterSet$.getMultidimensionalNumberOfStages(parameterNames)
 
-    stagesCaption <- parameterSet$.getDataFrameColumnCaption(
-        "stages",
-        tableColumnNames, niceColumnNamesEnabled
-    )
+    stagesCaption <- parameterSet$.getDataFrameColumnCaption("stages", niceColumnNamesEnabled)
 
     dataFrame <- data.frame(
         stages = sort(rep(1:numberOfStages, numberOfVariants))
@@ -1122,9 +1118,7 @@ ParameterSet <- setRefClass("ParameterSet",
         }
         dataFrame$populations <- rep(populations, numberOfStages)
         populationsCaption <- parameterSet$.getDataFrameColumnCaption(
-            "populations",
-            tableColumnNames, niceColumnNamesEnabled
-        )
+            "populations", niceColumnNamesEnabled)
         names(dataFrame) <- c(stagesCaption, populationsCaption)
     }
 
@@ -1133,9 +1127,7 @@ ParameterSet <- setRefClass("ParameterSet",
         {
             if (!is.null(variedParameter) && variedParameter != "stages") {
                 variedParameterCaption <- parameterSet$.getDataFrameColumnCaption(
-                    variedParameter,
-                    tableColumnNames, niceColumnNamesEnabled
-                )
+                    variedParameter, niceColumnNamesEnabled)
                 dataFrame[[variedParameterCaption]] <- rep(parameterSet[[variedParameter]], numberOfStages)
             }
         },
@@ -1161,9 +1153,7 @@ ParameterSet <- setRefClass("ParameterSet",
                     )
                     if (!is.null(columnValues)) {
                         columnCaption <- parameterSet$.getDataFrameColumnCaption(
-                            parameterName,
-                            tableColumnNames, niceColumnNamesEnabled
-                        )
+                            parameterName, niceColumnNamesEnabled)
                         dataFrame[[columnCaption]] <- columnValues
                         if (returnParametersAsCharacter) {
                             parameterSet$.formatDataFrameParametersAsCharacter(
@@ -1213,9 +1203,7 @@ ParameterSet <- setRefClass("ParameterSet",
                                 !is.matrix(value) && !is.array(value) && !is.data.frame(value) &&
                                 (is.numeric(value) || is.character(value) || is.logical(value))) {
                             columnCaption <- parameterSet$.getDataFrameColumnCaption(
-                                extraParameter,
-                                tableColumnNames, niceColumnNamesEnabled
-                            )
+                                extraParameter, niceColumnNamesEnabled)
 
                             if (length(value) == 1) {
                                 dataFrame[[columnCaption]] <- rep(value, nrow(dataFrame))
@@ -1239,16 +1227,19 @@ ParameterSet <- setRefClass("ParameterSet",
 }
 
 .getAsDataFrameUnidimensional <- function(parameterSet, parameterNames, niceColumnNamesEnabled,
-        includeAllParameters, returnParametersAsCharacter, tableColumnNames) {
+        includeAllParameters, returnParametersAsCharacter) {
     numberOfStages <- parameterSet$.getUnidimensionalNumberOfStages(parameterNames)
     dataFrame <- NULL
     for (parameterName in parameterNames) {
         tryCatch(
             {
-                parameterCaption <- ifelse(niceColumnNamesEnabled &&
-                    !is.null(tableColumnNames[[parameterName]]),
-                tableColumnNames[[parameterName]], parameterName
-                )
+                parameterCaption <- parameterName
+                if (niceColumnNamesEnabled) {
+                    parameterCaption <- .getParameterCaption(parameterName, parameterSet, tableOutputEnabled = TRUE)
+                }
+                if (is.null(parameterCaption)) {
+                    parameterCaption <- parameterName
+                }
                 parameterValues <- parameterSet[[parameterName]]
                 if (parameterName == "futilityBounds") {
                     parameterValues[parameterValues == C_FUTILITY_BOUNDS_DEFAULT] <- -Inf
@@ -1293,7 +1284,6 @@ ParameterSet <- setRefClass("ParameterSet",
         includeAllParameters = FALSE,
         handleParameterNamesAsToBeExcluded = FALSE,
         returnParametersAsCharacter = FALSE,
-        tableColumnNames = C_TABLE_COLUMN_NAMES,
         mandatoryParameterNames = character(0)) {
     parameterNamesToBeExcluded <- c()
     if (handleParameterNamesAsToBeExcluded) {
@@ -1339,7 +1329,7 @@ ParameterSet <- setRefClass("ParameterSet",
             (.isTrialDesignPlanCountData(parameterSet) && length(parameterSet$theta) > 1)) {
         return(.addDelayedInformationRates(.getAsDataFrameMultidimensional(
             parameterSet, parameterNames, niceColumnNamesEnabled,
-            includeAllParameters, returnParametersAsCharacter, tableColumnNames,
+            includeAllParameters, returnParametersAsCharacter, 
             mandatoryParameterNames
         )))
     }
@@ -1358,7 +1348,7 @@ ParameterSet <- setRefClass("ParameterSet",
 
     return(.addDelayedInformationRates(.getAsDataFrameUnidimensional(
         parameterSet, parameterNames, niceColumnNamesEnabled,
-        includeAllParameters, returnParametersAsCharacter, tableColumnNames
+        includeAllParameters, returnParametersAsCharacter
     )))
 }
 

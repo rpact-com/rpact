@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7509 $
-## |  Last changed: $Date: 2023-12-20 16:06:21 +0100 (Mi, 20 Dez 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -107,8 +107,6 @@ SimulationResults <- setRefClass("SimulationResults",
             callSuper(.design = design, .showStatistics = showStatistics, ...)
 
             .plotSettings <<- PlotSettings()
-            .parameterNames <<- .getParameterNames(design = design, designPlan = .self)
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
         },
         getPlotSettings = function() {
             return(.plotSettings)
@@ -260,7 +258,7 @@ SimulationResults <- setRefClass("SimulationResults",
                     parameterValues2 <- .getVariedParameterValues(variedParameterName2)
 
                     for (parameterName in params) {
-                        paramCaption <- .parameterNames[[parameterName]]
+                        paramCaption <- .getParameterCaption(parameterName, .self)
                         if (is.null(paramCaption)) {
                             paramCaption <- paste0("%", parameterName, "%")
                         }
@@ -293,7 +291,7 @@ SimulationResults <- setRefClass("SimulationResults",
                             }
                             if (parameterName == "subjectsActiveArm" && variedParameterName2 == "armNumber") {
                                 parameterName2 <- "subjectsControlArm"
-                                paramCaption2 <- .parameterNames[[parameterName2]]
+                                paramCaption2 <- .getParameterCaption(parameterName2, .self)
                                 if (is.null(paramCaption2)) {
                                     paramCaption2 <- paste0("%", parameterName2, "%")
                                 }

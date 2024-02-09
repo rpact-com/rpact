@@ -74,7 +74,7 @@ default is \code{0}.}
 
 \item{accrualIntensity}{If specified, the assumed accrual intensities for the study, there is no default.}
 
-\item{followUpTime}{If specified, The assumed (additional) follow-up time for the study, there is no default.
+\item{followUpTime}{If specified, the assumed (additional) follow-up time for the study, there is no default.
 The total study duration is \code{accrualTime + followUpTime}.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -62,8 +62,6 @@ ConditionalPowerResults <- setRefClass("ConditionalPowerResults",
             callSuper(...)
 
             .plotSettings <<- PlotSettings()
-            .parameterNames <<- C_PARAMETER_NAMES
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
 
             if (!is.null(.stageResults) && is.null(.design)) {
                 .design <<- .stageResults$.design
@@ -533,8 +531,6 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
             callSuper(...)
 
             .plotSettings <<- PlotSettings()
-            .parameterNames <<- C_PARAMETER_NAMES
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
 
             .setParameterType("intersectionTest", C_PARAM_USER_DEFINED)
 
@@ -559,10 +555,6 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
             }
             for (param in parametersGenerated) {
                 .setParameterType(param, C_PARAM_GENERATED)
-            }
-
-            if (!is.null(.design) && inherits(.design, C_CLASS_NAME_TRIAL_DESIGN_FISHER)) {
-                .parameterFormatFunctions$overallAdjustedTestStatistics <<- ".formatTestStatisticsFisher"
             }
         },
         show = function(showType = 1, digits = NA_integer_) {
@@ -712,14 +704,10 @@ AnalysisResults <- setRefClass("AnalysisResults",
     methods = list(
         initialize = function(design, dataInput, ...) {
             callSuper(.design = design, .dataInput = dataInput, ...)
-
             .plotSettings <<- PlotSettings()
-            .parameterNames <<- .getParameterNames(design = design, analysisResults = .self)
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
         },
         .setStageResults = function(stageResults) {
             .stageResults <<- stageResults
-            .parameterNames <<- .getParameterNames(design = .design, stageResults = stageResults, analysisResults = .self)
         },
         getPlotSettings = function() {
             return(.plotSettings)
@@ -1162,7 +1150,6 @@ as.data.frame.AnalysisResults <- function(x, row.names = NULL, optional = FALSE,
     return(.getAsDataFrame(
         parameterSet = x,
         parameterNames = parametersToShow,
-        tableColumnNames = .getTableColumnNames(design = x$.design),
         niceColumnNamesEnabled = niceColumnNamesEnabled
     ))
 }

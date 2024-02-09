@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7592 $
-## |  Last changed: $Date: 2024-01-24 10:48:09 +0100 (Mi, 24 Jan 2024) $
+## |  File version: $Revision: 7619 $
+## |  Last changed: $Date: 2024-02-09 11:29:14 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -335,7 +335,7 @@ NULL
 NULL
 
 #' Parameter Description: followUpTime for Counts
-#' @param followUpTime If specified, The assumed (additional) follow-up time for the study, there is no default.
+#' @param followUpTime If specified, the assumed (additional) follow-up time for the study, there is no default.
 #'        The total study duration is \code{accrualTime + followUpTime}.
 #' @name param_followUpTime_counts
 #' @keywords internal

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7565 $
-## |  Last changed: $Date: 2024-01-15 15:07:02 +0100 (Mo, 15 Jan 2024) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -435,9 +435,8 @@
         )
 
         if (groupedPlotEnabled) {
-            tableColumnNames <- C_TABLE_COLUMN_NAMES
-            criticalValuesName <- designPlan$.getDataFrameColumnCaption("criticalValuesEffectScale", tableColumnNames, TRUE)
-            futilityBoundsName <- designPlan$.getDataFrameColumnCaption("futilityBoundsEffectScale", tableColumnNames, TRUE)
+            criticalValuesName <- designPlan$.getDataFrameColumnCaption("criticalValuesEffectScale", TRUE)
+            futilityBoundsName <- designPlan$.getDataFrameColumnCaption("futilityBoundsEffectScale", TRUE)
 
             designPlan <- data.frame(
                 xValues = rep(data[[xParameterName]], 4),
