@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7206 $
-## |  Last changed: $Date: 2023-07-25 14:55:05 +0200 (Tue, 25 Jul 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -256,7 +256,7 @@ NULL
 
         if (k < kMax) {
             futilityStop[k] <- all(futility[stageResults$selectedPopulations[1:gMax, k], k])
-            if (all(isFALSE(stageResults$selectedPopulations[1:gMax, k + 1]))) {
+            if (all(!stageResults$selectedPopulations[1:gMax, k + 1], na.rm = TRUE)) {
                 futilityStop[k] <- TRUE
             }
         }
@@ -447,24 +447,6 @@ NULL
             "thetaH1", thetaH1, kMax > 1,
             "design is fixed ('kMax' = 1)", "Assumed effect"
         )
-    }
-
-    if (endpoint == "means") {
-        # 		if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !is.na(thetaH1)) {
-        # 			warning("'thetaH1' will be ignored because neither 'conditionalPower' nor ",
-        # 				"'calcSubjectsFunction' is defined", call. = FALSE)
-        # 		}
-        # 		if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !is.na(stDevH1)) {
-        # 			warning("'stDevH1' will be ignored because neither 'conditionalPower' nor ",
-        # 				"'calcSubjectsFunction' is defined", call. = FALSE)
-        # 		}
-    }
-
-    if (endpoint == "survival") {
-        # 		if (is.na(conditionalPower) && is.null(calcEventsFunction) && !is.na(thetaH1)) {
-        # 			warning("'thetaH1' will be ignored because neither 'conditionalPower' nor ",
-        # 				"'calcEventsFunction' is defined", call. = FALSE)
-        # 		}
     }
 
     conditionalPower <- .ignoreParameterIfNotUsed(

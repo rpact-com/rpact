@@ -66,7 +66,7 @@ default is \code{0}.}
 
 \item{accrualIntensity}{If specified, the assumed accrual intensities for the study, there is no default.}
 
-\item{followUpTime}{If specified, The assumed (additional) follow-up time for the study, there is no default.
+\item{followUpTime}{If specified, the assumed (additional) follow-up time for the study, there is no default.
 The total study duration is \code{accrualTime + followUpTime}.}
 
 \item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified for power calculations or calculation

@@ -1,4 +1,10 @@
 
+# rpact 3.5.1
+
+* The fields `.parameterNames` and `.parameterFormatFunctions` were removed from all rpact result objects in favor of a more efficient solution
+* Issues [15](https://github.com/rpact-com/rpact/issues/15), [16](https://github.com/rpact-com/rpact/issues/16), and [17](https://github.com/rpact-com/rpact/issues/17) fixed
+
+
 # rpact 3.5.0
 
 ## New features

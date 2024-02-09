@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7554 $
-## |  Last changed: $Date: 2024-01-12 10:19:05 +0100 (Fr, 12 Jan 2024) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1383,8 +1383,6 @@ Dataset <- setRefClass("Dataset",
                 .enrichmentEnabled = enrichmentEnabled, ...
             )
             .plotSettings <<- PlotSettings()
-            .parameterNames <<- .getParameterNames(dataset = .self)
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
 
             .id <<- NA_integer_
             .description <<- NA_character_
@@ -2347,6 +2345,7 @@ DatasetMeans <- setRefClass("DatasetMeans",
                 } else {
                     n <- dataset$getSampleSize(stage = stage, group = group)
                     n <- floor(n / numberOfVisits)
+                    
                     randomData <- stats::rnorm(
                         n    = sampleSize,
                         mean = dataset$getMean(stage = stage, group = group),
@@ -2365,6 +2364,7 @@ DatasetMeans <- setRefClass("DatasetMeans",
                     sampleSizeBefore <- sampleSize - numberOfDropOutsBefore
                     if (n < sampleSizeBefore) {
                         numberOfDropOuts <- sampleSizeBefore - n
+                        numberOfDropOuts <- min(numberOfDropOuts, ceiling(n * 0.2))
                         dropOuts <- sample(c(rep(1, n - numberOfDropOuts), rep(0, numberOfDropOuts)))
                         randomData[indices[dropOuts == 0]] <- NA_real_
                         if (!is.null(randomDataBefore)) {
@@ -2601,7 +2601,7 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
             # implement survival plot here
         }
     } else {
-        data$stageGroup <- interaction(data$stage, data$group)
+        data$stageGroup <- base::interaction(data$stage, data$group)
 
         if (x$isDatasetMeans()) {
             p <- ggplot2::ggplot(ggplot2::aes(
@@ -2647,9 +2647,9 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
 
     # hide second legend
     if (x$getNumberOfGroups() == 1) {
-        p <- p + ggplot2::guides(fill = FALSE, colour = FALSE)
+        p <- p + ggplot2::guides(fill = "none", colour = "none")
     } else {
-        p <- p + ggplot2::guides(colour = FALSE)
+        p <- p + ggplot2::guides(colour = "none")
     }
 
     # set theme
@@ -2680,7 +2680,7 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
     }
     p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
 
-    p
+    suppressWarnings(print(p))
 }
 
 #'

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7428 $
-## |  Last changed: $Date: 2023-11-13 10:42:22 +0100 (Mo, 13 Nov 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -37,7 +37,8 @@ NULL
 
 .skipTestIfPipeOperatorNotAvailable <- function() {
     if (!.isPipeOperatorAvailable()) {
-        testthat::skip("The test is disabled because it works only for R version >= 4.1.0 (pipe operator is available)")
+        testthat::skip(paste0("The test is disabled because it works only for ",
+            "R version >= 4.1.0 (pipe operator is available)"))
     }
 }
 
@@ -195,7 +196,8 @@ NULL
             for (testFile in testFiles) {
                 file.copy(file.path(testthatTempSubDirectory, testFile), file.path(testFileTargetDirectory, testFile))
             }
-            message(length(testFiles), " extracted from ", sQuote(packageSource), " and copied to ", sQuote(testFileTargetDirectory))
+            message(length(testFiles), " extracted from ", sQuote(packageSource), 
+                " and copied to ", sQuote(testFileTargetDirectory))
         },
         finally = {
             if (!is.null(testthatTempDirectory)) {
@@ -214,7 +216,7 @@ NULL
     tryCatch(
         {
             version <- utils::packageVersion("rpact")
-            baseUrl <- paste0("http://", token, ":", secret, "@unit.tests.rpact.com/", version, "/tests/")
+            baseUrl <- paste0("https://", token, ":", secret, "@unit.tests.rpact.com/", version, "/tests/")
 
             if (!dir.exists(testFileTargetDirectory)) {
                 dir.create(testFileTargetDirectory)
@@ -228,7 +230,7 @@ NULL
                 file.copy(testthatBaseFile, file.path(testFileTargetDirectory, "testthat.R"))
             } else {
                 currentFile <- "testthat.R"
-                result <- download.file(
+                result <- utils::download.file(
                     url = paste0(baseUrl, "testthat.R"),
                     destfile = file.path(testFileTargetDirectory, "testthat.R"),
                     method = "auto", mode = "wb"
@@ -239,7 +241,7 @@ NULL
             }
 
             currentFile <- "index.txt"
-            result <- download.file(
+            result <- utils::download.file(
                 url = paste0(baseUrl, "testthat/index.txt"),
                 destfile = indexFile, quiet = TRUE,
                 method = "auto", mode = "wb"
@@ -264,7 +266,7 @@ NULL
             message("Start to download ", length(testFiles), " unit test files (http). Please wait...")
             for (testFile in testFiles) {
                 currentFile <- testFile
-                result <- download.file(
+                result <- utils::download.file(
                     url = paste0(baseUrl, "testthat/", testFile),
                     destfile = file.path(testthatSubDirectory, testFile), quiet = TRUE,
                     method = "auto", mode = "wb"
@@ -290,7 +292,8 @@ NULL
             .logDebug(e$message)
             stop(
                 C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "failed to download unit test files (http): illegal 'token' / 'secret' or rpact version ", version, " unknown"
+                "failed to download unit test files (http): ",
+                "illegal 'token' / 'secret' or rpact version ", version, " unknown"
             )
         },
         finally = {
@@ -373,7 +376,8 @@ NULL
             .logDebug(e$message)
             stop(
                 C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "failed to download unit test files (ftp): illegal 'token' / 'secret' or rpact version ", version, " unknown"
+                "failed to download unit test files (ftp): ",
+                "illegal 'token' / 'secret' or rpact version ", version, " unknown"
             )
         },
         finally = {
@@ -396,7 +400,8 @@ NULL
             "mode", "cacheEnabled", "extra", "cleanOldFiles", "connectionType"
         )) {
     if (is.null(connection) || !is.list(connection)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'connection' must be a list (is ", .getClassName(connection), ")")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            "'connection' must be a list (is ", .getClassName(connection), ")")
     }
 
     name <- match.arg(name)
@@ -555,7 +560,9 @@ testPackage <- function(outDir = ".", ...,
         )
     }
 
-    cat("Total runtime for testing: ", .getRuntimeString(startTime, endTime = endTime, runtimeUnits = "auto"), ".\n", sep = "")
+    cat("Total runtime for testing: ", .getRuntimeString(startTime,
+        endTime = endTime, runtimeUnits = "auto"
+    ), ".\n", sep = "")
 
     inputFileName <- file.path(outDir, "testthat.Rout")
     if (file.exists(inputFileName)) {

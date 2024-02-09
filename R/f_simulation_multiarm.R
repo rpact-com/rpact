@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7379 $
-## |  Last changed: $Date: 2023-10-30 16:19:12 +0100 (Mo, 30 Okt 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -222,7 +222,7 @@ NULL
 
         if (k < kMax) {
             futilityStop[k] <- all(futility[stageResults$selectedArms[1:gMax, k], k])
-            if (all(isFALSE(stageResults$selectedArms[1:gMax, k + 1]))) {
+            if (all(!stageResults$selectedArms[1:gMax, k + 1], na.rm = TRUE)) {
                 futilityStop[k] <- TRUE
             }
         }
@@ -290,7 +290,7 @@ NULL
     signedOverallTestStatistics[, 2] <- sqrt(informationAtInterim) *
         testStatistics[, 1] + sqrt(1 - informationAtInterim) * testStatistics[, 2]
 
-    if (all(isFALSE(stageResults$selectedArms[1:gMax, 2]))) {
+    if (all(!stageResults$selectedArms[1:gMax, 2], na.rm = TRUE)) {
         futilityStop <- TRUE
     }
 

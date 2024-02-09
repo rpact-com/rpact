@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7476 $
-## |  Last changed: $Date: 2023-12-07 11:57:03 +0100 (Do, 07 Dez 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -31,8 +31,6 @@ TimeDefinition <- setRefClass("TimeDefinition",
     methods = list(
         initialize = function(...) {
             callSuper(...)
-            .parameterNames <<- C_PARAMETER_NAMES
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
         },
         .getRegexpFromTo = function(..., from, to, fromPrefix = "", toPrefix = "") {
             return(paste0("(^ *", fromPrefix, from, " *- *", toPrefix, to, " *$)"))
@@ -636,9 +634,9 @@ PiecewiseSurvivalTime <- setRefClass("PiecewiseSurvivalTime",
             rownames(data) <- as.character(1:nrow(data))
             colnames(data) <- c(
                 "Start time",
-                C_PARAMETER_NAMES["lambda1"], # Hazard rate (1)
-                C_PARAMETER_NAMES["lambda2"]
-            ) # Hazard rate (2)
+                .getParameterCaption("lambda1", tableOutputEnabled = TRUE),
+                .getParameterCaption("lambda2", tableOutputEnabled = TRUE) 
+            ) 
             return(data)
         },
         .isPiBased = function() {
@@ -1434,7 +1432,7 @@ AccrualTime <- setRefClass("AccrualTime",
             rownames(data) <- as.character(1:nrow(data))
             colnames(data) <- c(
                 "Start time",
-                C_PARAMETER_NAMES["accrualIntensity"]
+                .getParameterCaption("accrualIntensity", .self)
             )
             return(data)
         },

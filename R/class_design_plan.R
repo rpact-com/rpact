@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7592 $
-## |  Last changed: $Date: 2024-01-24 10:48:09 +0100 (Mi, 24 Jan 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_constants.R
@@ -112,8 +112,6 @@ TrialDesignPlan <- setRefClass("TrialDesignPlan",
             callSuper(.design = design, ...)
 
             .plotSettings <<- PlotSettings()
-            .parameterNames <<- .getParameterNames(design = design, designPlan = .self)
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
 
             if (.isTrialDesignPlanMeans(.self)) {
                 defaultValueList <- C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS
@@ -1066,7 +1064,6 @@ TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
 
             groups <<- 2L
             optimumAllocationRatio <<- FALSE
-            .parameterFormatFunctions$maxInformation <<- ".formatRatesDynamic"
             .self$.setParameterType("groups", C_PARAM_NOT_APPLICABLE)
             .self$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
             .self$.setParameterType("optimumAllocationRatio", C_PARAM_NOT_APPLICABLE)

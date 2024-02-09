@@ -1,11 +1,12 @@
  <!-- badges: start -->
-[![](https://img.shields.io/badge/CRAN-3.5.0-green.svg)](https://cran.r-project.org/package=rpact)
-[![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml)
-[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
-[![Monthly downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)[![](https://img.shields.io/badge/doi-10.1007/978--3--319--32562--0-yellow.svg)](https://doi.org/10.1007/978-3-319-32562-0)
-[![shinyapps.io](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://rpact.shinyapps.io/public)
+[![](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact) 
+[![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml) 
+[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact) 
+[![Monthly downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact) 
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) 
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0) 
+[![](https://img.shields.io/badge/doi-10.1007/978--3--319--32562--0-yellow.svg)](https://doi.org/10.1007/978-3-319-32562-0) 
+[![shinyapps.io](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://rpact.shinyapps.io/public) 
 [![](https://img.shields.io/badge/RPACT-Cloud-blue.svg)](https://rpact.shinyapps.io/cloud)
  <!-- badges: end -->
 

@@ -4,7 +4,7 @@
 \alias{param_followUpTime_counts}
 \title{Parameter Description: followUpTime for Counts}
 \arguments{
-\item{followUpTime}{If specified, The assumed (additional) follow-up time for the study, there is no default.
+\item{followUpTime}{If specified, the assumed (additional) follow-up time for the study, there is no default.
 The total study duration is \code{accrualTime + followUpTime}.}
 }
 \description{

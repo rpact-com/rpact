@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7526 $
-## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -337,16 +337,6 @@ PlotSettings <- setRefClass("PlotSettings",
             .scalingEnabled <<- TRUE
             .pointScalingCorrectionEnabled <<- TRUE
             .pointBorderEnabled <<- TRUE
-
-            .parameterNames <<- list(
-                "lineSize" = "Line size",
-                "pointSize" = "Point size",
-                "pointColor" = "Point color",
-                "mainTitleFontSize" = "Main title font size",
-                "axesTextFontSize" = "Axes text font size",
-                "legendFontSize" = "Legend font size",
-                "scalingFactor" = "Scaling factor"
-            )
         },
         clone = function() {
             return(PlotSettings(

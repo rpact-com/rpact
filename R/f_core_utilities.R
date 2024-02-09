@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7557 $
-## |  Last changed: $Date: 2024-01-12 13:41:28 +0100 (Fr, 12 Jan 2024) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1045,24 +1045,8 @@ getParameterCaption <- function(obj, parameterName) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
-
-    design <- NULL
-    designPlan <- NULL
-    if (inherits(obj, "TrialDesignPlan")) {
-        designPlan <- obj
-        design <- obj$.design
-    } else if (inherits(obj, "TrialDesign")) {
-        design <- obj
-    } else {
-        design <- obj[[".design"]]
-    }
-
-    parameterNames <- .getParameterNames(design = design, designPlan = designPlan)
-    if (is.null(parameterNames) || length(parameterNames) == 0) {
-        return(NULL)
-    }
-
-    return(parameterNames[[parameterName]])
+    
+    return(.getParameterCaption(parameterName, obj))
 }
 
 #'
@@ -1094,24 +1078,29 @@ getParameterName <- function(obj, parameterCaption) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
-
-    design <- NULL
-    designPlan <- NULL
-    if (inherits(obj, "TrialDesignPlan")) {
-        designPlan <- obj
-        design <- obj$.design
-    } else if (inherits(obj, "TrialDesign")) {
-        design <- obj
-    } else {
-        design <- obj[[".design"]]
+    
+    parameterName <- getDictionaryKeyByValue(C_PARAMETER_NAMES, parameterCaption)
+    if (!is.null(parameterName)) {
+        return(parameterName)
+    }
+    
+    parameterName <- getDictionaryKeyByValue(C_PARAMETER_NAMES_PLOT_SETTINGS, parameterCaption)
+    if (!is.null(parameterName)) {
+        return(parameterName)
+    }
+    
+    fieldNames <- obj$.getVisibleFieldNames()
+    for (parameterName in fieldNames) {
+        if (identical(.getParameterCaption(parameterName, obj), parameterCaption)) {
+            return(parameterName)
+        }
+        
+        if (identical(.getParameterCaption(parameterName, obj, tableOutputEnabled = TRUE), parameterCaption)) {
+            return(parameterName)
+        }
     }
 
-    parameterNames <- .getParameterNames(design = design, designPlan = designPlan)
-    if (is.null(parameterNames) || length(parameterNames) == 0) {
-        return(NULL)
-    }
-
-    return(unique(names(parameterNames)[parameterNames == parameterCaption]))
+    return("unknown")
 }
 
 .removeLastEntryFromArray <- function(x) {
