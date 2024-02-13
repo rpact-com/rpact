@@ -197,7 +197,7 @@ NULL
 }
 
 .isSimulationResults <- function(simulationResults) {
-    return(inherits(simulationResults, "SimulationResults"))
+    return(inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResultsR6"))
 }
 
 .assertIsSimulationResults <- function(simulationResults) {
@@ -447,15 +447,15 @@ NULL
 }
 
 .isDatasetMeans <- function(dataInput) {
-    return(inherits(dataInput, "DatasetMeans"))
+    return(inherits(dataInput, "DatasetMeans") || inherits(dataInput, "DatasetMeansR6"))
 }
 
 .isDatasetRates <- function(dataInput) {
-    return(inherits(dataInput, "DatasetRates"))
+    return(inherits(dataInput, "DatasetRates") || inherits(dataInput, "DatasetRatesR6"))
 }
 
 .isDatasetSurvival <- function(dataInput) {
-    return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
+    return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetSurvivalR6") || inherits(dataInput, "DatasetEnrichmentSurvival") || inherits(dataInput, "DatasetEnrichmentSurvivalR6"))
 }
 
 .assertIsNumericVector <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = TRUE) {
@@ -2146,7 +2146,7 @@ NULL
 }
 
 .isMultiArmDataset <- function(dataInput) {
-    return(inherits(dataInput, "Dataset") && dataInput$getNumberOfGroups() > 2)
+    return((inherits(dataInput, "Dataset") || inherits(dataInput, "DatasetR6")) && dataInput$getNumberOfGroups() > 2)
 }
 
 .isMultiArmStageResults <- function(stageResults) {
@@ -2171,7 +2171,7 @@ NULL
 }
 
 .isEnrichmentDataset <- function(dataInput) {
-    return(inherits(dataInput, "Dataset") && dataInput$.enrichmentEnabled)
+    return((inherits(dataInput, "Dataset") || inherits(dataInput, "DatasetR6")) && dataInput$.enrichmentEnabled)
 }
 
 .isEnrichmentAnalysisResults <- function(analysisResults) {
@@ -2179,11 +2179,11 @@ NULL
 }
 
 .isMultiArmSimulationResults <- function(simulationResults) {
-    return(inherits(simulationResults, "SimulationResults") && grepl("MultiArm", .getClassName(simulationResults)))
+    return((inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResultsR6")) && grepl("MultiArm", .getClassName(simulationResults)))
 }
 
 .isEnrichmentSimulationResults <- function(simulationResults) {
-    return(inherits(simulationResults, "SimulationResults") && grepl("Enrichment", .getClassName(simulationResults)))
+    return((inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResultsR6")) && grepl("Enrichment", .getClassName(simulationResults)))
 }
 
 .assertIsStageResultsMultiArm <- function(stageResults) {

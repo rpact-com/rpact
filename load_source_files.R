@@ -35,7 +35,9 @@ library(rpact.as251)
 tic()
 
 Sys.setenv("RPACT_COMPILE_CPP_FILES" = FALSE)
-Sys.setenv("RPACT_DEVELOPMENT_MODE" = TRUE)
+#Sys.setenv("RPACT_DEVELOPMENT_MODE" = TRUE)
+Sys.setenv("RPACT_DEVELOPMENT_MODE" = FALSE)
+Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
 
 #print("The following packages are not up to date:")
 #pacman::p_update(FALSE)
@@ -75,26 +77,32 @@ fileNames <- c(
   "class_design_r6",
   "class_core_plot_settings_r6",
   "class_design_set_r6",
+  "class_event_probabilities_r6",
+  "class_time_r6",
+  "class_design_power_and_asn_r6",
+  "class_performance_score_r6",
   "f_core_constants", 
   "class_design_plan_r6",
   "f_design_utilities",
   "f_analysis_utilities",
+  "class_analysis_dataset_r6",
   "class_core_parameter_set",
+  "class_simulation_results_r6",
   #"class_core_plot_settings",
   "f_core_assertions",
   "f_core_utilities", 
   #"class_design",
   #"class_design_set",
-  "class_design_power_and_asn",
-  "class_time",
+  #"class_design_power_and_asn",
+  #"class_time",
   "class_summary", 
   "f_logger",
   #"class_design_plan",
-  "class_analysis_dataset",
+  #"class_analysis_dataset",
   #"class_analysis_stage_results",
   #"class_analysis_results",
-  "class_simulation_results",
-  "class_event_probabilities",
+  #"class_simulation_results",
+  #"class_event_probabilities",
   "f_core_output_formats",
   "f_core_plot",
   "f_design_group_sequential",
@@ -112,6 +120,7 @@ fileNames <- c(
   "f_analysis_multiarm_rates",
   "f_analysis_multiarm_survival",	
   "f_analysis_multiarm",
+  "f_simulation_calc_subjects_function",
   "f_simulation_base_means",
   "f_simulation_base_rates",
   "f_simulation_base_survival",
@@ -120,7 +129,9 @@ fileNames <- c(
   "f_simulation_multiarm_rates",
   "f_simulation_multiarm_survival",
   "f_simulation_utilities",
-  "f_parameter_set_utilities"
+  "f_simulation_performance_score",
+  "f_parameter_set_utilities",
+  "f_object_r_code"
 )
 
 # https://stackoverflow.com/questions/17635531/calling-cuda-compiled-dll-from-r
@@ -177,6 +188,7 @@ if (as.logical(Sys.getenv("RPACT_COMPILE_CPP_FILES")) || !exists("getSimulationS
         }
     }
 }
+
 
 print("Initialization completed.")
 

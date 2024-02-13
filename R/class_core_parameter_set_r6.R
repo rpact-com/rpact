@@ -307,6 +307,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
                               .getParametersOfOneGroup = function(parameterType) {
                                 if (length(parameterType) == 1) {
                                   parameterNames <- names(self$.parameterTypes[self$.parameterTypes == parameterType])
+                                  
                                 } else {
                                   parameterNames <- names(self$.parameterTypes[which(self$.parameterTypes %in% parameterType)])
                                 }
@@ -580,7 +581,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
                                 }
                                 if (!is.null(category) && !is.na(category)) {
                                   if (.isMultiArmSimulationResults(self) && paramName == "singleNumberOfEventsPerStage") {
-                                    if (!inherits(self, "SimulationResultsEnrichmentSurvival") &&
+                                    if (!(inherits(self, "SimulationResultsEnrichmentSurvival") || inherits(self, "SimulationResultsEnrichmentSurvivalR6")) &&
                                         !is.na(numberOfCategories) && numberOfCategories == category) {
                                       category <- "control"
                                     }
@@ -637,7 +638,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
                                       }
                                     }
                                   } else if (.isMultiArmAnalysisResults(self) || grepl("StageResultsMultiArm", .getClassName(self)) ||
-                                             (inherits(self, "SimulationResults") && paramName == "effectMatrix") ||
+                                             ((inherits(self, "SimulationResults") || inherits(self, "SimulationResultsR6")) && paramName == "effectMatrix") ||
                                              (inherits(self, "ClosedCombinationTestResults") &&
                                               paramName %in% c("rejected", "separatePValues"))) {
                                     paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
@@ -1292,7 +1293,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
     parametersToIgnore <- c(parametersToIgnore, "hazardRatio")
   }
   
-  if (!inherits(parameterSet, "AccrualTime")) {
+  if (!(inherits(parameterSet, "AccrualTime") || !inherits(parameterSet, "AccrualTimeR6"))) {
     accrualTime <- parameterSet[["accrualTime"]]
     if (!is.null(accrualTime) && length(accrualTime) > 1) {
       parametersToIgnore <- c(parametersToIgnore, c("accrualTime", "accrualIntensity"))
@@ -1542,7 +1543,7 @@ as.matrix.FieldSetR6 <- function(x, ..., enforceRowNames = TRUE, niceColumnNames
     return(result)
   }
   
-  if (inherits(x, "PowerAndAverageSampleNumberResult")) {
+  if (inherits(x, "PowerAndAverageSampleNumberResult") || inherits(x, "PowerAndAverageSampleNumberResultR6")) {
     dimnames(result)[[1]] <- rep("", nrow(result))
     return(result)
   }
@@ -1621,9 +1622,9 @@ summary.ParameterSetR6 <- function(object, ..., type = 1, digits = NA_integer_, 
   }
   
   if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesignR6") || inherits(object, "TrialDesignPlan") || inherits(object, "TrialDesignPlanR6") ||
-                    inherits(object, "SimulationResults") || (inherits(object, "AnalysisResults") || inherits(object, "AnalysisResultsR6")) ||
+                    inherits(object, "SimulationResults") || inherits(object, "SimulationResultsR6") || (inherits(object, "AnalysisResults") || inherits(object, "AnalysisResultsR6")) ||
                     inherits(object, "TrialDesignCharacteristics") || inherits(object, "TrialDesignCharacteristicsR6") ||
-                    inherits(object, "PerformanceScore"))) {
+                    inherits(object, "PerformanceScore") || inherits(object, "PerformanceScoreR6"))) {
     output <- match.arg(output)
     return(.createSummary(object, digits = digits, output = output))
   }

@@ -2936,7 +2936,7 @@ getEventProbabilities <- function(time, ...,
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all rates (lambda2) must be > 0")
     }
 
-    eventProbabilities <- EventProbabilities(
+    eventProbabilities <- EventProbabilitiesR6$new(
         .piecewiseSurvivalTime = setting,
         .accrualTime           = accrualSetup,
         time                   = time,
@@ -3102,7 +3102,7 @@ getNumberOfSubjects <- function(time, ...,
         accrualIntensity = accrualIntensity, maxNumberOfSubjects = maxNumberOfSubjects
     )
 
-    result <- NumberOfSubjects(
+    result <- NumberOfSubjectsR6$new(
         .accrualTime = accrualSetup,
         time = time,
         accrualTime = accrualTime,

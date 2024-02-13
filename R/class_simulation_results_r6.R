@@ -39,9 +39,9 @@ NULL
 #'
 #' @keywords internal
 #'
-names.SimulationResults <- function(x) {
+names.SimulationResultsR6 <- function(x) {
     namesToShow <- c(".design", ".data", ".rawData")
-    if (inherits(x, "SimulationResultsSurvival")) {
+    if (inherits(x, "SimulationResultsSurvival") || inherits(x, "SimulationResultsSurvivalR6")) {
         namesToShow <- c(namesToShow, ".piecewiseSurvivalTime", ".accrualTime")
     }
     namesToShow <- c(namesToShow, x$.getVisibleFieldNames())
@@ -86,39 +86,39 @@ names.SimulationResults <- function(x) {
 #'
 #' @importFrom methods new
 #'
-SimulationResults <- setRefClass("SimulationResults",
-    contains = "ParameterSet",
-    fields = list(
-        .plotSettings = "ANY",
-        .design = "ANY",
-        .data = "data.frame",
-        .rawData = "data.frame",
-        .showStatistics = "logical",
-        maxNumberOfIterations = "integer",
-        seed = "numeric",
-        allocationRatioPlanned = "numeric",
-        conditionalPower = "numeric",
-        iterations = "matrix",
-        futilityPerStage = "matrix",
-        futilityStop = "numeric"
-    ),
-    methods = list(
+SimulationResultsR6 <- R6Class("SimulationResultsR6",
+    inherit = ParameterSetR6,
+    public = list(
+        .plotSettings = NULL,
+        .design = NULL,
+        .data = NULL,
+        .rawData = NULL,
+        .showStatistics = NULL,
+        maxNumberOfIterations = NULL,
+        seed = NULL,
+        allocationRatioPlanned = NULL,
+        conditionalPower = NULL,
+        iterations = NULL,
+        futilityPerStage = NULL,
+        futilityStop = NULL,
         initialize = function(design, ..., showStatistics = FALSE) {
-            callSuper(.design = design, .showStatistics = showStatistics, ...)
+            super$initialize(...)
+            self$.design <- design
+            self$.showStatistics <- showStatistics
 
-            .plotSettings <<- PlotSettingsR6$new()
-            .parameterNames <<- .getParameterNames(design = design, designPlan = .self)
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
+            self$.plotSettings <- PlotSettingsR6$new()
+            self$.parameterNames <- .getParameterNames(design = design, designPlan = self)
+            self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
         },
         getPlotSettings = function() {
-            return(.plotSettings)
+            return(self$.plotSettings)
         },
         setShowStatistics = function(showStatistics) {
             .assertIsSingleLogical(showStatistics, "showStatistics")
-            .showStatistics <<- showStatistics
+            self$.showStatistics <- showStatistics
         },
         show = function(showType = 1, digits = NA_integer_, showStatistics = FALSE) {
-            .show(
+            self$.show(
                 showType = showType, digits = digits, showStatistics = showStatistics,
                 consoleOutputEnabled = TRUE
             )
@@ -127,14 +127,14 @@ SimulationResults <- setRefClass("SimulationResults",
                 showStatistics = FALSE, consoleOutputEnabled = TRUE, performanceScore = NULL) {
             "Method for automatically printing simulation result objects"
 
-            .resetCat()
+            self$.resetCat()
             if (showType == 3) {
-                .createSummary(.self, digits = digits)$.show(
+                .createSummary(self, digits = digits)$.show(
                     showType = 1,
                     digits = digits, consoleOutputEnabled = consoleOutputEnabled
                 )
             } else if (showType == 2) {
-                callSuper(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             } else {
                 if (is.null(showStatistics) || length(showStatistics) != 1) {
                     stop(
@@ -145,59 +145,59 @@ SimulationResults <- setRefClass("SimulationResults",
                 }
 
                 if (!is.character(showStatistics) || showStatistics != "exclusive") {
-                    .cat(.toString(startWithUpperCase = TRUE), ":\n\n",
+                    self$.cat(self$.toString(startWithUpperCase = TRUE), ":\n\n",
                         heading = 1,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
 
-                    .showParametersOfOneGroup(.getDesignParametersToShow(.self), "Design parameters",
+                    self$.showParametersOfOneGroup(.getDesignParametersToShow(self), "Design parameters",
                         orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                     )
 
-                    userDefinedParameters <- .getUserDefinedParameters()
-                    if (inherits(.self, "SimulationResultsSurvival") &&
-                            .self$.piecewiseSurvivalTime$delayedResponseEnabled) {
+                    userDefinedParameters <- self$.getUserDefinedParameters()
+                    if ((inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvivalR6")) &&
+                            self$.piecewiseSurvivalTime$delayedResponseEnabled) {
                         userDefinedParameters <- c(
                             userDefinedParameters,
                             ".piecewiseSurvivalTime$delayedResponseEnabled"
                         )
                     }
-                    .showParametersOfOneGroup(userDefinedParameters, "User defined parameters",
+                    self$.showParametersOfOneGroup(userDefinedParameters, "User defined parameters",
                         orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                     )
-                    derivedParameters <- .getDerivedParameters()
+                    derivedParameters <- self$.getDerivedParameters()
                     if (length(derivedParameters) > 0) {
-                        .showParametersOfOneGroup(derivedParameters, "Derived from user defined parameters",
+                        self$.showParametersOfOneGroup(derivedParameters, "Derived from user defined parameters",
                             orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                         )
                     }
-                    .showParametersOfOneGroup(.getDefaultParameters(), "Default parameters",
+                    self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
                         orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                     )
-                    .showParametersOfOneGroup(.getGeneratedParameters(), "Results",
+                    self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Results",
                         orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                     )
-                    .showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+                    self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
                 }
 
                 ## statistics of simulated data
-                if (isTRUE(showStatistics) || .showStatistics ||
+                if (isTRUE(showStatistics) || self$.showStatistics ||
                         (is.character(showStatistics) && showStatistics == "exclusive")) {
-                    .cat("Simulated data:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat("Simulated data:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                     params <- c()
-                    if (inherits(.self, "SimulationResultsMeans")) {
+                    if (inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeansR6")) {
                         params <- c(
                             "effectMeasure",
                             "numberOfSubjects",
                             "testStatistic"
                         )
-                    } else if (inherits(.self, "SimulationResultsRates")) {
+                    } else if (inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsRatesR6")) {
                         params <- c(
                             "effectMeasure",
                             "numberOfSubjects",
                             "testStatistic"
                         )
-                    } else if (inherits(.self, "SimulationResultsSurvival")) {
+                    } else if (inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvivalR6")) {
                         params <- c(
                             "effectMeasure",
                             "analysisTime",
@@ -209,8 +209,8 @@ SimulationResults <- setRefClass("SimulationResults",
                             "logRankStatistic",
                             "hazardRatioEstimateLR"
                         )
-                    } else if (inherits(.self, "SimulationResultsMultiArmMeans") ||
-                            inherits(.self, "SimulationResultsMultiArmRates")) {
+                    } else if (inherits(self, "SimulationResultsMultiArmMeans") || inherits(self, "SimulationResultsMultiArmMeansR6") ||
+                            inherits(self, "SimulationResultsMultiArmRates") || inherits(self, "SimulationResultsMultiArmRatesR6")) {
                         params <- c(
                             "effectMeasure",
                             "subjectsActiveArm",
@@ -220,8 +220,8 @@ SimulationResults <- setRefClass("SimulationResults",
                             "successStop",
                             "futilityPerStage"
                         )
-                    } else if (inherits(.self, "SimulationResultsEnrichmentMeans") ||
-                            inherits(.self, "SimulationResultsEnrichmentRates")) {
+                    } else if (inherits(self, "SimulationResultsEnrichmentMeans") || inherits(self, "SimulationResultsEnrichmentMeansR6") ||
+                            inherits(self, "SimulationResultsEnrichmentRates") || inherits(self, "SimulationResultsEnrichmentRatesR6")) {
                         params <- c(
                             "effectMeasure",
                             "subjectsPopulation",
@@ -231,8 +231,8 @@ SimulationResults <- setRefClass("SimulationResults",
                             "successStop",
                             "futilityPerStage"
                         )
-                    } else if (inherits(.self, "SimulationResultsMultiArmSurvival") ||
-                            inherits(.self, "SimulationResultsEnrichmentSurvival")) {
+                    } else if (inherits(self, "SimulationResultsMultiArmSurvival") || inherits(self, "SimulationResultsMultiArmSurvivalR6") ||
+                            inherits(self, "SimulationResultsEnrichmentSurvival") || inherits(self, "SimulationResultsEnrichmentSurvivalR6")) {
                         params <- c(
                             "effectMeasure",
                             "numberOfEvents",
@@ -245,22 +245,22 @@ SimulationResults <- setRefClass("SimulationResults",
                         )
                     }
 
-                    if (!is.null(.self[["conditionalPowerAchieved"]]) &&
-                            !all(is.na(conditionalPowerAchieved)) &&
-                            any(!is.na(conditionalPowerAchieved)) &&
-                            any(na.omit(conditionalPowerAchieved) != 0)) {
+                    if (!is.null(self[["conditionalPowerAchieved"]]) &&
+                            !all(is.na(self$conditionalPowerAchieved)) &&
+                            any(!is.na(self$conditionalPowerAchieved)) &&
+                            any(na.omit(self$conditionalPowerAchieved) != 0)) {
                         params <- c(params, "conditionalPowerAchieved")
                     }
 
-                    stages <- sort(unique(.self$.data$stageNumber))
+                    stages <- sort(unique(self$.data$stageNumber))
 
-                    variedParameterName1 <- .getVariedParameterName(1)
-                    variedParameterName2 <- .getVariedParameterName(2)
-                    parameterValues1 <- .getVariedParameterValues(variedParameterName1)
-                    parameterValues2 <- .getVariedParameterValues(variedParameterName2)
+                    variedParameterName1 <- self$.getVariedParameterName(1)
+                    variedParameterName2 <- self$.getVariedParameterName(2)
+                    parameterValues1 <- self$.getVariedParameterValues(variedParameterName1)
+                    parameterValues2 <- self$.getVariedParameterValues(variedParameterName2)
 
                     for (parameterName in params) {
-                        paramCaption <- .parameterNames[[parameterName]]
+                        paramCaption <- self$.parameterNames[[parameterName]]
                         if (is.null(paramCaption)) {
                             paramCaption <- paste0("%", parameterName, "%")
                         }
@@ -269,7 +269,7 @@ SimulationResults <- setRefClass("SimulationResults",
                             for (parameterValue2 in parameterValues2) {
                                 for (stage in stages) {
                                     if (length(parameterValues1) > 1) {
-                                        .catStatisticsLine(
+                                        self$.catStatisticsLine(
                                             stage = stage,
                                             parameterName = parameterName,
                                             paramCaption = paramCaption,
@@ -280,7 +280,7 @@ SimulationResults <- setRefClass("SimulationResults",
                                             consoleOutputEnabled = consoleOutputEnabled
                                         )
                                     } else {
-                                        .catStatisticsLine(
+                                        self$.catStatisticsLine(
                                             stage = stage,
                                             parameterName = parameterName,
                                             paramCaption = paramCaption,
@@ -293,7 +293,7 @@ SimulationResults <- setRefClass("SimulationResults",
                             }
                             if (parameterName == "subjectsActiveArm" && variedParameterName2 == "armNumber") {
                                 parameterName2 <- "subjectsControlArm"
-                                paramCaption2 <- .parameterNames[[parameterName2]]
+                                paramCaption2 <- self$.parameterNames[[parameterName2]]
                                 if (is.null(paramCaption2)) {
                                     paramCaption2 <- paste0("%", parameterName2, "%")
                                 }
@@ -312,12 +312,12 @@ SimulationResults <- setRefClass("SimulationResults",
                             }
                         }
                     }
-                    .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
 
-                twoGroupsEnabled <- !inherits(.self, "SimulationResultsMeans")
-                multiArmSurvivalEnabled <- inherits(.self, "SimulationResultsMultiArmSurvival")
-                enrichmentEnabled <- grepl("SimulationResultsEnrichment", .getClassName(.self))
+                twoGroupsEnabled <- !(inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeansR6"))
+                multiArmSurvivalEnabled <- inherits(self, "SimulationResultsMultiArmSurvival") || inherits(self, "SimulationResultsMultiArmSurvivalR6")
+                enrichmentEnabled <- grepl("SimulationResultsEnrichment", .getClassName(self))
 
                 if (!is.null(performanceScore)) {
                     performanceScore$.showParametersOfOneGroup(
@@ -327,60 +327,60 @@ SimulationResults <- setRefClass("SimulationResults",
                     performanceScore$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
                 }
 
-                if (.design$kMax > 1 || twoGroupsEnabled || multiArmSurvivalEnabled) {
-                    .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                if (self$.design$kMax > 1 || twoGroupsEnabled || multiArmSurvivalEnabled) {
+                    self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
 
                     if (multiArmSurvivalEnabled) {
-                        .cat("  (i): values of treatment arm i compared to control\n", consoleOutputEnabled = consoleOutputEnabled)
-                        .cat("  {j}: values of treatment arm j\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat("  (i): values of treatment arm i compared to control\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat("  {j}: values of treatment arm j\n", consoleOutputEnabled = consoleOutputEnabled)
                     } else if (enrichmentEnabled) {
-                        matrixName <- .getSimulationEnrichmentEffectMatrixName(.self)
-                        if (nrow(.self$effectList[[matrixName]]) > 1) {
-                            .cat("  (i): results of situation i\n", consoleOutputEnabled = consoleOutputEnabled)
+                        matrixName <- .getSimulationEnrichmentEffectMatrixName(self)
+                        if (nrow(self$effectList[[matrixName]]) > 1) {
+                            self$.cat("  (i): results of situation i\n", consoleOutputEnabled = consoleOutputEnabled)
                         }
                     } else if (twoGroupsEnabled) {
-                        .cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
-                    if (.design$kMax > 1) {
-                        .cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
+                    if (self$.design$kMax > 1) {
+                        self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
 
                     if (enrichmentEnabled) {
-                        if (length(.self$effectList$subGroups) > 1) {
-                            .cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                        if (length(self$effectList$subGroups) > 1) {
+                            self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
                         }
-                        .cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
-                        if (length(.self$effectList$subGroups) > 1) {
-                            .cat(paste0("  R: remaining population\n"), consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
+                        if (length(self$effectList$subGroups) > 1) {
+                            self$.cat(paste0("  R: remaining population\n"), consoleOutputEnabled = consoleOutputEnabled)
                         }
                     }
 
-                    .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
             }
         },
         .getVariedParameterName = function(number = 1) {
             if (number == 2) {
-                if (!inherits(.self, "SimulationResultsMeans") &&
-                        !inherits(.self, "SimulationResultsRates") &&
-                        !inherits(.self, "SimulationResultsSurvival") &&
-                        grepl("MultiArm", .getClassName(.self))) {
+                if (!(inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeansR6")) &&
+                        !(inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsRatesR6")) &&
+                        !(inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvivalR6")) &&
+                        grepl("MultiArm", .getClassName(self))) {
                     return("armNumber")
                 }
                 return(NA_character_)
             }
 
             variedParameterName1 <- NA_character_
-            if (inherits(.self, "SimulationResultsMeans")) {
+            if (inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeansR6")) {
                 variedParameterName1 <- "alternative"
-            } else if (inherits(.self, "SimulationResultsRates") || inherits(.self, "SimulationResultsSurvival")) {
+            } else if (inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsRatesR6") || inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvivalR6")) {
                 variedParameterName1 <- "pi1"
-            } else if (grepl("MultiArm", .getClassName(.self))) {
-                if (inherits(.self, "SimulationResultsMultiArmMeans")) {
+            } else if (grepl("MultiArm", .getClassName(self))) {
+                if (inherits(self, "SimulationResultsMultiArmMeans") || inherits(self, "SimulationResultsMultiArmMeansR6")) {
                     variedParameterName1 <- "muMax"
-                } else if (inherits(.self, "SimulationResultsMultiArmRates")) {
+                } else if (inherits(self, "SimulationResultsMultiArmRates") || inherits(self, "SimulationResultsMultiArmRatesR6")) {
                     variedParameterName1 <- "piMax"
-                } else if (inherits(.self, "SimulationResultsMultiArmSurvival")) {
+                } else if (inherits(self, "SimulationResultsMultiArmSurvival") || inherits(self, "SimulationResultsMultiArmSurvivalR6")) {
                     variedParameterName1 <- "omegaMax"
                 }
             }
@@ -391,7 +391,7 @@ SimulationResults <- setRefClass("SimulationResults",
                 return(NA_real_)
             }
 
-            parameterValues <- .self$.data[[variedParameterName]]
+            parameterValues <- self$.data[[variedParameterName]]
             if (is.null(parameterValues)) {
                 return(NA_real_)
             }
@@ -419,34 +419,34 @@ SimulationResults <- setRefClass("SimulationResults",
             postfix <- ""
             if (!is.na(parameterValue1)) {
                 if (!all(is.na(parameterValue2))) {
-                    postfix <- paste0(postfix, .getVariedParameterValueString(
+                    postfix <- paste0(postfix, self$.getVariedParameterValueString(
                         variedParameterName1, parameterValue1
                     ))
                     if (parameterName != "subjectsControlArm") {
-                        postfix <- paste0(postfix, .getVariedParameterValueString(
+                        postfix <- paste0(postfix, self$.getVariedParameterValueString(
                             variedParameterName2, parameterValue2
                         ))
                     }
-                    paramValue <- .self$.data[[parameterName]][
-                        .self$.data$stageNumber == stage &
-                            .self$.data[[variedParameterName1]] == parameterValue1 &
-                            .self$.data[[variedParameterName2]] %in% parameterValue2
+                    paramValue <- self$.data[[parameterName]][
+                        self$.data$stageNumber == stage &
+                            self$.data[[variedParameterName1]] == parameterValue1 &
+                            self$.data[[variedParameterName2]] %in% parameterValue2
                     ]
                 } else {
-                    postfix <- paste0(postfix, .getVariedParameterValueString(
+                    postfix <- paste0(postfix, self$.getVariedParameterValueString(
                         variedParameterName1, parameterValue1
                     ))
-                    paramValue <- .self$.data[[parameterName]][
-                        .self$.data$stageNumber == stage &
-                            .self$.data[[variedParameterName1]] == parameterValue1
+                    paramValue <- self$.data[[parameterName]][
+                        self$.data$stageNumber == stage &
+                            self$.data[[variedParameterName1]] == parameterValue1
                     ]
                 }
             } else {
-                paramValue <- .self$.data[[parameterName]][
-                    .self$.data$stageNumber == stage
+                paramValue <- self$.data[[parameterName]][
+                    self$.data$stageNumber == stage
                 ]
             }
-            if (.design$kMax > 1) {
+            if (self$.design$kMax > 1) {
                 postfix <- paste0(postfix, " [", stage, "]")
             }
 
@@ -456,7 +456,7 @@ SimulationResults <- setRefClass("SimulationResults",
 
             variableNameFormatted <- .getFormattedVariableName(
                 name = paramCaption,
-                n = .getNChar(), prefix = "", postfix = postfix
+                n = self$.getNChar(), prefix = "", postfix = postfix
             )
 
             if (!is.null(paramValue)) {
@@ -472,39 +472,39 @@ SimulationResults <- setRefClass("SimulationResults",
                 }
                 output <- paste(variableNameFormatted, paramValueFormatted, "\n")
                 if (!grepl(": median \\[range\\]: NA \\[NA - NA\\]", output)) {
-                    .cat(output, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(output, consoleOutputEnabled = consoleOutputEnabled)
                 }
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
             s <- "simulation of"
 
-            if (grepl("MultiArm", .getClassName(.self)) && !is.null(.self[["activeArms"]]) && .self$activeArms > 1) {
+            if (grepl("MultiArm", .getClassName(self)) && !is.null(self[["activeArms"]]) && self$activeArms > 1) {
                 s <- paste(s, "multi-arm")
             }
 
-            if (grepl("Enrichment", .getClassName(.self)) && !is.null(.self[["populations"]]) && .self$populations > 1) {
+            if (grepl("Enrichment", .getClassName(self)) && !is.null(self[["populations"]]) && self$populations > 1) {
                 s <- paste(s, "enrichment")
             }
 
-            if (inherits(.self, "SimulationResultsBaseMeans")) {
+            if (inherits(self, "SimulationResultsBaseMeans") || inherits(self, "SimulationResultsBaseMeansR6")) {
                 s <- paste(s, "means")
-            } else if (inherits(.self, "SimulationResultsBaseRates")) {
+            } else if (inherits(self, "SimulationResultsBaseRates") || inherits(self, "SimulationResultsBaseRatesR6")) {
                 s <- paste(s, "rates")
-            } else if (inherits(.self, "SimulationResultsBaseSurvival")) {
+            } else if (inherits(self, "SimulationResultsBaseSurvival") || inherits(self, "SimulationResultsBaseSurvivalR6")) {
                 s <- paste(s, "survival data")
             } else {
                 s <- paste(s, "results")
             }
 
-            if (.design$kMax > 1) {
-                if (.isTrialDesignGroupSequential(.design)) {
+            if (self$.design$kMax > 1) {
+                if (.isTrialDesignGroupSequential(self$.design)) {
                     s <- paste(s, "(group sequential design)")
-                } else if (.isTrialDesignInverseNormal(.design)) {
+                } else if (.isTrialDesignInverseNormal(self$.design)) {
                     s <- paste(s, "(inverse normal combination test design)")
-                } else if (.isTrialDesignFisher(.design)) {
+                } else if (.isTrialDesignFisher(self$.design)) {
                     s <- paste(s, "(Fisher's combination test design)")
-                } else if (.isTrialDesignConditionalDunnett(.design)) {
+                } else if (.isTrialDesignConditionalDunnett(self$.design)) {
                     s <- paste(s, "(conditional Dunnett design)")
                 }
             } else {
@@ -513,7 +513,7 @@ SimulationResults <- setRefClass("SimulationResults",
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         },
         .getParametersToShow = function() {
-            parametersToShow <- .getVisibleFieldNames()
+            parametersToShow <- self$.getVisibleFieldNames()
             y <- c(
                 "eventsPerStage",
                 "overallEventsPerStage",
@@ -524,7 +524,7 @@ SimulationResults <- setRefClass("SimulationResults",
                 "rejectedArmsPerStage",
                 "rejectedPopulationsPerStage"
             )
-            if (.design$kMax > 2) {
+            if (self$.design$kMax > 2) {
                 y <- c(y, "futilityStop")
             }
             y <- c(
@@ -549,29 +549,27 @@ SimulationResults <- setRefClass("SimulationResults",
             return(FALSE)
         },
         getRawDataResults = function(maxNumberOfIterations = NA_integer_) {
-            return(.getSimulationParametersFromRawData(.self$.data,
-                variantName = .getVariedParameterName(),
+            return(.getSimulationParametersFromRawData(self$.data,
+                variantName = self$.getVariedParameterName(),
                 maxNumberOfIterations = maxNumberOfIterations
             ))
         }
     )
 )
 
-SimulationResultsBaseMeans <- setRefClass("SimulationResultsBaseMeans",
-    contains = "SimulationResults",
-    fields = list(
-        stDev = "numeric",
-        plannedSubjects = "numeric",
-        minNumberOfSubjectsPerStage = "numeric",
-        maxNumberOfSubjectsPerStage = "numeric",
-        thetaH1 = "numeric",
-        stDevH1 = "numeric",
-        calcSubjectsFunction = "ANY",
-        expectedNumberOfSubjects = "numeric"
-    ),
-    methods = list(
+SimulationResultsBaseMeansR6 <- R6Class("SimulationResultsBaseMeansR6",
+    inherit = SimulationResultsR6,
+    public = list(
+        stDev =NULL,
+        plannedSubjects =NULL,
+        minNumberOfSubjectsPerStage =NULL,
+        maxNumberOfSubjectsPerStage =NULL,
+        thetaH1 =NULL,
+        stDevH1 =NULL,
+        calcSubjectsFunction =NULL,
+        expectedNumberOfSubjects =NULL,
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
             generatedParams <- c(
                 "iterations",
                 "expectedNumberOfSubjects",
@@ -585,7 +583,7 @@ SimulationResultsBaseMeans <- setRefClass("SimulationResultsBaseMeans",
                 generatedParams <- c(generatedParams, "futilityStop")
             }
             for (generatedParam in generatedParams) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
@@ -649,25 +647,23 @@ SimulationResultsBaseMeans <- setRefClass("SimulationResultsBaseMeans",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMeans <- setRefClass("SimulationResultsMeans",
-    contains = "SimulationResultsBaseMeans",
-    fields = list(
-        meanRatio = "logical",
-        thetaH0 = "numeric",
-        normalApproximation = "logical",
-        alternative = "numeric",
-        groups = "integer",
-        directionUpper = "logical",
-        effect = "numeric",
-        earlyStop = "numeric",
-        sampleSizes = "matrix",
-        overallReject = "numeric", # = rejectedArmsPerStage in multi-arm
-        rejectPerStage = "matrix",
-        conditionalPowerAchieved = "matrix"
-    ),
-    methods = list(
+SimulationResultsMeansR6 <- R6Class("SimulationResultsMeansR6",
+    inherit = SimulationResultsBaseMeansR6,
+    public = list(
+        meanRatio =NULL,
+        thetaH0 =NULL,
+        normalApproximation =NULL,
+        alternative =NULL,
+        groups =NULL,
+        directionUpper =NULL,
+        effect =NULL,
+        earlyStop =NULL,
+        sampleSizes =NULL,
+        overallReject =NULL, # = rejectedArmsPerStage in multi-arm
+        rejectPerStage =NULL,
+        conditionalPowerAchieved =NULL,
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
         }
     )
 )
@@ -735,36 +731,34 @@ SimulationResultsMeans <- setRefClass("SimulationResultsMeans",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmMeans <- setRefClass("SimulationResultsMultiArmMeans",
-    contains = "SimulationResultsBaseMeans",
-    fields = list(
-        activeArms = "integer",
-        effectMatrix = "matrix",
-        typeOfShape = "character",
-        muMaxVector = "numeric",
-        gED50 = "numeric",
-        slope = "numeric",
-        intersectionTest = "character",
-        adaptations = "logical",
-        typeOfSelection = "character",
-        effectMeasure = "character",
-        successCriterion = "character",
-        epsilonValue = "numeric",
-        rValue = "numeric",
-        threshold = "numeric",
-        selectArmsFunction = "function",
-        earlyStop = "matrix",
-        selectedArms = "array",
-        numberOfActiveArms = "matrix",
-        rejectAtLeastOne = "numeric",
-        rejectedArmsPerStage = "array",
-        successPerStage = "matrix",
-        sampleSizes = "array",
-        conditionalPowerAchieved = "matrix"
-    ),
-    methods = list(
+SimulationResultsMultiArmMeansR6 <- R6Class("SimulationResultsMultiArmMeansR6",
+    inherit = SimulationResultsBaseMeansR6,
+    public = list(
+        activeArms = NULL,
+        effectMatrix = NULL,
+        typeOfShape = NULL,
+        muMaxVector = NULL,
+        gED50 = NULL,
+        slope = NULL,
+        intersectionTest = NULL,
+        adaptations = NULL,
+        typeOfSelection = NULL,
+        effectMeasure = NULL,
+        successCriterion = NULL,
+        epsilonValue = NULL,
+        rValue = NULL,
+        threshold = NULL,
+        selectArmsFunction = NULL,
+        earlyStop = NULL,
+        selectedArms = NULL,
+        numberOfActiveArms = NULL,
+        rejectAtLeastOne = NULL,
+        rejectedArmsPerStage = NULL,
+        successPerStage = NULL,
+        sampleSizes = NULL,
+        conditionalPowerAchieved = matrix(),
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
 
             for (generatedParam in c(
                 "rejectAtLeastOne",
@@ -773,25 +767,23 @@ SimulationResultsMultiArmMeans <- setRefClass("SimulationResultsMultiArmMeans",
                 "rejectedArmsPerStage",
                 "successPerStage"
             )) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
 )
 
-SimulationResultsBaseRates <- setRefClass("SimulationResultsBaseRates",
-    contains = "SimulationResults",
-    fields = list(
-        directionUpper = "logical",
-        plannedSubjects = "numeric",
-        minNumberOfSubjectsPerStage = "numeric",
-        maxNumberOfSubjectsPerStage = "numeric",
-        calcSubjectsFunction = "ANY",
-        expectedNumberOfSubjects = "numeric"
-    ),
-    methods = list(
+SimulationResultsBaseRatesR6 <- R6Class("SimulationResultsBaseRatesR6",
+    inherit = SimulationResultsR6,
+    public = list(
+        directionUpper = NULL,
+        plannedSubjects = NULL,
+        minNumberOfSubjectsPerStage = NULL,
+        maxNumberOfSubjectsPerStage = NULL,
+        calcSubjectsFunction = NULL,
+        expectedNumberOfSubjects = NULL,
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
             generatedParams <- c(
                 "iterations",
                 "expectedNumberOfSubjects",
@@ -805,7 +797,7 @@ SimulationResultsBaseRates <- setRefClass("SimulationResultsBaseRates",
                 generatedParams <- c(generatedParams, "futilityStop")
             }
             for (generatedParam in generatedParams) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
@@ -870,28 +862,26 @@ SimulationResultsBaseRates <- setRefClass("SimulationResultsBaseRates",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsRates <- setRefClass("SimulationResultsRates",
-    contains = "SimulationResultsBaseRates",
-    fields = list(
-        riskRatio = "logical",
-        thetaH0 = "numeric",
-        normalApproximation = "logical",
-        pi1 = "numeric",
-        pi2 = "numeric",
-        groups = "integer",
-        directionUpper = "logical",
-        pi1H1 = "numeric",
-        pi2H1 = "numeric",
-        effect = "numeric",
-        earlyStop = "numeric",
-        sampleSizes = "matrix",
-        overallReject = "numeric",
-        rejectPerStage = "matrix",
-        conditionalPowerAchieved = "matrix"
-    ),
-    methods = list(
+SimulationResultsRatesR6 <- R6Class("SimulationResultsRatesR6",
+    inherit = SimulationResultsBaseRatesR6,
+    public = list(
+        riskRatio = NULL,
+        thetaH0 = NULL,
+        normalApproximation = NULL,
+        pi1 = NULL,
+        pi2 = NULL,
+        groups = NULL,
+        #directionUpper = NULL,
+        pi1H1 = NULL,
+        pi2H1 = NULL,
+        effect = NULL,
+        earlyStop = NULL,
+        sampleSizes = NULL,
+        overallReject = NULL,
+        rejectPerStage = NULL,
+        conditionalPowerAchieved = matrix(),
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
             generatedParams <- c(
                 "effect",
                 "iterations",
@@ -909,7 +899,7 @@ SimulationResultsRates <- setRefClass("SimulationResultsRates",
                 generatedParams <- c(generatedParams, "futilityStop")
             }
             for (generatedParam in generatedParams) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
@@ -979,39 +969,37 @@ SimulationResultsRates <- setRefClass("SimulationResultsRates",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmRates <- setRefClass("SimulationResultsMultiArmRates",
-    contains = "SimulationResultsBaseRates",
-    fields = list(
-        activeArms = "integer",
-        effectMatrix = "matrix",
-        typeOfShape = "character",
-        piMaxVector = "numeric",
-        piControl = "numeric",
-        piTreatmentsH1 = "numeric",
-        piControlH1 = "numeric",
-        gED50 = "numeric",
-        slope = "numeric",
-        intersectionTest = "character",
-        adaptations = "logical",
-        typeOfSelection = "character",
-        effectMeasure = "character",
-        successCriterion = "character",
-        epsilonValue = "numeric",
-        rValue = "numeric",
-        threshold = "numeric",
-        selectArmsFunction = "function",
-        earlyStop = "matrix",
-        selectedArms = "array",
-        numberOfActiveArms = "matrix",
-        rejectAtLeastOne = "numeric",
-        rejectedArmsPerStage = "array",
-        successPerStage = "matrix",
-        sampleSizes = "array",
-        conditionalPowerAchieved = "matrix"
-    ),
-    methods = list(
+SimulationResultsMultiArmRatesR6 <- R6Class("SimulationResultsMultiArmRatesR6",
+    inherit = SimulationResultsBaseRatesR6,
+    public = list(
+        activeArms = NULL,
+        effectMatrix = NULL,
+        typeOfShape = NULL,
+        piMaxVector = NULL,
+        piControl = NULL,
+        piTreatmentsH1 = NULL,
+        piControlH1 = NULL,
+        gED50 = NULL,
+        slope = NULL,
+        intersectionTest = NULL,
+        adaptations = NULL,
+        typeOfSelection = NULL,
+        effectMeasure = NULL,
+        successCriterion = NULL,
+        epsilonValue = NULL,
+        rValue = NULL,
+        threshold = NULL,
+        selectArmsFunction = NULL,
+        earlyStop = NULL,
+        selectedArms = NULL,
+        numberOfActiveArms = NULL,
+        rejectAtLeastOne = NULL,
+        rejectedArmsPerStage = NULL,
+        successPerStage = NULL,
+        sampleSizes = NULL,
+        conditionalPowerAchieved = matrix(),
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
 
             for (generatedParam in c(
                 "rejectAtLeastOne",
@@ -1020,26 +1008,25 @@ SimulationResultsMultiArmRates <- setRefClass("SimulationResultsMultiArmRates",
                 "rejectedArmsPerStage",
                 "successPerStage"
             )) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
 )
 
-SimulationResultsBaseSurvival <- setRefClass("SimulationResultsBaseSurvival",
-    contains = "SimulationResults",
-    fields = list(
-        directionUpper = "logical",
-        plannedEvents = "numeric",
-        minNumberOfEventsPerStage = "numeric",
-        maxNumberOfEventsPerStage = "numeric",
-        thetaH1 = "numeric",
-        calcEventsFunction = "ANY",
-        expectedNumberOfEvents = "numeric"
-    ),
-    methods = list(
+SimulationResultsBaseSurvivalR6 <- R6Class("SimulationResultsBaseSurvivalR6",
+    inherit = SimulationResultsR6,
+    public = list(
+        directionUpper = NULL,
+        plannedEvents = NULL,
+        minNumberOfEventsPerStage = NULL,
+        maxNumberOfEventsPerStage = NULL,
+        thetaH1 = NULL,
+        calcEventsFunction = NULL,
+        expectedNumberOfEvents = NULL,
+        conditionalPowerAchieved = matrix(), #TODO remove?
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
             generatedParams <- c(
                 "iterations",
                 "expectedNumberOfEvents",
@@ -1053,7 +1040,7 @@ SimulationResultsBaseSurvival <- setRefClass("SimulationResultsBaseSurvival",
                 generatedParams <- c(generatedParams, "futilityStop")
             }
             for (generatedParam in generatedParams) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
@@ -1135,47 +1122,45 @@ SimulationResultsBaseSurvival <- setRefClass("SimulationResultsBaseSurvival",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
-    contains = "SimulationResultsBaseSurvival",
-    fields = list(
-        .piecewiseSurvivalTime = "ANY",
-        .accrualTime = "ANY",
-        pi1 = "numeric",
-        pi2 = "numeric",
-        median1 = "numeric",
-        median2 = "numeric",
-        maxNumberOfSubjects = "numeric",
-        accrualTime = "numeric",
-        accrualIntensity = "numeric",
-        dropoutRate1 = "numeric",
-        dropoutRate2 = "numeric",
-        dropoutTime = "numeric",
-        eventTime = "numeric",
-        thetaH0 = "numeric",
-        allocation1 = "numeric",
-        allocation2 = "numeric",
-        kappa = "numeric",
-        piecewiseSurvivalTime = "numeric",
-        lambda1 = "numeric",
-        lambda2 = "numeric",
-        earlyStop = "numeric",
-        hazardRatio = "numeric",
-        analysisTime = "matrix",
-        studyDuration = "numeric",
-        eventsNotAchieved = "matrix",
-        numberOfSubjects = "matrix",
-        numberOfSubjects1 = "matrix",
-        numberOfSubjects2 = "matrix",
-        eventsPerStage = "matrix",
-        overallEventsPerStage = "matrix",
-        expectedNumberOfSubjects = "numeric",
-        rejectPerStage = "matrix",
-        overallReject = "numeric",
-        conditionalPowerAchieved = "matrix"
-    ),
-    methods = list(
+SimulationResultsSurvivalR6 <- R6Class("SimulationResultsSurvivalR6",
+    inherit = SimulationResultsBaseSurvivalR6,
+    public = list(
+        .piecewiseSurvivalTime = NULL,
+        .accrualTime = NULL,
+        pi1 = NULL,
+        pi2 = NULL,
+        median1 = NULL,
+        median2 = NULL,
+        maxNumberOfSubjects = NULL,
+        accrualTime = NULL,
+        accrualIntensity = NULL,
+        dropoutRate1 = NULL,
+        dropoutRate2 = NULL,
+        dropoutTime = NULL,
+        eventTime = NULL,
+        thetaH0 = NULL,
+        allocation1 = NULL,
+        allocation2 = NULL,
+        kappa = NULL,
+        piecewiseSurvivalTime = NULL,
+        lambda1 = NULL,
+        lambda2 = NULL,
+        earlyStop = NULL,
+        hazardRatio = NULL,
+        analysisTime = NULL,
+        studyDuration = NULL,
+        eventsNotAchieved = NULL,
+        numberOfSubjects = NULL,
+        numberOfSubjects1 = NULL,
+        numberOfSubjects2 = NULL,
+        eventsPerStage = NULL,
+        overallEventsPerStage = NULL,
+        expectedNumberOfSubjects = NULL,
+        rejectPerStage = NULL,
+        overallReject = NULL,
+        conditionalPowerAchieved = matrix(),
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
             generatedParams <- c(
                 "hazardRatio",
                 "iterations",
@@ -1197,12 +1182,12 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
                 generatedParams <- c(generatedParams, "futilityStop")
             }
             for (generatedParam in generatedParams) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
-            .setParameterType("numberOfSubjects1", C_PARAM_NOT_APPLICABLE)
-            .setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
-            .setParameterType("median1", C_PARAM_NOT_APPLICABLE)
-            .setParameterType("median2", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("numberOfSubjects1", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("median1", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("median2", C_PARAM_NOT_APPLICABLE)
         }
     )
 )
@@ -1265,38 +1250,36 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmSurvival <- setRefClass("SimulationResultsMultiArmSurvival",
-    contains = "SimulationResultsBaseSurvival",
-    fields = list(
-        activeArms = "integer",
-        effectMatrix = "matrix",
-        typeOfShape = "character",
-        omegaMaxVector = "numeric",
-        gED50 = "numeric",
-        slope = "numeric",
-        intersectionTest = "character",
-        adaptations = "logical",
-        typeOfSelection = "character",
-        effectMeasure = "character",
-        successCriterion = "character",
-        epsilonValue = "numeric",
-        rValue = "numeric",
-        threshold = "numeric",
-        selectArmsFunction = "function",
-        correlationComputation = "character",
-        earlyStop = "matrix",
-        selectedArms = "array",
-        numberOfActiveArms = "matrix",
-        rejectAtLeastOne = "numeric",
-        rejectedArmsPerStage = "array",
-        successPerStage = "matrix",
-        eventsPerStage = "array",
-        singleNumberOfEventsPerStage = "array",
-        conditionalPowerAchieved = "matrix"
-    ),
-    methods = list(
+SimulationResultsMultiArmSurvivalR6 <- R6Class("SimulationResultsMultiArmSurvivalR6",
+    inherit = SimulationResultsBaseSurvivalR6,
+    public = list(
+        activeArms = NULL,
+        effectMatrix = NULL,
+        typeOfShape = NULL,
+        omegaMaxVector = NULL,
+        gED50 = NULL,
+        slope = NULL,
+        intersectionTest = NULL,
+        adaptations = NULL,
+        typeOfSelection = NULL,
+        effectMeasure = NULL,
+        successCriterion = NULL,
+        epsilonValue = NULL,
+        rValue = NULL,
+        threshold = NULL,
+        selectArmsFunction = NULL,
+        correlationComputation = NULL,
+        earlyStop = NULL,
+        selectedArms = NULL,
+        numberOfActiveArms = NULL,
+        rejectAtLeastOne = NULL,
+        rejectedArmsPerStage = NULL,
+        successPerStage = NULL,
+        eventsPerStage = NULL,
+        singleNumberOfEventsPerStage = NULL,
+        conditionalPowerAchieved = matrix(),
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
 
             for (generatedParam in c(
                 "rejectAtLeastOne",
@@ -1305,7 +1288,7 @@ SimulationResultsMultiArmSurvival <- setRefClass("SimulationResultsMultiArmSurvi
                 "rejectedArmsPerStage",
                 "successPerStage"
             )) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
@@ -1371,33 +1354,31 @@ SimulationResultsMultiArmSurvival <- setRefClass("SimulationResultsMultiArmSurvi
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentMeans <- setRefClass("SimulationResultsEnrichmentMeans",
-    contains = "SimulationResultsBaseMeans",
-    fields = list(
-        populations = "integer",
-        effectList = "list",
-        intersectionTest = "character",
-        stratifiedAnalysis = "logical",
-        adaptations = "logical",
-        typeOfSelection = "character",
-        effectMeasure = "character",
-        successCriterion = "character",
-        epsilonValue = "numeric",
-        rValue = "numeric",
-        threshold = "numeric",
-        selectPopulationsFunction = "function",
-        earlyStop = "matrix",
-        selectedPopulations = "array",
-        numberOfPopulations = "matrix",
-        rejectAtLeastOne = "numeric",
-        rejectedPopulationsPerStage = "array",
-        successPerStage = "matrix",
-        sampleSizes = "array",
-        conditionalPowerAchieved = "matrix"
-    ),
-    methods = list(
+SimulationResultsEnrichmentMeansR6 <- R6Class("SimulationResultsEnrichmentMeansR6",
+    inherit = SimulationResultsBaseMeansR6,
+    public = list(
+        populations = NULL,
+        effectList = NULL,
+        intersectionTest = NULL,
+        stratifiedAnalysis = NULL,
+        adaptations = NULL,
+        typeOfSelection = NULL,
+        effectMeasure = NULL,
+        successCriterion = NULL,
+        epsilonValue = NULL,
+        rValue = NULL,
+        threshold = NULL,
+        selectPopulationsFunction = NULL,
+        earlyStop = NULL,
+        selectedPopulations = NULL,
+        numberOfPopulations = NULL,
+        rejectAtLeastOne = NULL,
+        rejectedPopulationsPerStage = NULL,
+        successPerStage = NULL,
+        sampleSizes = NULL,
+        conditionalPowerAchieved = matrix(),
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
 
             for (generatedParam in c(
                 "rejectAtLeastOne",
@@ -1406,7 +1387,7 @@ SimulationResultsEnrichmentMeans <- setRefClass("SimulationResultsEnrichmentMean
                 "rejectedPopulationsPerStage",
                 "successPerStage"
             )) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
@@ -1472,35 +1453,33 @@ SimulationResultsEnrichmentMeans <- setRefClass("SimulationResultsEnrichmentMean
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentRates <- setRefClass("SimulationResultsEnrichmentRates",
-    contains = "SimulationResultsBaseRates",
-    fields = list(
-        populations = "integer",
-        effectList = "list",
-        intersectionTest = "character",
-        stratifiedAnalysis = "logical",
-        adaptations = "logical",
-        piTreatmentH1 = "numeric",
-        piControlH1 = "numeric",
-        typeOfSelection = "character",
-        effectMeasure = "character",
-        successCriterion = "character",
-        epsilonValue = "numeric",
-        rValue = "numeric",
-        threshold = "numeric",
-        selectPopulationsFunction = "function",
-        earlyStop = "matrix",
-        selectedPopulations = "array",
-        numberOfPopulations = "matrix",
-        rejectAtLeastOne = "numeric",
-        rejectedPopulationsPerStage = "array",
-        successPerStage = "matrix",
-        sampleSizes = "array",
-        conditionalPowerAchieved = "matrix"
-    ),
-    methods = list(
+SimulationResultsEnrichmentRatesR6 <- R6Class("SimulationResultsEnrichmentRatesR6",
+    inherit = SimulationResultsBaseRatesR6,
+    public = list(
+        populations = NULL,
+        effectList = NULL,
+        intersectionTest = NULL,
+        stratifiedAnalysis = NULL,
+        adaptations = NULL,
+        piTreatmentH1 = NULL,
+        piControlH1 = NULL,
+        typeOfSelection = NULL,
+        effectMeasure = NULL,
+        successCriterion = NULL,
+        epsilonValue = NULL,
+        rValue = NULL,
+        threshold = NULL,
+        selectPopulationsFunction = NULL,
+        earlyStop = NULL,
+        selectedPopulations = NULL,
+        numberOfPopulations = NULL,
+        rejectAtLeastOne = NULL,
+        rejectedPopulationsPerStage = NULL,
+        successPerStage = NULL,
+        sampleSizes = NULL,
+        conditionalPowerAchieved = matrix(),
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
 
             for (generatedParam in c(
                 "rejectAtLeastOne",
@@ -1509,7 +1488,7 @@ SimulationResultsEnrichmentRates <- setRefClass("SimulationResultsEnrichmentRate
                 "rejectedPopulationsPerStage",
                 "successPerStage"
             )) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
@@ -1576,35 +1555,33 @@ SimulationResultsEnrichmentRates <- setRefClass("SimulationResultsEnrichmentRate
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentSurvival",
-    contains = "SimulationResultsBaseSurvival",
-    fields = list(
-        populations = "integer",
-        effectList = "list",
-        intersectionTest = "character",
-        stratifiedAnalysis = "logical",
-        adaptations = "logical",
-        typeOfSelection = "character",
-        effectMeasure = "character",
-        successCriterion = "character",
-        epsilonValue = "numeric",
-        rValue = "numeric",
-        threshold = "numeric",
-        selectPopulationsFunction = "function",
-        correlationComputation = "character",
-        earlyStop = "matrix",
-        selectedPopulations = "array",
-        numberOfPopulations = "matrix",
-        rejectAtLeastOne = "numeric",
-        rejectedPopulationsPerStage = "array",
-        successPerStage = "matrix",
-        eventsPerStage = "array",
-        singleNumberOfEventsPerStage = "array",
-        conditionalPowerAchieved = "matrix"
-    ),
-    methods = list(
+SimulationResultsEnrichmentSurvivalR6 <- R6Class("SimulationResultsEnrichmentSurvivalR6",
+    inherit = SimulationResultsBaseSurvivalR6,
+    public = list(
+        populations = NULL,
+        effectList = NULL,
+        intersectionTest = NULL,
+        stratifiedAnalysis = NULL,
+        adaptations = NULL,
+        typeOfSelection = NULL,
+        effectMeasure = NULL,
+        successCriterion = NULL,
+        epsilonValue = NULL,
+        rValue = NULL,
+        threshold = NULL,
+        selectPopulationsFunction = NULL,
+        correlationComputation = NULL,
+        earlyStop = NULL,
+        selectedPopulations = NULL,
+        numberOfPopulations = NULL,
+        rejectAtLeastOne = NULL,
+        rejectedPopulationsPerStage = NULL,
+        successPerStage = NULL,
+        eventsPerStage = NULL,
+        singleNumberOfEventsPerStage = NULL,
+        conditionalPowerAchieved = matrix(),
         initialize = function(design, ...) {
-            callSuper(design = design, ...)
+            super$initialize(design = design, ...)
 
             for (generatedParam in c(
                 "rejectAtLeastOne",
@@ -1613,14 +1590,14 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
                 "rejectedPopulationsPerStage",
                 "successPerStage"
             )) {
-                .setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
         }
     )
 )
 
 .assertIsValidVariedParameterVectorForSimulationResultsPlotting <- function(simulationResults, plotType) {
-    if (inherits(simulationResults, "SimulationResultsMeans")) {
+    if (inherits(simulationResults, "SimulationResultsMeans") || inherits(simulationResults, "SimulationResultsMeansR6")) {
         if (is.null(simulationResults$alternative) ||
                 any(is.na(simulationResults$alternative)) ||
                 length(simulationResults$alternative) <= 1) {
@@ -1629,7 +1606,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
                 " is only available if 'alternative' with length > 1 is defined"
             )
         }
-    } else if (inherits(simulationResults, "SimulationResultsRates")) {
+    } else if (inherits(simulationResults, "SimulationResultsRates") || inherits(simulationResults, "SimulationResultsRatesR6")) {
         if (is.null(simulationResults$pi1) ||
                 any(is.na(simulationResults$pi1)) ||
                 length(simulationResults$pi1) <= 1) {
@@ -1638,7 +1615,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
                 " is only available if 'pi1' with length > 1 is defined"
             )
         }
-    } else if (inherits(simulationResults, "SimulationResultsSurvival")) {
+    } else if (inherits(simulationResults, "SimulationResultsSurvival") || inherits(simulationResults, "SimulationResultsSurvivalR6")) {
         if (is.null(simulationResults$hazardRatio) ||
                 any(is.na(simulationResults$hazardRatio)) ||
                 length(simulationResults$hazardRatio) <= 1) {
@@ -2559,7 +2536,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
 #'
 #' @export
 #'
-plot.SimulationResults <- function(x, y, ..., main = NA_character_,
+plot.SimulationResultsR6 <- function(x, y, ..., main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
         theta = seq(-1, 1, 0.01), plotPointsEnabled = NA,
         legendPosition = NA_integer_, showSource = FALSE,
@@ -2623,7 +2600,7 @@ plot.SimulationResults <- function(x, y, ..., main = NA_character_,
 #'
 #' @keywords internal
 #'
-print.SimulationResults <- function(x, ..., showStatistics = FALSE, markdown = FALSE) {
+print.SimulationResultsR6 <- function(x, ..., showStatistics = FALSE, markdown = FALSE) {
     if (markdown) {
         x$.catMarkdownText(showStatistics = showStatistics)
         return(invisible(x))
@@ -2697,7 +2674,7 @@ print.SimulationResults <- function(x, ..., showStatistics = FALSE, markdown = F
 #' @export
 #'
 getData <- function(x) {
-    if (!inherits(x, "SimulationResults")) { #  or 'Dataset'
+    if (!(inherits(x, "SimulationResults") || inherits(x, "SimulationResultsR6"))) { #  or 'Dataset'
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'x' must be a 'SimulationResults' object; for example, use getSimulationMeans() to create one"
@@ -2709,7 +2686,7 @@ getData <- function(x) {
 
 #' @rdname getData
 #' @export
-getData.SimulationResults <- function(x) {
+getData.SimulationResultsR6 <- function(x) {
     return(x$.data)
 }
 
@@ -2840,7 +2817,7 @@ getData.SimulationResults <- function(x) {
 #' @export
 #'
 getRawData <- function(x, aggregate = FALSE) {
-    if (!inherits(x, "SimulationResultsSurvival")) {
+    if (!(inherits(x, "SimulationResultsSurvival") || inherits(x, "SimulationResultsSurvivalR6"))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'x' must be a 'SimulationResultsSurvival' object; use getSimulationSurvival() to create one"

@@ -614,7 +614,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
                 } else {
                     if (inherits(parameterSet, "Dataset")) {
                         variedParameter <- "groups"
-                    } else if (inherits(parameterSet, "PerformanceScore")) {
+                    } else if (inherits(parameterSet, "PerformanceScore") || inherits(parameterSet, "PerformanceScoreR6")) {
                         variedParameter <- ".alternative"
                     } else {
                         variedParameter <- parameterSet$.getVariedParameter(parameterNames, numberOfVariants)
@@ -914,7 +914,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
     designPlan <- NULL
     if (inherits(object, "TrialDesignCharacteristics")) {
         design <- object$.design
-    } else if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
+    } else if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults") || inherits(object, "SimulationResultsR6")) {
         design <- object$.design
         designPlan <- object
     } else if (inherits(object, "AnalysisResults") || inherits(object, "AnalysisResultsR6")) {
@@ -984,7 +984,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         title <- paste0(title, "Sequential analysis with a maximum of ", kMax, " looks")
     }
     if (!is.null(designPlan)) {
-        if (inherits(designPlan, "SimulationResults")) {
+        if (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")) {
             title <- "Simulation of a "
         } else if (designPlan$.isSampleSizeObject()) {
             title <- "Sample size calculation for a "
@@ -1071,7 +1071,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
 
 .createSummaryHypothesisText <- function(object, summaryFactory) {
     if (!(inherits(object, "AnalysisResults") || inherits(object, "AnalysisResultsR6")) && !(inherits(object, "TrialDesignPlan") || inherits(object, "TrialDesignPlanR6")) &&
-            !inherits(object, "SimulationResults")) {
+            !(inherits(object, "SimulationResults") || inherits(object, "SimulationResultsR6"))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'object' must be an instance of class 'AnalysisResults', 'TrialDesignPlan' ",
@@ -1227,7 +1227,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         return(.createSummaryHeaderDesign(object$.design, NULL, summaryFactory))
     }
 
-    if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
+    if (.isTrialDesignPlan(object) || (inherits(object, "SimulationResults") || inherits(object, "SimulationResultsR6"))) {
         return(.createSummaryHeaderDesign(object$.design, object, summaryFactory))
     }
 
@@ -1732,9 +1732,9 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
 
     header <- paste0(header, "\n")
 
-    header <- paste0(header, "The ", ifelse(inherits(designPlan, "SimulationResults") ||
+    header <- paste0(header, "The ", ifelse((inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")) ||
         designPlan$.isPowerObject(), "results were ", "sample size was "))
-    header <- paste0(header, ifelse(inherits(designPlan, "SimulationResults"), "simulated", "calculated"))
+    header <- paste0(header, ifelse(inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6"), "simulated", "calculated"))
     header <- paste0(header, " for a ")
     settings <- .getSummaryObjectSettings(designPlan)
     if (settings$meansEnabled) {
@@ -1781,7 +1781,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
             ifelse(settings$populations == 1, "", "s")
         ))
     }
-    if (!is.null(designPlan) && (.isTrialDesignPlan(designPlan) || inherits(designPlan, "SimulationResults")) &&
+    if (!is.null(designPlan) && (.isTrialDesignPlan(designPlan) || (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6"))) &&
             !settings$multiArmEnabled && !settings$enrichmentEnabled && !settings$survivalEnabled) {
         if (settings$ratesEnabled) {
             if (settings$groups == 1) {
@@ -1801,7 +1801,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         header <- .concatenateSummaryText(header, paste0("(", part, ")"), sep = " ")
     }
     if (settings$meansEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
-            inherits(designPlan, "SimulationResults"))) {
+            (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")))) {
         header <- .concatenateSummaryText(header, .createSummaryHypothesisText(designPlan, summaryFactory))
         if (!is.null(designPlan[["alternative"]]) && length(designPlan$alternative) == 1) {
             alternativeText <- paste0("H1: effect = ", round(designPlan$alternative, 3))
@@ -1840,7 +1840,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         }
         header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
     } else if (settings$ratesEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
-            inherits(designPlan, "SimulationResults"))) {
+            (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")))) {
         if (settings$groups == 1) {
             if (!is.null(designPlan[["pi1"]]) && length(designPlan$pi1) == 1) {
                 treatmentRateText <- paste0("H1: treatment rate pi = ", round(designPlan$pi1, 3))
@@ -1902,7 +1902,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
             header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
         }
     } else if (settings$survivalEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
-            inherits(designPlan, "SimulationResults"))) {
+            (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")))) {
         parameterNames <- designPlan$.getVisibleFieldNamesOrdered()
         numberOfVariants <- .getMultidimensionalNumberOfVariants(designPlan, parameterNames)
 
@@ -1938,7 +1938,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         } else if (!is.null(designPlan[["omegaMaxVector"]]) && length(designPlan$omegaMaxVector) == 1) {
             treatmentRateText <- paste0("H1: omega_max = ", round(designPlan$omegaMaxVector, 3))
         } else if (!is.null(designPlan[["hazardRatio"]]) && (length(designPlan$hazardRatio) == 1) ||
-                (inherits(designPlan, "SimulationResults") && !is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
+                ((inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")) && !is.null(designPlan[[".piecewiseSurvivalTime"]]) &&
                     designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled)) {
             treatmentRateText <- paste0(
                 "H1: hazard ratio = ",
@@ -1984,12 +1984,12 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         header <- .addEnrichmentEffectListToHeader(header, designPlan)
         header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
     }
-    if (!inherits(designPlan, "SimulationResults") && designPlan$.isSampleSizeObject()) {
+    if (!(inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")) && designPlan$.isSampleSizeObject()) {
         header <- .concatenateSummaryText(header, paste0("power ", round(100 * (1 - design$beta), 1), "%"))
     }
 
 
-    if (inherits(designPlan, "SimulationResults")) {
+    if (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")) {
         header <- .concatenateSummaryText(header, paste0("simulation runs = ", designPlan$maxNumberOfIterations))
         header <- .concatenateSummaryText(header, paste0("seed = ", designPlan$seed))
     }
@@ -2286,11 +2286,11 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
 
 .createSummary <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
     output <- match.arg(output)
-    if (inherits(object, "TrialDesignCharacteristics")) {
+    if (inherits(object, "TrialDesignCharacteristics") || inherits(object, "TrialDesignCharacteristicsR6")) {
         return(.createSummaryDesignPlan(object, digits = digits, output = output, showStageLevels = TRUE))
     }
 
-    if (.isTrialDesign(object) || .isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
+    if (.isTrialDesign(object) || .isTrialDesignPlan(object) || inherits(object, "SimulationResults") || inherits(object, "SimulationResultsR6")) {
         return(.createSummaryDesignPlan(object, digits = digits, output = output, showStageLevels = !.isTrialDesignPlan(object)))
     }
 
@@ -2298,7 +2298,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         return(.createSummaryAnalysisResults(object, digits = digits, output = output))
     }
 
-    if (inherits(object, "PerformanceScore")) {
+    if (inherits(object, "PerformanceScore") || inherits(object, "PerformanceScoreR6")) {
         return(.createSummaryPerformanceScore(object, digits = digits, output = output))
     }
 
@@ -2743,10 +2743,10 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         return(invisible(summaryFactory))
     }
 
-    informationRatesCaption <- ifelse(inherits(designPlan, "SimulationResults") ||
+    informationRatesCaption <- ifelse(inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6") ||
         (inherits(designPlan, "AnalysisResults") || inherits(designPlan, "AnalysisResultsR6")), "Fixed weight", "Information")
 
-    if (inherits(designPlan, "SimulationResults") || (inherits(designPlan, "AnalysisResults") || inherits(designPlan, "AnalysisResultsR6"))) {
+    if (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6") || (inherits(designPlan, "AnalysisResults") || inherits(designPlan, "AnalysisResultsR6"))) {
         if (.isTrialDesignFisher(design)) {
             weights <- .getWeightsFisher(design)
         } else if (.isTrialDesignInverseNormal(design)) {
@@ -2759,7 +2759,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         summaryFactory$addItem(
             paste0(
                 informationRatesCaption,
-                ifelse(inherits(designPlan, "SimulationResults"), "", " rate")
+                ifelse(inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6"), "", " rate")
             ),
             .getSummaryValuesInPercent(design$informationRates)
         )
@@ -2773,7 +2773,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
 
 .addDesignParameterToSummary <- function(design, designPlan,
         designCharacteristics, summaryFactory, digitsGeneral, digitsProbabilities) {
-    if (design$kMax > 1 && !inherits(designPlan, "SimulationResults") &&
+    if (design$kMax > 1 && !(inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")) &&
             !.isTrialDesignConditionalDunnett(design)) {
         summaryFactory$addParameter(design,
             parameterName = "alphaSpent",
@@ -2792,7 +2792,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
     if (!is.null(designPlan)) {
         if (!grepl("SimulationResults(MultiArm|Enrichment)", .getClassName(designPlan))) {
             outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
-            if (outputSize == "large" && inherits(designPlan, "SimulationResults")) {
+            if (outputSize == "large" && (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6"))) {
                 summaryFactory$addParameter(designPlan,
                     parameterName = "conditionalPowerAchieved",
                     parameterCaption = "Conditional power (achieved)",
@@ -2859,7 +2859,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
             parameterName = "alpha",
             parameterCaption = "Significance level", roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
         )
-    } else if (!is.null(designPlan) && !inherits(designPlan, "SimulationResults")) {
+    } else if (!is.null(designPlan) && !(inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6"))) {
         summaryFactory$addParameter(design,
             parameterName = "stageLevels",
             twoSided = design$sided == 2,
@@ -2880,7 +2880,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         performanceScore = NULL) {
     output <- match.arg(output)
     designPlan <- NULL
-    if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
+    if (.isTrialDesignPlan(object) || (inherits(object, "SimulationResults") || inherits(object, "SimulationResultsR6"))) {
         design <- object$.design
         designPlan <- object
     } else if (inherits(object, "TrialDesignCharacteristics") || inherits(object, "TrialDesignCharacteristicsR6")) {
@@ -3172,7 +3172,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
             )
         }
 
-        if (inherits(designPlan, "SimulationResults")) {
+        if (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")) {
             parameterName1 <- ifelse(survivalEnabled, "numberOfSubjects", "sampleSizes")
             parameterName2 <- "eventsPerStage"
         } else {
@@ -3200,7 +3200,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
         }
 
         if (outputSize %in% c("medium", "large")) {
-            subjectsCaption <- ifelse(design$kMax > 1 && inherits(designPlan, "SimulationResults") &&
+            subjectsCaption <- ifelse(design$kMax > 1 && (inherits(designPlan, "SimulationResults") || inherits(designPlan, "SimulationResultsR6")) &&
                 !survivalEnabled, "Stagewise number of subjects", "Number of subjects")
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterName1,
@@ -3282,7 +3282,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
     if (planningEnabled) {
         legendEntry <- list("(t)" = "treatment effect scale")
 
-        if (ncol(designPlan$criticalValuesEffectScale) > 0) {
+        if (!is.null(designPlan$criticalValuesEffectScale) && ncol(designPlan$criticalValuesEffectScale) > 0) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "criticalValuesEffectScale",
                 parameterCaption = ifelse(.isDelayedInformationEnabled(design = design),
@@ -3290,7 +3290,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
                 ),
                 roundDigits = digitsGeneral, legendEntry = legendEntry
             )
-        } else if (ncol(designPlan$criticalValuesEffectScaleUpper) > 0) {
+        } else if (!is.null(designPlan$criticalValuesEffectScaleUpper) && ncol(designPlan$criticalValuesEffectScaleUpper) > 0) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "criticalValuesEffectScaleLower",
                 parameterCaption = "Lower efficacy boundary (t)",
@@ -3303,7 +3303,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
             )
         }
 
-        if (ncol(designPlan$futilityBoundsEffectScale) > 0 &&
+        if (!is.null(designPlan$futilityBoundsEffectScale) && ncol(designPlan$futilityBoundsEffectScale) > 0 &&
                 !all(is.na(designPlan$futilityBoundsEffectScale))) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "futilityBoundsEffectScale",
@@ -3412,7 +3412,6 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
     }
 
     if (!is.null(performanceScore)) {
-        print(performanceScore)
         summaryFactory$addParameter(performanceScore,
             parameterName = "performanceScore",
             parameterCaption = "Performance score",
@@ -3506,7 +3505,7 @@ SummaryFactoryR6 <- R6Class("SummaryFactoryR6",
     treatmentCaption <- ifelse(numberOfGroups > 2, paste0("Treatment arm ", groupNumber), "Treatment arm")
 
     if (!grepl("Survival", .getClassName(designPlan)) ||
-            (inherits(designPlan, "SimulationResultsMultiArmSurvival") &&
+            ((inherits(designPlan, "SimulationResultsMultiArmSurvival") || inherits(designPlan, "SimulationResultsMultiArmSurvivalR6")) &&
                 parameterName == "singleNumberOfEventsPerStage")) {
         return(ifelse(groupNumber == numberOfGroups,
             paste0(listItemPrefix, "Control arm"),

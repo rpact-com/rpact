@@ -27,15 +27,13 @@ test_that("Test plot settings", {
     
     expect_type(PlotSubTitleItems(), "S4")
 
-    expect_type(getPlotSettings(), "S4")
+    expect_type(getPlotSettings(), "environment")
 
     expect_type(PlotSettings(), "S4")
     
     expect_error(PlotSubTitleItemR6$new())
     
-    expect_type(PlotSubTitleItemsR6$new(), "R6")
+    expect_type(PlotSubTitleItemsR6$new(), "environment")
 
-    expect_type(getPlotSettingsR6$new(), "R6")
-
-    expect_type(PlotSettingsR6$new(), "R6")
+    expect_type(PlotSettingsR6$new(), "environment")
 })

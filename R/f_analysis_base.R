@@ -28,15 +28,15 @@ NULL
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, sQuote("dataInput"), " must be specified")
     }
 
-    if (missing(dataInput) && !missing(design) && inherits(design, "Dataset")) {
+    if (missing(dataInput) && !missing(design) && (inherits(design, "Dataset") || inherits(design, "DatasetR6"))) {
         dataInput <- design
-        if (!is.null(dataInput$.design) && inherits(dataInput$.design, "TrialDesign")) {
+        if (!is.null(dataInput$.design) && (inherits(dataInput$.design, "TrialDesign") || inherits(dataInput$.design, "TrialDesignR6"))) {
             design <- dataInput$.design
         } else {
             design <- .getDefaultDesign(..., type = "analysis")
         }
     } else if (!missing(dataInput) && missing(design)) {
-        if (!is.null(dataInput$.design) && inherits(dataInput$.design, "TrialDesign")) {
+        if (!is.null(dataInput$.design) && (inherits(dataInput$.design, "TrialDesign") || inherits(dataInput$.design, "TrialDesignR6"))) {
             design <- dataInput$.design
         } else {
             design <- .getDefaultDesign(..., type = "analysis")
@@ -50,7 +50,7 @@ NULL
 
     return(list(
         design = design,
-        dataInput = dataInput$copy(shallow = FALSE)
+        dataInput = dataInput$clone(deep=TRUE)#TODO was $copy shallow
     ))
 }
 

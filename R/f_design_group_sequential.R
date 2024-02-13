@@ -2115,7 +2115,7 @@ getPowerAndAverageSampleNumber <- function(design, theta = seq(-1, 1, 0.02), nMa
     .assertIsTrialDesign(design)
     .assertIsSingleNumber(nMax, "nMax")
     .assertIsInClosedInterval(nMax, "nMax", lower = 1, upper = NULL)
-    return(PowerAndAverageSampleNumberResult(design = design, theta = theta, nMax = nMax))
+    return(PowerAndAverageSampleNumberResultR6$new(design = design, theta = theta, nMax = nMax))
 }
 
 .getSimulatedRejectionsDelayedResponse <- function(delta, informationRates, delayedInformation,

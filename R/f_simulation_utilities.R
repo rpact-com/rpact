@@ -95,7 +95,7 @@ NULL
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'data' must be a valid data.frame or a simulation result object")
     }
 
-    if (inherits(data, "SimulationResults")) {
+    if (inherits(data, "SimulationResults") || inherits(data, "SimulationResultsR6")) {
         data <- data[[".data"]]
     }
 

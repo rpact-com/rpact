@@ -1060,7 +1060,7 @@ C_TABLE_COLUMN_NAMES <- list(
 
     if (!is.null(designPlan) &&
             ((inherits(designPlan, "TrialDesignPlanMeans") || inherits(designPlan, "TrialDesignPlanMeansR6")) ||
-                inherits(designPlan, "SimulationResultsMeans")) &&
+                (inherits(designPlan, "SimulationResultsMeans") || inherits(designPlan, "SimulationResultsMeansR6"))) &&
             isTRUE(designPlan$meanRatio)) {
         parameterNames$stDev <- "Coefficient of variation"
     }

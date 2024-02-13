@@ -76,11 +76,11 @@ NULL
                 "Rejected Populations per Stage", "Rejected Populations"
             ), type, numberInCaptionEnabled))
         }
-    } else if (inherits(obj, "SimulationResults") && type == 4) {
+    } else if ((inherits(obj, "SimulationResults") || inherits(obj, "SimulationResultsR6")) && type == 4) {
         return(.addNumberToPlotCaption("Reject per Stage", type, numberInCaptionEnabled))
     }
 
-    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlanR6") || inherits(obj, "SimulationResults")) {
+    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlanR6") || inherits(obj, "SimulationResults") || inherits(obj, "SimulationResultsR6")) {
         if (type == 5) {
             if (obj$.isSampleSizeObject()) {
                 return(.addNumberToPlotCaption("Sample Size", type, numberInCaptionEnabled))
@@ -92,7 +92,7 @@ NULL
             }
         } else if (type == 6) {
             return(.addNumberToPlotCaption(ifelse(.isTrialDesignPlanSurvival(obj) ||
-                inherits(obj, "SimulationResultsSurvival"),
+                inherits(obj, "SimulationResultsSurvival") || inherits(obj, "SimulationResultsSurvivalR6"),
             "Number of Events", "Sample Size"
             ), type, numberInCaptionEnabled))
         } else if (type == 7) {
@@ -101,7 +101,7 @@ NULL
             return(.addNumberToPlotCaption("Overall Early Stopping", type, numberInCaptionEnabled))
         } else if (type == 9) {
             if (.isTrialDesignPlanSurvival(obj) ||
-                    inherits(obj, "SimulationResultsSurvival")) {
+                    inherits(obj, "SimulationResultsSurvival") || inherits(obj, "SimulationResultsSurvivalR6")) {
                 return(.addNumberToPlotCaption("Expected Number of Events", type, numberInCaptionEnabled))
             } else {
                 return(.addNumberToPlotCaption("Expected Sample Size", type, numberInCaptionEnabled))
@@ -138,7 +138,7 @@ NULL
         } else if (type == 9) {
             return(.addNumberToPlotCaption("Average Sample Size", type, numberInCaptionEnabled))
         }
-    } else if (inherits(obj, "AnalysisResults")) {
+    } else if (inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResultsR6")) {
         if (type == 1) {
             return(.addNumberToPlotCaption(C_PLOT_MAIN_CONDITIONAL_POWER_WITH_LIKELIHOOD, type, numberInCaptionEnabled))
         } else if (type == 2) {
@@ -415,7 +415,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             }
         }
         types <- .removeInvalidPlotTypes(obj, types, c(5:14))
-    } else if (inherits(obj, "SimulationResults")) {
+    } else if (inherits(obj, "SimulationResults") || inherits(obj, "SimulationResultsR6")) {
         if (grepl("Enrichment", .getClassName(obj)) && !.getSimulationEnrichmentEffectData(
                 obj,
                 validatePlotCapability = FALSE
@@ -446,7 +446,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         if (!grepl("MultiArm", .getClassName(obj)) || obj$.design$kMax > 1) {
             types <- c(types, 9)
         }
-        if (inherits(obj, "SimulationResultsSurvival")) {
+        if (inherits(obj, "SimulationResultsSurvival") || inherits(obj, "SimulationResultsSurvivalR6")) {
             types <- c(types, 10:14)
         }
         plotTypesToCheck <- c(4:14)

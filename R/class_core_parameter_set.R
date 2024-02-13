@@ -611,7 +611,7 @@ ParameterSet <- setRefClass("ParameterSet",
             }
             if (!is.null(category) && !is.na(category)) {
                 if (.isMultiArmSimulationResults(.self) && paramName == "singleNumberOfEventsPerStage") {
-                    if (!inherits(.self, "SimulationResultsEnrichmentSurvival") &&
+                    if (!(inherits(.self, "SimulationResultsEnrichmentSurvival") || inherits(.self, "SimulationResultsEnrichmentSurvivalR6")) &&
                             !is.na(numberOfCategories) && numberOfCategories == category) {
                         category <- "control"
                     }
@@ -668,7 +668,7 @@ ParameterSet <- setRefClass("ParameterSet",
                         }
                     }
                 } else if (.isMultiArmAnalysisResults(.self) || grepl("StageResultsMultiArm", .getClassName(.self)) ||
-                        (inherits(.self, "SimulationResults") && paramName == "effectMatrix") ||
+                        ((inherits(.self, "SimulationResults") || inherits(.self, "SimulationResultsR6")) && paramName == "effectMatrix") ||
                         (inherits(.self, "ClosedCombinationTestResults") &&
                             paramName %in% c("rejected", "separatePValues"))) {
                     paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
@@ -1038,7 +1038,7 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
         return(result)
     }
 
-    if (inherits(x, "PowerAndAverageSampleNumberResult")) {
+    if (inherits(x, "PowerAndAverageSampleNumberResult") || inherits(x, "PowerAndAverageSampleNumberResultR6")) {
         dimnames(result)[[1]] <- rep("", nrow(result))
         return(result)
     }

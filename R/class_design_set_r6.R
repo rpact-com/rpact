@@ -679,7 +679,7 @@ as.data.frame.TrialDesignSetR6 <- function(x, row.names = NULL,
         }
 
         if (addPowerAndAverageSampleNumber) {
-            results <- PowerAndAverageSampleNumberResult(design, theta = theta, nMax = nMax)
+            results <- PowerAndAverageSampleNumberResultR6$new(design, theta = theta, nMax = nMax)
             suppressWarnings(df2 <- as.data.frame(results,
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
                 includeAllParameters = includeAllParameters
