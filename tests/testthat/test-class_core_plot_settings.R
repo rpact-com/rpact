@@ -23,13 +23,7 @@
 test_plan_section("Testing the Class 'PlotSettings'")
 
 test_that("Test plot settings", {
-    expect_error(PlotSubTitleItem())
-    
-    expect_type(PlotSubTitleItems(), "S4")
-
     expect_type(getPlotSettings(), "environment")
-
-    expect_type(PlotSettings(), "S4")
     
     expect_error(PlotSubTitleItemR6$new())
     

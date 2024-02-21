@@ -41,43 +41,41 @@
 #'
 #' @importFrom methods new
 #'
-PerformanceScore <- setRefClass("PerformanceScore",
-    contains = "ParameterSet",
-    fields = list(
-        .simulationResults = "ANY",
-        .plotSettings = "ANY",
-        .alternative = "numeric",
-        locationSampleSize = "numeric",
-        variationSampleSize = "numeric",
-        subscoreSampleSize = "numeric",
-        locationConditionalPower = "numeric",
-        variationConditionalPower = "numeric",
-        subscoreConditionalPower = "numeric",
-        performanceScore = "numeric"
-    ),
-    methods = list(
+PerformanceScoreR6 <- R6Class("PerformanceScoreR6",
+    inherit = ParameterSetR6,
+    public = list(
+        .simulationResults = NULL,
+        .plotSettings = NULL,
+        .alternative = NULL,
+        locationSampleSize = NULL,
+        variationSampleSize = NULL,
+        subscoreSampleSize = NULL,
+        locationConditionalPower = NULL,
+        variationConditionalPower = NULL,
+        subscoreConditionalPower = NULL,
+        performanceScore = NULL,
         initialize = function(simulationResults, ...) {
-            callSuper(.simulationResults = simulationResults, ...)
-
-            .plotSettings <<- PlotSettingsR6$new()
-            .parameterNames <<- C_PARAMETER_NAMES
-            .parameterFormatFunctions <<- C_PARAMETER_FORMAT_FUNCTIONS
+            super$initialize(...)
+            self$.simulationResults <- simulationResults
+            self$.plotSettings <- PlotSettingsR6$new()
+            self$.parameterNames <- C_PARAMETER_NAMES
+            self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
         },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing performance score objects"
-            .resetCat()
-            if (!is.null(.simulationResults)) {
-                .simulationResults$.show(
+            self$.resetCat()
+            if (!is.null(self$.simulationResults)) {
+                self$.simulationResults$.show(
                     showType = showType,
                     digits = digits,
                     showStatistics = FALSE,
                     consoleOutputEnabled = consoleOutputEnabled,
-                    performanceScore = .self
+                    performanceScore = self
                 )
             }
         },
         show = function(showType = 1, digits = NA_integer_) {
-            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         }
     )
 )

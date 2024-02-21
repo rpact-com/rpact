@@ -642,7 +642,7 @@ NULL
         )
     }
 
-    setting <- PiecewiseSurvivalTime(
+    setting <- PiecewiseSurvivalTimeR6$new(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
         lambda2 = piecewiseLambda,
         hazardRatio = 1, kappa = kappa,

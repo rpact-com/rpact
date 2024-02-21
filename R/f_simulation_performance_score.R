@@ -156,8 +156,6 @@ getPerformanceScore <- function(simulationResult) {
         performanceScore <- mean(c(subscoreSampleSize, subscoreConditionalPower), na.rm = TRUE)
 
         return(c(
-            alternative = alternativeValue,
-            reference = referenceValue,
             locationSampleSize = locationSampleSize,
             variationSampleSize = variationSampleSize,
             subscoreSampleSize = subscoreSampleSize,

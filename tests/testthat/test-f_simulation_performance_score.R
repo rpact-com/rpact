@@ -129,14 +129,14 @@ test_that("getPerformanceScore handles non-two-stage designs", {
 test_that("getPerformanceScore handles non-null conditionalPower", {
     simulationResult <- createCorrectSimulationResultObject()
     simulationResult$conditionalPower <- 0.8
-    suppressWarnings(expect_type(getPerformanceScore(simulationResult), "S4"))
+    suppressWarnings(expect_type(getPerformanceScore(simulationResult), "environment"))
 })
 
 # 4. Test to verify the correctness of the performance score calculation.
 test_that("getPerformanceScore calculates performance score correctly", {
     simulationResult <- createCorrectSimulationResultObject()
     suppressWarnings(scores <- getPerformanceScore(simulationResult))
-    expect_type(scores, "S4")
+    expect_type(scores, "environment")
 })
 
 # 5. Test to verify that the warning about the function being experimental is issued.
@@ -152,5 +152,5 @@ test_that("getPerformanceScore issues warning", {
 test_that("getPerformanceScore returns correct resultList", {
     simulationResult <- createCorrectSimulationResultObject()
     suppressWarnings(result <- getPerformanceScore(simulationResult))
-    expect_type(result, "S4")
+    expect_type(result, "environment")
 })
