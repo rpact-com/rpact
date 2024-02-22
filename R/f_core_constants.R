@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7650 $
-## |  Last changed: $Date: 2024-02-20 14:37:26 +0100 (Di, 20 Feb 2024) $
+## |  File version: $Revision: 7656 $
+## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -609,7 +609,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     expectedNumberOfEvents = "Expected number of events",
     singleEventsPerStage = "Single number of events",
     singleEventsPerArmAndStage = "Single number of events",
-    singleEventsPerPopulationAndStage = "Single number of events",
+    singleEventsPerSubsetAndStage = "Single number of events",
     endOfAccrualIsUserDefined = "End of accrual is user defined",
     followUpTimeMustBeUserDefined = "Follow-up time must be user defined",
     maxNumberOfSubjectsIsUserDefined = "Max number of subjects is user defined",
@@ -919,7 +919,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     expectedNumberOfSubjects = "Expected subjects",
     singleEventsPerStage = "Single events",
     singleEventsPerArmAndStage = "Single events",
-    singleEventsPerPopulationAndStage = "Single events",
+    singleEventsPerSubsetAndStage = "Single events",
     endOfAccrualIsUserDefined = "End of accrual is user defined",
     followUpTimeMustBeUserDefined = "Follow-up time must be user defined",
     maxNumberOfSubjectsIsUserDefined = "Max number of subjects is user defined",
@@ -1318,7 +1318,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     eventsPerStage = ".formatEvents",
     singleEventsPerStage = ".formatEvents",
     singleEventsPerArmAndStage = ".formatEvents",
-    singleEventsPerPopulationAndStage = ".formatEvents",
+    singleEventsPerSubsetAndStage = ".formatEvents",
     time = ".formatTime",
     cumulativeEventProbabilities = ".formatProbabilities",
     eventProbabilities1 = ".formatProbabilities",

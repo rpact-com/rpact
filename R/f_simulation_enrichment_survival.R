@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7650 $
-## |  Last changed: $Date: 2024-02-20 14:37:26 +0100 (Di, 20 Feb 2024) $
+## |  File version: $Revision: 7656 $
+## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -698,8 +698,8 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
 
-    simulationResults$singleEventsPerPopulationAndStage <- simulatedSingleEventsPerStage
-    simulationResults$.setParameterType("singleEventsPerPopulationAndStage", C_PARAM_GENERATED)
+    simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
+    simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
     .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", simulatedSingleEventsPerStage)
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents

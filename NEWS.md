@@ -1,7 +1,7 @@
 
 # rpact 3.5.1
 
-* The fields `.parameterNames` and `.parameterFormatFunctions` were removed from all rpact result objects in favor of a more efficient solution
+* The internal fields `.parameterNames` and `.parameterFormatFunctions` were removed from all rpact result objects in favor of a more efficient solution
 * Issues [#15](https://github.com/rpact-com/rpact/issues/15), [#16](https://github.com/rpact-com/rpact/issues/16), [#17](https://github.com/rpact-com/rpact/issues/17), and [#19](https://github.com/rpact-com/rpact/issues/19) fixed
 * Fixed inconsistent naming of variables and class fields (issue [#21](https://github.com/rpact-com/rpact/issues/21))
     - `getSampleSizeSurvival()` / `getPowerSurvival()`:
@@ -15,7 +15,8 @@
        + Field `singleNumberOfEventsPerStage` replaced by `singleEventsPerArmAndStage` 
        + Field `singleEventsPerStage` added
     - `getSimulationEnrichmentSurvival()`: 
-       + field `singleNumberOfEventsPerStage` replaced by `singleEventsPerPopulationAndStage` 
+       + field `singleNumberOfEventsPerStage` replaced by `singleEventsPerSubsetAndStage` 
+* Test coverage CI/CD pipeline activated with the assistance of GitHub Actions, which runs `covr` and uploads the results to [codecov.io](https://app.codecov.io/gh/rpact-com)
 
 
 # rpact 3.5.0

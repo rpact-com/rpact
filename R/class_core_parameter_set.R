@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7650 $
-## |  Last changed: $Date: 2024-02-20 14:37:26 +0100 (Di, 20 Feb 2024) $
+## |  File version: $Revision: 7656 $
+## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1357,7 +1357,7 @@ ParameterSet <- setRefClass("ParameterSet",
 
 .getCategoryCaptionEnrichment <- function(parameterSet, parameterName, categoryNumber) {
     categoryCaption <- categoryNumber
-    if (parameterName %in% c("sampleSizes", "singleEventsPerPopulationAndStage")) {
+    if (parameterName %in% c("sampleSizes", "singleEventsPerSubsetAndStage")) {
         categoryCaption <- parameterSet$effectList$subGroups[categoryNumber]
         maxNumberOfDigits <- max(nchar(sub("\\D*", "", parameterSet$effectList$subGroups)))
         if (parameterSet$populations > 2 && grepl(paste0("^S\\d{1,", maxNumberOfDigits - 1, "}$"), categoryCaption)) {

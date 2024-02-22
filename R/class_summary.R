@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7650 $
-## |  Last changed: $Date: 2024-02-20 14:37:26 +0100 (Di, 20 Feb 2024) $
+## |  File version: $Revision: 7656 $
+## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -526,7 +526,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                                 "expectedNumberOfSubjects",
                                 "expectedNumberOfEvents",
                                 "singleEventsPerArmAndStage",
-                                "singleEventsPerPopulationAndStage",
+                                "singleEventsPerSubsetAndStage",
                                 "numberOfActiveArms",
                                 "numberOfPopulations",
                                 "conditionalPowerAchieved"
@@ -3166,7 +3166,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
         if (outputSize %in% c("medium", "large")) {
             if (survivalEnabled) {
                 if (enrichmentEnabled) {
-                    parameterName <- "singleEventsPerPopulationAndStage"
+                    parameterName <- "singleEventsPerSubsetAndStage"
                     parameterCaption <- "Single number of events"
                 } else {
                     parameterName <- "cumulativeEventsPerStage" 

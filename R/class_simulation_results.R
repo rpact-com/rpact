@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7651 $
-## |  Last changed: $Date: 2024-02-20 15:45:44 +0100 (Di, 20 Feb 2024) $
+## |  File version: $Revision: 7656 $
+## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -235,7 +235,7 @@ SimulationResults <- setRefClass("SimulationResults",
                             "effectMeasure",
                             "numberOfEvents",
                             "singleEventsPerArmAndStage",
-                            "singleEventsPerPopulationAndStage",
+                            "singleEventsPerSubsetAndStage",
                             "testStatistic",
                             "conditionalCriticalValue",
                             "rejectPerStage",
@@ -541,7 +541,7 @@ SimulationResults <- setRefClass("SimulationResults",
                 "expectedNumberOfEvents",
                 "sampleSizes",
                 "singleEventsPerArmAndStage",
-                "singleEventsPerPopulationAndStage",
+                "singleEventsPerSubsetAndStage",
                 "conditionalPowerAchieved" # base
             )
             parametersToShow <- c(parametersToShow[!(parametersToShow %in% y)], y[y %in% parametersToShow])
@@ -1197,7 +1197,7 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
                 generatedParams <- c(generatedParams, 
                     "cumulativeEventsPerStage", "singleEventsPerArmAndStage")
             } else {
-                generatedParams <- c(generatedParams, "singleEventsPerPopulationAndStage")
+                generatedParams <- c(generatedParams, "singleEventsPerSubsetAndStage")
             }
             if (design$kMax > 2) {
                 generatedParams <- c(generatedParams, "futilityStop")
@@ -1612,7 +1612,7 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
         rejectedPopulationsPerStage = "array",
         successPerStage = "matrix",
         eventsPerStage = "array", # deprecated
-        singleEventsPerPopulationAndStage = "array",
+        singleEventsPerSubsetAndStage = "array",
         singleNumberOfEventsPerStage = "array", # deprecated
         conditionalPowerAchieved = "matrix"
     ),
