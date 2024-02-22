@@ -13,10 +13,10 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File name: test-f_simulation_multiarm_survival.R
+## |  File name: test-f_simulation_calc_subjects_functionR
 ## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 7554 $
-## |  Last changed: $Date: 2024-01-12 10:19:05 +0100 (Fr, 12 Jan 2024) $
+## |  File version: $Revision: 7644 $
+## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 

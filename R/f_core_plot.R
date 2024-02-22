@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -498,7 +498,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (output == "caption") {
-        captions <- character(0)
+        captions <- character()
         for (type in types) {
             captions <- c(captions, .getPlotCaption(obj,
                 type = type,
@@ -720,8 +720,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         addPowerAndAverageSampleNumber = FALSE,
         theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
-        mandatoryParameterNames = character(0),
-        yParameterNames = character(0)) {
+        mandatoryParameterNames = character(),
+        yParameterNames = character()) {
     if (.isTrialDesignSet(parameterSet) && parameterSet$getSize() > 1 &&
             (is.null(parameterSet$variedParameters) || length(parameterSet$variedParameters) == 0)) {
         stop(
@@ -1175,7 +1175,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (!.isTrialDesignFisher(designMaster) &&
-            (xParameterName == "informationRates" || xParameterName == "eventsPerStage") &&
+            (xParameterName == "informationRates" || xParameterName == "cumulativeEventsPerStage") &&
             yParameterName1 == "stageLevels") {
         yValue <- designMaster$alpha
         if (designMaster$sided == 2) {

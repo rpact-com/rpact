@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -615,19 +615,19 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
 #'
 #' For enrichment designs, the comparison of two samples is provided for an unstratified
 #' (sub-population wise) or stratified data input.\cr
-#' For unstratified (sub-population wise) data input the data sets are defined for the sub-populations
+#' For non-stratified (sub-population wise) data input the data sets are defined for the sub-populations
 #' S1, S2, ..., F, where F refers to the full populations. Use of \code{getDataset(S1 = , S2, ..., F = )}
 #' defines the data set to be used in \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 #' For stratified data input the data sets are defined for the strata S1, S12, S2, ..., R, where R
 #' refers to the remainder of the strata such that the union of all sets is the full population.
 #' Use of \code{getDataset(S1 = , S12 = , S2, ..., R = )} defines the data set to be used in
 #' \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
-#' For survival data, for enrichment designs the log-rank statistics should be entered as stratified
+#' For survival data, for enrichment designs the log-rank statistics can only be entered as stratified
 #' log-rank statistics in order to provide strong control of Type I error rate. For stratified data input,
-#' the variables to be specified in \code{getDataset()} are \code{events}, \code{expectedEvents},
-#' \code{varianceEvents}, and \code{allocationRatios} or \code{overallEvents}, \code{overallExpectedEvents},
-#' \code{overallVarianceEvents}, and \code{overallAllocationRatios}. From this, (stratified) log-rank tests are
-#' calculated.
+#' the variables to be specified in \code{getDataset()} are \code{cumEvents}, \code{cumExpectedEvents},
+#' \code{cumVarianceEvents}, and \code{cumAllocationRatios} or \code{overallEvents}, \code{overallExpectedEvents},
+#' \code{overallVarianceEvents}, and \code{overallAllocationRatios}. From this, (stratified) log-rank tests and
+#' and the independent increments are calculated.
 #'
 #' @template return_object_dataset
 #'
@@ -1463,7 +1463,7 @@ Dataset <- setRefClass("Dataset",
 
             if (any(grepl("^subsets?\\d*$", colnames(dataFrame)))) {
                 numberOfTreatmentGroups <- .getNumberOfGroups(dataFrame, c(C_KEY_WORDS_SAMPLE_SIZES, C_KEY_WORDS_LOG_RANKS))
-                subsets <<- character(0)
+                subsets <<- character()
                 for (group in 1:numberOfTreatmentGroups) {
                     suffix <- ifelse(any(grepl("^subsets?\\d+$", colnames(dataFrame))), group, "")
                     subsets <<- c(subsets, .getValuesByParameterName(dataFrame, C_KEY_WORDS_SUBSETS, suffix = suffix))
@@ -1729,7 +1729,7 @@ Dataset <- setRefClass("Dataset",
         getNumberOfStages = function(naOmitEnabled = TRUE) {
             if (naOmitEnabled) {
                 colNames <- colnames(.data)
-                validColNames <- character(0)
+                validColNames <- character()
                 for (colName in colNames) {
                     colValues <- .data[, colName]
                     if (length(colValues) > 0 && !all(is.na(colValues))) {
@@ -3755,10 +3755,10 @@ DatasetEnrichmentSurvival <- setRefClass("DatasetEnrichmentSurvival",
             if (.paramExists(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS) ||
                     .paramExists(dataFrame, C_KEY_WORDS_OVERALL_VARIANCE_EVENTS)) {
                 if (!.paramExists(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS)) {
-                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'overallExpectedEvents' is missing")
+                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'overallExpectedEvents' or 'cumExpectedEvents' is missing")
                 }
                 if (!.paramExists(dataFrame, C_KEY_WORDS_OVERALL_VARIANCE_EVENTS)) {
-                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'overallVarianceEvents' is missing")
+                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'overallVarianceEvents' or 'cumVarianceEvents' is missing")
                 }
 
                 .inputType <<- "overall"
@@ -4012,7 +4012,7 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
     digitsGeneral <- digitSettings$digitsGeneral
     digitsProbabilities <- digitSettings$digitsProbabilities
 
-    paramsToCheck <- character(0)
+    paramsToCheck <- character()
     if (object$isDatasetMeans() || object$isDatasetRates()) {
         paramsToCheck <- c(paramsToCheck, "sampleSizes")
         if (kMax > 1) {
@@ -4143,7 +4143,7 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
 
 .getDatasetArgumentsRCodeLines <- function(x, complete = FALSE, digits = 4) {
     m <- getWideFormat(x)
-    lines <- character(0)
+    lines <- character()
     paramNames <- colnames(m)
     if (!complete) {
         if (x$.inputType == "stagewise") {

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7383 $
-## |  Last changed: $Date: 2023-11-02 15:18:21 +0100 (Do, 02 Nov 2023) $
+## |  File version: $Revision: 7650 $
+## |  Last changed: $Date: 2024-02-20 14:37:26 +0100 (Di, 20 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -106,7 +106,7 @@ NULL
     gMax <- log(length(hazardRatios), 2) + 1
 
     simLogRanks <- matrix(NA_real_, nrow = pMax, ncol = kMax)
-    eventsPerStage <- matrix(NA_real_, nrow = pMax, ncol = kMax)
+    cumulativeEventsPerStage <- matrix(NA_real_, nrow = pMax, ncol = kMax)
 
     populationEventsPerStage <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     overallEffects <- matrix(NA_real_, nrow = gMax, ncol = kMax)
@@ -135,14 +135,14 @@ NULL
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
         if (is.null(piControls) || length(piControls) == 0) {
             if (k == 1) {
-                eventsPerStage[, k] <- prevalences * (1 + allocationRatioPlanned[k] * hazardRatios) /
+                cumulativeEventsPerStage[, k] <- prevalences * (1 + allocationRatioPlanned[k] * hazardRatios) /
                     sum(prevalences * (1 + allocationRatioPlanned[k] * hazardRatios), na.rm = TRUE) *
                     plannedEvents[k]
             } else {
                 prevSelected <- prevalences / sum(prevalences[selectedSubsets[, k]])
                 prevSelected[!selectedSubsets[, k]] <- 0
                 if (sum(prevSelected, na.rm = TRUE) > 0) {
-                    eventsPerStage[, k] <- prevSelected * (1 + allocationRatioPlanned[k] * hazardRatios) /
+                    cumulativeEventsPerStage[, k] <- prevSelected * (1 + allocationRatioPlanned[k] * hazardRatios) /
                         sum(prevSelected * (1 + allocationRatioPlanned[k] * hazardRatios), na.rm = TRUE) *
                         (plannedEvents[k] - plannedEvents[k - 1])
                 } else {
@@ -153,13 +153,13 @@ NULL
             rho <- (allocationRatioPlanned[k] * (1 - (1 - piControls)^hazardRatios) + piControls) /
                 (1 + allocationRatioPlanned[k])
             if (k == 1) {
-                eventsPerStage[, k] <- prevalences * rho / sum(prevalences * rho, na.rm = TRUE) *
+                cumulativeEventsPerStage[, k] <- prevalences * rho / sum(prevalences * rho, na.rm = TRUE) *
                     plannedEvents[k]
             } else {
                 prevSelected <- prevalences / sum(prevalences[selectedSubsets[, k]])
                 prevSelected[!selectedSubsets[, k]] <- 0
                 if (sum(prevSelected, na.rm = TRUE) > 0) {
-                    eventsPerStage[, k] <- prevSelected * rho / sum(prevSelected * rho, na.rm = TRUE) *
+                    cumulativeEventsPerStage[, k] <- prevSelected * rho / sum(prevSelected * rho, na.rm = TRUE) *
                         (plannedEvents[k] - plannedEvents[k - 1])
                 } else {
                     break
@@ -168,85 +168,85 @@ NULL
         }
 
         logRankStatistics[, k] <- (2 * directionUpper - 1) * stats::rnorm(pMax, log(hazardRatios) *
-            sqrt(const * eventsPerStage[, k]), 1)
+            sqrt(const * cumulativeEventsPerStage[, k]), 1)
         if (gMax == 1) {
             testStatistics[1, k] <- logRankStatistics[1, k]
-            populationEventsPerStage[1, k] <- eventsPerStage[1, k]
-            overallTestStatistics[1, k] <- sum(sqrt(eventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[1, 1:k], na.rm = TRUE))
+            populationEventsPerStage[1, k] <- cumulativeEventsPerStage[1, k]
+            overallTestStatistics[1, k] <- sum(sqrt(cumulativeEventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE))
             overallEffects[1, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[1, k] /
-                sqrt(const) / sqrt(sum(eventsPerStage[1, 1:k], na.rm = TRUE)))
+                sqrt(const) / sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE)))
         } else if (gMax == 2) {
             # Population S1
             testStatistics[1, k] <- logRankStatistics[1, k]
-            populationEventsPerStage[1, k] <- eventsPerStage[1, k]
-            overallTestStatistics[1, k] <- sum(sqrt(eventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[1, 1:k], na.rm = TRUE))
+            populationEventsPerStage[1, k] <- cumulativeEventsPerStage[1, k]
+            overallTestStatistics[1, k] <- sum(sqrt(cumulativeEventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE))
             overallEffects[1, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[1, k] /
-                sqrt(const) / sqrt(sum(eventsPerStage[1, 1:k], na.rm = TRUE)))
+                sqrt(const) / sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE)))
             # Full population
-            testStatistics[2, k] <- sum(sqrt(eventsPerStage[1:2, k]) * logRankStatistics[1:2, k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[1:2, k], na.rm = TRUE))
+            testStatistics[2, k] <- sum(sqrt(cumulativeEventsPerStage[1:2, k]) * logRankStatistics[1:2, k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[1:2, k], na.rm = TRUE))
 
-            populationEventsPerStage[2, k] <- sum(eventsPerStage[1:2, k], na.rm = TRUE)
+            populationEventsPerStage[2, k] <- sum(cumulativeEventsPerStage[1:2, k], na.rm = TRUE)
             overallTestStatistics[2, k] <- sum(sqrt(populationEventsPerStage[2, 1:k]) * testStatistics[2, 1:k], na.rm = TRUE) /
                 sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
             overallEffects[2, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[2, k] /
                 sqrt(const) / sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE)))
         } else if (gMax == 3) {
             # Population S1
-            testStatistics[1, k] <- sum(sqrt(eventsPerStage[c(1, 3), k]) * logRankStatistics[c(1, 3), k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[c(1, 3), k], na.rm = TRUE))
-            populationEventsPerStage[1, k] <- sum(eventsPerStage[c(1, 3), k], na.rm = TRUE)
+            testStatistics[1, k] <- sum(sqrt(cumulativeEventsPerStage[c(1, 3), k]) * logRankStatistics[c(1, 3), k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[c(1, 3), k], na.rm = TRUE))
+            populationEventsPerStage[1, k] <- sum(cumulativeEventsPerStage[c(1, 3), k], na.rm = TRUE)
             overallTestStatistics[1, k] <- sum(sqrt(populationEventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
                 sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE))
             overallEffects[1, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[1, k] /
                 sqrt(const) / sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE)))
             # Population S2
-            testStatistics[2, k] <- sum(sqrt(eventsPerStage[c(2, 3), k]) * logRankStatistics[c(2, 3), k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[c(2, 3), k], na.rm = TRUE))
-            populationEventsPerStage[2, k] <- sum(eventsPerStage[c(2, 3), k], na.rm = TRUE)
+            testStatistics[2, k] <- sum(sqrt(cumulativeEventsPerStage[c(2, 3), k]) * logRankStatistics[c(2, 3), k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[c(2, 3), k], na.rm = TRUE))
+            populationEventsPerStage[2, k] <- sum(cumulativeEventsPerStage[c(2, 3), k], na.rm = TRUE)
             overallTestStatistics[2, k] <- sum(sqrt(populationEventsPerStage[2, 1:k]) * testStatistics[2, 1:k], na.rm = TRUE) /
                 sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
             overallEffects[2, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[2, k] /
                 sqrt(const) / sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE)))
             # Full population
-            testStatistics[3, k] <- sum(sqrt(eventsPerStage[1:4, k]) * logRankStatistics[1:4, k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[1:4, k], na.rm = TRUE))
-            populationEventsPerStage[3, k] <- sum(eventsPerStage[1:4, k], na.rm = TRUE)
+            testStatistics[3, k] <- sum(sqrt(cumulativeEventsPerStage[1:4, k]) * logRankStatistics[1:4, k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[1:4, k], na.rm = TRUE))
+            populationEventsPerStage[3, k] <- sum(cumulativeEventsPerStage[1:4, k], na.rm = TRUE)
             overallTestStatistics[3, k] <- sum(sqrt(populationEventsPerStage[3, 1:k]) * testStatistics[3, 1:k], na.rm = TRUE) /
                 sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE))
             overallEffects[3, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[3, k] /
                 sqrt(const) / sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE)))
         } else if (gMax == 4) {
             # Population S1
-            testStatistics[1, k] <- sum(sqrt(eventsPerStage[c(1, 4, 5, 7), k]) * logRankStatistics[c(1, 4, 5, 7), k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[c(1, 4, 5, 7), k], na.rm = TRUE))
-            populationEventsPerStage[1, k] <- sum(eventsPerStage[c(1, 4, 5, 7), k], na.rm = TRUE)
+            testStatistics[1, k] <- sum(sqrt(cumulativeEventsPerStage[c(1, 4, 5, 7), k]) * logRankStatistics[c(1, 4, 5, 7), k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[c(1, 4, 5, 7), k], na.rm = TRUE))
+            populationEventsPerStage[1, k] <- sum(cumulativeEventsPerStage[c(1, 4, 5, 7), k], na.rm = TRUE)
             overallTestStatistics[1, k] <- sum(sqrt(populationEventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
                 sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE))
             overallEffects[1, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[1, k] /
                 sqrt(const) / sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE)))
             # Population S2
-            testStatistics[2, k] <- sum(sqrt(eventsPerStage[c(2, 4, 6, 7), k]) * logRankStatistics[c(2, 4, 6, 7), k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE))
-            populationEventsPerStage[2, k] <- sum(eventsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE)
+            testStatistics[2, k] <- sum(sqrt(cumulativeEventsPerStage[c(2, 4, 6, 7), k]) * logRankStatistics[c(2, 4, 6, 7), k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE))
+            populationEventsPerStage[2, k] <- sum(cumulativeEventsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE)
             overallTestStatistics[2, k] <- sum(sqrt(populationEventsPerStage[2, 1:k]) * testStatistics[2, 1:k], na.rm = TRUE) /
                 sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
             overallEffects[2, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[2, k] /
                 sqrt(const) / sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE)))
             # Population S3
-            testStatistics[3, k] <- sum(sqrt(eventsPerStage[c(3, 5, 6, 7), k]) * logRankStatistics[c(3, 5, 6, 7), k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[c(3, 5, 6, 7), k], na.rm = TRUE))
-            populationEventsPerStage[3, k] <- sum(eventsPerStage[c(3, 5, 6, 7), k], na.rm = TRUE)
+            testStatistics[3, k] <- sum(sqrt(cumulativeEventsPerStage[c(3, 5, 6, 7), k]) * logRankStatistics[c(3, 5, 6, 7), k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[c(3, 5, 6, 7), k], na.rm = TRUE))
+            populationEventsPerStage[3, k] <- sum(cumulativeEventsPerStage[c(3, 5, 6, 7), k], na.rm = TRUE)
             overallTestStatistics[3, k] <- sum(sqrt(populationEventsPerStage[3, 1:k]) * testStatistics[3, 1:k], na.rm = TRUE) /
                 sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE))
             overallEffects[3, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[3, k] /
                 sqrt(const) / sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE)))
             # Full population
-            testStatistics[4, k] <- sum(sqrt(eventsPerStage[1:8, k]) * logRankStatistics[1:8, k], na.rm = TRUE) /
-                sqrt(sum(eventsPerStage[1:8, k], na.rm = TRUE))
-            populationEventsPerStage[4, k] <- sum(eventsPerStage[1:8, k], na.rm = TRUE)
+            testStatistics[4, k] <- sum(sqrt(cumulativeEventsPerStage[1:8, k]) * logRankStatistics[1:8, k], na.rm = TRUE) /
+                sqrt(sum(cumulativeEventsPerStage[1:8, k], na.rm = TRUE))
+            populationEventsPerStage[4, k] <- sum(cumulativeEventsPerStage[1:8, k], na.rm = TRUE)
             overallTestStatistics[4, k] <- sum(sqrt(populationEventsPerStage[4, 1:k]) * testStatistics[4, 1:k], na.rm = TRUE) /
                 sqrt(sum(populationEventsPerStage[4, 1:k], na.rm = TRUE))
             overallEffects[4, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[4, k] /
@@ -343,7 +343,7 @@ NULL
     }
 
     return(list(
-        eventsPerStage = eventsPerStage,
+        cumulativeEventsPerStage = cumulativeEventsPerStage,
         plannedEvents = plannedEvents,
         allocationRatioPlanned = allocationRatioPlanned,
         overallEffects = overallEffects,
@@ -581,7 +581,8 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
             closedTest <- .performClosedCombinationTestForSimulationEnrichment(
                 stageResults = stageResults,
                 design = design, indices = indices,
-                intersectionTest = intersectionTest, successCriterion = successCriterion
+                intersectionTest = intersectionTest, 
+                successCriterion = successCriterion
             )
 
             rejectAtSomeStage <- FALSE
@@ -592,7 +593,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
                     (closedTest$rejected[, k] & closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore)
                 simulatedSelections[k, i, ] <- simulatedSelections[k, i, ] + closedTest$selectedPopulations[, k]
 
-                simulatedSingleEventsPerStage[k, i, ] <- simulatedSingleEventsPerStage[k, i, ] + stageResults$eventsPerStage[, k]
+                simulatedSingleEventsPerStage[k, i, ] <- simulatedSingleEventsPerStage[k, i, ] + stageResults$cumulativeEventsPerStage[, k]
 
                 simulatedNumberOfPopulations[k, i] <- simulatedNumberOfPopulations[k, i] + sum(closedTest$selectedPopulations[, k])
 
@@ -627,7 +628,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
                     dataArmNumber[index] <- g
                     dataAlternative[index] <- i
                     dataEffect[index] <- effectList$hazardRatios[i, g]
-                    dataNumberOfEvents[index] <- round(stageResults$eventsPerStage[g, k], 1)
+                    dataNumberOfEvents[index] <- round(stageResults$cumulativeEventsPerStage[g, k], 1)
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -697,8 +698,9 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
 
-    simulationResults$singleNumberOfEventsPerStage <- simulatedSingleEventsPerStage
-    simulationResults$.setParameterType("singleNumberOfEventsPerStage", C_PARAM_GENERATED)
+    simulationResults$singleEventsPerPopulationAndStage <- simulatedSingleEventsPerStage
+    simulationResults$.setParameterType("singleEventsPerPopulationAndStage", C_PARAM_GENERATED)
+    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", simulatedSingleEventsPerStage)
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 

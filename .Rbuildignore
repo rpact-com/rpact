@@ -47,3 +47,4 @@ testthat-problems\.rds
 ^.*\.gcno$
 ^inst/\.covrignore$
 ^README\.html$
+^codecov\.yml$

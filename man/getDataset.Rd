@@ -88,19 +88,19 @@ comparison to control (see Examples).
 
 For enrichment designs, the comparison of two samples is provided for an unstratified
 (sub-population wise) or stratified data input.\cr
-For unstratified (sub-population wise) data input the data sets are defined for the sub-populations
+For non-stratified (sub-population wise) data input the data sets are defined for the sub-populations
 S1, S2, ..., F, where F refers to the full populations. Use of \code{getDataset(S1 = , S2, ..., F = )}
 defines the data set to be used in \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 For stratified data input the data sets are defined for the strata S1, S12, S2, ..., R, where R
 refers to the remainder of the strata such that the union of all sets is the full population.
 Use of \code{getDataset(S1 = , S12 = , S2, ..., R = )} defines the data set to be used in
 \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
-For survival data, for enrichment designs the log-rank statistics should be entered as stratified
+For survival data, for enrichment designs the log-rank statistics can only be entered as stratified
 log-rank statistics in order to provide strong control of Type I error rate. For stratified data input,
-the variables to be specified in \code{getDataset()} are \code{events}, \code{expectedEvents},
-\code{varianceEvents}, and \code{allocationRatios} or \code{overallEvents}, \code{overallExpectedEvents},
-\code{overallVarianceEvents}, and \code{overallAllocationRatios}. From this, (stratified) log-rank tests are
-calculated.
+the variables to be specified in \code{getDataset()} are \code{cumEvents}, \code{cumExpectedEvents},
+\code{cumVarianceEvents}, and \code{cumAllocationRatios} or \code{overallEvents}, \code{overallExpectedEvents},
+\code{overallVarianceEvents}, and \code{overallAllocationRatios}. From this, (stratified) log-rank tests and
+and the independent increments are calculated.
 }
 \examples{
 # Create a Dataset of Means (one group):

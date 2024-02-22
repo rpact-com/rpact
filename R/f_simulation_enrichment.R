@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -159,7 +159,7 @@ NULL
     separatePValues <- stageResults$separatePValues
     if (intersectionTest == "SpiessensDebois") {
         subjectsPerStage <- stageResults[[ifelse(
-            !is.null(stageResults[["subjectsPerStage"]]), "subjectsPerStage", "eventsPerStage"
+            !is.null(stageResults[["subjectsPerStage"]]), "subjectsPerStage", "cumulativeEventsPerStage"
         )]]
         testStatistics <- stageResults$testStatistics
     } else {

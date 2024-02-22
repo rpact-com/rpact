@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7590 $
-## |  Last changed: $Date: 2024-01-23 11:32:01 +0100 (Di, 23 Jan 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -1331,7 +1331,7 @@ NULL
     return(TRUE)
 }
 
-.warnInCaseOfUnknownArguments <- function(..., functionName, ignore = character(0),
+.warnInCaseOfUnknownArguments <- function(..., functionName, ignore = character(),
         numberOfAllowedUnnamedParameters = 0, exceptionEnabled = FALSE) {
     args <- list(...)
     if (length(args) == 0) {

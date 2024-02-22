@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7650 $
+## |  Last changed: $Date: 2024-02-20 14:37:26 +0100 (Di, 20 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -45,7 +45,8 @@ FieldSet <- setRefClass("FieldSet",
     fields = list(
         .parameterTypes = "list",
         .showParameterTypeEnabled = "logical",
-        .catLines = "character"
+        .catLines = "character",
+        .deprecatedFieldNames = "character"
     ),
     methods = list(
         .getFieldNames = function() {
@@ -54,10 +55,11 @@ FieldSet <- setRefClass("FieldSet",
         .getVisibleFieldNames = function() {
             fieldNames <- names(.self$getRefClass()$fields())
             fieldNames <- fieldNames[!startsWith(fieldNames, ".")]
+            fieldNames <- fieldNames[!(fieldNames %in% .deprecatedFieldNames)]
             return(fieldNames)
         },
         .resetCat = function() {
-            .catLines <<- character(0)
+            .catLines <<- character()
         },
         .cat = function(..., file = "", sep = "", fill = FALSE, labels = NULL,
                 append = FALSE, heading = 0, tableColumns = 0, consoleOutputEnabled = TRUE,
@@ -199,7 +201,8 @@ ParameterSet <- setRefClass("ParameterSet",
                 .showParameterTypeEnabled = .showParameterTypeEnabled
             )
             .parameterTypes <<- list()
-            .catLines <<- character(0)
+            .catLines <<- character()
+            .deprecatedFieldNames <<- character()
         },
         clone = function() {
             paramNames <- names(.self$getRefClass()$fields())
@@ -605,7 +608,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 paramCaption <- paste0("%", paramName, "%")
             }
             if (!is.null(category) && !is.na(category)) {
-                if (.isMultiArmSimulationResults(.self) && paramName == "singleNumberOfEventsPerStage") {
+                if (.isMultiArmSimulationResults(.self) && paramName == "singleEventsPerArmAndStage") {
                     if (!inherits(.self, "SimulationResultsEnrichmentSurvival") &&
                             !is.na(numberOfCategories) && numberOfCategories == category) {
                         category <- "control"
@@ -1112,7 +1115,7 @@ ParameterSet <- setRefClass("ParameterSet",
     names(dataFrame) <- stagesCaption
 
     if (parameterSet$.isEnrichmentObject()) {
-        populations <- character(0)
+        populations <- character()
         for (i in 1:numberOfVariants) {
             populations <- c(populations, ifelse(i == numberOfVariants, "F", paste0("S", i)))
         }
@@ -1139,7 +1142,7 @@ ParameterSet <- setRefClass("ParameterSet",
         }
     )
 
-    usedParameterNames <- character(0)
+    usedParameterNames <- character()
     for (parameterName in parameterNames) {
         tryCatch(
             {
@@ -1284,7 +1287,7 @@ ParameterSet <- setRefClass("ParameterSet",
         includeAllParameters = FALSE,
         handleParameterNamesAsToBeExcluded = FALSE,
         returnParametersAsCharacter = FALSE,
-        mandatoryParameterNames = character(0)) {
+        mandatoryParameterNames = character()) {
     parameterNamesToBeExcluded <- c()
     if (handleParameterNamesAsToBeExcluded) {
         parameterNamesToBeExcluded <- parameterNames
@@ -1297,7 +1300,7 @@ ParameterSet <- setRefClass("ParameterSet",
     }
     parameterNames <- parameterNames[!grepl("^\\.", parameterNames)]
 
-    parametersToIgnore <- character(0)
+    parametersToIgnore <- character()
     if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
             parameterSet$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
         parametersToIgnore <- c(
@@ -1354,7 +1357,7 @@ ParameterSet <- setRefClass("ParameterSet",
 
 .getCategoryCaptionEnrichment <- function(parameterSet, parameterName, categoryNumber) {
     categoryCaption <- categoryNumber
-    if (parameterName %in% c("sampleSizes", "singleNumberOfEventsPerStage")) {
+    if (parameterName %in% c("sampleSizes", "singleEventsPerPopulationAndStage")) {
         categoryCaption <- parameterSet$effectList$subGroups[categoryNumber]
         maxNumberOfDigits <- max(nchar(sub("\\D*", "", parameterSet$effectList$subGroups)))
         if (parameterSet$populations > 2 && grepl(paste0("^S\\d{1,", maxNumberOfDigits - 1, "}$"), categoryCaption)) {

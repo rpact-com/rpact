@@ -11,7 +11,7 @@
   main = NA_character_,
   xlab = NA_character_,
   ylab = NA_character_,
-  type = ifelse(x$.design$kMax == 1, 5L, 1L),
+  type = NA_integer_,
   palette = "Set1",
   theta = NA_real_,
   plotPointsEnabled = NA,

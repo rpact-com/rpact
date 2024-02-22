@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7547 $
-## |  Last changed: $Date: 2024-01-10 08:13:40 +0100 (Mi, 10 Jan 2024) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -497,7 +497,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(parameterName), " must be a non-empty data.frame")
     }
 
-    effectList <- list(subGroups = character(0), prevalences = numeric(0))
+    effectList <- list(subGroups = character(), prevalences = numeric(0))
     matrixName <- NA_character_
     matrixNames <- c("effect", "piTreatment", "hazardRatio")
     names(matrixNames) <- c("means", "rates", "survival")

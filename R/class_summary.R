@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7650 $
+## |  Last changed: $Date: 2024-02-20 14:37:26 +0100 (Di, 20 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -525,7 +525,8 @@ SummaryFactory <- setRefClass("SummaryFactory",
                                 "successPerStage",
                                 "expectedNumberOfSubjects",
                                 "expectedNumberOfEvents",
-                                "singleNumberOfEventsPerStage",
+                                "singleEventsPerArmAndStage",
+                                "singleEventsPerPopulationAndStage",
                                 "numberOfActiveArms",
                                 "numberOfPopulations",
                                 "conditionalPowerAchieved"
@@ -764,6 +765,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     if (length(values) <= 1 && !is.matrix(values)) {
                         colValues <- values
                     } else if (is.matrix(values)) {
+                        if (length(values) == 0 || nrow(values) == 0 || ncol(values) == 0) {
+                            return("")
+                        }
+                        
                         if (nrow(values) == 1 && ncol(values) == 1) {
                             colValues <- values[1, 1]
                         } else if (ncol(values) == 1) {
@@ -3161,10 +3166,10 @@ SummaryFactory <- setRefClass("SummaryFactory",
         if (outputSize %in% c("medium", "large")) {
             if (survivalEnabled) {
                 if (enrichmentEnabled) {
-                    parameterName <- "singleNumberOfEventsPerStage"
+                    parameterName <- "singleEventsPerPopulationAndStage"
                     parameterCaption <- "Single number of events"
                 } else {
-                    parameterName <- "eventsPerStage" 
+                    parameterName <- "cumulativeEventsPerStage" 
                     parameterCaption <- "Cumulative number of events"
                 }
             } else {
@@ -3245,7 +3250,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
 
         if (inherits(designPlan, "SimulationResults")) {
             parameterNameSubjects <- ifelse(survivalEnabled, "numberOfSubjects", "sampleSizes")
-            parameterNameEvents <- "overallEventsPerStage"
+            parameterNameEvents <- "cumulativeEventsPerStage"
         } else {
             if (design$kMax == 1 && (
                     designPlan$.isSampleSizeObject() ||
@@ -3262,7 +3267,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 parameterNameEvents <- "expectedNumberOfEvents"
             } else {
                 parameterNameSubjects <- "numberOfSubjects"
-                parameterNameEvents <- "eventsPerStage"
+                parameterNameEvents <- "cumulativeEventsPerStage"
             }
         }
 
@@ -3691,7 +3696,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
 
     if (!grepl("Survival", .getClassName(designPlan)) ||
             (inherits(designPlan, "SimulationResultsMultiArmSurvival") &&
-                parameterName == "singleNumberOfEventsPerStage")) {
+                parameterName == "singleEventsPerArmAndStage")) {
         return(ifelse(groupNumber == numberOfGroups,
             paste0(listItemPrefix, "Control arm"),
             paste0(listItemPrefix, treatmentCaption)
@@ -3749,7 +3754,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
     arrayData <- designPlan[[parameterName]]
     if (is.array(arrayData) && length(dim(arrayData)) == 3) {
         totalNumberOfGroups <- dim(designPlan[[ifelse(grepl("Survival", .getClassName(designPlan)),
-            "eventsPerStage", "sampleSizes"
+            "cumulativeEventsPerStage", "sampleSizes"
         )]])[3]
 
         numberOfGroups <- dim(arrayData)[3]

@@ -1,3 +1,3 @@
 #' Field description: events per stage
-#' @field eventsPerStage The number of events per stage. Is a numeric matrix.
+#' @field eventsPerStage Deprecated: use \code{singleEventsPerStage} or \code{cumulativeEventsPerStage} instead Is a numeric matrix.
 #' @keywords internal

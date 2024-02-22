@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7651 $
+## |  Last changed: $Date: 2024-02-20 15:45:44 +0100 (Di, 20 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -202,7 +202,7 @@ SimulationResults <- setRefClass("SimulationResults",
                             "numberOfSubjects",
                             "eventsPerStage1",
                             "eventsPerStage2",
-                            "eventsPerStage",
+                            "cumulativeEventsPerStage",
                             "testStatistic",
                             "logRankStatistic",
                             "hazardRatioEstimateLR"
@@ -234,7 +234,8 @@ SimulationResults <- setRefClass("SimulationResults",
                         params <- c(
                             "effectMeasure",
                             "numberOfEvents",
-                            "singleNumberOfEventsPerStage",
+                            "singleEventsPerArmAndStage",
+                            "singleEventsPerPopulationAndStage",
                             "testStatistic",
                             "conditionalCriticalValue",
                             "rejectPerStage",
@@ -515,8 +516,8 @@ SimulationResults <- setRefClass("SimulationResults",
         .getParametersToShow = function() {
             parametersToShow <- .getVisibleFieldNames()
             y <- c(
-                "eventsPerStage",
-                "overallEventsPerStage",
+                "singleEventsPerStage",
+                "cumulativeEventsPerStage",
                 "iterations",
                 "overallReject", # base
                 "rejectAtLeastOne",
@@ -539,7 +540,8 @@ SimulationResults <- setRefClass("SimulationResults",
                 "expectedNumberOfSubjects",
                 "expectedNumberOfEvents",
                 "sampleSizes",
-                "singleNumberOfEventsPerStage",
+                "singleEventsPerArmAndStage",
+                "singleEventsPerPopulationAndStage",
                 "conditionalPowerAchieved" # base
             )
             parametersToShow <- c(parametersToShow[!(parametersToShow %in% y)], y[y %in% parametersToShow])
@@ -1042,7 +1044,7 @@ SimulationResultsBaseSurvival <- setRefClass("SimulationResultsBaseSurvival",
             generatedParams <- c(
                 "iterations",
                 "expectedNumberOfEvents",
-                "eventsPerStage",
+                "cumulativeEventsPerStage",
                 "overallReject",
                 "rejectPerStage",
                 "futilityPerStage",
@@ -1106,8 +1108,8 @@ SimulationResultsBaseSurvival <- setRefClass("SimulationResultsBaseSurvival",
 #' @template field_numberOfSubjects
 #' @template field_numberOfSubjects1
 #' @template field_numberOfSubjects2
-#' @template field_eventsPerStage
-#' @template field_overallEventsPerStage
+#' @template field_singleEventsPerStage
+#' @template field_cumulativeEventsPerStage
 #' @template field_expectedNumberOfSubjects
 #' @template field_rejectPerStage
 #' @template field_overallReject
@@ -1165,8 +1167,9 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
         numberOfSubjects = "matrix",
         numberOfSubjects1 = "matrix",
         numberOfSubjects2 = "matrix",
-        eventsPerStage = "matrix",
-        overallEventsPerStage = "matrix",
+        eventsPerStage = "matrix", # deprecated
+        singleEventsPerStage = "matrix",
+        cumulativeEventsPerStage = "matrix",
         expectedNumberOfSubjects = "numeric",
         rejectPerStage = "matrix",
         overallReject = "numeric",
@@ -1178,8 +1181,6 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
             generatedParams <- c(
                 "hazardRatio",
                 "iterations",
-                "eventsPerStage",
-                "singleNumberOfEventsPerStage",
                 "expectedNumberOfEvents",
                 "eventsNotAchieved",
                 "numberOfSubjects",
@@ -1192,6 +1193,12 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
                 "studyDuration",
                 "allocationRatioPlanned"
             )
+            if (inherits(.self, "SimulationResultsMultiArmSurvival")) {
+                generatedParams <- c(generatedParams, 
+                    "cumulativeEventsPerStage", "singleEventsPerArmAndStage")
+            } else {
+                generatedParams <- c(generatedParams, "singleEventsPerPopulationAndStage")
+            }
             if (design$kMax > 2) {
                 generatedParams <- c(generatedParams, "futilityStop")
             }
@@ -1248,6 +1255,9 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
 #' @template field_successPerStage
 #' @template field_eventsPerStage
 #' @template field_singleNumberOfEventsPerStage
+#' @template field_singleEventsPerArmAndStage
+#' @template field_singleEventsPerStage
+#' @template field_cumulativeEventsPerStage
 #' @template field_conditionalPowerAchieved
 #'
 #' @details
@@ -1289,8 +1299,11 @@ SimulationResultsMultiArmSurvival <- setRefClass("SimulationResultsMultiArmSurvi
         rejectAtLeastOne = "numeric",
         rejectedArmsPerStage = "array",
         successPerStage = "matrix",
-        eventsPerStage = "array",
-        singleNumberOfEventsPerStage = "array",
+        eventsPerStage = "array", # deprecated
+        singleEventsPerStage = "array",
+        cumulativeEventsPerStage = "array", 
+        singleEventsPerArmAndStage = "array",
+        singleNumberOfEventsPerStage = "array", # deprecated
         conditionalPowerAchieved = "matrix"
     ),
     methods = list(
@@ -1558,6 +1571,7 @@ SimulationResultsEnrichmentRates <- setRefClass("SimulationResultsEnrichmentRate
 #' @template field_successPerStage
 #' @template field_eventsPerStage
 #' @template field_singleNumberOfEventsPerStage
+#' @template field_singleEventsPerPopulationAndStage
 #' @template field_conditionalPowerAchieved
 #'
 #' @details
@@ -1597,8 +1611,9 @@ SimulationResultsEnrichmentSurvival <- setRefClass("SimulationResultsEnrichmentS
         rejectAtLeastOne = "numeric",
         rejectedPopulationsPerStage = "array",
         successPerStage = "matrix",
-        eventsPerStage = "array",
-        singleNumberOfEventsPerStage = "array",
+        eventsPerStage = "array", # deprecated
+        singleEventsPerPopulationAndStage = "array",
+        singleNumberOfEventsPerStage = "array", # deprecated
         conditionalPowerAchieved = "matrix"
     ),
     methods = list(

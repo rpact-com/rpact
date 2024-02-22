@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7543 $
-## |  Last changed: $Date: 2024-01-09 11:57:18 +0100 (Di, 09 Jan 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7652 $
+## |  Last changed: $Date: 2024-02-21 16:23:54 +0100 (Mi, 21 Feb 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -655,7 +655,7 @@ NULL
 #'
 getSampleSizeMeans <- function(
         design = NULL, ...,
-        groups = 2,
+        groups = 2L,
         normalApproximation = FALSE,
         meanRatio = FALSE,
         thetaH0 = ifelse(meanRatio, 1, 0),
@@ -682,7 +682,7 @@ getSampleSizeMeans <- function(
         allocationRatioPlanned = allocationRatioPlanned, ...
     )
 
-    return(.getSampleSize(designPlan))
+    return(.calculateSampleSizeMeansAndRates(designPlan))
 }
 
 #' @title

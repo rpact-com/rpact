@@ -223,7 +223,7 @@ testing situation. The function might depend on variables
 \code{conditionalPower},
 \code{thetaH0},
 \code{plannedEvents},
-\code{eventsPerStage},
+\code{singleEventsPerStage},
 \code{minNumberOfEventsPerStage},
 \code{maxNumberOfEventsPerStage},
 \code{allocationRatioPlanned},
@@ -301,7 +301,7 @@ object as \code{\link[base]{data.frame}}. The data frame contains the following 
 in treatment group 1.
 \item \code{eventsPerStage2}: The observed number of events per stage
 in treatment group 2.
-\item \code{eventsPerStage}: The observed number of events per stage
+\item \code{singleEventsPerStage}: The observed number of events per stage
 in both treatment groups.
 \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
 \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
