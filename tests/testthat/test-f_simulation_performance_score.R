@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_performance_score.R
 ## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 7644 $
-## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7662 $
+## |  Last changed: $Date: 2024-02-23 12:42:26 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -112,8 +112,47 @@ test_that("getPerformanceScore issues warning", {
 })
 
 # 6. Test to check if the correct values are returned in the resultList.
-test_that("getPerformanceScore returns correct resultList", {
+test_that("getPerformanceScore returns correct result object", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     suppressWarnings(result <- getPerformanceScore(simulationResult))
     expect_type(result, "S4")
+})
+
+# 7. Test to check if the correct values are returned in the resultList.
+test_that("Print getPerformanceScore results", {
+    .skipTestIfDisabled()
+        
+    design <- getDesignGroupSequential(
+        kMax = 2,
+        alpha = 0.025,
+        beta = 0.2,
+        sided = 1,
+        typeOfDesign = "P",
+        futilityBounds = 0,
+        bindingFutility = TRUE
+    )
+    simulationResult <- getSimulationMeans(
+        design = design,
+        normalApproximation = TRUE,
+        alternative = c(0.1, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6),
+        plannedSubjects = c(100, 300),
+        minNumberOfSubjectsPerStage = c(NA, 1),
+        maxNumberOfSubjectsPerStage = c(NA, 300),
+        conditionalPower = 0.8,
+        maxNumberOfIterations = 5,
+        showStatistics = FALSE,
+        seed = 4378258
+    )
+    suppressWarnings(result <- getPerformanceScore(simulationResult))
+    
+    ## Comparison of the results of PerformanceScore object 'result' with expected results
+    expect_equal(result$locationSampleSize, c(0.33333333, 0.46480206, 0.98145492, 0.68310847, 0.32073998, 0.58520454, 0.17612196), tolerance = 1e-07, label = paste0(result$locationSampleSize))
+    expect_equal(result$variationSampleSize, c(1, 0.4741251, 0.41415267, 0.41990327, 1, 0.93197635, 0.44658613), tolerance = 1e-07, label = paste0(result$variationSampleSize))
+    expect_equal(result$subscoreSampleSize, c(0.66666667, 0.46946358, 0.69780379, 0.55150587, 0.66036999, 0.75859044, 0.31135404), tolerance = 1e-07, label = paste0(result$subscoreSampleSize))
+    expect_equal(result$locationConditionalPower, c(0.30735073, 0.49743062, 0.60705436, 0.76291858, 0.5606313, 1, 0.97603637), tolerance = 1e-07, label = paste0(result$locationConditionalPower))
+    expect_equal(result$variationConditionalPower, c(0.82758598, 0.40491784, 0.33046135, 0.35800273, 0.6214103, 1, 0.94089187), tolerance = 1e-07, label = paste0(result$variationConditionalPower))
+    expect_equal(result$subscoreConditionalPower, c(0.56746835, 0.45117423, 0.46875786, 0.56046066, 0.5910208, 1, 0.95846412), tolerance = 1e-07, label = paste0(result$subscoreConditionalPower))
+    expect_equal(result$performanceScore, c(0.61706751, 0.4603189, 0.58328083, 0.55598326, 0.6256954, 0.87929522, 0.63490908), tolerance = 1e-07, label = paste0(result$performanceScore))
+    
+    expect_true(any(grepl("Performance score", capture.output(result))))
 })

@@ -32,6 +32,8 @@ jobs:
           covr::codecov(
             quiet = FALSE,
             clean = FALSE,
+            token = ${{ secrets.CODECOV_TOKEN }},
+            line_exclusions = c("src/f_count_data_estimation.cpp", "src/f_assertions.cpp", "R/f_design_plan_plot.R", "R/f_simulation_plot.R", "R/f_simulation_calc_subjects_function.R"),
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
         shell: Rscript {0}
@@ -49,9 +51,4 @@ jobs:
         with:
           name: coverage-test-failures
           path: ${{ runner.temp }}/package
-          
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: rpact-com/rpact
+

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7646 $
-## |  Last changed: $Date: 2024-02-19 11:43:25 +0100 (Mo, 19 Feb 2024) $
+## |  File version: $Revision: 7665 $
+## |  Last changed: $Date: 2024-02-23 17:33:46 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -832,7 +832,7 @@ getSimulationSurvival <- function(design = NULL, ...,
             )
             simulationResults$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
             .addDeprecatedFieldValues(simulationResults, 
-                "overallEventsPer1Stage", simulationResults$cumulativeEventsPerStage)
+                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage)
             simulationResults$expectedNumberOfEvents <-
                 diag(t(simulationResults$cumulativeEventsPerStage) %*% pStop)
         }
@@ -844,7 +844,7 @@ getSimulationSurvival <- function(design = NULL, ...,
                 ncol(simulationResults$singleEventsPerStage) > 0) {
             simulationResults$cumulativeEventsPerStage <- simulationResults$singleEventsPerStage
             .addDeprecatedFieldValues(simulationResults, 
-                "overallEventsPer1Stage", simulationResults$cumulativeEventsPerStage)
+                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage)
             simulationResults$expectedNumberOfEvents <-
                 as.numeric(simulationResults$cumulativeEventsPerStage)
         }

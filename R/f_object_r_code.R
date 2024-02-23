@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7659 $
+## |  Last changed: $Date: 2024-02-23 10:42:33 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -618,6 +618,7 @@ getObjectRCode <- function(obj, ...,
     if (!("accrualIntensity" %in% objNames) && !is.null(obj[[".accrualTime"]]) &&
             !obj$.accrualTime$absoluteAccrualIntensityEnabled) {
         objNames <- c(objNames, "accrualIntensity")
+        objNames <- objNames[objNames != "accrualIntensityRelative"]
     }
 
     newArgumentValueNames <- character()

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7652 $
-## |  Last changed: $Date: 2024-02-21 16:23:54 +0100 (Mi, 21 Feb 2024) $
+## |  File version: $Revision: 7662 $
+## |  Last changed: $Date: 2024-02-23 12:42:26 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -451,8 +451,8 @@ NULL
     designPlan$singleEventsPerStage <- .getSingleEventsPerStage(designPlan$cumulativeEventsPerStage)
     .addDeprecatedFieldValues(designPlan, "eventsPerStage", designPlan$cumulativeEventsPerStage)
 
-
-    if (designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED &&
+    paramName <- ifelse(designPlan$.design$kMax == 1, "nFixed", "maxNumberOfSubjects")
+    if (designPlan$.getParameterType(paramName) == C_PARAM_GENERATED &&
             designPlan$.accrualTime$.getParameterType("maxNumberOfSubjects") != C_PARAM_GENERATED &&
             all(designPlan$accrualIntensity < 1)) {
         numberOfDefinedAccrualIntensities <- length(designPlan$accrualIntensity)
@@ -479,9 +479,9 @@ NULL
                 designPlan$.getParameterType("accrualIntensity")
             )
         }
-
-        accrualIntensityAbsolute <- c()
-        for (maxNumberOfSubjects in designPlan$maxNumberOfSubjects) {
+        
+        accrualIntensityAbsolute <- numeric()
+        for (maxNumberOfSubjects in designPlan[[paramName]]) {
             accrualSetup <- getAccrualTime(
                 accrualTime = accrualTime,
                 accrualIntensity = designPlan$accrualIntensityRelative,
@@ -492,7 +492,7 @@ NULL
         }
         designPlan$accrualIntensity <- accrualIntensityAbsolute
         designPlan$.setParameterType("accrualIntensity", C_PARAM_GENERATED)
-
+        
         if (numberOfDefinedAccrualIntensities > 1) {
             paramName <- NULL
             if (designPlan$.getParameterType("pi1") == C_PARAM_USER_DEFINED ||
@@ -1244,12 +1244,6 @@ NULL
 
     designPlan$nFixed2 <- designPlan$nFixed / (1 + allocationRatioPlanned)
     designPlan$nFixed1 <- designPlan$nFixed2 * allocationRatioPlanned
-
-    if (designPlan$.design$kMax == 1 &&
-            designPlan$.accrualTime$.isRelativeAccrualIntensity(designPlan$accrualIntensity)) {
-        designPlan$accrualIntensity <- designPlan$nFixed / designPlan$accrualTime
-        designPlan$.setParameterType("accrualIntensity", C_PARAM_GENERATED)
-    }
 
     designPlan$numberOfSubjects1 <- matrix(designPlan$nFixed1, nrow = 1)
     designPlan$numberOfSubjects2 <- matrix(designPlan$nFixed2, nrow = 1)
@@ -2060,7 +2054,8 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
         accrualIntensityType = accrualIntensityType,
-        maxNumberOfSubjects = maxNumberOfSubjects, showWarnings = FALSE
+        maxNumberOfSubjects = maxNumberOfSubjects, 
+        showWarnings = FALSE
     )
     accrualSetup$.validate()
 

@@ -15,9 +15,9 @@
 ## |  
 ## |  File name: test-f_core_assertions.R
 ## |  Creation date: 08 November 2023, 09:09:35
-## |  File version: $Revision: 7560 $
-## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision$
+## |  Last changed: $Date$
+## |  Last changed by: $Author$
 ## |  
 
 test_plan_section("Testing Assertion Functions")

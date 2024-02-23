@@ -2,7 +2,7 @@
 # rpact 3.5.1
 
 * The internal fields `.parameterNames` and `.parameterFormatFunctions` were removed from all rpact result objects in favor of a more efficient solution
-* Issues [#15](https://github.com/rpact-com/rpact/issues/15), [#16](https://github.com/rpact-com/rpact/issues/16), [#17](https://github.com/rpact-com/rpact/issues/17), and [#19](https://github.com/rpact-com/rpact/issues/19) fixed
+* Issues [#15](https://github.com/rpact-com/rpact/issues/15), [#16](https://github.com/rpact-com/rpact/issues/16), [#17](https://github.com/rpact-com/rpact/issues/17), [#19](https://github.com/rpact-com/rpact/issues/19), and [#23](https://github.com/rpact-com/rpact/issues/23) fixed
 * Fixed inconsistent naming of variables and class fields (issue [#21](https://github.com/rpact-com/rpact/issues/21))
     - `getSampleSizeSurvival()` / `getPowerSurvival()`:
        + Field `eventsPerStage` replaced by `cumulativeEventsPerStage`

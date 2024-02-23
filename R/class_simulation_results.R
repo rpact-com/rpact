@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7656 $
-## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
+## |  File version: $Revision: 7665 $
+## |  Last changed: $Date: 2024-02-23 17:33:46 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1168,6 +1168,7 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
         numberOfSubjects1 = "matrix",
         numberOfSubjects2 = "matrix",
         eventsPerStage = "matrix", # deprecated
+        overallEventsPerStage = "matrix", # deprecated
         singleEventsPerStage = "matrix",
         cumulativeEventsPerStage = "matrix",
         expectedNumberOfSubjects = "numeric",
@@ -1209,6 +1210,8 @@ SimulationResultsSurvival <- setRefClass("SimulationResultsSurvival",
             .setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
             .setParameterType("median1", C_PARAM_NOT_APPLICABLE)
             .setParameterType("median2", C_PARAM_NOT_APPLICABLE)
+            .setParameterType("eventsPerStage", C_PARAM_NOT_APPLICABLE)
+            .setParameterType("overallEventsPerStage", C_PARAM_NOT_APPLICABLE)
         }
     )
 )
@@ -1571,7 +1574,7 @@ SimulationResultsEnrichmentRates <- setRefClass("SimulationResultsEnrichmentRate
 #' @template field_successPerStage
 #' @template field_eventsPerStage
 #' @template field_singleNumberOfEventsPerStage
-#' @template field_singleEventsPerPopulationAndStage
+#' @template field_singleEventsPerSubsetAndStage
 #' @template field_conditionalPowerAchieved
 #'
 #' @details

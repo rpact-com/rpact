@@ -81,9 +81,9 @@ Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurviva
 
 \item{\code{eventsPerStage}}{Deprecated: use \code{singleEventsPerStage} or \code{cumulativeEventsPerStage} instead Is a numeric matrix.}
 
-\item{\code{singleNumberOfEventsPerStage}}{Deprecated: use \code{singleEventsPerArmAndStage} or \code{singleEventsPerPopulationAndStage} instead}
+\item{\code{singleNumberOfEventsPerStage}}{Deprecated: use \code{singleEventsPerArmAndStage} or \code{singleEventsPerSubsetAndStage} instead}
 
-\item{\code{singleEventsPerPopulationAndStage}}{The number of events per population and stage that is used for the analysis.}
+\item{\code{singleEventsPerSubsetAndStage}}{The number of events per subset and stage that is used for the analysis.}
 
 \item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.}
 }}

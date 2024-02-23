@@ -77,7 +77,7 @@ Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}
 
 \item{\code{eventsPerStage}}{Deprecated: use \code{singleEventsPerStage} or \code{cumulativeEventsPerStage} instead Is a numeric matrix.}
 
-\item{\code{singleNumberOfEventsPerStage}}{Deprecated: use \code{singleEventsPerArmAndStage} or \code{singleEventsPerPopulationAndStage} instead}
+\item{\code{singleNumberOfEventsPerStage}}{Deprecated: use \code{singleEventsPerArmAndStage} or \code{singleEventsPerSubsetAndStage} instead}
 
 \item{\code{singleEventsPerArmAndStage}}{The number of events per arm and stage that is used for the analysis.}
 
