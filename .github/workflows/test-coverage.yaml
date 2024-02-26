@@ -32,10 +32,12 @@ jobs:
           covr::codecov(
             quiet = FALSE,
             clean = FALSE,
-            token = ${{ secrets.CODECOV_TOKEN }},
+            token = Sys.getenv("CODECOV_TOKEN")),
             line_exclusions = c("src/f_count_data_estimation.cpp", "src/f_assertions.cpp", "R/f_design_plan_plot.R", "R/f_simulation_plot.R", "R/f_simulation_calc_subjects_function.R"),
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         shell: Rscript {0}
 
       - name: Show testthat output
