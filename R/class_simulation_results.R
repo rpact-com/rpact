@@ -551,7 +551,8 @@ SimulationResults <- setRefClass("SimulationResults",
             return(FALSE)
         },
         getRawDataResults = function(maxNumberOfIterations = NA_integer_) {
-            return(.getSimulationParametersFromRawData(.self$.data,
+            return(.getSimulationParametersFromRawData(
+                data = .self$.data,
                 variantName = .getVariedParameterName(),
                 maxNumberOfIterations = maxNumberOfIterations
             ))

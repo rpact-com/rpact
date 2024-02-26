@@ -91,7 +91,7 @@ NULL
 }
 
 .getSimulationParametersFromRawData <- function(data, ..., variantName, maxNumberOfIterations = NA_integer_) {
-    if (is.null(data) || length(data) != 1) {
+    if (is.null(data) || length(data) == 0) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'data' must be a valid data.frame or a simulation result object")
     }
 
@@ -740,7 +740,7 @@ getData.SimulationResults <- function(x) {
         iterationNumber = iterationNumber,
         pi1 = pi1,
         stageNumber = subData$stopStage[1],
-        analysisTime = max(subData$observationTime),
+        analysisTime = max(subData$lastObservationTime, na.rm = TRUE),
         numberOfSubjects = nrow(subData),
         eventsPerStage1 = eventsPerStage1,
         eventsPerStage2 = eventsPerStage2,
@@ -818,7 +818,7 @@ getData.SimulationResults <- function(x) {
 #'   \item \code{treatmentGroup}: The treatment group number (1 or 2).
 #'   \item \code{survivalTime}: The survival time of the subject.
 #'   \item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
-#'   \item \code{observationTime}: The specific observation time.
+#'   \item \code{lastObservationTime}: The specific observation time.
 #'   \item \code{timeUnderObservation}: The time under observation is defined as follows:
 #' ```
 #' if (event == TRUE) {
@@ -826,7 +826,7 @@ getData.SimulationResults <- function(x) {
 #' } else if (dropoutEvent == TRUE) {
 #'     timeUnderObservation <- dropoutTime
 #' } else {
-#'     timeUnderObservation <- observationTime - accrualTime
+#'     timeUnderObservation <- lastObservationTime - accrualTime
 #' }
 #' ```
 #'   \item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.

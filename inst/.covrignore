@@ -3,7 +3,9 @@ R/class_core_plot_settings.R
 R/class_event_probabilities.R
 R/class_simulation_results.R
 R/class_analysis_results.R
+R/class_analysis_stage_results.R
 R/class_core_plot_settings.R
+R/class_design.R
 R/f_quality_assurance.R
 R/f_simulation_calc_subjects_function.R
 R/f_core_output_formats.R
