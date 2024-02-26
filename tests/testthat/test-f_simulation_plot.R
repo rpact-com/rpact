@@ -266,7 +266,7 @@ test_that(".plotSimulationResults handles type = 4", {
         seed = 1234567890
     )
 
-    expect_silent(plot(x, type = "all", grid = 0))
+    suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
 
     design <- getDesignInverseNormal(
         informationRates = c(0.2, 0.6, 1),
@@ -301,7 +301,7 @@ test_that(".plotSimulationResults handles type = 4", {
         seed = 1234567890
     )
 
-    expect_silent(plot(x, type = "all", grid = 0))
+    suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
 
     # Define subgroups and their prevalences
     subGroups <- c("S1", "S2", "S12", "R") # fixed names!
@@ -331,7 +331,7 @@ test_that(".plotSimulationResults handles type = 4", {
         directionUpper = FALSE
     )
 
-    expect_silent(plot(x, type = "all", grid = 0))
+    suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
 
     designMaster <- list("kMax" = 1)
     expect_silent(.plotSimulationResults(simulationResults, designMaster, type = 4))
