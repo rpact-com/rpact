@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7670 $
+## |  Last changed: $Date: 2024-02-26 15:46:14 +0100 (Mo, 26 Feb 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -111,8 +111,7 @@ NULL
     return(.isTrialDesignPlanMeans(designPlan) ||
         .isTrialDesignPlanRates(designPlan) ||
         .isTrialDesignPlanSurvival(designPlan) ||
-        .isTrialDesignPlanCountData(designPlan)
-    )
+        .isTrialDesignPlanCountData(designPlan))
 }
 
 .assertIsTrialDesignPlan <- function(designPlan) {
@@ -840,13 +839,13 @@ NULL
     if (is.null(accrualTime) || length(accrualTime) == 0 || all(is.na(accrualTime))) {
         return(invisible())
     }
-	
-  	if (!is.null(accrualTime) && (length(accrualTime) > 1) && (accrualTime[1] != 0)) {
-  		stop(
-  			C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-  			"the first value of 'accrualTime' (", .arrayToString(accrualTime), ") must be 0"
-  		)
-  	}
+
+    if (!is.null(accrualTime) && (length(accrualTime) > 1) && (accrualTime[1] != 0)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "the first value of 'accrualTime' (", .arrayToString(accrualTime), ") must be 0"
+        )
+    }
     .assertIsInClosedInterval(accrualTime, "accrualTime", lower = 0, upper = NULL, naAllowed = naAllowed)
     .assertValuesAreStrictlyIncreasing(accrualTime, "accrualTime")
 }
@@ -2752,8 +2751,7 @@ NULL
     return(all(!is.na(delayedInformation)) && any(delayedInformation >= 1e-03))
 }
 
-.assertIsValidEffectCountData <- function(
-        sampleSizeEnabled,
+.assertIsValidEffectCountData <- function(sampleSizeEnabled,
         sided,
         lambda1,
         lambda2,
@@ -2773,7 +2771,7 @@ NULL
     .assertIsInOpenInterval(lambda2, "lambda2", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsNumericVector(theta, "theta", naAllowed = TRUE)
     .assertIsInOpenInterval(theta, "theta", lower = 0, upper = NULL, naAllowed = TRUE)
-    .assertIsValidThetaH0(thetaH0, endpoint = "counts", groups = 2)    
+    .assertIsValidThetaH0(thetaH0, endpoint = "counts", groups = 2)
     .assertIsSingleNumber(overdispersion, "overdispersion", naAllowed = TRUE)
     .assertIsInClosedInterval(overdispersion, "overdispersion", lower = 0, upper = NULL, naAllowed = TRUE)
     if (!is.na(lambda) && all(!is.na(theta))) {
@@ -2847,12 +2845,12 @@ NULL
     }
 }
 
-.assertParametersAreSpecifiedCorrectlyTogether <- function(..., 
-        case = c("notTogether", "eitherOr"), 
+.assertParametersAreSpecifiedCorrectlyTogether <- function(...,
+        case = c("notTogether", "eitherOr"),
         .paramNames = NULL) {
     params <- list(...)
     if (length(params) != 2) {
-        if (is.null(names(params)) || 
+        if (is.null(names(params)) ||
                 length(params[!(names(params) %in% c("case", ".paramNames"))]) != 2) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "exactly two parameters must be specified")
         }
@@ -2869,30 +2867,28 @@ NULL
     if (case == "notTogether" && !all(is.na(params[[1]])) && !all(is.na(params[[2]]))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sQuote(paramNames[1]), " (", .arrayToString(params[[1]]), ") ", 
+            sQuote(paramNames[1]), " (", .arrayToString(params[[1]]), ") ",
             "and ", sQuote(paramNames[2]), " (", .arrayToString(params[[2]]), ") ",
             "cannot be specified together"
         )
-    }
-    else if (case == "eitherOr" && all(is.na(params[[1]])) && all(is.na(params[[2]]))) {
+    } else if (case == "eitherOr" && all(is.na(params[[1]])) && all(is.na(params[[2]]))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "either ", sQuote(paramNames[1]), " ", 
+            "either ", sQuote(paramNames[1]), " ",
             "or ", sQuote(paramNames[2]), " ",
             "needs to be specified"
         )
     }
 }
 
-.assertIsValidParametersCountData <- function(..., 
+.assertIsValidParametersCountData <- function(...,
         sampleSizeEnabled,
         simulationEnabled,
         fixedExposureTime,
         followUpTime,
         accrualTime,
         accrualIntensity,
-        maxNumberOfSubjects
-        ) {
+        maxNumberOfSubjects) {
     .assertIsSingleLogical(sampleSizeEnabled, "sampleSizeEnabled")
     .assertIsSingleNumber(fixedExposureTime, "fixedExposureTime", naAllowed = TRUE)
     .assertIsInOpenInterval(fixedExposureTime, "fixedExposureTime", lower = 0, upper = NULL, naAllowed = TRUE)
@@ -2906,26 +2902,31 @@ NULL
     if (sampleSizeEnabled) {
         if (is.na(maxNumberOfSubjects) && any(is.na(accrualIntensity))) {
             .assertParametersAreSpecifiedCorrectlyTogether(
-                'fixedExposureTime' = fixedExposureTime,
-                'followUpTime' = followUpTime)
+                "fixedExposureTime" = fixedExposureTime,
+                "followUpTime" = followUpTime
+            )
             .assertParametersAreSpecifiedCorrectlyTogether(
-                'fixedExposureTime' = fixedExposureTime,
-                'followUpTime' = followUpTime,
-                case = "eitherOr")
+                "fixedExposureTime" = fixedExposureTime,
+                "followUpTime" = followUpTime,
+                case = "eitherOr"
+            )
         }
     } else {
         .assertParametersAreSpecifiedCorrectlyTogether(
-            'fixedExposureTime' = fixedExposureTime,
-            'followUpTime' = followUpTime)
+            "fixedExposureTime" = fixedExposureTime,
+            "followUpTime" = followUpTime
+        )
         .assertParametersAreSpecifiedCorrectlyTogether(
-            'fixedExposureTime' = fixedExposureTime,
-            'followUpTime' = followUpTime,
-            case = "eitherOr")
+            "fixedExposureTime" = fixedExposureTime,
+            "followUpTime" = followUpTime,
+            case = "eitherOr"
+        )
         .assertParametersAreSpecifiedCorrectlyTogether(
-            'maxNumberOfSubjects' = maxNumberOfSubjects,
-            'accrualIntensity' = accrualIntensity,
+            "maxNumberOfSubjects" = maxNumberOfSubjects,
+            "accrualIntensity" = accrualIntensity,
             case = "eitherOr",
-            .paramNames = if (simulationEnabled) c("plannedMaxSubjects", "accrualIntensity") else NULL)
+            .paramNames = if (simulationEnabled) c("plannedMaxSubjects", "accrualIntensity") else NULL
+        )
     }
     if (any(is.na(accrualTime)) && !is.na(followUpTime)) {
         stop(
@@ -2935,45 +2936,57 @@ NULL
     }
     if (sampleSizeEnabled) {
         .assertParametersAreSpecifiedCorrectlyTogether(
-            'maxNumberOfSubjects' = maxNumberOfSubjects,
-            'followUpTime' = followUpTime)
+            "maxNumberOfSubjects" = maxNumberOfSubjects,
+            "followUpTime" = followUpTime
+        )
         .assertParametersAreSpecifiedCorrectlyTogether(
-            'accrualIntensity' = accrualIntensity,
-            'followUpTime' = followUpTime)
+            "accrualIntensity" = accrualIntensity,
+            "followUpTime" = followUpTime
+        )
         .assertParametersAreSpecifiedCorrectlyTogether(
-            'maxNumberOfSubjects' = maxNumberOfSubjects,
-            'fixedExposureTime' = fixedExposureTime)
+            "maxNumberOfSubjects" = maxNumberOfSubjects,
+            "fixedExposureTime" = fixedExposureTime
+        )
         .assertParametersAreSpecifiedCorrectlyTogether(
-            'accrualIntensity' = accrualIntensity,
-            'fixedExposureTime' = fixedExposureTime)
+            "accrualIntensity" = accrualIntensity,
+            "fixedExposureTime" = fixedExposureTime
+        )
         if (!is.na(maxNumberOfSubjects) && any(is.na(accrualTime))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' needs to be specified if 'maxNumberOfSubjects' (", maxNumberOfSubjects, ") is specified"
             )
         }
-    } else {
+    } else if (!simulationEnabled) {
         if (is.na(maxNumberOfSubjects) && (any(is.na(accrualIntensity)) || any(is.na(accrualTime)))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified"
             )
         }
-        if (any(is.na(accrualIntensity)) && !any(is.na(accrualTime)) && !is.na(fixedExposureTime) ) {
-          warning(
-            "Specification of 'accrualTime' has no influence of calculation and will be ignored",
-            call. = FALSE
-          )
+        if (any(is.na(accrualIntensity)) && !any(is.na(accrualTime)) && !is.na(fixedExposureTime)) {
+            warning(
+                "Specification of 'accrualTime' has no influence of calculation and will be ignored",
+                call. = FALSE
+            )
         }
-    }  
-    
+    } else {
+        if (is.na(maxNumberOfSubjects) && (any(is.na(accrualIntensity)) || any(is.na(accrualTime)))) {
+            stop(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'accrualTime' and 'accrualIntensity' need to be specified if 'plannedMaxSubjects' is not specified"
+            )
+        }
+    }
+
     .assertParametersAreSpecifiedCorrectlyTogether(
-        'maxNumberOfSubjects' = maxNumberOfSubjects,
-        'accrualIntensity' = accrualIntensity,
-        .paramNames = if (simulationEnabled) c("plannedMaxSubjects", "accrualIntensity") else NULL)
-    
+        "maxNumberOfSubjects" = maxNumberOfSubjects,
+        "accrualIntensity" = accrualIntensity,
+        .paramNames = if (simulationEnabled) c("plannedMaxSubjects", "accrualIntensity") else NULL
+    )
+
     if (!any(is.na(accrualIntensity)) &&
-  			length(accrualIntensity) == 1 && 
+            length(accrualIntensity) == 1 &&
             length(accrualTime) != length(accrualIntensity)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -2981,12 +2994,12 @@ NULL
             "'accrualIntensity' (", .arrayToString(accrualIntensity), ") does not match"
         )
     }
-  	if (any(is.na(accrualIntensity)) && length(accrualTime) > 1) {
-  		stop(
-  			C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-  			"'accrualIntensity' (", .arrayToString(accrualIntensity), ") is not correctly specified"
-  		)
-  	}	
+    if (any(is.na(accrualIntensity)) && length(accrualTime) > 1) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'accrualIntensity' (", .arrayToString(accrualIntensity), ") is not correctly specified"
+        )
+    }
 }
 
 .assertAreValidCalendarTimes <- function(plannedCalendarTime, kMax) {

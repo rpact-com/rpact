@@ -17,6 +17,7 @@
     - `getSimulationEnrichmentSurvival()`: 
        + field `singleNumberOfEventsPerStage` replaced by `singleEventsPerSubsetAndStage` 
 * Test coverage CI/CD pipeline activated with the assistance of GitHub Actions, which runs `covr` and uploads the results to [codecov.io](https://app.codecov.io/gh/rpact-com)
+* Minor improvements
 
 
 # rpact 3.5.0

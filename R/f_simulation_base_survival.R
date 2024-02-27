@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7665 $
-## |  Last changed: $Date: 2024-02-23 17:33:46 +0100 (Fr, 23 Feb 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7671 $
+## |  Last changed: $Date: 2024-02-26 16:27:43 +0100 (Mo, 26 Feb 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include class_simulation_results.R
@@ -298,14 +298,35 @@ getSimulationSurvival <- function(design = NULL, ...,
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)
     .assertIsNumericVector(lambda2, "lambda2", naAllowed = TRUE)
-    .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)    
+    .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
     .assertIsIntegerVector(allocation1, "allocation1", validateType = FALSE)
     .assertIsIntegerVector(allocation2, "allocation2", validateType = FALSE)
     .assertIsInClosedInterval(allocation1, "allocation1", lower = 1L, upper = NULL)
     .assertIsInClosedInterval(allocation2, "allocation2", lower = 1L, upper = NULL)
+    .assertIsSingleNumber(dropoutTime, "dropoutTime", naAllowed = TRUE)
+    .assertIsSingleNumber(dropoutRate1, "dropoutRate1", naAllowed = TRUE)
+    .assertIsSingleNumber(dropoutRate2, "dropoutRate2", naAllowed = TRUE)
     .assertIsSingleLogical(longTimeSimulationAllowed, "longTimeSimulationAllowed")
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedEvents, parameterName = "plannedEvents")
+
+    if (!is.na(dropoutTime) && dropoutTime <= 0) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0", call. = FALSE)
+    }
+
+    if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
+        stop(
+            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
+            "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)"
+        )
+    }
+
+    if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
+        stop(
+            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
+            "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)"
+        )
+    }
 
     if (design$sided == 2) {
         stop(
@@ -831,8 +852,10 @@ getSimulationSurvival <- function(design = NULL, ...,
                 simulationResults$singleEventsPerStage
             )
             simulationResults$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
-            .addDeprecatedFieldValues(simulationResults, 
-                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage)
+            .addDeprecatedFieldValues(
+                simulationResults,
+                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage
+            )
             simulationResults$expectedNumberOfEvents <-
                 diag(t(simulationResults$cumulativeEventsPerStage) %*% pStop)
         }
@@ -843,8 +866,10 @@ getSimulationSurvival <- function(design = NULL, ...,
                 nrow(simulationResults$singleEventsPerStage) > 0 &&
                 ncol(simulationResults$singleEventsPerStage) > 0) {
             simulationResults$cumulativeEventsPerStage <- simulationResults$singleEventsPerStage
-            .addDeprecatedFieldValues(simulationResults, 
-                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage)
+            .addDeprecatedFieldValues(
+                simulationResults,
+                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage
+            )
             simulationResults$expectedNumberOfEvents <-
                 as.numeric(simulationResults$cumulativeEventsPerStage)
         }
