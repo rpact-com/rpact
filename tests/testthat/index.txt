@@ -9,6 +9,7 @@ test-class_analysis_dataset.R
 test-class_core_plot_settings.R
 test-class_design_plan.R
 test-class_design_set.R
+test-class_dictionary.R
 test-class_simulation_results.R
 test-class_summary.R
 test-class_time.R
@@ -33,6 +34,7 @@ test-f_design_group_sequential.R
 test-f_design_group_sequential_beta_spending.R
 test-f_design_plan_count_data.R
 test-f_design_plan_means.R
+test-f_design_plan_plot.R
 test-f_design_plan_rates.R
 test-f_design_plan_survival.R
 test-f_design_utilities.R
@@ -50,5 +52,7 @@ test-f_simulation_multiarm_means.R
 test-f_simulation_multiarm_rates.R
 test-f_simulation_multiarm_survival.R
 test-f_simulation_performance_score.R
+test-f_simulation_plot.R
+test-f_simulation_utilities.R
 test-generic_functions.R
 test-pkgname.R

@@ -31,3 +31,4 @@ testthat-problems.rds
 /src/*.gcno
 /src/*.gcov
 /README.html
+/tests/testthat/Rplots.pdf

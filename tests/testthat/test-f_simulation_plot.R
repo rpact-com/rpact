@@ -254,7 +254,7 @@ test_that(".plotSimulationResults handles type = 4", {
         stDevs = stDev, effects = effects
     )
 
-    x <- getSimulationEnrichmentMeans(
+    suppressWarnings(x <- getSimulationEnrichmentMeans(
         design = design,
         plannedSubjects = c(10, 30, 50),
         effectList = el,
@@ -264,7 +264,7 @@ test_that(".plotSimulationResults handles type = 4", {
         maxNumberOfSubjectsPerStage = c(10, 100, 100),
         maxNumberOfIterations = 500,
         seed = 1234567890
-    )
+    ))
 
     suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
 
@@ -293,13 +293,13 @@ test_that(".plotSimulationResults handles type = 4", {
         )
     )
 
-    x <- getSimulationEnrichmentRates(
+    suppressWarnings(x <- getSimulationEnrichmentRates(
         design = design,
         plannedSubjects = c(10, 30, 50),
         effectList = el,
         maxNumberOfIterations = 500,
         seed = 1234567890
-    )
+    ))
 
     suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
 
@@ -320,7 +320,7 @@ test_that(".plotSimulationResults handles type = 4", {
     )
 
     # Perform simulation
-    x <- getSimulationEnrichmentSurvival(
+    suppressWarnings(x <- getSimulationEnrichmentSurvival(
         design = getDesignInverseNormal(typeOfDesign = "noEarlyEfficacy"),
         effectList = el,
         typeOfSelection = "rbest",
@@ -329,7 +329,7 @@ test_that(".plotSimulationResults handles type = 4", {
         plannedEvents = c(30, 80, 120),
         maxNumberOfIterations = 500,
         directionUpper = FALSE
-    )
+    ))
 
     suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
 
