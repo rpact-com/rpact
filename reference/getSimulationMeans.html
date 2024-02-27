@@ -12,7 +12,7 @@ for testing means in a one or two treatment groups testing situation."><!-- math
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1.9231</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -156,9 +156,10 @@ which means that larger values of the test statistics yield smaller p-values.</p
 <dt>allocationRatioPlanned</dt>
 <dd><p>The planned allocation ratio <code>n1 / n2</code> for a two treatment groups
 design, default is <code>1</code>. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
-For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+For simulating means and rates for a two treatment groups design, it can be a vector of length <code>kMax</code>, the number of stages.
 It can be a vector of length kMax, too, for multi-arm and enrichment designs.
-In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.</p></dd>
+In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.
+Note that internally <code>allocationRatioPlanned</code> is treated as a vector of length <code>kMax</code>, not a scalar.</p></dd>
 
 
 <dt>minNumberOfSubjectsPerStage</dt>
@@ -302,8 +303,8 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Fixed sample size design with two groups, total sample size 40, </span></span></span>
-<span class="r-in"><span><span class="co"># alternative = c(0, 0.2, 0.4, 0.8, 1), and standard deviation = 1 (the default) </span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Fixed sample size design with two groups, total sample size 40,</span></span></span>
+<span class="r-in"><span><span class="co"># alternative = c(0, 0.2, 0.4, 0.8, 1), and standard deviation = 1 (the default)</span></span></span>
 <span class="r-in"><span><span class="fu">getSimulationMeans</span><span class="op">(</span>plannedSubjects <span class="op">=</span> <span class="fl">40</span>, maxNumberOfIterations <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simulation of means (fixed sample size design):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -336,62 +337,78 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Sample sizes                                 : 40, 40, 40, 40, 40, 40 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># Increase number of simulation iterations and compare results </span></span></span>
-<span class="r-in"><span><span class="co"># with power calculator using normal approximation </span></span></span>
-<span class="r-in"><span><span class="fu">getSimulationMeans</span><span class="op">(</span>alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>, </span></span>
-<span class="r-in"><span>    plannedSubjects <span class="op">=</span> <span class="fl">40</span>, maxNumberOfIterations <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="getPowerMeans.html">getPowerMeans</a></span><span class="op">(</span>alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>, </span></span>
-<span class="r-in"><span>    maxNumberOfSubjects <span class="op">=</span> <span class="fl">40</span>, normalApproximation <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Increase number of simulation iterations and compare results</span></span></span>
+<span class="r-in"><span><span class="co"># with power calculator using normal approximation</span></span></span>
+<span class="r-in"><span><span class="fu">getSimulationMeans</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>    plannedSubjects <span class="op">=</span> <span class="fl">40</span>, maxNumberOfIterations <span class="op">=</span> <span class="fl">1000</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="getPowerMeans.html">getPowerMeans</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfSubjects <span class="op">=</span> <span class="fl">40</span>, normalApproximation <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Do the same for a three-stage O'Brien&amp;Fleming inverse </span></span></span>
+<span class="r-in"><span><span class="co"># Do the same for a three-stage O'Brien&amp;Fleming inverse</span></span></span>
 <span class="r-in"><span><span class="co"># normal group sequential design with non-binding futility stops</span></span></span>
 <span class="r-in"><span><span class="va">designIN</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDesignInverseNormal.html">getDesignInverseNormal</a></span><span class="op">(</span>typeOfDesign <span class="op">=</span> <span class="st">"OF"</span>, futilityBounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">getSimulationMeans</span><span class="op">(</span><span class="va">designIN</span>, alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>, stDev <span class="op">=</span> <span class="fl">5</span>, </span></span>
-<span class="r-in"><span>    plannedSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span><span class="op">)</span>, maxNumberOfIterations <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="getPowerMeans.html">getPowerMeans</a></span><span class="op">(</span><span class="va">designIN</span>, alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>, </span></span>
-<span class="r-in"><span>    maxNumberOfSubjects <span class="op">=</span> <span class="fl">60</span>, normalApproximation <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">getSimulationMeans</span><span class="op">(</span><span class="va">designIN</span>,</span></span>
+<span class="r-in"><span>    alternative <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>, stDev <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>    plannedSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span><span class="op">)</span>, maxNumberOfIterations <span class="op">=</span> <span class="fl">1000</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="getPowerMeans.html">getPowerMeans</a></span><span class="op">(</span><span class="va">designIN</span>,</span></span>
+<span class="r-in"><span>    alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfSubjects <span class="op">=</span> <span class="fl">60</span>, normalApproximation <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Assess power and average sample size if a sample size increase is foreseen </span></span></span>
-<span class="r-in"><span><span class="co"># at conditional power 80% for each subsequent stage based on observed overall </span></span></span>
+<span class="r-in"><span><span class="co"># Assess power and average sample size if a sample size increase is foreseen</span></span></span>
+<span class="r-in"><span><span class="co"># at conditional power 80% for each subsequent stage based on observed overall</span></span></span>
 <span class="r-in"><span><span class="co"># effect and specified minNumberOfSubjectsPerStage and</span></span></span>
 <span class="r-in"><span><span class="co"># maxNumberOfSubjectsPerStage</span></span></span>
-<span class="r-in"><span><span class="fu">getSimulationMeans</span><span class="op">(</span><span class="va">designIN</span>, alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>, </span></span>
-<span class="r-in"><span>    plannedSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>    minNumberOfSubjectsPerStage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">20</span>, <span class="fl">20</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span><span class="fu">getSimulationMeans</span><span class="op">(</span><span class="va">designIN</span>,</span></span>
+<span class="r-in"><span>    alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>    plannedSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    minNumberOfSubjectsPerStage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">20</span>, <span class="fl">20</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    maxNumberOfSubjectsPerStage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">80</span>, <span class="fl">80</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    conditionalPower <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
-<span class="r-in"><span>    maxNumberOfIterations <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    maxNumberOfIterations <span class="op">=</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Do the same under the assumption that a sample size increase only takes </span></span></span>
-<span class="r-in"><span><span class="co"># place at the first interim. The sample size for the third stage is set equal </span></span></span>
+<span class="r-in"><span><span class="co"># Do the same under the assumption that a sample size increase only takes</span></span></span>
+<span class="r-in"><span><span class="co"># place at the first interim. The sample size for the third stage is set equal</span></span></span>
 <span class="r-in"><span><span class="co"># to the second stage sample size.</span></span></span>
-<span class="r-in"><span><span class="va">mySampleSizeCalculationFunction</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span>, <span class="va">stage</span>, </span></span>
-<span class="r-in"><span>    <span class="va">minNumberOfSubjectsPerStage</span>,</span></span>
-<span class="r-in"><span>    <span class="va">maxNumberOfSubjectsPerStage</span>,</span></span>
-<span class="r-in"><span>    <span class="va">sampleSizesPerStage</span>,</span></span>
-<span class="r-in"><span>    <span class="va">conditionalPower</span>,</span></span>
-<span class="r-in"><span>    <span class="va">conditionalCriticalValue</span>,</span></span>
-<span class="r-in"><span>    <span class="va">allocationRatioPlanned</span>,</span></span>
-<span class="r-in"><span>    <span class="va">thetaH1</span>,</span></span>
-<span class="r-in"><span>    <span class="va">stDevH1</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="va">stage</span> <span class="op">&lt;=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="va">stageSubjects</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">allocationRatioPlanned</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">/</span><span class="va">allocationRatioPlanned</span> <span class="op">*</span> </span></span>
-<span class="r-in"><span>      <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">conditionalCriticalValue</span> <span class="op">+</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm</a></span><span class="op">(</span><span class="va">conditionalPower</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> </span></span>
-<span class="r-in"><span>         <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fl">1e-12</span>, <span class="va">thetaH1</span><span class="op">/</span><span class="va">stDevH1</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span></span>
-<span class="r-in"><span>    <span class="va">stageSubjects</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">minNumberOfSubjectsPerStage</span><span class="op">[</span><span class="va">stage</span><span class="op">]</span>, </span></span>
-<span class="r-in"><span>         <span class="va">stageSubjects</span><span class="op">)</span>, <span class="va">maxNumberOfSubjectsPerStage</span><span class="op">[</span><span class="va">stage</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="va">stageSubjects</span> <span class="op">&lt;-</span> <span class="va">sampleSizesPerStage</span><span class="op">[</span><span class="va">stage</span> <span class="op">-</span> <span class="fl">1</span><span class="op">]</span></span></span>
-<span class="r-in"><span>  <span class="op">}</span></span></span>
-<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">stageSubjects</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mySampleSizeCalculationFunction</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span>, <span class="va">stage</span>,</span></span>
+<span class="r-in"><span>        <span class="va">minNumberOfSubjectsPerStage</span>,</span></span>
+<span class="r-in"><span>        <span class="va">maxNumberOfSubjectsPerStage</span>,</span></span>
+<span class="r-in"><span>        <span class="va">sampleSizesPerStage</span>,</span></span>
+<span class="r-in"><span>        <span class="va">conditionalPower</span>,</span></span>
+<span class="r-in"><span>        <span class="va">conditionalCriticalValue</span>,</span></span>
+<span class="r-in"><span>        <span class="va">allocationRatioPlanned</span>,</span></span>
+<span class="r-in"><span>        <span class="va">thetaH1</span>,</span></span>
+<span class="r-in"><span>        <span class="va">stDevH1</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="va">stage</span> <span class="op">&lt;=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>        <span class="co"># Note that allocationRatioPlanned is as a vector of length kMax</span></span></span>
+<span class="r-in"><span>        <span class="va">stageSubjects</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">allocationRatioPlanned</span><span class="op">[</span><span class="va">stage</span><span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> </span></span>
+<span class="r-in"><span>            <span class="va">allocationRatioPlanned</span><span class="op">[</span><span class="va">stage</span><span class="op">]</span> <span class="op">*</span></span></span>
+<span class="r-in"><span>            <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">conditionalCriticalValue</span> <span class="op">+</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm</a></span><span class="op">(</span><span class="va">conditionalPower</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span></span></span>
+<span class="r-in"><span>            <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fl">1e-12</span>, <span class="va">thetaH1</span> <span class="op">/</span> <span class="va">stDevH1</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span></span>
+<span class="r-in"><span>        <span class="va">stageSubjects</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>            <span class="va">minNumberOfSubjectsPerStage</span><span class="op">[</span><span class="va">stage</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>            <span class="va">stageSubjects</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span>, <span class="va">maxNumberOfSubjectsPerStage</span><span class="op">[</span><span class="va">stage</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>        <span class="va">stageSubjects</span> <span class="op">&lt;-</span> <span class="va">sampleSizesPerStage</span><span class="op">[</span><span class="va">stage</span> <span class="op">-</span> <span class="fl">1</span><span class="op">]</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span></span></span>
+<span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">stageSubjects</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="fu">getSimulationMeans</span><span class="op">(</span><span class="va">designIN</span>, alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>, </span></span>
-<span class="r-in"><span>    plannedSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>    minNumberOfSubjectsPerStage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">20</span>, <span class="fl">20</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span><span class="fu">getSimulationMeans</span><span class="op">(</span><span class="va">designIN</span>,</span></span>
+<span class="r-in"><span>    alternative <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">4</span>, stDev <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>    plannedSubjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    minNumberOfSubjectsPerStage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">20</span>, <span class="fl">20</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    maxNumberOfSubjectsPerStage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">80</span>, <span class="fl">80</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    conditionalPower <span class="op">=</span> <span class="fl">0.8</span>, </span></span>
-<span class="r-in"><span>    calcSubjectsFunction <span class="op">=</span> <span class="va">mySampleSizeCalculationFunction</span>, </span></span>
-<span class="r-in"><span>    maxNumberOfIterations <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    conditionalPower <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
+<span class="r-in"><span>    calcSubjectsFunction <span class="op">=</span> <span class="va">mySampleSizeCalculationFunction</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfIterations <span class="op">=</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

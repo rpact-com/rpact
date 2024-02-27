@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1.9231</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,10 +129,10 @@ obtain the specific help documentation linked above by typing <code><a href="plo
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co"># In a two-stage design a conditional Dunnett test should be performed</span></span></span>
 <span class="r-in"><span><span class="co"># where the  unconditional second stage p-values should be used for the</span></span></span>
-<span class="r-in"><span><span class="co"># test decision. </span></span></span>
-<span class="r-in"><span><span class="co"># At the first stage the second treatment arm was dropped. The results of </span></span></span>
-<span class="r-in"><span><span class="co"># a closed conditionsal Dunnett test are obtained as follows with the given </span></span></span>
-<span class="r-in"><span><span class="co"># data (treatment arm 4 refers to the reference group):   </span></span></span>
+<span class="r-in"><span><span class="co"># test decision.</span></span></span>
+<span class="r-in"><span><span class="co"># At the first stage the second treatment arm was dropped. The results of</span></span></span>
+<span class="r-in"><span><span class="co"># a closed conditionsal Dunnett test are obtained as follows with the given</span></span></span>
+<span class="r-in"><span><span class="co"># data (treatment arm 4 refers to the reference group):</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDataset.html">getDataset</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    n1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">23</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    n2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">21</span>, <span class="cn">NA</span><span class="op">)</span>,</span></span>
@@ -145,11 +145,12 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 <span class="r-in"><span>    stds1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.2</span>, <span class="fl">1.4</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    stds2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.3</span>, <span class="cn">NA</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    stds3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.1</span>, <span class="fl">1.14</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    stds4 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.02</span>, <span class="fl">1.18</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    stds4 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.02</span>, <span class="fl">1.18</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># For getting the results of the closed test procedure, use the following commands:</span></span></span>
 <span class="r-in"><span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDesignConditionalDunnett.html">getDesignConditionalDunnett</a></span><span class="op">(</span>secondStageConditioning <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">stageResults</span> <span class="op">&lt;-</span> <span class="fu"><a href="getStageResults.html">getStageResults</a></span><span class="op">(</span><span class="va">design</span>, dataInput <span class="op">=</span> <span class="va">data</span><span class="op">)</span>  </span></span>
+<span class="r-in"><span><span class="va">stageResults</span> <span class="op">&lt;-</span> <span class="fu"><a href="getStageResults.html">getStageResults</a></span><span class="op">(</span><span class="va">design</span>, dataInput <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">getClosedConditionalDunnettTestResults</span><span class="op">(</span><span class="va">stageResults</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>

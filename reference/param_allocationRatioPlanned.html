@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1.9231</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,9 +61,10 @@
     <dl><dt>allocationRatioPlanned</dt>
 <dd><p>The planned allocation ratio <code>n1 / n2</code> for a two treatment groups
 design, default is <code>1</code>. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
-For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+For simulating means and rates for a two treatment groups design, it can be a vector of length <code>kMax</code>, the number of stages.
 It can be a vector of length kMax, too, for multi-arm and enrichment designs.
-In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.</p></dd>
+In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.
+Note that internally <code>allocationRatioPlanned</code> is treated as a vector of length <code>kMax</code>, not a scalar.</p></dd>
 
 </dl></div>
 

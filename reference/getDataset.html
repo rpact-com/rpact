@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1.9231</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,19 +128,19 @@ was dropped at interim. Number of events and logrank statistics are entered for 
 comparison to control (see Examples).</p>
 <p>For enrichment designs, the comparison of two samples is provided for an unstratified
 (sub-population wise) or stratified data input.<br>
-For unstratified (sub-population wise) data input the data sets are defined for the sub-populations
+For non-stratified (sub-population wise) data input the data sets are defined for the sub-populations
 S1, S2, ..., F, where F refers to the full populations. Use of <code>getDataset(S1 = , S2, ..., F = )</code>
 defines the data set to be used in <code><a href="getAnalysisResults.html">getAnalysisResults()</a></code> (see examples)<br>
 For stratified data input the data sets are defined for the strata S1, S12, S2, ..., R, where R
 refers to the remainder of the strata such that the union of all sets is the full population.
 Use of <code>getDataset(S1 = , S12 = , S2, ..., R = )</code> defines the data set to be used in
 <code><a href="getAnalysisResults.html">getAnalysisResults()</a></code> (see examples)<br>
-For survival data, for enrichment designs the log-rank statistics should be entered as stratified
+For survival data, for enrichment designs the log-rank statistics can only be entered as stratified
 log-rank statistics in order to provide strong control of Type I error rate. For stratified data input,
-the variables to be specified in <code>getDataset()</code> are <code>events</code>, <code>expectedEvents</code>,
-<code>varianceEvents</code>, and <code>allocationRatios</code> or <code>overallEvents</code>, <code>overallExpectedEvents</code>,
-<code>overallVarianceEvents</code>, and <code>overallAllocationRatios</code>. From this, (stratified) log-rank tests are
-calculated.</p>
+the variables to be specified in <code>getDataset()</code> are <code>cumEvents</code>, <code>cumExpectedEvents</code>,
+<code>cumVarianceEvents</code>, and <code>cumAllocationRatios</code> or <code>overallEvents</code>, <code>overallExpectedEvents</code>,
+<code>overallVarianceEvents</code>, and <code>overallAllocationRatios</code>. From this, (stratified) log-rank tests and
+and the independent increments are calculated.</p>
     </div>
 
     <div class="section level2">

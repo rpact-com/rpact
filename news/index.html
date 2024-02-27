@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1.9231</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,8 +52,39 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="3.5.1" id="rpact-351">rpact 3.5.1<a class="anchor" aria-label="anchor" href="#rpact-351"></a></h2>
-<ul><li>The fields <code>.parameterNames</code> and <code>.parameterFormatFunctions</code> were removed from all rpact result objects in favor of a more efficient solution</li>
-<li>Issues <a href="https://github.com/rpact-com/rpact/issues/15" class="external-link">15</a>, <a href="https://github.com/rpact-com/rpact/issues/16" class="external-link">16</a>, and <a href="https://github.com/rpact-com/rpact/issues/17" class="external-link">17</a> fixed</li>
+<ul><li>The internal fields <code>.parameterNames</code> and <code>.parameterFormatFunctions</code> were removed from all rpact result objects in favor of a more efficient solution</li>
+<li>Issues <a href="https://github.com/rpact-com/rpact/issues/15" class="external-link">#15</a>, <a href="https://github.com/rpact-com/rpact/issues/16" class="external-link">#16</a>, <a href="https://github.com/rpact-com/rpact/issues/17" class="external-link">#17</a>, <a href="https://github.com/rpact-com/rpact/issues/19" class="external-link">#19</a>, and <a href="https://github.com/rpact-com/rpact/issues/23" class="external-link">#23</a> fixed</li>
+<li>Fixed inconsistent naming of variables and class fields (issue <a href="https://github.com/rpact-com/rpact/issues/21" class="external-link">#21</a>)
+<ul><li>
+<code><a href="../reference/getSampleSizeSurvival.html">getSampleSizeSurvival()</a></code> / <code><a href="../reference/getPowerSurvival.html">getPowerSurvival()</a></code>:
+<ul><li>Field <code>eventsPerStage</code> replaced by <code>cumulativeEventsPerStage</code>
+</li>
+<li>Field <code>singleEventsPerStage</code> added</li>
+</ul></li>
+<li>
+<code><a href="../reference/getSimulationSurvival.html">getSimulationSurvival()</a></code>:
+<ul><li>Field <code>eventsPerStage</code> replaced by <code>singleEventsPerStage</code>
+</li>
+<li>Field <code>overallEventsPerStage</code> replaced by <code>cumulativeEventsPerStage</code>
+</li>
+</ul></li>
+<li>
+<code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code>:
+<ul><li>Field <code>eventsPerStage</code> replaced by <code>cumulativeEventsPerStage</code>
+</li>
+<li>Field <code>singleNumberOfEventsPerStage</code> replaced by <code>singleEventsPerArmAndStage</code>
+</li>
+<li>Field <code>singleEventsPerStage</code> added</li>
+</ul></li>
+<li>
+<code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code>:
+<ul><li>field <code>singleNumberOfEventsPerStage</code> replaced by <code>singleEventsPerSubsetAndStage</code>
+</li>
+</ul></li>
+</ul></li>
+<li>Test coverage CI/CD pipeline activated with the assistance of GitHub Actions, which runs <code>covr</code> and uploads the results to <a href="https://app.codecov.io/gh/rpact-com" class="external-link">codecov.io</a>
+</li>
+<li>Minor improvements</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="3.5.0" id="rpact-350">rpact 3.5.0<a class="anchor" aria-label="anchor" href="#rpact-350"></a></h2><p class="text-muted">CRAN release: 2024-01-25</p>

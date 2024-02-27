@@ -12,7 +12,7 @@ for testing the hazard ratio in a two treatment groups survival design."><!-- ma
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1.9231</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -340,7 +340,7 @@ testing situation. The function might depend on variables
 <code>conditionalPower</code>,
 <code>thetaH0</code>,
 <code>plannedEvents</code>,
-<code>eventsPerStage</code>,
+<code>singleEventsPerStage</code>,
 <code>minNumberOfEventsPerStage</code>,
 <code>maxNumberOfEventsPerStage</code>,
 <code>allocationRatioPlanned</code>,
@@ -408,7 +408,7 @@ object as <code><a href="https://rdrr.io/r/base/data.frame.html" class="external
 in treatment group 1.</p></li>
 <li><p><code>eventsPerStage2</code>: The observed number of events per stage
 in treatment group 2.</p></li>
-<li><p><code>eventsPerStage</code>: The observed number of events per stage
+<li><p><code>singleEventsPerStage</code>: The observed number of events per stage
 in both treatment groups.</p></li>
 <li><p><code>rejectPerStage</code>: 1 if null hypothesis can be rejected, 0 otherwise.</p></li>
 <li><p><code>futilityPerStage</code>: 1 if study should be stopped for futility, 0 otherwise.</p></li>
@@ -495,6 +495,7 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Analysis time                          : 20.10, 18.42, 16.90, 16.31 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Expected study duration                : 20.10, 18.42, 16.90, 16.31 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Events not achieved                    : 0.000, 0.000, 0.000, 0.000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Cumulative number of events            : 40, 40, 40, 40 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Iterations                             : 10, 10, 10, 10 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Overall reject                         : 0.0000, 0.1000, 0.7000, 1.0000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Reject per stage                       : 0.0000, 0.1000, 0.7000, 1.0000 </span>

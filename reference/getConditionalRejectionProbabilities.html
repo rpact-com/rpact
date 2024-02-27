@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1.9231</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,15 +117,19 @@ use of the prototype case testing a mean for normally distributed data with know
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># Calculate CRP for a Fisher's combination test design with </span></span></span>
+<span class="r-in"><span><span class="co"># Calculate CRP for a Fisher's combination test design with</span></span></span>
 <span class="r-in"><span><span class="co"># two remaining stages and check the results by simulation.</span></span></span>
-<span class="r-in"><span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDesignFisher.html">getDesignFisher</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">4</span>, </span></span>
-<span class="r-in"><span>    informationRates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.8</span>, <span class="fl">1</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDesignFisher.html">getDesignFisher</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    kMax <span class="op">=</span> <span class="fl">4</span>, alpha <span class="op">=</span> <span class="fl">0.01</span>,</span></span>
+<span class="r-in"><span>    informationRates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.8</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDataset.html">getDataset</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">40</span><span class="op">)</span>, events <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">22</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sr</span> <span class="op">&lt;-</span> <span class="fu"><a href="getStageResults.html">getStageResults</a></span><span class="op">(</span><span class="va">design</span>, <span class="va">data</span>, thetaH0 <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">getConditionalRejectionProbabilities</span><span class="op">(</span><span class="va">sr</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">getConditionalRejectionProbabilities</span><span class="op">(</span><span class="va">sr</span>, simulateCRP <span class="op">=</span> <span class="cn">TRUE</span>, </span></span>
-<span class="r-in"><span>    seed <span class="op">=</span> <span class="fl">12345</span>, iterations <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span> </span></span>
+<span class="r-in"><span><span class="fu">getConditionalRejectionProbabilities</span><span class="op">(</span><span class="va">sr</span>,</span></span>
+<span class="r-in"><span>    simulateCRP <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    seed <span class="op">=</span> <span class="fl">12345</span>, iterations <span class="op">=</span> <span class="fl">10000</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

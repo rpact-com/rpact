@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1.9231</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,9 +105,10 @@ For enrichment designs, it is the (combined) sample size for the considered sub-
 <dt>allocationRatioPlanned</dt>
 <dd><p>The planned allocation ratio <code>n1 / n2</code> for a two treatment groups
 design, default is <code>1</code>. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
-For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+For simulating means and rates for a two treatment groups design, it can be a vector of length <code>kMax</code>, the number of stages.
 It can be a vector of length kMax, too, for multi-arm and enrichment designs.
-In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.</p></dd>
+In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.
+Note that internally <code>allocationRatioPlanned</code> is treated as a vector of length <code>kMax</code>, not a scalar.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -167,17 +168,21 @@ for plotting the conditional power.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="getDataset.html">getDataset</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   n1     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">13</span>, <span class="fl">22</span>, <span class="fl">13</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   n2     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">11</span>, <span class="fl">22</span>, <span class="fl">11</span><span class="op">)</span>,  </span></span>
-<span class="r-in"><span>   means1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1.1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   means2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.4</span>, <span class="fl">1.5</span>, <span class="fl">1</span>, <span class="fl">2.5</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>   stds1  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1.3</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   stds2  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    n1     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">13</span>, <span class="fl">22</span>, <span class="fl">13</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    n2     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">11</span>, <span class="fl">22</span>, <span class="fl">11</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    means1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1.1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    means2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.4</span>, <span class="fl">1.5</span>, <span class="fl">1</span>, <span class="fl">2.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    stds1  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1.3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    stds2  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1.3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">stageResults</span> <span class="op">&lt;-</span> <span class="fu"><a href="getStageResults.html">getStageResults</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>   dataInput <span class="op">=</span> <span class="va">data</span>, stage <span class="op">=</span> <span class="fl">2</span>, directionUpper <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></span>
-<span class="r-in"><span><span class="fu">getConditionalPower</span><span class="op">(</span><span class="va">stageResults</span>, thetaH1 <span class="op">=</span> <span class="op">-</span><span class="fl">0.4</span>, </span></span>
-<span class="r-in"><span>   nPlanned <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">64</span>, <span class="fl">64</span><span class="op">)</span>, assumedStDev <span class="op">=</span> <span class="fl">1.5</span>, allocationRatioPlanned <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    dataInput <span class="op">=</span> <span class="va">data</span>, stage <span class="op">=</span> <span class="fl">2</span>, directionUpper <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">getConditionalPower</span><span class="op">(</span><span class="va">stageResults</span>, thetaH1 <span class="op">=</span> <span class="op">-</span><span class="fl">0.4</span>,</span></span>
+<span class="r-in"><span>    nPlanned <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">64</span>, <span class="fl">64</span><span class="op">)</span>, assumedStDev <span class="op">=</span> <span class="fl">1.5</span>, </span></span>
+<span class="r-in"><span>    allocationRatioPlanned <span class="op">=</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

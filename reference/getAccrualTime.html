@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1.9231</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -154,52 +154,69 @@ obtain the specific help documentation linked above by typing <code><a href="plo
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># Assume that in a trial the accrual after the first 6 months is doubled </span></span></span>
+<span class="r-in"><span><span class="co"># Assume that in a trial the accrual after the first 6 months is doubled</span></span></span>
 <span class="r-in"><span><span class="co"># and the total accrual time is 30 months.</span></span></span>
 <span class="r-in"><span><span class="co"># Further assume that a total of 1000 subjects are entered in the trial.</span></span></span>
-<span class="r-in"><span><span class="co"># The number of subjects to be accrued in the first 6 months and afterwards </span></span></span>
-<span class="r-in"><span><span class="co"># is achieved through   </span></span></span>
-<span class="r-in"><span><span class="fu">getAccrualTime</span><span class="op">(</span>accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">30</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>  </span></span>
+<span class="r-in"><span><span class="co"># The number of subjects to be accrued in the first 6 months and afterwards</span></span></span>
+<span class="r-in"><span><span class="co"># is achieved through</span></span></span>
+<span class="r-in"><span><span class="fu">getAccrualTime</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">30</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">1000</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># The same result is obtained via the list based definition</span></span></span>
-<span class="r-in"><span><span class="fu">getAccrualTime</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>     <span class="st">"0 - &lt;6"</span>   <span class="op">=</span> <span class="fl">0.1</span>,</span></span>
-<span class="r-in"><span>     <span class="st">"6 - &lt;=30"</span> <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>     maxNumberOfSubjects <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">getAccrualTime</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="st">"0 - &lt;6"</span>   <span class="op">=</span> <span class="fl">0.1</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"6 - &lt;=30"</span> <span class="op">=</span> <span class="fl">0.2</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfSubjects <span class="op">=</span> <span class="fl">1000</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Calculate the end of accrual at given absolute intensity:</span></span></span>
-<span class="r-in"><span><span class="fu">getAccrualTime</span><span class="op">(</span>accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">36</span><span class="op">)</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">getAccrualTime</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">36</span><span class="op">)</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">1000</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Via the list based definition this is</span></span></span>
-<span class="r-in"><span><span class="fu">getAccrualTime</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="st">"0 - &lt;6"</span> <span class="op">=</span> <span class="fl">18</span>,</span></span>
-<span class="r-in"><span>    <span class="st">"&gt;=6"</span> <span class="op">=</span> <span class="fl">36</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>    maxNumberOfSubjects <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">getAccrualTime</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="st">"0 - &lt;6"</span> <span class="op">=</span> <span class="fl">18</span>,</span></span>
+<span class="r-in"><span>        <span class="st">"&gt;=6"</span> <span class="op">=</span> <span class="fl">36</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfSubjects <span class="op">=</span> <span class="fl">1000</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># You can use an accrual time object in getSampleSizeSurvival() or </span></span></span>
+<span class="r-in"><span><span class="co"># You can use an accrual time object in getSampleSizeSurvival() or</span></span></span>
 <span class="r-in"><span><span class="co"># getPowerSurvival().</span></span></span>
-<span class="r-in"><span><span class="co"># For example, if the maximum number of subjects and the follow up </span></span></span>
-<span class="r-in"><span><span class="co"># time needs to be calculated for a given effect size: </span></span></span>
-<span class="r-in"><span><span class="va">accrualTime</span> <span class="op">=</span> <span class="fu">getAccrualTime</span><span class="op">(</span>accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">30</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># For example, if the maximum number of subjects and the follow up</span></span></span>
+<span class="r-in"><span><span class="co"># time needs to be calculated for a given effect size:</span></span></span>
+<span class="r-in"><span><span class="va">accrualTime</span> <span class="op">&lt;-</span> <span class="fu">getAccrualTime</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">30</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="getSampleSizeSurvival.html">getSampleSizeSurvival</a></span><span class="op">(</span>accrualTime <span class="op">=</span> <span class="va">accrualTime</span>, pi1 <span class="op">=</span> <span class="fl">0.4</span>, pi2 <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Or if the power and follow up time needs to be calculated for given </span></span></span>
+<span class="r-in"><span><span class="co"># Or if the power and follow up time needs to be calculated for given</span></span></span>
 <span class="r-in"><span><span class="co"># number of events and subjects:</span></span></span>
-<span class="r-in"><span><span class="va">accrualTime</span> <span class="op">=</span> <span class="fu">getAccrualTime</span><span class="op">(</span>accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">30</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">110</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="getPowerSurvival.html">getPowerSurvival</a></span><span class="op">(</span>accrualTime <span class="op">=</span> <span class="va">accrualTime</span>, pi1 <span class="op">=</span> <span class="fl">0.4</span>, pi2 <span class="op">=</span> <span class="fl">0.2</span>, </span></span>
-<span class="r-in"><span>maxNumberOfEvents <span class="op">=</span> <span class="fl">46</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">accrualTime</span> <span class="op">&lt;-</span> <span class="fu">getAccrualTime</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">30</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">110</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="getPowerSurvival.html">getPowerSurvival</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    accrualTime <span class="op">=</span> <span class="va">accrualTime</span>, pi1 <span class="op">=</span> <span class="fl">0.4</span>, pi2 <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfEvents <span class="op">=</span> <span class="fl">46</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># How to show accrual time details</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># You can use a sample size or power object as argument for the function </span></span></span>
+<span class="r-in"><span><span class="co"># You can use a sample size or power object as argument for the function</span></span></span>
 <span class="r-in"><span><span class="co"># getAccrualTime():</span></span></span>
-<span class="r-in"><span><span class="va">sampleSize</span> <span class="op">&lt;-</span> </span></span>
-<span class="r-in"><span><span class="fu"><a href="getSampleSizeSurvival.html">getSampleSizeSurvival</a></span><span class="op">(</span>accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>, accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">53</span><span class="op">)</span>,  </span></span>
-<span class="r-in"><span>    lambda2 <span class="op">=</span> <span class="fl">0.05</span>, hazardRatio <span class="op">=</span> <span class="fl">0.8</span>, followUpTime <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sampleSize</span> <span class="op">&lt;-</span> <span class="fu"><a href="getSampleSizeSurvival.html">getSampleSizeSurvival</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    accrualTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>, accrualIntensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">22</span>, <span class="fl">53</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    lambda2 <span class="op">=</span> <span class="fl">0.05</span>, hazardRatio <span class="op">=</span> <span class="fl">0.8</span>, followUpTime <span class="op">=</span> <span class="fl">6</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sampleSize</span></span></span>
 <span class="r-in"><span><span class="va">accrualTime</span> <span class="op">&lt;-</span> <span class="fu">getAccrualTime</span><span class="op">(</span><span class="va">sampleSize</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">accrualTime</span></span></span>
