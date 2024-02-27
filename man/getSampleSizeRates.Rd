@@ -7,7 +7,7 @@
 getSampleSizeRates(
   design = NULL,
   ...,
-  groups = 2,
+  groups = 2L,
   normalApproximation = TRUE,
   riskRatio = FALSE,
   thetaH0 = ifelse(riskRatio, 1, 0),

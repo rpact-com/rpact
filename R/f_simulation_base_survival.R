@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7547 $
-## |  Last changed: $Date: 2024-01-10 08:13:40 +0100 (Mi, 10 Jan 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7671 $
+## |  Last changed: $Date: 2024-02-26 16:27:43 +0100 (Mo, 26 Feb 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include class_simulation_results.R
@@ -160,7 +160,7 @@ NULL
 #' \code{conditionalPower},
 #' \code{thetaH0},
 #' \code{plannedEvents},
-#' \code{eventsPerStage},
+#' \code{singleEventsPerStage},
 #' \code{minNumberOfEventsPerStage},
 #' \code{maxNumberOfEventsPerStage},
 #' \code{allocationRatioPlanned},
@@ -201,7 +201,7 @@ NULL
 #'         in treatment group 1.
 #'   \item \code{eventsPerStage2}: The observed number of events per stage
 #'         in treatment group 2.
-#'   \item \code{eventsPerStage}: The observed number of events per stage
+#'   \item \code{singleEventsPerStage}: The observed number of events per stage
 #'         in both treatment groups.
 #'   \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
 #'   \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
@@ -298,14 +298,35 @@ getSimulationSurvival <- function(design = NULL, ...,
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)
     .assertIsNumericVector(lambda2, "lambda2", naAllowed = TRUE)
-    .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)    
+    .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
     .assertIsIntegerVector(allocation1, "allocation1", validateType = FALSE)
     .assertIsIntegerVector(allocation2, "allocation2", validateType = FALSE)
     .assertIsInClosedInterval(allocation1, "allocation1", lower = 1L, upper = NULL)
     .assertIsInClosedInterval(allocation2, "allocation2", lower = 1L, upper = NULL)
+    .assertIsSingleNumber(dropoutTime, "dropoutTime", naAllowed = TRUE)
+    .assertIsSingleNumber(dropoutRate1, "dropoutRate1", naAllowed = TRUE)
+    .assertIsSingleNumber(dropoutRate2, "dropoutRate2", naAllowed = TRUE)
     .assertIsSingleLogical(longTimeSimulationAllowed, "longTimeSimulationAllowed")
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedEvents, parameterName = "plannedEvents")
+
+    if (!is.na(dropoutTime) && dropoutTime <= 0) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0", call. = FALSE)
+    }
+
+    if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
+        stop(
+            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
+            "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)"
+        )
+    }
+
+    if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
+        stop(
+            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
+            "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)"
+        )
+    }
 
     if (design$sided == 2) {
         stop(
@@ -742,7 +763,8 @@ getSimulationSurvival <- function(design = NULL, ...,
     }
     simulationResults$iterations <- matrix(as.integer(overview$iterations), nrow = design$kMax)
     if (!is.null(overview$eventsPerStage)) {
-        simulationResults$eventsPerStage <- matrix(overview$eventsPerStage, nrow = design$kMax)
+        simulationResults$singleEventsPerStage <- matrix(overview$eventsPerStage, nrow = design$kMax)
+        .addDeprecatedFieldValues(simulationResults, "eventsPerStage", simulationResults$singleEventsPerStage)
     }
     simulationResults$eventsNotAchieved <- matrix(overview$eventsNotAchieved, nrow = design$kMax)
     if (any(simulationResults$eventsNotAchieved > 0)) {
@@ -783,7 +805,7 @@ getSimulationSurvival <- function(design = NULL, ...,
 
     if (design$kMax == 1) {
         simulationResults$.setParameterType("numberOfSubjects", C_PARAM_NOT_APPLICABLE)
-        simulationResults$.setParameterType("eventsPerStage", C_PARAM_NOT_APPLICABLE)
+        simulationResults$.setParameterType("singleEventsPerStage", C_PARAM_NOT_APPLICABLE)
     }
 
     if (design$kMax > 1) {
@@ -823,25 +845,33 @@ getSimulationSurvival <- function(design = NULL, ...,
         numberOfSubjects[is.na(numberOfSubjects)] <- 0
         simulationResults$expectedNumberOfSubjects <- diag(t(numberOfSubjects) %*% pStop)
 
-        if (!is.null(simulationResults$eventsPerStage) &&
-                nrow(simulationResults$eventsPerStage) > 0 &&
-                ncol(simulationResults$eventsPerStage) > 0) {
-            simulationResults$overallEventsPerStage <- .convertStageWiseToOverallValues(
-                simulationResults$eventsPerStage
+        if (!is.null(simulationResults$singleEventsPerStage) &&
+                nrow(simulationResults$singleEventsPerStage) > 0 &&
+                ncol(simulationResults$singleEventsPerStage) > 0) {
+            simulationResults$cumulativeEventsPerStage <- .convertStageWiseToOverallValues(
+                simulationResults$singleEventsPerStage
             )
-            simulationResults$.setParameterType("overallEventsPerStage", C_PARAM_GENERATED)
+            simulationResults$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
+            .addDeprecatedFieldValues(
+                simulationResults,
+                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage
+            )
             simulationResults$expectedNumberOfEvents <-
-                diag(t(simulationResults$overallEventsPerStage) %*% pStop)
+                diag(t(simulationResults$cumulativeEventsPerStage) %*% pStop)
         }
     } else {
         simulationResults$expectedNumberOfSubjects <-
             as.numeric(simulationResults$numberOfSubjects)
-        if (!is.null(simulationResults$eventsPerStage) &&
-                nrow(simulationResults$eventsPerStage) > 0 &&
-                ncol(simulationResults$eventsPerStage) > 0) {
-            simulationResults$overallEventsPerStage <- simulationResults$eventsPerStage
+        if (!is.null(simulationResults$singleEventsPerStage) &&
+                nrow(simulationResults$singleEventsPerStage) > 0 &&
+                ncol(simulationResults$singleEventsPerStage) > 0) {
+            simulationResults$cumulativeEventsPerStage <- simulationResults$singleEventsPerStage
+            .addDeprecatedFieldValues(
+                simulationResults,
+                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage
+            )
             simulationResults$expectedNumberOfEvents <-
-                as.numeric(simulationResults$overallEventsPerStage)
+                as.numeric(simulationResults$cumulativeEventsPerStage)
         }
     }
     if (is.null(simulationResults$expectedNumberOfEvents) ||

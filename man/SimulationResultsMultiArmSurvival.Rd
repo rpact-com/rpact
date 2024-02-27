@@ -75,9 +75,15 @@ Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}
 
 \item{\code{successPerStage}}{The simulated success probabilities per stage where success is defined by user. Is a numeric matrix.}
 
-\item{\code{eventsPerStage}}{The number of events per stage. Is a numeric matrix.}
+\item{\code{eventsPerStage}}{Deprecated: use \code{singleEventsPerStage} or \code{cumulativeEventsPerStage} instead Is a numeric matrix.}
 
-\item{\code{singleNumberOfEventsPerStage}}{In simulation results data set: the number of events per stage that is used for the analysis.}
+\item{\code{singleNumberOfEventsPerStage}}{Deprecated: use \code{singleEventsPerArmAndStage} or \code{singleEventsPerSubsetAndStage} instead}
+
+\item{\code{singleEventsPerArmAndStage}}{The number of events per arm and stage that is used for the analysis.}
+
+\item{\code{singleEventsPerStage}}{The single number of events per stage. Is a numeric matrix.}
+
+\item{\code{cumulativeEventsPerStage}}{The cumulative number of events per stage. Is a numeric matrix.}
 
 \item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.}
 }}

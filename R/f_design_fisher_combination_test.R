@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7408 $
-## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
+## |  File version: $Revision: 7644 $
+## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -63,7 +63,7 @@ NULL
 #'
 #' @family design functions
 #'
-#' @template examples_get_design_Fisher
+#' @template examples_get_design_fisher
 #'
 #' @export
 #'

@@ -28,4 +28,6 @@ testthat-problems.rds
 /tests/testthat/_examples
 /src/*.gcno
 /src/*.gcda
+/src/*.gcno
+/src/*.gcov
 /README.html

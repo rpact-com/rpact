@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-class_time.R
 ## |  Creation date: 08 November 2023, 08:49:49
-## |  File version: $Revision: 7560 $
-## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
+## |  File version: $Revision: 7665 $
+## |  Last changed: $Date: 2024-02-23 17:33:46 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -2189,7 +2189,7 @@ test_that("Testing 'getAccrualTime': test absolute and relative definition", {
 	expect_equal(accrualTime7$absoluteAccrualIntensityEnabled, FALSE, label = paste0("c(", paste0(accrualTime7$absoluteAccrualIntensityEnabled, collapse = ", "), ")"))
 	expect_equal(accrualTime7$accrualTime, c(0, 6, 30), label = paste0("c(", paste0(accrualTime7$accrualTime, collapse = ", "), ")"))
 	expect_equal(accrualTime7$accrualIntensity, c(0.22, 0.33), tolerance = 1e-07, label = paste0("c(", paste0(accrualTime7$accrualIntensity, collapse = ", "), ")"))
-	expect_equal(accrualTime7$accrualIntensityRelative, NA_real_, label = paste0("c(", paste0(accrualTime7$accrualIntensityRelative, collapse = ", "), ")"))
+	expect_equal(accrualTime7$accrualIntensityRelative, c(0.22, 0.33), label = paste0("c(", paste0(accrualTime7$accrualIntensityRelative, collapse = ", "), ")"))
 	expect_equal(accrualTime7$maxNumberOfSubjects, NA_real_, label = paste0("c(", paste0(accrualTime7$maxNumberOfSubjects, collapse = ", "), ")"))
 	expect_equal(accrualTime7$remainingTime, NA_real_, label = paste0("c(", paste0(accrualTime7$remainingTime, collapse = ", "), ")"))
 	expect_equal(accrualTime7$piecewiseAccrualEnabled, TRUE, label = paste0("c(", paste0(accrualTime7$piecewiseAccrualEnabled, collapse = ", "), ")"))
@@ -2232,7 +2232,7 @@ test_that("Testing 'getAccrualTime': test absolute and relative definition", {
 	expect_equal(accrualTime8$absoluteAccrualIntensityEnabled, FALSE, label = paste0("c(", paste0(accrualTime8$absoluteAccrualIntensityEnabled, collapse = ", "), ")"))
 	expect_equal(accrualTime8$accrualTime, c(0, 6, 30), label = paste0("c(", paste0(accrualTime8$accrualTime, collapse = ", "), ")"))
 	expect_equal(accrualTime8$accrualIntensity, c(0.22, 0.33), tolerance = 1e-07, label = paste0("c(", paste0(accrualTime8$accrualIntensity, collapse = ", "), ")"))
-	expect_equal(accrualTime8$accrualIntensityRelative, NA_real_, label = paste0("c(", paste0(accrualTime8$accrualIntensityRelative, collapse = ", "), ")"))
+	expect_equal(accrualTime8$accrualIntensityRelative, c(0.22, 0.33), label = paste0("c(", paste0(accrualTime8$accrualIntensityRelative, collapse = ", "), ")"))
 	expect_equal(accrualTime8$maxNumberOfSubjects, NA_real_, label = paste0("c(", paste0(accrualTime8$maxNumberOfSubjects, collapse = ", "), ")"))
 	expect_equal(accrualTime8$remainingTime, NA_real_, label = paste0("c(", paste0(accrualTime8$remainingTime, collapse = ", "), ")"))
 	expect_equal(accrualTime8$piecewiseAccrualEnabled, TRUE, label = paste0("c(", paste0(accrualTime8$piecewiseAccrualEnabled, collapse = ", "), ")"))

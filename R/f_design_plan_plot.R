@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -256,19 +256,19 @@
 
             if (designMaster$sided == 1) {
                 designPlan <- data.frame(
-                    eventsPerStage = designPlan$eventsPerStage[, 1],
+                    cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
                     criticalValues = designMaster$criticalValues,
                     futilityBounds = c(designMaster$futilityBounds, designMaster$criticalValues[designMaster$kMax])
                 )
             } else {
                 designPlan <- data.frame(
-                    eventsPerStage = designPlan$eventsPerStage[, 1],
+                    cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
                     criticalValues = designMaster$criticalValues,
                     criticalValuesMirrored = -designMaster$criticalValues
                 )
             }
 
-            xParameterName <- "eventsPerStage"
+            xParameterName <- "cumulativeEventsPerStage"
             if (designMaster$sided == 1) {
                 if (any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
                     yParameterNames <- c("futilityBounds", "criticalValues")
@@ -400,9 +400,9 @@
         }
 
         if (survivalDesignPlanEnabled) {
-            xParameterName <- "eventsPerStage"
+            xParameterName <- "cumulativeEventsPerStage"
             xParameterNameSrc <- paste0(designPlanName, "$", xParameterName, "[, 1]")
-            data <- cbind(data.frame(eventsPerStage = designPlan$eventsPerStage[, 1]), data)
+            data <- cbind(data.frame(cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1]), data)
         } else {
             xParameterName <- "informationRates"
             xParameterNameSrc <- paste0(designPlanName, "$.design$", xParameterName)
@@ -463,13 +463,13 @@
         }
 
         if (survivalDesignPlanEnabled) {
-            xParameterName <- "eventsPerStage"
+            xParameterName <- "cumulativeEventsPerStage"
             yParameterNames <- "stageLevels"
             designPlan <- data.frame(
-                eventsPerStage = designPlan$eventsPerStage[, 1],
+                cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
                 stageLevels = designMaster$stageLevels
             )
-            xParameterNameSrc <- "eventsPerStage[, 1]"
+            xParameterNameSrc <- "cumulativeEventsPerStage[, 1]"
             yParameterNamesSrc <- ".design$stageLevels"
         } else {
             xParameterName <- "informationRates"
@@ -495,13 +495,13 @@
             }
         }
         if (survivalDesignPlanEnabled) {
-            xParameterName <- "eventsPerStage"
+            xParameterName <- "cumulativeEventsPerStage"
             yParameterNames <- "alphaSpent"
             designPlan <- data.frame(
-                eventsPerStage = designPlan$eventsPerStage[, 1],
+                cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
                 alphaSpent = designMaster$alphaSpent
             )
-            xParameterNameSrc <- "eventsPerStage[, 1]"
+            xParameterNameSrc <- "cumulativeEventsPerStage[, 1]"
             yParameterNamesSrc <- ".design$alphaSpent"
         } else {
             xParameterName <- "informationRates"
@@ -563,7 +563,7 @@
                 designPlan <- data.frame(
                     hazardRatio = designPlan$hazardRatio,
                     eventsFixed = designPlan$eventsFixed,
-                    maxNumberOfEvents = designPlan$eventsPerStage[designMaster$kMax, ],
+                    maxNumberOfEvents = designPlan$cumulativeEventsPerStage[designMaster$kMax, ],
                     expectedEventsH1 = designPlan$expectedEventsH1
                 )
                 xParameterName <- "hazardRatio"
@@ -580,7 +580,7 @@
                 }
                 yParameterNamesSrc <- c(
                     "eventsFixed",
-                    paste0("eventsPerStage[", designMaster$kMax, ", ]"), "expectedEventsH1"
+                    paste0("cumulativeEventsPerStage[", designMaster$kMax, ", ]"), "expectedEventsH1"
                 )
             } else if (.isTrialDesignPlanCountData(designPlan)) {
                 xParameterName <- "theta" # "lambda1"
@@ -712,7 +712,7 @@
             }
         } else {
             xParameterName <- ifelse(.isTrialDesignPlanCountData(designPlan), "theta", "effect")
-            yParameterNames <- character(0)
+            yParameterNames <- character()
             if (!.isTrialDesignPlanCountData(designPlan)) {
                 yParameterNames <- c(yParameterNames, "expectedNumberOfSubjects")
             } else if (length(designPlan$expectedNumberOfSubjectsH1) > 0 && 
@@ -1371,12 +1371,17 @@
 #' @export
 #'
 plot.TrialDesignPlan <- function(
-        x, y, ..., main = NA_character_,
-        xlab = NA_character_, ylab = NA_character_,
-        type = ifelse(x$.design$kMax == 1, 5L, 1L), palette = "Set1",
+        x, y, ..., 
+        main = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_,
+        type = NA_integer_, 
+        palette = "Set1",
         theta = NA_real_, plotPointsEnabled = NA,
-        legendPosition = NA_integer_, showSource = FALSE,
-        grid = 1, plotSettings = NULL) {
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        grid = 1, 
+        plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
     designPlanName <- deparse(fCall$x)
     .assertGgplotIsInstalled()
@@ -1388,6 +1393,14 @@ plot.TrialDesignPlan <- function(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'nMax' (", nMax,
             ") will be ignored because it will be taken from design plan"
         )
+    }
+    
+    if (all(is.na(type))) {
+        type <- 1L
+        availablePlotTypes <- getAvailablePlotTypes(x)
+        if (length(availablePlotTypes) > 0 && !(type %in% availablePlotTypes)) {
+            type <- availablePlotTypes[1]
+        }
     }
 
     typeNumbers <- .getPlotTypeNumber(type, x)

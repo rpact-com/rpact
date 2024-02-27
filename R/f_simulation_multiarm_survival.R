@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7383 $
-## |  Last changed: $Date: 2023-11-02 15:18:21 +0100 (Do, 02 Nov 2023) $
+## |  File version: $Revision: 7650 $
+## |  Last changed: $Date: 2024-02-20 14:37:26 +0100 (Di, 20 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -120,8 +120,7 @@ NULL
     gMax <- length(omegaVector)
     simSurvival <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     overallEffects <- matrix(NA_real_, nrow = gMax, ncol = kMax)
-    eventsPerStage <- matrix(NA_real_, nrow = gMax, ncol = kMax)
-    singleEventsPerStage <- matrix(NA_real_, nrow = gMax + 1, ncol = kMax)
+    cumulativeEventsPerStage <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     testStatistics <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     overallTestStatistics <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     separatePValues <- matrix(NA_real_, nrow = gMax, ncol = kMax)
@@ -141,15 +140,15 @@ NULL
         for (treatmentArm in 1:gMax) {
             if (selectedArms[treatmentArm, k]) {
                 if (k == 1) {
-                    eventsPerStage[treatmentArm, k] <- plannedEvents[k] *
+                    cumulativeEventsPerStage[treatmentArm, k] <- plannedEvents[k] *
                         (allocationRatioPlanned[k] * omegaVector[treatmentArm] + 1) /
                         (allocationRatioPlanned[k] * sum(omegaVector) + 1)
                 } else {
-                    eventsPerStage[treatmentArm, k] <- (plannedEvents[k] - plannedEvents[k - 1]) *
+                    cumulativeEventsPerStage[treatmentArm, k] <- (plannedEvents[k] - plannedEvents[k - 1]) *
                         (allocationRatioPlanned[k] * omegaVector[treatmentArm] + 1) /
                         (allocationRatioPlanned[k] * sum(omegaVector[selectedArms[, k]]) + 1)
                 }
-                if (eventsPerStage[treatmentArm, k] > 0) {
+                if (cumulativeEventsPerStage[treatmentArm, k] > 0) {
                     testStatistics[treatmentArm, k] <- stats::rnorm(1, 0, 1)
                 }
             }
@@ -174,17 +173,17 @@ NULL
         for (treatmentArm in 1:gMax) {
             if (selectedArms[treatmentArm, k]) {
                 testStatistics[treatmentArm, k] <- testStatistics[treatmentArm, k] +
-                    (2 * directionUpper - 1) * log(omegaVector[treatmentArm]) * sqrt(eventsPerStage[treatmentArm, k]) *
+                    (2 * directionUpper - 1) * log(omegaVector[treatmentArm]) * sqrt(cumulativeEventsPerStage[treatmentArm, k]) *
                         sqrt(allocationRatioPlanned[k]) / (1 + allocationRatioPlanned[k])
 
                 separatePValues[treatmentArm, k] <- 1 - stats::pnorm(testStatistics[treatmentArm, k])
 
-                overallTestStatistics[treatmentArm, k] <- sqrt(eventsPerStage[treatmentArm, 1:k]) %*%
-                    testStatistics[treatmentArm, 1:k] / sqrt(sum(eventsPerStage[treatmentArm, 1:k]))
+                overallTestStatistics[treatmentArm, k] <- sqrt(cumulativeEventsPerStage[treatmentArm, 1:k]) %*%
+                    testStatistics[treatmentArm, 1:k] / sqrt(sum(cumulativeEventsPerStage[treatmentArm, 1:k]))
 
                 overallEffects[treatmentArm, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[treatmentArm, k] *
                     (1 + allocationRatioPlanned[k]) / sqrt(allocationRatioPlanned[k]) /
-                    sqrt(sum(eventsPerStage[treatmentArm, 1:k])))
+                    sqrt(sum(cumulativeEventsPerStage[treatmentArm, 1:k])))
             }
         }
 
@@ -274,7 +273,7 @@ NULL
     }
 
     return(list(
-        eventsPerStage = eventsPerStage,
+        cumulativeEventsPerStage = cumulativeEventsPerStage,
         plannedEvents = plannedEvents,
         allocationRatioPlanned = allocationRatioPlanned,
         overallEffects = overallEffects,
@@ -634,7 +633,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
                     dataArmNumber[index] <- g
                     dataAlternative[index] <- omegaMaxVector[i]
                     dataEffect[index] <- effectMatrix[i, g]
-                    dataNumberOfEvents[index] <- round(stageResults$eventsPerStage[g, k], 1)
+                    dataNumberOfEvents[index] <- round(stageResults$cumulativeEventsPerStage[g, k], 1)
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -699,15 +698,24 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
 
-    simulationResults$eventsPerStage <- .convertStageWiseToOverallValues(simulatedSingleEventsPerStage)
-    for (g in (1:gMax)) {
-        simulationResults$eventsPerStage[, , g] <- simulationResults$eventsPerStage[, , g] +
-            simulationResults$eventsPerStage[, , gMax + 1]
+    simulationResults$cumulativeEventsPerStage <- .convertStageWiseToOverallValues(simulatedSingleEventsPerStage)
+    for (g in 1:gMax) {
+        simulationResults$cumulativeEventsPerStage[, , g] <- simulationResults$cumulativeEventsPerStage[, , g] +
+            simulationResults$cumulativeEventsPerStage[, , gMax + 1]
     }
-    simulationResults$eventsPerStage <- .removeLastEntryFromArray(simulationResults$eventsPerStage)
+    simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
+    .addDeprecatedFieldValues(simulationResults, "eventsPerStage", simulationResults$cumulativeEventsPerStage)
+    
+    simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
+    for (g in 1:gMax) {
+        simulationResults$singleEventsPerStage[, , g] <- simulationResults$singleEventsPerStage[, , g] +
+            simulationResults$singleEventsPerStage[, , gMax + 1]
+    }
+    simulationResults$singleEventsPerStage <- .removeLastEntryFromArray(simulationResults$singleEventsPerStage)
 
-    simulationResults$singleNumberOfEventsPerStage <- simulatedSingleEventsPerStage
-    simulationResults$.setParameterType("singleNumberOfEventsPerStage", C_PARAM_GENERATED)
+    simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
+    simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
+    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", simulatedSingleEventsPerStage)
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 

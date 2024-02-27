@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7268 $
-## |  Last changed: $Date: 2023-09-06 15:04:31 +0200 (Mi, 06 Sep 2023) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -164,7 +164,7 @@ NULL
 
 .getAllAvailableSubsets <- function(numbers, ..., sort = TRUE, digits = NA_integer_) {
     if (length(numbers) == 0) {
-        return(character(0))
+        return(character())
     }
 
     results <- paste0(numbers, collapse = "")
@@ -596,7 +596,7 @@ NULL
 
     args <- list(...)
     if (length(args) == 0) {
-        return(character(0))
+        return(character())
     }
 
     args <- .removeDesignFromArgs(args)
@@ -703,7 +703,7 @@ NULL
         )
     }
     parameterNameVariants <- c(parameterNameVariants, overallParameterNameVariants)
-    otherVariants <- character(0)
+    otherVariants <- character()
     for (parameterNameVariant in parameterNameVariants) {
         otherVariants <- c(otherVariants, .getParameterNameVariant(parameterNameVariant, "."))
         otherVariants <- c(otherVariants, .getParameterNameVariant(parameterNameVariant, "_"))
@@ -854,7 +854,7 @@ getWideFormat <- function(dataInput) {
 .getNumberOfStages <- function(dataFrame, naOmitEnabled = TRUE) {
     if (naOmitEnabled) {
         colNames <- colnames(dataFrame)
-        validColNames <- character(0)
+        validColNames <- character()
         for (colName in colNames) {
             colValues <- dataFrame[, colName]
             if (length(colValues) > 0 && !all(is.na(colValues))) {

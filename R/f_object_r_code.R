@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7526 $
-## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
+## |  File version: $Revision: 7659 $
+## |  Last changed: $Date: 2024-02-23 10:42:33 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -49,7 +49,7 @@ NULL
         if (is.list(x)) {
             return("list()")
         } else if (is.character(x)) {
-            return("character(0)")
+            return("character()")
         } else if (is.integer(x)) {
             return("integer(0)")
         } else if (is.numeric(x)) {
@@ -396,9 +396,9 @@ getObjectRCode <- function(obj, ...,
         )
     }
 
-    precondition <- character(0)
+    precondition <- character()
     if (is.null(leadingArguments)) {
-        leadingArguments <- character(0)
+        leadingArguments <- character()
     }
     if (!inherits(obj, "ConditionalPowerResults") &&
             !is.null(obj[[".design"]]) &&
@@ -618,9 +618,10 @@ getObjectRCode <- function(obj, ...,
     if (!("accrualIntensity" %in% objNames) && !is.null(obj[[".accrualTime"]]) &&
             !obj$.accrualTime$absoluteAccrualIntensityEnabled) {
         objNames <- c(objNames, "accrualIntensity")
+        objNames <- objNames[objNames != "accrualIntensityRelative"]
     }
 
-    newArgumentValueNames <- character(0)
+    newArgumentValueNames <- character()
     if (length(newArgumentValues) > 0) {
         newArgumentValueNames <- names(newArgumentValues)
         illegalArgumentValueNames <- newArgumentValueNames[which(!(newArgumentValueNames %in% names(obj)))]
@@ -836,7 +837,7 @@ getObjectRCode <- function(obj, ...,
             length(stringWrapPrefix) == 1 &&
             !is.na(stringWrapPrefix) &&
             is.character(stringWrapPrefix)) {
-        rCodeNew <- character(0)
+        rCodeNew <- character()
         for (rCodeLine in rCode) {
             rCodeLine <- gsub("   ", "___", rCodeLine)
             rCodeLine <- gsub("  ", "__", rCodeLine)

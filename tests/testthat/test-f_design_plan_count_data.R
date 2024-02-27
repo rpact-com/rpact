@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-f_design_plan_count_data.R
 ## |  Creation date: 16 January 2024, 11:26:11
-## |  File version: $Revision: 7593 $
-## |  Last changed: $Date: 2024-01-24 16:19:18 +0100 (Mi, 24 Jan 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision$
+## |  Last changed: $Date$
+## |  Last changed by: $Author$
 ## |
 
 test_plan_section("Testing the Sample Size Calculation of Count Data Designs for Different Designs and Arguments")

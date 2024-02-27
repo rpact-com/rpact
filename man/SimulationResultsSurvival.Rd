@@ -98,9 +98,9 @@ Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} to create an o
 
 \item{\code{numberOfSubjects2}}{In simulation results data set: The number of subjects under consideration in treatment arm 2 when the interim analysis takes place.}
 
-\item{\code{eventsPerStage}}{The number of events per stage. Is a numeric matrix.}
+\item{\code{singleEventsPerStage}}{The single number of events per stage. Is a numeric matrix.}
 
-\item{\code{overallEventsPerStage}}{The cumulative events over stages. Is a numeric matrix.}
+\item{\code{cumulativeEventsPerStage}}{The cumulative number of events per stage. Is a numeric matrix.}
 
 \item{\code{expectedNumberOfSubjects}}{The expected number of subjects under specified alternative.}
 

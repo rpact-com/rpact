@@ -7,7 +7,7 @@
 getSampleSizeMeans(
   design = NULL,
   ...,
-  groups = 2,
+  groups = 2L,
   normalApproximation = FALSE,
   meanRatio = FALSE,
   thetaH0 = ifelse(meanRatio, 1, 0),

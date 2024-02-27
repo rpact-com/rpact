@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7543 $
-## |  Last changed: $Date: 2024-01-09 11:57:18 +0100 (Di, 09 Jan 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7662 $
+## |  Last changed: $Date: 2024-02-23 12:42:26 +0100 (Fr, 23 Feb 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -25,7 +25,7 @@ NULL
     if (!designPlan$accountForObservationTimes) {
         return(invisible())
     }
-    
+
     kMax <- designPlan$.design$kMax
     if (kMax == 1) {
         designPlan$studyDuration <- designPlan$analysisTime[1, ]
@@ -42,7 +42,7 @@ NULL
         if (!any(is.na(lambda1))) {
             return(lambda1)
         }
-        
+
         lambda2 <- lambda2 * hazardRatio^(1 / kappa)
     }
     return(lambda2)
@@ -56,11 +56,11 @@ NULL
                 call. = FALSE
             )
         }
-        
+
         return(piecewiseLambda / (piecewiseLambda + phi) *
-                pweibull(time, shape = kappa, scale = 1 / (piecewiseLambda + phi), lower.tail = TRUE, log.p = FALSE))
+            pweibull(time, shape = kappa, scale = 1 / (piecewiseLambda + phi), lower.tail = TRUE, log.p = FALSE))
     }
-    
+
     if (length(piecewiseSurvivalTime) != length(piecewiseLambda)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -68,9 +68,9 @@ NULL
             ") must be equal to length of 'piecewiseLambda' (", .arrayToString(piecewiseLambda), ")"
         )
     }
-    
+
     piecewiseSurvivalTime <- .getPiecewiseExpStartTimesWithoutLeadingZero(piecewiseSurvivalTime)
-    
+
     if (kappa != 1) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "Weibull distribution cannot be used for piecewise survival definition",
@@ -82,7 +82,7 @@ NULL
         if (i == 1) {
             if (time <= piecewiseSurvivalTime[1]) {
                 return(piecewiseLambda[1] / (piecewiseLambda[1] + phi) *
-                        (1 - exp(-((piecewiseLambda[1] + phi) * time))))
+                    (1 - exp(-((piecewiseLambda[1] + phi) * time))))
             }
         } else if (i == 2) {
             cdfPart <- piecewiseLambda[1] / (piecewiseLambda[1] + phi) *
@@ -90,67 +90,67 @@ NULL
             if (time <= piecewiseSurvivalTime[2]) {
                 cdfFactor <- piecewiseLambda[1] * piecewiseSurvivalTime[1]
                 cdf <- cdfPart + piecewiseLambda[2] / (piecewiseLambda[2] + phi) * exp(-cdfFactor) * (
-                        exp(-phi * piecewiseSurvivalTime[1]) - exp(-piecewiseLambda[2] *
-                                (time - piecewiseSurvivalTime[1]) - phi * time))
+                    exp(-phi * piecewiseSurvivalTime[1]) - exp(-piecewiseLambda[2] *
+                        (time - piecewiseSurvivalTime[1]) - phi * time))
                 return(cdf)
             }
         } else if (i == 3) {
             cdfPart <- cdfPart + piecewiseLambda[2] / (piecewiseLambda[2] + phi) *
                 exp(-piecewiseLambda[1] * piecewiseSurvivalTime[1]) * (
                     exp(-phi * piecewiseSurvivalTime[1]) - exp(-piecewiseLambda[2] *
-                            (piecewiseSurvivalTime[2] - piecewiseSurvivalTime[1]) - phi * piecewiseSurvivalTime[2]))
+                        (piecewiseSurvivalTime[2] - piecewiseSurvivalTime[1]) - phi * piecewiseSurvivalTime[2]))
             if (time <= piecewiseSurvivalTime[3]) {
                 cdfFactor <- piecewiseLambda[1] * piecewiseSurvivalTime[1] +
                     piecewiseLambda[2] * (piecewiseSurvivalTime[2] - piecewiseSurvivalTime[1])
                 cdf <- cdfPart + piecewiseLambda[3] / (piecewiseLambda[3] + phi) * exp(-cdfFactor) * (
-                        exp(-phi * piecewiseSurvivalTime[2]) - exp(-piecewiseLambda[3] *
-                                (time - piecewiseSurvivalTime[2]) - phi * time))
+                    exp(-phi * piecewiseSurvivalTime[2]) - exp(-piecewiseLambda[3] *
+                        (time - piecewiseSurvivalTime[2]) - phi * time))
                 return(cdf)
             }
         } else if (i > 3) {
             cdfFactor <- piecewiseLambda[1] * piecewiseSurvivalTime[1] +
                 sum(piecewiseLambda[2:(i - 2)] * (piecewiseSurvivalTime[2:(i - 2)] -
-                            piecewiseSurvivalTime[1:(i - 3)]))
+                    piecewiseSurvivalTime[1:(i - 3)]))
             cdfPart <- cdfPart + piecewiseLambda[i - 1] / (piecewiseLambda[i - 1] + phi) * exp(-cdfFactor) * (
-                    exp(-phi * piecewiseSurvivalTime[i - 2]) - exp(-piecewiseLambda[i - 1] *
-                            (piecewiseSurvivalTime[i - 1] - piecewiseSurvivalTime[i - 2]) - phi * piecewiseSurvivalTime[i - 1]))
+                exp(-phi * piecewiseSurvivalTime[i - 2]) - exp(-piecewiseLambda[i - 1] *
+                    (piecewiseSurvivalTime[i - 1] - piecewiseSurvivalTime[i - 2]) - phi * piecewiseSurvivalTime[i - 1]))
             if (time <= piecewiseSurvivalTime[i]) {
                 cdfFactor <- piecewiseLambda[1] * piecewiseSurvivalTime[1] +
                     sum(piecewiseLambda[2:(i - 1)] * (piecewiseSurvivalTime[2:(i - 1)] - piecewiseSurvivalTime[1:(i - 2)]))
                 cdf <- cdfPart + piecewiseLambda[i] / (piecewiseLambda[i] + phi) * exp(-cdfFactor) * (
-                        exp(-phi * piecewiseSurvivalTime[i - 1]) - exp(-piecewiseLambda[i] *
-                                (time - piecewiseSurvivalTime[i - 1]) - phi * time))
+                    exp(-phi * piecewiseSurvivalTime[i - 1]) - exp(-piecewiseLambda[i] *
+                        (time - piecewiseSurvivalTime[i - 1]) - phi * time))
                 return(cdf)
             }
         }
     }
-    
+
     if (len == 1) {
         cdfPart <- piecewiseLambda[1] / (piecewiseLambda[1] + phi) *
             (1 - exp(-((piecewiseLambda[1] + phi) * piecewiseSurvivalTime[1])))
     } else if (len == 2) {
         cdfFactor <- piecewiseLambda[1] * piecewiseSurvivalTime[1]
         cdfPart <- cdfPart + piecewiseLambda[len] / (piecewiseLambda[len] + phi) * exp(-cdfFactor) * (
-                exp(-phi * piecewiseSurvivalTime[len - 1]) - exp(-piecewiseLambda[len] *
-                        (piecewiseSurvivalTime[len] - piecewiseSurvivalTime[len - 1]) - phi * piecewiseSurvivalTime[len]))
+            exp(-phi * piecewiseSurvivalTime[len - 1]) - exp(-piecewiseLambda[len] *
+                (piecewiseSurvivalTime[len] - piecewiseSurvivalTime[len - 1]) - phi * piecewiseSurvivalTime[len]))
     } else {
         cdfFactor <- piecewiseLambda[1] * piecewiseSurvivalTime[1] +
             sum(piecewiseLambda[2:(len - 1)] * (piecewiseSurvivalTime[2:(len - 1)] - piecewiseSurvivalTime[1:(len - 2)]))
         cdfPart <- cdfPart + piecewiseLambda[len] / (piecewiseLambda[len] + phi) * exp(-cdfFactor) * (
-                exp(-phi * piecewiseSurvivalTime[len - 1]) - exp(-piecewiseLambda[len] *
-                        (piecewiseSurvivalTime[len] - piecewiseSurvivalTime[len - 1]) - phi * piecewiseSurvivalTime[len]))
+            exp(-phi * piecewiseSurvivalTime[len - 1]) - exp(-piecewiseLambda[len] *
+                (piecewiseSurvivalTime[len] - piecewiseSurvivalTime[len - 1]) - phi * piecewiseSurvivalTime[len]))
     }
-    
+
     if (len == 1) {
         cdfFactor <- piecewiseLambda[1] * piecewiseSurvivalTime[1]
     } else {
         cdfFactor <- cdfFactor + piecewiseLambda[len] * (piecewiseSurvivalTime[len] - piecewiseSurvivalTime[len - 1])
     }
-    
+
     cdf <- cdfPart + piecewiseLambda[len + 1] / (piecewiseLambda[len + 1] + phi) * exp(-cdfFactor) * (
-            exp(-phi * piecewiseSurvivalTime[len]) - exp(-piecewiseLambda[len + 1] *
-                    (time - piecewiseSurvivalTime[len]) - phi * time))
-    
+        exp(-phi * piecewiseSurvivalTime[len]) - exp(-piecewiseLambda[len + 1] *
+            (time - piecewiseSurvivalTime[len]) - phi * time))
+
     return(cdf)
 }
 
@@ -158,22 +158,22 @@ NULL
     result <- c()
     for (time in timeVector) {
         result <- c(result, .getEventProbabilityFunction(
-                time = time, piecewiseLambda = piecewiseLambda,
-                piecewiseSurvivalTime = piecewiseSurvivalTime, phi = phi, kappa = kappa
-            ))
+            time = time, piecewiseLambda = piecewiseLambda,
+            piecewiseSurvivalTime = piecewiseSurvivalTime, phi = phi, kappa = kappa
+        ))
     }
     return(result)
 }
 
 .getEventProbabilitiesGroupwise <- function(
-    ..., time, accrualTimeVector, accrualIntensity, lambda2,
-    lambda1, piecewiseSurvivalTime, phi, kappa, allocationRatioPlanned, hazardRatio) {
+        ..., time, accrualTimeVector, accrualIntensity, lambda2,
+        lambda1, piecewiseSurvivalTime, phi, kappa, allocationRatioPlanned, hazardRatio) {
     .assertIsSingleNumber(time, "time")
-    
+
     if (length(accrualTimeVector) > 1 && accrualTimeVector[1] == 0) {
         accrualTimeVector <- accrualTimeVector[2:length(accrualTimeVector)]
     }
-    
+
     accrualTimeVectorLength <- length(accrualTimeVector)
     densityIntervals <- accrualTimeVector
     if (accrualTimeVectorLength > 1) {
@@ -181,23 +181,23 @@ NULL
             accrualTimeVector[2:accrualTimeVectorLength] -
             accrualTimeVector[1:(accrualTimeVectorLength - 1)]
     }
-    
+
     if (length(densityIntervals) > 1 && length(accrualIntensity) > 1 &&
-        length(densityIntervals) != length(accrualIntensity)) {
+            length(densityIntervals) != length(accrualIntensity)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'densityIntervals' (", .arrayToString(densityIntervals),
             ") and 'accrualIntensity' (", .arrayToString(accrualIntensity), ") must have same length"
         )
     }
-    
+
     densityVector <- accrualIntensity / sum(densityIntervals * accrualIntensity)
-    
+
     eventProbs <- rep(NA_real_, 2)
-    
+
     for (k in 1:accrualTimeVectorLength) {
         if (time <= accrualTimeVector[k]) {
             for (groupNumber in c(1, 2)) { # two groups: 1 = treatment, 2 = control
-                
+
                 lambdaTemp <- .getLambda(
                     groupNumber           = groupNumber,
                     lambda2               = lambda2,
@@ -205,7 +205,7 @@ NULL
                     hazardRatio           = hazardRatio,
                     kappa                 = kappa
                 )
-                
+
                 inner <- function(x) {
                     .getEventProbabilityFunctionVec(
                         timeVector = x, piecewiseLambda = lambdaTemp,
@@ -216,9 +216,9 @@ NULL
                 if (k > 1) {
                     timeValue1 <- time - accrualTimeVector[1]
                 }
-                
+
                 eventProbs[groupNumber] <- densityVector[1] * stats::integrate(inner, timeValue1, time)$value
-                
+
                 if (k > 2) {
                     for (j in 2:(k - 1)) {
                         eventProbs[groupNumber] <- eventProbs[groupNumber] +
@@ -233,11 +233,11 @@ NULL
                         densityVector[k] * stats::integrate(inner, 0, time - accrualTimeVector[k - 1])$value
                 }
             }
-            
+
             return(eventProbs)
         }
     }
-    
+
     for (groupNumber in c(1, 2)) {
         lambdaTemp <- .getLambda(
             groupNumber           = groupNumber,
@@ -246,14 +246,14 @@ NULL
             hazardRatio           = hazardRatio,
             kappa                 = kappa
         )
-        
+
         inner <- function(x) {
             .getEventProbabilityFunctionVec(
                 timeVector = x, piecewiseLambda = lambdaTemp,
                 piecewiseSurvivalTime = piecewiseSurvivalTime, phi = phi[groupNumber], kappa = kappa
             )
         }
-        
+
         eventProbs[groupNumber] <- densityVector[1] *
             stats::integrate(inner, time - accrualTimeVector[1], time)$value
         if (accrualTimeVectorLength > 1) {
@@ -266,7 +266,7 @@ NULL
             }
         }
     }
-    
+
     return(eventProbs)
 }
 
@@ -285,8 +285,7 @@ NULL
         !is.na(designPlan$maxNumberOfSubjects) && designPlan$maxNumberOfSubjects > 0)
 }
 
-.getEventsFixed <- function(
-        ..., typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
+.getEventsFixed <- function(..., typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
         twoSidedPower, alpha, beta, sided, hazardRatio, thetaH0, allocationRatioPlanned) {
     typeOfComputation <- match.arg(typeOfComputation)
 
@@ -357,8 +356,7 @@ NULL
     }
 }
 
-.getEventProbabilities <- function(
-        ..., time, accrualTimeVector, accrualIntensity, lambda2,
+.getEventProbabilities <- function(..., time, accrualTimeVector, accrualIntensity, lambda2,
         lambda1, piecewiseSurvivalTime, phi, kappa, allocationRatioPlanned, hazardRatio) {
     eventProbs <- .getEventProbabilitiesGroupwise(
         time = time, accrualTimeVector = accrualTimeVector,
@@ -373,14 +371,14 @@ NULL
 .getEffectScaleBoundaryDataSurvival <- function(designPlan) {
     design <- designPlan$.design
     thetaH0 <- designPlan$thetaH0
-    eventsPerStage <- designPlan$eventsPerStage
+    cumulativeEventsPerStage <- designPlan$cumulativeEventsPerStage
     allocationRatioPlanned <- designPlan$allocationRatioPlanned
     directionUpper <- designPlan$directionUpper
 
     if (design$kMax == 1) {
-        nParameters <- length(eventsPerStage)
+        nParameters <- length(cumulativeEventsPerStage)
     } else {
-        nParameters <- ncol(eventsPerStage)
+        nParameters <- ncol(cumulativeEventsPerStage)
     }
 
     directionUpper[is.na(directionUpper)] <- TRUE
@@ -403,26 +401,26 @@ NULL
         if (design$sided == 1) {
             criticalValuesEffectScaleUpper[, j] <- thetaH0 * (exp((2 * directionUpper[j] - 1) * criticalValues *
                 (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    eventsPerStage[, j])))
+                    cumulativeEventsPerStage[, j])))
         } else {
             criticalValuesEffectScaleUpper[, j] <- thetaH0 * (exp((2 * directionUpper[j] - 1) * criticalValues *
                 (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    eventsPerStage[, j])))
+                    cumulativeEventsPerStage[, j])))
             criticalValuesEffectScaleLower[, j] <- thetaH0 * (exp(-(2 * directionUpper[j] - 1) * criticalValues *
                 (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    eventsPerStage[, j])))
+                    cumulativeEventsPerStage[, j])))
         }
 
         if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
             futilityBoundsEffectScaleUpper[, j] <- thetaH0 * (exp((2 * directionUpper[j] - 1) * futilityBounds *
                 (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    eventsPerStage[1:(design$kMax - 1), j])))
+                    cumulativeEventsPerStage[1:(design$kMax - 1), j])))
         }
         if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower[, j] <- thetaH0 * (exp(-(2 * directionUpper[j] - 1) * futilityBounds *
                 (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    eventsPerStage[1:(design$kMax - 1), j])))
+                    cumulativeEventsPerStage[1:(design$kMax - 1), j])))
         }
     }
 
@@ -432,6 +430,123 @@ NULL
         futilityBoundsEffectScaleUpper = matrix(futilityBoundsEffectScaleUpper, nrow = design$kMax - 1),
         futilityBoundsEffectScaleLower = matrix(futilityBoundsEffectScaleLower, nrow = design$kMax - 1)
     ))
+}
+
+.calculateSampleSizeSurvival <- function(designPlan) {
+    # Fixed
+    designPlan <- .getSampleSizeFixedSurvival(designPlan)
+
+    # Sequential
+    if (designPlan$.design$kMax > 1) {
+        designCharacteristics <- getDesignCharacteristics(designPlan$.design)
+        designPlan <- .getSampleSizeSequentialSurvival(designPlan, designCharacteristics)
+    }
+
+    if (designPlan$accountForObservationTimes && !any(is.na(designPlan$followUpTime)) &&
+            all(designPlan$followUpTime == C_FOLLOW_UP_TIME_DEFAULT)) {
+        designPlan$.setParameterType("followUpTime", C_PARAM_DEFAULT_VALUE)
+    }
+
+    .addEffectScaleBoundaryDataToDesignPlan(designPlan)
+    designPlan$singleEventsPerStage <- .getSingleEventsPerStage(designPlan$cumulativeEventsPerStage)
+    .addDeprecatedFieldValues(designPlan, "eventsPerStage", designPlan$cumulativeEventsPerStage)
+
+    paramName <- ifelse(designPlan$.design$kMax == 1, "nFixed", "maxNumberOfSubjects")
+    if (designPlan$.getParameterType(paramName) == C_PARAM_GENERATED &&
+            designPlan$.accrualTime$.getParameterType("maxNumberOfSubjects") != C_PARAM_GENERATED &&
+            all(designPlan$accrualIntensity < 1)) {
+        numberOfDefinedAccrualIntensities <- length(designPlan$accrualIntensity)
+
+        accrualTime <- designPlan$accrualTime
+        if (length(accrualTime) > 0 && accrualTime[1] != 0) {
+            accrualTime <- c(0, accrualTime)
+        }
+
+        if (any(designPlan$accrualIntensity < 0)) {
+            stop(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'accrualIntensityRelative' (",
+                .arrayToString(designPlan$accrualIntensity), ") must be >= 0"
+            )
+        }
+
+        designPlan$accrualIntensityRelative <- designPlan$accrualIntensity
+        if (identical(designPlan$accrualIntensityRelative, C_ACCRUAL_INTENSITY_DEFAULT)) {
+            designPlan$.setParameterType("accrualIntensityRelative", C_PARAM_NOT_APPLICABLE)
+        } else {
+            designPlan$.setParameterType(
+                "accrualIntensityRelative",
+                designPlan$.getParameterType("accrualIntensity")
+            )
+        }
+        
+        accrualIntensityAbsolute <- numeric()
+        for (maxNumberOfSubjects in designPlan[[paramName]]) {
+            accrualSetup <- getAccrualTime(
+                accrualTime = accrualTime,
+                accrualIntensity = designPlan$accrualIntensityRelative,
+                accrualIntensityType = "relative",
+                maxNumberOfSubjects = maxNumberOfSubjects
+            )
+            accrualIntensityAbsolute <- c(accrualIntensityAbsolute, accrualSetup$accrualIntensity)
+        }
+        designPlan$accrualIntensity <- accrualIntensityAbsolute
+        designPlan$.setParameterType("accrualIntensity", C_PARAM_GENERATED)
+        
+        if (numberOfDefinedAccrualIntensities > 1) {
+            paramName <- NULL
+            if (designPlan$.getParameterType("pi1") == C_PARAM_USER_DEFINED ||
+                    designPlan$.getParameterType("pi1") == C_PARAM_DEFAULT_VALUE ||
+                    designPlan$.getParameterType("pi2") == C_PARAM_USER_DEFINED) {
+                paramName <- "pi1"
+            } else if (designPlan$.getParameterType("median1") == C_PARAM_USER_DEFINED ||
+                    designPlan$.getParameterType("median2") == C_PARAM_USER_DEFINED) {
+                paramName <- "median1"
+            }
+            if (!is.null(paramName)) {
+                paramValue <- designPlan[[paramName]]
+                if (!is.null(paramValue) && length(paramValue) > 1) {
+                    stop(
+                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                        "the definition of relative accrual intensities ",
+                        "(all 'accrualIntensity' values < 1) ",
+                        "is only available for a single value ",
+                        "(", paramName, " = ", .arrayToString(
+                            paramValue,
+                            vectorLookAndFeelEnabled = TRUE
+                        ), ")"
+                    )
+                }
+            }
+        }
+    }
+
+    designPlan$maxNumberOfEvents <- designPlan$cumulativeEventsPerStage[designPlan$.design$kMax, ]
+    designPlan$.setParameterType("maxNumberOfEvents", C_PARAM_GENERATED)
+
+    if (!any(is.na(designPlan$followUpTime))) {
+        if (any(designPlan$followUpTime < -1e-02)) {
+            warning("Accrual duration longer than maximal study ",
+                "duration (time to maximal number of events); followUpTime = ",
+                .arrayToString(designPlan$followUpTime),
+                call. = FALSE
+            )
+        }
+    } else {
+        warning("Follow-up time could not be calculated for hazardRatio = ",
+            .arrayToString(designPlan$hazardRatio[indices]),
+            call. = FALSE
+        )
+    }
+
+    if (designPlan$.getParameterType("accountForObservationTimes") != C_PARAM_USER_DEFINED) {
+        designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
+    }
+    designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
+
+    .addStudyDurationToDesignPlan(designPlan)
+
+    return(designPlan)
 }
 
 # Hidden parameter:
@@ -495,7 +610,7 @@ NULL
         hazardRatio = hazardRatio,
         userFunctionCallEnabled = userFunctionCallEnabled
     )
-    return(.getSampleSize(designPlan))
+    return(.calculateSampleSizeSurvival(designPlan))
 }
 
 .createDesignPlanSurvival <- function(..., objectType = c("sampleSize", "power"),
@@ -534,44 +649,46 @@ NULL
         .assertIsSingleNumber(thetaH0, "thetaH0")
         .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
         .assertIsValidKappa(kappa)
-        directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-            design$sided, objectType, userFunctionCallEnabled = TRUE)
-    
+        directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+            design$sided, objectType,
+            userFunctionCallEnabled = TRUE
+        )
+
         if (objectType == "power") {
             .assertIsSingleNumber(maxNumberOfEvents, "maxNumberOfEvents")
             .assertIsInClosedInterval(maxNumberOfEvents, "maxNumberOfEvents",
                 lower = 1, upper = maxNumberOfSubjects
             )
         }
-    
+
         if (!any(is.na(pi1)) && (any(pi1 <= 0) || any(pi1 >= 1))) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "event rate 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)"
             )
         }
-    
+
         if (!any(is.na(pi2)) && (any(pi2 <= 0) || any(pi2 >= 1))) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "event rate 'pi2' (", .arrayToString(pi2), ") is out of bounds (0; 1)"
             )
         }
-    
+
         if (design$sided == 2 && thetaH0 != 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)"
             )
         }
-    
+
         if (thetaH0 <= 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "null hypothesis hazard ratio is not allowed be negative or zero"
             )
         }
-    
+
         if (!(typeOfComputation %in% c("Schoenfeld", "Freedman", "HsiehFreedman"))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -579,7 +696,7 @@ NULL
                 "'Schoenfeld', 'Freedman', or 'HsiehFreedman' "
             )
         }
-    
+
         if (typeOfComputation != "Schoenfeld" && thetaH0 != 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -594,7 +711,7 @@ NULL
     if (all(is.na(accrualIntensity))) {
         accrualIntensity <- C_ACCRUAL_INTENSITY_DEFAULT
     }
-    
+
     accrualSetup <- getAccrualTime(
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
@@ -1128,12 +1245,6 @@ NULL
     designPlan$nFixed2 <- designPlan$nFixed / (1 + allocationRatioPlanned)
     designPlan$nFixed1 <- designPlan$nFixed2 * allocationRatioPlanned
 
-    if (designPlan$.design$kMax == 1 &&
-            designPlan$.accrualTime$.isRelativeAccrualIntensity(designPlan$accrualIntensity)) {
-        designPlan$accrualIntensity <- designPlan$nFixed / designPlan$accrualTime
-        designPlan$.setParameterType("accrualIntensity", C_PARAM_GENERATED)
-    }
-
     designPlan$numberOfSubjects1 <- matrix(designPlan$nFixed1, nrow = 1)
     designPlan$numberOfSubjects2 <- matrix(designPlan$nFixed2, nrow = 1)
 
@@ -1171,7 +1282,7 @@ NULL
     }
 
     kMax <- designCharacteristics$.design$kMax
-    designPlan$eventsPerStage <- matrix(NA_real_, kMax, numberOfResults)
+    designPlan$cumulativeEventsPerStage <- matrix(NA_real_, kMax, numberOfResults)
     analysisTime <- matrix(NA_real_, kMax, numberOfResults)
     numberOfSubjects <- matrix(NA_real_, kMax, numberOfResults)
     designPlan$expectedEventsH0 <- rep(NA_real_, numberOfResults)
@@ -1193,7 +1304,7 @@ NULL
     }
 
     for (i in 1:numberOfResults) {
-        designPlan$eventsPerStage[, i] <- designPlan$eventsFixed[i] * informationRates *
+        designPlan$cumulativeEventsPerStage[, i] <- designPlan$eventsFixed[i] * informationRates *
             designCharacteristics$inflationFactor
 
         if (!designPlan$accountForObservationTimes) {
@@ -1205,13 +1316,13 @@ NULL
             designPlan$chi[i] <- (allocationRatioPlanned * designPlan$pi1[i] + designPlan$pi2) /
                 (1 + allocationRatioPlanned)
             designPlan$.setParameterType("chi", C_PARAM_GENERATED)
-            numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$chi[i]
+            numberOfSubjects[kMax, i] <- designPlan$cumulativeEventsPerStage[kMax, i] / designPlan$chi[i]
         } else {
             phi <- -c(log(1 - designPlan$dropoutRate1), log(1 - designPlan$dropoutRate2)) /
                 designPlan$dropoutTime
 
             if (designPlan$.calculateFollowUpTime) {
-                if (designPlan$eventsPerStage[kMax, i] > designPlan$maxNumberOfSubjects[i]) {
+                if (designPlan$cumulativeEventsPerStage[kMax, i] > designPlan$maxNumberOfSubjects[i]) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         sprintf(
@@ -1220,14 +1331,14 @@ NULL
                                 "of events (%s) at stage %s"
                             ),
                             designPlan$maxNumberOfSubjects[i],
-                            designPlan$eventsPerStage[kMax, i], i
+                            designPlan$cumulativeEventsPerStage[kMax, i], i
                         )
                     )
                 }
 
                 up <- 2
                 iterate <- 1
-                while (designPlan$eventsPerStage[kMax, i] / .getEventProbabilities(
+                while (designPlan$cumulativeEventsPerStage[kMax, i] / .getEventProbabilities(
                     time = up,
                     accrualTimeVector = designPlan$accrualTime,
                     accrualIntensity = designPlan$accrualIntensity,
@@ -1251,7 +1362,7 @@ NULL
 
                 totalTime <- .getOneDimensionalRoot(
                     function(x) {
-                        designPlan$eventsPerStage[kMax, i] / designPlan$maxNumberOfSubjects[i] -
+                        designPlan$cumulativeEventsPerStage[kMax, i] / designPlan$maxNumberOfSubjects[i] -
                             .getEventProbabilities(
                                 time = x, accrualTimeVector = designPlan$accrualTime,
                                 accrualIntensity = designPlan$accrualIntensity,
@@ -1271,7 +1382,7 @@ NULL
                 for (j in 1:kMax) {
                     analysisTime[j, i] <- .getOneDimensionalRoot(
                         function(x) {
-                            designPlan$eventsPerStage[j, i] / designPlan$maxNumberOfSubjects[i] -
+                            designPlan$cumulativeEventsPerStage[j, i] / designPlan$maxNumberOfSubjects[i] -
                                 .getEventProbabilities(
                                     time = x, accrualTimeVector = designPlan$accrualTime,
                                     accrualIntensity = designPlan$accrualIntensity,
@@ -1324,13 +1435,13 @@ NULL
                     hazardRatio = designPlan$hazardRatio[i]
                 )
                 designPlan$.setParameterType("chi", C_PARAM_GENERATED)
-                numberOfSubjects[kMax, i] <- designPlan$eventsPerStage[kMax, i] / designPlan$chi[i]
+                numberOfSubjects[kMax, i] <- designPlan$cumulativeEventsPerStage[kMax, i] / designPlan$chi[i]
 
                 #   Analysis times
                 for (j in 1:(kMax - 1)) {
                     analysisTime[j, i] <- .getOneDimensionalRoot(
                         function(x) {
-                            designPlan$eventsPerStage[j, i] / numberOfSubjects[kMax, i] -
+                            designPlan$cumulativeEventsPerStage[j, i] / numberOfSubjects[kMax, i] -
                                 .getEventProbabilities(
                                     time = x, accrualTimeVector = designPlan$accrualTime,
                                     accrualIntensity = designPlan$accrualIntensity,
@@ -1444,7 +1555,7 @@ NULL
         designPlan$.setParameterType("informationRates", C_PARAM_GENERATED)
     }
     designPlan$.setParameterType("numberOfSubjects", C_PARAM_GENERATED)
-    designPlan$.setParameterType("eventsPerStage", C_PARAM_GENERATED)
+    designPlan$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
 
     if (designPlan$accountForObservationTimes) {
         designPlan$analysisTime <- analysisTime
@@ -1478,7 +1589,7 @@ NULL
         if (is.na(timeValue)) {
             return(NA_real_)
         }
-        
+
         subjectNumbers <- c(
             subjectNumbers,
             .getNumberOfSubjectsInner(
@@ -1535,8 +1646,7 @@ NULL
 #'
 #' @export
 #'
-getEventProbabilities <- function(
-        time, ...,
+getEventProbabilities <- function(time, ...,
         accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
         accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),
@@ -1767,8 +1877,7 @@ getEventProbabilities <- function(
 #'
 #' @export
 #'
-getNumberOfSubjects <- function(
-        time, ...,
+getNumberOfSubjects <- function(time, ...,
         accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
         accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),
@@ -1895,8 +2004,7 @@ getNumberOfSubjects <- function(
 #'
 #' @export
 #'
-getSampleSizeSurvival <- function(
-        design = NULL, ...,
+getSampleSizeSurvival <- function(design = NULL, ...,
         typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         pi1 = NA_real_,
@@ -1946,7 +2054,8 @@ getSampleSizeSurvival <- function(
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
         accrualIntensityType = accrualIntensityType,
-        maxNumberOfSubjects = maxNumberOfSubjects, showWarnings = FALSE
+        maxNumberOfSubjects = maxNumberOfSubjects, 
+        showWarnings = FALSE
     )
     accrualSetup$.validate()
 
@@ -2092,7 +2201,7 @@ getSampleSizeSurvival <- function(
                 # define lower bound for maxNumberOfSubjects
                 maxNumberOfSubjectsLower <- ceiling(max(na.omit(c(
                     sampleSize$eventsFixed,
-                    as.vector(sampleSize$eventsPerStage)
+                    as.vector(sampleSize$cumulativeEventsPerStage)
                 ))))
                 if (is.na(maxNumberOfSubjectsLower)) {
                     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -2358,8 +2467,7 @@ getSampleSizeSurvival <- function(
 #'
 #' @export
 #'
-getPowerSurvival <- function(
-        design = NULL, ...,
+getPowerSurvival <- function(design = NULL, ...,
         typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         directionUpper = NA,
@@ -2460,13 +2568,13 @@ getPowerSurvival <- function(
     designPlan$numberOfSubjects <- matrix(NA_real_, kMax, numberOfResults)
     designPlan$studyDuration <- rep(NA_real_, numberOfResults)
     designPlan$expectedNumberOfSubjects <- rep(NA_real_, numberOfResults)
-    eventsPerStage <- maxNumberOfEvents * design$informationRates
+    cumulativeEventsPerStage <- maxNumberOfEvents * design$informationRates
     parameterNames <- c(
         "analysisTime",
         "numberOfSubjects",
         "studyDuration",
         "expectedNumberOfSubjects",
-        "eventsPerStage"
+        "cumulativeEventsPerStage"
     )
 
     phi <- -c(log(1 - dropoutRate1), log(1 - dropoutRate2)) / dropoutTime
@@ -2480,7 +2588,7 @@ getPowerSurvival <- function(
         # Analysis times
         up <- 2
         iterate <- 1
-        while (eventsPerStage[kMax] / designPlan$maxNumberOfSubjects > .getEventProbabilities(
+        while (cumulativeEventsPerStage[kMax] / designPlan$maxNumberOfSubjects > .getEventProbabilities(
             time = up, accrualTimeVector = designPlan$accrualTime,
             accrualIntensity = designPlan$accrualIntensity,
             lambda2 = designPlan$lambda2,
@@ -2503,7 +2611,7 @@ getPowerSurvival <- function(
         for (j in 1:kMax) {
             designPlan$analysisTime[j, i] <- .getOneDimensionalRoot(
                 function(x) {
-                    eventsPerStage[j] / designPlan$maxNumberOfSubjects -
+                    cumulativeEventsPerStage[j] / designPlan$maxNumberOfSubjects -
                         .getEventProbabilities(
                             time = x,
                             accrualTimeVector = designPlan$accrualTime,
@@ -2560,8 +2668,9 @@ getPowerSurvival <- function(
         designPlan$numberOfSubjects <- matrix(designPlan$expectedNumberOfSubjects, nrow = 1)
     }
 
-    designPlan$eventsPerStage <- matrix(eventsPerStage, ncol = 1)
-    designPlan$.setParameterType("eventsPerStage", C_PARAM_GENERATED)
+    designPlan$cumulativeEventsPerStage <- matrix(cumulativeEventsPerStage, ncol = 1)
+    designPlan$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
+    .addDeprecatedFieldValues(designPlan, "eventsPerStage", designPlan$cumulativeEventsPerStage)
 
     designPlan$expectedNumberOfEvents <- powerAndAverageSampleNumber$averageSampleNumber
     designPlan$overallReject <- powerAndAverageSampleNumber$overallReject
@@ -2586,7 +2695,7 @@ getPowerSurvival <- function(
 
     if (kMax == 1L) {
         designPlan$.setParameterType("numberOfSubjects", C_PARAM_NOT_APPLICABLE)
-        designPlan$.setParameterType("eventsPerStage", C_PARAM_NOT_APPLICABLE)
+        designPlan$.setParameterType("cumulativeEventsPerStage", C_PARAM_NOT_APPLICABLE)
 
         designPlan$.setParameterType("futilityStop", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("earlyStop", C_PARAM_NOT_APPLICABLE)
@@ -2598,6 +2707,8 @@ getPowerSurvival <- function(
             designPlan$accrualTime[length(designPlan$accrualTime)]
         designPlan$.setParameterType("followUpTime", C_PARAM_GENERATED)
     }
+
+    designPlan$singleEventsPerStage <- .getSingleEventsPerStage(designPlan$cumulativeEventsPerStage)
 
     .addEffectScaleBoundaryDataToDesignPlan(designPlan)
     .addStudyDurationToDesignPlan(designPlan)

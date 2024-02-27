@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7659 $
+## |  Last changed: $Date: 2024-02-23 10:42:33 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1882,6 +1882,9 @@ AccrualTime <- setRefClass("AccrualTime",
         .initAccrualIntensityAbsolute = function() {
             if (is.null(maxNumberOfSubjects) || length(maxNumberOfSubjects) != 1 ||
                     is.na(maxNumberOfSubjects) || maxNumberOfSubjects == 0) {
+                if (!absoluteAccrualIntensityEnabled) {
+                    accrualIntensityRelative <<- accrualIntensity
+                }
                 return(invisible())
             }
 
@@ -1889,12 +1892,13 @@ AccrualTime <- setRefClass("AccrualTime",
                     !absoluteAccrualIntensityEnabled) {
                 return(invisible()) # case 6
             }
-
+            
             if (length(accrualTime) >= 2 && length(accrualTime) == length(accrualIntensity) + 1 &&
                     !any(is.na(accrualTime)) && !any(is.na(accrualIntensity))) {
                 len <- length(accrualIntensity)
                 accrualIntensityAbsolute <- maxNumberOfSubjects / sum((accrualTime[2:(len + 1)] -
                     accrualTime[1:len]) * accrualIntensity) * accrualIntensity
+        
                 if (!isTRUE(all.equal(accrualIntensityAbsolute, accrualIntensity, tolerance = 1e-06)) &&
                         !isTRUE(all.equal(accrualIntensityAbsolute, 0, tolerance = 1e-06))) {
                     .validateAccrualTimeAndIntensity()
@@ -1915,7 +1919,7 @@ AccrualTime <- setRefClass("AccrualTime",
                             )
                         }
                     } else {
-                        if (!absoluteAccrualIntensityEnabled && # .isRelativeAccrualIntensity(accrualIntensity)
+                        if (!absoluteAccrualIntensityEnabled && 
                                 .getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED &&
                                 .getParameterType("accrualTime") == C_PARAM_DEFAULT_VALUE &&
                                 .getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED) {

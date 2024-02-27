@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -85,7 +85,7 @@ NULL
 
 .formatCamelCase <- function(x, title = FALSE, ..., ignoreBlackList = FALSE) {
     words <- strsplit(x, " ")[[1]]
-    parts <- character(0)
+    parts <- character()
     for (word in words) {
         parts <- c(parts, .formatCamelCaseSingleWord(word, title = title))
     }
@@ -1476,5 +1476,11 @@ getParameterName <- function(obj, parameterCaption) {
             acceptResultsOutOfTolerance = TRUE
         ))
     }
+}
+
+.addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues) {
+    parameterSet[[fieldName]] <- fieldValues
+    parameterSet$.setParameterType(fieldName, C_PARAM_NOT_APPLICABLE)
+    parameterSet$.deprecatedFieldNames <- unique(c(parameterSet$.deprecatedFieldNames, fieldName))
 }
 

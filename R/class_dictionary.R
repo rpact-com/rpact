@@ -145,7 +145,7 @@ addValueToDictionary <- function(x, key, value) {
     if (base::exists(key, envir = x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "dictionary ", attr(x, "name"), " already contains key ", sQuote(key)
+            "dictionary ", base::sQuote(base::attr(x, "name")), " already contains key ", base::sQuote(key)
         )
     }
     setValueToDictionary(x, key, value)
@@ -161,7 +161,7 @@ getValueFromDictionary <- function(x, key) {
     if (!base::exists(key, envir = x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "dictionary ", attr(x, "name"), " does not contain key ", sQuote(key)
+            "dictionary ", base::sQuote(base::attr(x, "name")), " does not contain key ", base::sQuote(key)
         )
     }
 

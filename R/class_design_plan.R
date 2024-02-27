@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7651 $
+## |  Last changed: $Date: 2024-02-20 15:45:44 +0100 (Di, 20 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -699,6 +699,8 @@ TrialDesignPlanRates <- setRefClass("TrialDesignPlanRates",
 #' @template field_studyDuration
 #' @template field_maxStudyDuration
 #' @template field_eventsPerStage
+#' @template field_singleEventsPerStage
+#' @template field_cumulativeEventsPerStage
 #' @template field_expectedEventsH0
 #' @template field_expectedEventsH01
 #' @template field_expectedEventsH1
@@ -715,7 +717,7 @@ TrialDesignPlanRates <- setRefClass("TrialDesignPlanRates",
 #' @template field_futilityBoundsEffectScaleLower
 #' @template field_futilityBoundsEffectScaleUpper
 #' @template field_futilityBoundsPValueScale
-#'
+#' 
 #' @details
 #' This object cannot be created directly; use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 #' with suitable arguments to create a design plan for a dataset of survival data.
@@ -783,7 +785,9 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
         studyDurationH1 = "numeric",
         studyDuration = "numeric",
         maxStudyDuration = "numeric",
-        eventsPerStage = "matrix",
+        eventsPerStage = "matrix", # deprecated
+        singleEventsPerStage = "matrix",
+        cumulativeEventsPerStage = "matrix",
         expectedEventsH0 = "numeric",
         expectedEventsH01 = "numeric",
         expectedEventsH1 = "numeric",
@@ -826,6 +830,8 @@ TrialDesignPlanSurvival <- setRefClass("TrialDesignPlanSurvival",
             .setParameterType("futilityBoundsEffectScale", C_PARAM_NOT_APPLICABLE)
             .setParameterType("futilityBoundsEffectScaleLower", C_PARAM_NOT_APPLICABLE)
             .setParameterType("futilityBoundsEffectScaleUpper", C_PARAM_NOT_APPLICABLE)
+            
+            .setParameterType("singleEventsPerStage", C_PARAM_NOT_APPLICABLE)
 
             # set default values
             for (parameterName in c(

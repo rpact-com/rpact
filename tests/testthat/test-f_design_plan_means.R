@@ -15,9 +15,9 @@
 ## |  
 ## |  File name: test-f_design_plan_means.R
 ## |  Creation date: 21 December 2023, 08:52:45
-## |  File version: $Revision: 7560 $
-## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision$
+## |  Last changed: $Date$
+## |  Last changed by: $Author$
 ## |  
 
 test_plan_section("Testing the Sample Size Calculation of Testing Means for Different Designs and Arguments")

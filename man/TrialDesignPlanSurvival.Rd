@@ -102,7 +102,11 @@ with suitable arguments to create a design plan for a dataset of survival data.
 
 \item{\code{maxStudyDuration}}{The maximum study duration in survival designs. Is a numeric vector.}
 
-\item{\code{eventsPerStage}}{The number of events per stage. Is a numeric matrix.}
+\item{\code{eventsPerStage}}{Deprecated: use \code{singleEventsPerStage} or \code{cumulativeEventsPerStage} instead Is a numeric matrix.}
+
+\item{\code{singleEventsPerStage}}{The single number of events per stage. Is a numeric matrix.}
+
+\item{\code{cumulativeEventsPerStage}}{The cumulative number of events per stage. Is a numeric matrix.}
 
 \item{\code{expectedEventsH0}}{The expected number of events under H0. Is a numeric vector.}
 

@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-f_simulation_multiarm_rates.R
 ## |  Creation date: 09 February 2024, 10:57:39
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision$
+## |  Last changed: $Date$
+## |  Last changed by: $Author$
 ## |
 
 test_plan_section("Testing Simulation Multi-Arm Rates Function")

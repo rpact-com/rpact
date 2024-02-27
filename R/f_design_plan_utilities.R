@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7471 $
-## |  Last changed: $Date: 2023-12-05 15:19:36 +0100 (Di, 05 Dez 2023) $
+## |  File version: $Revision: 7652 $
+## |  Last changed: $Date: 2024-02-21 16:23:54 +0100 (Mi, 21 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -26,6 +26,19 @@ NULL
         designPlan$.setParameterType("futilityStop", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("futilityPerStage", C_PARAM_NOT_APPLICABLE)
     }
+}
+
+.getSingleEventsPerStage <- function(cumulativeEventsPerStage) {
+    singleEventsPerStage <- matrix(nrow = nrow(cumulativeEventsPerStage), ncol = ncol(cumulativeEventsPerStage))
+    if (nrow(cumulativeEventsPerStage) > 1) {
+        for (i in nrow(cumulativeEventsPerStage):2) {
+            singleEventsPerStage[i, ] <- cumulativeEventsPerStage[i, ] - cumulativeEventsPerStage[i - 1, ]
+        }
+    }
+    if (nrow(cumulativeEventsPerStage) > 0) {
+        singleEventsPerStage[1, ] <- cumulativeEventsPerStage[1, ]
+    }
+    return(singleEventsPerStage)
 }
 
 .addEffectScaleBoundaryDataToDesignPlan <- function(designPlan) {
@@ -62,7 +75,7 @@ NULL
         }
 
         if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
-            designPlan$eventsPerStage <- matrix(designPlan$eventsFixed, nrow = 1)
+            designPlan$cumulativeEventsPerStage <- matrix(designPlan$eventsFixed, nrow = 1)
         }
         boundaries <- .getEffectScaleBoundaryDataSurvival(designPlan)
     }
@@ -100,266 +113,150 @@ NULL
     }
 }
 
-.getSampleSize <- function(designPlan) {
-    if (.isTrialDesignPlanMeans(designPlan) || .isTrialDesignPlanRates(designPlan)) {
-        if (identical(designPlan$allocationRatioPlanned, 0)) {
-            designPlan$optimumAllocationRatio <- TRUE
-            designPlan$.setParameterType("optimumAllocationRatio", C_PARAM_USER_DEFINED)
-        }
-
-        if (.isTrialDesignPlanMeans(designPlan)) {
-            sampleSizeFixed <- .getSampleSizeFixedMeans(
-                alpha = designPlan$getAlpha(),
-                beta = designPlan$getBeta(),
-                sided = designPlan$getSided(),
-                twoSidedPower = designPlan$getTwoSidedPower(),
-                normalApproximation = designPlan$normalApproximation,
-                meanRatio = designPlan$meanRatio,
-                thetaH0 = designPlan$thetaH0,
-                alternative = designPlan$alternative,
-                stDev = designPlan$stDev,
-                groups = designPlan$groups,
-                allocationRatioPlanned = designPlan$allocationRatioPlanned
-            )
-        } else {
-            sampleSizeFixed <- .getSampleSizeFixedRates(
-                alpha = designPlan$getAlpha(),
-                beta = designPlan$getBeta(),
-                sided = designPlan$getSided(),
-                normalApproximation = designPlan$normalApproximation,
-                riskRatio = designPlan$riskRatio,
-                thetaH0 = designPlan$thetaH0,
-                pi1 = designPlan$pi1,
-                pi2 = designPlan$pi2,
-                groups = designPlan$groups,
-                allocationRatioPlanned = designPlan$allocationRatioPlanned
-            )
-        }
-
-        # Fixed
-        designPlan$nFixed <- sampleSizeFixed$nFixed
-        designPlan$.setParameterType("nFixed", C_PARAM_GENERATED)
-        if (designPlan$groups == 2) {
-            designPlan$nFixed1 <- sampleSizeFixed$n1Fixed
-            designPlan$nFixed2 <- sampleSizeFixed$n2Fixed
-            designPlan$.setParameterType("nFixed1", C_PARAM_GENERATED)
-            designPlan$.setParameterType("nFixed2", C_PARAM_GENERATED)
-            designPlan$numberOfSubjects1 <- matrix(designPlan$nFixed1, nrow = 1)
-            designPlan$numberOfSubjects2 <- matrix(designPlan$nFixed2, nrow = 1)
-        }
-        designPlan$numberOfSubjects <- matrix(designPlan$nFixed, nrow = 1)
-
-        if (!is.null(sampleSizeFixed$allocationRatioPlanned) &&
-                (length(designPlan$allocationRatioPlanned) !=
-                    length(sampleSizeFixed$allocationRatioPlanned) ||
-                    sum(designPlan$allocationRatioPlanned == sampleSizeFixed$allocationRatioPlanned) !=
-                        length(designPlan$allocationRatioPlanned))) {
-            designPlan$allocationRatioPlanned <- sampleSizeFixed$allocationRatioPlanned
-            designPlan$.setParameterType("allocationRatioPlanned", C_PARAM_GENERATED)
-        }
-
-        # Sequential
-        if (designPlan$.design$kMax > 1) {
-            designCharacteristics <- getDesignCharacteristics(designPlan$.design)
-            if (.isTrialDesignPlanMeans(designPlan)) {
-                sampleSizeSequential <- .getSampleSizeSequentialMeans(
-                    sampleSizeFixed, designCharacteristics
-                )
-            } else {
-                sampleSizeSequential <- .getSampleSizeSequentialRates(
-                    sampleSizeFixed, designCharacteristics
-                )
-            }
-
-            designPlan$informationRates <- sampleSizeSequential$informationRates
-            if (ncol(designPlan$informationRates) == 1 &&
-                    identical(designPlan$informationRates[, 1], designPlan$.design$informationRates)) {
-                designPlan$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
-            } else {
-                designPlan$.setParameterType("informationRates", C_PARAM_GENERATED)
-            }
-
-            designPlan$maxNumberOfSubjects <- sampleSizeSequential$maxNumberOfSubjects
-            designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
-            if (designPlan$groups == 2) {
-                designPlan$maxNumberOfSubjects1 <- .getNumberOfSubjects1(
-                    designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
-                )
-                designPlan$maxNumberOfSubjects2 <- .getNumberOfSubjects2(
-                    designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
-                )
-                designPlan$.setParameterType("maxNumberOfSubjects1", C_PARAM_GENERATED)
-                designPlan$.setParameterType("maxNumberOfSubjects2", C_PARAM_GENERATED)
-            }
-
-            designPlan$numberOfSubjects <- sampleSizeSequential$numberOfSubjects
-            designPlan$.setParameterType("numberOfSubjects", C_PARAM_GENERATED)
-
-            if (designPlan$groups == 2) {
-                designPlan$numberOfSubjects1 <- sampleSizeSequential$numberOfSubjects1
-                designPlan$numberOfSubjects2 <- sampleSizeSequential$numberOfSubjects2
-                designPlan$.setParameterType("numberOfSubjects1", C_PARAM_GENERATED)
-                designPlan$.setParameterType("numberOfSubjects2", C_PARAM_GENERATED)
-            }
-
-            designPlan$expectedNumberOfSubjectsH0 <- sampleSizeSequential$expectedNumberOfSubjectsH0
-            designPlan$expectedNumberOfSubjectsH01 <- sampleSizeSequential$expectedNumberOfSubjectsH01
-            designPlan$expectedNumberOfSubjectsH1 <- sampleSizeSequential$expectedNumberOfSubjectsH1
-            designPlan$.setParameterType("expectedNumberOfSubjectsH0", C_PARAM_GENERATED)
-            designPlan$.setParameterType("expectedNumberOfSubjectsH01", C_PARAM_GENERATED)
-            designPlan$.setParameterType("expectedNumberOfSubjectsH1", C_PARAM_GENERATED)
-
-            designPlan$.setParameterType("eventsFixed", C_PARAM_NOT_APPLICABLE)
-            designPlan$.setParameterType("nFixed1", C_PARAM_NOT_APPLICABLE)
-            designPlan$.setParameterType("nFixed2", C_PARAM_NOT_APPLICABLE)
-            designPlan$.setParameterType("nFixed", C_PARAM_NOT_APPLICABLE)
-
-            if (all(designPlan$allocationRatioPlanned == 1)) {
-                designPlan$.setParameterType("numberOfSubjects1", C_PARAM_NOT_APPLICABLE)
-                designPlan$.setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
-            }
-
-            if (!is.null(sampleSizeSequential$rejectPerStage)) {
-                designPlan$rejectPerStage <- matrix(sampleSizeSequential$rejectPerStage,
-                    nrow = designPlan$.design$kMax
-                )
-                designPlan$.setParameterType("rejectPerStage", C_PARAM_GENERATED)
-
-                designPlan$earlyStop <- sum(designPlan$rejectPerStage[1:(designPlan$.design$kMax - 1), ])
-                designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
-            }
-            if (!is.null(sampleSizeSequential$futilityPerStage) &&
-                    any(designPlan$.design$futilityBounds != C_FUTILITY_BOUNDS_DEFAULT)) {
-                designPlan$futilityPerStage <- matrix(sampleSizeSequential$futilityPerStage,
-                    nrow = designPlan$.design$kMax - 1
-                )
-                designPlan$.setParameterType("futilityPerStage", C_PARAM_GENERATED)
-
-                designPlan$futilityStop <- sum(designPlan$futilityPerStage)
-                designPlan$.setParameterType("futilityStop", C_PARAM_GENERATED)
-
-                designPlan$earlyStop <- designPlan$earlyStop + sum(designPlan$futilityPerStage)
-            }
-        }
-
-        .addEffectScaleBoundaryDataToDesignPlan(designPlan)
-
-        return(designPlan)
-    } else if (.isTrialDesignPlanSurvival(designPlan)) {
-        # Fixed
-        designPlan <- .getSampleSizeFixedSurvival(designPlan)
-
-        # Sequential
-        if (designPlan$.design$kMax > 1) {
-            designCharacteristics <- getDesignCharacteristics(designPlan$.design)
-            designPlan <- .getSampleSizeSequentialSurvival(designPlan, designCharacteristics)
-        }
-
-        if (designPlan$accountForObservationTimes && !any(is.na(designPlan$followUpTime)) &&
-                all(designPlan$followUpTime == C_FOLLOW_UP_TIME_DEFAULT)) {
-            designPlan$.setParameterType("followUpTime", C_PARAM_DEFAULT_VALUE)
-        }
-
-        .addEffectScaleBoundaryDataToDesignPlan(designPlan)
-
-        if (designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED &&
-                designPlan$.accrualTime$.getParameterType("maxNumberOfSubjects") != C_PARAM_GENERATED &&
-                all(designPlan$accrualIntensity < 1)) {
-            numberOfDefinedAccrualIntensities <- length(designPlan$accrualIntensity)
-
-            accrualTime <- designPlan$accrualTime
-            if (length(accrualTime) > 0 && accrualTime[1] != 0) {
-                accrualTime <- c(0, accrualTime)
-            }
-
-            if (any(designPlan$accrualIntensity < 0)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'accrualIntensityRelative' (",
-                    .arrayToString(designPlan$accrualIntensity), ") must be >= 0"
-                )
-            }
-
-            designPlan$accrualIntensityRelative <- designPlan$accrualIntensity
-            if (identical(designPlan$accrualIntensityRelative, C_ACCRUAL_INTENSITY_DEFAULT)) {
-                designPlan$.setParameterType("accrualIntensityRelative", C_PARAM_NOT_APPLICABLE)
-            } else {
-                designPlan$.setParameterType(
-                    "accrualIntensityRelative",
-                    designPlan$.getParameterType("accrualIntensity")
-                )
-            }
-
-            accrualIntensityAbsolute <- c()
-            for (maxNumberOfSubjects in designPlan$maxNumberOfSubjects) {
-                accrualSetup <- getAccrualTime(
-                    accrualTime = accrualTime,
-                    accrualIntensity = designPlan$accrualIntensityRelative,
-                    accrualIntensityType = "relative",
-                    maxNumberOfSubjects = maxNumberOfSubjects
-                )
-                accrualIntensityAbsolute <- c(accrualIntensityAbsolute, accrualSetup$accrualIntensity)
-            }
-            designPlan$accrualIntensity <- accrualIntensityAbsolute
-            designPlan$.setParameterType("accrualIntensity", C_PARAM_GENERATED)
-
-            if (numberOfDefinedAccrualIntensities > 1) {
-                paramName <- NULL
-                if (designPlan$.getParameterType("pi1") == C_PARAM_USER_DEFINED ||
-                        designPlan$.getParameterType("pi1") == C_PARAM_DEFAULT_VALUE ||
-                        designPlan$.getParameterType("pi2") == C_PARAM_USER_DEFINED) {
-                    paramName <- "pi1"
-                } else if (designPlan$.getParameterType("median1") == C_PARAM_USER_DEFINED ||
-                        designPlan$.getParameterType("median2") == C_PARAM_USER_DEFINED) {
-                    paramName <- "median1"
-                }
-                if (!is.null(paramName)) {
-                    paramValue <- designPlan[[paramName]]
-                    if (!is.null(paramValue) && length(paramValue) > 1) {
-                        stop(
-                            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                            "the definition of relative accrual intensities ",
-                            "(all 'accrualIntensity' values < 1) ",
-                            "is only available for a single value ",
-                            "(", paramName, " = ", .arrayToString(
-                                paramValue,
-                                vectorLookAndFeelEnabled = TRUE
-                            ), ")"
-                        )
-                    }
-                }
-            }
-        }
-
-        designPlan$maxNumberOfEvents <- designPlan$eventsPerStage[designPlan$.design$kMax, ]
-        designPlan$.setParameterType("maxNumberOfEvents", C_PARAM_GENERATED)
-
-        if (!any(is.na(designPlan$followUpTime))) {
-            if (any(designPlan$followUpTime < -1e-02)) {
-                warning("Accrual duration longer than maximal study ",
-                    "duration (time to maximal number of events); followUpTime = ",
-                    .arrayToString(designPlan$followUpTime),
-                    call. = FALSE
-                )
-            }
-        } else {
-            warning("Follow-up time could not be calculated for hazardRatio = ",
-                .arrayToString(designPlan$hazardRatio[indices]),
-                call. = FALSE
-            )
-        }
-
-        if (designPlan$.getParameterType("accountForObservationTimes") != C_PARAM_USER_DEFINED) {
-            designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
-        }
-        designPlan$.setParameterType("chi", C_PARAM_NOT_APPLICABLE)
-
-        .addStudyDurationToDesignPlan(designPlan)
-
-        return(designPlan)
+.calculateSampleSizeMeansAndRates <- function(designPlan) {
+    if (identical(designPlan$allocationRatioPlanned, 0)) {
+        designPlan$optimumAllocationRatio <- TRUE
+        designPlan$.setParameterType("optimumAllocationRatio", C_PARAM_USER_DEFINED)
     }
-
-    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "unknown trial plan class '", .getClassName(designPlan), "'")
+    
+    if (.isTrialDesignPlanMeans(designPlan)) {
+        sampleSizeFixed <- .getSampleSizeFixedMeans(
+            alpha = designPlan$getAlpha(),
+            beta = designPlan$getBeta(),
+            sided = designPlan$getSided(),
+            twoSidedPower = designPlan$getTwoSidedPower(),
+            normalApproximation = designPlan$normalApproximation,
+            meanRatio = designPlan$meanRatio,
+            thetaH0 = designPlan$thetaH0,
+            alternative = designPlan$alternative,
+            stDev = designPlan$stDev,
+            groups = designPlan$groups,
+            allocationRatioPlanned = designPlan$allocationRatioPlanned
+        )
+    } else {
+        sampleSizeFixed <- .getSampleSizeFixedRates(
+            alpha = designPlan$getAlpha(),
+            beta = designPlan$getBeta(),
+            sided = designPlan$getSided(),
+            normalApproximation = designPlan$normalApproximation,
+            riskRatio = designPlan$riskRatio,
+            thetaH0 = designPlan$thetaH0,
+            pi1 = designPlan$pi1,
+            pi2 = designPlan$pi2,
+            groups = designPlan$groups,
+            allocationRatioPlanned = designPlan$allocationRatioPlanned
+        )
+    }
+    
+    # Fixed
+    designPlan$nFixed <- sampleSizeFixed$nFixed
+    designPlan$.setParameterType("nFixed", C_PARAM_GENERATED)
+    if (designPlan$groups == 2) {
+        designPlan$nFixed1 <- sampleSizeFixed$n1Fixed
+        designPlan$nFixed2 <- sampleSizeFixed$n2Fixed
+        designPlan$.setParameterType("nFixed1", C_PARAM_GENERATED)
+        designPlan$.setParameterType("nFixed2", C_PARAM_GENERATED)
+        designPlan$numberOfSubjects1 <- matrix(designPlan$nFixed1, nrow = 1)
+        designPlan$numberOfSubjects2 <- matrix(designPlan$nFixed2, nrow = 1)
+    }
+    designPlan$numberOfSubjects <- matrix(designPlan$nFixed, nrow = 1)
+    
+    if (!is.null(sampleSizeFixed$allocationRatioPlanned) &&
+        (length(designPlan$allocationRatioPlanned) !=
+            length(sampleSizeFixed$allocationRatioPlanned) ||
+            sum(designPlan$allocationRatioPlanned == sampleSizeFixed$allocationRatioPlanned) !=
+            length(designPlan$allocationRatioPlanned))) {
+        designPlan$allocationRatioPlanned <- sampleSizeFixed$allocationRatioPlanned
+        designPlan$.setParameterType("allocationRatioPlanned", C_PARAM_GENERATED)
+    }
+    
+    # Sequential
+    if (designPlan$.design$kMax > 1) {
+        designCharacteristics <- getDesignCharacteristics(designPlan$.design)
+        if (.isTrialDesignPlanMeans(designPlan)) {
+            sampleSizeSequential <- .getSampleSizeSequentialMeans(
+                sampleSizeFixed, designCharacteristics
+            )
+        } else {
+            sampleSizeSequential <- .getSampleSizeSequentialRates(
+                sampleSizeFixed, designCharacteristics
+            )
+        }
+        
+        designPlan$informationRates <- sampleSizeSequential$informationRates
+        if (ncol(designPlan$informationRates) == 1 &&
+            identical(designPlan$informationRates[, 1], designPlan$.design$informationRates)) {
+            designPlan$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
+        } else {
+            designPlan$.setParameterType("informationRates", C_PARAM_GENERATED)
+        }
+        
+        designPlan$maxNumberOfSubjects <- sampleSizeSequential$maxNumberOfSubjects
+        designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
+        if (designPlan$groups == 2) {
+            designPlan$maxNumberOfSubjects1 <- .getNumberOfSubjects1(
+                designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
+            )
+            designPlan$maxNumberOfSubjects2 <- .getNumberOfSubjects2(
+                designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
+            )
+            designPlan$.setParameterType("maxNumberOfSubjects1", C_PARAM_GENERATED)
+            designPlan$.setParameterType("maxNumberOfSubjects2", C_PARAM_GENERATED)
+        }
+        
+        designPlan$numberOfSubjects <- sampleSizeSequential$numberOfSubjects
+        designPlan$.setParameterType("numberOfSubjects", C_PARAM_GENERATED)
+        
+        if (designPlan$groups == 2) {
+            designPlan$numberOfSubjects1 <- sampleSizeSequential$numberOfSubjects1
+            designPlan$numberOfSubjects2 <- sampleSizeSequential$numberOfSubjects2
+            designPlan$.setParameterType("numberOfSubjects1", C_PARAM_GENERATED)
+            designPlan$.setParameterType("numberOfSubjects2", C_PARAM_GENERATED)
+        }
+        
+        designPlan$expectedNumberOfSubjectsH0 <- sampleSizeSequential$expectedNumberOfSubjectsH0
+        designPlan$expectedNumberOfSubjectsH01 <- sampleSizeSequential$expectedNumberOfSubjectsH01
+        designPlan$expectedNumberOfSubjectsH1 <- sampleSizeSequential$expectedNumberOfSubjectsH1
+        designPlan$.setParameterType("expectedNumberOfSubjectsH0", C_PARAM_GENERATED)
+        designPlan$.setParameterType("expectedNumberOfSubjectsH01", C_PARAM_GENERATED)
+        designPlan$.setParameterType("expectedNumberOfSubjectsH1", C_PARAM_GENERATED)
+        
+        designPlan$.setParameterType("eventsFixed", C_PARAM_NOT_APPLICABLE)
+        designPlan$.setParameterType("nFixed1", C_PARAM_NOT_APPLICABLE)
+        designPlan$.setParameterType("nFixed2", C_PARAM_NOT_APPLICABLE)
+        designPlan$.setParameterType("nFixed", C_PARAM_NOT_APPLICABLE)
+        
+        if (all(designPlan$allocationRatioPlanned == 1)) {
+            designPlan$.setParameterType("numberOfSubjects1", C_PARAM_NOT_APPLICABLE)
+            designPlan$.setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
+        }
+        
+        if (!is.null(sampleSizeSequential$rejectPerStage)) {
+            designPlan$rejectPerStage <- matrix(sampleSizeSequential$rejectPerStage,
+                nrow = designPlan$.design$kMax
+            )
+            designPlan$.setParameterType("rejectPerStage", C_PARAM_GENERATED)
+            
+            designPlan$earlyStop <- sum(designPlan$rejectPerStage[1:(designPlan$.design$kMax - 1), ])
+            designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
+        }
+        if (!is.null(sampleSizeSequential$futilityPerStage) &&
+            any(designPlan$.design$futilityBounds != C_FUTILITY_BOUNDS_DEFAULT)) {
+            designPlan$futilityPerStage <- matrix(sampleSizeSequential$futilityPerStage,
+                nrow = designPlan$.design$kMax - 1
+            )
+            designPlan$.setParameterType("futilityPerStage", C_PARAM_GENERATED)
+            
+            designPlan$futilityStop <- sum(designPlan$futilityPerStage)
+            designPlan$.setParameterType("futilityStop", C_PARAM_GENERATED)
+            
+            designPlan$earlyStop <- designPlan$earlyStop + sum(designPlan$futilityPerStage)
+        }
+    }
+    
+    .addEffectScaleBoundaryDataToDesignPlan(designPlan)
+    
+    return(designPlan)
 }
 
 .getColumnCumSum <- function(x) {

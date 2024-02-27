@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_multiarm_survival.R
 ## |  Creation date: 09 February 2024, 10:57:46
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7665 $
+## |  Last changed: $Date: 2024-02-23 17:33:46 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1626,7 +1626,7 @@ test_that("'getSimulationMultiArmSurvival': comparison of base and multi-arm, in
     expect_equal(comp3[1, ], c(-0.06, -0.02, -0.03), tolerance = 1e-07, label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(0.08, 0.06, 0), tolerance = 1e-07, label = paste0(comp3[2, ]))
 
-    comp4 <- round(y$overallEventsPerStage - x$eventsPerStage[, , 1], 1)
+    comp4 <- round(y$cumulativeEventsPerStage - x$cumulativeEventsPerStage[, , 1], 1)
 
     ## Comparison of the results of matrixarray object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0), label = paste0(comp4[1, ]))
@@ -1694,7 +1694,7 @@ test_that("'getSimulationMultiArmSurvival': comparison of base and multi-arm, Fi
     expect_equal(comp3[1, ], c(-0.03, 0.01, -0.01), tolerance = 1e-07, label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(0.05, 0.05, -0.01), tolerance = 1e-07, label = paste0(comp3[2, ]))
 
-    comp4 <- round(y$overallEventsPerStage - x$eventsPerStage[, , 1], 1)
+    comp4 <- round(y$cumulativeEventsPerStage - x$cumulativeEventsPerStage[, , 1], 1)
 
     ## Comparison of the results of matrixarray object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0), label = paste0(comp4[1, ]))
@@ -1764,7 +1764,7 @@ test_that("'getSimulationMultiArmSurvival': comparison of base and multi-arm, in
     expect_equal(comp3[1, ], c(0, 0, 0), label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(0, 0, 0), label = paste0(comp3[2, ]))
 
-    comp4 <- round(y$overallEventsPerStage - x$eventsPerStage[, , 1], 1)
+    comp4 <- round(y$cumulativeEventsPerStage - x$cumulativeEventsPerStage[, , 1], 1)
 
     ## Comparison of the results of matrixarray object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0), label = paste0(comp4[1, ]))
