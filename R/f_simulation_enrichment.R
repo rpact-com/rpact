@@ -351,11 +351,11 @@ NULL
     effectMeasure <- .assertIsValidEffectMeasure(effectMeasure)
 
     if (endpoint == "means") {
-        simulationResults <- SimulationResultsEnrichmentMeansR6$new(design, showStatistics = showStatistics)
+        simulationResults <- SimulationResultsEnrichmentMeans$new(design, showStatistics = showStatistics)
     } else if (endpoint == "rates") {
-        simulationResults <- SimulationResultsEnrichmentRatesR6$new(design, showStatistics = showStatistics)
+        simulationResults <- SimulationResultsEnrichmentRates$new(design, showStatistics = showStatistics)
     } else if (endpoint == "survival") {
-        simulationResults <- SimulationResultsEnrichmentSurvivalR6$new(design, showStatistics = showStatistics)
+        simulationResults <- SimulationResultsEnrichmentSurvival$new(design, showStatistics = showStatistics)
     }
 
     effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)

@@ -41,8 +41,8 @@
 #'
 #' @importFrom methods new
 #'
-PerformanceScoreR6 <- R6Class("PerformanceScoreR6",
-    inherit = ParameterSetR6,
+PerformanceScore <- R6Class("PerformanceScore",
+    inherit = ParameterSet,
     public = list(
         .simulationResults = NULL,
         .plotSettings = NULL,
@@ -57,7 +57,7 @@ PerformanceScoreR6 <- R6Class("PerformanceScoreR6",
         initialize = function(simulationResults, ...) {
             super$initialize(...)
             self$.simulationResults <- simulationResults
-            self$.plotSettings <- PlotSettingsR6$new()
+            self$.plotSettings <- PlotSettings$new()
             self$.parameterNames <- C_PARAMETER_NAMES
             self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
         },

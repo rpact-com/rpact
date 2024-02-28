@@ -39,9 +39,9 @@ NULL
 #'
 #' @keywords internal
 #'
-names.SimulationResultsR6 <- function(x) {
+names.SimulationResults <- function(x) {
     namesToShow <- c(".design", ".data", ".rawData")
-    if (inherits(x, "SimulationResultsSurvival") || inherits(x, "SimulationResultsSurvivalR6")) {
+    if (inherits(x, "SimulationResultsSurvival") || inherits(x, "SimulationResultsSurvival")) {
         namesToShow <- c(namesToShow, ".piecewiseSurvivalTime", ".accrualTime")
     }
     namesToShow <- c(namesToShow, x$.getVisibleFieldNames())
@@ -86,8 +86,8 @@ names.SimulationResultsR6 <- function(x) {
 #'
 #' @importFrom methods new
 #'
-SimulationResultsR6 <- R6Class("SimulationResultsR6",
-    inherit = ParameterSetR6,
+SimulationResults <- R6Class("SimulationResults",
+    inherit = ParameterSet,
     public = list(
         .plotSettings = NULL,
         .design = NULL,
@@ -106,7 +106,7 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
             self$.design <- design
             self$.showStatistics <- showStatistics
 
-            self$.plotSettings <- PlotSettingsR6$new()
+            self$.plotSettings <- PlotSettings$new()
             self$.parameterNames <- .getParameterNames(design = design, designPlan = self)
             self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
         },
@@ -155,7 +155,7 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
                     )
 
                     userDefinedParameters <- self$.getUserDefinedParameters()
-                    if ((inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvivalR6")) &&
+                    if ((inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvival")) &&
                             self$.piecewiseSurvivalTime$delayedResponseEnabled) {
                         userDefinedParameters <- c(
                             userDefinedParameters,
@@ -185,19 +185,19 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
                         (is.character(showStatistics) && showStatistics == "exclusive")) {
                     self$.cat("Simulated data:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                     params <- c()
-                    if (inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeansR6")) {
+                    if (inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeans")) {
                         params <- c(
                             "effectMeasure",
                             "numberOfSubjects",
                             "testStatistic"
                         )
-                    } else if (inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsRatesR6")) {
+                    } else if (inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsRates")) {
                         params <- c(
                             "effectMeasure",
                             "numberOfSubjects",
                             "testStatistic"
                         )
-                    } else if (inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvivalR6")) {
+                    } else if (inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvival")) {
                         params <- c(
                             "effectMeasure",
                             "analysisTime",
@@ -209,8 +209,8 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
                             "logRankStatistic",
                             "hazardRatioEstimateLR"
                         )
-                    } else if (inherits(self, "SimulationResultsMultiArmMeans") || inherits(self, "SimulationResultsMultiArmMeansR6") ||
-                            inherits(self, "SimulationResultsMultiArmRates") || inherits(self, "SimulationResultsMultiArmRatesR6")) {
+                    } else if (inherits(self, "SimulationResultsMultiArmMeans") || inherits(self, "SimulationResultsMultiArmMeans") ||
+                            inherits(self, "SimulationResultsMultiArmRates") || inherits(self, "SimulationResultsMultiArmRates")) {
                         params <- c(
                             "effectMeasure",
                             "subjectsActiveArm",
@@ -220,8 +220,8 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
                             "successStop",
                             "futilityPerStage"
                         )
-                    } else if (inherits(self, "SimulationResultsEnrichmentMeans") || inherits(self, "SimulationResultsEnrichmentMeansR6") ||
-                            inherits(self, "SimulationResultsEnrichmentRates") || inherits(self, "SimulationResultsEnrichmentRatesR6")) {
+                    } else if (inherits(self, "SimulationResultsEnrichmentMeans") || inherits(self, "SimulationResultsEnrichmentMeans") ||
+                            inherits(self, "SimulationResultsEnrichmentRates") || inherits(self, "SimulationResultsEnrichmentRates")) {
                         params <- c(
                             "effectMeasure",
                             "subjectsPopulation",
@@ -231,8 +231,8 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
                             "successStop",
                             "futilityPerStage"
                         )
-                    } else if (inherits(self, "SimulationResultsMultiArmSurvival") || inherits(self, "SimulationResultsMultiArmSurvivalR6") ||
-                            inherits(self, "SimulationResultsEnrichmentSurvival") || inherits(self, "SimulationResultsEnrichmentSurvivalR6")) {
+                    } else if (inherits(self, "SimulationResultsMultiArmSurvival") || inherits(self, "SimulationResultsMultiArmSurvival") ||
+                            inherits(self, "SimulationResultsEnrichmentSurvival") || inherits(self, "SimulationResultsEnrichmentSurvival")) {
                         params <- c(
                             "effectMeasure",
                             "numberOfEvents",
@@ -315,8 +315,8 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
                     self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
 
-                twoGroupsEnabled <- !(inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeansR6"))
-                multiArmSurvivalEnabled <- inherits(self, "SimulationResultsMultiArmSurvival") || inherits(self, "SimulationResultsMultiArmSurvivalR6")
+                twoGroupsEnabled <- !(inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeans"))
+                multiArmSurvivalEnabled <- inherits(self, "SimulationResultsMultiArmSurvival") || inherits(self, "SimulationResultsMultiArmSurvival")
                 enrichmentEnabled <- grepl("SimulationResultsEnrichment", .getClassName(self))
 
                 if (!is.null(performanceScore)) {
@@ -361,9 +361,9 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
         },
         .getVariedParameterName = function(number = 1) {
             if (number == 2) {
-                if (!(inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeansR6")) &&
-                        !(inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsRatesR6")) &&
-                        !(inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvivalR6")) &&
+                if (!(inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeans")) &&
+                        !(inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsRates")) &&
+                        !(inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvival")) &&
                         grepl("MultiArm", .getClassName(self))) {
                     return("armNumber")
                 }
@@ -371,16 +371,16 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
             }
 
             variedParameterName1 <- NA_character_
-            if (inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeansR6")) {
+            if (inherits(self, "SimulationResultsMeans") || inherits(self, "SimulationResultsMeans")) {
                 variedParameterName1 <- "alternative"
-            } else if (inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsRatesR6") || inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvivalR6")) {
+            } else if (inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsSurvival") || inherits(self, "SimulationResultsSurvival")) {
                 variedParameterName1 <- "pi1"
             } else if (grepl("MultiArm", .getClassName(self))) {
-                if (inherits(self, "SimulationResultsMultiArmMeans") || inherits(self, "SimulationResultsMultiArmMeansR6")) {
+                if (inherits(self, "SimulationResultsMultiArmMeans") || inherits(self, "SimulationResultsMultiArmMeans")) {
                     variedParameterName1 <- "muMax"
-                } else if (inherits(self, "SimulationResultsMultiArmRates") || inherits(self, "SimulationResultsMultiArmRatesR6")) {
+                } else if (inherits(self, "SimulationResultsMultiArmRates") || inherits(self, "SimulationResultsMultiArmRates")) {
                     variedParameterName1 <- "piMax"
-                } else if (inherits(self, "SimulationResultsMultiArmSurvival") || inherits(self, "SimulationResultsMultiArmSurvivalR6")) {
+                } else if (inherits(self, "SimulationResultsMultiArmSurvival") || inherits(self, "SimulationResultsMultiArmSurvival")) {
                     variedParameterName1 <- "omegaMax"
                 }
             }
@@ -487,11 +487,11 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
                 s <- paste(s, "enrichment")
             }
 
-            if (inherits(self, "SimulationResultsBaseMeans") || inherits(self, "SimulationResultsBaseMeansR6")) {
+            if (inherits(self, "SimulationResultsBaseMeans") || inherits(self, "SimulationResultsBaseMeans")) {
                 s <- paste(s, "means")
-            } else if (inherits(self, "SimulationResultsBaseRates") || inherits(self, "SimulationResultsBaseRatesR6")) {
+            } else if (inherits(self, "SimulationResultsBaseRates") || inherits(self, "SimulationResultsBaseRates")) {
                 s <- paste(s, "rates")
-            } else if (inherits(self, "SimulationResultsBaseSurvival") || inherits(self, "SimulationResultsBaseSurvivalR6")) {
+            } else if (inherits(self, "SimulationResultsBaseSurvival") || inherits(self, "SimulationResultsBaseSurvival")) {
                 s <- paste(s, "survival data")
             } else {
                 s <- paste(s, "results")
@@ -557,8 +557,8 @@ SimulationResultsR6 <- R6Class("SimulationResultsR6",
     )
 )
 
-SimulationResultsBaseMeansR6 <- R6Class("SimulationResultsBaseMeansR6",
-    inherit = SimulationResultsR6,
+SimulationResultsBaseMeans <- R6Class("SimulationResultsBaseMeans",
+    inherit = SimulationResults,
     public = list(
         stDev =NULL,
         plannedSubjects =NULL,
@@ -647,8 +647,8 @@ SimulationResultsBaseMeansR6 <- R6Class("SimulationResultsBaseMeansR6",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMeansR6 <- R6Class("SimulationResultsMeansR6",
-    inherit = SimulationResultsBaseMeansR6,
+SimulationResultsMeans <- R6Class("SimulationResultsMeans",
+    inherit = SimulationResultsBaseMeans,
     public = list(
         meanRatio =NULL,
         thetaH0 =NULL,
@@ -731,8 +731,8 @@ SimulationResultsMeansR6 <- R6Class("SimulationResultsMeansR6",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmMeansR6 <- R6Class("SimulationResultsMultiArmMeansR6",
-    inherit = SimulationResultsBaseMeansR6,
+SimulationResultsMultiArmMeans <- R6Class("SimulationResultsMultiArmMeans",
+    inherit = SimulationResultsBaseMeans,
     public = list(
         activeArms = NULL,
         effectMatrix = NULL,
@@ -773,8 +773,8 @@ SimulationResultsMultiArmMeansR6 <- R6Class("SimulationResultsMultiArmMeansR6",
     )
 )
 
-SimulationResultsBaseRatesR6 <- R6Class("SimulationResultsBaseRatesR6",
-    inherit = SimulationResultsR6,
+SimulationResultsBaseRates <- R6Class("SimulationResultsBaseRates",
+    inherit = SimulationResults,
     public = list(
         directionUpper = NULL,
         plannedSubjects = NULL,
@@ -862,8 +862,8 @@ SimulationResultsBaseRatesR6 <- R6Class("SimulationResultsBaseRatesR6",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsRatesR6 <- R6Class("SimulationResultsRatesR6",
-    inherit = SimulationResultsBaseRatesR6,
+SimulationResultsRates <- R6Class("SimulationResultsRates",
+    inherit = SimulationResultsBaseRates,
     public = list(
         riskRatio = NULL,
         thetaH0 = NULL,
@@ -969,8 +969,8 @@ SimulationResultsRatesR6 <- R6Class("SimulationResultsRatesR6",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmRatesR6 <- R6Class("SimulationResultsMultiArmRatesR6",
-    inherit = SimulationResultsBaseRatesR6,
+SimulationResultsMultiArmRates <- R6Class("SimulationResultsMultiArmRates",
+    inherit = SimulationResultsBaseRates,
     public = list(
         activeArms = NULL,
         effectMatrix = NULL,
@@ -1014,8 +1014,8 @@ SimulationResultsMultiArmRatesR6 <- R6Class("SimulationResultsMultiArmRatesR6",
     )
 )
 
-SimulationResultsBaseSurvivalR6 <- R6Class("SimulationResultsBaseSurvivalR6",
-    inherit = SimulationResultsR6,
+SimulationResultsBaseSurvival <- R6Class("SimulationResultsBaseSurvival",
+    inherit = SimulationResults,
     public = list(
         directionUpper = NULL,
         plannedEvents = NULL,
@@ -1122,8 +1122,8 @@ SimulationResultsBaseSurvivalR6 <- R6Class("SimulationResultsBaseSurvivalR6",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsSurvivalR6 <- R6Class("SimulationResultsSurvivalR6",
-    inherit = SimulationResultsBaseSurvivalR6,
+SimulationResultsSurvival <- R6Class("SimulationResultsSurvival",
+    inherit = SimulationResultsBaseSurvival,
     public = list(
         .piecewiseSurvivalTime = NULL,
         .accrualTime = NULL,
@@ -1250,8 +1250,8 @@ SimulationResultsSurvivalR6 <- R6Class("SimulationResultsSurvivalR6",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmSurvivalR6 <- R6Class("SimulationResultsMultiArmSurvivalR6",
-    inherit = SimulationResultsBaseSurvivalR6,
+SimulationResultsMultiArmSurvival <- R6Class("SimulationResultsMultiArmSurvival",
+    inherit = SimulationResultsBaseSurvival,
     public = list(
         activeArms = NULL,
         effectMatrix = NULL,
@@ -1354,8 +1354,8 @@ SimulationResultsMultiArmSurvivalR6 <- R6Class("SimulationResultsMultiArmSurviva
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentMeansR6 <- R6Class("SimulationResultsEnrichmentMeansR6",
-    inherit = SimulationResultsBaseMeansR6,
+SimulationResultsEnrichmentMeans <- R6Class("SimulationResultsEnrichmentMeans",
+    inherit = SimulationResultsBaseMeans,
     public = list(
         populations = NULL,
         effectList = NULL,
@@ -1453,8 +1453,8 @@ SimulationResultsEnrichmentMeansR6 <- R6Class("SimulationResultsEnrichmentMeansR
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentRatesR6 <- R6Class("SimulationResultsEnrichmentRatesR6",
-    inherit = SimulationResultsBaseRatesR6,
+SimulationResultsEnrichmentRates <- R6Class("SimulationResultsEnrichmentRates",
+    inherit = SimulationResultsBaseRates,
     public = list(
         populations = NULL,
         effectList = NULL,
@@ -1555,8 +1555,8 @@ SimulationResultsEnrichmentRatesR6 <- R6Class("SimulationResultsEnrichmentRatesR
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentSurvivalR6 <- R6Class("SimulationResultsEnrichmentSurvivalR6",
-    inherit = SimulationResultsBaseSurvivalR6,
+SimulationResultsEnrichmentSurvival <- R6Class("SimulationResultsEnrichmentSurvival",
+    inherit = SimulationResultsBaseSurvival,
     public = list(
         populations = NULL,
         effectList = NULL,
@@ -1597,7 +1597,7 @@ SimulationResultsEnrichmentSurvivalR6 <- R6Class("SimulationResultsEnrichmentSur
 )
 
 .assertIsValidVariedParameterVectorForSimulationResultsPlotting <- function(simulationResults, plotType) {
-    if (inherits(simulationResults, "SimulationResultsMeans") || inherits(simulationResults, "SimulationResultsMeansR6")) {
+    if (inherits(simulationResults, "SimulationResultsMeans") || inherits(simulationResults, "SimulationResultsMeans")) {
         if (is.null(simulationResults$alternative) ||
                 any(is.na(simulationResults$alternative)) ||
                 length(simulationResults$alternative) <= 1) {
@@ -1606,7 +1606,7 @@ SimulationResultsEnrichmentSurvivalR6 <- R6Class("SimulationResultsEnrichmentSur
                 " is only available if 'alternative' with length > 1 is defined"
             )
         }
-    } else if (inherits(simulationResults, "SimulationResultsRates") || inherits(simulationResults, "SimulationResultsRatesR6")) {
+    } else if (inherits(simulationResults, "SimulationResultsRates") || inherits(simulationResults, "SimulationResultsRates")) {
         if (is.null(simulationResults$pi1) ||
                 any(is.na(simulationResults$pi1)) ||
                 length(simulationResults$pi1) <= 1) {
@@ -1615,7 +1615,7 @@ SimulationResultsEnrichmentSurvivalR6 <- R6Class("SimulationResultsEnrichmentSur
                 " is only available if 'pi1' with length > 1 is defined"
             )
         }
-    } else if (inherits(simulationResults, "SimulationResultsSurvival") || inherits(simulationResults, "SimulationResultsSurvivalR6")) {
+    } else if (inherits(simulationResults, "SimulationResultsSurvival") || inherits(simulationResults, "SimulationResultsSurvival")) {
         if (is.null(simulationResults$hazardRatio) ||
                 any(is.na(simulationResults$hazardRatio)) ||
                 length(simulationResults$hazardRatio) <= 1) {
@@ -2536,7 +2536,7 @@ SimulationResultsEnrichmentSurvivalR6 <- R6Class("SimulationResultsEnrichmentSur
 #'
 #' @export
 #'
-plot.SimulationResultsR6 <- function(x, y, ..., main = NA_character_,
+plot.SimulationResults <- function(x, y, ..., main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
         theta = seq(-1, 1, 0.01), plotPointsEnabled = NA,
         legendPosition = NA_integer_, showSource = FALSE,
@@ -2600,7 +2600,7 @@ plot.SimulationResultsR6 <- function(x, y, ..., main = NA_character_,
 #'
 #' @keywords internal
 #'
-print.SimulationResultsR6 <- function(x, ..., showStatistics = FALSE, markdown = FALSE) {
+print.SimulationResults <- function(x, ..., showStatistics = FALSE, markdown = FALSE) {
     if (markdown) {
         x$.catMarkdownText(showStatistics = showStatistics)
         return(invisible(x))
@@ -2674,7 +2674,7 @@ print.SimulationResultsR6 <- function(x, ..., showStatistics = FALSE, markdown =
 #' @export
 #'
 getData <- function(x) {
-    if (!(inherits(x, "SimulationResults") || inherits(x, "SimulationResultsR6"))) { #  or 'Dataset'
+    if (!(inherits(x, "SimulationResults") || inherits(x, "SimulationResults"))) { #  or 'Dataset'
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'x' must be a 'SimulationResults' object; for example, use getSimulationMeans() to create one"
@@ -2686,7 +2686,7 @@ getData <- function(x) {
 
 #' @rdname getData
 #' @export
-getData.SimulationResultsR6 <- function(x) {
+getData.SimulationResults <- function(x) {
     return(x$.data)
 }
 
@@ -2817,7 +2817,7 @@ getData.SimulationResultsR6 <- function(x) {
 #' @export
 #'
 getRawData <- function(x, aggregate = FALSE) {
-    if (!(inherits(x, "SimulationResultsSurvival") || inherits(x, "SimulationResultsSurvivalR6"))) {
+    if (!(inherits(x, "SimulationResultsSurvival") || inherits(x, "SimulationResultsSurvival"))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'x' must be a 'SimulationResultsSurvival' object; use getSimulationSurvival() to create one"

@@ -23,8 +23,8 @@ C_REGEXP_SMALLER <- "< ?"
 C_REGEXP_SMALLER_OR_EQUAL <- "<= ?"
 C_REGEXP_DECIMAL_NUMBER <- "\\d*(\\.{1}\\d*)?"
 
-TimeDefinitionR6 <- R6Class("TimeDefinitionR6",
-    inherit = ParameterSetR6,
+TimeDefinition <- R6Class("TimeDefinition",
+    inherit = ParameterSet,
     public = list(
         initialize = function(...) {
             super$initialize()
@@ -214,11 +214,11 @@ getPiecewiseSurvivalTime <- function(piecewiseSurvivalTime = NA_real_,
         ignore = c(".pi1Default", ".lambdaBased", ".silent"), exceptionEnabled = TRUE
     )
 
-    if (inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvival") || inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvivalR6")) {
+    if (inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvival") || inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvival")) {
         piecewiseSurvivalTime <- piecewiseSurvivalTime$.piecewiseSurvivalTime
     }
 
-    if (inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTime") || inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTimeR6")) {
+    if (inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTime") || inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTime")) {
         lambdaBased <- .getOptionalArgument(".lambdaBased", ...)
         if (!is.null(lambdaBased) && isTRUE(lambdaBased) && !piecewiseSurvivalTime$.isLambdaBased()) {
             stop(
@@ -249,7 +249,7 @@ getPiecewiseSurvivalTime <- function(piecewiseSurvivalTime = NA_real_,
     .assertIsValidKappa(kappa)
     .assertIsSingleLogical(delayedResponseAllowed, "delayedResponseAllowed")
 
-    return(PiecewiseSurvivalTimeR6$new(
+    return(PiecewiseSurvivalTime$new(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
         lambda1 = lambda1,
         lambda2 = lambda2,
@@ -307,19 +307,19 @@ getAccrualTime <- function(accrualTime = NA_real_,
         ignore = c("showWarnings")
     )
 
-    if (inherits(accrualTime, "AccrualTime") || inherits(accrualTime, "AccrualTimeR6") ||
-            inherits(accrualTime, "TrialDesignPlanSurvival") || inherits(accrualTime, "TrialDesignPlanSurvivalR6")) {
+    if (inherits(accrualTime, "AccrualTime") || inherits(accrualTime, "AccrualTime") ||
+            inherits(accrualTime, "TrialDesignPlanSurvival") || inherits(accrualTime, "TrialDesignPlanSurvival")) {
         if (!identical(accrualIntensity, C_ACCRUAL_INTENSITY_DEFAULT)) {
             .warnInCaseOfUnusedArgument(accrualIntensity, "accrualIntensity", NA_real_, "getAccrualTime")
         }
         .warnInCaseOfUnusedArgument(maxNumberOfSubjects, "maxNumberOfSubjects", NA_real_, "getAccrualTime")
     }
 
-    if (inherits(accrualTime, "AccrualTime") || inherits(accrualTime, "AccrualTimeR6")) {
+    if (inherits(accrualTime, "AccrualTime") || inherits(accrualTime, "AccrualTime")) {
         return(accrualTime)
     }
 
-    if (inherits(accrualTime, "TrialDesignPlanSurvival") || inherits(accrualTime, "TrialDesignPlanSurvivalR6")) {
+    if (inherits(accrualTime, "TrialDesignPlanSurvival") || inherits(accrualTime, "TrialDesignPlanSurvival")) {
         return(accrualTime$.accrualTime)
     }
 
@@ -348,7 +348,7 @@ getAccrualTime <- function(accrualTime = NA_real_,
         showWarnings <- TRUE
     }
 
-    return(AccrualTimeR6$new(
+    return(AccrualTime$new(
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
         maxNumberOfSubjects = maxNumberOfSubjects,
@@ -392,8 +392,8 @@ getAccrualTime <- function(accrualTime = NA_real_,
 #'
 #' @importFrom methods new
 #'
-PiecewiseSurvivalTimeR6 <- R6Class("PiecewiseSurvivalTimeR6",
-    inherit = TimeDefinitionR6,
+PiecewiseSurvivalTime <- R6Class("PiecewiseSurvivalTime",
+    inherit = TimeDefinition,
     public = list(
         .pi1Default = NULL,
         .lambdaBased = NULL,
@@ -1351,8 +1351,8 @@ PiecewiseSurvivalTimeR6 <- R6Class("PiecewiseSurvivalTimeR6",
 #'
 #' @importFrom methods new
 #'
-AccrualTimeR6 <- R6Class("AccrualTimeR6",
-    inherit = TimeDefinitionR6,
+AccrualTime <- R6Class("AccrualTime",
+    inherit = TimeDefinition,
     public = list(
         .showWarnings = NULL,
         endOfAccrualIsUserDefined = NULL,

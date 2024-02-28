@@ -52,8 +52,8 @@ NULL
 #'
 #' @importFrom methods new
 #'
-TrialDesignSetR6 <- R6Class("TrialDesignSetR6",
-    inherit = FieldSetR6,
+TrialDesignSet <- R6Class("TrialDesignSet",
+    inherit = FieldSet,
     public = list(
         .plotSettings = NULL,
         designs = NULL,
@@ -62,7 +62,7 @@ TrialDesignSetR6 <- R6Class("TrialDesignSetR6",
         # @param ... 'designs' OR 'design' and one or more design parameters, e.g., deltaWT = c(0.1, 0.3, 0.4)
         #
         initialize = function(...) {
-            self$.plotSettings <- PlotSettingsR6$new()
+            self$.plotSettings <- PlotSettings$new()
             self$designs <- list()
             self$variedParameters <- character(0)
             if (length(list(...)) > 0) {
@@ -70,7 +70,7 @@ TrialDesignSetR6 <- R6Class("TrialDesignSetR6",
             }
             if (length(self$designs) > 0) {
                 masterDesign <- self$designs[[1]]
-                if (inherits(masterDesign, "ParameterSet") || inherits(masterDesign, "ParameterSetR6")) {
+                if (inherits(masterDesign, "ParameterSet") || inherits(masterDesign, "ParameterSet")) {
                     self$.plotSettings <- masterDesign$.plotSettings
                 }
             }
@@ -502,7 +502,7 @@ TrialDesignSetR6 <- R6Class("TrialDesignSetR6",
 #' @export
 #'
 getDesignSet <- function(...) {
-    return(TrialDesignSetR6$new(...))
+    return(TrialDesignSet$new(...))
 }
 
 #'
@@ -528,8 +528,8 @@ getDesignSet <- function(...) {
 #'
 #' @keywords internal
 #'
-summary.TrialDesignSetR6 <- function(object, ..., type = 1, digits = NA_integer_) {
-    .warnInCaseOfUnknownArguments(functionName = "summary.TrialDesignSetR6", ...)
+summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) {
+    .warnInCaseOfUnknownArguments(functionName = "summary.TrialDesignSet", ...)
 
     .assertIsTrialDesignSet(object)#TODO
     if (object$isEmpty()) {
@@ -566,7 +566,7 @@ summary.TrialDesignSetR6 <- function(object, ..., type = 1, digits = NA_integer_
 #'
 #' @keywords internal
 #'
-names.TrialDesignSetR6 <- function(x) {
+names.TrialDesignSet <- function(x) {
     return(x$.getVisibleFieldNames())
 }
 
@@ -593,7 +593,7 @@ names.TrialDesignSetR6 <- function(x) {
 #'
 #' @keywords internal
 #'
-length.TrialDesignSetR6 <- function(x) {
+length.TrialDesignSet <- function(x) {
     return(length(x$designs))
 }
 
@@ -626,7 +626,7 @@ length.TrialDesignSetR6 <- function(x) {
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesignSetR6 <- function(x, row.names = NULL,
+as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
         optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE,
         addPowerAndAverageSampleNumber = FALSE, theta = seq(-1, 1, 0.02), nMax = NA_integer_, ...) {
     .assertIsTrialDesignSet(x)
@@ -679,7 +679,7 @@ as.data.frame.TrialDesignSetR6 <- function(x, row.names = NULL,
         }
 
         if (addPowerAndAverageSampleNumber) {
-            results <- PowerAndAverageSampleNumberResultR6$new(design, theta = theta, nMax = nMax)
+            results <- PowerAndAverageSampleNumberResult$new(design, theta = theta, nMax = nMax)
             suppressWarnings(df2 <- as.data.frame(results,
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
                 includeAllParameters = includeAllParameters
@@ -762,7 +762,7 @@ as.data.frame.TrialDesignSetR6 <- function(x, row.names = NULL,
 #'
 #' @export
 #'
-plot.TrialDesignSetR6 <- function(x, y, ..., type = 1L, main = NA_character_,
+plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, palette = "Set1",
         theta = seq(-1, 1, 0.02), nMax = NA_integer_, plotPointsEnabled = NA,
         legendPosition = NA_integer_, showSource = FALSE,

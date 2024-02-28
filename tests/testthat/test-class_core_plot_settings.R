@@ -25,9 +25,9 @@ test_plan_section("Testing the Class 'PlotSettings'")
 test_that("Test plot settings", {
     expect_type(getPlotSettings(), "environment")
     
-    expect_error(PlotSubTitleItemR6$new())
+    expect_error(PlotSubTitleItem$new())
     
-    expect_type(PlotSubTitleItemsR6$new(), "environment")
+    expect_type(PlotSubTitleItems$new(), "environment")
 
-    expect_type(PlotSettingsR6$new(), "environment")
+    expect_type(PlotSettings$new(), "environment")
 })

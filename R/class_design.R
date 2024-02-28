@@ -63,8 +63,8 @@ NULL
 #'
 #' @importFrom methods new
 #'
-TrialDesignR6 <- R6Class("TrialDesignR6",
-                           inherit = ParameterSetR6,
+TrialDesign <- R6Class("TrialDesign",
+                           inherit = ParameterSet,
                            public = list(
                              .plotSettings = NULL,
                              kMax = NULL,
@@ -100,9 +100,9 @@ TrialDesignR6 <- R6Class("TrialDesignR6",
                                self$tolerance <- tolerance
                                super$initialize(...)
                                
-                               self$.plotSettings <- PlotSettingsR6$new()
+                               self$.plotSettings <- PlotSettings$new()
                                
-                               if (inherits(self, "TrialDesignConditionalDunnettR6")) {
+                               if (inherits(self, "TrialDesignConditionalDunnett")) {
                                  self$.parameterNames <- C_PARAMETER_NAMES
                                } else {
                                  self$.parameterNames <- self$.getSubListByNames(.getParameterNames(design = self), c(#TODO
@@ -183,7 +183,7 @@ TrialDesignR6 <- R6Class("TrialDesignR6",
                                }
                              },
                              .isDelayedResponseDesign = function() {
-                               return((inherits(self, "TrialDesignGroupSequentialR6") || inherits(self, "TrialDesignInverseNormalR6")) &&
+                               return((inherits(self, "TrialDesignGroupSequential") || inherits(self, "TrialDesignInverseNormal")) &&
                                         self$kMax > 1 &&
                                         !is.null(self[["delayedInformation"]]) &&#TODO
                                         !any(is.na(self$delayedInformation)) && any(self$delayedInformation > 0))
@@ -226,8 +226,8 @@ TrialDesignR6 <- R6Class("TrialDesignR6",
 #'
 #' @importFrom methods new
 #'
-TrialDesignCharacteristicsR6 <- R6Class("TrialDesignCharacteristicsR6",
-                                          inherit = ParameterSetR6,
+TrialDesignCharacteristics <- R6Class("TrialDesignCharacteristics",
+                                          inherit = ParameterSet,
                                           public = list(
                                             .design = NULL,
                                             .probs = NULL,
@@ -311,11 +311,11 @@ TrialDesignCharacteristicsR6 <- R6Class("TrialDesignCharacteristicsR6",
 #'
 #' @export
 #'
-print.TrialDesignCharacteristicsR6 <- function(x, ..., markdown = FALSE, showDesign = TRUE) {
+print.TrialDesignCharacteristics <- function(x, ..., markdown = FALSE, showDesign = TRUE) {
   if (showDesign) {
-    print.ParameterSetR6(x$.design, ..., markdown = markdown)
+    print.ParameterSet(x$.design, ..., markdown = markdown)
   }
-  print.ParameterSetR6(x, ..., markdown = markdown)
+  print.ParameterSet(x, ..., markdown = markdown)
 }
 
 #'
@@ -342,7 +342,7 @@ print.TrialDesignCharacteristicsR6 <- function(x, ..., markdown = FALSE, showDes
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesignCharacteristicsR6 <- function(x, row.names = NULL,
+as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
                                                      optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
   if (x$.design$kMax > 1) {
     parameterNamesToBeExcluded <- c("nFixed", "shift")
@@ -401,8 +401,8 @@ as.data.frame.TrialDesignCharacteristicsR6 <- function(x, row.names = NULL,
 #'
 #' @importFrom methods new
 #'
-TrialDesignFisherR6 <- R6Class("TrialDesignFisherR6",
-                                 inherit = TrialDesignR6,
+TrialDesignFisher <- R6Class("TrialDesignFisher",
+                                 inherit = TrialDesign,
                                  public = list(
                                    method = NULL,
                                    alpha0Vec = NULL,
@@ -422,6 +422,7 @@ TrialDesignFisherR6 <- R6Class("TrialDesignFisherR6",
                                                          iterations = 0L,
                                                          seed = NA_real_,
                                                          tolerance = C_ANALYSIS_TOLERANCE_FISHER_DEFAULT) {
+                                    
                                      
                                      self$method <- method
                                      self$alpha0Vec <- alpha0Vec
@@ -429,10 +430,10 @@ TrialDesignFisherR6 <- R6Class("TrialDesignFisherR6",
                                      self$nonStochasticCurtailment <- nonStochasticCurtailment
                                      self$sided <- sided
                                      self$simAlpha <- simAlpha
+                                     super$initialize(...)#TODO dont move to first line of constructor
                                      self$iterations <- iterations
                                      self$seed <- seed
                                      self$tolerance <- tolerance
-                                     super$initialize(...)
                                      
                                      self$.parameterNames <- c(self$.parameterNames, self$.getSubListByNames(
                                        .getParameterNames(design = self), c(
@@ -571,8 +572,8 @@ TrialDesignFisherR6 <- R6Class("TrialDesignFisherR6",
 #'
 #' @importFrom methods new
 #'
-TrialDesignInverseNormalR6 <- R6Class("TrialDesignInverseNormalR6",
-                                        inherit = TrialDesignR6,
+TrialDesignInverseNormal <- R6Class("TrialDesignInverseNormal",
+                                        inherit = TrialDesign,
                                         public = list(
                                           typeOfDesign = NULL,
                                           beta = NULL,
@@ -895,8 +896,8 @@ TrialDesignInverseNormalR6 <- R6Class("TrialDesignInverseNormalR6",
 #'
 #' @importFrom methods new
 #'
-TrialDesignGroupSequentialR6 <- R6Class("TrialDesignGroupSequentialR6",
-  inherit = TrialDesignInverseNormalR6,
+TrialDesignGroupSequential <- R6Class("TrialDesignGroupSequential",
+  inherit = TrialDesignInverseNormal,
   public = list(
     initialize = function(...) {
       self$.parameterFormatFunctions$criticalValues <- ".formatCriticalValues"
@@ -947,8 +948,8 @@ TrialDesignGroupSequentialR6 <- R6Class("TrialDesignGroupSequentialR6",
 #'
 #' @seealso \code{\link{getDesignConditionalDunnett}} for creating a conditional Dunnett test design.
 #'
-TrialDesignConditionalDunnettR6 <- R6Class("TrialDesignConditionalDunnettR6",
-  inherit = TrialDesignR6,
+TrialDesignConditionalDunnett <- R6Class("TrialDesignConditionalDunnett",
+  inherit = TrialDesign,
   public = list(
     informationAtInterim = NULL,
     secondStageConditioning = NULL,
@@ -1026,7 +1027,7 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
   .assertIsValidAlpha(alpha)
   .assertIsSingleNumber(informationAtInterim, "informationAtInterim")
   .assertIsInOpenInterval(informationAtInterim, "informationAtInterim", 0, 1)
-  return(TrialDesignConditionalDunnettR6$new(
+  return(TrialDesignConditionalDunnett$new(
     alpha = alpha,
     informationAtInterim = informationAtInterim,
     secondStageConditioning = secondStageConditioning
@@ -1103,7 +1104,7 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #'
 #' @export
 #'
-plot.TrialDesignR6 <- function(x, y, ..., main = NA_character_,
+plot.TrialDesign <- function(x, y, ..., main = NA_character_,
                              xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
                              theta = seq(-1, 1, 0.01), nMax = NA_integer_, plotPointsEnabled = NA,
                              legendPosition = NA_integer_, showSource = FALSE,
@@ -1150,7 +1151,7 @@ plot.TrialDesignR6 <- function(x, y, ..., main = NA_character_,
 
 #' @rdname plot.TrialDesign
 #' @export
-plot.TrialDesignCharacteristicsR6 <- function(x, y, ...) {
+plot.TrialDesignCharacteristics <- function(x, y, ...) {
   plot(x = x$.design, y = y, ...)
 }
 
@@ -1194,7 +1195,7 @@ plot.TrialDesignCharacteristicsR6 <- function(x, y, ...) {
     }
     designSet <- getDesignSet(designs = c(x, y), variedParameters = variedParameters)
   } else {
-    designSet <- TrialDesignSetR6$new(design = x, singleDesign = TRUE)
+    designSet <- TrialDesignSet$new(design = x, singleDesign = TRUE)
     if (!is.null(plotSettings)) {
       designSet$.plotSettings <- plotSettings
     }
@@ -1232,7 +1233,7 @@ plot.TrialDesignCharacteristicsR6 <- function(x, y, ...) {
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesignR6 <- function(x, row.names = NULL,
+as.data.frame.TrialDesign <- function(x, row.names = NULL,
                                       optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
   .assertIsTrialDesign(x)
   

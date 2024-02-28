@@ -50,8 +50,8 @@
 #'
 #' @importFrom methods new
 #'
-PowerAndAverageSampleNumberResultR6 <- R6Class("PowerAndAverageSampleNumberResultR6",
-    inherit = ParameterSetR6,
+PowerAndAverageSampleNumberResult <- R6Class("PowerAndAverageSampleNumberResult",
+    inherit = ParameterSet,
     public = list(
         .design = NULL,
         nMax = NULL,
@@ -314,7 +314,7 @@ PowerAndAverageSampleNumberResultR6 <- R6Class("PowerAndAverageSampleNumberResul
 #'
 #' @keywords internal
 #'
-as.data.frame.PowerAndAverageSampleNumberResultR6 <- function(x, row.names = NULL,
+as.data.frame.PowerAndAverageSampleNumberResult <- function(x, row.names = NULL,
         optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
     parameterNames <- x$.getVisibleFieldNames()
     parameterNames <- parameterNames[parameterNames != "nMax"]

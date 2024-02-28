@@ -642,7 +642,7 @@ NULL
         )
     }
 
-    setting <- PiecewiseSurvivalTimeR6$new(
+    setting <- PiecewiseSurvivalTime$new(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
         lambda2 = piecewiseLambda,
         hazardRatio = 1, kappa = kappa,
@@ -1020,12 +1020,12 @@ getMedianByPi <- function(piValue,
             designParametersToShow <- c(designParametersToShow, ".design$stageLevels")
         }
         if (design$sided == 2 && !grepl("Analysis|Simulation", .getClassName(parameterSet)) &&
-                (!(inherits(parameterSet, "TrialDesignPlan") || inherits(parameterSet, "TrialDesignPlanR6")) || parameterSet$.isSampleSizeObject())) {
+                (!(inherits(parameterSet, "TrialDesignPlan") || inherits(parameterSet, "TrialDesignPlan")) || parameterSet$.isSampleSizeObject())) {
             designParametersToShow <- c(designParametersToShow, ".design$twoSidedPower")
         }
         designParametersToShow <- c(designParametersToShow, ".design$alpha")
         if (!grepl("Analysis|Simulation", .getClassName(parameterSet)) &&
-                (!(inherits(parameterSet, "TrialDesignPlan") || inherits(parameterSet, "TrialDesignPlanR6")) || parameterSet$.isSampleSizeObject())) {
+                (!(inherits(parameterSet, "TrialDesignPlan") || inherits(parameterSet, "TrialDesignPlan")) || parameterSet$.isSampleSizeObject())) {
             designParametersToShow <- c(designParametersToShow, ".design$beta")
         }
 

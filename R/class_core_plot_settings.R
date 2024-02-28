@@ -18,7 +18,7 @@
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-PlotSubTitleItemR6 <- R6Class("PlotSubTitleItemR6",
+PlotSubTitleItem <- R6Class("PlotSubTitleItem",
     public = list(
         title = NULL,
         subscript = NULL,
@@ -60,7 +60,7 @@ PlotSubTitleItemR6 <- R6Class("PlotSubTitleItemR6",
     )
 )
 
-PlotSubTitleItemsR6 <- R6Class("PlotSubTitleItemsR6",
+PlotSubTitleItems <- R6Class("PlotSubTitleItems",
     public = list(
         title = NULL,
         subtitle = NULL,
@@ -96,7 +96,7 @@ PlotSubTitleItemsR6 <- R6Class("PlotSubTitleItemsR6",
             } else {
                 titleTemp <- paste0(titleTemp, " ")
             }
-            self$addItem(PlotSubTitleItemR6$new(title = titleTemp, value = value, subscript = subscript, digits = digits))
+            self$addItem(PlotSubTitleItem$new(title = titleTemp, value = value, subscript = subscript, digits = digits))
         },
         toString = function() {
             if (is.null(self$items) || length(self$items) == 0) {
@@ -256,7 +256,7 @@ getPlotSettings <- function(lineSize = 0.8,
         axesTextFontSize = 10,
         legendFontSize = 11,
         scalingFactor = 1) {
-    return(PlotSettingsR6$new(
+    return(PlotSettings$new(
         lineSize = lineSize,
         pointSize = pointSize,
         pointColor = pointColor,
@@ -293,8 +293,8 @@ getPlotSettings <- function(lineSize = 0.8,
 #'
 #' @importFrom methods new
 #'
-PlotSettingsR6 <- R6Class("PlotSettingsR6",
-    inherit = ParameterSetR6,
+PlotSettings <- R6Class("PlotSettings",
+    inherit = ParameterSet,
     public = list(
         .legendLineBreakIndex = NULL,
         .pointSize = NULL,
@@ -357,7 +357,7 @@ PlotSettingsR6 <- R6Class("PlotSettingsR6",
             )
         },
         #clone = function() {
-        #    return(PlotSettingsR6$new(
+        #    return(PlotSettings$new(
         #        lineSize = self$lineSize,
         #        pointSize = self$pointSize,
         #        pointColor = self$pointColor,
@@ -574,7 +574,7 @@ PlotSettingsR6 <- R6Class("PlotSettingsR6",
             "Sets the main title"
 
             caption <- NA_character_
-            if (!is.null(mainTitle) && (inherits(mainTitle, "PlotSubTitleItems") || inherits(mainTitle, "PlotSubTitleItemsR6"))) {
+            if (!is.null(mainTitle) && (inherits(mainTitle, "PlotSubTitleItems") || inherits(mainTitle, "PlotSubTitleItems"))) {
                 plotLabsType <- getOption("rpact.plot.labs.type", "quote")
                 if (plotLabsType == "quote") {
                     mainTitle <- mainTitle$toQuote()

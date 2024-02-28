@@ -324,12 +324,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     .assertIsInClosedInterval(delayedInformation, "delayedInformation", lower = 0, upper = NULL, naAllowed = TRUE)
 
     if (designClass == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL) {
-        design <- TrialDesignInverseNormalR6$new(
+        design <- TrialDesignInverseNormal$new(
             kMax = kMax, bindingFutility = bindingFutility,
             delayedInformation = delayedInformation
         )
     } else if (designClass == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL) {
-        design <- TrialDesignGroupSequentialR6$new(
+        design <- TrialDesignGroupSequential$new(
             kMax = kMax, bindingFutility = bindingFutility,
             delayedInformation = delayedInformation
         )
@@ -1768,7 +1768,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         writeToDesign = FALSE, twoSidedWarningForDefaultValues = FALSE
     )
 
-    designCharacteristics <- TrialDesignCharacteristicsR6$new(design = design)
+    designCharacteristics <- TrialDesignCharacteristics$new(design = design)
 
     designCharacteristics$rejectionProbabilities <- rep(NA_real_, design$kMax)
     designCharacteristics$.setParameterType("rejectionProbabilities", C_PARAM_NOT_APPLICABLE)
@@ -2115,7 +2115,7 @@ getPowerAndAverageSampleNumber <- function(design, theta = seq(-1, 1, 0.02), nMa
     .assertIsTrialDesign(design)
     .assertIsSingleNumber(nMax, "nMax")
     .assertIsInClosedInterval(nMax, "nMax", lower = 1, upper = NULL)
-    return(PowerAndAverageSampleNumberResultR6$new(design = design, theta = theta, nMax = nMax))
+    return(PowerAndAverageSampleNumberResult$new(design = design, theta = theta, nMax = nMax))
 }
 
 .getSimulatedRejectionsDelayedResponse <- function(delta, informationRates, delayedInformation,

@@ -1366,7 +1366,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
     }
 
     .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
-    designPlan <- TrialDesignPlanSurvivalR6$new(
+    designPlan <- TrialDesignPlanSurvival$new(
         design = design,
         typeOfComputation = typeOfComputation,
         thetaH0 = thetaH0,
@@ -2936,7 +2936,7 @@ getEventProbabilities <- function(time, ...,
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all rates (lambda2) must be > 0")
     }
 
-    eventProbabilities <- EventProbabilitiesR6$new(
+    eventProbabilities <- EventProbabilities$new(
         .piecewiseSurvivalTime = setting,
         .accrualTime           = accrualSetup,
         time                   = time,
@@ -3102,7 +3102,7 @@ getNumberOfSubjects <- function(time, ...,
         accrualIntensity = accrualIntensity, maxNumberOfSubjects = maxNumberOfSubjects
     )
 
-    result <- NumberOfSubjectsR6$new(
+    result <- NumberOfSubjects$new(
         .accrualTime = accrualSetup,
         time = time,
         accrualTime = accrualTime,
@@ -3933,7 +3933,7 @@ getNumberOfSubjects <- function(time, ...,
         }
     }
 
-    designPlan <- TrialDesignPlanMeansR6$new(design = design, meanRatio = meanRatio)
+    designPlan <- TrialDesignPlanMeans$new(design = design, meanRatio = meanRatio)
     designPlan$.setSampleSizeObject(objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
@@ -4124,7 +4124,7 @@ getNumberOfSubjects <- function(time, ...,
         }
     }
 
-    designPlan <- TrialDesignPlanRatesR6$new(design = design)
+    designPlan <- TrialDesignPlanRates$new(design = design)
     designPlan$.setSampleSizeObject(objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)

@@ -253,7 +253,7 @@ NULL
         )
     }
 
-    stageResults <- StageResultsEnrichmentMeansR6$new(
+    stageResults <- StageResultsEnrichmentMeans$new(
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
@@ -444,7 +444,7 @@ NULL
         ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"), ...
     )
 
-    results <- AnalysisResultsEnrichmentInverseNormalR6$new(design = design, dataInput = dataInput)
+    results <- AnalysisResultsEnrichmentInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansEnrichmentAll(
         results = results, design = design, dataInput = dataInput,
@@ -486,7 +486,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsEnrichmentFisherR6$new(design = design, dataInput = dataInput)
+    results <- AnalysisResultsEnrichmentFisher$new(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
@@ -965,7 +965,7 @@ NULL
         assumedStDevs <- stDevsH1
     }
 
-    results <- ConditionalPowerResultsEnrichmentMeansR6$new(
+    results <- ConditionalPowerResultsEnrichmentMeans$new(
         .design = design,
         .stageResults = stageResults,
         thetaH1 = thetaH1,
@@ -1291,7 +1291,7 @@ NULL
     stdErr <- stageResults$overallStDevs[stage] *
         sqrt(1 / stageResults$.overallSampleSizes1[, stage] + 1 / stageResults$.overallSampleSizes2[, stage])
 
-    results <- ConditionalPowerResultsEnrichmentMeansR6$new(
+    results <- ConditionalPowerResultsEnrichmentMeans$new(
         .design = design,
         .stageResults = stageResults,
         assumedStDevs = assumedStDevs,

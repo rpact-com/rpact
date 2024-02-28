@@ -125,7 +125,7 @@ NULL
 }
 
 .getGeneratorFunctionName <- function(obj) {
-    if ("TrialDesignPlanMeans" == .getClassName(obj) || "TrialDesignPlanMeansR6" == .getClassName(obj)) {
+    if ("TrialDesignPlanMeans" == .getClassName(obj) || "TrialDesignPlanMeans" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeMeans")
         }
@@ -133,7 +133,7 @@ NULL
         return("getPowerMeans")
     }
     
-    if ("TrialDesignPlanRates" == .getClassName(obj) || "TrialDesignPlanRatesR6" == .getClassName(obj)) {
+    if ("TrialDesignPlanRates" == .getClassName(obj) || "TrialDesignPlanRates" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeRates")
         } 
@@ -141,7 +141,7 @@ NULL
         return("getPowerRates")
     } 
     
-    if ("TrialDesignPlanSurvival" == .getClassName(obj) || "TrialDesignPlanSurvivalR6" == .getClassName(obj)) {
+    if ("TrialDesignPlanSurvival" == .getClassName(obj) || "TrialDesignPlanSurvival" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeSurvival")
         } 
@@ -149,95 +149,95 @@ NULL
         return("getPowerSurvival")
     }  
     
-    if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignR6")) {
+    if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesign")) { #TODO
         return(paste0("get", sub("^Trial", "", sub("R6","",.getClassName(obj)))))
     }  
   
-    if (inherits(obj, "Dataset") || inherits(obj, "DatasetR6")) {
+    if (inherits(obj, "Dataset") || inherits(obj, "Dataset")) {
         return("getDataset")
     }  
     
-    if (inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResultsR6")) {
+    if (inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResults")) {
         return("getAnalysisResults")
     }  
     
-    if ("TrialDesignSet" == .getClassName(obj) || "TrialDesignSetR6" == .getClassName(obj)) {
+    if ("TrialDesignSet" == .getClassName(obj) || "TrialDesignSet" == .getClassName(obj)) {
         return("getDesignSet")
     }  
     
-    if ("TrialDesignCharacteristics" == .getClassName(obj) || "TrialDesignCharacteristicsR6" == .getClassName(obj)) {
+    if ("TrialDesignCharacteristics" == .getClassName(obj) || "TrialDesignCharacteristics" == .getClassName(obj)) {
         return("getDesignCharacteristics")
     }  
     
-    if (inherits(obj, "SimulationResultsMeans") || inherits(obj, "SimulationResultsMeansR6")) {
+    if (inherits(obj, "SimulationResultsMeans") || inherits(obj, "SimulationResultsMeans")) {
         return("getSimulationMeans")
     }  
     
-    if (inherits(obj, "SimulationResultsRates") || inherits(obj, "SimulationResultsRatesR6")) {
+    if (inherits(obj, "SimulationResultsRates") || inherits(obj, "SimulationResultsRates")) {
         return("getSimulationRates")
     }  
     
-    if (inherits(obj, "SimulationResultsSurvival") || inherits(obj, "SimulationResultsSurvivalR6")) {
+    if (inherits(obj, "SimulationResultsSurvival") || inherits(obj, "SimulationResultsSurvival")) {
         return("getSimulationSurvival")
     }  
     
-    if (inherits(obj, "SimulationResultsMultiArmMeans") || inherits(obj, "SimulationResultsMultiArmMeansR6")) {
+    if (inherits(obj, "SimulationResultsMultiArmMeans") || inherits(obj, "SimulationResultsMultiArmMeans")) {
         return("getSimulationMultiArmMeans")
     }  
     
-    if (inherits(obj, "SimulationResultsMultiArmRates") || inherits(obj, "SimulationResultsMultiArmRatesR6")) {
+    if (inherits(obj, "SimulationResultsMultiArmRates") || inherits(obj, "SimulationResultsMultiArmRates")) {
         return("getSimulationMultiArmRates")
     }  
     
-    if (inherits(obj, "SimulationResultsMultiArmSurvival") || inherits(obj, "SimulationResultsMultiArmSurvivalR6")) {
+    if (inherits(obj, "SimulationResultsMultiArmSurvival") || inherits(obj, "SimulationResultsMultiArmSurvival")) {
         return("getSimulationMultiArmSurvival")
     }  
     
-    if (inherits(obj, "SimulationResultsEnrichmentMeans") || inherits(obj, "SimulationResultsEnrichmentMeansR6")) {
+    if (inherits(obj, "SimulationResultsEnrichmentMeans") || inherits(obj, "SimulationResultsEnrichmentMeans")) {
         return("getSimulationEnrichmentMeans")
     }  
     
-    if (inherits(obj, "SimulationResultsEnrichmentRates") || inherits(obj, "SimulationResultsEnrichmentRatesR6")) {
+    if (inherits(obj, "SimulationResultsEnrichmentRates") || inherits(obj, "SimulationResultsEnrichmentRates")) {
         return("getSimulationEnrichmentRates")
     }  
     
-    if (inherits(obj, "SimulationResultsEnrichmentSurvival") || inherits(obj, "SimulationResultsEnrichmentSurvivalR6")) {
+    if (inherits(obj, "SimulationResultsEnrichmentSurvival") || inherits(obj, "SimulationResultsEnrichmentSurvival")) {
         return("getSimulationEnrichmentSurvival")
     }  
     
-    if (inherits(obj, "PiecewiseSurvivalTime") || inherits(obj, "PiecewiseSurvivalTimeR6")) {
+    if (inherits(obj, "PiecewiseSurvivalTime") || inherits(obj, "PiecewiseSurvivalTime")) {
         return("getPiecewiseSurvivalTime")
     }  
     
-    if (inherits(obj, "AccrualTime") || inherits(obj, "AccrualTimeR6")) {
+    if (inherits(obj, "AccrualTime") || inherits(obj, "AccrualTime")) {
         return("getAccrualTime")
     }  
     
-    if (inherits(obj, "StageResults") || inherits(obj, "StageResultsR6")) {
+    if (inherits(obj, "StageResults") || inherits(obj, "StageResults")) {
         return("getStageResults")
     }  
     
-    if (inherits(obj, "ConditionalPowerResults") || inherits(obj, "ConditionalPowerResultsR6")) {
+    if (inherits(obj, "ConditionalPowerResults") || inherits(obj, "ConditionalPowerResults")) {
         return("getConditionalPower")
     }  
     
-    if (inherits(obj, "PowerAndAverageSampleNumberResult") || inherits(obj, "PowerAndAverageSampleNumberResultR6")) {
+    if (inherits(obj, "PowerAndAverageSampleNumberResult") || inherits(obj, "PowerAndAverageSampleNumberResult")) {
         return("getPowerAndAverageSampleNumber")
     }  
     
-    if (inherits(obj, "EventProbabilities") || inherits(obj, "EventProbabilitiesR6")) {
+    if (inherits(obj, "EventProbabilities") || inherits(obj, "EventProbabilities")) {
         return("getEventProbabilities")
     }  
     
-    if (inherits(obj, "NumberOfSubjects") || inherits(obj, "NumberOfSubjectsR6")) {
+    if (inherits(obj, "NumberOfSubjects") || inherits(obj, "NumberOfSubjects")) {
         return("getNumberOfSubjects")
     }  
     
-    if (inherits(obj, "PerformanceScore") || inherits(obj, "PerformanceScoreR6")) {
+    if (inherits(obj, "PerformanceScore") || inherits(obj, "PerformanceScore")) {
         return("gePerformanceScore")
     }  
     
-    if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj) || inherits(obj, "SummaryFactoryR6") || "SummaryFactoryR6" == .getClassName(obj)) {
+    if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj) || inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
         return(.getGeneratorFunctionName(obj$object))
     } 
     
@@ -391,7 +391,7 @@ getObjectRCode <- function(obj, ...,
     if (is.null(leadingArguments)) {
         leadingArguments <- character(0)
     }
-    if (!(inherits(obj, "ConditionalPowerResults") || inherits(obj, "ConditionalPowerResultsR6")) &&
+    if (!(inherits(obj, "ConditionalPowerResults") || inherits(obj, "ConditionalPowerResults")) &&
             !is.null(obj[[".design"]]) &&
             (is.null(leadingArguments) || !any(grepl("design", leadingArguments)))) {
         preconditionDesign <- getObjectRCode(obj$.design,
@@ -411,7 +411,7 @@ getObjectRCode <- function(obj, ...,
             }
         }
     }
-    if (inherits(obj, "PerformanceScore") || inherits(obj, "PerformanceScoreR6")) {
+    if (inherits(obj, "PerformanceScore") || inherits(obj, "PerformanceScore")) {
         preconditionSimulationResults <- getObjectRCode(obj$.simulationResults,
             prefix = ifelse(pipeOperator == "none", "simulationResults <- ", ""),
             postfix = pipeOperatorPostfix,
@@ -497,7 +497,7 @@ getObjectRCode <- function(obj, ...,
         }
         leadingArguments <- c(leadingArguments, "selectArmsFunction = selectArmsFunction")
     }
-    if ((inherits(obj, "ConditionalPowerResults") || inherits(obj, "ConditionalPowerResultsR6")) &&
+    if ((inherits(obj, "ConditionalPowerResults") || inherits(obj, "ConditionalPowerResults")) &&
             !is.null(obj[[".stageResults"]]) &&
             (is.null(leadingArguments) || !any(grepl("stageResults", leadingArguments)))) {
         precond <- getObjectRCode(obj$.stageResults,
@@ -532,7 +532,7 @@ getObjectRCode <- function(obj, ...,
     
     precondition <- unique(precondition)
     
-    if (inherits(obj, "SummaryFactory") || inherits(obj, "SummaryFactoryR6") || "SummaryFactory" == .getClassName(obj) || "SummaryFactoryR6" == .getClassName(obj)) {
+    if (inherits(obj, "SummaryFactory") || inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj) || "SummaryFactory" == .getClassName(obj)) {
         return(getObjectRCode(obj$object,
             prefix = ifelse(pipeOperator == "none", "summary(", ""),
             postfix = {
@@ -554,7 +554,7 @@ getObjectRCode <- function(obj, ...,
 
     objNames <- objNames[objNames != "effectList"]
 
-    if (inherits(obj, "ParameterSet") || inherits(obj, "ParameterSetR6")) {
+    if (inherits(obj, "ParameterSet") || inherits(obj, "ParameterSet")) {
         if (includeDefaultParameters) {
             objNames <- obj$.getInputParameters()
         } else {
@@ -564,23 +564,23 @@ getObjectRCode <- function(obj, ...,
         
     }
 
-    if ((inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignR6")) && !(inherits(obj, "TrialDesignConditionalDunnett") || inherits(obj, "TrialDesignConditionalDunnettR6")) &&
+    if ((inherits(obj, "TrialDesign") || inherits(obj, "TrialDesign")) && !(inherits(obj, "TrialDesignConditionalDunnett") || inherits(obj, "TrialDesignConditionalDunnett")) &&
             !("informationRates" %in% objNames) && !("kMax" %in% objNames) && obj$kMax != 3) {
         objNames <- c("kMax", objNames)
     }
 
     thetaH0 <- NA_real_
-    if ((inherits(obj, "SimulationResultsSurvival") || inherits(obj, "SimulationResultsSurvivalR6")) &&
+    if ((inherits(obj, "SimulationResultsSurvival") || inherits(obj, "SimulationResultsSurvival")) &&
             obj$.getParameterType("thetaH1") == "g") {
         objNames <- c(objNames, "thetaH1")
         thetaH0 <- obj[["thetaH0"]]
     }
 
-    if (inherits(obj, "SimulationResultsSurvival") || inherits(obj, "SimulationResultsSurvivalR6")) {
+    if (inherits(obj, "SimulationResultsSurvival") || inherits(obj, "SimulationResultsSurvival")) {
         objNames <- objNames[objNames != "allocationRatioPlanned"] # allocation1 and allocation2 are used instead
     }
 
-    if ((inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResultsR6")) && grepl("Fisher", .getClassName(obj))) {
+    if ((inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResults")) && grepl("Fisher", .getClassName(obj))) {
         if (!is.null(obj[["seed"]]) && length(obj$seed) == 1 && !is.na(obj$seed)) {
             if (!("iterations" %in% objNames)) {
                 objNames <- c(objNames, "iterations")
@@ -627,7 +627,7 @@ getObjectRCode <- function(obj, ...,
         objNames <- c(objNames, defaultParams)
     }
 
-    if ((inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignR6")) && "informationRates" %in% objNames &&
+    if ((inherits(obj, "TrialDesign") || inherits(obj, "TrialDesign")) && "informationRates" %in% objNames &&
             !("informationRates" %in% newArgumentValueNames)) {
         informationRates <- obj[["informationRates"]]
         if (!is.null(informationRates) && length(informationRates) > 0) {
@@ -644,7 +644,7 @@ getObjectRCode <- function(obj, ...,
         }
     }
 
-    if (inherits(obj, "Dataset") || inherits(obj, "DatasetR6")) {
+    if (inherits(obj, "Dataset") || inherits(obj, "Dataset")) {
         lines <- .getDatasetArgumentsRCodeLines(obj, complete = FALSE, digits = NA_integer_)
         argumentsRCode <- paste0(lines, collapse = ", ")
     } else {
@@ -659,7 +659,7 @@ getObjectRCode <- function(obj, ...,
                     value <- obj[[name]]
                 }
 
-                if (name == "accrualTime" && (inherits(obj, "AccrualTime") || inherits(obj, "AccrualTimeR6")) &&
+                if (name == "accrualTime" && (inherits(obj, "AccrualTime") || inherits(obj, "AccrualTime")) &&
                         !isTRUE(obj$endOfAccrualIsUserDefined) &&
                         isTRUE(length(obj$accrualIntensity) < length(value))) {
                     value <- value[1:(length(value) - 1)]
@@ -685,7 +685,7 @@ getObjectRCode <- function(obj, ...,
                     optimumAllocationRatio <- obj[["optimumAllocationRatio"]]
                     if (!is.null(optimumAllocationRatio) && isTRUE(optimumAllocationRatio)) {
                         value <- 0
-                    } else if ((inherits(obj, "ParameterSet") || inherits(obj, "ParameterSetR6"))) {
+                    } else if ((inherits(obj, "ParameterSet") || inherits(obj, "ParameterSet"))) {
                         if (obj$.getParameterType("allocationRatioPlanned") == "g") {
                             value <- 0
                         }
@@ -729,7 +729,7 @@ getObjectRCode <- function(obj, ...,
             }
         }
 
-        if (inherits(obj, "TrialDesignPlanSurvival") || inherits(obj, "TrialDesignPlanSurvivalR6")) {
+        if (inherits(obj, "TrialDesignPlanSurvival") || inherits(obj, "TrialDesignPlanSurvival")) {
             if (!("accrualTime" %in% objNames) &&
                     obj$.getParameterType("accrualTime") == "g" && !all(is.na(obj$accrualTime))) {
                 # case 2: follow-up time and absolute intensity given
@@ -773,9 +773,9 @@ getObjectRCode <- function(obj, ...,
                     .getArgumentValueRCode(obj$maxNumberOfSubjects[1], "maxNumberOfSubjects")
                 ))
             }
-        } else if (inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResultsR6")) {
+        } else if (inherits(obj, "AnalysisResults") || inherits(obj, "AnalysisResults")) {
             arguments <- c(arguments, paste0("stage = ", obj$.stageResults$stage))
-        } else if (inherits(obj, "StageResults") || inherits(obj, "StageResultsR6")) {
+        } else if (inherits(obj, "StageResults") || inherits(obj, "StageResults")) {
             arguments <- c(arguments, paste0("stage = ", obj$stage))
         }
 

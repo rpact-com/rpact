@@ -218,7 +218,7 @@ getSimulationMeans <- function(design = NULL, ...,
     .assertIsSingleLogical(normalApproximation, "normalApproximation", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
-    simulationResults <- SimulationResultsMeansR6$new(design, showStatistics = showStatistics)
+    simulationResults <- SimulationResultsMeans$new(design, showStatistics = showStatistics)
 
     if (design$sided == 2) {
         stop(

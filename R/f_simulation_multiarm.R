@@ -468,11 +468,11 @@ NULL
     effectMeasure <- .assertIsValidEffectMeasure(effectMeasure)
 
     if (endpoint == "means") {
-        simulationResults <- SimulationResultsMultiArmMeansR6$new(design, showStatistics = showStatistics)
+        simulationResults <- SimulationResultsMultiArmMeans$new(design, showStatistics = showStatistics)
     } else if (endpoint == "rates") {
-        simulationResults <- SimulationResultsMultiArmRatesR6$new(design, showStatistics = showStatistics)
+        simulationResults <- SimulationResultsMultiArmRates$new(design, showStatistics = showStatistics)
     } else if (endpoint == "survival") {
-        simulationResults <- SimulationResultsMultiArmSurvivalR6$new(design, showStatistics = showStatistics)
+        simulationResults <- SimulationResultsMultiArmSurvival$new(design, showStatistics = showStatistics)
     }
 
     gMax <- activeArms

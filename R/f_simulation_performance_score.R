@@ -50,7 +50,7 @@ getPerformanceScore <- function(simulationResult) {
 
     design <- simulationResult$.design
 
-    if (!(inherits(simulationResult, "SimulationResultsMeans") || inherits(simulationResult, "SimulationResultsMeansR6"))) { 
+    if (!(inherits(simulationResult, "SimulationResultsMeans") || inherits(simulationResult, "SimulationResultsMeans"))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "performance score so far implemented only for single comparisons with continuous endpoints"
@@ -94,10 +94,10 @@ getPerformanceScore <- function(simulationResult) {
     referenceValue <- NA_real_
 
     # simulated alternative values
-    if (methods::is(simulationResult, "SimulationResultsMeans") || methods::is(simulationResult, "SimulationResultsMeansR6")) {
+    if (methods::is(simulationResult, "SimulationResultsMeans") || methods::is(simulationResult, "SimulationResultsMeans")) {
         alternativeParamName <- "alternative"
         referenceValue <- 0
-    } else if (methods::is(simulationResult, "SimulationResultsRates") || methods::is(simulationResult, "SimulationResultsRatesR6")) {
+    } else if (methods::is(simulationResult, "SimulationResultsRates") || methods::is(simulationResult, "SimulationResultsRates")) {
         alternativeParamName <- "pi1"
         referenceValue <- simulationResult$pi2
         args$pi2 <- referenceValue
@@ -116,9 +116,9 @@ getPerformanceScore <- function(simulationResult) {
 
         if (alternativeValue == referenceValue) {
             singleStageSampleSize <- plannedSubjects[2] - plannedSubjects[1]
-        } else if (methods::is(simulationResult, "SimulationResultsMeans") || methods::is(simulationResult, "SimulationResultsMeansR6")) {
+        } else if (methods::is(simulationResult, "SimulationResultsMeans") || methods::is(simulationResult, "SimulationResultsMeans")) {
             singleStageSampleSize <- do.call(getSampleSizeMeans, args)$numberOfSubjects
-        } else if (methods::is(simulationResult, "SimulationResultsRates") || methods::is(simulationResult, "SimulationResultsRatesR6")) {
+        } else if (methods::is(simulationResult, "SimulationResultsRates") || methods::is(simulationResult, "SimulationResultsRates")) {
             singleStageSampleSize <- do.call(getSampleSizeRates, args)$numberOfSubjects
         }
 
@@ -166,7 +166,7 @@ getPerformanceScore <- function(simulationResult) {
         ))
     })
 
-    performanceScore <- PerformanceScoreR6$new(simulationResult)
+    performanceScore <- PerformanceScore$new(simulationResult)
     performanceScore$.alternative <- alternativeValues
     paramNames <- rownames(resultMatrix)
     for (k in 1:nrow(resultMatrix)) {

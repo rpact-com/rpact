@@ -21,7 +21,7 @@
 getAssertionTestDesign <- function(..., kMax = NA_integer_, informationRates = NA_real_, futilityBounds = NA_real_,
         designClass = "TrialDesignInverseNormal") {
     if (designClass == "TrialDesignFisher") {
-        return(TrialDesignFisherR6$new(
+        return(TrialDesignFisher$new(
             kMax = kMax,
             alpha = 0.025,
             method = "equalAlpha",

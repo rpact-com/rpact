@@ -322,13 +322,13 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
     .assertIsSingleLogical(cppEnabled, "cppEnabled")
 
     cppCodeBodyType <- NA_character_
-    if (inherits(simulationResults, "SimulationResultsMeans") || inherits(simulationResults, "SimulationResultsMeansR6")) {
+    if (inherits(simulationResults, "SimulationResultsMeans") || inherits(simulationResults, "SimulationResultsMeans")) {
         cppCodeBodyType <- C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS
     }
-    if (inherits(simulationResults, "SimulationResultsRates") || inherits(simulationResults, "SimulationResultsRatesR6")) {
+    if (inherits(simulationResults, "SimulationResultsRates") || inherits(simulationResults, "SimulationResultsRates")) {
         cppCodeBodyType <- C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_RATES
     }
-    if (inherits(simulationResults, "SimulationResultsSurvival") || inherits(simulationResults, "SimulationResultsSurvivalR6")) {
+    if (inherits(simulationResults, "SimulationResultsSurvival") || inherits(simulationResults, "SimulationResultsSurvival")) {
         cppCodeBodyType <- C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_SURVIVAL
     }
     if (is.na(cppCodeBodyType)) {
@@ -338,7 +338,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
         )
     }
 
-    functionFieldName <- ifelse(inherits(simulationResults, "SimulationResultsSurvival") || inherits(simulationResults, "SimulationResultsSurvivalR6"),
+    functionFieldName <- ifelse(inherits(simulationResults, "SimulationResultsSurvival") || inherits(simulationResults, "SimulationResultsSurvival"),
         "calcEventsFunction", "calcSubjectsFunction"
     )
 
@@ -397,7 +397,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
     if (.isCppCode(calcFunction)) {
         tryCatch(
             {
-                survivalEnabled <- inherits(simulationResults, "SimulationResultsSurvival") || inherits(simulationResults, "SimulationResultsSurvivalR6")
+                survivalEnabled <- inherits(simulationResults, "SimulationResultsSurvival") || inherits(simulationResults, "SimulationResultsSurvival")
                 expectedFunctionName <- ifelse(survivalEnabled,
                     "calcEventsFunctionCppTemp", "calcSubjectsFunctionCppTemp"
                 )

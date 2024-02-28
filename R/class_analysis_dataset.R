@@ -509,7 +509,7 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
     enrichmentEnabled <- .isDataObjectEnrichment(...)
 
     if (.isDataObjectMeans(...)) {
-        return(DatasetMeansR6$new(
+        return(DatasetMeans$new(
             dataFrame = dataFrame,
             floatingPointNumbersEnabled = floatingPointNumbersEnabled,
             enrichmentEnabled = enrichmentEnabled,
@@ -518,7 +518,7 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
     }
 
     if (.isDataObjectRates(...)) {
-        return(DatasetRatesR6$new(
+        return(DatasetRates$new(
             dataFrame = dataFrame,
             floatingPointNumbersEnabled = floatingPointNumbersEnabled,
             enrichmentEnabled = enrichmentEnabled,
@@ -527,7 +527,7 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
     }
 
     if (.isDataObjectNonStratifiedEnrichmentSurvival(...)) {
-        return(DatasetEnrichmentSurvivalR6$new(
+        return(DatasetEnrichmentSurvival$new(
             dataFrame = dataFrame,
             floatingPointNumbersEnabled = floatingPointNumbersEnabled,
             enrichmentEnabled = enrichmentEnabled,
@@ -536,7 +536,7 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
     }
 
     if (.isDataObjectSurvival(...)) {
-        return(DatasetSurvivalR6$new(
+        return(DatasetSurvival$new(
             dataFrame = dataFrame,
             floatingPointNumbersEnabled = floatingPointNumbersEnabled,
             enrichmentEnabled = enrichmentEnabled,
@@ -839,7 +839,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     }
 
     for (arg in args) {
-        if (inherits(arg, "Dataset") || inherits(arg, "DatasetR6")) {
+        if (inherits(arg, "Dataset") || inherits(arg, "Dataset")) {
             return(TRUE)
         }
     }
@@ -1360,9 +1360,9 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #'
 #' @importFrom methods new
 #'
-DatasetR6 <- R6Class("DatasetR6",
-    inherit = ParameterSetR6,
-    public = list(
+Dataset <- R6Class("Dataset",
+                   inherit = ParameterSet,
+                   public = list(
         .data = NULL,
         .plotSettings = NULL,
         .id = NULL,
@@ -1382,7 +1382,7 @@ DatasetR6 <- R6Class("DatasetR6",
             self$.enrichmentEnabled <- enrichmentEnabled
             self$.design <- .design
             
-            self$.plotSettings <- PlotSettingsR6$new()
+            self$.plotSettings <- PlotSettings$new()
             self$.parameterNames <- .getParameterNames(dataset = self)
             self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
 
@@ -1726,7 +1726,7 @@ DatasetR6 <- R6Class("DatasetR6",
             if (!survivalCorrectionEnabled) {
                 return(length(levels(data$group)))
             }
-            return(length(levels(data$group)) + ifelse(inherits(self, "DatasetSurvival") || inherits(self, "DatasetSurvivalR6"), 1, 0))
+            return(length(levels(data$group)) + ifelse(inherits(self, "DatasetSurvival") || inherits(self, "DatasetSurvival"), 1, 0))
         },
         getNumberOfStages = function(naOmitEnabled = TRUE) {
             if (naOmitEnabled) {
@@ -1755,13 +1755,13 @@ DatasetR6 <- R6Class("DatasetR6",
             return(length(levels(self$.data$subset)))
         },
         isDatasetMeans = function() {
-            return(inherits(self, "DatasetMeansR6"))
+            return(inherits(self, "DatasetMeans"))
         },
         isDatasetRates = function() {
-            return(inherits(self, "DatasetRatesR6"))
+            return(inherits(self, "DatasetRates"))
         },
         isDatasetSurvival = function() {
-            return(inherits(self, "DatasetSurvivalR6"))
+            return(inherits(self, "DatasetSurvival"))
         },
         isStratified = function() {
             return(self$.enrichmentEnabled && "R" %in% levels(self$.data$subset))
@@ -1830,8 +1830,8 @@ DatasetR6 <- R6Class("DatasetR6",
 #'
 #' @importFrom methods new
 #'
-DatasetMeansR6 <- R6Class("DatasetMeansR6",
-    inherit = DatasetR6,
+DatasetMeans <- R6Class("DatasetMeans",
+    inherit = Dataset,
     public = list(
         sampleSizes = NULL,
         means = NULL,
@@ -2525,7 +2525,7 @@ DatasetMeansR6 <- R6Class("DatasetMeansR6",
 #'
 #' @export
 #'
-plot.DatasetR6 <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_character_,
+plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_character_,
         legendTitle = "Group", palette = "Set1", showSource = FALSE, plotSettings = NULL) {
     if (x$.enrichmentEnabled) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of enrichment data is not implemented yet")
@@ -2709,8 +2709,8 @@ plot.DatasetR6 <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = N
 #'
 #' @importFrom methods new
 #'
-DatasetRatesR6 <- R6Class("DatasetRatesR6",
-    inherit = DatasetR6,
+DatasetRates <- R6Class("DatasetRates",
+    inherit = Dataset,
     public = list(
         sampleSizes = NULL,
         events = NULL,
@@ -3183,8 +3183,8 @@ DatasetRatesR6 <- R6Class("DatasetRatesR6",
 #'
 #' @importFrom methods new
 #'
-DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
-    inherit = DatasetR6,
+DatasetSurvival <- R6Class("DatasetSurvival",
+    inherit = Dataset,
     public = list(
         overallEvents = NULL,
         overallAllocationRatios = NULL,
@@ -3255,7 +3255,7 @@ DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
         .initByDataFrame = function(dataFrame) {
             super$.initByDataFrame(dataFrame)
 
-            if (inherits(self, "DatasetEnrichmentSurvivalR6")) {
+            if (inherits(self, "DatasetEnrichmentSurvival")) {
                 if (self$.paramExists(dataFrame, C_KEY_WORDS_EXPECTED_EVENTS) ||
                         self$.paramExists(dataFrame, C_KEY_WORDS_VARIANCE_EVENTS)) {
                     self$.inputType <- "stagewise"
@@ -3449,17 +3449,17 @@ DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
 
                 self$.setParameterType("events", C_PARAM_USER_DEFINED)
                 self$.setParameterType("allocationRatios", C_PARAM_USER_DEFINED)
-                if (!inherits(self, "DatasetEnrichmentSurvivalR6")) {
+                if (!inherits(self, "DatasetEnrichmentSurvival")) {
                     self$.setParameterType("logRanks", C_PARAM_USER_DEFINED)
                 }
 
                 self$.setParameterType("overallEvents", C_PARAM_GENERATED)
                 self$.setParameterType("overallAllocationRatios", C_PARAM_GENERATED)
-                if (!inherits(self, "DatasetEnrichmentSurvivalR6")) {
+                if (!inherits(self, "DatasetEnrichmentSurvival")) {
                     self$.setParameterType("overallLogRanks", C_PARAM_GENERATED)
                 }
 
-                if (!inherits(self, "DatasetEnrichmentSurvivalR6")) {
+                if (!inherits(self, "DatasetEnrichmentSurvival")) {
                     self$.recreateDataFrame()
                     self$.createOverallData()
                 }
@@ -3471,17 +3471,17 @@ DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
 
                 self$.setParameterType("events", C_PARAM_GENERATED)
                 self$.setParameterType("allocationRatios", C_PARAM_GENERATED)
-                if (!inherits(self, "DatasetEnrichmentSurvivalR6")) {
+                if (!inherits(self, "DatasetEnrichmentSurvival")) {
                     self$.setParameterType("logRanks", C_PARAM_GENERATED)
                 }
 
                 self$.setParameterType("overallEvents", C_PARAM_USER_DEFINED)
                 self$.setParameterType("overallAllocationRatios", C_PARAM_USER_DEFINED)
-                if (!inherits(self, "DatasetEnrichmentSurvivalR6")) {
+                if (!inherits(self, "DatasetEnrichmentSurvival")) {
                     self$.setParameterType("overallLogRanks", C_PARAM_USER_DEFINED)
                 }
 
-                if (!inherits(self, "DatasetEnrichmentSurvivalR6")) {
+                if (!inherits(self, "DatasetEnrichmentSurvival")) {
                     self$.recreateDataFrame()
                     self$.createStageWiseData()
                 }
@@ -3490,7 +3490,7 @@ DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
         .recreateDataFrame = function() {
             super$.recreateDataFrame()
 
-            if (inherits(self, "DatasetEnrichmentSurvivalR6")) {
+            if (inherits(self, "DatasetEnrichmentSurvival")) {
                 self$.data <- cbind(self$.data, data.frame(
                     overallEvent = self$overallEvents,
                     overallExpectedEvent = self$overallExpectedEvents,
@@ -3520,7 +3520,7 @@ DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
             self$overallAllocationRatios <- self$.data$overallAllocationRatio
             self$events <- self$.data$event
             self$allocationRatios <- self$.data$allocationRatio
-            if (!inherits(self, "DatasetEnrichmentSurvivalR6")) {
+            if (!inherits(self, "DatasetEnrichmentSurvival")) {
                 self$overallLogRanks <- self$.data$overallLogRank
                 self$logRanks <- self$.data$logRank
             }
@@ -3595,7 +3595,7 @@ DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
         },
         .createOverallData = function() {
             self$.data$overallEvent <- rep(NA_real_, nrow(self$.data))
-            if (inherits(self, "DatasetEnrichmentSurvivalR6")) {
+            if (inherits(self, "DatasetEnrichmentSurvival")) {
                 self$.data$overallExpectedEvent <- rep(NA_real_, nrow(self$.data))
                 self$.data$overallVarianceEvent <- rep(NA_real_, nrow(self$.data))
             } else {
@@ -3675,7 +3675,7 @@ DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
             "Calculates stage-wise logrank statistics, events, and allocation ratios if cumulative data is available"
 
             self$.data$event <- rep(NA_real_, nrow(self$.data))
-            if (inherits(self, "DatasetEnrichmentSurvivalR6")) {
+            if (inherits(self, "DatasetEnrichmentSurvival")) {
                 self$.data$expectedEvent <- rep(NA_real_, nrow(self$.data))
                 self$.data$varianceEvent <- rep(NA_real_, nrow(self$.data))
             } else {
@@ -3710,7 +3710,7 @@ DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
                     }
 
                     self$.data$event[indices] <- self$.getStageWiseEvents(self$.data$overallEvent[indices])
-                    if (inherits(self, "DatasetEnrichmentSurvivalR6")) {
+                    if (inherits(self, "DatasetEnrichmentSurvival")) {
                         self$.data$expectedEvent[indices] <- self$.getStageWiseEvents(self$.data$overallExpectedEvent[indices])
                         # .data$varianceEvent[indices] <<- # maybe implemented later
                     } else {
@@ -3734,8 +3734,8 @@ DatasetSurvivalR6 <- R6Class("DatasetSurvivalR6",
 #'
 #' @keywords internal
 #'
-DatasetEnrichmentSurvivalR6 <- R6Class("DatasetEnrichmentSurvivalR6",
-    inherit = DatasetSurvivalR6,
+DatasetEnrichmentSurvival <- R6Class("DatasetEnrichmentSurvival",
+    inherit = DatasetSurvival,
     public = list(
         expectedEvents = NULL,
         varianceEvents = NULL,
@@ -3928,10 +3928,10 @@ DatasetEnrichmentSurvivalR6 <- R6Class("DatasetEnrichmentSurvivalR6",
 #'
 #' @keywords internal
 #'
-summary.DatasetR6 <- function(object, ..., type = 1, digits = NA_integer_) {
+summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
     .warnInCaseOfUnknownArguments(functionName = "summary", ...)
 
-    if (type == 1 && inherits(object, "SummaryFactoryR6")) {
+    if (type == 1 && inherits(object, "SummaryFactory")) {
         return(object)
     }
 
@@ -3942,7 +3942,7 @@ summary.DatasetR6 <- function(object, ..., type = 1, digits = NA_integer_) {
     intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
     .assertIsValidSummaryIntervalFormat(intervalFormat)
 
-    summaryFactory <- SummaryFactoryR6$new(object = object, intervalFormat = intervalFormat)
+    summaryFactory <- SummaryFactory$new(object = object, intervalFormat = intervalFormat)
 
     s <- object$.toString()
 
@@ -4180,7 +4180,7 @@ summary.DatasetR6 <- function(object, ..., type = 1, digits = NA_integer_) {
 #'
 #' @keywords internal
 #'
-print.DatasetR6 <- function(x, ..., markdown = FALSE, output = c("list", "long", "wide", "r", "rComplete")) {
+print.Dataset <- function(x, ..., markdown = FALSE, output = c("list", "long", "wide", "r", "rComplete")) {
     fCall <- match.call(expand.dots = FALSE)
     datasetName <- deparse(fCall$x)
 

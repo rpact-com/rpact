@@ -1043,10 +1043,10 @@ getParameterCaption <- function(obj, parameterName) {
 
     design <- NULL
     designPlan <- NULL
-    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlanR6")) {
+    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlan")) {
         designPlan <- obj
         design <- obj$.design
-    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignR6")) {
+    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesign")) {
         design <- obj
     } else {
         design <- obj[[".design"]]
@@ -1092,10 +1092,10 @@ getParameterName <- function(obj, parameterCaption) {
 
     design <- NULL
     designPlan <- NULL
-    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlanR6")) {
+    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlan")) {
         designPlan <- obj
         design <- obj$.design
-    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignR6")) {
+    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesign")) {
         design <- obj
     } else {
         design <- obj[[".design"]]

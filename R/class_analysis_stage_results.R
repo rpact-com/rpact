@@ -63,8 +63,8 @@ library("R6")
 #'
 #' @importFrom methods new
 #'
-StageResultsR6 <- R6Class("StageResultsR6",
-                            inherit = ParameterSetR6,
+StageResults <- R6Class("StageResults",
+                            inherit = ParameterSet,
                             public = list(
                               .plotSettings = NULL,
                               .design = NULL,
@@ -90,7 +90,7 @@ StageResultsR6 <- R6Class("StageResultsR6",
                                 self$.design <- design
                                 self$.dataInput <- dataInput
                                 
-                                self$.plotSettings <- PlotSettingsR6$new()
+                                self$.plotSettings <- PlotSettings$new()
                                 if (!missing(design)) {
                                   self$stages <- c(1:design$kMax)
                                   if (design$kMax == C_KMAX_DEFAULT) {
@@ -232,7 +232,7 @@ StageResultsR6 <- R6Class("StageResultsR6",
                               },
                               getNumberOfStages = function() {
                                 if (self$.isMultiArm()) {
-                                  if (inherits(self, "StageResultsMultiArmRatesR6")) {
+                                  if (inherits(self, "StageResultsMultiArmRates")) {
                                     return(max(
                                       ncol(stats::na.omit(self$testStatistics)),
                                       ncol(stats::na.omit(self$separatePValues))
@@ -289,8 +289,8 @@ StageResultsR6 <- R6Class("StageResultsR6",
 #'
 #' @importFrom methods new
 #'
-StageResultsMeansR6 <- R6Class("StageResultsMeansR6",
-                                 inherit = StageResultsR6,
+StageResultsMeans <- R6Class("StageResultsMeans",
+                                 inherit = StageResults,
                                  public = list(
                                    combInverseNormal = NULL,
                                    combFisher = NULL,
@@ -476,8 +476,8 @@ StageResultsMeansR6 <- R6Class("StageResultsMeansR6",
 #'
 #' @importFrom methods new
 #'
-StageResultsMultiArmMeansR6 <- R6Class("StageResultsMultiArmMeansR6",
-                                         inherit = StageResultsR6,
+StageResultsMultiArmMeans <- R6Class("StageResultsMultiArmMeans",
+                                         inherit = StageResults,
                                          public = list(
                                            combInverseNormal = NULL,
                                            combFisher = NULL,
@@ -624,8 +624,8 @@ StageResultsMultiArmMeansR6 <- R6Class("StageResultsMultiArmMeansR6",
 #'
 #' @importFrom methods new
 #'
-StageResultsRatesR6 <- R6Class("StageResultsRatesR6",
-                                 inherit = StageResultsR6,
+StageResultsRates <- R6Class("StageResultsRates",
+                                 inherit = StageResults,
                                  public = list(
                                    combInverseNormal = NULL,
                                    combFisher = NULL,
@@ -797,8 +797,8 @@ StageResultsRatesR6 <- R6Class("StageResultsRatesR6",
 #'
 #' @importFrom methods new
 #'
-StageResultsMultiArmRatesR6 <- R6Class("StageResultsMultiArmRatesR6",
-                                         inherit = StageResultsR6,
+StageResultsMultiArmRates <- R6Class("StageResultsMultiArmRates",
+                                         inherit = StageResults,
                                          public = list(
                                            stage = NULL,
                                            overallPiTreatments = NULL,
@@ -944,8 +944,8 @@ StageResultsMultiArmRatesR6 <- R6Class("StageResultsMultiArmRatesR6",
 #'
 #' @importFrom methods new
 #'
-StageResultsSurvivalR6 <- R6Class("StageResultsSurvivalR6",
-                                    inherit = StageResultsR6,
+StageResultsSurvival <- R6Class("StageResultsSurvival",
+                                    inherit = StageResults,
                                     public = list(
                                       combInverseNormal = NULL,
                                       combFisher = NULL,
@@ -1076,8 +1076,8 @@ StageResultsSurvivalR6 <- R6Class("StageResultsSurvivalR6",
 #'
 #' @importFrom methods new
 #'
-StageResultsMultiArmSurvivalR6 <- R6Class("StageResultsMultiArmSurvivalR6",
-                                            inherit = StageResultsR6,
+StageResultsMultiArmSurvival <- R6Class("StageResultsMultiArmSurvival",
+                                            inherit = StageResults,
                                             public = list(
                                               stage = NULL,
                                               combInverseNormal = NULL,
@@ -1207,8 +1207,8 @@ StageResultsMultiArmSurvivalR6 <- R6Class("StageResultsMultiArmSurvivalR6",
 #'
 #' @importFrom methods new
 #'
-StageResultsEnrichmentMeansR6 <- R6Class("StageResultsEnrichmentMeansR6",
-                                           inherit = StageResultsMultiArmMeansR6,
+StageResultsEnrichmentMeans <- R6Class("StageResultsEnrichmentMeans",
+                                           inherit = StageResultsMultiArmMeans,
                                            public = list(
                                              .overallSampleSizes1 = NULL,
                                              .overallSampleSizes2 = NULL,
@@ -1246,8 +1246,8 @@ StageResultsEnrichmentMeansR6 <- R6Class("StageResultsEnrichmentMeansR6",
 #'
 #' @importFrom methods new
 #'
-StageResultsEnrichmentRatesR6 <- R6Class("StageResultsEnrichmentRatesR6",
-                                           inherit = StageResultsMultiArmRatesR6,
+StageResultsEnrichmentRates <- R6Class("StageResultsEnrichmentRates",
+                                           inherit = StageResultsMultiArmRates,
                                            public = list(
                                              .overallSampleSizes1 = NULL,
                                              .overallSampleSizes2 = NULL,
@@ -1289,8 +1289,8 @@ StageResultsEnrichmentRatesR6 <- R6Class("StageResultsEnrichmentRatesR6",
 #'
 #' @importFrom methods new
 #'
-StageResultsEnrichmentSurvivalR6 <- R6Class("StageResultsEnrichmentSurvivalR6",
-                                              inherit = StageResultsMultiArmSurvivalR6,
+StageResultsEnrichmentSurvival <- R6Class("StageResultsEnrichmentSurvival",
+                                              inherit = StageResultsMultiArmSurvival,
                                               public = list(
                                                 stratifiedAnalysis = NULL,
                                                 .overallEvents = NULL,
@@ -1318,7 +1318,7 @@ StageResultsEnrichmentSurvivalR6 <- R6Class("StageResultsEnrichmentSurvivalR6",
 #'
 #' @keywords internal
 #'
-names.StageResultsR6 <- function(x) {
+names.StageResults <- function(x) {
   return(x$.getParametersToShow())
 }
 
@@ -1343,7 +1343,7 @@ names.StageResultsR6 <- function(x) {
 #'
 #' @keywords internal
 #'
-as.data.frame.StageResultsR6 <- function(x, row.names = NULL,
+as.data.frame.StageResults <- function(x, row.names = NULL,
                                        optional = FALSE, niceColumnNamesEnabled = FALSE,
                                        includeAllParameters = FALSE, type = 1, ...) {
   if (type == 1) {
@@ -1518,7 +1518,7 @@ as.data.frame.StageResultsR6 <- function(x, row.names = NULL,
 #' 
 #' @export
 #'
-plot.StageResultsR6 <- function(x, y, ..., type = 1L,
+plot.StageResults <- function(x, y, ..., type = 1L,
                               nPlanned, allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
                               main = NA_character_, xlab = NA_character_, ylab = NA_character_,
                               legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,

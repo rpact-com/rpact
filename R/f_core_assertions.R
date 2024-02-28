@@ -39,7 +39,7 @@ NULL
 }
 
 .isParameterSet <- function(x) {
-    return((isS4(x) || R6::is.R6(x)) && (inherits(x, "ParameterSet") || inherits(x, "ParameterSetR6")))
+    return((isS4(x) || R6::is.R6(x)) && (inherits(x, "ParameterSet") || inherits(x, "ParameterSet")))
 }
 
 .assertIsParameterSetClass <- function(x, objectName = "x") {
@@ -61,23 +61,23 @@ NULL
 }
 
 .isTrialDesignSet <- function(x) {
-    return(.getClassName(x) == "TrialDesignSet" || .getClassName(x) == "TrialDesignSetR6")
+    return(.getClassName(x) == "TrialDesignSet" || .getClassName(x) == "TrialDesignSet")
 }
 
 .isTrialDesignGroupSequential <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL || .getClassName(design) == "TrialDesignGroupSequentialR6")
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL || .getClassName(design) == "TrialDesignGroupSequential")
 }
 
 .isTrialDesignInverseNormal <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL || .getClassName(design) == "TrialDesignInverseNormalR6")
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL || .getClassName(design) == "TrialDesignInverseNormal")
 }
 
 .isTrialDesignFisher <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_FISHER || .getClassName(design) == "TrialDesignFisherR6")
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_FISHER || .getClassName(design) == "TrialDesignFisher")
 }
 
 .isTrialDesignConditionalDunnett <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT || .getClassName(design) == "TrialDesignConditionalDunnettR6")
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT || .getClassName(design) == "TrialDesignConditionalDunnett")
 }
 
 .isTrialDesignInverseNormalOrGroupSequential <- function(design) {
@@ -94,15 +94,15 @@ NULL
 }
 
 .isTrialDesignPlanMeans <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanMeans" || .getClassName(designPlan) == "TrialDesignPlanMeansR6")
+    return(.getClassName(designPlan) == "TrialDesignPlanMeans" || .getClassName(designPlan) == "TrialDesignPlanMeans")
 }
 
 .isTrialDesignPlanRates <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanRates" || .getClassName(designPlan) == "TrialDesignPlanRatesR6")
+    return(.getClassName(designPlan) == "TrialDesignPlanRates" || .getClassName(designPlan) == "TrialDesignPlanRates")
 }
 
 .isTrialDesignPlanSurvival <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanSurvival" || .getClassName(designPlan) == "TrialDesignPlanSurvivalR6")
+    return(.getClassName(designPlan) == "TrialDesignPlanSurvival" || .getClassName(designPlan) == "TrialDesignPlanSurvival")
 }
 
 .isTrialDesignPlan <- function(designPlan) {
@@ -197,7 +197,7 @@ NULL
 }
 
 .isSimulationResults <- function(simulationResults) {
-    return(inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResultsR6"))
+    return(inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResults"))
 }
 
 .assertIsSimulationResults <- function(simulationResults) {
@@ -210,23 +210,23 @@ NULL
 }
 
 .isStageResults <- function(stageResults) {
-    return(inherits(stageResults, "StageResults") || inherits(stageResults, "StageResultsR6"))
+    return(inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults"))
 }
 
 .isStageResultsMultiArmMeans <- function(stageResults) {
-    return(.getClassName(stageResults) == "StageResultsMultiArmMeans" || .getClassName(stageResults) == "StageResultsMultiArmMeansR6")
+    return(.getClassName(stageResults) == "StageResultsMultiArmMeans" || .getClassName(stageResults) == "StageResultsMultiArmMeans")
 }
 
 .isStageResultsMultiArmSurvival <- function(stageResults) {
-    return(.getClassName(stageResults) == "StageResultsMultiArmSurvival" || .getClassName(stageResults) == "StageResultsMultiArmSurvivalR6")
+    return(.getClassName(stageResults) == "StageResultsMultiArmSurvival" || .getClassName(stageResults) == "StageResultsMultiArmSurvival")
 }
 
 .isStageResultsEnrichmentMeans <- function(stageResults) {
-    return(.getClassName(stageResults) == "StageResultsEnrichmentMeans" || .getClassName(stageResults) == "StageResultsEnrichmentMeansR6")
+    return(.getClassName(stageResults) == "StageResultsEnrichmentMeans" || .getClassName(stageResults) == "StageResultsEnrichmentMeans")
 }
 
 .isStageResultsEnrichmentSurvival <- function(stageResults) {
-    return(.getClassName(stageResults) == "StageResultsEnrichmentSurvival" || .getClassName(stageResults) == "StageResultsEnrichmentSurvivalR6")
+    return(.getClassName(stageResults) == "StageResultsEnrichmentSurvival" || .getClassName(stageResults) == "StageResultsEnrichmentSurvival")
 }
 
 .assertIsStageResults <- function(stageResults) {
@@ -447,15 +447,15 @@ NULL
 }
 
 .isDatasetMeans <- function(dataInput) {
-    return(inherits(dataInput, "DatasetMeans") || inherits(dataInput, "DatasetMeansR6"))
+    return(inherits(dataInput, "DatasetMeans") || inherits(dataInput, "DatasetMeans"))
 }
 
 .isDatasetRates <- function(dataInput) {
-    return(inherits(dataInput, "DatasetRates") || inherits(dataInput, "DatasetRatesR6"))
+    return(inherits(dataInput, "DatasetRates") || inherits(dataInput, "DatasetRates"))
 }
 
 .isDatasetSurvival <- function(dataInput) {
-    return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetSurvivalR6") || inherits(dataInput, "DatasetEnrichmentSurvival") || inherits(dataInput, "DatasetEnrichmentSurvivalR6"))
+    return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
 .assertIsNumericVector <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = TRUE) {
@@ -1340,7 +1340,7 @@ NULL
     for (i in 1:length(args)) {
         arg <- args[[i]]
         argName <- ifelse(is.null(argNames[i]) || argNames[i] == "",
-            ifelse(inherits(arg, "StageResults") || inherits(arg, "StageResultsR6"), "stageResultsName", paste0("%param", i, "%")),
+            ifelse(inherits(arg, "StageResults") || inherits(arg, "StageResults"), "stageResultsName", paste0("%param", i, "%")),
             argNames[i]
         )
         if (!(argName %in% ignore) && !grepl("^\\.", argName)) {
@@ -2146,24 +2146,24 @@ NULL
 }
 
 .isMultiArmDataset <- function(dataInput) {
-    return((inherits(dataInput, "Dataset") || inherits(dataInput, "DatasetR6")) && dataInput$getNumberOfGroups() > 2)
+    return((inherits(dataInput, "Dataset") || inherits(dataInput, "Dataset")) && dataInput$getNumberOfGroups() > 2)
 }
 
 .isMultiArmStageResults <- function(stageResults) {
-    return((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResultsR6")) && grepl("MultiArm", .getClassName(stageResults)))
+    return((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults")) && grepl("MultiArm", .getClassName(stageResults)))
 }
 
 .isEnrichmentStageResults <- function(stageResults) {
-    return((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResultsR6")) && grepl("Enrichment", .getClassName(stageResults)))
+    return((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults")) && grepl("Enrichment", .getClassName(stageResults)))
 }
 
 .isEnrichmentConditionalPowerResults <- function(conditionalPowerResults) {
-    return((inherits(conditionalPowerResults, "ConditionalPowerResults") || inherits(conditionalPowerResults, "ConditionalPowerResultsR6")) &&
+    return((inherits(conditionalPowerResults, "ConditionalPowerResults") || inherits(conditionalPowerResults, "ConditionalPowerResults")) &&
         grepl("Enrichment", .getClassName(conditionalPowerResults)))
 }
 
 .isMultiArmAnalysisResults <- function(analysisResults) {
-    return((inherits(analysisResults, "AnalysisResultsMultiArm") || inherits(analysisResults, "AnalysisResultsMultiArmR6")))
+    return((inherits(analysisResults, "AnalysisResultsMultiArm") || inherits(analysisResults, "AnalysisResultsMultiArm")))
 }
 
 .isMultiHypothesesAnalysisResults <- function(x) {
@@ -2171,23 +2171,23 @@ NULL
 }
 
 .isEnrichmentDataset <- function(dataInput) {
-    return((inherits(dataInput, "Dataset") || inherits(dataInput, "DatasetR6")) && dataInput$.enrichmentEnabled)
+    return((inherits(dataInput, "Dataset") || inherits(dataInput, "Dataset")) && dataInput$.enrichmentEnabled)
 }
 
 .isEnrichmentAnalysisResults <- function(analysisResults) {
-    return(inherits(analysisResults, "AnalysisResultsEnrichment") || inherits(analysisResults, "AnalysisResultsEnrichmentR6"))
+    return(inherits(analysisResults, "AnalysisResultsEnrichment") || inherits(analysisResults, "AnalysisResultsEnrichment"))
 }
 
 .isMultiArmSimulationResults <- function(simulationResults) {
-    return((inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResultsR6")) && grepl("MultiArm", .getClassName(simulationResults)))
+    return((inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResults")) && grepl("MultiArm", .getClassName(simulationResults)))
 }
 
 .isEnrichmentSimulationResults <- function(simulationResults) {
-    return((inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResultsR6")) && grepl("Enrichment", .getClassName(simulationResults)))
+    return((inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResults")) && grepl("Enrichment", .getClassName(simulationResults)))
 }
 
 .assertIsStageResultsMultiArm <- function(stageResults) {
-    if (!(inherits(stageResults, "StageResults") || inherits(stageResults, "StageResultsR6"))) {
+    if (!(inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults"))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a multi-arm stage results object (is ", .getClassName(stageResults), ")"
@@ -2203,14 +2203,14 @@ NULL
 }
 
 .assertIsStageResultsNonMultiHypotheses <- function(stageResults) {
-    if ((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResultsR6")) && .isMultiArmStageResults(stageResults)) {
+    if ((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults")) && .isMultiArmStageResults(stageResults)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a non-multi-arm object (is ", .getClassName(stageResults), ")"
         )
     }
 
-    if ((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResultsR6")) && .isEnrichmentStageResults(stageResults)) {
+    if ((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults")) && .isEnrichmentStageResults(stageResults)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a non-enrichment object (is ", .getClassName(stageResults), ")"
@@ -2221,9 +2221,9 @@ NULL
         "StageResultsMeans",
         "StageResultsRates",
         "StageResultsSurvival",
-        "StageResultsMeansR6",
-        "StageResultsRatesR6",
-        "StageResultsSurvivalR6"
+        "StageResultsMeans",
+        "StageResultsRates",
+        "StageResultsSurvival"
     )
     if (!(.getClassName(stageResults) %in% allowedClasses)) {
         stop(
@@ -2250,7 +2250,7 @@ NULL
 }
 
 .assertIsAnalysisResults <- function(analysisResults) {
-    if (!(inherits(analysisResults, "AnalysisResults") || inherits(analysisResults, "AnalysisResultsR6"))) {
+    if (!(inherits(analysisResults, "AnalysisResults") || inherits(analysisResults, "AnalysisResults"))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'analysisResults' must be a valid 'AnalysisResults' object ",
             " (is '", .getClassName(analysisResults), "')"

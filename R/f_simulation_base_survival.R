@@ -377,7 +377,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         endpoint = "survival", calcSubjectsFunctionEnabled = FALSE
     )
 
-    simulationResults <- SimulationResultsSurvivalR6$new(design, showStatistics = showStatistics)
+    simulationResults <- SimulationResultsSurvival$new(design, showStatistics = showStatistics)
     if (!is.na(conditionalPower)) {
         if (design$kMax > 1) {
             if (any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0) &&

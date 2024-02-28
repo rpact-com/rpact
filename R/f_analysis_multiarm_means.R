@@ -59,7 +59,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmInverseNormalR6$new(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design, dataInput = dataInput,
@@ -97,7 +97,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmFisherR6$new(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmFisher$new(design = design, dataInput = dataInput)
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -133,7 +133,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsConditionalDunnettR6$new(design = design, dataInput = dataInput)
+    results <- AnalysisResultsConditionalDunnett$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design,
@@ -327,7 +327,7 @@ NULL
 						select 'varianceOption' = \"overallPooled\"", call. = FALSE)
     }
 
-    stageResults <- StageResultsMultiArmMeansR6$new(
+    stageResults <- StageResultsMultiArmMeans$new(
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
@@ -1001,7 +1001,7 @@ NULL
     gMax <- stageResults$getGMax()
     kMax <- design$kMax
 
-    results <- ConditionalPowerResultsMultiArmMeansR6$new(
+    results <- ConditionalPowerResultsMultiArmMeans$new(
         .design = design,
         .stageResults = stageResults,
         thetaH1 = thetaH1,
@@ -1380,7 +1380,7 @@ NULL
         sqrt(1 / stageResults$.dataInput$getOverallSampleSizes(stage = stage, group = gMax + 1) +
             1 / stageResults$.dataInput$getOverallSampleSizes(stage = stage, group = (1:gMax)))
 
-    results <- ConditionalPowerResultsMultiArmMeansR6$new(
+    results <- ConditionalPowerResultsMultiArmMeans$new(
         .design = design,
         .stageResults = stageResults,
         assumedStDevs = assumedStDevs,

@@ -24,7 +24,7 @@ library("R6")
 NULL
 
 #'
-#' @name FieldSetR6
+#' @name FieldSet
 #'
 #' @title
 #' Field Set
@@ -41,7 +41,7 @@ NULL
 #'
 #' @importFrom methods new
 #'
-FieldSetR6 <- R6Class("FieldSetR6",
+FieldSet <- R6Class("FieldSet",
                         public = list(
                           .parameterTypes = NULL,
                           .parameterNames = NULL,
@@ -169,7 +169,7 @@ FieldSetR6 <- R6Class("FieldSetR6",
 )
 
 #'
-#' @name ParameterSetR6
+#' @name ParameterSet
 #'
 #' @title
 #' Parameter Set
@@ -189,8 +189,8 @@ FieldSetR6 <- R6Class("FieldSetR6",
 #'
 #' @importFrom methods new
 #'
-ParameterSetR6 <- R6Class("ParameterSetR6",
-                            inherit = FieldSetR6,
+ParameterSet <- R6Class("ParameterSet",
+                            inherit = FieldSet,
                             public = list(
                               initialize = function(..., .showParameterTypeEnabled = TRUE) {
                                 self$.showParameterTypeEnabled <- .showParameterTypeEnabled
@@ -581,7 +581,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
                                 }
                                 if (!is.null(category) && !is.na(category)) {
                                   if (.isMultiArmSimulationResults(self) && paramName == "singleNumberOfEventsPerStage") {
-                                    if (!(inherits(self, "SimulationResultsEnrichmentSurvival") || inherits(self, "SimulationResultsEnrichmentSurvivalR6")) &&
+                                    if (!(inherits(self, "SimulationResultsEnrichmentSurvival") || inherits(self, "SimulationResultsEnrichmentSurvival")) &&
                                         !is.na(numberOfCategories) && numberOfCategories == category) {
                                       category <- "control"
                                     }
@@ -638,7 +638,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
                                       }
                                     }
                                   } else if (.isMultiArmAnalysisResults(self) || grepl("StageResultsMultiArm", .getClassName(self)) ||
-                                             ((inherits(self, "SimulationResults") || inherits(self, "SimulationResultsR6")) && paramName == "effectMatrix") ||
+                                             ((inherits(self, "SimulationResults") || inherits(self, "SimulationResults")) && paramName == "effectMatrix") ||
                                              (inherits(self, "ClosedCombinationTestResults") &&
                                               paramName %in% c("rejected", "separatePValues"))) {
                                     paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
@@ -1293,7 +1293,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
     parametersToIgnore <- c(parametersToIgnore, "hazardRatio")
   }
   
-  if (!(inherits(parameterSet, "AccrualTime") || !inherits(parameterSet, "AccrualTimeR6"))) {
+  if (!(inherits(parameterSet, "AccrualTime") || !inherits(parameterSet, "AccrualTime"))) {
     accrualTime <- parameterSet[["accrualTime"]]
     if (!is.null(accrualTime) && length(accrualTime) > 1) {
       parametersToIgnore <- c(parametersToIgnore, c("accrualTime", "accrualIntensity"))
@@ -1367,7 +1367,7 @@ ParameterSetR6 <- R6Class("ParameterSetR6",
 #'
 #' @keywords internal
 #'
-names.FieldSetR6 <- function(x) {
+names.FieldSet <- function(x) {
   return(x$.getVisibleFieldNames())
 }
 
@@ -1388,7 +1388,7 @@ names.FieldSetR6 <- function(x) {
 #'
 #' @keywords internal
 #'
-print.FieldSetR6 <- function(x, ...) {
+print.FieldSet <- function(x, ...) {
   x$show()
   invisible(x)
 }
@@ -1414,7 +1414,7 @@ print.FieldSetR6 <- function(x, ...) {
 #'
 #' @keywords internal
 #'
-as.data.frame.ParameterSetR6 <- function(x, row.names = NULL,
+as.data.frame.ParameterSet <- function(x, row.names = NULL,
                                        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
   .warnInCaseOfUnknownArguments(functionName = "as.data.frame", ...)
   
@@ -1470,9 +1470,9 @@ as.data.frame.ParameterSetR6 <- function(x, row.names = NULL,
 #'
 #' @export
 #'
-kable.ParameterSetR6 <- function(x, ...) {
+kable.ParameterSet <- function(x, ...) {
   fCall <- match.call(expand.dots = FALSE)
-  if (inherits(x, "ParameterSetR6")) {
+  if (inherits(x, "ParameterSet")) {
     objName <- deparse(fCall$x)
     if (all(grepl("^ *print\\(", objName))) {
       stop(
@@ -1510,7 +1510,7 @@ kable.ParameterSetR6 <- function(x, ...) {
 #'
 #' @export
 #'
-setGeneric("kable", kable.ParameterSetR6)
+setGeneric("kable", kable.ParameterSet)
 
 #'
 #' @title
@@ -1534,7 +1534,7 @@ setGeneric("kable", kable.ParameterSetR6)
 #'
 #' @keywords internal
 #'
-as.matrix.FieldSetR6 <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEnabled = TRUE) {
+as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEnabled = TRUE) {
   dataFrame <- as.data.frame(x, niceColumnNamesEnabled = niceColumnNamesEnabled)
   dataFrame <- .setStagesAsFirstColumn(dataFrame)
   result <- as.matrix(dataFrame)
@@ -1543,7 +1543,7 @@ as.matrix.FieldSetR6 <- function(x, ..., enforceRowNames = TRUE, niceColumnNames
     return(result)
   }
   
-  if (inherits(x, "PowerAndAverageSampleNumberResult") || inherits(x, "PowerAndAverageSampleNumberResultR6")) {
+  if (inherits(x, "PowerAndAverageSampleNumberResult") || inherits(x, "PowerAndAverageSampleNumberResult")) {
     dimnames(result)[[1]] <- rep("", nrow(result))
     return(result)
   }
@@ -1614,17 +1614,17 @@ as.matrix.FieldSetR6 <- function(x, ..., enforceRowNames = TRUE, niceColumnNames
 #'
 #' @keywords internal
 #'
-summary.ParameterSetR6 <- function(object, ..., type = 1, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
+summary.ParameterSet <- function(object, ..., type = 1, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
   .warnInCaseOfUnknownArguments(functionName = "summary", ...)
   
-  if (type == 1 && (inherits(object, "SummaryFactory") || inherits(object, "SummaryFactoryR6"))) {
+  if (type == 1 && (inherits(object, "SummaryFactory") || inherits(object, "SummaryFactory"))) {
     return(object)
   }
   
-  if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesignR6") || inherits(object, "TrialDesignPlan") || inherits(object, "TrialDesignPlanR6") ||
-                    inherits(object, "SimulationResults") || inherits(object, "SimulationResultsR6") || (inherits(object, "AnalysisResults") || inherits(object, "AnalysisResultsR6")) ||
-                    inherits(object, "TrialDesignCharacteristics") || inherits(object, "TrialDesignCharacteristicsR6") ||
-                    inherits(object, "PerformanceScore") || inherits(object, "PerformanceScoreR6"))) {
+  if (type == 1 && (inherits(object, "TrialDesign") || inherits(object, "TrialDesign") || inherits(object, "TrialDesignPlan") || inherits(object, "TrialDesignPlan") ||
+                    inherits(object, "SimulationResults") || inherits(object, "SimulationResults") || (inherits(object, "AnalysisResults") || inherits(object, "AnalysisResults")) ||
+                    inherits(object, "TrialDesignCharacteristics") || inherits(object, "TrialDesignCharacteristics") ||
+                    inherits(object, "PerformanceScore") || inherits(object, "PerformanceScore"))) {
     output <- match.arg(output)
     return(.createSummary(object, digits = digits, output = output))
   }
@@ -1673,7 +1673,7 @@ summary.ParameterSetR6 <- function(object, ..., type = 1, digits = NA_integer_, 
 #'
 #' @keywords internal
 #'
-print.ParameterSetR6 <- function(x, ..., markdown = FALSE) {
+print.ParameterSet <- function(x, ..., markdown = FALSE) {
   if (markdown) {
     x$.catMarkdownText()
     return(invisible(x))
@@ -1709,7 +1709,7 @@ print.ParameterSetR6 <- function(x, ..., markdown = FALSE) {
 #'
 #' @export
 #'
-plot.ParameterSetR6 <- function(x, y, ..., main = NA_character_,
+plot.ParameterSet <- function(x, y, ..., main = NA_character_,
                               xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
                               legendPosition = NA_integer_, showSource = FALSE, plotSettings = NULL) {
   .assertGgplotIsInstalled()

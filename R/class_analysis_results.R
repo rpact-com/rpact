@@ -45,8 +45,8 @@ library("R6")
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsR6 <- R6Class("ConditionalPowerResultsR6",
-                                       inherit = ParameterSetR6,
+ConditionalPowerResults <- R6Class("ConditionalPowerResults",
+                                       inherit = ParameterSet,
                                        public = list(
                                          .plotSettings = NULL,
                                          .design = NULL,
@@ -69,7 +69,7 @@ ConditionalPowerResultsR6 <- R6Class("ConditionalPowerResultsR6",
                                            
                                            super$initialize(...)
                                            
-                                           self$.plotSettings <- PlotSettingsR6$new()
+                                           self$.plotSettings <- PlotSettings$new()
                                            self$.parameterNames <- C_PARAMETER_NAMES
                                            self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                            
@@ -156,8 +156,8 @@ ConditionalPowerResultsR6 <- R6Class("ConditionalPowerResultsR6",
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsMeansR6 <- R6Class("ConditionalPowerResultsMeansR6",
-                                            inherit = ConditionalPowerResultsR6,
+ConditionalPowerResultsMeans <- R6Class("ConditionalPowerResultsMeans",
+                                            inherit = ConditionalPowerResults,
                                             public = list(
                                               conditionalPower = NULL,
                                               thetaH1 = NULL,
@@ -187,8 +187,8 @@ ConditionalPowerResultsMeansR6 <- R6Class("ConditionalPowerResultsMeansR6",
                                             )
 )
 
-ConditionalPowerResultsMultiHypothesesR6 <- R6Class("ConditionalPowerResultsMultiHypothesesR6",
-                                                      inherit = ConditionalPowerResultsR6,
+ConditionalPowerResultsMultiHypotheses <- R6Class("ConditionalPowerResultsMultiHypotheses",
+                                                      inherit = ConditionalPowerResults,
                                                       public = list(
                                                         conditionalPower = NULL,
                                                         initialize = function(..., conditionalPower = NULL) {
@@ -240,8 +240,8 @@ ConditionalPowerResultsMultiHypothesesR6 <- R6Class("ConditionalPowerResultsMult
                                                       )
 )
 
-ConditionalPowerResultsMultiArmMeansR6 <- R6Class("ConditionalPowerResultsMultiArmMeansR6",
-                                                    inherit = ConditionalPowerResultsMultiHypothesesR6,
+ConditionalPowerResultsMultiArmMeans <- R6Class("ConditionalPowerResultsMultiArmMeans",
+                                                    inherit = ConditionalPowerResultsMultiHypotheses,
                                                     public = list(
                                                       thetaH1 = NULL,
                                                       assumedStDevs = NULL,
@@ -289,8 +289,8 @@ ConditionalPowerResultsMultiArmMeansR6 <- R6Class("ConditionalPowerResultsMultiA
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsRatesR6 <- R6Class("ConditionalPowerResultsRatesR6",
-                                            inherit = ConditionalPowerResultsR6,
+ConditionalPowerResultsRates <- R6Class("ConditionalPowerResultsRates",
+                                            inherit = ConditionalPowerResults,
                                             public = list(
                                               conditionalPower = NULL,
                                               pi1 = NULL,
@@ -322,8 +322,8 @@ ConditionalPowerResultsRatesR6 <- R6Class("ConditionalPowerResultsRatesR6",
                                             )
 )
 
-ConditionalPowerResultsMultiArmRatesR6 <- R6Class("ConditionalPowerResultsMultiArmRatesR6",
-                                                    inherit = ConditionalPowerResultsMultiHypothesesR6,
+ConditionalPowerResultsMultiArmRates <- R6Class("ConditionalPowerResultsMultiArmRates",
+                                                    inherit = ConditionalPowerResultsMultiHypotheses,
                                                     public = list(
                                                       piTreatments = NULL,
                                                       piControl = NULL,
@@ -370,8 +370,8 @@ ConditionalPowerResultsMultiArmRatesR6 <- R6Class("ConditionalPowerResultsMultiA
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsSurvivalR6 <- R6Class("ConditionalPowerResultsSurvivalR6",
-                                               inherit = ConditionalPowerResultsR6,
+ConditionalPowerResultsSurvival <- R6Class("ConditionalPowerResultsSurvival",
+                                               inherit = ConditionalPowerResults,
                                                public = list(
                                                  conditionalPower = NULL,
                                                  thetaH1 = NULL,
@@ -395,8 +395,8 @@ ConditionalPowerResultsSurvivalR6 <- R6Class("ConditionalPowerResultsSurvivalR6"
                                                )
 )
 
-ConditionalPowerResultsMultiArmSurvivalR6 <- R6Class("ConditionalPowerResultsMultiArmSurvivalR6",
-                                                       inherit = ConditionalPowerResultsMultiHypothesesR6,
+ConditionalPowerResultsMultiArmSurvival <- R6Class("ConditionalPowerResultsMultiArmSurvival",
+                                                       inherit = ConditionalPowerResultsMultiHypotheses,
                                                        public = list(
                                                          thetaH1 = NULL,
                                                          initialize = function(..., thetaH1 = NULL) {
@@ -439,8 +439,8 @@ ConditionalPowerResultsMultiArmSurvivalR6 <- R6Class("ConditionalPowerResultsMul
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsEnrichmentMeansR6 <- R6Class("ConditionalPowerResultsEnrichmentMeansR6",
-                                                      inherit = ConditionalPowerResultsMultiArmMeansR6
+ConditionalPowerResultsEnrichmentMeans <- R6Class("ConditionalPowerResultsEnrichmentMeans",
+                                                      inherit = ConditionalPowerResultsMultiArmMeans
 )
 
 #'
@@ -469,8 +469,8 @@ ConditionalPowerResultsEnrichmentMeansR6 <- R6Class("ConditionalPowerResultsEnri
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsEnrichmentRatesR6 <- R6Class("ConditionalPowerResultsEnrichmentRatesR6",
-                                                      inherit = ConditionalPowerResultsMultiHypothesesR6,
+ConditionalPowerResultsEnrichmentRates <- R6Class("ConditionalPowerResultsEnrichmentRates",
+                                                      inherit = ConditionalPowerResultsMultiHypotheses,
                                                       public = list(
                                                         piTreatments = NULL,
                                                         piControls = NULL,
@@ -493,8 +493,8 @@ ConditionalPowerResultsEnrichmentRatesR6 <- R6Class("ConditionalPowerResultsEnri
 )
 
 
-ConditionalPowerResultsEnrichmentSurvivalR6 <- R6Class("ConditionalPowerResultsEnrichmentSurvivalR6",
-                                                         inherit = ConditionalPowerResultsMultiArmSurvivalR6
+ConditionalPowerResultsEnrichmentSurvival <- R6Class("ConditionalPowerResultsEnrichmentSurvival",
+                                                         inherit = ConditionalPowerResultsMultiArmSurvival
 )
 
 #'
@@ -524,8 +524,8 @@ ConditionalPowerResultsEnrichmentSurvivalR6 <- R6Class("ConditionalPowerResultsE
 #'
 #' @importFrom methods new
 #'
-ClosedCombinationTestResultsR6 <- R6Class("ClosedCombinationTestResultsR6",
-                                            inherit = ParameterSetR6,
+ClosedCombinationTestResults <- R6Class("ClosedCombinationTestResults",
+                                            inherit = ParameterSet,
                                             public = list(
                                               .plotSettings = NULL,
                                               .design = NULL,
@@ -564,7 +564,7 @@ ClosedCombinationTestResultsR6 <- R6Class("ClosedCombinationTestResultsR6",
                                                 
                                                 super$initialize(...)
                                                 
-                                                self$.plotSettings <- PlotSettingsR6$new()
+                                                self$.plotSettings <- PlotSettings$new()
                                                 self$.parameterNames <- C_PARAMETER_NAMES
                                                 self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                                 
@@ -725,8 +725,8 @@ ClosedCombinationTestResultsR6 <- R6Class("ClosedCombinationTestResultsR6",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsR6 <- R6Class("AnalysisResultsR6",
-                               inherit = ParameterSetR6,
+AnalysisResults <- R6Class("AnalysisResults",
+                               inherit = ParameterSet,
                                public = list(
                                  .plotSettings = NULL,
                                  .design = NULL,
@@ -750,7 +750,7 @@ AnalysisResultsR6 <- R6Class("AnalysisResultsR6",
                                    
                                    super$initialize(...)
                                    
-                                   self$.plotSettings <- PlotSettingsR6$new()
+                                   self$.plotSettings <- PlotSettings$new()
                                    self$.parameterNames <- .getParameterNames(design = design, analysisResults = self)
                                    self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                  },
@@ -911,9 +911,9 @@ AnalysisResultsR6 <- R6Class("AnalysisResultsR6",
                                  },
                                  .toString = function(startWithUpperCase = FALSE) {
                                    str <- "analysis results"
-                                   if (inherits(self, "AnalysisResultsMultiArmR6")) {
+                                   if (inherits(self, "AnalysisResultsMultiArm")) {
                                      str <- paste0("multi-arm ", str)
-                                   } else if (inherits(self, "AnalysisResultsEnrichmentR6")) {
+                                   } else if (inherits(self, "AnalysisResultsEnrichment")) {
                                      str <- paste0("enrichment ", str)
                                    }
                                    if (startWithUpperCase) {
@@ -960,8 +960,8 @@ AnalysisResultsR6 <- R6Class("AnalysisResultsR6",
                                )
 )
 
-AnalysisResultsBaseR6 <- R6Class("AnalysisResultsBaseR6",
-                                   inherit = AnalysisResultsR6,
+AnalysisResultsBase <- R6Class("AnalysisResultsBase",
+                                   inherit = AnalysisResults,
                                    public = list(
                                      thetaH1 = NULL,
                                      assumedStDev = NULL,
@@ -1039,8 +1039,8 @@ AnalysisResultsBaseR6 <- R6Class("AnalysisResultsBaseR6",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiHypothesesR6 <- R6Class("AnalysisResultsMultiHypothesesR6",
-                                              inherit = AnalysisResultsR6,
+AnalysisResultsMultiHypotheses <- R6Class("AnalysisResultsMultiHypotheses",
+                                              inherit = AnalysisResults,
                                               public = list(
                                                 .closedTestResults = NULL,
                                                 thetaH1 = NULL, # means only
@@ -1112,8 +1112,8 @@ AnalysisResultsMultiHypothesesR6 <- R6Class("AnalysisResultsMultiHypothesesR6",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiArmR6 <- R6Class("AnalysisResultsMultiArmR6",
-                                       inherit = AnalysisResultsMultiHypothesesR6,
+AnalysisResultsMultiArm <- R6Class("AnalysisResultsMultiArm",
+                                       inherit = AnalysisResultsMultiHypotheses,
                                        public = list(
                                          piControl = NULL, # rates only
                                          initialize = function(design, dataInput, ..., piControl = NULL) {
@@ -1165,8 +1165,8 @@ AnalysisResultsMultiArmR6 <- R6Class("AnalysisResultsMultiArmR6",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsEnrichmentR6 <- R6Class("AnalysisResultsEnrichmentR6",
-                                         inherit = AnalysisResultsMultiHypothesesR6,
+AnalysisResultsEnrichment <- R6Class("AnalysisResultsEnrichment",
+                                         inherit = AnalysisResultsMultiHypotheses,
                                          public = list(
                                            piControls = NULL, # rates only
                                            initialize = function(design, dataInput, ..., piControls = NULL) {
@@ -1200,8 +1200,8 @@ AnalysisResultsEnrichmentR6 <- R6Class("AnalysisResultsEnrichmentR6",
 #'
 #' @keywords internal
 #'
-summary.AnalysisResultsR6 <- function(object, ..., type = 1, digits = NA_integer_) {
-  return(summary.ParameterSetR6(object = object, ..., type = type, digits = digits))
+summary.AnalysisResults <- function(object, ..., type = 1, digits = NA_integer_) {
+  return(summary.ParameterSet(object = object, ..., type = type, digits = digits))
 }
 
 #'
@@ -1224,11 +1224,11 @@ summary.AnalysisResultsR6 <- function(object, ..., type = 1, digits = NA_integer
 #'
 #' @keywords internal
 #'
-as.data.frame.AnalysisResultsR6 <- function(x, row.names = NULL, optional = FALSE, ..., 
+as.data.frame.AnalysisResults <- function(x, row.names = NULL, optional = FALSE, ...,
                                           niceColumnNamesEnabled = FALSE) {
   
   parametersToShow <- .getDesignParametersToShow(x)
-  if (inherits(x, "AnalysisResultsMultiArmR6")) {
+  if (inherits(x, "AnalysisResultsMultiArm")) {
     parametersToShow <- c(parametersToShow, ".closedTestResults$rejected")
   }
   parametersToShow <- c(parametersToShow, x$.getUserDefinedParameters())
@@ -1265,7 +1265,7 @@ as.data.frame.AnalysisResultsR6 <- function(x, row.names = NULL, optional = FALS
 #'
 #' @keywords internal
 #'
-names.AnalysisResultsR6 <- function(x) {
+names.AnalysisResults <- function(x) {
   namesToShow <- c(".design", ".dataInput", ".stageResults", ".conditionalPowerResults")
   if (.isMultiArmAnalysisResults(x)) {
     namesToShow <- c(namesToShow, ".closedTestResults")
@@ -1321,8 +1321,8 @@ names.AnalysisResultsR6 <- function(x) {
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsGroupSequentialR6 <- R6Class("AnalysisResultsGroupSequentialR6",
-                                              inherit = AnalysisResultsBaseR6,
+AnalysisResultsGroupSequential <- R6Class("AnalysisResultsGroupSequential",
+                                              inherit = AnalysisResultsBase,
                                               public = list(
                                                 maxInformation = NULL,
                                                 informationEpsilon = NULL,
@@ -1383,8 +1383,8 @@ AnalysisResultsGroupSequentialR6 <- R6Class("AnalysisResultsGroupSequentialR6",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsInverseNormalR6 <- R6Class("AnalysisResultsInverseNormalR6",
-                                            inherit = AnalysisResultsBaseR6
+AnalysisResultsInverseNormal <- R6Class("AnalysisResultsInverseNormal",
+                                            inherit = AnalysisResultsBase
 )
 
 #'
@@ -1429,8 +1429,8 @@ AnalysisResultsInverseNormalR6 <- R6Class("AnalysisResultsInverseNormalR6",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiArmInverseNormalR6 <- R6Class("AnalysisResultsMultiArmInverseNormalR6",
-                                                    inherit = AnalysisResultsMultiArmR6
+AnalysisResultsMultiArmInverseNormal <- R6Class("AnalysisResultsMultiArmInverseNormal",
+                                                    inherit = AnalysisResultsMultiArm
 )
 
 #'
@@ -1476,8 +1476,8 @@ AnalysisResultsMultiArmInverseNormalR6 <- R6Class("AnalysisResultsMultiArmInvers
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsEnrichmentInverseNormalR6 <- R6Class("AnalysisResultsEnrichmentInverseNormalR6",
-                                                      inherit = AnalysisResultsEnrichmentR6,
+AnalysisResultsEnrichmentInverseNormal <- R6Class("AnalysisResultsEnrichmentInverseNormal",
+                                                      inherit = AnalysisResultsEnrichment,
                                                       public = list(
                                                         stratifiedAnalysis = NULL
                                                       )
@@ -1531,8 +1531,8 @@ AnalysisResultsEnrichmentInverseNormalR6 <- R6Class("AnalysisResultsEnrichmentIn
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsFisherR6 <- R6Class("AnalysisResultsFisherR6",
-                                     inherit = AnalysisResultsBaseR6,
+AnalysisResultsFisher <- R6Class("AnalysisResultsFisher",
+                                     inherit = AnalysisResultsBase,
                                      public = list(
                                        conditionalPowerSimulated = NULL,
                                        iterations = NULL,
@@ -1589,8 +1589,8 @@ AnalysisResultsFisherR6 <- R6Class("AnalysisResultsFisherR6",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiArmFisherR6 <- R6Class("AnalysisResultsMultiArmFisherR6",
-                                             inherit = AnalysisResultsMultiArmR6,
+AnalysisResultsMultiArmFisher <- R6Class("AnalysisResultsMultiArmFisher",
+                                             inherit = AnalysisResultsMultiArm,
                                              public = list(
                                                conditionalPowerSimulated = NULL,
                                                iterations = NULL,
@@ -1643,8 +1643,8 @@ AnalysisResultsMultiArmFisherR6 <- R6Class("AnalysisResultsMultiArmFisherR6",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsEnrichmentFisherR6 <- R6Class("AnalysisResultsEnrichmentFisherR6",
-                                               inherit = AnalysisResultsEnrichmentR6,
+AnalysisResultsEnrichmentFisher <- R6Class("AnalysisResultsEnrichmentFisher",
+                                               inherit = AnalysisResultsEnrichment,
                                                public = list(
                                                  conditionalPowerSimulated = NULL,
                                                  iterations = NULL,
@@ -1689,8 +1689,8 @@ AnalysisResultsEnrichmentFisherR6 <- R6Class("AnalysisResultsEnrichmentFisherR6"
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsConditionalDunnettR6 <- R6Class("AnalysisResultsConditionalDunnettR6",
-                                                 inherit = AnalysisResultsMultiArmR6,
+AnalysisResultsConditionalDunnett <- R6Class("AnalysisResultsConditionalDunnett",
+                                                 inherit = AnalysisResultsMultiArm,
                                                  public = list()
 )
 
@@ -1837,7 +1837,7 @@ AnalysisResultsConditionalDunnettR6 <- R6Class("AnalysisResultsConditionalDunnet
 #'
 #' @export
 #'
-plot.AnalysisResultsR6 <- function(x, y, ..., type = 1L,
+plot.AnalysisResults <- function(x, y, ..., type = 1L,
                                  nPlanned = NA_real_,
                                  allocationRatioPlanned = NA_real_,
                                  main = NA_character_, xlab = NA_character_, ylab = NA_character_,

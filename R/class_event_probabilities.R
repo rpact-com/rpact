@@ -56,8 +56,8 @@
 #'
 #' @keywords internal
 #'
-EventProbabilitiesR6 <- R6Class("EventProbabilitiesR6",
-    inherit = ParameterSetR6,
+EventProbabilities <- R6Class("EventProbabilities",
+    inherit = ParameterSet,
     public = list(
         .piecewiseSurvivalTime = NULL,
         .accrualTime = NULL,
@@ -113,7 +113,7 @@ EventProbabilitiesR6 <- R6Class("EventProbabilitiesR6",
             #TODO callSuper(...)
             super$initialize()
             
-            self$.plotSettings <- PlotSettingsR6$new()
+            self$.plotSettings <- PlotSettings$new()
             self$.parameterNames <- C_PARAMETER_NAMES
             self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
             self$.setParameterType("overallEventProbabilities", C_PARAM_NOT_APPLICABLE) # deprecated
@@ -182,8 +182,8 @@ EventProbabilitiesR6 <- R6Class("EventProbabilitiesR6",
 #'
 #' @keywords internal
 #'
-NumberOfSubjectsR6 <- R6Class("NumberOfSubjectsR6",
-    inherit = ParameterSetR6,
+NumberOfSubjects <- R6Class("NumberOfSubjects",
+    inherit = ParameterSet,
     public = list(
         .accrualTime = NULL,
         .plotSettings = NULL,
@@ -208,7 +208,7 @@ NumberOfSubjectsR6 <- R6Class("NumberOfSubjectsR6",
             #TODO callSuper(...)
             super$initialize()
             
-            self$.plotSettings <- PlotSettingsR6$new()
+            self$.plotSettings <- PlotSettings$new()
             self$.parameterNames <- C_PARAMETER_NAMES
             self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
         },
@@ -279,7 +279,7 @@ NumberOfSubjectsR6 <- R6Class("NumberOfSubjectsR6",
 #'
 #' @export
 #'
-plot.EventProbabilitiesR6 <- function(x, y, ...,
+plot.EventProbabilities <- function(x, y, ...,
         allocationRatioPlanned = x$allocationRatioPlanned,
         main = NA_character_, xlab = NA_character_, ylab = NA_character_, type = 1L,
         legendTitle = NA_character_, palette = "Set1",
@@ -295,7 +295,7 @@ plot.EventProbabilitiesR6 <- function(x, y, ...,
     # .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
 
     numberOfSubjectsObject <- NULL
-    if (!missing(y) && inherits(y, "NumberOfSubjectsR6")) {
+    if (!missing(y) && inherits(y, "NumberOfSubjects")) {
         numberOfSubjectsObject <- y
         yObjectName <- deparse(fCall$y)
     }
@@ -455,7 +455,7 @@ plot.EventProbabilitiesR6 <- function(x, y, ...,
 #'
 #' @export
 #'
-plot.NumberOfSubjectsR6 <- function(x, y, ...,
+plot.NumberOfSubjects <- function(x, y, ...,
         allocationRatioPlanned = NA_real_,
         main = NA_character_, xlab = NA_character_, ylab = NA_character_, type = 1L,
         legendTitle = NA_character_, palette = "Set1",
@@ -466,8 +466,8 @@ plot.NumberOfSubjectsR6 <- function(x, y, ...,
 
     # .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
 
-    if (!missing(y) && inherits(y, "EventProbabilitiesR6")) {
-        return(plot.EventProbabilitiesR6(
+    if (!missing(y) && inherits(y, "EventProbabilities")) {
+        return(plot.EventProbabilities(
             x = y, y = x,
             allocationRatioPlanned = ifelse(is.na(allocationRatioPlanned), y$allocationRatioPlanned, allocationRatioPlanned),
             main = main, xlab = xlab, ylab = ylab, type = type,

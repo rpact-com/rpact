@@ -173,7 +173,7 @@ NULL
         )
     }
 
-    stageResults <- StageResultsEnrichmentSurvivalR6$new(
+    stageResults <- StageResultsEnrichmentSurvival$new(
         design = design,
         dataInput = dataInput,
         intersectionTest = intersectionTest,
@@ -335,7 +335,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsEnrichmentInverseNormalR6$new(design = design, dataInput = dataInput)
+    results <- AnalysisResultsEnrichmentInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsSurvivalEnrichmentAll(
         results = results, design = design, dataInput = dataInput,
@@ -373,7 +373,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsEnrichmentFisherR6$new(design = design, dataInput = dataInput)
+    results <- AnalysisResultsEnrichmentFisher$new(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
@@ -781,7 +781,7 @@ NULL
     gMax <- stageResults$getGMax()
     kMax <- design$kMax
 
-    results <- ConditionalPowerResultsEnrichmentSurvivalR6$new(
+    results <- ConditionalPowerResultsEnrichmentSurvival$new(
         .design = design,
         .stageResults = stageResults,
         thetaH1 = thetaH1,

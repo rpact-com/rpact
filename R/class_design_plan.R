@@ -94,8 +94,8 @@ C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_SURVIVAL <- list(
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlanR6 <- R6Class("TrialDesignPlanR6",
-    inherit = ParameterSetR6,
+TrialDesignPlan <- R6Class("TrialDesignPlan",
+    inherit = ParameterSet,
     public = list(
         .plotSettings = NULL,
         .design = NULL,
@@ -105,7 +105,7 @@ TrialDesignPlanR6 <- R6Class("TrialDesignPlanR6",
             
             super$initialize(...)#TODO
 
-            self$.plotSettings <- PlotSettingsR6$new()
+            self$.plotSettings <- PlotSettings$new()
             self$.parameterNames <- .getParameterNames(design = design, designPlan = self)
             self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
 
@@ -190,12 +190,12 @@ TrialDesignPlanR6 <- R6Class("TrialDesignPlanR6",
 
                 self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
 
-                if (inherits(self, "TrialDesignPlanSurvival") || inherits(self, "TrialDesignPlanSurvivalR6") || self$groups == 2 || self$.design$kMax > 1) {#TODO Groups????
+                if (inherits(self, "TrialDesignPlanSurvival") || inherits(self, "TrialDesignPlanSurvival") || self$groups == 2 || self$.design$kMax > 1) {#TODO Groups????
                     self$.cat("Legend:\n",
                         heading = 2,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
-                    if (inherits(self, "TrialDesignPlanSurvival") || inherits(self, "TrialDesignPlanSurvivalR6") || self$groups == 2) {
+                    if (inherits(self, "TrialDesignPlanSurvival") || inherits(self, "TrialDesignPlanSurvival") || self$groups == 2) {
                         self$.cat("  (i): values of treatment arm i\n",
                             consoleOutputEnabled = consoleOutputEnabled
                         )
@@ -265,7 +265,7 @@ TrialDesignPlanR6 <- R6Class("TrialDesignPlanR6",
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesignPlanR6 <- function(x, row.names = NULL,
+as.data.frame.TrialDesignPlan <- function(x, row.names = NULL,
         optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
     return(.getAsDataFrame(
         parameterSet = x,
@@ -335,8 +335,8 @@ as.data.frame.TrialDesignPlanR6 <- function(x, row.names = NULL,
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlanMeansR6 <- R6Class("TrialDesignPlanMeansR6",
-    inherit = TrialDesignPlanR6,
+TrialDesignPlanMeans <- R6Class("TrialDesignPlanMeans",
+    inherit = TrialDesignPlan,
     public = list(
         meanRatio = NULL,
         thetaH0 = NULL,
@@ -484,8 +484,8 @@ TrialDesignPlanMeansR6 <- R6Class("TrialDesignPlanMeansR6",
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlanRatesR6 <- R6Class("TrialDesignPlanRatesR6",
-    inherit = TrialDesignPlanR6,
+TrialDesignPlanRates <- R6Class("TrialDesignPlanRates",
+    inherit = TrialDesignPlan,
     public = list(
         riskRatio = NULL,
         thetaH0 = NULL,
@@ -657,8 +657,8 @@ TrialDesignPlanRatesR6 <- R6Class("TrialDesignPlanRatesR6",
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlanSurvivalR6 <- R6Class("TrialDesignPlanSurvivalR6",
-    inherit = TrialDesignPlanR6,
+TrialDesignPlanSurvival <- R6Class("TrialDesignPlanSurvival",
+    inherit = TrialDesignPlan,
     public = list(
         .piecewiseSurvivalTime = NULL,
         .accrualTime = NULL,
@@ -1076,7 +1076,7 @@ TrialDesignPlanSurvivalR6 <- R6Class("TrialDesignPlanSurvivalR6",
                 }
             }
 
-            designSet <- TrialDesignSetR6$new(design = designMaster, singleDesign = TRUE)
+            designSet <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             designSet$.plotSettings <- designPlan$.plotSettings
             designPlanName <- paste0(designPlanName, "$.design")
             return(.plotTrialDesignSet(
@@ -1250,7 +1250,7 @@ TrialDesignPlanSurvivalR6 <- R6Class("TrialDesignPlanSurvivalR6",
         } else {
             xParameterName <- "informationRates"
             yParameterNames <- "stageLevels"
-            designPlan <- TrialDesignSetR6$new(design = designMaster, singleDesign = TRUE)
+            designPlan <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             xParameterNameSrc <- ".design$informationRates"
             yParameterNamesSrc <- ".design$stageLevels"
         }
@@ -1282,7 +1282,7 @@ TrialDesignPlanSurvivalR6 <- R6Class("TrialDesignPlanSurvivalR6",
         } else {
             xParameterName <- "informationRates"
             yParameterNames <- "alphaSpent"
-            designPlan <- TrialDesignSetR6$new(design = designMaster, singleDesign = TRUE)
+            designPlan <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             xParameterNameSrc <- ".design$informationRates"
             yParameterNamesSrc <- ".design$alphaSpent"
         }
@@ -2093,7 +2093,7 @@ TrialDesignPlanSurvivalR6 <- R6Class("TrialDesignPlanSurvivalR6",
 #'
 #' @export
 #'
-plot.TrialDesignPlanR6 <- function(x, y, ..., main = NA_character_,
+plot.TrialDesignPlan <- function(x, y, ..., main = NA_character_,
         xlab = NA_character_, ylab = NA_character_,
         type = ifelse(x$.design$kMax == 1, 5L, 1L), palette = "Set1",
         theta = seq(-1, 1, 0.01), plotPointsEnabled = NA,
