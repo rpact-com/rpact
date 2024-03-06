@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 5924 $
-## |  Last changed: $Date: 2022-03-04 10:48:37 +0100 (Fri, 04 Mar 2022) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -46,6 +46,13 @@ NULL
 }
 
 .getMatrixFormatted <- function(paramValueFormatted, enforceListOuput = FALSE) {
+    if (length(paramValueFormatted) == 0) {
+        return(list(
+            paramValueFormatted = matrix(nrow = 0, ncol = 0),
+            type = "matrix"
+        ))
+    }
+    
     if (!is.matrix(paramValueFormatted) && enforceListOuput) {
         paramValueFormatted <- matrix(paramValueFormatted, nrow = 1)
     }
@@ -136,7 +143,7 @@ NULL
                     paramValueFormatted <- C_TYPE_OF_DESIGN_BS_LIST[[paramValue]]
                 }
             } else {
-                formatFunctionName <- obj$.parameterFormatFunctions[[parameterName]]
+                formatFunctionName <- .getParameterFormatFunction(parameterName, obj) 
                 if (!is.null(formatFunctionName)) {
                     paramValueFormatted <- eval(call(formatFunctionName, paramValueFormatted))
                     if (.isArray(paramValue) && length(dim(paramValue)) == 2) {

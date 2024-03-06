@@ -14,12 +14,13 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7435 $
- * Last changed: $Date: 2023-11-13 13:27:51 +0100 (Mo, 13 Nov 2023) $
+ * File version: $Revision: 7496 $
+ * Last changed: $Date: 2023-12-15 10:42:15 +0100 (Fr, 15 Dez 2023) $
  * Last changed by: $Author: pahlke $
  *
  */
 
+#include <cmath>
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -146,6 +147,7 @@ double find_shape_start(NumericVector counts1, NumericVector counts2, NumericVec
 		return (shape_up);
 	}
 
+	shape_mid = -1;
 	while ((iterate_count < 10) && (shape_up / shape_low > 1.2)) {
 
 		shape_mid = (shape_low + shape_up) / 2;

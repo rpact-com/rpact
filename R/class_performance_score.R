@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7148 $
-## |  Last changed: $Date: 2023-07-03 15:50:22 +0200 (Mo, 03 Jul 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -58,8 +58,6 @@ PerformanceScore <- R6Class("PerformanceScore",
             super$initialize(...)
             self$.simulationResults <- simulationResults
             self$.plotSettings <- PlotSettings$new()
-            self$.parameterNames <- C_PARAMETER_NAMES
-            self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
         },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing performance score objects"

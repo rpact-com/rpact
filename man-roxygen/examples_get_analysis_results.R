@@ -8,7 +8,8 @@
 #' dataMeans <- getDataset(
 #'     n = c(30, 30),
 #'     means = c(1.96, 1.76),
-#'     stDevs = c(1.92, 2.01))
+#'     stDevs = c(1.92, 2.01)
+#' )
 #' getAnalysisResults(design = dsnGS, dataInput = dataMeans, thetaH0 = 1.2)
 #'
 #' # You can obtain the results when performing an inverse normal combination test
@@ -24,10 +25,13 @@
 #' # that 116 > 120 - 5 observed events defines the final analysis.
 #' design <- getDesignGroupSequential(typeOfDesign = "asOF")
 #' dataSurvival <- getDataset(
-#' 		cumulativeEvents = c(33, 72, 116),
-#' 		cumulativeLogRanks = c(1.33, 1.88, 1.902))
-#' getAnalysisResults(design, dataInput = dataSurvival, maxInformation = 120,
-#' 		informationEpsilon = 5)
+#'     cumulativeEvents = c(33, 72, 116),
+#'     cumulativeLogRanks = c(1.33, 1.88, 1.902)
+#' )
+#' getAnalysisResults(design,
+#'     dataInput = dataSurvival,
+#'     maxInformation = 120, informationEpsilon = 5
+#' )
 #'
 #' # Example 3 Multi-Arm Design
 #' # In a four-stage combination test design with O'Brien & Fleming boundaries
@@ -50,15 +54,20 @@
 #'     stds1 = c(1.2, 1.4),
 #'     stds2 = c(1.3, NA),
 #'     stds3 = c(1.1, 1.14),
-#'     stds4 = c(1.02, 1.18))
+#'     stds4 = c(1.02, 1.18)
+#' )
 #' design <- getDesignInverseNormal(kMax = 4)
-#' x <- getAnalysisResults(design, dataInput = data, intersectionTest = "Bonferroni",
-#'     nPlanned = c(40, 40), thetaH1 = c(0.5, NA, 0.8), assumedStDevs = 1.2)
+#' x <- getAnalysisResults(design,
+#'     dataInput = data, intersectionTest = "Bonferroni",
+#'     nPlanned = c(40, 40), thetaH1 = c(0.5, NA, 0.8), assumedStDevs = 1.2
+#' )
 #' summary(x)
 #' if (require(ggplot2)) plot(x, thetaRange = c(0, 0.8))
 #' design <- getDesignConditionalDunnett(secondStageConditioning = FALSE)
-#' y <- getAnalysisResults(design, dataInput = data,
-#'     nPlanned = 40, thetaH1 = c(0.5, NA, 0.8), assumedStDevs = 1.2,  stage = 1)
+#' y <- getAnalysisResults(design,
+#'     dataInput = data,
+#'     nPlanned = 40, thetaH1 = c(0.5, NA, 0.8), assumedStDevs = 1.2, stage = 1
+#' )
 #' summary(y)
 #' if (require(ggplot2)) plot(y, thetaRange = c(0, 0.4))
 #'
@@ -77,19 +86,23 @@
 #'     stDev1 = c(3.4, 3.3),
 #'     stDev2 = c(2.9, 3.5),
 #'     n1 = c(21, 42),
-#'     n2 = c(19, 39))
+#'     n2 = c(19, 39)
+#' )
 #' dataNotS1 <- getDataset(
 #'     means1 = c(11.8, NA),
 #'     means2 = c(10.5, NA),
 #'     stDev1 = c(3.6, NA),
 #'     stDev2 = c(2.7, NA),
 #'     n1 = c(15, NA),
-#'     n2 = c(13, NA))
+#'     n2 = c(13, NA)
+#' )
 #' dataBoth <- getDataset(S1 = dataS1, R = dataNotS1)
-#' x <- getAnalysisResults(design, dataInput = dataBoth,
+#' x <- getAnalysisResults(design,
+#'     dataInput = dataBoth,
 #'     intersectionTest = "SpiessensDebois",
 #'     varianceOption = "pooledFromFull",
-#'     stratifiedAnalysis = TRUE)
+#'     stratifiedAnalysis = TRUE
+#' )
 #' summary(x)
 #' if (require(ggplot2)) plot(x, type = 2)
 #' }

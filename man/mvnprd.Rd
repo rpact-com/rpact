@@ -31,7 +31,7 @@ fourth derivative is used.  If set to zero, error control based on halving inter
 }
 \description{
 Calculates the Multivariate Normal Distribution with Product Correlation Structure published
-by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 \url{https://doi.org/10.2307/2347754}.
+by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 \doi{10.2307/2347754}.
 }
 \details{
 This is a wrapper function for the original Fortran 77 code.

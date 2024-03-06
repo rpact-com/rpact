@@ -15,8 +15,8 @@ library("R6")
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7387 $
-## |  Last changed: $Date: 2023-11-03 14:39:37 +0100 (Fr, 03 Nov 2023) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -87,7 +87,7 @@ NULL
 
 .formatCamelCase <- function(x, title = FALSE, ..., ignoreBlackList = FALSE) {
     words <- strsplit(x, " ")[[1]]
-    parts <- character(0)
+    parts <- character()
     for (word in words) {
         parts <- c(parts, .formatCamelCaseSingleWord(word, title = title))
     }
@@ -830,6 +830,14 @@ NULL
     return((variedParameter[2] - variedParameter[1]) / C_VARIED_PARAMETER_SEQUENCE_LENGTH_DEFAULT)
 }
 
+.plotTheta <- function(theta) {
+    if (is.null(theta) || length(theta) == 0 || all(is.na(theta))) {
+        theta <- seq(-1, 1, 0.02)
+    }
+    theta <- .assertIsValidThetaRange(thetaRange = theta)
+    return(theta)
+}
+
 .getVariedParameterVector <- function(variedParameter, variedParameterName) {
     if (is.null(variedParameter) || length(variedParameter) != 2 || any(is.na(variedParameter))) {
         return(variedParameter)
@@ -1040,24 +1048,8 @@ getParameterCaption <- function(obj, parameterName) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
-
-    design <- NULL
-    designPlan <- NULL
-    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlan")) {
-        designPlan <- obj
-        design <- obj$.design
-    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesign")) {
-        design <- obj
-    } else {
-        design <- obj[[".design"]]
-    }
-
-    parameterNames <- .getParameterNames(design = design, designPlan = designPlan)
-    if (is.null(parameterNames) || length(parameterNames) == 0) {
-        return(NULL)
-    }
-
-    return(parameterNames[[parameterName]])
+    
+    return(.getParameterCaption(parameterName, obj))
 }
 
 #'
@@ -1089,24 +1081,29 @@ getParameterName <- function(obj, parameterCaption) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
-
-    design <- NULL
-    designPlan <- NULL
-    if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlan")) {
-        designPlan <- obj
-        design <- obj$.design
-    } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesign")) {
-        design <- obj
-    } else {
-        design <- obj[[".design"]]
+    
+    parameterName <- getDictionaryKeyByValue(C_PARAMETER_NAMES, parameterCaption)
+    if (!is.null(parameterName)) {
+        return(parameterName)
+    }
+    
+    parameterName <- getDictionaryKeyByValue(C_PARAMETER_NAMES_PLOT_SETTINGS, parameterCaption)
+    if (!is.null(parameterName)) {
+        return(parameterName)
+    }
+    
+    fieldNames <- obj$.getVisibleFieldNames()
+    for (parameterName in fieldNames) {
+        if (identical(.getParameterCaption(parameterName, obj), parameterCaption)) {
+            return(parameterName)
+        }
+        
+        if (identical(.getParameterCaption(parameterName, obj, tableOutputEnabled = TRUE), parameterCaption)) {
+            return(parameterName)
+        }
     }
 
-    parameterNames <- .getParameterNames(design = design, designPlan = designPlan)
-    if (is.null(parameterNames) || length(parameterNames) == 0) {
-        return(NULL)
-    }
-
-    return(unique(names(parameterNames)[parameterNames == parameterCaption]))
+    return("unknown")
 }
 
 .removeLastEntryFromArray <- function(x) {
@@ -1484,48 +1481,9 @@ getParameterName <- function(obj, parameterCaption) {
     }
 }
 
-# TODO remove old function
-#.getMultivariateDistribution <- function(...,
-#        type = c("normal", "t", "quantile"),
-#        upper,
-#        sigma,
-#        df = NA_real_, alpha = NA_real_) {
-#    # .assertMnormtIsInstalled()
-#    type <- match.arg(type)
-#
-#    dimensionSigma <- length(base::diag(sigma))
-#    if (type == "normal") {
-#        if (dimensionSigma == 1) {
-#            return(stats::pnorm(upper))
-#        }
-#
-#        return(mnormt::sadmvn(lower = -Inf, upper = upper, mean = 0, varcov = sigma))
-#    }
-#
-#    if (type == "t") {
-#        if (dimensionSigma == 1) {
-#            return(stats::pt(upper, df))
-#        }
-#        if (df > 500) {
-#            return(mnormt::sadmvn(lower = -Inf, upper = upper, mean = 0, varcov = sigma))
-#        }
-#
-#        return(mnormt::sadmvt(lower = -Inf, upper = upper, mean = 0, S = sigma, df = df))
-#    }
-#
-#    if (type == "quantile") {
-#        if (dimensionSigma == 1) {
-#            return(.getOneMinusQNorm(alpha))
-#        }
-#
-#        return(.getOneDimensionalRoot(
-#            function(x) {
-#                return(mnormt::sadmvn(lower = -Inf, upper = x, mean = 0, varcov = sigma) - (1 - alpha))
-#            },
-#            lower = -8,
-#            upper = 8,
-#            tolerance = 1e-08,
-#            callingFunctionInformation = ".getMultivariateDistribution"
-#        ))
-#    }
-#}
+.addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues) {
+    parameterSet[[fieldName]] <- fieldValues
+    parameterSet$.setParameterType(fieldName, C_PARAM_NOT_APPLICABLE)
+    parameterSet$.deprecatedFieldNames <- unique(c(parameterSet$.deprecatedFieldNames, fieldName))
+}
+

@@ -14,8 +14,8 @@ library("R6")
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -130,7 +130,7 @@ TrialDesign <- R6Class("TrialDesign",
                                "Method for automatically printing trial design objects"
                                self$.resetCat()
                                if (showType == 3) {
-                                 .createSummary(self, digits = digits)$.show(#TODO should not work
+                                 .createSummary(self, digits = digits)$.show(
                                    showType = 1,
                                    digits = digits, consoleOutputEnabled = consoleOutputEnabled
                                  )
@@ -175,7 +175,7 @@ TrialDesign <- R6Class("TrialDesign",
                                  if (self$kMax == C_KMAX_DEFAULT) {
                                    self$.setParameterType("stages", C_PARAM_DEFAULT_VALUE)
                                  } else {
-                                   type <- self$.getParameterType("kMax")#TODO
+                                   type <- self$.getParameterType("kMax")
                                    self$.setParameterType("stages", ifelse(type != C_PARAM_TYPE_UNKNOWN, type, C_PARAM_USER_DEFINED))
                                  }
                                } else {
@@ -185,7 +185,7 @@ TrialDesign <- R6Class("TrialDesign",
                              .isDelayedResponseDesign = function() {
                                return((inherits(self, "TrialDesignGroupSequential") || inherits(self, "TrialDesignInverseNormal")) &&
                                         self$kMax > 1 &&
-                                        !is.null(self[["delayedInformation"]]) &&#TODO
+                                        !is.null(self[["delayedInformation"]]) &&
                                         !any(is.na(self$delayedInformation)) && any(self$delayedInformation > 0))
                              }
                            )
@@ -245,10 +245,7 @@ TrialDesignCharacteristics <- R6Class("TrialDesignCharacteristics",
                                             initialize = function(design, ...) {
                                               
                                               self$.design <- design
-                                              self$.parameterNames <- .getParameterNames(design = design)
-                                              self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
-                                              self$.parameterFormatFunctions[["nFixed"]] <- ".formatProbabilities"
-                                              super$initialize(...)#TODO init vars?
+                                              super$initialize(...)
                                               self$.initStages()
                                             },
                                             show = function(showType = 1, digits = NA_integer_) {
@@ -343,20 +340,19 @@ print.TrialDesignCharacteristics <- function(x, ..., markdown = FALSE, showDesig
 #' @keywords internal
 #'
 as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
-                                                     optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
-  if (x$.design$kMax > 1) {
-    parameterNamesToBeExcluded <- c("nFixed", "shift")
-  } else {
-    parameterNamesToBeExcluded <- c("inflationFactor")
-  }
-  return(.getAsDataFrame(
-    parameterSet = x,
-    parameterNames = parameterNamesToBeExcluded,
-    niceColumnNamesEnabled = niceColumnNamesEnabled,
-    includeAllParameters = includeAllParameters,
-    handleParameterNamesAsToBeExcluded = TRUE,
-    tableColumnNames = .getTableColumnNames(design = x$.design)
-  ))
+        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
+    if (x$.design$kMax > 1) {
+        parameterNamesToBeExcluded <- c("nFixed", "shift")
+    } else {
+        parameterNamesToBeExcluded <- c("inflationFactor")
+    }
+    return(.getAsDataFrame(
+        parameterSet = x,
+        parameterNames = parameterNamesToBeExcluded,
+        niceColumnNamesEnabled = niceColumnNamesEnabled,
+        includeAllParameters = includeAllParameters,
+        handleParameterNamesAsToBeExcluded = TRUE
+    ))
 }
 
 #'
@@ -434,21 +430,6 @@ TrialDesignFisher <- R6Class("TrialDesignFisher",
                                      self$iterations <- iterations
                                      self$seed <- seed
                                      self$tolerance <- tolerance
-                                     
-                                     self$.parameterNames <- c(self$.parameterNames, self$.getSubListByNames(
-                                       .getParameterNames(design = self), c(
-                                         "method",
-                                         "alpha0Vec",
-                                         "scale",
-                                         "nonStochasticCurtailment",
-                                         "sided",
-                                         "simAlpha",
-                                         "iterations",
-                                         "seed"
-                                       )
-                                     ))
-                                     
-                                     self$.parameterFormatFunctions$criticalValues <- ".formatCriticalValuesFisher"
                                      
                                      self$.initParameterTypes()
                                      self$.setParameterType("iterations", C_PARAM_NOT_APPLICABLE)
@@ -635,8 +616,7 @@ TrialDesignInverseNormal <- R6Class("TrialDesignInverseNormal",
                                             self$betaAdjustment <- betaAdjustment
                                             self$delayedInformation <- delayedInformation
                                             super$initialize(...)
-                                            self$.initParameterNames()
-                                            self$.parameterFormatFunctions$criticalValues <- ".formatCriticalValues"
+
                                             self$.initParameterTypes()
                                             self$.initStages()
                                             
@@ -645,32 +625,6 @@ TrialDesignInverseNormal <- R6Class("TrialDesignInverseNormal",
                                             self$.setParameterType("decisionCriticalValues", C_PARAM_NOT_APPLICABLE)
                                             self$.setParameterType("reversalProbabilities", C_PARAM_NOT_APPLICABLE)
                                             
-                                          },
-                                          .initParameterNames = function() {
-                                            self$.parameterNames <- c(self$.parameterNames, self$.getSubListByNames(
-                                              .getParameterNames(design = self), c(
-                                                "beta",
-                                                "betaSpent",
-                                                "sided",
-                                                "futilityBounds",
-                                                "typeOfDesign",
-                                                "deltaWT",
-                                                "deltaPT1",
-                                                "deltaPT0",
-                                                "optimizationCriterion",
-                                                "gammaA",
-                                                "gammaB",
-                                                "typeBetaSpending",
-                                                "userBetaSpending",
-                                                "power",
-                                                "twoSidedPower",
-                                                "constantBoundsHP",
-                                                "betaAdjustment",
-                                                "delayedInformation",
-                                                "decisionCriticalValues",
-                                                "reversalProbabilities"
-                                              )
-                                            ))
                                           },
                                           .formatComparisonResult = function(x) {
                                             if (is.null(x) || length(x) == 0 || !is.numeric(x)) {
@@ -1234,19 +1188,18 @@ plot.TrialDesignCharacteristics <- function(x, y, ...) {
 #' @keywords internal
 #'
 as.data.frame.TrialDesign <- function(x, row.names = NULL,
-                                      optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
-  .assertIsTrialDesign(x)
-  
-  if (includeAllParameters) {
-    parameterNames <- NULL
-  } else {
-    parameterNames <- x$.getParametersToShow()
-  }
-  return(.getAsDataFrame(
-    parameterSet = x,
-    parameterNames = parameterNames,
-    niceColumnNamesEnabled = niceColumnNamesEnabled,
-    includeAllParameters = includeAllParameters,
-    tableColumnNames = .getTableColumnNames(design = x)
-  ))
+        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
+    .assertIsTrialDesign(x)
+
+    if (includeAllParameters) {
+        parameterNames <- NULL
+    } else {
+        parameterNames <- x$.getParametersToShow()
+    }
+    return(.getAsDataFrame(
+        parameterSet = x,
+        parameterNames = parameterNames,
+        niceColumnNamesEnabled = niceColumnNamesEnabled,
+        includeAllParameters = includeAllParameters
+    ))
 }

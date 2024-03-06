@@ -79,9 +79,11 @@ Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurviva
 
 \item{\code{successPerStage}}{The simulated success probabilities per stage where success is defined by user. Is a numeric matrix.}
 
-\item{\code{eventsPerStage}}{The number of events per stage. Is a numeric matrix.}
+\item{\code{eventsPerStage}}{Deprecated: use \code{singleEventsPerStage} or \code{cumulativeEventsPerStage} instead Is a numeric matrix.}
 
-\item{\code{singleNumberOfEventsPerStage}}{In simulation results data set: the number of events per stage that is used for the analysis.}
+\item{\code{singleNumberOfEventsPerStage}}{Deprecated: use \code{singleEventsPerArmAndStage} or \code{singleEventsPerSubsetAndStage} instead}
+
+\item{\code{singleEventsPerSubsetAndStage}}{The number of events per subset and stage that is used for the analysis.}
 
 \item{\code{conditionalPowerAchieved}}{The calculated conditional power, under the assumption of observed or assumed effect sizes. Is a numeric matrix.}
 }}

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -64,7 +64,7 @@ TrialDesignSet <- R6Class("TrialDesignSet",
         initialize = function(...) {
             self$.plotSettings <- PlotSettings$new()
             self$designs <- list()
-            self$variedParameters <- character(0)
+            self$variedParameters <- character()
             if (length(list(...)) > 0) {
                 self$add(...)
             }
@@ -204,13 +204,13 @@ TrialDesignSet <- R6Class("TrialDesignSet",
         .getArgumentNames = function(validatedDesign, ...) {
             args <- list(...)
             if (length(args) == 0) {
-                return(character(0))
+                return(character())
             }
 
             argumentNames <- names(args)
             if (length(argumentNames) == 0) {
                 warning("No argument names available for ", paste(args, collapse = ", "), call. = FALSE)
-                return(character(0))
+                return(character())
             }
 
             argumentNames <- argumentNames[nchar(argumentNames) != 0]
@@ -597,6 +597,70 @@ length.TrialDesignSet <- function(x) {
     return(length(x$designs))
 }
 
+.getHarmonizedColumnNames <- function(df1, df2) {
+    colNames1 <- colnames(df1)
+    colNames2 <- colnames(df2)
+    if (length(colNames1) != length(colNames2)) {
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+            "cannot harmonize column names of two data frames if number of columns is unequal (",
+            length(colNames1), " != ", length(colNames2), ")")
+    }
+    
+    colNames <- character()
+    for (i in 1:length(colNames1)) {
+        colName1 <- colNames1[i]
+        colName2 <- colNames2[i]
+        if (!identical(colName1, colName2)) {
+            vec1 <- unlist(strsplit(colName1, " "))
+            vec2 <- unlist(strsplit(colName2, " "))
+            colNames <- c(colNames, paste(base::intersect(vec1, vec2), collapse = " "))
+        } else {
+            colNames <- c(colNames, colName1)
+        }
+    }
+    return(colNames)
+}
+
+.insertColumnName <- function(df, colName, colNames, at) {
+    naCol <- rep(NA, nrow(df))
+    if (at == 1) {
+        colNames <- c(colName, colNames)
+        df <- cbind(naCol, df)
+    }
+    else if (at <= length(colNames)) {
+        colNames <- c(colNames[1:(at - 1)], colName, colNames[at:length(colNames)])
+        df <- cbind(df[, 1:(at - 1)], naCol, df[, at:ncol(df)])
+    }
+    else {
+        colNames <- c(colNames, colName)
+        df <- cbind(df, naCol)
+    }
+    colnames(df) <- colNames
+    return(list(df = df, colNames = colNames))
+}
+
+.getHarmonizedDataFrames <- function(df1, df2) {
+    if (ncol(df1) == ncol(df2)) {
+        return(list(df1 = df1, df2 = df2))
+    }
+    
+    colNames1 <- colnames(df1)
+    colNames2 <- colnames(df2)
+    difference <- c(colNames1[!(colNames1 %in% colNames2)], colNames2[!(colNames2 %in% colNames1)])
+    for (colName in difference) {
+        if (colName %in% colNames1) {
+            result <- .insertColumnName(df2, colName, colNames2, at = which(colNames1 == colName))
+            colNames2 <- result$colNames
+            df2 <- result$df
+        } else {
+            result <- .insertColumnName(df1, colName, colNames1, at = which(colNames2 == colName))
+            colNames1 <- result$colNames
+            df1 <- result$df
+        }
+    }
+    return(list(df1 = df1, df2 = df2))
+}
+
 #'
 #' @title
 #' Coerce Trial Design Set to a Data Frame
@@ -626,9 +690,14 @@ length.TrialDesignSet <- function(x) {
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE,
-        addPowerAndAverageSampleNumber = FALSE, theta = seq(-1, 1, 0.02), nMax = NA_integer_, ...) {
+as.data.frame.TrialDesignSet <- function(x, 
+        row.names = NULL,
+        optional = FALSE, 
+        niceColumnNamesEnabled = FALSE, 
+        includeAllParameters = FALSE,
+        addPowerAndAverageSampleNumber = FALSE, 
+        theta = seq(-1, 1, 0.02), 
+        nMax = NA_integer_, ...) {
     .assertIsTrialDesignSet(x)
     if (x$isEmpty()) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot create data.frame because the design set is empty")
@@ -658,11 +727,11 @@ as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
             niceColumnNamesEnabled = niceColumnNamesEnabled,
             includeAllParameters = includeAllParameters
         ))
-
+    
         if (.isTrialDesignWithValidFutilityBounds(design)) {
             futilityBoundsName <- "futilityBounds"
             if (niceColumnNamesEnabled) {
-                futilityBoundsName <- .getTableColumnNames(design = design)[["futilityBounds"]]
+                futilityBoundsName <- .getParameterCaption("futilityBounds", design, tableOutputEnabled = TRUE)
             }
 
             kMax <- design$kMax
@@ -671,21 +740,22 @@ as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
         if (.isTrialDesignWithValidAlpha0Vec(design)) {
             alpha0VecName <- "alpha0Vec"
             if (niceColumnNamesEnabled) {
-                alpha0VecName <- .getTableColumnNames(design = design)[["alpha0Vec"]]
+                alpha0VecName <- .getParameterCaption("alpha0Vec", design, tableOutputEnabled = TRUE)
             }
 
             kMax <- design$kMax
             df[[alpha0VecName]][kMax] <- design$criticalValues[kMax]
         }
-
+        
         if (addPowerAndAverageSampleNumber) {
             results <- PowerAndAverageSampleNumberResult$new(design, theta = theta, nMax = nMax)
             suppressWarnings(df2 <- as.data.frame(results,
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
-                includeAllParameters = includeAllParameters
+                includeAllParameters = FALSE #includeAllParameters
             ))
             df <- merge(df, df2, all.y = TRUE)
         }
+        
         if (is.null(dataFrame)) {
             if (niceColumnNamesEnabled) {
                 dataFrame <- cbind("Design number" = rep(1, nrow(df)), df)
@@ -698,6 +768,15 @@ as.data.frame.TrialDesignSet <- function(x, row.names = NULL,
             } else {
                 df <- cbind(designNumber = rep(max(dataFrame$designNumber) + 1, nrow(df)), df)
             }
+            
+            result <- .getHarmonizedDataFrames(dataFrame, df)
+            dataFrame <- result$df1
+            df <- result$df2
+            
+            colNames <- .getHarmonizedColumnNames(dataFrame, df)
+            colnames(dataFrame) <- colNames
+            colnames(df) <- colNames
+            
             dataFrame <- rbind(dataFrame, df)
         }
     }

@@ -55,9 +55,10 @@ For enrichment designs, it is the (combined) sample size for the considered sub-
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
-For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+For simulating means and rates for a two treatment groups design, it can be a vector of length \code{kMax}, the number of stages.
 It can be a vector of length kMax, too, for multi-arm and enrichment designs.
-In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.}
+In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.
+Note that internally \code{allocationRatioPlanned} is treated as a vector of length \code{kMax}, not a scalar.}
 
 \item{main}{The main title.}
 
@@ -98,7 +99,7 @@ returned as character vector (function stops if an error occurs)
 }
 Note: no plot object will be returned if \code{showSource} is a character.}
 
-\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.}
+\item{plotSettings}{An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSettings()}}.}
 }
 \value{
 Returns a \code{ggplot2} object.

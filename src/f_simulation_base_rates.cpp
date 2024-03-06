@@ -1,6 +1,6 @@
 /**
  *
- * -- Simulation of means with group sequential and combination test --
+ * -- Simulation of rates with group sequential and combination test --
  *
  * This file is part of the R package rpact:
  * Confirmatory Adaptive Clinical Trial Design and Analysis
@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7408 $
- * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
+ * File version: $Revision: 7461 $
+ * Last changed: $Date: 2023-12-01 10:24:25 +0100 (Fr, 01 Dez 2023) $
  * Last changed by: $Author: pahlke $
  *
  */

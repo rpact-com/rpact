@@ -13,10 +13,13 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7659 $
+## |  Last changed: $Date: 2024-02-23 10:42:33 +0100 (Fr, 23 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
+
+#' @include f_design_general_utilities.R
+NULL
 
 C_REGEXP_GREATER_OR_EQUAL <- ">= ?"
 C_REGEXP_SMALLER <- "< ?"
@@ -28,9 +31,6 @@ TimeDefinition <- R6Class("TimeDefinition",
     public = list(
         initialize = function(...) {
             super$initialize()
-          
-            self$.parameterNames <- C_PARAMETER_NAMES
-            self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
         },
         .getRegexpFromTo = function(..., from, to, fromPrefix = "", toPrefix = "") {
             return(paste0("(^ *", fromPrefix, from, " *- *", toPrefix, to, " *$)"))
@@ -631,9 +631,9 @@ PiecewiseSurvivalTime <- R6Class("PiecewiseSurvivalTime",
             rownames(data) <- as.character(1:nrow(data))
             colnames(data) <- c(
                 "Start time",
-                C_PARAMETER_NAMES["lambda1"], # Hazard rate (1)
-                C_PARAMETER_NAMES["lambda2"]
-            ) # Hazard rate (2)
+                .getParameterCaption("lambda1", tableOutputEnabled = TRUE),
+                .getParameterCaption("lambda2", tableOutputEnabled = TRUE) 
+            ) 
             return(data)
         },
         .isPiBased = function() {
@@ -1426,7 +1426,7 @@ AccrualTime <- R6Class("AccrualTime",
             rownames(data) <- as.character(1:nrow(data))
             colnames(data) <- c(
                 "Start time",
-                C_PARAMETER_NAMES["accrualIntensity"]
+                .getParameterCaption("accrualIntensity", .self)
             )
             return(data)
         },
@@ -1876,6 +1876,9 @@ AccrualTime <- R6Class("AccrualTime",
         .initAccrualIntensityAbsolute = function() {
             if (is.null(self$maxNumberOfSubjects) || length(self$maxNumberOfSubjects) != 1 ||
                     is.na(self$maxNumberOfSubjects) || self$maxNumberOfSubjects == 0) {
+                if (!self$absoluteAccrualIntensityEnabled) {
+                    self$accrualIntensityRelative <- self$accrualIntensity
+                }
                 return(invisible())
             }
 
@@ -1889,6 +1892,7 @@ AccrualTime <- R6Class("AccrualTime",
                 len <- length(self$accrualIntensity)
                 accrualIntensityAbsolute <- self$maxNumberOfSubjects / sum((self$accrualTime[2:(len + 1)] -
                     self$accrualTime[1:len]) * self$accrualIntensity) * self$accrualIntensity
+                    
                 if (!isTRUE(all.equal(accrualIntensityAbsolute, self$accrualIntensity, tolerance = 1e-06)) &&
                         !isTRUE(all.equal(accrualIntensityAbsolute, 0, tolerance = 1e-06))) {
                     self$.validateAccrualTimeAndIntensity()
@@ -1909,7 +1913,7 @@ AccrualTime <- R6Class("AccrualTime",
                             )
                         }
                     } else {
-                        if (!self$absoluteAccrualIntensityEnabled && # .isRelativeAccrualIntensity(accrualIntensity)
+                        if (!self$absoluteAccrualIntensityEnabled &&
                                 self$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED &&
                                 self$.getParameterType("accrualTime") == C_PARAM_DEFAULT_VALUE &&
                                 self$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED) {

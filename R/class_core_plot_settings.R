@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -84,7 +84,11 @@ PlotSubTitleItems <- R6Class("PlotSubTitleItems",
         addItem = function(item) {
             self$items <- c(self$items, item)
         },
-        add = function(title, value, subscript = NA_character_, ..., digits = 3L) {
+        add = function(title, value, subscript = NA_character_, ..., digits = 3L, condition = TRUE) {
+            if (isFALSE(condition)) {
+                return(invisible())
+            }
+            
             titleTemp <- title
             if (length(self$items) == 0) {
                 titleTemp <- .formatCamelCase(titleTemp, title = TRUE)
@@ -103,7 +107,7 @@ PlotSubTitleItems <- R6Class("PlotSubTitleItems",
                 return(NA_character_)
             }
 
-            s <- character(0)
+            s <- character()
             for (item in self$items) {
                 s <- c(s, item$toString())
             }
@@ -318,17 +322,6 @@ PlotSettings <- R6Class("PlotSettings",
                 legendFontSize = 11,
                 scalingFactor = 1,
                 ...) {
-            #callSuper(
-            #    lineSize = lineSize,
-            #    pointSize = pointSize,
-            #    pointColor = pointColor,
-            #    mainTitleFontSize = mainTitleFontSize,
-            #    axesTextFontSize = axesTextFontSize,
-            #    legendFontSize = legendFontSize,
-            #    scalingFactor = scalingFactor,
-            #    ...
-            #)#TODO
-          
             super$initialize()
             self$lineSize <- lineSize
             self$pointSize <- pointSize
@@ -356,17 +349,6 @@ PlotSettings <- R6Class("PlotSettings",
                 "scalingFactor" = "Scaling factor"
             )
         },
-        #clone = function() {
-        #    return(PlotSettings$new(
-        #        lineSize = self$lineSize,
-        #        pointSize = self$pointSize,
-        #        pointColor = self$pointColor,
-        #        mainTitleFontSize = self$mainTitleFontSize,
-        #        axesTextFontSize = self$axesTextFontSize,
-        #        legendFontSize = self$legendFontSize,
-        #        scalingFactor = self$scalingFactor
-        #    ))
-        #},#TODO
         show = function(showType = 1, digits = NA_integer_) {
             self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },

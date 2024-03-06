@@ -27,7 +27,7 @@ getAvailablePlotTypes(
 caption, default is \code{FALSE}.}
 }
 \value{
-Returns a list if \code{option} is either \code{capnum} or {numcap}
+Returns a list if \code{option} is either \code{capnum} or \code{numcap}
 or returns a vector that is of  character type for \code{option=caption} or
 of numeric type for \code{option=numeric}.
 }

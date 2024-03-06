@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -73,8 +73,6 @@ PowerAndAverageSampleNumberResult <- R6Class("PowerAndAverageSampleNumberResult"
             
             self$theta <- .assertIsValidThetaRange(thetaRange = theta, thetaAutoSeqEnabled = FALSE)
             self$.initPowerAndAverageSampleNumber()
-            self$.parameterNames <- .getParameterNames(design = design)
-            self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
         },
         show = function(showType = 1, digits = NA_integer_) {
             self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
@@ -322,8 +320,7 @@ as.data.frame.PowerAndAverageSampleNumberResult <- function(x, row.names = NULL,
         parameterSet = x,
         parameterNames = parameterNames,
         niceColumnNamesEnabled = niceColumnNamesEnabled,
-        includeAllParameters = includeAllParameters,
-        tableColumnNames = .getTableColumnNames(design = x$.design)
+        includeAllParameters = includeAllParameters
     )
     return(dataFrame)
 }

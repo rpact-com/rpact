@@ -42,3 +42,9 @@ lastMiKTeXException
 ^tests-complete$
 testthat-problems\.rds
 ^\.covrignore$
+^tests-complete$
+^.*\.gcda$
+^.*\.gcno$
+^inst/\.covrignore$
+^README\.html$
+^codecov\.yml$

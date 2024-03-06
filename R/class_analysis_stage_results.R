@@ -14,8 +14,8 @@ library("R6")
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6943 $
-## |  Last changed: $Date: 2023-04-24 09:47:00 +0200 (Mo, 24 Apr 2023) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1344,43 +1344,42 @@ names.StageResults <- function(x) {
 #' @keywords internal
 #'
 as.data.frame.StageResults <- function(x, row.names = NULL,
-                                       optional = FALSE, niceColumnNamesEnabled = FALSE,
-                                       includeAllParameters = FALSE, type = 1, ...) {
-  if (type == 1) {
-    parametersToShow <- x$.getParametersToShow()
-    
-    return(.getAsDataFrame(
-      parameterSet = x, 
-      parameterNames = parametersToShow,
-      niceColumnNamesEnabled = niceColumnNamesEnabled, 
-      includeAllParameters = includeAllParameters,
-      tableColumnNames = .getTableColumnNames(design = x$.design)
-    ))
-  }
-  
-  kMax <- length(x$stages)
-  group1 <- rep(1, kMax)
-  group2 <- rep(2, kMax)
-  empty <- rep(NA_real_, kMax)
-  stageResults <- data.frame(
-    Stage = c(x$stages, x$stages),
-    Group = c(group1, group2),
-    "Cumulative Mean" = c(x$overallMeans1, x$overallMeans2),
-    "Cumulative stDev" = c(x$overallStDevs1, x$overallStDevs2),
-    "Cumulative test statistics" = c(x$overallTestStatistics, empty),
-    "Overall p-value" = c(x$overallPValues, empty),
-    "Cumulative stDev" = c(x$overallStDevs, empty),
-    "Stage-wise test statistic" = c(x$testStatistics, empty),
-    "Stage-wise p-value" = c(x$pValues, empty),
-    "Comb Inverse Normal" = c(x$combInverseNormal, empty),
-    "Comb Fisher" = c(x$combFisher, empty),
-    "Weights Fisher" = c(x$weightsFisher, empty),
-    "Weights Inverse Normal" = c(x$weightsInverseNormal, empty),
-    row.names = row.names,
-    ...
-  )
-  stageResults <- stageResults[with(stageResults, order(Stage, Group)), ]
-  return(stageResults)
+        optional = FALSE, niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE, type = 1, ...) {
+    if (type == 1) {
+        parametersToShow <- x$.getParametersToShow()
+
+        return(.getAsDataFrame(
+            parameterSet = x,
+            parameterNames = parametersToShow,
+            niceColumnNamesEnabled = niceColumnNamesEnabled,
+            includeAllParameters = includeAllParameters
+        ))
+    }
+
+    kMax <- length(x$stages)
+    group1 <- rep(1, kMax)
+    group2 <- rep(2, kMax)
+    empty <- rep(NA_real_, kMax)
+    stageResults <- data.frame(
+        Stage = c(x$stages, x$stages),
+        Group = c(group1, group2),
+        "Cumulative Mean" = c(x$overallMeans1, x$overallMeans2),
+        "Cumulative stDev" = c(x$overallStDevs1, x$overallStDevs2),
+        "Cumulative test statistics" = c(x$overallTestStatistics, empty),
+        "Overall p-value" = c(x$overallPValues, empty),
+        "Cumulative stDev" = c(x$overallStDevs, empty),
+        "Stage-wise test statistic" = c(x$testStatistics, empty),
+        "Stage-wise p-value" = c(x$pValues, empty),
+        "Comb Inverse Normal" = c(x$combInverseNormal, empty),
+        "Comb Fisher" = c(x$combFisher, empty),
+        "Weights Fisher" = c(x$weightsFisher, empty),
+        "Weights Inverse Normal" = c(x$weightsInverseNormal, empty),
+        row.names = row.names,
+        ...
+    )
+    stageResults <- stageResults[with(stageResults, order(Stage, Group)), ]
+    return(stageResults)
 }
 
 .getTreatmentArmsToShow <- function(x, ...) {
@@ -1550,107 +1549,107 @@ plot.StageResults <- function(x, y, ..., type = 1L,
       "condPow <- getConditionalPower(", stageResultsName,
       ", nPlanned = ", .arrayToString(nPlanned, vectorLookAndFeelEnabled = TRUE)
     )
-    if (.isConditionalPowerEnabled(nPlanned) && allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT) {
-      cmd <- paste0(cmd, ", allocationRatioPlanned = ", allocationRatioPlanned)
-    }
-    if (grepl("Means|Survival", .getClassName(x))) {
-      cmd <- paste0(cmd, ", thetaRange = seq(0, 1, 0.1)")
-    } else if (grepl("Rates", .getClassName(x))) {
-      cmd <- paste0(cmd, ", piTreatmentRange = seq(0, 1, 0.1)")
-    }
-    cmd <- paste0(cmd, ", addPlotData = TRUE)")
-    
-    cat("  ", cmd, "\n", sep = "")
-    cat("  plotData <- condPow$.plotData # get plot data list\n", sep = "")
-    cat("  plotData # show plot data list\n", sep = "")
-    cat("  plot(plotData$xValues, plotData$condPowerValues)\n", sep = "")
-    cat("  plot(plotData$xValues, plotData$likelihoodValues)\n", sep = "")
-  }
-  
-  plotData <- .getConditionalPowerPlot(
-    stageResults = x, nPlanned = nPlanned,
-    allocationRatioPlanned = allocationRatioPlanned, ...
-  )
-  
-  yParameterName1 <- "Conditional power"
-  yParameterName2 <- "Likelihood"
-  
-  if (.isMultiArmStageResults(x)) {
-    treatmentArmsToShow <- .getTreatmentArmsToShow(x, ...)
-    data <- data.frame(
-      xValues = numeric(0),
-      yValues = numeric(0),
-      categories = character(0),
-      treatmentArms = numeric(0)
-    )
-    for (treatmentArm in treatmentArmsToShow) {
-      legend1 <- ifelse(length(treatmentArmsToShow) == 1, yParameterName1,
-                        paste0(yParameterName1, " (", treatmentArm, " vs control)")
-      )
-      legend2 <- ifelse(length(treatmentArmsToShow) == 1, yParameterName2,
-                        paste0(yParameterName2, " (", treatmentArm, " vs control)")
-      )
-      
-      treatmentArmIndices <- which(plotData$treatmentArms == treatmentArm)
-      
-      if (all(is.na(plotData$condPowerValues[treatmentArmIndices]))) {
-        if (!all(is.na(plotData$likelihoodValues[treatmentArmIndices]))) {
-          data <- rbind(data, data.frame(
-            xValues = plotData$xValues[treatmentArmIndices],
-            yValues = plotData$likelihoodValues[treatmentArmIndices],
-            categories = rep(legend2, length(plotData$xValues[treatmentArmIndices])),
-            treatmentArms = rep(treatmentArm, length(plotData$xValues[treatmentArmIndices]))
-          ))
+
+    yParameterName1 <- "Conditional power"
+    yParameterName2 <- "Likelihood"
+
+    if (.isMultiArmStageResults(x)) {
+        treatmentArmsToShow <- .getTreatmentArmsToShow(x, ...)
+        data <- data.frame(
+            xValues = numeric(0),
+            yValues = numeric(0),
+            categories = character(),
+            treatmentArms = numeric(0)
+        )
+        for (treatmentArm in treatmentArmsToShow) {
+            legend1 <- ifelse(length(treatmentArmsToShow) == 1, yParameterName1,
+                paste0(yParameterName1, " (", treatmentArm, " vs control)")
+            )
+            legend2 <- ifelse(length(treatmentArmsToShow) == 1, yParameterName2,
+                paste0(yParameterName2, " (", treatmentArm, " vs control)")
+            )
+
+            treatmentArmIndices <- which(plotData$treatmentArms == treatmentArm)
+
+            if (all(is.na(plotData$condPowerValues[treatmentArmIndices]))) {
+                if (!all(is.na(plotData$likelihoodValues[treatmentArmIndices]))) {
+                    data <- rbind(data, data.frame(
+                        xValues = plotData$xValues[treatmentArmIndices],
+                        yValues = plotData$likelihoodValues[treatmentArmIndices],
+                        categories = rep(legend2, length(plotData$xValues[treatmentArmIndices])),
+                        treatmentArms = rep(treatmentArm, length(plotData$xValues[treatmentArmIndices]))
+                    ))
+                }
+            } else {
+                data <- rbind(data, data.frame(
+                    xValues = c(
+                        plotData$xValues[treatmentArmIndices],
+                        plotData$xValues[treatmentArmIndices]
+                    ),
+                    yValues = c(
+                        plotData$condPowerValues[treatmentArmIndices],
+                        plotData$likelihoodValues[treatmentArmIndices]
+                    ),
+                    categories = c(
+                        rep(legend1, length(plotData$xValues[treatmentArmIndices])),
+                        rep(legend2, length(plotData$xValues[treatmentArmIndices]))
+                    ),
+                    treatmentArms = c(
+                        rep(treatmentArm, length(plotData$xValues[treatmentArmIndices])),
+                        rep(treatmentArm, length(plotData$xValues[treatmentArmIndices]))
+                    )
+                ))
+            }
         }
-      } else {
-        data <- rbind(data, data.frame(
-          xValues = c(
-            plotData$xValues[treatmentArmIndices],
-            plotData$xValues[treatmentArmIndices]
-          ),
-          yValues = c(
-            plotData$condPowerValues[treatmentArmIndices],
-            plotData$likelihoodValues[treatmentArmIndices]
-          ),
-          categories = c(
-            rep(legend1, length(plotData$xValues[treatmentArmIndices])),
-            rep(legend2, length(plotData$xValues[treatmentArmIndices]))
-          ),
-          treatmentArms = c(
-            rep(treatmentArm, length(plotData$xValues[treatmentArmIndices])),
-            rep(treatmentArm, length(plotData$xValues[treatmentArmIndices]))
-          )
-        ))
-      }
-    }
-  } else if (.isEnrichmentStageResults(x)) {
-    gMax <- max(na.omit(plotData$populations))
-    populationsToShow <- .getPopulationsToShow(x, ..., gMax = gMax)
-    data <- data.frame(
-      xValues = numeric(0),
-      yValues = numeric(0),
-      categories = character(0),
-      populations = numeric(0)
-    )
-    for (population in populationsToShow) {
-      populationName <- ifelse(population == gMax, "F", paste0("S", population))
-      legend1 <- ifelse(length(populationsToShow) == 1, yParameterName1,
-                        paste0(yParameterName1, " (", populationName, ")")
-      )
-      legend2 <- ifelse(length(populationsToShow) == 1, yParameterName2,
-                        paste0(yParameterName2, " (", populationName, ")")
-      )
-      
-      populationIndices <- which(plotData$populations == population)
-      
-      if (all(is.na(plotData$condPowerValues[populationIndices]))) {
-        if (!all(is.na(plotData$likelihoodValues[populationIndices]))) {
-          data <- rbind(data, data.frame(
-            xValues = plotData$xValues[populationIndices],
-            yValues = plotData$likelihoodValues[populationIndices],
-            categories = rep(legend2, length(plotData$xValues[populationIndices])),
-            populations = rep(population, length(plotData$xValues[populationIndices]))
-          ))
+    } else if (.isEnrichmentStageResults(x)) {
+        gMax <- max(na.omit(plotData$populations))
+        populationsToShow <- .getPopulationsToShow(x, ..., gMax = gMax)
+        data <- data.frame(
+            xValues = numeric(0),
+            yValues = numeric(0),
+            categories = character(),
+            populations = numeric(0)
+        )
+        for (population in populationsToShow) {
+            populationName <- ifelse(population == gMax, "F", paste0("S", population))
+            legend1 <- ifelse(length(populationsToShow) == 1, yParameterName1,
+                paste0(yParameterName1, " (", populationName, ")")
+            )
+            legend2 <- ifelse(length(populationsToShow) == 1, yParameterName2,
+                paste0(yParameterName2, " (", populationName, ")")
+            )
+
+            populationIndices <- which(plotData$populations == population)
+
+            if (all(is.na(plotData$condPowerValues[populationIndices]))) {
+                if (!all(is.na(plotData$likelihoodValues[populationIndices]))) {
+                    data <- rbind(data, data.frame(
+                        xValues = plotData$xValues[populationIndices],
+                        yValues = plotData$likelihoodValues[populationIndices],
+                        categories = rep(legend2, length(plotData$xValues[populationIndices])),
+                        populations = rep(population, length(plotData$xValues[populationIndices]))
+                    ))
+                }
+            } else {
+                data <- rbind(data, data.frame(
+                    xValues = c(
+                        plotData$xValues[populationIndices],
+                        plotData$xValues[populationIndices]
+                    ),
+                    yValues = c(
+                        plotData$condPowerValues[populationIndices],
+                        plotData$likelihoodValues[populationIndices]
+                    ),
+                    categories = c(
+                        rep(legend1, length(plotData$xValues[populationIndices])),
+                        rep(legend2, length(plotData$xValues[populationIndices]))
+                    ),
+                    populations = c(
+                        rep(population, length(plotData$xValues[populationIndices])),
+                        rep(population, length(plotData$xValues[populationIndices]))
+                    )
+                ))
+            }
         }
       } else {
         data <- rbind(data, data.frame(
@@ -1806,18 +1805,40 @@ plot.StageResults <- function(x, y, ..., type = 1L,
     } else if (length(stage) > 1 && all(stage %in% 1:10)) {
       p <- p + ggplot2::scale_x_continuous(breaks = stage)
     }
-  }
-  
-  p <- plotSettings$setAxesAppearance(p)
-  p <- plotSettings$enlargeAxisTicks(p)
-  
-  companyAnnotationEnabled <- .getOptionalArgument("companyAnnotationEnabled", ...)
-  if (is.null(companyAnnotationEnabled) || !is.logical(companyAnnotationEnabled)) {
-    companyAnnotationEnabled <- FALSE
-  }
-  
-  p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
-  
-  # start plot generation
-  return(p)
+
+    # plot confidence intervall
+    else {
+        pd <- ggplot2::position_dodge(0.15)
+
+        p <- p + ggplot2::geom_errorbar(
+            data = data,
+            ggplot2::aes(ymin = .data[["lower"]], ymax = .data[["upper"]]),
+            width = 0.15, position = pd, linewidth = 0.8
+        )
+        p <- p + ggplot2::geom_line(position = pd, linetype = "longdash")
+        p <- p + ggplot2::geom_point(position = pd, size = 2.0)
+
+
+        stage <- unique(data$xValues)
+        kMax <- list(...)[["kMax"]]
+        if (length(stage) == 1 && !is.null(kMax)) {
+            stages <- 1:kMax
+            p <- p + ggplot2::scale_x_continuous(breaks = stages)
+        } else if (length(stage) > 1 && all(stage %in% 1:10)) {
+            p <- p + ggplot2::scale_x_continuous(breaks = stage)
+        }
+    }
+
+    p <- plotSettings$setAxesAppearance(p)
+    p <- plotSettings$enlargeAxisTicks(p)
+
+    companyAnnotationEnabled <- .getOptionalArgument("companyAnnotationEnabled", ...)
+    if (is.null(companyAnnotationEnabled) || !is.logical(companyAnnotationEnabled)) {
+        companyAnnotationEnabled <- FALSE
+    }
+
+    p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
+
+    # start plot generation
+    return(p)
 }

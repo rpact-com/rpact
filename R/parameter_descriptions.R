@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7644 $
+## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -265,10 +265,6 @@ NULL
 #' @keywords internal
 NULL
 
-##
-## Sample Size / Power
-##
-
 #' Parameter Description: Alternative
 #' @param alternative The alternative hypothesis value for testing means. This can be a vector of assumed
 #'   alternatives, default is \code{seq(0, 1, 0.2)} (power calculations) or \code{seq(0.2, 1, 0.2)} (sample size calculations).
@@ -282,6 +278,70 @@ NULL
 #' @name param_alternative_simulation
 #' @keywords internal
 NULL
+
+##  Count data
+
+#' Parameter Description: lambda for Counts
+#' @param lambda A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
+#'   the pooled treatment groups, there is no default. 
+#' @name param_lambda_counts
+#' @keywords internal
+NULL
+
+#' Parameter Description: theta for Counts
+#' @param theta A numeric value or vector that represents the assumed mean ratios lambda1/lambda2 of a homogeneous 
+#' Poisson process, there is no default. 
+#' @name param_theta_counts
+#' @keywords internal
+NULL
+
+#' Parameter Description: lambda (1) for Counts
+#' @param lambda1 A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
+#'   the active treatment group, there is no default. 
+#' @name param_lambda1_counts
+#' @keywords internal
+NULL
+
+#' Parameter Description: lambda (2) for Counts
+#' @param lambda2 A numeric value that represents the assumed rate of a homogeneous Poisson process in
+#'   the control group, there is no default. 
+#' @name param_lambda2_counts
+#' @keywords internal
+NULL
+
+#' Parameter Description: overdispersion for Counts
+#' @param overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution, 
+#' default is \code{0}. 
+#' @name param_overdispersion_counts
+#' @keywords internal
+NULL
+
+#' Parameter Description: fixedExposureTime for Counts
+#' @param fixedExposureTime If specified, the fixed time of exposure per subject for count data, there is no default. 
+#' @name param_fixedExposureTime_counts
+#' @keywords internal
+NULL
+
+#' Parameter Description: accrualTime for Counts
+#' @param accrualTime If specified, the assumed accrual time interval(s) for the study, there is no default.
+#' @name param_accrualTime_counts
+#' @keywords internal
+NULL
+
+#' Parameter Description: accrualIntensity for Counts
+#' @param accrualIntensity If specified, the assumed accrual intensities for the study, there is no default.
+#' @name param_accrualIntensity_counts
+#' @keywords internal
+NULL
+
+#' Parameter Description: followUpTime for Counts
+#' @param followUpTime If specified, the assumed (additional) follow-up time for the study, there is no default.
+#'        The total study duration is \code{accrualTime + followUpTime}.
+#' @name param_followUpTime_counts
+#' @keywords internal
+NULL
+
+
 
 ##
 ## Analysis
@@ -313,9 +373,10 @@ NULL
 #' Parameter Description: Allocation Ratio Planned
 #' @param allocationRatioPlanned The planned allocation ratio \code{n1 / n2} for a two treatment groups
 #'   design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
-#'   For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+#'   For simulating means and rates for a two treatment groups design, it can be a vector of length `kMax`, the number of stages.
 #'   It can be a vector of length kMax, too, for multi-arm and enrichment designs.
 #' 	 In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.
+#'   Note that internally `allocationRatioPlanned` is treated as a vector of length `kMax`, not a scalar.
 #' @name param_allocationRatioPlanned
 #' @keywords internal
 NULL
@@ -367,6 +428,7 @@ NULL
 #'     \item \emph{rates}: a value \code{!= 0}
 #'       (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
 #'     \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+#'     \item \emph{count data}: a bound for testing H0: \code{lambda1 / lambda2 = thetaH0 != 1} can be specified.
 #'   }
 #'   For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 #'   defining the null hypothesis H0: \code{pi = thetaH0}.
@@ -524,8 +586,8 @@ NULL
 NULL
 
 #' Parameter Description: Maximum Number Of Subjects
-#' @param maxNumberOfSubjects \code{maxNumberOfSubjects > 0} needs to be specified.
-#'   For two treatment arms, it is the maximum number of subjects for both treatment arms.
+#' @param maxNumberOfSubjects \code{maxNumberOfSubjects > 0} needs to be specified for power calculations or calculation
+#' of necessary follow-up (count data). For two treatment arms, it is the maximum number of subjects for both treatment arms.
 #' @name param_maxNumberOfSubjects
 #' @keywords internal
 NULL
@@ -839,7 +901,7 @@ NULL
 NULL
 
 #' Parameter Description: Plot Settings
-#' @param plotSettings An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSetting()s}}.
+#' @param plotSettings An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSettings()}}.
 #' @name param_plotSettings
 #' @keywords internal
 NULL

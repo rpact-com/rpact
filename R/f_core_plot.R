@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -372,7 +372,7 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
 #'   \item \code{capnum}:  list with caption and number
 #' }
 #'
-#' @return Returns a list if \code{option} is either \code{capnum} or {numcap}
+#' @return Returns a list if \code{option} is either \code{capnum} or \code{numcap}
 #' or returns a vector that is of  character type for \code{option=caption} or
 #' of numeric type for \code{option=numeric}.
 #'
@@ -401,15 +401,31 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     types <- integer(0)
     if (inherits(obj, "TrialDesignPlan") || inherits(obj, "TrialDesignPlan")) {
         if (obj$.design$kMax > 1) {
-            types <- c(types, 1:4)
+            types <- c(types, 1)
+            if (!.isTrialDesignPlanCountData(obj)) {
+                types <- c(types, 2)
+            }
+            types <- c(types, 3:4)
         }
-        types <- c(types, 5)
         if (obj$.isSampleSizeObject()) {
+            if (!.isTrialDesignPlanCountData(obj) || length(obj[["theta"]]) > 1) {
+                types <- c(types, 5)
+            }
             if (.isTrialDesignPlanSurvival(obj)) {
                 types <- c(types, 13, 14)
             }
         } else {
-            types <- c(types, 6:9)
+            if (obj$.design$kMax > 1) {
+                types <- c(types, 5, 6)
+            }
+            types <- c(types, 7)
+            if (obj$.design$kMax > 1) {
+                types <- c(types, 8)
+                if (!.isTrialDesignPlanCountData(obj) ||
+                        obj$.getParameterType("expectedNumberOfSubjectsH1") == C_PARAM_GENERATED) {
+                    types <- c(types, 9)
+                }
+            }
             if (.isTrialDesignPlanSurvival(obj)) {
                 types <- c(types, 10:14)
             }
@@ -482,7 +498,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (output == "caption") {
-        captions <- character(0)
+        captions <- character()
         for (type in types) {
             captions <- c(captions, .getPlotCaption(obj,
                 type = type,
@@ -514,6 +530,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 }
 
 .getVariedParameterHint <- function(variedParameter, variedParameterName) {
+    if (length(variedParameter) != 2) {
+        return("")
+    }
+    
     return(paste0(
         "Note: interim values between ", round(variedParameter[1], 4), " and ",
         round(variedParameter[2], 4), " were calculated to get smoother lines; use, e.g., '",
@@ -700,8 +720,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         addPowerAndAverageSampleNumber = FALSE,
         theta = seq(-1, 1, 0.02),
         nMax = NA_integer_,
-        mandatoryParameterNames = character(0),
-        yParameterNames = character(0)) {
+        mandatoryParameterNames = character(),
+        yParameterNames = character()) {
     if (.isTrialDesignSet(parameterSet) && parameterSet$getSize() > 1 &&
             (is.null(parameterSet$variedParameters) || length(parameterSet$variedParameters) == 0)) {
         stop(
@@ -710,12 +730,14 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         )
     }
 
-    if (inherits(parameterSet, "TrialDesignSet") || inherits(parameterSet, "TrialDesignSet")) {
-        suppressWarnings(data <- as.data.frame(parameterSet,
+    if (inherits(parameterSet, "TrialDesignSet")) {
+        suppressWarnings(data <- as.data.frame(
+            parameterSet,
             niceColumnNamesEnabled = FALSE,
             includeAllParameters = TRUE,
             addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
-            theta = theta, nMax = nMax
+            theta = theta, 
+            nMax = nMax
         ))
     } else {
         parameterNames <- parameterSet$.getVisibleFieldNamesOrdered()
@@ -770,23 +792,24 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     for (variedParameter in variedParameters) {
         variedParameterNames <- c(
             variedParameterNames,
-            .getTableColumnNames(design = designMaster)[[variedParameter]]
+            .getParameterCaption(variedParameter, designMaster, tableOutputEnabled = TRUE)
         )
     }
     names(variedParameters) <- variedParameterNames
     return(list(data = data, variedParameters = variedParameters))
 }
 
-.getCategories <- function(data, yParameterName, tableColumnNames) {
+.getCategories <- function(data, yParameterName, parameterSet) {
+    axisLabel <- .getAxisLabel(yParameterName, parameterSet)
     if (is.null(data$categories) || sum(is.na(data$categories)) > 0) {
-        return(rep(.getAxisLabel(yParameterName, tableColumnNames), nrow(data)))
+        return(rep(axisLabel, nrow(data)))
     }
 
-    return(paste(data$categories, .getAxisLabel(yParameterName, tableColumnNames), sep = ", "))
+    return(paste(data$categories, axisLabel, sep = ", "))
 }
 
-.getAxisLabel <- function(parameterName, tableColumnNames) {
-    axisLabel <- tableColumnNames[[parameterName]]
+.getAxisLabel <- function(parameterName, parameterSet) {
+    axisLabel <- .getParameterCaption(parameterName, parameterSet, tableOutputEnabled = TRUE)
     if (is.null(axisLabel)) {
         return(paste0("%", parameterName, "%"))
     }
@@ -884,7 +907,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             yParameterNames = yParameterNames
         )
         data <- df$data
-
+        
         variedParameters <- df$variedParameters
         variedParameters <- na.omit(variedParameters)
         variedParameters <- variedParameters[variedParameters != "NA"]
@@ -923,48 +946,45 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     mirrorModeEnabled <- any(grepl("Mirrored$", yParameterNames))
-
-    tableColumnNames <- .getTableColumnNames(design = designMaster)
-
-    xAxisLabel <- .getAxisLabel(xParameterName, tableColumnNames)
-    yAxisLabel1 <- .getAxisLabel(yParameterName1, tableColumnNames)
+    xAxisLabel <- .getAxisLabel(xParameterName, parameterSet)
+    yAxisLabel1 <- .getAxisLabel(yParameterName1, parameterSet)
     yAxisLabel2 <- NULL
     if (!is.null(yParameterName2) && !is.null(yParameterName3)) {
         if (!is.na(yParameterName2)) {
-            pn2 <- .getAxisLabel(yParameterName2, tableColumnNames)
+            pn2 <- .getAxisLabel(yParameterName2, parameterSet)
             if (yParameterName2 == "overallEarlyStop") {
                 pn2 <- "Stopping Probability"
             }
-            yAxisLabel2 <- paste(pn2, .getAxisLabel(yParameterName3, tableColumnNames), sep = " and ")
+            yAxisLabel2 <- paste(pn2, .getAxisLabel(yParameterName3, parameterSet), sep = " and ")
         } else {
-            yAxisLabel2 <- .getAxisLabel(yParameterName3, tableColumnNames)
+            yAxisLabel2 <- .getAxisLabel(yParameterName3, parameterSet)
         }
     } else if (xParameterName == "effectMatrix" && !is.null(yParameterName2) && !is.na(yParameterName2) &&
             yParameterName1 %in% c("expectedNumberOfEvents", "expectedNumberOfSubjects") &&
             yParameterName2 == "rejectAtLeastOne") {
         # special case: simulation results, plot type 6 (expected number of subjects and power)
-        yAxisLabel2 <- .getAxisLabel(yParameterName2, tableColumnNames)
+        yAxisLabel2 <- .getAxisLabel(yParameterName2, parameterSet)
         yParameterName3 <- yParameterName2
         yParameterName2 <- NA_character_
     } else if (!is.null(yParameterName2) && !mirrorModeEnabled) {
-        yAxisLabel1 <- paste(yAxisLabel1, .getAxisLabel(yParameterName2, tableColumnNames), sep = " and ")
+        yAxisLabel1 <- paste(yAxisLabel1, .getAxisLabel(yParameterName2, parameterSet), sep = " and ")
     }
     if (yParameterName1 %in% c("alphaSpent", "betaSpent")) {
         yAxisLabel1 <- "Cumulative Error"
         if (is.null(yParameterName2)) {
-            yAxisLabel1 <- paste0(yAxisLabel1, " (", .getAxisLabel(yParameterName1, tableColumnNames), ")")
+            yAxisLabel1 <- paste0(yAxisLabel1, " (", .getAxisLabel(yParameterName1, parameterSet), ")")
         }
     }
 
-    yAxisLabel1 <- sub(paste0(C_PARAMETER_NAMES[["futilityBoundsDelayedInformation"]], " and"),
+    yAxisLabel1 <- sub(paste0(.getParameterCaption("futilityBoundsDelayedInformation"), " and"),
         "Lower and", yAxisLabel1,
         fixed = TRUE
     )
-    yAxisLabel1 <- sub(paste0(C_PARAMETER_NAMES[["futilityBoundsDelayedInformationNonBinding"]], " and"),
+    yAxisLabel1 <- sub(paste0(.getParameterCaption("futilityBoundsDelayedInformationNonBinding"), " and"),
         "Lower and", yAxisLabel1,
         fixed = TRUE
     )
-
+    
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
         if (!(xParameterName %in% colnames(data))) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset")
@@ -1011,7 +1031,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$categories <- rep(NA_character_, nrow(data))
         }
     }
-
+    
     if (!is.na(nMax) && is.null(yParameterName3) && xParameterName == "informationRates") {
         xAxisLabel <- "Sample Size"
         data$xValues <- data$xValues * nMax
@@ -1052,20 +1072,20 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         df1 <- data.frame(
             xValues = data$xValues,
             yValues = data$yValues * scalingFactor1,
-            categories = .getCategories(data, yParameterName1, tableColumnNames)
+            categories = .getCategories(data, yParameterName1, parameterSet)
         )
         if (!is.na(yParameterName2)) {
             df2 <- data.frame(
                 xValues = data$xValues,
                 yValues = data$yValues2 * scalingFactor2,
-                categories = .getCategories(data, yParameterName2, tableColumnNames)
+                categories = .getCategories(data, yParameterName2, parameterSet)
             )
         }
         if (!is.null(yParameterName3)) {
             df3 <- data.frame(
                 xValues = data$xValues,
                 yValues = data$yValues3 * scalingFactor2,
-                categories = .getCategories(data, yParameterName3, tableColumnNames)
+                categories = .getCategories(data, yParameterName3, parameterSet)
             )
             if (is.na(yParameterName2)) {
                 data <- rbind(df1, df3)
@@ -1086,7 +1106,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             legendTitle <- paste(legendTitle, "Type of error", sep = sep)
         }
     }
-
+    
     if (is.na(legendPosition)) {
         legendPosition <- .getLegendPosition(
             plotSettings, designMaster, data, yParameterName1,
@@ -1155,7 +1175,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (!.isTrialDesignFisher(designMaster) &&
-            (xParameterName == "informationRates" || xParameterName == "eventsPerStage") &&
+            (xParameterName == "informationRates" || xParameterName == "cumulativeEventsPerStage") &&
             yParameterName1 == "stageLevels") {
         yValue <- designMaster$alpha
         if (designMaster$sided == 2) {
@@ -1267,7 +1287,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     data$yValues[!is.na(data$yValues) & is.infinite(data$yValues)] <- NA_real_
     data <- data[!is.na(data$yValues), ]
-
+    
     if (categoryEnabled && groupEnabled) {
         p <- ggplot2::ggplot(data, ggplot2::aes(
             x = .data[["xValues"]], y = .data[["yValues"]],

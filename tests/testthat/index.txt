@@ -23,6 +23,7 @@ test-f_analysis_multiarm_means.R
 test-f_analysis_multiarm_rates.R
 test-f_analysis_multiarm_survival.R
 test-f_analysis_utilities.R
+test-f_as251.R
 test-f_core_assertions.R
 test-f_core_output_formats.R
 test-f_core_plot.R
@@ -30,8 +31,10 @@ test-f_core_utilities.R
 test-f_design_fisher_combination_test.R
 test-f_design_group_sequential.R
 test-f_design_group_sequential_beta_spending.R
-test-f_design_power_calculator.R
-test-f_design_sample_size_calculator.R
+test-f_design_plan_count_data.R
+test-f_design_plan_means.R
+test-f_design_plan_rates.R
+test-f_design_plan_survival.R
 test-f_design_utilities.R
 test-f_logger.R
 test-f_parameter_set_utilities.R
@@ -39,6 +42,7 @@ test-f_quality_assurance.R
 test-f_simulation_base_means.R
 test-f_simulation_base_rates.R
 test-f_simulation_base_survival.R
+test-f_simulation_calc_subjects_function.R
 test-f_simulation_enrichment_means.R
 test-f_simulation_enrichment_rates.R
 test-f_simulation_enrichment_survival.R

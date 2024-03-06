@@ -13,11 +13,12 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7656 $
+## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
+#' @include class_dictionary.R
 #' @include f_core_utilities.R
 NULL
 
@@ -221,7 +222,7 @@ C_TYPE_OF_DESIGN_AS_USER <- "asUser" # user defined alpha spending
 C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY <- "noEarlyEfficacy" # no early efficacy stop
 C_DEFAULT_TYPE_OF_DESIGN <- C_TYPE_OF_DESIGN_OF # the default type of design
 
-C_TYPE_OF_DESIGN_LIST <- list(
+C_TYPE_OF_DESIGN_LIST <- createDictionary("C_TYPE_OF_DESIGN_LIST", list(
     "OF" = "O'Brien & Fleming",
     "P" = "Pocock",
     "WT" = "Wang & Tsiatis Delta class",
@@ -234,7 +235,7 @@ C_TYPE_OF_DESIGN_LIST <- list(
     "asHSD" = "Hwang, Shi & DeCani alpha spending",
     "asUser" = "User defined alpha spending",
     "noEarlyEfficacy" = "No early efficacy stop"
-)
+))
 
 C_PLOT_SHOW_SOURCE_ARGUMENTS <- c("commands", "axes", "test", "validate")
 
@@ -289,14 +290,14 @@ C_TYPE_OF_DESIGN_BS_KD <- "bsKD" # Kim & DeMets beta spending
 C_TYPE_OF_DESIGN_BS_HSD <- "bsHSD" # Hwang, Shi & DeCani beta spending
 C_TYPE_OF_DESIGN_BS_USER <- "bsUser" # user defined beta spending
 
-C_TYPE_OF_DESIGN_BS_LIST <- list(
+C_TYPE_OF_DESIGN_BS_LIST <- createDictionary("C_TYPE_OF_DESIGN_BS_LIST", list(
     "none" = "none",
     "bsP" = "Pocock type beta spending",
     "bsOF" = "O'Brien & Fleming type beta spending",
     "bsKD" = "Kim & DeMets beta spending",
     "bsHSD" = "Hwang, Shi & DeCani beta spending",
     "bsUser" = "user defined beta spending"
-)
+))
 
 C_CIPHERS <- list(token = "310818669631424001", secret = "9318655074497250732")
 
@@ -389,7 +390,7 @@ C_FISHER_METHOD_DEFAULT <- C_FISHER_METHOD_EQUAL_ALPHA
 ## -------------------------------------------
 ##
 
-C_PARAMETER_NAMES <- list(
+C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     iterations = "Iterations",
     seed = "Seed",
     groups = "Treatment groups",
@@ -398,6 +399,8 @@ C_PARAMETER_NAMES <- list(
     means = "Means",
     stDevs = "Standard deviations",
     overallEvents = "Cumulative events",
+    overallEvents1 = "Cumulative events (1)",
+    overallEvents2 = "Cumulative events (2)",
     overallAllocationRatios = "Cumulative allocation ratios",
     expectedEvents = "Expected events",
     varianceEvents = "Variance of events",
@@ -500,16 +503,11 @@ C_PARAMETER_NAMES <- list(
     overallStDevs1 = "Cumulative standard deviations (1)",
     overallStDevs2 = "Cumulative standard deviations (2)",
     overallStDevs = "Cumulative (pooled) standard deviations",
-    testStatistics = "Stage-wise test statistics",
     combInverseNormal = "Combination test statistics", # Inverse normal combination
     combFisher = "Combination test statistics", # Fisher combination
     weightsFisher = "Fixed weights",
     weightsInverseNormal = "Fixed weights",
     overallLogRanks = "Cumulative log-ranks",
-    overallEvents = "Cumulative number of events",
-    overallEvents1 = "Cumulative number of events (1)",
-    overallEvents2 = "Cumulative number of events (2)",
-    overallAllocationRatios = "Cumulative allocation ratios",
     events = "Number of events",
     allocationRatios = "Allocation ratios",
     logRanks = "Log-ranks",
@@ -556,9 +554,7 @@ C_PARAMETER_NAMES <- list(
     expectedEventsH0 = "Expected number of events under H0",
     expectedEventsH01 = "Expected number of events under H0/H1",
     expectedEventsH1 = "Expected number of events under H1",
-    analysisTime = "Analysis times",
     studyDurationH1 = "Expected study duration under H1",
-    expectedNumberOfSubjectsH1 = "Expected number of subjects under H1",
     twoSidedPower = "Two-sided power",
     plannedEvents = "Planned cumulative events",
     plannedSubjects = "Planned cumulative subjects", # per arm (multi-arm); overall (base)
@@ -571,11 +567,7 @@ C_PARAMETER_NAMES <- list(
     maxNumberOfIterations = "Maximum number of iterations",
     allocation1 = "Allocation 1",
     allocation2 = "Allocation 2",
-    expectedNumberOfEvents = "Expected number of events",
-    expectedNumberOfEventsPerStage = "Expected number of events by stage",
-    eventsNotAchieved = "Events not achieved",
     subjects = "Subjects",
-    overallReject = "Overall reject",
     futilityStop = "Overall futility stop",
     studyDuration = "Expected study duration",
     maxStudyDuration = "Maximal study duration",
@@ -600,8 +592,8 @@ C_PARAMETER_NAMES <- list(
     futilityBoundsPValueScale = "Futility bounds (one-sided p-value scale)",
     futilityBoundsPValueScaleDelayedInformation = "Lower bounds of continuation (one-sided p-value scale)",
     analysisTime = "Analysis time",
-    eventsPerStage1 = "Observed # events by stage (1)",
-    eventsPerStage2 = "Observed # events by stage (2)",
+    eventsPerStage1 = "Observed events by stage (1)",
+    eventsPerStage2 = "Observed events by stage (2)",
     testStatistic = "Test statistic",
     logRankStatistic = "Log-rank statistic",
     hazardRatioEstimateLR = "Hazard ratio estimate LR",
@@ -611,10 +603,13 @@ C_PARAMETER_NAMES <- list(
     median1 = "median(1)",
     median2 = "median(2)",
     eventsPerStage = "Number of events per stage",
-    overallEventsPerStage = "Cumulative number of events",
-    expectedNumberOfEvents = "Observed number of events",
-    expectedNumberOfSubjects = "Observed number of subjects",
-    singleNumberOfEventsPerStage = "Single number of events",
+    expectedNumberOfEventsPerStage = "Expected number of events by stage",
+    eventsNotAchieved = "Events not achieved",
+    cumulativeEventsPerStage = "Cumulative number of events",
+    expectedNumberOfEvents = "Expected number of events",
+    singleEventsPerStage = "Single number of events",
+    singleEventsPerArmAndStage = "Single number of events",
+    singleEventsPerSubsetAndStage = "Single number of events",
     endOfAccrualIsUserDefined = "End of accrual is user defined",
     followUpTimeMustBeUserDefined = "Follow-up time must be user defined",
     maxNumberOfSubjectsIsUserDefined = "Max number of subjects is user defined",
@@ -694,10 +689,23 @@ C_PARAMETER_NAMES <- list(
     locationConditionalPower = "Location conditional power",
     variationConditionalPower = "Variation conditional power",
     subscoreConditionalPower = "Sub-score conditional power",
-    performanceScore = "Performance scores"
-)
+    performanceScore = "Performance scores",
+    overdispersion = "Overdispersion",
+    lambda = "Lambda",
+    fixedExposureTime = "Fixed exposure time",
+    calendarTime = "Calendar time",
+    studyTime = "Study time",
+    studySubjects = "Study subjects",
+    expectedStudyDurationH1 = "Expected study duration under H1",
+    informationOverStages = "Information over stages",
+    expectedInformationH0 = "Expected information under H0",
+    expectedInformationH01 = "Expected information under H0/H1",
+    expectedInformationH1 = "Expected information under H1",
+    plannedMaxSubjects = "Planned maximum number of subjects",
+    plannedCalendarTime = "Planned calendar time"
+))
 
-C_TABLE_COLUMN_NAMES <- list(
+C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     iterations = "Iterations",
     seed = "Seed",
     groups = "Treatment group",
@@ -706,6 +714,8 @@ C_TABLE_COLUMN_NAMES <- list(
     means = "Mean",
     stDevs = "Standard deviation",
     overallEvents = "Cumulative event",
+    overallEvents1 = "Cumulative events (1)",
+    overallEvents2 = "Cumulative events (2)",
     overallAllocationRatios = "Cumulative allocation ratio",
     overallMeans = "Cumulative mean",
     expectedEvents = "Expected event",
@@ -781,9 +791,7 @@ C_TABLE_COLUMN_NAMES <- list(
     overallPiTreatments = "Cumulative treatment rate",
     overallPisControl = "Cumulative control rate",
     overallPisTreatment = "Cumulative treatment rate",
-    stages = "Stage",
     effectSizes = "Overall effect size",
-    testStatistics = "Stage-wise test statistic",
     pValues = "p-value",
     testActions = "Action",
     conditionalPower = "Conditional power",
@@ -813,10 +821,6 @@ C_TABLE_COLUMN_NAMES <- list(
     weightsFisher = "Fixed weight",
     weightsInverseNormal = "Fixed weight",
     overallLogRanks = "Cumulative log-rank",
-    overallEvents = "Cumulative # events",
-    overallEvents1 = "Cumulative # events (1)",
-    overallEvents2 = "Cumulative # events (2)",
-    overallAllocationRatios = "Cumulative allocation ratio",
     events = "# events",
     allocationRatios = "Allocation ratio",
     logRanks = "Log-rank",
@@ -845,7 +849,6 @@ C_TABLE_COLUMN_NAMES <- list(
     expectedNumberOfSubjectsH0 = "Expected # subjects under H0",
     expectedNumberOfSubjectsH01 = "Expected # subjects under H0/H1",
     expectedNumberOfSubjectsH1 = "Expected # subjects under H1",
-    expectedNumberOfSubjects = "Expected # subjects",
     chi = "Probability of an event",
     hazardRatio = "Hazard ratio",
     hazardRatios = "Hazard ratios",
@@ -860,14 +863,13 @@ C_TABLE_COLUMN_NAMES <- list(
     dropoutRate2 = "Drop-out rate (2)",
     dropoutTime = "Drop-out time",
     eventsFixed = "# events fixed",
-    expectedEventsH0 = "Expected # events under H0",
-    expectedEventsH01 = "Expected # events under H0/H1",
-    expectedEventsH1 = "Expected # events under H1",
+    expectedEventsH0 = "Expected events under H0",
+    expectedEventsH01 = "Expected events under H0/H1",
+    expectedEventsH1 = "Expected events under H1",
     analysisTime = "Analysis time",
-    eventsPerStage1 = "Observed # events by stage (1)",
-    eventsPerStage2 = "Observed # events by stage (2)",
+    eventsPerStage1 = "Observed events by stage (1)",
+    eventsPerStage2 = "Observed events by stage (2)",
     studyDurationH1 = "Expected study duration H1",
-    expectedNumberOfSubjectsH1 = "Expected # subjects H1",
     twoSidedPower = "Two-sided power",
     plannedEvents = "Planned cumulative events",
     plannedSubjects = "Planned cumulative subjects",
@@ -880,7 +882,6 @@ C_TABLE_COLUMN_NAMES <- list(
     maxNumberOfIterations = "Maximum # iterations",
     allocation1 = "Allocation 1",
     allocation2 = "Allocation 2",
-    expectedNumberOfEvents = "Expected # events",
     expectedNumberOfEventsPerStage = "Expected # events by stage",
     eventsNotAchieved = "Events not achieved",
     subjects = "Subjects",
@@ -912,12 +913,13 @@ C_TABLE_COLUMN_NAMES <- list(
     piecewiseSurvivalEnabled = "Piecewise exponential survival enabled",
     median1 = "median(1)",
     median2 = "median(2)",
-    eventsPerStage = "Cumulative # events",
-    eventsPerStage = "# events per stage",
-    overallEventsPerStage = "Cumulative # events",
-    expectedNumberOfEvents = "Observed # events",
-    expectedNumberOfSubjects = "Observed # subjects",
-    singleNumberOfEventsPerStage = "Single # events",
+    eventsPerStage = "Events per stage", 
+    cumulativeEventsPerStage = "Cumulative events",
+    expectedNumberOfEvents = "Expected events",
+    expectedNumberOfSubjects = "Expected subjects",
+    singleEventsPerStage = "Single events",
+    singleEventsPerArmAndStage = "Single events",
+    singleEventsPerSubsetAndStage = "Single events",
     endOfAccrualIsUserDefined = "End of accrual is user defined",
     followUpTimeMustBeUserDefined = "Follow-up time must be user defined",
     maxNumberOfSubjectsIsUserDefined = "Max number of subjects is user defined",
@@ -993,128 +995,192 @@ C_TABLE_COLUMN_NAMES <- list(
     locationConditionalPower = "Location conditional power",
     variationConditionalPower = "Variation conditional power",
     subscoreConditionalPower = "Sub-score conditional power",
-    performanceScore = "Performance score"
-)
+    performanceScore = "Performance score",
+    overdispersion = "Overdispersion",
+    lambda = "Lambda",
+    fixedExposureTime = "Fixed exposure time",
+    calendarTime = "Calendar time",
+    studyTime = "Study time",
+    studySubjects = "Study subjects",
+    expectedStudyDurationH1 = "Expected study duration under H1",
+    informationOverStages = "Information over stages",
+    expectedInformationH0 = "Expected information under H0",
+    expectedInformationH01 = "Expected information under H0/H1",
+    expectedInformationH1 = "Expected information under H1",
+    plannedMaxSubjects = "Planned max. number of subjects",
+    plannedCalendarTime = "Planned calendar time"
+))
 
-.getParameterCaptions <- function(captionList, ...,
-        design = NULL,
-        designPlan = NULL,
-        stageResults = NULL,
-        analysisResults = NULL,
-        dataset = NULL,
-        designCharacteristics = NULL,
-        tableColumns = FALSE) {
-    parameterNames <- captionList
+C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETTINGS", list(
+    "lineSize" = "Line size",
+    "pointSize" = "Point size",
+    "pointColor" = "Point color",
+    "mainTitleFontSize" = "Main title font size",
+    "axesTextFontSize" = "Axes text font size",
+    "legendFontSize" = "Legend font size",
+    "scalingFactor" = "Scaling factor"
+))
 
-    if (!is.null(design)) {
-        parameterNameFutilityBounds <- "futilityBounds"
-        if (.isDelayedInformationEnabled(design = design)) {
-            if (!is.na(design$bindingFutility) && !design$bindingFutility) {
-                parameterNameFutilityBounds <- "futilityBoundsDelayedInformationNonBinding"
-            } else {
-                parameterNameFutilityBounds <- "futilityBoundsDelayedInformation"
+.getParameterCaption <- function(parameterName, obj = NULL, ..., tableOutputEnabled = FALSE) {
+    if (is.null(obj)) {
+        if (tableOutputEnabled) {
+            return(C_TABLE_COLUMN_NAMES[[parameterName]])
+        }
+
+        return(C_PARAMETER_NAMES[[parameterName]])
+    }
+
+    if (inherits(obj, "PlotSettings")) {
+        return(C_PARAMETER_NAMES_PLOT_SETTINGS[[parameterName]])
+    }
+
+    if (inherits(obj, "TrialDesign")) {
+        if (identical(parameterName, "futilityBounds")) {
+            if (.isDelayedInformationEnabled(design = obj)) {
+                if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
+                    return("futilityBoundsDelayedInformationNonBinding")
+                }
+                return("futilityBoundsDelayedInformation")
+            } else if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
+                return("futilityBoundsNonBinding")
             }
-            parameterNames$criticalValues <- captionList[["criticalValuesDelayedInformation"]]
-
-            parameterNames$criticalValuesEffectScale <- captionList[["criticalValuesEffectScaleDelayedInformation"]]
-            parameterNames$futilityBoundsEffectScale <- captionList[["futilityBoundsEffectScaleDelayedInformation"]]
-            parameterNames$futilityBoundsPValueScale <- captionList[["futilityBoundsPValueScaleDelayedInformation"]]
-        } else if (!is.na(design$bindingFutility) && !design$bindingFutility) {
-            parameterNameFutilityBounds <- "futilityBoundsNonBinding"
         }
-        parameterNames$futilityBounds <- captionList[[parameterNameFutilityBounds]]
-    }
-
-    if (!is.null(designPlan) && (inherits(designPlan, "TrialDesignPlanSurvival") || inherits(designPlan, "TrialDesignPlanSurvival")) &&
-            !is.null(designPlan$.piecewiseSurvivalTime) &&
-            designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
-        parameterNames$lambda2 <- "Piecewise survival lambda (2)"
-        parameterNames$lambda1 <- "Piecewise survival lambda (1)"
-    }
-
-    if (!is.null(designPlan) &&
-            (inherits(designPlan, "TrialDesignPlanSurvival") || inherits(designPlan, "TrialDesignPlanSurvival")) &&
-            identical(designPlan$.design$kMax, 1L)) {
-        parameterNames$maxNumberOfEvents <- "Number of events"
-    }
-
-    if (!is.null(designPlan) && (inherits(designPlan, "TrialDesignPlan") || inherits(designPlan, "TrialDesignPlan")) &&
-            identical(designPlan$.design$kMax, 1L)) {
-        parameterNames$studyDuration <- "Study duration"
-    }
-
-    if (!is.null(analysisResults)) {
-        pluralExt <- ifelse(tableColumns, "", "s")
-        if (.isTrialDesignConditionalDunnett(analysisResults$.design)) {
-            parameterNames$repeatedConfidenceIntervalLowerBounds <-
-                paste0("Overall confidence interval", pluralExt, " (lower)")
-            parameterNames$repeatedConfidenceIntervalUpperBounds <-
-                paste0("Overall confidence interval", pluralExt, " (upper)")
-            parameterNames$repeatedPValues <- paste0("Overall p-value", pluralExt)
-        } else if (identical(analysisResults$.design$kMax, 1L)) {
-            parameterNames$repeatedConfidenceIntervalLowerBounds <- paste0("Confidence interval", pluralExt, " (lower)")
-            parameterNames$repeatedConfidenceIntervalUpperBounds <- paste0("Confidence interval", pluralExt, " (upper)")
-            parameterNames$repeatedPValues <- paste0("Overall p-value", pluralExt)
+        if (identical(parameterName, "criticalValues") && .isDelayedInformationEnabled(design = obj)) {
+            return("criticalValuesDelayedInformation")
+        }
+        if (identical(parameterName, "criticalValuesEffectScale") && .isDelayedInformationEnabled(design = obj)) {
+            return("criticalValuesEffectScaleDelayedInformation")
+        }
+        if (identical(parameterName, "futilityBoundsEffectScale") && .isDelayedInformationEnabled(design = obj)) {
+            return("futilityBoundsEffectScaleDelayedInformation")
+        }
+        if (identical(parameterName, "futilityBoundsPValueScale") && .isDelayedInformationEnabled(design = obj)) {
+            return("futilityBoundsPValueScaleDelayedInformation")
         }
     }
 
-    if (!is.null(designPlan) &&
-            ((inherits(designPlan, "TrialDesignPlanMeans") || inherits(designPlan, "TrialDesignPlanMeans")) ||
-                (inherits(designPlan, "SimulationResultsMeans") || inherits(designPlan, "SimulationResultsMeans"))) &&
-            isTRUE(designPlan$meanRatio)) {
-        parameterNames$stDev <- "Coefficient of variation"
+    if (identical(parameterName, "futilityBounds") &&
+            inherits(obj, "TrialDesignSet") && length(obj$designs) > 1) {
+        bindingFutilityValues <- logical(0)
+        for (design in obj$designs) {
+            bindingFutilityValues <- unique(c(bindingFutilityValues, design$bindingFutility))
+        }
+        if (length(bindingFutilityValues) > 1) {
+            return("Futility bound")
+        }
     }
 
-    if (!is.null(design) && .getClassName(design) != "TrialDesign" && design$sided == 2) {
-        parameterNames$criticalValuesPValueScale <- paste0("Local two-sided significance level", ifelse(tableColumns, "", "s"))
+    if (identical(parameterName, "eventsPerStage") &&
+            (inherits(obj, "TrialDesignPlanSurvival") || 
+                inherits(obj, "SimulationResultsMultiArmSurvival"))) {
+        return(ifelse(tableOutputEnabled, "Cumulative events", "Cumulative events per stage"))
     }
 
-    if ((!is.null(stageResults) && stageResults$isOneSampleDataset()) ||
-            (!is.null(dataset) && inherits(dataset, "DatasetMeans"))) {
-        parameterNames$overallStDevs <- paste0("Cumulative standard deviation", ifelse(tableColumns, "", "s"))
+    if (identical(parameterName, "lambda1") &&
+            inherits(obj, "TrialDesignPlanSurvival") &&
+            !is.null(obj$.piecewiseSurvivalTime) &&
+            obj$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
+        return("Piecewise survival lambda (1)")
     }
 
-    return(parameterNames)
+    if (identical(parameterName, "lambda2") &&
+            inherits(obj, "TrialDesignPlanSurvival") &&
+            !is.null(obj$.piecewiseSurvivalTime) &&
+            obj$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
+        return("Piecewise survival lambda (2)")
+    }
+
+    if (identical(parameterName, "maxNumberOfEvents") &&
+            inherits(obj, "TrialDesignPlanSurvival") &&
+            identical(obj$.design$kMax, 1L)) {
+        return("Number of events")
+    }
+
+    if (identical(parameterName, "studyDuration") &&
+            inherits(obj, "TrialDesignPlan") &&
+            identical(obj$.design$kMax, 1L)) {
+        return("Study duration")
+    }
+
+    if (inherits(obj, "AnalysisResults")) {
+        pluralExt <- ifelse(tableOutputEnabled, "", "s")
+        if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds")) {
+            if (.isTrialDesignConditionalDunnett(obj$.design)) {
+                return(paste0("Overall confidence interval", pluralExt, " (lower)"))
+            } else {
+                return(paste0("Confidence interval", pluralExt, " (lower)"))
+            }
+        }
+        if (identical(parameterName, "repeatedConfidenceIntervalUpperBounds")) {
+            if (.isTrialDesignConditionalDunnett(obj$.design)) {
+                return(paste0("Overall confidence interval", pluralExt, " (upper)"))
+            } else {
+                return(paste0("Confidence interval", pluralExt, " (upper)"))
+            }
+        }
+        if (identical(parameterName, "repeatedPValues")) {
+            return(paste0("Overall p-value", pluralExt))
+        }
+    }
+
+    if (identical(parameterName, "stDev") &&
+            (inherits(obj, "TrialDesignPlanMeans") || inherits(obj, "SimulationResultsMeans")) &&
+            isTRUE(obj$meanRatio)) {
+        return("Coefficient of variation")
+    }
+
+    if (identical(parameterName, "criticalValuesPValueScale") && inherits(obj, "TrailDesign") &&
+            .getClassName(obj) != "TrialDesign" && obj$sided == 2) {
+        return(paste0("Local two-sided significance level", ifelse(tableOutputEnabled, "", "s")))
+    }
+
+    if (identical(parameterName, "overallStDevs") &&
+            ((inherits(obj, "StageResults") && obj$isOneSampleDataset()) ||
+            inherits(obj, "DatasetMeans"))) {
+        return(paste0("Cumulative standard deviation", ifelse(tableOutputEnabled, "", "s")))
+    }
+
+    if (tableOutputEnabled) {
+        return(C_TABLE_COLUMN_NAMES[[parameterName]])
+    }
+
+    return(C_PARAMETER_NAMES[[parameterName]])
 }
 
-.getParameterNames <- function(...,
-        design = NULL,
-        designPlan = NULL,
-        stageResults = NULL,
-        analysisResults = NULL,
-        dataset = NULL,
-        designCharacteristics = NULL) {
-    .getParameterCaptions(
-        captionList = C_PARAMETER_NAMES,
-        design = design,
-        designPlan = designPlan,
-        stageResults = stageResults,
-        analysisResults = analysisResults,
-        dataset = dataset,
-        designCharacteristics = designCharacteristics
-    )
+.getParameterFormatFunction <- function(parameterName, obj = NULL) {
+    if (is.null(obj) || !inherits(obj, "FieldSet")) {
+        return(C_PARAMETER_FORMAT_FUNCTIONS[[parameterName]])
+    }
+
+    if (parameterName == "overallAdjustedTestStatistics" &&
+            inherits(obj, "ClosedCombinationTestResults") &&
+            !is.null(obj[[".design"]]) &&
+            inherits(obj$.design, C_CLASS_NAME_TRIAL_DESIGN_FISHER)) {
+        return(".formatTestStatisticsFisher")
+    }
+
+    if (parameterName == "maxInformation" && inherits(obj, "TrialDesignPlanCountData")) {
+        return(".formatRatesDynamic")
+    }
+
+    if (parameterName == "nFixed" && inherits(obj, "TrialDesignCharacteristics")) {
+        return(".formatProbabilities")
+    }
+
+    if (parameterName == "criticalValues" && inherits(obj, "TrialDesignFisher")) {
+        return(".formatCriticalValuesFisher")
+    }
+
+    if (parameterName == "accrualTime" && inherits(obj, "TrialDesignPlanCountData")) {
+        if (obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
+            return(".formatHowItIs")
+        }
+    }
+
+    return(C_PARAMETER_FORMAT_FUNCTIONS[[parameterName]])
 }
 
-.getTableColumnNames <- function(...,
-        design = NULL,
-        designPlan = NULL,
-        stageResults = NULL,
-        analysisResults = NULL,
-        dataset = NULL,
-        designCharacteristics = NULL) {
-    .getParameterCaptions(
-        captionList = C_TABLE_COLUMN_NAMES,
-        design = design,
-        designPlan = designPlan,
-        stageResults = stageResults,
-        analysisResults = analysisResults,
-        dataset = dataset,
-        designCharacteristics = designCharacteristics,
-        tableColumns = TRUE
-    )
-}
-
-C_PARAMETER_FORMAT_FUNCTIONS <- list(
+C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS", list(
     means = ".formatMeans",
     stDevs = ".formatStDevs",
     stDev = ".formatStDevs",
@@ -1131,11 +1197,9 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     alphaSpent = ".formatProbabilities",
     alpha0Vec = ".formatProbabilities",
     simAlpha = ".formatProbabilities",
-    criticalValues = ".formatCriticalValuesFisher", # will be set in class TrialDesignFisher
-    criticalValues = ".formatCriticalValues", # will be set in class TrialDesignGroupSequential
+    criticalValues = ".formatCriticalValues",
     betaSpent = ".formatProbabilities",
     futilityBounds = ".formatCriticalValues",
-    alpha0Vec = ".formatProbabilities",
     constantBoundsHP = ".formatCriticalValues",
     nMax = ".formatProbabilities",
     nFixed = ".formatSampleSizes",
@@ -1176,7 +1240,6 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     overallStDevs2 = ".formatStDevs",
     overallStDevs = ".formatStDevs",
     overallPooledStDevs = ".formatStDevs",
-    testStatistics = ".formatTestStatistics",
     combInverseNormal = ".formatTestStatistics",
     combFisher = ".formatTestStatisticsFisher",
     weightsFisher = ".formatRates",
@@ -1229,7 +1292,6 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     expectedEventsH1 = ".formatEvents",
     analysisTime = ".formatTime",
     studyDurationH1 = ".formatDurations",
-    expectedNumberOfSubjectsH1 = ".formatSampleSizes",
     expectedEvents = ".formatEvents",
     varianceEvents = ".formatEvents",
     overallExpectedEvents = ".formatEvents",
@@ -1254,9 +1316,9 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     accrualIntensity = ".formatAccrualIntensities",
     accrualIntensityRelative = ".formatAccrualIntensities",
     eventsPerStage = ".formatEvents",
-    expectedNumberOfEvents = ".formatEvents",
-    expectedNumberOfSubjects = ".formatEvents",
-    singleNumberOfEventsPerStage = ".formatEvents",
+    singleEventsPerStage = ".formatEvents",
+    singleEventsPerArmAndStage = ".formatEvents",
+    singleEventsPerSubsetAndStage = ".formatEvents",
     time = ".formatTime",
     cumulativeEventProbabilities = ".formatProbabilities",
     eventProbabilities1 = ".formatProbabilities",
@@ -1277,7 +1339,6 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     overallPisControl = ".formatRates",
     overallPisTreatment = ".formatRates",
     adjustedStageWisePValues = ".formatPValues",
-    overallAdjustedTestStatistics = ".formatTestStatisticsFisher", # will be set in class ClosedCombinationTestResults
     overallAdjustedTestStatistics = ".formatTestStatistics",
     conditionalErrorRate = ".formatProbabilities",
     secondStagePValues = ".formatPValues",
@@ -1314,5 +1375,17 @@ C_PARAMETER_FORMAT_FUNCTIONS <- list(
     locationConditionalPower = ".formatProbabilities",
     variationConditionalPower = ".formatProbabilities",
     subscoreConditionalPower = ".formatProbabilities",
-    performanceScore = ".formatProbabilities"
-)
+    performanceScore = ".formatProbabilities",
+    overdispersion = ".formatStDevs",
+    lambda = ".formatRates",
+    fixedExposureTime = ".formatTime",
+    calendarTime = ".formatTime",
+    studyTime = ".formatTime",
+    studySubjects = ".formatSampleSizes",
+    expectedStudyDurationH1 = ".formatTime",
+    informationOverStages = ".formatRatesDynamic",
+    expectedInformationH0 = ".formatRatesDynamic",
+    expectedInformationH01 = ".formatRatesDynamic",
+    expectedInformationH1 = ".formatRatesDynamic",
+    plannedMaxSubjects = ".formatSampleSizes"
+))

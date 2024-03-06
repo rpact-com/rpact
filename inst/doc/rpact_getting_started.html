@@ -12,7 +12,7 @@
 
 <meta name="author" content="Friedrich Pahlke and Gernot Wassmer" />
 
-<meta name="date" content="2023-11-13" />
+<meta name="date" content="2024-02-21" />
 
 <title>Getting started with rpact</title>
 
@@ -239,7 +239,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Getting started with rpact</h1>
 <h4 class="author">Friedrich Pahlke and Gernot Wassmer</h4>
-<h4 class="date">2023-11-13</h4>
+<h4 class="date">2024-02-21</h4>
 
 
 
@@ -248,32 +248,28 @@ Analysis</strong></p>
 <div id="functional-range" class="section level2">
 <h2>Functional Range</h2>
 <ul>
+<li>Fixed sample design and designs with interim analysis stages</li>
 <li>Sample size and power calculation for
 <ul>
 <li>means (continuous endpoint)</li>
 <li>rates (binary endpoint)</li>
-<li>survival trials with
-<ul>
-<li>flexible survival time distributions</li>
-<li>user defined patient recruitment</li>
+<li>survival trials with flexible recruitment and survival time
+options</li>
+<li>count data</li>
 </ul></li>
-<li>count data<br />
-</li>
-</ul></li>
-<li>Fixed sample size design and designs with interim analysis
-stages</li>
 <li>Simulation tool for means, rates, and survival data
 <ul>
 <li>Assessment of adaptive sample size/event number recalculations based
-on conditional power using predefined and user-defined formulas</li>
-<li>Assessment of treatment selection rules in multi-arm trials</li>
-<li>Assessment of adaptive strategies in population enrichment
-designs</li>
+on conditional power</li>
+<li>Assessment of treatment selection strategies in multi-arm
+trials</li>
 </ul></li>
-<li>Adaptive analysis for means, rates, and survival data</li>
-<li>One- and two-armed trials testing a single hypothesis</li>
-<li>Closed testing procedure for testing multiple hypotheses in
-multi-arm and population enrichment designs</li>
+<li>Adaptive analysis of means, rates, and survival data</li>
+<li>Adaptive designs and analysis for multi-arm trials</li>
+<li>Adaptive analysis and simulation tools for enrichment design testing
+means, rates, and hazard ratios</li>
+<li>Automatic boundary recalculations during the trial for analysis with
+alpha spending approach, including under- and over-running</li>
 </ul>
 </div>
 <div id="learn-to-use-rpact" class="section level2">
@@ -331,9 +327,9 @@ rpact</li>
 <li>Planning and Analyzing a Group-Sequential Multi-Arm Multi-Stage
 Design with Binary Endpoint using rpact<br />
 </li>
-<li>Two-arm analysis for continuous data with covariates from raw data
-(<em>exclusive</em>)</li>
-<li>How to install the latest developer version
+<li>Two-arm Analysis for Continuous Data with Covariates from Raw Data
+using rpact (<em>exclusive</em>)</li>
+<li>How to Install the Latest rpact Developer Version
 (<em>exclusive</em>)</li>
 <li>Delayed Response Designs with rpact</li>
 <li>Sample Size Calculation for Count Data</li>
@@ -366,8 +362,8 @@ names:</p>
 <ul>
 <li><code>getDesign</code>[<code>GroupSequential</code>/<code>InverseNormal</code>/<code>Fisher</code>]<code>()</code></li>
 <li><code>getDesignCharacteristics()</code></li>
-<li><code>getSampleSize</code>[<code>Means</code>/<code>Rates</code>/<code>Survival</code>]<code>()</code></li>
-<li><code>getPower</code>[<code>Means</code>/<code>Rates</code>/<code>Survival</code>]<code>()</code></li>
+<li><code>getSampleSize</code>[<code>Means</code>/<code>Rates</code>/<code>Survival</code>/<code>Counts</code>]<code>()</code></li>
+<li><code>getPower</code>[<code>Means</code>/<code>Rates</code>/<code>Survival</code>/<code>Counts</code>]<code>()</code></li>
 <li><code>getSimulation</code>[<code>MultiArm</code>/<code>Enrichment</code>]`<code>[</code>Means<code>/</code>Rates<code>/</code>Survival<code>]</code>()`</li>
 <li><code>getDataSet()</code></li>
 <li><code>getAnalysisResults()</code></li>

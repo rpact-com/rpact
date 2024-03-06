@@ -60,6 +60,7 @@ That is, in case of (one-sided) testing of
 \item \emph{rates}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
 \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{count data}: a bound for testing H0: \code{lambda1 / lambda2 = thetaH0 != 1} can be specified.
 }
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
@@ -222,7 +223,7 @@ testing situation. The function might depend on variables
 \code{conditionalPower},
 \code{thetaH0},
 \code{plannedEvents},
-\code{eventsPerStage},
+\code{singleEventsPerStage},
 \code{minNumberOfEventsPerStage},
 \code{maxNumberOfEventsPerStage},
 \code{allocationRatioPlanned},
@@ -300,7 +301,7 @@ object as \code{\link[base]{data.frame}}. The data frame contains the following 
 in treatment group 1.
 \item \code{eventsPerStage2}: The observed number of events per stage
 in treatment group 2.
-\item \code{eventsPerStage}: The observed number of events per stage
+\item \code{singleEventsPerStage}: The observed number of events per stage
 in both treatment groups.
 \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
 \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
@@ -325,27 +326,6 @@ user defined with \code{thetaH1}.
 \code{\link[=getRawData]{getRawData()}} can be used to get the simulated raw data from the
 object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival()}
 must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
-The data frame contains the following columns:
-\enumerate{
-\item \code{iterationNumber}: The number of the simulation iteration.
-\item \code{stopStage}: The stage of stopping.
-\item \code{subjectId}: The subject id (increasing number 1, 2, 3, ...)
-\item \code{accrualTime}: The accrual time, i.e., the time when the subject entered the trial.
-\item \code{treatmentGroup}: The treatment group number (1 or 2).
-\item \code{survivalTime}: The survival time of the subject.
-\item \code{dropoutTime}: The dropout time of the subject (may be \code{NA}).
-\item \code{observationTime}: The specific observation time.
-\item \code{timeUnderObservation}: The time under observation is defined as follows:\cr
-if (event == TRUE) {\cr
-timeUnderObservation <- survivalTime;\cr
-} else if (dropoutEvent == TRUE) {\cr
-timeUnderObservation <- dropoutTime;\cr
-} else {\cr
-timeUnderObservation <- observationTime - accrualTime;\cr
-}
-\item \code{event}: \code{TRUE} if an event occurred; \code{FALSE} otherwise.
-\item \code{dropoutEvent}: \code{TRUE} if an dropout event occurred; \code{FALSE} otherwise.
-}
 }
 
 \section{How to get help for generic functions}{

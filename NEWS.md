@@ -1,16 +1,39 @@
 
+# rpact 3.5.1
+
+* The internal fields `.parameterNames` and `.parameterFormatFunctions` were removed from all rpact result objects in favor of a more efficient solution
+* Issues [#15](https://github.com/rpact-com/rpact/issues/15), [#16](https://github.com/rpact-com/rpact/issues/16), [#17](https://github.com/rpact-com/rpact/issues/17), [#19](https://github.com/rpact-com/rpact/issues/19), and [#23](https://github.com/rpact-com/rpact/issues/23) fixed
+* Fixed inconsistent naming of variables and class fields (issue [#21](https://github.com/rpact-com/rpact/issues/21))
+    - `getSampleSizeSurvival()` / `getPowerSurvival()`:
+       + Field `eventsPerStage` replaced by `cumulativeEventsPerStage`
+       + Field `singleEventsPerStage` added
+    - `getSimulationSurvival()`: 
+       + Field `eventsPerStage` replaced by `singleEventsPerStage` 
+       + Field `overallEventsPerStage` replaced by `cumulativeEventsPerStage` 
+    - `getSimulationMultiArmSurvival()`: 
+       + Field `eventsPerStage` replaced by `cumulativeEventsPerStage` 
+       + Field `singleNumberOfEventsPerStage` replaced by `singleEventsPerArmAndStage` 
+       + Field `singleEventsPerStage` added
+    - `getSimulationEnrichmentSurvival()`: 
+       + field `singleNumberOfEventsPerStage` replaced by `singleEventsPerSubsetAndStage` 
+* Test coverage CI/CD pipeline activated with the assistance of GitHub Actions, which runs `covr` and uploads the results to [codecov.io](https://app.codecov.io/gh/rpact-com)
+* Minor improvements
+
+
 # rpact 3.5.0
 
 ## New features
 
-* TODO Count Data
+* The new functions `getSampleSizeCounts()` and `getPowerCounts()` can be used to perform sample size calculations and the assessment of test characteristics for clinical trials with negative binomial distributed count data. This is possible for fixed sample size and group sequential designs. For the latter, the methodology described in Muetze et al. (2019) is implemented. These functions can also be used to perform blinded sample size reassessments according to Friede and Schmidli (2010).
 
 ## Improvements, issues, and changes
 
 * Original Fortran 77 code of AS 251 included into the package, see functions `mvnprd`, `mvstud`, `as251Normal`, and `as251StudentT`
 * R package `mnormt` dependency has been removed 
+* Argument `theta` can be used for plotting of sample size and power results
 * Pipe operator usage improved
 * Shiny app link changed to https://rpact.shinyapps.io/cloud
+* Several minor improvements
 
 
 # rpact 3.4.0

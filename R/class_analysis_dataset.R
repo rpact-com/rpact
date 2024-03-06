@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7139 $
-## |  Last changed: $Date: 2023-06-28 08:15:31 +0200 (Mi, 28 Jun 2023) $
+## |  File version: $Revision: 7645 $
+## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -107,7 +107,7 @@ C_KEY_WORDS <- c(
 #' @param fileEncoding character string: if non-empty declares the encoding used on a file
 #'        (not a connection) so the character data can be re-encoded.
 #'        See the 'Encoding' section of the help for file, the 'R Data Import/Export Manual' and 'Note'.
-#' @param ... Further arguments to be passed to code{\link[utils]{read.table}}.
+#' @param ... Further arguments to be passed to \code{\link[utils]{read.table}}.
 #'
 #' @details
 #' \code{readDataset} is a wrapper function that uses \code{\link[utils]{read.table}} to read the
@@ -615,19 +615,19 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
 #'
 #' For enrichment designs, the comparison of two samples is provided for an unstratified
 #' (sub-population wise) or stratified data input.\cr
-#' For unstratified (sub-population wise) data input the data sets are defined for the sub-populations
+#' For non-stratified (sub-population wise) data input the data sets are defined for the sub-populations
 #' S1, S2, ..., F, where F refers to the full populations. Use of \code{getDataset(S1 = , S2, ..., F = )}
 #' defines the data set to be used in \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
 #' For stratified data input the data sets are defined for the strata S1, S12, S2, ..., R, where R
 #' refers to the remainder of the strata such that the union of all sets is the full population.
 #' Use of \code{getDataset(S1 = , S12 = , S2, ..., R = )} defines the data set to be used in
 #' \code{\link[=getAnalysisResults]{getAnalysisResults()}} (see examples)\cr
-#' For survival data, for enrichment designs the log-rank statistics should be entered as stratified
+#' For survival data, for enrichment designs the log-rank statistics can only be entered as stratified
 #' log-rank statistics in order to provide strong control of Type I error rate. For stratified data input,
-#' the variables to be specified in \code{getDataset()} are \code{events}, \code{expectedEvents},
-#' \code{varianceEvents}, and \code{allocationRatios} or \code{overallEvents}, \code{overallExpectedEvents},
-#' \code{overallVarianceEvents}, and \code{overallAllocationRatios}. From this, (stratified) log-rank tests are
-#' calculated.
+#' the variables to be specified in \code{getDataset()} are \code{cumEvents}, \code{cumExpectedEvents},
+#' \code{cumVarianceEvents}, and \code{cumAllocationRatios} or \code{overallEvents}, \code{overallExpectedEvents},
+#' \code{overallVarianceEvents}, and \code{overallAllocationRatios}. From this, (stratified) log-rank tests and
+#' and the independent increments are calculated.
 #'
 #' @template return_object_dataset
 #'
@@ -1383,8 +1383,6 @@ Dataset <- R6Class("Dataset",
             self$.design <- .design
             
             self$.plotSettings <- PlotSettings$new()
-            self$.parameterNames <- .getParameterNames(dataset = self)
-            self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
 
             self$.id <- NA_integer_
             self$.description <- NA_character_
@@ -1465,7 +1463,7 @@ Dataset <- R6Class("Dataset",
 
             if (any(grepl("^subsets?\\d*$", colnames(dataFrame)))) {
                 numberOfTreatmentGroups <- self$.getNumberOfGroups(dataFrame, c(C_KEY_WORDS_SAMPLE_SIZES, C_KEY_WORDS_LOG_RANKS))
-                self$subsets <- character(0)
+                self$subsets <- character()
                 for (group in 1:numberOfTreatmentGroups) {
                     suffix <- ifelse(any(grepl("^subsets?\\d+$", colnames(dataFrame))), group, "")
                     self$subsets <- c(self$subsets, self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_SUBSETS, suffix = suffix))
@@ -1731,7 +1729,7 @@ Dataset <- R6Class("Dataset",
         getNumberOfStages = function(naOmitEnabled = TRUE) {
             if (naOmitEnabled) {
                 colNames <- colnames(self$.data)
-                validColNames <- character(0)
+                validColNames <- character()
                 for (colName in colNames) {
                     colValues <- self$.data[, colName]
                     if (length(colValues) > 0 && !all(is.na(colValues))) {
@@ -2345,6 +2343,7 @@ DatasetMeans <- R6Class("DatasetMeans",
                 } else {
                     n <- dataset$getSampleSize(stage = stage, group = group)
                     n <- floor(n / numberOfVisits)
+                    
                     randomData <- stats::rnorm(
                         n    = sampleSize,
                         mean = dataset$getMean(stage = stage, group = group),
@@ -2363,6 +2362,7 @@ DatasetMeans <- R6Class("DatasetMeans",
                     sampleSizeBefore <- sampleSize - numberOfDropOutsBefore
                     if (n < sampleSizeBefore) {
                         numberOfDropOuts <- sampleSizeBefore - n
+                        numberOfDropOuts <- min(numberOfDropOuts, ceiling(n * 0.2))
                         dropOuts <- sample(c(rep(1, n - numberOfDropOuts), rep(0, numberOfDropOuts)))
                         randomData[indices[dropOuts == 0]] <- NA_real_
                         if (!is.null(randomDataBefore)) {
@@ -2599,7 +2599,7 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
             # implement survival plot here
         }
     } else {
-        data$stageGroup <- interaction(data$stage, data$group)
+        data$stageGroup <- base::interaction(data$stage, data$group)
 
         if (x$isDatasetMeans()) {
             p <- ggplot2::ggplot(ggplot2::aes(
@@ -2645,9 +2645,9 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
 
     # hide second legend
     if (x$getNumberOfGroups() == 1) {
-        p <- p + ggplot2::guides(fill = FALSE, colour = FALSE)
+        p <- p + ggplot2::guides(fill = "none", colour = "none")
     } else {
-        p <- p + ggplot2::guides(colour = FALSE)
+        p <- p + ggplot2::guides(colour = "none")
     }
 
     # set theme
@@ -2678,7 +2678,7 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
     }
     p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
 
-    p
+    suppressWarnings(print(p))
 }
 
 #'
@@ -3747,10 +3747,10 @@ DatasetEnrichmentSurvival <- R6Class("DatasetEnrichmentSurvival",
             if (self$.paramExists(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS) ||
                     self$.paramExists(dataFrame, C_KEY_WORDS_OVERALL_VARIANCE_EVENTS)) {
                 if (!self$.paramExists(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS)) {
-                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'overallExpectedEvents' is missing")
+                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'overallExpectedEvents' or 'cumExpectedEvents' is missing")
                 }
                 if (!self$.paramExists(dataFrame, C_KEY_WORDS_OVERALL_VARIANCE_EVENTS)) {
-                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'overallVarianceEvents' is missing")
+                    stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'overallVarianceEvents' or 'cumVarianceEvents' is missing")
                 }
 
                 self$.inputType <- "overall"
@@ -4004,7 +4004,7 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
     digitsGeneral <- digitSettings$digitsGeneral
     digitsProbabilities <- digitSettings$digitsProbabilities
 
-    paramsToCheck <- character(0)
+    paramsToCheck <- character()
     if (object$isDatasetMeans() || object$isDatasetRates()) {
         paramsToCheck <- c(paramsToCheck, "sampleSizes")
         if (kMax > 1) {
@@ -4135,7 +4135,7 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
 
 .getDatasetArgumentsRCodeLines <- function(x, complete = FALSE, digits = 4) {
     m <- getWideFormat(x)
-    lines <- character(0)
+    lines <- character()
     paramNames <- colnames(m)
     if (!complete) {
         if (x$.inputType == "stagewise") {

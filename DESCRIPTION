@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 3.5.0.9222
-Date: 2023-11-13
+Version: 3.5.1
+Date: 2024-02-27
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -56,23 +56,23 @@ Imports:
 	tools,
 	rlang,
 	knitr (>= 1.19), 
-	Rcpp (>= 1.0.3),
-	R6
+	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
 Suggests: 
 	ggplot2 (>= 2.2.0),	
 	testthat (>= 3.0.0),
 	rmarkdown (>= 1.10)
 VignetteBuilder: knitr, rmarkdown
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 Config/testthat/start-first: *analysis*
 Collate: 
     'RcppExports.R'
-    'f_core_constants.R'
     'f_logger.R'
+    'class_dictionary.R'
+    'f_core_constants.R'
     'f_core_utilities.R'
     'f_core_assertions.R'
     'f_analysis_utilities.R'
@@ -86,10 +86,12 @@ Collate:
     'class_analysis_dataset.R'
     'class_analysis_stage_results.R'
     'class_analysis_results.R'
+    'f_design_general_utilities.R'
+    'class_time.R'
     'class_design_set.R'
-    'f_design_utilities.R'
     'class_design_plan.R'
     'class_design_power_and_asn.R'
+    'class_event_probabilities.R'
     'f_simulation_utilities.R'
     'f_simulation_base_survival.R'
     'class_simulation_results.R'
@@ -109,12 +111,14 @@ Collate:
     'f_analysis_multiarm_survival.R'
     'f_as251.R'
     'f_core_output_formats.R'
-    'f_count_data_sample_size.R'
-    'f_count_data_simulation.R'
-    'f_count_data_utilities.R'
     'f_design_fisher_combination_test.R'
     'f_design_group_sequential.R'
-    'f_design_sample_size_calculator.R'
+    'f_design_plan_count_data.R'
+    'f_design_plan_means.R'
+    'f_design_plan_plot.R'
+    'f_design_plan_rates.R'
+    'f_design_plan_survival.R'
+    'f_design_plan_utilities.R'
     'f_quality_assurance.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'
@@ -128,6 +132,6 @@ Collate:
     'f_simulation_multiarm_rates.R'
     'f_simulation_multiarm_survival.R'
     'f_simulation_performance_score.R'
+    'f_simulation_plot.R'
     'parameter_descriptions.R'
     'pkgname.R'
-    

@@ -57,6 +57,7 @@ That is, in case of (one-sided) testing of
 \item \emph{rates}: a value \code{!= 0}
 (or a value \code{!= 1} for testing the risk ratio \code{pi1 / pi2}) can be specified.
 \item \emph{survival data}: a bound for testing H0: \code{hazard ratio = thetaH0 != 1} can be specified.
+\item \emph{count data}: a bound for testing H0: \code{lambda1 / lambda2 = thetaH0 != 1} can be specified.
 }
 For testing a rate in one sample, a value \code{thetaH0} in (0, 1) has to be specified for
 defining the null hypothesis H0: \code{pi = thetaH0}.}
@@ -81,9 +82,10 @@ which means that larger values of the test statistics yield smaller p-values.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
-For simulating means and rates for a two treatment groups design, it can be a vector of length kMax, the number of stages.
+For simulating means and rates for a two treatment groups design, it can be a vector of length \code{kMax}, the number of stages.
 It can be a vector of length kMax, too, for multi-arm and enrichment designs.
-In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.}
+In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.
+Note that internally \code{allocationRatioPlanned} is treated as a vector of length \code{kMax}, not a scalar.}
 
 \item{minNumberOfSubjectsPerStage}{When performing a data driven sample size recalculation,
 the numeric vector \code{minNumberOfSubjectsPerStage} with length kMax determines the

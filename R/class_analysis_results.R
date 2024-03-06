@@ -14,8 +14,8 @@ library("R6")
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6909 $
-## |  Last changed: $Date: 2023-03-31 14:33:51 +0200 (Fr, 31 Mrz 2023) $
+## |  File version: $Revision: 7620 $
+## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -70,8 +70,6 @@ ConditionalPowerResults <- R6Class("ConditionalPowerResults",
                                            super$initialize(...)
                                            
                                            self$.plotSettings <- PlotSettings$new()
-                                           self$.parameterNames <- C_PARAMETER_NAMES
-                                           self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                            
                                            if (!is.null(self$.stageResults) && is.null(self$.design)) {
                                              self$.design <- self$.stageResults$.design
@@ -565,8 +563,6 @@ ClosedCombinationTestResults <- R6Class("ClosedCombinationTestResults",
                                                 super$initialize(...)
                                                 
                                                 self$.plotSettings <- PlotSettings$new()
-                                                self$.parameterNames <- C_PARAMETER_NAMES
-                                                self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                                 
                                                 self$.setParameterType("intersectionTest", C_PARAM_USER_DEFINED)
                                                 
@@ -591,10 +587,6 @@ ClosedCombinationTestResults <- R6Class("ClosedCombinationTestResults",
                                                 }
                                                 for (param in parametersGenerated) {
                                                   self$.setParameterType(param, C_PARAM_GENERATED)
-                                                }
-                                                
-                                                if (!is.null(self$.design) && inherits(self$.design, C_CLASS_NAME_TRIAL_DESIGN_FISHER)) {
-                                                  self$.parameterFormatFunctions$overallAdjustedTestStatistics <- ".formatTestStatisticsFisher"
                                                 }
                                               },
                                               show = function(showType = 1, digits = NA_integer_) {
@@ -751,12 +743,9 @@ AnalysisResults <- R6Class("AnalysisResults",
                                    super$initialize(...)
                                    
                                    self$.plotSettings <- PlotSettings$new()
-                                   self$.parameterNames <- .getParameterNames(design = design, analysisResults = self)
-                                   self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                  },
                                  .setStageResults = function(stageResults) {
                                    self$.stageResults <- stageResults
-                                   self$.parameterNames <- .getParameterNames(design = self$.design, stageResults = stageResults, analysisResults = self)
                                  },
                                  getPlotSettings = function() {
                                    return(self$.plotSettings)
@@ -924,7 +913,7 @@ AnalysisResults <- R6Class("AnalysisResults",
                                    str <- paste0(str, " (")
                                    
                                    str <- paste0(str, tolower(sub("Dataset(Enrichment)?", "", .getClassName(self$.dataInput))))
-                                   if (grepl("Survival", .getClassName(.getClassName))) {#TODO BUG?
+                                   if (grepl("Survival", .getClassName(.getClassName))) {
                                      str <- paste0(str, " data")
                                    }
                                    
@@ -1225,26 +1214,24 @@ summary.AnalysisResults <- function(object, ..., type = 1, digits = NA_integer_)
 #' @keywords internal
 #'
 as.data.frame.AnalysisResults <- function(x, row.names = NULL, optional = FALSE, ...,
-                                          niceColumnNamesEnabled = FALSE) {
-  
-  parametersToShow <- .getDesignParametersToShow(x)
-  if (inherits(x, "AnalysisResultsMultiArm")) {
-    parametersToShow <- c(parametersToShow, ".closedTestResults$rejected")
-  }
-  parametersToShow <- c(parametersToShow, x$.getUserDefinedParameters())
-  parametersToShow <- c(parametersToShow, x$.getDefaultParameters())
-  parametersToShow <- c(parametersToShow, x$.getStageResultParametersToShow())
-  parametersToShow <- c(parametersToShow, x$.getGeneratedParameters())
-  
-  parametersToShow <- parametersToShow[!(parametersToShow %in% c(
-    "finalStage", "allocationRatioPlanned", "thetaH0", "thetaH1", "pi1", "pi2"
-  ))]
-  return(.getAsDataFrame(
-    parameterSet = x, 
-    parameterNames = parametersToShow,
-    tableColumnNames = .getTableColumnNames(design = x$.design),
-    niceColumnNamesEnabled = niceColumnNamesEnabled
-  ))
+        niceColumnNamesEnabled = FALSE) {
+    parametersToShow <- .getDesignParametersToShow(x)
+    if (inherits(x, "AnalysisResultsMultiArm")) {
+        parametersToShow <- c(parametersToShow, ".closedTestResults$rejected")
+    }
+    parametersToShow <- c(parametersToShow, x$.getUserDefinedParameters())
+    parametersToShow <- c(parametersToShow, x$.getDefaultParameters())
+    parametersToShow <- c(parametersToShow, x$.getStageResultParametersToShow())
+    parametersToShow <- c(parametersToShow, x$.getGeneratedParameters())
+
+    parametersToShow <- parametersToShow[!(parametersToShow %in% c(
+        "finalStage", "allocationRatioPlanned", "thetaH0", "thetaH1", "pi1", "pi2"
+    ))]
+    return(.getAsDataFrame(
+        parameterSet = x,
+        parameterNames = parametersToShow,
+        niceColumnNamesEnabled = niceColumnNamesEnabled
+    ))
 }
 
 #'
