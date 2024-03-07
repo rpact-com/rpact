@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7701 $
+## |  Last changed: $Date: 2024-03-07 11:44:08 +0100 (Do, 07 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1034,7 +1034,7 @@
         timeTo <- max(designPlan$piecewiseSurvivalTime)
     }
     if (is.na(timeTo) || !is.numeric(timeTo) || is.infinite(timeTo)) {
-        # warning("Unable to determine upper bound of time values", call. = FALSE)
+        # unable to determine upper bound of time values
         timeTo <- 0
     }
 

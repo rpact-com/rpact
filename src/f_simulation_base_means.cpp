@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7408 $
- * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
+ * File version: $Revision: 7701 $
+ * Last changed: $Date: 2024-03-07 11:44:08 +0100 (Do, 07 Mrz 2024) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -278,7 +278,7 @@ List getSimulationStepMeans(
 				thetaStandardized = thetaStandardized * sqrt(allocationRatio) / (1.0 + allocationRatio);
 			} else {
 				thetaStandardized = thetaStandardized * sqrt(allocationRatio) /
-						sqrt((1.0 + allocationRatio) * (1.0 + thetaH0 * allocationRatio));
+						sqrt((1.0 + allocationRatio) * (1.0 + pow(thetaH0, 2) * allocationRatio));
 			}
 		}
 		simulatedConditionalPower = getOneMinusPNorm(conditionalCriticalValue -
@@ -297,10 +297,10 @@ List getSimulationStepMeans(
 		double allocationRatio = allocationRatioPlanned[k - 1];
 		if (!meanRatio) {
 			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatio * stageSubjects) /
-					(1 + allocationRatio);
+					(1.0 + allocationRatio);
 		} else {
 			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatio * stageSubjects) /
-					sqrt((1 + allocationRatio) * (1 + pow(thetaH0,2) * allocationRatio));
+					sqrt((1.0 + allocationRatio) * (1.0 + pow(thetaH0, 2) * allocationRatio));
 		}
 		if (normalApproximation) {
 			testResult = (2.0 * directionUpper - 1.0) * R::rnorm(nz, 1.0);

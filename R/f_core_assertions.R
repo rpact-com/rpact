@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7670 $
-## |  Last changed: $Date: 2024-02-26 15:46:14 +0100 (Mo, 26 Feb 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7703 $
+## |  Last changed: $Date: 2024-03-07 13:38:48 +0100 (Do, 07 Mrz 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -779,20 +779,74 @@ NULL
     }
 }
 
+.showParameterOutOfValidatedBoundsMessage <- function(
+    parameterValue, 
+    parameterName, ..., 
+    lowerBound = NA_real_, 
+    upperBound = NA_real_, 
+    spendingFunctionName = NA_character_,
+    closedLowerBound = TRUE,
+    closedUpperBound = TRUE) {
+    
+    .assertIsSingleNumber(lowerBound, "lowerBound", naAllowed = TRUE)
+    .assertIsSingleNumber(upperBound, "upperBound", naAllowed = TRUE)
+    if (is.na(lowerBound) && is.na(upperBound)) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'lowerBound' or 'upperBound' must be defined")
+    }
+    
+    if (is.na(lowerBound)) {
+        lowerBound <- -Inf
+    }
+    
+    if (is.na(upperBound)) {
+        upperBound <- Inf
+    }
+    
+    if (closedLowerBound) {
+        bracketLowerBound <- "["
+        conditionLowerBound <- parameterValue < lowerBound
+    } else {
+        bracketLowerBound <- "("
+        conditionLowerBound <- parameterValue <= lowerBound
+    }
+    if (closedUpperBound) {
+        bracketUpperBound <- "]"
+        conditionUpperBound <- parameterValue > upperBound
+    } else {
+        bracketUpperBound <- ")"
+        conditionUpperBound <- parameterValue >= upperBound
+    }
+    
+    if (conditionLowerBound || conditionUpperBound) {
+        if (!is.null(spendingFunctionName) && !is.na(spendingFunctionName)) {
+            spendingFunctionName <- paste0("for ", spendingFunctionName, " function ")
+        } else {
+            spendingFunctionName <- ""
+        }
+        
+        type <- getOption("rpact.out.of.validated.bounds.message.type", "warning")
+        if (identical(type, "warning")) {
+            warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ", 
+                spendingFunctionName, "is out of validated bounds ", 
+                bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, call. = FALSE)
+        } 
+        else if (identical(type, "message")) {
+            message("Note that parameter ", sQuote(parameterName), " (", parameterValue, ") ", 
+                spendingFunctionName, "is out of validated bounds ", 
+                bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound)
+        } 
+    }
+}
+
 .assertIsValidAlpha <- function(alpha) {
     .assertIsSingleNumber(alpha, "alpha")
-
-    if (alpha < 1e-06 || alpha >= 0.5) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'alpha' (", alpha, ") is out of bounds [1e-06; 0.5)"
-        )
-    }
+    .assertIsInOpenInterval(alpha, "alpha", lower = 0, upper = NULL)   
+    .showParameterOutOfValidatedBoundsMessage(alpha, "alpha", lowerBound = 1e-06, upperBound = 0.5, closedUpperBound = FALSE)
 }
 
 .assertIsValidKappa <- function(kappa) {
     .assertIsSingleNumber(kappa, "kappa")
-    .assertIsInOpenInterval(kappa, "kappa", lower = 0, upper = NULL)
+    .assertIsInOpenInterval(kappa, "kappa", lower = 0, upper = NULL)    
 }
 
 .assertIsValidLambda <- function(lambda, lambdaNumber = 0) {
@@ -861,13 +915,13 @@ NULL
 .assertIsValidBeta <- function(beta, alpha) {
     .assertIsSingleNumber(beta, "beta")
     .assertIsSingleNumber(alpha, "alpha")
-
+    .assertIsInOpenInterval(beta, "beta", lower = 0, upper = NULL)    
     if (beta < 1e-04 || beta >= 1 - alpha) {
-        stop(
+        warning(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'beta' (", beta, ") is out of bounds [1e-04; ", (1 - alpha), "); ",
-            "condition: 1e-05 <= alpha < 1 - beta <= 1 - 1e-04"
-        )
+            "'beta' (", beta, ") is out of validated bounds [1e-04; ", (1 - alpha), "); ",
+            "condition: 1e-05 <= alpha < 1 - beta <= 1 - 1e-04",
+            call. = FALSE)
     }
 }
 
