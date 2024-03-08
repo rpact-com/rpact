@@ -2,7 +2,7 @@
 #' \dontrun{
 #' # Example from Table 3 in "A new conditional performance score for 
 #' # the evaluation of adaptive group sequential designs with samplesize 
-#' # recalculation from Herrmann et al 2023", p.2097 for 
+#' # recalculation from Herrmann et al 2023", p. 2097 for 
 #' # Observed Conditional Power approach and Delta = 0.5
 #' 
 #' # Create two-stage Pocock design with binding futility boundary at 0
@@ -17,7 +17,7 @@
 #' nMax <- n1 + n2
 #' alternative <- 0.5
 #' 
-#' # Perform Simulation; nMax*1.5 defines the maximum 
+#' # Perform Simulation; nMax * 1.5 defines the maximum 
 #' # sample size for the additional stage
 #' simulationResult <- getSimulationMeans(
 #'     design = design,

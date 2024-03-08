@@ -11,7 +11,9 @@ getPerformanceScore(simulationResult)
 }
 \description{
 Calculates the conditional performance score, its sub-scores and components according to
-Herrmann et al. (2020) for a given simulation result from a two-stage design.
+\href{https://doi.org/10.1002/sim.8534}{Herrmann et al. (2020)} and
+\href{https://doi.org/10.1186/s12874-024-02150-4}{Bokelmann et al. (2024)} for a given
+simulation result from a two-stage design with continuous or binary endpoint.
 Larger (sub-)score and component values refer to a better performance.
 }
 \details{
@@ -22,13 +24,14 @@ and variation component (variationSampleSize, variationConditionalPower).
 The term conditional refers to an evaluation perspective where the interim results
 suggest a trial continuation with a second stage.
 The score can take values between 0 and 1. More details on the performance score
-can be found in Herrmann et al. (2020).
+can be found in \href{https://doi.org/10.1002/sim.8534}{Herrmann et al. (2020)} and
+\href{https://doi.org/10.1186/s12874-024-02150-4}{Bokelmann et al. (2024)}.
 }
 \examples{
 \dontrun{
 # Example from Table 3 in "A new conditional performance score for 
 # the evaluation of adaptive group sequential designs with samplesize 
-# recalculation from Herrmann et al 2023", p.2097 for 
+# recalculation from Herrmann et al 2023", p. 2097 for 
 # Observed Conditional Power approach and Delta = 0.5
 
 # Create two-stage Pocock design with binding futility boundary at 0
@@ -43,7 +46,7 @@ n2 <- 100
 nMax <- n1 + n2
 alternative <- 0.5
 
-# Perform Simulation; nMax*1.5 defines the maximum 
+# Perform Simulation; nMax * 1.5 defines the maximum 
 # sample size for the additional stage
 simulationResult <- getSimulationMeans(
     design = design,

@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_performance_score.R
 ## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 7659 $
-## |  Last changed: $Date: 2024-02-23 10:42:33 +0100 (Fr, 23 Feb 2024) $
+## |  File version: $Revision: 7682 $
+## |  Last changed: $Date: 2024-03-05 07:53:40 +0100 (Di, 05 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -108,16 +108,9 @@ test_that(".getPowerAndStoppingProbabilities handles expectedNumberOfSubjects", 
     expect_equal(result$data$yValues, c(1, 2, 3))
 })
 
-test_that(".plotSimulationResults handles type = 4", {
+test_that("Plot simulation means results", {
     .skipTestIfDisabled()
 
-    simulationResults <- getSimulationSurvival(
-        maxNumberOfSubjects = 200, plannedEvents = 50,
-        accrualTime = c(0, 3, 6, 12), accrualIntensity = c(0.1, 0.2, 0.2),
-        maxNumberOfIterations = 100, seed = 1234567890
-    )
-
-    # means
     maxNumberOfSubjects <- 90
     informationRates <- c(0.2, 0.5, 1)
     plannedSubjects <- round(informationRates * maxNumberOfSubjects)
@@ -125,15 +118,18 @@ test_that(".plotSimulationResults handles type = 4", {
         futilityBounds = c(-0.5, 0.5),
         informationRates = informationRates
     )
-    x_means <- getSimulationMeans(
+    simulationMeansResult <- getSimulationMeans(
         design = design, groups = 2, meanRatio = TRUE,
         thetaH0 = 0.4, plannedSubjects = plannedSubjects,
         maxNumberOfIterations = 500, allocationRatioPlanned = 3,
         stDev = 1.5, seed = 1234567890
     )
-    expect_silent(plot(x_means, type = "all", grid = 0))
+    expect_silent(plot(simulationMeansResult, type = "all", grid = 0))
+})
 
-    # rates
+test_that("Plot simulation rates results", {
+    .skipTestIfDisabled()
+
     maxNumberOfSubjects <- 90
     informationRates <- (1:3) / 3
     plannedSubjects <- round(informationRates * maxNumberOfSubjects)
@@ -141,18 +137,21 @@ test_that(".plotSimulationResults handles type = 4", {
         futilityBounds = c(-0.5, 0.5),
         informationRates = informationRates
     )
-    x_rates <- getSimulationRates(
+    simulationRatesResult <- getSimulationRates(
         design = getDesignFisher(),
         groups = 2, riskRatio = TRUE,
         thetaH0 = 0.8, plannedSubjects = plannedSubjects,
         maxNumberOfIterations = 500, allocationRatioPlanned = 3,
         seed = 1234567890
     )
-    expect_silent(plot(x_rates, type = "all", grid = 0))
+    expect_silent(plot(simulationRatesResult, type = "all", grid = 0))
+})
 
-    # survival
+test_that("Plot simulation survival results", {
+    .skipTestIfDisabled()
+
     design <- getDesignFisher(kMax = 3, alpha0Vec = c(0.5, 0.5))
-    x_surv <- getSimulationSurvival(
+    simulationSurvivalResult <- getSimulationSurvival(
         design = design, pi2 = 0.6,
         pi1 = seq(0.3, 0.45, 0.05), directionUpper = FALSE,
         maxNumberOfSubjects = 500, plannedEvents = (1:design$kMax) * 20,
@@ -163,7 +162,11 @@ test_that(".plotSimulationResults handles type = 4", {
         maxNumberOfEventsPerStage = c(NA_real_, 100, 200),
         maxNumberOfIterations = 500, seed = 1234567890
     )
-    expect_silent(plot(x_surv, type = 4, grid = 0))
+    expect_silent(plot(simulationSurvivalResult, type = 4, grid = 0))
+})
+
+test_that("Plot simulation piecewise survival time results", {
+    .skipTestIfDisabled()
 
     design <- getDesignGroupSequential(kMax = 3, typeOfDesign = "WT", deltaWT = 0.25)
     piecewiseSurvivalTime <- list(
@@ -173,7 +176,7 @@ test_that(".plotSimulationResults handles type = 4", {
         "15 - <21" = 0.01,
         ">=21" = 0.007
     )
-    x <- getSimulationSurvival(
+    simulationSurvivalResult <- getSimulationSurvival(
         design = design,
         directionUpper = TRUE, maxNumberOfSubjects = 500,
         plannedEvents = (1:design$kMax) * 20, allocation1 = 1,
@@ -185,7 +188,11 @@ test_that(".plotSimulationResults handles type = 4", {
         maxNumberOfEventsPerStage = c(NA_real_, 100, 200),
         maxNumberOfIterations = 500, seed = 1234567890
     )
-    expect_silent(plot(x, type = "all", grid = 0))
+    expect_silent(plot(simulationSurvivalResult, type = "all", grid = 0))
+})
+
+test_that("Plot simulation multi-arm means results", {
+    .skipTestIfDisabled()
 
     design <- getDesignInverseNormal(
         informationRates = c(0.2, 0.6, 1),
@@ -200,6 +207,10 @@ test_that(".plotSimulationResults handles type = 4", {
         maxNumberOfIterations = 500, seed = 1234567890
     )
     expect_silent(plot(x, type = "all", grid = 0))
+})
+
+test_that("Plot simulation multi-arm rates results", {
+    .skipTestIfDisabled()
 
     design <- getDesignInverseNormal(
         informationRates = c(0.2, 0.6, 1),
@@ -215,6 +226,10 @@ test_that(".plotSimulationResults handles type = 4", {
         maxNumberOfIterations = 500, seed = 1234567890
     )
     expect_silent(plot(x, type = "all", grid = 0))
+})
+
+test_that("Plot simulation multi-arm survival results", {
+    .skipTestIfDisabled()
 
     design <- getDesignInverseNormal(
         informationRates = c(0.2, 0.6, 1),
@@ -229,6 +244,10 @@ test_that(".plotSimulationResults handles type = 4", {
         maxNumberOfIterations = 500, seed = 1234567890
     )
     expect_silent(plot(x, type = "all", grid = 0))
+})
+
+test_that("Plot simulation enrichment means results", {
+    .skipTestIfDisabled()
 
     design <- getDesignInverseNormal(
         informationRates = c(0.2, 0.6, 1),
@@ -254,7 +273,7 @@ test_that(".plotSimulationResults handles type = 4", {
         stDevs = stDev, effects = effects
     )
 
-    x <- getSimulationEnrichmentMeans(
+    suppressWarnings(x <- getSimulationEnrichmentMeans(
         design = design,
         plannedSubjects = c(10, 30, 50),
         effectList = el,
@@ -264,9 +283,13 @@ test_that(".plotSimulationResults handles type = 4", {
         maxNumberOfSubjectsPerStage = c(10, 100, 100),
         maxNumberOfIterations = 500,
         seed = 1234567890
-    )
+    ))
 
     suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
+})
+
+test_that("Plot simulation enrichment rates results", {
+    .skipTestIfDisabled()
 
     design <- getDesignInverseNormal(
         informationRates = c(0.2, 0.6, 1),
@@ -293,15 +316,20 @@ test_that(".plotSimulationResults handles type = 4", {
         )
     )
 
-    x <- getSimulationEnrichmentRates(
+    suppressWarnings(x <- getSimulationEnrichmentRates(
         design = design,
         plannedSubjects = c(10, 30, 50),
         effectList = el,
         maxNumberOfIterations = 500,
         seed = 1234567890
-    )
+    ))
 
     suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
+})
+
+
+test_that("Plot simulation enrichment survival results", {
+    .skipTestIfDisabled()
 
     # Define subgroups and their prevalences
     subGroups <- c("S1", "S2", "S12", "R") # fixed names!
@@ -320,7 +348,7 @@ test_that(".plotSimulationResults handles type = 4", {
     )
 
     # Perform simulation
-    x <- getSimulationEnrichmentSurvival(
+    suppressWarnings(x <- getSimulationEnrichmentSurvival(
         design = getDesignInverseNormal(typeOfDesign = "noEarlyEfficacy"),
         effectList = el,
         typeOfSelection = "rbest",
@@ -329,10 +357,19 @@ test_that(".plotSimulationResults handles type = 4", {
         plannedEvents = c(30, 80, 120),
         maxNumberOfIterations = 500,
         directionUpper = FALSE
-    )
+    ))
 
     suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
+})
 
+test_that("Plot simulation results with wrong plot types", {
+    .skipTestIfDisabled()
+
+    simulationResults <- getSimulationSurvival(
+        maxNumberOfSubjects = 200, plannedEvents = 50,
+        accrualTime = c(0, 3, 6, 12), accrualIntensity = c(0.1, 0.2, 0.2),
+        maxNumberOfIterations = 100, seed = 1234567890
+    )
     designMaster <- list("kMax" = 1)
     expect_silent(.plotSimulationResults(simulationResults, designMaster, type = 4))
     expect_error(.plotSimulationResults(simulationResults, designMaster, type = 1))
