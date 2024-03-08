@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.2.9232</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,18 @@
       <small>Source: <a href="https://github.com/rpact-com/rpact/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="3.5.2" id="rpact-352">rpact 3.5.2<a class="anchor" aria-label="anchor" href="#rpact-352"></a></h2>
+<div class="section level3">
+<h3 id="new-features-3-5-2">New features<a class="anchor" aria-label="anchor" href="#new-features-3-5-2"></a></h3>
+<ul><li>Extension of the function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> for sample size recalculation rules to the setting of binary endpoints according to <a href="https://doi.org/10.1186/s12874-024-02150-4" class="external-link">Bokelmann et al. (2024)</a>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-issues-and-changes-3-5-2">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-3-5-2"></a></h3>
+<ul><li>Issue <a href="https://github.com/rpact-com/rpact/issues/25" class="external-link">#25</a> fixed</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="3.5.1" id="rpact-351">rpact 3.5.1<a class="anchor" aria-label="anchor" href="#rpact-351"></a></h2><p class="text-muted">CRAN release: 2024-02-27</p>
 <ul><li>The internal fields <code>.parameterNames</code> and <code>.parameterFormatFunctions</code> were removed from all rpact result objects in favor of a more efficient solution</li>
@@ -108,7 +120,7 @@
 <h2 class="pkg-version" data-toc-text="3.4.0" id="rpact-340">rpact 3.4.0<a class="anchor" aria-label="anchor" href="#rpact-340"></a></h2><p class="text-muted">CRAN release: 2023-07-03</p>
 <div class="section level3">
 <h3 id="new-features-3-4-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-4-0"></a></h3>
-<ul><li>The new function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> calculates the conditional performance score, its sub-scores and components according to Herrmann et al. (2020) for a given simulation result from a two-stage design</li>
+<ul><li>The new function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> calculates the conditional performance score, its sub-scores and components according to <a href="https://doi.org/10.1002/sim.8534" class="external-link">Herrmann et al. (2020)</a> for a given simulation result from a two-stage design</li>
 <li>
 <code>allocationRatioPlanned</code> for simulating multi-arm and enrichment designs can be a vector of length kMax, the number of stages</li>
 <li>
