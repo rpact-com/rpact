@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7703 $
-## |  Last changed: $Date: 2024-03-07 13:38:48 +0100 (Do, 07 Mrz 2024) $
+## |  File version: $Revision: 7712 $
+## |  Last changed: $Date: 2024-03-12 08:24:58 +0100 (Di, 12 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -786,7 +786,8 @@ NULL
     upperBound = NA_real_, 
     spendingFunctionName = NA_character_,
     closedLowerBound = TRUE,
-    closedUpperBound = TRUE) {
+    closedUpperBound = TRUE,
+    suffix = NA_character_) {
     
     .assertIsSingleNumber(lowerBound, "lowerBound", naAllowed = TRUE)
     .assertIsSingleNumber(upperBound, "upperBound", naAllowed = TRUE)
@@ -824,16 +825,22 @@ NULL
             spendingFunctionName <- ""
         }
         
+        if (is.na(suffix)) {
+            suffix <- ""
+        } else {
+            suffix <- paste0(" ", trimws(suffix))
+        }
+        
         type <- getOption("rpact.out.of.validated.bounds.message.type", "warning")
         if (identical(type, "warning")) {
             warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ", 
                 spendingFunctionName, "is out of validated bounds ", 
-                bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, call. = FALSE)
+                bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix, call. = FALSE)
         } 
         else if (identical(type, "message")) {
             message("Note that parameter ", sQuote(parameterName), " (", parameterValue, ") ", 
                 spendingFunctionName, "is out of validated bounds ", 
-                bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound)
+                bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix)
         } 
     }
 }
@@ -916,13 +923,9 @@ NULL
     .assertIsSingleNumber(beta, "beta")
     .assertIsSingleNumber(alpha, "alpha")
     .assertIsInOpenInterval(beta, "beta", lower = 0, upper = NULL)    
-    if (beta < 1e-04 || beta >= 1 - alpha) {
-        warning(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'beta' (", beta, ") is out of validated bounds [1e-04; ", (1 - alpha), "); ",
-            "condition: 1e-05 <= alpha < 1 - beta <= 1 - 1e-04",
-            call. = FALSE)
-    }
+    .showParameterOutOfValidatedBoundsMessage(beta, "beta", lowerBound = 1e-04, 
+        upperBound = 1 - alpha, closedUpperBound = FALSE, 
+        suffix = "condition: 1e-06 <= alpha < 1 - beta <= 1 - 1e-04")
 }
 
 .assertIsValidAlphaAndBeta <- function(alpha, beta) {
