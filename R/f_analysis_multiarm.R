@@ -426,7 +426,7 @@ getClosedCombinationTestResults <- function(stageResults) {
     .assertIsTrialDesignInverseNormalOrFisher(stageResults$.design)
 
     result <- .performClosedCombinationTest(stageResults = stageResults)
-    return(ClosedCombinationTestResults(
+    return(ClosedCombinationTestResults$new(
         .design = result$.design,
         .enrichment = grepl("Enrichment", .getClassName(stageResults)),
         intersectionTest = result$intersectionTest,
@@ -683,7 +683,7 @@ getClosedConditionalDunnettTestResults <- function(stageResults, ..., stage = st
     .assertIsTrialDesignConditionalDunnett(design)
 
     result <- .getClosedConditionalDunnettTestResults(stageResults = stageResults, design = design, stage = stage)
-    return(ClosedCombinationTestResults(
+    return(ClosedCombinationTestResults$new(
         .design = result$.design,
         .enrichment = grepl("Enrichment", .getClassName(stageResults)),
         intersectionTest = result$intersectionTest,

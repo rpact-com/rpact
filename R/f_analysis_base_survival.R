@@ -61,7 +61,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsInverseNormal$new(design = design, dataInput = dataInput)
 
     .getAnalysisResultsSurvivalAll(
         results = results, design = design, dataInput = dataInput,
@@ -89,7 +89,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsGroupSequential(design = design, dataInput = dataInput)
+    results <- AnalysisResultsGroupSequential$new(design = design, dataInput = dataInput)
 
     .getAnalysisResultsSurvivalAll(
         results = results, design = design, dataInput = dataInput,
@@ -119,7 +119,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsFisher$new(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
@@ -348,7 +348,7 @@ NULL
         combFisher[k] <- prod(pValues[1:k]^weightsFisher[1:k])
     }
 
-    stageResults <- StageResultsSurvival(
+    stageResults <- StageResultsSurvival$new(
         design = design,
         dataInput = dataInput,
         stage = as.integer(stage),
@@ -902,7 +902,7 @@ NULL
 
 .getConditionalPowerSurvival <- function(..., stageResults, nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, thetaH1 = NA_real_) {
-    results <- ConditionalPowerResultsSurvival(
+    results <- ConditionalPowerResultsSurvival$new(
         .stageResults = stageResults,
         .design = stageResults$.design, nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned, thetaH1 = thetaH1

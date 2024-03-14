@@ -234,7 +234,7 @@ NULL
         )
     }
 
-    stageResults <- StageResultsEnrichmentRates(
+    stageResults <- StageResultsEnrichmentRates$new(
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
@@ -391,7 +391,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsEnrichmentInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsEnrichmentInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsRatesEnrichmentAll(
         results = results, design = design, dataInput = dataInput,
@@ -428,7 +428,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsEnrichmentFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsEnrichmentFisher$new(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
@@ -825,7 +825,7 @@ NULL
         piControl <- piControlH1
     }
 
-    results <- ConditionalPowerResultsEnrichmentRates(
+    results <- ConditionalPowerResultsEnrichmentRates$new(
         .design = design,
         .stageResults = stageResults,
         piControls = piControls,
@@ -1165,7 +1165,7 @@ NULL
     stdErr <- sqrt(stageResults$overallPisTreatment[, stage] * (1 - stageResults$overallPisTreatment[, stage])) /
         sqrt(stageResults$.overallSampleSizes2[, stage])
 
-    results <- ConditionalPowerResultsEnrichmentRates(
+    results <- ConditionalPowerResultsEnrichmentRates$new(
         .design = design,
         .stageResults = stageResults,
         piControls = piControls,

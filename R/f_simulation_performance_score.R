@@ -169,7 +169,7 @@ getPerformanceScore <- function(simulationResult) {
         ))
     })
 
-    performanceScore <- PerformanceScore(simulationResult)
+    performanceScore <- PerformanceScore$new(simulationResult)
     performanceScore$.alternative <- alternativeValues
     paramNames <- rownames(resultMatrix)
     for (k in 1:nrow(resultMatrix)) {

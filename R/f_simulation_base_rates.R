@@ -258,7 +258,7 @@ getSimulationRates <- function(design = NULL, ...,
         )
     }
 
-    simulationResults <- SimulationResultsRates(design, showStatistics = showStatistics)
+    simulationResults <- SimulationResultsRates$new(design, showStatistics = showStatistics)
 
     conditionalPower <- .ignoreParameterIfNotUsed(
         "conditionalPower",

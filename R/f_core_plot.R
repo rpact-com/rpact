@@ -850,8 +850,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             "overallEarlyStop", "calculatedPower"
         ))]
         fieldNames <- c(
-            names(parameterSet$getRefClass()$fields()),
-            names(designMaster$getRefClass()$fields())
+            names(parameterSet),#TODO
+            names(designMaster)#TODO
         )
         if (simulationEnrichmentEnmabled) {
             fieldNames <- c(fieldNames, gsub("s$", "", names(parameterSet$effectList)), "situation")
@@ -870,7 +870,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         }
     } else {
         if (is.null(plotSettings) || !inherits(plotSettings, "PlotSettings")) {
-            plotSettings <- PlotSettings()
+            plotSettings <- PlotSettings$new()
         }
     }
 
@@ -1255,7 +1255,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (is.null(plotSettings)) {
-        plotSettings <- PlotSettings()
+        plotSettings <- PlotSettings$new()
     }
 
     nRow <- nrow(data)
@@ -1612,7 +1612,7 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
 
     plotSettings <- x$.plotSettings
     if (is.null(plotSettings)) {
-        plotSettings <- PlotSettings()
+        plotSettings <- PlotSettings$new()
     } else {
         plotSettings <- plotSettings$clone()
     }

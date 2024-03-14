@@ -700,7 +700,7 @@ NULL
         }
     }
 
-    designPlan <- TrialDesignPlanRates(design = design)
+    designPlan <- TrialDesignPlanRates$new(design = design)
     designPlan$.setObjectType(objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)

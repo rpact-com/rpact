@@ -50,7 +50,7 @@ NULL
 
     return(list(
         design = design,
-        dataInput = dataInput$copy(shallow = FALSE)
+        dataInput = dataInput$clone(deep=TRUE)#TODO was $copy shallow
     ))
 }
 

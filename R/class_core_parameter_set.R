@@ -41,27 +41,25 @@ NULL
 #'
 #' @importFrom methods new
 #'
-FieldSet <- setRefClass("FieldSet",
-    fields = list(
-        .parameterTypes = "list",
-        .showParameterTypeEnabled = "logical",
-        .catLines = "character",
-        .deprecatedFieldNames = "character"
-    ),
-    methods = list(
-        .getFieldNames = function() {
-            return(names(.self$getRefClass()$fields()))
-        },
-        .getVisibleFieldNames = function() {
-            fieldNames <- names(.self$getRefClass()$fields())
-            fieldNames <- fieldNames[!startsWith(fieldNames, ".")]
-            fieldNames <- fieldNames[!(fieldNames %in% .deprecatedFieldNames)]
-            return(fieldNames)
-        },
-        .resetCat = function() {
-            .catLines <<- character()
-        },
-        .cat = function(..., file = "", sep = "", fill = FALSE, labels = NULL,
+FieldSet <- R6::R6Class("FieldSet",
+                        public = list(
+                          .parameterTypes = NULL,
+                          .showParameterTypeEnabled = NULL,
+                          .catLines = NULL,
+                          .deprecatedFieldNames = NULL,
+                          .getFieldNames = function() {
+                            return(unlist(lapply(class(self)[1:(length(class(self))-1)],function(x) {names(get(x)$public_fields)})))
+                          },
+                          .getVisibleFieldNames = function() {
+                            fieldNames <- self$.getFieldNames()
+                            fieldNames <- fieldNames[!startsWith(fieldNames, ".")]
+                            fieldNames <- fieldNames[!(fieldNames %in% self$.deprecatedFieldNames)]
+                            return(fieldNames)
+                          },
+                          .resetCat = function() {
+                            self$.catLines <- character()
+                          },
+                                  .cat = function(..., file = "", sep = "", fill = FALSE, labels = NULL,
                 append = FALSE, heading = 0, tableColumns = 0, consoleOutputEnabled = TRUE,
                 na = NA_character_) {
             if (consoleOutputEnabled) {
@@ -156,19 +154,19 @@ FieldSet <- setRefClass("FieldSet",
                 .catLines <<- c(.catLines, line)
             }
             return(invisible())
-        },
-        .getFields = function(values) {
-            flds <- names(.self$getRefClass()$fields())
-            if (!missing(values)) {
-                flds <- flds[flds %in% values]
-            }
-            result <- setNames(vector("list", length(flds)), flds)
-            for (fld in flds) {
-                result[[fld]] <- .self[[fld]]
-            }
-            return(result)
-        }
-    )
+                          },
+                          .getFields = function(values) {
+                            flds <- self$.getFieldNames()
+                            if (!missing(values)) {
+                              flds <- flds[flds %in% values]
+                            }
+                            result <- setNames(vector("list", length(flds)), flds)
+                            for (fld in flds) {
+                              result[[fld]] <- self[[fld]]
+                            }
+                            return(result)
+                          }
+            )
 )
 
 #'
@@ -192,251 +190,227 @@ FieldSet <- setRefClass("FieldSet",
 #'
 #' @importFrom methods new
 #'
-ParameterSet <- setRefClass("ParameterSet",
-    contains = "FieldSet",
-    methods = list(
-        initialize = function(...,
-                .showParameterTypeEnabled = TRUE) {
-            callSuper(...,
-                .showParameterTypeEnabled = .showParameterTypeEnabled
-            )
-            .parameterTypes <<- list()
-            .catLines <<- character()
-            .deprecatedFieldNames <<- character()
-        },
-        clone = function() {
-            paramNames <- names(.self$getRefClass()$fields())
-            plotSettingsEnabled <- ".plotSettings" %in% paramNames
-            designEnabled <- ".design" %in% paramNames
-            paramNames <- paramNames[!grepl("^\\.|^stages$", paramNames)]
-            args <- list()
-            if (designEnabled) {
-                args$design <- .self$.design
-            }
-            for (paramName in paramNames) {
-                if (.self$.getParameterType(paramName) == C_PARAM_USER_DEFINED) {
-                    args[[paramName]] <- .self[[paramName]]
-                }
-            }
-            what <- .getGeneratorFunctionName(.self)
-            result <- do.call(what = what, args = args)
-            if (plotSettingsEnabled && !is.null(.self$.plotSettings)) {
-                result$.plotSettings <- .self$.plotSettings$clone()
-            }
-            return(result)
-        },
-        .toString = function(startWithUpperCase = FALSE) {
-            s <- .formatCamelCase(.getClassName(.self))
-            return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
-        },
-        .initParameterTypes = function() {
-            .parameterTypes <<- list()
-            for (parameterName in .self$.getVisibleFieldNames()) {
-                .parameterTypes[[parameterName]] <<- C_PARAM_TYPE_UNKNOWN
-            }
-        },
-        .getParameterType = function(parameterName) {
-            if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterName' must be a valid character with length > 0"
-                )
-            }
-
-            parameterType <- .parameterTypes[[parameterName]]
-            if (is.null(parameterType)) {
-                return(C_PARAM_TYPE_UNKNOWN)
-            }
-
-            return(parameterType[1])
-        },
-        .getParametersToShow = function() {
-            return(.getVisibleFieldNames())
-        },
-        .setParameterType = function(parameterName, parameterType) {
-            if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterName' must be a valid character with length > 0"
-                )
-            }
-
-            parameterType <- parameterType[1]
-
-            if (!all(parameterType %in% c(
-                    C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE,
-                    C_PARAM_GENERATED, C_PARAM_DERIVED, C_PARAM_NOT_APPLICABLE
-                ))) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterType' ('", parameterType, "') is invalid"
-                )
-            }
-
-            .parameterTypes[[parameterName]] <<- parameterType
-
-            invisible(parameterType)
-        },
-        isUserDefinedParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_USER_DEFINED)
-        },
-        isDefaultParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE)
-        },
-        isGeneratedParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_GENERATED)
-        },
-        isDerivedParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_DERIVED)
-        },
-        isUndefinedParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN)
-        },
-        .getInputParameters = function() {
-            params <- .getParametersOfOneGroup(c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))
-            return(params)
-        },
-        .getUserDefinedParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_USER_DEFINED))
-        },
-        .getDefaultParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_DEFAULT_VALUE))
-        },
-        .getGeneratedParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_GENERATED))
-        },
-        .getDerivedParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_DERIVED))
-        },
-        .getUndefinedParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_TYPE_UNKNOWN))
-        },
-        .getParameterValueIfUserDefinedOrDefault = function(parameterName) {
-            if (isUserDefinedParameter(parameterName) || isDefaultParameter(parameterName)) {
-                return(.self[[parameterName]])
-            }
-
-            parameterType <- .self$getRefClass()$fields()[[parameterName]]
-            if (parameterType == "numeric") {
-                return(NA_real_)
-            }
-
-            if (parameterType == "integer") {
-                return(NA_integer_)
-            }
-
-            if (parameterType == "character") {
-                return(NA_character_)
-            }
-
-            return(NA)
-        },
-        .getParametersOfOneGroup = function(parameterType) {
-            if (length(parameterType) == 1) {
-                parameterNames <- names(.parameterTypes[.parameterTypes == parameterType])
-            } else {
-                parameterNames <- names(.parameterTypes[which(.parameterTypes %in% parameterType)])
-            }
-            parametersToShow <- .getParametersToShow()
-            if (is.null(parametersToShow) || length(parametersToShow) == 0) {
-                return(parameterNames)
-            }
-
-            return(parametersToShow[parametersToShow %in% parameterNames])
-        },
-        .showParameterType = function(parameterName) {
-            if (!.showParameterTypeEnabled) {
-                return("  ")
-            }
-
-            return(paste0("[", .getParameterType(parameterName), "]"))
-        },
-        .showAllParameters = function(consoleOutputEnabled = TRUE) {
-            parametersToShow <- .getVisibleFieldNamesOrdered()
-            for (parameter in parametersToShow) {
-                .showParameter(parameter,
-                    showParameterType = TRUE,
-                    consoleOutputEnabled = consoleOutputEnabled
-                )
-            }
-        },
-        .getVisibleFieldNamesOrdered = function() {
-            visibleFieldNames <- .getVisibleFieldNames()
-
-            parametersToShowSorted <- .getParametersToShow()
-            if (is.null(parametersToShowSorted) || length(parametersToShowSorted) == 0) {
-                return(visibleFieldNames)
-            }
-
-            visibleFieldNames <- visibleFieldNames[!(visibleFieldNames %in% parametersToShowSorted)]
-            visibleFieldNames <- c(parametersToShowSorted, visibleFieldNames)
-            return(visibleFieldNames)
-        },
-        .show = function(..., consoleOutputEnabled = FALSE) {
-            showType <- .getOptionalArgument("showType", ...)
-            if (!is.null(showType) && showType == 2) {
-                .cat("Technical developer summary of the ", .self$.toString(), " object (",
-                    methods::classLabel(class(.self)), "):\n\n",
-                    sep = "", heading = 1,
-                    consoleOutputEnabled = consoleOutputEnabled
-                )
-                .showAllParameters(consoleOutputEnabled = consoleOutputEnabled)
-                .showParameterTypeDescription(consoleOutputEnabled = consoleOutputEnabled)
-            } else {
-                stop(
-                    C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "method '.show()' is not implemented in class '", .getClassName(.self), "'"
-                )
-            }
-        },
-        .catMarkdownText = function(...) {
-            .show(consoleOutputEnabled = FALSE, ...)
-            if (length(.catLines) == 0) {
-                return(invisible())
-            }
-
-            for (line in .catLines) {
-                cat(line)
-            }
-        },
-        .showParametersOfOneGroup = function(parameters, title,
-                orderByParameterName = TRUE, consoleOutputEnabled = TRUE) {
-            output <- ""
-            if (is.null(parameters) || length(parameters) == 0 || all(is.na(parameters))) {
-                if (!missing(title) && !is.null(title) && !is.na(title) && consoleOutputEnabled) {
-                    output <- paste0(title, ": not available\n\n")
-                    .cat(output, heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                }
-                invisible(output)
-            } else {
-                if (orderByParameterName) {
-                    parameters <- sort(parameters)
-                }
-
-                if (!missing(title) && !is.null(title) && !is.na(title)) {
-                    output <- paste0(title, ":\n")
-                    .cat(output, heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                }
-                for (parameterName in parameters) {
-                    output <- paste0(output, .showParameter(parameterName,
-                        consoleOutputEnabled = consoleOutputEnabled
-                    ))
-                }
-                .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
-                output <- paste0(output, "\n")
-                invisible(output)
-            }
-        },
+ParameterSet <- R6::R6Class("ParameterSet",
+                            inherit = FieldSet,
+                            public = list(
+                              initialize = function(..., .showParameterTypeEnabled = TRUE) {
+                                self$.showParameterTypeEnabled <- .showParameterTypeEnabled
+                                self$.parameterTypes <- list()
+                                self$.catLines <- character()
+                                self$.deprecatedFieldNames <- character()
+                              },
+                              .toString = function(startWithUpperCase = FALSE) {
+                                s <- .formatCamelCase(.getClassName(self))
+                                return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
+                              },
+                              .initParameterTypes = function() {
+                                self$.parameterTypes <- list()
+                                for (parameterName in self$.getVisibleFieldNames()) {
+                                  self$.parameterTypes[[parameterName]] <- C_PARAM_TYPE_UNKNOWN
+                                }
+                              },
+                              .getParameterType = function(parameterName) {
+                                if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
+                                  stop(
+                                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                                    "'parameterName' must be a valid character with length > 0"
+                                  )
+                                }
+                                
+                                parameterType <- self$.parameterTypes[[parameterName]]
+                                if (is.null(parameterType)) {
+                                  return(C_PARAM_TYPE_UNKNOWN)
+                                }
+                                
+                                return(parameterType[1])
+                              },
+                              .getParametersToShow = function() {
+                                return(self$.getVisibleFieldNames())
+                              },
+                              .setParameterType = function(parameterName, parameterType) {
+                                if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
+                                  stop(
+                                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                                    "'parameterName' must be a valid character with length > 0"
+                                  )
+                                }
+                                
+                                parameterType <- parameterType[1]
+                                
+                                if (!all(parameterType %in% c(
+                                  C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE,
+                                  C_PARAM_GENERATED, C_PARAM_DERIVED, C_PARAM_NOT_APPLICABLE
+                                ))) {
+                                  stop(
+                                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                                    "'parameterType' ('", parameterType, "') is invalid"
+                                  )
+                                }
+                                
+                                self$.parameterTypes[[parameterName]] <- parameterType
+                                
+                                invisible(parameterType)
+                              },
+                              isUserDefinedParameter = function(parameterName) {
+                                return(self$.getParameterType(parameterName) == C_PARAM_USER_DEFINED)
+                              },
+                              isDefaultParameter = function(parameterName) {
+                                return(self$.getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE)
+                              },
+                              isGeneratedParameter = function(parameterName) {
+                                return(self$.getParameterType(parameterName) == C_PARAM_GENERATED)
+                              },
+                              isDerivedParameter = function(parameterName) {
+                                return(self$.getParameterType(parameterName) == C_PARAM_DERIVED)
+                              },
+                              isUndefinedParameter = function(parameterName) {
+                                return(self$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN)
+                              },
+                              .getInputParameters = function() {
+                                params <- self$.getParametersOfOneGroup(c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))
+                                return(params)
+                              },
+                              .getUserDefinedParameters = function() {
+                                return(self$.getParametersOfOneGroup(C_PARAM_USER_DEFINED))
+                              },
+                              .getDefaultParameters = function() {
+                                return(self$.getParametersOfOneGroup(C_PARAM_DEFAULT_VALUE))
+                              },
+                              .getGeneratedParameters = function() {
+                                return(self$.getParametersOfOneGroup(C_PARAM_GENERATED))
+                              },
+                              .getDerivedParameters = function() {
+                                return(self$.getParametersOfOneGroup(C_PARAM_DERIVED))
+                              },
+                              .getUndefinedParameters = function() {
+                                return(self$.getParametersOfOneGroup(C_PARAM_TYPE_UNKNOWN))
+                              },
+                              .getParameterValueIfUserDefinedOrDefault = function(parameterName) {
+                                if (self$isUserDefinedParameter(parameterName) || self$isDefaultParameter(parameterName)) {
+                                  return(self[[parameterName]])
+                                }
+                                
+                                parameterType <- self$getRefClass()$fields()[[parameterName]]
+                                if (parameterType == "numeric") {
+                                  return(NA_real_)
+                                }
+                                
+                                if (parameterType == "integer") {
+                                  return(NA_integer_)
+                                }
+                                
+                                if (parameterType == "character") {
+                                  return(NA_character_)
+                                }
+                                
+                                return(NA)
+                              },
+                              .getParametersOfOneGroup = function(parameterType) {
+                                if (length(parameterType) == 1) {
+                                  parameterNames <- names(self$.parameterTypes[self$.parameterTypes == parameterType])
+                                } else {
+                                  parameterNames <- names(self$.parameterTypes[which(self$.parameterTypes %in% parameterType)])
+                                }
+                                parametersToShow <- self$.getParametersToShow()
+                                if (is.null(parametersToShow) || length(parametersToShow) == 0) {
+                                  return(parameterNames)
+                                }
+                                
+                                return(parametersToShow[parametersToShow %in% parameterNames])
+                              },
+                              .showParameterType = function(parameterName) {
+                                if (!self$.showParameterTypeEnabled) {
+                                  return("  ")
+                                }
+                                
+                                return(paste0("[", self$.getParameterType(parameterName), "]"))
+                              },
+                              .showAllParameters = function(consoleOutputEnabled = TRUE) {
+                                parametersToShow <- self$.getVisibleFieldNamesOrdered()
+                                for (parameter in parametersToShow) {
+                                  self$.showParameter(parameter,
+                                                 showParameterType = TRUE,
+                                                 consoleOutputEnabled = consoleOutputEnabled
+                                  )
+                                }
+                              },
+                              .getVisibleFieldNamesOrdered = function() {
+                                visibleFieldNames <- self$.getVisibleFieldNames()
+                                
+                                parametersToShowSorted <- self$.getParametersToShow()
+                                if (is.null(parametersToShowSorted) || length(parametersToShowSorted) == 0) {
+                                  return(visibleFieldNames)
+                                }
+                                
+                                visibleFieldNames <- visibleFieldNames[!(visibleFieldNames %in% parametersToShowSorted)]
+                                visibleFieldNames <- c(parametersToShowSorted, visibleFieldNames)
+                                return(visibleFieldNames)
+                              },
+                              .show = function(..., consoleOutputEnabled = FALSE) {
+                                showType <- .getOptionalArgument("showType", ...)
+                                if (!is.null(showType) && showType == 2) {
+                                  self$.cat("Technical developer summary of the ", self$.toString(), " object (",
+                                       methods::classLabel(class(self)), "):\n\n",
+                                       sep = "", heading = 1,
+                                       consoleOutputEnabled = consoleOutputEnabled
+                                  )
+                                  self$.showAllParameters(consoleOutputEnabled = consoleOutputEnabled)
+                                  self$.showParameterTypeDescription(consoleOutputEnabled = consoleOutputEnabled)
+                                } else {
+                                  stop(
+                                    C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+                                    "method '.show()' is not implemented in class '", .getClassName(self), "'"
+                                  )
+                                }
+                              },
+                              .catMarkdownText = function(...) {
+                                self$.show(consoleOutputEnabled = FALSE, ...)
+                                if (length(self$.catLines) == 0) {
+                                  return(invisible())
+                                }
+                                
+                                for (line in self$.catLines) {
+                                  cat(line)
+                                }
+                              },
+                              .showParametersOfOneGroup = function(parameters, title,
+                                                                   orderByParameterName = TRUE, consoleOutputEnabled = TRUE) {
+                                output <- ""
+                                if (is.null(parameters) || length(parameters) == 0 || all(is.na(parameters))) {
+                                  if (!missing(title) && !is.null(title) && !is.na(title) && consoleOutputEnabled) {
+                                    output <- paste0(title, ": not available\n\n")
+                                    self$.cat(output, heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                                  }
+                                  invisible(output)
+                                } else {
+                                  if (orderByParameterName) {
+                                    parameters <- sort(parameters)
+                                  }
+                                  
+                                  if (!missing(title) && !is.null(title) && !is.na(title)) {
+                                    output <- paste0(title, ":\n")
+                                    self$.cat(output, heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                                  }
+                                  for (parameterName in parameters) {
+                                    output <- paste0(output, self$.showParameter(parameterName,
+                                                                            consoleOutputEnabled = consoleOutputEnabled
+                                    ))
+                                  }
+                                  self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                                  output <- paste0(output, "\n")
+                                  invisible(output)
+                                }
+                              },
         .showParameter = function(parameterName, showParameterType = FALSE, consoleOutputEnabled = TRUE) {
             tryCatch(
                 {
-                    params <- .getParameterValueFormatted(obj = .self, parameterName = parameterName)
+                    params <- .getParameterValueFormatted(obj = self, parameterName = parameterName)
                     if (is.null(params) || !is.list(params)) {
                         return(invisible(""))
                     }
 
                     if (!is.null(names(params)) && "paramValue" %in% names(params)) {
-                        return(.showParameterSingle(
+                        return(self$.showParameterSingle(
                             param = params,
                             parameterName = parameterName,
                             showParameterType = showParameterType,
@@ -454,13 +428,13 @@ ParameterSet <- setRefClass("ParameterSet",
                             param$paramName <- parameterName
 
                             category <- parts[2]
-                            categoryCaption <- .getParameterCaption(category, .self)
+                            categoryCaption <- .getParameterCaption(category, self)
                             if (is.null(categoryCaption)) {
                                 categoryCaption <- paste0("%", category, "%")
                             }
                             category <- categoryCaption
                         }
-                        outputPart <- .showParameterSingle(
+                        outputPart <- self$.showParameterSingle(
                             param = param,
                             parameterName = parameterName,
                             category = category,
@@ -501,7 +475,7 @@ ParameterSet <- setRefClass("ParameterSet",
                             index <- 1
                             for (i in 1:numberOfEntries) {
                                 for (j in 1:numberOfRows) {
-                                    output <- paste0(output, .showParameterFormatted(
+                                    output <- paste0(output, self$.showParameterFormatted(
                                         paramName = param$paramName,
                                         paramValue = param$paramValue[j, , i],
                                         paramValueFormatted = param$paramValueFormatted[[index]],
@@ -529,7 +503,7 @@ ParameterSet <- setRefClass("ParameterSet",
                                     paramValue <- paramValue[i, ]
                                 }
 
-                                output <- paste0(output, .showParameterFormatted(
+                                output <- paste0(output, self$.showParameterFormatted(
                                     paramName = param$paramName,
                                     paramValue = paramValue,
                                     paramValueFormatted = param$paramValueFormatted[[i]],
@@ -543,7 +517,7 @@ ParameterSet <- setRefClass("ParameterSet",
                             }
                         }
                     } else {
-                        output <- .showParameterFormatted(
+                        output <- self$.showParameterFormatted(
                             paramName = param$paramName,
                             paramValue = param$paramValue,
                             paramValueFormatted = param$paramValueFormatted,
@@ -567,7 +541,7 @@ ParameterSet <- setRefClass("ParameterSet",
             if (d[1] != 1) {
                 return(list(
                     parameterName = parameterName, 
-                    paramValue = base::get(parameterName, envir = .self)
+                    paramValue = base::get(parameterName, envir = self)
                 ))
             }
 
@@ -588,9 +562,9 @@ ParameterSet <- setRefClass("ParameterSet",
             return(list(parameterName = parameterName, paramValue = paramValue))
         },
         .showUnknownParameters = function(consoleOutputEnabled = TRUE) {
-            params <- .getUndefinedParameters()
+            params <- self$.getUndefinedParameters()
             if (length(params) > 0) {
-                .showParametersOfOneGroup(params, "ISSUES (parameters with undefined type)",
+                self$.showParametersOfOneGroup(params, "ISSUES (parameters with undefined type)",
                     consoleOutputEnabled = consoleOutputEnabled
                 )
             }
@@ -599,25 +573,25 @@ ParameterSet <- setRefClass("ParameterSet",
                 showParameterType = FALSE, category = NULL, matrixRow = NA_integer_, consoleOutputEnabled = TRUE,
                 paramNameRaw = NA_character_, numberOfCategories = NA_integer_) {
             if (!is.na(paramNameRaw)) {
-                paramCaption <- .getParameterCaption(paramNameRaw, .self)
+                paramCaption <- .getParameterCaption(paramNameRaw, self)
             }
             if (is.null(paramCaption)) {
-                paramCaption <- .getParameterCaption(paramName, .self)
+                paramCaption <- .getParameterCaption(paramName, self)
             }
             if (is.null(paramCaption)) {
                 paramCaption <- paste0("%", paramName, "%")
             }
             if (!is.null(category) && !is.na(category)) {
-                if (.isMultiArmSimulationResults(.self) && paramName == "singleEventsPerArmAndStage") {
-                    if (!inherits(.self, "SimulationResultsEnrichmentSurvival") &&
+                if (.isMultiArmSimulationResults(self) && paramName == "singleEventsPerArmAndStage") {
+                    if (!inherits(self, "SimulationResultsEnrichmentSurvival") &&
                             !is.na(numberOfCategories) && numberOfCategories == category) {
                         category <- "control"
                     }
                     paramCaption <- paste0(paramCaption, " {", category, "}")
                 } else if (paramName == "effectList") {
                     paramCaption <- paste0(paramCaption, " [", category, "]")
-                } else if (.isEnrichmentSimulationResults(.self)) {
-                    categoryCaption <- .getCategoryCaptionEnrichment(.self, paramName, category)
+                } else if (.isEnrichmentSimulationResults(self)) {
+                    categoryCaption <- .getCategoryCaptionEnrichment(self, paramName, category)
                     paramCaption <- paste0(paramCaption, " (", categoryCaption, ")")
                 } else {
                     paramCaption <- paste0(paramCaption, " (", category, ")")
@@ -631,7 +605,7 @@ ParameterSet <- setRefClass("ParameterSet",
                     }
                 }
             } else if (!is.na(matrixRow)) {
-                if (.isMultiArmAnalysisResults(.self) && paramName %in%
+                if (.isMultiArmAnalysisResults(self) && paramName %in%
                         c(
                             "conditionalErrorRate", "secondStagePValues",
                             "adjustedStageWisePValues", "overallAdjustedTestStatistics"
@@ -641,20 +615,20 @@ ParameterSet <- setRefClass("ParameterSet",
                         "Treatment", ifelse(grepl(",", treatments), "s", ""), " ",
                         treatments, " vs. control"
                     )
-                } else if (.isEnrichmentAnalysisResults(.self) || .isEnrichmentStageResults(.self) ||
-                        (inherits(.self, "ClosedCombinationTestResults") && isTRUE(.self$.enrichment))) {
+                } else if (.isEnrichmentAnalysisResults(self) || .isEnrichmentStageResults(self) ||
+                        (inherits(self, "ClosedCombinationTestResults") && isTRUE(self$.enrichment))) {
                     if (paramName %in% c(
                             "indices", "conditionalErrorRate", "secondStagePValues",
                             "adjustedStageWisePValues", "overallAdjustedTestStatistics", "rejectedIntersections"
                         )) {
-                        if (.isEnrichmentAnalysisResults(.self)) {
+                        if (.isEnrichmentAnalysisResults(self)) {
                             populations <- .closedTestResults$.getHypothesisPopulationVariants()[matrixRow]
-                        } else if (inherits(.self, "ClosedCombinationTestResults")) {
-                            populations <- .self$.getHypothesisPopulationVariants()[matrixRow]
+                        } else if (inherits(self, "ClosedCombinationTestResults")) {
+                            populations <- self$.getHypothesisPopulationVariants()[matrixRow]
                         } else {
                             stop(
                                 C_EXCEPTION_TYPE_RUNTIME_ISSUE, "only ClosedCombinationTestResults ",
-                                "supports function .getHypothesisPopulationVariants() (object is ", .getClassName(.self), ")"
+                                "supports function .getHypothesisPopulationVariants() (object is ", .getClassName(self), ")"
                             )
                         }
                         paramCaption <- paste0(paramCaption, " ", populations)
@@ -665,9 +639,9 @@ ParameterSet <- setRefClass("ParameterSet",
                             paramCaption <- paste0(paramCaption, " S", matrixRow)
                         }
                     }
-                } else if (.isMultiArmAnalysisResults(.self) || grepl("StageResultsMultiArm", .getClassName(.self)) ||
-                        (inherits(.self, "SimulationResults") && paramName == "effectMatrix") ||
-                        (inherits(.self, "ClosedCombinationTestResults") &&
+                } else if (.isMultiArmAnalysisResults(self) || grepl("StageResultsMultiArm", .getClassName(self)) ||
+                        (inherits(self, "SimulationResults") && paramName == "effectMatrix") ||
+                        (inherits(self, "ClosedCombinationTestResults") &&
                             paramName %in% c("rejected", "separatePValues"))) {
                     paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
                 } else {
@@ -683,52 +657,52 @@ ParameterSet <- setRefClass("ParameterSet",
             }
             if (is.function(paramValue) || grepl("Function$", paramName)) {
                 paramValueFormatted <- ifelse(
-                    .getParameterType(paramName) == C_PARAM_USER_DEFINED,
+                    self$.getParameterType(paramName) == C_PARAM_USER_DEFINED,
                     ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"),
                     "default"
                 )
             }
-            prefix <- ifelse(showParameterType, .showParameterType(paramName), "")
+            prefix <- ifelse(showParameterType, self$.showParameterType(paramName), "")
             variableNameFormatted <- .getFormattedVariableName(
                 name = paramCaption,
-                n = .getNChar(), prefix = prefix
+                n = self$.getNChar(), prefix = prefix
             )
 
             output <- paste(variableNameFormatted, paramValueFormatted, "\n")
-            .cat(output, consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat(output, consoleOutputEnabled = consoleOutputEnabled)
             invisible(output)
         },
         .getNChar = function() {
-            fieldNames <- .getVisibleFieldNames()
+            fieldNames <- self$.getVisibleFieldNames()
             if (length(fieldNames) == 0) {
                 return(40)
             }
             
             fieldCaptions <- character()
             for (parameterName in fieldNames) {
-                fieldCaptions <- c(fieldCaptions, .getParameterCaption(parameterName, .self))
+                fieldCaptions <- c(fieldCaptions, .getParameterCaption(parameterName, self))
             }
             return(min(40, max(nchar(fieldCaptions))) + 4)
         },
         .showParameterTypeDescription = function(consoleOutputEnabled = consoleOutputEnabled) {
-            .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_USER_DEFINED, ": user defined\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_DERIVED, ": derived value\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_DEFAULT_VALUE, ": default value\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_GENERATED, ": generated/calculated value\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_NOT_APPLICABLE, ": not applicable or hidden\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_USER_DEFINED, ": user defined\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_DERIVED, ": derived value\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_DEFAULT_VALUE, ": default value\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_GENERATED, ": generated/calculated value\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_NOT_APPLICABLE, ": not applicable or hidden\n", consoleOutputEnabled = consoleOutputEnabled)
         },
         .printAsDataFrame = function(parameterNames, niceColumnNamesEnabled = FALSE,
                 includeAllParameters = FALSE, handleParameterNamesAsToBeExcluded = FALSE,
                 lineBreakEnabled = FALSE) {
 
-            if (.isTrialDesignPlan(.self)) {
+            if (.isTrialDesignPlan(self)) {
                 parameterNames <- NULL
             }
 
             dataFrame <- .getAsDataFrame(
-                parameterSet = .self,
+                parameterSet = self,
                 parameterNames = parameterNames,
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
                 includeAllParameters = includeAllParameters,
@@ -736,7 +710,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 returnParametersAsCharacter = TRUE
             )
             result <- as.matrix(dataFrame)
-            if (.isTrialDesignPlan(.self)) {
+            if (.isTrialDesignPlan(self)) {
                 dimnames(result)[[1]] <- paste("  ", c(1:nrow(dataFrame)))
             } else if (!is.null(dataFrame[["stages"]])) {
                 dimnames(result)[[1]] <- paste("  Stage", dataFrame$stages)
@@ -747,7 +721,7 @@ ParameterSet <- setRefClass("ParameterSet",
         .getNumberOfRows = function(parameterNames) {
             numberOfRows <- 1
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (is.vector(parameterValues) && length(parameterValues) > numberOfRows) {
                     numberOfRows <- length(parameterValues)
                 } else if (is.matrix(parameterValues) && (nrow(parameterValues) == 1 || ncol(parameterValues) == 1) &&
@@ -759,7 +733,7 @@ ParameterSet <- setRefClass("ParameterSet",
         },
         .containsMultidimensionalParameters = function(parameterNames) {
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && is.matrix(parameterValues) &&
                         nrow(parameterValues) > 0 && ncol(parameterValues) > 0) {
                     return(TRUE)
@@ -768,13 +742,13 @@ ParameterSet <- setRefClass("ParameterSet",
             return(FALSE)
         },
         .getMultidimensionalNumberOfStages = function(parameterNames) {
-            if (!is.null(.self[[".design"]])) {
-                return(.self$.design$kMax)
+            if (!is.null(self[[".design"]])) {
+                return(self$.design$kMax)
             }
 
             n <- 1
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && is.matrix(parameterValues) &&
                         ncol(parameterValues) > 0 && nrow(parameterValues) > n) {
                     n <- nrow(parameterValues)
@@ -785,22 +759,22 @@ ParameterSet <- setRefClass("ParameterSet",
         .getVariedParameter = function(parameterNames, numberOfVariants) {
             # search for user defined parameters
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && !is.matrix(parameterValues) &&
                         length(parameterValues) == numberOfVariants &&
                         parameterName %in% C_VARIABLE_DESIGN_PLAN_PARAMETERS &&
-                        .getParameterType(parameterName) == C_PARAM_USER_DEFINED) {
+                        self$.getParameterType(parameterName) == C_PARAM_USER_DEFINED) {
                     return(parameterName)
                 }
             }
 
             # search for default values
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && !is.matrix(parameterValues) &&
                         length(parameterValues) == numberOfVariants &&
                         parameterName %in% C_VARIABLE_DESIGN_PLAN_PARAMETERS &&
-                        .getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE) {
+                        self$.getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE) {
                     return(parameterName)
                 }
             }
@@ -816,13 +790,13 @@ ParameterSet <- setRefClass("ParameterSet",
                 return(parameterName)
             }
 
-            tableColumnName <- .getParameterCaption(parameterName, .self, tableOutputEnabled = TRUE)
+            tableColumnName <- .getParameterCaption(parameterName, self, tableOutputEnabled = TRUE)
             return(ifelse(!is.null(tableColumnName), tableColumnName, parameterName))
         },
         .getUnidimensionalNumberOfStages = function(parameterNames) {
-            kMax <- .self[["kMax"]]
-            if (is.null(kMax) && !is.null(.self[[".design"]])) {
-                kMax <- .self[[".design"]][["kMax"]]
+            kMax <- self[["kMax"]]
+            if (is.null(kMax) && !is.null(self[[".design"]])) {
+                kMax <- self[[".design"]][["kMax"]]
             }
             if (!is.null(kMax) && length(kMax) == 1 && is.integer(kMax)) {
                 return(kMax)
@@ -830,7 +804,7 @@ ParameterSet <- setRefClass("ParameterSet",
 
             n <- 1
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && !is.matrix(parameterValues) &&
                         length(parameterValues) > n) {
                     n <- length(parameterValues)
@@ -842,7 +816,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 parameterName, parameterValues, parameterCaption) {
             tryCatch(
                 {
-                    formatFunctionName <- .getParameterFormatFunction(parameterName, .self)
+                    formatFunctionName <- .getParameterFormatFunction(parameterName, self)
                     if (!is.null(formatFunctionName)) {
                         parameterValuesFormatted <- eval(call(formatFunctionName, parameterValues))
                     } else {
@@ -871,7 +845,7 @@ ParameterSet <- setRefClass("ParameterSet",
                     .logError(paste0(
                         "Error in '.getAsDataFrame'. Failed to show parameter '%s' ",
                         "(class '%s'): %s"
-                    ), parameterName, .getClassName(.self), e)
+                    ), parameterName, .getClassName(self), e)
                 }
             )
         },
@@ -899,11 +873,11 @@ ParameterSet <- setRefClass("ParameterSet",
             return(x[which(names(x) %in% listEntryNames)])
         },
         .isMultiHypothesesObject = function() {
-            return(.isEnrichmentAnalysisResults(.self) || .isEnrichmentStageResults(.self) ||
-                .isMultiArmAnalysisResults(.self) || .isMultiArmStageResults(.self))
+            return(.isEnrichmentAnalysisResults(self) || .isEnrichmentStageResults(self) ||
+                .isMultiArmAnalysisResults(self) || .isMultiArmStageResults(self))
         },
         .isEnrichmentObject = function() {
-            return(.isEnrichmentAnalysisResults(.self) || .isEnrichmentStageResults(.self))
+            return(.isEnrichmentAnalysisResults(self) || .isEnrichmentStageResults(self))
         }
     )
 )
@@ -1449,30 +1423,6 @@ as.data.frame.ParameterSet <- function(x, row.names = NULL,
         includeAllParameters = includeAllParameters
     ))
 }
-
-#'
-#' @title
-#' Field Set Transpose
-#'
-#' @description
-#' Given a \code{FieldSet} \code{x}, t returns the transpose of \code{x}.
-#'
-#' @param x A \code{FieldSet}.
-#'
-#' @details
-#' Implementation of the base R generic function \code{\link[base]{t}}
-#'
-#' @keywords internal
-#'
-#' @export
-#'
-setMethod(
-    "t", "FieldSet",
-    function(x) {
-        x <- as.matrix(x, niceColumnNamesEnabled = TRUE)
-        return(t(x))
-    }
-)
 
 #'
 #' @title

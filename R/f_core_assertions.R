@@ -37,7 +37,7 @@ NULL
 }
 
 .isParameterSet <- function(x) {
-    return(isS4(x) && inherits(x, "ParameterSet"))
+    return(R6::is.R6(x) && inherits(x, "ParameterSet"))
 }
 
 .assertIsParameterSetClass <- function(x, objectName = "x") {
@@ -559,7 +559,7 @@ NULL
     if ((!naAllowed && is.na(x)) || !is.logical(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            ifelse(isS4(x), .getClassName(x), x), ") must be a single logical value",
+            ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a single logical value",
             call. = call.
         )
     }
@@ -586,7 +586,7 @@ NULL
     if ((!naAllowed && is.na(x)) || !is.numeric(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            ifelse(isS4(x), .getClassName(x), x), ") must be a valid numeric value",
+            ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a valid numeric value",
             call. = call.
         )
     }
@@ -629,7 +629,7 @@ NULL
             (!validateType && !is.na(x) && !is.infinite(x) && as.integer(x) != x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(isS4(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            "'", argumentName, "' (", ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
             call. = call.
         )
     }
@@ -637,7 +637,7 @@ NULL
     if (mustBePositive && !is.na(x) && !is.infinite(x) && x <= 0) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(isS4(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            "'", argumentName, "' (", ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
             call. = call.
         )
     }
@@ -1406,7 +1406,7 @@ NULL
             argNames[i]
         )
         if (!(argName %in% ignore) && !grepl("^\\.", argName)) {
-            if (isS4(arg) || is.environment(arg)) {
+            if (isS4(arg) || is.environment(arg) || R6::is.R6(arg)) {
                 arg <- .getClassName(arg)
             }
             if (is.function(arg)) {

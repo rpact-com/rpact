@@ -127,7 +127,7 @@
         followUpTime,
         maxNumberOfSubjects,
         allocationRatioPlanned) {
-    designPlan <- TrialDesignPlanCountData(design = design, designCharacteristics = designCharacteristics)
+    designPlan <- TrialDesignPlanCountData$new(design = design, designCharacteristics = designCharacteristics)
     designPlan$.setObjectType(objectType)
     sampleSizeEnabled <- identical(objectType, "sampleSize")
 

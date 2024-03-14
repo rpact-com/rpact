@@ -247,7 +247,7 @@
     if (type == 1) { # Boundary plot
         if (survivalDesignPlanEnabled) {
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Boundaries Z Scale")
+                main <- PlotSubTitleItems$new(title = "Boundaries Z Scale")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
                 if (!is.null(reducedParam)) {
                     main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
@@ -294,14 +294,14 @@
             )
         } else {
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Boundaries")
+                main <- PlotSubTitleItems$new(title = "Boundaries")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
                 if (!is.null(reducedParam)) {
                     main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
                 }
             }
 
-            designSet <- TrialDesignSet(design = designMaster, singleDesign = TRUE)
+            designSet <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             designSet$.plotSettings <- designPlan$.plotSettings
             designPlanName <- paste0(designPlanName, "$.design")
             return(.plotTrialDesignSet(
@@ -315,7 +315,7 @@
         }
     } else if (type == 2) { # Effect Scale Boundary plot
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Boundaries Effect Scale")
+            main <- PlotSubTitleItems$new(title = "Boundaries Effect Scale")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
             if (!is.null(reducedParam)) {
                 main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
@@ -455,7 +455,7 @@
         }
     } else if (type == 3) { # Stage Levels
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Boundaries p Values Scale")
+            main <- PlotSubTitleItems$new(title = "Boundaries p Values Scale")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
             if (!is.null(reducedParam)) {
                 main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
@@ -474,7 +474,7 @@
         } else {
             xParameterName <- "informationRates"
             yParameterNames <- "stageLevels"
-            designPlan <- TrialDesignSet(design = designMaster, singleDesign = TRUE)
+            designPlan <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             xParameterNameSrc <- ".design$informationRates"
             yParameterNamesSrc <- ".design$stageLevels"
         }
@@ -488,7 +488,7 @@
         )
     } else if (type == 4) { # Alpha Spending
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Error Spending")
+            main <- PlotSubTitleItems$new(title = "Error Spending")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
             if (!is.null(reducedParam)) {
                 main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
@@ -506,7 +506,7 @@
         } else {
             xParameterName <- "informationRates"
             yParameterNames <- "alphaSpent"
-            designPlan <- TrialDesignSet(design = designMaster, singleDesign = TRUE)
+            designPlan <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             xParameterNameSrc <- ".design$informationRates"
             yParameterNamesSrc <- ".design$alphaSpent"
         }
@@ -525,7 +525,7 @@
 
         if (designPlan$.isSampleSizeObject()) {
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Sample Size")
+                main <- PlotSubTitleItems$new(title = "Sample Size")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
 
@@ -626,7 +626,7 @@
             ))
         } else {
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Overall Power and Early Stopping")
+                main <- PlotSubTitleItems$new(title = "Overall Power and Early Stopping")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
             if (survivalDesignPlanEnabled) {
@@ -691,10 +691,10 @@
             if (.isTrialDesignPlanCountData(designPlan) && 
                 (length(designPlan$expectedNumberOfSubjectsH1) == 0 || 
                     all(is.na(designPlan$expectedNumberOfSubjectsH1)))) {
-                main <- PlotSubTitleItems(title = "Power / Early Stop")
+                main <- PlotSubTitleItems$new(title = "Power / Early Stop")
             } else {
                 titlePart <- ifelse(survivalDesignPlanEnabled, "Number of Events", "Sample Size")
-                main <- PlotSubTitleItems(title = paste0("Expected ", titlePart, " and Power / Early Stop"))
+                main <- PlotSubTitleItems$new(title = paste0("Expected ", titlePart, " and Power / Early Stop"))
             }
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
         }
@@ -735,7 +735,7 @@
         .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
 
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Overall Power")
+            main <- PlotSubTitleItems$new(title = "Overall Power")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
         }
 
@@ -761,7 +761,7 @@
         .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
 
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Overall Early Stopping")
+            main <- PlotSubTitleItems$new(title = "Overall Early Stopping")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
         }
 
@@ -788,9 +788,9 @@
 
         if (is.na(main)) {
             if (survivalDesignPlanEnabled) {
-                main <- PlotSubTitleItems(title = "Expected Number of Events")
+                main <- PlotSubTitleItems$new(title = "Expected Number of Events")
             } else {
-                main <- PlotSubTitleItems(title = "Expected Sample Size")
+                main <- PlotSubTitleItems$new(title = "Expected Sample Size")
             }
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
         }
@@ -827,7 +827,7 @@
         if (type == 10) { # Study Duration
             .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Study Duration")
+                main <- PlotSubTitleItems$new(title = "Study Duration")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
             xParameterName <- "hazardRatio"
@@ -842,7 +842,7 @@
         } else if (type == 11) {
             .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Expected Number of Subjects")
+                main <- PlotSubTitleItems$new(title = "Expected Number of Subjects")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
             xParameterName <- "hazardRatio"
@@ -857,7 +857,7 @@
         } else if (type == 12) { # Analysis Time
             .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Analysis Time")
+                main <- PlotSubTitleItems$new(title = "Analysis Time")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
 
@@ -1009,9 +1009,9 @@
 
     if (is.na(main)) {
         if (type == 13) {
-            main <- PlotSubTitleItems(title = "Cumulative Distribution Function")
+            main <- PlotSubTitleItems$new(title = "Cumulative Distribution Function")
         } else {
-            main <- PlotSubTitleItems(title = "Survival Function")
+            main <- PlotSubTitleItems$new(title = "Survival Function")
         }
         .addPlotSubTitleItems(designPlan, designMaster, main, type)
         if (!piecewiseSurvivalEnabled) {
