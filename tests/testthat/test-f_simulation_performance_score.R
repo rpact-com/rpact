@@ -92,14 +92,14 @@ test_that("getPerformanceScore handles non-two-stage designs", {
 test_that("getPerformanceScore handles non-null conditionalPower", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     simulationResult$conditionalPower <- 0.8
-    suppressWarnings(expect_type(getPerformanceScore(simulationResult), "S4"))
+    suppressWarnings(expect_type(getPerformanceScore(simulationResult), "environment"))
 })
 
 # Test to verify the correctness of the performance score calculation
 test_that("getPerformanceScore calculates performance score correctly", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     suppressWarnings(scores <- getPerformanceScore(simulationResult))
-    expect_type(scores, "S4")
+    expect_type(scores, "environment")
 })
 
 # Test to verify that the warning about the function being experimental is issued
@@ -111,11 +111,11 @@ test_that("getPerformanceScore issues warning", {
     )
 })
 
-# Test to check if the correct values are returned 
+# Test to check if the correct values are returned
 test_that("getPerformanceScore returns correct result object", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     suppressWarnings(result <- getPerformanceScore(simulationResult))
-    expect_type(result, "S4")
+    expect_type(result, "environment")
 })
 
 # Test to check if the correct values are returned
@@ -160,7 +160,7 @@ test_that("Print getPerformanceScore of simualtion means results", {
 # Test to check if the correct values are returned (rates)
 test_that("Print getPerformanceScore of simualtion rates results", {
     .skipTestIfDisabled()
-        
+
     design <- getDesignGroupSequential(
         kMax = 2,
         alpha = 0.025,
@@ -182,7 +182,7 @@ test_that("Print getPerformanceScore of simualtion rates results", {
         seed = 4378258
     )
     suppressWarnings(result <- getPerformanceScore(simulationResult))
-    
+
     ## Comparison of the results of PerformanceScore object 'result' with expected results
     expect_equal(result$locationSampleSize, c(0.33333333, 0.76333333, 0.6331616, NaN), tolerance = 1e-07, label = paste0(result$locationSampleSize))
     expect_equal(result$variationSampleSize, c(NA_real_, 0.32538077, 0.33802988, NA_real_), tolerance = 1e-07, label = paste0(result$variationSampleSize))
@@ -191,6 +191,6 @@ test_that("Print getPerformanceScore of simualtion rates results", {
     expect_equal(result$variationConditionalPower, c(NA_real_, 0.99864022, 0.99927015, NA_real_), tolerance = 1e-07, label = paste0(result$variationConditionalPower))
     expect_equal(result$subscoreConditionalPower, c(0.32576, 0.99882806, 0.99927071, NaN), tolerance = 1e-07, label = paste0(result$subscoreConditionalPower))
     expect_equal(result$performanceScore, c(0.32954667, 0.77159255, 0.74243323, NaN), tolerance = 1e-07, label = paste0(result$performanceScore))
-    
+
     expect_true(any(grepl("Performance score", capture.output(result))))
 })

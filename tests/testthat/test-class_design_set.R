@@ -98,5 +98,5 @@ test_that("Testing 'TrialDesignSet' functions, warnings, and errors", {
     expect_error(getDesignSet()$add(x = 1))
     expect_error(getDesignSet()$assertHaveEqualSidedValues(), NA)
     expect_error(getDesignSet(designs = c(getDesignGroupSequential(sided = 1), getDesignGroupSequential(sided = 2)))$assertHaveEqualSidedValues())
-    expect_true(isS4(designSet$getPlotSettings()))
+    expect_true(R6::is.R6(designSet$getPlotSettings()))
 })

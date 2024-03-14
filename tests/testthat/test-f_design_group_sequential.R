@@ -2103,6 +2103,7 @@ test_that("'getDesignGroupSequential': illegal arguments throw exceptions as exp
 	expect_error(getDesignGroupSequential(futilityBounds = c(1, 7)),
 	    "Argument out of bounds: 'futilityBounds' (1, 7) is out of bounds [-Inf; 6]",
 	    fixed = TRUE
-	)
+	)
+
 })
 

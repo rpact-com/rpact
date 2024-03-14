@@ -579,6 +579,7 @@ test_that("Testing 'summary.ParameterSet': output will be produced", {
 
 	expect_output(summary(getSimulationMeans(getDesignGroupSequential(kMax = 1),
 	    stDev = 4, plannedSubjects = 200, alternative = 1
-	))$show())
+	))$show())
+
 })
 

@@ -29,7 +29,7 @@ test_that("Function .getCalcSubjectsFunctionCppCode works for C++ code", {
     design <- getDesignInverseNormal()
     result <- .getCalcSubjectsFunction(
         design = design,
-        simulationResults = SimulationResultsRates(design = design),
+        simulationResults = SimulationResultsRates$new(design = design),
         calcFunction = calcFunction,
         expectedFunction = .getSimulationRatesStageSubjects,
         cppEnabled = TRUE

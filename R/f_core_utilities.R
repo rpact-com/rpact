@@ -1,3 +1,5 @@
+library("R6")
+
 ## |
 ## |  *Core utilities*
 ## |
@@ -764,7 +766,7 @@ NULL
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null")
     }
 
-    if (!(parameterName %in% names(parameterSet$getRefClass()$fields()))) {
+    if (!ifelse(R6::is.R6(parameterSet), parameterName %in% names(parameterSet), parameterName %in% names(getClass(class(parameterSet))@fieldClasses))) { #TODO
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'"
@@ -1041,7 +1043,7 @@ printCitation <- function(inclusiveR = TRUE, language = "en") {
 #' @export
 #'
 getParameterCaption <- function(obj, parameterName) {
-    if (is.null(obj) || length(obj) != 1 || !isS4(obj) || !inherits(obj, "FieldSet")) {
+    if (is.null(obj) || length(obj) != 1 || !isS4(obj) || !R6::is.R6(obj) || !inherits(obj, "FieldSet")) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
@@ -1074,7 +1076,7 @@ getParameterCaption <- function(obj, parameterName) {
 #' @export
 #'
 getParameterName <- function(obj, parameterCaption) {
-    if (is.null(obj) || length(obj) != 1 || !isS4(obj) || !inherits(obj, "FieldSet")) {
+    if (is.null(obj) || length(obj) != 1 || !isS4(obj) || !R6::is.R6(obj) || !inherits(obj, "FieldSet")) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)

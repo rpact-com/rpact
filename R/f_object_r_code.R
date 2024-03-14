@@ -59,7 +59,7 @@ NULL
         }
     }
 
-    if (is.function(x) || isS4(x)) {
+    if (is.function(x) || isS4(x) || R6::is.R6(x)) {
         return("NULL")
     }
 

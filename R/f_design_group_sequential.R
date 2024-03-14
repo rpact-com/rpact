@@ -135,13 +135,13 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_KD) {
         .assertDesignParameterExists(design, "gammaA", NA_real_)
         .assertIsSingleNumber(design$gammaA, "gammaA", naAllowed = FALSE)
-        .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA", 
+        .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA",
             lowerBound = 0.4, upperBound = 8,
             spendingFunctionName = "Kim & DeMets alpha spending")
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_HSD) {
         .assertDesignParameterExists(design, "gammaA", NA_real_)
         .assertIsSingleNumber(design$gammaA, "gammaA", naAllowed = FALSE)
-        .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA", 
+        .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA",
             lowerBound = -10, upperBound = 5,
             spendingFunctionName = "Hwang, Shih & DeCani alpha spending")
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
@@ -180,7 +180,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_KD) {
             .assertDesignParameterExists(design, "gammaB", NA_real_)
             .assertIsSingleNumber(design$gammaB, "gammaB", naAllowed = FALSE)
-            .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB", 
+            .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB",
                 lowerBound = 0.4, upperBound = 8,
                 spendingFunctionName = "Kim & DeMets beta spending", c(-0.4, 8))
         }
@@ -188,7 +188,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_HSD) {
             .assertDesignParameterExists(design, "gammaB", NA_real_)
             .assertIsSingleNumber(design$gammaB, "gammaB", naAllowed = FALSE)
-            .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB", 
+            .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB",
                 lowerBound = -10, upperBound = 5,
                 spendingFunctionName = "Hwang, Shih & DeCani beta spending")
         }
@@ -308,12 +308,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     .assertIsInClosedInterval(delayedInformation, "delayedInformation", lower = 0, upper = NULL, naAllowed = TRUE)
 
     if (designClass == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL) {
-        design <- TrialDesignInverseNormal(
+        design <- TrialDesignInverseNormal$new(
             kMax = kMax, bindingFutility = bindingFutility,
             delayedInformation = delayedInformation
         )
     } else if (designClass == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL) {
-        design <- TrialDesignGroupSequential(
+        design <- TrialDesignGroupSequential$new(
             kMax = kMax, bindingFutility = bindingFutility,
             delayedInformation = delayedInformation
         )
@@ -1751,7 +1751,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         writeToDesign = FALSE, twoSidedWarningForDefaultValues = FALSE
     )
 
-    designCharacteristics <- TrialDesignCharacteristics(design = design)
+    designCharacteristics <- TrialDesignCharacteristics$new(design = design)
 
     designCharacteristics$rejectionProbabilities <- rep(NA_real_, design$kMax)
     designCharacteristics$.setParameterType("rejectionProbabilities", C_PARAM_NOT_APPLICABLE)
@@ -2098,7 +2098,7 @@ getPowerAndAverageSampleNumber <- function(design, theta = seq(-1, 1, 0.02), nMa
     .assertIsTrialDesign(design)
     .assertIsSingleNumber(nMax, "nMax")
     .assertIsInClosedInterval(nMax, "nMax", lower = 1, upper = NULL)
-    return(PowerAndAverageSampleNumberResult(design = design, theta = theta, nMax = nMax))
+    return(PowerAndAverageSampleNumberResult$new(design = design, theta = theta, nMax = nMax))
 }
 
 .getSimulatedRejectionsDelayedResponse <- function(delta, informationRates, delayedInformation,

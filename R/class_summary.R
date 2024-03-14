@@ -23,20 +23,20 @@
 NULL
 
 
-SummaryItem <- setRefClass("SummaryItem",
-    fields = list(
-        title = "character",
-        values = "character",
-        legendEntry = "list"
-    ),
-    methods = list(
+SummaryItem <- R6Class("SummaryItem",
+    public = list(
+        title = NULL,
+        values = NULL,
+        legendEntry = NULL,
         initialize = function(title = NA_character_, values = NA_character_, ...) {
-            callSuper(title = title, values = values, ...)
-            if (!is.null(legendEntry) && length(legendEntry) > 0) {
-                if (is.null(names(legendEntry))) {
+            self$title <- title
+            self$values <- values
+            #callSuper(...) TODO LEGENDENTRyy
+            if (!is.null(self$legendEntry) && length(self$legendEntry) > 0) {
+                if (is.null(names(self$legendEntry))) {
                     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote("legendEntry"), " must be a named list")
                 }
-                for (l in legendEntry) {
+                for (l in self$legendEntry) {
                     if (length(l) == 0) {
                         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote("legendEntry"), " must be not empty")
                     }
@@ -44,11 +44,11 @@ SummaryItem <- setRefClass("SummaryItem",
             }
         },
         show = function() {
-            cat(title, "=", values, "\n")
+            cat(self$title, "=", self$values, "\n")
         },
         toList = function() {
             result <- list()
-            result[[title]] <- values
+            result[[self$title]] <- self$values
         }
     )
 )
@@ -177,58 +177,58 @@ print.SummaryFactory <- function(x, ...,
 #'
 #' @importFrom methods new
 #'
-SummaryFactory <- setRefClass("SummaryFactory",
-    contains = "ParameterSet",
-    fields = list(
-        object = "ParameterSet",
-        title = "character",
-        header = "character",
-        summaryItems = "list",
-        intervalFormat = "character",
-        justify = "character",
-        output = "character"
-    ),
-    methods = list(
+SummaryFactory <- R6Class("SummaryFactory",
+    inherit = ParameterSet,
+    public = list(
+        object = NULL,
+        title = NULL,
+        header = NULL,
+        summaryItems = NULL,
+        intervalFormat = NULL,
+        justify = NULL,
+        output = NULL,
         initialize = function(..., intervalFormat = "[%s; %s]", output = "all") {
-            callSuper(..., intervalFormat = intervalFormat, output = output)
-            summaryItems <<- list()
-            justify <<- getOption("rpact.summary.justify", "right")
+            #callSuper(...) TODO
+            self$intervalFormat <- intervalFormat
+            self$output <- output
+            self$summaryItems <- list()
+            self$justify <- getOption("rpact.summary.justify", "right")
         },
         show = function(showType = 1, digits = NA_integer_) {
-            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
         .show = function(showType = 1, digits = NA_integer_, ..., consoleOutputEnabled = TRUE) {
-            if (output %in% c("all", "title")) {
-                if (is.null(title) || length(title) == 0) {
-                    title <<- .createSummaryTitleObject(object)
+            if (self$output %in% c("all", "title")) {
+                if (is.null(self$title) || length(self$title) == 0) {
+                    self$title <- .createSummaryTitleObject(self$object)
                 }
-                if (!is.null(title) && length(title) == 1 && trimws(title) != "") {
-                    .cat(title, "\n\n",
+                if (!is.null(self$title) && length(self$title) == 1 && trimws(self$title) != "") {
+                    self$.cat(self$title, "\n\n",
                         heading = 1,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
                 }
             }
 
-            if (output %in% c("all", "overview")) {
-                if (is.null(header) || length(header) == 0) {
-                    header <<- .createSummaryHeaderObject(object, .self, digits)
+            if (self$output %in% c("all", "overview")) {
+                if (is.null(self$header) || length(self$header) == 0) {
+                    self$header <- .createSummaryHeaderObject(self$object, self, digits)
                 }
-                if (!is.null(header) && length(header) == 1 && trimws(header) != "") {
-                    .cat(header, "\n\n",
+                if (!is.null(self$header) && length(self$header) == 1 && trimws(self$header) != "") {
+                    self$.cat(self$header, "\n\n",
                         consoleOutputEnabled = consoleOutputEnabled
                     )
                 }
             }
 
-            if (!(output %in% c("all", "body"))) {
+            if (!(self$output %in% c("all", "body"))) {
                 return(invisible())
             }
 
             legendEntries <- c()
             legendEntriesUnique <- c()
             summaryItemNames <- c()
-            for (summaryItem in summaryItems) {
+            for (summaryItem in self$summaryItems) {
                 if (!is.null(summaryItem$title) && length(summaryItem$title) == 1 && !is.na(summaryItem$title)) {
                     summaryItemNames <- c(summaryItemNames, summaryItem$title)
                 }
@@ -245,12 +245,12 @@ SummaryFactory <- setRefClass("SummaryFactory",
             }
             summaryItemNames <- paste0(format(summaryItemNames), " ")
 
-            na <- ifelse(.isDataset(object), "NA", NA_character_)
+            na <- ifelse(.isDataset(self$object), "NA", NA_character_)
             tableColumns <- 0
             maxValueWidth <- 1
-            if (length(summaryItems) > 0) {
-                for (i in 1:length(summaryItems)) {
-                    validValues <- na.omit(summaryItems[[i]]$values)
+            if (length(self$summaryItems) > 0) {
+                for (i in 1:length(self$summaryItems)) {
+                    validValues <- na.omit(self$summaryItems[[i]]$values)
                     if (length(validValues) > 0) {
                         w <- max(nchar(validValues))
                         maxValueWidth <- max(maxValueWidth, w)
@@ -258,21 +258,21 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     }
                 }
                 spaceString <- paste0(rep(" ", maxValueWidth + 1), collapse = "")
-                for (i in 1:length(summaryItems)) {
-                    itemTitle <- summaryItems[[i]]$title
+                for (i in 1:length(self$summaryItems)) {
+                    itemTitle <- self$summaryItems[[i]]$title
                     if (!is.null(itemTitle) && length(itemTitle) == 1 && !is.na(itemTitle)) {
                         summaryItemName <- summaryItemNames[i]
-                        values <- summaryItems[[i]]$values
+                        values <- self$summaryItems[[i]]$values
                         values <- trimws(values)
                         indices <- !grepl("(\\])$", values)
                         values[indices] <- paste0(values[indices], " ")
-                        values <- format(c(spaceString, values), justify = justify)[2:(length(values) + 1)]
-                        .cat(summaryItemName, values, "\n",
+                        values <- format(c(spaceString, values), justify = self$justify)[2:(length(values) + 1)]
+                        self$.cat(summaryItemName, values, "\n",
                             tableColumns = tableColumns,
                             consoleOutputEnabled = consoleOutputEnabled, na = na
                         )
                         if (!consoleOutputEnabled && trimws(summaryItemName) == "Stage") {
-                            .cat(rep("----- ", tableColumns), "\n",
+                            self$.cat(rep("----- ", tableColumns), "\n",
                                 tableColumns = tableColumns,
                                 consoleOutputEnabled = consoleOutputEnabled, na = na
                             )
@@ -282,15 +282,15 @@ SummaryFactory <- setRefClass("SummaryFactory",
             }
 
             if (length(legendEntries) > 0) {
-                .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
-                .cat("Legend:\n", consoleOutputEnabled = consoleOutputEnabled)
+                self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                self$.cat("Legend:\n", consoleOutputEnabled = consoleOutputEnabled)
                 if (!consoleOutputEnabled) {
-                    .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
                 for (legendEntry in legendEntries) {
-                    .cat(legendEntry, "\n", consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(legendEntry, "\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
-                .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
             }
         },
         addItem = function(title, values, legendEntry = list()) {
@@ -299,7 +299,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
             }
             tryCatch(
                 {
-                    addSummaryItem(SummaryItem(title = title, values = values, legendEntry = legendEntry))
+                    self$addSummaryItem(SummaryItem$new(title = title, values = values, legendEntry = legendEntry))
                 },
                 error = function(e) {
                     stop(
@@ -316,7 +316,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     "'summaryItem' must be an instance of class 'SummaryItem' (was '", .getClassName(summaryItem), "')"
                 )
             }
-            summaryItems <<- c(summaryItems, summaryItem)
+            self$summaryItems <- c(self$summaryItems, summaryItem)
         },
         .getFormattedParameterValue = function(valuesToShow, valuesToShow2) {
             naText <- getOption("rpact.summary.na", "")
@@ -333,7 +333,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     if (trimws(value1) == "" && trimws(value2) == "") {
                         valuesToShow[variantIndex] <- naText
                     } else {
-                        valuesToShow[variantIndex] <- sprintf(intervalFormat, value1, value2)
+                        valuesToShow[variantIndex] <- sprintf(self$intervalFormat, value1, value2)
                     }
                 }
             } else {
@@ -481,9 +481,9 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 )
 
                 if (parameterName1 %in% c("piControl", "overallPiControl", "overallPooledStDevs")) {
-                    valuesToShow <- .getInnerValues(valuesToShow, transpose = TRUE)
+                    valuesToShow <- self$.getInnerValues(valuesToShow, transpose = TRUE)
                 } else {
-                    valuesToShow <- .getInnerValues(valuesToShow, transpose = transpose)
+                    valuesToShow <- self$.getInnerValues(valuesToShow, transpose = transpose)
                 }
 
                 valuesToShow2 <- NA_real_
@@ -495,11 +495,11 @@ SummaryFactory <- setRefClass("SummaryFactory",
                         smoothedZeroFormat = smoothedZeroFormat,
                         formatRepeatedPValues = formatRepeatedPValues
                     )
-                    valuesToShow2 <- .getInnerValues(valuesToShow2, transpose = transpose)
+                    valuesToShow2 <- self$.getInnerValues(valuesToShow2, transpose = transpose)
                 }
 
-                valuesToShow <- .getFormattedParameterValue(valuesToShow, valuesToShow2)
-                addItem(parameterCaptionSingle, valuesToShow, legendEntry)
+                valuesToShow <- self$.getFormattedParameterValue(valuesToShow, valuesToShow2)
+                self$addItem(parameterCaptionSingle, valuesToShow, legendEntry)
             } else {
                 if (!inherits(parameterSet, "ParameterSet")) {
                     stop(
@@ -564,7 +564,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                             numberOfVariants <- length(variedParameterValues)
                         }
                         variedParameterCaption <- tolower(variedParameterCaption)
-                    } else if (.isEnrichmentObject(parameterSet)) {
+                    } else if (self$.isEnrichmentObject(parameterSet)) {
                         transposed <- TRUE
                         variedParameterCaption <- "populations"
                         if (parameterName1 %in% c(
@@ -658,7 +658,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                 }
 
                 for (variantIndex in 1:numberOfVariants) {
-                    colValues <- .getColumnValues(parameterName, values, variantIndex, transposed)
+                    colValues <- self$.getColumnValues(parameterName, values, variantIndex, transposed)
                     colValues <- .getSummaryValuesFormatted(parameterSet, parameterName1,
                         colValues,
                         roundDigits = roundDigits,
@@ -668,7 +668,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                     )
                     colValues2 <- NA_real_
                     if (!all(is.na(values2))) {
-                        colValues2 <- .getColumnValues(parameterName, values2, variantIndex, transposed)
+                        colValues2 <- self$.getColumnValues(parameterName, values2, variantIndex, transposed)
                         colValues2 <- .getSummaryValuesFormatted(parameterSet, parameterName2, colValues2,
                             roundDigits = roundDigits, ceilingEnabled = ceilingEnabled,
                             cumsumEnabled = cumsumEnabled,
@@ -676,12 +676,12 @@ SummaryFactory <- setRefClass("SummaryFactory",
                             formatRepeatedPValues = formatRepeatedPValues
                         )
                     }
-                    colValues <- .getFormattedParameterValue(valuesToShow = colValues, valuesToShow2 = colValues2)
+                    colValues <- self$.getFormattedParameterValue(valuesToShow = colValues, valuesToShow2 = colValues2)
 
                     if (numberOfVariants == 1) {
-                        addItem(parameterCaption, colValues, legendEntry)
-                    } else if (.isEnrichmentObject(parameterSet)) {
-                        addItem(paste0(
+                        self$addItem(parameterCaption, colValues, legendEntry)
+                    } else if (self$.isEnrichmentObject(parameterSet)) {
+                        self$addItem(paste0(
                             parameterCaption, " ",
                             variedParameterValues[variantIndex]
                         ), colValues, legendEntry)
@@ -692,12 +692,12 @@ SummaryFactory <- setRefClass("SummaryFactory",
                             inherits(parameterSet, "ClosedCombinationTestResults") ||
                             inherits(parameterSet, "ConditionalPowerResults")) {
                         spacePrefix <- ifelse(parameterCaption %in% c("pi", "lambda", "median"), "", " ")
-                        addItem(paste0(
+                        self$addItem(paste0(
                             parameterCaption, spacePrefix,
                             "(", variedParameterValues[variantIndex], ")"
                         ), colValues, legendEntry)
                     } else if (userDefinedEffectMatrix) {
-                        addItem(paste0(parameterCaption, " [", variantIndex, "]"), colValues, legendEntry)
+                        self$addItem(paste0(parameterCaption, " [", variantIndex, "]"), colValues, legendEntry)
                     } else {
                         if (is.matrix(variedParameterValues) && ncol(variedParameterValues) > 1) {
                             variedParameterValuesFormatted <-
@@ -705,7 +705,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
                         } else {
                             variedParameterValuesFormatted <- variedParameterValues[variantIndex]
                         }
-                        addItem(
+                        self$addItem(
                             paste0(
                                 parameterCaption, ", ",
                                 variedParameterCaption, " = ", variedParameterValuesFormatted
@@ -2458,7 +2458,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
         }
     }
 
-    summaryFactory <- SummaryFactory(object = object, intervalFormat = intervalFormat, output = output)
+    summaryFactory <- SummaryFactory$new(object = object, intervalFormat = intervalFormat, output = output)
 
     .addDesignInformationToSummary(design, object, summaryFactory, output = output)
 
@@ -2988,7 +2988,7 @@ SummaryFactory <- setRefClass("SummaryFactory",
     intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
     .assertIsValidSummaryIntervalFormat(intervalFormat)
 
-    summaryFactory <- SummaryFactory(object = object, intervalFormat = intervalFormat, output = output)
+    summaryFactory <- SummaryFactory$new(object = object, intervalFormat = intervalFormat, output = output)
 
     if (output %in% c("all", "title", "overview")) {
         .addDesignInformationToSummary(design, designPlan, summaryFactory, output = output)

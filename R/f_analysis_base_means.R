@@ -64,7 +64,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsInverseNormal$new(design = design, dataInput = dataInput)
 
     .getAnalysisResultsMeansAll(
         results = results, design = design, dataInput = dataInput,
@@ -93,7 +93,7 @@ NULL
         ), c("stage", "stDevH1")), ...
     )
 
-    results <- AnalysisResultsGroupSequential(design = design, dataInput = dataInput)
+    results <- AnalysisResultsGroupSequential$new(design = design, dataInput = dataInput)
 
     stDevH1 <- .getOptionalArgument("stDevH1", ...)
     if (!is.null(stDevH1)) {
@@ -135,7 +135,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsFisher$new(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
@@ -474,7 +474,7 @@ NULL
     }
 
     if (dataInput$getNumberOfGroups() == 1) {
-        stageResults <- StageResultsMeans(
+        stageResults <- StageResultsMeans$new(
             design = design,
             dataInput = dataInput,
             stage = as.integer(stage),
@@ -500,7 +500,7 @@ NULL
             equalVariances = equalVariances
         )
     } else if (dataInput$getNumberOfGroups() == 2) {
-        stageResults <- StageResultsMeans(
+        stageResults <- StageResultsMeans$new(
             design = design,
             dataInput = dataInput,
             stage = as.integer(stage),
@@ -1190,7 +1190,7 @@ NULL
 
     design <- stageResults$.design
 
-    results <- ConditionalPowerResultsMeans(
+    results <- ConditionalPowerResultsMeans$new(
         .stageResults = stageResults, .design = design,
         nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
         thetaH1 = thetaH1, assumedStDev = assumedStDev

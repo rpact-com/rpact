@@ -145,7 +145,7 @@ getDesignFisher <- function(...,
         warning("'bindingFutility' (", bindingFutility, ") will be ignored", call. = FALSE)
     }
 
-    design <- TrialDesignFisher(
+    design <- TrialDesignFisher$new(
         kMax = kMax,
         alpha = alpha,
         method = method,

@@ -278,7 +278,7 @@ NULL
     if (type == 1) { # Multi-arm, Overall Success
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Overall Success")
+            main <- PlotSubTitleItems$new(title = "Overall Success")
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
 
@@ -320,7 +320,7 @@ NULL
     } else if (type == 2) { # Multi-arm, Success per Stage
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Success per Stage")
+            main <- PlotSubTitleItems$new(title = "Success per Stage")
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
 
@@ -385,7 +385,7 @@ NULL
 
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = paste0("Selected ", armsCaption, " per Stage"))
+            main <- PlotSubTitleItems$new(title = paste0("Selected ", armsCaption, " per Stage"))
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
 
@@ -476,7 +476,7 @@ NULL
     } else if (type == 4) { # Multi-arm, Rejected Arms/Populations per Stage
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = ifelse(!multiArmEnabled,
+            main <- PlotSubTitleItems$new(title = ifelse(!multiArmEnabled,
                 "Reject per Stage",
                 ifelse(designMaster$kMax > 1,
                     paste0("Rejected ", armsCaption, " per Stage"), paste0("Rejected ", armsCaption)
@@ -607,7 +607,7 @@ NULL
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
 
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = ifelse(designMaster$kMax == 1,
+            main <- PlotSubTitleItems$new(title = ifelse(designMaster$kMax == 1,
                 "Overall Power", "Overall Power and Early Stopping"
             ))
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
@@ -694,7 +694,7 @@ NULL
 
         if (is.na(main)) {
             titlePart <- paste0("Expected ", ifelse(survivalEnabled, "Number of Events", "Number of Subjects"))
-            main <- PlotSubTitleItems(title = paste0(
+            main <- PlotSubTitleItems$new(title = paste0(
                 titlePart,
                 ifelse(designMaster$kMax == 1, "", paste0(
                     " and Power",
@@ -727,7 +727,7 @@ NULL
     } else if (type == 7) {
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Overall Power")
+            main <- PlotSubTitleItems$new(title = "Overall Power")
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
 
@@ -753,7 +753,7 @@ NULL
             !all(na.omit(simulationResults$futilityStop) == 0)
 
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = paste0(
+            main <- PlotSubTitleItems$new(title = paste0(
                 "Overall Early Stopping",
                 ifelse(futilityStopEnabled, " and Futility Stopping", "")
             ))
@@ -778,7 +778,7 @@ NULL
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
 
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = ifelse(survivalEnabled,
+            main <- PlotSubTitleItems$new(title = ifelse(survivalEnabled,
                 "Expected Number of Events", "Expected Number of Subjects"
             ))
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
@@ -797,7 +797,7 @@ NULL
     } else if (type == 10) { # Study Duration
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Study Duration")
+            main <- PlotSubTitleItems$new(title = "Study Duration")
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
         xParameterName <- "hazardRatio"
@@ -812,7 +812,7 @@ NULL
     } else if (type == 11) {
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Expected Number of Subjects")
+            main <- PlotSubTitleItems$new(title = "Expected Number of Subjects")
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
         xParameterName <- "hazardRatio"
@@ -827,7 +827,7 @@ NULL
     } else if (type == 12) { # Analysis Time
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Analysis Time")
+            main <- PlotSubTitleItems$new(title = "Analysis Time")
             .addPlotSubTitleItems(simulationResults, designMaster, main, type)
         }
 
