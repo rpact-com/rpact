@@ -780,29 +780,29 @@ NULL
 }
 
 .showParameterOutOfValidatedBoundsMessage <- function(
-    parameterValue,
-    parameterName, ...,
-    lowerBound = NA_real_,
-    upperBound = NA_real_,
+    parameterValue, 
+    parameterName, ..., 
+    lowerBound = NA_real_, 
+    upperBound = NA_real_, 
     spendingFunctionName = NA_character_,
     closedLowerBound = TRUE,
     closedUpperBound = TRUE,
     suffix = NA_character_) {
-
+    
     .assertIsSingleNumber(lowerBound, "lowerBound", naAllowed = TRUE)
     .assertIsSingleNumber(upperBound, "upperBound", naAllowed = TRUE)
     if (is.na(lowerBound) && is.na(upperBound)) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'lowerBound' or 'upperBound' must be defined")
     }
-
+    
     if (is.na(lowerBound)) {
         lowerBound <- -Inf
     }
-
+    
     if (is.na(upperBound)) {
         upperBound <- Inf
     }
-
+    
     if (closedLowerBound) {
         bracketLowerBound <- "["
         conditionLowerBound <- parameterValue < lowerBound
@@ -817,43 +817,43 @@ NULL
         bracketUpperBound <- ")"
         conditionUpperBound <- parameterValue >= upperBound
     }
-
+    
     if (conditionLowerBound || conditionUpperBound) {
         if (!is.null(spendingFunctionName) && !is.na(spendingFunctionName)) {
             spendingFunctionName <- paste0("for ", spendingFunctionName, " function ")
         } else {
             spendingFunctionName <- ""
         }
-
+        
         if (is.na(suffix)) {
             suffix <- ""
         } else {
             suffix <- paste0(" ", trimws(suffix))
         }
-
+        
         type <- getOption("rpact.out.of.validated.bounds.message.type", "warning")
         if (identical(type, "warning")) {
-            warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
-                spendingFunctionName, "is out of validated bounds ",
+            warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ", 
+                spendingFunctionName, "is out of validated bounds ", 
                 bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix, call. = FALSE)
-        }
+        } 
         else if (identical(type, "message")) {
-            message("Note that parameter ", sQuote(parameterName), " (", parameterValue, ") ",
-                spendingFunctionName, "is out of validated bounds ",
+            message("Note that parameter ", sQuote(parameterName), " (", parameterValue, ") ", 
+                spendingFunctionName, "is out of validated bounds ", 
                 bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix)
-        }
+        } 
     }
 }
 
 .assertIsValidAlpha <- function(alpha) {
     .assertIsSingleNumber(alpha, "alpha")
-    .assertIsInOpenInterval(alpha, "alpha", lower = 0, upper = NULL)
+    .assertIsInOpenInterval(alpha, "alpha", lower = 0, upper = NULL)   
     .showParameterOutOfValidatedBoundsMessage(alpha, "alpha", lowerBound = 1e-06, upperBound = 0.5, closedUpperBound = FALSE)
 }
 
 .assertIsValidKappa <- function(kappa) {
     .assertIsSingleNumber(kappa, "kappa")
-    .assertIsInOpenInterval(kappa, "kappa", lower = 0, upper = NULL)
+    .assertIsInOpenInterval(kappa, "kappa", lower = 0, upper = NULL)    
 }
 
 .assertIsValidLambda <- function(lambda, lambdaNumber = 0) {
@@ -922,9 +922,9 @@ NULL
 .assertIsValidBeta <- function(beta, alpha) {
     .assertIsSingleNumber(beta, "beta")
     .assertIsSingleNumber(alpha, "alpha")
-    .assertIsInOpenInterval(beta, "beta", lower = 0, upper = NULL)
-    .showParameterOutOfValidatedBoundsMessage(beta, "beta", lowerBound = 1e-04,
-        upperBound = 1 - alpha, closedUpperBound = FALSE,
+    .assertIsInOpenInterval(beta, "beta", lower = 0, upper = NULL)    
+    .showParameterOutOfValidatedBoundsMessage(beta, "beta", lowerBound = 1e-04, 
+        upperBound = 1 - alpha, closedUpperBound = FALSE, 
         suffix = "condition: 1e-06 <= alpha < 1 - beta <= 1 - 1e-04")
 }
 
