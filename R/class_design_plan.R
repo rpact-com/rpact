@@ -100,7 +100,7 @@ C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_COUNT_DATA <- list(
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlan <- R6Class("TrialDesignPlan",
+TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
     inherit = ParameterSet,
     public = list(
         .plotSettings = NULL,
@@ -342,7 +342,7 @@ as.data.frame.TrialDesignPlan <- function(x, row.names = NULL,
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlanMeans <- R6Class("TrialDesignPlanMeans",
+TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
     inherit = TrialDesignPlan,
     public = list(
         meanRatio = NULL,
@@ -491,7 +491,7 @@ TrialDesignPlanMeans <- R6Class("TrialDesignPlanMeans",
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlanRates <- R6Class("TrialDesignPlanRates",
+TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
     inherit = TrialDesignPlan,
     public = list(
         riskRatio = NULL,
@@ -665,7 +665,7 @@ TrialDesignPlanRates <- R6Class("TrialDesignPlanRates",
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlanSurvival <- R6Class("TrialDesignPlanSurvival",
+TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
     inherit = TrialDesignPlan,
     public = list(
         .piecewiseSurvivalTime = NULL,
@@ -883,7 +883,7 @@ TrialDesignPlanSurvival <- R6Class("TrialDesignPlanSurvival",
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlanCountData <- R6Class("TrialDesignPlanCountData",
+TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
     inherit = TrialDesignPlan,
     public = list(
         .designCharacteristics = NULL,

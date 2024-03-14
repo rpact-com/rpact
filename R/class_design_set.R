@@ -165,7 +165,7 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 #'
 #' @importFrom methods new
 #'
-TrialDesignSet <- R6Class("TrialDesignSet",
+TrialDesignSet <- R6::R6Class("TrialDesignSet",
     inherit = FieldSet,
     public = list(
         .plotSettings = NULL,

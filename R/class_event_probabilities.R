@@ -56,7 +56,7 @@
 #'
 #' @keywords internal
 #'
-EventProbabilities <- R6Class("EventProbabilities",
+EventProbabilities <- R6::R6Class("EventProbabilities",
     inherit = ParameterSet,
     public = list(
         .piecewiseSurvivalTime = NULL,
@@ -179,7 +179,7 @@ EventProbabilities <- R6Class("EventProbabilities",
 #'
 #' @keywords internal
 #'
-NumberOfSubjects <- R6Class("NumberOfSubjects",
+NumberOfSubjects <- R6::R6Class("NumberOfSubjects",
     inherit = ParameterSet,
     public = list(
         .accrualTime = NULL,

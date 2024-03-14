@@ -23,7 +23,7 @@
 NULL
 
 
-SummaryItem <- R6Class("SummaryItem",
+SummaryItem <- R6::R6Class("SummaryItem",
     public = list(
         title = NULL,
         values = NULL,
@@ -177,7 +177,7 @@ print.SummaryFactory <- function(x, ...,
 #'
 #' @importFrom methods new
 #'
-SummaryFactory <- R6Class("SummaryFactory",
+SummaryFactory <- R6::R6Class("SummaryFactory",
     inherit = ParameterSet,
     public = list(
         object = NULL,

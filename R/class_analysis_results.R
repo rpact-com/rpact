@@ -1,4 +1,3 @@
-library("R6")
 ## |
 ## |  *Analysis result classes*
 ## |
@@ -45,7 +44,7 @@ library("R6")
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResults <- R6Class("ConditionalPowerResults",
+ConditionalPowerResults <- R6::R6Class("ConditionalPowerResults",
                                        inherit = ParameterSet,
                                        public = list(
                                          .plotSettings = NULL,
@@ -154,7 +153,7 @@ ConditionalPowerResults <- R6Class("ConditionalPowerResults",
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsMeans <- R6Class("ConditionalPowerResultsMeans",
+ConditionalPowerResultsMeans <- R6::R6Class("ConditionalPowerResultsMeans",
                                             inherit = ConditionalPowerResults,
                                             public = list(
                                               conditionalPower = NULL,
@@ -185,7 +184,7 @@ ConditionalPowerResultsMeans <- R6Class("ConditionalPowerResultsMeans",
                                             )
 )
 
-ConditionalPowerResultsMultiHypotheses <- R6Class("ConditionalPowerResultsMultiHypotheses",
+ConditionalPowerResultsMultiHypotheses <- R6::R6Class("ConditionalPowerResultsMultiHypotheses",
                                                       inherit = ConditionalPowerResults,
                                                       public = list(
                                                         conditionalPower = NULL,
@@ -238,7 +237,7 @@ ConditionalPowerResultsMultiHypotheses <- R6Class("ConditionalPowerResultsMultiH
                                                       )
 )
 
-ConditionalPowerResultsMultiArmMeans <- R6Class("ConditionalPowerResultsMultiArmMeans",
+ConditionalPowerResultsMultiArmMeans <- R6::R6Class("ConditionalPowerResultsMultiArmMeans",
                                                     inherit = ConditionalPowerResultsMultiHypotheses,
                                                     public = list(
                                                       thetaH1 = NULL,
@@ -287,7 +286,7 @@ ConditionalPowerResultsMultiArmMeans <- R6Class("ConditionalPowerResultsMultiArm
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsRates <- R6Class("ConditionalPowerResultsRates",
+ConditionalPowerResultsRates <- R6::R6Class("ConditionalPowerResultsRates",
                                             inherit = ConditionalPowerResults,
                                             public = list(
                                               conditionalPower = NULL,
@@ -320,7 +319,7 @@ ConditionalPowerResultsRates <- R6Class("ConditionalPowerResultsRates",
                                             )
 )
 
-ConditionalPowerResultsMultiArmRates <- R6Class("ConditionalPowerResultsMultiArmRates",
+ConditionalPowerResultsMultiArmRates <- R6::R6Class("ConditionalPowerResultsMultiArmRates",
                                                     inherit = ConditionalPowerResultsMultiHypotheses,
                                                     public = list(
                                                       piTreatments = NULL,
@@ -368,7 +367,7 @@ ConditionalPowerResultsMultiArmRates <- R6Class("ConditionalPowerResultsMultiArm
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsSurvival <- R6Class("ConditionalPowerResultsSurvival",
+ConditionalPowerResultsSurvival <- R6::R6Class("ConditionalPowerResultsSurvival",
                                                inherit = ConditionalPowerResults,
                                                public = list(
                                                  conditionalPower = NULL,
@@ -393,7 +392,7 @@ ConditionalPowerResultsSurvival <- R6Class("ConditionalPowerResultsSurvival",
                                                )
 )
 
-ConditionalPowerResultsMultiArmSurvival <- R6Class("ConditionalPowerResultsMultiArmSurvival",
+ConditionalPowerResultsMultiArmSurvival <- R6::R6Class("ConditionalPowerResultsMultiArmSurvival",
                                                        inherit = ConditionalPowerResultsMultiHypotheses,
                                                        public = list(
                                                          thetaH1 = NULL,
@@ -437,7 +436,7 @@ ConditionalPowerResultsMultiArmSurvival <- R6Class("ConditionalPowerResultsMulti
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsEnrichmentMeans <- R6Class("ConditionalPowerResultsEnrichmentMeans",
+ConditionalPowerResultsEnrichmentMeans <- R6::R6Class("ConditionalPowerResultsEnrichmentMeans",
                                                       inherit = ConditionalPowerResultsMultiArmMeans
 )
 
@@ -467,7 +466,7 @@ ConditionalPowerResultsEnrichmentMeans <- R6Class("ConditionalPowerResultsEnrich
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsEnrichmentRates <- R6Class("ConditionalPowerResultsEnrichmentRates",
+ConditionalPowerResultsEnrichmentRates <- R6::R6Class("ConditionalPowerResultsEnrichmentRates",
                                                       inherit = ConditionalPowerResultsMultiHypotheses,
                                                       public = list(
                                                         piTreatments = NULL,
@@ -491,7 +490,7 @@ ConditionalPowerResultsEnrichmentRates <- R6Class("ConditionalPowerResultsEnrich
 )
 
 
-ConditionalPowerResultsEnrichmentSurvival <- R6Class("ConditionalPowerResultsEnrichmentSurvival",
+ConditionalPowerResultsEnrichmentSurvival <- R6::R6Class("ConditionalPowerResultsEnrichmentSurvival",
                                                          inherit = ConditionalPowerResultsMultiArmSurvival
 )
 
@@ -522,7 +521,7 @@ ConditionalPowerResultsEnrichmentSurvival <- R6Class("ConditionalPowerResultsEnr
 #'
 #' @importFrom methods new
 #'
-ClosedCombinationTestResults <- R6Class("ClosedCombinationTestResults",
+ClosedCombinationTestResults <- R6::R6Class("ClosedCombinationTestResults",
                                             inherit = ParameterSet,
                                             public = list(
                                               .plotSettings = NULL,
@@ -717,7 +716,7 @@ ClosedCombinationTestResults <- R6Class("ClosedCombinationTestResults",
 #'
 #' @importFrom methods new
 #'
-AnalysisResults <- R6Class("AnalysisResults",
+AnalysisResults <- R6::R6Class("AnalysisResults",
                                inherit = ParameterSet,
                                public = list(
                                  .plotSettings = NULL,
@@ -951,7 +950,7 @@ AnalysisResults <- R6Class("AnalysisResults",
                                )
 )
 
-AnalysisResultsBase <- R6Class("AnalysisResultsBase",
+AnalysisResultsBase <- R6::R6Class("AnalysisResultsBase",
                                    inherit = AnalysisResults,
                                    public = list(
                                      thetaH1 = NULL,
@@ -1030,7 +1029,7 @@ AnalysisResultsBase <- R6Class("AnalysisResultsBase",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiHypotheses <- R6Class("AnalysisResultsMultiHypotheses",
+AnalysisResultsMultiHypotheses <- R6::R6Class("AnalysisResultsMultiHypotheses",
                                               inherit = AnalysisResults,
                                               public = list(
                                                 .closedTestResults = NULL,
@@ -1103,7 +1102,7 @@ AnalysisResultsMultiHypotheses <- R6Class("AnalysisResultsMultiHypotheses",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiArm <- R6Class("AnalysisResultsMultiArm",
+AnalysisResultsMultiArm <- R6::R6Class("AnalysisResultsMultiArm",
                                        inherit = AnalysisResultsMultiHypotheses,
                                        public = list(
                                          piControl = NULL, # rates only
@@ -1156,7 +1155,7 @@ AnalysisResultsMultiArm <- R6Class("AnalysisResultsMultiArm",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsEnrichment <- R6Class("AnalysisResultsEnrichment",
+AnalysisResultsEnrichment <- R6::R6Class("AnalysisResultsEnrichment",
                                          inherit = AnalysisResultsMultiHypotheses,
                                          public = list(
                                            piControls = NULL, # rates only
@@ -1310,7 +1309,7 @@ names.AnalysisResults <- function(x) {
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsGroupSequential <- R6Class("AnalysisResultsGroupSequential",
+AnalysisResultsGroupSequential <- R6::R6Class("AnalysisResultsGroupSequential",
                                               inherit = AnalysisResultsBase,
                                               public = list(
                                                 maxInformation = NULL,
@@ -1372,7 +1371,7 @@ AnalysisResultsGroupSequential <- R6Class("AnalysisResultsGroupSequential",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsInverseNormal <- R6Class("AnalysisResultsInverseNormal",
+AnalysisResultsInverseNormal <- R6::R6Class("AnalysisResultsInverseNormal",
                                             inherit = AnalysisResultsBase
 )
 
@@ -1418,7 +1417,7 @@ AnalysisResultsInverseNormal <- R6Class("AnalysisResultsInverseNormal",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiArmInverseNormal <- R6Class("AnalysisResultsMultiArmInverseNormal",
+AnalysisResultsMultiArmInverseNormal <- R6::R6Class("AnalysisResultsMultiArmInverseNormal",
                                                     inherit = AnalysisResultsMultiArm
 )
 
@@ -1465,7 +1464,7 @@ AnalysisResultsMultiArmInverseNormal <- R6Class("AnalysisResultsMultiArmInverseN
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsEnrichmentInverseNormal <- R6Class("AnalysisResultsEnrichmentInverseNormal",
+AnalysisResultsEnrichmentInverseNormal <- R6::R6Class("AnalysisResultsEnrichmentInverseNormal",
                                                       inherit = AnalysisResultsEnrichment,
                                                       public = list(
                                                         stratifiedAnalysis = NULL
@@ -1520,7 +1519,7 @@ AnalysisResultsEnrichmentInverseNormal <- R6Class("AnalysisResultsEnrichmentInve
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsFisher <- R6Class("AnalysisResultsFisher",
+AnalysisResultsFisher <- R6::R6Class("AnalysisResultsFisher",
                                      inherit = AnalysisResultsBase,
                                      public = list(
                                        conditionalPowerSimulated = NULL,
@@ -1578,7 +1577,7 @@ AnalysisResultsFisher <- R6Class("AnalysisResultsFisher",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiArmFisher <- R6Class("AnalysisResultsMultiArmFisher",
+AnalysisResultsMultiArmFisher <- R6::R6Class("AnalysisResultsMultiArmFisher",
                                              inherit = AnalysisResultsMultiArm,
                                              public = list(
                                                conditionalPowerSimulated = NULL,
@@ -1632,7 +1631,7 @@ AnalysisResultsMultiArmFisher <- R6Class("AnalysisResultsMultiArmFisher",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsEnrichmentFisher <- R6Class("AnalysisResultsEnrichmentFisher",
+AnalysisResultsEnrichmentFisher <- R6::R6Class("AnalysisResultsEnrichmentFisher",
                                                inherit = AnalysisResultsEnrichment,
                                                public = list(
                                                  conditionalPowerSimulated = NULL,
@@ -1678,7 +1677,7 @@ AnalysisResultsEnrichmentFisher <- R6Class("AnalysisResultsEnrichmentFisher",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsConditionalDunnett <- R6Class("AnalysisResultsConditionalDunnett",
+AnalysisResultsConditionalDunnett <- R6::R6Class("AnalysisResultsConditionalDunnett",
                                                  inherit = AnalysisResultsMultiArm,
                                                  public = list()
 )

@@ -1,5 +1,3 @@
-library("R6")
-
 ## |
 ## |  *Core utilities*
 ## |

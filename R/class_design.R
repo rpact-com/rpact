@@ -1,4 +1,3 @@
-library("R6")
 ## |
 ## |  *Trial design classes*
 ## |
@@ -63,7 +62,7 @@ NULL
 #'
 #' @importFrom methods new
 #'
-TrialDesign <- R6Class("TrialDesign",
+TrialDesign <- R6::R6Class("TrialDesign",
     inherit = ParameterSet,
     public = list(
         .plotSettings = NULL,
@@ -206,7 +205,7 @@ TrialDesign <- R6Class("TrialDesign",
 #'
 #' @importFrom methods new
 #'
-TrialDesignCharacteristics <- R6Class("TrialDesignCharacteristics",
+TrialDesignCharacteristics <- R6::R6Class("TrialDesignCharacteristics",
                                           inherit = ParameterSet,
                                           public = list(
                                             .design = NULL,
@@ -377,7 +376,7 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
 #'
 #' @importFrom methods new
 #'
-TrialDesignFisher <- R6Class("TrialDesignFisher",
+TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
                                  inherit = TrialDesign,
                                  public = list(
                                    method = NULL,
@@ -533,7 +532,7 @@ TrialDesignFisher <- R6Class("TrialDesignFisher",
 #'
 #' @importFrom methods new
 #'
-TrialDesignInverseNormal <- R6Class("TrialDesignInverseNormal",
+TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                                         inherit = TrialDesign,
                                         public = list(
                                           typeOfDesign = NULL,
@@ -830,7 +829,7 @@ TrialDesignInverseNormal <- R6Class("TrialDesignInverseNormal",
 #'
 #' @importFrom methods new
 #'
-TrialDesignGroupSequential <- R6Class("TrialDesignGroupSequential",
+TrialDesignGroupSequential <- R6::R6Class("TrialDesignGroupSequential",
   inherit = TrialDesignInverseNormal,
   public = list(
     initialize = function(...) {
@@ -881,7 +880,7 @@ TrialDesignGroupSequential <- R6Class("TrialDesignGroupSequential",
 #'
 #' @seealso \code{\link{getDesignConditionalDunnett}} for creating a conditional Dunnett test design.
 #'
-TrialDesignConditionalDunnett <- R6Class("TrialDesignConditionalDunnett",
+TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
   inherit = TrialDesign,
   public = list(
     informationAtInterim = NULL,

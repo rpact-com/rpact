@@ -909,7 +909,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     emptySubsetNames <- validSubsetNames[!(validSubsetNames %in% subsetNames)]
     for (subsetName in subsetNames) {
         subset <- args[[subsetName]]
-        if (is.null(subset) || (!is.R6(subset) && is.na(subset))) {
+        if (is.null(subset) || (!R6::is.R6(subset) && is.na(subset))) {
             emptySubsetNames <- c(emptySubsetNames, subsetName)
         } else {
             if (!.isDataset(subset)) {
@@ -1360,7 +1360,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #'
 #' @importFrom methods new
 #'
-Dataset <- R6Class("Dataset",
+Dataset <- R6::R6Class("Dataset",
                    inherit = ParameterSet,
                    public = list(
         .data = NULL,
@@ -1828,7 +1828,7 @@ Dataset <- R6Class("Dataset",
 #'
 #' @importFrom methods new
 #'
-DatasetMeans <- R6Class("DatasetMeans",
+DatasetMeans <- R6::R6Class("DatasetMeans",
     inherit = Dataset,
     public = list(
         sampleSizes = NULL,
@@ -2709,7 +2709,7 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
 #'
 #' @importFrom methods new
 #'
-DatasetRates <- R6Class("DatasetRates",
+DatasetRates <- R6::R6Class("DatasetRates",
     inherit = Dataset,
     public = list(
         sampleSizes = NULL,
@@ -3183,7 +3183,7 @@ DatasetRates <- R6Class("DatasetRates",
 #'
 #' @importFrom methods new
 #'
-DatasetSurvival <- R6Class("DatasetSurvival",
+DatasetSurvival <- R6::R6Class("DatasetSurvival",
     inherit = Dataset,
     public = list(
         overallEvents = NULL,
@@ -3734,7 +3734,7 @@ DatasetSurvival <- R6Class("DatasetSurvival",
 #'
 #' @keywords internal
 #'
-DatasetEnrichmentSurvival <- R6Class("DatasetEnrichmentSurvival",
+DatasetEnrichmentSurvival <- R6::R6Class("DatasetEnrichmentSurvival",
     inherit = DatasetSurvival,
     public = list(
         expectedEvents = NULL,

@@ -86,7 +86,7 @@ names.SimulationResults <- function(x) {
 #'
 #' @importFrom methods new
 #'
-SimulationResults <- R6Class("SimulationResults",
+SimulationResults <- R6::R6Class("SimulationResults",
     inherit = ParameterSet,
     public = list(
         .plotSettings = NULL,
@@ -560,7 +560,7 @@ SimulationResults <- R6Class("SimulationResults",
     )
 )
 
-SimulationResultsBaseMeans <- R6Class("SimulationResultsBaseMeans",
+SimulationResultsBaseMeans <- R6::R6Class("SimulationResultsBaseMeans",
     inherit = SimulationResults,
     public = list(
         stDev =NULL,
@@ -650,7 +650,7 @@ SimulationResultsBaseMeans <- R6Class("SimulationResultsBaseMeans",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMeans <- R6Class("SimulationResultsMeans",
+SimulationResultsMeans <- R6::R6Class("SimulationResultsMeans",
     inherit = SimulationResultsBaseMeans,
     public = list(
         meanRatio =NULL,
@@ -733,7 +733,7 @@ SimulationResultsMeans <- R6Class("SimulationResultsMeans",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmMeans <- R6Class("SimulationResultsMultiArmMeans",
+SimulationResultsMultiArmMeans <- R6::R6Class("SimulationResultsMultiArmMeans",
     inherit = SimulationResultsBaseMeans,
     public = list(
         activeArms = NULL,
@@ -775,7 +775,7 @@ SimulationResultsMultiArmMeans <- R6Class("SimulationResultsMultiArmMeans",
     )
 )
 
-SimulationResultsBaseRates <- R6Class("SimulationResultsBaseRates",
+SimulationResultsBaseRates <- R6::R6Class("SimulationResultsBaseRates",
     inherit = SimulationResults,
     public = list(
         directionUpper = NULL,
@@ -864,7 +864,7 @@ SimulationResultsBaseRates <- R6Class("SimulationResultsBaseRates",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsRates <- R6Class("SimulationResultsRates",
+SimulationResultsRates <- R6::R6Class("SimulationResultsRates",
     inherit = SimulationResultsBaseRates,
     public = list(
         riskRatio = NULL,
@@ -971,7 +971,7 @@ SimulationResultsRates <- R6Class("SimulationResultsRates",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmRates <- R6Class("SimulationResultsMultiArmRates",
+SimulationResultsMultiArmRates <- R6::R6Class("SimulationResultsMultiArmRates",
     inherit = SimulationResultsBaseRates,
     public = list(
         activeArms = NULL,
@@ -1016,7 +1016,7 @@ SimulationResultsMultiArmRates <- R6Class("SimulationResultsMultiArmRates",
     )
 )
 
-SimulationResultsBaseSurvival <- R6Class("SimulationResultsBaseSurvival",
+SimulationResultsBaseSurvival <- R6::R6Class("SimulationResultsBaseSurvival",
     inherit = SimulationResults,
     public = list(
         directionUpper = NULL,
@@ -1124,7 +1124,7 @@ SimulationResultsBaseSurvival <- R6Class("SimulationResultsBaseSurvival",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsSurvival <- R6Class("SimulationResultsSurvival",
+SimulationResultsSurvival <- R6::R6Class("SimulationResultsSurvival",
     inherit = SimulationResultsBaseSurvival,
     public = list(
         .piecewiseSurvivalTime = NULL,
@@ -1263,7 +1263,7 @@ SimulationResultsSurvival <- R6Class("SimulationResultsSurvival",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmSurvival <- R6Class("SimulationResultsMultiArmSurvival",
+SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvival",
     inherit = SimulationResultsBaseSurvival,
     public = list(
         activeArms = NULL,
@@ -1370,7 +1370,7 @@ SimulationResultsMultiArmSurvival <- R6Class("SimulationResultsMultiArmSurvival"
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentMeans <- R6Class("SimulationResultsEnrichmentMeans",
+SimulationResultsEnrichmentMeans <- R6::R6Class("SimulationResultsEnrichmentMeans",
     inherit = SimulationResultsBaseMeans,
     public = list(
         populations = NULL,
@@ -1469,7 +1469,7 @@ SimulationResultsEnrichmentMeans <- R6Class("SimulationResultsEnrichmentMeans",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentRates <- R6Class("SimulationResultsEnrichmentRates",
+SimulationResultsEnrichmentRates <- R6::R6Class("SimulationResultsEnrichmentRates",
     inherit = SimulationResultsBaseRates,
     public = list(
         populations = NULL,
@@ -1572,7 +1572,7 @@ SimulationResultsEnrichmentRates <- R6Class("SimulationResultsEnrichmentRates",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentSurvival <- R6Class("SimulationResultsEnrichmentSurvival",
+SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentSurvival",
     inherit = SimulationResultsBaseSurvival,
     public = list(
         populations = NULL,

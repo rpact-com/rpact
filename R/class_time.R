@@ -26,7 +26,7 @@ C_REGEXP_SMALLER <- "< ?"
 C_REGEXP_SMALLER_OR_EQUAL <- "<= ?"
 C_REGEXP_DECIMAL_NUMBER <- "\\d*(\\.{1}\\d*)?"
 
-TimeDefinition <- R6Class("TimeDefinition",
+TimeDefinition <- R6::R6Class("TimeDefinition",
     inherit = ParameterSet,
     public = list(
         initialize = function(...) {
@@ -392,7 +392,7 @@ getAccrualTime <- function(accrualTime = NA_real_,
 #'
 #' @importFrom methods new
 #'
-PiecewiseSurvivalTime <- R6Class("PiecewiseSurvivalTime",
+PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
     inherit = TimeDefinition,
     public = list(
         .pi1Default = NULL,
@@ -1351,7 +1351,7 @@ PiecewiseSurvivalTime <- R6Class("PiecewiseSurvivalTime",
 #'
 #' @importFrom methods new
 #'
-AccrualTime <- R6Class("AccrualTime",
+AccrualTime <- R6::R6Class("AccrualTime",
     inherit = TimeDefinition,
     public = list(
         .showWarnings = NULL,

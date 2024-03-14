@@ -1,4 +1,3 @@
-library("R6")
 ## |
 ## |  *Stage results classes*
 ## |
@@ -63,7 +62,7 @@ library("R6")
 #'
 #' @importFrom methods new
 #'
-StageResults <- R6Class("StageResults",
+StageResults <- R6::R6Class("StageResults",
                             inherit = ParameterSet,
                             public = list(
                               .plotSettings = NULL,
@@ -288,7 +287,7 @@ StageResults <- R6Class("StageResults",
 #'
 #' @importFrom methods new
 #'
-StageResultsMeans <- R6Class("StageResultsMeans",
+StageResultsMeans <- R6::R6Class("StageResultsMeans",
                                  inherit = StageResults,
                                  public = list(
                                    combInverseNormal = NULL,
@@ -475,7 +474,7 @@ StageResultsMeans <- R6Class("StageResultsMeans",
 #'
 #' @importFrom methods new
 #'
-StageResultsMultiArmMeans <- R6Class("StageResultsMultiArmMeans",
+StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
                                          inherit = StageResults,
                                          public = list(
                                            combInverseNormal = NULL,
@@ -623,7 +622,7 @@ StageResultsMultiArmMeans <- R6Class("StageResultsMultiArmMeans",
 #'
 #' @importFrom methods new
 #'
-StageResultsRates <- R6Class("StageResultsRates",
+StageResultsRates <- R6::R6Class("StageResultsRates",
                                  inherit = StageResults,
                                  public = list(
                                    combInverseNormal = NULL,
@@ -796,7 +795,7 @@ StageResultsRates <- R6Class("StageResultsRates",
 #'
 #' @importFrom methods new
 #'
-StageResultsMultiArmRates <- R6Class("StageResultsMultiArmRates",
+StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
                                          inherit = StageResults,
                                          public = list(
                                            stage = NULL,
@@ -943,7 +942,7 @@ StageResultsMultiArmRates <- R6Class("StageResultsMultiArmRates",
 #'
 #' @importFrom methods new
 #'
-StageResultsSurvival <- R6Class("StageResultsSurvival",
+StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
                                     inherit = StageResults,
                                     public = list(
                                       combInverseNormal = NULL,
@@ -1075,7 +1074,7 @@ StageResultsSurvival <- R6Class("StageResultsSurvival",
 #'
 #' @importFrom methods new
 #'
-StageResultsMultiArmSurvival <- R6Class("StageResultsMultiArmSurvival",
+StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
                                             inherit = StageResults,
                                             public = list(
                                               stage = NULL,
@@ -1206,7 +1205,7 @@ StageResultsMultiArmSurvival <- R6Class("StageResultsMultiArmSurvival",
 #'
 #' @importFrom methods new
 #'
-StageResultsEnrichmentMeans <- R6Class("StageResultsEnrichmentMeans",
+StageResultsEnrichmentMeans <- R6::R6Class("StageResultsEnrichmentMeans",
                                            inherit = StageResultsMultiArmMeans,
                                            public = list(
                                              .overallSampleSizes1 = NULL,
@@ -1245,7 +1244,7 @@ StageResultsEnrichmentMeans <- R6Class("StageResultsEnrichmentMeans",
 #'
 #' @importFrom methods new
 #'
-StageResultsEnrichmentRates <- R6Class("StageResultsEnrichmentRates",
+StageResultsEnrichmentRates <- R6::R6Class("StageResultsEnrichmentRates",
                                            inherit = StageResultsMultiArmRates,
                                            public = list(
                                              .overallSampleSizes1 = NULL,
@@ -1288,7 +1287,7 @@ StageResultsEnrichmentRates <- R6Class("StageResultsEnrichmentRates",
 #'
 #' @importFrom methods new
 #'
-StageResultsEnrichmentSurvival <- R6Class("StageResultsEnrichmentSurvival",
+StageResultsEnrichmentSurvival <- R6::R6Class("StageResultsEnrichmentSurvival",
                                               inherit = StageResultsMultiArmSurvival,
                                               public = list(
                                                 stratifiedAnalysis = NULL,

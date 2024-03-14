@@ -18,7 +18,7 @@
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-PlotSubTitleItem <- R6Class("PlotSubTitleItem",
+PlotSubTitleItem <- R6::R6Class("PlotSubTitleItem",
     public = list(
         title = NULL,
         subscript = NULL,
@@ -55,7 +55,7 @@ PlotSubTitleItem <- R6Class("PlotSubTitleItem",
     )
 )
 
-PlotSubTitleItems <- R6Class("PlotSubTitleItems",
+PlotSubTitleItems <- R6::R6Class("PlotSubTitleItems",
     public = list(
         title = NULL,
         subtitle = NULL,
@@ -292,7 +292,7 @@ getPlotSettings <- function(lineSize = 0.8,
 #'
 #' @importFrom methods new
 #'
-PlotSettings <- R6Class("PlotSettings",
+PlotSettings <- R6::R6Class("PlotSettings",
     inherit = ParameterSet,
     public = list(
         .legendLineBreakIndex = NULL,

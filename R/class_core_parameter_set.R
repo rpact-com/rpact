@@ -1,4 +1,3 @@
-library("R6")
 ## |
 ## |  *Parameter set classes*
 ## |
@@ -42,7 +41,7 @@ NULL
 #'
 #' @importFrom methods new
 #'
-FieldSet <- R6Class("FieldSet",
+FieldSet <- R6::R6Class("FieldSet",
                         public = list(
                           .parameterTypes = NULL,
                           .showParameterTypeEnabled = NULL,
@@ -191,7 +190,7 @@ FieldSet <- R6Class("FieldSet",
 #'
 #' @importFrom methods new
 #'
-ParameterSet <- R6Class("ParameterSet",
+ParameterSet <- R6::R6Class("ParameterSet",
                             inherit = FieldSet,
                             public = list(
                               initialize = function(..., .showParameterTypeEnabled = TRUE) {

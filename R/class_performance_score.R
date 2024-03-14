@@ -41,7 +41,7 @@
 #'
 #' @importFrom methods new
 #'
-PerformanceScore <- R6Class("PerformanceScore",
+PerformanceScore <- R6::R6Class("PerformanceScore",
     inherit = ParameterSet,
     public = list(
         .simulationResults = NULL,

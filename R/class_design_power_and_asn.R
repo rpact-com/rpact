@@ -50,7 +50,7 @@
 #'
 #' @importFrom methods new
 #'
-PowerAndAverageSampleNumberResult <- R6Class("PowerAndAverageSampleNumberResult",
+PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberResult",
     inherit = ParameterSet,
     public = list(
         .design = NULL,
