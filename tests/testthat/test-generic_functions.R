@@ -154,6 +154,7 @@ test_that("Testing 'summary.ParameterSet': no errors occur", {
 	expect_output(summary(analysisResults)$show())
 	expect_named(as.data.frame(analysisResults))
 	expect_s3_class(as.data.frame(analysisResults, niceColumnNamesEnabled = FALSE), "data.frame")
-	expect_type(as.matrix(analysisResults), "character")
+	expect_type(as.matrix(analysisResults), "character")
+
 })
 

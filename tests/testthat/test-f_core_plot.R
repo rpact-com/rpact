@@ -110,6 +110,7 @@ test_that("Internal core plot functions throw errors when arguments are missing 
 
 	expect_error(.getGridLegendPosition())
 
-	expect_error(.formatSubTitleValue())
+	expect_error(.formatSubTitleValue())
+
 })
 

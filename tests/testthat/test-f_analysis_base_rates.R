@@ -2428,6 +2428,7 @@ test_that("'getAnalysisResults' produces the correct critical values for a bound
 	))
 	expect_equal(result1$.design$criticalValues[1:2], result2$.design$criticalValues[1:2], tolerance = 1e-07)
 	expect_equal(result1$.design$criticalValues[1:2], result3$.design$criticalValues[1:2], tolerance = 1e-07)
-	expect_equal(result2$.design$criticalValues[1:2], result3$.design$criticalValues[1:2], tolerance = 1e-07)
+	expect_equal(result2$.design$criticalValues[1:2], result3$.design$criticalValues[1:2], tolerance = 1e-07)
+
 })
 

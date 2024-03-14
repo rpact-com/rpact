@@ -528,7 +528,7 @@ NULL
         }
     }
 
-    designPlan <- TrialDesignPlanMeans(design = design, meanRatio = meanRatio)
+    designPlan <- TrialDesignPlanMeans$new(design = design, meanRatio = meanRatio)
     designPlan$.setObjectType(objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)

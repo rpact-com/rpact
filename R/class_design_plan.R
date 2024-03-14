@@ -119,7 +119,7 @@ TrialDesignPlan <- R6Class("TrialDesignPlan",
                 defaultValueList <- C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES
             } else if (.isTrialDesignPlanSurvival(self)) {
                 defaultValueList <- C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_SURVIVAL
-            } else if (.isTrialDesignPlanCountData(.self)) {
+            } else if (.isTrialDesignPlanCountData(self)) {
                 defaultValueList <- C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_COUNT_DATA
             }
             for (parameterName in self$.getVisibleFieldNames()) {
@@ -197,12 +197,12 @@ TrialDesignPlan <- R6Class("TrialDesignPlan",
 
                 self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
 
-                if (inherits(self, "TrialDesignPlanSurvival") || inherits(self, "TrialDesignPlanSurvival") || self$groups == 2 || self$.design$kMax > 1) {#TODO Groups????
+                if (inherits(self, "TrialDesignPlanSurvival") || self$groups == 2 || self$.design$kMax > 1) {#TODO Groups????
                     self$.cat("Legend:\n",
                         heading = 2,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
-                    if (inherits(self, "TrialDesignPlanSurvival") || inherits(self, "TrialDesignPlanSurvival") || self$groups == 2) {
+                    if (inherits(self, "TrialDesignPlanSurvival") || self$groups == 2) {
                         self$.cat("  (i): values of treatment arm i\n",
                             consoleOutputEnabled = consoleOutputEnabled
                         )
@@ -355,6 +355,12 @@ TrialDesignPlanMeans <- R6Class("TrialDesignPlanMeans",
         optimumAllocationRatio = NULL,
         directionUpper = NULL,
         effect = NULL,
+        maxNumberOfSubjects = NULL,
+        maxNumberOfSubjects1 = NULL,
+        maxNumberOfSubjects2 = NULL,
+        numberOfSubjects = NULL,
+        numberOfSubjects1 = NULL,
+        numberOfSubjects2 = NULL,
         overallReject = NULL,
         rejectPerStage = NULL,
         futilityStop = NULL,
@@ -365,16 +371,10 @@ TrialDesignPlanMeans <- R6Class("TrialDesignPlanMeans",
         nFixed1 = NULL,
         nFixed2 = NULL,
         informationRates = NULL,
-        maxNumberOfSubjects = NULL,
-        maxNumberOfSubjects1 = NULL,
-        maxNumberOfSubjects2 = NULL,
-        numberOfSubjects = NULL,
-        numberOfSubjects1 = NULL,
-        numberOfSubjects2 = NULL,
         expectedNumberOfSubjectsH0 = NULL,
         expectedNumberOfSubjectsH01 = NULL,
         expectedNumberOfSubjectsH1 = NULL,
-        criticalValuesEffectScale = NULL,
+        criticalValuesEffectScale = matrix(),
         criticalValuesEffectScaleLower = NULL,
         criticalValuesEffectScaleUpper = NULL,
         criticalValuesPValueScale = NULL,
@@ -504,26 +504,26 @@ TrialDesignPlanRates <- R6Class("TrialDesignPlanRates",
         optimumAllocationRatio = NULL,
         directionUpper = NULL,
         effect = NULL,
-        expectedNumberOfSubjects = NULL,
-        nFixed = NULL,
-        nFixed1 = NULL,
-        nFixed2 = NULL,
-        overallReject = NULL,
-        rejectPerStage = NULL,
-        futilityStop = NULL,
-        futilityPerStage = NULL,
-        earlyStop = NULL,
-        informationRates = NULL,
         maxNumberOfSubjects = NULL,
         maxNumberOfSubjects1 = NULL,
         maxNumberOfSubjects2 = NULL,
         numberOfSubjects = NULL,
         numberOfSubjects1 = NULL,
         numberOfSubjects2 = NULL,
+        overallReject = NULL,
+        rejectPerStage = NULL,
+        futilityStop = NULL,
+        futilityPerStage = NULL,
+        earlyStop = NULL,
+        expectedNumberOfSubjects = NULL,
+        nFixed = NULL,
+        nFixed1 = NULL,
+        nFixed2 = NULL,
+        informationRates = NULL,
         expectedNumberOfSubjectsH0 = NULL,
         expectedNumberOfSubjectsH01 = NULL,
         expectedNumberOfSubjectsH1 = NULL,
-        criticalValuesEffectScale = NULL,
+        criticalValuesEffectScale = matrix(),
         criticalValuesEffectScaleLower = NULL,
         criticalValuesEffectScaleUpper = NULL,
         criticalValuesPValueScale = NULL,
@@ -540,7 +540,6 @@ TrialDesignPlanRates <- R6Class("TrialDesignPlanRates",
                 groups = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["groups"]],
                 allocationRatioPlanned = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["allocationRatioPlanned"]]) {
             super$initialize(...) #TODO
-          
             self$normalApproximation <- normalApproximation
             self$riskRatio <- riskRatio
             self$thetaH0 <- thetaH0
@@ -727,7 +726,7 @@ TrialDesignPlanSurvival <- R6Class("TrialDesignPlanSurvival",
         expectedEventsH1 = NULL,
         expectedNumberOfSubjectsH1 = NULL,
         expectedNumberOfSubjects = NULL,
-        criticalValuesEffectScale = NULL,
+        criticalValuesEffectScale = matrix(),
         criticalValuesEffectScaleLower = NULL,
         criticalValuesEffectScaleUpper = NULL,
         criticalValuesPValueScale = NULL,
@@ -884,48 +883,46 @@ TrialDesignPlanSurvival <- R6Class("TrialDesignPlanSurvival",
 #'
 #' @importFrom methods new
 #'
-TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
-    contains = "TrialDesignPlan",
-    fields = list(
-        .designCharacteristics = "ANY",
-        thetaH0 = "numeric",
-        groups = "integer",
-        allocationRatioPlanned = "numeric",
-        optimumAllocationRatio = "logical",
-        directionUpper = "logical",
-        lambda1 = "numeric",
-        lambda2 = "numeric",
-        lambda = "numeric",
-        theta = "numeric",
-        nFixed = "numeric",
-        nFixed1 = "numeric",
-        nFixed2 = "numeric",
-        maxNumberOfSubjects = "numeric",
-        maxNumberOfSubjects1 = "numeric",
-        maxNumberOfSubjects2 = "numeric",
-        overallReject = "numeric",
-        rejectPerStage = "matrix",
-        futilityStop = "numeric",
-        futilityPerStage = "matrix",
-        earlyStop = "numeric",
-        overdispersion = "numeric",
-        fixedExposureTime = "numeric",
-        accrualTime = "numeric",
-        accrualIntensity = "numeric",
-        followUpTime = "numeric",
-        calendarTime = "matrix",
-        expectedStudyDurationH1 = "numeric",
-        studyTime = "numeric",
-        numberOfSubjects = "matrix",
-        expectedNumberOfSubjectsH1 = "numeric",
-        informationOverStages = "matrix",
-        expectedInformationH0 = "numeric",
-        expectedInformationH01 = "numeric",
-        expectedInformationH1 = "numeric",
-        maxInformation = "numeric",
-        futilityBoundsPValueScale = "matrix"
-    ),
-    methods = list(
+TrialDesignPlanCountData <- R6Class("TrialDesignPlanCountData",
+    inherit = TrialDesignPlan,
+    public = list(
+        .designCharacteristics = NULL,
+        thetaH0 = NULL,
+        groups = NULL,
+        allocationRatioPlanned = NULL,
+        optimumAllocationRatio = NULL,
+        directionUpper = NULL,
+        lambda1 = NULL,
+        lambda2 = NULL,
+        lambda = NULL,
+        theta = NULL,
+        nFixed = NULL,
+        nFixed1 = NULL,
+        nFixed2 = NULL,
+        maxNumberOfSubjects = NULL,
+        maxNumberOfSubjects1 = NULL,
+        maxNumberOfSubjects2 = NULL,
+        overallReject = NULL,
+        rejectPerStage = NULL,
+        futilityStop = NULL,
+        futilityPerStage = NULL,
+        earlyStop = NULL,
+        overdispersion = NULL,
+        fixedExposureTime = NULL,
+        accrualTime = NULL,
+        accrualIntensity = NULL,
+        followUpTime = NULL,
+        calendarTime = NULL,
+        expectedStudyDurationH1 = NULL,
+        studyTime = NULL,
+        numberOfSubjects = NULL,
+        expectedNumberOfSubjectsH1 = NULL,
+        informationOverStages = NULL,
+        expectedInformationH0 = NULL,
+        expectedInformationH01 = NULL,
+        expectedInformationH1 = NULL,
+        maxInformation = NULL,
+        futilityBoundsPValueScale = NULL,
         initialize = function(...,
                 designCharacteristics,
                 lambda1 = NA_real_,
@@ -939,84 +936,29 @@ TrialDesignPlanCountData <- setRefClass("TrialDesignPlanCountData",
                 accrualIntensity = NA_real_,
                 followUpTime = NA_real_,
                 allocationRatioPlanned = NA_real_) {
-            callSuper(...,
-                .designCharacteristics = designCharacteristics,
-                lambda1 = lambda1,
-                lambda2 = lambda2,
-                lambda = lambda,
-                theta = theta,
-                thetaH0 = thetaH0,
-                overdispersion = overdispersion,
-                fixedExposureTime = fixedExposureTime,
-                accrualTime = accrualTime,
-                accrualIntensity = accrualIntensity,
-                followUpTime = followUpTime,
-                allocationRatioPlanned = allocationRatioPlanned
-            )
+            super$initialize(...)
+            self$.designCharacteristics <- designCharacteristics
+            self$lambda1 <- lambda1
+            self$lambda2 <- lambda2
+            self$lambda <- lambda
+            self$theta <- theta
+            self$thetaH0 <- thetaH0
+            self$overdispersion <- overdispersion
+            self$fixedExposureTime <- fixedExposureTime
+            self$accrualTime <- accrualTime
+            self$accrualIntensity <- accrualIntensity
+            self$followUpTime <- followUpTime
+            self$allocationRatioPlanned <- allocationRatioPlanned
 
-            groups <<- 2L
-            optimumAllocationRatio <<- FALSE
-            .self$.setParameterType("groups", C_PARAM_NOT_APPLICABLE)
-            .self$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
-            .self$.setParameterType("optimumAllocationRatio", C_PARAM_NOT_APPLICABLE)
+            self$groups <- 2L
+            self$optimumAllocationRatio <- FALSE
+            self$.setParameterType("groups", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("optimumAllocationRatio", C_PARAM_NOT_APPLICABLE)
         },
         .toString = function(startWithUpperCase = FALSE) {
             s <- "count data"
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
-        },
-        clone = function(..., lambda1 = NA_real_, theta = NA_real_) {
-            if (all(is.na(lambda1))) {
-                lambda1Temp <- .self$.getParameterValueIfUserDefinedOrDefault("lambda1")
-            } else {
-                lambda1Temp <- lambda1
-                if (any(is.na(lambda1))) {
-                    lambda1Temp <- .self$lambda1
-                }
-            }
-            if (all(is.na(theta))) {
-                thetaTemp <- .self$.getParameterValueIfUserDefinedOrDefault("theta")
-            } else {
-                thetaTemp <- theta
-                if (any(is.na(theta))) {
-                    thetaTemp <- .self$theta
-                }
-            }
-            if (.objectType == "sampleSize") {
-                result <- getSampleSizeCounts(
-                    design = .self$.design,
-                    lambda1 = lambda1Temp,
-                    lambda2 = .self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
-                    lambda = .self$.getParameterValueIfUserDefinedOrDefault("lambda"),
-                    theta = thetaTemp,
-                    thetaH0 = .self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
-                    overdispersion = .self$.getParameterValueIfUserDefinedOrDefault("overdispersion"),
-                    fixedExposureTime = .self$.getParameterValueIfUserDefinedOrDefault("fixedExposureTime"),
-                    accrualTime = .self$.getParameterValueIfUserDefinedOrDefault("accrualTime"),
-                    accrualIntensity = .self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity"),
-                    followUpTime = .self$.getParameterValueIfUserDefinedOrDefault("followUpTime"),
-                    maxNumberOfSubjects = .self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
-                    allocationRatioPlanned = .self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned")
-                )
-            } else {
-                result <- getPowerCounts(
-                    design = .self$.design,
-                    directionUpper = .self$.getParameterValueIfUserDefinedOrDefault("directionUpper"),
-                    maxNumberOfSubjects = .self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
-                    lambda1 = lambda1Temp,
-                    lambda2 = .self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
-                    lambda = .self$.getParameterValueIfUserDefinedOrDefault("lambda"),
-                    theta = thetaTemp,
-                    thetaH0 = .self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
-                    overdispersion = .self$.getParameterValueIfUserDefinedOrDefault("overdispersion"),
-                    fixedExposureTime = .self$.getParameterValueIfUserDefinedOrDefault("fixedExposureTime"),
-                    accrualTime = .self$.getParameterValueIfUserDefinedOrDefault("accrualTime"),
-                    accrualIntensity = .self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity"),
-                    followUpTime = .self$.getParameterValueIfUserDefinedOrDefault("followUpTime"),
-                    allocationRatioPlanned = .self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned")
-                )
-            }
-            result$.plotSettings <- .self$.plotSettings
-            return(result)
         }
     )
 )

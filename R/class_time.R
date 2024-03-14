@@ -214,11 +214,11 @@ getPiecewiseSurvivalTime <- function(piecewiseSurvivalTime = NA_real_,
         ignore = c(".pi1Default", ".lambdaBased", ".silent"), exceptionEnabled = TRUE
     )
 
-    if (inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvival") || inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvival")) {
+    if (inherits(piecewiseSurvivalTime, "TrialDesignPlanSurvival")) {
         piecewiseSurvivalTime <- piecewiseSurvivalTime$.piecewiseSurvivalTime
     }
 
-    if (inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTime") || inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTime")) {
+    if (inherits(piecewiseSurvivalTime, "PiecewiseSurvivalTime")) {
         lambdaBased <- .getOptionalArgument(".lambdaBased", ...)
         if (!is.null(lambdaBased) && isTRUE(lambdaBased) && !piecewiseSurvivalTime$.isLambdaBased()) {
             stop(
@@ -307,19 +307,19 @@ getAccrualTime <- function(accrualTime = NA_real_,
         ignore = c("showWarnings")
     )
 
-    if (inherits(accrualTime, "AccrualTime") || inherits(accrualTime, "AccrualTime") ||
-            inherits(accrualTime, "TrialDesignPlanSurvival") || inherits(accrualTime, "TrialDesignPlanSurvival")) {
+    if (inherits(accrualTime, "AccrualTime") ||
+            inherits(accrualTime, "TrialDesignPlanSurvival")) {
         if (!identical(accrualIntensity, C_ACCRUAL_INTENSITY_DEFAULT)) {
             .warnInCaseOfUnusedArgument(accrualIntensity, "accrualIntensity", NA_real_, "getAccrualTime")
         }
         .warnInCaseOfUnusedArgument(maxNumberOfSubjects, "maxNumberOfSubjects", NA_real_, "getAccrualTime")
     }
 
-    if (inherits(accrualTime, "AccrualTime") || inherits(accrualTime, "AccrualTime")) {
+    if (inherits(accrualTime, "AccrualTime")) {
         return(accrualTime)
     }
 
-    if (inherits(accrualTime, "TrialDesignPlanSurvival") || inherits(accrualTime, "TrialDesignPlanSurvival")) {
+    if (inherits(accrualTime, "TrialDesignPlanSurvival")) {
         return(accrualTime$.accrualTime)
     }
 
@@ -1409,7 +1409,7 @@ AccrualTime <- R6Class("AccrualTime",
 
             self$.initAccrualIntensityAbsolute()
             self$.validateFormula()
-            self$.showWarningIfCaseIsNotAllowed()
+            self$.showWarningIfCaseIsNotAllowed()#TODO wrong naming upstream!
         },
         .asDataFrame = function() {
             accrualIntensityTemp <- self$accrualIntensity
@@ -1426,7 +1426,7 @@ AccrualTime <- R6Class("AccrualTime",
             rownames(data) <- as.character(1:nrow(data))
             colnames(data) <- c(
                 "Start time",
-                .getParameterCaption("accrualIntensity", .self)
+                .getParameterCaption("accrualIntensity", self)
             )
             return(data)
         },
@@ -1892,7 +1892,7 @@ AccrualTime <- R6Class("AccrualTime",
                 len <- length(self$accrualIntensity)
                 accrualIntensityAbsolute <- self$maxNumberOfSubjects / sum((self$accrualTime[2:(len + 1)] -
                     self$accrualTime[1:len]) * self$accrualIntensity) * self$accrualIntensity
-                    
+
                 if (!isTRUE(all.equal(accrualIntensityAbsolute, self$accrualIntensity, tolerance = 1e-06)) &&
                         !isTRUE(all.equal(accrualIntensityAbsolute, 0, tolerance = 1e-06))) {
                     self$.validateAccrualTimeAndIntensity()

@@ -559,6 +559,7 @@ test_that("'getDesignFisher': illegal arguments throw exceptions as expected", {
 	expect_error(getDesignFisher(alpha0Vec = c(0.1, 1.01)),
 	    "Argument out of bounds: 'alpha0Vec' (0.1, 1.01) is out of bounds (0; 1]",
 	    fixed = TRUE
-	)
+	)
+
 })
 

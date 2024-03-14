@@ -329,7 +329,6 @@ getDesignFisher <- function(...,
             }
 
             if (!all(is.na(design$stageLevels)) && any(na.omit(design$stageLevels[1:(design$kMax - 1)]) > design$alpha)) {
-                print(design$tolerance)
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'alpha' (", design$alpha, ") not correctly specified"

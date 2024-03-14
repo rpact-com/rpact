@@ -91,7 +91,7 @@ NULL
             parameterName <- result$parameterName
             paramValue <- result$paramValue
 
-            if (isS4(paramValue)) {
+            if (isS4(paramValue) || R6::is.R6(paramValue)) {
                 return(NULL)
             }
 

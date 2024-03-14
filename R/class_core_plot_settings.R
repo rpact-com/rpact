@@ -25,11 +25,6 @@ PlotSubTitleItem <- R6Class("PlotSubTitleItem",
         value = NULL,
         digits = NULL,
         initialize = function(..., title, value, subscript = NA_character_, digits = 3L) {
-            #callSuper(
-            #    title = trimws(title), value = value,
-            #    subscript = trimws(subscript), digits = digits, ...
-            #)#TODO
-          
             self$title <- trimws(title)
             self$value <- value
             self$subscript <- trimws(subscript)
@@ -322,7 +317,7 @@ PlotSettings <- R6Class("PlotSettings",
                 legendFontSize = 11,
                 scalingFactor = 1,
                 ...) {
-            super$initialize()
+            super$initialize(...)
             self$lineSize <- lineSize
             self$pointSize <- pointSize
             self$pointColor <- pointColor
@@ -338,16 +333,6 @@ PlotSettings <- R6Class("PlotSettings",
             self$.scalingEnabled <- TRUE
             self$.pointScalingCorrectionEnabled <- TRUE
             self$.pointBorderEnabled <- TRUE
-
-            self$.parameterNames <- list(
-                "lineSize" = "Line size",
-                "pointSize" = "Point size",
-                "pointColor" = "Point color",
-                "mainTitleFontSize" = "Main title font size",
-                "axesTextFontSize" = "Axes text font size",
-                "legendFontSize" = "Legend font size",
-                "scalingFactor" = "Scaling factor"
-            )
         },
         show = function(showType = 1, digits = NA_integer_) {
             self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
@@ -556,7 +541,7 @@ PlotSettings <- R6Class("PlotSettings",
             "Sets the main title"
 
             caption <- NA_character_
-            if (!is.null(mainTitle) && (inherits(mainTitle, "PlotSubTitleItems") || inherits(mainTitle, "PlotSubTitleItems"))) {
+            if (!is.null(mainTitle) && inherits(mainTitle, "PlotSubTitleItems")) {
                 plotLabsType <- getOption("rpact.plot.labs.type", "quote")
                 if (plotLabsType == "quote") {
                     mainTitle <- mainTitle$toQuote()

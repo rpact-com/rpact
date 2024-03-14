@@ -839,7 +839,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     }
 
     for (arg in args) {
-        if (inherits(arg, "Dataset") || inherits(arg, "Dataset")) {
+        if (inherits(arg, "Dataset")) {
             return(TRUE)
         }
     }
@@ -909,7 +909,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     emptySubsetNames <- validSubsetNames[!(validSubsetNames %in% subsetNames)]
     for (subsetName in subsetNames) {
         subset <- args[[subsetName]]
-        if (is.null(subset) || (!(isS4(subset) || is.R6(subset)) && is.na(subset))) {
+        if (is.null(subset) || (!is.R6(subset) && is.na(subset))) {
             emptySubsetNames <- c(emptySubsetNames, subsetName)
         } else {
             if (!.isDataset(subset)) {
@@ -1376,7 +1376,7 @@ Dataset <- R6Class("Dataset",
         groups = NULL,
         subsets = NULL,
         initialize = function(dataFrame, ..., floatingPointNumbersEnabled = FALSE, enrichmentEnabled = FALSE, .design = NULL) {
-            super$initialize()
+            super$initialize(...)
             
             self$.floatingPointNumbersEnabled <- floatingPointNumbersEnabled
             self$.enrichmentEnabled <- enrichmentEnabled
@@ -3044,7 +3044,7 @@ DatasetRates <- R6Class("DatasetRates",
                             numberOfEvents <- self$getEvent(stage = stage, group = group, subset = subset)
                             randomIndices <- sample(x = c(1:n), size = numberOfEvents, replace = FALSE)
                             randomData <- rep(0, n)
-                            randomData[randomIndices] <- 1#TODO indices -> indizes
+                            randomData[randomIndices] <- 1
 
                             row <- data.frame(
                                 stage = stage,
@@ -3191,7 +3191,7 @@ DatasetSurvival <- R6Class("DatasetSurvival",
         overallLogRanks = NULL,
         events = NULL,
         allocationRatios = NULL,
-        logRanks = NULL,
+        logRanks = numeric(),
         getEvent = function(stage, group = 1, subset = NA_character_) {
             return(self$.data$event[self$.getIndices(stage = stage, group = group, subset = subset)])
         },

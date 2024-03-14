@@ -14,9 +14,9 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7450 $
- * Last changed: $Date: 2023-11-27 15:01:59 +0100 (Mon, 27 Nov 2023) $
- * Last changed by: $Author: pahlke $
+ * File version: $Revision: 7679 $
+ * Last changed: $Date: 2024-03-04 15:00:35 +0100 (Mo, 04 Mrz 2024) $
+ * Last changed by: $Author: wassmer $
  *
  */
 
@@ -277,7 +277,7 @@ double getEstimatedTheta(
 		double allocationRatioPlanned) {
 
 	if (!R_IsNA(thetaH1)) {
-		return directionUpper ? thetaH1 : 1 / thetaH1;
+		return directionUpper ? thetaH1 * thetaH0 : 1 / thetaH1 * thetaH0;
 	}
 
 	return exp((double) logRankOverStages[stage - 2] *

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7644 $
-## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7688 $
+## |  Last changed: $Date: 2024-03-05 14:56:47 +0100 (Tue, 05 Mar 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -24,7 +24,9 @@
 #'
 #' @description
 #' Calculates the conditional performance score, its sub-scores and components according to
-#' Herrmann et al. (2020) for a given simulation result from a two-stage design.
+#' [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) and
+#' [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4) for a given
+#' simulation result from a two-stage design with continuous or binary endpoint.
 #' Larger (sub-)score and component values refer to a better performance.
 #'
 #' @param simulationResult A simulation result.
@@ -37,7 +39,8 @@
 #' The term conditional refers to an evaluation perspective where the interim results
 #' suggest a trial continuation with a second stage.
 #' The score can take values between 0 and 1. More details on the performance score
-#' can be found in Herrmann et al. (2020).
+#' can be found in [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) and
+#' [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4).
 #' 
 #' @template examples_get_performance_score
 #'
@@ -50,10 +53,10 @@ getPerformanceScore <- function(simulationResult) {
 
     design <- simulationResult$.design
 
-    if (!(inherits(simulationResult, "SimulationResultsMeans") || inherits(simulationResult, "SimulationResultsMeans"))) {
+    if (!inherits(simulationResult, "SimulationResultsMeans") && !inherits(simulationResult, "SimulationResultsRates")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "performance score so far implemented only for single comparisons with continuous endpoints"
+            "performance score so far implemented only for single comparisons with continuous and binary endpoints"
         )
     }
 
@@ -94,10 +97,10 @@ getPerformanceScore <- function(simulationResult) {
     referenceValue <- NA_real_
 
     # simulated alternative values
-    if (methods::is(simulationResult, "SimulationResultsMeans") || methods::is(simulationResult, "SimulationResultsMeans")) {
+    if (methods::is(simulationResult, "SimulationResultsMeans")) {
         alternativeParamName <- "alternative"
         referenceValue <- 0
-    } else if (methods::is(simulationResult, "SimulationResultsRates") || methods::is(simulationResult, "SimulationResultsRates")) {
+    } else if (methods::is(simulationResult, "SimulationResultsRates")) {
         alternativeParamName <- "pi1"
         referenceValue <- simulationResult$pi2
         args$pi2 <- referenceValue
@@ -116,9 +119,9 @@ getPerformanceScore <- function(simulationResult) {
 
         if (alternativeValue == referenceValue) {
             singleStageSampleSize <- plannedSubjects[2] - plannedSubjects[1]
-        } else if (methods::is(simulationResult, "SimulationResultsMeans") || methods::is(simulationResult, "SimulationResultsMeans")) {
+        } else if (methods::is(simulationResult, "SimulationResultsMeans")) {
             singleStageSampleSize <- do.call(getSampleSizeMeans, args)$numberOfSubjects
-        } else if (methods::is(simulationResult, "SimulationResultsRates") || methods::is(simulationResult, "SimulationResultsRates")) {
+        } else if (methods::is(simulationResult, "SimulationResultsRates")) {
             singleStageSampleSize <- do.call(getSampleSizeRates, args)$numberOfSubjects
         }
 

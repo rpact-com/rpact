@@ -15,9 +15,9 @@ library("R6")
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7670 $
-## |  Last changed: $Date: 2024-02-26 15:46:14 +0100 (Mo, 26 Feb 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7712 $
+## |  Last changed: $Date: 2024-03-12 08:24:58 +0100 (Di, 12 Mrz 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -39,7 +39,7 @@ NULL
 }
 
 .isParameterSet <- function(x) {
-    return((isS4(x) || R6::is.R6(x)) && (inherits(x, "ParameterSet") || inherits(x, "ParameterSet")))
+    return(R6::is.R6(x) && inherits(x, "ParameterSet"))
 }
 
 .assertIsParameterSetClass <- function(x, objectName = "x") {
@@ -61,23 +61,23 @@ NULL
 }
 
 .isTrialDesignSet <- function(x) {
-    return(.getClassName(x) == "TrialDesignSet" || .getClassName(x) == "TrialDesignSet")
+    return(.getClassName(x) == "TrialDesignSet")
 }
 
 .isTrialDesignGroupSequential <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL || .getClassName(design) == "TrialDesignGroupSequential")
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL)
 }
 
 .isTrialDesignInverseNormal <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL || .getClassName(design) == "TrialDesignInverseNormal")
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL)
 }
 
 .isTrialDesignFisher <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_FISHER || .getClassName(design) == "TrialDesignFisher")
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_FISHER)
 }
 
 .isTrialDesignConditionalDunnett <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT || .getClassName(design) == "TrialDesignConditionalDunnett")
+    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT)
 }
 
 .isTrialDesignInverseNormalOrGroupSequential <- function(design) {
@@ -94,15 +94,15 @@ NULL
 }
 
 .isTrialDesignPlanMeans <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanMeans" || .getClassName(designPlan) == "TrialDesignPlanMeans")
+    return(.getClassName(designPlan) == "TrialDesignPlanMeans")
 }
 
 .isTrialDesignPlanRates <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanRates" || .getClassName(designPlan) == "TrialDesignPlanRates")
+    return(.getClassName(designPlan) == "TrialDesignPlanRates")
 }
 
 .isTrialDesignPlanSurvival <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanSurvival" || .getClassName(designPlan) == "TrialDesignPlanSurvival")
+    return(.getClassName(designPlan) == "TrialDesignPlanSurvival")
 }
 
 .isTrialDesignPlanCountData <- function(designPlan) {
@@ -202,7 +202,7 @@ NULL
 }
 
 .isSimulationResults <- function(simulationResults) {
-    return(inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResults"))
+    return(inherits(simulationResults, "SimulationResults"))
 }
 
 .assertIsSimulationResults <- function(simulationResults) {
@@ -215,23 +215,23 @@ NULL
 }
 
 .isStageResults <- function(stageResults) {
-    return(inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults"))
+    return(inherits(stageResults, "StageResults"))
 }
 
 .isStageResultsMultiArmMeans <- function(stageResults) {
-    return(.getClassName(stageResults) == "StageResultsMultiArmMeans" || .getClassName(stageResults) == "StageResultsMultiArmMeans")
+    return(.getClassName(stageResults) == "StageResultsMultiArmMeans")
 }
 
 .isStageResultsMultiArmSurvival <- function(stageResults) {
-    return(.getClassName(stageResults) == "StageResultsMultiArmSurvival" || .getClassName(stageResults) == "StageResultsMultiArmSurvival")
+    return(.getClassName(stageResults) == "StageResultsMultiArmSurvival")
 }
 
 .isStageResultsEnrichmentMeans <- function(stageResults) {
-    return(.getClassName(stageResults) == "StageResultsEnrichmentMeans" || .getClassName(stageResults) == "StageResultsEnrichmentMeans")
+    return(.getClassName(stageResults) == "StageResultsEnrichmentMeans")
 }
 
 .isStageResultsEnrichmentSurvival <- function(stageResults) {
-    return(.getClassName(stageResults) == "StageResultsEnrichmentSurvival" || .getClassName(stageResults) == "StageResultsEnrichmentSurvival")
+    return(.getClassName(stageResults) == "StageResultsEnrichmentSurvival")
 }
 
 .assertIsStageResults <- function(stageResults) {
@@ -452,15 +452,15 @@ NULL
 }
 
 .isDatasetMeans <- function(dataInput) {
-    return(inherits(dataInput, "DatasetMeans") || inherits(dataInput, "DatasetMeans"))
+    return(inherits(dataInput, "DatasetMeans"))
 }
 
 .isDatasetRates <- function(dataInput) {
-    return(inherits(dataInput, "DatasetRates") || inherits(dataInput, "DatasetRates"))
+    return(inherits(dataInput, "DatasetRates"))
 }
 
 .isDatasetSurvival <- function(dataInput) {
-    return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
+    return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
 .assertIsNumericVector <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = TRUE) {
@@ -561,7 +561,7 @@ NULL
     if ((!naAllowed && is.na(x)) || !is.logical(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            ifelse(isS4(x), .getClassName(x), x), ") must be a single logical value",
+            ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a single logical value",
             call. = call.
         )
     }
@@ -588,7 +588,7 @@ NULL
     if ((!naAllowed && is.na(x)) || !is.numeric(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            ifelse(isS4(x), .getClassName(x), x), ") must be a valid numeric value",
+            ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a valid numeric value",
             call. = call.
         )
     }
@@ -631,7 +631,7 @@ NULL
             (!validateType && !is.na(x) && !is.infinite(x) && as.integer(x) != x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(isS4(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            "'", argumentName, "' (", ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
             call. = call.
         )
     }
@@ -639,7 +639,7 @@ NULL
     if (mustBePositive && !is.na(x) && !is.infinite(x) && x <= 0) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(isS4(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            "'", argumentName, "' (", ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
             call. = call.
         )
     }
@@ -781,15 +781,76 @@ NULL
     }
 }
 
+.showParameterOutOfValidatedBoundsMessage <- function(
+    parameterValue,
+    parameterName, ...,
+    lowerBound = NA_real_,
+    upperBound = NA_real_,
+    spendingFunctionName = NA_character_,
+    closedLowerBound = TRUE,
+    closedUpperBound = TRUE,
+    suffix = NA_character_) {
+
+    .assertIsSingleNumber(lowerBound, "lowerBound", naAllowed = TRUE)
+    .assertIsSingleNumber(upperBound, "upperBound", naAllowed = TRUE)
+    if (is.na(lowerBound) && is.na(upperBound)) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'lowerBound' or 'upperBound' must be defined")
+    }
+
+    if (is.na(lowerBound)) {
+        lowerBound <- -Inf
+    }
+
+    if (is.na(upperBound)) {
+        upperBound <- Inf
+    }
+
+    if (closedLowerBound) {
+        bracketLowerBound <- "["
+        conditionLowerBound <- parameterValue < lowerBound
+    } else {
+        bracketLowerBound <- "("
+        conditionLowerBound <- parameterValue <= lowerBound
+    }
+    if (closedUpperBound) {
+        bracketUpperBound <- "]"
+        conditionUpperBound <- parameterValue > upperBound
+    } else {
+        bracketUpperBound <- ")"
+        conditionUpperBound <- parameterValue >= upperBound
+    }
+
+    if (conditionLowerBound || conditionUpperBound) {
+        if (!is.null(spendingFunctionName) && !is.na(spendingFunctionName)) {
+            spendingFunctionName <- paste0("for ", spendingFunctionName, " function ")
+        } else {
+            spendingFunctionName <- ""
+        }
+
+        if (is.na(suffix)) {
+            suffix <- ""
+        } else {
+            suffix <- paste0(" ", trimws(suffix))
+        }
+
+        type <- getOption("rpact.out.of.validated.bounds.message.type", "warning")
+        if (identical(type, "warning")) {
+            warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
+                spendingFunctionName, "is out of validated bounds ",
+                bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix, call. = FALSE)
+        }
+        else if (identical(type, "message")) {
+            message("Note that parameter ", sQuote(parameterName), " (", parameterValue, ") ",
+                spendingFunctionName, "is out of validated bounds ",
+                bracketLowerBound, lowerBound, "; ", upperBound, bracketUpperBound, suffix)
+        }
+    }
+}
+
 .assertIsValidAlpha <- function(alpha) {
     .assertIsSingleNumber(alpha, "alpha")
-
-    if (alpha < 1e-06 || alpha >= 0.5) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'alpha' (", alpha, ") is out of bounds [1e-06; 0.5)"
-        )
-    }
+    .assertIsInOpenInterval(alpha, "alpha", lower = 0, upper = NULL)
+    .showParameterOutOfValidatedBoundsMessage(alpha, "alpha", lowerBound = 1e-06, upperBound = 0.5, closedUpperBound = FALSE)
 }
 
 .assertIsValidKappa <- function(kappa) {
@@ -863,14 +924,10 @@ NULL
 .assertIsValidBeta <- function(beta, alpha) {
     .assertIsSingleNumber(beta, "beta")
     .assertIsSingleNumber(alpha, "alpha")
-
-    if (beta < 1e-04 || beta >= 1 - alpha) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'beta' (", beta, ") is out of bounds [1e-04; ", (1 - alpha), "); ",
-            "condition: 1e-05 <= alpha < 1 - beta <= 1 - 1e-04"
-        )
-    }
+    .assertIsInOpenInterval(beta, "beta", lower = 0, upper = NULL)
+    .showParameterOutOfValidatedBoundsMessage(beta, "beta", lowerBound = 1e-04,
+        upperBound = 1 - alpha, closedUpperBound = FALSE,
+        suffix = "condition: 1e-06 <= alpha < 1 - beta <= 1 - 1e-04")
 }
 
 .assertIsValidAlphaAndBeta <- function(alpha, beta) {
@@ -1347,11 +1404,11 @@ NULL
     for (i in 1:length(args)) {
         arg <- args[[i]]
         argName <- ifelse(is.null(argNames[i]) || argNames[i] == "",
-            ifelse(inherits(arg, "StageResults") || inherits(arg, "StageResults"), "stageResultsName", paste0("%param", i, "%")),
+            ifelse(inherits(arg, "StageResults"), "stageResultsName", paste0("%param", i, "%")),
             argNames[i]
         )
         if (!(argName %in% ignore) && !grepl("^\\.", argName)) {
-            if (isS4(arg) || is.environment(arg)) {
+            if (isS4(arg) || is.environment(arg) || R6::is.R6(arg)) {
                 arg <- .getClassName(arg)
             }
             if (is.function(arg)) {
@@ -2157,24 +2214,24 @@ NULL
 }
 
 .isMultiArmDataset <- function(dataInput) {
-    return((inherits(dataInput, "Dataset") || inherits(dataInput, "Dataset")) && dataInput$getNumberOfGroups() > 2)
+    return(inherits(dataInput, "Dataset") && dataInput$getNumberOfGroups() > 2)
 }
 
 .isMultiArmStageResults <- function(stageResults) {
-    return((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults")) && grepl("MultiArm", .getClassName(stageResults)))
+    return(inherits(stageResults, "StageResults") && grepl("MultiArm", .getClassName(stageResults)))
 }
 
 .isEnrichmentStageResults <- function(stageResults) {
-    return((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults")) && grepl("Enrichment", .getClassName(stageResults)))
+    return(inherits(stageResults, "StageResults") && grepl("Enrichment", .getClassName(stageResults)))
 }
 
 .isEnrichmentConditionalPowerResults <- function(conditionalPowerResults) {
-    return((inherits(conditionalPowerResults, "ConditionalPowerResults") || inherits(conditionalPowerResults, "ConditionalPowerResults")) &&
+    return(inherits(conditionalPowerResults, "ConditionalPowerResults") &&
         grepl("Enrichment", .getClassName(conditionalPowerResults)))
 }
 
 .isMultiArmAnalysisResults <- function(analysisResults) {
-    return((inherits(analysisResults, "AnalysisResultsMultiArm") || inherits(analysisResults, "AnalysisResultsMultiArm")))
+    return(inherits(analysisResults, "AnalysisResultsMultiArm"))
 }
 
 .isMultiHypothesesAnalysisResults <- function(x) {
@@ -2182,23 +2239,23 @@ NULL
 }
 
 .isEnrichmentDataset <- function(dataInput) {
-    return((inherits(dataInput, "Dataset") || inherits(dataInput, "Dataset")) && dataInput$.enrichmentEnabled)
+    return(inherits(dataInput, "Dataset") && dataInput$.enrichmentEnabled)
 }
 
 .isEnrichmentAnalysisResults <- function(analysisResults) {
-    return(inherits(analysisResults, "AnalysisResultsEnrichment") || inherits(analysisResults, "AnalysisResultsEnrichment"))
+    return(inherits(analysisResults, "AnalysisResultsEnrichment"))
 }
 
 .isMultiArmSimulationResults <- function(simulationResults) {
-    return((inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResults")) && grepl("MultiArm", .getClassName(simulationResults)))
+    return(inherits(simulationResults, "SimulationResults") && grepl("MultiArm", .getClassName(simulationResults)))
 }
 
 .isEnrichmentSimulationResults <- function(simulationResults) {
-    return((inherits(simulationResults, "SimulationResults") || inherits(simulationResults, "SimulationResults")) && grepl("Enrichment", .getClassName(simulationResults)))
+    return(inherits(simulationResults, "SimulationResults") && grepl("Enrichment", .getClassName(simulationResults)))
 }
 
 .assertIsStageResultsMultiArm <- function(stageResults) {
-    if (!(inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults"))) {
+    if (!inherits(stageResults, "StageResults")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a multi-arm stage results object (is ", .getClassName(stageResults), ")"
@@ -2214,14 +2271,14 @@ NULL
 }
 
 .assertIsStageResultsNonMultiHypotheses <- function(stageResults) {
-    if ((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults")) && .isMultiArmStageResults(stageResults)) {
+    if (inherits(stageResults, "StageResults") && .isMultiArmStageResults(stageResults)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a non-multi-arm object (is ", .getClassName(stageResults), ")"
         )
     }
 
-    if ((inherits(stageResults, "StageResults") || inherits(stageResults, "StageResults")) && .isEnrichmentStageResults(stageResults)) {
+    if (inherits(stageResults, "StageResults") && .isEnrichmentStageResults(stageResults)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a non-enrichment object (is ", .getClassName(stageResults), ")"
@@ -2229,9 +2286,6 @@ NULL
     }
 
     allowedClasses <- c(
-        "StageResultsMeans",
-        "StageResultsRates",
-        "StageResultsSurvival",
         "StageResultsMeans",
         "StageResultsRates",
         "StageResultsSurvival"
@@ -2261,7 +2315,7 @@ NULL
 }
 
 .assertIsAnalysisResults <- function(analysisResults) {
-    if (!(inherits(analysisResults, "AnalysisResults") || inherits(analysisResults, "AnalysisResults"))) {
+    if (!inherits(analysisResults, "AnalysisResults")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'analysisResults' must be a valid 'AnalysisResults' object ",
             " (is '", .getClassName(analysisResults), "')"

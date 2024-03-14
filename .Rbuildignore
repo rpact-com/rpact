@@ -48,3 +48,4 @@ testthat-problems\.rds
 ^inst/\.covrignore$
 ^README\.html$
 ^codecov\.yml$
+Rplots\.pdf

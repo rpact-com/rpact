@@ -98,9 +98,7 @@ StageResults <- R6Class("StageResults",
                                   } else {
                                     self$.setParameterType("stages", C_PARAM_USER_DEFINED)
                                   }
-                                  self$.parameterNames <- .getParameterNames(design = design)
                                 }
-                                self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
                                 
                                 self$.setParameterType("stage", C_PARAM_NOT_APPLICABLE)
                                 
@@ -147,7 +145,8 @@ StageResults <- R6Class("StageResults",
                                     self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                                   } else if (grepl("MultiArm", .getClassName(self))) {
                                     self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                                    self$.cat(paste0(
+                                    self$.cat(
+                                      paste0(
                                       "  (i): results of treatment arm i vs. control group ",
                                       self$.dataInput$getNumberOfGroups(), "\n"
                                     ),
@@ -1518,36 +1517,57 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #' @export
 #'
 plot.StageResults <- function(x, y, ..., type = 1L,
-                              nPlanned, allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
-                              main = NA_character_, xlab = NA_character_, ylab = NA_character_,
-                              legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
-                              showSource = FALSE, plotSettings = NULL) {
-  fCall <- match.call(expand.dots = FALSE)
-  
-  .assertGgplotIsInstalled()
-  .assertIsStageResults(x)
-  .assertIsValidLegendPosition(legendPosition)
-  if (.isConditionalPowerEnabled(nPlanned)) {
-    .assertIsValidAllocationRatioPlanned(allocationRatioPlanned, x$.dataInput$getNumberOfGroups())
-  }
-  .stopInCaseOfIllegalStageDefinition2(...)
-  
-  if (x$.design$kMax == 1) {
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot plot stage results of a fixed design")
-  }
-  
-  if (!is.logical(showSource) || isTRUE(showSource)) {
-    stageResultsName <- .getOptionalArgument("stageResultsName", ...)
-    if (is.null(stageResultsName)) {
-      stageResultsName <- deparse(fCall$x)
+        nPlanned, allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
+        main = NA_character_, xlab = NA_character_, ylab = NA_character_,
+        legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
+        showSource = FALSE, plotSettings = NULL) {
+    fCall <- match.call(expand.dots = FALSE)
+
+    .assertGgplotIsInstalled()
+    .assertIsStageResults(x)
+    .assertIsValidLegendPosition(legendPosition)
+    if (.isConditionalPowerEnabled(nPlanned)) {
+        .assertIsValidAllocationRatioPlanned(allocationRatioPlanned, x$.dataInput$getNumberOfGroups())
     }
-    cat("Source data of the plot:\n")
-    cat("  Use getConditionalPower(..., addPlotData = TRUE) to create the data.\n", sep = "")
-    cat("Simple plot command example:\n", sep = "")
-    
-    cmd <- paste0(
-      "condPow <- getConditionalPower(", stageResultsName,
-      ", nPlanned = ", .arrayToString(nPlanned, vectorLookAndFeelEnabled = TRUE)
+    .stopInCaseOfIllegalStageDefinition2(...)
+
+    if (x$.design$kMax == 1) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot plot stage results of a fixed design")
+    }
+
+    if (!is.logical(showSource) || isTRUE(showSource)) {
+        stageResultsName <- .getOptionalArgument("stageResultsName", ...)
+        if (is.null(stageResultsName)) {
+            stageResultsName <- deparse(fCall$x)
+        }
+        cat("Source data of the plot:\n")
+        cat("  Use getConditionalPower(..., addPlotData = TRUE) to create the data.\n", sep = "")
+        cat("Simple plot command example:\n", sep = "")
+
+        cmd <- paste0(
+            "condPow <- getConditionalPower(", stageResultsName,
+            ", nPlanned = ", .arrayToString(nPlanned, vectorLookAndFeelEnabled = TRUE)
+        )
+        if (.isConditionalPowerEnabled(nPlanned) && allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT) {
+            cmd <- paste0(cmd, ", allocationRatioPlanned = ", allocationRatioPlanned)
+        }
+        if (grepl("Means|Survival", .getClassName(x))) {
+            cmd <- paste0(cmd, ", thetaRange = seq(0, 1, 0.1)")
+        } else if (grepl("Rates", .getClassName(x))) {
+            cmd <- paste0(cmd, ", piTreatmentRange = seq(0, 1, 0.1)")
+        }
+        cmd <- paste0(cmd, ", addPlotData = TRUE)")
+
+        cat("  ", cmd, "\n", sep = "")
+        cat("  plotData <- condPow$.plotData # get plot data list\n", sep = "")
+        cat("  plotData # show plot data list\n", sep = "")
+        cat("  plot(plotData$xValues, plotData$condPowerValues)\n", sep = "")
+        cat("  plot(plotData$xValues, plotData$likelihoodValues)\n", sep = "")
+    }
+
+    plotData <- .getConditionalPowerPlot(
+        stageResults = x, nPlanned = nPlanned,
+        allocationRatioPlanned = allocationRatioPlanned, ...
     )
 
     yParameterName1 <- "Conditional power"
@@ -1651,159 +1671,116 @@ plot.StageResults <- function(x, y, ..., type = 1L,
                 ))
             }
         }
-      } else {
-        data <- rbind(data, data.frame(
-          xValues = c(
-            plotData$xValues[populationIndices],
-            plotData$xValues[populationIndices]
-          ),
-          yValues = c(
-            plotData$condPowerValues[populationIndices],
-            plotData$likelihoodValues[populationIndices]
-          ),
-          categories = c(
-            rep(legend1, length(plotData$xValues[populationIndices])),
-            rep(legend2, length(plotData$xValues[populationIndices]))
-          ),
-          populations = c(
-            rep(population, length(plotData$xValues[populationIndices])),
-            rep(population, length(plotData$xValues[populationIndices]))
-          )
-        ))
-      }
-    }
-  } else {
-    if (all(is.na(plotData$condPowerValues))) {
-      legendPosition <- -1
-      data <- data.frame(
-        xValues = plotData$xValues,
-        yValues = plotData$likelihoodValues,
-        categories = rep(yParameterName2, length(plotData$xValues))
-      )
     } else {
-      data <- data.frame(
-        xValues = c(plotData$xValues, plotData$xValues),
-        yValues = c(plotData$condPowerValues, plotData$likelihoodValues),
-        categories = c(
-          rep(yParameterName1, length(plotData$xValues)),
-          rep(yParameterName2, length(plotData$xValues))
-        )
-      )
+        if (all(is.na(plotData$condPowerValues))) {
+            legendPosition <- -1
+            data <- data.frame(
+                xValues = plotData$xValues,
+                yValues = plotData$likelihoodValues,
+                categories = rep(yParameterName2, length(plotData$xValues))
+            )
+        } else {
+            data <- data.frame(
+                xValues = c(plotData$xValues, plotData$xValues),
+                yValues = c(plotData$condPowerValues, plotData$likelihoodValues),
+                categories = c(
+                    rep(yParameterName1, length(plotData$xValues)),
+                    rep(yParameterName2, length(plotData$xValues))
+                )
+            )
+        }
     }
-  }
-  
-  data$categories <- factor(data$categories, levels = unique(data$categories))
-  
-  main <- ifelse(is.na(main), C_PLOT_MAIN_CONDITIONAL_POWER_WITH_LIKELIHOOD, main)
-  ylab <- ifelse(is.na(ylab), C_PLOT_YLAB_CONDITIONAL_POWER_WITH_LIKELIHOOD, ylab)
-  
-  if (is.na(legendTitle)) {
-    legendTitle <- "Parameter"
-  }
-  
-  return(.createAnalysisResultsPlotObject(x,
-                                          data = data, plotData = plotData, main = main, xlab = xlab, ylab = ylab,
-                                          legendTitle = legendTitle, palette = palette, legendPosition = legendPosition, numberOfPairedLines = 2L,
-                                          plotSettings = plotSettings
-  ))
+
+    data$categories <- factor(data$categories, levels = unique(data$categories))
+
+    main <- ifelse(is.na(main), C_PLOT_MAIN_CONDITIONAL_POWER_WITH_LIKELIHOOD, main)
+    ylab <- ifelse(is.na(ylab), C_PLOT_YLAB_CONDITIONAL_POWER_WITH_LIKELIHOOD, ylab)
+
+    if (is.na(legendTitle)) {
+        legendTitle <- "Parameter"
+    }
+
+    return(.createAnalysisResultsPlotObject(x,
+        data = data, plotData = plotData, main = main, xlab = xlab, ylab = ylab,
+        legendTitle = legendTitle, palette = palette, legendPosition = legendPosition, numberOfPairedLines = 2L,
+        plotSettings = plotSettings
+    ))
 }
 
 .createAnalysisResultsPlotObject <- function(x, ..., data, plotData,
-                                             main = NA_character_, xlab = NA_character_, ylab = NA_character_,
-                                             legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
-                                             numberOfPairedLines = NA_integer_, plotSettings = NULL) {
-  ciModeEnabled <- !is.null(data[["lower"]]) && !is.null(data[["upper"]])
-  
-  if (!ciModeEnabled) {
-    p <- ggplot2::ggplot(data, ggplot2::aes(
-      x = .data[["xValues"]], y = .data[["yValues"]],
-      colour = factor(.data[["categories"]]),
-      linetype = factor(.data[["categories"]])
-    ))
-  } else {
-    p <- ggplot2::ggplot(data, ggplot2::aes(
-      x = .data[["xValues"]], y = .data[["yValues"]],
-      colour = factor(.data[["categories"]])
-    ))
-  }
-  
-  if (is.null(plotSettings)) {
-    plotSettings <- x$getPlotSettings()
-  }
-  
-  p <- plotSettings$setTheme(p)
-  p <- plotSettings$hideGridLines(p)
-  
-  # set main title
-  mainTitle <- ifelse(!is.call(main) && !isS4(main) && is.na(main), plotData$main, main)
-  p <- plotSettings$setMainTitle(p, mainTitle, subtitle = plotData$sub)
-  
-  # set legend
-  if (is.na(legendPosition)) {
-    legendPosition <- C_POSITION_LEFT_TOP
-  }
-  p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition)
-  p <- plotSettings$setLegendBorder(p)
-  p <- plotSettings$setLegendTitle(p, legendTitle)
-  p <- plotSettings$setLegendLabelSize(p)
-  
-  # set axes labels
-  p <- plotSettings$setAxesLabels(p,
-                                  xAxisLabel = plotData$xlab, yAxisLabel1 = plotData$ylab,
-                                  xlab = xlab, ylab = ylab
-  )
-  
-  # plot lines and points
-  if (!ciModeEnabled) {
-    if (is.na(numberOfPairedLines)) {
-      numberOfPairedLines <- 2
-      if (x$.isMultiArm()) {
-        numberOfPairedLines <- length(unique(data$treatmentArms)) - 1
-      } else if (x$.isEnrichment()) {
-        numberOfPairedLines <- length(unique(data$populations)) - 1
-      }
-    }
-    
-    p <- plotSettings$plotValues(p, plotPointsEnabled = FALSE, pointBorder = 1)
-    n <- length(unique(data$categories)) / numberOfPairedLines
-    if (n > 1) {
-      lineTypeValues <- rep(1:numberOfPairedLines, n)
-      colorTypes <- sort(rep(1:n, numberOfPairedLines))
-      for (i in c(1, 3)) {
-        colorTypes[colorTypes >= i] <- colorTypes[colorTypes >= i] + 1
-      }
-      p <- p + ggplot2::scale_color_manual(name = legendTitle, values = colorTypes)
-      p <- p + ggplot2::scale_linetype_manual(name = legendTitle, values = lineTypeValues)
+        main = NA_character_, xlab = NA_character_, ylab = NA_character_,
+        legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
+        numberOfPairedLines = NA_integer_, plotSettings = NULL) {
+    ciModeEnabled <- !is.null(data[["lower"]]) && !is.null(data[["upper"]])
+
+    if (!ciModeEnabled) {
+        p <- ggplot2::ggplot(data, ggplot2::aes(
+            x = .data[["xValues"]], y = .data[["yValues"]],
+            colour = factor(.data[["categories"]]),
+            linetype = factor(.data[["categories"]])
+        ))
     } else {
-      colorValues <- c(2, 4)
-      if (!x$.isMultiArm()) {
-        colorValues <- c(2, 2) # use only one color
-      }
-      p <- p + ggplot2::scale_color_manual(name = legendTitle, values = colorValues)
-      p <- p + ggplot2::scale_linetype_manual(name = legendTitle, values = c(1, 2))
+        p <- ggplot2::ggplot(data, ggplot2::aes(
+            x = .data[["xValues"]], y = .data[["yValues"]],
+            colour = factor(.data[["categories"]])
+        ))
     }
-  }
-  
-  # plot confidence intervall
-  else {
-    pd <- ggplot2::position_dodge(0.15)
-    
-    p <- p + ggplot2::geom_errorbar(
-      data = data,
-      ggplot2::aes(ymin = .data[["lower"]], ymax = .data[["upper"]]),
-      width = 0.15, position = pd, size = 0.8
+
+    if (is.null(plotSettings)) {
+        plotSettings <- x$getPlotSettings()
+    }
+
+    p <- plotSettings$setTheme(p)
+    p <- plotSettings$hideGridLines(p)
+
+    # set main title
+    mainTitle <- ifelse(!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main), plotData$main, main)
+    p <- plotSettings$setMainTitle(p, mainTitle, subtitle = plotData$sub)
+
+    # set legend
+    if (is.na(legendPosition)) {
+        legendPosition <- C_POSITION_LEFT_TOP
+    }
+    p <- plotSettings$setLegendPosition(p, legendPosition = legendPosition)
+    p <- plotSettings$setLegendBorder(p)
+    p <- plotSettings$setLegendTitle(p, legendTitle)
+    p <- plotSettings$setLegendLabelSize(p)
+
+    # set axes labels
+    p <- plotSettings$setAxesLabels(p,
+        xAxisLabel = plotData$xlab, yAxisLabel1 = plotData$ylab,
+        xlab = xlab, ylab = ylab
     )
-    p <- p + ggplot2::geom_line(position = pd, linetype = "longdash")
-    p <- p + ggplot2::geom_point(position = pd, size = 2.0)
-    
-    
-    stage <- unique(data$xValues)
-    kMax <- list(...)[["kMax"]]
-    if (length(stage) == 1 && !is.null(kMax)) {
-      stages <- 1:kMax
-      p <- p + ggplot2::scale_x_continuous(breaks = stages)
-    } else if (length(stage) > 1 && all(stage %in% 1:10)) {
-      p <- p + ggplot2::scale_x_continuous(breaks = stage)
+
+    # plot lines and points
+    if (!ciModeEnabled) {
+        if (is.na(numberOfPairedLines)) {
+            numberOfPairedLines <- 2
+            if (x$.isMultiArm()) {
+                numberOfPairedLines <- length(unique(data$treatmentArms)) - 1
+            } else if (x$.isEnrichment()) {
+                numberOfPairedLines <- length(unique(data$populations)) - 1
+            }
+        }
+
+        p <- plotSettings$plotValues(p, plotPointsEnabled = FALSE, pointBorder = 1)
+        n <- length(unique(data$categories)) / numberOfPairedLines
+        if (n > 1) {
+            lineTypeValues <- rep(1:numberOfPairedLines, n)
+            colorTypes <- sort(rep(1:n, numberOfPairedLines))
+            for (i in c(1, 3)) {
+                colorTypes[colorTypes >= i] <- colorTypes[colorTypes >= i] + 1
+            }
+            p <- p + ggplot2::scale_color_manual(name = legendTitle, values = colorTypes)
+            p <- p + ggplot2::scale_linetype_manual(name = legendTitle, values = lineTypeValues)
+        } else {
+            colorValues <- c(2, 4)
+            if (!x$.isMultiArm()) {
+                colorValues <- c(2, 2) # use only one color
+            }
+            p <- p + ggplot2::scale_color_manual(name = legendTitle, values = colorValues)
+            p <- p + ggplot2::scale_linetype_manual(name = legendTitle, values = c(1, 2))
+        }
     }
 
     # plot confidence intervall

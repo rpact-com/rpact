@@ -64,63 +64,43 @@ NULL
 #' @importFrom methods new
 #'
 TrialDesign <- R6Class("TrialDesign",
-                           inherit = ParameterSet,
-                           public = list(
-                             .plotSettings = NULL,
-                             kMax = NULL,
-                             alpha = NULL,
-                             stages = NULL,
-                             informationRates = NULL,
-                             userAlphaSpending = NULL,
-                             criticalValues = NULL,
-                             stageLevels = NULL,
-                             alphaSpent = NULL,
-                             bindingFutility = NULL,
-                             tolerance = NULL,
-                             initialize = function(...,
-                                                   kMax = NA_integer_,
-                                                   alpha = NA_real_,
-                                                   informationRates = NA_real_,
-                                                   userAlphaSpending = NA_real_,
-                                                   criticalValues = NA_real_,
-                                                   stageLevels = NA_real_,
-                                                   alphaSpent = NA_real_,
-                                                   bindingFutility = NA,
-                                                   tolerance = 1e-06 # C_ANALYSIS_TOLERANCE_DEFAULT
-                             ) {
-                               
-                               self$kMax <- kMax #NEW
-                               self$alpha <- alpha
-                               self$informationRates <- informationRates
-                               self$userAlphaSpending <- userAlphaSpending
-                               self$criticalValues <- criticalValues
-                               self$stageLevels <- stageLevels
-                               self$alphaSpent <- alphaSpent
-                               self$bindingFutility <- bindingFutility
-                               self$tolerance <- tolerance
-                               super$initialize(...)
-                               
-                               self$.plotSettings <- PlotSettings$new()
-                               
-                               if (inherits(self, "TrialDesignConditionalDunnett")) {
-                                 self$.parameterNames <- C_PARAMETER_NAMES
-                               } else {
-                                 self$.parameterNames <- self$.getSubListByNames(.getParameterNames(design = self), c(#TODO
-                                   "stages",
-                                   "kMax",
-                                   "alpha",
-                                   "informationRates",
-                                   "userAlphaSpending",
-                                   "criticalValues",
-                                   "stageLevels",
-                                   "alphaSpent",
-                                   "bindingFutility",
-                                   "tolerance"
-                                 ))
-                               }
-                               
-                               self$.parameterFormatFunctions <- C_PARAMETER_FORMAT_FUNCTIONS
-                               
+    inherit = ParameterSet,
+    public = list(
+        .plotSettings = NULL,
+        kMax = NULL,
+        alpha = NULL,
+        stages = NULL,
+        informationRates = NULL,
+        userAlphaSpending = NULL,
+        criticalValues = NULL,
+        stageLevels = NULL,
+        alphaSpent = NULL,
+        bindingFutility = NULL,
+        tolerance = NULL,
+        initialize = function(...,
+                kMax = NA_integer_,
+                alpha = NA_real_,
+                informationRates = NA_real_,
+                userAlphaSpending = NA_real_,
+                criticalValues = NA_real_,
+                stageLevels = NA_real_,
+                alphaSpent = NA_real_,
+                bindingFutility = NA,
+                tolerance = 1e-06 # C_ANALYSIS_TOLERANCE_DEFAULT
+                ) {
+                self$kMax <- kMax #NEW
+                self$alpha <- alpha
+                self$informationRates <- informationRates
+                self$userAlphaSpending <- userAlphaSpending
+                self$criticalValues <- criticalValues
+                self$stageLevels <- stageLevels
+                self$alphaSpent <- alphaSpent
+                self$bindingFutility <- bindingFutility
+                self$tolerance <- tolerance
+                super$initialize(...)
+
+            self$.plotSettings <- PlotSettings$new()
+
                                self$.initStages()
                              },
                              show = function(showType = 1, digits = NA_integer_) {
@@ -854,7 +834,6 @@ TrialDesignGroupSequential <- R6Class("TrialDesignGroupSequential",
   inherit = TrialDesignInverseNormal,
   public = list(
     initialize = function(...) {
-      self$.parameterFormatFunctions$criticalValues <- ".formatCriticalValues"
       super$initialize(...)
       self$.initStages()
     },
@@ -910,7 +889,8 @@ TrialDesignConditionalDunnett <- R6Class("TrialDesignConditionalDunnett",
     sided = NULL,
     initialize = function(...,informationAtInterim = NULL, secondStageConditioning = NULL) {
       super$initialize(...)
-      
+      self$informationAtInterim <- informationAtInterim
+      self$secondStageConditioning <- secondStageConditioning
       notApplicableParameters <- c(
         "kMax",
         "stages",
@@ -1112,7 +1092,7 @@ plot.TrialDesignCharacteristics <- function(x, y, ...) {
 .plotTrialDesign <- function(..., x, y, main,
                              xlab, ylab, type, palette,
                              theta, nMax, plotPointsEnabled,
-                             legendPosition, showSource, designName, plotSettings = NULL) {#TODO
+        legendPosition, showSource, designName, plotSettings = NULL) {
   .assertGgplotIsInstalled()
   
   .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)

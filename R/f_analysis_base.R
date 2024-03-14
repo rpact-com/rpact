@@ -28,15 +28,15 @@ NULL
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, sQuote("dataInput"), " must be specified")
     }
 
-    if (missing(dataInput) && !missing(design) && (inherits(design, "Dataset") || inherits(design, "Dataset"))) {
+    if (missing(dataInput) && !missing(design) && inherits(design, "Dataset")) {
         dataInput <- design
-        if (!is.null(dataInput$.design) && (inherits(dataInput$.design, "TrialDesign") || inherits(dataInput$.design, "TrialDesign"))) {
+        if (!is.null(dataInput$.design) && inherits(dataInput$.design, "TrialDesign")) {
             design <- dataInput$.design
         } else {
             design <- .getDefaultDesign(..., type = "analysis")
         }
     } else if (!missing(dataInput) && missing(design)) {
-        if (!is.null(dataInput$.design) && (inherits(dataInput$.design, "TrialDesign") || inherits(dataInput$.design, "TrialDesign"))) {
+        if (!is.null(dataInput$.design) && inherits(dataInput$.design, "TrialDesign")) {
             design <- dataInput$.design
         } else {
             design <- .getDefaultDesign(..., type = "analysis")

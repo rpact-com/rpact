@@ -22,7 +22,120 @@
 #' @include f_core_utilities.R
 NULL
 
+#' @title
+#' Get Design Set
+#'
+#' @description
+#' Creates a trial design set object and returns it.
+#'
+#' @param ... \code{designs} or \code{design} and one or more design parameters, e.g., \code{deltaWT = c(0.1, 0.3, 0.4)}.
+#' \itemize{
+#'   \item \code{design} The master design (optional, you need to specify an
+#'         additional parameter that shall be varied).
+#'   \item \code{designs} The designs to compare (optional, you need to specify the variable \code{variedParameters}).
+#' }
+#'
+#' @details
+#' Specify a master design and one or more design parameters or a list of designs.
+#'
+#' @return Returns a \code{\link{TrialDesignSet}} object.
+#' The following generics (R generic functions) are available for this result object:
+#' \itemize{
+#'   \item \code{\link[=names.TrialDesignSet]{names}} to obtain the field names,
+#'   \item \code{\link[=length.TrialDesignSet]{length}} to obtain the number of design,
+#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
+#'   \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
+#'   \item \code{\link[=plot.TrialDesignSet]{plot()}} to plot the object,
+#'   \item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+#' }
+#' @template how_to_get_help_for_generics
+#'
+#' @examples
+#' # Example 1
+#' design <- getDesignGroupSequential(
+#'     alpha = 0.05, kMax = 6,
+#'     sided = 2, typeOfDesign = "WT", deltaWT = 0.1
+#' )
+#' designSet <- getDesignSet()
+#' designSet$add(design = design, deltaWT = c(0.3, 0.4))
+#' \dontrun{
+#' if (require(ggplot2)) plot(designSet, type = 1)
+#' }
+#'
+#' # Example 2 (shorter script)
+#' design <- getDesignGroupSequential(
+#'     alpha = 0.05, kMax = 6,
+#'     sided = 2, typeOfDesign = "WT", deltaWT = 0.1
+#' )
+#' designSet <- getDesignSet(design = design, deltaWT = c(0.3, 0.4))
+#' \dontrun{
+#' if (require(ggplot2)) plot(designSet, type = 1)
+#' }
+#'
+#' # Example 3 (use of designs instead of design)
+#' d1 <- getDesignGroupSequential(
+#'     alpha = 0.05, kMax = 2,
+#'     sided = 1, beta = 0.2, typeOfDesign = "asHSD",
+#'     gammaA = 0.5, typeBetaSpending = "bsHSD", gammaB = 0.5
+#' )
+#' d2 <- getDesignGroupSequential(
+#'     alpha = 0.05, kMax = 4,
+#'     sided = 1, beta = 0.2, typeOfDesign = "asP",
+#'     typeBetaSpending = "bsP"
+#' )
+#' designSet <- getDesignSet(
+#'     designs = c(d1, d2),
+#'     variedParameters = c("typeOfDesign", "kMax")
+#' )
+#' \dontrun{
+#' if (require(ggplot2)) plot(designSet, type = 8, nMax = 20)
+#' }
+#'
+#' @export
+#'
+getDesignSet <- function(...) {
+    return(TrialDesignSet$new(...))
+}
 
+#'
+#' @title
+#' Trial Design Set Summary
+#'
+#' @description
+#' Displays a summary of \code{\link{ParameterSet}} object.
+#'
+#' @param object A \code{\link{ParameterSet}} object.
+#' @inheritParams param_digits
+#' @inheritParams param_three_dots
+#'
+#' @details
+#' Summarizes the trial designs.
+#'
+#' @template details_summary
+#'
+#' @template return_object_summary
+#' @template how_to_get_help_for_generics
+#'
+#' @export
+#'
+#' @keywords internal
+#'
+summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) {
+    .warnInCaseOfUnknownArguments(functionName = "summary.TrialDesignSet", ...)
+
+    .assertIsTrialDesignSet(object)
+    if (object$isEmpty()) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot create summary because the design set is empty")
+    }
+
+    summaries <- list()
+    for (design in object$designs) {
+        s <- .createSummary(design, digits = digits)
+        summaries <- c(summaries, s)
+    }
+    return(summaries)
+}
 
 #'
 #' @name TrialDesignSet
@@ -70,7 +183,7 @@ TrialDesignSet <- R6Class("TrialDesignSet",
             }
             if (length(self$designs) > 0) {
                 masterDesign <- self$designs[[1]]
-                if (inherits(masterDesign, "ParameterSet") || inherits(masterDesign, "ParameterSet")) {
+                if (inherits(masterDesign, "ParameterSet")) {
                     self$.plotSettings <- masterDesign$.plotSettings
                 }
             }
@@ -429,121 +542,6 @@ TrialDesignSet <- R6Class("TrialDesignSet",
     )
 )
 
-#' @title
-#' Get Design Set
-#'
-#' @description
-#' Creates a trial design set object and returns it.
-#'
-#' @param ... \code{designs} or \code{design} and one or more design parameters, e.g., \code{deltaWT = c(0.1, 0.3, 0.4)}.
-#' \itemize{
-#'   \item \code{design} The master design (optional, you need to specify an
-#'         additional parameter that shall be varied).
-#'   \item \code{designs} The designs to compare (optional, you need to specify the variable \code{variedParameters}).
-#' }
-#'
-#' @details
-#' Specify a master design and one or more design parameters or a list of designs.
-#'
-#' @return Returns a \code{\link{TrialDesignSet}} object.
-#' The following generics (R generic functions) are available for this result object:
-#' \itemize{
-#'   \item \code{\link[=names.TrialDesignSet]{names}} to obtain the field names,
-#'   \item \code{\link[=length.TrialDesignSet]{length}} to obtain the number of design,
-#'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
-#'   \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
-#'   \item \code{\link[=plot.TrialDesignSet]{plot()}} to plot the object,
-#'   \item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
-#' }
-#' @template how_to_get_help_for_generics
-#'
-#' @examples
-#' # Example 1
-#' design <- getDesignGroupSequential(
-#'     alpha = 0.05, kMax = 6,
-#'     sided = 2, typeOfDesign = "WT", deltaWT = 0.1
-#' )
-#' designSet <- getDesignSet()
-#' designSet$add(design = design, deltaWT = c(0.3, 0.4))
-#' \dontrun{
-#' if (require(ggplot2)) plot(designSet, type = 1)
-#' }
-#'
-#' # Example 2 (shorter script)
-#' design <- getDesignGroupSequential(
-#'     alpha = 0.05, kMax = 6,
-#'     sided = 2, typeOfDesign = "WT", deltaWT = 0.1
-#' )
-#' designSet <- getDesignSet(design = design, deltaWT = c(0.3, 0.4))
-#' \dontrun{
-#' if (require(ggplot2)) plot(designSet, type = 1)
-#' }
-#'
-#' # Example 3 (use of designs instead of design)
-#' d1 <- getDesignGroupSequential(
-#'     alpha = 0.05, kMax = 2,
-#'     sided = 1, beta = 0.2, typeOfDesign = "asHSD",
-#'     gammaA = 0.5, typeBetaSpending = "bsHSD", gammaB = 0.5
-#' )
-#' d2 <- getDesignGroupSequential(
-#'     alpha = 0.05, kMax = 4,
-#'     sided = 1, beta = 0.2, typeOfDesign = "asP",
-#'     typeBetaSpending = "bsP"
-#' )
-#' designSet <- getDesignSet(
-#'     designs = c(d1, d2),
-#'     variedParameters = c("typeOfDesign", "kMax")
-#' )
-#' \dontrun{
-#' if (require(ggplot2)) plot(designSet, type = 8, nMax = 20)
-#' }
-#'
-#' @export
-#'
-getDesignSet <- function(...) {
-    return(TrialDesignSet$new(...))
-}
-
-#'
-#' @title
-#' Trial Design Set Summary
-#'
-#' @description
-#' Displays a summary of \code{\link{ParameterSet}} object.
-#'
-#' @param object A \code{\link{ParameterSet}} object.
-#' @inheritParams param_digits
-#' @inheritParams param_three_dots
-#'
-#' @details
-#' Summarizes the trial designs.
-#'
-#' @template details_summary
-#'
-#' @template return_object_summary
-#' @template how_to_get_help_for_generics
-#'
-#' @export
-#'
-#' @keywords internal
-#'
-summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) {
-    .warnInCaseOfUnknownArguments(functionName = "summary.TrialDesignSet", ...)
-
-    .assertIsTrialDesignSet(object)#TODO
-    if (object$isEmpty()) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot create summary because the design set is empty")
-    }
-
-    summaries <- list()
-    for (design in object$designs) {
-        s <- .createSummary(design, digits = digits)
-        summaries <- c(summaries, s)
-    }
-    return(summaries)
-}
-
 #'
 #' @title
 #' Names of a Trial Design Set Object
@@ -884,7 +882,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         legendPosition = NA_integer_, showSource = FALSE,
         designSetName = NA_character_, plotSettings = NULL) {
     .assertGgplotIsInstalled()
-    if (!is.call(main) && !isS4(main)) {
+    if (!is.call(main) && !isS4(main) && !R6::is.R6(main)) { #TODO is.R6 added
         .assertIsSingleCharacter(main, "main", naAllowed = TRUE)
     }
     .assertIsSingleCharacter(xlab, "xlab", naAllowed = TRUE)
@@ -902,7 +900,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
     .assertIsTrialDesign(designMaster)
 
     if (type == 1) {
-        main <- if (!is.call(main) && !isS4(main) && is.na(main)) "Boundaries" else main
+        main <- if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) "Boundaries" else main
         xParameterName <- "informationRates"
         yParameterNames <- "criticalValues"
 
@@ -918,11 +916,11 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
     } else if (type == 2) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "designs with undefined endpoint do not support plot type 2")
     } else if (type == 3) {
-        main <- if (!is.call(main) && !isS4(main) && is.na(main)) "Stage Levels" else main
+        main <- if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) "Stage Levels" else main
         xParameterName <- "informationRates"
         yParameterNames <- "stageLevels"
     } else if (type == 4) {
-        main <- if (!is.call(main) && !isS4(main) && is.na(main)) "Error Spending" else main
+        main <- if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) "Error Spending" else main
         xParameterName <- "informationRates"
         yParameterNames <- c("alphaSpent")
         if (!.isTrialDesignFisher(designMaster) &&
@@ -932,36 +930,36 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         }
         plotPointsEnabled <- ifelse(is.na(plotPointsEnabled), FALSE, plotPointsEnabled)
     } else if (type == 5) {
-        if (!is.call(main) && !isS4(main) && is.na(main)) {
-            main <- PlotSubTitleItems(title = "Power and Early Stopping")
+        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+            main <- PlotSubTitleItems$new(title = "Power and Early Stopping")
             main$add("N", nMax, "max")
         }
         xParameterName <- "theta"
         yParameterNames <- c("overallEarlyStop", "calculatedPower")
     } else if (type == 6) {
-        if (!is.call(main) && !isS4(main) && is.na(main)) {
-            main <- PlotSubTitleItems(title = "Average Sample Size and Power / Early Stop")
+        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+            main <- PlotSubTitleItems$new(title = "Average Sample Size and Power / Early Stop")
             main$add("N", nMax, "max")
         }
         xParameterName <- "theta"
         yParameterNames <- c("averageSampleNumber", "overallEarlyStop", "calculatedPower")
     } else if (type == 7) {
-        if (!is.call(main) && !isS4(main) && is.na(main)) {
-            main <- PlotSubTitleItems(title = "Power")
+        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+            main <- PlotSubTitleItems$new(title = "Power")
             main$add("N", nMax, "max")
         }
         xParameterName <- "theta"
         yParameterNames <- "calculatedPower"
     } else if (type == 8) {
-        if (!is.call(main) && !isS4(main) && is.na(main)) {
-            main <- PlotSubTitleItems(title = "Early Stopping")
+        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+            main <- PlotSubTitleItems$new(title = "Early Stopping")
             main$add("N", nMax, "max")
         }
         xParameterName <- "theta"
         yParameterNames <- "overallEarlyStop"
     } else if (type == 9) {
-        if (!is.call(main) && !isS4(main) && is.na(main)) {
-            main <- PlotSubTitleItems(title = "Average Sample Size")
+        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+            main <- PlotSubTitleItems$new(title = "Average Sample Size")
             main$add("N", nMax, "max")
         }
         xParameterName <- "theta"

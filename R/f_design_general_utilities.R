@@ -1020,12 +1020,12 @@ getMedianByPi <- function(piValue,
             designParametersToShow <- c(designParametersToShow, ".design$stageLevels")
         }
         if (design$sided == 2 && !grepl("Analysis|Simulation", .getClassName(parameterSet)) &&
-                (!(inherits(parameterSet, "TrialDesignPlan") || inherits(parameterSet, "TrialDesignPlan")) || parameterSet$.isSampleSizeObject())) {
+                (!inherits(parameterSet, "TrialDesignPlan") || parameterSet$.isSampleSizeObject())) {
             designParametersToShow <- c(designParametersToShow, ".design$twoSidedPower")
         }
         designParametersToShow <- c(designParametersToShow, ".design$alpha")
         if (!grepl("Analysis|Simulation", .getClassName(parameterSet)) &&
-                (!(inherits(parameterSet, "TrialDesignPlan") || inherits(parameterSet, "TrialDesignPlan")) || parameterSet$.isSampleSizeObject())) {
+                (!inherits(parameterSet, "TrialDesignPlan") || parameterSet$.isSampleSizeObject())) {
             designParametersToShow <- c(designParametersToShow, ".design$beta")
         }
 
@@ -1054,7 +1054,6 @@ getMedianByPi <- function(piValue,
 }
 
 .addDelayedInformationRates <- function(dataFrame) {
-    #print(dataFrame)
     if (all(c("informationRates", "delayedInformation", "kMax", "stages") %in% colnames(dataFrame))) {
         kMax <- max(dataFrame$kMax)
         if (kMax > 1) {

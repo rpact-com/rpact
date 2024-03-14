@@ -863,10 +863,11 @@ AnalysisResults <- R6Class("AnalysisResults",
                                                                             c("assumedStDevs", "thetaH1", "pi1", "pi2", "piTreatments", "piTreatments", "piControl", "piControls"))]
                                      
                                      if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(self))) {
-                                       
                                        if (all(c("conditionalPowerSimulated", "conditionalRejectionProbabilities") %in% generatedParams)) {
-                                         generatedParams <- .moveValue(generatedParams, 
-                                                                       "conditionalPowerSimulated", "conditionalRejectionProbabilities")
+                                         generatedParams <- .moveValue(
+                                             generatedParams,
+                                             "conditionalPowerSimulated", "conditionalRejectionProbabilities"
+                                         )
                                        }
                                        
                                        self$.showParametersOfOneGroup(generatedParams, "Further analysis results",
@@ -882,7 +883,8 @@ AnalysisResults <- R6Class("AnalysisResults",
                                      
                                      if (grepl("(MultiArm|Dunnett)", .getClassName(self))) {
                                        self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                                       self$.cat(paste0(
+                                       self$.cat(
+                                         paste0(
                                          "  (i): results of treatment arm i vs. control group ",
                                          self$.dataInput$getNumberOfGroups(), "\n"
                                        ),

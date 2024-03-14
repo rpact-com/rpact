@@ -1,4 +1,15 @@
 
+# rpact 3.5.2
+
+## New features
+
+* Extension of the function `getPerformanceScore()` for sample size recalculation rules to the setting of binary endpoints according to [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4)
+
+## Improvements, issues, and changes
+
+* Issue [#25](https://github.com/rpact-com/rpact/issues/25) fixed
+
+
 # rpact 3.5.1
 
 * The internal fields `.parameterNames` and `.parameterFormatFunctions` were removed from all rpact result objects in favor of a more efficient solution
@@ -40,7 +51,7 @@
 
 ## New features
 
-* The new function `getPerformanceScore()` calculates the conditional performance score, its sub-scores and components according to Herrmann et al. (2020) for a given simulation result from a two-stage design
+* The new function `getPerformanceScore()` calculates the conditional performance score, its sub-scores and components according to [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) for a given simulation result from a two-stage design
 * `allocationRatioPlanned` for simulating multi-arm and enrichment designs can be a vector of length kMax, the number of stages 
 * `getObjectRCode()` (short: `rcmd()`): with the new arguments `pipeOperator` and `output` many new output variants can be specified, e.g., the native R pipe operator or the magrittr pipe operator can be used
 * Generic function `knitr::knit_print` for all result objects implemented and automatic code chunk option `results = 'asis'` activated

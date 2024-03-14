@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_performance_score.R
 ## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 7662 $
-## |  Last changed: $Date: 2024-02-23 12:42:26 +0100 (Fr, 23 Feb 2024) $
+## |  File version: $Revision: 7702 $
+## |  Last changed: $Date: 2024-03-07 13:30:30 +0100 (Do, 07 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -67,18 +67,18 @@ test_that("getPerformanceScore handles SimulationResultsMeans", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsNonMeans")
     expect_error(
         getPerformanceScore(simulationResult),
-        "Illegal argument: performance score so far implemented only for single comparisons with continuous endpoints"
+        "Illegal argument: performance score so far implemented only for single comparisons with continuous and binary endpoints"
     )
 })
 
-# 1. Test for a simulationResult that does not have `bindingFutility = TRUE`.
+# Test for a simulationResult that does not have `bindingFutility = TRUE`
 test_that("getPerformanceScore handles non-binding futility", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     simulationResult$.design$bindingFutility <- FALSE
     expect_warning(getPerformanceScore(simulationResult))
 })
 
-# 2. Test for a simulationResult that does not have `kMax = 2`.
+# Test for a simulationResult that does not have `kMax = 2`
 test_that("getPerformanceScore handles non-two-stage designs", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     simulationResult$.design$kMax <- 3
@@ -88,21 +88,21 @@ test_that("getPerformanceScore handles non-two-stage designs", {
     )
 })
 
-# 3. Test for a simulationResult that has a non-null `conditionalPower`.
+# Test for a simulationResult that has a non-null `conditionalPower`.
 test_that("getPerformanceScore handles non-null conditionalPower", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     simulationResult$conditionalPower <- 0.8
     suppressWarnings(expect_type(getPerformanceScore(simulationResult), "environment"))
 })
 
-# 4. Test to verify the correctness of the performance score calculation.
+# Test to verify the correctness of the performance score calculation
 test_that("getPerformanceScore calculates performance score correctly", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     suppressWarnings(scores <- getPerformanceScore(simulationResult))
     expect_type(scores, "environment")
 })
 
-# 5. Test to verify that the warning about the function being experimental is issued.
+# Test to verify that the warning about the function being experimental is issued
 test_that("getPerformanceScore issues warning", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     expect_warning(
@@ -111,15 +111,15 @@ test_that("getPerformanceScore issues warning", {
     )
 })
 
-# 6. Test to check if the correct values are returned in the resultList.
+# Test to check if the correct values are returned
 test_that("getPerformanceScore returns correct result object", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     suppressWarnings(result <- getPerformanceScore(simulationResult))
     expect_type(result, "environment")
 })
 
-# 7. Test to check if the correct values are returned in the resultList.
-test_that("Print getPerformanceScore results", {
+# Test to check if the correct values are returned
+test_that("Print getPerformanceScore of simualtion means results", {
     .skipTestIfDisabled()
         
     design <- getDesignGroupSequential(
@@ -154,5 +154,43 @@ test_that("Print getPerformanceScore results", {
     expect_equal(result$subscoreConditionalPower, c(0.56746835, 0.45117423, 0.46875786, 0.56046066, 0.5910208, 1, 0.95846412), tolerance = 1e-07, label = paste0(result$subscoreConditionalPower))
     expect_equal(result$performanceScore, c(0.61706751, 0.4603189, 0.58328083, 0.55598326, 0.6256954, 0.87929522, 0.63490908), tolerance = 1e-07, label = paste0(result$performanceScore))
     
+    expect_true(any(grepl("Performance score", capture.output(result))))
+})
+
+# Test to check if the correct values are returned (rates)
+test_that("Print getPerformanceScore of simualtion rates results", {
+    .skipTestIfDisabled()
+
+    design <- getDesignGroupSequential(
+        kMax = 2,
+        alpha = 0.025,
+        beta = 0.2,
+        sided = 1,
+        typeOfDesign = "P",
+        futilityBounds = 0,
+        bindingFutility = TRUE
+    )
+    simulationResult <- getSimulationRates(
+        design = design,
+        normalApproximation = TRUE,
+        plannedSubjects = c(100, 300),
+        minNumberOfSubjectsPerStage = c(NA, 1),
+        maxNumberOfSubjectsPerStage = c(NA, 300),
+        conditionalPower = 0.8,
+        maxNumberOfIterations = 5,
+        showStatistics = FALSE,
+        seed = 4378258
+    )
+    suppressWarnings(result <- getPerformanceScore(simulationResult))
+
+    ## Comparison of the results of PerformanceScore object 'result' with expected results
+    expect_equal(result$locationSampleSize, c(0.33333333, 0.76333333, 0.6331616, NaN), tolerance = 1e-07, label = paste0(result$locationSampleSize))
+    expect_equal(result$variationSampleSize, c(NA_real_, 0.32538077, 0.33802988, NA_real_), tolerance = 1e-07, label = paste0(result$variationSampleSize))
+    expect_equal(result$subscoreSampleSize, c(0.33333333, 0.54435705, 0.48559574, NaN), tolerance = 1e-07, label = paste0(result$subscoreSampleSize))
+    expect_equal(result$locationConditionalPower, c(0.32576, 0.9990159, 0.99927128, NaN), tolerance = 1e-07, label = paste0(result$locationConditionalPower))
+    expect_equal(result$variationConditionalPower, c(NA_real_, 0.99864022, 0.99927015, NA_real_), tolerance = 1e-07, label = paste0(result$variationConditionalPower))
+    expect_equal(result$subscoreConditionalPower, c(0.32576, 0.99882806, 0.99927071, NaN), tolerance = 1e-07, label = paste0(result$subscoreConditionalPower))
+    expect_equal(result$performanceScore, c(0.32954667, 0.77159255, 0.74243323, NaN), tolerance = 1e-07, label = paste0(result$performanceScore))
+
     expect_true(any(grepl("Performance score", capture.output(result))))
 })

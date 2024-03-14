@@ -728,7 +728,7 @@ NULL
         .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     }
 
-    designPlan <- TrialDesignPlanSurvival(
+    designPlan <- TrialDesignPlanSurvival$new(
         design = design,
         typeOfComputation = typeOfComputation,
         thetaH0 = thetaH0,
@@ -1755,7 +1755,7 @@ getEventProbabilities <- function(time, ...,
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all rates (lambda2) must be > 0")
     }
 
-    eventProbabilities <- EventProbabilities(
+    eventProbabilities <- EventProbabilities$new(
         .piecewiseSurvivalTime = setting,
         .accrualTime           = accrualSetup,
         time                   = time,
@@ -1921,7 +1921,7 @@ getNumberOfSubjects <- function(time, ...,
         accrualIntensity = accrualIntensity, maxNumberOfSubjects = maxNumberOfSubjects
     )
 
-    result <- NumberOfSubjects(
+    result <- NumberOfSubjects$new(
         .accrualTime = accrualSetup,
         time = time,
         accrualTime = accrualTime,
