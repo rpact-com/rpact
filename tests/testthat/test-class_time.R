@@ -2729,7 +2729,6 @@ test_that("Testing 'getPiecewiseSurvivalTime': mixed arguments", {
 	expect_warning(getPiecewiseSurvivalTime(hazardRatio = c(0.6, 0.8), pi1 = 0.3),
 	    "'hazardRatio' (0.6, 0.8) will be ignored because it will be calculated",
 	    fixed = TRUE
-	)
-
+	)
 })
 

@@ -29,7 +29,7 @@
 #'
 #' @template field_stages
 #' @template field_testStatistics
-#' @template field_pValues 
+#' @template field_pValues
 #' @template field_combInverseNormal
 #' @template field_combFisher
 #' @template field_effectSizes

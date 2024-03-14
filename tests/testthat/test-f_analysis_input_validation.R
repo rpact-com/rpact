@@ -109,7 +109,6 @@ test_that("Errors and warnings for calculation of analysis results with dataset 
 
 	expect_error(getConditionalPower(getStageResults(design1, dataInput = dataExample2),
 	    nPlanned = c(20, 20), allocationRatioPlanned = -1
-	))
-
+	))
 })
 

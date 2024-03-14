@@ -81,7 +81,6 @@ test_that("'.getParameterValueFormatted' produce correct results if parameter is
 	expect_match(lines4[5], "^ *Sample sizes \\(3\\) \\[1\\] *: 50 *$")
 	expect_match(lines4[6], "^ *Sample sizes \\(3\\) \\[2\\] *: 16 *$")
 	expect_match(lines4[7], "^ *Sample sizes \\(4\\) \\[1\\] *: 50 *$")
-	expect_match(lines4[8], "^ *Sample sizes \\(4\\) \\[2\\] *: 50 *$")
-
+	expect_match(lines4[8], "^ *Sample sizes \\(4\\) \\[2\\] *: 50 *$")
 })
 

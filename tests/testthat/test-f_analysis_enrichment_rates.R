@@ -662,7 +662,6 @@ test_that("'getAnalysisResults': enrichment rates, expected warning for empty su
 	expect_warning(getDataset(S1 = S1, S2 = S2, S3 = S3, R = R),
 	    "The 4 undefined subsets S12, S13, S23, S123 were defined as empty subsets",
 	    fixed = TRUE
-	)
-
+	)
 })
 

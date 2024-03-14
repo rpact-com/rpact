@@ -437,7 +437,6 @@ test_that(".getOptionBasedFormattedValue returns NULL for unknown option key", {
 	result <- .getOptionBasedFormattedValue(optionKey, value)
 
 	# Expect NULL as the result
-	expect_null(result)
-
+	expect_null(result)
 })
 

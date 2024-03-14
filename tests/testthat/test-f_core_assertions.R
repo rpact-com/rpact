@@ -248,7 +248,6 @@ test_that("Testing '.assertIsValidMatrix'", {
 	expect_error(.assertIsValidMatrix("a", "x", naAllowed = FALSE))
 	expect_error(.assertIsValidMatrix("a", "x", naAllowed = TRUE))
 	expect_error(.assertIsValidMatrix(NA, "x", naAllowed = FALSE))
-	expect_error(.assertIsValidMatrix(NA, "x", naAllowed = TRUE))
-
+	expect_error(.assertIsValidMatrix(NA, "x", naAllowed = TRUE))
 })
 
