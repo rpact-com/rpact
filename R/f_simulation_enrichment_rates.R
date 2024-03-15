@@ -707,7 +707,7 @@ NULL
 
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
 
-            if (any(!is.na(thetaStandardized))){
+            if (any(!is.na(thetaStandardized))) {
                 thetaStandardized <- min(thetaStandardized, na.rm = TRUE)
                 conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
                     thetaStandardized * sqrt(plannedSubjects[k + 1] - plannedSubjects[k]))

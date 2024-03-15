@@ -103,8 +103,7 @@ mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
 #'
 #' @export
 #'
-as251Normal <- function(
-        lower, upper, sigma, ...,
+as251Normal <- function(lower, upper, sigma, ...,
         eps = 1e-06,
         errorControl = c("strict", "halvingIntervals"),
         intervalSimpsonsRule = 0) {
@@ -224,8 +223,7 @@ mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0)
 #'
 #' @export
 #'
-as251StudentT <- function(
-        lower, upper, sigma, ...,
+as251StudentT <- function(lower, upper, sigma, ...,
         df,
         eps = 1e-06,
         errorControl = c("strict", "halvingIntervals"),

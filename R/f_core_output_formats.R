@@ -1205,11 +1205,11 @@ getOutputFormat <- function(parameterName = NA_character_, ...,
     if (is.null(fieldName) || length(fieldName) != 1 || is.na(fieldName)) {
         return(NULL)
     }
-    
+
     if (!(fieldName %in% names(C_PARAMETER_FORMAT_FUNCTIONS))) {
         return(NULL)
     }
-    
+
     functionName <- C_PARAMETER_FORMAT_FUNCTIONS[[fieldName]]
     if (is.null(functionName)) {
         return(NULL)

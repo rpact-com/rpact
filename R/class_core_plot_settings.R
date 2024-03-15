@@ -29,7 +29,7 @@ PlotSubTitleItem <- R6::R6Class("PlotSubTitleItem",
             self$value <- value
             self$subscript <- trimws(subscript)
             self$digits <- digits
-            
+
             self$value <- round(value, digits)
         },
         show = function() {
@@ -63,7 +63,7 @@ PlotSubTitleItems <- R6::R6Class("PlotSubTitleItems",
         initialize = function(..., title = NULL, subtitle = NULL) {
             self$title <- title
             self$subtitle <- subtitle
-            
+
             self$items <- list()
         },
         show = function() {
@@ -83,7 +83,7 @@ PlotSubTitleItems <- R6::R6Class("PlotSubTitleItems",
             if (isFALSE(condition)) {
                 return(invisible())
             }
-            
+
             titleTemp <- title
             if (length(self$items) == 0) {
                 titleTemp <- .formatCamelCase(titleTemp, title = TRUE)

@@ -52,7 +52,7 @@ NULL
             type = "matrix"
         ))
     }
-    
+
     if (!is.matrix(paramValueFormatted) && enforceListOuput) {
         paramValueFormatted <- matrix(paramValueFormatted, nrow = 1)
     }
@@ -143,7 +143,7 @@ NULL
                     paramValueFormatted <- C_TYPE_OF_DESIGN_BS_LIST[[paramValue]]
                 }
             } else {
-                formatFunctionName <- .getParameterFormatFunction(parameterName, obj) 
+                formatFunctionName <- .getParameterFormatFunction(parameterName, obj)
                 if (!is.null(formatFunctionName)) {
                     paramValueFormatted <- eval(call(formatFunctionName, paramValueFormatted))
                     if (.isArray(paramValue) && length(dim(paramValue)) == 2) {

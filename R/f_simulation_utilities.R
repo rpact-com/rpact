@@ -710,7 +710,7 @@ getData <- function(x) {
             "'x' must be a 'SimulationResults' object; for example, use getSimulationMeans() to create one"
         )
     }
-    
+
     return(x$.data)
 }
 
@@ -732,10 +732,10 @@ getData.SimulationResults <- function(x) {
     } else {
         subData <- rawData[rawData$iterationNumber == iterationNumber, ]
     }
-    
+
     eventsPerStage1 <- sum(subData$event[subData$treatmentGroup == 1])
     eventsPerStage2 <- sum(subData$event[subData$treatmentGroup == 2])
-    
+
     result <- data.frame(
         iterationNumber = iterationNumber,
         pi1 = pi1,
@@ -746,11 +746,11 @@ getData.SimulationResults <- function(x) {
         eventsPerStage2 = eventsPerStage2,
         eventsPerStage = eventsPerStage1 + eventsPerStage2
     )
-    
+
     if (is.na(pi1)) {
         result <- result[, colnames(result) != "pi1"]
     }
-    
+
     return(result)
 }
 
@@ -760,7 +760,7 @@ getData.SimulationResults <- function(x) {
     if (!is.null(pi1Vec)) {
         pi1Vec <- sort(unique(na.omit(rawData$pi1)))
     }
-    
+
     data <- NULL
     if (!is.null(pi1Vec) && length(pi1Vec) > 0) {
         for (iterationNumber in iterationNumbers) {
@@ -806,7 +806,7 @@ getData.SimulationResults <- function(x) {
 #' \code{maxNumberOfRawDatasetsPerStage} > 0 (default is \code{0}).
 #'
 #' This function can be used to get the simulated raw data from a simulation results
-#' object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}. 
+#' object obtained by \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}.
 #' Note that \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
 #' must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
 #' The data frame contains the following columns:
@@ -856,7 +856,7 @@ getRawData <- function(x, aggregate = FALSE) {
             "'x' must be a 'SimulationResultsSurvival' object; use getSimulationSurvival() to create one"
         )
     }
-    
+
     rawData <- x$.rawData
     if (is.null(rawData) || ncol(rawData) == 0 || nrow(rawData) == 0) {
         stop(
@@ -866,10 +866,10 @@ getRawData <- function(x, aggregate = FALSE) {
             "getSimulationSurvival(..., maxNumberOfRawDatasetsPerStage = 1)"
         )
     }
-    
+
     if (!aggregate) {
         return(rawData)
     }
-    
+
     return(.getAggregatedData(rawData))
 }

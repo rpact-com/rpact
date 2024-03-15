@@ -705,7 +705,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
     }
     simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
     .addDeprecatedFieldValues(simulationResults, "eventsPerStage", simulationResults$cumulativeEventsPerStage)
-    
+
     simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
     for (g in 1:gMax) {
         simulationResults$singleEventsPerStage[, , g] <- simulationResults$singleEventsPerStage[, , g] +

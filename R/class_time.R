@@ -632,8 +632,8 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             colnames(data) <- c(
                 "Start time",
                 .getParameterCaption("lambda1", tableOutputEnabled = TRUE),
-                .getParameterCaption("lambda2", tableOutputEnabled = TRUE) 
-            ) 
+                .getParameterCaption("lambda2", tableOutputEnabled = TRUE)
+            )
             return(data)
         },
         .isPiBased = function() {
@@ -1107,7 +1107,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 }
             } else {
                 if (length(self$lambda1) > 0 && !all(is.na(self$lambda1)) && self$.getParameterType("median1") != C_PARAM_USER_DEFINED) {
-                    self$median1 <- getMedianByLambda(self$lambda1, kappa =self$kappa)
+                    self$median1 <- getMedianByLambda(self$lambda1, kappa = self$kappa)
                     self$.setParameterType("median1", C_PARAM_GENERATED)
                 }
                 if (length(self$lambda2) == 1 && !is.na(self$lambda2) && self$.getParameterType("median2") != C_PARAM_USER_DEFINED) {
@@ -1409,7 +1409,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
 
             self$.initAccrualIntensityAbsolute()
             self$.validateFormula()
-            self$.showWarningIfCaseIsNotAllowed()#TODO wrong naming upstream!
+            self$.showWarningIfCaseIsNotAllowed() # TODO wrong naming upstream!
         },
         .asDataFrame = function() {
             accrualIntensityTemp <- self$accrualIntensity

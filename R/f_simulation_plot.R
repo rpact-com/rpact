@@ -58,8 +58,7 @@ NULL
     }
 }
 
-.getSimulationPlotXAxisParameterName <- function(
-        simulationResults,
+.getSimulationPlotXAxisParameterName <- function(simulationResults,
         showSource = FALSE, simulationResultsName = NA_character_) {
     if (grepl("SimulationResultsEnrichment", .getClassName(simulationResults))) {
         effectDataList <- .getSimulationEnrichmentEffectData(simulationResults)
@@ -180,8 +179,7 @@ NULL
     ))
 }
 
-.plotSimulationResults <- function(
-        simulationResults, designMaster, type = 5L, main = NA_character_,
+.plotSimulationResults <- function(simulationResults, designMaster, type = 5L, main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, palette = "Set1",
         theta = seq(-1, 1, 0.02), plotPointsEnabled = NA,
         legendPosition = NA_integer_, showSource = FALSE,
@@ -963,8 +961,7 @@ NULL
 #'
 #' @export
 #'
-plot.SimulationResults <- function(
-        x, y, ..., main = NA_character_,
+plot.SimulationResults <- function(x, y, ..., main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
         theta = seq(-1, 1, 0.01), plotPointsEnabled = NA,
         legendPosition = NA_integer_, showSource = FALSE,

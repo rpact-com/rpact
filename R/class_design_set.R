@@ -599,11 +599,13 @@ length.TrialDesignSet <- function(x) {
     colNames1 <- colnames(df1)
     colNames2 <- colnames(df2)
     if (length(colNames1) != length(colNames2)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+        stop(
+            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
             "cannot harmonize column names of two data frames if number of columns is unequal (",
-            length(colNames1), " != ", length(colNames2), ")")
+            length(colNames1), " != ", length(colNames2), ")"
+        )
     }
-    
+
     colNames <- character()
     for (i in 1:length(colNames1)) {
         colName1 <- colNames1[i]
@@ -624,12 +626,10 @@ length.TrialDesignSet <- function(x) {
     if (at == 1) {
         colNames <- c(colName, colNames)
         df <- cbind(naCol, df)
-    }
-    else if (at <= length(colNames)) {
+    } else if (at <= length(colNames)) {
         colNames <- c(colNames[1:(at - 1)], colName, colNames[at:length(colNames)])
         df <- cbind(df[, 1:(at - 1)], naCol, df[, at:ncol(df)])
-    }
-    else {
+    } else {
         colNames <- c(colNames, colName)
         df <- cbind(df, naCol)
     }
@@ -641,7 +641,7 @@ length.TrialDesignSet <- function(x) {
     if (ncol(df1) == ncol(df2)) {
         return(list(df1 = df1, df2 = df2))
     }
-    
+
     colNames1 <- colnames(df1)
     colNames2 <- colnames(df2)
     difference <- c(colNames1[!(colNames1 %in% colNames2)], colNames2[!(colNames2 %in% colNames1)])
@@ -688,13 +688,13 @@ length.TrialDesignSet <- function(x) {
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesignSet <- function(x, 
+as.data.frame.TrialDesignSet <- function(x,
         row.names = NULL,
-        optional = FALSE, 
-        niceColumnNamesEnabled = FALSE, 
+        optional = FALSE,
+        niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE,
-        addPowerAndAverageSampleNumber = FALSE, 
-        theta = seq(-1, 1, 0.02), 
+        addPowerAndAverageSampleNumber = FALSE,
+        theta = seq(-1, 1, 0.02),
         nMax = NA_integer_, ...) {
     .assertIsTrialDesignSet(x)
     if (x$isEmpty()) {
@@ -725,7 +725,7 @@ as.data.frame.TrialDesignSet <- function(x,
             niceColumnNamesEnabled = niceColumnNamesEnabled,
             includeAllParameters = includeAllParameters
         ))
-    
+
         if (.isTrialDesignWithValidFutilityBounds(design)) {
             futilityBoundsName <- "futilityBounds"
             if (niceColumnNamesEnabled) {
@@ -744,16 +744,16 @@ as.data.frame.TrialDesignSet <- function(x,
             kMax <- design$kMax
             df[[alpha0VecName]][kMax] <- design$criticalValues[kMax]
         }
-        
+
         if (addPowerAndAverageSampleNumber) {
             results <- PowerAndAverageSampleNumberResult$new(design, theta = theta, nMax = nMax)
             suppressWarnings(df2 <- as.data.frame(results,
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
-                includeAllParameters = FALSE #includeAllParameters
+                includeAllParameters = FALSE # includeAllParameters
             ))
             df <- merge(df, df2, all.y = TRUE)
         }
-        
+
         if (is.null(dataFrame)) {
             if (niceColumnNamesEnabled) {
                 dataFrame <- cbind("Design number" = rep(1, nrow(df)), df)
@@ -766,15 +766,15 @@ as.data.frame.TrialDesignSet <- function(x,
             } else {
                 df <- cbind(designNumber = rep(max(dataFrame$designNumber) + 1, nrow(df)), df)
             }
-            
+
             result <- .getHarmonizedDataFrames(dataFrame, df)
             dataFrame <- result$df1
             df <- result$df2
-            
+
             colNames <- .getHarmonizedColumnNames(dataFrame, df)
             colnames(dataFrame) <- colNames
             colnames(df) <- colNames
-            
+
             dataFrame <- rbind(dataFrame, df)
         }
     }
@@ -882,7 +882,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         legendPosition = NA_integer_, showSource = FALSE,
         designSetName = NA_character_, plotSettings = NULL) {
     .assertGgplotIsInstalled()
-    if (!is.call(main) && !isS4(main) && !R6::is.R6(main)) { #TODO is.R6 added
+    if (!is.call(main) && !isS4(main) && !R6::is.R6(main)) { # TODO is.R6 added
         .assertIsSingleCharacter(main, "main", naAllowed = TRUE)
     }
     .assertIsSingleCharacter(xlab, "xlab", naAllowed = TRUE)

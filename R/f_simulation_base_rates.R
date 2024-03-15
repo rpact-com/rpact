@@ -18,8 +18,7 @@
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-.getSimulationRatesStageSubjects <- function(
-        ...,
+.getSimulationRatesStageSubjects <- function(...,
         stage,
         riskRatio,
         thetaH0,

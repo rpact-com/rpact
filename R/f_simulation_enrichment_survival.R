@@ -581,7 +581,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
             closedTest <- .performClosedCombinationTestForSimulationEnrichment(
                 stageResults = stageResults,
                 design = design, indices = indices,
-                intersectionTest = intersectionTest, 
+                intersectionTest = intersectionTest,
                 successCriterion = successCriterion
             )
 

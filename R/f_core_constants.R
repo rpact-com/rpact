@@ -913,7 +913,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     piecewiseSurvivalEnabled = "Piecewise exponential survival enabled",
     median1 = "median(1)",
     median2 = "median(2)",
-    eventsPerStage = "Events per stage", 
+    eventsPerStage = "Events per stage",
     cumulativeEventsPerStage = "Cumulative events",
     expectedNumberOfEvents = "Expected events",
     expectedNumberOfSubjects = "Expected subjects",
@@ -1071,7 +1071,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (identical(parameterName, "eventsPerStage") &&
-            (inherits(obj, "TrialDesignPlanSurvival") || 
+            (inherits(obj, "TrialDesignPlanSurvival") ||
                 inherits(obj, "SimulationResultsMultiArmSurvival"))) {
         return(ifelse(tableOutputEnabled, "Cumulative events", "Cumulative events per stage"))
     }
@@ -1136,7 +1136,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
 
     if (identical(parameterName, "overallStDevs") &&
             ((inherits(obj, "StageResults") && obj$isOneSampleDataset()) ||
-            inherits(obj, "DatasetMeans"))) {
+                inherits(obj, "DatasetMeans"))) {
         return(paste0("Cumulative standard deviation", ifelse(tableOutputEnabled, "", "s")))
     }
 

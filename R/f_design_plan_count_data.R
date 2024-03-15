@@ -18,8 +18,7 @@
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-.getCalendarTime <- function(
-        n1, 
+.getCalendarTime <- function(n1,
         n2,
         information,
         shift,
@@ -194,8 +193,10 @@
     .setValueAndParameterType(designPlan, "accrualTime", accrualTime, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "accrualIntensity", accrualIntensity, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "followUpTime", followUpTime, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(designPlan, "maxNumberOfSubjects", 
-        as.integer(maxNumberOfSubjects), NA_integer_, notApplicableIfNA = TRUE)
+    .setValueAndParameterType(designPlan, "maxNumberOfSubjects",
+        as.integer(maxNumberOfSubjects), NA_integer_,
+        notApplicableIfNA = TRUE
+    )
     .setValueAndParameterType(
         designPlan, "allocationRatioPlanned",
         allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
@@ -358,7 +359,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
     if (length(accrualTime) > 1) {
         accrualTime <- accrualTime[-1]
     }
-    
+
     if (design$kMax > 1) {
         designPlan$rejectPerStage <- matrix(designCharacteristics$rejectionProbabilities, ncol = 1)
         designPlan$.setParameterType("rejectPerStage", C_PARAM_GENERATED)
@@ -382,9 +383,9 @@ getSampleSizeCounts <- function(design = NULL, ...,
         )
 
         designPlan$earlyStop <- sum(c(
-            designCharacteristics$rejectionProbabilities[1:(design$kMax - 1)], designPlan$futilityStop))
+            designCharacteristics$rejectionProbabilities[1:(design$kMax - 1)], designPlan$futilityStop
+        ))
         designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
-
     } else {
         designPlan$.setParameterType("nFixed", C_PARAM_GENERATED)
     }
@@ -644,22 +645,21 @@ getSampleSizeCounts <- function(design = NULL, ...,
             C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE
         )
     )
-    
+
     if (!is.na(maxNumberOfSubjects)) {
         designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_USER_DEFINED)
     } else {
         designPlan$maxNumberOfSubjects <- n1 + n2
         designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
     }
-  
+
     designPlan$maxNumberOfSubjects1 <- n1
     designPlan$.setParameterType("maxNumberOfSubjects1", C_PARAM_GENERATED)
-    
+
     designPlan$maxNumberOfSubjects2 <- n2
     designPlan$.setParameterType("maxNumberOfSubjects2", C_PARAM_GENERATED)
- 
-    if (design$kMax > 1) {
 
+    if (design$kMax > 1) {
         designPlan$informationOverStages <- informationOverStages
         designPlan$.setParameterType("informationOverStages", C_PARAM_GENERATED)
 
@@ -766,8 +766,7 @@ getSampleSizeCounts <- function(design = NULL, ...,
 #'
 #' @export
 #'
-getPowerCounts <- function(
-        design = NULL, ...,
+getPowerCounts <- function(design = NULL, ...,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
         lambda1 = NA_real_,

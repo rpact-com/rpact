@@ -563,14 +563,14 @@ SimulationResults <- R6::R6Class("SimulationResults",
 SimulationResultsBaseMeans <- R6::R6Class("SimulationResultsBaseMeans",
     inherit = SimulationResults,
     public = list(
-        stDev =NULL,
-        plannedSubjects =NULL,
-        minNumberOfSubjectsPerStage =NULL,
-        maxNumberOfSubjectsPerStage =NULL,
-        thetaH1 =NULL,
-        stDevH1 =NULL,
-        calcSubjectsFunction =NULL,
-        expectedNumberOfSubjects =NULL,
+        stDev = NULL,
+        plannedSubjects = NULL,
+        minNumberOfSubjectsPerStage = NULL,
+        maxNumberOfSubjectsPerStage = NULL,
+        thetaH1 = NULL,
+        stDevH1 = NULL,
+        calcSubjectsFunction = NULL,
+        expectedNumberOfSubjects = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             generatedParams <- c(
@@ -653,18 +653,18 @@ SimulationResultsBaseMeans <- R6::R6Class("SimulationResultsBaseMeans",
 SimulationResultsMeans <- R6::R6Class("SimulationResultsMeans",
     inherit = SimulationResultsBaseMeans,
     public = list(
-        meanRatio =NULL,
-        thetaH0 =NULL,
-        normalApproximation =NULL,
-        alternative =NULL,
-        groups =NULL,
-        directionUpper =NULL,
-        effect =NULL,
-        earlyStop =NULL,
-        sampleSizes =NULL,
-        overallReject =NULL, # = rejectedArmsPerStage in multi-arm
-        rejectPerStage =NULL,
-        conditionalPowerAchieved =NULL,
+        meanRatio = NULL,
+        thetaH0 = NULL,
+        normalApproximation = NULL,
+        alternative = NULL,
+        groups = NULL,
+        directionUpper = NULL,
+        effect = NULL,
+        earlyStop = NULL,
+        sampleSizes = NULL,
+        overallReject = NULL, # = rejectedArmsPerStage in multi-arm
+        rejectPerStage = NULL,
+        conditionalPowerAchieved = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
         }
@@ -873,7 +873,7 @@ SimulationResultsRates <- R6::R6Class("SimulationResultsRates",
         pi1 = NULL,
         pi2 = NULL,
         groups = NULL,
-        #directionUpper = NULL,
+        # directionUpper = NULL,
         pi1H1 = NULL,
         pi2H1 = NULL,
         effect = NULL,
@@ -1026,7 +1026,7 @@ SimulationResultsBaseSurvival <- R6::R6Class("SimulationResultsBaseSurvival",
         thetaH1 = NULL,
         calcEventsFunction = NULL,
         expectedNumberOfEvents = NULL,
-        #conditionalPowerAchieved = matrix(), #TODO remove?
+        # conditionalPowerAchieved = matrix(), #TODO remove?
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             generatedParams <- c(
@@ -1181,8 +1181,10 @@ SimulationResultsSurvival <- R6::R6Class("SimulationResultsSurvival",
                 "allocationRatioPlanned"
             )
             if (inherits(self, "SimulationResultsMultiArmSurvival")) {
-                generatedParams <- c(generatedParams, 
-                    "cumulativeEventsPerStage", "singleEventsPerArmAndStage")
+                generatedParams <- c(
+                    generatedParams,
+                    "cumulativeEventsPerStage", "singleEventsPerArmAndStage"
+                )
             } else {
                 generatedParams <- c(generatedParams, "singleEventsPerSubsetAndStage")
             }
@@ -1290,7 +1292,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvi
         successPerStage = NULL,
         eventsPerStage = NULL,
         singleEventsPerStage = NULL,
-        cumulativeEventsPerStage = NULL, 
+        cumulativeEventsPerStage = NULL,
         singleEventsPerArmAndStage = NULL,
         singleNumberOfEventsPerStage = NULL,
         conditionalPowerAchieved = matrix(),
