@@ -150,10 +150,10 @@ FieldSet <- R6::R6Class("FieldSet",
                     }
                 }
             }
-            if (length(.catLines) == 0) {
-                .catLines <<- line
+            if (length(self$.catLines) == 0) {
+                self$.catLines <<- line
             } else {
-                .catLines <<- c(.catLines, line)
+                self$.catLines <<- c(.catLines, line)
             }
             return(invisible())
         },
