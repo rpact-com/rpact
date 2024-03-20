@@ -28,10 +28,11 @@ SummaryItem <- R6::R6Class("SummaryItem",
         title = NULL,
         values = NULL,
         legendEntry = NULL,
-        initialize = function(title = NA_character_, values = NA_character_, ...) {
+        initialize = function(title = NA_character_, values = NA_character_, legendEntry = NULL, ...) {
             self$title <- title
             self$values <- values
-            #callSuper(...) TODO LEGENDENTRyy
+            self$legendEntry <- legendEntry
+            
             if (!is.null(self$legendEntry) && length(self$legendEntry) > 0) {
                 if (is.null(names(self$legendEntry))) {
                     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote("legendEntry"), " must be a named list")
@@ -187,8 +188,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         intervalFormat = NULL,
         justify = NULL,
         output = NULL,
-        initialize = function(..., intervalFormat = "[%s; %s]", output = "all") {
-            #callSuper(...) TODO
+        initialize = function(..., object = NULL, intervalFormat = "[%s; %s]", output = "all") {
+            super$initialize(...)
+            self$object <- object
             self$intervalFormat <- intervalFormat
             self$output <- output
             self$summaryItems <- list()
@@ -228,6 +230,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             legendEntries <- c()
             legendEntriesUnique <- c()
             summaryItemNames <- c()
+            
             for (summaryItem in self$summaryItems) {
                 if (!is.null(summaryItem$title) && length(summaryItem$title) == 1 && !is.na(summaryItem$title)) {
                     summaryItemNames <- c(summaryItemNames, summaryItem$title)
@@ -3603,7 +3606,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     if (!is.null(performanceScore)) {
-        print(performanceScore)
+        print(performanceScore)#TODO?
         summaryFactory$addParameter(performanceScore,
             parameterName = "performanceScore",
             parameterCaption = "Performance score",

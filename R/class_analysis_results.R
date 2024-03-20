@@ -731,13 +731,14 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
                                  pi2 = NULL,
                                  nPlanned = NULL,
                                  allocationRatioPlanned = NULL,
-                                 initialize = function(design, dataInput, ..., .stageResults = NULL, .conditionalPowerResults = NULL, directionUpper = NULL, thetaH0 = NULL) {
+                                 initialize = function(design, dataInput, ..., .stageResults = NULL, .conditionalPowerResults = NULL, directionUpper = NULL, thetaH0 = NULL, nPlanned = NULL) {
                                    self$.design <- design
                                    self$.dataInput <- dataInput
                                    self$.stageResults <- .stageResults
                                    self$.conditionalPowerResults <- .conditionalPowerResults
                                    self$directionUpper <- directionUpper
                                    self$thetaH0 <- thetaH0
+                                   self$nPlanned <- nPlanned
                                    
                                    super$initialize(...)
                                    
