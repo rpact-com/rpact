@@ -541,7 +541,7 @@ NULL
         if (is.na(direction)) {
             return(NA_real_)
         }
-        
+
         return(.getOneDimensionalRootBisectionMethod(
             fun = fun,
             lower = lower, upper = upper, tolerance = tolerance,
@@ -764,7 +764,7 @@ NULL
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null")
     }
 
-    if (!ifelse(R6::is.R6(parameterSet), parameterName %in% names(parameterSet), parameterName %in% names(getClass(class(parameterSet))@fieldClasses))) { #TODO
+    if (!ifelse(R6::is.R6(parameterSet), parameterName %in% names(parameterSet), parameterName %in% names(getClass(class(parameterSet))@fieldClasses))) { # TODO
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'"
@@ -1045,7 +1045,7 @@ getParameterCaption <- function(obj, parameterName) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
-    
+
     return(.getParameterCaption(parameterName, obj))
 }
 
@@ -1078,23 +1078,23 @@ getParameterName <- function(obj, parameterCaption) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
-    
+
     parameterName <- getDictionaryKeyByValue(C_PARAMETER_NAMES, parameterCaption)
     if (!is.null(parameterName)) {
         return(parameterName)
     }
-    
+
     parameterName <- getDictionaryKeyByValue(C_PARAMETER_NAMES_PLOT_SETTINGS, parameterCaption)
     if (!is.null(parameterName)) {
         return(parameterName)
     }
-    
+
     fieldNames <- obj$.getVisibleFieldNames()
     for (parameterName in fieldNames) {
         if (identical(.getParameterCaption(parameterName, obj), parameterCaption)) {
             return(parameterName)
         }
-        
+
         if (identical(.getParameterCaption(parameterName, obj, tableOutputEnabled = TRUE), parameterCaption)) {
             return(parameterName)
         }
@@ -1483,4 +1483,3 @@ getParameterName <- function(obj, parameterCaption) {
     parameterSet$.setParameterType(fieldName, C_PARAM_NOT_APPLICABLE)
     parameterSet$.deprecatedFieldNames <- unique(c(parameterSet$.deprecatedFieldNames, fieldName))
 }
-

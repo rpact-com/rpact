@@ -80,20 +80,20 @@ EventProbabilities <- R6::R6Class("EventProbabilities",
         eventProbabilities1 = NULL,
         eventProbabilities2 = NULL,
         initialize = function(..., .piecewiseSurvivalTime = NULL,
-                                   .accrualTime = NULL,
-                                   time = NULL,
-                                   accrualTime = NULL,
-                                   accrualIntensity = NULL,
-                                   kappa = NULL,
-                                   piecewiseSurvivalTime = NULL,
-                                   lambda1 = NULL,
-                                   lambda2 = NULL,
-                                   allocationRatioPlanned = NULL,
-                                   hazardRatio = NULL,
-                                   dropoutRate1 = NULL,
-                                   dropoutRate2 = NULL,
-                                   dropoutTime = NULL,
-                                   maxNumberOfSubjects = NULL) {
+                .accrualTime = NULL,
+                time = NULL,
+                accrualTime = NULL,
+                accrualIntensity = NULL,
+                kappa = NULL,
+                piecewiseSurvivalTime = NULL,
+                lambda1 = NULL,
+                lambda2 = NULL,
+                allocationRatioPlanned = NULL,
+                hazardRatio = NULL,
+                dropoutRate1 = NULL,
+                dropoutRate2 = NULL,
+                dropoutTime = NULL,
+                maxNumberOfSubjects = NULL) {
             self$.piecewiseSurvivalTime <- .piecewiseSurvivalTime
             self$.accrualTime <- .accrualTime
             self$time <- time
@@ -109,9 +109,9 @@ EventProbabilities <- R6::R6Class("EventProbabilities",
             self$dropoutRate2 <- dropoutRate2
             self$dropoutTime <- dropoutTime
             self$maxNumberOfSubjects <- maxNumberOfSubjects
-            
+
             super$initialize()
-            
+
             self$.plotSettings <- PlotSettings$new()
             self$.setParameterType("overallEventProbabilities", C_PARAM_NOT_APPLICABLE) # deprecated
         },
@@ -190,20 +190,20 @@ NumberOfSubjects <- R6::R6Class("NumberOfSubjects",
         maxNumberOfSubjects = NULL,
         numberOfSubjects = NULL,
         initialize = function(..., accrualSetup = NULL,
-                                   time = NULL,
-                                   accrualTime = NULL,
-                                   accrualIntensity = NULL,
-                                   maxNumberOfSubjects = NULL,
-                                   numberOfSubjects = NULL) {
+                time = NULL,
+                accrualTime = NULL,
+                accrualIntensity = NULL,
+                maxNumberOfSubjects = NULL,
+                numberOfSubjects = NULL) {
             self$.accrualTime <- accrualSetup
             self$time <- time
             self$accrualTime <- accrualTime
             self$accrualIntensity <- accrualIntensity
             self$maxNumberOfSubjects <- maxNumberOfSubjects
             self$numberOfSubjects <- numberOfSubjects
-            
+
             super$initialize()
-            
+
             self$.plotSettings <- PlotSettings$new()
         },
         getPlotSettings = function() {

@@ -457,7 +457,7 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
         if (length(args) == 2 && !is.null(design)) {
             dataset <- .getDatasetFromArgs(...)
             if (!is.null(dataset)) {
-                dataset <- dataset$clone(deep = TRUE) #TODO was $copy shallow
+                dataset <- dataset$clone(deep = TRUE) # TODO was $copy shallow
                 dataset$.design <- design
                 return(dataset)
             }
@@ -483,7 +483,7 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
     dataFrame <- .getDataFrameFromArgs(...)
 
     design <- .getDesignFromArgs(...)
-    
+
     if (is.null(dataFrame)) {
         args <- .removeDesignFromArgs(args)
 
@@ -1361,8 +1361,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #' @importFrom methods new
 #'
 Dataset <- R6::R6Class("Dataset",
-                   inherit = ParameterSet,
-                   public = list(
+    inherit = ParameterSet,
+    public = list(
         .data = NULL,
         .plotSettings = NULL,
         .id = NULL,
@@ -1377,11 +1377,11 @@ Dataset <- R6::R6Class("Dataset",
         subsets = NULL,
         initialize = function(dataFrame, ..., floatingPointNumbersEnabled = FALSE, enrichmentEnabled = FALSE, .design = NULL) {
             super$initialize(...)
-            
+
             self$.floatingPointNumbersEnabled <- floatingPointNumbersEnabled
             self$.enrichmentEnabled <- enrichmentEnabled
             self$.design <- .design
-            
+
             self$.plotSettings <- PlotSettings$new()
 
             self$.id <- NA_integer_
@@ -2343,7 +2343,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
                 } else {
                     n <- dataset$getSampleSize(stage = stage, group = group)
                     n <- floor(n / numberOfVisits)
-                    
+
                     randomData <- stats::rnorm(
                         n    = sampleSize,
                         mean = dataset$getMean(stage = stage, group = group),

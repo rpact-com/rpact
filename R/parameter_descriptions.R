@@ -283,41 +283,41 @@ NULL
 
 #' Parameter Description: lambda for Counts
 #' @param lambda A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
-#'   the pooled treatment groups, there is no default. 
+#'   the pooled treatment groups, there is no default.
 #' @name param_lambda_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: theta for Counts
-#' @param theta A numeric value or vector that represents the assumed mean ratios lambda1/lambda2 of a homogeneous 
-#' Poisson process, there is no default. 
+#' @param theta A numeric value or vector that represents the assumed mean ratios lambda1/lambda2 of a homogeneous
+#' Poisson process, there is no default.
 #' @name param_theta_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: lambda (1) for Counts
 #' @param lambda1 A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
-#'   the active treatment group, there is no default. 
+#'   the active treatment group, there is no default.
 #' @name param_lambda1_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: lambda (2) for Counts
 #' @param lambda2 A numeric value that represents the assumed rate of a homogeneous Poisson process in
-#'   the control group, there is no default. 
+#'   the control group, there is no default.
 #' @name param_lambda2_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: overdispersion for Counts
-#' @param overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution, 
-#' default is \code{0}. 
+#' @param overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution,
+#' default is \code{0}.
 #' @name param_overdispersion_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: fixedExposureTime for Counts
-#' @param fixedExposureTime If specified, the fixed time of exposure per subject for count data, there is no default. 
+#' @param fixedExposureTime If specified, the fixed time of exposure per subject for count data, there is no default.
 #' @name param_fixedExposureTime_counts
 #' @keywords internal
 NULL

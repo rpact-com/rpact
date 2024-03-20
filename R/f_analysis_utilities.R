@@ -1240,4 +1240,3 @@ getObservedInformationRates <- function(dataInput, ...,
 
     return(invisible(results))
 }
-

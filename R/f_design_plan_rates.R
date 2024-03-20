@@ -790,7 +790,7 @@ NULL
 #' At given design the function calculates the power, stopping probabilities, and expected sample size
 #' for testing rates at given maximum sample size.
 #' The sample sizes over the stages are calculated according to the specified information rate in the design.
-#' In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2} can be specified 
+#' In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2} can be specified
 #' where \code{n1} and \code{n2} are the number of subjects in the two treatment groups.
 #' If a null hypothesis value thetaH0 != 0 for testing the difference of two rates
 #' or \code{thetaH0 != 1} for testing the risk ratio is specified, the
@@ -943,7 +943,7 @@ getPowerRates <- function(design = NULL, ...,
 #'
 #' @details
 #' At given design the function calculates the stage-wise and maximum sample size for testing rates.
-#' In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2} can be specified 
+#' In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2} can be specified
 #' where \code{n1} and \code{n2} are the number of subjects in the two treatment groups.
 #' If a null hypothesis value thetaH0 != 0 for testing the difference of two rates or
 #' thetaH0 != 1 for testing the risk ratio is specified, the sample size
@@ -962,8 +962,7 @@ getPowerRates <- function(design = NULL, ...,
 #'
 #' @export
 #'
-getSampleSizeRates <- function(
-        design = NULL, ...,
+getSampleSizeRates <- function(design = NULL, ...,
         groups = 2L,
         normalApproximation = TRUE,
         riskRatio = FALSE,

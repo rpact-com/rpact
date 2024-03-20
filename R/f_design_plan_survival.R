@@ -165,8 +165,7 @@ NULL
     return(result)
 }
 
-.getEventProbabilitiesGroupwise <- function(
-        ..., time, accrualTimeVector, accrualIntensity, lambda2,
+.getEventProbabilitiesGroupwise <- function(..., time, accrualTimeVector, accrualIntensity, lambda2,
         lambda1, piecewiseSurvivalTime, phi, kappa, allocationRatioPlanned, hazardRatio) {
     .assertIsSingleNumber(time, "time")
 
@@ -479,7 +478,7 @@ NULL
                 designPlan$.getParameterType("accrualIntensity")
             )
         }
-        
+
         accrualIntensityAbsolute <- numeric()
         for (maxNumberOfSubjects in designPlan[[paramName]]) {
             accrualSetup <- getAccrualTime(
@@ -492,7 +491,7 @@ NULL
         }
         designPlan$accrualIntensity <- accrualIntensityAbsolute
         designPlan$.setParameterType("accrualIntensity", C_PARAM_GENERATED)
-        
+
         if (numberOfDefinedAccrualIntensities > 1) {
             paramName <- NULL
             if (designPlan$.getParameterType("pi1") == C_PARAM_USER_DEFINED ||
@@ -2054,7 +2053,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
         accrualIntensityType = accrualIntensityType,
-        maxNumberOfSubjects = maxNumberOfSubjects, 
+        maxNumberOfSubjects = maxNumberOfSubjects,
         showWarnings = FALSE
     )
     accrualSetup$.validate()

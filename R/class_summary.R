@@ -32,7 +32,7 @@ SummaryItem <- R6::R6Class("SummaryItem",
             self$title <- title
             self$values <- values
             self$legendEntry <- legendEntry
-            
+
             if (!is.null(self$legendEntry) && length(self$legendEntry) > 0) {
                 if (is.null(names(self$legendEntry))) {
                     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote("legendEntry"), " must be a named list")
@@ -230,7 +230,6 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             legendEntries <- c()
             legendEntriesUnique <- c()
             summaryItemNames <- c()
-            
             for (summaryItem in self$summaryItems) {
                 if (!is.null(summaryItem$title) && length(summaryItem$title) == 1 && !is.na(summaryItem$title)) {
                     summaryItemNames <- c(summaryItemNames, summaryItem$title)
@@ -632,7 +631,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     }
                     if (is.null(variedParameter) || length(variedParameter) == 0 || variedParameter == "") {
                         if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE")) {
-                            warning( 
+                            warning(
                                 "Failed to get varied parameter from ", .getClassName(parameterSet),
                                 " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ")"
                             )
@@ -641,7 +640,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     }
 
                     variedParameterCaption <- parameterSet$.getDataFrameColumnCaption(
-                        variedParameter, niceColumnNamesEnabled = TRUE)
+                        variedParameter,
+                        niceColumnNamesEnabled = TRUE
+                    )
                     variedParameterCaption <- tolower(variedParameterCaption)
 
                     if (variedParameterCaption == "alternative" || variedParameterCaption == ".alternative") {
@@ -773,7 +774,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                         if (length(values) == 0 || nrow(values) == 0 || ncol(values) == 0) {
                             return("")
                         }
-                        
+
                         if (nrow(values) == 1 && ncol(values) == 1) {
                             colValues <- values[1, 1]
                         } else if (ncol(values) == 1) {
@@ -3174,7 +3175,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     parameterName <- "singleEventsPerSubsetAndStage"
                     parameterCaption <- "Single number of events"
                 } else {
-                    parameterName <- "cumulativeEventsPerStage" 
+                    parameterName <- "cumulativeEventsPerStage"
                     parameterCaption <- "Cumulative number of events"
                 }
             } else {
@@ -3327,8 +3328,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
 
-        if (countDataEnabled && design$kMax > 1 && 
-                !is.null(designPlan[["maxNumberOfSubjects"]]) && 
+        if (countDataEnabled && design$kMax > 1 &&
+                !is.null(designPlan[["maxNumberOfSubjects"]]) &&
                 designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "maxNumberOfSubjects",
@@ -3606,7 +3607,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     if (!is.null(performanceScore)) {
-        print(performanceScore)#TODO?
+        print(performanceScore)
         summaryFactory$addParameter(performanceScore,
             parameterName = "performanceScore",
             parameterCaption = "Performance score",

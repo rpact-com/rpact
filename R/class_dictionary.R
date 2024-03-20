@@ -43,13 +43,13 @@ createDictionary <- function(name, keyValuePairList = NULL) {
     }
 }
 
-#' 
-#' @examples 
+#'
+#' @examples
 #' x <- createDictionary("x", list(a = 1, b = 2, c = 3))
 #' getDictionaryKeyByValue(x, 2)
-#' 
-#' @noRd 
-#' 
+#'
+#' @noRd
+#'
 getDictionaryKeyByValue <- function(x, value) {
     .assertIsDictionary(x)
     keys <- names(x)
@@ -57,13 +57,13 @@ getDictionaryKeyByValue <- function(x, value) {
     return(unique(keys[values == value]))
 }
 
-#' 
-#' @examples 
+#'
+#' @examples
 #' x <- createDictionary("x", list(a = 1, b = 2, c = 3))
 #' getDictionarySubset(x, c("b", "c"))
-#' 
-#' @noRd 
-#' 
+#'
+#' @noRd
+#'
 getDictionarySubset <- function(x, subsetNames) {
     .assertIsDictionary(x)
     result <- createDictionary(attr(x, "name"))
@@ -85,8 +85,8 @@ cloneDictionary <- function(x) {
 }
 
 #'
-#' @export 
-#' @noRd 
+#' @export
+#' @noRd
 #'
 as.vector.Dictionary <- function(x, ...) {
     .assertIsDictionary(x)
@@ -98,8 +98,8 @@ as.vector.Dictionary <- function(x, ...) {
 }
 
 #'
-#' @export 
-#' @noRd 
+#' @export
+#' @noRd
 #'
 as.list.Dictionary <- function(x, ...) {
     .assertIsDictionary(x)
@@ -111,8 +111,8 @@ as.list.Dictionary <- function(x, ...) {
 }
 
 #'
-#' @export 
-#' @noRd 
+#' @export
+#' @noRd
 #'
 print.Dictionary <- function(x, ...) {
     .assertIsDictionary(x)
@@ -133,7 +133,7 @@ initDictionary <- function(x, keyValuePairList) {
     if (any(names(keyValuePairList) == "")) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'keyValuePairList' must be a named list")
     }
-    
+
     for (key in names(keyValuePairList)) {
         value <- keyValuePairList[[key]]
         addValueToDictionary(x, key, value)

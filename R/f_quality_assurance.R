@@ -37,8 +37,10 @@ NULL
 
 .skipTestIfPipeOperatorNotAvailable <- function() {
     if (!.isPipeOperatorAvailable()) {
-        testthat::skip(paste0("The test is disabled because it works only for ",
-            "R version >= 4.1.0 (pipe operator is available)"))
+        testthat::skip(paste0(
+            "The test is disabled because it works only for ",
+            "R version >= 4.1.0 (pipe operator is available)"
+        ))
     }
 }
 
@@ -196,8 +198,10 @@ NULL
             for (testFile in testFiles) {
                 file.copy(file.path(testthatTempSubDirectory, testFile), file.path(testFileTargetDirectory, testFile))
             }
-            message(length(testFiles), " extracted from ", sQuote(packageSource), 
-                " and copied to ", sQuote(testFileTargetDirectory))
+            message(
+                length(testFiles), " extracted from ", sQuote(packageSource),
+                " and copied to ", sQuote(testFileTargetDirectory)
+            )
         },
         finally = {
             if (!is.null(testthatTempDirectory)) {
@@ -400,8 +404,10 @@ NULL
             "mode", "cacheEnabled", "extra", "cleanOldFiles", "connectionType"
         )) {
     if (is.null(connection) || !is.list(connection)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'connection' must be a list (is ", .getClassName(connection), ")")
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'connection' must be a list (is ", .getClassName(connection), ")"
+        )
     }
 
     name <- match.arg(name)

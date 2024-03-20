@@ -255,7 +255,7 @@ getDesignFisher <- function(...,
             cases <- .getFisherCombinationCases(kMax = design$kMax, tVec = design$scale)
             result <- .getDesignFisherInner(
                 design$kMax, design$alpha, design$tolerance,
-                design$criticalValues, design$scale, alpha0Vec, 
+                design$criticalValues, design$scale, alpha0Vec,
                 design$userAlphaSpending, design$method
             )
             design$criticalValues <- result$criticalValues

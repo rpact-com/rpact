@@ -66,11 +66,11 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
         futilityPerStage = NULL,
         initialize = function(design, theta = seq(-1, 1, 0.05), nMax = 100L, ...) {
             super$initialize(...)
-          
+
             self$.design <- design
             self$theta <- theta
             self$nMax <- nMax
-            
+
             self$theta <- .assertIsValidThetaRange(thetaRange = theta, thetaAutoSeqEnabled = FALSE)
             self$.initPowerAndAverageSampleNumber()
         },

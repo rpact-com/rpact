@@ -87,87 +87,87 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 bindingFutility = NA,
                 tolerance = 1e-06 # C_ANALYSIS_TOLERANCE_DEFAULT
                 ) {
-                self$kMax <- kMax #NEW
-                self$alpha <- alpha
-                self$informationRates <- informationRates
-                self$userAlphaSpending <- userAlphaSpending
-                self$criticalValues <- criticalValues
-                self$stageLevels <- stageLevels
-                self$alphaSpent <- alphaSpent
-                self$bindingFutility <- bindingFutility
-                self$tolerance <- tolerance
-                super$initialize(...)
+            self$kMax <- kMax # NEW
+            self$alpha <- alpha
+            self$informationRates <- informationRates
+            self$userAlphaSpending <- userAlphaSpending
+            self$criticalValues <- criticalValues
+            self$stageLevels <- stageLevels
+            self$alphaSpent <- alphaSpent
+            self$bindingFutility <- bindingFutility
+            self$tolerance <- tolerance
+            super$initialize(...)
 
             self$.plotSettings <- PlotSettings$new()
 
-                               self$.initStages()
-                             },
-                             show = function(showType = 1, digits = NA_integer_) {
-                               self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
-                             },
-                             .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
-                               "Method for automatically printing trial design objects"
-                               self$.resetCat()
-                               if (showType == 3) {
-                                 .createSummary(self, digits = digits)$.show(
-                                   showType = 1,
-                                   digits = digits, consoleOutputEnabled = consoleOutputEnabled
-                                 )
-                               } else if (showType == 2) {
-                                 super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
-                               } else {
-                                 self$.cat("Design parameters and output of ", self$.toString(), ":\n\n",
-                                      heading = 1,
-                                      consoleOutputEnabled = consoleOutputEnabled
-                                 )
-                                 self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
-                                                           orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                                 )
-                                 self$.showParametersOfOneGroup(self$.getDerivedParameters(), "Derived from user defined parameters",
-                                                           orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                                 )
-                                 self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
-                                                           orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                                 )
-                                 self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Output",
-                                                           orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                                 )
-                                 self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
-                               }
-                             },
-                             .toString = function(startWithUpperCase = FALSE) {
-                               s <- "unknown trial design"
-                               if (.isTrialDesignGroupSequential(self)) {
-                                 s <- "group sequential design"
-                               } else if (.isTrialDesignInverseNormal(self)) {
-                                 s <- "inverse normal combination test design"
-                               } else if (.isTrialDesignFisher(self)) {
-                                 s <- "Fisher's combination test design"
-                               } else if (.isTrialDesignConditionalDunnett(self)) {
-                                 s <- "conditional Dunnett test design"
-                               }
-                               return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
-                             },
-                             .initStages = function() {
-                               if (length(self$kMax) == 1 && !is.na(self$kMax) && self$kMax > 0) {
-                                 self$stages <- c(1L:self$kMax)
-                                 if (self$kMax == C_KMAX_DEFAULT) {
-                                   self$.setParameterType("stages", C_PARAM_DEFAULT_VALUE)
-                                 } else {
-                                   type <- self$.getParameterType("kMax")
-                                   self$.setParameterType("stages", ifelse(type != C_PARAM_TYPE_UNKNOWN, type, C_PARAM_USER_DEFINED))
-                                 }
-                               } else {
-                                 self$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
-                               }
-                             },
-                             .isDelayedResponseDesign = function() {
-                               return((inherits(self, "TrialDesignGroupSequential") || inherits(self, "TrialDesignInverseNormal")) &&
-                                        self$kMax > 1 &&
-                                        !is.null(self[["delayedInformation"]]) &&
-                                        !any(is.na(self$delayedInformation)) && any(self$delayedInformation > 0))
-                             }
-                           )
+            self$.initStages()
+        },
+        show = function(showType = 1, digits = NA_integer_) {
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+        },
+        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
+            "Method for automatically printing trial design objects"
+            self$.resetCat()
+            if (showType == 3) {
+                .createSummary(self, digits = digits)$.show(
+                    showType = 1,
+                    digits = digits, consoleOutputEnabled = consoleOutputEnabled
+                )
+            } else if (showType == 2) {
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+            } else {
+                self$.cat("Design parameters and output of ", self$.toString(), ":\n\n",
+                    heading = 1,
+                    consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getDerivedParameters(), "Derived from user defined parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Output",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+            }
+        },
+        .toString = function(startWithUpperCase = FALSE) {
+            s <- "unknown trial design"
+            if (.isTrialDesignGroupSequential(self)) {
+                s <- "group sequential design"
+            } else if (.isTrialDesignInverseNormal(self)) {
+                s <- "inverse normal combination test design"
+            } else if (.isTrialDesignFisher(self)) {
+                s <- "Fisher's combination test design"
+            } else if (.isTrialDesignConditionalDunnett(self)) {
+                s <- "conditional Dunnett test design"
+            }
+            return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
+        },
+        .initStages = function() {
+            if (length(self$kMax) == 1 && !is.na(self$kMax) && self$kMax > 0) {
+                self$stages <- c(1L:self$kMax)
+                if (self$kMax == C_KMAX_DEFAULT) {
+                    self$.setParameterType("stages", C_PARAM_DEFAULT_VALUE)
+                } else {
+                    type <- self$.getParameterType("kMax")
+                    self$.setParameterType("stages", ifelse(type != C_PARAM_TYPE_UNKNOWN, type, C_PARAM_USER_DEFINED))
+                }
+            } else {
+                self$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
+            }
+        },
+        .isDelayedResponseDesign = function() {
+            return((inherits(self, "TrialDesignGroupSequential") || inherits(self, "TrialDesignInverseNormal")) &&
+                self$kMax > 1 &&
+                !is.null(self[["delayedInformation"]]) &&
+                !any(is.na(self$delayedInformation)) && any(self$delayedInformation > 0))
+        }
+    )
 )
 
 #'
@@ -206,67 +206,66 @@ TrialDesign <- R6::R6Class("TrialDesign",
 #' @importFrom methods new
 #'
 TrialDesignCharacteristics <- R6::R6Class("TrialDesignCharacteristics",
-                                          inherit = ParameterSet,
-                                          public = list(
-                                            .design = NULL,
-                                            .probs = NULL,
-                                            nFixed = NULL,
-                                            shift = NULL,
-                                            inflationFactor = NULL,
-                                            stages = NULL,
-                                            information = NULL,
-                                            power = NULL,
-                                            rejectionProbabilities = NULL, # efficacy probabilities
-                                            futilityProbabilities = NULL,
-                                            averageSampleNumber1 = NULL,
-                                            averageSampleNumber01 = NULL,
-                                            averageSampleNumber0 = NULL,
-                                            initialize = function(design, ...) {
-                                              
-                                              self$.design <- design
-                                              super$initialize(...)
-                                              self$.initStages()
-                                            },
-                                            show = function(showType = 1, digits = NA_integer_) {
-                                              self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
-                                            },
-                                            .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
-                                              "Method for automatically printing trial design characteristics objects"
-                                              self$.resetCat()
-                                              if (showType == 2) {
-                                                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
-                                              } else {
-                                                self$.showParametersOfOneGroup(self$.getGeneratedParameters(),
-                                                                          title = self$.toString(startWithUpperCase = TRUE),
-                                                                          orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
-                                                )
-                                                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
-                                              }
-                                            },
-                                            .initStages = function() {
-                                              if (!is.na(self$.design$kMax) && self$.design$kMax > 0) {
-                                                self$stages <- c(1L:self$.design$kMax)
-                                                if (self$.design$kMax == C_KMAX_DEFAULT) {
-                                                  self$.setParameterType("stages", C_PARAM_DEFAULT_VALUE)
-                                                } else {
-                                                  self$.setParameterType("stages", C_PARAM_USER_DEFINED)
-                                                }
-                                              } else {
-                                                self$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
-                                              }
-                                            },
-                                            .toString = function(startWithUpperCase = FALSE) {
-                                              if (self$.design$.isDelayedResponseDesign()) {
-                                                prefix <- "delayed response"
-                                                if (startWithUpperCase) {
-                                                  prefix <- .firstCharacterToUpperCase(prefix)
-                                                }
-                                                return(paste(prefix, self$.design$.toString(startWithUpperCase = FALSE), "characteristics"))
-                                              }
-                                              
-                                              return(paste(self$.design$.toString(startWithUpperCase = startWithUpperCase), "characteristics"))
-                                            }
-                                          )
+    inherit = ParameterSet,
+    public = list(
+        .design = NULL,
+        .probs = NULL,
+        nFixed = NULL,
+        shift = NULL,
+        inflationFactor = NULL,
+        stages = NULL,
+        information = NULL,
+        power = NULL,
+        rejectionProbabilities = NULL, # efficacy probabilities
+        futilityProbabilities = NULL,
+        averageSampleNumber1 = NULL,
+        averageSampleNumber01 = NULL,
+        averageSampleNumber0 = NULL,
+        initialize = function(design, ...) {
+            self$.design <- design
+            super$initialize(...)
+            self$.initStages()
+        },
+        show = function(showType = 1, digits = NA_integer_) {
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+        },
+        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
+            "Method for automatically printing trial design characteristics objects"
+            self$.resetCat()
+            if (showType == 2) {
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+            } else {
+                self$.showParametersOfOneGroup(self$.getGeneratedParameters(),
+                    title = self$.toString(startWithUpperCase = TRUE),
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+            }
+        },
+        .initStages = function() {
+            if (!is.na(self$.design$kMax) && self$.design$kMax > 0) {
+                self$stages <- c(1L:self$.design$kMax)
+                if (self$.design$kMax == C_KMAX_DEFAULT) {
+                    self$.setParameterType("stages", C_PARAM_DEFAULT_VALUE)
+                } else {
+                    self$.setParameterType("stages", C_PARAM_USER_DEFINED)
+                }
+            } else {
+                self$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
+            }
+        },
+        .toString = function(startWithUpperCase = FALSE) {
+            if (self$.design$.isDelayedResponseDesign()) {
+                prefix <- "delayed response"
+                if (startWithUpperCase) {
+                    prefix <- .firstCharacterToUpperCase(prefix)
+                }
+                return(paste(prefix, self$.design$.toString(startWithUpperCase = FALSE), "characteristics"))
+            }
+
+            return(paste(self$.design$.toString(startWithUpperCase = startWithUpperCase), "characteristics"))
+        }
+    )
 )
 
 #'
@@ -288,10 +287,10 @@ TrialDesignCharacteristics <- R6::R6Class("TrialDesignCharacteristics",
 #' @export
 #'
 print.TrialDesignCharacteristics <- function(x, ..., markdown = FALSE, showDesign = TRUE) {
-  if (showDesign) {
-    print.ParameterSet(x$.design, ..., markdown = markdown)
-  }
-  print.ParameterSet(x, ..., markdown = markdown)
+    if (showDesign) {
+        print.ParameterSet(x$.design, ..., markdown = markdown)
+    }
+    print.ParameterSet(x, ..., markdown = markdown)
 }
 
 #'
@@ -377,105 +376,103 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
 #' @importFrom methods new
 #'
 TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
-                                 inherit = TrialDesign,
-                                 public = list(
-                                   method = NULL,
-                                   alpha0Vec = NULL,
-                                   scale = NULL,
-                                   nonStochasticCurtailment = NULL,
-                                   sided = NULL,
-                                   simAlpha = NULL,
-                                   iterations = NULL,
-                                   seed = NULL,
-                                   initialize = function(...,
-                                                         method = NA_character_,
-                                                         alpha0Vec = NA_real_,
-                                                         scale = NA_real_,
-                                                         nonStochasticCurtailment = FALSE,
-                                                         sided = as.integer(C_SIDED_DEFAULT),
-                                                         simAlpha = NA_real_,
-                                                         iterations = 0L,
-                                                         seed = NA_real_,
-                                                         tolerance = C_ANALYSIS_TOLERANCE_FISHER_DEFAULT) {
-                                    
-                                     
-                                     self$method <- method
-                                     self$alpha0Vec <- alpha0Vec
-                                     self$scale <- scale
-                                     self$nonStochasticCurtailment <- nonStochasticCurtailment
-                                     self$sided <- sided
-                                     self$simAlpha <- simAlpha
-                                     super$initialize(...)#TODO dont move to first line of constructor
-                                     self$iterations <- iterations
-                                     self$seed <- seed
-                                     self$tolerance <- tolerance
-                                     
-                                     self$.initParameterTypes()
-                                     self$.setParameterType("iterations", C_PARAM_NOT_APPLICABLE)
-                                     self$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
-                                     self$.initStages()
-                                   },
-                                   hasChanged = function(kMax, alpha, sided, method, informationRates, alpha0Vec, userAlphaSpending, bindingFutility) {
-                                     informationRatesTemp <- informationRates
-                                     if (any(is.na(informationRatesTemp))) {
-                                       informationRatesTemp <- .getInformationRatesDefault(kMax)
-                                     }
-                                     alpha0VecTemp <- alpha0Vec[1:(kMax - 1)]
-                                     if (any(is.na(alpha0VecTemp))) {
-                                       alpha0VecTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
-                                     }
-                                     
-                                     if (!identical(kMax, self$kMax)) {
-                                       return(TRUE)
-                                     }
-                                     if (!identical(alpha, self$alpha)) {
-                                       return(TRUE)
-                                     }
-                                     if (!identical(sided, self$sided)) {
-                                       return(TRUE)
-                                     }
-                                     if (!identical(method, self$method)) {
-                                       return(TRUE)
-                                     }
-                                     if (!identical(informationRatesTemp, self$informationRates)) {
-                                       return(TRUE)
-                                     }
-                                     if (!identical(alpha0VecTemp, self$alpha0Vec)) {
-                                       return(TRUE)
-                                     }
-                                     if (!identical(userAlphaSpending, self$userAlphaSpending)) {
-                                       return(TRUE)
-                                     }
-                                     if (!identical(bindingFutility, self$bindingFutility)) {
-                                       return(TRUE)
-                                     }
-                                     return(FALSE)
-                                   },
-                                   
-                                   # Defines the order of the parameter output
-                                   .getParametersToShow = function() {
-                                     return(c(
-                                       "method",
-                                       "kMax",
-                                       "stages",
-                                       "informationRates",
-                                       "alpha",
-                                       "alpha0Vec",
-                                       "bindingFutility",
-                                       "sided",
-                                       "tolerance",
-                                       "iterations",
-                                       "seed",
-                                       "alphaSpent",
-                                       "userAlphaSpending",
-                                       "criticalValues",
-                                       "stageLevels",
-                                       "scale",
-                                       "simAlpha",
-                                       "nonStochasticCurtailment"
-                                     ))
-                                   }
-                                 )
+    inherit = TrialDesign,
+    public = list(
+        method = NULL,
+        alpha0Vec = NULL,
+        scale = NULL,
+        nonStochasticCurtailment = NULL,
+        sided = NULL,
+        simAlpha = NULL,
+        iterations = NULL,
+        seed = NULL,
+        initialize = function(...,
+                method = NA_character_,
+                alpha0Vec = NA_real_,
+                scale = NA_real_,
+                nonStochasticCurtailment = FALSE,
+                sided = as.integer(C_SIDED_DEFAULT),
+                simAlpha = NA_real_,
+                iterations = 0L,
+                seed = NA_real_,
+                tolerance = C_ANALYSIS_TOLERANCE_FISHER_DEFAULT) {
+            self$method <- method
+            self$alpha0Vec <- alpha0Vec
+            self$scale <- scale
+            self$nonStochasticCurtailment <- nonStochasticCurtailment
+            self$sided <- sided
+            self$simAlpha <- simAlpha
+            super$initialize(...) # TODO dont move to first line of constructor
+            self$iterations <- iterations
+            self$seed <- seed
+            self$tolerance <- tolerance
+
+            self$.initParameterTypes()
+            self$.setParameterType("iterations", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
+            self$.initStages()
+        },
+        hasChanged = function(kMax, alpha, sided, method, informationRates, alpha0Vec, userAlphaSpending, bindingFutility) {
+            informationRatesTemp <- informationRates
+            if (any(is.na(informationRatesTemp))) {
+                informationRatesTemp <- .getInformationRatesDefault(kMax)
+            }
+            alpha0VecTemp <- alpha0Vec[1:(kMax - 1)]
+            if (any(is.na(alpha0VecTemp))) {
+                alpha0VecTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
+            }
+
+            if (!identical(kMax, self$kMax)) {
+                return(TRUE)
+            }
+            if (!identical(alpha, self$alpha)) {
+                return(TRUE)
+            }
+            if (!identical(sided, self$sided)) {
+                return(TRUE)
+            }
+            if (!identical(method, self$method)) {
+                return(TRUE)
+            }
+            if (!identical(informationRatesTemp, self$informationRates)) {
+                return(TRUE)
+            }
+            if (!identical(alpha0VecTemp, self$alpha0Vec)) {
+                return(TRUE)
+            }
+            if (!identical(userAlphaSpending, self$userAlphaSpending)) {
+                return(TRUE)
+            }
+            if (!identical(bindingFutility, self$bindingFutility)) {
+                return(TRUE)
+            }
+            return(FALSE)
+        },
+
+        # Defines the order of the parameter output
+        .getParametersToShow = function() {
+            return(c(
+                "method",
+                "kMax",
+                "stages",
+                "informationRates",
+                "alpha",
+                "alpha0Vec",
+                "bindingFutility",
+                "sided",
+                "tolerance",
+                "iterations",
+                "seed",
+                "alphaSpent",
+                "userAlphaSpending",
+                "criticalValues",
+                "stageLevels",
+                "scale",
+                "simAlpha",
+                "nonStochasticCurtailment"
+            ))
+        }
+    )
 )
 
 #'
@@ -533,246 +530,243 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
 #' @importFrom methods new
 #'
 TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
-                                        inherit = TrialDesign,
-                                        public = list(
-                                          typeOfDesign = NULL,
-                                          beta = NULL,
-                                          deltaWT = NULL,
-                                          deltaPT1 = NULL,
-                                          deltaPT0 = NULL,
-                                          futilityBounds = NULL,
-                                          gammaA = NULL,
-                                          gammaB = NULL,
-                                          optimizationCriterion = NULL,
-                                          sided = NULL,
-                                          betaSpent = NULL,
-                                          typeBetaSpending = NULL,
-                                          userBetaSpending = NULL,
-                                          power = NULL,
-                                          twoSidedPower = NULL,
-                                          constantBoundsHP = NULL,
-                                          betaAdjustment = NULL,
-                                          delayedInformation = NULL,
-                                          decisionCriticalValues = NULL,
-                                          reversalProbabilities = NULL,
-                                          initialize = function(...,
-                                                                beta = C_BETA_DEFAULT,
-                                                                betaSpent = NA_real_,
-                                                                sided = C_SIDED_DEFAULT,
-                                                                futilityBounds = NA_real_,
-                                                                typeOfDesign = C_DEFAULT_TYPE_OF_DESIGN,
-                                                                deltaWT = NA_real_,
-                                                                deltaPT1 = NA_real_,
-                                                                deltaPT0 = NA_real_,
-                                                                optimizationCriterion = C_OPTIMIZATION_CRITERION_DEFAULT,
-                                                                gammaA = NA_real_,
-                                                                gammaB = NA_real_,
-                                                                typeBetaSpending = C_TYPE_OF_DESIGN_BS_NONE,
-                                                                userBetaSpending = NA_real_,
-                                                                power = NA_real_,
-                                                                twoSidedPower = C_TWO_SIDED_POWER_DEFAULT,
-                                                                constantBoundsHP = NA_real_,
-                                                                betaAdjustment = TRUE, # impl as constant
-                                                                delayedInformation = NA_real_) {
-                                            
-                                            
-                                            self$beta <- beta
-                                            self$betaSpent <- betaSpent
-                                            self$sided <- sided
-                                            self$futilityBounds <- futilityBounds
-                                            self$typeOfDesign <- typeOfDesign
-                                            self$deltaWT <- deltaWT
-                                            self$deltaPT1 <- deltaPT1
-                                            self$deltaPT0 <- deltaPT0
-                                            self$optimizationCriterion <- optimizationCriterion
-                                            self$gammaA <- gammaA
-                                            self$gammaB <- gammaB
-                                            self$typeBetaSpending <- typeBetaSpending
-                                            self$userBetaSpending <- userBetaSpending
-                                            self$power <- power
-                                            self$twoSidedPower <- twoSidedPower
-                                            self$constantBoundsHP <- constantBoundsHP
-                                            self$betaAdjustment <- betaAdjustment
-                                            self$delayedInformation <- delayedInformation
-                                            super$initialize(...)
+    inherit = TrialDesign,
+    public = list(
+        typeOfDesign = NULL,
+        beta = NULL,
+        deltaWT = NULL,
+        deltaPT1 = NULL,
+        deltaPT0 = NULL,
+        futilityBounds = NULL,
+        gammaA = NULL,
+        gammaB = NULL,
+        optimizationCriterion = NULL,
+        sided = NULL,
+        betaSpent = NULL,
+        typeBetaSpending = NULL,
+        userBetaSpending = NULL,
+        power = NULL,
+        twoSidedPower = NULL,
+        constantBoundsHP = NULL,
+        betaAdjustment = NULL,
+        delayedInformation = NULL,
+        decisionCriticalValues = NULL,
+        reversalProbabilities = NULL,
+        initialize = function(...,
+                beta = C_BETA_DEFAULT,
+                betaSpent = NA_real_,
+                sided = C_SIDED_DEFAULT,
+                futilityBounds = NA_real_,
+                typeOfDesign = C_DEFAULT_TYPE_OF_DESIGN,
+                deltaWT = NA_real_,
+                deltaPT1 = NA_real_,
+                deltaPT0 = NA_real_,
+                optimizationCriterion = C_OPTIMIZATION_CRITERION_DEFAULT,
+                gammaA = NA_real_,
+                gammaB = NA_real_,
+                typeBetaSpending = C_TYPE_OF_DESIGN_BS_NONE,
+                userBetaSpending = NA_real_,
+                power = NA_real_,
+                twoSidedPower = C_TWO_SIDED_POWER_DEFAULT,
+                constantBoundsHP = NA_real_,
+                betaAdjustment = TRUE, # impl as constant
+                delayedInformation = NA_real_) {
+            self$beta <- beta
+            self$betaSpent <- betaSpent
+            self$sided <- sided
+            self$futilityBounds <- futilityBounds
+            self$typeOfDesign <- typeOfDesign
+            self$deltaWT <- deltaWT
+            self$deltaPT1 <- deltaPT1
+            self$deltaPT0 <- deltaPT0
+            self$optimizationCriterion <- optimizationCriterion
+            self$gammaA <- gammaA
+            self$gammaB <- gammaB
+            self$typeBetaSpending <- typeBetaSpending
+            self$userBetaSpending <- userBetaSpending
+            self$power <- power
+            self$twoSidedPower <- twoSidedPower
+            self$constantBoundsHP <- constantBoundsHP
+            self$betaAdjustment <- betaAdjustment
+            self$delayedInformation <- delayedInformation
+            super$initialize(...)
 
-                                            self$.initParameterTypes()
-                                            self$.initStages()
-                                            
-                                            self$.setParameterType("betaAdjustment", C_PARAM_NOT_APPLICABLE)
-                                            self$.setParameterType("delayedInformation", C_PARAM_NOT_APPLICABLE)
-                                            self$.setParameterType("decisionCriticalValues", C_PARAM_NOT_APPLICABLE)
-                                            self$.setParameterType("reversalProbabilities", C_PARAM_NOT_APPLICABLE)
-                                            
-                                          },
-                                          .formatComparisonResult = function(x) {
-                                            if (is.null(x) || length(x) == 0 || !is.numeric(x)) {
-                                              return(x)
-                                            }
-                                            
-                                            s <- sprintf("%.9f", x)
-                                            s <- sub("\\.0+", "", s)
-                                            return(s)
-                                          },
-                                          .pasteComparisonResult = function(name, newValue, oldValue) {
-                                            return(paste0(
-                                              name, "_new = ", .arrayToString(.formatComparisonResult(newValue)), " (", .getClassName(newValue), "), ",
-                                              name, "_old = ", .arrayToString(.formatComparisonResult(oldValue)), " (", .getClassName(oldValue), ")"
-                                            ))
-                                          },
-                                          hasChanged = function(...,
-                                                                kMax,
-                                                                alpha,
-                                                                beta,
-                                                                sided,
-                                                                typeOfDesign,
-                                                                deltaWT,
-                                                                deltaPT1,
-                                                                deltaPT0,
-                                                                informationRates,
-                                                                futilityBounds,
-                                                                optimizationCriterion,
-                                                                typeBetaSpending,
-                                                                gammaA,
-                                                                gammaB,
-                                                                bindingFutility,
-                                                                userAlphaSpending,
-                                                                userBetaSpending,
-                                                                twoSidedPower,
-                                                                constantBoundsHP,
-                                                                betaAdjustment = TRUE,
-                                                                delayedInformation = NA_real_) {
-                                            informationRatesTemp <- informationRates
-                                            if (any(is.na(informationRatesTemp))) {
-                                              informationRatesTemp <- .getInformationRatesDefault(kMax)
-                                            }
-                                            futilityBoundsTemp <- futilityBounds[1:(kMax - 1)]
-                                            if (any(is.na(futilityBoundsTemp))) {
-                                              futilityBoundsTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
-                                            }
-                                            
-                                            if (!identical(kMax, self$kMax)) {
-                                              return(self$.pasteComparisonResult("kMax", kMax, self$kMax))
-                                            }
-                                            if (!identical(alpha, self$alpha)) {
-                                              return(self$.pasteComparisonResult("alpha", alpha, self$alpha))
-                                            }
-                                            if (!identical(beta, self$beta)) {
-                                              return(self$.pasteComparisonResult("beta", beta, self$beta))
-                                            }
-                                            if (!identical(sided, self$sided)) {
-                                              return(self$.pasteComparisonResult("sided", sided, self$sided))
-                                            }
-                                            if (!identical(twoSidedPower, self$twoSidedPower)) {
-                                              return(self$.pasteComparisonResult("twoSidedPower", twoSidedPower, self$twoSidedPower))
-                                            }
-                                            if (kMax == 1) {
-                                              return(FALSE)
-                                            }
-                                            
-                                            if (!identical(betaAdjustment, self$betaAdjustment)) {
-                                              return(self$.pasteComparisonResult("betaAdjustment", betaAdjustment, self$betaAdjustment))
-                                            }
-                                            if (!identical(delayedInformation, self$delayedInformation)) {
-                                              return(self$.pasteComparisonResult("delayedInformation", delayedInformation, self$delayedInformation))
-                                            }
-                                            if (!identical(typeOfDesign, self$typeOfDesign)) {
-                                              return(self$.pasteComparisonResult("typeOfDesign", typeOfDesign, self$typeOfDesign))
-                                            }
-                                            if (typeOfDesign == C_TYPE_OF_DESIGN_WT) {
-                                              if (!identical(deltaWT, self$deltaWT)) {
-                                                return(self$.pasteComparisonResult("deltaWT", deltaWT, self$deltaWT))
-                                              }
-                                            }
-                                            if (typeOfDesign == C_TYPE_OF_DESIGN_PT) {
-                                              if (!identical(deltaPT1, self$deltaPT1)) {
-                                                return(self$.pasteComparisonResult("deltaPT1", deltaPT1, self$deltaPT1))
-                                              }
-                                              if (!identical(deltaPT0, self$deltaPT0)) {
-                                                return(self$.pasteComparisonResult("deltaPT0", deltaPT0, self$deltaPT0))
-                                              }
-                                            }
-                                            if (!identical(informationRatesTemp, self$informationRates)) {
-                                              return(self$.pasteComparisonResult("informationRates", informationRatesTemp, self$informationRates))
-                                            }
-                                            if (self$.getParameterType("futilityBounds") != C_PARAM_GENERATED &&
-                                                (!grepl("^as.*", typeOfDesign) || typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) &&
-                                                !identical(futilityBoundsTemp, self$futilityBounds)) {
-                                              return(self$.pasteComparisonResult("futilityBounds", futilityBoundsTemp, self$futilityBounds))
-                                            }
-                                            if (!identical(optimizationCriterion, self$optimizationCriterion)) {
-                                              return(self$.pasteComparisonResult("optimizationCriterion", optimizationCriterion, self$optimizationCriterion))
-                                            }
-                                            if (!identical(typeBetaSpending, self$typeBetaSpending)) {
-                                              return(self$.pasteComparisonResult("typeBetaSpending", typeBetaSpending, self$typeBetaSpending))
-                                            }
-                                            if (!identical(gammaA, self$gammaA)) {
-                                              return(self$.pasteComparisonResult("gammaA", gammaA, self$gammaA))
-                                            }
-                                            if (!identical(gammaB, self$gammaB)) {#TODO
-                                              return(self$.pasteComparisonResult("gammaB", gammaB, self$gammaB))
-                                            }
-                                            if ((typeOfDesign == C_TYPE_OF_DESIGN_PT && !identical(bindingFutility, self$bindingFutility)) ||
-                                                (!identical(bindingFutility, self$bindingFutility) &&
-                                                 self$.getParameterType("futilityBounds") != C_PARAM_NOT_APPLICABLE &&
-                                                 (sided == 1 || !grepl("^as.*", typeOfDesign) || typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) &&
-                                                 (any(na.omit(futilityBounds) > -6) || any(na.omit(self$futilityBounds) > -6))
-                                                )) {
-                                              return(self$.pasteComparisonResult("bindingFutility", bindingFutility, self$bindingFutility))
-                                            }
-                                            if (!identical(userAlphaSpending, self$userAlphaSpending)) {
-                                              return(self$.pasteComparisonResult("userAlphaSpending", userAlphaSpending, self$userAlphaSpending))
-                                            }
-                                            if (!identical(userBetaSpending, self$userBetaSpending)) {
-                                              return(self$.pasteComparisonResult("userBetaSpending", userBetaSpending, self$userBetaSpending))
-                                            }
-                                            if (!identical(twoSidedPower, self$twoSidedPower)) {
-                                              return(self$.pasteComparisonResult("twoSidedPower", twoSidedPower, self$twoSidedPower))
-                                            }
-                                            if (typeOfDesign == C_TYPE_OF_DESIGN_HP) {
-                                              if (!identical(constantBoundsHP, self$constantBoundsHP)) {
-                                                return(self$.pasteComparisonResult("constantBoundsHP", constantBoundsHP, self$constantBoundsHP))
-                                              }
-                                            }
-                                            return(FALSE)
-                                          },
-                                          
-                                          # Defines the order of the parameter output
-                                          .getParametersToShow = function() {
-                                            return(c(
-                                              "typeOfDesign",
-                                              "kMax",
-                                              "stages",
-                                              "informationRates",
-                                              "alpha",
-                                              "beta",
-                                              "power",
-                                              "twoSidedPower",
-                                              "deltaWT",
-                                              "deltaPT1",
-                                              "deltaPT0",
-                                              "futilityBounds",
-                                              "bindingFutility",
-                                              "constantBoundsHP",
-                                              "gammaA",
-                                              "gammaB",
-                                              "optimizationCriterion",
-                                              "sided",
-                                              "betaAdjustment",
-                                              "delayedInformation",
-                                              "tolerance",
-                                              "alphaSpent",
-                                              "userAlphaSpending",
-                                              "betaSpent",
-                                              "typeBetaSpending",
-                                              "userBetaSpending",
-                                              "criticalValues",
-                                              "stageLevels",
-                                              "decisionCriticalValues",
-                                              "reversalProbabilities"
-                                            ))
-                                          }
-                                        )
+            self$.initParameterTypes()
+            self$.initStages()
+
+            self$.setParameterType("betaAdjustment", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("delayedInformation", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("decisionCriticalValues", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("reversalProbabilities", C_PARAM_NOT_APPLICABLE)
+        },
+        .formatComparisonResult = function(x) {
+            if (is.null(x) || length(x) == 0 || !is.numeric(x)) {
+                return(x)
+            }
+
+            s <- sprintf("%.9f", x)
+            s <- sub("\\.0+", "", s)
+            return(s)
+        },
+        .pasteComparisonResult = function(name, newValue, oldValue) {
+            return(paste0(
+                name, "_new = ", .arrayToString(.formatComparisonResult(newValue)), " (", .getClassName(newValue), "), ",
+                name, "_old = ", .arrayToString(.formatComparisonResult(oldValue)), " (", .getClassName(oldValue), ")"
+            ))
+        },
+        hasChanged = function(...,
+                kMax,
+                alpha,
+                beta,
+                sided,
+                typeOfDesign,
+                deltaWT,
+                deltaPT1,
+                deltaPT0,
+                informationRates,
+                futilityBounds,
+                optimizationCriterion,
+                typeBetaSpending,
+                gammaA,
+                gammaB,
+                bindingFutility,
+                userAlphaSpending,
+                userBetaSpending,
+                twoSidedPower,
+                constantBoundsHP,
+                betaAdjustment = TRUE,
+                delayedInformation = NA_real_) {
+            informationRatesTemp <- informationRates
+            if (any(is.na(informationRatesTemp))) {
+                informationRatesTemp <- .getInformationRatesDefault(kMax)
+            }
+            futilityBoundsTemp <- futilityBounds[1:(kMax - 1)]
+            if (any(is.na(futilityBoundsTemp))) {
+                futilityBoundsTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
+            }
+
+            if (!identical(kMax, self$kMax)) {
+                return(self$.pasteComparisonResult("kMax", kMax, self$kMax))
+            }
+            if (!identical(alpha, self$alpha)) {
+                return(self$.pasteComparisonResult("alpha", alpha, self$alpha))
+            }
+            if (!identical(beta, self$beta)) {
+                return(self$.pasteComparisonResult("beta", beta, self$beta))
+            }
+            if (!identical(sided, self$sided)) {
+                return(self$.pasteComparisonResult("sided", sided, self$sided))
+            }
+            if (!identical(twoSidedPower, self$twoSidedPower)) {
+                return(self$.pasteComparisonResult("twoSidedPower", twoSidedPower, self$twoSidedPower))
+            }
+            if (kMax == 1) {
+                return(FALSE)
+            }
+
+            if (!identical(betaAdjustment, self$betaAdjustment)) {
+                return(self$.pasteComparisonResult("betaAdjustment", betaAdjustment, self$betaAdjustment))
+            }
+            if (!identical(delayedInformation, self$delayedInformation)) {
+                return(self$.pasteComparisonResult("delayedInformation", delayedInformation, self$delayedInformation))
+            }
+            if (!identical(typeOfDesign, self$typeOfDesign)) {
+                return(self$.pasteComparisonResult("typeOfDesign", typeOfDesign, self$typeOfDesign))
+            }
+            if (typeOfDesign == C_TYPE_OF_DESIGN_WT) {
+                if (!identical(deltaWT, self$deltaWT)) {
+                    return(self$.pasteComparisonResult("deltaWT", deltaWT, self$deltaWT))
+                }
+            }
+            if (typeOfDesign == C_TYPE_OF_DESIGN_PT) {
+                if (!identical(deltaPT1, self$deltaPT1)) {
+                    return(self$.pasteComparisonResult("deltaPT1", deltaPT1, self$deltaPT1))
+                }
+                if (!identical(deltaPT0, self$deltaPT0)) {
+                    return(self$.pasteComparisonResult("deltaPT0", deltaPT0, self$deltaPT0))
+                }
+            }
+            if (!identical(informationRatesTemp, self$informationRates)) {
+                return(self$.pasteComparisonResult("informationRates", informationRatesTemp, self$informationRates))
+            }
+            if (self$.getParameterType("futilityBounds") != C_PARAM_GENERATED &&
+                    (!grepl("^as.*", typeOfDesign) || typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) &&
+                    !identical(futilityBoundsTemp, self$futilityBounds)) {
+                return(self$.pasteComparisonResult("futilityBounds", futilityBoundsTemp, self$futilityBounds))
+            }
+            if (!identical(optimizationCriterion, self$optimizationCriterion)) {
+                return(self$.pasteComparisonResult("optimizationCriterion", optimizationCriterion, self$optimizationCriterion))
+            }
+            if (!identical(typeBetaSpending, self$typeBetaSpending)) {
+                return(self$.pasteComparisonResult("typeBetaSpending", typeBetaSpending, self$typeBetaSpending))
+            }
+            if (!identical(gammaA, self$gammaA)) {
+                return(self$.pasteComparisonResult("gammaA", gammaA, self$gammaA))
+            }
+            if (!identical(gammaB, self$gammaB)) { # TODO
+                return(self$.pasteComparisonResult("gammaB", gammaB, self$gammaB))
+            }
+            if ((typeOfDesign == C_TYPE_OF_DESIGN_PT && !identical(bindingFutility, self$bindingFutility)) ||
+                    (!identical(bindingFutility, self$bindingFutility) &&
+                        self$.getParameterType("futilityBounds") != C_PARAM_NOT_APPLICABLE &&
+                        (sided == 1 || !grepl("^as.*", typeOfDesign) || typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) &&
+                        (any(na.omit(futilityBounds) > -6) || any(na.omit(self$futilityBounds) > -6))
+                    )) {
+                return(self$.pasteComparisonResult("bindingFutility", bindingFutility, self$bindingFutility))
+            }
+            if (!identical(userAlphaSpending, self$userAlphaSpending)) {
+                return(self$.pasteComparisonResult("userAlphaSpending", userAlphaSpending, self$userAlphaSpending))
+            }
+            if (!identical(userBetaSpending, self$userBetaSpending)) {
+                return(self$.pasteComparisonResult("userBetaSpending", userBetaSpending, self$userBetaSpending))
+            }
+            if (!identical(twoSidedPower, self$twoSidedPower)) {
+                return(self$.pasteComparisonResult("twoSidedPower", twoSidedPower, self$twoSidedPower))
+            }
+            if (typeOfDesign == C_TYPE_OF_DESIGN_HP) {
+                if (!identical(constantBoundsHP, self$constantBoundsHP)) {
+                    return(self$.pasteComparisonResult("constantBoundsHP", constantBoundsHP, self$constantBoundsHP))
+                }
+            }
+            return(FALSE)
+        },
+
+        # Defines the order of the parameter output
+        .getParametersToShow = function() {
+            return(c(
+                "typeOfDesign",
+                "kMax",
+                "stages",
+                "informationRates",
+                "alpha",
+                "beta",
+                "power",
+                "twoSidedPower",
+                "deltaWT",
+                "deltaPT1",
+                "deltaPT0",
+                "futilityBounds",
+                "bindingFutility",
+                "constantBoundsHP",
+                "gammaA",
+                "gammaB",
+                "optimizationCriterion",
+                "sided",
+                "betaAdjustment",
+                "delayedInformation",
+                "tolerance",
+                "alphaSpent",
+                "userAlphaSpending",
+                "betaSpent",
+                "typeBetaSpending",
+                "userBetaSpending",
+                "criticalValues",
+                "stageLevels",
+                "decisionCriticalValues",
+                "reversalProbabilities"
+            ))
+        }
+    )
 )
 
 #'
@@ -830,17 +824,17 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
 #' @importFrom methods new
 #'
 TrialDesignGroupSequential <- R6::R6Class("TrialDesignGroupSequential",
-  inherit = TrialDesignInverseNormal,
-  public = list(
-    initialize = function(...) {
-      super$initialize(...)
-      self$.initStages()
-    },
-    show = function(showType = 1, digits = NA_integer_) {
-      "Method for automatically printing trial design objects"
-      super$show(showType = showType, digits = digits)
-    }
-  )
+    inherit = TrialDesignInverseNormal,
+    public = list(
+        initialize = function(...) {
+            super$initialize(...)
+            self$.initStages()
+        },
+        show = function(showType = 1, digits = NA_integer_) {
+            "Method for automatically printing trial design objects"
+            super$show(showType = showType, digits = digits)
+        }
+    )
 )
 
 #'
@@ -881,49 +875,49 @@ TrialDesignGroupSequential <- R6::R6Class("TrialDesignGroupSequential",
 #' @seealso \code{\link{getDesignConditionalDunnett}} for creating a conditional Dunnett test design.
 #'
 TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
-  inherit = TrialDesign,
-  public = list(
-    informationAtInterim = NULL,
-    secondStageConditioning = NULL,
-    sided = NULL,
-    initialize = function(...,informationAtInterim = NULL, secondStageConditioning = NULL) {
-      super$initialize(...)
-      self$informationAtInterim <- informationAtInterim
-      self$secondStageConditioning <- secondStageConditioning
-      notApplicableParameters <- c(
-        "kMax",
-        "stages",
-        "informationRates",
-        "userAlphaSpending",
-        "criticalValues",
-        "stageLevels",
-        "alphaSpent",
-        "bindingFutility",
-        "tolerance"
-      )
-      for (notApplicableParameter in notApplicableParameters) {
-        self$.setParameterType(notApplicableParameter, C_PARAM_NOT_APPLICABLE)
-      }
-      self$.setParameterType("alpha", ifelse(
-        identical(self$alpha, C_ALPHA_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-      ))
-      self$.setParameterType("informationAtInterim", ifelse(
-        identical(self$informationAtInterim, 0.5), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-      ))
-      self$.setParameterType("secondStageConditioning", ifelse(
-        identical(self$secondStageConditioning, TRUE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-      ))
-      
-      self$kMax <- 2L
-      self$sided <- 1L
-      
-      self$.initStages()
-    },
-    show = function(showType = 1, digits = NA_integer_) {
-      "Method for automatically printing trial design objects"
-      super$show(showType = showType, digits = digits)
-    }
-  )
+    inherit = TrialDesign,
+    public = list(
+        informationAtInterim = NULL,
+        secondStageConditioning = NULL,
+        sided = NULL,
+        initialize = function(..., informationAtInterim = NULL, secondStageConditioning = NULL) {
+            super$initialize(...)
+            self$informationAtInterim <- informationAtInterim
+            self$secondStageConditioning <- secondStageConditioning
+            notApplicableParameters <- c(
+                "kMax",
+                "stages",
+                "informationRates",
+                "userAlphaSpending",
+                "criticalValues",
+                "stageLevels",
+                "alphaSpent",
+                "bindingFutility",
+                "tolerance"
+            )
+            for (notApplicableParameter in notApplicableParameters) {
+                self$.setParameterType(notApplicableParameter, C_PARAM_NOT_APPLICABLE)
+            }
+            self$.setParameterType("alpha", ifelse(
+                identical(self$alpha, C_ALPHA_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            ))
+            self$.setParameterType("informationAtInterim", ifelse(
+                identical(self$informationAtInterim, 0.5), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            ))
+            self$.setParameterType("secondStageConditioning", ifelse(
+                identical(self$secondStageConditioning, TRUE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            ))
+
+            self$kMax <- 2L
+            self$sided <- 1L
+
+            self$.initStages()
+        },
+        show = function(showType = 1, digits = NA_integer_) {
+            "Method for automatically printing trial design objects"
+            super$show(showType = showType, digits = digits)
+        }
+    )
 )
 
 #'
@@ -956,15 +950,15 @@ TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
 #' @export
 #'
 getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
-                                        informationAtInterim = 0.5, secondStageConditioning = TRUE) {
-  .assertIsValidAlpha(alpha)
-  .assertIsSingleNumber(informationAtInterim, "informationAtInterim")
-  .assertIsInOpenInterval(informationAtInterim, "informationAtInterim", 0, 1)
-  return(TrialDesignConditionalDunnett$new(
-    alpha = alpha,
-    informationAtInterim = informationAtInterim,
-    secondStageConditioning = secondStageConditioning
-  ))
+        informationAtInterim = 0.5, secondStageConditioning = TRUE) {
+    .assertIsValidAlpha(alpha)
+    .assertIsSingleNumber(informationAtInterim, "informationAtInterim")
+    .assertIsInOpenInterval(informationAtInterim, "informationAtInterim", 0, 1)
+    return(TrialDesignConditionalDunnett$new(
+        alpha = alpha,
+        informationAtInterim = informationAtInterim,
+        secondStageConditioning = secondStageConditioning
+    ))
 }
 
 #'
@@ -1038,108 +1032,108 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #' @export
 #'
 plot.TrialDesign <- function(x, y, ..., main = NA_character_,
-                             xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
-                             theta = seq(-1, 1, 0.01), nMax = NA_integer_, plotPointsEnabled = NA,
-                             legendPosition = NA_integer_, showSource = FALSE,
-                             grid = 1, plotSettings = NULL) {
-  fCall <- match.call(expand.dots = FALSE)
-  designName <- deparse(fCall$x)
-  .assertGgplotIsInstalled()
-  .assertIsSingleInteger(grid, "grid", validateType = FALSE)
-  typeNumbers <- .getPlotTypeNumber(type, x)
-  if (is.null(plotSettings)) {
-    plotSettings <- .getGridPlotSettings(x, typeNumbers, grid)
-  }
-  p <- NULL
-  plotList <- list()
-  for (typeNumber in typeNumbers) {
-    p <- .plotTrialDesign(
-      x = x, y = y, main = main,
-      xlab = xlab, ylab = ylab, type = typeNumber, palette = palette,
-      theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
-      legendPosition = .getGridLegendPosition(legendPosition, typeNumbers, grid),
-      showSource = showSource, designName = designName,
-      plotSettings = plotSettings, ...
-    )
-    .printPlotShowSourceSeparator(showSource, typeNumber, typeNumbers)
-    if (length(typeNumbers) > 1) {
-      caption <- .getPlotCaption(x, typeNumber, stopIfNotFound = TRUE)
-      plotList[[caption]] <- p
+        xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
+        theta = seq(-1, 1, 0.01), nMax = NA_integer_, plotPointsEnabled = NA,
+        legendPosition = NA_integer_, showSource = FALSE,
+        grid = 1, plotSettings = NULL) {
+    fCall <- match.call(expand.dots = FALSE)
+    designName <- deparse(fCall$x)
+    .assertGgplotIsInstalled()
+    .assertIsSingleInteger(grid, "grid", validateType = FALSE)
+    typeNumbers <- .getPlotTypeNumber(type, x)
+    if (is.null(plotSettings)) {
+        plotSettings <- .getGridPlotSettings(x, typeNumbers, grid)
     }
-  }
-  if (length(typeNumbers) == 1) {
+    p <- NULL
+    plotList <- list()
+    for (typeNumber in typeNumbers) {
+        p <- .plotTrialDesign(
+            x = x, y = y, main = main,
+            xlab = xlab, ylab = ylab, type = typeNumber, palette = palette,
+            theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
+            legendPosition = .getGridLegendPosition(legendPosition, typeNumbers, grid),
+            showSource = showSource, designName = designName,
+            plotSettings = plotSettings, ...
+        )
+        .printPlotShowSourceSeparator(showSource, typeNumber, typeNumbers)
+        if (length(typeNumbers) > 1) {
+            caption <- .getPlotCaption(x, typeNumber, stopIfNotFound = TRUE)
+            plotList[[caption]] <- p
+        }
+    }
+    if (length(typeNumbers) == 1) {
+        if (.isSpecialPlotShowSourceArgument(showSource)) {
+            return(invisible(p))
+        }
+
+        return(p)
+    }
+
     if (.isSpecialPlotShowSourceArgument(showSource)) {
-      return(invisible(p))
+        return(invisible(plotList))
     }
-    
-    return(p)
-  }
-  
-  if (.isSpecialPlotShowSourceArgument(showSource)) {
-    return(invisible(plotList))
-  }
-  
-  return(.createPlotResultObject(plotList, grid))
+
+    return(.createPlotResultObject(plotList, grid))
 }
 
 #' @rdname plot.TrialDesign
 #' @export
 plot.TrialDesignCharacteristics <- function(x, y, ...) {
-  plot(x = x$.design, y = y, ...)
+    plot(x = x$.design, y = y, ...)
 }
 
 .plotTrialDesign <- function(..., x, y, main,
-                             xlab, ylab, type, palette,
-                             theta, nMax, plotPointsEnabled,
+        xlab, ylab, type, palette,
+        theta, nMax, plotPointsEnabled,
         legendPosition, showSource, designName, plotSettings = NULL) {
-  .assertGgplotIsInstalled()
-  
-  .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-  if (any(.isTrialDesignFisher(x)) && !(type %in% c(1, 3, 4))) {
-    stop(
-      C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-      "'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4"
-    )
-  }
-  
-  .warnInCaseOfUnknownArguments(
-    functionName = "plot",
-    ignore = c("xlim", "ylim", "companyAnnotationEnabled", "variedParameters"), ...
-  )
-  
-  if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {
-    warning("'theta' (", .reconstructSequenceCommand(theta), ") will be ignored for plot type ", type, call. = FALSE)
-  }
-  
-  if (!missing(y) && !is.null(y) && length(y) == 1 && inherits(y, "TrialDesign")) {
-    args <- list(...)
-    variedParameters <- args[["variedParameters"]]
-    if (is.null(variedParameters)) {
-      if (.isTrialDesignInverseNormalOrGroupSequential(x) &&
-          .isTrialDesignInverseNormalOrGroupSequential(y) &&
-          x$typeOfDesign != y$typeOfDesign) {
-        variedParameters <- "typeOfDesign"
-      } else {
+    .assertGgplotIsInstalled()
+
+    .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
+    if (any(.isTrialDesignFisher(x)) && !(type %in% c(1, 3, 4))) {
         stop(
-          C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-          "'variedParameters' needs to be specified, e.g., variedParameters = \"typeOfDesign\""
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4"
         )
-      }
     }
-    designSet <- getDesignSet(designs = c(x, y), variedParameters = variedParameters)
-  } else {
-    designSet <- TrialDesignSet$new(design = x, singleDesign = TRUE)
-    if (!is.null(plotSettings)) {
-      designSet$.plotSettings <- plotSettings
+
+    .warnInCaseOfUnknownArguments(
+        functionName = "plot",
+        ignore = c("xlim", "ylim", "companyAnnotationEnabled", "variedParameters"), ...
+    )
+
+    if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {
+        warning("'theta' (", .reconstructSequenceCommand(theta), ") will be ignored for plot type ", type, call. = FALSE)
     }
-  }
-  
-  .plotTrialDesignSet(
-    x = designSet, y = y, main = main, xlab = xlab, ylab = ylab, type = type,
-    palette = palette, theta = theta, nMax = nMax,
-    plotPointsEnabled = plotPointsEnabled, legendPosition = legendPosition,
-    showSource = showSource, designSetName = designName, ...
-  )
+
+    if (!missing(y) && !is.null(y) && length(y) == 1 && inherits(y, "TrialDesign")) {
+        args <- list(...)
+        variedParameters <- args[["variedParameters"]]
+        if (is.null(variedParameters)) {
+            if (.isTrialDesignInverseNormalOrGroupSequential(x) &&
+                    .isTrialDesignInverseNormalOrGroupSequential(y) &&
+                    x$typeOfDesign != y$typeOfDesign) {
+                variedParameters <- "typeOfDesign"
+            } else {
+                stop(
+                    C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+                    "'variedParameters' needs to be specified, e.g., variedParameters = \"typeOfDesign\""
+                )
+            }
+        }
+        designSet <- getDesignSet(designs = c(x, y), variedParameters = variedParameters)
+    } else {
+        designSet <- TrialDesignSet$new(design = x, singleDesign = TRUE)
+        if (!is.null(plotSettings)) {
+            designSet$.plotSettings <- plotSettings
+        }
+    }
+
+    .plotTrialDesignSet(
+        x = designSet, y = y, main = main, xlab = xlab, ylab = ylab, type = type,
+        palette = palette, theta = theta, nMax = nMax,
+        plotPointsEnabled = plotPointsEnabled, legendPosition = legendPosition,
+        showSource = showSource, designSetName = designName, ...
+    )
 }
 
 #'

@@ -129,128 +129,130 @@ NULL
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeMeans")
         }
-        
+
         return("getPowerMeans")
     }
-    
+
     if ("TrialDesignPlanRates" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeRates")
-        } 
-        
+        }
+
         return("getPowerRates")
-    } 
-    
+    }
+
     if ("TrialDesignPlanSurvival" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeSurvival")
-        } 
-        
+        }
+
         return("getPowerSurvival")
-    }  
-    
+    }
+
     if ("TrialDesignPlanCountData" == .getClassName(obj)) {
         if (obj$.isSampleSizeObject()) {
             return("getSampleSizeCounts")
-        } 
-        
+        }
+
         return("getPowerCounts")
-    }  
-    
+    }
+
     if (inherits(obj, "TrialDesign")) {
         return(paste0("get", sub("^Trial", "", .getClassName(obj))))
-    }  
-    
+    }
+
     if (inherits(obj, "Dataset")) {
         return("getDataset")
-    }  
-    
+    }
+
     if (inherits(obj, "AnalysisResults")) {
         return("getAnalysisResults")
-    }  
-    
+    }
+
     if ("TrialDesignSet" == .getClassName(obj)) {
         return("getDesignSet")
-    }  
-    
+    }
+
     if ("TrialDesignCharacteristics" == .getClassName(obj)) {
         return("getDesignCharacteristics")
-    }  
-    
+    }
+
     if (inherits(obj, "SimulationResultsMeans")) {
         return("getSimulationMeans")
-    }  
-    
+    }
+
     if (inherits(obj, "SimulationResultsRates")) {
         return("getSimulationRates")
-    }  
-    
+    }
+
     if (inherits(obj, "SimulationResultsSurvival")) {
         return("getSimulationSurvival")
-    }  
-    
+    }
+
     if (inherits(obj, "SimulationResultsMultiArmMeans")) {
         return("getSimulationMultiArmMeans")
-    }  
-    
+    }
+
     if (inherits(obj, "SimulationResultsMultiArmRates")) {
         return("getSimulationMultiArmRates")
-    }  
-    
+    }
+
     if (inherits(obj, "SimulationResultsMultiArmSurvival")) {
         return("getSimulationMultiArmSurvival")
-    }  
-    
+    }
+
     if (inherits(obj, "SimulationResultsEnrichmentMeans")) {
         return("getSimulationEnrichmentMeans")
-    }  
-    
+    }
+
     if (inherits(obj, "SimulationResultsEnrichmentRates")) {
         return("getSimulationEnrichmentRates")
-    }  
-    
+    }
+
     if (inherits(obj, "SimulationResultsEnrichmentSurvival")) {
         return("getSimulationEnrichmentSurvival")
-    }  
-    
+    }
+
     if (inherits(obj, "PiecewiseSurvivalTime")) {
         return("getPiecewiseSurvivalTime")
-    }  
-    
+    }
+
     if (inherits(obj, "AccrualTime")) {
         return("getAccrualTime")
-    }  
-    
+    }
+
     if (inherits(obj, "StageResults")) {
         return("getStageResults")
-    }  
-    
+    }
+
     if (inherits(obj, "ConditionalPowerResults")) {
         return("getConditionalPower")
-    }  
-    
+    }
+
     if (inherits(obj, "PowerAndAverageSampleNumberResult")) {
         return("getPowerAndAverageSampleNumber")
-    }  
-    
+    }
+
     if (inherits(obj, "EventProbabilities")) {
         return("getEventProbabilities")
-    }  
-    
+    }
+
     if (inherits(obj, "NumberOfSubjects")) {
         return("getNumberOfSubjects")
-    }  
-    
+    }
+
     if (inherits(obj, "PerformanceScore")) {
         return("gePerformanceScore")
-    }  
-    
+    }
+
     if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
         return(.getGeneratorFunctionName(obj$object))
-    } 
-    
-    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
-        "function '.getGeneratorFunctionName' is not implemented for class ", .getClassName(obj))
+    }
+
+    stop(
+        C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+        "function '.getGeneratorFunctionName' is not implemented for class ", .getClassName(obj)
+    )
 }
 
 #' @rdname getObjectRCode
@@ -323,7 +325,7 @@ getObjectRCode <- function(obj, ...,
         explicitPrint = FALSE) {
     functionName <- deparse(substitute(obj))
     functionName <- sub("\\(.*\\)$", "", functionName)
-    
+
     output <- match.arg(output)
 
     .assertIsSingleLogical(includeDefaultParameters, "includeDefaultParameters")
@@ -538,9 +540,9 @@ getObjectRCode <- function(obj, ...,
             precondition <- c(precond, precondition)
         }
     }
-    
+
     precondition <- unique(precondition)
-    
+
     if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
         return(getObjectRCode(obj$object,
             prefix = ifelse(pipeOperator == "none", "summary(", ""),

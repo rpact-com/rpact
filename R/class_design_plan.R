@@ -108,8 +108,8 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
         .objectType = NULL, # "sampleSize" or "power"
         initialize = function(design, ...) {
             self$.design <- design
-            
-            super$initialize(...)#TODO
+
+            super$initialize(...) # TODO
 
             self$.plotSettings <- PlotSettings$new()
 
@@ -197,7 +197,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
 
                 self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
 
-                if (inherits(self, "TrialDesignPlanSurvival") || self$groups == 2 || self$.design$kMax > 1) {#TODO Groups????
+                if (inherits(self, "TrialDesignPlanSurvival") || self$groups == 2 || self$.design$kMax > 1) { # TODO Groups????
                     self$.cat("Legend:\n",
                         heading = 2,
                         consoleOutputEnabled = consoleOutputEnabled
@@ -243,7 +243,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             } else {
                 s <- paste0("unknown data class '", .getClassName(self), "'")
             }
-            return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s)) #TODO correct closure of s?
+            return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s)) # TODO correct closure of s?
         }
     )
 )
@@ -390,8 +390,7 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
                 stDev = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS[["stDev"]],
                 groups = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS[["groups"]],
                 allocationRatioPlanned = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS[["allocationRatioPlanned"]]) {
-            
-            super$initialize(...)#TODO
+            super$initialize(...) # TODO
 
             self$normalApproximation <- normalApproximation
             self$meanRatio <- meanRatio
@@ -400,7 +399,7 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
             self$stDev <- stDev
             self$groups <- groups
             self$allocationRatioPlanned <- allocationRatioPlanned
-          
+
             self$optimumAllocationRatio <- FALSE
             visibleFieldNames <- self$.getVisibleFieldNames()
             startIndex <- which(visibleFieldNames == "directionUpper")
@@ -539,7 +538,7 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
                 pi2 = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["pi2"]],
                 groups = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["groups"]],
                 allocationRatioPlanned = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["allocationRatioPlanned"]]) {
-            super$initialize(...) #TODO
+            super$initialize(...) # TODO
             self$normalApproximation <- normalApproximation
             self$riskRatio <- riskRatio
             self$thetaH0 <- thetaH0
@@ -650,7 +649,7 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
 #' @template field_futilityBoundsEffectScaleLower
 #' @template field_futilityBoundsEffectScaleUpper
 #' @template field_futilityBoundsPValueScale
-#' 
+#'
 #' @details
 #' This object cannot be created directly; use \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 #' with suitable arguments to create a design plan for a dataset of survival data.
@@ -734,22 +733,20 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
         futilityBoundsEffectScaleLower = NULL,
         futilityBoundsEffectScaleUpper = NULL,
         futilityBoundsPValueScale = NULL,
-        initialize = function(...,typeOfComputation = NULL,
-                                  thetaH0 = NULL,
-                                  allocationRatioPlanned = NULL,
-                                  accountForObservationTimes = NULL,
-                                  eventTime = NULL,
-                                  accrualTime = NULL,
-                                  accrualIntensity = NULL,
-                                  kappa = NULL,
-                                  followUpTime = NULL,
-                                  maxNumberOfSubjects = NULL,
-                                  dropoutRate1 = NULL,
-                                  dropoutRate2 = NULL,
-                                  dropoutTime = NULL,
-                                  hazardRatio = NULL) {
-          
-            
+        initialize = function(..., typeOfComputation = NULL,
+                thetaH0 = NULL,
+                allocationRatioPlanned = NULL,
+                accountForObservationTimes = NULL,
+                eventTime = NULL,
+                accrualTime = NULL,
+                accrualIntensity = NULL,
+                kappa = NULL,
+                followUpTime = NULL,
+                maxNumberOfSubjects = NULL,
+                dropoutRate1 = NULL,
+                dropoutRate2 = NULL,
+                dropoutTime = NULL,
+                hazardRatio = NULL) {
             self$typeOfComputation <- typeOfComputation
             self$thetaH0 <- thetaH0
             self$allocationRatioPlanned <- allocationRatioPlanned
@@ -764,7 +761,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
             self$dropoutRate2 <- dropoutRate2
             self$dropoutTime <- dropoutTime
             self$hazardRatio <- hazardRatio
-            
+
             super$initialize(...)
 
             self$optimumAllocationRatio <- FALSE
