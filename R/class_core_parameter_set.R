@@ -100,21 +100,22 @@ FieldSet <- R6::R6Class("FieldSet",
                     line <- paste0(args, collapse = sep)
                     listItemEnabled <- grepl("^  ", line)
 
-                    headingBaseNumber <- as.integer(getOption("rpact.print.heading.base.number", 0L))
+                    headingBaseNumber <- as.integer(getOption("rpact.print.heading.base.number", 
+                            C_HEADING_BASE_NUMBER_DEFAULT))
                     if (is.na(headingBaseNumber)) {
-                        headingBaseNumber <- 0L
+                        headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
                     if (headingBaseNumber < -2) {
                         warning(
                             "Illegal option ", sQuote("rpact.print.heading.base.number"),
-                            " (", headingBaseNumber, ") was set to 0"
+                            " (", headingBaseNumber, ") was set to ", C_HEADING_BASE_NUMBER_DEFAULT
                         )
-                        headingBaseNumber <- 0L
+                        headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
                     if (headingBaseNumber > 4) {
                         warning(
                             "Illgeal option ", sQuote("rpact.print.heading.base.number"),
-                            " (", headingBaseNumber, ") was set to 4 becasue it was too large"
+                            " (", headingBaseNumber, ") was set to 4 because it was too large"
                         )
                         headingBaseNumber <- 4L
                     }
