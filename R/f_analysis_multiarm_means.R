@@ -60,7 +60,7 @@ NULL
     )
 
     results <- AnalysisResultsMultiArmInverseNormal$new(design = design, dataInput = dataInput)
-    
+
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,

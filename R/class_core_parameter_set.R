@@ -151,9 +151,9 @@ FieldSet <- R6::R6Class("FieldSet",
                 }
             }
             if (length(self$.catLines) == 0) {
-                self$.catLines <<- line
+                self$.catLines <- line
             } else {
-                self$.catLines <<- c(.catLines, line)
+                self$.catLines <- c(.catLines, line)
             }
             return(invisible())
         },

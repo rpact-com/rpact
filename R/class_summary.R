@@ -22,7 +22,6 @@
 #' @include f_core_assertions.R
 NULL
 
-
 SummaryItem <- R6::R6Class("SummaryItem",
     public = list(
         title = NULL,
@@ -81,10 +80,6 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
             markdown <- .isMarkdownEnabled()
         }
         if (markdown) {
-            if (.isQuartoEnabled()) {
-                # cat("#| results: 'asis'\n\n")
-            }
-
             x$.catMarkdownText()
         } else {
             x$show()

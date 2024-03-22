@@ -1058,3 +1058,5 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
     try(suppressWarnings(suppressMessages(p <- p + ggplot2::scale_color_manual(values = c("#4daf4a", "#377eb8", "#e41a1c")))))
     return(p)
 }
+
+
