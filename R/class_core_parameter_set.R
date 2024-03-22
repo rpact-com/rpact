@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7656 $
-## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
+## |  File version: $Revision: 7739 $
+## |  Last changed: $Date: 2024-03-22 09:34:48 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -100,21 +100,22 @@ FieldSet <- setRefClass("FieldSet",
                     line <- paste0(args, collapse = sep)
                     listItemEnabled <- grepl("^  ", line)
 
-                    headingBaseNumber <- as.integer(getOption("rpact.print.heading.base.number", 0L))
+                    headingBaseNumber <- as.integer(getOption("rpact.print.heading.base.number", 
+                        C_HEADING_BASE_NUMBER_DEFAULT))
                     if (is.na(headingBaseNumber)) {
-                        headingBaseNumber <- 0L
+                        headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
                     if (headingBaseNumber < -2) {
                         warning(
                             "Illegal option ", sQuote("rpact.print.heading.base.number"),
-                            " (", headingBaseNumber, ") was set to 0"
+                            " (", headingBaseNumber, ") was set to ", C_HEADING_BASE_NUMBER_DEFAULT
                         )
-                        headingBaseNumber <- 0L
+                        headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
                     if (headingBaseNumber > 4) {
                         warning(
                             "Illgeal option ", sQuote("rpact.print.heading.base.number"),
-                            " (", headingBaseNumber, ") was set to 4 becasue it was too large"
+                            " (", headingBaseNumber, ") was set to 4 because it was too large"
                         )
                         headingBaseNumber <- 4L
                     }

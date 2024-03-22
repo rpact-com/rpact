@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7656 $
-## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
+## |  File version: $Revision: 7739 $
+## |  Last changed: $Date: 2024-03-22 09:34:48 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -78,6 +78,8 @@ C_ACCEPT_DEVIATION_INFORMATIONRATES <- 0.05
 
 C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT <- 50
 C_VARIED_PARAMETER_SEQUENCE_LENGTH_DEFAULT <- 30
+
+C_HEADING_BASE_NUMBER_DEFAULT <- -2L
 
 C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL <- "TrialDesignGroupSequential"
 C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL <- "TrialDesignInverseNormal"
