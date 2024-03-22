@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7744 $
+## |  Last changed: $Date: 2024-03-22 17:38:03 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -91,6 +91,7 @@
 #' testing means rates for negative binomial distributed event numbers in the two treatment groups testing situation.
 #'
 #' @inheritParams param_design_with_default
+#' @inheritParams param_plannedCalendarTime
 #' @inheritParams param_thetaH0
 #' @inheritParams param_lambda_counts
 #' @inheritParams param_lambda1_counts
@@ -108,26 +109,16 @@
 #' @inheritParams param_minNumberOfSubjectsPerStage
 #' @inheritParams param_plannedMaxSubjectsPerStage
 #' @inheritParams param_conditionalPowerSimulation
-#' @param lambda1H1 If specified, the assumed probability in the active treatment group if two treatment groups
-#'        are considered, or the assumed probability for a one treatment group design, for which the conditional
-#'        power was calculated.
-#' @param lambda2H1 If specified, the assumed probability in the reference group if two treatment groups
-#'        are considered, for which the conditional power was calculated.
 #' @inheritParams param_maxNumberOfIterations
 #' @inheritParams param_calcSubjectsFunction
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
 #' @inheritParams param_showStatistics
 #'
-#'
 #' @details
 #' At given design the function simulates the power, stopping probabilities, conditional power, and expected
 #' sample size at given number of subjects and parameter configuration.
 #' Additionally, an allocation ratio = n1/n2 and a null hypothesis value thetaH0 can be specified.
-#'
-#' The definition of \code{lambda1H1} and/or \code{lambda2H1} makes only sense if \code{kMax} > 1
-#' and if \code{conditionalPower}, \code{minNumberOfSubjectsPerStage}, and
-#' \code{plannedMaxSubjectsPerStage} (or \code{calcSubjectsFunction}) are defined.
 #'
 #' @section Simulation Data:
 #' The summary statistics "Simulated data" contains the following parameters: median [range]; mean +/-sd\cr

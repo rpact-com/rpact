@@ -35,6 +35,8 @@ and \code{sided} can be directly entered as argument where necessary.}
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
+\item{plannedCalendarTime}{TODO @Gernot please describe}
+
 \item{plannedMaxSubjects}{TODO @Gernot please describe}
 
 \item{lambda1}{A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
@@ -99,13 +101,6 @@ recalculation. By default, sample size recalculation is performed with condition
 \item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default
 is \code{FALSE}.}
-
-\item{lambda1H1}{If specified, the assumed probability in the active treatment group if two treatment groups
-are considered, or the assumed probability for a one treatment group design, for which the conditional
-power was calculated.}
-
-\item{lambda2H1}{If specified, the assumed probability in the reference group if two treatment groups
-are considered, for which the conditional power was calculated.}
 }
 \value{
 Returns a \code{\link{SimulationResults}} object.
@@ -127,10 +122,6 @@ testing means rates for negative binomial distributed event numbers in the two t
 At given design the function simulates the power, stopping probabilities, conditional power, and expected
 sample size at given number of subjects and parameter configuration.
 Additionally, an allocation ratio = n1/n2 and a null hypothesis value thetaH0 can be specified.
-
-The definition of \code{lambda1H1} and/or \code{lambda2H1} makes only sense if \code{kMax} > 1
-and if \code{conditionalPower}, \code{minNumberOfSubjectsPerStage}, and
-\code{plannedMaxSubjectsPerStage} (or \code{calcSubjectsFunction}) are defined.
 }
 \section{Simulation Data}{
 

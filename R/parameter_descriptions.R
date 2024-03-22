@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7744 $
+## |  Last changed: $Date: 2024-03-22 17:38:03 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -915,5 +915,11 @@ NULL
 #' Parameter Description: Planned Max Subjects
 #' @param plannedMaxSubjects TODO @Gernot please describe
 #' @name param_plannedMaxSubjects
+#' @keywords internal
+NULL
+
+#' Parameter Description: Planned Calendar Time
+#' @param plannedCalendarTime TODO @Gernot please describe
+#' @name param_plannedCalendarTime
 #' @keywords internal
 NULL
