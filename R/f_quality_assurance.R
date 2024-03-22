@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -504,7 +504,7 @@ testPackage <- function(outDir = ".", ...,
 
     if (completeUnitTestSetEnabled && fullTestEnabled) {
         cat("Run all tests. Please wait...\n")
-        cat("Have a break - it takes about 30 minutes.\n")
+        cat("Have a break - it takes about 20 minutes.\n")
         cat("Exceution of all available unit tests startet at ",
             format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
             sep = ""

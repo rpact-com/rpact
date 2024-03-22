@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7644 $
-## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -322,7 +322,7 @@ getDesignFisher <- function(...,
             if (length(diff) > 0 && any(diff > 1e-12)) {
                 .logDebug(
                     "Stop creation of Fisher design because critical values are ",
-                    .arrayToString(criticalValues, vectorLookAndFeelEnabled = TRUE), ", ",
+                    .arrayToString(design$criticalValues, vectorLookAndFeelEnabled = TRUE), ", ",
                     "i.e., differences are ", .arrayToString(diff, vectorLookAndFeelEnabled = TRUE)
                 )
                 stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "no calculation possible")

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7659 $
-## |  Last changed: $Date: 2024-02-23 10:42:33 +0100 (Fr, 23 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1409,7 +1409,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
 
             self$.initAccrualIntensityAbsolute()
             self$.validateFormula()
-            self$.showWarningIfCaseIsNotAllowed() # TODO wrong naming upstream!
+            self$.showWarningIfCaseIsNotAllowed() 
         },
         .asDataFrame = function() {
             accrualIntensityTemp <- self$accrualIntensity

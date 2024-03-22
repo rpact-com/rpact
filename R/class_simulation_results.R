@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7665 $
-## |  Last changed: $Date: 2024-02-23 17:33:46 +0100 (Fr, 23 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1026,7 +1026,6 @@ SimulationResultsBaseSurvival <- R6::R6Class("SimulationResultsBaseSurvival",
         thetaH1 = NULL,
         calcEventsFunction = NULL,
         expectedNumberOfEvents = NULL,
-        # conditionalPowerAchieved = matrix(), #TODO remove?
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             generatedParams <- c(
@@ -1612,6 +1611,80 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentS
             )) {
                 self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
+        }
+    )
+)
+
+#'
+#' @name SimulationResultsBaseCountData
+#'
+#' @title
+#' Class for Simulation Results Count Data
+#'
+#' @description
+#' A class for simulation results count data.
+#'
+#' @template field_maxNumberOfIterations
+#' @template field_seed
+#' @template field_allocationRatioPlanned
+#' @template field_conditionalPower
+#' @template field_iterations
+#' @template field_futilityPerStage
+#' @template field_thetaH0
+#' @template field_accrualTime
+#' @template field_accrualIntensity
+#' @template field_groups
+#' @template field_directionUpper
+#' @template field_earlyStop
+#' @template field_sampleSizes
+#' @template field_overallReject
+#' @template field_rejectPerStage
+#'
+#' @details
+#' Use \code{\link[=getSimulationCounts]{getSimulationCounts()}} to create an object of this type.
+#'
+#' @include class_core_parameter_set.R
+#' @include class_core_plot_settings.R
+#' @include class_design.R
+#' @include f_core_constants.R
+#' @include f_simulation_base_count_data.R
+#'
+#' @keywords internal
+#'
+#' @importFrom methods new
+#'
+SimulationResultsBaseCountData <- R6::R6Class("SimulationResultsBaseCountData",
+    inherit = SimulationResults,
+    public = list(
+        plannedMaxSubjects = NULL,
+        plannedCalendarTime = NULL,
+        directionUpper = NULL,
+        lambda1 = NULL,
+        lambda2 = NULL,
+        lambda = NULL,
+        theta = NULL,
+        thetaH0 = NULL,
+        overdispersion = NULL,
+        fixedExposureTime = NULL,
+        accrualTime = NULL,
+        accrualIntensity = NULL,
+        followUpTime = NULL,
+        groups = NULL,
+        numberOfSubjects = NULL, 
+        numberOfSubjects1 = NULL,
+        numberOfSubjects2 = NULL,
+        iterations = NULL,
+        futilityStop = NULL,
+        futilityPerStage = NULL,
+        rejectPerStage = NULL,
+        earlyStop = NULL,
+        overallReject = NULL,
+        calcSubjectsFunction = NULL,
+        initialize = function(design, ...) {
+            super$initialize(design = design, ...)
+            self$groups <- 2L
+            self$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("futilityStop", C_PARAM_NOT_APPLICABLE)
         }
     )
 )

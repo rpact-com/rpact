@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -402,7 +402,7 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             self$nonStochasticCurtailment <- nonStochasticCurtailment
             self$sided <- sided
             self$simAlpha <- simAlpha
-            super$initialize(...) # TODO dont move to first line of constructor
+            super$initialize(...) # important: don't move to first line of constructor
             self$iterations <- iterations
             self$seed <- seed
             self$tolerance <- tolerance
@@ -703,7 +703,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             if (!identical(gammaA, self$gammaA)) {
                 return(self$.pasteComparisonResult("gammaA", gammaA, self$gammaA))
             }
-            if (!identical(gammaB, self$gammaB)) { # TODO
+            if (!identical(gammaB, self$gammaB)) {
                 return(self$.pasteComparisonResult("gammaB", gammaB, self$gammaB))
             }
             if ((typeOfDesign == C_TYPE_OF_DESIGN_PT && !identical(bindingFutility, self$bindingFutility)) ||

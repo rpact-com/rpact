@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7651 $
-## |  Last changed: $Date: 2024-02-20 15:45:44 +0100 (Di, 20 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -109,7 +109,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
         initialize = function(design, ...) {
             self$.design <- design
 
-            super$initialize(...) # TODO
+            super$initialize(...)
 
             self$.plotSettings <- PlotSettings$new()
 
@@ -197,12 +197,15 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
 
                 self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
 
-                if (inherits(self, "TrialDesignPlanSurvival") || self$groups == 2 || self$.design$kMax > 1) { # TODO Groups????
+                if (inherits(self, "TrialDesignPlanSurvival") ||
+                        (!is.null(self$groups) && self$groups == 2) ||
+                        self$.design$kMax > 1) {
                     self$.cat("Legend:\n",
                         heading = 2,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
-                    if (inherits(self, "TrialDesignPlanSurvival") || self$groups == 2) {
+                    if (inherits(self, "TrialDesignPlanSurvival") ||
+                            (!is.null(self$groups) && self$groups == 2)) {
                         self$.cat("  (i): values of treatment arm i\n",
                             consoleOutputEnabled = consoleOutputEnabled
                         )
@@ -235,15 +238,15 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
         },
         .toString = function(startWithUpperCase = FALSE) {
             if (.isTrialDesignPlanMeans(self)) {
-                s <- "means"
+                result <- "means"
             } else if (.isTrialDesignPlanRates(self)) {
-                s <- "rates"
+                result <- "rates"
             } else if (.isTrialDesignPlanSurvival(self)) {
-                s <- "survival data"
+                result <- "survival data"
             } else {
-                s <- paste0("unknown data class '", .getClassName(self), "'")
+                result <- paste0("unknown data class '", .getClassName(self), "'")
             }
-            return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s)) # TODO correct closure of s?
+            return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(result), result))
         }
     )
 )
@@ -390,7 +393,7 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
                 stDev = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS[["stDev"]],
                 groups = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS[["groups"]],
                 allocationRatioPlanned = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS[["allocationRatioPlanned"]]) {
-            super$initialize(...) # TODO
+            super$initialize(...)
 
             self$normalApproximation <- normalApproximation
             self$meanRatio <- meanRatio
@@ -426,6 +429,39 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
         show = function(showType = 1, digits = NA_integer_) {
             "Method for automatically printing trial plan objects"
             super$show(showType = showType, digits = digits)
+        },
+        recreate = function(alternative = NA_real_) {
+            alternativeTemp <- alternative
+            if (any(is.na(alternative))) {
+                alternativeTemp <- self$alternative
+            }
+            if (self$.objectType == "sampleSize") {
+                result <- getSampleSizeMeans(
+                    design = self$.design,
+                    normalApproximation = self$.getParameterValueIfUserDefinedOrDefault("normalApproximation"),
+                    meanRatio = self$meanRatio,
+                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
+                    alternative = alternativeTemp,
+                    stDev = self$.getParameterValueIfUserDefinedOrDefault("stDev"),
+                    groups = self$.getParameterValueIfUserDefinedOrDefault("groups"),
+                    allocationRatioPlanned = self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned")
+                )
+            } else {
+                result <- getPowerMeans(
+                    design = self$.design,
+                    normalApproximation = self$.getParameterValueIfUserDefinedOrDefault("normalApproximation"),
+                    meanRatio = self$meanRatio,
+                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
+                    alternative = alternativeTemp,
+                    stDev = self$.getParameterValueIfUserDefinedOrDefault("stDev"),
+                    directionUpper = self$.getParameterValueIfUserDefinedOrDefault("directionUpper"),
+                    maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
+                    groups = self$.getParameterValueIfUserDefinedOrDefault("groups"),
+                    allocationRatioPlanned = self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned")
+                )
+            }
+            result$.plotSettings <- self$.plotSettings
+            return(result)
         }
     )
 )
@@ -538,7 +574,7 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
                 pi2 = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["pi2"]],
                 groups = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["groups"]],
                 allocationRatioPlanned = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["allocationRatioPlanned"]]) {
-            super$initialize(...) # TODO
+            super$initialize(...)
             self$normalApproximation <- normalApproximation
             self$riskRatio <- riskRatio
             self$thetaH0 <- thetaH0
@@ -573,6 +609,36 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
         show = function(showType = 1, digits = NA_integer_) {
             "Method for automatically printing trial plan objects"
             super$show(showType = showType, digits = digits)
+        },
+        recreate = function(pi1 = NA_real_) {
+            pi1Temp <- pi1
+            if (any(is.na(pi1))) {
+                pi1Temp <- self$pi1
+            }
+            if (self$.objectType == "sampleSize") {
+                return(getSampleSizeRates(
+                    design = self$.design,
+                    normalApproximation = self$.getParameterValueIfUserDefinedOrDefault("normalApproximation"),
+                    riskRatio = self$riskRatio, 
+                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
+                    pi1 = pi1Temp,
+                    pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
+                    groups = self$.getParameterValueIfUserDefinedOrDefault("groups"),
+                    allocationRatioPlanned = self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned")
+                ))
+            } else {
+                return(getPowerRates(
+                    design = self$.design,
+                    riskRatio = self$riskRatio, 
+                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
+                    pi1 = pi1Temp,
+                    pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
+                    directionUpper = self$.getParameterValueIfUserDefinedOrDefault("directionUpper"),
+                    maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
+                    groups = self$.getParameterValueIfUserDefinedOrDefault("groups"),
+                    allocationRatioPlanned = self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned")
+                ))
+            }
         }
     )
 )
@@ -817,6 +883,82 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     argumentName, .arrayToString(argument)
                 ), call. = FALSE)
             }
+        },
+        recreate = function(hazardRatio = NA_real_, pi1 = NA_real_) {
+            hr <- NA_real_
+            if (.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
+                hr <- hazardRatio
+                if (any(is.na(hazardRatio))) {
+                    hr <- self$hazardRatio
+                }
+            }
+            pi1Temp <- NA_real_
+            if (.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
+                pi1Temp <- pi1
+                if (any(is.na(pi1))) {
+                    pi1Temp <- self$pi1
+                }
+            }
+            accrualTimeTemp <- self$.getParameterValueIfUserDefinedOrDefault("accrualTime")
+            if (!is.null(accrualTimeTemp) && length(accrualTimeTemp) > 0 &&
+                    !all(is.na(accrualTimeTemp)) && accrualTimeTemp[1] != 0) {
+                accrualTimeTemp <- c(0, accrualTimeTemp)
+            }
+            accrualIntensityTemp <- self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity")
+            if (all(is.na(accrualIntensityTemp))) {
+                accrualIntensityTemp <- C_ACCRUAL_INTENSITY_DEFAULT
+            }
+            if (self$.objectType == "sampleSize") {
+                return(getSampleSizeSurvival(
+                    design = self$.design,
+                    typeOfComputation = self$.getParameterValueIfUserDefinedOrDefault("typeOfComputation"),
+                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
+                    pi1 = pi1Temp,
+                    pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
+                    allocationRatioPlanned = self$allocationRatioPlanned,
+                    accountForObservationTimes = self$.getParameterValueIfUserDefinedOrDefault("accountForObservationTimes"),
+                    eventTime = self$eventTime,
+                    accrualTime = accrualTimeTemp,
+                    accrualIntensity = accrualIntensityTemp,
+                    kappa = self$kappa,
+                    piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
+                    lambda2 = self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
+                    lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
+                    followUpTime = self$.getParameterValueIfUserDefinedOrDefault("followUpTime"),
+                    maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
+                    dropoutRate1 = self$dropoutRate1,
+                    dropoutRate2 = self$dropoutRate2,
+                    dropoutTime = self$dropoutTime,
+                    hazardRatio = hr
+                ))
+            } else {
+                directionUpperTemp <- directionUpper
+                if (length(directionUpperTemp) > 1) {
+                    directionUpperTemp <- directionUpperTemp[1]
+                }
+                return(getPowerSurvival(
+                    design = self$.design,
+                    typeOfComputation = self$.getParameterValueIfUserDefinedOrDefault("typeOfComputation"),
+                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
+                    pi1 = pi1Temp,
+                    pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
+                    directionUpper = directionUpperTemp,
+                    allocationRatioPlanned = self$allocationRatioPlanned,
+                    eventTime = self$eventTime,
+                    accrualTime = accrualTimeTemp,
+                    accrualIntensity = accrualIntensityTemp,
+                    kappa = self$kappa,
+                    piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
+                    lambda2 = self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
+                    lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
+                    hazardRatio = hr,
+                    maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
+                    maxNumberOfEvents = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfEvents"),
+                    dropoutRate1 = self$dropoutRate1,
+                    dropoutRate2 = self$dropoutRate2,
+                    dropoutTime = self$dropoutTime
+                ))
+            }
         }
     )
 )
@@ -956,6 +1098,60 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
         .toString = function(startWithUpperCase = FALSE) {
             s <- "count data"
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
+        },
+        recreate = function(..., lambda1 = NA_real_, theta = NA_real_) {
+            if (all(is.na(lambda1))) {
+                lambda1Temp <- self$.getParameterValueIfUserDefinedOrDefault("lambda1")
+            } else {
+                lambda1Temp <- lambda1
+                if (any(is.na(lambda1))) {
+                    lambda1Temp <- self$lambda1
+                }
+            }
+            if (all(is.na(theta))) {
+                thetaTemp <- self$.getParameterValueIfUserDefinedOrDefault("theta")
+            } else {
+                thetaTemp <- theta
+                if (any(is.na(theta))) {
+                    thetaTemp <- self$theta
+                }
+            }
+            if (self$.objectType == "sampleSize") {
+                result <- getSampleSizeCounts(
+                    design = self$.design,
+                    lambda1 = lambda1Temp,
+                    lambda2 = self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
+                    lambda = self$.getParameterValueIfUserDefinedOrDefault("lambda"),
+                    theta = thetaTemp,
+                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
+                    overdispersion = self$.getParameterValueIfUserDefinedOrDefault("overdispersion"),
+                    fixedExposureTime = self$.getParameterValueIfUserDefinedOrDefault("fixedExposureTime"),
+                    accrualTime = self$.getParameterValueIfUserDefinedOrDefault("accrualTime"),
+                    accrualIntensity = self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity"),
+                    followUpTime = self$.getParameterValueIfUserDefinedOrDefault("followUpTime"),
+                    maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
+                    allocationRatioPlanned = self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned")
+                )
+            } else {
+                result <- getPowerCounts(
+                    design = self$.design,
+                    directionUpper = self$.getParameterValueIfUserDefinedOrDefault("directionUpper"),
+                    maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
+                    lambda1 = lambda1Temp,
+                    lambda2 = self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
+                    lambda = self$.getParameterValueIfUserDefinedOrDefault("lambda"),
+                    theta = thetaTemp,
+                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
+                    overdispersion = self$.getParameterValueIfUserDefinedOrDefault("overdispersion"),
+                    fixedExposureTime = self$.getParameterValueIfUserDefinedOrDefault("fixedExposureTime"),
+                    accrualTime = self$.getParameterValueIfUserDefinedOrDefault("accrualTime"),
+                    accrualIntensity = self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity"),
+                    followUpTime = self$.getParameterValueIfUserDefinedOrDefault("followUpTime"),
+                    allocationRatioPlanned = self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned")
+                )
+            }
+            result$.plotSettings <- self$.plotSettings
+            return(result)
         }
     )
 )

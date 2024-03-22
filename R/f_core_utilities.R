@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -764,7 +764,7 @@ NULL
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null")
     }
 
-    if (!ifelse(R6::is.R6(parameterSet), parameterName %in% names(parameterSet), parameterName %in% names(getClass(class(parameterSet))@fieldClasses))) { # TODO
+    if (!(parameterName %in% names(parameterSet))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'"
@@ -1017,6 +1017,10 @@ printCitation <- function(inclusiveR = TRUE, language = "en") {
     return(decimalPlaces)
 }
 
+.isResultObjectBaseClass <- function(x) {
+    return(R6::is.R6(x))
+}
+
 #'
 #' @title
 #' Get Parameter Caption
@@ -1041,7 +1045,7 @@ printCitation <- function(inclusiveR = TRUE, language = "en") {
 #' @export
 #'
 getParameterCaption <- function(obj, parameterName) {
-    if (is.null(obj) || length(obj) != 1 || !isS4(obj) || !R6::is.R6(obj) || !inherits(obj, "FieldSet")) {
+    if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
@@ -1074,7 +1078,7 @@ getParameterCaption <- function(obj, parameterName) {
 #' @export
 #'
 getParameterName <- function(obj, parameterCaption) {
-    if (is.null(obj) || length(obj) != 1 || !isS4(obj) || !R6::is.R6(obj) || !inherits(obj, "FieldSet")) {
+    if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)

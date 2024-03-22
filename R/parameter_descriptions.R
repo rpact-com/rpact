@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7644 $
-## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -903,5 +903,17 @@ NULL
 #' Parameter Description: Plot Settings
 #' @param plotSettings An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSettings()}}.
 #' @name param_plotSettings
+#' @keywords internal
+NULL
+
+#' Parameter Description: Planned Max Subjects Per Stage
+#' @param plannedMaxSubjectsPerStage TODO @Gernot please describe
+#' @name param_plannedMaxSubjectsPerStage
+#' @keywords internal
+NULL
+
+#' Parameter Description: Planned Max Subjects
+#' @param plannedMaxSubjects TODO @Gernot please describe
+#' @name param_plannedMaxSubjects
 #' @keywords internal
 NULL

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7656 $
-## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -154,7 +154,7 @@ FieldSet <- R6::R6Class("FieldSet",
             if (length(self$.catLines) == 0) {
                 self$.catLines <- line
             } else {
-                self$.catLines <- c(.catLines, line)
+                self$.catLines <- c(self$.catLines, line)
             }
             return(invisible())
         },
@@ -292,8 +292,13 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (self$isUserDefinedParameter(parameterName) || self$isDefaultParameter(parameterName)) {
                 return(self[[parameterName]])
             }
-
-            parameterType <- self$getRefClass()$fields()[[parameterName]]
+            
+            tryCatch({
+                parameterType <- .getClassName(self[[parameterName]])
+            }, error = function(e) {
+                parameterType <- "unknown"
+            })
+        
             if (parameterType == "numeric") {
                 return(NA_real_)
             }

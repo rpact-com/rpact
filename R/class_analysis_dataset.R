@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -909,7 +909,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     emptySubsetNames <- validSubsetNames[!(validSubsetNames %in% subsetNames)]
     for (subsetName in subsetNames) {
         subset <- args[[subsetName]]
-        if (is.null(subset) || (!R6::is.R6(subset) && is.na(subset))) {
+        if (is.null(subset) || (!.isResultObjectBaseClass(subset) && is.na(subset))) {
             emptySubsetNames <- c(emptySubsetNames, subsetName)
         } else {
             if (!.isDataset(subset)) {

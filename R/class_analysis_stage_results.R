@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -324,7 +324,7 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
                 overallSampleSizes1 = NULL,
                 overallSampleSizes2 = NULL,
                 equalVariances = TRUE, normalApproximation = FALSE) {
-            super$initialize(.design = design, .dataInput = dataInput, ...) # TODO
+            super$initialize(.design = design, .dataInput = dataInput, ...) 
 
             self$combInverseNormal <- combInverseNormal
             self$combFisher <- combFisher
@@ -656,7 +656,7 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
                 overallSampleSizes1 = NULL,
                 overallSampleSizes2 = NULL,
                 normalApproximation = TRUE) {
-            super$initialize(.design = design, .dataInput = dataInput, ...) # TODO
+            super$initialize(.design = design, .dataInput = dataInput, ...)
 
             self$combInverseNormal <- combInverseNormal
             self$combFisher <- combFisher
@@ -826,7 +826,7 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
                 intersectionTest = NULL,
                 normalApproximation = FALSE,
                 directionUpper = NULL) {
-            super$initialize(.design = design, .dataInput = dataInput, ...) # TODO
+            super$initialize(.design = design, .dataInput = dataInput, ...) 
 
             self$overallPiTreatments <- overallPiTreatments
             self$overallPiControl <- overallPiControl
@@ -966,7 +966,7 @@ StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
                 events = NULL,
                 allocationRatios = NULL,
                 testStatistics = NULL) {
-            super$initialize(.design = design, .dataInput = dataInput, ...) # TODO
+            super$initialize(.design = design, .dataInput = dataInput, ...) 
 
             self$combInverseNormal <- combInverseNormal
             self$combFisher <- combFisher
@@ -1099,7 +1099,7 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
                 singleStepAdjustedPValues = NULL,
                 intersectionTest = NULL,
                 directionUpper = NULL) {
-            super$initialize(.design = design, .dataInput = dataInput, ...) # TODO
+            super$initialize(.design = design, .dataInput = dataInput, ...) 
 
             self$combInverseNormal <- combInverseNormal
             self$combFisher <- combFisher
@@ -1211,7 +1211,7 @@ StageResultsEnrichmentMeans <- R6::R6Class("StageResultsEnrichmentMeans",
         .overallSampleSizes1 = NULL,
         .overallSampleSizes2 = NULL,
         stratifiedAnalysis = NULL,
-        .getParametersToShow = function() { # TODO init
+        .getParametersToShow = function() {
             return(c(super$.getParametersToShow(), "stratifiedAnalysis"))
         }
     )
@@ -1733,7 +1733,7 @@ plot.StageResults <- function(x, y, ..., type = 1L,
     p <- plotSettings$hideGridLines(p)
 
     # set main title
-    mainTitle <- ifelse(!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main), plotData$main, main)
+    mainTitle <- ifelse(!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main), plotData$main, main)
     p <- plotSettings$setMainTitle(p, mainTitle, subtitle = plotData$sub)
 
     # set legend

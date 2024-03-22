@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7701 $
-## |  Last changed: $Date: 2024-03-07 11:44:08 +0100 (Do, 07 Mrz 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -237,7 +237,7 @@
             }
             parameterList <- list()
             parameterList[[result$thetaName]] <- .getVariedParameterVector(result$theta, result$thetaName)
-            designPlan <- do.call(designPlan$clone, parameterList)
+            designPlan <- do.call(designPlan$recreate, parameterList)
         }
     }
 

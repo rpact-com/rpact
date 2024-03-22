@@ -1,12 +1,14 @@
 
-# rpact 3.5.2
+# rpact 4.0.0
 
 ## New features
 
 * Extension of the function `getPerformanceScore()` for sample size recalculation rules to the setting of binary endpoints according to [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4)
+* The new functions `getSimulationCounts()` can be used to perform power simulations and the assessment of test characteristics for clinical trials with negative binomial distributed count data.
 
 ## Improvements, issues, and changes
 
+* All reference classes were replaced by [R6](https://cran.r-project.org/package=R6) classes due to better performance
 * Issue [#25](https://github.com/rpact-com/rpact/issues/25) fixed
 
 

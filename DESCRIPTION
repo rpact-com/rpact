@@ -55,6 +55,7 @@ Imports:
 	graphics,
 	tools,
 	rlang,
+    R6 (>= 2.5.1),
 	knitr (>= 1.19), 
 	Rcpp (>= 1.0.3)
 LinkingTo: Rcpp
@@ -92,6 +93,7 @@ Collate:
     'class_design_plan.R'
     'class_design_power_and_asn.R'
     'class_event_probabilities.R'
+    'f_simulation_base_count_data.R'
     'f_simulation_utilities.R'
     'f_simulation_base_survival.R'
     'class_simulation_results.R'

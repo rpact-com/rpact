@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7712 $
-## |  Last changed: $Date: 2024-03-12 08:24:58 +0100 (Di, 12 Mrz 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -37,7 +37,7 @@ NULL
 }
 
 .isParameterSet <- function(x) {
-    return(R6::is.R6(x) && inherits(x, "ParameterSet"))
+    return(.isResultObjectBaseClass(x) && inherits(x, "ParameterSet"))
 }
 
 .assertIsParameterSetClass <- function(x, objectName = "x") {
@@ -559,7 +559,7 @@ NULL
     if ((!naAllowed && is.na(x)) || !is.logical(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a single logical value",
+            ifelse(.isResultObjectBaseClass(x), .getClassName(x), x), ") must be a single logical value",
             call. = call.
         )
     }
@@ -586,7 +586,7 @@ NULL
     if ((!naAllowed && is.na(x)) || !is.numeric(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a valid numeric value",
+            ifelse(.isResultObjectBaseClass(x), .getClassName(x), x), ") must be a valid numeric value",
             call. = call.
         )
     }
@@ -629,7 +629,7 @@ NULL
             (!validateType && !is.na(x) && !is.infinite(x) && as.integer(x) != x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            "'", argumentName, "' (", ifelse(.isResultObjectBaseClass(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
             call. = call.
         )
     }
@@ -637,7 +637,7 @@ NULL
     if (mustBePositive && !is.na(x) && !is.infinite(x) && x <= 0) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(isS4(x) || R6::is.R6(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            "'", argumentName, "' (", ifelse(.isResultObjectBaseClass(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
             call. = call.
         )
     }
@@ -1410,7 +1410,7 @@ NULL
             argNames[i]
         )
         if (!(argName %in% ignore) && !grepl("^\\.", argName)) {
-            if (isS4(arg) || is.environment(arg) || R6::is.R6(arg)) {
+            if (.isResultObjectBaseClass(arg) || is.environment(arg)) {
                 arg <- .getClassName(arg)
             }
             if (is.function(arg)) {

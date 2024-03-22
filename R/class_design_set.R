@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -882,7 +882,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         legendPosition = NA_integer_, showSource = FALSE,
         designSetName = NA_character_, plotSettings = NULL) {
     .assertGgplotIsInstalled()
-    if (!is.call(main) && !isS4(main) && !R6::is.R6(main)) { # TODO is.R6 added
+    if (!is.call(main) && !.isResultObjectBaseClass(main)) { 
         .assertIsSingleCharacter(main, "main", naAllowed = TRUE)
     }
     .assertIsSingleCharacter(xlab, "xlab", naAllowed = TRUE)
@@ -900,7 +900,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
     .assertIsTrialDesign(designMaster)
 
     if (type == 1) {
-        main <- if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) "Boundaries" else main
+        main <- if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) "Boundaries" else main
         xParameterName <- "informationRates"
         yParameterNames <- "criticalValues"
 
@@ -916,11 +916,11 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
     } else if (type == 2) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "designs with undefined endpoint do not support plot type 2")
     } else if (type == 3) {
-        main <- if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) "Stage Levels" else main
+        main <- if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) "Stage Levels" else main
         xParameterName <- "informationRates"
         yParameterNames <- "stageLevels"
     } else if (type == 4) {
-        main <- if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) "Error Spending" else main
+        main <- if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) "Error Spending" else main
         xParameterName <- "informationRates"
         yParameterNames <- c("alphaSpent")
         if (!.isTrialDesignFisher(designMaster) &&
@@ -930,35 +930,35 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         }
         plotPointsEnabled <- ifelse(is.na(plotPointsEnabled), FALSE, plotPointsEnabled)
     } else if (type == 5) {
-        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Power and Early Stopping")
             main$add("N", nMax, "max")
         }
         xParameterName <- "theta"
         yParameterNames <- c("overallEarlyStop", "calculatedPower")
     } else if (type == 6) {
-        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Average Sample Size and Power / Early Stop")
             main$add("N", nMax, "max")
         }
         xParameterName <- "theta"
         yParameterNames <- c("averageSampleNumber", "overallEarlyStop", "calculatedPower")
     } else if (type == 7) {
-        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Power")
             main$add("N", nMax, "max")
         }
         xParameterName <- "theta"
         yParameterNames <- "calculatedPower"
     } else if (type == 8) {
-        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Early Stopping")
             main$add("N", nMax, "max")
         }
         xParameterName <- "theta"
         yParameterNames <- "overallEarlyStop"
     } else if (type == 9) {
-        if (!is.call(main) && !isS4(main) && !R6::is.R6(main) && is.na(main)) {
+        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Average Sample Size")
             main$add("N", nMax, "max")
         }
