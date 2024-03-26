@@ -8,7 +8,7 @@ getSimulationCounts(
   design = NULL,
   ...,
   plannedCalendarTime,
-  plannedMaxSubjects = NA_real_,
+  maxNumberOfSubjects = NA_real_,
   lambda1 = NA_real_,
   lambda2 = NA_real_,
   lambda = NA_real_,
@@ -35,9 +35,11 @@ and \code{sided} can be directly entered as argument where necessary.}
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{plannedCalendarTime}{TODO @Gernot please describe}
+\item{plannedCalendarTime}{For simulating count data, the time points where an analysis is planned to be performed.
+Should be a vector of length \code{kMax}}
 
-\item{plannedMaxSubjects}{TODO @Gernot please describe}
+\item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified for power calculations or calculation
+of necessary follow-up (count data). For two treatment arms, it is the maximum number of subjects for both treatment arms.}
 
 \item{lambda1}{A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
 the active treatment group, there is no default.}

@@ -4,7 +4,8 @@
 \alias{param_plannedCalendarTime}
 \title{Parameter Description: Planned Calendar Time}
 \arguments{
-\item{plannedCalendarTime}{TODO @Gernot please describe}
+\item{plannedCalendarTime}{For simulating count data, the time points where an analysis is planned to be performed.
+Should be a vector of length \code{kMax}}
 }
 \description{
 Parameter Description: Planned Calendar Time
