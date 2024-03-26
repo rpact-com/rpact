@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7750 $
+## |  Last changed: $Date: 2024-03-26 15:44:44 +0100 (Di, 26 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -213,9 +213,9 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
                     if (self$.design$kMax > 1) {
                         self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
+                } else {
+                    self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
-
-                self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
             }
         },
         getAlpha = function() {
@@ -886,14 +886,14 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
         },
         recreate = function(hazardRatio = NA_real_, pi1 = NA_real_) {
             hr <- NA_real_
-            if (.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
+            if (self$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
                 hr <- hazardRatio
                 if (any(is.na(hazardRatio))) {
                     hr <- self$hazardRatio
                 }
             }
             pi1Temp <- NA_real_
-            if (.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
+            if (self$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
                 pi1Temp <- pi1
                 if (any(is.na(pi1))) {
                     pi1Temp <- self$pi1
@@ -932,7 +932,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     hazardRatio = hr
                 ))
             } else {
-                directionUpperTemp <- directionUpper
+                directionUpperTemp <- self$directionUpper
                 if (length(directionUpperTemp) > 1) {
                     directionUpperTemp <- directionUpperTemp[1]
                 }

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7750 $
+## |  Last changed: $Date: 2024-03-26 15:44:44 +0100 (Di, 26 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -48,9 +48,15 @@ FieldSet <- R6::R6Class("FieldSet",
         .catLines = NULL,
         .deprecatedFieldNames = NULL,
         .getFieldNames = function() {
-            return(unlist(lapply(class(self)[1:(length(class(self)) - 1)], function(x) {
-                names(get(x)$public_fields)
-            })))
+            classNames <- class(self)
+            classNames <- classNames[classNames != "R6"]
+            classNames <- base::rev(classNames)
+            fieldNames <- unlist(lapply(classNames, function(x) {
+                names(base::get(x)$public_fields)
+            }))
+            startFieldNameIndices <- grepl("^\\.", fieldNames)
+            fieldNames <- c(fieldNames[startFieldNameIndices], fieldNames[!startFieldNameIndices])
+            return(fieldNames)
         },
         .getVisibleFieldNames = function() {
             fieldNames <- self$.getFieldNames()
@@ -545,29 +551,36 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(invisible(output))
         },
         .extractParameterNameAndValue = function(parameterName) {
-            d <- regexpr("\\..+\\$", parameterName)
-            if (d[1] != 1) {
-                return(list(
-                    parameterName = parameterName,
-                    paramValue = base::get(parameterName, envir = self)
-                ))
-            }
-
-            index <- attr(d, "match.length")
-            objectName <- substr(parameterName, 1, index - 1)
-            parameterName <- substr(parameterName, index + 1, nchar(parameterName))
-            paramValue <- get(objectName)[[parameterName]]
-
-            # .closedTestResults$rejected
-            if (objectName == ".closedTestResults" && parameterName == "rejected") {
-                paramValueLogical <- as.logical(paramValue)
-                if (is.matrix(paramValue)) {
-                    paramValueLogical <- matrix(paramValueLogical, ncol = ncol(paramValue))
+            tryCatch({
+                d <- regexpr("\\..+\\$", parameterName)
+                if (d[1] != 1) {
+                    return(list(
+                        parameterName = parameterName,
+                        paramValue = base::get(parameterName, envir = self)
+                    ))
                 }
-                paramValue <- paramValueLogical
-            }
-
-            return(list(parameterName = parameterName, paramValue = paramValue))
+                
+                index <- attr(d, "match.length")
+                objectName <- substr(parameterName, 1, index - 1)
+                parameterName <- substr(parameterName, index + 1, nchar(parameterName))
+                obj <- base::get(objectName, envir = self)
+                paramValue <- base::get(parameterName, envir = obj)
+                #paramValue <- self[[objectName]][[parameterName]]
+            
+                if (objectName == ".closedTestResults" && parameterName == "rejected") {
+                    paramValueLogical <- as.logical(paramValue)
+                    if (is.matrix(paramValue)) {
+                        paramValueLogical <- matrix(paramValueLogical, ncol = ncol(paramValue))
+                    }
+                    paramValue <- paramValueLogical
+                }
+                return(list(parameterName = parameterName, paramValue = paramValue))
+            }, error = function(e) {
+                if (consoleOutputEnabled) {
+                    warning("Failed to extract parameter name and value from ", sQuote(parameterName), ": ", e$message)
+                }
+                return(list(parameterName = parameterName, paramValue = ""))
+            })
         },
         .showUnknownParameters = function(consoleOutputEnabled = TRUE) {
             params <- self$.getUndefinedParameters()
@@ -580,6 +593,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         .showParameterFormatted = function(paramName, paramValue, ..., paramValueFormatted = NA_character_,
                 showParameterType = FALSE, category = NULL, matrixRow = NA_integer_, consoleOutputEnabled = TRUE,
                 paramNameRaw = NA_character_, numberOfCategories = NA_integer_) {
+                
             if (!is.na(paramNameRaw)) {
                 paramCaption <- .getParameterCaption(paramNameRaw, self)
             }
@@ -618,7 +632,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                             "conditionalErrorRate", "secondStagePValues",
                             "adjustedStageWisePValues", "overallAdjustedTestStatistics"
                         )) {
-                    treatments <- .closedTestResults$.getHypothesisTreatmentArmVariants()[matrixRow]
+                    treatments <- self$.closedTestResults$.getHypothesisTreatmentArmVariants()[matrixRow]
                     paramCaption <- paste0(
                         "Treatment", ifelse(grepl(",", treatments), "s", ""), " ",
                         treatments, " vs. control"
@@ -630,7 +644,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                             "adjustedStageWisePValues", "overallAdjustedTestStatistics", "rejectedIntersections"
                         )) {
                         if (.isEnrichmentAnalysisResults(self)) {
-                            populations <- .closedTestResults$.getHypothesisPopulationVariants()[matrixRow]
+                            populations <- self$.closedTestResults$.getHypothesisPopulationVariants()[matrixRow]
                         } else if (inherits(self, "ClosedCombinationTestResults")) {
                             populations <- self$.getHypothesisPopulationVariants()[matrixRow]
                         } else {

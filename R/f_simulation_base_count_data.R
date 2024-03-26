@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7744 $
-## |  Last changed: $Date: 2024-03-22 17:38:03 +0100 (Fr, 22 Mrz 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7747 $
+## |  Last changed: $Date: 2024-03-25 17:58:00 +0100 (Mo, 25 Mrz 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 .getInformationCountData <- function(lambda1,
@@ -101,13 +101,13 @@
 #' @inheritParams param_accrualTime_counts
 #' @inheritParams param_accrualIntensity_counts
 #' @inheritParams param_followUpTime_counts
-#' @inheritParams param_plannedMaxSubjects
+#' @inheritParams param_maxNumberOfSubjects
 #' @inheritParams param_overdispersion_counts
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_plannedSubjects
 #' @inheritParams param_minNumberOfSubjectsPerStage
-#' @inheritParams param_plannedMaxSubjectsPerStage
+#' @inheritParams param_maxNumberOfSubjectsPerStage
 #' @inheritParams param_conditionalPowerSimulation
 #' @inheritParams param_maxNumberOfIterations
 #' @inheritParams param_calcSubjectsFunction
@@ -173,7 +173,7 @@
 getSimulationCounts <- function(design = NULL,
         ...,
         plannedCalendarTime,
-        plannedMaxSubjects = NA_real_,
+        maxNumberOfSubjects = NA_real_,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
         lambda = NA_real_,
@@ -225,7 +225,7 @@ getSimulationCounts <- function(design = NULL,
     sided <- design$sided
     sampleSizeEnabled <- FALSE
 
-    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, plannedMaxSubjects)
+    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     .assertIsValidEffectCountData(
         sampleSizeEnabled, sided, lambda1, lambda2, lambda, theta,
         thetaH0, overdispersion
@@ -242,7 +242,7 @@ getSimulationCounts <- function(design = NULL,
         followUpTime = followUpTime,
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
-        maxNumberOfSubjects = plannedMaxSubjects
+        maxNumberOfSubjects = maxNumberOfSubjects
     )
     .assertAreValidCalendarTimes(plannedCalendarTime, kMax)
     if (any(is.na(accrualTime))) {
@@ -266,7 +266,7 @@ getSimulationCounts <- function(design = NULL,
     }
 
     .setValueAndParameterType(simulationResults, "plannedCalendarTime", plannedCalendarTime, NA_real_)
-    .setValueAndParameterType(simulationResults, "plannedMaxSubjects", plannedMaxSubjects, NA_real_, notApplicableIfNA = TRUE)
+    .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "lambda1", lambda1, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "lambda2", lambda2, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "lambda", lambda, NA_real_, notApplicableIfNA = TRUE)
@@ -350,7 +350,7 @@ getSimulationCounts <- function(design = NULL,
             n2 <- length(recruit2)
             nTotal <- n1 + n2
         } else {
-            n2 <- plannedMaxSubjects / (1 + allocationRatioPlanned)
+            n2 <- maxNumberOfSubjects / (1 + allocationRatioPlanned)
             n1 <- allocationRatioPlanned * n2
             nTotal <- n1 + n2
             recruit1 <- seq(0, accrualTime, length.out = n1)

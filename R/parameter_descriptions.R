@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7744 $
-## |  Last changed: $Date: 2024-03-22 17:38:03 +0100 (Fr, 22 Mrz 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7747 $
+## |  Last changed: $Date: 2024-03-25 17:58:00 +0100 (Mo, 25 Mrz 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' Parameter Description: "..."
@@ -510,7 +510,7 @@ NULL
 
 #' Parameter Description: Minimum Number Of Subjects Per Stage
 #' @param minNumberOfSubjectsPerStage When performing a data driven sample size recalculation,
-#'   the numeric vector \code{minNumberOfSubjectsPerStage} with length kMax determines the
+#'   the numeric vector \code{minNumberOfSubjectsPerStage} with length \code{kMax} determines the
 #'   minimum number of subjects per stage (i.e., not cumulated), the first element
 #'   is not taken into account. For two treatment arms, it is the number of subjects for both treatment arms.
 #'   For multi-arm designs \code{minNumberOfSubjectsPerStage} refers
@@ -521,7 +521,7 @@ NULL
 
 #' Parameter Description: Maximum Number Of Subjects Per Stage
 #' @param maxNumberOfSubjectsPerStage When performing a data driven sample size recalculation,
-#'   the numeric vector \code{maxNumberOfSubjectsPerStage} with length kMax determines the maximum number
+#'   the numeric vector \code{maxNumberOfSubjectsPerStage} with length \code{kMax} determines the maximum number
 #'   of subjects per stage (i.e., not cumulated), the first element is not taken into account.
 #'   For two treatment arms, it is the number of subjects for both treatment arms.
 #'   For multi-arm designs \code{maxNumberOfSubjectsPerStage} refers
@@ -906,20 +906,9 @@ NULL
 #' @keywords internal
 NULL
 
-#' Parameter Description: Planned Max Subjects Per Stage
-#' @param plannedMaxSubjectsPerStage TODO @Gernot please describe
-#' @name param_plannedMaxSubjectsPerStage
-#' @keywords internal
-NULL
-
-#' Parameter Description: Planned Max Subjects
-#' @param plannedMaxSubjects TODO @Gernot please describe
-#' @name param_plannedMaxSubjects
-#' @keywords internal
-NULL
-
 #' Parameter Description: Planned Calendar Time
-#' @param plannedCalendarTime TODO @Gernot please describe
+#' @param plannedCalendarTime For simulating count data, the time points where an analysis is planned to be performed.
+#' Should be a vector of length \code{kMax}
 #' @name param_plannedCalendarTime
 #' @keywords internal
 NULL
