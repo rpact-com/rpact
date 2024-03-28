@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7763 $
+## |  Last changed: $Date: 2024-03-28 14:35:29 +0100 (Do, 28 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -463,7 +463,9 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
             }
         }
 
-        return(.getEnrichmentDatasetFromArgs(...))
+        dataset <- .getEnrichmentDatasetFromArgs(...)
+        dataset$.design <- design
+        return(dataset)
     }
 
     exampleType <- args[["example"]]
@@ -881,12 +883,13 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     subsetNumbers <- as.integer(subsetNumbers)
     gMax <- max(subsetNumbers) + 1
     validSubsetNames <- .createSubsetsByGMax(gMax, stratifiedInput = stratifiedInput, all = FALSE)
-    for (subsetName in subsetNames) {
-        if (subsetName == "") {
+    for (i in 1:length(subsetNames)) {
+        subsetName <- subsetNames[i]
+        if (subsetName == "" && !inherits(args[[i]], "TrialDesign")) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all subsets must be named")
         }
 
-        if (!(subsetName %in% validSubsetNames)) {
+        if (subsetName != "" && !(subsetName %in% validSubsetNames)) {
             suffix <- ifelse(stratifiedInput, " (stratified analysis)", " (non-stratified analysis)")
             if (length(validSubsetNames) < 10) {
                 stop(
@@ -903,7 +906,8 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
             }
         }
     }
-
+    
+    subsetNames <- subsetNames[subsetNames != ""]
     subsets <- NULL
     subsetType <- NA_character_
     emptySubsetNames <- validSubsetNames[!(validSubsetNames %in% subsetNames)]

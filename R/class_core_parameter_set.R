@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7750 $
-## |  Last changed: $Date: 2024-03-26 15:44:44 +0100 (Di, 26 Mrz 2024) $
+## |  File version: $Revision: 7763 $
+## |  Last changed: $Date: 2024-03-28 14:35:29 +0100 (Do, 28 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1631,12 +1631,60 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
 
     if (markdown) {
         x$.catMarkdownText()
-        cat("\n\n")
     } else {
         x$show()
     }
+    
+    if (isTRUE(markdown)) {
+        attr(x, "markdown") <- TRUE
+    }
 
     return(invisible(x))
+}
+
+#' @export 
+pull <- function(x, var) UseMethod("pull")
+
+#'
+#' Extract a single parameter
+#' 
+#' Pull a parameter from a parameter set.
+#' 
+#' @param  var A variable specified as: 
+#'  - a literal variable name 
+#'  - a positive integer, giving the position counting from the left 
+#'  - a negative integer, giving the position counting from the right. 
+#' The default returns the last column (on the assumption that's the column you've created most recently). 
+#' This argument is taken by expression and supports quasiquotation (you can unquote column names and column locations).
+#' 
+#' @export 
+#' 
+pull.ParameterSet <- function(x, var = -1) {
+    fCall <- match.call(expand.dots = FALSE)
+    varName <- deparse(fCall$var)
+    if (!exists(varName) || (!is.character(var) && !is.integer(var))) {
+        var <- gsub('"', "", varName)
+        var <- gsub("'", "", var)
+    }
+    
+    if (is.character(var)) {
+        if (!(var %in% names(x))) {
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(var), " does not exist")
+        }
+        
+        return(x[[var]])
+    }
+
+    .assertIsSingleInteger(x, "x", validateType = FALSE)
+    .assertIsInClosedInterval(x, "x", lower = -length(x), upper = length(x))
+    if (var == 0) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'x' (", x, ") must != 0")
+    }
+    x <- addTrace(x, "pull", var)
+    if (var < 0) {
+        var <- length(x) + 1 - var
+    }
+    return(x[[var]])
 }
 
 #'

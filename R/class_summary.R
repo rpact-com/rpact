@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7763 $
+## |  Last changed: $Date: 2024-03-28 14:35:29 +0100 (Do, 28 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -123,6 +123,11 @@ knit_print.SummaryFactory <- function(x, ...) {
             paste0(utils::capture.output(x$object$.catMarkdownText()), collapse = "\n")
         )
     }
+    
+    if (isTRUE(x[["markdown"]])) {
+        sep <- "\n-----\n\n"
+        result <- paste0(sep, result)
+    }
 
     return(knitr::asis_output(result))
 }
@@ -152,9 +157,10 @@ print.SummaryFactory <- function(x, ...,
         markdown <- .isMarkdownEnabled()
     }
 
-    if (markdown) {
+    if (markdown || isTRUE(x[["markdown"]])) {
         result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
-        cat(result, "\n")
+        cat(sep)
+        cat(trimws(result), "\n")
         return(invisible())
     }
 
@@ -183,11 +189,13 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         intervalFormat = NULL,
         justify = NULL,
         output = NULL,
-        initialize = function(..., object = NULL, intervalFormat = "[%s; %s]", output = "all") {
+        markdown = NULL,
+        initialize = function(..., object = NULL, intervalFormat = "[%s; %s]", output = "all", markdown = FALSE) {
             super$initialize(...)
             self$object <- object
             self$intervalFormat <- intervalFormat
             self$output <- output
+            self$markdown <- markdown
             self$summaryItems <- list()
             self$justify <- getOption("rpact.summary.justify", "right")
         },
@@ -2370,29 +2378,41 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
 .createSummary <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
     output <- match.arg(output)
+    
+    markdown <- attr(object, "markdown")
+    if (is.null(markdown) || length(markdown) == 0 || !is.logical(markdown)) {
+        markdown <- FALSE
+    }
+    
     if (inherits(object, "TrialDesignCharacteristics")) {
-        return(.createSummaryDesignPlan(object, digits = digits, output = output, showStageLevels = TRUE))
+        return(.createSummaryDesignPlan(object, digits = digits, output = output, 
+                showStageLevels = TRUE, markdown = markdown))
     }
 
     if (.isTrialDesign(object) || .isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
-        return(.createSummaryDesignPlan(object, digits = digits, output = output, showStageLevels = !.isTrialDesignPlan(object)))
+        return(.createSummaryDesignPlan(object, digits = digits, output = output, 
+                showStageLevels = !.isTrialDesignPlan(object), markdown = markdown))
     }
 
     if (inherits(object, "AnalysisResults")) {
-        return(.createSummaryAnalysisResults(object, digits = digits, output = output))
+        return(.createSummaryAnalysisResults(object, digits = digits, output = output, markdown = markdown))
     }
 
     if (inherits(object, "PerformanceScore")) {
-        return(.createSummaryPerformanceScore(object, digits = digits, output = output))
+        return(.createSummaryPerformanceScore(object, digits = digits, output = output, markdown = markdown))
     }
 
     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "function 'summary' not implemented yet for class ", .getClassName(object))
 }
 
-.createSummaryPerformanceScore <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
+.createSummaryPerformanceScore <- function(object, ..., 
+        digits = NA_integer_, 
+        output = c("all", "title", "overview", "body"), 
+        markdown = FALSE) {
     .createSummaryDesignPlan(object$.simulationResults,
         digits = digits, output = output,
-        showStageLevels = TRUE, performanceScore = object
+        showStageLevels = TRUE, performanceScore = object,
+        markdown = markdown
     )
 }
 
@@ -2420,7 +2440,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 #'
 #' @noRd
 #'
-.createSummaryAnalysisResults <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
+.createSummaryAnalysisResults <- function(object, ..., digits = NA_integer_, 
+        output = c("all", "title", "overview", "body"), markdown = FALSE) {
     output <- match.arg(output)
     if (!inherits(object, "AnalysisResults")) {
         stop(
@@ -2457,7 +2478,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
     }
 
-    summaryFactory <- SummaryFactory$new(object = object, intervalFormat = intervalFormat, output = output)
+    summaryFactory <- SummaryFactory$new(object = object, 
+        intervalFormat = intervalFormat, output = output, markdown = markdown)
 
     .addDesignInformationToSummary(design, object, summaryFactory, output = output)
 
@@ -2957,7 +2979,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 #'
 .createSummaryDesignPlan <- function(object, digits = NA_integer_,
         output = c("all", "title", "overview", "body"), showStageLevels = FALSE,
-        performanceScore = NULL) {
+        performanceScore = NULL, markdown = FALSE) {
     output <- match.arg(output)
     designPlan <- NULL
     if (.isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
@@ -2987,7 +3009,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
     .assertIsValidSummaryIntervalFormat(intervalFormat)
 
-    summaryFactory <- SummaryFactory$new(object = object, intervalFormat = intervalFormat, output = output)
+    summaryFactory <- SummaryFactory$new(object = object, intervalFormat = intervalFormat, output = output, markdown = markdown)
 
     if (output %in% c("all", "title", "overview")) {
         .addDesignInformationToSummary(design, designPlan, summaryFactory, output = output)
@@ -3155,7 +3177,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
 
         # simulation multi-arm #5: earlyStop per mu_max
-        if (outputSize %in% c("medium", "large")) {
+        if (design$kMax > 1 && outputSize %in% c("medium", "large")) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "earlyStop",
                 parameterCaption = "Overall exit probability", # (under H1)
