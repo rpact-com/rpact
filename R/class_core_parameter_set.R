@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7763 $
-## |  Last changed: $Date: 2024-03-28 14:35:29 +0100 (Do, 28 Mrz 2024) $
+## |  File version: $Revision: 7809 $
+## |  Last changed: $Date: 2024-04-05 18:37:05 +0200 (Fr, 05 Apr 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1757,13 +1757,6 @@ knit_print.ParameterSet <- function(x, ...) {
     return(knitr::asis_output(result))
 }
 
-#' 
-#' @rdname kable.ParameterSet
-#' 
-#' @export 
-#' 
-kable <- function(x, ...) UseMethod("kable")
-
 #'
 #' @title
 #' Create output in Markdown
@@ -1782,6 +1775,8 @@ kable <- function(x, ...) UseMethod("kable")
 #' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
 #' that all headings will be written bold but are not explicit defined as header.
 #'
+#' @name kableParameterSet
+#' 
 #' @export
 #'
 kable.ParameterSet <- function(x, ...) {
@@ -1808,3 +1803,10 @@ kable.ParameterSet <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
+
+#' 
+#' @rdname kableParameterSet
+#' 
+#' @export 
+#' 
+kable <- function(x, ...) UseMethod("kable")
