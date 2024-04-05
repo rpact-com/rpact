@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.5.2.9232</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.0.9239</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,15 +51,17 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="3.5.2" id="rpact-352">rpact 3.5.2<a class="anchor" aria-label="anchor" href="#rpact-352"></a></h2>
+<h2 class="pkg-version" data-toc-text="4.0.0" id="rpact-400">rpact 4.0.0<a class="anchor" aria-label="anchor" href="#rpact-400"></a></h2>
 <div class="section level3">
-<h3 id="new-features-3-5-2">New features<a class="anchor" aria-label="anchor" href="#new-features-3-5-2"></a></h3>
+<h3 id="new-features-4-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-0-0"></a></h3>
 <ul><li>Extension of the function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> for sample size recalculation rules to the setting of binary endpoints according to <a href="https://doi.org/10.1186/s12874-024-02150-4" class="external-link">Bokelmann et al. (2024)</a>
 </li>
+<li>The new functions <code><a href="../reference/getSimulationCounts.html">getSimulationCounts()</a></code> can be used to perform power simulations and the assessment of test characteristics for clinical trials with negative binomial distributed count data.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="improvements-issues-and-changes-3-5-2">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-3-5-2"></a></h3>
-<ul><li>Issue <a href="https://github.com/rpact-com/rpact/issues/25" class="external-link">#25</a> fixed</li>
+<h3 id="improvements-issues-and-changes-4-0-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-0-0"></a></h3>
+<ul><li>All reference classes were replaced by <a href="https://cran.r-project.org/package=R6" class="external-link">R6</a> classes due to better performance</li>
+<li>Issue <a href="https://github.com/rpact-com/rpact/issues/25" class="external-link">#25</a> fixed</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -252,7 +254,7 @@
 </li>
 <li>Conditional power calculation for analysis rates takes into account differently the null value of condErrorRate</li>
 <li>Function <code><a href="../reference/testPackage.html">testPackage()</a></code>: a problem with downloading full set of unit tests under Debian/Linux has been fixed</li>
-<li>Generic function <code><a href="../reference/kable.html">kable()</a></code> improved: optional knitr::kable arguments enabled, e.g., format</li>
+<li>Generic function <code><a href="../reference/kableParameterSet.html">kable()</a></code> improved: optional knitr::kable arguments enabled, e.g., format</li>
 <li>In print and summary output, “overall” renamed to “cumulative” if means, stDevs, or rate are calculated over stages rather than stage-wise</li>
 <li>getDataset: support of emmeans result objects as input improved</li>
 <li>Numerical accuracy of <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm()</a></code> calculations improved</li>
@@ -285,7 +287,7 @@
 <li>The new function <code><a href="../reference/getObjectRCode.html">getObjectRCode()</a></code> (short: <code><a href="../reference/getObjectRCode.html">rcmd()</a></code>) returns the original R command which produced any rpact result object, including all dependencies</li>
 <li>
 <code><a href="../reference/getWideFormat.html">getWideFormat()</a></code> and <code><a href="../reference/getLongFormat.html">getLongFormat()</a></code> return a dataset object in wide format (unstacked) or long format (narrow, stacked)</li>
-<li>Generic function <code><a href="../reference/kable.html">kable()</a></code> returns the output of an rpact result object formatted in Markdown.</li>
+<li>Generic function <code><a href="../reference/kableParameterSet.html">kable()</a></code> returns the output of an rpact result object formatted in Markdown.</li>
 <li>Generic function <code><a href="https://rdrr.io/r/base/t.html" class="external-link">t()</a></code> returns the transpose of an rpact result object</li>
 </ul></div>
 <div class="section level3">

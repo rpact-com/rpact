@@ -49,7 +49,7 @@
     <loc>https://rpact-com.github.io/rpact/reference/AnalysisResultsMultiArm.html</loc>
   </url>
   <url>
-    <loc>https://rpact-com.github.io/rpact/reference/AnalysisResultsMultiArmFisher-class.html</loc>
+    <loc>https://rpact-com.github.io/rpact/reference/AnalysisResultsMultiArmFisher.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/AnalysisResultsMultiArmInverseNormal.html</loc>
@@ -116,6 +116,9 @@
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/SimulationResults.html</loc>
+  </url>
+  <url>
+    <loc>https://rpact-com.github.io/rpact/reference/SimulationResultsBaseCountData.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/SimulationResultsEnrichmentMeans.html</loc>
@@ -412,6 +415,9 @@
     <loc>https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/getSimulationCounts.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentMeans.html</loc>
   </url>
   <url>
@@ -451,10 +457,7 @@
     <loc>https://rpact-com.github.io/rpact/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://rpact-com.github.io/rpact/reference/kable.ParameterSet.html</loc>
-  </url>
-  <url>
-    <loc>https://rpact-com.github.io/rpact/reference/kable.html</loc>
+    <loc>https://rpact-com.github.io/rpact/reference/kableParameterSet.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/knit_print.ParameterSet.html</loc>
@@ -700,6 +703,9 @@
     <loc>https://rpact-com.github.io/rpact/reference/param_piecewiseSurvivalTime.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/param_plannedCalendarTime.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/param_plannedEvents.html</loc>
   </url>
   <url>
@@ -856,6 +862,9 @@
     <loc>https://rpact-com.github.io/rpact/reference/printCitation.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/pull.ParameterSet.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/rawDataTwoArmNormal.html</loc>
   </url>
   <url>
@@ -877,9 +886,6 @@
     <loc>https://rpact-com.github.io/rpact/reference/setOutputFormat.html</loc>
   </url>
   <url>
-    <loc>https://rpact-com.github.io/rpact/reference/sub-TrialDesignSet-method.html</loc>
-  </url>
-  <url>
     <loc>https://rpact-com.github.io/rpact/reference/summary.AnalysisResults.html</loc>
   </url>
   <url>
@@ -890,9 +896,6 @@
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/summary.TrialDesignSet.html</loc>
-  </url>
-  <url>
-    <loc>https://rpact-com.github.io/rpact/reference/t-FieldSet-method.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/testPackage.html</loc>
