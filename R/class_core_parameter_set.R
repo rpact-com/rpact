@@ -1642,15 +1642,22 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     return(invisible(x))
 }
 
+#' 
+#' @rdname pull.ParameterSet
+#' 
 #' @export 
+#' 
 pull <- function(x, var) UseMethod("pull")
 
 #'
+#' @title
 #' Extract a single parameter
 #' 
+#' @description
 #' Pull a parameter from a parameter set.
 #' 
-#' @param  var A variable specified as: 
+#' @param x The \code{\link{ParameterSet}} object to pull from.
+#' @param var A variable specified as: 
 #'  - a literal variable name 
 #'  - a positive integer, giving the position counting from the left 
 #'  - a negative integer, giving the position counting from the right. 
@@ -1680,7 +1687,6 @@ pull.ParameterSet <- function(x, var = -1) {
     if (var == 0) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'x' (", x, ") must != 0")
     }
-    x <- addTrace(x, "pull", var)
     if (var < 0) {
         var <- length(x) + 1 - var
     }
@@ -1751,6 +1757,13 @@ knit_print.ParameterSet <- function(x, ...) {
     return(knitr::asis_output(result))
 }
 
+#' 
+#' @rdname kable.ParameterSet
+#' 
+#' @export 
+#' 
+kable <- function(x, ...) UseMethod("kable")
+
 #'
 #' @title
 #' Create output in Markdown
@@ -1795,20 +1808,3 @@ kable.ParameterSet <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
-
-#'
-#' @title
-#' Create tables in Markdown
-#'
-#' @description
-#' The \code{kable()} function returns a single table for a single object that inherits from class \code{\link{ParameterSet}}.
-#'
-#' @details
-#' Generic to represent a parameter set in Markdown.
-#'
-#' @param x The object that inherits from \code{\link{ParameterSet}}.
-#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
-#'
-#' @export
-#'
-setGeneric("kable", kable.ParameterSet)

@@ -457,7 +457,7 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
         if (length(args) == 2 && !is.null(design)) {
             dataset <- .getDatasetFromArgs(...)
             if (!is.null(dataset)) {
-                dataset <- dataset$clone(deep = TRUE) # TODO was $copy shallow
+                dataset <- dataset$clone(deep = TRUE) 
                 dataset$.design <- design
                 return(dataset)
             }
