@@ -15,19 +15,19 @@
 ## |
 ## |  File name: test-class_analysis_dataset.R
 ## |  Creation date: 06 February 2023, 12:04:06
-## |  File version: $Revision: 7403 $
-## |  Last changed: $Date: 2023-11-08 16:12:00 +0100 (Mi, 08 Nov 2023) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing the Class 'PlotSettings'")
 
 test_that("Test plot settings", {
-    expect_error(PlotSubTitleItem())
+    expect_error(PlotSubTitleItem$new())
+    
+    expect_type(PlotSubTitleItems$new(), "environment")
 
-    expect_type(PlotSubTitleItems(), "S4")
+    expect_type(getPlotSettings(), "environment")
 
-    expect_type(getPlotSettings(), "S4")
-
-    expect_type(PlotSettings(), "S4")
+    expect_type(PlotSettings$new(), "environment")
 })

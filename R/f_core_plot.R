@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7750 $
+## |  Last changed: $Date: 2024-03-26 15:44:44 +0100 (Di, 26 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -533,7 +533,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (length(variedParameter) != 2) {
         return("")
     }
-    
+
     return(paste0(
         "Note: interim values between ", round(variedParameter[1], 4), " and ",
         round(variedParameter[2], 4), " were calculated to get smoother lines; use, e.g., '",
@@ -736,7 +736,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             niceColumnNamesEnabled = FALSE,
             includeAllParameters = TRUE,
             addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
-            theta = theta, 
+            theta = theta,
             nMax = nMax
         ))
     } else {
@@ -850,8 +850,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             "overallEarlyStop", "calculatedPower"
         ))]
         fieldNames <- c(
-            names(parameterSet$getRefClass()$fields()),
-            names(designMaster$getRefClass()$fields())
+            names(parameterSet), # alternatively use parameterSet$.getFieldNames()
+            names(designMaster) 
         )
         if (simulationEnrichmentEnmabled) {
             fieldNames <- c(fieldNames, gsub("s$", "", names(parameterSet$effectList)), "situation")
@@ -870,7 +870,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         }
     } else {
         if (is.null(plotSettings) || !inherits(plotSettings, "PlotSettings")) {
-            plotSettings <- PlotSettings()
+            plotSettings <- PlotSettings$new()
         }
     }
 
@@ -907,7 +907,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             yParameterNames = yParameterNames
         )
         data <- df$data
-        
+
         variedParameters <- df$variedParameters
         variedParameters <- na.omit(variedParameters)
         variedParameters <- variedParameters[variedParameters != "NA"]
@@ -984,7 +984,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         "Lower and", yAxisLabel1,
         fixed = TRUE
     )
-    
+
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
         if (!(xParameterName %in% colnames(data))) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset")
@@ -1031,7 +1031,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$categories <- rep(NA_character_, nrow(data))
         }
     }
-    
+
     if (!is.na(nMax) && is.null(yParameterName3) && xParameterName == "informationRates") {
         xAxisLabel <- "Sample Size"
         data$xValues <- data$xValues * nMax
@@ -1106,7 +1106,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             legendTitle <- paste(legendTitle, "Type of error", sep = sep)
         }
     }
-    
+
     if (is.na(legendPosition)) {
         legendPosition <- .getLegendPosition(
             plotSettings, designMaster, data, yParameterName1,
@@ -1255,7 +1255,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     if (is.null(plotSettings)) {
-        plotSettings <- PlotSettings()
+        plotSettings <- PlotSettings$new()
     }
 
     nRow <- nrow(data)
@@ -1287,7 +1287,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     data$yValues[!is.na(data$yValues) & is.infinite(data$yValues)] <- NA_real_
     data <- data[!is.na(data$yValues), ]
-    
+
     if (categoryEnabled && groupEnabled) {
         p <- ggplot2::ggplot(data, ggplot2::aes(
             x = .data[["xValues"]], y = .data[["yValues"]],
@@ -1612,7 +1612,7 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
 
     plotSettings <- x$.plotSettings
     if (is.null(plotSettings)) {
-        plotSettings <- PlotSettings()
+        plotSettings <- PlotSettings$new()
     } else {
         plotSettings <- plotSettings$clone()
     }

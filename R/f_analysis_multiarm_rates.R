@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -80,7 +80,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsRatesMultiArmAll(
         results = results, design = design, dataInput = dataInput,
@@ -115,7 +115,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmFisher$new(design = design, dataInput = dataInput)
     results <- .getAnalysisResultsRatesMultiArmAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -136,7 +136,8 @@ NULL
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         thetaH0 = C_THETA_H0_RATES_DEFAULT, piTreatments = NA_real_, piControl = NA_real_, nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
+        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
     .assertIsTrialDesignConditionalDunnett(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
@@ -147,7 +148,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsConditionalDunnett(design = design, dataInput = dataInput)
+    results <- AnalysisResultsConditionalDunnett$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsRatesMultiArmAll(
         results = results, design = design,
@@ -328,7 +329,7 @@ NULL
         )
     }
 
-    stageResults <- StageResultsMultiArmRates(
+    stageResults <- StageResultsMultiArmRates$new(
         design = design,
         dataInput = dataInput,
         intersectionTest = intersectionTest,
@@ -923,7 +924,7 @@ NULL
         piControl <- piControlH1
     }
 
-    results <- ConditionalPowerResultsMultiArmRates(
+    results <- ConditionalPowerResultsMultiArmRates$new(
         .design = design,
         .stageResults = stageResults,
         piControl = piControl,
@@ -1331,7 +1332,7 @@ NULL
     stdErr <- sqrt(stageResults$overallPiTreatments[, stage] * (1 - stageResults$overallPiTreatments[, stage])) /
         sqrt(stageResults$.dataInput$getOverallSampleSizes(stage = stage, group = (1:gMax)))
 
-    results <- ConditionalPowerResultsMultiArmRates(
+    results <- ConditionalPowerResultsMultiArmRates$new(
         .design = design,
         .stageResults = stageResults,
         piControl = piControl,

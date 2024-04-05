@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7526 $
-## |  Last changed: $Date: 2023-12-21 13:38:20 +0100 (Do, 21 Dez 2023) $
+## |  File version: $Revision: 7808 $
+## |  Last changed: $Date: 2024-04-05 18:22:34 +0200 (Fr, 05 Apr 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -50,7 +50,7 @@ NULL
 
     return(list(
         design = design,
-        dataInput = dataInput$copy(shallow = FALSE)
+        dataInput = dataInput$clone(deep = TRUE) 
     ))
 }
 

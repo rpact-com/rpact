@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -62,111 +62,116 @@
 #'
 #' @importFrom methods new
 #'
-StageResults <- setRefClass("StageResults",
-    contains = "ParameterSet",
-    fields = list(
-        .plotSettings = "PlotSettings",
-        .design = "TrialDesign",
-        .dataInput = "Dataset",
-        stage = "integer",
-        stages = "integer",
-        pValues = "numeric",
-        weightsFisher = "numeric",
-        weightsInverseNormal = "numeric",
-        thetaH0 = "numeric",
-        direction = "character"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+StageResults <- R6::R6Class("StageResults",
+    inherit = ParameterSet,
+    public = list(
+        .plotSettings = NULL,
+        .design = NULL,
+        .dataInput = NULL,
+        stage = NULL,
+        stages = NULL,
+        pValues = NULL,
+        weightsFisher = NULL,
+        weightsInverseNormal = NULL,
+        thetaH0 = NULL,
+        direction = NULL,
+        initialize = function(..., stage = NULL, stages = NULL, pValues = NULL, weightsFisher = NULL, weightsInverseNormal = NULL, thetaH0 = NULL, direction = NULL) {
+            self$stage <- stage
+            self$stages <- stages
+            self$pValues <- pValues
+            self$weightsFisher <- weightsFisher
+            self$weightsInverseNormal <- weightsInverseNormal
+            self$thetaH0 <- thetaH0
+            self$direction <- direction
+            super$initialize(...)
         },
         init = function(design, dataInput) {
-            .design <<- design
-            .dataInput <<- dataInput
+            self$.design <- design
+            self$.dataInput <- dataInput
 
-            .plotSettings <<- PlotSettings()
+            self$.plotSettings <- PlotSettings$new()
             if (!missing(design)) {
-                stages <<- c(1:design$kMax)
+                self$stages <- c(1:design$kMax)
                 if (design$kMax == C_KMAX_DEFAULT) {
-                    .setParameterType("stages", C_PARAM_DEFAULT_VALUE)
+                    self$.setParameterType("stages", C_PARAM_DEFAULT_VALUE)
                 } else {
-                    .setParameterType("stages", C_PARAM_USER_DEFINED)
+                    self$.setParameterType("stages", C_PARAM_USER_DEFINED)
                 }
             }
 
-            .setParameterType("stage", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("stage", C_PARAM_NOT_APPLICABLE)
 
-            .setParameterType("pValues", ifelse(
-                .isMultiArm(), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED
+            self$.setParameterType("pValues", ifelse(
+                self$.isMultiArm(), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED
             ))
-            .setParameterType("thetaH0", ifelse(
-                identical(thetaH0, C_THETA_H0_MEANS_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("thetaH0", ifelse(
+                identical(self$thetaH0, C_THETA_H0_MEANS_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
-            .setParameterType("direction", ifelse(
-                identical(direction, C_DIRECTION_UPPER), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("direction", ifelse(
+                identical(self$direction, C_DIRECTION_UPPER), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         getPlotSettings = function() {
-            return(.plotSettings)
+            return(self$.plotSettings)
         },
         show = function(showType = 1, digits = NA_integer_) {
-            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing stage results"
-            .resetCat()
+            self$.resetCat()
             if (showType == 2) {
-                callSuper(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                .cat(.toString(startWithUpperCase = TRUE), ":\n\n",
+                self$.cat(self$.toString(startWithUpperCase = TRUE), ":\n\n",
                     heading = 1,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showParametersOfOneGroup(.getUserDefinedParameters(), "User defined parameters",
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showParametersOfOneGroup(.getDefaultParameters(), "Default parameters",
+                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showParametersOfOneGroup(.getGeneratedParameters(), "Output",
+                self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Output",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
 
-                if (grepl("Enrichment", .getClassName(.self))) {
-                    .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
-                } else if (grepl("MultiArm", .getClassName(.self))) {
-                    .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(
+                if (grepl("Enrichment", .getClassName(self))) {
+                    self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
+                } else if (grepl("MultiArm", .getClassName(self))) {
+                    self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(
                         paste0(
                             "  (i): results of treatment arm i vs. control group ",
-                            .dataInput$getNumberOfGroups(), "\n"
+                            self$.dataInput$getNumberOfGroups(), "\n"
                         ),
                         consoleOutputEnabled = consoleOutputEnabled
                     )
-                } else if (.dataInput$getNumberOfGroups(survivalCorrectionEnabled = FALSE) >= 2) {
-                    .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    .cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
+                } else if (self$.dataInput$getNumberOfGroups(survivalCorrectionEnabled = FALSE) >= 2) {
+                    self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
             }
         },
         isDirectionUpper = function() {
-            return(direction == C_DIRECTION_UPPER)
+            return(self$direction == C_DIRECTION_UPPER)
         },
         .isMultiArm = function() {
-            return(grepl("multi", tolower(.getClassName(.self))))
+            return(grepl("multi", tolower(.getClassName(self))))
         },
         .isEnrichment = function() {
-            return(grepl("enrichment", tolower(.getClassName(.self))))
+            return(grepl("enrichment", tolower(.getClassName(self))))
         },
         getGMax = function() {
-            if (!is.matrix(testStatistics)) {
+            if (!is.matrix(self$testStatistics)) {
                 return(1L)
             }
 
-            gMax <- nrow(testStatistics)
+            gMax <- nrow(self$testStatistics)
             if (is.null(gMax) || gMax == 0) {
                 gMax <- 1L
             }
@@ -178,21 +183,21 @@ StageResults <- setRefClass("StageResults",
         .toString = function(startWithUpperCase = FALSE) {
             s <- "stage results of"
 
-            if (grepl("MultiArm", .getClassName(.self))) {
+            if (grepl("MultiArm", .getClassName(self))) {
                 s <- paste(s, "multi-arm")
-            } else if (grepl("Enrichment", .getClassName(.self))) {
+            } else if (grepl("Enrichment", .getClassName(self))) {
                 s <- paste(s, "enrichment")
             }
 
-            if (grepl("Means", .getClassName(.self))) {
+            if (grepl("Means", .getClassName(self))) {
                 s <- paste(s, "means")
             }
 
-            if (grepl("Rates", .getClassName(.self))) {
+            if (grepl("Rates", .getClassName(self))) {
                 s <- paste(s, "rates")
             }
 
-            if (grepl("Survival", .getClassName(.self))) {
+            if (grepl("Survival", .getClassName(self))) {
                 s <- paste(s, "survival data")
             }
 
@@ -203,42 +208,42 @@ StageResults <- setRefClass("StageResults",
             return(s)
         },
         getDataInput = function() {
-            return(.dataInput)
+            return(self$.dataInput)
         },
         getNumberOfGroups = function() {
-            return(.dataInput$getNumberOfGroups())
+            return(self$.dataInput$getNumberOfGroups())
         },
         isOneSampleDataset = function() {
-            return(getNumberOfGroups() == 1)
+            return(self$getNumberOfGroups() == 1)
         },
         isTwoSampleDataset = function() {
-            return(getNumberOfGroups() == 2)
+            return(self$getNumberOfGroups() == 2)
         },
         isDatasetMeans = function() {
-            return(.dataInput$isDatasetMeans())
+            return(self$.dataInput$isDatasetMeans())
         },
         isDatasetRates = function() {
-            return(.dataInput$isDatasetRates())
+            return(self$.dataInput$isDatasetRates())
         },
         isDatasetSurvival = function() {
-            return(.dataInput$isDatasetSurvival())
+            return(self$.dataInput$isDatasetSurvival())
         },
         getNumberOfStages = function() {
-            if (.isMultiArm()) {
-                if (inherits(.self, "StageResultsMultiArmRates")) {
+            if (self$.isMultiArm()) {
+                if (inherits(self, "StageResultsMultiArmRates")) {
                     return(max(
-                        ncol(stats::na.omit(testStatistics)),
-                        ncol(stats::na.omit(separatePValues))
+                        ncol(stats::na.omit(self$testStatistics)),
+                        ncol(stats::na.omit(self$separatePValues))
                     ))
                 }
                 return(max(
-                    ncol(stats::na.omit(effectSizes)),
-                    ncol(stats::na.omit(separatePValues))
+                    ncol(stats::na.omit(self$effectSizes)),
+                    ncol(stats::na.omit(self$separatePValues))
                 ))
             }
             return(max(
-                length(stats::na.omit(effectSizes)),
-                length(stats::na.omit(pValues))
+                length(stats::na.omit(self$effectSizes)),
+                length(stats::na.omit(self$pValues))
             ))
         }
     )
@@ -282,34 +287,65 @@ StageResults <- setRefClass("StageResults",
 #'
 #' @importFrom methods new
 #'
-StageResultsMeans <- setRefClass("StageResultsMeans",
-    contains = "StageResults",
-    fields = list(
-        combInverseNormal = "numeric",
-        combFisher = "numeric",
-        overallTestStatistics = "numeric",
-        overallPValues = "numeric",
-        effectSizes = "numeric",
-        testStatistics = "numeric",
-        overallMeans = "numeric",
-        overallMeans1 = "numeric",
-        overallMeans2 = "numeric",
-        overallStDevs = "numeric",
-        overallStDevs1 = "numeric",
-        overallStDevs2 = "numeric",
-        overallSampleSizes = "numeric",
-        overallSampleSizes1 = "numeric",
-        overallSampleSizes2 = "numeric",
-        equalVariances = "logical",
-        normalApproximation = "logical"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ..., equalVariances = TRUE, normalApproximation = FALSE) {
-            callSuper(
-                .design = design, .dataInput = dataInput, ...,
-                equalVariances = equalVariances, normalApproximation = normalApproximation
-            )
-            init(design = design, dataInput = dataInput)
+StageResultsMeans <- R6::R6Class("StageResultsMeans",
+    inherit = StageResults,
+    public = list(
+        combInverseNormal = NULL,
+        combFisher = NULL,
+        overallTestStatistics = NULL,
+        overallPValues = NULL,
+        effectSizes = NULL,
+        testStatistics = NULL,
+        overallMeans = NULL,
+        overallMeans1 = NULL,
+        overallMeans2 = NULL,
+        overallStDevs = NULL,
+        overallStDevs1 = NULL,
+        overallStDevs2 = NULL,
+        overallSampleSizes = NULL,
+        overallSampleSizes1 = NULL,
+        overallSampleSizes2 = NULL,
+        equalVariances = NULL,
+        normalApproximation = NULL,
+        initialize = function(design, dataInput, ...,
+                combInverseNormal = NULL,
+                combFisher = NULL,
+                overallTestStatistics = NULL,
+                overallPValues = NULL,
+                effectSizes = NULL,
+                testStatistics = NULL,
+                overallMeans = NULL,
+                overallMeans1 = NULL,
+                overallMeans2 = NULL,
+                overallStDevs = NULL,
+                overallStDevs1 = NULL,
+                overallStDevs2 = NULL,
+                overallSampleSizes = NULL,
+                overallSampleSizes1 = NULL,
+                overallSampleSizes2 = NULL,
+                equalVariances = TRUE, normalApproximation = FALSE) {
+            super$initialize(.design = design, .dataInput = dataInput, ...) 
+
+            self$combInverseNormal <- combInverseNormal
+            self$combFisher <- combFisher
+            self$overallTestStatistics <- overallTestStatistics
+            self$overallPValues <- overallPValues
+            self$effectSizes <- effectSizes
+            self$testStatistics <- testStatistics
+            self$overallMeans <- overallMeans
+            self$overallMeans1 <- overallMeans1
+            self$overallMeans2 <- overallMeans2
+            self$overallStDevs <- overallStDevs
+            self$overallStDevs1 <- overallStDevs1
+            self$overallStDevs2 <- overallStDevs2
+            self$overallSampleSizes <- overallSampleSizes
+            self$overallSampleSizes1 <- overallSampleSizes1
+            self$overallSampleSizes2 <- overallSampleSizes2
+
+            self$equalVariances <- equalVariances
+            self$normalApproximation <- normalApproximation
+
+            self$init(design = design, dataInput = dataInput)
 
             for (param in c(
                 "weightsFisher",
@@ -317,20 +353,20 @@ StageResultsMeans <- setRefClass("StageResultsMeans",
                 "combFisher",
                 "combInverseNormal"
             )) {
-                .setParameterType(param, C_PARAM_NOT_APPLICABLE)
+                self$.setParameterType(param, C_PARAM_NOT_APPLICABLE)
             }
 
-            for (param in .getParametersToShow()) {
-                if (.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
-                    .setParameterType(param, C_PARAM_GENERATED)
+            for (param in self$.getParametersToShow()) {
+                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                    self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
 
-            .setParameterType("equalVariances", ifelse(
-                identical(equalVariances, TRUE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("equalVariances", ifelse(
+                identical(self$equalVariances, TRUE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
-            .setParameterType("normalApproximation", ifelse(
-                identical(normalApproximation, FALSE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("normalApproximation", ifelse(
+                identical(self$normalApproximation, FALSE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         .getParametersToShow = function() {
@@ -339,14 +375,14 @@ StageResultsMeans <- setRefClass("StageResultsMeans",
                 "overallTestStatistics",
                 "overallPValues"
             )
-            if (.dataInput$getNumberOfGroups() == 1) {
+            if (self$.dataInput$getNumberOfGroups() == 1) {
                 parametersToShow <- c(
                     parametersToShow,
                     "overallMeans",
                     "overallStDevs",
                     "overallSampleSizes"
                 )
-            } else if (.dataInput$getNumberOfGroups() == 2) {
+            } else if (self$.dataInput$getNumberOfGroups() == 2) {
                 parametersToShow <- c(
                     parametersToShow,
                     "overallMeans1",
@@ -363,13 +399,13 @@ StageResultsMeans <- setRefClass("StageResultsMeans",
                 "pValues",
                 "effectSizes"
             )
-            if (.isTrialDesignInverseNormal(.design)) {
+            if (.isTrialDesignInverseNormal(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combInverseNormal",
                     "weightsInverseNormal"
                 )
-            } else if (.isTrialDesignFisher(.design)) {
+            } else if (.isTrialDesignFisher(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combFisher",
@@ -382,7 +418,7 @@ StageResultsMeans <- setRefClass("StageResultsMeans",
                 "direction",
                 "normalApproximation"
             )
-            if (.dataInput$getNumberOfGroups() == 2) {
+            if (self$.dataInput$getNumberOfGroups() == 2) {
                 parametersToShow <- c(
                     parametersToShow,
                     "equalVariances"
@@ -438,33 +474,53 @@ StageResultsMeans <- setRefClass("StageResultsMeans",
 #'
 #' @importFrom methods new
 #'
-StageResultsMultiArmMeans <- setRefClass("StageResultsMultiArmMeans",
-    contains = "StageResults",
-    fields = list(
-        stage = "integer",
-        combInverseNormal = "matrix",
-        combFisher = "matrix",
-        overallTestStatistics = "matrix",
-        overallStDevs = "matrix",
-        overallPooledStDevs = "matrix",
-        overallPValues = "matrix",
-        testStatistics = "matrix",
-        separatePValues = "matrix",
-        effectSizes = "matrix",
-        singleStepAdjustedPValues = "matrix",
-        intersectionTest = "character",
-        varianceOption = "character",
-        normalApproximation = "logical",
-        directionUpper = "logical"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ..., varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
-                normalApproximation = FALSE) {
-            callSuper(
-                .design = design, .dataInput = dataInput, ...,
-                varianceOption = varianceOption, normalApproximation = normalApproximation
-            )
-            init(design = design, dataInput = dataInput)
+StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
+    inherit = StageResults,
+    public = list(
+        combInverseNormal = NULL,
+        combFisher = NULL,
+        overallTestStatistics = NULL,
+        overallStDevs = NULL,
+        overallPooledStDevs = NULL,
+        overallPValues = NULL,
+        testStatistics = NULL,
+        separatePValues = NULL,
+        effectSizes = NULL,
+        singleStepAdjustedPValues = NULL,
+        intersectionTest = NULL,
+        varianceOption = NULL,
+        normalApproximation = NULL,
+        directionUpper = NULL,
+        initialize = function(design, dataInput, ...,
+                combInverseNormal = NULL,
+                combFisher = NULL,
+                overallTestStatistics = NULL,
+                overallStDevs = NULL,
+                overallPooledStDevs = NULL,
+                overallPValues = NULL,
+                testStatistics = NULL,
+                separatePValues = NULL,
+                effectSizes = NULL,
+                singleStepAdjustedPValues = NULL,
+                intersectionTest = NULL, varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
+                normalApproximation = FALSE, directionUpper = NULL) {
+            super$initialize(...)
+            self$combInverseNormal <- combInverseNormal
+            self$combFisher <- combFisher
+            self$overallTestStatistics <- overallTestStatistics
+            self$overallStDevs <- overallStDevs
+            self$overallPooledStDevs <- overallPooledStDevs
+            self$overallPValues <- overallPValues
+            self$testStatistics <- testStatistics
+            self$separatePValues <- separatePValues
+            self$effectSizes <- effectSizes
+            self$singleStepAdjustedPValues <- singleStepAdjustedPValues
+            self$varianceOption <- varianceOption
+            self$normalApproximation <- normalApproximation
+            self$directionUpper <- directionUpper
+
+
+            self$init(design = design, dataInput = dataInput)
 
             for (param in c(
                 "singleStepAdjustedPValues",
@@ -473,23 +529,23 @@ StageResultsMultiArmMeans <- setRefClass("StageResultsMultiArmMeans",
                 "combFisher",
                 "combInverseNormal"
             )) {
-                .setParameterType(param, C_PARAM_NOT_APPLICABLE)
+                self$.setParameterType(param, C_PARAM_NOT_APPLICABLE)
             }
 
-            for (param in .getParametersToShow()) {
-                if (.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
-                    .setParameterType(param, C_PARAM_GENERATED)
+            for (param in self$.getParametersToShow()) {
+                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                    self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
 
-            .setParameterType("varianceOption", ifelse(
-                identical(varianceOption, C_VARIANCE_OPTION_MULTIARMED_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("varianceOption", ifelse(
+                identical(self$varianceOption, C_VARIANCE_OPTION_MULTIARMED_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
-            .setParameterType("normalApproximation", ifelse(
-                identical(normalApproximation, FALSE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("normalApproximation", ifelse(
+                identical(self$normalApproximation, FALSE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
-            .setParameterType("directionUpper", ifelse(
-                identical(directionUpper, C_DIRECTION_UPPER_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("directionUpper", ifelse(
+                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         .getParametersToShow = function() {
@@ -510,13 +566,13 @@ StageResultsMultiArmMeans <- setRefClass("StageResultsMultiArmMeans",
                 "effectSizes",
                 "singleStepAdjustedPValues"
             )
-            if (.isTrialDesignInverseNormal(.design)) {
+            if (.isTrialDesignInverseNormal(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combInverseNormal",
                     "weightsInverseNormal"
                 )
-            } else if (.isTrialDesignFisher(.design)) {
+            } else if (.isTrialDesignFisher(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combFisher",
@@ -566,32 +622,60 @@ StageResultsMultiArmMeans <- setRefClass("StageResultsMultiArmMeans",
 #'
 #' @importFrom methods new
 #'
-StageResultsRates <- setRefClass("StageResultsRates",
-    contains = "StageResults",
-    fields = list(
-        combInverseNormal = "numeric",
-        combFisher = "numeric",
-        overallTestStatistics = "numeric",
-        overallPValues = "numeric",
-        effectSizes = "numeric",
-        testStatistics = "numeric",
-        overallPi1 = "numeric",
-        overallPi2 = "numeric",
-        overallEvents = "numeric",
-        overallEvents1 = "numeric",
-        overallEvents2 = "numeric",
-        overallSampleSizes = "numeric",
-        overallSampleSizes1 = "numeric",
-        overallSampleSizes2 = "numeric",
-        normalApproximation = "logical"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ..., normalApproximation = TRUE) {
-            callSuper(
-                .design = design, .dataInput = dataInput, ...,
-                normalApproximation = normalApproximation
-            )
-            init(design = design, dataInput = dataInput)
+StageResultsRates <- R6::R6Class("StageResultsRates",
+    inherit = StageResults,
+    public = list(
+        combInverseNormal = NULL,
+        combFisher = NULL,
+        overallTestStatistics = NULL,
+        overallPValues = NULL,
+        effectSizes = NULL,
+        testStatistics = NULL,
+        overallPi1 = NULL,
+        overallPi2 = NULL,
+        overallEvents = NULL,
+        overallEvents1 = NULL,
+        overallEvents2 = NULL,
+        overallSampleSizes = NULL,
+        overallSampleSizes1 = NULL,
+        overallSampleSizes2 = NULL,
+        normalApproximation = NULL,
+        initialize = function(design, dataInput, ...,
+                combInverseNormal = NULL,
+                combFisher = NULL,
+                overallTestStatistics = NULL,
+                overallPValues = NULL,
+                effectSizes = NULL,
+                testStatistics = NULL,
+                overallPi1 = NULL,
+                overallPi2 = NULL,
+                overallEvents = NULL,
+                overallEvents1 = NULL,
+                overallEvents2 = NULL,
+                overallSampleSizes = NULL,
+                overallSampleSizes1 = NULL,
+                overallSampleSizes2 = NULL,
+                normalApproximation = TRUE) {
+            super$initialize(.design = design, .dataInput = dataInput, ...)
+
+            self$combInverseNormal <- combInverseNormal
+            self$combFisher <- combFisher
+            self$overallTestStatistics <- overallTestStatistics
+            self$overallPValues <- overallPValues
+            self$effectSizes <- effectSizes
+            self$testStatistics <- testStatistics
+            self$overallPi1 <- overallPi1
+            self$overallPi2 <- overallPi2
+            self$overallEvents <- overallEvents
+            self$overallEvents1 <- overallEvents1
+            self$overallEvents2 <- overallEvents2
+            self$overallSampleSizes <- overallSampleSizes
+            self$overallSampleSizes1 <- overallSampleSizes1
+            self$overallSampleSizes2 <- overallSampleSizes2
+
+            self$normalApproximation <- normalApproximation
+
+            self$init(design = design, dataInput = dataInput)
 
             for (param in c(
                 "weightsFisher",
@@ -599,17 +683,17 @@ StageResultsRates <- setRefClass("StageResultsRates",
                 "combFisher",
                 "combInverseNormal"
             )) {
-                .setParameterType(param, C_PARAM_NOT_APPLICABLE)
+                self$.setParameterType(param, C_PARAM_NOT_APPLICABLE)
             }
 
-            for (param in .getParametersToShow()) {
-                if (.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
-                    .setParameterType(param, C_PARAM_GENERATED)
+            for (param in self$.getParametersToShow()) {
+                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                    self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
 
-            .setParameterType("normalApproximation", ifelse(
-                identical(normalApproximation, TRUE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("normalApproximation", ifelse(
+                identical(self$normalApproximation, TRUE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         .getParametersToShow = function() {
@@ -618,14 +702,14 @@ StageResultsRates <- setRefClass("StageResultsRates",
                 "overallTestStatistics",
                 "overallPValues"
             )
-            if (.dataInput$getNumberOfGroups() == 1) {
+            if (self$.dataInput$getNumberOfGroups() == 1) {
                 parametersToShow <- c(
                     parametersToShow,
                     "overallEvents",
                     "overallSampleSizes",
                     "overallPi1"
                 )
-            } else if (.dataInput$getNumberOfGroups() == 2) {
+            } else if (self$.dataInput$getNumberOfGroups() == 2) {
                 parametersToShow <- c(
                     parametersToShow,
                     "overallEvents1",
@@ -641,17 +725,17 @@ StageResultsRates <- setRefClass("StageResultsRates",
                 "testStatistics",
                 "pValues"
             )
-            if (.dataInput$getNumberOfGroups() > 1) {
+            if (self$.dataInput$getNumberOfGroups() > 1) {
                 parametersToShow <- c(parametersToShow, "effectSizes")
             }
 
-            if (.isTrialDesignInverseNormal(.design)) {
+            if (.isTrialDesignInverseNormal(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combInverseNormal",
                     "weightsInverseNormal"
                 )
-            } else if (.isTrialDesignFisher(.design)) {
+            } else if (.isTrialDesignFisher(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combFisher",
@@ -711,32 +795,54 @@ StageResultsRates <- setRefClass("StageResultsRates",
 #'
 #' @importFrom methods new
 #'
-StageResultsMultiArmRates <- setRefClass("StageResultsMultiArmRates",
-    contains = "StageResults",
-    fields = list(
-        stage = "integer",
-        overallPiTreatments = "matrix",
-        overallPiControl = "matrix",
-        combInverseNormal = "matrix",
-        combFisher = "matrix",
-        overallTestStatistics = "matrix",
-        overallPValues = "matrix",
-        testStatistics = "matrix",
-        separatePValues = "matrix",
-        effectSizes = "matrix",
-        singleStepAdjustedPValues = "matrix",
-        intersectionTest = "character",
-        normalApproximation = "logical",
-        directionUpper = "logical"
-    ),
-    methods = list(
+StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
+    inherit = StageResults,
+    public = list(
+        stage = NULL,
+        overallPiTreatments = NULL,
+        overallPiControl = NULL,
+        combInverseNormal = NULL,
+        combFisher = NULL,
+        overallTestStatistics = NULL,
+        overallPValues = NULL,
+        testStatistics = NULL,
+        separatePValues = NULL,
+        effectSizes = NULL,
+        singleStepAdjustedPValues = NULL,
+        intersectionTest = NULL,
+        normalApproximation = NULL,
+        directionUpper = NULL,
         initialize = function(design, dataInput, ...,
-                normalApproximation = FALSE) {
-            callSuper(
-                .design = design, .dataInput = dataInput, ...,
-                normalApproximation = normalApproximation
-            )
-            init(design = design, dataInput = dataInput)
+                overallPiTreatments = NULL,
+                overallPiControl = NULL,
+                combInverseNormal = NULL,
+                combFisher = NULL,
+                overallTestStatistics = NULL,
+                overallPValues = NULL,
+                testStatistics = NULL,
+                separatePValues = NULL,
+                effectSizes = NULL,
+                singleStepAdjustedPValues = NULL,
+                intersectionTest = NULL,
+                normalApproximation = FALSE,
+                directionUpper = NULL) {
+            super$initialize(.design = design, .dataInput = dataInput, ...) 
+
+            self$overallPiTreatments <- overallPiTreatments
+            self$overallPiControl <- overallPiControl
+            self$combInverseNormal <- combInverseNormal
+            self$combFisher <- combFisher
+            self$overallTestStatistics <- overallTestStatistics
+            self$overallPValues <- overallPValues
+            self$testStatistics <- testStatistics
+            self$separatePValues <- separatePValues
+            self$effectSizes <- effectSizes
+            self$singleStepAdjustedPValues <- singleStepAdjustedPValues
+            self$intersectionTest <- intersectionTest
+            self$normalApproximation <- normalApproximation
+            self$directionUpper <- directionUpper
+
+            self$init(design = design, dataInput = dataInput)
 
             for (param in c(
                 "singleStepAdjustedPValues",
@@ -745,20 +851,20 @@ StageResultsMultiArmRates <- setRefClass("StageResultsMultiArmRates",
                 "combFisher",
                 "combInverseNormal"
             )) {
-                .setParameterType(param, C_PARAM_NOT_APPLICABLE)
+                self$.setParameterType(param, C_PARAM_NOT_APPLICABLE)
             }
 
-            for (param in .getParametersToShow()) {
-                if (.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
-                    .setParameterType(param, C_PARAM_GENERATED)
+            for (param in self$.getParametersToShow()) {
+                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                    self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
 
-            .setParameterType("normalApproximation", ifelse(
-                identical(normalApproximation, FALSE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("normalApproximation", ifelse(
+                identical(self$normalApproximation, FALSE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
-            .setParameterType("directionUpper", ifelse(
-                identical(directionUpper, C_DIRECTION_UPPER_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("directionUpper", ifelse(
+                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         .getParametersToShow = function() {
@@ -777,13 +883,13 @@ StageResultsMultiArmRates <- setRefClass("StageResultsMultiArmRates",
                 "separatePValues",
                 "singleStepAdjustedPValues"
             )
-            if (.isTrialDesignInverseNormal(.design)) {
+            if (.isTrialDesignInverseNormal(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combInverseNormal",
                     "weightsInverseNormal"
                 )
-            } else if (.isTrialDesignFisher(.design)) {
+            } else if (.isTrialDesignFisher(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combFisher",
@@ -836,24 +942,44 @@ StageResultsMultiArmRates <- setRefClass("StageResultsMultiArmRates",
 #'
 #' @importFrom methods new
 #'
-StageResultsSurvival <- setRefClass("StageResultsSurvival",
-    contains = "StageResults",
-    fields = list(
-        combInverseNormal = "numeric",
-        combFisher = "numeric",
-        overallPValues = "numeric",
-        effectSizes = "numeric",
-        overallTestStatistics = "numeric",
-        overallEvents = "numeric",
-        overallAllocationRatios = "numeric",
-        events = "numeric",
-        allocationRatios = "numeric",
-        testStatistics = "numeric"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ...) {
-            callSuper(.design = design, .dataInput = dataInput, ...)
-            init(design = design, dataInput = dataInput)
+StageResultsSurvival <- R6::R6Class("StageResultsSurvival",
+    inherit = StageResults,
+    public = list(
+        combInverseNormal = NULL,
+        combFisher = NULL,
+        overallPValues = NULL,
+        effectSizes = NULL,
+        overallTestStatistics = NULL,
+        overallEvents = NULL,
+        overallAllocationRatios = NULL,
+        events = NULL,
+        allocationRatios = NULL,
+        testStatistics = NULL,
+        initialize = function(design, dataInput, ...,
+                combInverseNormal = NULL,
+                combFisher = NULL,
+                overallPValues = NULL,
+                effectSizes = NULL,
+                overallTestStatistics = NULL,
+                overallEvents = NULL,
+                overallAllocationRatios = NULL,
+                events = NULL,
+                allocationRatios = NULL,
+                testStatistics = NULL) {
+            super$initialize(.design = design, .dataInput = dataInput, ...) 
+
+            self$combInverseNormal <- combInverseNormal
+            self$combFisher <- combFisher
+            self$overallPValues <- overallPValues
+            self$effectSizes <- effectSizes
+            self$overallTestStatistics <- overallTestStatistics
+            self$overallEvents <- overallEvents
+            self$overallAllocationRatios <- overallAllocationRatios
+            self$events <- events
+            self$allocationRatios <- allocationRatios
+            self$testStatistics <- testStatistics
+
+            self$init(design = design, dataInput = dataInput)
 
             for (param in c(
                 "weightsFisher",
@@ -861,12 +987,12 @@ StageResultsSurvival <- setRefClass("StageResultsSurvival",
                 "combFisher",
                 "combInverseNormal"
             )) {
-                .setParameterType(param, C_PARAM_NOT_APPLICABLE)
+                self$.setParameterType(param, C_PARAM_NOT_APPLICABLE)
             }
 
-            for (param in .getParametersToShow()) {
-                if (.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
-                    .setParameterType(param, C_PARAM_GENERATED)
+            for (param in self$.getParametersToShow()) {
+                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                    self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
         },
@@ -884,13 +1010,13 @@ StageResultsSurvival <- setRefClass("StageResultsSurvival",
                 "overallPValues",
                 "effectSizes"
             )
-            if (.isTrialDesignInverseNormal(.design)) {
+            if (.isTrialDesignInverseNormal(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combInverseNormal",
                     "weightsInverseNormal"
                 )
-            } else if (.isTrialDesignFisher(.design)) {
+            } else if (.isTrialDesignFisher(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combFisher",
@@ -948,25 +1074,45 @@ StageResultsSurvival <- setRefClass("StageResultsSurvival",
 #'
 #' @importFrom methods new
 #'
-StageResultsMultiArmSurvival <- setRefClass("StageResultsMultiArmSurvival",
-    contains = "StageResults",
-    fields = list(
-        stage = "integer",
-        combInverseNormal = "matrix",
-        combFisher = "matrix",
-        overallTestStatistics = "matrix",
-        overallPValues = "matrix",
-        testStatistics = "matrix",
-        separatePValues = "matrix",
-        effectSizes = "matrix",
-        singleStepAdjustedPValues = "matrix",
-        intersectionTest = "character",
-        directionUpper = "logical"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ...) {
-            callSuper(.design = design, .dataInput = dataInput, ...)
-            init(design = design, dataInput = dataInput)
+StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
+    inherit = StageResults,
+    public = list(
+        stage = NULL,
+        combInverseNormal = NULL,
+        combFisher = NULL,
+        overallTestStatistics = NULL,
+        overallPValues = NULL,
+        testStatistics = NULL,
+        separatePValues = NULL,
+        effectSizes = NULL,
+        singleStepAdjustedPValues = NULL,
+        intersectionTest = NULL,
+        directionUpper = NULL,
+        initialize = function(design, dataInput, ...,
+                combInverseNormal = NULL,
+                combFisher = NULL,
+                overallTestStatistics = NULL,
+                overallPValues = NULL,
+                testStatistics = NULL,
+                separatePValues = NULL,
+                effectSizes = NULL,
+                singleStepAdjustedPValues = NULL,
+                intersectionTest = NULL,
+                directionUpper = NULL) {
+            super$initialize(.design = design, .dataInput = dataInput, ...) 
+
+            self$combInverseNormal <- combInverseNormal
+            self$combFisher <- combFisher
+            self$overallTestStatistics <- overallTestStatistics
+            self$overallPValues <- overallPValues
+            self$testStatistics <- testStatistics
+            self$separatePValues <- separatePValues
+            self$effectSizes <- effectSizes
+            self$singleStepAdjustedPValues <- singleStepAdjustedPValues
+            self$intersectionTest <- intersectionTest
+            self$directionUpper <- directionUpper
+
+            self$init(design = design, dataInput = dataInput)
 
             for (param in c(
                 "singleStepAdjustedPValues",
@@ -975,17 +1121,17 @@ StageResultsMultiArmSurvival <- setRefClass("StageResultsMultiArmSurvival",
                 "combFisher",
                 "combInverseNormal"
             )) {
-                .setParameterType(param, C_PARAM_NOT_APPLICABLE)
+                self$.setParameterType(param, C_PARAM_NOT_APPLICABLE)
             }
 
-            for (param in .getParametersToShow()) {
-                if (.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
-                    .setParameterType(param, C_PARAM_GENERATED)
+            for (param in self$.getParametersToShow()) {
+                if (self$.getParameterType(param) == C_PARAM_TYPE_UNKNOWN) {
+                    self$.setParameterType(param, C_PARAM_GENERATED)
                 }
             }
 
-            .setParameterType("directionUpper", ifelse(
-                identical(directionUpper, C_DIRECTION_UPPER_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            self$.setParameterType("directionUpper", ifelse(
+                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         .getParametersToShow = function() {
@@ -1002,13 +1148,13 @@ StageResultsMultiArmSurvival <- setRefClass("StageResultsMultiArmSurvival",
                 "effectSizes",
                 "singleStepAdjustedPValues"
             )
-            if (.isTrialDesignInverseNormal(.design)) {
+            if (.isTrialDesignInverseNormal(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combInverseNormal",
                     "weightsInverseNormal"
                 )
-            } else if (.isTrialDesignFisher(.design)) {
+            } else if (.isTrialDesignFisher(self$.design)) {
                 parametersToShow <- c(
                     parametersToShow,
                     "combFisher",
@@ -1059,16 +1205,14 @@ StageResultsMultiArmSurvival <- setRefClass("StageResultsMultiArmSurvival",
 #'
 #' @importFrom methods new
 #'
-StageResultsEnrichmentMeans <- setRefClass("StageResultsEnrichmentMeans",
-    contains = "StageResultsMultiArmMeans",
-    fields = list(
-        .overallSampleSizes1 = "matrix",
-        .overallSampleSizes2 = "matrix",
-        stratifiedAnalysis = "logical"
-    ),
-    methods = list(
+StageResultsEnrichmentMeans <- R6::R6Class("StageResultsEnrichmentMeans",
+    inherit = StageResultsMultiArmMeans,
+    public = list(
+        .overallSampleSizes1 = NULL,
+        .overallSampleSizes2 = NULL,
+        stratifiedAnalysis = NULL,
         .getParametersToShow = function() {
-            return(c(callSuper(), "stratifiedAnalysis"))
+            return(c(super$.getParametersToShow(), "stratifiedAnalysis"))
         }
     )
 )
@@ -1100,18 +1244,16 @@ StageResultsEnrichmentMeans <- setRefClass("StageResultsEnrichmentMeans",
 #'
 #' @importFrom methods new
 #'
-StageResultsEnrichmentRates <- setRefClass("StageResultsEnrichmentRates",
-    contains = "StageResultsMultiArmRates",
-    fields = list(
-        .overallSampleSizes1 = "matrix",
-        .overallSampleSizes2 = "matrix",
-        overallPisTreatment = "matrix",
-        overallPisControl = "matrix",
-        stratifiedAnalysis = "logical"
-    ),
-    methods = list(
+StageResultsEnrichmentRates <- R6::R6Class("StageResultsEnrichmentRates",
+    inherit = StageResultsMultiArmRates,
+    public = list(
+        .overallSampleSizes1 = NULL,
+        .overallSampleSizes2 = NULL,
+        overallPisTreatment = NULL,
+        overallPisControl = NULL,
+        stratifiedAnalysis = NULL,
         .getParametersToShow = function() {
-            parametersToShow <- callSuper()
+            parametersToShow <- super$.getParametersToShow()
             parametersToShow <- parametersToShow[!(parametersToShow %in% c("overallPiTreatments", "overallPiControl"))]
             return(c(parametersToShow, "stratifiedAnalysis", "overallPisTreatment", "overallPisControl"))
         }
@@ -1145,15 +1287,13 @@ StageResultsEnrichmentRates <- setRefClass("StageResultsEnrichmentRates",
 #'
 #' @importFrom methods new
 #'
-StageResultsEnrichmentSurvival <- setRefClass("StageResultsEnrichmentSurvival",
-    contains = "StageResultsMultiArmSurvival",
-    fields = list(
-        stratifiedAnalysis = "logical",
-        .overallEvents = "matrix"
-    ),
-    methods = list(
+StageResultsEnrichmentSurvival <- R6::R6Class("StageResultsEnrichmentSurvival",
+    inherit = StageResultsMultiArmSurvival,
+    public = list(
+        stratifiedAnalysis = NULL,
+        .overallEvents = NULL,
         .getParametersToShow = function() {
-            return(c(callSuper(), "stratifiedAnalysis"))
+            return(c(super$.getParametersToShow(), "stratifiedAnalysis"))
         }
     )
 )
@@ -1593,7 +1733,7 @@ plot.StageResults <- function(x, y, ..., type = 1L,
     p <- plotSettings$hideGridLines(p)
 
     # set main title
-    mainTitle <- ifelse(!is.call(main) && !isS4(main) && is.na(main), plotData$main, main)
+    mainTitle <- ifelse(!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main), plotData$main, main)
     p <- plotSettings$setMainTitle(p, mainTitle, subtitle = plotData$sub)
 
     # set legend

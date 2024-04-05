@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7535 $
-## |  Last changed: $Date: 2024-01-08 09:39:31 +0100 (Mo, 08 Jan 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -61,7 +61,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsInverseNormal$new(design = design, dataInput = dataInput)
 
     .getAnalysisResultsSurvivalAll(
         results = results, design = design, dataInput = dataInput,
@@ -89,7 +89,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsGroupSequential(design = design, dataInput = dataInput)
+    results <- AnalysisResultsGroupSequential$new(design = design, dataInput = dataInput)
 
     .getAnalysisResultsSurvivalAll(
         results = results, design = design, dataInput = dataInput,
@@ -119,7 +119,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsFisher$new(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
@@ -348,7 +348,7 @@ NULL
         combFisher[k] <- prod(pValues[1:k]^weightsFisher[1:k])
     }
 
-    stageResults <- StageResultsSurvival(
+    stageResults <- StageResultsSurvival$new(
         design = design,
         dataInput = dataInput,
         stage = as.integer(stage),
@@ -902,7 +902,7 @@ NULL
 
 .getConditionalPowerSurvival <- function(..., stageResults, nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, thetaH1 = NA_real_) {
-    results <- ConditionalPowerResultsSurvival(
+    results <- ConditionalPowerResultsSurvival$new(
         .stageResults = stageResults,
         .design = stageResults$.design, nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned, thetaH1 = thetaH1

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7147 $
-## |  Last changed: $Date: 2023-07-03 08:10:31 +0200 (Mo, 03 Jul 2023) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -64,7 +64,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsInverseNormal$new(design = design, dataInput = dataInput)
 
     .getAnalysisResultsMeansAll(
         results = results, design = design, dataInput = dataInput,
@@ -93,7 +93,7 @@ NULL
         ), c("stage", "stDevH1")), ...
     )
 
-    results <- AnalysisResultsGroupSequential(design = design, dataInput = dataInput)
+    results <- AnalysisResultsGroupSequential$new(design = design, dataInput = dataInput)
 
     stDevH1 <- .getOptionalArgument("stDevH1", ...)
     if (!is.null(stDevH1)) {
@@ -135,7 +135,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsFisher$new(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
@@ -474,7 +474,7 @@ NULL
     }
 
     if (dataInput$getNumberOfGroups() == 1) {
-        stageResults <- StageResultsMeans(
+        stageResults <- StageResultsMeans$new(
             design = design,
             dataInput = dataInput,
             stage = as.integer(stage),
@@ -500,7 +500,7 @@ NULL
             equalVariances = equalVariances
         )
     } else if (dataInput$getNumberOfGroups() == 2) {
-        stageResults <- StageResultsMeans(
+        stageResults <- StageResultsMeans$new(
             design = design,
             dataInput = dataInput,
             stage = as.integer(stage),
@@ -1190,7 +1190,7 @@ NULL
 
     design <- stageResults$.design
 
-    results <- ConditionalPowerResultsMeans(
+    results <- ConditionalPowerResultsMeans$new(
         .stageResults = stageResults, .design = design,
         nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
         thetaH1 = thetaH1, assumedStDev = assumedStDev

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -50,62 +50,62 @@
 #'
 #' @importFrom methods new
 #'
-PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberResult",
-    contains = "ParameterSet",
-    fields = list(
-        .design = "TrialDesign",
-        nMax = "numeric",
-        theta = "numeric",
-        averageSampleNumber = "numeric",
-        calculatedPower = "numeric",
-        overallEarlyStop = "numeric",
-        earlyStop = "matrix",
-        overallReject = "numeric",
-        rejectPerStage = "matrix",
-        overallFutility = "numeric",
-        futilityPerStage = "matrix"
-    ),
-    methods = list(
+PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberResult",
+    inherit = ParameterSet,
+    public = list(
+        .design = NULL,
+        nMax = NULL,
+        theta = NULL,
+        averageSampleNumber = NULL,
+        calculatedPower = NULL,
+        overallEarlyStop = NULL,
+        earlyStop = NULL,
+        overallReject = NULL,
+        rejectPerStage = NULL,
+        overallFutility = NULL,
+        futilityPerStage = NULL,
         initialize = function(design, theta = seq(-1, 1, 0.05), nMax = 100L, ...) {
-            callSuper(.design = design, theta = theta, nMax = nMax, ...)
-            theta <<- .assertIsValidThetaRange(thetaRange = theta, thetaAutoSeqEnabled = FALSE)
-            .initPowerAndAverageSampleNumber()
-        },
-        clone = function() {
-            return(PowerAndAverageSampleNumberResult(design = .self$.design, theta = .self$theta, nMax = .self$nMax))
+            super$initialize(...)
+
+            self$.design <- design
+            self$theta <- theta
+            self$nMax <- nMax
+
+            self$theta <- .assertIsValidThetaRange(thetaRange = theta, thetaAutoSeqEnabled = FALSE)
+            self$.initPowerAndAverageSampleNumber()
         },
         show = function(showType = 1, digits = NA_integer_) {
-            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing a power and average sample size (ASN) result"
-            .resetCat()
+            self$.resetCat()
             if (showType == 2) {
-                callSuper(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                .cat("Power and average sample size (ASN):\n\n",
+                self$.cat("Power and average sample size (ASN):\n\n",
                     heading = 1,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showParametersOfOneGroup(.getUserDefinedParameters(), "User defined parameters",
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showParametersOfOneGroup(.getDefaultParameters(), "Default parameters",
+                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showParametersOfOneGroup(.getGeneratedParameters(), "Output",
+                self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Output",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
-                if (.design$kMax > 1) {
-                    .cat("Legend:\n",
+                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+                if (self$.design$kMax > 1) {
+                    self$.cat("Legend:\n",
                         heading = 2,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
-                    if (.design$kMax > 1) {
-                        .cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
+                    if (self$.design$kMax > 1) {
+                        self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
-                    .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
             }
         },
@@ -114,72 +114,72 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         },
         .initPowerAndAverageSampleNumber = function() {
-            .assertIsTrialDesignInverseNormalOrGroupSequential(.design)
-            .assertIsValidSidedParameter(.design$sided)
+            .assertIsTrialDesignInverseNormalOrGroupSequential(self$.design)
+            .assertIsValidSidedParameter(self$.design$sided)
 
-            if (nMax <= 0) {
+            if (self$nMax <= 0) {
                 stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'nMax' must be an integer > 0")
             }
 
-            .setParameterType("nMax", ifelse(nMax == C_NA_MAX_DEFAULT, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
+            self$.setParameterType("nMax", ifelse(self$nMax == C_NA_MAX_DEFAULT, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
 
-            thetaIsDefault <- length(theta) == length(C_POWER_ASN_THETA_DEFAULT) &&
-                sum(theta == C_POWER_ASN_THETA_DEFAULT) == length(theta)
-            .setParameterType("theta", ifelse(thetaIsDefault, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
+            thetaIsDefault <- length(self$theta) == length(C_POWER_ASN_THETA_DEFAULT) &&
+                sum(self$theta == C_POWER_ASN_THETA_DEFAULT) == length(self$theta)
+            self$.setParameterType("theta", ifelse(thetaIsDefault, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
 
-            kMax <- .design$kMax
+            kMax <- self$.design$kMax
 
             # initialization
-            numberOfThetas <- length(theta)
+            numberOfThetas <- length(self$theta)
 
-            averageSampleNumber <<- rep(NA_real_, numberOfThetas)
-            .setParameterType("averageSampleNumber", C_PARAM_GENERATED)
+            self$averageSampleNumber <- rep(NA_real_, numberOfThetas)
+            self$.setParameterType("averageSampleNumber", C_PARAM_GENERATED)
 
-            calculatedPower <<- rep(NA_real_, numberOfThetas)
-            .setParameterType("calculatedPower", C_PARAM_GENERATED)
+            self$calculatedPower <- rep(NA_real_, numberOfThetas)
+            self$.setParameterType("calculatedPower", C_PARAM_GENERATED)
 
-            earlyStop <<- matrix(NA_real_, kMax, numberOfThetas)
-            .setParameterType("earlyStop", C_PARAM_GENERATED)
+            self$earlyStop <- matrix(NA_real_, kMax, numberOfThetas)
+            self$.setParameterType("earlyStop", C_PARAM_GENERATED)
 
-            rejectPerStage <<- matrix(NA_real_, kMax, numberOfThetas)
-            .setParameterType("rejectPerStage", C_PARAM_GENERATED)
+            self$rejectPerStage <- matrix(NA_real_, kMax, numberOfThetas)
+            self$.setParameterType("rejectPerStage", C_PARAM_GENERATED)
 
-            futilityPerStage <<- matrix(NA_real_, kMax - 1, numberOfThetas)
-            .setParameterType("futilityPerStage", C_PARAM_GENERATED)
+            self$futilityPerStage <- matrix(NA_real_, kMax - 1, numberOfThetas)
+            self$.setParameterType("futilityPerStage", C_PARAM_GENERATED)
 
             rowNames <- paste("stage =", c(1:kMax))
-            rownames(earlyStop) <<- rowNames
-            rownames(rejectPerStage) <<- rowNames
+            rownames(self$earlyStop) <- rowNames
+            rownames(self$rejectPerStage) <- rowNames
             if (kMax > 1) {
-                rownames(futilityPerStage) <<- rowNames[1:(kMax - 1)]
+                rownames(self$futilityPerStage) <- rowNames[1:(kMax - 1)]
             }
 
             for (i in 1:numberOfThetas) {
-                result <- .getPowerAndAverageSampleNumber(theta = theta[i])
+                result <- self$.getPowerAndAverageSampleNumber(theta = self$theta[i])
 
-                averageSampleNumber[i] <<- result$averageSampleNumber
-                calculatedPower[i] <<- result$calculatedPower
-                earlyStop[1:(kMax - 1), i] <<- result$earlyStop[1:(kMax - 1)]
-                rejectPerStage[, i] <<- result$rejectPerStage[1:kMax]
-                futilityPerStage[, i] <<- result$futilityPerStage[1:(kMax - 1)]
+                self$averageSampleNumber[i] <- result$averageSampleNumber
+                self$calculatedPower[i] <- result$calculatedPower
+                self$earlyStop[1:(kMax - 1), i] <- result$earlyStop[1:(kMax - 1)]
+                self$rejectPerStage[, i] <- result$rejectPerStage[1:kMax]
+                self$futilityPerStage[, i] <- result$futilityPerStage[1:(kMax - 1)]
             }
 
-            overallEarlyStop <<- .getOverallParameter(earlyStop)
-            .setParameterType("overallEarlyStop", C_PARAM_GENERATED)
+            self$overallEarlyStop <- self$.getOverallParameter(self$earlyStop)
+            self$.setParameterType("overallEarlyStop", C_PARAM_GENERATED)
 
-            overallReject <<- .getOverallParameter(rejectPerStage)
-            .setParameterType("overallReject", C_PARAM_GENERATED)
+            self$overallReject <- self$.getOverallParameter(self$rejectPerStage)
+            self$.setParameterType("overallReject", C_PARAM_GENERATED)
 
-            overallFutility <<- .getOverallParameter(futilityPerStage)
-            .setParameterType("overallFutility", C_PARAM_GENERATED)
+            self$overallFutility <- self$.getOverallParameter(self$futilityPerStage)
+            self$.setParameterType("overallFutility", C_PARAM_GENERATED)
         },
         .getPowerAndAverageSampleNumber = function(theta) {
-            kMax <- .design$kMax
-            futilityBounds <- .design$futilityBounds
-            informationRates <- .design$informationRates
-            criticalValues <- .design$criticalValues
-            sided <- .design$sided
-            delayedInformation <- .design$delayedInformation
+            kMax <- self$.design$kMax
+            futilityBounds <- self$.design$futilityBounds
+            informationRates <- self$.design$informationRates
+            criticalValues <- self$.design$criticalValues
+            sided <- self$.design$sided
+            delayedInformation <- self$.design$delayedInformation
 
             .earlyStop <- rep(NA_real_, kMax)
             .futilityPerStage <- rep(NA_real_, kMax)
@@ -187,52 +187,52 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
             if (!any(is.na(delayedInformation))) {
                 contRegionLower <- futilityBounds
                 contRegionUpper <- criticalValues
-                decisionCriticalValues <- .design$decisionCriticalValues
+                decisionCriticalValues <- self$.design$decisionCriticalValues
                 probs <- .calculateDecisionProbabilities(
-                    sqrtShift = sqrt(nMax) * theta,
+                    sqrtShift = sqrt(self$nMax) * theta,
                     informationRates, delayedInformation, contRegionUpper, contRegionLower, decisionCriticalValues
                 )
 
-                .averageSampleNumber <- nMax - sum(probs$stoppingProbabilities *
-                    (informationRates[kMax] - delayedInformation - informationRates[1:(kMax - 1)]) * nMax)
+                .averageSampleNumber <- self$nMax - sum(probs$stoppingProbabilities *
+                    (informationRates[kMax] - delayedInformation - informationRates[1:(kMax - 1)]) * self$nMax)
                 .calculatedPower <- probs$power[kMax]
                 .rejectPerStage <- probs$rejectionProbabilities
                 .earlyStop <- probs$stoppingProbabilities
                 .futilityPerStage <- probs$futilityProbabilities
             } else {
                 if (sided == 2) {
-                    if (.design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(.design$typeBetaSpending) && .design$typeBetaSpending != "none") {
+                    if (self$.design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(self$.design$typeBetaSpending) && self$.design$typeBetaSpending != "none") {
                         futilityBounds[is.na(futilityBounds)] <- 0
                         decisionMatrix <- matrix(c(
-                            -criticalValues - theta * sqrt(nMax * informationRates),
-                            c(-futilityBounds - theta * sqrt(nMax * informationRates[1:(kMax - 1)]), 0),
-                            c(futilityBounds - theta * sqrt(nMax * informationRates[1:(kMax - 1)]), 0),
-                            criticalValues - theta * sqrt(nMax * informationRates)
+                            -criticalValues - theta * sqrt(self$nMax * informationRates),
+                            c(-futilityBounds - theta * sqrt(self$nMax * informationRates[1:(kMax - 1)]), 0),
+                            c(futilityBounds - theta * sqrt(self$nMax * informationRates[1:(kMax - 1)]), 0),
+                            criticalValues - theta * sqrt(self$nMax * informationRates)
                         ), nrow = 4, byrow = TRUE)
                     } else {
                         decisionMatrix <- matrix(c(
-                            -criticalValues - theta * sqrt(nMax * informationRates),
-                            criticalValues - theta * sqrt(nMax * informationRates)
+                            -criticalValues - theta * sqrt(self$nMax * informationRates),
+                            criticalValues - theta * sqrt(self$nMax * informationRates)
                         ), nrow = 2, byrow = TRUE)
                     }
                 } else {
-                    shiftedFutilityBounds <- futilityBounds - theta * sqrt(nMax * informationRates[1:(kMax - 1)])
+                    shiftedFutilityBounds <- futilityBounds - theta * sqrt(self$nMax * informationRates[1:(kMax - 1)])
                     shiftedFutilityBounds[futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- C_FUTILITY_BOUNDS_DEFAULT
                     decisionMatrix <- matrix(c(
                         shiftedFutilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
-                        criticalValues - theta * sqrt(nMax * informationRates)
+                        criticalValues - theta * sqrt(self$nMax * informationRates)
                     ), nrow = 2, byrow = TRUE)
                 }
 
                 probs <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
 
                 if (nrow(probs) == 3) {
-                    .averageSampleNumber <- nMax - sum((probs[3, 1:(kMax - 1)] - probs[2, 1:(kMax - 1)] + probs[1, 1:(kMax - 1)]) *
-                        (informationRates[kMax] - informationRates[1:(kMax - 1)]) * nMax)
+                    .averageSampleNumber <- self$nMax - sum((probs[3, 1:(kMax - 1)] - probs[2, 1:(kMax - 1)] + probs[1, 1:(kMax - 1)]) *
+                        (informationRates[kMax] - informationRates[1:(kMax - 1)]) * self$nMax)
                 } else {
-                    .averageSampleNumber <- nMax - sum((probs[5, 1:(kMax - 1)] -
+                    .averageSampleNumber <- self$nMax - sum((probs[5, 1:(kMax - 1)] -
                         probs[4, 1:(kMax - 1)] + probs[3, 1:(kMax - 1)] - probs[2, 1:(kMax - 1)] + probs[1, 1:(kMax - 1)]) *
-                        (informationRates[kMax] - informationRates[1:(kMax - 1)]) * nMax)
+                        (informationRates[kMax] - informationRates[1:(kMax - 1)]) * self$nMax)
                 }
 
                 if (sided == 2) {
@@ -251,7 +251,7 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
                     .rejectPerStage <- probs[3, 1:kMax] - probs[2, 1:kMax]
                     if (kMax > 1) {
                         .futilityPerStage <- probs[1, 1:(kMax - 1)]
-                        .rejectPerStage <- .getNoEarlyEfficacyZeroCorrectedValues(.design, .rejectPerStage)
+                        .rejectPerStage <- .getNoEarlyEfficacyZeroCorrectedValues(self$.design, .rejectPerStage)
                     }
                 }
 
@@ -275,7 +275,7 @@ PowerAndAverageSampleNumberResult <- setRefClass("PowerAndAverageSampleNumberRes
         },
         .getOverallParameter = function(parameter) {
             if (is.null(parameter) || length(parameter) == 0) {
-                return(rep(NA_real_, length(theta)))
+                return(rep(NA_real_, length(self$theta)))
             }
 
             overallParameter <- parameter

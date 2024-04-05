@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7652 $
-## |  Last changed: $Date: 2024-02-21 16:23:54 +0100 (Mi, 21 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -141,12 +141,11 @@ NULL
     ))
 }
 
-.getSampleSizeFixedMeans <- function(
-        ..., alpha = 0.025, beta = 0.2, sided = 1,
+.getSampleSizeFixedMeans <- function(..., alpha = 0.025, beta = 0.2, sided = 1,
         twoSidedPower = C_TWO_SIDED_POWER_DEFAULT,
         normalApproximation = FALSE, meanRatio = FALSE,
         thetaH0 = 0, alternative = C_ALTERNATIVE_DEFAULT,
-        stDev = C_STDEV_DEFAULT, groups = 2, 
+        stDev = C_STDEV_DEFAULT, groups = 2,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
     nFixed <- rep(NA_real_, length(alternative))
 
@@ -482,12 +481,11 @@ NULL
 
 # Note that 'directionUpper' and 'maxNumberOfSubjects' are only applicable
 # for 'objectType' = "power"
-.createDesignPlanMeans <- function(
-        ..., objectType = c("sampleSize", "power"),
+.createDesignPlanMeans <- function(..., objectType = c("sampleSize", "power"),
         design, normalApproximation = FALSE, meanRatio = FALSE,
         thetaH0 = ifelse(meanRatio, 1, 0), alternative = NA_real_,
         stDev = C_STDEV_DEFAULT, directionUpper = NA,
-        maxNumberOfSubjects = NA_real_, groups = 2, 
+        maxNumberOfSubjects = NA_real_, groups = 2,
         allocationRatioPlanned = NA_real_) {
     objectType <- match.arg(objectType)
 
@@ -528,7 +526,7 @@ NULL
         }
     }
 
-    designPlan <- TrialDesignPlanMeans(design = design, meanRatio = meanRatio)
+    designPlan <- TrialDesignPlanMeans$new(design = design, meanRatio = meanRatio)
     designPlan$.setObjectType(objectType)
 
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
@@ -637,7 +635,7 @@ NULL
 #'
 #' @details
 #' At given design the function calculates the stage-wise and maximum sample size for testing means.
-#' In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2} 
+#' In a two treatment groups design, additionally, an allocation ratio = \code{n1 / n2}
 #' can be specified where \code{n1} and \code{n2} are the number of subjects in the two treatment groups.
 #' A null hypothesis value thetaH0 != 0 for testing the difference of two means or
 #' thetaH0 != 1 for testing the ratio of two means can be specified.
@@ -653,8 +651,7 @@ NULL
 #'
 #' @export
 #'
-getSampleSizeMeans <- function(
-        design = NULL, ...,
+getSampleSizeMeans <- function(design = NULL, ...,
         groups = 2L,
         normalApproximation = FALSE,
         meanRatio = FALSE,
@@ -728,8 +725,7 @@ getSampleSizeMeans <- function(
 #'
 #' @export
 #'
-getPowerMeans <- function(
-        design = NULL, ...,
+getPowerMeans <- function(design = NULL, ...,
         groups = 2L,
         normalApproximation = FALSE,
         meanRatio = FALSE,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7620 $
-## |  Last changed: $Date: 2024-02-09 12:57:37 +0100 (Fr, 09 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -44,74 +44,81 @@
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResults <- setRefClass("ConditionalPowerResults",
-    contains = "ParameterSet",
-    fields = list(
-        .plotSettings = "PlotSettings",
-        .design = "TrialDesign",
-        .stageResults = "StageResults",
-        .plotData = "list",
-        nPlanned = "numeric",
-        allocationRatioPlanned = "numeric",
-        iterations = "integer",
-        seed = "numeric",
-        simulated = "logical"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ConditionalPowerResults <- R6::R6Class("ConditionalPowerResults",
+    inherit = ParameterSet,
+    public = list(
+        .plotSettings = NULL,
+        .design = NULL,
+        .stageResults = NULL,
+        .plotData = NULL,
+        nPlanned = NULL,
+        allocationRatioPlanned = NULL,
+        iterations = NULL,
+        seed = NULL,
+        simulated = NULL,
+        initialize = function(..., .design = NULL, .stageResults = NULL, .plotData = NULL, nPlanned = NULL, allocationRatioPlanned = NULL, iterations = NULL, seed = NULL, simulated = NULL) {
+            self$.design <- .design
+            self$.stageResults <- .stageResults
+            self$.plotData <- .plotData
+            self$nPlanned <- nPlanned
+            self$allocationRatioPlanned <- allocationRatioPlanned
+            self$iterations <- iterations
+            self$seed <- seed
+            self$simulated <- simulated
 
-            .plotSettings <<- PlotSettings()
+            super$initialize(...)
 
-            if (!is.null(.stageResults) && is.null(.design)) {
-                .design <<- .stageResults$.design
+            self$.plotSettings <- PlotSettings$new()
+
+            if (!is.null(self$.stageResults) && is.null(self$.design)) {
+                self$.design <- self$.stageResults$.design
             }
 
-            if (is.null(simulated) || length(simulated) == 0 || is.na(simulated)) {
-                .self$simulated <<- FALSE
+            if (is.null(self$simulated) || length(self$simulated) == 0 || is.na(self$simulated)) {
+                self$simulated <- FALSE
             }
 
-            if (!is.null(.design) && length(.design$kMax) == 1 && .design$kMax == 1L) {
-                .setParameterType("nPlanned", C_PARAM_NOT_APPLICABLE)
-                .setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)
-                .setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
+            if (!is.null(self$.design) && length(self$.design$kMax) == 1 && self$.design$kMax == 1L) {
+                self$.setParameterType("nPlanned", C_PARAM_NOT_APPLICABLE)
+                self$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)
+                self$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
             } else {
-                .setParameterType("nPlanned", C_PARAM_GENERATED)
-                .setParameterType("allocationRatioPlanned", C_PARAM_USER_DEFINED)
-                .setParameterType("conditionalPower", C_PARAM_GENERATED)
+                self$.setParameterType("nPlanned", C_PARAM_GENERATED)
+                self$.setParameterType("allocationRatioPlanned", C_PARAM_USER_DEFINED)
+                self$.setParameterType("conditionalPower", C_PARAM_GENERATED)
             }
-            .setParameterType("simulated", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("simulated", C_PARAM_NOT_APPLICABLE)
         },
         show = function(showType = 1, digits = NA_integer_) {
-            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing conditional power result objects"
-            .resetCat()
+            self$.resetCat()
             if (showType == 2) {
-                callSuper(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                if (!is.null(.design) && length(.design$kMax) == 1 && .design$kMax == 1) {
-                    .cat(.toString(), ": not applicable for fixed design (kMax = 1)\n",
+                if (!is.null(self$.design) && length(self$.design$kMax) == 1 && self$.design$kMax == 1) {
+                    self$.cat(self$.toString(), ": not applicable for fixed design (kMax = 1)\n",
                         heading = 1,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
                 } else {
-                    .cat(.toString(), ":\n\n",
+                    self$.cat(self$.toString(), ":\n\n",
                         heading = 1,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
                 }
-                .showParametersOfOneGroup(.getUserDefinedParameters(), "User defined parameters",
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showParametersOfOneGroup(.getDefaultParameters(), "Default parameters",
+                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showParametersOfOneGroup(.getGeneratedParameters(), "Output",
+                self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Output",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
@@ -146,27 +153,29 @@ ConditionalPowerResults <- setRefClass("ConditionalPowerResults",
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsMeans <- setRefClass("ConditionalPowerResultsMeans",
-    contains = "ConditionalPowerResults",
-    fields = list(
-        conditionalPower = "numeric",
-        thetaH1 = "numeric",
-        assumedStDev = "numeric"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ConditionalPowerResultsMeans <- R6::R6Class("ConditionalPowerResultsMeans",
+    inherit = ConditionalPowerResults,
+    public = list(
+        conditionalPower = NULL,
+        thetaH1 = NULL,
+        assumedStDev = NULL,
+        initialize = function(..., conditionalPower = NULL, thetaH1 = NULL, assumedStDev = NULL) {
+            self$conditionalPower <- conditionalPower
+            self$thetaH1 <- thetaH1
+            self$assumedStDev <- assumedStDev
 
-            if ((is.null(conditionalPower) || length(conditionalPower) == 0) &&
-                    !is.null(.design) && !is.null(.design$kMax) && length(.design$kMax) > 0) {
-                conditionalPower <<- rep(NA_real_, .design$kMax)
+            super$initialize(...)
+
+            if ((is.null(self$conditionalPower) || length(self$conditionalPower) == 0) &&
+                    !is.null(self$.design) && !is.null(self$.design$kMax) && length(self$.design$kMax) > 0) {
+                self$conditionalPower <- rep(NA_real_, self$.design$kMax)
             }
 
-            if (is.null(thetaH1) || length(thetaH1) == 0 || all(is.na(thetaH1))) {
-                thetaH1 <<- NA_real_
+            if (is.null(self$thetaH1) || length(self$thetaH1) == 0 || all(is.na(self$thetaH1))) {
+                self$thetaH1 <- NA_real_
             }
-            if (is.null(assumedStDev) || length(assumedStDev) == 0 || all(is.na(assumedStDev))) {
-                assumedStDev <<- NA_real_
+            if (is.null(self$assumedStDev) || length(self$assumedStDev) == 0 || all(is.na(self$assumedStDev))) {
+                self$assumedStDev <- NA_real_
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
@@ -175,52 +184,51 @@ ConditionalPowerResultsMeans <- setRefClass("ConditionalPowerResultsMeans",
     )
 )
 
-ConditionalPowerResultsMultiHypotheses <- setRefClass("ConditionalPowerResultsMultiHypotheses",
-    contains = "ConditionalPowerResults",
-    fields = list(
-        conditionalPower = "matrix"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ConditionalPowerResultsMultiHypotheses <- R6::R6Class("ConditionalPowerResultsMultiHypotheses",
+    inherit = ConditionalPowerResults,
+    public = list(
+        conditionalPower = NULL,
+        initialize = function(..., conditionalPower = NULL) {
+            self$conditionalPower <- conditionalPower
+            super$initialize(...)
 
-            if (.readyForInitialization()) {
-                gMax <- getGMax()
-                kMax <- .design$kMax
-                if (is.null(conditionalPower) || (nrow(conditionalPower) == 0 && ncol(conditionalPower) == 0)) {
-                    conditionalPower <<- matrix(rep(NA_real_, gMax * kMax), nrow = gMax, ncol = kMax)
+            if (self$.readyForInitialization()) {
+                gMax <- self$getGMax()
+                kMax <- self$.design$kMax
+                if (is.null(self$conditionalPower) || (nrow(self$conditionalPower) == 0 && ncol(self$conditionalPower) == 0)) {
+                    self$conditionalPower <- matrix(rep(NA_real_, gMax * kMax), nrow = gMax, ncol = kMax)
                 }
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
             s <- "Conditional power results"
-            s <- paste0(s, " ", ifelse(grepl("Enrichment", .getClassName(.stageResults)), "enrichment", "multi-arm"))
-            if (grepl("Means", .getClassName(.self))) {
+            s <- paste0(s, " ", ifelse(grepl("Enrichment", .getClassName(self$.stageResults)), "enrichment", "multi-arm"))
+            if (grepl("Means", .getClassName(self))) {
                 s <- paste0(s, " means")
-            } else if (grepl("Rates", .getClassName(.self))) {
+            } else if (grepl("Rates", .getClassName(self))) {
                 s <- paste0(s, " rates")
-            } else if (grepl("Survival", .getClassName(.self))) {
+            } else if (grepl("Survival", .getClassName(self))) {
                 s <- paste0(s, " survival")
             }
             return(s)
         },
         getGMax = function() {
-            return(.stageResults$getGMax())
+            return(self$.stageResults$getGMax())
         },
         .readyForInitialization = function() {
-            if (is.null(.design)) {
+            if (is.null(self$.design)) {
                 return(FALSE)
             }
 
-            if (length(.design$kMax) != 1) {
+            if (length(self$.design$kMax) != 1) {
                 return(FALSE)
             }
 
-            if (is.null(.stageResults)) {
+            if (is.null(self$.stageResults)) {
                 return(FALSE)
             }
 
-            if (is.null(.stageResults$testStatistics)) {
+            if (is.null(self$.stageResults$testStatistics)) {
                 return(FALSE)
             }
 
@@ -229,23 +237,23 @@ ConditionalPowerResultsMultiHypotheses <- setRefClass("ConditionalPowerResultsMu
     )
 )
 
-ConditionalPowerResultsMultiArmMeans <- setRefClass("ConditionalPowerResultsMultiArmMeans",
-    contains = "ConditionalPowerResultsMultiHypotheses",
-    fields = list(
-        thetaH1 = "numeric",
-        assumedStDevs = "numeric"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ConditionalPowerResultsMultiArmMeans <- R6::R6Class("ConditionalPowerResultsMultiArmMeans",
+    inherit = ConditionalPowerResultsMultiHypotheses,
+    public = list(
+        thetaH1 = NULL,
+        assumedStDevs = NULL,
+        initialize = function(..., thetaH1 = NULL, assumedStDevs = NULL) {
+            self$thetaH1 <- thetaH1
+            self$assumedStDevs <- assumedStDevs
+            super$initialize(...)
 
-            if (.readyForInitialization()) {
-                gMax <- getGMax()
-                if (is.null(thetaH1) || length(thetaH1) == 0 || all(is.na(thetaH1))) {
-                    thetaH1 <<- rep(NA_real_, gMax)
+            if (self$.readyForInitialization()) {
+                gMax <- self$getGMax()
+                if (is.null(self$thetaH1) || length(self$thetaH1) == 0 || all(is.na(self$thetaH1))) {
+                    self$thetaH1 <- rep(NA_real_, gMax)
                 }
-                if (is.null(assumedStDevs) || length(assumedStDevs) == 0 || all(is.na(assumedStDevs))) {
-                    assumedStDevs <<- rep(NA_real_, gMax)
+                if (is.null(self$assumedStDevs) || length(self$assumedStDevs) == 0 || all(is.na(self$assumedStDevs))) {
+                    self$assumedStDevs <- rep(NA_real_, gMax)
                 }
             }
         }
@@ -278,27 +286,31 @@ ConditionalPowerResultsMultiArmMeans <- setRefClass("ConditionalPowerResultsMult
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsRates <- setRefClass("ConditionalPowerResultsRates",
-    contains = "ConditionalPowerResults",
-    fields = list(
-        conditionalPower = "numeric",
-        pi1 = "numeric",
-        pi2 = "numeric"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ConditionalPowerResultsRates <- R6::R6Class("ConditionalPowerResultsRates",
+    inherit = ConditionalPowerResults,
+    public = list(
+        conditionalPower = NULL,
+        pi1 = NULL,
+        pi2 = NULL,
+        initialize = function(..., conditionalPower = NULL,
+                pi1 = NULL,
+                pi2 = NULL) {
+            self$conditionalPower <- conditionalPower
+            self$pi1 <- pi1
+            self$pi2 <- pi2
 
-            if ((is.null(conditionalPower) || length(conditionalPower) == 0) &&
-                    !is.null(.design) && !is.null(.design$kMax) && length(.design$kMax) > 0) {
-                conditionalPower <<- rep(NA_real_, .design$kMax)
+            super$initialize(...)
+
+            if ((is.null(self$conditionalPower) || length(self$conditionalPower) == 0) &&
+                    !is.null(self$.design) && !is.null(self$.design$kMax) && length(self$.design$kMax) > 0) {
+                self$conditionalPower <- rep(NA_real_, self$.design$kMax)
             }
 
-            if (is.null(pi1) || length(pi1) == 0 || all(is.na(pi1))) {
-                pi1 <<- NA_real_
+            if (is.null(self$pi1) || length(self$pi1) == 0 || all(is.na(self$pi1))) {
+                self$pi1 <- NA_real_
             }
-            if (is.null(pi2) || length(pi2) == 0 || all(is.na(pi2))) {
-                pi2 <<- NA_real_
+            if (is.null(self$pi2) || length(self$pi2) == 0 || all(is.na(self$pi2))) {
+                self$pi2 <- NA_real_
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
@@ -307,23 +319,23 @@ ConditionalPowerResultsRates <- setRefClass("ConditionalPowerResultsRates",
     )
 )
 
-ConditionalPowerResultsMultiArmRates <- setRefClass("ConditionalPowerResultsMultiArmRates",
-    contains = "ConditionalPowerResultsMultiHypotheses",
-    fields = list(
-        piTreatments = "numeric",
-        piControl = "numeric"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ConditionalPowerResultsMultiArmRates <- R6::R6Class("ConditionalPowerResultsMultiArmRates",
+    inherit = ConditionalPowerResultsMultiHypotheses,
+    public = list(
+        piTreatments = NULL,
+        piControl = NULL,
+        initialize = function(..., piTreatments = NULL, piControl = NULL) {
+            self$piTreatments <- piTreatments
+            self$piControl <- piControl
+            super$initialize(...)
 
-            if (.readyForInitialization()) {
-                gMax <- getGMax()
-                if (is.null(piControl) || length(piControl) == 0 || all(is.na(piControl))) {
-                    piControl <<- NA_real_
+            if (self$.readyForInitialization()) {
+                gMax <- self$getGMax()
+                if (is.null(self$piControl) || length(self$piControl) == 0 || all(is.na(self$piControl))) {
+                    self$piControl <- NA_real_
                 }
-                if (is.null(piTreatments) || length(piTreatments) == 0 || all(is.na(piTreatments))) {
-                    piTreatments <<- rep(NA_real_, gMax)
+                if (is.null(self$piTreatments) || length(self$piTreatments) == 0 || all(is.na(self$piTreatments))) {
+                    self$piTreatments <- rep(NA_real_, gMax)
                 }
             }
         }
@@ -355,23 +367,23 @@ ConditionalPowerResultsMultiArmRates <- setRefClass("ConditionalPowerResultsMult
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsSurvival <- setRefClass("ConditionalPowerResultsSurvival",
-    contains = "ConditionalPowerResults",
-    fields = list(
-        conditionalPower = "numeric",
-        thetaH1 = "numeric"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ConditionalPowerResultsSurvival <- R6::R6Class("ConditionalPowerResultsSurvival",
+    inherit = ConditionalPowerResults,
+    public = list(
+        conditionalPower = NULL,
+        thetaH1 = NULL,
+        initialize = function(..., conditionalPower = NULL, thetaH1 = NULL) {
+            self$conditionalPower <- conditionalPower
+            self$thetaH1 <- thetaH1
+            super$initialize(...)
 
-            if ((is.null(conditionalPower) || length(conditionalPower) == 0) &&
-                    !is.null(.design) && !is.null(.design$kMax) && length(.design$kMax) > 0) {
-                conditionalPower <<- rep(NA_real_, .design$kMax)
+            if ((is.null(self$conditionalPower) || length(self$conditionalPower) == 0) &&
+                    !is.null(self$.design) && !is.null(self$.design$kMax) && length(self$.design$kMax) > 0) {
+                self$conditionalPower <- rep(NA_real_, self$.design$kMax)
             }
 
-            if (is.null(thetaH1) || length(thetaH1) == 0 || all(is.na(thetaH1))) {
-                thetaH1 <<- NA_real_
+            if (is.null(self$thetaH1) || length(self$thetaH1) == 0 || all(is.na(self$thetaH1))) {
+                self$thetaH1 <- NA_real_
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
@@ -380,19 +392,18 @@ ConditionalPowerResultsSurvival <- setRefClass("ConditionalPowerResultsSurvival"
     )
 )
 
-ConditionalPowerResultsMultiArmSurvival <- setRefClass("ConditionalPowerResultsMultiArmSurvival",
-    contains = "ConditionalPowerResultsMultiHypotheses",
-    fields = list(
-        thetaH1 = "numeric"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ConditionalPowerResultsMultiArmSurvival <- R6::R6Class("ConditionalPowerResultsMultiArmSurvival",
+    inherit = ConditionalPowerResultsMultiHypotheses,
+    public = list(
+        thetaH1 = NULL,
+        initialize = function(..., thetaH1 = NULL) {
+            self$thetaH1 <- thetaH1
+            super$initialize(...)
 
-            if (.readyForInitialization()) {
-                gMax <- getGMax()
-                if (is.null(thetaH1) || length(thetaH1) == 0 || all(is.na(thetaH1))) {
-                    thetaH1 <<- rep(NA_real_, gMax)
+            if (self$.readyForInitialization()) {
+                gMax <- self$getGMax()
+                if (is.null(self$thetaH1) || length(self$thetaH1) == 0 || all(is.na(self$thetaH1))) {
+                    self$thetaH1 <- rep(NA_real_, gMax)
                 }
             }
         }
@@ -425,8 +436,8 @@ ConditionalPowerResultsMultiArmSurvival <- setRefClass("ConditionalPowerResultsM
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsEnrichmentMeans <- setRefClass("ConditionalPowerResultsEnrichmentMeans",
-    contains = "ConditionalPowerResultsMultiArmMeans"
+ConditionalPowerResultsEnrichmentMeans <- R6::R6Class("ConditionalPowerResultsEnrichmentMeans",
+    inherit = ConditionalPowerResultsMultiArmMeans
 )
 
 #'
@@ -455,23 +466,23 @@ ConditionalPowerResultsEnrichmentMeans <- setRefClass("ConditionalPowerResultsEn
 #'
 #' @importFrom methods new
 #'
-ConditionalPowerResultsEnrichmentRates <- setRefClass("ConditionalPowerResultsEnrichmentRates",
-    contains = "ConditionalPowerResultsMultiHypotheses",
-    fields = list(
-        piTreatments = "numeric",
-        piControls = "numeric"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ConditionalPowerResultsEnrichmentRates <- R6::R6Class("ConditionalPowerResultsEnrichmentRates",
+    inherit = ConditionalPowerResultsMultiHypotheses,
+    public = list(
+        piTreatments = NULL,
+        piControls = NULL,
+        initialize = function(..., piTreatments = NULL, piControls = NULL) {
+            self$piTreatments <- piTreatments
+            self$piControls <- piControls
+            super$initialize(...)
 
-            if (.readyForInitialization()) {
-                gMax <- getGMax()
-                if (is.null(piControls) || length(piControls) == 0 || all(is.na(piControls))) {
-                    piControls <<- rep(NA_real_, gMax)
+            if (self$.readyForInitialization()) {
+                gMax <- self$getGMax()
+                if (is.null(self$piControls) || length(self$piControls) == 0 || all(is.na(self$piControls))) {
+                    self$piControls <- rep(NA_real_, gMax)
                 }
-                if (is.null(piTreatments) || length(piTreatments) == 0 || all(is.na(piTreatments))) {
-                    piTreatments <<- rep(NA_real_, gMax)
+                if (is.null(self$piTreatments) || length(self$piTreatments) == 0 || all(is.na(self$piTreatments))) {
+                    self$piTreatments <- rep(NA_real_, gMax)
                 }
             }
         }
@@ -479,8 +490,8 @@ ConditionalPowerResultsEnrichmentRates <- setRefClass("ConditionalPowerResultsEn
 )
 
 
-ConditionalPowerResultsEnrichmentSurvival <- setRefClass("ConditionalPowerResultsEnrichmentSurvival",
-    contains = "ConditionalPowerResultsMultiArmSurvival"
+ConditionalPowerResultsEnrichmentSurvival <- R6::R6Class("ConditionalPowerResultsEnrichmentSurvival",
+    inherit = ConditionalPowerResultsMultiArmSurvival
 )
 
 #'
@@ -510,29 +521,49 @@ ConditionalPowerResultsEnrichmentSurvival <- setRefClass("ConditionalPowerResult
 #'
 #' @importFrom methods new
 #'
-ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
-    contains = "ParameterSet",
-    fields = list(
-        .plotSettings = "PlotSettings",
-        .design = "TrialDesign",
-        .enrichment = "logical",
-        intersectionTest = "character",
-        indices = "matrix",
-        adjustedStageWisePValues = "matrix",
-        overallAdjustedTestStatistics = "matrix",
-        separatePValues = "matrix",
-        conditionalErrorRate = "matrix",
-        secondStagePValues = "matrix",
-        rejected = "matrix",
-        rejectedIntersections = "matrix"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
+ClosedCombinationTestResults <- R6::R6Class("ClosedCombinationTestResults",
+    inherit = ParameterSet,
+    public = list(
+        .plotSettings = NULL,
+        .design = NULL,
+        .enrichment = NULL,
+        intersectionTest = NULL,
+        indices = NULL,
+        adjustedStageWisePValues = NULL,
+        overallAdjustedTestStatistics = NULL,
+        separatePValues = NULL,
+        conditionalErrorRate = NULL,
+        secondStagePValues = NULL,
+        rejected = NULL,
+        rejectedIntersections = NULL,
+        initialize = function(..., .design = NULL,
+                .enrichment = NULL,
+                intersectionTest = NULL,
+                indices = NULL,
+                adjustedStageWisePValues = NULL,
+                overallAdjustedTestStatistics = NULL,
+                separatePValues = NULL,
+                conditionalErrorRate = NULL,
+                secondStagePValues = NULL,
+                rejected = NULL,
+                rejectedIntersections = NULL) {
+            self$.design <- .design
+            self$.enrichment <- .enrichment
+            self$intersectionTest <- intersectionTest
+            self$indices <- indices
+            self$adjustedStageWisePValues <- adjustedStageWisePValues
+            self$overallAdjustedTestStatistics <- overallAdjustedTestStatistics
+            self$separatePValues <- separatePValues
+            self$conditionalErrorRate <- conditionalErrorRate
+            self$secondStagePValues <- secondStagePValues
+            self$rejected <- rejected
+            self$rejectedIntersections <- rejectedIntersections
 
-            .plotSettings <<- PlotSettings()
+            super$initialize(...)
 
-            .setParameterType("intersectionTest", C_PARAM_USER_DEFINED)
+            self$.plotSettings <- PlotSettings$new()
+
+            self$.setParameterType("intersectionTest", C_PARAM_USER_DEFINED)
 
             parametersGenerated <- c(
                 "indices",
@@ -540,7 +571,7 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
                 "rejected",
                 "rejectedIntersections"
             )
-            if (inherits(.design, "TrialDesignConditionalDunnett")) {
+            if (inherits(self$.design, "TrialDesignConditionalDunnett")) {
                 parametersGenerated <- c(
                     parametersGenerated,
                     "conditionalErrorRate",
@@ -554,24 +585,24 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
                 )
             }
             for (param in parametersGenerated) {
-                .setParameterType(param, C_PARAM_GENERATED)
+                self$.setParameterType(param, C_PARAM_GENERATED)
             }
         },
         show = function(showType = 1, digits = NA_integer_) {
-            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing closed combination test result objects"
-            .resetCat()
+            self$.resetCat()
             if (showType == 2) {
-                callSuper(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                .cat(.toString(), ":\n\n",
+                self$.cat(self$.toString(), ":\n\n",
                     heading = 1,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
 
-                .showParametersOfOneGroup(.getUserDefinedParameters(), "User defined parameters",
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
 
@@ -579,33 +610,33 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
                     ".design$stages",
                     ".design$alpha"
                 )
-                if (inherits(.design, "TrialDesignConditionalDunnett")) {
+                if (inherits(self$.design, "TrialDesignConditionalDunnett")) {
                     designParametersToShow <- c(
                         designParametersToShow,
                         ".design$informationAtInterim",
                         ".design$secondStageConditioning"
                     )
                 }
-                .showParametersOfOneGroup(designParametersToShow, "Design parameters",
+                self$.showParametersOfOneGroup(designParametersToShow, "Design parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
 
-                .showParametersOfOneGroup(.getGeneratedParameters(), "Output",
+                self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Output",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
 
-                .showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
 
-                .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                if (isTRUE(.enrichment)) {
-                    .cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
+                self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                if (isTRUE(self$.enrichment)) {
+                    self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                 } else {
-                    .cat(paste0(
+                    self$.cat(paste0(
                         "  (i): results of treatment arm i vs. control group ",
-                        (nrow(separatePValues) + 1), "\n"
+                        (nrow(self$separatePValues) + 1), "\n"
                     ), consoleOutputEnabled = consoleOutputEnabled)
-                    .cat("  [i]: hypothesis number\n",
+                    self$.cat("  [i]: hypothesis number\n",
                         consoleOutputEnabled = consoleOutputEnabled
                     )
                 }
@@ -613,15 +644,15 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
         },
         .toString = function(startWithUpperCase = FALSE) {
             s <- "Closed combination test results"
-            if (inherits(.design, "TrialDesignConditionalDunnett")) {
+            if (inherits(self$.design, "TrialDesignConditionalDunnett")) {
                 s <- paste0(s, " (Conditional Dunnett)")
             }
             return(s)
         },
         .getHypothesisTreatmentArms = function(number) {
             result <- c()
-            for (i in 1:ncol(indices)) {
-                if (indices[number, i] == 1) {
+            for (i in 1:ncol(self$indices)) {
+                if (self$indices[number, i] == 1) {
                     result <- c(result, i)
                 }
             }
@@ -629,8 +660,8 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
         },
         .getHypothesisTreatmentArmVariants = function() {
             result <- c()
-            for (number in 1:nrow(indices)) {
-                arms <- .getHypothesisTreatmentArms(number)
+            for (number in 1:nrow(self$indices)) {
+                arms <- self$.getHypothesisTreatmentArms(number)
                 result <- c(result, paste0(arms, collapse = ", "))
             }
             return(result)
@@ -638,8 +669,8 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
         .getHypothesisPopulationVariants = function() {
             result <- c()
             gMax <- 1
-            for (number in 1:nrow(indices)) {
-                arms <- .getHypothesisTreatmentArms(number)
+            for (number in 1:nrow(self$indices)) {
+                arms <- self$.getHypothesisTreatmentArms(number)
                 if (number == 1) {
                     gMax <- length(arms)
                 }
@@ -685,146 +716,152 @@ ClosedCombinationTestResults <- setRefClass("ClosedCombinationTestResults",
 #'
 #' @importFrom methods new
 #'
-AnalysisResults <- setRefClass("AnalysisResults",
-    contains = "ParameterSet",
-    fields = list(
-        .plotSettings = "PlotSettings",
-        .design = "TrialDesign",
-        .dataInput = "Dataset",
-        .stageResults = "StageResults",
-        .conditionalPowerResults = "ConditionalPowerResults",
-        normalApproximation = "logical",
-        directionUpper = "logical",
-        thetaH0 = "numeric",
-        pi1 = "numeric",
-        pi2 = "numeric",
-        nPlanned = "numeric",
-        allocationRatioPlanned = "numeric"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ...) {
-            callSuper(.design = design, .dataInput = dataInput, ...)
-            .plotSettings <<- PlotSettings()
+AnalysisResults <- R6::R6Class("AnalysisResults",
+    inherit = ParameterSet,
+    public = list(
+        .plotSettings = NULL,
+        .design = NULL,
+        .dataInput = NULL,
+        .stageResults = NULL,
+        .conditionalPowerResults = NULL,
+        normalApproximation = NULL,
+        directionUpper = NULL,
+        thetaH0 = NULL,
+        pi1 = NULL,
+        pi2 = NULL,
+        nPlanned = NULL,
+        allocationRatioPlanned = NULL,
+        initialize = function(design, dataInput, ..., .stageResults = NULL, .conditionalPowerResults = NULL, directionUpper = NULL, thetaH0 = NULL) {
+            self$.design <- design
+            self$.dataInput <- dataInput
+            self$.stageResults <- .stageResults
+            self$.conditionalPowerResults <- .conditionalPowerResults
+            self$directionUpper <- directionUpper
+            self$thetaH0 <- thetaH0
+
+            super$initialize(...)
+
+            self$.plotSettings <- PlotSettings$new()
         },
         .setStageResults = function(stageResults) {
-            .stageResults <<- stageResults
+            self$.stageResults <- stageResults
         },
         getPlotSettings = function() {
-            return(.plotSettings)
+            return(self$.plotSettings)
         },
         show = function(showType = 1, digits = NA_integer_) {
-            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
         .getStageResultParametersToShow = function() {
             stageResultParametersToShow <- c()
-            if (.design$kMax > 1) {
-                if (!grepl("Rates", .getClassName(.dataInput)) || .dataInput$getNumberOfGroups() > 1) {
+            if (self$.design$kMax > 1) {
+                if (!grepl("Rates", .getClassName(self$.dataInput)) || self$.dataInput$getNumberOfGroups() > 1) {
                     stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$effectSizes")
                 }
 
-                if (grepl("Means", .getClassName(.dataInput))) {
+                if (grepl("Means", .getClassName(self$.dataInput))) {
                     stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallStDevs")
                 }
-                if (grepl("Rates", .getClassName(.dataInput))) {
-                    if (.isMultiArmAnalysisResults(.self)) {
+                if (grepl("Rates", .getClassName(self$.dataInput))) {
+                    if (.isMultiArmAnalysisResults(self)) {
                         stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallPiTreatments")
                         stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallPiControl")
-                    } else if (.isEnrichmentAnalysisResults(.self)) {
+                    } else if (.isEnrichmentAnalysisResults(self)) {
                         stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallPisTreatment")
                         stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallPisControl")
                     } else {
                         stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallPi1")
-                        if (.dataInput$getNumberOfGroups() > 1) {
+                        if (self$.dataInput$getNumberOfGroups() > 1) {
                             stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallPi2")
                         }
                     }
                 }
             }
             stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$testStatistics")
-            if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(.self))) {
+            if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(self))) {
                 stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$separatePValues")
             } else {
                 stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$pValues")
             }
 
-            if (.design$kMax == 1) {
+            if (self$.design$kMax == 1) {
                 # return(stageResultParametersToShow)
             }
 
             # show combination test statistics
-            if (.isTrialDesignInverseNormal(.design)) {
+            if (.isTrialDesignInverseNormal(self$.design)) {
                 stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$combInverseNormal")
-            } else if (.isTrialDesignGroupSequential(.design)) {
+            } else if (.isTrialDesignGroupSequential(self$.design)) {
                 stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallTestStatistics")
                 stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$overallPValues")
-            } else if (.isTrialDesignFisher(.design)) {
+            } else if (.isTrialDesignFisher(self$.design)) {
                 stageResultParametersToShow <- c(stageResultParametersToShow, ".stageResults$combFisher")
             }
             return(stageResultParametersToShow)
         },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing analysis result objects"
-            .resetCat()
+            self$.resetCat()
             if (showType == 2) {
-                callSuper(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                .cat(.toString(startWithUpperCase = TRUE), ":\n\n",
+                self$.cat(self$.toString(startWithUpperCase = TRUE), ":\n\n",
                     heading = 1,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
 
-                .showParametersOfOneGroup(.getDesignParametersToShow(.self), "Design parameters",
+                self$.showParametersOfOneGroup(.getDesignParametersToShow(self), "Design parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
 
-                .showParametersOfOneGroup(.getUserDefinedParameters(), "User defined parameters",
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
 
-                .showParametersOfOneGroup(.getDefaultParameters(), "Default parameters",
+                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
 
-                .showParametersOfOneGroup(.getStageResultParametersToShow(), "Stage results",
+                self$.showParametersOfOneGroup(self$.getStageResultParametersToShow(), "Stage results",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
 
                 # show multi-arm parameters
-                if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(.self))) {
-                    if (.isTrialDesignConditionalDunnett(.design)) {
-                        .showParametersOfOneGroup(".closedTestResults$conditionalErrorRate",
+                if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(self))) {
+                    if (.isTrialDesignConditionalDunnett(self$.design)) {
+                        self$.showParametersOfOneGroup(".closedTestResults$conditionalErrorRate",
                             "Conditional error rate",
                             orderByParameterName = FALSE,
                             consoleOutputEnabled = consoleOutputEnabled
                         )
-                        .showParametersOfOneGroup(".closedTestResults$secondStagePValues",
+                        self$.showParametersOfOneGroup(".closedTestResults$secondStagePValues",
                             "Second stage p-values",
                             orderByParameterName = FALSE,
                             consoleOutputEnabled = consoleOutputEnabled
                         )
                     } else {
-                        .showParametersOfOneGroup(".closedTestResults$adjustedStageWisePValues",
+                        self$.showParametersOfOneGroup(".closedTestResults$adjustedStageWisePValues",
                             "Adjusted stage-wise p-values",
                             orderByParameterName = FALSE,
                             consoleOutputEnabled = consoleOutputEnabled
                         )
-                        .showParametersOfOneGroup(".closedTestResults$overallAdjustedTestStatistics",
+                        self$.showParametersOfOneGroup(".closedTestResults$overallAdjustedTestStatistics",
                             "Overall adjusted test statistics",
                             orderByParameterName = FALSE,
                             consoleOutputEnabled = consoleOutputEnabled
                         )
                     }
 
-                    .showParametersOfOneGroup(".closedTestResults$rejected", "Test actions",
+                    self$.showParametersOfOneGroup(".closedTestResults$rejected", "Test actions",
                         orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                     )
                 }
 
-                generatedParams <- .getGeneratedParameters()
+                generatedParams <- self$.getGeneratedParameters()
                 generatedParams <- generatedParams[!(generatedParams %in%
                     c("assumedStDevs", "thetaH1", "pi1", "pi2", "piTreatments", "piTreatments", "piControl", "piControls"))]
 
-                if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(.self))) {
+                if (grepl("(MultiArm|Dunnett|Enrichment)", .getClassName(self))) {
                     if (all(c("conditionalPowerSimulated", "conditionalRejectionProbabilities") %in% generatedParams)) {
                         generatedParams <- .moveValue(
                             generatedParams,
@@ -832,51 +869,51 @@ AnalysisResults <- setRefClass("AnalysisResults",
                         )
                     }
 
-                    .showParametersOfOneGroup(generatedParams, "Further analysis results",
+                    self$.showParametersOfOneGroup(generatedParams, "Further analysis results",
                         orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                     )
                 } else {
-                    .showParametersOfOneGroup(generatedParams, "Analysis results",
+                    self$.showParametersOfOneGroup(generatedParams, "Analysis results",
                         orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                     )
                 }
 
-                .showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
 
-                if (grepl("(MultiArm|Dunnett)", .getClassName(.self))) {
-                    .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(
+                if (grepl("(MultiArm|Dunnett)", .getClassName(self))) {
+                    self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(
                         paste0(
                             "  (i): results of treatment arm i vs. control group ",
-                            .dataInput$getNumberOfGroups(), "\n"
+                            self$.dataInput$getNumberOfGroups(), "\n"
                         ),
                         consoleOutputEnabled = consoleOutputEnabled
                     )
-                } else if (.isEnrichmentAnalysisResults(.self)) {
-                    .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
-                    .cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
-                } else if (grepl("Rates", .getClassName(.dataInput)) && .dataInput$getNumberOfGroups() == 2) {
-                    .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-                    .cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
+                } else if (.isEnrichmentAnalysisResults(self)) {
+                    self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
+                } else if (grepl("Rates", .getClassName(self$.dataInput)) && self$.dataInput$getNumberOfGroups() == 2) {
+                    self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
                 }
             }
         },
         .toString = function(startWithUpperCase = FALSE) {
             str <- "analysis results"
-            if (inherits(.self, "AnalysisResultsMultiArm")) {
+            if (inherits(self, "AnalysisResultsMultiArm")) {
                 str <- paste0("multi-arm ", str)
-            } else if (inherits(.self, "AnalysisResultsEnrichment")) {
+            } else if (inherits(self, "AnalysisResultsEnrichment")) {
                 str <- paste0("enrichment ", str)
             }
             if (startWithUpperCase) {
                 str <- .firstCharacterToUpperCase(str)
             }
 
-            numberOfGroups <- .dataInput$getNumberOfGroups()
+            numberOfGroups <- self$.dataInput$getNumberOfGroups()
             str <- paste0(str, " (")
 
-            str <- paste0(str, tolower(sub("Dataset(Enrichment)?", "", .getClassName(.dataInput))))
+            str <- paste0(str, tolower(sub("Dataset(Enrichment)?", "", .getClassName(self$.dataInput))))
             if (grepl("Survival", .getClassName(.getClassName))) {
                 str <- paste0(str, " data")
             }
@@ -887,14 +924,14 @@ AnalysisResults <- setRefClass("AnalysisResults",
                 str <- paste0(str, " of ", numberOfGroups, " groups")
             }
 
-            if (.design$kMax > 1) {
-                if (grepl("GroupSequential", .getClassName(.self))) {
+            if (self$.design$kMax > 1) {
+                if (grepl("GroupSequential", .getClassName(self))) {
                     str <- paste0(str, ", group sequential design")
-                } else if (grepl("InverseNormal", .getClassName(.self))) {
+                } else if (grepl("InverseNormal", .getClassName(self))) {
                     str <- paste0(str, ", inverse normal combination test design")
-                } else if (grepl("Fisher", .getClassName(.self))) {
+                } else if (grepl("Fisher", .getClassName(self))) {
                     str <- paste0(str, ", Fisher's combination test design")
-                } else if (grepl("Dunnett", .getClassName(.self))) {
+                } else if (grepl("Dunnett", .getClassName(self))) {
                     str <- paste0(str, ", conditional Dunnett design")
                 }
             } else {
@@ -905,36 +942,62 @@ AnalysisResults <- setRefClass("AnalysisResults",
             return(str)
         },
         getNumberOfStages = function() {
-            return(.stageResults$getNumberOfStages())
+            return(self$.stageResults$getNumberOfStages())
         },
         getDataInput = function() {
-            return(.dataInput)
+            return(self$.dataInput)
         }
     )
 )
 
-AnalysisResultsBase <- setRefClass("AnalysisResultsBase",
-    contains = "AnalysisResults",
-    fields = list(
-        thetaH1 = "numeric",
-        assumedStDev = "numeric",
-        equalVariances = "logical",
-        testActions = "character",
-        conditionalRejectionProbabilities = "numeric",
-        conditionalPower = "numeric",
-        repeatedConfidenceIntervalLowerBounds = "numeric",
-        repeatedConfidenceIntervalUpperBounds = "numeric",
-        repeatedPValues = "numeric",
-        finalStage = "integer",
-        finalPValues = "numeric",
-        finalConfidenceIntervalLowerBounds = "numeric",
-        finalConfidenceIntervalUpperBounds = "numeric",
-        medianUnbiasedEstimates = "numeric"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ...) {
-            callSuper(design = design, dataInput = dataInput, ...)
-            finalStage <<- NA_integer_
+AnalysisResultsBase <- R6::R6Class("AnalysisResultsBase",
+    inherit = AnalysisResults,
+    public = list(
+        thetaH1 = NULL,
+        assumedStDev = NULL,
+        equalVariances = NULL,
+        testActions = NULL,
+        conditionalRejectionProbabilities = NULL,
+        conditionalPower = NULL,
+        repeatedConfidenceIntervalLowerBounds = NULL,
+        repeatedConfidenceIntervalUpperBounds = NULL,
+        repeatedPValues = NULL,
+        finalStage = NULL,
+        finalPValues = NULL,
+        finalConfidenceIntervalLowerBounds = NULL,
+        finalConfidenceIntervalUpperBounds = NULL,
+        medianUnbiasedEstimates = NULL,
+        initialize = function(design, dataInput, ..., thetaH1 = NULL,
+                assumedStDev = NULL,
+                equalVariances = NULL,
+                testActions = NULL,
+                conditionalRejectionProbabilities = NULL,
+                conditionalPower = NULL,
+                repeatedConfidenceIntervalLowerBounds = NULL,
+                repeatedConfidenceIntervalUpperBounds = NULL,
+                repeatedPValues = NULL,
+                finalStage = NULL,
+                finalPValues = NULL,
+                finalConfidenceIntervalLowerBounds = NULL,
+                finalConfidenceIntervalUpperBounds = NULL,
+                medianUnbiasedEstimates = NULL) {
+            self$thetaH1 <- thetaH1
+            self$assumedStDev <- assumedStDev
+            self$equalVariances <- equalVariances
+            self$testActions <- testActions
+            self$conditionalRejectionProbabilities <- conditionalRejectionProbabilities
+            self$conditionalPower <- conditionalPower
+            self$repeatedConfidenceIntervalLowerBounds <- repeatedConfidenceIntervalLowerBounds
+            self$repeatedConfidenceIntervalUpperBounds <- repeatedConfidenceIntervalUpperBounds
+            self$repeatedPValues <- repeatedPValues
+            self$finalStage <- finalStage
+            self$finalPValues <- finalPValues
+            self$finalConfidenceIntervalLowerBounds <- finalConfidenceIntervalLowerBounds
+            self$finalConfidenceIntervalUpperBounds <- finalConfidenceIntervalUpperBounds
+            self$medianUnbiasedEstimates <- medianUnbiasedEstimates
+
+            super$initialize(design = design, dataInput = dataInput, ...)
+            self$finalStage <- NA_integer_
         }
     )
 )
@@ -966,26 +1029,46 @@ AnalysisResultsBase <- setRefClass("AnalysisResultsBase",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiHypotheses <- setRefClass("AnalysisResultsMultiHypotheses",
-    contains = "AnalysisResults",
-    fields = list(
-        .closedTestResults = "ClosedCombinationTestResults",
-        thetaH1 = "matrix", # means only
-        assumedStDevs = "matrix", # means only
-        piTreatments = "matrix", # rates only
-        intersectionTest = "character",
-        varianceOption = "character",
-        conditionalRejectionProbabilities = "matrix",
-        conditionalPower = "matrix",
-        repeatedConfidenceIntervalLowerBounds = "matrix",
-        repeatedConfidenceIntervalUpperBounds = "matrix",
-        repeatedPValues = "matrix"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ...) {
-            callSuper(design = design, dataInput = dataInput, ...)
+AnalysisResultsMultiHypotheses <- R6::R6Class("AnalysisResultsMultiHypotheses",
+    inherit = AnalysisResults,
+    public = list(
+        .closedTestResults = NULL,
+        thetaH1 = NULL, # means only
+        assumedStDevs = NULL, # means only
+        piTreatments = NULL, # rates only
+        intersectionTest = NULL,
+        varianceOption = NULL,
+        conditionalRejectionProbabilities = NULL,
+        conditionalPower = NULL,
+        repeatedConfidenceIntervalLowerBounds = NULL,
+        repeatedConfidenceIntervalUpperBounds = NULL,
+        repeatedPValues = NULL,
+        initialize = function(design, dataInput, ..., .closedTestResults = NULL,
+                thetaH1 = NULL,
+                assumedStDevs = NULL,
+                piTreatments = NULL,
+                intersectionTest = NULL,
+                varianceOption = NULL,
+                conditionalRejectionProbabilities = NULL,
+                conditionalPower = NULL,
+                repeatedConfidenceIntervalLowerBounds = NULL,
+                repeatedConfidenceIntervalUpperBounds = NULL,
+                repeatedPValues = NULL) {
+            self$.closedTestResults <- .closedTestResults
+            self$thetaH1 <- thetaH1
+            self$assumedStDevs <- assumedStDevs
+            self$piTreatments <- piTreatments
+            self$intersectionTest <- intersectionTest
+            self$varianceOption <- varianceOption
+            self$conditionalRejectionProbabilities <- conditionalRejectionProbabilities
+            self$conditionalPower <- conditionalPower
+            self$repeatedConfidenceIntervalLowerBounds <- repeatedConfidenceIntervalLowerBounds
+            self$repeatedConfidenceIntervalUpperBounds <- repeatedConfidenceIntervalUpperBounds
+            self$repeatedPValues <- repeatedPValues
+            super$initialize(design = design, dataInput = dataInput, ...)
+
             for (param in c("thetaH1", "assumedStDevs", "piTreatments")) {
-                .setParameterType(param, C_PARAM_NOT_APPLICABLE)
+                self$.setParameterType(param, C_PARAM_NOT_APPLICABLE)
             }
         }
     )
@@ -1019,18 +1102,17 @@ AnalysisResultsMultiHypotheses <- setRefClass("AnalysisResultsMultiHypotheses",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiArm <- setRefClass("AnalysisResultsMultiArm",
-    contains = "AnalysisResultsMultiHypotheses",
-    fields = list(
-        piControl = "matrix" # rates only
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ...) {
-            callSuper(design = design, dataInput = dataInput, ...)
-            .setParameterType("piControl", C_PARAM_NOT_APPLICABLE)
+AnalysisResultsMultiArm <- R6::R6Class("AnalysisResultsMultiArm",
+    inherit = AnalysisResultsMultiHypotheses,
+    public = list(
+        piControl = NULL, # rates only
+        initialize = function(design, dataInput, ..., piControl = NULL) {
+            self$piControl <- piControl
+            super$initialize(design = design, dataInput = dataInput, ...)
+            self$.setParameterType("piControl", C_PARAM_NOT_APPLICABLE)
         },
         .getParametersToShow = function() {
-            parametersToShow <- .getVisibleFieldNames()
+            parametersToShow <- self$.getVisibleFieldNames()
 
             if ("piTreatments" %in% parametersToShow && "piControl" %in% parametersToShow) {
                 index <- which(parametersToShow == "piTreatments")
@@ -1073,15 +1155,14 @@ AnalysisResultsMultiArm <- setRefClass("AnalysisResultsMultiArm",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsEnrichment <- setRefClass("AnalysisResultsEnrichment",
-    contains = "AnalysisResultsMultiHypotheses",
-    fields = list(
-        piControls = "matrix" # rates only
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ...) {
-            callSuper(design = design, dataInput = dataInput, ...)
-            .setParameterType("piControls", C_PARAM_NOT_APPLICABLE)
+AnalysisResultsEnrichment <- R6::R6Class("AnalysisResultsEnrichment",
+    inherit = AnalysisResultsMultiHypotheses,
+    public = list(
+        piControls = NULL, # rates only
+        initialize = function(design, dataInput, ..., piControls = NULL) {
+            self$piControls <- piControls
+            super$initialize(design = design, dataInput = dataInput, ...)
+            self$.setParameterType("piControls", C_PARAM_NOT_APPLICABLE)
         }
     )
 )
@@ -1228,17 +1309,19 @@ names.AnalysisResults <- function(x) {
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsGroupSequential <- setRefClass("AnalysisResultsGroupSequential",
-    contains = "AnalysisResultsBase",
-    fields = list(
-        maxInformation = "integer",
-        informationEpsilon = "numeric"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ...) {
-            callSuper(design = design, dataInput = dataInput, ...)
-            .setParameterType("maxInformation", C_PARAM_NOT_APPLICABLE)
-            .setParameterType("informationEpsilon", C_PARAM_NOT_APPLICABLE)
+AnalysisResultsGroupSequential <- R6::R6Class("AnalysisResultsGroupSequential",
+    inherit = AnalysisResultsBase,
+    public = list(
+        maxInformation = NULL,
+        informationEpsilon = NULL,
+        initialize = function(design, dataInput, ..., maxInformation = NULL, informationEpsilon = NULL) {
+            self$maxInformation <- maxInformation
+            self$informationEpsilon <- informationEpsilon
+
+            super$initialize(design = design, dataInput = dataInput, ...)
+
+            self$.setParameterType("maxInformation", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("informationEpsilon", C_PARAM_NOT_APPLICABLE)
         }
     )
 )
@@ -1288,8 +1371,8 @@ AnalysisResultsGroupSequential <- setRefClass("AnalysisResultsGroupSequential",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsInverseNormal <- setRefClass("AnalysisResultsInverseNormal",
-    contains = "AnalysisResultsBase"
+AnalysisResultsInverseNormal <- R6::R6Class("AnalysisResultsInverseNormal",
+    inherit = AnalysisResultsBase
 )
 
 #'
@@ -1334,8 +1417,8 @@ AnalysisResultsInverseNormal <- setRefClass("AnalysisResultsInverseNormal",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiArmInverseNormal <- setRefClass("AnalysisResultsMultiArmInverseNormal",
-    contains = "AnalysisResultsMultiArm"
+AnalysisResultsMultiArmInverseNormal <- R6::R6Class("AnalysisResultsMultiArmInverseNormal",
+    inherit = AnalysisResultsMultiArm
 )
 
 #'
@@ -1381,10 +1464,10 @@ AnalysisResultsMultiArmInverseNormal <- setRefClass("AnalysisResultsMultiArmInve
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsEnrichmentInverseNormal <- setRefClass("AnalysisResultsEnrichmentInverseNormal",
-    contains = "AnalysisResultsEnrichment",
-    fields = list(
-        stratifiedAnalysis = "logical"
+AnalysisResultsEnrichmentInverseNormal <- R6::R6Class("AnalysisResultsEnrichmentInverseNormal",
+    inherit = AnalysisResultsEnrichment,
+    public = list(
+        stratifiedAnalysis = NULL
     )
 )
 
@@ -1436,17 +1519,17 @@ AnalysisResultsEnrichmentInverseNormal <- setRefClass("AnalysisResultsEnrichment
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsFisher <- setRefClass("AnalysisResultsFisher",
-    contains = "AnalysisResultsBase",
-    fields = list(
-        conditionalPowerSimulated = "numeric",
-        iterations = "integer",
-        seed = "numeric"
-    ),
-    methods = list(
-        initialize = function(design, dataInput, ...) {
-            callSuper(design = design, dataInput = dataInput, ...)
-            conditionalPowerSimulated <<- -1
+AnalysisResultsFisher <- R6::R6Class("AnalysisResultsFisher",
+    inherit = AnalysisResultsBase,
+    public = list(
+        conditionalPowerSimulated = NULL,
+        iterations = NULL,
+        seed = NULL,
+        initialize = function(design, dataInput, ..., iterations = NULL, seed = NULL) {
+            self$iterations <- iterations
+            self$seed <- seed
+            super$initialize(design = design, dataInput = dataInput, ...)
+            self$conditionalPowerSimulated <- -1
         }
     )
 )
@@ -1494,12 +1577,12 @@ AnalysisResultsFisher <- setRefClass("AnalysisResultsFisher",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsMultiArmFisher <- setRefClass("AnalysisResultsMultiArmFisher",
-    contains = "AnalysisResultsMultiArm",
-    fields = list(
-        conditionalPowerSimulated = "matrix",
-        iterations = "integer",
-        seed = "numeric"
+AnalysisResultsMultiArmFisher <- R6::R6Class("AnalysisResultsMultiArmFisher",
+    inherit = AnalysisResultsMultiArm,
+    public = list(
+        conditionalPowerSimulated = NULL,
+        iterations = NULL,
+        seed = NULL
     )
 )
 
@@ -1548,13 +1631,13 @@ AnalysisResultsMultiArmFisher <- setRefClass("AnalysisResultsMultiArmFisher",
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsEnrichmentFisher <- setRefClass("AnalysisResultsEnrichmentFisher",
-    contains = "AnalysisResultsEnrichment",
-    fields = list(
-        conditionalPowerSimulated = "matrix",
-        iterations = "integer",
-        seed = "numeric",
-        stratifiedAnalysis = "logical"
+AnalysisResultsEnrichmentFisher <- R6::R6Class("AnalysisResultsEnrichmentFisher",
+    inherit = AnalysisResultsEnrichment,
+    public = list(
+        conditionalPowerSimulated = NULL,
+        iterations = NULL,
+        seed = NULL,
+        stratifiedAnalysis = NULL
     )
 )
 
@@ -1594,9 +1677,9 @@ AnalysisResultsEnrichmentFisher <- setRefClass("AnalysisResultsEnrichmentFisher"
 #'
 #' @importFrom methods new
 #'
-AnalysisResultsConditionalDunnett <- setRefClass("AnalysisResultsConditionalDunnett",
-    contains = "AnalysisResultsMultiArm",
-    fields = list()
+AnalysisResultsConditionalDunnett <- R6::R6Class("AnalysisResultsConditionalDunnett",
+    inherit = AnalysisResultsMultiArm,
+    public = list()
 )
 
 .getAnalysisResultsPlotArguments <- function(x,

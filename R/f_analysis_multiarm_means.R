@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7206 $
-## |  Last changed: $Date: 2023-07-25 14:55:05 +0200 (Tue, 25 Jul 2023) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -59,7 +59,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design, dataInput = dataInput,
@@ -85,7 +85,8 @@ NULL
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         calculateSingleStepAdjusted = FALSE,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+        iterations = C_ITERATIONS_DEFAULT, 
+        seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -97,7 +98,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsMultiArmFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsMultiArmFisher$new(design = design, dataInput = dataInput)
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design, dataInput = dataInput,
         intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
@@ -122,7 +123,9 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         calculateSingleStepAdjusted = FALSE,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
+        iterations = C_ITERATIONS_DEFAULT, 
+        seed = NA_real_) {
     .assertIsTrialDesignConditionalDunnett(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
@@ -133,7 +136,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsConditionalDunnett(design = design, dataInput = dataInput)
+    results <- AnalysisResultsConditionalDunnett$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansMultiArmAll(
         results = results, design = design,
@@ -327,7 +330,7 @@ NULL
 						select 'varianceOption' = \"overallPooled\"", call. = FALSE)
     }
 
-    stageResults <- StageResultsMultiArmMeans(
+    stageResults <- StageResultsMultiArmMeans$new(
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
@@ -1001,7 +1004,7 @@ NULL
     gMax <- stageResults$getGMax()
     kMax <- design$kMax
 
-    results <- ConditionalPowerResultsMultiArmMeans(
+    results <- ConditionalPowerResultsMultiArmMeans$new(
         .design = design,
         .stageResults = stageResults,
         thetaH1 = thetaH1,
@@ -1380,7 +1383,7 @@ NULL
         sqrt(1 / stageResults$.dataInput$getOverallSampleSizes(stage = stage, group = gMax + 1) +
             1 / stageResults$.dataInput$getOverallSampleSizes(stage = stage, group = (1:gMax)))
 
-    results <- ConditionalPowerResultsMultiArmMeans(
+    results <- ConditionalPowerResultsMultiArmMeans$new(
         .design = design,
         .stageResults = stageResults,
         assumedStDevs = assumedStDevs,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7656 $
-## |  Last changed: $Date: 2024-02-22 10:55:00 +0100 (Do, 22 Feb 2024) $
+## |  File version: $Revision: 7809 $
+## |  Last changed: $Date: 2024-04-05 18:37:05 +0200 (Fr, 05 Apr 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -41,25 +41,31 @@ NULL
 #'
 #' @importFrom methods new
 #'
-FieldSet <- setRefClass("FieldSet",
-    fields = list(
-        .parameterTypes = "list",
-        .showParameterTypeEnabled = "logical",
-        .catLines = "character",
-        .deprecatedFieldNames = "character"
-    ),
-    methods = list(
+FieldSet <- R6::R6Class("FieldSet",
+    public = list(
+        .parameterTypes = NULL,
+        .showParameterTypeEnabled = NULL,
+        .catLines = NULL,
+        .deprecatedFieldNames = NULL,
         .getFieldNames = function() {
-            return(names(.self$getRefClass()$fields()))
+            classNames <- class(self)
+            classNames <- classNames[classNames != "R6"]
+            classNames <- base::rev(classNames)
+            fieldNames <- unlist(lapply(classNames, function(x) {
+                names(base::get(x)$public_fields)
+            }))
+            startFieldNameIndices <- grepl("^\\.", fieldNames)
+            fieldNames <- c(fieldNames[startFieldNameIndices], fieldNames[!startFieldNameIndices])
+            return(fieldNames)
         },
         .getVisibleFieldNames = function() {
-            fieldNames <- names(.self$getRefClass()$fields())
+            fieldNames <- self$.getFieldNames()
             fieldNames <- fieldNames[!startsWith(fieldNames, ".")]
-            fieldNames <- fieldNames[!(fieldNames %in% .deprecatedFieldNames)]
+            fieldNames <- fieldNames[!(fieldNames %in% self$.deprecatedFieldNames)]
             return(fieldNames)
         },
         .resetCat = function() {
-            .catLines <<- character()
+            self$.catLines <- character()
         },
         .cat = function(..., file = "", sep = "", fill = FALSE, labels = NULL,
                 append = FALSE, heading = 0, tableColumns = 0, consoleOutputEnabled = TRUE,
@@ -100,21 +106,22 @@ FieldSet <- setRefClass("FieldSet",
                     line <- paste0(args, collapse = sep)
                     listItemEnabled <- grepl("^  ", line)
 
-                    headingBaseNumber <- as.integer(getOption("rpact.print.heading.base.number", 0L))
+                    headingBaseNumber <- as.integer(getOption("rpact.print.heading.base.number", 
+                            C_HEADING_BASE_NUMBER_DEFAULT))
                     if (is.na(headingBaseNumber)) {
-                        headingBaseNumber <- 0L
+                        headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
                     if (headingBaseNumber < -2) {
                         warning(
                             "Illegal option ", sQuote("rpact.print.heading.base.number"),
-                            " (", headingBaseNumber, ") was set to 0"
+                            " (", headingBaseNumber, ") was set to ", C_HEADING_BASE_NUMBER_DEFAULT
                         )
-                        headingBaseNumber <- 0L
+                        headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
                     if (headingBaseNumber > 4) {
                         warning(
                             "Illgeal option ", sQuote("rpact.print.heading.base.number"),
-                            " (", headingBaseNumber, ") was set to 4 becasue it was too large"
+                            " (", headingBaseNumber, ") was set to 4 because it was too large"
                         )
                         headingBaseNumber <- 4L
                     }
@@ -150,21 +157,21 @@ FieldSet <- setRefClass("FieldSet",
                     }
                 }
             }
-            if (length(.catLines) == 0) {
-                .catLines <<- line
+            if (length(self$.catLines) == 0) {
+                self$.catLines <- line
             } else {
-                .catLines <<- c(.catLines, line)
+                self$.catLines <- c(self$.catLines, line)
             }
             return(invisible())
         },
         .getFields = function(values) {
-            flds <- names(.self$getRefClass()$fields())
+            flds <- self$.getFieldNames()
             if (!missing(values)) {
                 flds <- flds[flds %in% values]
             }
             result <- setNames(vector("list", length(flds)), flds)
             for (fld in flds) {
-                result[[fld]] <- .self[[fld]]
+                result[[fld]] <- self[[fld]]
             }
             return(result)
         }
@@ -192,47 +199,23 @@ FieldSet <- setRefClass("FieldSet",
 #'
 #' @importFrom methods new
 #'
-ParameterSet <- setRefClass("ParameterSet",
-    contains = "FieldSet",
-    methods = list(
-        initialize = function(...,
-                .showParameterTypeEnabled = TRUE) {
-            callSuper(...,
-                .showParameterTypeEnabled = .showParameterTypeEnabled
-            )
-            .parameterTypes <<- list()
-            .catLines <<- character()
-            .deprecatedFieldNames <<- character()
-        },
-        clone = function() {
-            paramNames <- names(.self$getRefClass()$fields())
-            plotSettingsEnabled <- ".plotSettings" %in% paramNames
-            designEnabled <- ".design" %in% paramNames
-            paramNames <- paramNames[!grepl("^\\.|^stages$", paramNames)]
-            args <- list()
-            if (designEnabled) {
-                args$design <- .self$.design
-            }
-            for (paramName in paramNames) {
-                if (.self$.getParameterType(paramName) == C_PARAM_USER_DEFINED) {
-                    args[[paramName]] <- .self[[paramName]]
-                }
-            }
-            what <- .getGeneratorFunctionName(.self)
-            result <- do.call(what = what, args = args)
-            if (plotSettingsEnabled && !is.null(.self$.plotSettings)) {
-                result$.plotSettings <- .self$.plotSettings$clone()
-            }
-            return(result)
+ParameterSet <- R6::R6Class("ParameterSet",
+    inherit = FieldSet,
+    public = list(
+        initialize = function(..., .showParameterTypeEnabled = TRUE) {
+            self$.showParameterTypeEnabled <- .showParameterTypeEnabled
+            self$.parameterTypes <- list()
+            self$.catLines <- character()
+            self$.deprecatedFieldNames <- character()
         },
         .toString = function(startWithUpperCase = FALSE) {
-            s <- .formatCamelCase(.getClassName(.self))
+            s <- .formatCamelCase(.getClassName(self))
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         },
         .initParameterTypes = function() {
-            .parameterTypes <<- list()
-            for (parameterName in .self$.getVisibleFieldNames()) {
-                .parameterTypes[[parameterName]] <<- C_PARAM_TYPE_UNKNOWN
+            self$.parameterTypes <- list()
+            for (parameterName in self$.getVisibleFieldNames()) {
+                self$.parameterTypes[[parameterName]] <- C_PARAM_TYPE_UNKNOWN
             }
         },
         .getParameterType = function(parameterName) {
@@ -243,7 +226,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 )
             }
 
-            parameterType <- .parameterTypes[[parameterName]]
+            parameterType <- self$.parameterTypes[[parameterName]]
             if (is.null(parameterType)) {
                 return(C_PARAM_TYPE_UNKNOWN)
             }
@@ -251,7 +234,7 @@ ParameterSet <- setRefClass("ParameterSet",
             return(parameterType[1])
         },
         .getParametersToShow = function() {
-            return(.getVisibleFieldNames())
+            return(self$.getVisibleFieldNames())
         },
         .setParameterType = function(parameterName, parameterType) {
             if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
@@ -273,50 +256,55 @@ ParameterSet <- setRefClass("ParameterSet",
                 )
             }
 
-            .parameterTypes[[parameterName]] <<- parameterType
+            self$.parameterTypes[[parameterName]] <- parameterType
 
             invisible(parameterType)
         },
         isUserDefinedParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_USER_DEFINED)
+            return(self$.getParameterType(parameterName) == C_PARAM_USER_DEFINED)
         },
         isDefaultParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE)
+            return(self$.getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE)
         },
         isGeneratedParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_GENERATED)
+            return(self$.getParameterType(parameterName) == C_PARAM_GENERATED)
         },
         isDerivedParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_DERIVED)
+            return(self$.getParameterType(parameterName) == C_PARAM_DERIVED)
         },
         isUndefinedParameter = function(parameterName) {
-            return(.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN)
+            return(self$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN)
         },
         .getInputParameters = function() {
-            params <- .getParametersOfOneGroup(c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))
+            params <- self$.getParametersOfOneGroup(c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))
             return(params)
         },
         .getUserDefinedParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_USER_DEFINED))
+            return(self$.getParametersOfOneGroup(C_PARAM_USER_DEFINED))
         },
         .getDefaultParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_DEFAULT_VALUE))
+            return(self$.getParametersOfOneGroup(C_PARAM_DEFAULT_VALUE))
         },
         .getGeneratedParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_GENERATED))
+            return(self$.getParametersOfOneGroup(C_PARAM_GENERATED))
         },
         .getDerivedParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_DERIVED))
+            return(self$.getParametersOfOneGroup(C_PARAM_DERIVED))
         },
         .getUndefinedParameters = function() {
-            return(.getParametersOfOneGroup(C_PARAM_TYPE_UNKNOWN))
+            return(self$.getParametersOfOneGroup(C_PARAM_TYPE_UNKNOWN))
         },
         .getParameterValueIfUserDefinedOrDefault = function(parameterName) {
-            if (isUserDefinedParameter(parameterName) || isDefaultParameter(parameterName)) {
-                return(.self[[parameterName]])
+            if (self$isUserDefinedParameter(parameterName) || self$isDefaultParameter(parameterName)) {
+                return(self[[parameterName]])
             }
-
-            parameterType <- .self$getRefClass()$fields()[[parameterName]]
+            
+            tryCatch({
+                parameterType <- .getClassName(self[[parameterName]])
+            }, error = function(e) {
+                parameterType <- "unknown"
+            })
+        
             if (parameterType == "numeric") {
                 return(NA_real_)
             }
@@ -333,11 +321,11 @@ ParameterSet <- setRefClass("ParameterSet",
         },
         .getParametersOfOneGroup = function(parameterType) {
             if (length(parameterType) == 1) {
-                parameterNames <- names(.parameterTypes[.parameterTypes == parameterType])
+                parameterNames <- names(self$.parameterTypes[self$.parameterTypes == parameterType])
             } else {
-                parameterNames <- names(.parameterTypes[which(.parameterTypes %in% parameterType)])
+                parameterNames <- names(self$.parameterTypes[which(self$.parameterTypes %in% parameterType)])
             }
-            parametersToShow <- .getParametersToShow()
+            parametersToShow <- self$.getParametersToShow()
             if (is.null(parametersToShow) || length(parametersToShow) == 0) {
                 return(parameterNames)
             }
@@ -345,25 +333,25 @@ ParameterSet <- setRefClass("ParameterSet",
             return(parametersToShow[parametersToShow %in% parameterNames])
         },
         .showParameterType = function(parameterName) {
-            if (!.showParameterTypeEnabled) {
+            if (!self$.showParameterTypeEnabled) {
                 return("  ")
             }
 
-            return(paste0("[", .getParameterType(parameterName), "]"))
+            return(paste0("[", self$.getParameterType(parameterName), "]"))
         },
         .showAllParameters = function(consoleOutputEnabled = TRUE) {
-            parametersToShow <- .getVisibleFieldNamesOrdered()
+            parametersToShow <- self$.getVisibleFieldNamesOrdered()
             for (parameter in parametersToShow) {
-                .showParameter(parameter,
+                self$.showParameter(parameter,
                     showParameterType = TRUE,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
             }
         },
         .getVisibleFieldNamesOrdered = function() {
-            visibleFieldNames <- .getVisibleFieldNames()
+            visibleFieldNames <- self$.getVisibleFieldNames()
 
-            parametersToShowSorted <- .getParametersToShow()
+            parametersToShowSorted <- self$.getParametersToShow()
             if (is.null(parametersToShowSorted) || length(parametersToShowSorted) == 0) {
                 return(visibleFieldNames)
             }
@@ -375,27 +363,27 @@ ParameterSet <- setRefClass("ParameterSet",
         .show = function(..., consoleOutputEnabled = FALSE) {
             showType <- .getOptionalArgument("showType", ...)
             if (!is.null(showType) && showType == 2) {
-                .cat("Technical developer summary of the ", .self$.toString(), " object (",
-                    methods::classLabel(class(.self)), "):\n\n",
+                self$.cat("Technical developer summary of the ", self$.toString(), " object (",
+                    methods::classLabel(class(self)), "):\n\n",
                     sep = "", heading = 1,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
-                .showAllParameters(consoleOutputEnabled = consoleOutputEnabled)
-                .showParameterTypeDescription(consoleOutputEnabled = consoleOutputEnabled)
+                self$.showAllParameters(consoleOutputEnabled = consoleOutputEnabled)
+                self$.showParameterTypeDescription(consoleOutputEnabled = consoleOutputEnabled)
             } else {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "method '.show()' is not implemented in class '", .getClassName(.self), "'"
+                    "method '.show()' is not implemented in class '", .getClassName(self), "'"
                 )
             }
         },
         .catMarkdownText = function(...) {
-            .show(consoleOutputEnabled = FALSE, ...)
-            if (length(.catLines) == 0) {
+            self$.show(consoleOutputEnabled = FALSE, ...)
+            if (length(self$.catLines) == 0) {
                 return(invisible())
             }
 
-            for (line in .catLines) {
+            for (line in self$.catLines) {
                 cat(line)
             }
         },
@@ -405,7 +393,7 @@ ParameterSet <- setRefClass("ParameterSet",
             if (is.null(parameters) || length(parameters) == 0 || all(is.na(parameters))) {
                 if (!missing(title) && !is.null(title) && !is.na(title) && consoleOutputEnabled) {
                     output <- paste0(title, ": not available\n\n")
-                    .cat(output, heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(output, heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                 }
                 invisible(output)
             } else {
@@ -415,14 +403,14 @@ ParameterSet <- setRefClass("ParameterSet",
 
                 if (!missing(title) && !is.null(title) && !is.na(title)) {
                     output <- paste0(title, ":\n")
-                    .cat(output, heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat(output, heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                 }
                 for (parameterName in parameters) {
-                    output <- paste0(output, .showParameter(parameterName,
+                    output <- paste0(output, self$.showParameter(parameterName,
                         consoleOutputEnabled = consoleOutputEnabled
                     ))
                 }
-                .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+                self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
                 output <- paste0(output, "\n")
                 invisible(output)
             }
@@ -430,13 +418,13 @@ ParameterSet <- setRefClass("ParameterSet",
         .showParameter = function(parameterName, showParameterType = FALSE, consoleOutputEnabled = TRUE) {
             tryCatch(
                 {
-                    params <- .getParameterValueFormatted(obj = .self, parameterName = parameterName)
+                    params <- .getParameterValueFormatted(obj = self, parameterName = parameterName)
                     if (is.null(params) || !is.list(params)) {
                         return(invisible(""))
                     }
 
                     if (!is.null(names(params)) && "paramValue" %in% names(params)) {
-                        return(.showParameterSingle(
+                        return(self$.showParameterSingle(
                             param = params,
                             parameterName = parameterName,
                             showParameterType = showParameterType,
@@ -454,13 +442,13 @@ ParameterSet <- setRefClass("ParameterSet",
                             param$paramName <- parameterName
 
                             category <- parts[2]
-                            categoryCaption <- .getParameterCaption(category, .self)
+                            categoryCaption <- .getParameterCaption(category, self)
                             if (is.null(categoryCaption)) {
                                 categoryCaption <- paste0("%", category, "%")
                             }
                             category <- categoryCaption
                         }
-                        outputPart <- .showParameterSingle(
+                        outputPart <- self$.showParameterSingle(
                             param = param,
                             parameterName = parameterName,
                             category = category,
@@ -501,7 +489,7 @@ ParameterSet <- setRefClass("ParameterSet",
                             index <- 1
                             for (i in 1:numberOfEntries) {
                                 for (j in 1:numberOfRows) {
-                                    output <- paste0(output, .showParameterFormatted(
+                                    output <- paste0(output, self$.showParameterFormatted(
                                         paramName = param$paramName,
                                         paramValue = param$paramValue[j, , i],
                                         paramValueFormatted = param$paramValueFormatted[[index]],
@@ -529,7 +517,7 @@ ParameterSet <- setRefClass("ParameterSet",
                                     paramValue <- paramValue[i, ]
                                 }
 
-                                output <- paste0(output, .showParameterFormatted(
+                                output <- paste0(output, self$.showParameterFormatted(
                                     paramName = param$paramName,
                                     paramValue = paramValue,
                                     paramValueFormatted = param$paramValueFormatted[[i]],
@@ -543,7 +531,7 @@ ParameterSet <- setRefClass("ParameterSet",
                             }
                         }
                     } else {
-                        output <- .showParameterFormatted(
+                        output <- self$.showParameterFormatted(
                             paramName = param$paramName,
                             paramValue = param$paramValue,
                             paramValueFormatted = param$paramValueFormatted,
@@ -563,34 +551,41 @@ ParameterSet <- setRefClass("ParameterSet",
             return(invisible(output))
         },
         .extractParameterNameAndValue = function(parameterName) {
-            d <- regexpr("\\..+\\$", parameterName)
-            if (d[1] != 1) {
-                return(list(
-                    parameterName = parameterName, 
-                    paramValue = base::get(parameterName, envir = .self)
-                ))
-            }
-
-            index <- attr(d, "match.length")
-            objectName <- substr(parameterName, 1, index - 1)
-            parameterName <- substr(parameterName, index + 1, nchar(parameterName))
-            paramValue <- get(objectName)[[parameterName]]
-
-            # .closedTestResults$rejected
-            if (objectName == ".closedTestResults" && parameterName == "rejected") {
-                paramValueLogical <- as.logical(paramValue)
-                if (is.matrix(paramValue)) {
-                    paramValueLogical <- matrix(paramValueLogical, ncol = ncol(paramValue))
+            tryCatch({
+                d <- regexpr("\\..+\\$", parameterName)
+                if (d[1] != 1) {
+                    return(list(
+                        parameterName = parameterName,
+                        paramValue = base::get(parameterName, envir = self)
+                    ))
                 }
-                paramValue <- paramValueLogical
-            }
-
-            return(list(parameterName = parameterName, paramValue = paramValue))
+                
+                index <- attr(d, "match.length")
+                objectName <- substr(parameterName, 1, index - 1)
+                parameterName <- substr(parameterName, index + 1, nchar(parameterName))
+                obj <- base::get(objectName, envir = self)
+                paramValue <- base::get(parameterName, envir = obj)
+                #paramValue <- self[[objectName]][[parameterName]]
+            
+                if (objectName == ".closedTestResults" && parameterName == "rejected") {
+                    paramValueLogical <- as.logical(paramValue)
+                    if (is.matrix(paramValue)) {
+                        paramValueLogical <- matrix(paramValueLogical, ncol = ncol(paramValue))
+                    }
+                    paramValue <- paramValueLogical
+                }
+                return(list(parameterName = parameterName, paramValue = paramValue))
+            }, error = function(e) {
+                if (consoleOutputEnabled) {
+                    warning("Failed to extract parameter name and value from ", sQuote(parameterName), ": ", e$message)
+                }
+                return(list(parameterName = parameterName, paramValue = ""))
+            })
         },
         .showUnknownParameters = function(consoleOutputEnabled = TRUE) {
-            params <- .getUndefinedParameters()
+            params <- self$.getUndefinedParameters()
             if (length(params) > 0) {
-                .showParametersOfOneGroup(params, "ISSUES (parameters with undefined type)",
+                self$.showParametersOfOneGroup(params, "ISSUES (parameters with undefined type)",
                     consoleOutputEnabled = consoleOutputEnabled
                 )
             }
@@ -598,26 +593,27 @@ ParameterSet <- setRefClass("ParameterSet",
         .showParameterFormatted = function(paramName, paramValue, ..., paramValueFormatted = NA_character_,
                 showParameterType = FALSE, category = NULL, matrixRow = NA_integer_, consoleOutputEnabled = TRUE,
                 paramNameRaw = NA_character_, numberOfCategories = NA_integer_) {
+                
             if (!is.na(paramNameRaw)) {
-                paramCaption <- .getParameterCaption(paramNameRaw, .self)
+                paramCaption <- .getParameterCaption(paramNameRaw, self)
             }
             if (is.null(paramCaption)) {
-                paramCaption <- .getParameterCaption(paramName, .self)
+                paramCaption <- .getParameterCaption(paramName, self)
             }
             if (is.null(paramCaption)) {
                 paramCaption <- paste0("%", paramName, "%")
             }
             if (!is.null(category) && !is.na(category)) {
-                if (.isMultiArmSimulationResults(.self) && paramName == "singleEventsPerArmAndStage") {
-                    if (!inherits(.self, "SimulationResultsEnrichmentSurvival") &&
+                if (.isMultiArmSimulationResults(self) && paramName == "singleEventsPerArmAndStage") {
+                    if (!inherits(self, "SimulationResultsEnrichmentSurvival") &&
                             !is.na(numberOfCategories) && numberOfCategories == category) {
                         category <- "control"
                     }
                     paramCaption <- paste0(paramCaption, " {", category, "}")
                 } else if (paramName == "effectList") {
                     paramCaption <- paste0(paramCaption, " [", category, "]")
-                } else if (.isEnrichmentSimulationResults(.self)) {
-                    categoryCaption <- .getCategoryCaptionEnrichment(.self, paramName, category)
+                } else if (.isEnrichmentSimulationResults(self)) {
+                    categoryCaption <- .getCategoryCaptionEnrichment(self, paramName, category)
                     paramCaption <- paste0(paramCaption, " (", categoryCaption, ")")
                 } else {
                     paramCaption <- paste0(paramCaption, " (", category, ")")
@@ -631,30 +627,30 @@ ParameterSet <- setRefClass("ParameterSet",
                     }
                 }
             } else if (!is.na(matrixRow)) {
-                if (.isMultiArmAnalysisResults(.self) && paramName %in%
+                if (.isMultiArmAnalysisResults(self) && paramName %in%
                         c(
                             "conditionalErrorRate", "secondStagePValues",
                             "adjustedStageWisePValues", "overallAdjustedTestStatistics"
                         )) {
-                    treatments <- .closedTestResults$.getHypothesisTreatmentArmVariants()[matrixRow]
+                    treatments <- self$.closedTestResults$.getHypothesisTreatmentArmVariants()[matrixRow]
                     paramCaption <- paste0(
                         "Treatment", ifelse(grepl(",", treatments), "s", ""), " ",
                         treatments, " vs. control"
                     )
-                } else if (.isEnrichmentAnalysisResults(.self) || .isEnrichmentStageResults(.self) ||
-                        (inherits(.self, "ClosedCombinationTestResults") && isTRUE(.self$.enrichment))) {
+                } else if (.isEnrichmentAnalysisResults(self) || .isEnrichmentStageResults(self) ||
+                        (inherits(self, "ClosedCombinationTestResults") && isTRUE(self$.enrichment))) {
                     if (paramName %in% c(
                             "indices", "conditionalErrorRate", "secondStagePValues",
                             "adjustedStageWisePValues", "overallAdjustedTestStatistics", "rejectedIntersections"
                         )) {
-                        if (.isEnrichmentAnalysisResults(.self)) {
-                            populations <- .closedTestResults$.getHypothesisPopulationVariants()[matrixRow]
-                        } else if (inherits(.self, "ClosedCombinationTestResults")) {
-                            populations <- .self$.getHypothesisPopulationVariants()[matrixRow]
+                        if (.isEnrichmentAnalysisResults(self)) {
+                            populations <- self$.closedTestResults$.getHypothesisPopulationVariants()[matrixRow]
+                        } else if (inherits(self, "ClosedCombinationTestResults")) {
+                            populations <- self$.getHypothesisPopulationVariants()[matrixRow]
                         } else {
                             stop(
                                 C_EXCEPTION_TYPE_RUNTIME_ISSUE, "only ClosedCombinationTestResults ",
-                                "supports function .getHypothesisPopulationVariants() (object is ", .getClassName(.self), ")"
+                                "supports function .getHypothesisPopulationVariants() (object is ", .getClassName(self), ")"
                             )
                         }
                         paramCaption <- paste0(paramCaption, " ", populations)
@@ -665,9 +661,9 @@ ParameterSet <- setRefClass("ParameterSet",
                             paramCaption <- paste0(paramCaption, " S", matrixRow)
                         }
                     }
-                } else if (.isMultiArmAnalysisResults(.self) || grepl("StageResultsMultiArm", .getClassName(.self)) ||
-                        (inherits(.self, "SimulationResults") && paramName == "effectMatrix") ||
-                        (inherits(.self, "ClosedCombinationTestResults") &&
+                } else if (.isMultiArmAnalysisResults(self) || grepl("StageResultsMultiArm", .getClassName(self)) ||
+                        (inherits(self, "SimulationResults") && paramName == "effectMatrix") ||
+                        (inherits(self, "ClosedCombinationTestResults") &&
                             paramName %in% c("rejected", "separatePValues"))) {
                     paramCaption <- paste0(paramCaption, " (", matrixRow, ")")
                 } else {
@@ -683,52 +679,51 @@ ParameterSet <- setRefClass("ParameterSet",
             }
             if (is.function(paramValue) || grepl("Function$", paramName)) {
                 paramValueFormatted <- ifelse(
-                    .getParameterType(paramName) == C_PARAM_USER_DEFINED,
+                    self$.getParameterType(paramName) == C_PARAM_USER_DEFINED,
                     ifelse(.isCppCode(paramValueFormatted), "user defined (C++)", "user defined"),
                     "default"
                 )
             }
-            prefix <- ifelse(showParameterType, .showParameterType(paramName), "")
+            prefix <- ifelse(showParameterType, self$.showParameterType(paramName), "")
             variableNameFormatted <- .getFormattedVariableName(
                 name = paramCaption,
-                n = .getNChar(), prefix = prefix
+                n = self$.getNChar(), prefix = prefix
             )
 
             output <- paste(variableNameFormatted, paramValueFormatted, "\n")
-            .cat(output, consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat(output, consoleOutputEnabled = consoleOutputEnabled)
             invisible(output)
         },
         .getNChar = function() {
-            fieldNames <- .getVisibleFieldNames()
+            fieldNames <- self$.getVisibleFieldNames()
             if (length(fieldNames) == 0) {
                 return(40)
             }
-            
+
             fieldCaptions <- character()
             for (parameterName in fieldNames) {
-                fieldCaptions <- c(fieldCaptions, .getParameterCaption(parameterName, .self))
+                fieldCaptions <- c(fieldCaptions, .getParameterCaption(parameterName, self))
             }
             return(min(40, max(nchar(fieldCaptions))) + 4)
         },
         .showParameterTypeDescription = function(consoleOutputEnabled = consoleOutputEnabled) {
-            .cat("\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_USER_DEFINED, ": user defined\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_DERIVED, ": derived value\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_DEFAULT_VALUE, ": default value\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_GENERATED, ": generated/calculated value\n", consoleOutputEnabled = consoleOutputEnabled)
-            .cat("  ", C_PARAM_NOT_APPLICABLE, ": not applicable or hidden\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_USER_DEFINED, ": user defined\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_DERIVED, ": derived value\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_DEFAULT_VALUE, ": default value\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_GENERATED, ": generated/calculated value\n", consoleOutputEnabled = consoleOutputEnabled)
+            self$.cat("  ", C_PARAM_NOT_APPLICABLE, ": not applicable or hidden\n", consoleOutputEnabled = consoleOutputEnabled)
         },
         .printAsDataFrame = function(parameterNames, niceColumnNamesEnabled = FALSE,
                 includeAllParameters = FALSE, handleParameterNamesAsToBeExcluded = FALSE,
                 lineBreakEnabled = FALSE) {
-
-            if (.isTrialDesignPlan(.self)) {
+            if (.isTrialDesignPlan(self)) {
                 parameterNames <- NULL
             }
 
             dataFrame <- .getAsDataFrame(
-                parameterSet = .self,
+                parameterSet = self,
                 parameterNames = parameterNames,
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
                 includeAllParameters = includeAllParameters,
@@ -736,7 +731,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 returnParametersAsCharacter = TRUE
             )
             result <- as.matrix(dataFrame)
-            if (.isTrialDesignPlan(.self)) {
+            if (.isTrialDesignPlan(self)) {
                 dimnames(result)[[1]] <- paste("  ", c(1:nrow(dataFrame)))
             } else if (!is.null(dataFrame[["stages"]])) {
                 dimnames(result)[[1]] <- paste("  Stage", dataFrame$stages)
@@ -747,7 +742,7 @@ ParameterSet <- setRefClass("ParameterSet",
         .getNumberOfRows = function(parameterNames) {
             numberOfRows <- 1
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (is.vector(parameterValues) && length(parameterValues) > numberOfRows) {
                     numberOfRows <- length(parameterValues)
                 } else if (is.matrix(parameterValues) && (nrow(parameterValues) == 1 || ncol(parameterValues) == 1) &&
@@ -759,7 +754,7 @@ ParameterSet <- setRefClass("ParameterSet",
         },
         .containsMultidimensionalParameters = function(parameterNames) {
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && is.matrix(parameterValues) &&
                         nrow(parameterValues) > 0 && ncol(parameterValues) > 0) {
                     return(TRUE)
@@ -768,13 +763,13 @@ ParameterSet <- setRefClass("ParameterSet",
             return(FALSE)
         },
         .getMultidimensionalNumberOfStages = function(parameterNames) {
-            if (!is.null(.self[[".design"]])) {
-                return(.self$.design$kMax)
+            if (!is.null(self[[".design"]])) {
+                return(self$.design$kMax)
             }
 
             n <- 1
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && is.matrix(parameterValues) &&
                         ncol(parameterValues) > 0 && nrow(parameterValues) > n) {
                     n <- nrow(parameterValues)
@@ -785,22 +780,22 @@ ParameterSet <- setRefClass("ParameterSet",
         .getVariedParameter = function(parameterNames, numberOfVariants) {
             # search for user defined parameters
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && !is.matrix(parameterValues) &&
                         length(parameterValues) == numberOfVariants &&
                         parameterName %in% C_VARIABLE_DESIGN_PLAN_PARAMETERS &&
-                        .getParameterType(parameterName) == C_PARAM_USER_DEFINED) {
+                        self$.getParameterType(parameterName) == C_PARAM_USER_DEFINED) {
                     return(parameterName)
                 }
             }
 
             # search for default values
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && !is.matrix(parameterValues) &&
                         length(parameterValues) == numberOfVariants &&
                         parameterName %in% C_VARIABLE_DESIGN_PLAN_PARAMETERS &&
-                        .getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE) {
+                        self$.getParameterType(parameterName) == C_PARAM_DEFAULT_VALUE) {
                     return(parameterName)
                 }
             }
@@ -811,18 +806,18 @@ ParameterSet <- setRefClass("ParameterSet",
             if (length(parameterName) == 0 || parameterName == "") {
                 stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterName' must be a valid parameter name")
             }
-            
+
             if (!niceColumnNamesEnabled) {
                 return(parameterName)
             }
 
-            tableColumnName <- .getParameterCaption(parameterName, .self, tableOutputEnabled = TRUE)
+            tableColumnName <- .getParameterCaption(parameterName, self, tableOutputEnabled = TRUE)
             return(ifelse(!is.null(tableColumnName), tableColumnName, parameterName))
         },
         .getUnidimensionalNumberOfStages = function(parameterNames) {
-            kMax <- .self[["kMax"]]
-            if (is.null(kMax) && !is.null(.self[[".design"]])) {
-                kMax <- .self[[".design"]][["kMax"]]
+            kMax <- self[["kMax"]]
+            if (is.null(kMax) && !is.null(self[[".design"]])) {
+                kMax <- self[[".design"]][["kMax"]]
             }
             if (!is.null(kMax) && length(kMax) == 1 && is.integer(kMax)) {
                 return(kMax)
@@ -830,7 +825,7 @@ ParameterSet <- setRefClass("ParameterSet",
 
             n <- 1
             for (parameterName in parameterNames) {
-                parameterValues <- .self[[parameterName]]
+                parameterValues <- self[[parameterName]]
                 if (!is.null(parameterValues) && !is.matrix(parameterValues) &&
                         length(parameterValues) > n) {
                     n <- length(parameterValues)
@@ -842,7 +837,7 @@ ParameterSet <- setRefClass("ParameterSet",
                 parameterName, parameterValues, parameterCaption) {
             tryCatch(
                 {
-                    formatFunctionName <- .getParameterFormatFunction(parameterName, .self)
+                    formatFunctionName <- .getParameterFormatFunction(parameterName, self)
                     if (!is.null(formatFunctionName)) {
                         parameterValuesFormatted <- eval(call(formatFunctionName, parameterValues))
                     } else {
@@ -871,7 +866,7 @@ ParameterSet <- setRefClass("ParameterSet",
                     .logError(paste0(
                         "Error in '.getAsDataFrame'. Failed to show parameter '%s' ",
                         "(class '%s'): %s"
-                    ), parameterName, .getClassName(.self), e)
+                    ), parameterName, .getClassName(self), e)
                 }
             )
         },
@@ -884,14 +879,14 @@ ParameterSet <- setRefClass("ParameterSet",
         #
         .getSubListByNames = function(x, listEntryNames) {
             "Returns a sub-list."
-            if (!is.list(x) && !inherits(x, "Dictionary")) { 
+            if (!is.list(x) && !inherits(x, "Dictionary")) {
                 stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'x' must be a list or Dictionary (is ", .getClassName(x), ")")
             }
 
             if (!is.character(listEntryNames)) {
                 stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'listEntryNames' must be a character vector")
             }
-            
+
             if (inherits(x, "Dictionary")) {
                 return(getDictionarySubset(x, listEntryNames))
             }
@@ -899,11 +894,11 @@ ParameterSet <- setRefClass("ParameterSet",
             return(x[which(names(x) %in% listEntryNames)])
         },
         .isMultiHypothesesObject = function() {
-            return(.isEnrichmentAnalysisResults(.self) || .isEnrichmentStageResults(.self) ||
-                .isMultiArmAnalysisResults(.self) || .isMultiArmStageResults(.self))
+            return(.isEnrichmentAnalysisResults(self) || .isEnrichmentStageResults(self) ||
+                .isMultiArmAnalysisResults(self) || .isMultiArmStageResults(self))
         },
         .isEnrichmentObject = function() {
-            return(.isEnrichmentAnalysisResults(.self) || .isEnrichmentStageResults(.self))
+            return(.isEnrichmentAnalysisResults(self) || .isEnrichmentStageResults(self))
         }
     )
 )
@@ -1121,7 +1116,8 @@ ParameterSet <- setRefClass("ParameterSet",
         }
         dataFrame$populations <- rep(populations, numberOfStages)
         populationsCaption <- parameterSet$.getDataFrameColumnCaption(
-            "populations", niceColumnNamesEnabled)
+            "populations", niceColumnNamesEnabled
+        )
         names(dataFrame) <- c(stagesCaption, populationsCaption)
     }
 
@@ -1130,7 +1126,8 @@ ParameterSet <- setRefClass("ParameterSet",
         {
             if (!is.null(variedParameter) && variedParameter != "stages") {
                 variedParameterCaption <- parameterSet$.getDataFrameColumnCaption(
-                    variedParameter, niceColumnNamesEnabled)
+                    variedParameter, niceColumnNamesEnabled
+                )
                 dataFrame[[variedParameterCaption]] <- rep(parameterSet[[variedParameter]], numberOfStages)
             }
         },
@@ -1156,7 +1153,8 @@ ParameterSet <- setRefClass("ParameterSet",
                     )
                     if (!is.null(columnValues)) {
                         columnCaption <- parameterSet$.getDataFrameColumnCaption(
-                            parameterName, niceColumnNamesEnabled)
+                            parameterName, niceColumnNamesEnabled
+                        )
                         dataFrame[[columnCaption]] <- columnValues
                         if (returnParametersAsCharacter) {
                             parameterSet$.formatDataFrameParametersAsCharacter(
@@ -1206,7 +1204,8 @@ ParameterSet <- setRefClass("ParameterSet",
                                 !is.matrix(value) && !is.array(value) && !is.data.frame(value) &&
                                 (is.numeric(value) || is.character(value) || is.logical(value))) {
                             columnCaption <- parameterSet$.getDataFrameColumnCaption(
-                                extraParameter, niceColumnNamesEnabled)
+                                extraParameter, niceColumnNamesEnabled
+                            )
 
                             if (length(value) == 1) {
                                 dataFrame[[columnCaption]] <- rep(value, nrow(dataFrame))
@@ -1332,7 +1331,7 @@ ParameterSet <- setRefClass("ParameterSet",
             (.isTrialDesignPlanCountData(parameterSet) && length(parameterSet$theta) > 1)) {
         return(.addDelayedInformationRates(.getAsDataFrameMultidimensional(
             parameterSet, parameterNames, niceColumnNamesEnabled,
-            includeAllParameters, returnParametersAsCharacter, 
+            includeAllParameters, returnParametersAsCharacter,
             mandatoryParameterNames
         )))
     }
@@ -1449,30 +1448,6 @@ as.data.frame.ParameterSet <- function(x, row.names = NULL,
         includeAllParameters = includeAllParameters
     ))
 }
-
-#'
-#' @title
-#' Field Set Transpose
-#'
-#' @description
-#' Given a \code{FieldSet} \code{x}, t returns the transpose of \code{x}.
-#'
-#' @param x A \code{FieldSet}.
-#'
-#' @details
-#' Implementation of the base R generic function \code{\link[base]{t}}
-#'
-#' @keywords internal
-#'
-#' @export
-#'
-setMethod(
-    "t", "FieldSet",
-    function(x) {
-        x <- as.matrix(x, niceColumnNamesEnabled = TRUE)
-        return(t(x))
-    }
-)
 
 #'
 #' @title
@@ -1656,12 +1631,66 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
 
     if (markdown) {
         x$.catMarkdownText()
-        cat("\n\n")
     } else {
         x$show()
     }
+    
+    if (isTRUE(markdown)) {
+        attr(x, "markdown") <- TRUE
+    }
 
     return(invisible(x))
+}
+
+#' 
+#' @rdname pull.ParameterSet
+#' 
+#' @export 
+#' 
+pull <- function(x, var) UseMethod("pull")
+
+#'
+#' @title
+#' Extract a single parameter
+#' 
+#' @description
+#' Pull a parameter from a parameter set.
+#' 
+#' @param x The \code{\link{ParameterSet}} object to pull from.
+#' @param var A variable specified as: 
+#'  - a literal variable name 
+#'  - a positive integer, giving the position counting from the left 
+#'  - a negative integer, giving the position counting from the right. 
+#' The default returns the last column (on the assumption that's the column you've created most recently). 
+#' This argument is taken by expression and supports quasiquotation (you can unquote column names and column locations).
+#' 
+#' @export 
+#' 
+pull.ParameterSet <- function(x, var = -1) {
+    fCall <- match.call(expand.dots = FALSE)
+    varName <- deparse(fCall$var)
+    if (!exists(varName) || (!is.character(var) && !is.integer(var))) {
+        var <- gsub('"', "", varName)
+        var <- gsub("'", "", var)
+    }
+    
+    if (is.character(var)) {
+        if (!(var %in% names(x))) {
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(var), " does not exist")
+        }
+        
+        return(x[[var]])
+    }
+
+    .assertIsSingleInteger(x, "x", validateType = FALSE)
+    .assertIsInClosedInterval(x, "x", lower = -length(x), upper = length(x))
+    if (var == 0) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'x' (", x, ") must != 0")
+    }
+    if (var < 0) {
+        var <- length(x) + 1 - var
+    }
+    return(x[[var]])
 }
 
 #'
@@ -1746,6 +1775,8 @@ knit_print.ParameterSet <- function(x, ...) {
 #' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
 #' that all headings will be written bold but are not explicit defined as header.
 #'
+#' @name kableParameterSet
+#' 
 #' @export
 #'
 kable.ParameterSet <- function(x, ...) {
@@ -1773,19 +1804,9 @@ kable.ParameterSet <- function(x, ...) {
     knitr::kable(x, ...)
 }
 
-#'
-#' @title
-#' Create tables in Markdown
-#'
-#' @description
-#' The \code{kable()} function returns a single table for a single object that inherits from class \code{\link{ParameterSet}}.
-#'
-#' @details
-#' Generic to represent a parameter set in Markdown.
-#'
-#' @param x The object that inherits from \code{\link{ParameterSet}}.
-#' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
-#'
-#' @export
-#'
-setGeneric("kable", kable.ParameterSet)
+#' 
+#' @rdname kableParameterSet
+#' 
+#' @export 
+#' 
+kable <- function(x, ...) UseMethod("kable")

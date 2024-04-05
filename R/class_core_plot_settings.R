@@ -13,80 +13,79 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7645 $
-## |  Last changed: $Date: 2024-02-16 16:12:34 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-PlotSubTitleItem <- setRefClass("PlotSubTitleItem",
-    fields = list(
-        title = "character",
-        subscript = "character",
-        value = "numeric",
-        digits = "integer"
-    ),
-    methods = list(
+PlotSubTitleItem <- R6::R6Class("PlotSubTitleItem",
+    public = list(
+        title = NULL,
+        subscript = NULL,
+        value = NULL,
+        digits = NULL,
         initialize = function(..., title, value, subscript = NA_character_, digits = 3L) {
-            callSuper(
-                title = trimws(title), value = value,
-                subscript = trimws(subscript), digits = digits, ...
-            )
-            value <<- round(value, digits)
+            self$title <- trimws(title)
+            self$value <- value
+            self$subscript <- trimws(subscript)
+            self$digits <- digits
+
+            self$value <- round(value, digits)
         },
         show = function() {
-            cat(toString(), "\n")
+            cat(self$toString(), "\n")
         },
         toQuote = function() {
-            if (!is.null(subscript) && length(subscript) == 1 && !is.na(subscript)) {
-                return(bquote(" " * .(title)[.(subscript)] == .(value)))
+            if (!is.null(self$subscript) && length(self$subscript) == 1 && !is.na(self$subscript)) {
+                return(bquote(" " * .(self$title)[.(self$subscript)] == .(self$value)))
             }
 
-            return(bquote(" " * .(title) == .(value)))
+            return(bquote(" " * .(self$title) == .(self$value)))
         },
         toString = function() {
-            if (!is.null(subscript) && length(subscript) == 1 && !is.na(subscript)) {
-                if (grepl("^(\\d+)|max|min$", subscript)) {
-                    return(paste0(title, "_", subscript, " = ", value))
+            if (!is.null(self$subscript) && length(self$subscript) == 1 && !is.na(self$subscript)) {
+                if (grepl("^(\\d+)|max|min$", self$subscript)) {
+                    return(paste0(self$title, "_", self$subscript, " = ", self$value))
                 }
-                return(paste0(title, "(", trimws(subscript), ") = ", value))
+                return(paste0(self$title, "(", trimws(self$subscript), ") = ", self$value))
             }
 
-            return(paste(title, "=", value))
+            return(paste(self$title, "=", self$value))
         }
     )
 )
 
-PlotSubTitleItems <- setRefClass("PlotSubTitleItems",
-    fields = list(
-        title = "character",
-        subtitle = "character",
-        items = "list"
-    ),
-    methods = list(
-        initialize = function(...) {
-            callSuper(...)
-            items <<- list()
+PlotSubTitleItems <- R6::R6Class("PlotSubTitleItems",
+    public = list(
+        title = NULL,
+        subtitle = NULL,
+        items = NULL,
+        initialize = function(..., title = NULL, subtitle = NULL) {
+            self$title <- title
+            self$subtitle <- subtitle
+
+            self$items <- list()
         },
         show = function() {
-            cat(title, "\n")
-            if (length(subtitle) == 1 && !is.na(subtitle)) {
-                cat(subtitle, "\n")
+            cat(self$title, "\n")
+            if (length(self$subtitle) == 1 && !is.na(self$subtitle)) {
+                cat(self$subtitle, "\n")
             }
-            s <- toString()
+            s <- self$toString()
             if (length(s) == 1 && !is.na(s) && nchar(s) > 0) {
                 cat(s, "\n")
             }
         },
         addItem = function(item) {
-            items <<- c(items, item)
+            self$items <- c(self$items, item)
         },
         add = function(title, value, subscript = NA_character_, ..., digits = 3L, condition = TRUE) {
             if (isFALSE(condition)) {
                 return(invisible())
             }
-            
+
             titleTemp <- title
-            if (length(items) == 0) {
+            if (length(self$items) == 0) {
                 titleTemp <- .formatCamelCase(titleTemp, title = TRUE)
             }
 
@@ -96,53 +95,53 @@ PlotSubTitleItems <- setRefClass("PlotSubTitleItems",
             } else {
                 titleTemp <- paste0(titleTemp, " ")
             }
-            addItem(PlotSubTitleItem(title = titleTemp, value = value, subscript = subscript, digits = digits))
+            self$addItem(PlotSubTitleItem$new(title = titleTemp, value = value, subscript = subscript, digits = digits))
         },
         toString = function() {
-            if (is.null(items) || length(items) == 0) {
+            if (is.null(self$items) || length(self$items) == 0) {
                 return(NA_character_)
             }
 
             s <- character()
-            for (item in items) {
+            for (item in self$items) {
                 s <- c(s, item$toString())
             }
             return(paste0(s, collapse = ", "))
         },
         toHtml = function() {
-            htmlStr <- title
-            if (length(subtitle) == 1 && !is.na(subtitle)) {
-                htmlStr <- paste0(htmlStr, "<br><sup>", subtitle, "</sup>")
+            htmlStr <- self$title
+            if (length(self$subtitle) == 1 && !is.na(self$subtitle)) {
+                htmlStr <- paste0(htmlStr, "<br><sup>", self$subtitle, "</sup>")
             }
-            s <- toString()
+            s <- self$toString()
             if (length(s) == 1 && !is.na(s) && nchar(s) > 0) {
                 htmlStr <- paste0(htmlStr, "<br><sup>", s, "</sup>")
             }
             return(htmlStr)
         },
         toQuote = function() {
-            quotedItems <- .getQuotedItems()
+            quotedItems <- self$.getQuotedItems()
             if (is.null(quotedItems)) {
-                if (length(subtitle) > 0) {
+                if (length(self$subtitle) > 0) {
                     return(bquote(atop(
-                        bold(.(title)),
-                        atop(.(subtitle))
+                        bold(.(self$title)),
+                        atop(.(self$subtitle))
                     )))
                 }
 
-                return(title)
+                return(self$title)
             }
 
-            if (length(subtitle) > 0) {
+            if (length(self$subtitle) > 0) {
                 return(bquote(atop(
-                    bold(.(title)),
-                    atop(.(subtitle) * "," ~ .(quotedItems))
+                    bold(.(self$title)),
+                    atop(.(self$subtitle) * "," ~ .(quotedItems))
                 )))
             }
 
             return(bquote(atop(
-                bold(.(title)),
-                atop(.(quotedItems))
+                bold(.(self$title)),
+                atop(.(self$quotedItems))
             )))
         },
         .getQuotedItems = function() {
@@ -150,17 +149,17 @@ PlotSubTitleItems <- setRefClass("PlotSubTitleItems",
             item2 <- NULL
             item3 <- NULL
             item4 <- NULL
-            if (length(items) > 0) {
-                item1 <- items[[1]]
+            if (length(self$items) > 0) {
+                item1 <- self$items[[1]]
             }
-            if (length(items) > 1) {
-                item2 <- items[[2]]
+            if (length(self$items) > 1) {
+                item2 <- self$items[[2]]
             }
-            if (length(items) > 2) {
-                item3 <- items[[3]]
+            if (length(self$items) > 2) {
+                item3 <- self$items[[3]]
             }
-            if (length(items) > 3) {
-                item4 <- items[[4]]
+            if (length(self$items) > 3) {
+                item4 <- self$items[[4]]
             }
 
             if (!is.null(item1) && !is.null(item2) && !is.null(item3) && !is.null(item4)) {
@@ -256,7 +255,7 @@ getPlotSettings <- function(lineSize = 0.8,
         axesTextFontSize = 10,
         legendFontSize = 11,
         scalingFactor = 1) {
-    return(PlotSettings(
+    return(PlotSettings$new(
         lineSize = lineSize,
         pointSize = pointSize,
         pointColor = pointColor,
@@ -293,25 +292,23 @@ getPlotSettings <- function(lineSize = 0.8,
 #'
 #' @importFrom methods new
 #'
-PlotSettings <- setRefClass("PlotSettings",
-    contains = "ParameterSet",
-    fields = list(
-        .legendLineBreakIndex = "numeric",
-        .pointSize = "numeric",
-        .legendFontSize = "numeric",
-        .htmlTitle = "character",
-        .scalingEnabled = "logical",
-        .pointScalingCorrectionEnabled = "logical",
-        .pointBorderEnabled = "logical",
-        lineSize = "numeric",
-        pointSize = "numeric",
-        pointColor = "character",
-        mainTitleFontSize = "numeric",
-        axesTextFontSize = "numeric",
-        legendFontSize = "numeric",
-        scalingFactor = "numeric"
-    ),
-    methods = list(
+PlotSettings <- R6::R6Class("PlotSettings",
+    inherit = ParameterSet,
+    public = list(
+        .legendLineBreakIndex = NULL,
+        .pointSize = NULL,
+        .legendFontSize = NULL,
+        .htmlTitle = NULL,
+        .scalingEnabled = NULL,
+        .pointScalingCorrectionEnabled = NULL,
+        .pointBorderEnabled = NULL,
+        lineSize = NULL,
+        pointSize = NULL,
+        pointColor = NULL,
+        mainTitleFontSize = NULL,
+        axesTextFontSize = NULL,
+        legendFontSize = NULL,
+        scalingFactor = NULL,
         initialize = function(lineSize = 0.8,
                 pointSize = 3,
                 pointColor = NA_character_,
@@ -320,43 +317,31 @@ PlotSettings <- setRefClass("PlotSettings",
                 legendFontSize = 11,
                 scalingFactor = 1,
                 ...) {
-            callSuper(
-                lineSize = lineSize,
-                pointSize = pointSize,
-                pointColor = pointColor,
-                mainTitleFontSize = mainTitleFontSize,
-                axesTextFontSize = axesTextFontSize,
-                legendFontSize = legendFontSize,
-                scalingFactor = scalingFactor,
-                ...
-            )
-            .legendLineBreakIndex <<- 15
-            .pointSize <<- pointSize
-            .legendFontSize <<- legendFontSize
-            .htmlTitle <<- NA_character_
-            .scalingEnabled <<- TRUE
-            .pointScalingCorrectionEnabled <<- TRUE
-            .pointBorderEnabled <<- TRUE
-        },
-        clone = function() {
-            return(PlotSettings(
-                lineSize = .self$lineSize,
-                pointSize = .self$pointSize,
-                pointColor = .self$pointColor,
-                mainTitleFontSize = .self$mainTitleFontSize,
-                axesTextFontSize = .self$axesTextFontSize,
-                legendFontSize = .self$legendFontSize,
-                scalingFactor = .self$scalingFactor
-            ))
+            super$initialize(...)
+            self$lineSize <- lineSize
+            self$pointSize <- pointSize
+            self$pointColor <- pointColor
+            self$mainTitleFontSize <- mainTitleFontSize
+            self$axesTextFontSize <- axesTextFontSize
+            self$legendFontSize <- legendFontSize
+            self$scalingFactor <- scalingFactor
+
+            self$.legendLineBreakIndex <- 15
+            self$.pointSize <- pointSize
+            self$.legendFontSize <- legendFontSize
+            self$.htmlTitle <- NA_character_
+            self$.scalingEnabled <- TRUE
+            self$.pointScalingCorrectionEnabled <- TRUE
+            self$.pointBorderEnabled <- TRUE
         },
         show = function(showType = 1, digits = NA_integer_) {
-            .show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
         .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
             "Method for automatically printing plot setting objects"
-            .resetCat()
-            .showParametersOfOneGroup(
-                parameters = .getVisibleFieldNames(),
+            self$.resetCat()
+            self$.showParametersOfOneGroup(
+                parameters = self$.getVisibleFieldNames(),
                 title = "Plot settings", orderByParameterName = FALSE,
                 consoleOutputEnabled = consoleOutputEnabled
             )
@@ -400,15 +385,15 @@ PlotSettings <- setRefClass("PlotSettings",
         },
         enlargeAxisTicks = function(p) {
             "Enlarges the axis ticks"
-            p <- p + ggplot2::theme(axis.ticks.length = ggplot2::unit(scaleSize(0.3), "cm"))
+            p <- p + ggplot2::theme(axis.ticks.length = ggplot2::unit(self$scaleSize(0.3), "cm"))
             return(p)
         },
         setAxesAppearance = function(p) {
             "Sets the font size and face of the axes titles and texts"
-            p <- p + ggplot2::theme(axis.title.x = ggplot2::element_text(size = scaleSize(.self$axesTextFontSize + 1), face = "bold"))
-            p <- p + ggplot2::theme(axis.title.y = ggplot2::element_text(size = scaleSize(.self$axesTextFontSize + 1), face = "bold"))
-            p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(size = scaleSize(.self$axesTextFontSize)))
-            p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(size = scaleSize(.self$axesTextFontSize)))
+            p <- p + ggplot2::theme(axis.title.x = ggplot2::element_text(size = self$scaleSize(self$axesTextFontSize + 1), face = "bold"))
+            p <- p + ggplot2::theme(axis.title.y = ggplot2::element_text(size = self$scaleSize(self$axesTextFontSize + 1), face = "bold"))
+            p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(size = self$scaleSize(self$axesTextFontSize)))
+            p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(size = self$scaleSize(self$axesTextFontSize)))
             return(p)
         },
 
@@ -442,7 +427,7 @@ PlotSettings <- setRefClass("PlotSettings",
             }
             p <- p + ggplot2::ylab(yAxisLabel1)
 
-            p <- setSecondYAxisOnRightSide(p, yAxisLabel1, yAxisLabel2, scalingFactor1, scalingFactor2)
+            p <- self$setSecondYAxisOnRightSide(p, yAxisLabel1, yAxisLabel2, scalingFactor1, scalingFactor2)
 
             return(p)
         },
@@ -460,15 +445,15 @@ PlotSettings <- setRefClass("PlotSettings",
             if (!is.null(legendTitle) && !is.na(legendTitle) && trimws(legendTitle) != "") {
                 if (mode == "colour") {
                     p <- p + ggplot2::labs(colour = .getTextLineWithLineBreak(legendTitle,
-                        lineBreakIndex = scaleSize(.legendLineBreakIndex)
+                        lineBreakIndex = self$scaleSize(self$.legendLineBreakIndex)
                     ))
                 } else {
                     p <- p + ggplot2::labs(fill = .getTextLineWithLineBreak(legendTitle,
-                        lineBreakIndex = scaleSize(.legendLineBreakIndex)
+                        lineBreakIndex = self$scaleSize(self$.legendLineBreakIndex)
                     ))
                 }
                 p <- p + ggplot2::theme(legend.title = ggplot2::element_text(
-                    colour = "black", size = scaleSize(.self$legendFontSize + 1), face = "bold"
+                    colour = "black", size = self$scaleSize(self$legendFontSize + 1), face = "bold"
                 ))
             } else {
                 p <- p + ggplot2::theme(legend.title = ggplot2::element_blank())
@@ -477,7 +462,7 @@ PlotSettings <- setRefClass("PlotSettings",
             return(p)
         },
         setLegendLabelSize = function(p) {
-            p <- p + ggplot2::theme(legend.text = ggplot2::element_text(size = scaleSize(.self$legendFontSize)))
+            p <- p + ggplot2::theme(legend.text = ggplot2::element_text(size = self$scaleSize(self$legendFontSize)))
             return(p)
         },
         setLegendPosition = function(p, legendPosition) {
@@ -517,40 +502,40 @@ PlotSettings <- setRefClass("PlotSettings",
             if (packageVersion("ggplot2") >= "3.4.0") {
                 p <- p + ggplot2::theme(
                     legend.background =
-                        ggplot2::element_rect(fill = "white", colour = "black", linewidth = scaleSize(0.4))
+                        ggplot2::element_rect(fill = "white", colour = "black", linewidth = self$scaleSize(0.4))
                 )
             } else {
                 p <- p + ggplot2::theme(
                     legend.background =
-                        ggplot2::element_rect(fill = "white", colour = "black", size = scaleSize(0.4))
+                        ggplot2::element_rect(fill = "white", colour = "black", size = self$scaleSize(0.4))
                 )
             }
             return(p)
         },
         adjustPointSize = function(adjustingValue) {
             .assertIsInClosedInterval(adjustingValue, "adjustingValue", lower = 0.1, upper = 2)
-            pointSize <<- .self$.pointSize * adjustingValue
+            self$pointSize <- self$.pointSize * adjustingValue
         },
         adjustLegendFontSize = function(adjustingValue) {
             "Adjusts the legend font size, e.g., run \\cr
 			\\code{adjustLegendFontSize(-2)} # makes the font size 2 points smaller"
             .assertIsInClosedInterval(adjustingValue, "adjustingValue", lower = 0.1, upper = 2)
-            legendFontSize <<- .self$.legendFontSize * adjustingValue
+            self$legendFontSize <- self$.legendFontSize * adjustingValue
         },
         scaleSize = function(size, pointEnabled = FALSE) {
-            if (isFALSE(.self$.scalingEnabled)) {
+            if (isFALSE(self$.scalingEnabled)) {
                 return(size)
             }
 
             if (pointEnabled) {
-                if (isFALSE(.pointScalingCorrectionEnabled)) {
+                if (isFALSE(self$.pointScalingCorrectionEnabled)) {
                     return(size)
                 }
 
-                return(size * .self$scalingFactor^2)
+                return(size * self$scalingFactor^2)
             }
 
-            return(size * .self$scalingFactor)
+            return(size * self$scalingFactor)
         },
         setMainTitle = function(p, mainTitle, subtitle = NA_character_) {
             "Sets the main title"
@@ -585,7 +570,7 @@ PlotSettings <- setRefClass("PlotSettings",
                     }
 
                     if (plotLabsType == "html") {
-                        .htmlTitle <<- items$toHtml()
+                        self$.htmlTitle <- items$toHtml()
                     }
                 }
             }
@@ -598,8 +583,8 @@ PlotSettings <- setRefClass("PlotSettings",
                 p <- p + ggplot2::labs(title = mainTitle, subtitle = subtitle, caption = caption)
                 targetWidth <- 130
                 subtitleFontSize <- targetWidth / nchar(subtitle) * 8
-                if (subtitleFontSize > scaleSize(.self$mainTitleFontSize) - 2) {
-                    subtitleFontSize <- scaleSize(.self$mainTitleFontSize) - 2
+                if (subtitleFontSize > self$scaleSize(self$mainTitleFontSize) - 2) {
+                    subtitleFontSize <- self$scaleSize(self$mainTitleFontSize) - 2
                 }
             } else if (length(caption) == 1 && !is.na(caption)) {
                 p <- p + ggplot2::labs(title = mainTitle, caption = caption)
@@ -608,14 +593,14 @@ PlotSettings <- setRefClass("PlotSettings",
             }
 
             p <- p + ggplot2::theme(plot.title = ggplot2::element_text(
-                hjust = 0.5, size = scaleSize(.self$mainTitleFontSize), face = "bold"
+                hjust = 0.5, size = self$scaleSize(self$mainTitleFontSize), face = "bold"
             ))
 
             if (!is.na(subtitleFontSize)) {
                 p <- p + ggplot2::theme(
                     plot.subtitle = ggplot2::element_text(
                         hjust = 0.5,
-                        size = scaleSize(subtitleFontSize)
+                        size = self$scaleSize(subtitleFontSize)
                     )
                 )
             }
@@ -667,11 +652,11 @@ PlotSettings <- setRefClass("PlotSettings",
         },
         plotPoints = function(p, pointBorder, ..., mapping = NULL) {
             # plot white border around the points
-            if (pointBorder > 0 && .pointBorderEnabled) {
+            if (pointBorder > 0 && self$.pointBorderEnabled) {
                 p <- p + ggplot2::geom_point(
                     mapping = mapping,
                     color = "white",
-                    size = scaleSize(.self$pointSize, TRUE),
+                    size = self$scaleSize(self$pointSize, TRUE),
                     alpha = 1,
                     shape = 21,
                     stroke = pointBorder / 2.25,
@@ -679,11 +664,11 @@ PlotSettings <- setRefClass("PlotSettings",
                 )
             }
 
-            if (!is.null(.self$pointColor) && length(.self$pointColor) == 1 && !is.na(.self$pointColor)) {
+            if (!is.null(self$pointColor) && length(self$pointColor) == 1 && !is.na(self$pointColor)) {
                 p <- p + ggplot2::geom_point(
                     mapping = mapping,
-                    color = .self$pointColor,
-                    size = scaleSize(.self$pointSize, TRUE),
+                    color = self$pointColor,
+                    size = self$scaleSize(self$pointSize, TRUE),
                     alpha = 1,
                     shape = 19,
                     show.legend = FALSE
@@ -691,7 +676,7 @@ PlotSettings <- setRefClass("PlotSettings",
             } else {
                 p <- p + ggplot2::geom_point(
                     mapping = mapping,
-                    size = scaleSize(.self$pointSize, TRUE), alpha = 1,
+                    size = self$scaleSize(self$pointSize, TRUE), alpha = 1,
                     shape = 19, show.legend = FALSE
                 )
             }
@@ -701,13 +686,13 @@ PlotSettings <- setRefClass("PlotSettings",
                 plotPointsEnabled = TRUE, pointBorder = 4) {
             if (plotLineEnabled) {
                 if (packageVersion("ggplot2") >= "3.4.0") {
-                    p <- p + ggplot2::geom_line(linewidth = scaleSize(.self$lineSize))
+                    p <- p + ggplot2::geom_line(linewidth = self$scaleSize(self$lineSize))
                 } else {
-                    p <- p + ggplot2::geom_line(size = scaleSize(.self$lineSize))
+                    p <- p + ggplot2::geom_line(size = self$scaleSize(self$lineSize))
                 }
             }
             if (plotPointsEnabled) {
-                p <- plotPoints(p, pointBorder)
+                p <- self$plotPoints(p, pointBorder)
             }
             return(p)
         },
@@ -715,13 +700,13 @@ PlotSettings <- setRefClass("PlotSettings",
                 plotPointsEnabled = TRUE, pointBorder = 4) {
             if (plotLineEnabled) {
                 if (packageVersion("ggplot2") >= "3.4.0") {
-                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues), linewidth = scaleSize(.self$lineSize))
+                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues), linewidth = self$scaleSize(self$lineSize))
                 } else {
-                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues), size = scaleSize(.self$lineSize))
+                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues), size = self$scaleSize(self$lineSize))
                 }
             }
             if (plotPointsEnabled) {
-                p <- plotPoints(p, pointBorder, mapping = ggplot2::aes(y = -yValues))
+                p <- self$plotPoints(p, pointBorder, mapping = ggplot2::aes(y = -yValues))
             }
             return(p)
         },
@@ -733,12 +718,12 @@ PlotSettings <- setRefClass("PlotSettings",
             label <- "www.rpact.org"
             p <- p + ggplot2::annotate("label",
                 x = -Inf, y = Inf, hjust = -0.1, vjust = 1,
-                label = label, size = scaleSize(2.8), colour = "white", fill = "white"
+                label = label, size = self$scaleSize(2.8), colour = "white", fill = "white"
             )
 
             p <- p + ggplot2::annotate("text",
                 x = -Inf, y = Inf, label = label,
-                hjust = -.12, vjust = 1, colour = "lightgray", size = scaleSize(2.7)
+                hjust = -.12, vjust = 1, colour = "lightgray", size = self$scaleSize(2.7)
             )
             return(p)
         }

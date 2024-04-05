@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7644 $
-## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 7747 $
+## |  Last changed: $Date: 2024-03-25 17:58:00 +0100 (Mo, 25 Mrz 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' Parameter Description: "..."
@@ -283,41 +283,41 @@ NULL
 
 #' Parameter Description: lambda for Counts
 #' @param lambda A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
-#'   the pooled treatment groups, there is no default. 
+#'   the pooled treatment groups, there is no default.
 #' @name param_lambda_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: theta for Counts
-#' @param theta A numeric value or vector that represents the assumed mean ratios lambda1/lambda2 of a homogeneous 
-#' Poisson process, there is no default. 
+#' @param theta A numeric value or vector that represents the assumed mean ratios lambda1/lambda2 of a homogeneous
+#' Poisson process, there is no default.
 #' @name param_theta_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: lambda (1) for Counts
 #' @param lambda1 A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
-#'   the active treatment group, there is no default. 
+#'   the active treatment group, there is no default.
 #' @name param_lambda1_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: lambda (2) for Counts
 #' @param lambda2 A numeric value that represents the assumed rate of a homogeneous Poisson process in
-#'   the control group, there is no default. 
+#'   the control group, there is no default.
 #' @name param_lambda2_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: overdispersion for Counts
-#' @param overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution, 
-#' default is \code{0}. 
+#' @param overdispersion A numeric value that represents the assumed overdispersion of the negative binomial distribution,
+#' default is \code{0}.
 #' @name param_overdispersion_counts
 #' @keywords internal
 NULL
 
 #' Parameter Description: fixedExposureTime for Counts
-#' @param fixedExposureTime If specified, the fixed time of exposure per subject for count data, there is no default. 
+#' @param fixedExposureTime If specified, the fixed time of exposure per subject for count data, there is no default.
 #' @name param_fixedExposureTime_counts
 #' @keywords internal
 NULL
@@ -510,7 +510,7 @@ NULL
 
 #' Parameter Description: Minimum Number Of Subjects Per Stage
 #' @param minNumberOfSubjectsPerStage When performing a data driven sample size recalculation,
-#'   the numeric vector \code{minNumberOfSubjectsPerStage} with length kMax determines the
+#'   the numeric vector \code{minNumberOfSubjectsPerStage} with length \code{kMax} determines the
 #'   minimum number of subjects per stage (i.e., not cumulated), the first element
 #'   is not taken into account. For two treatment arms, it is the number of subjects for both treatment arms.
 #'   For multi-arm designs \code{minNumberOfSubjectsPerStage} refers
@@ -521,7 +521,7 @@ NULL
 
 #' Parameter Description: Maximum Number Of Subjects Per Stage
 #' @param maxNumberOfSubjectsPerStage When performing a data driven sample size recalculation,
-#'   the numeric vector \code{maxNumberOfSubjectsPerStage} with length kMax determines the maximum number
+#'   the numeric vector \code{maxNumberOfSubjectsPerStage} with length \code{kMax} determines the maximum number
 #'   of subjects per stage (i.e., not cumulated), the first element is not taken into account.
 #'   For two treatment arms, it is the number of subjects for both treatment arms.
 #'   For multi-arm designs \code{maxNumberOfSubjectsPerStage} refers
@@ -903,5 +903,12 @@ NULL
 #' Parameter Description: Plot Settings
 #' @param plotSettings An object of class \code{PlotSettings} created by \code{\link[=getPlotSettings]{getPlotSettings()}}.
 #' @name param_plotSettings
+#' @keywords internal
+NULL
+
+#' Parameter Description: Planned Calendar Time
+#' @param plannedCalendarTime For simulating count data, the time points where an analysis is planned to be performed.
+#' Should be a vector of length \code{kMax}
+#' @name param_plannedCalendarTime
 #' @keywords internal
 NULL

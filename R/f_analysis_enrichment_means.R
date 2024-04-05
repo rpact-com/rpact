@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -253,7 +253,7 @@ NULL
         )
     }
 
-    stageResults <- StageResultsEnrichmentMeans(
+    stageResults <- StageResultsEnrichmentMeans$new(
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
@@ -444,7 +444,7 @@ NULL
         ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"), ...
     )
 
-    results <- AnalysisResultsEnrichmentInverseNormal(design = design, dataInput = dataInput)
+    results <- AnalysisResultsEnrichmentInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansEnrichmentAll(
         results = results, design = design, dataInput = dataInput,
@@ -486,7 +486,7 @@ NULL
         ), "stage"), ...
     )
 
-    results <- AnalysisResultsEnrichmentFisher(design = design, dataInput = dataInput)
+    results <- AnalysisResultsEnrichmentFisher$new(design = design, dataInput = dataInput)
     .setValueAndParameterType(results, "iterations", as.integer(iterations), C_ITERATIONS_DEFAULT)
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
@@ -965,7 +965,7 @@ NULL
         assumedStDevs <- stDevsH1
     }
 
-    results <- ConditionalPowerResultsEnrichmentMeans(
+    results <- ConditionalPowerResultsEnrichmentMeans$new(
         .design = design,
         .stageResults = stageResults,
         thetaH1 = thetaH1,
@@ -1291,7 +1291,7 @@ NULL
     stdErr <- stageResults$overallStDevs[stage] *
         sqrt(1 / stageResults$.overallSampleSizes1[, stage] + 1 / stageResults$.overallSampleSizes2[, stage])
 
-    results <- ConditionalPowerResultsEnrichmentMeans(
+    results <- ConditionalPowerResultsEnrichmentMeans$new(
         .design = design,
         .stageResults = stageResults,
         assumedStDevs = assumedStDevs,

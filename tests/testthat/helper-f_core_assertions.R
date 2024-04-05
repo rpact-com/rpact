@@ -13,15 +13,15 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 6117 $
-## |  Last changed: $Date: 2022-05-04 15:55:23 +0200 (Mi, 04 Mai 2022) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 getAssertionTestDesign <- function(..., kMax = NA_integer_, informationRates = NA_real_, futilityBounds = NA_real_,
         designClass = "TrialDesignInverseNormal") {
     if (designClass == "TrialDesignFisher") {
-        return(TrialDesignFisher(
+        return(TrialDesignFisher$new(
             kMax = kMax,
             alpha = 0.025,
             method = "equalAlpha",

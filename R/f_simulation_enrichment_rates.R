@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7679 $
-## |  Last changed: $Date: 2024-03-04 15:00:35 +0100 (Mo, 04 Mrz 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_enrichment.R
@@ -707,7 +707,7 @@ NULL
 
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
 
-            if (any(!is.na(thetaStandardized))){
+            if (any(!is.na(thetaStandardized))) {
                 thetaStandardized <- min(thetaStandardized, na.rm = TRUE)
                 conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
                     thetaStandardized * sqrt(plannedSubjects[k + 1] - plannedSubjects[k]))

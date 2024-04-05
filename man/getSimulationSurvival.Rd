@@ -587,14 +587,14 @@ myCalcEventsFunction <- function(...,
     if (stage == 2) {
         requiredStageEvents <-
             max(0, conditionalCriticalValue + qnorm(conditionalPower))^2 * 4 / log(theta)^2
-        requiredStageEvents <- min(
+        requiredOverallStageEvents <- min(
             max(minNumberOfEventsPerStage[stage], requiredStageEvents),
             maxNumberOfEventsPerStage[stage]
         ) + eventsOverStages[stage - 1]
     } else {
-        requiredStageEvents <- 2 * eventsOverStages[stage - 1] - eventsOverStages[1]
+        requiredOverallStageEvents <- 2 * eventsOverStages[stage - 1] - eventsOverStages[1]
     }
-    return(requiredStageEvents)
+    return(requiredOverallStageEvents)
 }
 resultsWithSSR <- getSimulationSurvival(
     design = designIN,

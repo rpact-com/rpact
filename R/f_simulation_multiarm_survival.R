@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7650 $
-## |  Last changed: $Date: 2024-02-20 14:37:26 +0100 (Di, 20 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -705,7 +705,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
     }
     simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
     .addDeprecatedFieldValues(simulationResults, "eventsPerStage", simulationResults$cumulativeEventsPerStage)
-    
+
     simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
     for (g in 1:gMax) {
         simulationResults$singleEventsPerStage[, , g] <- simulationResults$singleEventsPerStage[, , g] +

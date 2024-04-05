@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7662 $
-## |  Last changed: $Date: 2024-02-23 12:42:26 +0100 (Fr, 23 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -165,8 +165,7 @@ NULL
     return(result)
 }
 
-.getEventProbabilitiesGroupwise <- function(
-        ..., time, accrualTimeVector, accrualIntensity, lambda2,
+.getEventProbabilitiesGroupwise <- function(..., time, accrualTimeVector, accrualIntensity, lambda2,
         lambda1, piecewiseSurvivalTime, phi, kappa, allocationRatioPlanned, hazardRatio) {
     .assertIsSingleNumber(time, "time")
 
@@ -479,7 +478,7 @@ NULL
                 designPlan$.getParameterType("accrualIntensity")
             )
         }
-        
+
         accrualIntensityAbsolute <- numeric()
         for (maxNumberOfSubjects in designPlan[[paramName]]) {
             accrualSetup <- getAccrualTime(
@@ -492,7 +491,7 @@ NULL
         }
         designPlan$accrualIntensity <- accrualIntensityAbsolute
         designPlan$.setParameterType("accrualIntensity", C_PARAM_GENERATED)
-        
+
         if (numberOfDefinedAccrualIntensities > 1) {
             paramName <- NULL
             if (designPlan$.getParameterType("pi1") == C_PARAM_USER_DEFINED ||
@@ -534,7 +533,7 @@ NULL
         }
     } else {
         warning("Follow-up time could not be calculated for hazardRatio = ",
-            .arrayToString(designPlan$hazardRatio[indices]),
+            .arrayToString(designPlan$hazardRatio),
             call. = FALSE
         )
     }
@@ -728,7 +727,7 @@ NULL
         .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     }
 
-    designPlan <- TrialDesignPlanSurvival(
+    designPlan <- TrialDesignPlanSurvival$new(
         design = design,
         typeOfComputation = typeOfComputation,
         thetaH0 = thetaH0,
@@ -1755,7 +1754,7 @@ getEventProbabilities <- function(time, ...,
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all rates (lambda2) must be > 0")
     }
 
-    eventProbabilities <- EventProbabilities(
+    eventProbabilities <- EventProbabilities$new(
         .piecewiseSurvivalTime = setting,
         .accrualTime           = accrualSetup,
         time                   = time,
@@ -1921,7 +1920,7 @@ getNumberOfSubjects <- function(time, ...,
         accrualIntensity = accrualIntensity, maxNumberOfSubjects = maxNumberOfSubjects
     )
 
-    result <- NumberOfSubjects(
+    result <- NumberOfSubjects$new(
         .accrualTime = accrualSetup,
         time = time,
         accrualTime = accrualTime,
@@ -2054,7 +2053,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
         accrualIntensityType = accrualIntensityType,
-        maxNumberOfSubjects = maxNumberOfSubjects, 
+        maxNumberOfSubjects = maxNumberOfSubjects,
         showWarnings = FALSE
     )
     accrualSetup$.validate()

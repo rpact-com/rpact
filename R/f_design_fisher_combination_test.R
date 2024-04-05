@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7644 $
-## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -145,7 +145,7 @@ getDesignFisher <- function(...,
         warning("'bindingFutility' (", bindingFutility, ") will be ignored", call. = FALSE)
     }
 
-    design <- TrialDesignFisher(
+    design <- TrialDesignFisher$new(
         kMax = kMax,
         alpha = alpha,
         method = method,
@@ -255,7 +255,7 @@ getDesignFisher <- function(...,
             cases <- .getFisherCombinationCases(kMax = design$kMax, tVec = design$scale)
             result <- .getDesignFisherInner(
                 design$kMax, design$alpha, design$tolerance,
-                design$criticalValues, design$scale, alpha0Vec, 
+                design$criticalValues, design$scale, alpha0Vec,
                 design$userAlphaSpending, design$method
             )
             design$criticalValues <- result$criticalValues
@@ -322,7 +322,7 @@ getDesignFisher <- function(...,
             if (length(diff) > 0 && any(diff > 1e-12)) {
                 .logDebug(
                     "Stop creation of Fisher design because critical values are ",
-                    .arrayToString(criticalValues, vectorLookAndFeelEnabled = TRUE), ", ",
+                    .arrayToString(design$criticalValues, vectorLookAndFeelEnabled = TRUE), ", ",
                     "i.e., differences are ", .arrayToString(diff, vectorLookAndFeelEnabled = TRUE)
                 )
                 stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "no calculation possible")

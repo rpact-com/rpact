@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7701 $
-## |  Last changed: $Date: 2024-03-07 11:44:08 +0100 (Do, 07 Mrz 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -44,8 +44,9 @@
         if (designPlan$groups == 1) {
             if (type %in% c(2, (5:9))) {
                 items$add("H0: mu", designPlan$thetaH0)
-                items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2), 
-                    condition = (designPlan$allocationRatioPlanned != 1))
+                items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+                    condition = (designPlan$allocationRatioPlanned != 1)
+                )
             }
         } else {
             if (type %in% c(2, (5:9))) {
@@ -54,8 +55,9 @@
                 } else {
                     items$add("H0: mean difference", designPlan$thetaH0)
                 }
-                items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2), 
-                    condition = (designPlan$allocationRatioPlanned != 1))
+                items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+                    condition = (designPlan$allocationRatioPlanned != 1)
+                )
             }
         }
     } else if (.isTrialDesignPlanRates(designPlan)) {
@@ -85,8 +87,9 @@
                 } else {
                     items$add("H0: risk difference", designPlan$thetaH0)
                 }
-                items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2), 
-                    condition = (designPlan$allocationRatioPlanned != 1))
+                items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+                    condition = (designPlan$allocationRatioPlanned != 1)
+                )
             }
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
@@ -98,8 +101,9 @@
         }
         if (type %in% c(2, (5:12))) {
             items$add("H0: hazard ratio", designPlan$thetaH0)
-            items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2), 
-                condition = (designPlan$allocationRatioPlanned != 1))
+            items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+                condition = (designPlan$allocationRatioPlanned != 1)
+            )
         }
     } else if (.isTrialDesignPlanCountData(designPlan)) {
         if (type %in% c(2, (5:9))) {
@@ -107,8 +111,9 @@
             if (length(designPlan$theta) == 1) {
                 items$add("H1: effect", designPlan$theta)
             }
-            items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2), 
-                condition = (designPlan$allocationRatioPlanned != 1))
+            items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+                condition = (designPlan$allocationRatioPlanned != 1)
+            )
         }
     }
 }
@@ -141,67 +146,66 @@
     }
 }
 
-.getTrialDesignPlanTheta <- function(designPlan, theta) {   
+.getTrialDesignPlanTheta <- function(designPlan, theta) {
     thetaName <- NA_character_
-    if (.isTrialDesignPlanMeans(designPlan) && 
+    if (.isTrialDesignPlanMeans(designPlan) &&
             designPlan$.getParameterType("alternative") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "alternative"
     } else if ((.isTrialDesignPlanRates(designPlan) || .isTrialDesignPlanSurvival(designPlan)) &&
             designPlan$.getParameterType("pi1") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "pi1"
-    } else if (.isTrialDesignPlanCountData(designPlan) && 
+    } else if (.isTrialDesignPlanCountData(designPlan) &&
             designPlan$.getParameterType("theta") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "theta"
-    } else if (.isTrialDesignPlanCountData(designPlan) && 
+    } else if (.isTrialDesignPlanCountData(designPlan) &&
             designPlan$.getParameterType("lambda1") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "lambda1"
-    } else if (.isTrialDesignPlanSurvival(designPlan) && 
+    } else if (.isTrialDesignPlanSurvival(designPlan) &&
             designPlan$.getParameterType("hazardRatio") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)) {
         thetaName <- "hazardRatio"
     }
     if (is.na(thetaName)) {
         return(list(theta = NA_real_, thetaName = thetaName))
     }
-    
+
     if (!is.null(theta) && length(theta) > 1 && !all(is.na(theta))) {
         return(list(theta = theta, thetaName = thetaName))
     }
-    
+
     return(list(theta = designPlan[[thetaName]], thetaName = thetaName))
 }
 
-.plotTrialDesignPlan <- function(
-        designPlan, 
-        type = 1L, 
+.plotTrialDesignPlan <- function(designPlan,
+        type = 1L,
         main = NA_character_,
-        xlab = NA_character_, 
-        ylab = NA_character_, 
+        xlab = NA_character_,
+        ylab = NA_character_,
         palette = "Set1",
-        theta = NA_real_, 
+        theta = NA_real_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_, 
+        legendPosition = NA_integer_,
         showSource = FALSE,
-        designPlanName = NA_character_, 
+        designPlanName = NA_character_,
         plotSettings = NULL, ...) {
     .assertGgplotIsInstalled()
     .assertIsTrialDesignPlan(designPlan)
     .assertIsValidLegendPosition(legendPosition)
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-    
+
     availablePlotTypes <- getAvailablePlotTypes(designPlan, output = "numeric", numberInCaptionEnabled = FALSE)
     if (!(type %in% availablePlotTypes)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-            ") is not available; 'type' can ", ifelse(length(availablePlotTypes) == 1, "only ", ""), 
+            ") is not available; 'type' can ", ifelse(length(availablePlotTypes) == 1, "only ", ""),
             "be ", .arrayToString(availablePlotTypes, mode = "or")
         )
     }
 
     survivalDesignPlanEnabled <- .isTrialDesignPlanSurvival(designPlan)
 
-    nMax = NA_integer_
+    nMax <- NA_integer_
     if (!.isTrialDesignPlanCountData(designPlan)) {
-        nMax <- ifelse(survivalDesignPlanEnabled, 
+        nMax <- ifelse(survivalDesignPlanEnabled,
             designPlan$maxNumberOfEvents[1],
             designPlan$maxNumberOfSubjects[1]
         ) # use first value for plotting
@@ -210,7 +214,7 @@
     if (is.null(plotSettings)) {
         plotSettings <- designPlan$.plotSettings
     }
-    
+
     designMaster <- designPlan$.design
 
     if (is.na(plotPointsEnabled)) {
@@ -226,14 +230,14 @@
     showSourceHint <- ""
     if (type %in% c(5:12)) {
         result <- .getTrialDesignPlanTheta(designPlan, theta)
-        if (!all(is.na(result$theta)) && !is.na(result$thetaName) && 
+        if (!all(is.na(result$theta)) && !is.na(result$thetaName) &&
                 (length(result$theta) == 2 || !identical(result$theta, designPlan[[result$thetaName]]))) {
             if (!is.logical(showSource) || isTRUE(showSource)) {
                 showSourceHint <- .getVariedParameterHint(result$theta, result$thetaName)
             }
             parameterList <- list()
             parameterList[[result$thetaName]] <- .getVariedParameterVector(result$theta, result$thetaName)
-            designPlan <- do.call(designPlan$clone, parameterList)
+            designPlan <- do.call(designPlan$recreate, parameterList)
         }
     }
 
@@ -247,7 +251,7 @@
     if (type == 1) { # Boundary plot
         if (survivalDesignPlanEnabled) {
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Boundaries Z Scale")
+                main <- PlotSubTitleItems$new(title = "Boundaries Z Scale")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
                 if (!is.null(reducedParam)) {
                     main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
@@ -294,14 +298,14 @@
             )
         } else {
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Boundaries")
+                main <- PlotSubTitleItems$new(title = "Boundaries")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
                 if (!is.null(reducedParam)) {
                     main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
                 }
             }
 
-            designSet <- TrialDesignSet(design = designMaster, singleDesign = TRUE)
+            designSet <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             designSet$.plotSettings <- designPlan$.plotSettings
             designPlanName <- paste0(designPlanName, "$.design")
             return(.plotTrialDesignSet(
@@ -315,7 +319,7 @@
         }
     } else if (type == 2) { # Effect Scale Boundary plot
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Boundaries Effect Scale")
+            main <- PlotSubTitleItems$new(title = "Boundaries Effect Scale")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
             if (!is.null(reducedParam)) {
                 main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
@@ -455,7 +459,7 @@
         }
     } else if (type == 3) { # Stage Levels
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Boundaries p Values Scale")
+            main <- PlotSubTitleItems$new(title = "Boundaries p Values Scale")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
             if (!is.null(reducedParam)) {
                 main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
@@ -474,7 +478,7 @@
         } else {
             xParameterName <- "informationRates"
             yParameterNames <- "stageLevels"
-            designPlan <- TrialDesignSet(design = designMaster, singleDesign = TRUE)
+            designPlan <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             xParameterNameSrc <- ".design$informationRates"
             yParameterNamesSrc <- ".design$stageLevels"
         }
@@ -488,7 +492,7 @@
         )
     } else if (type == 4) { # Alpha Spending
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Error Spending")
+            main <- PlotSubTitleItems$new(title = "Error Spending")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
             if (!is.null(reducedParam)) {
                 main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
@@ -506,7 +510,7 @@
         } else {
             xParameterName <- "informationRates"
             yParameterNames <- "alphaSpent"
-            designPlan <- TrialDesignSet(design = designMaster, singleDesign = TRUE)
+            designPlan <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             xParameterNameSrc <- ".design$informationRates"
             yParameterNamesSrc <- ".design$alphaSpent"
         }
@@ -525,7 +529,7 @@
 
         if (designPlan$.isSampleSizeObject()) {
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Sample Size")
+                main <- PlotSubTitleItems$new(title = "Sample Size")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
 
@@ -618,7 +622,7 @@
                 parameterSet = designPlan, designMaster = designMaster,
                 xParameterName = xParameterName,
                 yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-                palette = palette, theta = .plotTheta(theta), 
+                palette = palette, theta = .plotTheta(theta),
                 nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                 legendPosition = legendPosition, variedParameters = variedParameters,
                 qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
@@ -626,7 +630,7 @@
             ))
         } else {
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Overall Power and Early Stopping")
+                main <- PlotSubTitleItems$new(title = "Overall Power and Early Stopping")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
             if (survivalDesignPlanEnabled) {
@@ -665,7 +669,7 @@
                     parameterSet = designPlan, designMaster = designMaster,
                     xParameterName = xParameterName,
                     yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-                    palette = palette, theta = .plotTheta(theta), 
+                    palette = palette, theta = .plotTheta(theta),
                     nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
@@ -676,7 +680,7 @@
                     parameterSet = designPlan, designMaster = designMaster,
                     xParameterName = xParameterName,
                     yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-                    palette = palette, theta = .plotTheta(theta), 
+                    palette = palette, theta = .plotTheta(theta),
                     nMax = nMax, plotPointsEnabled = plotPointsEnabled,
                     legendPosition = legendPosition, variedParameters = variedParameters,
                     qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
@@ -688,13 +692,13 @@
         .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
 
         if (is.na(main)) {
-            if (.isTrialDesignPlanCountData(designPlan) && 
-                (length(designPlan$expectedNumberOfSubjectsH1) == 0 || 
-                    all(is.na(designPlan$expectedNumberOfSubjectsH1)))) {
-                main <- PlotSubTitleItems(title = "Power / Early Stop")
+            if (.isTrialDesignPlanCountData(designPlan) &&
+                    (length(designPlan$expectedNumberOfSubjectsH1) == 0 ||
+                        all(is.na(designPlan$expectedNumberOfSubjectsH1)))) {
+                main <- PlotSubTitleItems$new(title = "Power / Early Stop")
             } else {
                 titlePart <- ifelse(survivalDesignPlanEnabled, "Number of Events", "Sample Size")
-                main <- PlotSubTitleItems(title = paste0("Expected ", titlePart, " and Power / Early Stop"))
+                main <- PlotSubTitleItems$new(title = paste0("Expected ", titlePart, " and Power / Early Stop"))
             }
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
         }
@@ -715,14 +719,15 @@
             yParameterNames <- character()
             if (!.isTrialDesignPlanCountData(designPlan)) {
                 yParameterNames <- c(yParameterNames, "expectedNumberOfSubjects")
-            } else if (length(designPlan$expectedNumberOfSubjectsH1) > 0 && 
+            } else if (length(designPlan$expectedNumberOfSubjectsH1) > 0 &&
                     all(is.na(designPlan$expectedNumberOfSubjectsH1))) {
                 yParameterNames <- c(yParameterNames, "expectedNumberOfSubjectsH1")
             }
             yParameterNames <- c(
-                yParameterNames, 
-                "overallReject", # overallReject = power 
-                "earlyStop") 
+                yParameterNames,
+                "overallReject", # overallReject = power
+                "earlyStop"
+            )
         }
         srcCmd <- .showPlotSourceInformation(
             objectName = designPlanName,
@@ -735,7 +740,7 @@
         .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
 
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Overall Power")
+            main <- PlotSubTitleItems$new(title = "Overall Power")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
         }
 
@@ -761,7 +766,7 @@
         .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
 
         if (is.na(main)) {
-            main <- PlotSubTitleItems(title = "Overall Early Stopping")
+            main <- PlotSubTitleItems$new(title = "Overall Early Stopping")
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
         }
 
@@ -788,9 +793,9 @@
 
         if (is.na(main)) {
             if (survivalDesignPlanEnabled) {
-                main <- PlotSubTitleItems(title = "Expected Number of Events")
+                main <- PlotSubTitleItems$new(title = "Expected Number of Events")
             } else {
-                main <- PlotSubTitleItems(title = "Expected Sample Size")
+                main <- PlotSubTitleItems$new(title = "Expected Sample Size")
             }
             .addPlotSubTitleItems(designPlan, designMaster, main, type)
         }
@@ -805,11 +810,11 @@
                     legendPosition <- C_POSITION_RIGHT_CENTER
                 }
             }
-        } else if(.isTrialDesignPlanCountData(designPlan)) {
+        } else if (.isTrialDesignPlanCountData(designPlan)) {
             if (designPlan$.getParameterType("expectedNumberOfSubjectsH1") != C_PARAM_GENERATED) {
                 stop("Plot type 9 is only available for count data endpoint if 'expectedNumberOfSubjectsH1' was not calculated")
             }
-            
+
             xParameterName <- "theta"
             yParameterNames <- "expectedNumberOfSubjectsH1"
         } else {
@@ -827,7 +832,7 @@
         if (type == 10) { # Study Duration
             .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Study Duration")
+                main <- PlotSubTitleItems$new(title = "Study Duration")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
             xParameterName <- "hazardRatio"
@@ -842,7 +847,7 @@
         } else if (type == 11) {
             .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Expected Number of Subjects")
+                main <- PlotSubTitleItems$new(title = "Expected Number of Subjects")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
             xParameterName <- "hazardRatio"
@@ -857,7 +862,7 @@
         } else if (type == 12) { # Analysis Time
             .assertIsValidVariedParameterVectorForPlotting(designPlan, type)
             if (is.na(main)) {
-                main <- PlotSubTitleItems(title = "Analysis Time")
+                main <- PlotSubTitleItems$new(title = "Analysis Time")
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
 
@@ -930,7 +935,7 @@
         parameterSet = designPlan, designMaster = designMaster,
         xParameterName = xParameterName,
         yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-        palette = palette, theta = .plotTheta(theta), 
+        palette = palette, theta = .plotTheta(theta),
         nMax = nMax, plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition, variedParameters = variedParameters,
         qnormAlphaLineEnabled = (type != 2), ratioEnabled = ratioEnabled,
@@ -943,8 +948,7 @@
     return(p)
 }
 
-.getSurvivalFunctionPlotCommand <- function(
-        functionType = c("pwExpDist", "lambdaStep"), timeValues, lambda,
+.getSurvivalFunctionPlotCommand <- function(functionType = c("pwExpDist", "lambdaStep"), timeValues, lambda,
         designPlan, type, piecewiseSurvivalEnabled, multiplyByHazardRatio = FALSE) {
     functionType <- match.arg(functionType)
     signPrefix <- ifelse(type == 13, "", "-")
@@ -975,8 +979,7 @@
 }
 
 # Cumulative Distribution Function / Survival function
-.plotSurvivalFunction <- function(
-        designPlan, ..., designMaster, type = c(13, 14), main = NA_character_,
+.plotSurvivalFunction <- function(designPlan, ..., designMaster, type = c(13, 14), main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, palette = "Set1",
         legendPosition = NA_integer_, showSource = FALSE,
         designPlanName = NA_character_, plotSettings = NULL) {
@@ -1009,9 +1012,9 @@
 
     if (is.na(main)) {
         if (type == 13) {
-            main <- PlotSubTitleItems(title = "Cumulative Distribution Function")
+            main <- PlotSubTitleItems$new(title = "Cumulative Distribution Function")
         } else {
-            main <- PlotSubTitleItems(title = "Survival Function")
+            main <- PlotSubTitleItems$new(title = "Survival Function")
         }
         .addPlotSubTitleItems(designPlan, designMaster, main, type)
         if (!piecewiseSurvivalEnabled) {
@@ -1370,17 +1373,16 @@
 #'
 #' @export
 #'
-plot.TrialDesignPlan <- function(
-        x, y, ..., 
+plot.TrialDesignPlan <- function(x, y, ...,
         main = NA_character_,
-        xlab = NA_character_, 
+        xlab = NA_character_,
         ylab = NA_character_,
-        type = NA_integer_, 
+        type = NA_integer_,
         palette = "Set1",
         theta = NA_real_, plotPointsEnabled = NA,
-        legendPosition = NA_integer_, 
+        legendPosition = NA_integer_,
         showSource = FALSE,
-        grid = 1, 
+        grid = 1,
         plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
     designPlanName <- deparse(fCall$x)
@@ -1394,7 +1396,7 @@ plot.TrialDesignPlan <- function(
             ") will be ignored because it will be taken from design plan"
         )
     }
-    
+
     if (all(is.na(type))) {
         type <- 1L
         availablePlotTypes <- getAvailablePlotTypes(x)

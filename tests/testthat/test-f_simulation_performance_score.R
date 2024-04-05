@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_performance_score.R
 ## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 7702 $
-## |  Last changed: $Date: 2024-03-07 13:30:30 +0100 (Do, 07 Mrz 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -92,14 +92,14 @@ test_that("getPerformanceScore handles non-two-stage designs", {
 test_that("getPerformanceScore handles non-null conditionalPower", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     simulationResult$conditionalPower <- 0.8
-    suppressWarnings(expect_type(getPerformanceScore(simulationResult), "S4"))
+    suppressWarnings(expect_type(getPerformanceScore(simulationResult), "environment"))
 })
 
 # Test to verify the correctness of the performance score calculation
 test_that("getPerformanceScore calculates performance score correctly", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     suppressWarnings(scores <- getPerformanceScore(simulationResult))
-    expect_type(scores, "S4")
+    expect_type(scores, "environment")
 })
 
 # Test to verify that the warning about the function being experimental is issued
@@ -115,7 +115,7 @@ test_that("getPerformanceScore issues warning", {
 test_that("getPerformanceScore returns correct result object", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     suppressWarnings(result <- getPerformanceScore(simulationResult))
-    expect_type(result, "S4")
+    expect_type(result, "environment")
 })
 
 # Test to check if the correct values are returned

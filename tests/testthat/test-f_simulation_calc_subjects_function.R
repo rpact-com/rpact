@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_calc_subjects_function.R
 ## |  Creation date: 23 February 2024, 12:20:41
-## |  File version: $Revision: 7662 $
-## |  Last changed: $Date: 2024-02-23 12:42:26 +0100 (Fr, 23 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -29,7 +29,7 @@ test_that("Function .getCalcSubjectsFunctionCppCode works for C++ code", {
     design <- getDesignInverseNormal()
     result <- .getCalcSubjectsFunction(
         design = design,
-        simulationResults = SimulationResultsRates(design = design),
+        simulationResults = SimulationResultsRates$new(design = design),
         calcFunction = calcFunction,
         expectedFunction = .getSimulationRatesStageSubjects,
         cppEnabled = TRUE

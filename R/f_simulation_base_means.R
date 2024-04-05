@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7408 $
-## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -218,7 +218,7 @@ getSimulationMeans <- function(design = NULL, ...,
     .assertIsSingleLogical(normalApproximation, "normalApproximation", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
-    simulationResults <- SimulationResultsMeans(design, showStatistics = showStatistics)
+    simulationResults <- SimulationResultsMeans$new(design, showStatistics = showStatistics)
 
     if (design$sided == 2) {
         stop(

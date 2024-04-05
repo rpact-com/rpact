@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-class_design_plan.R
 ## |  Creation date: 26 February 2024, 10:31:43
-## |  File version: $Revision: 7667 $
-## |  Last changed: $Date: 2024-02-26 10:35:51 +0100 (Mo, 26 Feb 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -50,7 +50,7 @@ test_that("Sample size means result object clone function", {
 
 test_that("Sample size means result object utility functions", {
     sampleSizeResult <- getSampleSizeMeans(groups = 1, thetaH0 = 0.1, stDev = 2)
-    expect_true(isS4(sampleSizeResult$getPlotSettings()))
+    expect_true(R6::is.R6(sampleSizeResult$getPlotSettings()))
     expect_true(any(grepl("Technical developer summary", utils::capture.output(sampleSizeResult$show(showType = 2)))))
     expect_true(any(grepl("Legend", utils::capture.output(sampleSizeResult$show(showType = 3)))))
 })
@@ -87,7 +87,7 @@ test_that("Power means result object clone function", {
 
 test_that("Power means result object utility functions", {
     powerResult <- getPowerMeans(groups = 1, thetaH0 = -0.5, stDev = 2, alternative = -1.2, maxNumberOfSubjects = 50)
-    expect_true(isS4(powerResult$getPlotSettings()))
+    expect_true(R6::is.R6(powerResult$getPlotSettings()))
     expect_true(any(grepl("Technical developer summary", utils::capture.output(powerResult$show(showType = 2)))))
     expect_true(any(grepl("Legend", utils::capture.output(powerResult$show(showType = 3)))))
 })
@@ -115,7 +115,7 @@ test_that("Sample size rates result object clone function", {
 
 test_that("Sample size rates result object utility functions", {
     sampleSizeResult <- getSampleSizeRates(groups = 1, thetaH0 = 0.5, pi1 = 0.8, normalApproximation = FALSE)
-    expect_true(isS4(sampleSizeResult$getPlotSettings()))
+    expect_true(R6::is.R6(sampleSizeResult$getPlotSettings()))
     expect_true(any(grepl("Technical developer summary", utils::capture.output(sampleSizeResult$show(showType = 2)))))
     expect_true(any(grepl("Legend", utils::capture.output(sampleSizeResult$show(showType = 3)))))
 })
@@ -151,7 +151,7 @@ test_that("Power rates result object clone function", {
 
 test_that("Power rates result object utility functions", {
     powerResult <- getPowerRates(groups = 1, thetaH0 = 0.4, pi1 = c(0.2, 0.3, 0.4), directionUpper = FALSE, maxNumberOfSubjects = 40)
-    expect_true(isS4(powerResult$getPlotSettings()))
+    expect_true(R6::is.R6(powerResult$getPlotSettings()))
     expect_true(any(grepl("Technical developer summary", utils::capture.output(powerResult$show(showType = 2)))))
     expect_true(any(grepl("Legend", utils::capture.output(powerResult$show(showType = 3)))))
 })
@@ -195,7 +195,7 @@ test_that("Sample size survival result object clone function", {
 
 test_that("Sample size survival result object utility functions", {
     sampleSizeResult <- getSampleSizeSurvival(alpha = 0.01)
-    expect_true(isS4(sampleSizeResult$getPlotSettings()))
+    expect_true(R6::is.R6(sampleSizeResult$getPlotSettings()))
     expect_true(any(grepl("Technical developer summary", utils::capture.output(sampleSizeResult$show(showType = 2)))))
     expect_true(any(grepl("Legend", utils::capture.output(sampleSizeResult$show(showType = 3)))))
 })
@@ -249,7 +249,7 @@ test_that("Power survival result object clone function", {
 
 test_that("Power survival result object utility functions", {
     powerResult <- getPowerSurvival(maxNumberOfEvents = 40, maxNumberOfSubjects = 200)
-    expect_true(isS4(powerResult$getPlotSettings()))
+    expect_true(R6::is.R6(powerResult$getPlotSettings()))
     expect_true(any(grepl("Technical developer summary", utils::capture.output(powerResult$show(showType = 2)))))
     expect_true(any(grepl("Legend", utils::capture.output(powerResult$show(showType = 3)))))
 })
@@ -296,7 +296,7 @@ test_that("Sample size counts result object utility functions", {
         alpha = 0.01, beta = 0.05, lambda = 0.234, theta = 0.7,
         overdispersion = 0.71, accrualTime = 7, fixedExposureTime = 1
     )
-    expect_true(isS4(sampleSizeResult$getPlotSettings()))
+    expect_true(R6::is.R6(sampleSizeResult$getPlotSettings()))
     expect_true(any(grepl("Technical developer summary", utils::capture.output(sampleSizeResult$show(showType = 2)))))
     expect_true(any(grepl("Sample size calculation for a count data endpoint", utils::capture.output(sampleSizeResult$show(showType = 3)))))
 })
@@ -338,7 +338,7 @@ test_that("Power counts result object utility functions", {
         maxNumberOfSubjects = 400, directionUpper = FALSE,
         overdispersion = 1, fixedExposureTime = 1, lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
     )
-    expect_true(isS4(powerResult$getPlotSettings()))
+    expect_true(R6::is.R6(powerResult$getPlotSettings()))
     expect_true(any(grepl("Technical developer summary", utils::capture.output(powerResult$show(showType = 2)))))
     expect_true(any(grepl("Power calculation for a count data endpoint", utils::capture.output(powerResult$show(showType = 3)))))
 })

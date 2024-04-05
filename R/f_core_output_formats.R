@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7383 $
-## |  Last changed: $Date: 2023-11-02 15:18:21 +0100 (Do, 02 Nov 2023) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1205,11 +1205,11 @@ getOutputFormat <- function(parameterName = NA_character_, ...,
     if (is.null(fieldName) || length(fieldName) != 1 || is.na(fieldName)) {
         return(NULL)
     }
-    
+
     if (!(fieldName %in% names(C_PARAMETER_FORMAT_FUNCTIONS))) {
         return(NULL)
     }
-    
+
     functionName <- C_PARAMETER_FORMAT_FUNCTIONS[[fieldName]]
     if (is.null(functionName)) {
         return(NULL)

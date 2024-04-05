@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7671 $
-## |  Last changed: $Date: 2024-02-26 16:27:43 +0100 (Mo, 26 Feb 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include class_simulation_results.R
@@ -387,7 +387,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         endpoint = "survival", calcSubjectsFunctionEnabled = FALSE
     )
 
-    simulationResults <- SimulationResultsSurvival(design, showStatistics = showStatistics)
+    simulationResults <- SimulationResultsSurvival$new(design, showStatistics = showStatistics)
     if (!is.na(conditionalPower)) {
         if (design$kMax > 1) {
             if (any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0) &&

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7703 $
-## |  Last changed: $Date: 2024-03-07 13:38:48 +0100 (Do, 07 Mrz 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -135,15 +135,17 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_KD) {
         .assertDesignParameterExists(design, "gammaA", NA_real_)
         .assertIsSingleNumber(design$gammaA, "gammaA", naAllowed = FALSE)
-        .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA", 
+        .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA",
             lowerBound = 0.4, upperBound = 8,
-            spendingFunctionName = "Kim & DeMets alpha spending")
+            spendingFunctionName = "Kim & DeMets alpha spending"
+        )
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_HSD) {
         .assertDesignParameterExists(design, "gammaA", NA_real_)
         .assertIsSingleNumber(design$gammaA, "gammaA", naAllowed = FALSE)
-        .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA", 
+        .showParameterOutOfValidatedBoundsMessage(design$gammaA, "gammaA",
             lowerBound = -10, upperBound = 5,
-            spendingFunctionName = "Hwang, Shih & DeCani alpha spending")
+            spendingFunctionName = "Hwang, Shih & DeCani alpha spending"
+        )
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
         .validateUserAlphaSpending(design)
         design$.setParameterType("userAlphaSpending", C_PARAM_USER_DEFINED)
@@ -180,17 +182,19 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_KD) {
             .assertDesignParameterExists(design, "gammaB", NA_real_)
             .assertIsSingleNumber(design$gammaB, "gammaB", naAllowed = FALSE)
-            .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB", 
+            .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB",
                 lowerBound = 0.4, upperBound = 8,
-                spendingFunctionName = "Kim & DeMets beta spending", c(-0.4, 8))
+                spendingFunctionName = "Kim & DeMets beta spending", c(-0.4, 8)
+            )
         }
 
         if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_HSD) {
             .assertDesignParameterExists(design, "gammaB", NA_real_)
             .assertIsSingleNumber(design$gammaB, "gammaB", naAllowed = FALSE)
-            .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB", 
+            .showParameterOutOfValidatedBoundsMessage(design$gammaB, "gammaB",
                 lowerBound = -10, upperBound = 5,
-                spendingFunctionName = "Hwang, Shih & DeCani beta spending")
+                spendingFunctionName = "Hwang, Shih & DeCani beta spending"
+            )
         }
 
         if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_USER) {
@@ -308,12 +312,12 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     .assertIsInClosedInterval(delayedInformation, "delayedInformation", lower = 0, upper = NULL, naAllowed = TRUE)
 
     if (designClass == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL) {
-        design <- TrialDesignInverseNormal(
+        design <- TrialDesignInverseNormal$new(
             kMax = kMax, bindingFutility = bindingFutility,
             delayedInformation = delayedInformation
         )
     } else if (designClass == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL) {
-        design <- TrialDesignGroupSequential(
+        design <- TrialDesignGroupSequential$new(
             kMax = kMax, bindingFutility = bindingFutility,
             delayedInformation = delayedInformation
         )
@@ -1330,7 +1334,8 @@ getDesignInverseNormal <- function(...,
             if (!is.na(design$informationRates)) {
                 warning("Information rate", ifelse(length(design$informationRates) != 1, "s", ""), " ",
                     .arrayToString(design$informationRates, vectorLookAndFeelEnabled = TRUE),
-                    " will be ignored", call. = FALSE
+                    " will be ignored",
+                    call. = FALSE
                 )
             }
             design$informationRates <- 1
@@ -1751,7 +1756,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         writeToDesign = FALSE, twoSidedWarningForDefaultValues = FALSE
     )
 
-    designCharacteristics <- TrialDesignCharacteristics(design = design)
+    designCharacteristics <- TrialDesignCharacteristics$new(design = design)
 
     designCharacteristics$rejectionProbabilities <- rep(NA_real_, design$kMax)
     designCharacteristics$.setParameterType("rejectionProbabilities", C_PARAM_NOT_APPLICABLE)
@@ -1850,7 +1855,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 
         designCharacteristics$rejectionProbabilities <- rejectionProbabilities
         designCharacteristics$futilityProbabilities <- futilityProbabilities
-    } else if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT || 
+    } else if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
             .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2) {
         design$futilityBounds[is.na(design$futilityBounds)] <- 0
 
@@ -2098,7 +2103,7 @@ getPowerAndAverageSampleNumber <- function(design, theta = seq(-1, 1, 0.02), nMa
     .assertIsTrialDesign(design)
     .assertIsSingleNumber(nMax, "nMax")
     .assertIsInClosedInterval(nMax, "nMax", lower = 1, upper = NULL)
-    return(PowerAndAverageSampleNumberResult(design = design, theta = theta, nMax = nMax))
+    return(PowerAndAverageSampleNumberResult$new(design = design, theta = theta, nMax = nMax))
 }
 
 .getSimulatedRejectionsDelayedResponse <- function(delta, informationRates, delayedInformation,
@@ -2142,18 +2147,18 @@ getPowerAndAverageSampleNumber <- function(design, theta = seq(-1, 1, 0.02), nMa
 
 
 #'
-#' @title 
+#' @title
 #' Simulated Rejections Delayed Response
-#' 
-#' @description 
+#'
+#' @description
 #' Simulates the rejection probability of a delayed response group sequential design with specified parameters.
-#' 
+#'
 #' @inheritParams param_design
 #' @param delta The delay value.
 #' @param iterations The number of simulation iterations.
 #' @inheritParams param_seed
-#' 
-#' @details 
+#'
+#' @details
 #' By default, delta = 0, i.e., the Type error rate is simulated.
 #'
 #' @return Returns a list summarizing the rejection probabilities.

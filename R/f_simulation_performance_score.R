@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7688 $
-## |  Last changed: $Date: 2024-03-05 14:56:47 +0100 (Tue, 05 Mar 2024) $
+## |  File version: $Revision: 7742 $
+## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -23,9 +23,9 @@
 #' Get Performance Score
 #'
 #' @description
-#' Calculates the conditional performance score, its sub-scores and components according to 
-#' [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) and 
-#' [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4) for a given 
+#' Calculates the conditional performance score, its sub-scores and components according to
+#' [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) and
+#' [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4) for a given
 #' simulation result from a two-stage design with continuous or binary endpoint.
 #' Larger (sub-)score and component values refer to a better performance.
 #'
@@ -39,9 +39,9 @@
 #' The term conditional refers to an evaluation perspective where the interim results
 #' suggest a trial continuation with a second stage.
 #' The score can take values between 0 and 1. More details on the performance score
-#' can be found in [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) and 
+#' can be found in [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) and
 #' [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4).
-#' 
+#'
 #' @template examples_get_performance_score
 #'
 #' @author Stephen Schueuerhuis
@@ -53,7 +53,7 @@ getPerformanceScore <- function(simulationResult) {
 
     design <- simulationResult$.design
 
-    if (!inherits(simulationResult, "SimulationResultsMeans") && !inherits(simulationResult, "SimulationResultsRates")) { 
+    if (!inherits(simulationResult, "SimulationResultsMeans") && !inherits(simulationResult, "SimulationResultsRates")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "performance score so far implemented only for single comparisons with continuous and binary endpoints"
@@ -92,7 +92,7 @@ getPerformanceScore <- function(simulationResult) {
         normalApproximation = TRUE,
         groups = simulationResult$groups
     )
-	
+
     alternativeParamName <- NA_character_
     referenceValue <- NA_real_
 
@@ -169,7 +169,7 @@ getPerformanceScore <- function(simulationResult) {
         ))
     })
 
-    performanceScore <- PerformanceScore(simulationResult)
+    performanceScore <- PerformanceScore$new(simulationResult)
     performanceScore$.alternative <- alternativeValues
     paramNames <- rownames(resultMatrix)
     for (k in 1:nrow(resultMatrix)) {
