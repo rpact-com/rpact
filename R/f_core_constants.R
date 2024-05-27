@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7940 $
+## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -165,7 +165,7 @@ C_ALLOCATION_1_DEFAULT <- 1
 C_ALLOCATION_2_DEFAULT <- 1
 C_MAX_ITERATIONS_DEFAULT <- 10L
 C_MAX_SIMULATION_ITERATIONS_DEFAULT <- 1000L
-C_ACCRUAL_TIME_DEFAULT <- c(0, 12)
+C_ACCRUAL_TIME_DEFAULT <- c(0L, 12L)
 C_ACCRUAL_INTENSITY_DEFAULT <- 0.1
 C_FOLLOW_UP_TIME_DEFAULT <- 6
 
@@ -1023,6 +1023,40 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     "scalingFactor" = "Scaling factor"
 ))
 
+.getParameterNameTrialDesign <- function(parameterName, obj) {
+    if (inherits(obj, "TrialDesignSet") && length(obj$designs) > 0) {
+        obj <- obj$designs[[1]]
+    }
+    
+    if (!inherits(obj, "TrialDesign")) {
+        return(parameterName)
+    }
+    
+    if (identical(parameterName, "futilityBounds")) {
+        if (.isDelayedInformationEnabled(design = obj)) {
+            if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
+                return("futilityBoundsDelayedInformationNonBinding")
+            }
+            return("futilityBoundsDelayedInformation")
+        } else if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
+            return("futilityBoundsNonBinding")
+        }
+    }
+    if (identical(parameterName, "criticalValues") && .isDelayedInformationEnabled(design = obj)) {
+        return("criticalValuesDelayedInformation")
+    }
+    if (identical(parameterName, "criticalValuesEffectScale") && .isDelayedInformationEnabled(design = obj)) {
+        return("criticalValuesEffectScaleDelayedInformation")
+    }
+    if (identical(parameterName, "futilityBoundsEffectScale") && .isDelayedInformationEnabled(design = obj)) {
+        return("futilityBoundsEffectScaleDelayedInformation")
+    }
+    if (identical(parameterName, "futilityBoundsPValueScale") && .isDelayedInformationEnabled(design = obj)) {
+        return("futilityBoundsPValueScaleDelayedInformation")
+    }
+    return(parameterName)
+}
+
 .getParameterCaption <- function(parameterName, obj = NULL, ..., tableOutputEnabled = FALSE) {
     if (is.null(obj)) {
         if (tableOutputEnabled) {
@@ -1031,34 +1065,25 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
 
         return(C_PARAMETER_NAMES[[parameterName]])
     }
+    
+    parameterName <- .getParameterNameTrialDesign(parameterName, obj)
 
     if (inherits(obj, "PlotSettings")) {
         return(C_PARAMETER_NAMES_PLOT_SETTINGS[[parameterName]])
     }
 
-    if (inherits(obj, "TrialDesign")) {
-        if (identical(parameterName, "futilityBounds")) {
-            if (.isDelayedInformationEnabled(design = obj)) {
-                if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
-                    return("futilityBoundsDelayedInformationNonBinding")
-                }
-                return("futilityBoundsDelayedInformation")
-            } else if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
-                return("futilityBoundsNonBinding")
-            }
-        }
-        if (identical(parameterName, "criticalValues") && .isDelayedInformationEnabled(design = obj)) {
-            return("criticalValuesDelayedInformation")
-        }
-        if (identical(parameterName, "criticalValuesEffectScale") && .isDelayedInformationEnabled(design = obj)) {
-            return("criticalValuesEffectScaleDelayedInformation")
-        }
-        if (identical(parameterName, "futilityBoundsEffectScale") && .isDelayedInformationEnabled(design = obj)) {
-            return("futilityBoundsEffectScaleDelayedInformation")
-        }
-        if (identical(parameterName, "futilityBoundsPValueScale") && .isDelayedInformationEnabled(design = obj)) {
-            return("futilityBoundsPValueScaleDelayedInformation")
-        }
+    parameterName <- .getParameterNameTrialDesign(parameterName, obj)
+    
+    pluralExt <- ifelse(tableOutputEnabled, "", "s")
+    
+    if (identical(parameterName, "informationRates") && 
+            (
+                .isTrialDesignInverseNormalOrFisher(obj) ||
+                ((inherits(obj, "TrialDesignPlan") || inherits(obj, "SimulationResults")) && 
+                .isTrialDesignInverseNormalOrFisher(obj[[".design"]]))
+            )
+        ) {
+        return(paste0("Fixed weight", pluralExt))
     }
 
     if (identical(parameterName, "futilityBounds") &&
@@ -1068,7 +1093,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
             bindingFutilityValues <- unique(c(bindingFutilityValues, design$bindingFutility))
         }
         if (length(bindingFutilityValues) > 1) {
-            return("Futility bound")
+            return(paste0("Futility bound", pluralExt))
         }
     }
 
@@ -1105,7 +1130,6 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (inherits(obj, "AnalysisResults")) {
-        pluralExt <- ifelse(tableOutputEnabled, "", "s")
         if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds")) {
             if (.isTrialDesignConditionalDunnett(obj$.design)) {
                 return(paste0("Overall confidence interval", pluralExt, " (lower)"))

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7920 $
+## |  Last changed: $Date: 2024-05-23 13:56:24 +0200 (Do, 23 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -27,6 +27,19 @@ NULL
             base::requireNamespace("testthat", quietly = TRUE)) {
         testthat::skip("Test is disabled")
     }
+}
+
+.skipTestIfCppCompilerIsMissing <- function() {
+    if (.Platform$OS.type != "windows") {
+        return(invisible())
+    }
+    
+    if (.isPackageInstalled("pkgbuild") && 
+            isTRUE(eval(parse(text = "pkgbuild::has_build_tools(debug = FALSE)")))) {
+        return(invisible())
+    }
+    
+    testthat::skip("The test requires a C++ compiler")
 }
 
 .skipTestIfNotX64 <- function() {

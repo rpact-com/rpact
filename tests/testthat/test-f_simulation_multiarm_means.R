@@ -1408,7 +1408,7 @@ test_that("'getSimulationMultiArmMeans': using selectArmsFunction", {
     # @refFS[Formula]{fs:adjustedPValueSubsetDunnett}
     # @refFS[Formula]{fs:adjustedPValueSubsetSidak}
     # @refFS[Formula]{fs:adjustedPValueSubsetSimes}
-    selectArmsFunctionSimulationMultiArmMeans <- function(effectSizes) {
+    selectArmsFunctionSimulationMultiArmMeans <- function(effectVector) {
         return(c(TRUE, FALSE, FALSE, FALSE))
     }
 

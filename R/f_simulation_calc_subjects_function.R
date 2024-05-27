@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7019 $
-## |  Last changed: $Date: 2023-05-31 07:23:47 +0200 (Mi, 31 Mai 2023) $
+## |  File version: $Revision: 7920 $
+## |  Last changed: $Date: 2024-05-23 13:56:24 +0200 (Do, 23 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -397,6 +397,12 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
     if (.isCppCode(calcFunction)) {
         tryCatch(
             {
+                if (.isPackageInstalled("pkgbuild") && 
+                        !isTRUE(eval(parse(text = "pkgbuild::has_build_tools(debug = FALSE)")))) {
+                    stop("no C++ compiler found", ifelse(.Platform$OS.type == "windows", 
+                        " (install RTools to solve the issue)", ""))
+                }
+                
                 survivalEnabled <- inherits(simulationResults, "SimulationResultsSurvival")
                 expectedFunctionName <- ifelse(survivalEnabled,
                     "calcEventsFunctionCppTemp", "calcSubjectsFunctionCppTemp"

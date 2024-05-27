@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-class_dictionary.R
 ## |  Creation date: 23 February 2024, 07:45:41
-## |  File version: $Revision: 7662 $
-## |  Last changed: $Date: 2024-02-23 12:42:26 +0100 (Fr, 23 Feb 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision$
+## |  Last changed: $Date$
+## |  Last changed by: $Author$
 ## |
 
 test_plan_section("Testing Class 'Dictionary'")

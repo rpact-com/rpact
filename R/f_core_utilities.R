@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7750 $
-## |  Last changed: $Date: 2024-03-26 15:44:44 +0100 (Di, 26 Mrz 2024) $
+## |  File version: $Revision: 7940 $
+## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -166,17 +166,20 @@ NULL
             if (length(arg) > 1) {
                 return(FALSE)
             }
+            
+            return(is.na(arg))
         },
-        error = function(e) {
+        warning = function(w) {
             paramName <- deparse(substitute(arg))
             .logWarn(
                 "Failed to execute '.isUndefinedArgument(%s)' ('%s' is an instance of class '%s'): %s",
-                paramName, paramName, .getClassName(arg), e
+                paramName, paramName, .getClassName(arg), w$message
             )
+            return(FALSE)
         }
     )
-
-    return(is.na(arg))
+    
+    return(FALSE)
 }
 
 .isDefinedArgument <- function(arg, argumentExistsValidationEnabled = TRUE) {
@@ -212,8 +215,10 @@ NULL
             if (length(arg) > 1) {
                 return(TRUE)
             }
+            
+            return(!is.na(arg))
         },
-        error = function(e) {
+        warning = function(e) {
             paramName <- deparse(substitute(arg))
             .logWarn(
                 "Failed to execute '.isDefinedArgument(%s)' ('%s' is an instance of class '%s'): %s",
@@ -222,7 +227,7 @@ NULL
         }
     )
 
-    return(!is.na(arg))
+    return(FALSE)
 }
 
 .getConcatenatedValues <- function(x, separator = ", ", mode = c("csv", "vector", "and", "or")) {

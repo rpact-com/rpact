@@ -135,7 +135,10 @@ recalculation. By default, sample size recalculation is performed with condition
 
 \item{selectPopulationsFunction}{Optionally, a function can be entered that defines the way of how populations
 are selected. This function is allowed to depend on \code{effectVector} with length \code{populations}
-and \code{stage} (see examples).}
+\code{stage}, \code{"conditionalPower"}, \code{"conditionalCriticalValue"}, \code{"plannedSubjects/plannedEvents"},
+\code{"allocationRatioPlanned"}, \code{"selectedPopulations"}, \code{"thetaH1"} (for means and survival), \code{"stDevH1"} (for means),
+\code{"overallEffects"}, and for rates additionally: \code{"piTreatmentsH1"}, \code{"piControlH1"}, \code{"overallRates"}, and
+\code{"overallRatesControl"}.}
 
 \item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default

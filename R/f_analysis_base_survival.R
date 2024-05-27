@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7879 $
+## |  Last changed: $Date: 2024-05-13 10:19:43 +0200 (Mo, 13 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1121,12 +1121,11 @@ NULL
         directionUpperSign <- ifelse(directionUpper, 1, -1)
 
         if (stageGroupSeq == 1) {
-            finalConfidenceInterval <- exp(stderr * finalConfidenceIntervalGeneral)
-            medianUnbiased <- exp(stderr * medianUnbiasedGeneral)
+            finalConfidenceInterval <- exp(stderr * finalConfidenceIntervalGeneral + log(thetaH0))
+            medianUnbiased <- exp(stderr * medianUnbiasedGeneral + log(thetaH0))
         } else {
             finalConfidenceInterval[1] <- exp(finalConfidenceIntervalGeneral[1] *
-                (1 + y$overallAllocationRatios[finalStage]) /
-                sqrt(y$overallAllocationRatios[finalStage]) +
+                (1 + y$overallAllocationRatios[finalStage]) / sqrt(y$overallAllocationRatios[finalStage]) +
                 directionUpperSign * log(thetaH0))
             finalConfidenceInterval[2] <- exp(finalConfidenceIntervalGeneral[2] *
                 (1 + y$overallAllocationRatios[finalStage]) /
@@ -1247,8 +1246,8 @@ NULL
 
         directionUpperSign <- ifelse(directionUpper, 1, -1)
         if (stageInvNormal == 1) {
-            finalConfidenceInterval <- exp(stderr * finalConfidenceIntervalGeneral)
-            medianUnbiased <- exp(stderr * medianUnbiasedGeneral)
+            finalConfidenceInterval <- exp(stderr * finalConfidenceIntervalGeneral + log(thetaH0))
+            medianUnbiased <- exp(stderr * medianUnbiasedGeneral + log(thetaH0))
         } else {
             finalConfidenceInterval[1] <- exp(finalConfidenceIntervalGeneral[1] *
                 (1 + y$overallAllocationRatios[finalStage]) / sqrt(y$overallAllocationRatios[finalStage]) +

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7916 $
+## |  Last changed: $Date: 2024-05-22 17:52:27 +0200 (Mi, 22 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -476,22 +476,22 @@ PlotSettings <- R6::R6Class("PlotSettings",
                     p <- p + ggplot2::theme(aspect.ratio = 1)
                 },
                 "1" = {
-                    p <- p + ggplot2::theme(legend.position = c(0.05, 1), legend.justification = c(0, 1))
+                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.05, 1), legend.justification = c(0, 1))
                 },
                 "2" = {
-                    p <- p + ggplot2::theme(legend.position = c(0.05, 0.5), legend.justification = c(0, 0.5))
+                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.05, 0.5), legend.justification = c(0, 0.5))
                 },
                 "3" = {
-                    p <- p + ggplot2::theme(legend.position = c(0.05, 0.05), legend.justification = c(0, 0))
+                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.05, 0.05), legend.justification = c(0, 0))
                 },
                 "4" = {
-                    p <- p + ggplot2::theme(legend.position = c(0.95, 1), legend.justification = c(1, 1))
+                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.95, 1), legend.justification = c(1, 1))
                 },
                 "5" = {
-                    p <- p + ggplot2::theme(legend.position = c(0.95, 0.5), legend.justification = c(1, 0.5))
+                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.95, 0.5), legend.justification = c(1, 0.5))
                 },
                 "6" = {
-                    p <- p + ggplot2::theme(legend.position = c(0.95, 0.05), legend.justification = c(1, 0))
+                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.95, 0.05), legend.justification = c(1, 0))
                 }
             )
 

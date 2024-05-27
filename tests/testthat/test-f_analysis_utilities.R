@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_utilities.R
 ## |  Creation date: 08 November 2023, 09:09:34
-## |  File version: $Revision: 7665 $
-## |  Last changed: $Date: 2024-02-23 17:33:46 +0100 (Fr, 23 Feb 2024) $
+## |  File version: $Revision: 7920 $
+## |  Last changed: $Date: 2024-05-23 13:56:24 +0200 (Do, 23 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -99,4 +99,11 @@ test_that("'getObservedInformationRates': under-running with relative informatio
 
 })
 
+test_that(".sigmaToBPD works correctly", {
+
+	bpd <- c(0.3, 0.4, 0.5) 
+	sigma <- bpd %*% t(bpd)
+	diag(sigma) <- 1
+
+})
 

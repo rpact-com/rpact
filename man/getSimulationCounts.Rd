@@ -8,7 +8,7 @@ getSimulationCounts(
   design = NULL,
   ...,
   plannedCalendarTime,
-  maxNumberOfSubjects = NA_real_,
+  plannedMaxSubjects = NA_real_,
   lambda1 = NA_real_,
   lambda2 = NA_real_,
   lambda = NA_real_,
@@ -37,9 +37,6 @@ that a warning will be displayed if unknown arguments are passed.}
 
 \item{plannedCalendarTime}{For simulating count data, the time points where an analysis is planned to be performed.
 Should be a vector of length \code{kMax}}
-
-\item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified for power calculations or calculation
-of necessary follow-up (count data). For two treatment arms, it is the maximum number of subjects for both treatment arms.}
 
 \item{lambda1}{A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
 the active treatment group, there is no default.}
@@ -132,15 +129,6 @@ The summary statistics "Simulated data" contains the following parameters: media
 \code{$show(showStatistics = FALSE)} or \code{$setShowStatistics(FALSE)} can be used to disable
 the output of the aggregated simulated data.\cr
 
-Example 1: \cr
-\code{simulationResults <- getSimulationRates(plannedSubjects = 40)} \cr
-\code{simulationResults$show(showStatistics = FALSE)}\cr
-
-Example 2: \cr
-\code{simulationResults <- getSimulationRates(plannedSubjects = 40)} \cr
-\code{simulationResults$setShowStatistics(FALSE)}\cr
-\code{simulationResults}\cr
-
 \code{\link[=getData]{getData()}} can be used to get the aggregated simulated data from the
 object as \code{\link[base]{data.frame}}. The data frame contains the following columns:
 \enumerate{
@@ -181,3 +169,4 @@ There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 
+\keyword{internal}

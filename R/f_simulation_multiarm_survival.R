@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7910 $
+## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -211,24 +211,43 @@ NULL
             }
 
             if (adaptations[k]) {
+                selectArmsFunctionArgs <- list(
+                    effectVector = NULL,
+                    stage = k,
+                    directionUpper = directionUpper,
+                    conditionalPower = conditionalPower,
+                    conditionalCriticalValue = conditionalCriticalValue,
+                    plannedEvents = plannedEvents,
+                    allocationRatioPlanned = allocationRatioPlanned,
+                    selectedArms = selectedArms,
+                    thetaH1 = thetaH1,
+                    overallEffects = overallEffects
+                )
+
+                args <- list(
+                    typeOfSelection = typeOfSelection,
+                    epsilonValue = epsilonValue,
+                    rValue = rValue,
+                    threshold = threshold,
+                    selectArmsFunction = selectArmsFunction,
+                    selectArmsFunctionArgs = NULL,
+                    survival = TRUE
+                )
+
                 if (effectMeasure == "testStatistic") {
-                    selectedArms[, k + 1] <- (selectedArms[, k] & .selectTreatmentArms(k, overallTestStatistics[, k],
-                        typeOfSelection, epsilonValue, rValue, threshold, selectArmsFunction,
-                        survival = TRUE
-                    ))
+                    selectArmsFunctionArgs$effectVector <- overallTestStatistics[, k]
                 } else if (effectMeasure == "effectEstimate") {
                     if (directionUpper) {
-                        selectedArms[, k + 1] <- (selectedArms[, k] & .selectTreatmentArms(k, overallEffects[, k],
-                            typeOfSelection, epsilonValue, rValue, threshold, selectArmsFunction,
-                            survival = TRUE
-                        ))
+                        selectArmsFunctionArgs$effectVector <- overallEffects[, k]
                     } else {
-                        selectedArms[, k + 1] <- (selectedArms[, k] & .selectTreatmentArms(k, 1 / overallEffects[, k],
-                            typeOfSelection, epsilonValue, rValue, 1 / threshold, selectArmsFunction,
-                            survival = TRUE
-                        ))
+                        selectArmsFunctionArgs$effectVector <- 1 / overallEffects[, k]
+                        args$threshold <- 1 / threshold
                     }
                 }
+
+                args$selectArmsFunctionArgs <- selectArmsFunctionArgs
+
+                selectedArms[, k + 1] <- (selectedArms[, k] & do.call(.selectTreatmentArms, args))
 
                 newEvents <- calcEventsFunction(
                     stage = k + 1, # to be consistent with non-multiarm situation, cf. line 38

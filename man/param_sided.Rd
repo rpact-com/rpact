@@ -4,7 +4,8 @@
 \alias{param_sided}
 \title{Parameter Description: Sided}
 \arguments{
-\item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. Must be a positive integer of length 1.}
+\item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}.
+Must be a positive integer of length 1.}
 }
 \description{
 Parameter Description: Sided

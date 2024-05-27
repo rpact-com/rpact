@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7823 $
+## |  Last changed: $Date: 2024-04-16 08:27:22 +0200 (Di, 16 Apr 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -847,7 +847,8 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
 
                 hazardRatioCalculationEnabled <- TRUE
                 if (all(is.na(self$pi1))) {
-                    if (length(self$hazardRatio) > 0 && !all(is.na(self$hazardRatio))) {
+                    if ((all(is.na(self$median1)) || all(is.na(self$median2))) && 
+                            length(self$hazardRatio) > 0 && !all(is.na(self$hazardRatio))) {
                         self$.setParameterType("hazardRatio", C_PARAM_USER_DEFINED)
                         hazardRatioCalculationEnabled <- FALSE
                     }
@@ -931,7 +932,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                         )
                     }
 
-                    if (!any(is.na(self$lambda1)) && !is.na(self$lambda2)) {
+                    if (!any(is.na(self$lambda1)) && !any(is.na(self$lambda2))) {
                         .logDebug(".init: calculate hazardRatio by lambda1 and lambda2")
                         self$hazardRatio <- (self$lambda1 / self$lambda2)^self$kappa
                         self$.setParameterType("hazardRatio", C_PARAM_GENERATED)
@@ -1163,10 +1164,12 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
         },
         .initHazardRatio = function() {
             .logDebug(".initHazardRatio")
-
+            
             if (!is.null(self$hazardRatio) && length(self$hazardRatio) > 0 && !all(is.na(self$hazardRatio))) {
                 if ((length(self$lambda1) == 1 && is.na(self$lambda1)) ||
-                        self$.getParameterType("lambda1") == C_PARAM_GENERATED) {
+                        (self$.getParameterType("lambda1") == C_PARAM_GENERATED &&
+                            (self$.getParameterType("median1") != C_PARAM_USER_DEFINED ||
+                                self$.getParameterType("median2") != C_PARAM_USER_DEFINED))) {
                     self$.setParameterType("hazardRatio", C_PARAM_USER_DEFINED)
                     return(invisible())
                 }

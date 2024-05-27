@@ -15,9 +15,9 @@
 ## |  
 ## |  File name: test-f_core_output_formats.R
 ## |  Creation date: 08 November 2023, 09:09:35
-## |  File version: $Revision: 7665 $
-## |  Last changed: $Date: 2024-02-23 17:33:46 +0100 (Fr, 23 Feb 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision$
+## |  Last changed: $Date$
+## |  Last changed by: $Author$
 ## |  
 
 test_plan_section("Testing the Output Format Functions")

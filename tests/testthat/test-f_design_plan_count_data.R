@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-f_design_plan_count_data.R
 ## |  Creation date: 16 January 2024, 11:26:11
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 7929 $
+## |  Last changed: $Date: 2024-05-26 13:03:06 +0200 (So, 26 Mai 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 test_plan_section("Testing the Sample Size Calculation of Count Data Designs for Different Designs and Arguments")
@@ -28,7 +28,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
 
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureSingleStage}
-    # @refFS[Formula]{fs:sampleSizePerStageFixedExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeFixedExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result1 <- getSampleSizeCounts(
         alpha = 0.01, beta = 0.05, lambda = 0.234, theta = 0.7,
@@ -74,7 +74,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result2 <- getSampleSizeCounts(
         alpha = 0.01, beta = 0.05, lambda = 0.234, theta = 0.7,
@@ -121,7 +121,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
 
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureSingleStage}
-    # @refFS[Formula]{fs:sampleSizePerStageFixedExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeFixedExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result3 <- getSampleSizeCounts(
         alpha = 0.01, beta = 0.05, lambda2 = 0.02, theta = c(0.7, 0.8),
@@ -165,7 +165,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result4 <- getSampleSizeCounts(
         alpha = 0.01, beta = 0.05, lambda1 = seq(1.05, 1.35, 0.15),
@@ -207,7 +207,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     expect_error(getSampleSizeCounts(
         alpha = 0.01, beta = 0.05, lambda1 = seq(1.35, 1.35, 0.15),
@@ -215,7 +215,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     ))
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result5 <- getSampleSizeCounts(
         alpha = 0.01, beta = 0.05, thetaH0 = 0.9, lambda1 = seq(1.1, 1.15, 0.05),
@@ -257,7 +257,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result6 <- getSampleSizeCounts(
         alpha = 0.01, beta = 0.05, theta = seq(1.05, 1.35, 0.15),
@@ -302,7 +302,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
 
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureSingleStage}
-    # @refFS[Formula]{fs:sampleSizePerStageFixedExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeFixedExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureOptimumAllocationRatio}
     result7 <- getSampleSizeCounts(
@@ -349,7 +349,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     # @refFS[Formula]{fs:sampleSizeCountsVariableExposureOptimumAllocationRatio}
     result8 <- getSampleSizeCounts(
@@ -406,7 +406,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
 
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureSingleStage}
-    # @refFS[Formula]{fs:sampleSizePerStageFixedExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeFixedExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result1 <- getSampleSizeCounts(
         design = designGS1, lambda = 0.234, theta = 0.7,
@@ -480,7 +480,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result2 <- getSampleSizeCounts(
         design = designGS1, lambda = 0.234, theta = 0.7,
@@ -555,7 +555,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
 
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureSingleStage}
-    # @refFS[Formula]{fs:sampleSizePerStageFixedExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeFixedExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result3 <- getSampleSizeCounts(
         design = designGS1, lambda2 = 0.02, theta = c(0.7, 0.8),
@@ -627,7 +627,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result4 <- getSampleSizeCounts(
         design = designGS1, lambda1 = seq(1.05, 1.35, 0.15),
@@ -693,7 +693,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result5 <- getSampleSizeCounts(
         design = designGS1, lambda1 = seq(1.05, 1.35, 0.15),
@@ -765,7 +765,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result6 <- getSampleSizeCounts(
         design = designGS1, thetaH0 = 0.9, lambda1 = seq(1.1, 1.15, 0.05),
@@ -831,7 +831,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result7 <- getSampleSizeCounts(
         design = designGS1, lambda1 = seq(1.05, 1.35, 0.15),
@@ -904,7 +904,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
 
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureSingleStage}
-    # @refFS[Formula]{fs:sampleSizePerStageFixedExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeFixedExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureOptimumAllocationRatio}
     result8 <- getSampleSizeCounts(
@@ -979,7 +979,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     # @refFS[Formula]{fs:sampleSizeCountsVariableExposureOptimumAllocationRatio}
     result9 <- getSampleSizeCounts(
@@ -1064,7 +1064,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
 
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureSingleStage}
-    # @refFS[Formula]{fs:sampleSizePerStageFixedExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeFixedExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result1 <- getSampleSizeCounts(
         design = designGS2, lambda = 0.234, theta = 0.7,
@@ -1130,7 +1130,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result2 <- getSampleSizeCounts(
         design = designGS2, lambda = 0.234, theta = 0.7,
@@ -1197,7 +1197,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
 
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureSingleStage}
-    # @refFS[Formula]{fs:sampleSizePerStageFixedExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeFixedExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result3 <- getSampleSizeCounts(
         design = designGS2, lambda2 = 0.02, theta = c(0.7, 0.8),
@@ -1261,7 +1261,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result4 <- getSampleSizeCounts(
         design = designGS2, lambda1 = seq(1.05, 1.35, 0.15),
@@ -1319,7 +1319,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result5 <- getSampleSizeCounts(
         design = designGS2, lambda1 = seq(1.05, 1.35, 0.15),
@@ -1383,7 +1383,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     result6 <- getSampleSizeCounts(
         design = designGS2, lambda1 = seq(1.05, 1.35, 0.15),
@@ -1448,7 +1448,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
 
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureSingleStage}
-    # @refFS[Formula]{fs:sampleSizePerStageFixedExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeFixedExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     # @refFS[Formula]{fs:sampleSizeCountsFixedExposureOptimumAllocationRatio}
     result7 <- getSampleSizeCounts(
@@ -1515,7 +1515,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     }
 
     # @refFS[Formula]{fs:FisherInfCounts}
-    # @refFS[Formula]{fs:sampleSizePerStageVariableExposureCounts}
+    # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
     # @refFS[Formula]{fs:sampleSizeCountsVariableExposureOptimumAllocationRatio}
     result8 <- getSampleSizeCounts(

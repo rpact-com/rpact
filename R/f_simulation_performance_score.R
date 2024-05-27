@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7905 $
+## |  Last changed: $Date: 2024-05-21 17:15:42 +0200 (Di, 21 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -178,10 +178,12 @@ getPerformanceScore <- function(simulationResult) {
         performanceScore$.setParameterType(paramName, C_PARAM_GENERATED)
     }
 
-    warning("The performance score function is experimental and hence not fully validated ",
-        "(see www.rpact.com/experimental)",
-        call. = FALSE
-    )
+    if (inherits(simulationResult, "SimulationResultsRates")) {
+        warning("The performance score function is experimental and hence not fully validated ",
+            "(see www.rpact.com/experimental)",
+            call. = FALSE
+        )
+    }
 
     return(performanceScore)
 }

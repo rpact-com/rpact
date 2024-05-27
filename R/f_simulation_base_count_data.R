@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7747 $
-## |  Last changed: $Date: 2024-03-25 17:58:00 +0100 (Mo, 25 Mrz 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7920 $
+## |  Last changed: $Date: 2024-05-23 13:56:24 +0200 (Do, 23 Mai 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 .getInformationCountData <- function(lambda1,
@@ -126,15 +126,6 @@
 #' \code{$show(showStatistics = FALSE)} or \code{$setShowStatistics(FALSE)} can be used to disable
 #' the output of the aggregated simulated data.\cr
 #'
-#' Example 1: \cr
-#' \code{simulationResults <- getSimulationRates(plannedSubjects = 40)} \cr
-#' \code{simulationResults$show(showStatistics = FALSE)}\cr
-#'
-#' Example 2: \cr
-#' \code{simulationResults <- getSimulationRates(plannedSubjects = 40)} \cr
-#' \code{simulationResults$setShowStatistics(FALSE)}\cr
-#' \code{simulationResults}\cr
-#'
 #' \code{\link[=getData]{getData()}} can be used to get the aggregated simulated data from the
 #' object as \code{\link[base]{data.frame}}. The data frame contains the following columns:
 #' \enumerate{
@@ -166,14 +157,12 @@
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #'
-#' @template examples_get_simulation_count_data
-#'
-#' @export
+#' @keywords internal
 #'
 getSimulationCounts <- function(design = NULL,
         ...,
         plannedCalendarTime,
-        maxNumberOfSubjects = NA_real_,
+        plannedMaxSubjects = NA_real_,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
         lambda = NA_real_,
@@ -225,7 +214,7 @@ getSimulationCounts <- function(design = NULL,
     sided <- design$sided
     sampleSizeEnabled <- FALSE
 
-    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
+    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, plannedMaxSubjects)
     .assertIsValidEffectCountData(
         sampleSizeEnabled, sided, lambda1, lambda2, lambda, theta,
         thetaH0, overdispersion
@@ -242,7 +231,7 @@ getSimulationCounts <- function(design = NULL,
         followUpTime = followUpTime,
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
-        maxNumberOfSubjects = maxNumberOfSubjects
+        maxNumberOfSubjects = plannedMaxSubjects
     )
     .assertAreValidCalendarTimes(plannedCalendarTime, kMax)
     if (any(is.na(accrualTime))) {
@@ -266,7 +255,7 @@ getSimulationCounts <- function(design = NULL,
     }
 
     .setValueAndParameterType(simulationResults, "plannedCalendarTime", plannedCalendarTime, NA_real_)
-    .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_, notApplicableIfNA = TRUE)
+    .setValueAndParameterType(simulationResults, "plannedMaxSubjects", plannedMaxSubjects, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "lambda1", lambda1, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "lambda2", lambda2, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "lambda", lambda, NA_real_, notApplicableIfNA = TRUE)
@@ -350,7 +339,7 @@ getSimulationCounts <- function(design = NULL,
             n2 <- length(recruit2)
             nTotal <- n1 + n2
         } else {
-            n2 <- maxNumberOfSubjects / (1 + allocationRatioPlanned)
+            n2 <- plannedMaxSubjects / (1 + allocationRatioPlanned)
             n1 <- allocationRatioPlanned * n2
             nTotal <- n1 + n2
             recruit1 <- seq(0, accrualTime, length.out = n1)
