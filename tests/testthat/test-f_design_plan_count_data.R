@@ -14,10 +14,10 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_design_plan_count_data.R
-## |  Creation date: 16 January 2024, 11:26:11
-## |  File version: $Revision: 7929 $
-## |  Last changed: $Date: 2024-05-26 13:03:06 +0200 (So, 26 Mai 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  Creation date: 28 May 2024, 09:45:32
+## |  File version: $Revision$
+## |  Last changed: $Date$
+## |  Last changed by: $Author$
 ## |
 
 test_plan_section("Testing the Sample Size Calculation of Count Data Designs for Different Designs and Arguments")
@@ -637,6 +637,8 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     ## Comparison of the results of TrialDesignPlanCountData object 'result4' with expected results
     expect_equal(result4$directionUpper, c(FALSE, FALSE, FALSE), label = paste0(result4$directionUpper))
     expect_equal(result4$theta, c(0.75, 0.85714286, 0.96428571), tolerance = 1e-07, label = paste0(result4$theta))
+    expect_equal(result4$maxNumberOfSubjects1, c(80, 80, 80), label = paste0(result4$maxNumberOfSubjects1))
+    expect_equal(result4$maxNumberOfSubjects2, c(20, 20, 20), label = paste0(result4$maxNumberOfSubjects2))
     expect_equal(result4$rejectPerStage[1, ], 0.19514116, tolerance = 1e-07, label = paste0(result4$rejectPerStage[1, ]))
     expect_equal(result4$rejectPerStage[2, ], 0.37204423, tolerance = 1e-07, label = paste0(result4$rejectPerStage[2, ]))
     expect_equal(result4$rejectPerStage[3, ], 0.33281461, tolerance = 1e-07, label = paste0(result4$rejectPerStage[3, ]))
@@ -669,6 +671,8 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         result4CodeBased <- eval(parse(text = getObjectRCode(result4, stringWrapParagraphWidth = NULL)))
         expect_equal(result4CodeBased$directionUpper, result4$directionUpper, tolerance = 1e-07)
         expect_equal(result4CodeBased$theta, result4$theta, tolerance = 1e-07)
+        expect_equal(result4CodeBased$maxNumberOfSubjects1, result4$maxNumberOfSubjects1, tolerance = 1e-07)
+        expect_equal(result4CodeBased$maxNumberOfSubjects2, result4$maxNumberOfSubjects2, tolerance = 1e-07)
         expect_equal(result4CodeBased$rejectPerStage, result4$rejectPerStage, tolerance = 1e-07)
         expect_equal(result4CodeBased$futilityStop, result4$futilityStop, tolerance = 1e-07)
         expect_equal(result4CodeBased$futilityPerStage, result4$futilityPerStage, tolerance = 1e-07)
@@ -775,6 +779,8 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     ## Comparison of the results of TrialDesignPlanCountData object 'result6' with expected results
     expect_equal(result6$directionUpper, c(FALSE, FALSE), label = paste0(result6$directionUpper))
     expect_equal(result6$theta, c(0.64705882, 0.67647059), tolerance = 1e-07, label = paste0(result6$theta))
+    expect_equal(result6$maxNumberOfSubjects1, c(150, 150), label = paste0(result6$maxNumberOfSubjects1))
+    expect_equal(result6$maxNumberOfSubjects2, c(150, 150), label = paste0(result6$maxNumberOfSubjects2))
     expect_equal(result6$rejectPerStage[1, ], 0.19514116, tolerance = 1e-07, label = paste0(result6$rejectPerStage[1, ]))
     expect_equal(result6$rejectPerStage[2, ], 0.37204423, tolerance = 1e-07, label = paste0(result6$rejectPerStage[2, ]))
     expect_equal(result6$rejectPerStage[3, ], 0.33281461, tolerance = 1e-07, label = paste0(result6$rejectPerStage[3, ]))
@@ -807,6 +813,8 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         result6CodeBased <- eval(parse(text = getObjectRCode(result6, stringWrapParagraphWidth = NULL)))
         expect_equal(result6CodeBased$directionUpper, result6$directionUpper, tolerance = 1e-07)
         expect_equal(result6CodeBased$theta, result6$theta, tolerance = 1e-07)
+        expect_equal(result6CodeBased$maxNumberOfSubjects1, result6$maxNumberOfSubjects1, tolerance = 1e-07)
+        expect_equal(result6CodeBased$maxNumberOfSubjects2, result6$maxNumberOfSubjects2, tolerance = 1e-07)
         expect_equal(result6CodeBased$rejectPerStage, result6$rejectPerStage, tolerance = 1e-07)
         expect_equal(result6CodeBased$futilityStop, result6$futilityStop, tolerance = 1e-07)
         expect_equal(result6CodeBased$futilityPerStage, result6$futilityPerStage, tolerance = 1e-07)
@@ -1215,7 +1223,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result3$rejectPerStage[3, ], 0.49132609, tolerance = 1e-07, label = paste0(result3$rejectPerStage[3, ]))
     expect_equal(result3$earlyStop, 0.30867391, tolerance = 1e-07, label = paste0(result3$earlyStop))
     expect_equal(result3$calendarTime[1, ], c(3.2316907, 3.2313779), tolerance = 1e-07, label = paste0(result3$calendarTime[1, ]))
-    expect_equal(result3$calendarTime[2, ], c(4.9818015, 4.9813797), tolerance = 1e-07, label = paste0(result3$calendarTime[2, ]))
+    expect_equal(result3$calendarTime[2, ], c(4.9818015, 4.9813796), tolerance = 1e-07, label = paste0(result3$calendarTime[2, ]))
     expect_equal(result3$calendarTime[3, ], c(9, 9), label = paste0(result3$calendarTime[3, ]))
     expect_equal(result3$expectedStudyDurationH1, c(7.7010947, 7.7009681), tolerance = 1e-07, label = paste0(result3$expectedStudyDurationH1))
     expect_equal(result3$numberOfSubjects[1, ], c(4348, 10310), label = paste0(result3$numberOfSubjects[1, ]))
@@ -1271,6 +1279,8 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     ## Comparison of the results of TrialDesignPlanCountData object 'result4' with expected results
     expect_equal(result4$directionUpper, c(FALSE, FALSE, FALSE), label = paste0(result4$directionUpper))
     expect_equal(result4$theta, c(0.75, 0.85714286, 0.96428571), tolerance = 1e-07, label = paste0(result4$theta))
+    expect_equal(result4$maxNumberOfSubjects1, c(80, 80, 80), label = paste0(result4$maxNumberOfSubjects1))
+    expect_equal(result4$maxNumberOfSubjects2, c(20, 20, 20), label = paste0(result4$maxNumberOfSubjects2))
     expect_equal(result4$rejectPerStage[1, ], 0.033479189, tolerance = 1e-07, label = paste0(result4$rejectPerStage[1, ]))
     expect_equal(result4$rejectPerStage[2, ], 0.27519472, tolerance = 1e-07, label = paste0(result4$rejectPerStage[2, ]))
     expect_equal(result4$rejectPerStage[3, ], 0.49132609, tolerance = 1e-07, label = paste0(result4$rejectPerStage[3, ]))
@@ -1298,6 +1308,8 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         result4CodeBased <- eval(parse(text = getObjectRCode(result4, stringWrapParagraphWidth = NULL)))
         expect_equal(result4CodeBased$directionUpper, result4$directionUpper, tolerance = 1e-07)
         expect_equal(result4CodeBased$theta, result4$theta, tolerance = 1e-07)
+        expect_equal(result4CodeBased$maxNumberOfSubjects1, result4$maxNumberOfSubjects1, tolerance = 1e-07)
+        expect_equal(result4CodeBased$maxNumberOfSubjects2, result4$maxNumberOfSubjects2, tolerance = 1e-07)
         expect_equal(result4CodeBased$rejectPerStage, result4$rejectPerStage, tolerance = 1e-07)
         expect_equal(result4CodeBased$earlyStop, result4$earlyStop, tolerance = 1e-07)
         expect_equal(result4CodeBased$calendarTime, result4$calendarTime, tolerance = 1e-07)
@@ -1535,9 +1547,9 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result8$rejectPerStage[3, ], 0.49132609, tolerance = 1e-07, label = paste0(result8$rejectPerStage[3, ]))
     expect_equal(result8$earlyStop, 0.30867391, tolerance = 1e-07, label = paste0(result8$earlyStop))
     expect_equal(result8$calendarTime[1, ], c(4.4478569, 4.4878996), tolerance = 1e-07, label = paste0(result8$calendarTime[1, ]))
-    expect_equal(result8$calendarTime[2, ], c(5.9668445, 5.9911665), tolerance = 1e-07, label = paste0(result8$calendarTime[2, ]))
+    expect_equal(result8$calendarTime[2, ], c(5.9668444, 5.9911665), tolerance = 1e-07, label = paste0(result8$calendarTime[2, ]))
     expect_equal(result8$calendarTime[3, ], c(8, 8), label = paste0(result8$calendarTime[3, ]))
-    expect_equal(result8$expectedStudyDurationH1, c(7.3215635, 7.3295973), tolerance = 1e-07, label = paste0(result8$expectedStudyDurationH1))
+    expect_equal(result8$expectedStudyDurationH1, c(7.3215634, 7.3295973), tolerance = 1e-07, label = paste0(result8$expectedStudyDurationH1))
     expect_equal(result8$numberOfSubjects[1, ], c(52, 1032), label = paste0(result8$numberOfSubjects[1, ]))
     expect_equal(result8$numberOfSubjects[2, ], c(69, 1378), label = paste0(result8$numberOfSubjects[2, ]))
     expect_equal(result8$numberOfSubjects[3, ], c(82, 1610), label = paste0(result8$numberOfSubjects[3, ]))

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7940 $
-## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
+## |  File version: $Revision: 7941 $
+## |  Last changed: $Date: 2024-05-28 08:44:36 +0200 (Di, 28 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2856,24 +2856,25 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         return(invisible(summaryFactory))
     }
     
-    informationRatesCaption <- ifelse(inherits(design, "TrialDesignGroupSequential"), 
-        "Planned information rate", "Fixed weight")
-
-    if (inherits(designPlan, "SimulationResults") || inherits(designPlan, "AnalysisResults")) {
-        if (.isTrialDesignFisher(design)) {
-            weights <- .getWeightsFisher(design)
-        } else if (.isTrialDesignInverseNormal(design)) {
-            weights <- .getWeightsInverseNormal(design)
-        } else {
-            weights <- design$informationRates
-        }
-        summaryFactory$addItem(informationRatesCaption, .getSummaryValuesInPercent(weights, FALSE))
+    informationRatesCaption <- "Planned information rate"
+    percentFormatEnabled <- TRUE
+    if (.isTrialDesignFisher(design)) {
+        weights <- .getWeightsFisher(design)
+        informationRatesCaption <- "Fixed weight"
+        percentFormatEnabled <- FALSE
+    } else if (.isTrialDesignInverseNormal(design)) {
+        weights <- .getWeightsInverseNormal(design)
+        informationRatesCaption <- "Fixed weight"
+        percentFormatEnabled <- FALSE
     } else {
-        summaryFactory$addItem(informationRatesCaption, .getSummaryValuesInPercent(design$informationRates))
+        weights <- design$informationRates
     }
+    summaryFactory$addItem(informationRatesCaption, 
+        .getSummaryValuesInPercent(weights, percentFormatEnabled = percentFormatEnabled))
 
     if (design$.isDelayedResponseDesign()) {
-        summaryFactory$addItem("Delayed information", .getSummaryValuesInPercent(design$delayedInformation, TRUE))
+        summaryFactory$addItem("Delayed information", 
+            .getSummaryValuesInPercent(design$delayedInformation, percentFormatEnabled = TRUE))
     }
 
     return(invisible(summaryFactory))

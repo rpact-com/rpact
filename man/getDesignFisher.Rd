@@ -41,8 +41,8 @@ alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 
 
 \item{informationRates}{The information rates t_1, ..., t_kMax (that must be fixed prior to the trial),
 default is \code{(1:kMax) / kMax}. For the weighted inverse normal design, the weights are derived
-through w_1 = sqrt(t_1), and w_k = sqrt(t_k - t_\link{k-1}). For the weighted Fisher's combination test, the
-weights (scales) are w_k = sqrt((t_k - t_\link{k-1}) / t_1) (see the documentation).}
+through w_1 = sqrt(t_1), and w_k = sqrt(t_k - t_(k-1)). For the weighted Fisher's combination test, the
+weights (scales) are w_k = sqrt((t_k - t_(k-1)) / t_1) (see the documentation).}
 
 \item{sided}{Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}.
 Must be a positive integer of length 1.}

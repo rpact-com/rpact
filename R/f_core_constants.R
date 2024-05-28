@@ -1075,16 +1075,6 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     parameterName <- .getParameterNameTrialDesign(parameterName, obj)
     
     pluralExt <- ifelse(tableOutputEnabled, "", "s")
-    
-    if (identical(parameterName, "informationRates") && 
-            (
-                .isTrialDesignInverseNormalOrFisher(obj) ||
-                ((inherits(obj, "TrialDesignPlan") || inherits(obj, "SimulationResults")) && 
-                .isTrialDesignInverseNormalOrFisher(obj[[".design"]]))
-            )
-        ) {
-        return(paste0("Fixed weight", pluralExt))
-    }
 
     if (identical(parameterName, "futilityBounds") &&
             inherits(obj, "TrialDesignSet") && length(obj$designs) > 1) {

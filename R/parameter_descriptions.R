@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7940 $
-## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
+## |  File version: $Revision: 7941 $
+## |  Last changed: $Date: 2024-05-28 08:44:36 +0200 (Di, 28 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -65,8 +65,8 @@ NULL
 #' Parameter Description: Information Rates
 #' @param informationRates The information rates t_1, ..., t_kMax (that must be fixed prior to the trial),
 #'   default is \code{(1:kMax) / kMax}. For the weighted inverse normal design, the weights are derived
-#'   through w_1 = sqrt(t_1), and w_k = sqrt(t_k - t_[k-1]). For the weighted Fisher's combination test, the 
-#'   weights (scales) are w_k = sqrt((t_k - t_[k-1]) / t_1) (see the documentation).
+#'   through w_1 = sqrt(t_1), and w_k = sqrt(t_k - t_(k-1)). For the weighted Fisher's combination test, the 
+#'   weights (scales) are w_k = sqrt((t_k - t_(k-1)) / t_1) (see the documentation).
 #' @name param_informationRates
 #' @keywords internal
 NULL
