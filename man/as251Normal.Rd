@@ -33,7 +33,7 @@ fourth derivative is used. If set to zero, error control based on halving interv
 }
 \description{
 Calculates the Multivariate Normal Distribution with Product Correlation Structure published
-by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 \doi{10.2307/2347754}.
+by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3, \doi{10.2307/2347754}.
 }
 \details{
 For a multivariate normal vector with correlation structure

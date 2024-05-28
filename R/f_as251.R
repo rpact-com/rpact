@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7947 $
+## |  Last changed: $Date: 2024-05-28 14:25:47 +0200 (Di, 28 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -36,7 +36,7 @@
 #'
 #' @description
 #' Calculates the Multivariate Normal Distribution with Product Correlation Structure published
-#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 \doi{10.2307/2347754}.
+#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3, \doi{10.2307/2347754}.
 #'
 #' @details
 #' This is a wrapper function for the original Fortran 77 code.
@@ -82,7 +82,7 @@ mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
 #'
 #' @description
 #' Calculates the Multivariate Normal Distribution with Product Correlation Structure published
-#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 \doi{10.2307/2347754}.
+#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3, \doi{10.2307/2347754}.
 #'
 #' @details
 #' For a multivariate normal vector with correlation structure
@@ -142,7 +142,7 @@ as251Normal <- function(lower, upper, sigma, ...,
 #'
 #' @description
 #' Calculates the Multivariate Normal Distribution with Product Correlation Structure published
-#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 \doi{10.2307/2347754}.
+#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3, \doi{10.2307/2347754}.
 #'
 #' @details
 #' This is a wrapper function for the original Fortran 77 code.
@@ -201,7 +201,7 @@ mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0)
 #'
 #' @description
 #' Calculates the Multivariate Normal Distribution with Product Correlation Structure published
-#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3 \doi{10.2307/2347754}.
+#' by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3, \doi{10.2307/2347754}.
 #'
 #' @details
 #' For a multivariate normal vector with correlation structure
