@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7940 $
-## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
+## |  File version: $Revision: 7953 $
+## |  Last changed: $Date: 2024-05-29 10:36:52 +0200 (Mi, 29 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -892,13 +892,16 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     hr <- self$hazardRatio
                 }
             }
+            
+            lambda2 <- self$.getParameterValueIfUserDefinedOrDefault("lambda2")
+            
             pi1Temp <- NA_real_
             if (self$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
                 pi1Temp <- pi1
                 if (any(is.na(pi1))) {
                     pi1Temp <- self$pi1
                 }
-            } else {
+            } else if (all(is.na(lambda2))) {
                 if (self$.objectType == "sampleSize") {
                     pi1Temp <- C_PI_1_SAMPLE_SIZE_DEFAULT 
                 } else {
@@ -929,7 +932,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     accrualIntensity = accrualIntensityTemp,
                     kappa = self$kappa,
                     piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
-                    lambda2 = self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
+                    lambda2 = lambda2,
                     lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
                     followUpTime = self$.getParameterValueIfUserDefinedOrDefault("followUpTime"),
                     maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
@@ -956,7 +959,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     accrualIntensity = accrualIntensityTemp,
                     kappa = self$kappa,
                     piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
-                    lambda2 = self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
+                    lambda2 = lambda2,
                     lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
                     hazardRatio = hr,
                     maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),

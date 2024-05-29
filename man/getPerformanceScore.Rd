@@ -24,8 +24,8 @@ and variation component (variationSampleSize, variationConditionalPower).
 The term conditional refers to an evaluation perspective where the interim results
 suggest a trial continuation with a second stage.
 The score can take values between 0 and 1. More details on the performance score
-can be found in \href{https://doi.org/10.1002/sim.8534}{Herrmann et al. (2020)} and
-\href{https://doi.org/10.1186/s12874-024-02150-4}{Bokelmann et al. (2024)}.
+can be found in Herrmann et al. (2020), \doi{10.1002/sim.8534} and
+Bokelmann et al. (2024) \doi{10.1186/s12874-024-02150-4}.
 }
 \examples{
 \dontrun{

@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_design_plan_means.R
 ## |  Creation date: 21 December 2023, 08:52:45
-## |  File version: $Revision: 7682 $
-## |  Last changed: $Date: 2024-03-05 07:53:40 +0100 (Di, 05 Mrz 2024) $
+## |  File version: $Revision: 7953 $
+## |  Last changed: $Date: 2024-05-29 10:36:52 +0200 (Mi, 29 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -40,6 +40,7 @@ test_that(".addPlotSubTitleItems function works as expected", {
 # Test case for .assertIsValidVariedParameterVectorForPlotting function
 test_that(".assertIsValidVariedParameterVectorForPlotting function works as expected", {
     .skipTestIfDisabled()
+    
     designPlan <- getDesignInverseNormal(
         typeOfDesign = "OF", kMax = 2, alpha =
             0.025, beta = 0.2, sided = 1, tolerance = 1e-08
@@ -53,6 +54,7 @@ test_that(".assertIsValidVariedParameterVectorForPlotting function works as expe
 # Test case for .getTrialDesignPlanTheta function
 test_that(".getTrialDesignPlanTheta function works as expected", {
     .skipTestIfDisabled()
+    
     survivalDesignPlanEnabled <- .isTrialDesignPlanSurvival(getDesignGroupSequential(
         informationRates = c(0.2, 0.5, 1), sided = 1,
         beta = 0.1, typeOfDesign = "WT", deltaWT = 0.3
@@ -176,16 +178,19 @@ test_that(".plotTrialDesignPlan function works as expected", {
 
 test_that(".getSurvivalFunctionPlotCommand works as intended", {
     .skipTestIfDisabled()
+    
     expect_error(.getSurvivalFunctionPlotCommand())
 })
 
 test_that(".plotSurvivalFunction works as intended", {
     .skipTestIfDisabled()
+    
     expect_error(.plotSurvivalFunction())
 })
 
-test_that("warnings works as intended", {
+test_that("The plot warning functions work as intended", {
     .skipTestIfDisabled()
+    
     expect_error(.warnInCaseOfUnusedValuesForPlottingMeans())
     expect_error(.warnInCaseOfUnusedValuesForPlottingRates())
     expect_error(.warnInCaseOfUnusedValuesForPlottingSurvival())
@@ -194,5 +199,43 @@ test_that("warnings works as intended", {
 
 test_that("plot.TrialDesignPlan works as intended", {
     .skipTestIfDisabled()
+    
     expect_error(plot.TrialDesignPlan())
+})
+
+test_that("The plot of a getPowerSurvival() result works as intended", {
+    .skipTestIfDisabled()
+    
+    design <- getDesignGroupSequential(
+        kMax = 3, typeOfDesign = "OF",
+        sided = 2, twoSidedPower = TRUE
+    )
+    piecewiseSurvivalTime <- list(
+        "<5" = 0.04,
+        "5 - <10" = 0.02,
+        ">= 10" = 0.008
+    )
+    powerSurvival <- getPowerSurvival(
+        design = design,
+        typeOfComputation = "Schoenfeld", thetaH0 = 1,
+        allocationRatioPlanned = 1, kappa = 1,
+        piecewiseSurvivalTime = piecewiseSurvivalTime,
+        maxNumberOfSubjects = 2480, maxNumberOfEvents = 70,
+        hazardRatio = c(0.5, 2)
+    )
+    expect_silent(plot(powerSurvival, type = 1))
+    expect_silent(plot(powerSurvival, type = 2))
+    expect_silent(plot(powerSurvival, type = 12))
+    
+    powerSurvival2 <- getPowerSurvival(
+        design = design,
+        typeOfComputation = "Schoenfeld", thetaH0 = 1,
+        allocationRatioPlanned = 1, kappa = 1,
+        piecewiseSurvivalTime = piecewiseSurvivalTime,
+        maxNumberOfSubjects = 2480, maxNumberOfEvents = 70,
+        hazardRatio = 0.5
+    )
+    
+    expect_silent(plot(powerSurvival2, type = 13, legendPosition = 1))
+    expect_silent(plot(powerSurvival2, type = 14, legendPosition = 5))
 })
