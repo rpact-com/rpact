@@ -5,8 +5,11 @@
 \title{Parameter Description: Select Arms Function}
 \arguments{
 \item{selectArmsFunction}{Optionally, a function can be entered that defines the way of how treatment arms
-are selected. This function is allowed to depend on \code{effectVector} with length \code{activeArms}
-and \code{stage} (see examples).}
+are selected. This function is allowed to depend on \code{effectVector} with length \code{activeArms},
+\code{stage}, \code{"conditionalPower"}, \code{"conditionalCriticalValue"}, \code{"plannedSubjects/plannedEvents"},
+\code{"allocationRatioPlanned"}, \code{"selectedArms"}, \code{"thetaH1"} (for means and survival), \code{"stDevH1"} (for means),
+\code{"overallEffects"}, and for rates additionally: \code{"piTreatmentsH1"}, \code{"piControlH1"}, \code{"overallRates"}, and
+\code{"overallRatesControl"}.}
 }
 \description{
 Parameter Description: Select Arms Function

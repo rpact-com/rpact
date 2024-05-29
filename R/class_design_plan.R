@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7750 $
-## |  Last changed: $Date: 2024-03-26 15:44:44 +0100 (Di, 26 Mrz 2024) $
+## |  File version: $Revision: 7940 $
+## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -898,16 +898,23 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                 if (any(is.na(pi1))) {
                     pi1Temp <- self$pi1
                 }
+            } else {
+                if (self$.objectType == "sampleSize") {
+                    pi1Temp <- C_PI_1_SAMPLE_SIZE_DEFAULT 
+                } else {
+                    pi1Temp <- C_PI_1_DEFAULT
+                }
             }
             accrualTimeTemp <- self$.getParameterValueIfUserDefinedOrDefault("accrualTime")
             if (!is.null(accrualTimeTemp) && length(accrualTimeTemp) > 0 &&
-                    !all(is.na(accrualTimeTemp)) && accrualTimeTemp[1] != 0) {
-                accrualTimeTemp <- c(0, accrualTimeTemp)
+                    !all(is.na(accrualTimeTemp)) && accrualTimeTemp[1] != 0L) {
+                accrualTimeTemp <- c(0L, as.integer(accrualTimeTemp))
             }
             accrualIntensityTemp <- self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity")
             if (all(is.na(accrualIntensityTemp))) {
                 accrualIntensityTemp <- C_ACCRUAL_INTENSITY_DEFAULT
             }
+            
             if (self$.objectType == "sampleSize") {
                 return(getSampleSizeSurvival(
                     design = self$.design,
@@ -917,7 +924,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
                     allocationRatioPlanned = self$allocationRatioPlanned,
                     accountForObservationTimes = self$.getParameterValueIfUserDefinedOrDefault("accountForObservationTimes"),
-                    eventTime = self$eventTime,
+                    eventTime = ifelse(all(is.na(self$eventTime)), C_EVENT_TIME_DEFAULT, self$eventTime),
                     accrualTime = accrualTimeTemp,
                     accrualIntensity = accrualIntensityTemp,
                     kappa = self$kappa,
@@ -944,7 +951,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
                     directionUpper = directionUpperTemp,
                     allocationRatioPlanned = self$allocationRatioPlanned,
-                    eventTime = self$eventTime,
+                    eventTime = ifelse(all(is.na(self$eventTime)), C_EVENT_TIME_DEFAULT, self$eventTime),
                     accrualTime = accrualTimeTemp,
                     accrualIntensity = accrualIntensityTemp,
                     kappa = self$kappa,

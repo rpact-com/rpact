@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7747 $
-## |  Last changed: $Date: 2024-03-25 17:58:00 +0100 (Mo, 25 Mrz 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 7941 $
+## |  Last changed: $Date: 2024-05-28 08:44:36 +0200 (Di, 28 Mai 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' Parameter Description: "..."
@@ -56,14 +56,17 @@ NULL
 NULL
 
 #' Parameter Description: Sided
-#' @param sided Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. Must be a positive integer of length 1.
+#' @param sided Is the alternative one-sided (\code{1}) or two-sided (\code{2}), default is \code{1}. 
+#'    Must be a positive integer of length 1.
 #' @name param_sided
 #' @keywords internal
 NULL
 
 #' Parameter Description: Information Rates
-#' @param informationRates The information rates (that must be fixed prior to the trial),
-#'   default is \code{(1:kMax) / kMax}.
+#' @param informationRates The information rates t_1, ..., t_kMax (that must be fixed prior to the trial),
+#'   default is \code{(1:kMax) / kMax}. For the weighted inverse normal design, the weights are derived
+#'   through w_1 = sqrt(t_1), and w_k = sqrt(t_k - t_(k-1)). For the weighted Fisher's combination test, the 
+#'   weights (scales) are w_k = sqrt((t_k - t_(k-1)) / t_1) (see the documentation).
 #' @name param_informationRates
 #' @keywords internal
 NULL
@@ -815,8 +818,11 @@ NULL
 
 #' Parameter Description: Select Arms Function
 #' @param selectArmsFunction Optionally, a function can be entered that defines the way of how treatment arms
-#' are selected. This function is allowed to depend on \code{effectVector} with length \code{activeArms}
-#' and \code{stage} (see examples).
+#' are selected. This function is allowed to depend on \code{effectVector} with length \code{activeArms}, 
+#' \code{stage}, \code{"conditionalPower"}, \code{"conditionalCriticalValue"}, \code{"plannedSubjects/plannedEvents"}, 
+#' \code{"allocationRatioPlanned"}, \code{"selectedArms"}, \code{"thetaH1"} (for means and survival), \code{"stDevH1"} (for means), 
+#' \code{"overallEffects"}, and for rates additionally: \code{"piTreatmentsH1"}, \code{"piControlH1"}, \code{"overallRates"}, and 
+#' \code{"overallRatesControl"}. 
 #' @name param_selectArmsFunction
 #' @keywords internal
 NULL
@@ -824,7 +830,10 @@ NULL
 #' Parameter Description: Select Populations Function
 #' @param selectPopulationsFunction Optionally, a function can be entered that defines the way of how populations
 #' are selected. This function is allowed to depend on \code{effectVector} with length \code{populations}
-#' and \code{stage} (see examples).
+#' \code{stage}, \code{"conditionalPower"}, \code{"conditionalCriticalValue"}, \code{"plannedSubjects/plannedEvents"}, 
+#' \code{"allocationRatioPlanned"}, \code{"selectedPopulations"}, \code{"thetaH1"} (for means and survival), \code{"stDevH1"} (for means), 
+#' \code{"overallEffects"}, and for rates additionally: \code{"piTreatmentsH1"}, \code{"piControlH1"}, \code{"overallRates"}, and 
+#' \code{"overallRatesControl"}. 
 #' @name param_selectPopulationsFunction
 #' @keywords internal
 NULL

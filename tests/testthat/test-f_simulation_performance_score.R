@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_performance_score.R
 ## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7905 $
+## |  Last changed: $Date: 2024-05-21 17:15:42 +0200 (Di, 21 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -71,13 +71,6 @@ test_that("getPerformanceScore handles SimulationResultsMeans", {
     )
 })
 
-# Test for a simulationResult that does not have `bindingFutility = TRUE`
-test_that("getPerformanceScore handles non-binding futility", {
-    simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
-    simulationResult$.design$bindingFutility <- FALSE
-    expect_warning(getPerformanceScore(simulationResult))
-})
-
 # Test for a simulationResult that does not have `kMax = 2`
 test_that("getPerformanceScore handles non-two-stage designs", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
@@ -100,15 +93,6 @@ test_that("getPerformanceScore calculates performance score correctly", {
     simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
     suppressWarnings(scores <- getPerformanceScore(simulationResult))
     expect_type(scores, "environment")
-})
-
-# Test to verify that the warning about the function being experimental is issued
-test_that("getPerformanceScore issues warning", {
-    simulationResult <- createCorrectSimulationResultObject("SimulationResultsMeans")
-    expect_warning(
-        getPerformanceScore(simulationResult),
-        "The performance score function is experimental and hence not fully validated"
-    )
 })
 
 # Test to check if the correct values are returned 

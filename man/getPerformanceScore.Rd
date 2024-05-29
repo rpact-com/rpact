@@ -11,8 +11,8 @@ getPerformanceScore(simulationResult)
 }
 \description{
 Calculates the conditional performance score, its sub-scores and components according to
-\href{https://doi.org/10.1002/sim.8534}{Herrmann et al. (2020)} and
-\href{https://doi.org/10.1186/s12874-024-02150-4}{Bokelmann et al. (2024)} for a given
+(Herrmann et al. (2020), \doi{10.1002/sim.8534}) and
+(Bokelmann et al. (2024), \doi{10.1186/s12874-024-02150-4}) for a given
 simulation result from a two-stage design with continuous or binary endpoint.
 Larger (sub-)score and component values refer to a better performance.
 }

@@ -15,9 +15,9 @@
 ## |  
 ## |  File name: test-f_simulation_enrichment_survival.R
 ## |  Creation date: 08 November 2023, 09:11:32
-## |  File version: $Revision: 7662 $
-## |  Last changed: $Date: 2024-02-23 12:42:26 +0100 (Fr, 23 Feb 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision$
+## |  Last changed: $Date$
+## |  Last changed by: $Author$
 ## |  
 
 test_plan_section("Testing Simulation Enrichment Survival Function")

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7383 $
-## |  Last changed: $Date: 2023-11-02 15:18:21 +0100 (Do, 02 Nov 2023) $
+## |  File version: $Revision: 7910 $
+## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -273,17 +273,34 @@ NULL
             }
 
             if (adaptations[k]) {
+                selectPopulationsFunctionArgs <- list(
+                    effectVector = NULL,
+                    stage = k,
+                    conditionalPower = conditionalPower,
+                    conditionalCriticalValue = conditionalCriticalValue,
+                    plannedSubjects = plannedSubjects,
+                    allocationRatioPlanned = allocationRatioPlanned,
+                    selectedPopulations = selectedPopulations,
+                    thetaH1 = thetaH1,
+                    stDevH1 = stDevH1,
+                    overallEffects = overallEffects
+                )
                 if (effectMeasure == "testStatistic") {
-                    selectedPopulations[, k + 1] <- (selectedPopulations[, k] & .selectPopulations(
-                        k, overallTestStatistics[, k],
-                        typeOfSelection, epsilonValue, rValue, threshold, selectPopulationsFunction
-                    ))
+                    selectPopulationsFunctionArgs$effectVector <- overallTestStatistics[, k]
                 } else if (effectMeasure == "effectEstimate") {
-                    selectedPopulations[, k + 1] <- (selectedPopulations[, k] & .selectPopulations(
-                        k, overallEffects[, k],
-                        typeOfSelection, epsilonValue, rValue, threshold, selectPopulationsFunction
-                    ))
+                    selectPopulationsFunctionArgs$effectVector <- overallEffects[, k]
                 }
+
+                args <- list(
+                    typeOfSelection = typeOfSelection,
+                    epsilonValue = epsilonValue,
+                    rValue = rValue,
+                    threshold = threshold,
+                    selectPopulationsFunction = selectPopulationsFunction,
+                    selectPopulationsFunctionArgs = selectPopulationsFunctionArgs
+                )
+
+                selectedPopulations[, k + 1] <- (selectedPopulations[, k] & do.call(.selectPopulations, args))
 
                 newSubjects <- calcSubjectsFunction(
                     stage = k + 1, # to be consistent with non-enrichment situation, cf. line 36

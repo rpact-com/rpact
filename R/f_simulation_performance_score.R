@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7947 $
+## |  Last changed: $Date: 2024-05-28 14:25:47 +0200 (Di, 28 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -24,8 +24,8 @@
 #'
 #' @description
 #' Calculates the conditional performance score, its sub-scores and components according to
-#' [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) and
-#' [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4) for a given
+#' (Herrmann et al. (2020), \doi{10.1002/sim.8534}) and
+#' (Bokelmann et al. (2024), \doi{10.1186/s12874-024-02150-4}) for a given
 #' simulation result from a two-stage design with continuous or binary endpoint.
 #' Larger (sub-)score and component values refer to a better performance.
 #'
@@ -178,10 +178,12 @@ getPerformanceScore <- function(simulationResult) {
         performanceScore$.setParameterType(paramName, C_PARAM_GENERATED)
     }
 
-    warning("The performance score function is experimental and hence not fully validated ",
-        "(see www.rpact.com/experimental)",
-        call. = FALSE
-    )
+    if (inherits(simulationResult, "SimulationResultsRates")) {
+        warning("The performance score function is experimental and hence not fully validated ",
+            "(see www.rpact.com/experimental)",
+            call. = FALSE
+        )
+    }
 
     return(performanceScore)
 }

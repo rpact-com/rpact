@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_input_validation.R
 ## |  Creation date: 08 November 2023, 08:56:03
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7928 $
+## |  Last changed: $Date: 2024-05-23 16:35:16 +0200 (Do, 23 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -79,7 +79,7 @@ test_that("Errors and warnings for calculation of analysis results with dataset 
 	    design = design1, dataInput = dataExample4,
 	    intersectionTest = "Simes", varianceOption = "notPooled", nPlanned = 20
 	))
-	expect_warning(getAnalysisResults(
+    expect_warning(getAnalysisResults(
 	    design = design1, dataInput = dataExample4,
 	    intersectionTest = "Simes", varianceOption = "notPooled", nPlanned = c()
 	))

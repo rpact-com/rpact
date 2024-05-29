@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7910 $
+## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -69,9 +69,13 @@ NULL
     return(selectedVector)
 }
 
-
-.selectPopulations <- function(stage, effectVector, typeOfSelection,
-        epsilonValue, rValue, threshold, selectPopulationsFunction) {
+.selectPopulations <- function(typeOfSelection,
+        epsilonValue,
+        rValue,
+        threshold,
+        selectPopulationsFunction,
+        selectPopulationsFunctionArgs) {
+    effectVector <- selectPopulationsFunctionArgs$effectVector
     gMax <- length(effectVector)
 
     if (typeOfSelection != "userDefined") {
@@ -92,26 +96,20 @@ NULL
         selectedPopulations[effectVector <= threshold] <- FALSE
     } else {
         functionArgumentNames <- .getFunctionArgumentNames(selectPopulationsFunction, ignoreThreeDots = TRUE)
-        if (length(functionArgumentNames) == 1) {
-            .assertIsValidFunction(
-                fun = selectPopulationsFunction,
-                funArgName = "selectPopulationsFunction",
-                expectedArguments = c("effectVector"), validateThreeDots = FALSE
-            )
-            selectedPopulations <- selectPopulationsFunction(effectVector)
-        } else {
-            .assertIsValidFunction(
-                fun = selectPopulationsFunction,
-                funArgName = "selectPopulationsFunction",
-                expectedArguments = c("effectVector", "stage"), validateThreeDots = FALSE
-            )
-            selectedPopulations <- selectPopulationsFunction(effectVector = effectVector, stage = stage)
-        }
+        .assertIsValidFunction(
+            fun = selectPopulationsFunction,
+            funArgName = "selectPopulationsFunction",
+            expectedArguments = names(selectPopulationsFunctionArgs),
+            validateThreeDots = FALSE
+        )
+        selectedPopulations <- do.call(what = selectPopulationsFunction, 
+            args = selectPopulationsFunctionArgs[functionArgumentNames])
         selectedPopulations[is.na(effectVector)] <- FALSE
 
         msg <- paste0(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'selectPopulationsFunction' returned an illegal or undefined result (", .arrayToString(selectedPopulations), "); "
+            "'selectPopulationsFunction' returned an illegal or undefined result (", 
+            .arrayToString(selectedPopulations), "); "
         )
         if (length(selectedPopulations) != gMax) {
             stop(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")")
@@ -726,8 +724,6 @@ NULL
     .setValueAndParameterType(simulationResults, "typeOfSelection", typeOfSelection, C_TYPE_OF_SELECTION_DEFAULT)
     .setValueAndParameterType(simulationResults, "successCriterion", successCriterion, C_SUCCESS_CRITERION_DEFAULT)
     .setValueAndParameterType(simulationResults, "effectMeasure", effectMeasure, C_EFFECT_MEASURE_DEFAULT)
-
-    warning("Simulation of enrichment designs is experimental and hence not fully validated (see www.rpact.com/experimental)", call. = FALSE)
 
     return(simulationResults)
 }

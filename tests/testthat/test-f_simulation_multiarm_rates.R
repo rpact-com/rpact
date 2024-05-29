@@ -1424,7 +1424,7 @@ test_that("'getSimulationMultiArmRates': using selectArmsFunction", {
     # @refFS[Formula]{fs:simulationMultiArmSelections}
     # @refFS[Formula]{fs:multiarmRejectionRule}
     # @refFS[Formula]{fs:adjustedPValueSubsetDunnett}
-    selectArmsFunctionSimulationMultiArmRates <- function(effectSizes) {
+    selectArmsFunctionSimulationMultiArmRates <- function(effectVector) {
         return(c(TRUE, FALSE, FALSE, FALSE))
     }
 

@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_analysis_multiarm_means.R
 ## |  Creation date: 08 November 2023, 08:56:03
-## |  File version: $Revision: 7682 $
-## |  Last changed: $Date: 2024-03-05 07:53:40 +0100 (Di, 05 Mrz 2024) $
+## |  File version: $Revision: 7928 $
+## |  Last changed: $Date: 2024-05-23 16:35:16 +0200 (Do, 23 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2821,7 +2821,7 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
     expect_equal(results41$assumedStDevs[1, ], 22.357668, tolerance = 1e-06, label = paste0("c(", paste0(results41$assumedStDevs[1, ], collapse = ", "), ")"))
     expect_equal(results41$assumedStDevs[2, ], NA_real_, label = paste0("c(", paste0(results41$assumedStDevs[2, ], collapse = ", "), ")"))
     expect_equal(results41$assumedStDevs[3, ], 22.943518, tolerance = 1e-06, label = paste0("c(", paste0(results41$assumedStDevs[3, ], collapse = ", "), ")"))
-    expect_equal(results41$conditionalRejectionProbabilities[1, ], c(NA_real_, 0.061352937), tolerance = 1e-05, label = paste0("c(", paste0(results41$conditionalRejectionProbabilities[1, ], collapse = ", "), ")"))
+    expect_equal(results41$conditionalRejectionProbabilities[1, ], c(NA_real_, 0.061352937), tolerance = 1e-06, label = paste0("c(", paste0(results41$conditionalRejectionProbabilities[1, ], collapse = ", "), ")"))
     expect_equal(results41$conditionalRejectionProbabilities[2, ], c(NA_real_, 0.03744742), tolerance = 1e-06, label = paste0("c(", paste0(results41$conditionalRejectionProbabilities[2, ], collapse = ", "), ")"))
     expect_equal(results41$conditionalRejectionProbabilities[3, ], c(NA_real_, 0.086511764), tolerance = 1e-06, label = paste0("c(", paste0(results41$conditionalRejectionProbabilities[3, ], collapse = ", "), ")"))
     expect_equal(results41$conditionalPower[1, ], c(NA_real_, NA_real_), label = paste0("c(", paste0(results41$conditionalPower[1, ], collapse = ", "), ")"))
@@ -5609,7 +5609,7 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
     expect_equal(results82$assumedStDevs[1, ], 22.357668, tolerance = 1e-06, label = paste0("c(", paste0(results82$assumedStDevs[1, ], collapse = ", "), ")"))
     expect_equal(results82$assumedStDevs[2, ], NA_real_, label = paste0("c(", paste0(results82$assumedStDevs[2, ], collapse = ", "), ")"))
     expect_equal(results82$assumedStDevs[3, ], 22.943518, tolerance = 1e-06, label = paste0("c(", paste0(results82$assumedStDevs[3, ], collapse = ", "), ")"))
-    expect_equal(results82$conditionalRejectionProbabilities[1, ], c(NA_real_, 0.061352937), tolerance = 1e-05, label = paste0("c(", paste0(results82$conditionalRejectionProbabilities[1, ], collapse = ", "), ")"))
+    expect_equal(results82$conditionalRejectionProbabilities[1, ], c(NA_real_, 0.061352937), tolerance = 1e-06, label = paste0("c(", paste0(results82$conditionalRejectionProbabilities[1, ], collapse = ", "), ")"))
     expect_equal(results82$conditionalRejectionProbabilities[2, ], c(NA_real_, 0.03744742), tolerance = 1e-06, label = paste0("c(", paste0(results82$conditionalRejectionProbabilities[2, ], collapse = ", "), ")"))
     expect_equal(results82$conditionalRejectionProbabilities[3, ], c(NA_real_, 0.086511764), tolerance = 1e-06, label = paste0("c(", paste0(results82$conditionalRejectionProbabilities[3, ], collapse = ", "), ")"))
     expect_equal(results82$conditionalPower[1, ], c(NA_real_, NA_real_), label = paste0("c(", paste0(results82$conditionalPower[1, ], collapse = ", "), ")"))

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7383 $
-## |  Last changed: $Date: 2023-11-02 15:18:21 +0100 (Do, 02 Nov 2023) $
+## |  File version: $Revision: 7910 $
+## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -190,17 +190,38 @@ NULL
             }
 
             if (adaptations[k]) {
+                selectArmsFunctionArgs <- list(
+                    effectVector = NULL,
+                    stage = k,
+                    directionUpper = directionUpper,
+                    conditionalPower = conditionalPower,
+                    conditionalCriticalValue = conditionalCriticalValue,
+                    plannedSubjects = plannedSubjects,
+                    allocationRatioPlanned = allocationRatioPlanned,
+                    selectedArms = selectedArms,
+                    piTreatmentsH1 = piTreatmentsH1,
+                    piControlH1 = piControlH1,
+                    overallRates = overallRates,
+                    overallRatesControl = overallRatesControl
+                )
+
                 if (effectMeasure == "testStatistic") {
-                    selectedArms[, k + 1] <- (selectedArms[, k] & .selectTreatmentArms(
-                        k, overallTestStatistics[, k] + runif(gMax, -1e-05, 1e-05),
-                        typeOfSelection, epsilonValue, rValue, threshold, selectArmsFunction
-                    ))
+                    selectArmsFunctionArgs$effectVector <- overallTestStatistics[, k] + runif(gMax, -1e-05, 1e-05)
                 } else if (effectMeasure == "effectEstimate") {
-                    selectedArms[, k + 1] <- (selectedArms[, k] & .selectTreatmentArms(
-                        k, overallEffectSizes[, k] + runif(gMax, -1e-05, 1e-05),
-                        typeOfSelection, epsilonValue, rValue, threshold, selectArmsFunction
-                    ))
+                    selectArmsFunctionArgs$effectVector <- overallEffectSizes[, k] + runif(gMax, -1e-05, 1e-05)
                 }
+
+                args <- list(
+                    typeOfSelection = typeOfSelection,
+                    epsilonValue = epsilonValue,
+                    rValue = rValue,
+                    threshold = threshold,
+                    selectArmsFunction = selectArmsFunction,
+                    selectArmsFunctionArgs = selectArmsFunctionArgs,
+                    survival = FALSE
+                )
+
+                selectedArms[, k + 1] <- (selectedArms[, k] & do.call(.selectTreatmentArms, args))
 
                 newSubjects <- calcSubjectsFunction(
                     stage = k + 1, # to be consistent with non-multiarm situation, cf. line 39

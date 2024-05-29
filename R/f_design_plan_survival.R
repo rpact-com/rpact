@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7902 $
+## |  Last changed: $Date: 2024-05-21 08:44:08 +0200 (Di, 21 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2067,6 +2067,13 @@ getSampleSizeSurvival <- function(design = NULL, ...,
             accrualSetup$followUpTimeMustBeUserDefined) {
         if (is.na(followUpTime)) {
             if (accrualSetup$piecewiseAccrualEnabled && !accrualSetup$endOfAccrualIsUserDefined) {
+                if (length(accrualIntensity) + 1 < length(accrualTime)) {
+                  stop(
+                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+                    "length of 'accrualTime' (", length(accrualTime), ") must be greater ",
+                    "than length of 'accrualIntensity' (", length(accrualIntensity), ") + 1"
+                  )
+                }             
                 stop(
                     C_EXCEPTION_TYPE_MISSING_ARGUMENT,
                     "'followUpTime', 'maxNumberOfSubjects' or end of accrual must be defined"

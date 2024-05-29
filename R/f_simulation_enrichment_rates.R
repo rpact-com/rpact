@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7910 $
+## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -169,7 +169,6 @@ NULL
             round(subjectsPerStage[selsubs, k] / (1 + const)), piControls[selsubs]
         )
 
-
         if (gMax == 1) {
             rm <- (simEventsControl[1, k] + simEventsTreatment[1, k]) / subjectsPerStage[1, k]
             if (rm <= 0 || rm >= 1) {
@@ -195,6 +194,7 @@ NULL
                     sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[1, 1:k]) * const / (1 + const)^2)
             }
         } else if (gMax == 2) {
+            
             # Population S1
             rm <- (simEventsControl[1, k] + simEventsTreatment[1, k]) / subjectsPerStage[1, k]
             if (!is.na(rm)) {
@@ -223,6 +223,7 @@ NULL
                         sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[1, 1:k]) * const / (1 + const)^2)
                 }
             }
+            
             # Full population
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[1:2, k] + simEventsTreatment[1:2, k]) / subjectsPerStage[1:2, k]
@@ -271,6 +272,7 @@ NULL
                 }
             }
         } else if (gMax == 3) {
+            
             # Population S1
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[c(1, 3), k] + simEventsTreatment[c(1, 3), k]) / subjectsPerStage[c(1, 3), k]
@@ -318,6 +320,7 @@ NULL
                         sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(1, 3), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
+            
             # Population S2
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[c(2, 3), k] + simEventsTreatment[c(2, 3), k]) / subjectsPerStage[c(2, 3), k]
@@ -365,6 +368,7 @@ NULL
                         sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(2, 3), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
+            
             # Full population
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[1:4, k] + simEventsTreatment[1:4, k]) / subjectsPerStage[1:4, k]
@@ -413,6 +417,7 @@ NULL
                 }
             }
         } else if (gMax == 4) {
+            
             # Population S1
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[c(1, 4, 5, 7), k] + simEventsTreatment[c(1, 4, 5, 7), k]) / subjectsPerStage[c(1, 4, 5, 7), k]
@@ -460,6 +465,7 @@ NULL
                         sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(1, 4, 5, 7), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
+            
             # Population S2
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[c(2, 4, 6, 7), k] + simEventsTreatment[c(2, 4, 6, 7), k]) / subjectsPerStage[c(2, 4, 6, 7), k]
@@ -507,6 +513,7 @@ NULL
                         sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(2, 4, 6, 7), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
+            
             # Population S3
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[c(3, 5, 6, 7), k] + simEventsTreatment[c(3, 5, 6, 7), k]) / subjectsPerStage[c(3, 5, 6, 7), k]
@@ -554,6 +561,7 @@ NULL
                         sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(3, 5, 6, 7), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
+            
             # Full population
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[1:8, k] + simEventsTreatment[1:8, k]) / subjectsPerStage[1:8, k]
@@ -633,19 +641,36 @@ NULL
             }
 
             if (adaptations[k]) {
+                selectPopulationsFunctionArgs <- list(
+                    effectVector = NULL,
+                    stage = k,
+                    directionUpper = directionUpper,
+                    conditionalPower = conditionalPower,
+                    conditionalCriticalValue = conditionalCriticalValue,
+                    plannedSubjects = plannedSubjects,
+                    allocationRatioPlanned = allocationRatioPlanned,
+                    selectedPopulations = selectedPopulations,
+                    piTreatmentH1 = piTreatmentH1,
+                    piControlH1 = piControlH1,
+                    overallRatesTreatment = overallRatesTreatment,
+                    overallRatesControl = overallRatesControl
+                )
                 if (effectMeasure == "testStatistic") {
-                    selectedPopulations[, k + 1] <- (selectedPopulations[, k] &
-                        .selectPopulations(
-                            k, overallTestStatistics[, k] + runif(gMax, -1e-05, 1e-05),
-                            typeOfSelection, epsilonValue, rValue, threshold, selectPopulationsFunction
-                        ))
+                    selectPopulationsFunctionArgs$effectVector <- overallTestStatistics[, k] + runif(gMax, -1e-05, 1e-05)
                 } else if (effectMeasure == "effectEstimate") {
-                    selectedPopulations[, k + 1] <- (selectedPopulations[, k] &
-                        .selectPopulations(
-                            k, overallEffectSizes[, k] + runif(gMax, -1e-05, 1e-05),
-                            typeOfSelection, epsilonValue, rValue, threshold, selectPopulationsFunction
-                        ))
+                    selectPopulationsFunctionArgs$effectVector <- overallEffectSizes[, k] + runif(gMax, -1e-05, 1e-05)
                 }
+
+                args <- list(
+                    typeOfSelection = typeOfSelection,
+                    epsilonValue = epsilonValue,
+                    rValue = rValue,
+                    threshold = threshold,
+                    selectPopulationsFunction = selectPopulationsFunction,
+                    selectPopulationsFunctionArgs = selectPopulationsFunctionArgs
+                )
+
+                selectedPopulations[, k + 1] <- (selectedPopulations[, k] & do.call(.selectPopulations, args))
 
                 newSubjects <- calcSubjectsFunction(
                     stage = k + 1, # to be consistent with non-enrichment situation, cf. line 40

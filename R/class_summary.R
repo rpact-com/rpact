@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7763 $
-## |  Last changed: $Date: 2024-03-28 14:35:29 +0100 (Do, 28 Mrz 2024) $
+## |  File version: $Revision: 7946 $
+## |  Last changed: $Date: 2024-05-28 12:08:57 +0200 (Di, 28 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -123,7 +123,7 @@ knit_print.SummaryFactory <- function(x, ...) {
             paste0(utils::capture.output(x$object$.catMarkdownText()), collapse = "\n")
         )
     }
-    
+
     if (isTRUE(x[["markdown"]])) {
         sep <- "\n-----\n\n"
         result <- paste0(sep, result)
@@ -2190,11 +2190,14 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             ))
         }
         if (!is.null(designPlan[["followUpTime"]]) &&
-                designPlan$.getParameterType("followUpTime") == C_PARAM_USER_DEFINED &&
+                designPlan$.getParameterType("followUpTime") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE) &&
                 length(designPlan$followUpTime) == 1 &&
                 !is.na(designPlan$followUpTime)) {
             header <- .concatenateSummaryText(header, paste0(
-                "follow-up time = ", designPlan$followUpTime[1]
+                "follow-up time = ", round(
+                    designPlan$followUpTime[1],
+                    as.integer(getOption("rpact.summary.digits", 3))
+                )
             ))
         }
         if (settings$survivalEnabled && !is.null(designPlan[["dropoutTime"]])) {
@@ -2378,20 +2381,24 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
 .createSummary <- function(object, digits = NA_integer_, output = c("all", "title", "overview", "body")) {
     output <- match.arg(output)
-    
+
     markdown <- attr(object, "markdown")
     if (is.null(markdown) || length(markdown) == 0 || !is.logical(markdown)) {
         markdown <- FALSE
     }
-    
+
     if (inherits(object, "TrialDesignCharacteristics")) {
-        return(.createSummaryDesignPlan(object, digits = digits, output = output, 
-                showStageLevels = TRUE, markdown = markdown))
+        return(.createSummaryDesignPlan(object,
+            digits = digits, output = output,
+            showStageLevels = TRUE, markdown = markdown
+        ))
     }
 
     if (.isTrialDesign(object) || .isTrialDesignPlan(object) || inherits(object, "SimulationResults")) {
-        return(.createSummaryDesignPlan(object, digits = digits, output = output, 
-                showStageLevels = !.isTrialDesignPlan(object), markdown = markdown))
+        return(.createSummaryDesignPlan(object,
+            digits = digits, output = output,
+            showStageLevels = !.isTrialDesignPlan(object), markdown = markdown
+        ))
     }
 
     if (inherits(object, "AnalysisResults")) {
@@ -2405,9 +2412,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "function 'summary' not implemented yet for class ", .getClassName(object))
 }
 
-.createSummaryPerformanceScore <- function(object, ..., 
-        digits = NA_integer_, 
-        output = c("all", "title", "overview", "body"), 
+.createSummaryPerformanceScore <- function(object, ...,
+        digits = NA_integer_,
+        output = c("all", "title", "overview", "body"),
         markdown = FALSE) {
     .createSummaryDesignPlan(object$.simulationResults,
         digits = digits, output = output,
@@ -2440,7 +2447,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 #'
 #' @noRd
 #'
-.createSummaryAnalysisResults <- function(object, ..., digits = NA_integer_, 
+.createSummaryAnalysisResults <- function(object, ..., digits = NA_integer_,
         output = c("all", "title", "overview", "body"), markdown = FALSE) {
     output <- match.arg(output)
     if (!inherits(object, "AnalysisResults")) {
@@ -2478,8 +2485,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
     }
 
-    summaryFactory <- SummaryFactory$new(object = object, 
-        intervalFormat = intervalFormat, output = output, markdown = markdown)
+    summaryFactory <- SummaryFactory$new(
+        object = object,
+        intervalFormat = intervalFormat, output = output, markdown = markdown
+    )
 
     .addDesignInformationToSummary(design, object, summaryFactory, output = output)
 
@@ -2788,6 +2797,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     .assertIsInClosedInterval(digits, "digits", lower = -1, upper = 12, naAllowed = TRUE)
 
     digitsSampleSize <- 1
+    digitsTime <- 2
     if (digits > 0) {
         digitsGeneral <- digits
         digitsProbabilities <- NA_integer_
@@ -2807,12 +2817,14 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         digitsSampleSize <- digits
         digitsGeneral <- digits
         digitsProbabilities <- digits
+        digitsTime <- digits
     }
     return(list(
         digits = digits,
         digitsSampleSize = digitsSampleSize,
         digitsGeneral = digitsGeneral,
-        digitsProbabilities = digitsProbabilities
+        digitsProbabilities = digitsProbabilities,
+        digitsTime = digitsTime
     ))
 }
 
@@ -2843,31 +2855,26 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         )
         return(invisible(summaryFactory))
     }
-
-    informationRatesCaption <- ifelse(inherits(designPlan, "SimulationResults") ||
-        inherits(designPlan, "AnalysisResults"), "Fixed weight", "Information")
-
-    if (inherits(designPlan, "SimulationResults") || inherits(designPlan, "AnalysisResults")) {
-        if (.isTrialDesignFisher(design)) {
-            weights <- .getWeightsFisher(design)
-        } else if (.isTrialDesignInverseNormal(design)) {
-            weights <- .getWeightsInverseNormal(design)
-        } else {
-            weights <- design$informationRates
-        }
-        summaryFactory$addItem(informationRatesCaption, .getSummaryValuesInPercent(weights, FALSE))
+    
+    informationRatesCaption <- "Planned information rate"
+    percentFormatEnabled <- TRUE
+    if (.isTrialDesignFisher(design)) {
+        weights <- .getWeightsFisher(design)
+        informationRatesCaption <- "Fixed weight"
+        percentFormatEnabled <- FALSE
+    } else if (.isTrialDesignInverseNormal(design)) {
+        weights <- .getWeightsInverseNormal(design)
+        informationRatesCaption <- "Fixed weight"
+        percentFormatEnabled <- FALSE
     } else {
-        summaryFactory$addItem(
-            paste0(
-                informationRatesCaption,
-                ifelse(inherits(designPlan, "SimulationResults"), "", " rate")
-            ),
-            .getSummaryValuesInPercent(design$informationRates)
-        )
+        weights <- design$informationRates
     }
+    summaryFactory$addItem(informationRatesCaption, 
+        .getSummaryValuesInPercent(weights, percentFormatEnabled = percentFormatEnabled))
 
     if (design$.isDelayedResponseDesign()) {
-        summaryFactory$addItem("Delayed information", .getSummaryValuesInPercent(design$delayedInformation, TRUE))
+        summaryFactory$addItem("Delayed information", 
+            .getSummaryValuesInPercent(design$delayedInformation, percentFormatEnabled = TRUE))
     }
 
     return(invisible(summaryFactory))
@@ -2912,7 +2919,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (!is.null(powerObject)) {
             summaryFactory$addParameter(powerObject,
                 parameterName = "power",
-                parameterCaption = ifelse(design$kMax == 1, "Power", "Overall power"),
+                parameterCaption = ifelse(design$kMax == 1, "Power", "Cumulative power"),
                 roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
             )
         }
@@ -3003,6 +3010,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     digitsSampleSize <- digitSettings$digitsSampleSize
     digitsGeneral <- digitSettings$digitsGeneral
     digitsProbabilities <- digitSettings$digitsProbabilities
+    digitsTime <- digitSettings$digitsTime
 
     outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
 
@@ -3266,7 +3274,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (any(!is.na(designPlan[[parameterName]]))) {
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterName,
-                parameterCaption = ifelse(design$kMax == 1, "Power", "Overall power"),
+                parameterCaption = ifelse(design$kMax == 1, "Power", "Cumulative power"),
                 roundDigits = digitsProbabilities, cumsumEnabled = TRUE, smoothedZeroFormat = TRUE
             )
         }
@@ -3299,7 +3307,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             summaryFactory$addParameter(designPlan,
                 parameterName = "calendarTime",
                 parameterCaption = "Calendar time",
-                roundDigits = digitsGeneral
+                roundDigits = digitsTime
             )
         }
 
@@ -3308,7 +3316,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             summaryFactory$addParameter(designPlan,
                 parameterName = "expectedStudyDurationH1",
                 parameterCaption = "Expected study duration under H1",
-                roundDigits = digitsGeneral,
+                roundDigits = digitsTime,
                 transpose = TRUE
             )
         }
@@ -3318,7 +3326,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             summaryFactory$addParameter(designPlan,
                 parameterName = "studyTime",
                 parameterCaption = "Study time",
-                roundDigits = digitsGeneral
+                roundDigits = digitsTime
             )
         }
 
@@ -3435,14 +3443,17 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             if (outputSize == "large") {
                 summaryFactory$addParameter(designPlan,
                     parameterName = "analysisTime",
-                    parameterCaption = "Analysis time", roundDigits = digitsGeneral
+                    parameterCaption = "Analysis time", 
+                    roundDigits = digitsTime
                 )
             }
 
             summaryFactory$addParameter(designPlan,
                 parameterName = "studyDuration",
                 parameterCaption = "Expected study duration",
-                roundDigits = digitsSampleSize, smoothedZeroFormat = TRUE, transpose = TRUE
+                roundDigits = digitsTime, 
+                smoothedZeroFormat = TRUE, 
+                transpose = TRUE 
             )
         }
     }
