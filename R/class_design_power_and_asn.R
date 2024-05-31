@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7958 $
+## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -40,7 +40,8 @@
 #' @template field_futilityPerStage
 #'
 #' @details
-#' This object cannot be created directly; use \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
+#' This object cannot be created directly;
+#' use \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 #' with suitable arguments to create it.
 #'
 #' @include class_core_parameter_set.R
@@ -121,11 +122,15 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                 stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'nMax' must be an integer > 0")
             }
 
-            self$.setParameterType("nMax", ifelse(self$nMax == C_NA_MAX_DEFAULT, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
+            self$.setParameterType("nMax", ifelse(self$nMax == C_NA_MAX_DEFAULT,
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            ))
 
             thetaIsDefault <- length(self$theta) == length(C_POWER_ASN_THETA_DEFAULT) &&
                 sum(self$theta == C_POWER_ASN_THETA_DEFAULT) == length(self$theta)
-            self$.setParameterType("theta", ifelse(thetaIsDefault, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
+            self$.setParameterType("theta", ifelse(thetaIsDefault,
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            ))
 
             kMax <- self$.design$kMax
 
@@ -201,7 +206,8 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                 .futilityPerStage <- probs$futilityProbabilities
             } else {
                 if (sided == 2) {
-                    if (self$.design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(self$.design$typeBetaSpending) && self$.design$typeBetaSpending != "none") {
+                    if (self$.design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                            !is.null(self$.design$typeBetaSpending) && self$.design$typeBetaSpending != "none") {
                         futilityBounds[is.na(futilityBounds)] <- 0
                         decisionMatrix <- matrix(c(
                             -criticalValues - theta * sqrt(self$nMax * informationRates),

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7920 $
-## |  Last changed: $Date: 2024-05-23 13:56:24 +0200 (Do, 23 Mai 2024) $
+## |  File version: $Revision: 7961 $
+## |  Last changed: $Date: 2024-05-30 14:58:05 +0200 (Thu, 30 May 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -22,10 +22,13 @@
 NULL
 
 # See testthat::skip_on_cran()
-.skipTestIfDisabled <- function() {
+.skipTestIfDisabled <- function(msg = "Test is disabled", ..., ignoreInTestPlan = FALSE) {
     if (!isTRUE(.isCompleteUnitTestSetEnabled()) &&
             base::requireNamespace("testthat", quietly = TRUE)) {
-        testthat::skip("Test is disabled")
+        if (isTRUE(ignoreInTestPlan)) {
+            msg <- paste(msg, "and ignored in test plan")
+        }
+        testthat::skip(msg)
     }
 }
 
@@ -33,12 +36,12 @@ NULL
     if (.Platform$OS.type != "windows") {
         return(invisible())
     }
-    
-    if (.isPackageInstalled("pkgbuild") && 
+
+    if (.isPackageInstalled("pkgbuild") &&
             isTRUE(eval(parse(text = "pkgbuild::has_build_tools(debug = FALSE)")))) {
         return(invisible())
     }
-    
+
     testthat::skip("The test requires a C++ compiler")
 }
 

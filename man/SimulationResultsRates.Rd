@@ -7,7 +7,8 @@
 A class for simulation results rates.
 }
 \details{
-Use \code{\link[=getSimulationRates]{getSimulationRates()}} to create an object of this type.
+Use \code{\link[=getSimulationRates]{getSimulationRates()}}
+to create an object of this type.
 
 \code{SimulationResultsRates} is the basic class for
 \itemize{

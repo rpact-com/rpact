@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7962 $
+## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -87,7 +87,7 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 bindingFutility = NA,
                 tolerance = 1e-06 # C_ANALYSIS_TOLERANCE_DEFAULT
                 ) {
-            self$kMax <- kMax # NEW
+            self$kMax <- kMax
             self$alpha <- alpha
             self$informationRates <- informationRates
             self$userAlphaSpending <- userAlphaSpending
@@ -192,7 +192,8 @@ TrialDesign <- R6::R6Class("TrialDesign",
 #' @template field_averageSampleNumber0
 #'
 #' @details
-#' \code{TrialDesignCharacteristics} contains all fields required to collect the characteristics of a design.
+#' \code{TrialDesignCharacteristics} contains all fields required
+#' to collect the characteristics of a design.
 #' This object should not be created directly; use \code{getDesignCharacteristics}
 #' with suitable arguments to create it.
 #'
@@ -233,13 +234,19 @@ TrialDesignCharacteristics <- R6::R6Class("TrialDesignCharacteristics",
             "Method for automatically printing trial design characteristics objects"
             self$.resetCat()
             if (showType == 2) {
-                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+                super$.show(
+                    showType = showType, digits = digits,
+                    consoleOutputEnabled = consoleOutputEnabled
+                )
             } else {
                 self$.showParametersOfOneGroup(self$.getGeneratedParameters(),
                     title = self$.toString(startWithUpperCase = TRUE),
-                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                    orderByParameterName = FALSE,
+                    consoleOutputEnabled = consoleOutputEnabled
                 )
-                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+                self$.showUnknownParameters(
+                    consoleOutputEnabled = consoleOutputEnabled
+                )
             }
         },
         .initStages = function() {
@@ -422,13 +429,13 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
                 alpha0VecTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
             }
 
-            if (!identical(kMax, self$kMax)) {
+            if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(TRUE)
             }
             if (!identical(alpha, self$alpha)) {
                 return(TRUE)
             }
-            if (!identical(sided, self$sided)) {
+            if (!isTRUE(all.equal(sided, self$sided))) {
                 return(TRUE)
             }
             if (!identical(method, self$method)) {
@@ -569,7 +576,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 power = NA_real_,
                 twoSidedPower = C_TWO_SIDED_POWER_DEFAULT,
                 constantBoundsHP = NA_real_,
-                betaAdjustment = TRUE, # impl as constant
+                betaAdjustment = TRUE,
                 delayedInformation = NA_real_) {
             self$beta <- beta
             self$betaSpent <- betaSpent
@@ -645,7 +652,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 futilityBoundsTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
             }
 
-            if (!identical(kMax, self$kMax)) {
+            if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(self$.pasteComparisonResult("kMax", kMax, self$kMax))
             }
             if (!identical(alpha, self$alpha)) {
@@ -654,7 +661,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             if (!identical(beta, self$beta)) {
                 return(self$.pasteComparisonResult("beta", beta, self$beta))
             }
-            if (!identical(sided, self$sided)) {
+            if (!isTRUE(all.equal(sided, self$sided))) {
                 return(self$.pasteComparisonResult("sided", sided, self$sided))
             }
             if (!identical(twoSidedPower, self$twoSidedPower)) {
@@ -665,10 +672,16 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             }
 
             if (!identical(betaAdjustment, self$betaAdjustment)) {
-                return(self$.pasteComparisonResult("betaAdjustment", betaAdjustment, self$betaAdjustment))
+                return(self$.pasteComparisonResult(
+                    "betaAdjustment",
+                    betaAdjustment, self$betaAdjustment
+                ))
             }
             if (!identical(delayedInformation, self$delayedInformation)) {
-                return(self$.pasteComparisonResult("delayedInformation", delayedInformation, self$delayedInformation))
+                return(self$.pasteComparisonResult(
+                    "delayedInformation",
+                    delayedInformation, self$delayedInformation
+                ))
             }
             if (!identical(typeOfDesign, self$typeOfDesign)) {
                 return(self$.pasteComparisonResult("typeOfDesign", typeOfDesign, self$typeOfDesign))
@@ -687,18 +700,30 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 }
             }
             if (!identical(informationRatesTemp, self$informationRates)) {
-                return(self$.pasteComparisonResult("informationRates", informationRatesTemp, self$informationRates))
+                return(self$.pasteComparisonResult(
+                    "informationRates",
+                    informationRatesTemp, self$informationRates
+                ))
             }
             if (self$.getParameterType("futilityBounds") != C_PARAM_GENERATED &&
                     (!grepl("^as.*", typeOfDesign) || typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) &&
                     !identical(futilityBoundsTemp, self$futilityBounds)) {
-                return(self$.pasteComparisonResult("futilityBounds", futilityBoundsTemp, self$futilityBounds))
+                return(self$.pasteComparisonResult(
+                    "futilityBounds",
+                    futilityBoundsTemp, self$futilityBounds
+                ))
             }
             if (!identical(optimizationCriterion, self$optimizationCriterion)) {
-                return(self$.pasteComparisonResult("optimizationCriterion", optimizationCriterion, self$optimizationCriterion))
+                return(self$.pasteComparisonResult(
+                    "optimizationCriterion",
+                    optimizationCriterion, self$optimizationCriterion
+                ))
             }
             if (!identical(typeBetaSpending, self$typeBetaSpending)) {
-                return(self$.pasteComparisonResult("typeBetaSpending", typeBetaSpending, self$typeBetaSpending))
+                return(self$.pasteComparisonResult(
+                    "typeBetaSpending",
+                    typeBetaSpending, self$typeBetaSpending
+                ))
             }
             if (!identical(gammaA, self$gammaA)) {
                 return(self$.pasteComparisonResult("gammaA", gammaA, self$gammaA))
@@ -712,20 +737,35 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                         (sided == 1 || !grepl("^as.*", typeOfDesign) || typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) &&
                         (any(na.omit(futilityBounds) > -6) || any(na.omit(self$futilityBounds) > -6))
                     )) {
-                return(self$.pasteComparisonResult("bindingFutility", bindingFutility, self$bindingFutility))
+                return(self$.pasteComparisonResult(
+                    "bindingFutility",
+                    bindingFutility, self$bindingFutility
+                ))
             }
             if (!identical(userAlphaSpending, self$userAlphaSpending)) {
-                return(self$.pasteComparisonResult("userAlphaSpending", userAlphaSpending, self$userAlphaSpending))
+                return(self$.pasteComparisonResult(
+                    "userAlphaSpending",
+                    userAlphaSpending, self$userAlphaSpending
+                ))
             }
             if (!identical(userBetaSpending, self$userBetaSpending)) {
-                return(self$.pasteComparisonResult("userBetaSpending", userBetaSpending, self$userBetaSpending))
+                return(self$.pasteComparisonResult(
+                    "userBetaSpending",
+                    userBetaSpending, self$userBetaSpending
+                ))
             }
             if (!identical(twoSidedPower, self$twoSidedPower)) {
-                return(self$.pasteComparisonResult("twoSidedPower", twoSidedPower, self$twoSidedPower))
+                return(self$.pasteComparisonResult(
+                    "twoSidedPower",
+                    twoSidedPower, self$twoSidedPower
+                ))
             }
             if (typeOfDesign == C_TYPE_OF_DESIGN_HP) {
                 if (!identical(constantBoundsHP, self$constantBoundsHP)) {
-                    return(self$.pasteComparisonResult("constantBoundsHP", constantBoundsHP, self$constantBoundsHP))
+                    return(self$.pasteComparisonResult(
+                        "constantBoundsHP",
+                        constantBoundsHP, self$constantBoundsHP
+                    ))
                 }
             }
             return(FALSE)
@@ -810,7 +850,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
 #' @template field_reversalProbabilities
 #'
 #' @details
-#' This object should not be created directly; use \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}}
+#' This object should not be created directly;
+#' use \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}}
 #' with suitable arguments to create a group sequential design.
 #'
 #' @seealso \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}} for creating a group sequential design.
@@ -899,13 +940,16 @@ TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
                 self$.setParameterType(notApplicableParameter, C_PARAM_NOT_APPLICABLE)
             }
             self$.setParameterType("alpha", ifelse(
-                identical(self$alpha, C_ALPHA_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$alpha, C_ALPHA_DEFAULT),
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
             self$.setParameterType("informationAtInterim", ifelse(
-                identical(self$informationAtInterim, 0.5), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$informationAtInterim, 0.5),
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
             self$.setParameterType("secondStageConditioning", ifelse(
-                identical(self$secondStageConditioning, TRUE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$secondStageConditioning, TRUE),
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
 
             self$kMax <- 2L
@@ -1102,7 +1146,10 @@ plot.TrialDesignCharacteristics <- function(x, y, ...) {
     )
 
     if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {
-        warning("'theta' (", .reconstructSequenceCommand(theta), ") will be ignored for plot type ", type, call. = FALSE)
+        warning("'theta' (", .reconstructSequenceCommand(theta), ") ",
+            "will be ignored for plot type ", type,
+            call. = FALSE
+        )
     }
 
     if (!missing(y) && !is.null(y) && length(y) == 1 && inherits(y, "TrialDesign")) {
@@ -1116,7 +1163,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ...) {
             } else {
                 stop(
                     C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                    "'variedParameters' needs to be specified, e.g., variedParameters = \"typeOfDesign\""
+                    "'variedParameters' needs to be specified, ",
+                    "e.g., variedParameters = \"typeOfDesign\""
                 )
             }
         }
@@ -1149,7 +1197,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ...) {
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' Each element of the \code{\link{TrialDesign}} is converted to a column in the data frame.
+#' Each element of the \code{\link{TrialDesign}} is
+#' converted to a column in the data frame.
 #'
 #' @template return_dataframe
 #'
@@ -1161,7 +1210,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ...) {
 #' @keywords internal
 #'
 as.data.frame.TrialDesign <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
+        optional = FALSE, niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE, ...) {
     .assertIsTrialDesign(x)
 
     if (includeAllParameters) {

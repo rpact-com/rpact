@@ -23,8 +23,10 @@ The following generics (R generic functions) are available for this result objec
 \item \code{\link[=print.FieldSet]{print()}} to print the object,
 \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
 \item \code{\link[=plot.TrialDesignSet]{plot()}} to plot the object,
-\item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-\item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+\item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}}
+to coerce the object to a \code{\link[base]{data.frame}},
+\item \code{\link[=as.matrix.FieldSet]{as.matrix()}}
+to coerce the object to a \code{\link[base]{matrix}}.
 }
 }
 \description{

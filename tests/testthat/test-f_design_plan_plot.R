@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_design_plan_means.R
 ## |  Creation date: 21 December 2023, 08:52:45
-## |  File version: $Revision: 7953 $
-## |  Last changed: $Date: 2024-05-29 10:36:52 +0200 (Mi, 29 Mai 2024) $
+## |  File version: $Revision: 7961 $
+## |  Last changed: $Date: 2024-05-30 14:58:05 +0200 (Thu, 30 May 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -68,7 +68,7 @@ test_that(".getTrialDesignPlanTheta function works as expected", {
 
 # Test case for .plotTrialDesignPlan function
 test_that(".plotTrialDesignPlan function works as expected", {
-    .skipTestIfDisabled()
+    .skipTestIfDisabled(ignoreInTestPlan = TRUE)
 
     design <- getDesignInverseNormal(
         typeOfDesign = "OF", kMax = 2, alpha =

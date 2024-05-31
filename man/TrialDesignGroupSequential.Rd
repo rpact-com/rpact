@@ -7,7 +7,8 @@
 Trial design for group sequential design.
 }
 \details{
-This object should not be created directly; use \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}}
+This object should not be created directly;
+use \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}}
 with suitable arguments to create a group sequential design.
 }
 \section{Fields}{

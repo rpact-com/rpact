@@ -7,7 +7,8 @@
 Class for power and average sample number (ASN) results.
 }
 \details{
-This object cannot be created directly; use \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
+This object cannot be created directly;
+use \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 with suitable arguments to create it.
 }
 \section{Fields}{

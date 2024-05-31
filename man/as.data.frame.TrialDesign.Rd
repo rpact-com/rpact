@@ -34,7 +34,8 @@ Returns a \code{\link[base]{data.frame}}.
 Returns the \code{TrialDesign} as data frame.
 }
 \details{
-Each element of the \code{\link{TrialDesign}} is converted to a column in the data frame.
+Each element of the \code{\link{TrialDesign}} is
+converted to a column in the data frame.
 }
 \examples{
 as.data.frame(getDesignGroupSequential())

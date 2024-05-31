@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7962 $
+## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1911,7 +1911,7 @@ plot.AnalysisResults <- function(x, y, ..., type = 1L,
     }
 
     treatmentArmsToShowCmd <- ""
-    if (!is.null(treatmentArmsToShow) && !identical(sort(unique(treatmentArmsToShow)), 1:nrow(data))) {
+    if (!is.null(treatmentArmsToShow) && !isTRUE(all.equal(sort(unique(treatmentArmsToShow)), 1:nrow(data)))) {
         treatmentArmsToShowCmd <- paste0(", ", .arrayToString(treatmentArmsToShow, mode = "vector"))
     }
     dataCmd <- paste0("rpact:::.getConfidenceIntervalData(", analysisResultsName, treatmentArmsToShowCmd, ")")

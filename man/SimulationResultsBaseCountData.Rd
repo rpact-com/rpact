@@ -7,7 +7,8 @@
 A class for simulation results count data.
 }
 \details{
-Use \code{\link[=getSimulationCounts]{getSimulationCounts()}} to create an object of this type.
+Use \code{\link[=getSimulationCounts]{getSimulationCounts()}}
+to create an object of this type.
 }
 \section{Fields}{
 

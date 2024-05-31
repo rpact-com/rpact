@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7808 $
-## |  Last changed: $Date: 2024-04-05 18:22:34 +0200 (Fr, 05 Apr 2024) $
+## |  File version: $Revision: 7962 $
+## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1193,7 +1193,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     for (s in subsets) {
         subsetStages <- as.integer(sort(unique(na.omit(as.character(dataFrame$stage[dataFrame$subset == s])))))
         kMax <- max(subsetStages)
-        if (!identical(1:kMax, subsetStages)) {
+        if (!isTRUE(all.equal(1:kMax, subsetStages))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 gettextf("subset %s has incomplete stages (%s)", s, .arrayToString(subsetStages))

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7916 $
-## |  Last changed: $Date: 2024-05-22 17:52:27 +0200 (Mi, 22 Mai 2024) $
+## |  File version: $Revision: 7958 $
+## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -165,52 +165,70 @@ PlotSubTitleItems <- R6::R6Class("PlotSubTitleItems",
             if (!is.null(item1) && !is.null(item2) && !is.null(item3) && !is.null(item4)) {
                 if (length(item1$subscript) == 1 && !is.na(item1$subscript) &&
                         length(item2$subscript) == 1 && !is.na(item2$subscript)) {
-                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) * "," ~ .(item2$title)[.(item2$subscript)] == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * "," ~ .(item4$title) == .(item4$value) * ""))
+                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) *
+                        "," ~ .(item2$title)[.(item2$subscript)] == .(item2$value) * "," ~
+                        .(item3$title) == .(item3$value) * "," ~ .(item4$title) == .(item4$value) * ""))
                 }
 
                 if (length(item1$subscript) == 1 && !is.na(item1$subscript)) {
-                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) * "," ~ .(item2$title) == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * "," ~ .(item4$title) == .(item4$value) * ""))
+                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) *
+                        "," ~ .(item2$title) == .(item2$value) * "," ~
+                        .(item3$title) == .(item3$value) * "," ~ .(item4$title) == .(item4$value) * ""))
                 }
 
                 if (length(item2$subscript) == 1 && !is.na(item2$subscript)) {
-                    return(bquote(" " * .(item1$title) == .(item1$value) * "," ~ .(item2$title)[.(item2$subscript)] == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * "," ~ .(item4$title) == .(item4$value) * ""))
+                    return(bquote(" " * .(item1$title) == .(item1$value) * "," ~
+                        .(item2$title)[.(item2$subscript)] == .(item2$value) *
+                            "," ~ .(item3$title) == .(item3$value) * "," ~ .(item4$title) == .(item4$value) * ""))
                 }
 
-                return(bquote(" " * .(item1$title) == .(item1$value) * "," ~ .(item2$title) == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * "," ~ .(item4$title) == .(item4$value) * ""))
+                return(bquote(" " * .(item1$title) == .(item1$value) * "," ~
+                    .(item2$title) == .(item2$value) * "," ~ .(item3$title) == .(item3$value) *
+                    "," ~ .(item4$title) == .(item4$value) * ""))
             }
 
             if (!is.null(item1) && !is.null(item2) && !is.null(item3)) {
                 if (length(item1$subscript) == 1 && !is.na(item1$subscript) &&
                         length(item2$subscript) == 1 && !is.na(item2$subscript)) {
-                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) * "," ~ .(item2$title)[.(item2$subscript)] == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * ""))
+                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) *
+                        "," ~ .(item2$title)[.(item2$subscript)] == .(item2$value) *
+                        "," ~ .(item3$title) == .(item3$value) * ""))
                 }
 
                 if (length(item1$subscript) == 1 && !is.na(item1$subscript)) {
-                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) * "," ~ .(item2$title) == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * ""))
+                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) *
+                        "," ~ .(item2$title) == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * ""))
                 }
 
                 if (length(item2$subscript) == 1 && !is.na(item2$subscript)) {
-                    return(bquote(" " * .(item1$title) == .(item1$value) * "," ~ .(item2$title)[.(item2$subscript)] == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * ""))
+                    return(bquote(" " * .(item1$title) == .(item1$value) * "," ~
+                        .(item2$title)[.(item2$subscript)] == .(item2$value) *
+                            "," ~ .(item3$title) == .(item3$value) * ""))
                 }
 
-                return(bquote(" " * .(item1$title) == .(item1$value) * "," ~ .(item2$title) == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * ""))
+                return(bquote(" " * .(item1$title) == .(item1$value) * "," ~
+                    .(item2$title) == .(item2$value) * "," ~ .(item3$title) == .(item3$value) * ""))
             }
 
             if (!is.null(item1) && !is.null(item2)) {
                 if (length(item1$subscript) == 1 && !is.na(item1$subscript) &&
                         length(item2$subscript) == 1 && !is.na(item2$subscript)) {
-                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) * "," ~ .(item2$title)[.(item2$subscript)] == .(item2$value) * ""))
+                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) *
+                        "," ~ .(item2$title)[.(item2$subscript)] == .(item2$value) * ""))
                 }
 
                 if (length(item1$subscript) == 1 && !is.na(item1$subscript)) {
-                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) * "," ~ .(item2$title) == .(item2$value) * ""))
+                    return(bquote(" " * .(item1$title)[.(item1$subscript)] == .(item1$value) *
+                        "," ~ .(item2$title) == .(item2$value) * ""))
                 }
 
                 if (length(item2$subscript) == 1 && !is.na(item2$subscript)) {
-                    return(bquote(" " * .(item1$title) == .(item1$value) * "," ~ .(item2$title)[.(item2$subscript)] == .(item2$value) * ""))
+                    return(bquote(" " * .(item1$title) == .(item1$value) * "," ~
+                        .(item2$title)[.(item2$subscript)] == .(item2$value) * ""))
                 }
 
-                return(bquote(" " * .(item1$title) == .(item1$value) * "," ~ .(item2$title) == .(item2$value) * ""))
+                return(bquote(" " * .(item1$title) == .(item1$value) * "," ~
+                    .(item2$title) == .(item2$value) * ""))
             }
 
             if (!is.null(item1)) {
@@ -390,10 +408,18 @@ PlotSettings <- R6::R6Class("PlotSettings",
         },
         setAxesAppearance = function(p) {
             "Sets the font size and face of the axes titles and texts"
-            p <- p + ggplot2::theme(axis.title.x = ggplot2::element_text(size = self$scaleSize(self$axesTextFontSize + 1), face = "bold"))
-            p <- p + ggplot2::theme(axis.title.y = ggplot2::element_text(size = self$scaleSize(self$axesTextFontSize + 1), face = "bold"))
-            p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(size = self$scaleSize(self$axesTextFontSize)))
-            p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(size = self$scaleSize(self$axesTextFontSize)))
+            p <- p + ggplot2::theme(axis.title.x = ggplot2::element_text(
+                size = self$scaleSize(self$axesTextFontSize + 1), face = "bold"
+            ))
+            p <- p + ggplot2::theme(axis.title.y = ggplot2::element_text(
+                size = self$scaleSize(self$axesTextFontSize + 1), face = "bold"
+            ))
+            p <- p + ggplot2::theme(axis.text.x = ggplot2::element_text(
+                size = self$scaleSize(self$axesTextFontSize)
+            ))
+            p <- p + ggplot2::theme(axis.text.y = ggplot2::element_text(
+                size = self$scaleSize(self$axesTextFontSize)
+            ))
             return(p)
         },
 
@@ -476,22 +502,40 @@ PlotSettings <- R6::R6Class("PlotSettings",
                     p <- p + ggplot2::theme(aspect.ratio = 1)
                 },
                 "1" = {
-                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.05, 1), legend.justification = c(0, 1))
+                    p <- p + ggplot2::theme(
+                        legend.position = "inside",
+                        legend.position.inside = c(0.05, 1), legend.justification = c(0, 1)
+                    )
                 },
                 "2" = {
-                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.05, 0.5), legend.justification = c(0, 0.5))
+                    p <- p + ggplot2::theme(
+                        legend.position = "inside",
+                        legend.position.inside = c(0.05, 0.5), legend.justification = c(0, 0.5)
+                    )
                 },
                 "3" = {
-                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.05, 0.05), legend.justification = c(0, 0))
+                    p <- p + ggplot2::theme(
+                        legend.position = "inside",
+                        legend.position.inside = c(0.05, 0.05), legend.justification = c(0, 0)
+                    )
                 },
                 "4" = {
-                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.95, 1), legend.justification = c(1, 1))
+                    p <- p + ggplot2::theme(
+                        legend.position = "inside",
+                        legend.position.inside = c(0.95, 1), legend.justification = c(1, 1)
+                    )
                 },
                 "5" = {
-                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.95, 0.5), legend.justification = c(1, 0.5))
+                    p <- p + ggplot2::theme(
+                        legend.position = "inside",
+                        legend.position.inside = c(0.95, 0.5), legend.justification = c(1, 0.5)
+                    )
                 },
                 "6" = {
-                    p <- p + ggplot2::theme(legend.position = "inside", legend.position.inside = c(0.95, 0.05), legend.justification = c(1, 0))
+                    p <- p + ggplot2::theme(
+                        legend.position = "inside",
+                        legend.position.inside = c(0.95, 0.05), legend.justification = c(1, 0)
+                    )
                 }
             )
 
@@ -557,7 +601,9 @@ PlotSettings <- R6::R6Class("PlotSettings",
                     }
                     s <- items$toString()
                     if (length(s) == 1 && !is.na(s) && nchar(s) > 0) {
-                        plotLabsCaptionEnabled <- as.logical(getOption("rpact.plot.labs.caption.enabled", "true"))
+                        plotLabsCaptionEnabled <- as.logical(getOption(
+                            "rpact.plot.labs.caption.enabled", "true"
+                        ))
                         if (isTRUE(plotLabsCaptionEnabled)) {
                             caption <- s
                         } else {
@@ -700,9 +746,13 @@ PlotSettings <- R6::R6Class("PlotSettings",
                 plotPointsEnabled = TRUE, pointBorder = 4) {
             if (plotLineEnabled) {
                 if (packageVersion("ggplot2") >= "3.4.0") {
-                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues), linewidth = self$scaleSize(self$lineSize))
+                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues),
+                        linewidth = self$scaleSize(self$lineSize)
+                    )
                 } else {
-                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues), size = self$scaleSize(self$lineSize))
+                    p <- p + ggplot2::geom_line(ggplot2::aes(y = -yValues),
+                        size = self$scaleSize(self$lineSize)
+                    )
                 }
             }
             if (plotPointsEnabled) {
