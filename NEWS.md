@@ -7,7 +7,7 @@
 * Extension of the function `getPerformanceScore()` for sample size recalculation rules to the setting of binary endpoints according to [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4)
 * The `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()` functions now support an enhanced `selectArmsFunction` argument. Previously, only `effectVector` and `stage` were allowed as arguments. Now, users can optionally utilize additional arguments for more powerful custom function implementations, including `conditionalPower`, `conditionalCriticalValue`, `plannedSubjects/plannedEvents`, `allocationRatioPlanned`, `selectedArms`, `thetaH1` (for means and survival), `stDevH1` (for means), `overallEffects`, and for rates additionally: `piTreatmentsH1`, `piControlH1`, `overallRates`, and `overallRatesControl`.
 * Same as above for`getSimulationEnrichmentMeans()`, `getSimulationEnrichmentRates()`, and `getSimulationEnrichmentSurvival()`. Specifically, support for population selection with `selectPopulationsFunction` argument based on predictive/posterior probabilities added (see [#32](https://github.com/rpact-com/rpact/issues/32))
-
+* The `fetch()` and `obtain()` functions can be used to extract a single parameter from an rpact result object, which is useful for writing pipe-operator linked commands
 
 ## Improvements, issues, and changes
 
