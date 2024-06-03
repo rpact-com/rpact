@@ -15,9 +15,9 @@
 ## |  
 ## |  File name: test-f_core_plot.R
 ## |  Creation date: 08 November 2023, 09:09:36
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 7953 $
+## |  Last changed: $Date: 2024-05-29 10:36:52 +0200 (Mi, 29 Mai 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |  
 
 test_plan_section("Testing .reconstructSequenceCommand")
@@ -110,6 +110,5 @@ test_that("Internal core plot functions throw errors when arguments are missing 
 
 	expect_error(.getGridLegendPosition())
 
-	expect_error(.formatSubTitleValue())
-})
+	expect_error(.formatSubTitleValue())})
 

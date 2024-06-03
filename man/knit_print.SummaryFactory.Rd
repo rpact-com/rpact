@@ -12,15 +12,21 @@
 \item{...}{Other arguments (see \code{\link[knitr]{knit_print}}).}
 }
 \description{
-The function \code{knit_print.SummaryFactory} is the default printing function for rpact summary objects in knitr.
+The function \code{knit_print.SummaryFactory} is the default
+printing function for rpact summary objects in knitr.
 The chunk option \code{render} uses this function by default.
-To fall back to the normal printing behavior set the chunk option \code{render = normal_print}.
+To fall back to the normal printing behavior set the
+chunk option \code{render = normal_print}.
 For more information see \code{\link[knitr]{knit_print}}.
 }
 \details{
 Generic function to print a summary object in Markdown.
-Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
-specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
-top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
-that all headings will be written bold but are not explicit defined as header.
+Use \code{options("rpact.print.heading.base.number" = "NUMBER")}
+(where \code{NUMBER} is an integer value >= -1) to
+specify the heading level. The default is
+\code{options("rpact.print.heading.base.number" = "0")}, i.e., the
+top headings start with \code{##} in Markdown.
+\code{options("rpact.print.heading.base.number" = "-1")} means
+that all headings will be written bold but are not
+explicit defined as header.
 }

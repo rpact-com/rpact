@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7750 $
-## |  Last changed: $Date: 2024-03-26 15:44:44 +0100 (Di, 26 Mrz 2024) $
+## |  File version: $Revision: 7958 $
+## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -28,7 +28,8 @@ NULL
 #' @description
 #' Function to get the names of a \code{\link{SimulationResults}} object.
 #'
-#' @param x A \code{\link{SimulationResults}} object created by \code{getSimulationResults[MultiArm/Enrichment][Means/Rates/Survival]}.
+#' @param x A \code{\link{SimulationResults}} object created by
+#'        \code{getSimulationResults[MultiArm/Enrichment][Means/Rates/Survival]}.
 #'
 #' @details
 #' Returns the names of a simulation results that can be accessed by the user.
@@ -321,36 +322,58 @@ SimulationResults <- R6::R6Class("SimulationResults",
                 if (!is.null(performanceScore)) {
                     performanceScore$.showParametersOfOneGroup(
                         performanceScore$.getGeneratedParameters(), "Performance",
-                        orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                        orderByParameterName = FALSE,
+                        consoleOutputEnabled = consoleOutputEnabled
                     )
-                    performanceScore$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+                    performanceScore$.showUnknownParameters(
+                        consoleOutputEnabled = consoleOutputEnabled
+                    )
                 }
 
                 if (self$.design$kMax > 1 || twoGroupsEnabled || multiArmSurvivalEnabled) {
-                    self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
+                    self$.cat("Legend:\n",
+                        heading = 2,
+                        consoleOutputEnabled = consoleOutputEnabled
+                    )
 
                     if (multiArmSurvivalEnabled) {
-                        self$.cat("  (i): values of treatment arm i compared to control\n", consoleOutputEnabled = consoleOutputEnabled)
-                        self$.cat("  {j}: values of treatment arm j\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat("  (i): values of treatment arm i compared to control\n",
+                            consoleOutputEnabled = consoleOutputEnabled
+                        )
+                        self$.cat("  {j}: values of treatment arm j\n",
+                            consoleOutputEnabled = consoleOutputEnabled
+                        )
                     } else if (enrichmentEnabled) {
                         matrixName <- .getSimulationEnrichmentEffectMatrixName(self)
                         if (nrow(self$effectList[[matrixName]]) > 1) {
-                            self$.cat("  (i): results of situation i\n", consoleOutputEnabled = consoleOutputEnabled)
+                            self$.cat("  (i): results of situation i\n",
+                                consoleOutputEnabled = consoleOutputEnabled
+                            )
                         }
                     } else if (twoGroupsEnabled) {
-                        self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat("  (i): values of treatment arm i\n",
+                            consoleOutputEnabled = consoleOutputEnabled
+                        )
                     }
                     if (self$.design$kMax > 1) {
-                        self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat("  [k]: values at stage k\n",
+                            consoleOutputEnabled = consoleOutputEnabled
+                        )
                     }
 
                     if (enrichmentEnabled) {
                         if (length(self$effectList$subGroups) > 1) {
-                            self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
+                            self$.cat(paste0("  S[i]: population i\n"),
+                                consoleOutputEnabled = consoleOutputEnabled
+                            )
                         }
-                        self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat(paste0("  F: full population\n"),
+                            consoleOutputEnabled = consoleOutputEnabled
+                        )
                         if (length(self$effectList$subGroups) > 1) {
-                            self$.cat(paste0("  R: remaining population\n"), consoleOutputEnabled = consoleOutputEnabled)
+                            self$.cat(paste0("  R: remaining population\n"),
+                                consoleOutputEnabled = consoleOutputEnabled
+                            )
                         }
                     }
 
@@ -372,7 +395,8 @@ SimulationResults <- R6::R6Class("SimulationResults",
             variedParameterName1 <- NA_character_
             if (inherits(self, "SimulationResultsMeans")) {
                 variedParameterName1 <- "alternative"
-            } else if (inherits(self, "SimulationResultsRates") || inherits(self, "SimulationResultsSurvival")) {
+            } else if (inherits(self, "SimulationResultsRates") ||
+                    inherits(self, "SimulationResultsSurvival")) {
                 variedParameterName1 <- "pi1"
             } else if (grepl("MultiArm", .getClassName(self))) {
                 if (inherits(self, "SimulationResultsMultiArmMeans")) {
@@ -464,7 +488,8 @@ SimulationResults <- R6::R6Class("SimulationResults",
                     paramValueFormatted <- paste0(
                         "median [range]: ", round(stats::median(paramValue), 3),
                         " [", paste(round(base::range(paramValue), 3), collapse = " - "), "]; ",
-                        "mean +/-sd: ", round(base::mean(paramValue), 3), " +/-", round(stats::sd(paramValue), 3)
+                        "mean +/-sd: ", round(base::mean(paramValue), 3),
+                        " +/-", round(stats::sd(paramValue), 3)
                     )
                 } else {
                     paramValueFormatted <- "median [range]: NA [NA - NA]; mean +/sd: NA +/-NA"
@@ -478,11 +503,13 @@ SimulationResults <- R6::R6Class("SimulationResults",
         .toString = function(startWithUpperCase = FALSE) {
             s <- "simulation of"
 
-            if (grepl("MultiArm", .getClassName(self)) && !is.null(self[["activeArms"]]) && self$activeArms > 1) {
+            if (grepl("MultiArm", .getClassName(self)) &&
+                    !is.null(self[["activeArms"]]) && self$activeArms > 1) {
                 s <- paste(s, "multi-arm")
             }
 
-            if (grepl("Enrichment", .getClassName(self)) && !is.null(self[["populations"]]) && self$populations > 1) {
+            if (grepl("Enrichment", .getClassName(self)) &&
+                    !is.null(self[["populations"]]) && self$populations > 1) {
                 s <- paste(s, "enrichment")
             }
 
@@ -844,7 +871,8 @@ SimulationResultsBaseRates <- R6::R6Class("SimulationResultsBaseRates",
 #'
 #'
 #' @details
-#' Use \code{\link[=getSimulationRates]{getSimulationRates()}} to create an object of this type.
+#' Use \code{\link[=getSimulationRates]{getSimulationRates()}}
+#' to create an object of this type.
 #'
 #' \code{SimulationResultsRates} is the basic class for
 #' \itemize{
@@ -958,7 +986,8 @@ SimulationResultsRates <- R6::R6Class("SimulationResultsRates",
 #'
 #'
 #' @details
-#' Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}} to create an object of this type.
+#' Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}
+#' to create an object of this type.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1103,7 +1132,8 @@ SimulationResultsBaseSurvival <- R6::R6Class("SimulationResultsBaseSurvival",
 #' @template field_conditionalPowerAchieved
 #'
 #' @details
-#' Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}} to create an object of this type.
+#' Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
+#' to create an object of this type.
 #'
 #' \code{SimulationResultsSurvival} is the basic class for
 #' \itemize{
@@ -1251,7 +1281,8 @@ SimulationResultsSurvival <- R6::R6Class("SimulationResultsSurvival",
 #' @template field_conditionalPowerAchieved
 #'
 #' @details
-#' Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}} to create an object of this type.
+#' Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}
+#' to create an object of this type.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1357,7 +1388,8 @@ SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvi
 #' @template field_conditionalPowerAchieved
 #'
 #' @details
-#' Use \code{\link[=getSimulationEnrichmentMeans]{getSimulationEnrichmentMeans()}} to create an object of this type.
+#' Use \code{\link[=getSimulationEnrichmentMeans]{getSimulationEnrichmentMeans()}}
+#' to create an object of this type.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1456,7 +1488,8 @@ SimulationResultsEnrichmentMeans <- R6::R6Class("SimulationResultsEnrichmentMean
 #' @template field_conditionalPowerAchieved
 #'
 #' @details
-#' Use \code{\link[=getSimulationEnrichmentRates]{getSimulationEnrichmentRates()}} to create an object of this type.
+#' Use \code{\link[=getSimulationEnrichmentRates]{getSimulationEnrichmentRates()}}
+#' to create an object of this type.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1559,7 +1592,8 @@ SimulationResultsEnrichmentRates <- R6::R6Class("SimulationResultsEnrichmentRate
 #' @template field_conditionalPowerAchieved
 #'
 #' @details
-#' Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurvival()}} to create an object of this type.
+#' Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurvival()}}
+#' to create an object of this type.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1641,7 +1675,8 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentS
 #' @template field_rejectPerStage
 #'
 #' @details
-#' Use \code{\link[=getSimulationCounts]{getSimulationCounts()}} to create an object of this type.
+#' Use \code{\link[=getSimulationCounts]{getSimulationCounts()}}
+#' to create an object of this type.
 #'
 #' @include class_core_parameter_set.R
 #' @include class_core_plot_settings.R
@@ -1670,7 +1705,7 @@ SimulationResultsBaseCountData <- R6::R6Class("SimulationResultsBaseCountData",
         accrualIntensity = NULL,
         followUpTime = NULL,
         groups = NULL,
-        numberOfSubjects = NULL, 
+        numberOfSubjects = NULL,
         numberOfSubjects1 = NULL,
         numberOfSubjects2 = NULL,
         iterations = NULL,
@@ -1694,10 +1729,12 @@ SimulationResultsBaseCountData <- R6::R6Class("SimulationResultsBaseCountData",
 #' Print Simulation Results
 #'
 #' @description
-#' \code{print} prints its \code{SimulationResults} argument and returns it invisibly (via \code{invisible(x)}).
+#' \code{print} prints its \code{SimulationResults} argument and
+#' returns it invisibly (via \code{invisible(x)}).
 #'
 #' @param x The \code{\link{SimulationResults}} object to print.
-#' @param markdown If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
+#' @param markdown If \code{TRUE}, the object \code{x}
+#'        will be printed using markdown syntax;
 #'        normal representation will be used otherwise (default is \code{FALSE})
 #' @inheritParams param_three_dots
 #'

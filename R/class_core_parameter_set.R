@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7809 $
-## |  Last changed: $Date: 2024-04-05 18:37:05 +0200 (Fr, 05 Apr 2024) $
+## |  File version: $Revision: 7962 $
+## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1642,55 +1642,158 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     return(invisible(x))
 }
 
+.getParameterSetVar <- function(fCall, var) {
+    varName <- deparse(fCall$var)
+    if (identical(varName, "NULL")) {
+        return(var)
+    }
+    
+    varNameExists <- !is.null(varName) && exists(varName)
+    if (varNameExists) {
+        return(var)
+    }
+    
+    if (grepl("\"|'", varName)) {
+        varName <- gsub('"', "", varName)
+        varName <- gsub("'", "", varName)
+        return(varName)
+    }
+
+    if (!varNameExists) {
+        var <- suppressWarnings(as.integer(varName))
+        if (!is.na(var)) {
+            return(var)
+        }
+        
+        varName <- gsub('"', "", varName)
+        varName <- gsub("'", "", varName)
+        return(varName)
+    }
+    
+    return(var)
+}
+
 #' 
-#' @rdname pull.ParameterSet
+#' @rdname fetch.ParameterSet
 #' 
 #' @export 
 #' 
-pull <- function(x, var) UseMethod("pull")
+pull <- function(x, var, output) UseMethod("pull")
+
+#'
+#' @rdname fetch.ParameterSet
+#' 
+#' @export 
+#' 
+pull.ParameterSet <- function(x, var = -1, output = c("named", "value", "list")) {
+    fCall <- match.call(expand.dots = FALSE)
+    var <- .getParameterSetVar(fCall, var)
+    output <- match.arg(output)
+    return(fetch.ParameterSet(x, var = var, output = output))
+}
+
+#' 
+#' @rdname fetch.ParameterSet
+#' 
+#' @export 
+#' 
+obtain <- function(x, var, output) UseMethod("obtain")
+
+#'
+#' @rdname fetch.ParameterSet
+#' 
+#' @export 
+#' 
+obtain.ParameterSet <- function(x, var = -1, output = c("named", "value", "list")) {
+    fCall <- match.call(expand.dots = FALSE)
+    var <- .getParameterSetVar(fCall, var)
+    output <- match.arg(output)
+    return(fetch.ParameterSet(x, var = var, output = output))
+}
+
+#' 
+#' @rdname fetch.ParameterSet
+#' 
+#' @export 
+#' 
+fetch <- function(x, var, output) UseMethod("fetch")
 
 #'
 #' @title
 #' Extract a single parameter
 #' 
 #' @description
-#' Pull a parameter from a parameter set.
+#' Fetch a parameter from a parameter set.
 #' 
-#' @param x The \code{\link{ParameterSet}} object to pull from.
+#' @param x The \code{\link{ParameterSet}} object to fetch from.
 #' @param var A variable specified as: 
 #'  - a literal variable name 
 #'  - a positive integer, giving the position counting from the left 
 #'  - a negative integer, giving the position counting from the right. 
-#' The default returns the last column (on the assumption that's the column you've created most recently). 
+#' The default returns the last parameter.  
 #' This argument is taken by expression and supports quasiquotation (you can unquote column names and column locations).
+#' @param output A character defining the output type as follows:
+#'  - "named" (default) returns the named value if the value is a single value, the value inside a named list otherwise
+#'  - "value" returns only the value itself
+#'  - "list" returns the value inside a named list
+#' 
+#' @template examples_fetch_parameter_from_result
 #' 
 #' @export 
 #' 
-pull.ParameterSet <- function(x, var = -1) {
+fetch.ParameterSet <- function(x, var = -1, output = c("named", "value", "list")) {
     fCall <- match.call(expand.dots = FALSE)
-    varName <- deparse(fCall$var)
-    if (!exists(varName) || (!is.character(var) && !is.integer(var))) {
-        var <- gsub('"', "", varName)
-        var <- gsub("'", "", var)
-    }
+    var <- .getParameterSetVar(fCall, var)
+    output <- match.arg(output)
+
+    .assertIsParameterSetClass(x, "x")
     
     if (is.character(var)) {
         if (!(var %in% names(x))) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(var), " does not exist")
         }
         
-        return(x[[var]])
+        value <- x[[var]]
+        
+        if (output == "value") {
+            return(value)
+        }
+        
+        if (output == "named" && is.vector(value) && length(value) <= 1) {
+            names(value) <- var
+            return(value)
+        }
+        
+        result <- list(value = value)
+        names(result) <- var
+        return(result)
     }
-
-    .assertIsSingleInteger(x, "x", validateType = FALSE)
-    .assertIsInClosedInterval(x, "x", lower = -length(x), upper = length(x))
+    
+    .assertIsSingleInteger(var, "var", validateType = FALSE)
+    varNames <- names(x)
+    .assertIsInClosedInterval(var, "var", lower = -length(varNames), upper = length(varNames))
     if (var == 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'x' (", x, ") must != 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'var' (", var, ") must != 0")
     }
     if (var < 0) {
-        var <- length(x) + 1 - var
+        var <- length(varNames) + var + 1
     }
-    return(x[[var]])
+    
+    varName <- varNames[var]
+    value <- x[[varName]]
+    
+    if (output == "value") {
+        return(value)
+    }
+    
+    if (output == "named" && is.vector(value) && length(value) <= 1) {
+        names(value) <- names(x)[var]
+        return(value)
+    }
+    
+    result <- list(value = value)
+    names(result) <- names(x)[var]
+    return(result)
 }
 
 #'

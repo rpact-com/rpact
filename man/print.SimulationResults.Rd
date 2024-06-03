@@ -12,11 +12,13 @@
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{markdown}{If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
+\item{markdown}{If \code{TRUE}, the object \code{x}
+will be printed using markdown syntax;
 normal representation will be used otherwise (default is \code{FALSE})}
 }
 \description{
-\code{print} prints its \code{SimulationResults} argument and returns it invisibly (via \code{invisible(x)}).
+\code{print} prints its \code{SimulationResults} argument and
+returns it invisibly (via \code{invisible(x)}).
 }
 \details{
 Prints the parameters and results of an \code{SimulationResults} object.

@@ -7,7 +7,8 @@
 A class for simulation results survival in enrichment designs.
 }
 \details{
-Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurvival()}} to create an object of this type.
+Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurvival()}}
+to create an object of this type.
 }
 \section{Fields}{
 

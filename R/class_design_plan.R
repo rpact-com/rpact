@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7940 $
-## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
+## |  File version: $Revision: 7958 $
+## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -22,7 +22,10 @@
 #' @include f_design_general_utilities.R
 NULL
 
-C_VARIABLE_DESIGN_PLAN_PARAMETERS <- c("lambda1", "pi1", "median1", "alternative", "hazardRatio", "theta")
+C_VARIABLE_DESIGN_PLAN_PARAMETERS <- c(
+    "lambda1", "pi1", "median1",
+    "alternative", "hazardRatio", "theta"
+)
 
 C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS <- list(
     normalApproximation = FALSE,
@@ -148,13 +151,19 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
         },
         .isSampleSizeObject = function() {
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'.objectType' must be specified as 'sampleSize' or 'power'")
+                stop(
+                    C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+                    "'.objectType' must be specified as 'sampleSize' or 'power'"
+                )
             }
             return(self$.objectType == "sampleSize")
         },
         .isPowerObject = function() {
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'.objectType' must be specified as 'sampleSize' or 'power'")
+                stop(
+                    C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+                    "'.objectType' must be specified as 'sampleSize' or 'power'"
+                )
             }
             return(self$.objectType == "power")
         },
@@ -180,18 +189,23 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
                     consoleOutputEnabled = consoleOutputEnabled
                 )
 
-                self$.showParametersOfOneGroup(.getDesignParametersToShow(self), "Design parameters",
+                self$.showParametersOfOneGroup(.getDesignParametersToShow(self),
+                    "Design parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
 
-                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(),
+                    "User defined parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
-                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
+                self$.showParametersOfOneGroup(self$.getDefaultParameters(),
+                    "Default parameters",
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
                 self$.showParametersOfOneGroup(self$.getGeneratedParameters(),
-                    ifelse(identical(self$.objectType, "sampleSize"), "Sample size and output", "Power and output"),
+                    ifelse(identical(self$.objectType, "sampleSize"),
+                        "Sample size and output", "Power and output"
+                    ),
                     orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
                 )
 
@@ -211,7 +225,9 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
                         )
                     }
                     if (self$.design$kMax > 1) {
-                        self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
+                        self$.cat("  [k]: values at stage k\n",
+                            consoleOutputEnabled = consoleOutputEnabled
+                        )
                     }
                 } else {
                     self$.cat("\n", consoleOutputEnabled = consoleOutputEnabled)
@@ -619,7 +635,7 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
                 return(getSampleSizeRates(
                     design = self$.design,
                     normalApproximation = self$.getParameterValueIfUserDefinedOrDefault("normalApproximation"),
-                    riskRatio = self$riskRatio, 
+                    riskRatio = self$riskRatio,
                     thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
                     pi1 = pi1Temp,
                     pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
@@ -629,7 +645,7 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
             } else {
                 return(getPowerRates(
                     design = self$.design,
-                    riskRatio = self$riskRatio, 
+                    riskRatio = self$riskRatio,
                     thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
                     pi1 = pi1Temp,
                     pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
@@ -892,15 +908,18 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     hr <- self$hazardRatio
                 }
             }
+
+            lambda2 <- self$.getParameterValueIfUserDefinedOrDefault("lambda2")
+
             pi1Temp <- NA_real_
             if (self$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
                 pi1Temp <- pi1
                 if (any(is.na(pi1))) {
                     pi1Temp <- self$pi1
                 }
-            } else {
+            } else if (all(is.na(lambda2))) {
                 if (self$.objectType == "sampleSize") {
-                    pi1Temp <- C_PI_1_SAMPLE_SIZE_DEFAULT 
+                    pi1Temp <- C_PI_1_SAMPLE_SIZE_DEFAULT
                 } else {
                     pi1Temp <- C_PI_1_DEFAULT
                 }
@@ -914,7 +933,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
             if (all(is.na(accrualIntensityTemp))) {
                 accrualIntensityTemp <- C_ACCRUAL_INTENSITY_DEFAULT
             }
-            
+
             if (self$.objectType == "sampleSize") {
                 return(getSampleSizeSurvival(
                     design = self$.design,
@@ -929,7 +948,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     accrualIntensity = accrualIntensityTemp,
                     kappa = self$kappa,
                     piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
-                    lambda2 = self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
+                    lambda2 = lambda2,
                     lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
                     followUpTime = self$.getParameterValueIfUserDefinedOrDefault("followUpTime"),
                     maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
@@ -956,7 +975,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                     accrualIntensity = accrualIntensityTemp,
                     kappa = self$kappa,
                     piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
-                    lambda2 = self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
+                    lambda2 = lambda2,
                     lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
                     hazardRatio = hr,
                     maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),

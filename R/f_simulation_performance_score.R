@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7947 $
-## |  Last changed: $Date: 2024-05-28 14:25:47 +0200 (Di, 28 Mai 2024) $
+## |  File version: $Revision: 7954 $
+## |  Last changed: $Date: 2024-05-29 12:02:48 +0200 (Mi, 29 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -39,8 +39,8 @@
 #' The term conditional refers to an evaluation perspective where the interim results
 #' suggest a trial continuation with a second stage.
 #' The score can take values between 0 and 1. More details on the performance score
-#' can be found in [Herrmann et al. (2020)](https://doi.org/10.1002/sim.8534) and
-#' [Bokelmann et al. (2024)](https://doi.org/10.1186/s12874-024-02150-4).
+#' can be found in Herrmann et al. (2020), \doi{10.1002/sim.8534} and
+#' Bokelmann et al. (2024) \doi{10.1186/s12874-024-02150-4}.
 #'
 #' @template examples_get_performance_score
 #'

@@ -7,7 +7,8 @@
 A class for simulation results survival in multi-arm designs.
 }
 \details{
-Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}} to create an object of this type.
+Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}
+to create an object of this type.
 }
 \section{Fields}{
 

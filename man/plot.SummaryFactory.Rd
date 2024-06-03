@@ -9,12 +9,14 @@
 \arguments{
 \item{x}{The summary factory object.}
 
-\item{y}{Not available for this kind of plot (is only defined to be compatible to the generic plot function).}
+\item{y}{Not available for this kind of plot (is only defined
+to be compatible to the generic plot function).}
 
 \item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented
 for changing x or y axis limits without dropping data observations.}
 
-\item{showSummary}{Show the summary before creating the plot output, default is \code{FALSE}.}
+\item{showSummary}{Show the summary before creating the
+plot output, default is \code{FALSE}.}
 }
 \value{
 Returns a \code{ggplot2} object.

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7958 $
+## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -286,7 +286,6 @@ plot.EventProbabilities <- function(x, y, ...,
     .assertGgplotIsInstalled()
     .assertIsValidLegendPosition(legendPosition)
     .assertIsValidAllocationRatioPlanned(allocationRatioPlanned, 2L)
-    # .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
 
     numberOfSubjectsObject <- NULL
     if (!missing(y) && inherits(y, "NumberOfSubjects")) {
@@ -305,8 +304,12 @@ plot.EventProbabilities <- function(x, y, ...,
 
     if (is.na(maxNumberOfSubjectsToUse)) {
         maxNumberOfSubjectsToUse <- x$maxNumberOfSubjects
-    } else if (!is.na(x$maxNumberOfSubjects) && x$maxNumberOfSubjects != maxNumberOfSubjectsToUse) {
-        stop("'x' (EventProbabilities) and 'y' (NumberOfSubjects) must have the same 'maxNumberOfSubjects' defined")
+    } else if (!is.na(x$maxNumberOfSubjects) &&
+            x$maxNumberOfSubjects != maxNumberOfSubjectsToUse) {
+        stop(
+            "'x' (EventProbabilities) and 'y' (NumberOfSubjects) ",
+            "must have the same 'maxNumberOfSubjects' defined"
+        )
     }
 
     if (!is.na(maxNumberOfSubjectsToUse)) {
@@ -368,7 +371,10 @@ plot.EventProbabilities <- function(x, y, ...,
     srcCmd <- .showPlotSourceInformation(
         objectName = xObjectName,
         xParameterName = "time",
-        yParameterNames = c("cumulativeEventProbabilities", "eventProbabilities1", "eventProbabilities2"),
+        yParameterNames = c(
+            "cumulativeEventProbabilities",
+            "eventProbabilities1", "eventProbabilities2"
+        ),
         type = type,
         showSource = showSource
     )
@@ -458,12 +464,12 @@ plot.NumberOfSubjects <- function(x, y, ...,
     fCall <- match.call(expand.dots = FALSE)
     objectName <- deparse(fCall$x)
 
-    # .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
-
     if (!missing(y) && inherits(y, "EventProbabilities")) {
         return(plot.EventProbabilities(
             x = y, y = x,
-            allocationRatioPlanned = ifelse(is.na(allocationRatioPlanned), y$allocationRatioPlanned, allocationRatioPlanned),
+            allocationRatioPlanned = ifelse(is.na(allocationRatioPlanned),
+                y$allocationRatioPlanned, allocationRatioPlanned
+            ),
             main = main, xlab = xlab, ylab = ylab, type = type,
             legendTitle = legendTitle, palette = palette,
             plotPointsEnabled = plotPointsEnabled, legendPosition = legendPosition,
@@ -473,7 +479,8 @@ plot.NumberOfSubjects <- function(x, y, ...,
 
     if (!is.na(allocationRatioPlanned)) {
         warning("'allocationRatioPlanned' (", allocationRatioPlanned,
-            ") will be ignored because 'y' is undefined (for more information see ?plot.NumberOfSubjects)",
+            ") will be ignored because 'y' is undefined ",
+            "(for more information see ?plot.NumberOfSubjects)",
             call. = FALSE
         )
     }

@@ -12,7 +12,8 @@
 \item{...}{Optional plot arguments. At the moment \code{xlim} and \code{ylim} are implemented
 for changing x or y axis limits without dropping data observations.}
 
-\item{markdown}{If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
+\item{markdown}{If \code{TRUE}, the object \code{x}
+will be printed using markdown syntax;
 normal representation will be used otherwise (default is \code{FALSE})}
 
 \item{sep}{The separator line between the summary and the print output.}

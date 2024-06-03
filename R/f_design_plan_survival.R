@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7902 $
-## |  Last changed: $Date: 2024-05-21 08:44:08 +0200 (Di, 21 Mai 2024) $
+## |  File version: $Revision: 7962 $
+## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -790,11 +790,11 @@ NULL
         designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_USER_DEFINED)
     }
 
-    if (identical(as.integer(accrualSetup$accrualTime), C_ACCRUAL_TIME_DEFAULT) ||
-            identical(
+    if (isTRUE(all.equal(accrualSetup$accrualTime, C_ACCRUAL_TIME_DEFAULT)) ||
+            isTRUE(all.equal(
                 as.integer(c(0L, accrualSetup$.getAccrualTimeWithoutLeadingZero())),
-                C_ACCRUAL_TIME_DEFAULT
-            )) {
+                C_ACCRUAL_TIME_DEFAULT))
+            ) {
         designPlan$.setParameterType("accrualTime", C_PARAM_DEFAULT_VALUE)
     } else {
         designPlan$.setParameterType("accrualTime", accrualSetup$.getParameterType("accrualTime"))
@@ -903,7 +903,7 @@ NULL
             designPlan$.setParameterType(p, C_PARAM_NOT_APPLICABLE)
         }
         if (designPlan$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED ||
-                !identical(accrualTime, C_ACCRUAL_TIME_DEFAULT)) {
+                !isTRUE(all.equal(accrualTime, C_ACCRUAL_TIME_DEFAULT))) {
             designPlan$.warnInCaseArgumentExists(accrualSetup$accrualTime, "accrualTime")
         }
         designPlan$.warnInCaseArgumentExists(dropoutRate1, "dropoutRate1")

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7958 $
+## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -46,8 +46,10 @@ NULL
 #'   \item \code{\link[=print.FieldSet]{print()}} to print the object,
 #'   \item \code{\link[=summary.TrialDesignSet]{summary()}} to display a summary of the object,
 #'   \item \code{\link[=plot.TrialDesignSet]{plot()}} to plot the object,
-#'   \item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}} to coerce the object to a \code{\link[base]{data.frame}},
-#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}} to coerce the object to a \code{\link[base]{matrix}}.
+#'   \item \code{\link[=as.data.frame.TrialDesignSet]{as.data.frame()}}
+#'         to coerce the object to a \code{\link[base]{data.frame}},
+#'   \item \code{\link[=as.matrix.FieldSet]{as.matrix()}}
+#'         to coerce the object to a \code{\link[base]{matrix}}.
 #' }
 #' @template how_to_get_help_for_generics
 #'
@@ -126,7 +128,10 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 
     .assertIsTrialDesignSet(object)
     if (object$isEmpty()) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot create summary because the design set is empty")
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "cannot create summary because the design set is empty"
+        )
     }
 
     summaries <- list()
@@ -171,9 +176,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
         .plotSettings = NULL,
         designs = NULL,
         variedParameters = NULL,
-        #
         # @param ... 'designs' OR 'design' and one or more design parameters, e.g., deltaWT = c(0.1, 0.3, 0.4)
-        #
         initialize = function(...) {
             self$.plotSettings <- PlotSettings$new()
             self$designs <- list()
@@ -749,7 +752,7 @@ as.data.frame.TrialDesignSet <- function(x,
             results <- PowerAndAverageSampleNumberResult$new(design, theta = theta, nMax = nMax)
             suppressWarnings(df2 <- as.data.frame(results,
                 niceColumnNamesEnabled = niceColumnNamesEnabled,
-                includeAllParameters = FALSE # includeAllParameters
+                includeAllParameters = FALSE
             ))
             df <- merge(df, df2, all.y = TRUE)
         }
@@ -882,7 +885,7 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
         legendPosition = NA_integer_, showSource = FALSE,
         designSetName = NA_character_, plotSettings = NULL) {
     .assertGgplotIsInstalled()
-    if (!is.call(main) && !.isResultObjectBaseClass(main)) { 
+    if (!is.call(main) && !.isResultObjectBaseClass(main)) {
         .assertIsSingleCharacter(main, "main", naAllowed = TRUE)
     }
     .assertIsSingleCharacter(xlab, "xlab", naAllowed = TRUE)
@@ -1058,5 +1061,3 @@ plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
     try(suppressWarnings(suppressMessages(p <- p + ggplot2::scale_color_manual(values = c("#4daf4a", "#377eb8", "#e41a1c")))))
     return(p)
 }
-
-

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 7962 $
+## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -75,7 +75,14 @@ StageResults <- R6::R6Class("StageResults",
         weightsInverseNormal = NULL,
         thetaH0 = NULL,
         direction = NULL,
-        initialize = function(..., stage = NULL, stages = NULL, pValues = NULL, weightsFisher = NULL, weightsInverseNormal = NULL, thetaH0 = NULL, direction = NULL) {
+        initialize = function(..., 
+                stage = NULL, 
+                stages = NULL, 
+                pValues = NULL, 
+                weightsFisher = NULL, 
+                weightsInverseNormal = NULL, 
+                thetaH0 = NULL, 
+                direction = NULL) {
             self$stage <- stage
             self$stages <- stages
             self$pValues <- pValues
@@ -105,7 +112,7 @@ StageResults <- R6::R6Class("StageResults",
                 self$.isMultiArm(), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED
             ))
             self$.setParameterType("thetaH0", ifelse(
-                identical(self$thetaH0, C_THETA_H0_MEANS_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                isTRUE(all.equal(self$thetaH0, C_THETA_H0_MEANS_DEFAULT)), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
             self$.setParameterType("direction", ifelse(
                 identical(self$direction, C_DIRECTION_UPPER), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
@@ -307,7 +314,9 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
         overallSampleSizes2 = NULL,
         equalVariances = NULL,
         normalApproximation = NULL,
-        initialize = function(design, dataInput, ...,
+        initialize = function(
+                design, 
+                dataInput, ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -323,7 +332,8 @@ StageResultsMeans <- R6::R6Class("StageResultsMeans",
                 overallSampleSizes = NULL,
                 overallSampleSizes1 = NULL,
                 overallSampleSizes2 = NULL,
-                equalVariances = TRUE, normalApproximation = FALSE) {
+                equalVariances = TRUE, 
+                normalApproximation = FALSE) {
             super$initialize(.design = design, .dataInput = dataInput, ...) 
 
             self$combInverseNormal <- combInverseNormal
@@ -491,7 +501,9 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
         varianceOption = NULL,
         normalApproximation = NULL,
         directionUpper = NULL,
-        initialize = function(design, dataInput, ...,
+        initialize = function(
+                design, 
+                dataInput, ...,
                 combInverseNormal = NULL,
                 combFisher = NULL,
                 overallTestStatistics = NULL,
@@ -502,8 +514,10 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
                 separatePValues = NULL,
                 effectSizes = NULL,
                 singleStepAdjustedPValues = NULL,
-                intersectionTest = NULL, varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
-                normalApproximation = FALSE, directionUpper = NULL) {
+                intersectionTest = NULL, 
+                varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
+                normalApproximation = FALSE, 
+                directionUpper = NULL) {
             super$initialize(...)
             self$combInverseNormal <- combInverseNormal
             self$combFisher <- combFisher
@@ -539,13 +553,16 @@ StageResultsMultiArmMeans <- R6::R6Class("StageResultsMultiArmMeans",
             }
 
             self$.setParameterType("varianceOption", ifelse(
-                identical(self$varianceOption, C_VARIANCE_OPTION_MULTIARMED_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$varianceOption, C_VARIANCE_OPTION_MULTIARMED_DEFAULT), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
             self$.setParameterType("normalApproximation", ifelse(
-                identical(self$normalApproximation, FALSE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$normalApproximation, FALSE), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
             self$.setParameterType("directionUpper", ifelse(
-                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         .getParametersToShow = function() {
@@ -693,7 +710,8 @@ StageResultsRates <- R6::R6Class("StageResultsRates",
             }
 
             self$.setParameterType("normalApproximation", ifelse(
-                identical(self$normalApproximation, TRUE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$normalApproximation, TRUE), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         .getParametersToShow = function() {
@@ -812,7 +830,9 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
         intersectionTest = NULL,
         normalApproximation = NULL,
         directionUpper = NULL,
-        initialize = function(design, dataInput, ...,
+        initialize = function(
+                design, 
+                dataInput, ...,
                 overallPiTreatments = NULL,
                 overallPiControl = NULL,
                 combInverseNormal = NULL,
@@ -861,10 +881,12 @@ StageResultsMultiArmRates <- R6::R6Class("StageResultsMultiArmRates",
             }
 
             self$.setParameterType("normalApproximation", ifelse(
-                identical(self$normalApproximation, FALSE), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$normalApproximation, FALSE), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
             self$.setParameterType("directionUpper", ifelse(
-                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         .getParametersToShow = function() {
@@ -1131,7 +1153,8 @@ StageResultsMultiArmSurvival <- R6::R6Class("StageResultsMultiArmSurvival",
             }
 
             self$.setParameterType("directionUpper", ifelse(
-                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                identical(self$directionUpper, C_DIRECTION_UPPER_DEFAULT), 
+                C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
             ))
         },
         .getParametersToShow = function() {
@@ -1254,8 +1277,10 @@ StageResultsEnrichmentRates <- R6::R6Class("StageResultsEnrichmentRates",
         stratifiedAnalysis = NULL,
         .getParametersToShow = function() {
             parametersToShow <- super$.getParametersToShow()
-            parametersToShow <- parametersToShow[!(parametersToShow %in% c("overallPiTreatments", "overallPiControl"))]
-            return(c(parametersToShow, "stratifiedAnalysis", "overallPisTreatment", "overallPisControl"))
+            parametersToShow <- parametersToShow[
+                !(parametersToShow %in% c("overallPiTreatments", "overallPiControl"))]
+            return(c(parametersToShow, "stratifiedAnalysis", 
+                "overallPisTreatment", "overallPisControl"))
         }
     )
 )
@@ -1547,7 +1572,8 @@ plot.StageResults <- function(x, y, ..., type = 1L,
             "condPow <- getConditionalPower(", stageResultsName,
             ", nPlanned = ", .arrayToString(nPlanned, vectorLookAndFeelEnabled = TRUE)
         )
-        if (.isConditionalPowerEnabled(nPlanned) && allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT) {
+        if (.isConditionalPowerEnabled(nPlanned) && 
+                allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT) {
             cmd <- paste0(cmd, ", allocationRatioPlanned = ", allocationRatioPlanned)
         }
         if (grepl("Means|Survival", .getClassName(x))) {
