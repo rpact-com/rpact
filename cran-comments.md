@@ -1,4 +1,3 @@
-
 ## Test environments
 
 * local OS X install, R 4.4.0
@@ -10,7 +9,7 @@ There were no ERRORs or WARNINGs.
 
 ## Unit tests: testthat results (complete test)
 
-OK:       34427
+OK:       34446
 Failed:   0
 Warnings: 0
 Skipped:  0

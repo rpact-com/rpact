@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-class_design_set.R
 ## |  Creation date: 23 February 2024, 12:33:48
-## |  File version: $Revision: 7928 $
-## |  Last changed: $Date: 2024-05-23 16:35:16 +0200 (Do, 23 Mai 2024) $
+## |  File version: $Revision: 7965 $
+## |  Last changed: $Date: 2024-06-03 07:30:23 +0200 (Mo, 03 Jun 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -24,6 +24,8 @@ test_plan_section("Testing Class 'TrialDesignSet'")
 
 
 test_that("Testing '.getHarmonizedColumnNames'", {
+    .skipTestIfDisabled()
+
     df1 <- data.frame(
         x = 4:6,
         y = 1:3,
@@ -41,6 +43,8 @@ test_that("Testing '.getHarmonizedColumnNames'", {
 })
 
 test_that("Testing '.getHarmonizedDataFrames': small df1 vs large df2", {
+    .skipTestIfDisabled()
+
     df1 <- data.frame(
         x2 = 1,
         x3 = 1,

@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-class_time.R
 ## |  Creation date: 08 November 2023, 08:49:49
-## |  File version: $Revision: 7940 $
-## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
+## |  File version: $Revision: 7965 $
+## |  Last changed: $Date: 2024-06-03 07:30:23 +0200 (Mo, 03 Jun 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -30,6 +30,8 @@ test_that("Testing 'getPiecewiseSurvivalTime': isPiecewiseSurvivalEnabled()", {
 })
 
 test_that("Testing 'getPiecewiseSurvivalTime': simple vector based definition", {
+    .skipTestIfDisabled()
+
     # @refFS[Tab.]{fs:tab:output:getPiecewiseSurvivalTime}
     pwSurvivalTime1 <- getPiecewiseSurvivalTime(lambda2 = 0.5, hazardRatio = 0.8)
 
@@ -118,8 +120,6 @@ test_that("Testing 'getPiecewiseSurvivalTime': simple vector based definition", 
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
-
-    .skipTestIfDisabled()
 
     pwSurvivalTime2 <- getPiecewiseSurvivalTime(pi2 = 0.5, hazardRatio = 0.8)
 
@@ -876,6 +876,8 @@ test_that("Testing 'getPiecewiseSurvivalTime': simple vector based definition", 
 })
 
 test_that("Testing 'getPiecewiseSurvivalTime': vector based definition", {
+    .skipTestIfDisabled()
+
     # @refFS[Tab.]{fs:tab:output:getPiecewiseSurvivalTime}
     pwSurvivalTime1 <- getPiecewiseSurvivalTime(
         piecewiseSurvivalTime = c(0, 6, 9),
@@ -884,8 +886,6 @@ test_that("Testing 'getPiecewiseSurvivalTime': vector based definition", {
     expect_equal(pwSurvivalTime1$hazardRatio, 0.8)
     expect_equal(pwSurvivalTime1$lambda1, c(0.025, 0.04, 0.015) * 0.8)
     expect_false(pwSurvivalTime1$isDelayedResponseEnabled())
-
-    .skipTestIfDisabled()
 
     pwSurvivalTime2 <- getPiecewiseSurvivalTime(
         piecewiseSurvivalTime = c(0, 5, 10),
@@ -1169,6 +1169,8 @@ test_that("Testing 'getPiecewiseSurvivalTime': vector based definition", {
 })
 
 test_that("Testing 'getPiecewiseSurvivalTime': check error and warnings", {
+    .skipTestIfDisabled()
+
     # @refFS[Tab.]{fs:tab:output:getPiecewiseSurvivalTime}
     expect_error(getPiecewiseSurvivalTime(hazardRatio = c(0.6, 0.8), lambda2 = 0.4, pi2 = 0.4),
         "Conflicting arguments: it is not allowed to specify 'pi2' (0.4) and 'lambda2' (0.4) concurrently",
@@ -1224,6 +1226,8 @@ test_that("Testing 'getPiecewiseSurvivalTime': check error and warnings", {
 })
 
 test_that("Testing 'getPiecewiseSurvivalTime': list-wise definition", {
+    .skipTestIfDisabled()
+
     # @refFS[Tab.]{fs:tab:output:getPiecewiseSurvivalTime}
     pwSurvivalTime8 <- getPiecewiseSurvivalTime(piecewiseSurvivalTime = list(
         "<6"       = 0.025,
@@ -1238,8 +1242,6 @@ test_that("Testing 'getPiecewiseSurvivalTime': list-wise definition", {
     expect_equal(pwSurvivalTime8$piecewiseSurvivalTime, c(0, 6, 9, 15, 21))
     expect_equal(pwSurvivalTime8$lambda2, c(0.025, 0.040, 0.015, 0.010, 0.007))
     expect_equal(pwSurvivalTime8$lambda1, c(0.0150, 0.0240, 0.0090, 0.0060, 0.0042))
-
-    .skipTestIfDisabled()
 
     result1 <- getPiecewiseSurvivalTime(list(
         "<5" = 0.1,
@@ -1518,6 +1520,8 @@ test_that("Testing 'getAccrualTime': isAccrualTimeEnabled()", {
 })
 
 test_that("Testing 'getAccrualTime': vector based definition", {
+    .skipTestIfDisabled()
+
     accrualTime1 <- getAccrualTime(
         accrualTime = c(0, 6, 9, 15),
         accrualIntensity = c(15, 21, 27), maxNumberOfSubjects = 315
@@ -1533,8 +1537,6 @@ test_that("Testing 'getAccrualTime': vector based definition", {
     expect_equal(accrualTime2$accrualTime, c(0, 6, 9, 40.37037))
     expect_equal(accrualTime2$accrualIntensity, c(15, 21, 27))
     expect_equal(accrualTime2$remainingTime, 31.37037)
-
-    .skipTestIfDisabled()
 
     accrualTime3 <- getAccrualTime(
         accrualTime = c(0, 12, 13, 14, 15, 16),
@@ -1915,6 +1917,8 @@ test_that("Testing 'getAccrualTime': vector based definition", {
 })
 
 test_that("Testing 'getAccrualTime': test absolute and relative definition", {
+    .skipTestIfDisabled()
+
     # @refFS[Tab.]{fs:tab:output:getAccrualTime}
     accrualTime1 <- getAccrualTime(
         accrualTime = c(0, 6, 30),
@@ -2004,8 +2008,6 @@ test_that("Testing 'getAccrualTime': test absolute and relative definition", {
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
-
-    .skipTestIfDisabled()
 
     accrualTime3 <- getAccrualTime(
         accrualTime = c(0, 6, 30),
@@ -2482,6 +2484,8 @@ test_that("Testing 'getAccrualTime': test absolute and relative definition", {
 })
 
 test_that("Testing 'getAccrualTime': check expected warnings and errors", {
+    .skipTestIfDisabled()
+
     # @refFS[Tab.]{fs:tab:output:getAccrualTime}
     expect_warning(getAccrualTime(accrualTime = c(0, 6), accrualIntensity = c(0.22, 0.33)),
         paste0(
@@ -2495,8 +2499,6 @@ test_that("Testing 'getAccrualTime': check expected warnings and errors", {
         "Last accrual intensity value (45) ignored",
         fixed = TRUE
     )
-
-    .skipTestIfDisabled()
 
     suppressWarnings(expect_warning(
         getAccrualTime(
@@ -2549,6 +2551,8 @@ test_that("Testing 'getAccrualTime': check expected warnings and errors", {
 })
 
 test_that("Testing 'getAccrualTime': list-wise definition", {
+    .skipTestIfDisabled()
+
     accrualTime1 <- list(
         "0  - <12" = 15,
         "12 - <13" = 21,
@@ -2563,8 +2567,6 @@ test_that("Testing 'getAccrualTime': list-wise definition", {
     expect_equal(accrualTime4$accrualTime, c(0, 12, 13, 14, 15, 16, 40.55555556))
     expect_equal(accrualTime4$accrualIntensity, c(15, 21, 27, 33, 39, 45))
     expect_equal(accrualTime4$remainingTime, 24.55555556)
-
-    .skipTestIfDisabled()
 
     accrualTime2 <- list(
         "0  - <12" = 15,
@@ -2601,6 +2603,8 @@ test_that("Testing 'getAccrualTime': list-wise definition", {
 })
 
 test_that("Testing 'getPiecewiseSurvivalTime': mixed arguments", {
+    .skipTestIfDisabled()
+
     # @refFS[Tab.]{fs:tab:output:getPiecewiseSurvivalTime}
     pwSurvivalTime1 <- getPiecewiseSurvivalTime(median1 = 37, hazardRatio = 0.8)
 
@@ -2741,6 +2745,8 @@ test_that("Testing 'getPiecewiseSurvivalTime': mixed arguments", {
 })
 
 test_that("Testing 'getAccrualTime' and 'getPiecewiseSurvivalTime': illegal user arguments", {
+    .skipTestIfDisabled()
+
     expect_error(getAccrualTime(accrualTime = c(0, 12), accrualIntensity = 0.1, accrualIntensityType = "absolute"))
 
     expect_error(getAccrualTime(

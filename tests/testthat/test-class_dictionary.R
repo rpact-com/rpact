@@ -15,15 +15,17 @@
 ## |
 ## |  File name: test-class_dictionary.R
 ## |  Creation date: 23 February 2024, 07:45:41
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 7965 $
+## |  Last changed: $Date: 2024-06-03 07:30:23 +0200 (Mo, 03 Jun 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing Class 'Dictionary'")
 
 
 test_that("Add values to Dictionary", {
+    .skipTestIfDisabled()
+
     dict <- createDictionary("TestDictionary")
     expect_equal(class(dict)[1], "Dictionary")
     expect_error(.assertIsDictionary(dict), NA)
@@ -40,6 +42,8 @@ test_that("Add values to Dictionary", {
 })
 
 test_that("Set values to Dictionary", {
+    .skipTestIfDisabled()
+
     dict <- createDictionary("TestDictionary", list(a = 1, b = 2, c = 3))
     setValueToDictionary(dict, "b", 99)
     setValueToDictionary(dict, "d", 33)
@@ -52,6 +56,8 @@ test_that("Set values to Dictionary", {
 })
 
 test_that("Get values from Dictionary", {
+    .skipTestIfDisabled()
+
     dict <- createDictionary("TestDictionary", list(a = 1, b = 2, c = 3))
     expect_equal(getValueFromDictionary(dict, "a"), 1)
     expect_equal(getValueFromDictionary(dict, "b"), 2)
@@ -60,6 +66,8 @@ test_that("Get values from Dictionary", {
 })
 
 test_that("Get Dictionary key by value", {
+    .skipTestIfDisabled()
+
     dict <- createDictionary("TestDictionary", list(a = 1, b = "B", c = 3))
     expect_equal(getDictionaryKeyByValue(dict, "B"), "b")
     expect_equal(getDictionaryKeyByValue(dict, 1), "a")
@@ -67,24 +75,31 @@ test_that("Get Dictionary key by value", {
 })
 
 test_that("Dictionary as vector", {
+    .skipTestIfDisabled()
+
     dict <- createDictionary("TestDictionary", list(a = 1, b = 2, c = 3))
     expect_equal(as.vector(dict), c("1", "2", "3"))
 })
 
 test_that("Dictionary as list", {
+    .skipTestIfDisabled()
+
     dict <- createDictionary("TestDictionary", list(a = 1, b = 2, c = 3))
     expect_equal(as.list(dict), list(a = 1, b = 2, c = 3))
 })
 
 test_that("Print Dictionary", {
+    .skipTestIfDisabled()
+
     dict <- createDictionary("TestDictionary", list(a = 1, b = 2, c = 3))
     expect_equal(paste(utils::capture.output(print(dict)), collapse = "\n"), "TestDictionary \n$a\n[1] 1\n\n$b\n[1] 2\n\n$c\n[1] 3\n")
 })
 
 test_that("Get subset from Dictionary", {
+    .skipTestIfDisabled()
+
     dict <- createDictionary("TestDictionary", list(a = 1, b = 2, c = 3))
     dictSub <- getDictionarySubset(dict, c("a", "c"))
-
 
     ## Comparison of the results of Dictionary object 'dictSub' with expected results
     expect_equal(dictSub$a, 1, label = paste0(dictSub$a))
