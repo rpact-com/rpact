@@ -286,6 +286,9 @@
     <loc>https://rpact-com.github.io/rpact/reference/dataSurvival.html</loc>
   </url>
   <url>
+    <loc>https://rpact-com.github.io/rpact/reference/fetch.ParameterSet.html</loc>
+  </url>
+  <url>
     <loc>https://rpact-com.github.io/rpact/reference/getAccrualTime.html</loc>
   </url>
   <url>
@@ -860,9 +863,6 @@
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/printCitation.html</loc>
-  </url>
-  <url>
-    <loc>https://rpact-com.github.io/rpact/reference/pull.ParameterSet.html</loc>
   </url>
   <url>
     <loc>https://rpact-com.github.io/rpact/reference/rawDataTwoArmNormal.html</loc>
