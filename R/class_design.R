@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7962 $
-## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -293,7 +293,33 @@ TrialDesignCharacteristics <- R6::R6Class("TrialDesignCharacteristics",
 #'
 #' @export
 #'
-print.TrialDesignCharacteristics <- function(x, ..., markdown = FALSE, showDesign = TRUE) {
+print.TrialDesignCharacteristics <- function(x, ..., markdown = NA, showDesign = TRUE) {
+    sysCalls <- sys.calls()
+    
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    if (isTRUE(markdown)) {
+        if (.isPrintCall(sysCalls)) {
+            result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+            return(knitr::asis_output(result))
+        }
+        
+        attr(x, "markdown") <- TRUE
+        queue <- attr(x, "queue")
+        if (is.null(queue)) {
+            queue <- list()
+        }
+        if (showDesign) {
+            queue[[length(queue) + 1]] <- x$.design
+        }
+        queue[[length(queue) + 1]] <- x
+        attr(x, "queue") <- queue
+        return(invisible(x))
+    }
+    
+    
     if (showDesign) {
         print.ParameterSet(x$.design, ..., markdown = markdown)
     }
@@ -1075,11 +1101,71 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #'
 #' @export
 #'
-plot.TrialDesign <- function(x, y, ..., main = NA_character_,
-        xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
-        theta = seq(-1, 1, 0.01), nMax = NA_integer_, plotPointsEnabled = NA,
-        legendPosition = NA_integer_, showSource = FALSE,
-        grid = 1, plotSettings = NULL) {
+plot.TrialDesign <- function(
+        x, 
+        y, 
+        ..., 
+        main = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        type = 1L, 
+        palette = "Set1",
+        theta = seq(-1, 1, 0.01), 
+        nMax = NA_integer_, 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        grid = 1, 
+        plotSettings = NULL) {
+        
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    args <- list(
+        x = x, 
+        y = NULL,
+        main = main,
+        xlab = xlab,
+        ylab = ylab,
+        type = type,
+        palette = palette,
+        theta = theta, 
+        nMax = nMax, 
+        plotPointsEnabled = plotPointsEnabled,
+        legendPosition = legendPosition,
+        showSource = showSource,
+        grid = grid,
+        plotSettings = plotSettings, 
+        ...)
+    
+    if (markdown) {
+        sep <- "\n\n-----\n\n"
+        print(do.call(.plot.TrialDesign, args))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    }
+    
+    return(do.call(.plot.TrialDesign, args))
+}
+
+.plot.TrialDesign <- function(
+        x, 
+        y, 
+        ..., 
+        main = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        type = 1L, 
+        palette = "Set1",
+        theta = seq(-1, 1, 0.01), 
+        nMax = NA_integer_, 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        grid = 1, 
+        plotSettings = NULL) {
+        
     fCall <- match.call(expand.dots = FALSE)
     designName <- deparse(fCall$x)
     .assertGgplotIsInstalled()
@@ -1123,6 +1209,17 @@ plot.TrialDesign <- function(x, y, ..., main = NA_character_,
 #' @rdname plot.TrialDesign
 #' @export
 plot.TrialDesignCharacteristics <- function(x, y, ...) {
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    if (markdown) {
+        sep <- "\n\n-----\n\n"
+        print(.plot.TrialDesign(x = x$.design, y = y, ...))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    }
+    
     plot(x = x$.design, y = y, ...)
 }
 

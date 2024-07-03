@@ -4,7 +4,7 @@
 \alias{print.TrialDesignCharacteristics}
 \title{Trial Design Characteristics Printing}
 \usage{
-\method{print}{TrialDesignCharacteristics}(x, ..., markdown = FALSE, showDesign = TRUE)
+\method{print}{TrialDesignCharacteristics}(x, ..., markdown = NA, showDesign = TRUE)
 }
 \arguments{
 \item{x}{The trial design characteristics object.}

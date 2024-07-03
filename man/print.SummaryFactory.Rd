@@ -4,7 +4,7 @@
 \alias{print.SummaryFactory}
 \title{Summary Factory Printing}
 \usage{
-\method{print}{SummaryFactory}(x, ..., markdown = NA, sep = "\\n-----\\n\\n")
+\method{print}{SummaryFactory}(x, ..., markdown = NA, sep = "\\n\\n-----\\n\\n")
 }
 \arguments{
 \item{x}{The summary factory object.}

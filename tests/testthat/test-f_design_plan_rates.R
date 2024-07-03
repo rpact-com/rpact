@@ -15,9 +15,9 @@
 ## |  
 ## |  File name: test-f_design_plan_rates.R
 ## |  Creation date: 21 December 2023, 08:52:47
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 8027 $
+## |  Last changed: $Date: 2024-07-03 16:00:55 +0200 (Mi, 03 Jul 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |  
 
 test_plan_section("Testing the Sample Size Calculation of Testing Rates for Different Designs and Arguments")
@@ -49,7 +49,7 @@ test_that("'getSampleSizeRates': Sample size calculation of testing rates for on
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH0, 29.371899, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH0, collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH01, 27.638803, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH01, collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH1, 21.510502, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH1, collapse = ", "), ")"))
-	expect_equal(sampleSizeResult$criticalValuesEffectScale[1, ], 1.090192, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[1, ], collapse = ", "), ")"))
+	expect_equal(sampleSizeResult$criticalValuesEffectScale[1, ], NA_real_, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[1, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScale[2, ], 0.81076728, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[2, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScale[3, ], 0.6912997, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[3, ], collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -98,7 +98,7 @@ test_that("'getSampleSizeRates': Sample size calculation of testing rates for on
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH0, 29.371899, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH0, collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH01, 27.638803, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH01, collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH1, 21.510502, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH1, collapse = ", "), ")"))
-	expect_equal(sampleSizeResult$criticalValuesEffectScale[1, ], -0.090191958, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[1, ], collapse = ", "), ")"))
+	expect_equal(sampleSizeResult$criticalValuesEffectScale[1, ], NA_real_, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[1, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScale[2, ], 0.18923272, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[2, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScale[3, ], 0.3087003, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[3, ], collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -147,7 +147,7 @@ test_that("'getSampleSizeRates': Sample size calculation of testing rates for on
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH0, 25.966887, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH0, collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH01, 24.434704, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH01, collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH1, 19.016842, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH1, collapse = ", "), ")"))
-	expect_equal(sampleSizeResult$criticalValuesEffectScale[1, ], 1.127696, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[1, ], collapse = ", "), ")"))
+	expect_equal(sampleSizeResult$criticalValuesEffectScale[1, ], NA_real_, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[1, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScale[2, ], 0.83051514, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[2, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScale[3, ], 0.70345593, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScale[3, ], collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -682,10 +682,10 @@ test_that("'getSampleSizeRates': Sample size calculation of testing rates for tw
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH0, 9.4279622, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH0, collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH01, 8.5285086, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH01, collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$expectedNumberOfSubjectsH1, 6.4928537, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$expectedNumberOfSubjectsH1, collapse = ", "), ")"))
-	expect_equal(sampleSizeResult$criticalValuesEffectScaleLower[1, ], -0.01272092, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScaleLower[1, ], collapse = ", "), ")"))
+	expect_equal(sampleSizeResult$criticalValuesEffectScaleLower[1, ], NA_real_, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScaleLower[1, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScaleLower[2, ], 0.23002532, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScaleLower[2, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScaleLower[3, ], 0.33381109, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScaleLower[3, ], collapse = ", "), ")"))
-	expect_equal(sampleSizeResult$criticalValuesEffectScaleUpper[1, ], 1.0127209, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScaleUpper[1, ], collapse = ", "), ")"))
+	expect_equal(sampleSizeResult$criticalValuesEffectScaleUpper[1, ], NA_real_, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScaleUpper[1, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScaleUpper[2, ], 0.76997468, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScaleUpper[2, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesEffectScaleUpper[3, ], 0.66618891, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesEffectScaleUpper[3, ], collapse = ", "), ")"))
 	expect_equal(sampleSizeResult$criticalValuesPValueScale[1, ], 0.12265406, tolerance = 1e-07, label = paste0("c(", paste0(sampleSizeResult$criticalValuesPValueScale[1, ], collapse = ", "), ")"))

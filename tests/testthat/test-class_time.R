@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-class_time.R
 ## |  Creation date: 08 November 2023, 08:49:49
-## |  File version: $Revision: 7940 $
-## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
+## |  File version: $Revision: 7968 $
+## |  Last changed: $Date: 2024-06-07 15:03:21 +0200 (Fr, 07 Jun 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 

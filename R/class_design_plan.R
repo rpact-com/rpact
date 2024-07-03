@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7958 $
-## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -900,7 +900,7 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
                 ), call. = FALSE)
             }
         },
-        recreate = function(hazardRatio = NA_real_, pi1 = NA_real_) {
+        recreate = function(..., hazardRatio = NA_real_, pi1 = NA_real_, maxNumberOfSubjects = NA_integer_) {
             hr <- NA_real_
             if (self$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
                 hr <- hazardRatio
@@ -933,57 +933,44 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
             if (all(is.na(accrualIntensityTemp))) {
                 accrualIntensityTemp <- C_ACCRUAL_INTENSITY_DEFAULT
             }
-
+            
+            if (is.null(maxNumberOfSubjects) || length(maxNumberOfSubjects) != 1 || is.na(maxNumberOfSubjects)) {
+                maxNumberOfSubjects <- self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects")
+            }
+            
+            args <- list(
+                design = self$.design,
+                typeOfComputation = self$.getParameterValueIfUserDefinedOrDefault("typeOfComputation"),
+                thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
+                pi1 = pi1Temp,
+                pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
+                allocationRatioPlanned = self$allocationRatioPlanned,
+                eventTime = ifelse(all(is.na(self$eventTime)), C_EVENT_TIME_DEFAULT, self$eventTime),
+                accrualTime = accrualTimeTemp,
+                accrualIntensity = accrualIntensityTemp,
+                kappa = self$kappa,
+                piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
+                lambda2 = lambda2,
+                lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
+                hazardRatio = hr,
+                maxNumberOfSubjects = maxNumberOfSubjects,
+                dropoutRate1 = self$dropoutRate1,
+                dropoutRate2 = self$dropoutRate2,
+                dropoutTime = self$dropoutTime
+            )
+            
             if (self$.objectType == "sampleSize") {
-                return(getSampleSizeSurvival(
-                    design = self$.design,
-                    typeOfComputation = self$.getParameterValueIfUserDefinedOrDefault("typeOfComputation"),
-                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
-                    pi1 = pi1Temp,
-                    pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
-                    allocationRatioPlanned = self$allocationRatioPlanned,
-                    accountForObservationTimes = self$.getParameterValueIfUserDefinedOrDefault("accountForObservationTimes"),
-                    eventTime = ifelse(all(is.na(self$eventTime)), C_EVENT_TIME_DEFAULT, self$eventTime),
-                    accrualTime = accrualTimeTemp,
-                    accrualIntensity = accrualIntensityTemp,
-                    kappa = self$kappa,
-                    piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
-                    lambda2 = lambda2,
-                    lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
-                    followUpTime = self$.getParameterValueIfUserDefinedOrDefault("followUpTime"),
-                    maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
-                    dropoutRate1 = self$dropoutRate1,
-                    dropoutRate2 = self$dropoutRate2,
-                    dropoutTime = self$dropoutTime,
-                    hazardRatio = hr
-                ))
+                args$ accountForObservationTimes = self$.getParameterValueIfUserDefinedOrDefault("accountForObservationTimes")
+                args$followUpTime = self$.getParameterValueIfUserDefinedOrDefault("followUpTime")
+                return(do.call(getSampleSizeSurvival, args))
             } else {
                 directionUpperTemp <- self$directionUpper
                 if (length(directionUpperTemp) > 1) {
                     directionUpperTemp <- directionUpperTemp[1]
                 }
-                return(getPowerSurvival(
-                    design = self$.design,
-                    typeOfComputation = self$.getParameterValueIfUserDefinedOrDefault("typeOfComputation"),
-                    thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
-                    pi1 = pi1Temp,
-                    pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
-                    directionUpper = directionUpperTemp,
-                    allocationRatioPlanned = self$allocationRatioPlanned,
-                    eventTime = ifelse(all(is.na(self$eventTime)), C_EVENT_TIME_DEFAULT, self$eventTime),
-                    accrualTime = accrualTimeTemp,
-                    accrualIntensity = accrualIntensityTemp,
-                    kappa = self$kappa,
-                    piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
-                    lambda2 = lambda2,
-                    lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
-                    hazardRatio = hr,
-                    maxNumberOfSubjects = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects"),
-                    maxNumberOfEvents = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfEvents"),
-                    dropoutRate1 = self$dropoutRate1,
-                    dropoutRate2 = self$dropoutRate2,
-                    dropoutTime = self$dropoutTime
-                ))
+                args$directionUpper = directionUpperTemp
+                args$maxNumberOfEvents = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfEvents")
+                return(do.call(getPowerSurvival, args))
             }
         }
     )

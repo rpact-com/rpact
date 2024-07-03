@@ -90,5 +90,5 @@ Plots an object that inherits from class \code{\link{EventProbabilities}}.
 \details{
 Generic function to plot an event probabilities object.
 
-Generic function to plot a parameter set.
+Generic function to plot an event probabilities object.
 }

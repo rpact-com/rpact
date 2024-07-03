@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7958 $
-## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -205,7 +205,13 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                 consoleOutputEnabled = consoleOutputEnabled
             )
             for (design in self$designs) {
-                design$.show(showType = showType, consoleOutputEnabled = consoleOutputEnabled)
+                designOutputLines <- utils::capture.output(design$.show(
+                    showType = showType, consoleOutputEnabled = TRUE))
+                for (designOutputLine in designOutputLines) {
+                    self$.cat(designOutputLine, "\n", 
+                        heading = ifelse(grepl(":$", designOutputLine), 2, 0),
+                        consoleOutputEnabled = consoleOutputEnabled)
+                }
             }
         },
         isEmpty = function() {
@@ -291,6 +297,12 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                     "e.g., deltaWT = c(0.1, 0.3, 0.4)"
                 )
             }
+            
+            if (is.null(design) && length(args) == 1 && .isTrialDesign(args[[1]])) {
+                design <- args[[1]]
+                self$designs <- c(self$designs, design)
+                return(invisible(design))
+            }
 
             if (is.null(design) && optionalArgumentsDefined && length(self$designs) == 0) {
                 stop(
@@ -315,12 +327,16 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
             self$.getArgumentNames(validatedDesign = design, ...)
 
-            invisible(design)
+            return(invisible(design))
         },
         .getArgumentNames = function(validatedDesign, ...) {
             args <- list(...)
             if (length(args) == 0) {
                 return(character())
+            }
+            
+            if (length(args) == 1 && .isTrialDesign(args[[1]])) {
+                return("design")
             }
 
             argumentNames <- names(args)
@@ -342,7 +358,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                 }
             }
 
-            invisible(argumentNames)
+            return(invisible(argumentNames))
         },
         add = function(...) {
             "Adds 'designs' OR a 'design' and/or a design parameter, e.g., deltaWT = c(0.1, 0.3, 0.4)"
@@ -381,6 +397,10 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
             if (length(argumentNames) == 0) {
                 warning("Creation of design variants stopped: no valid design parameters found", call. = FALSE)
+                return(list())
+            }
+            
+            if (identical(argumentNames, "design")) {
                 return(list())
             }
 
@@ -842,11 +862,70 @@ as.data.frame.TrialDesignSet <- function(x,
 #'
 #' @export
 #'
-plot.TrialDesignSet <- function(x, y, ..., type = 1L, main = NA_character_,
-        xlab = NA_character_, ylab = NA_character_, palette = "Set1",
-        theta = seq(-1, 1, 0.02), nMax = NA_integer_, plotPointsEnabled = NA,
-        legendPosition = NA_integer_, showSource = FALSE,
-        grid = 1, plotSettings = NULL) {
+plot.TrialDesignSet <- function(
+        x, 
+        y, 
+        ..., 
+        type = 1L, 
+        main = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        palette = "Set1",
+        theta = seq(-1, 1, 0.02), 
+        nMax = NA_integer_, 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        grid = 1, 
+        plotSettings = NULL) {
+        
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    args <- list(
+        x = x, 
+        y = NULL,
+        type = type,
+        main = main,
+        xlab = xlab,
+        ylab = ylab,
+        palette = palette,
+        theta = theta, 
+        plotPointsEnabled = plotPointsEnabled,
+        legendPosition = legendPosition,
+        showSource = showSource,
+        grid = grid,
+        plotSettings = plotSettings, 
+        ...)
+    
+    if (markdown) {
+        sep <- "\n\n-----\n\n"
+        print(do.call(.plot.TrialDesignSet, args))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    }
+    
+    return(do.call(.plot.TrialDesignSet, args))
+}
+
+.plot.TrialDesignSet <- function(
+        x, 
+        y, 
+        ..., 
+        type = 1L, 
+        main = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        palette = "Set1",
+        theta = seq(-1, 1, 0.02), 
+        nMax = NA_integer_, 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        grid = 1, 
+        plotSettings = NULL) {
+        
     fCall <- match.call(expand.dots = FALSE)
     designSetName <- deparse(fCall$x)
     .assertGgplotIsInstalled()

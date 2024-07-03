@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1373,18 +1373,67 @@
 #'
 #' @export
 #'
-plot.TrialDesignPlan <- function(x, y, ...,
+plot.TrialDesignPlan <- function(
+        x, 
+        y, ...,
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,
         type = NA_integer_,
         palette = "Set1",
-        theta = NA_real_, plotPointsEnabled = NA,
+        theta = NA_real_, 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_,
+        showSource = FALSE,
+        grid = 1,
+        plotSettings = NULL) {
+        
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    args <- list(
+        x = x, 
+        y = NULL,
+        main = main,
+        xlab = xlab,
+        ylab = ylab,
+        type = type,
+        palette = palette,
+        theta = theta, 
+        plotPointsEnabled = plotPointsEnabled,
+        legendPosition = legendPosition,
+        showSource = showSource,
+        grid = grid,
+        plotSettings = plotSettings, 
+        ...)
+
+    if (markdown) {
+        sep <- "\n\n-----\n\n"
+        print(do.call(.plot.TrialDesignPlan, args))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    }
+    
+    return(do.call(.plot.TrialDesignPlan, args))
+}
+  
+.plot.TrialDesignPlan <- function(
+        x, 
+        y, ...,
+        main = NA_character_,
+        xlab = NA_character_,
+        ylab = NA_character_,
+        type = NA_integer_,
+        palette = "Set1",
+        theta = NA_real_, 
+        plotPointsEnabled = NA,
         legendPosition = NA_integer_,
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
+    
     designPlanName <- deparse(fCall$x)
     .assertGgplotIsInstalled()
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
@@ -1398,8 +1447,14 @@ plot.TrialDesignPlan <- function(x, y, ...,
     }
 
     if (all(is.na(type))) {
-        type <- 1L
         availablePlotTypes <- getAvailablePlotTypes(x)
+        if (length(availablePlotTypes) == 0) {
+            stop("No plot available for this ", 
+                .formatCamelCaseSingleWord(x$.objectType), " ", x$.toString(), 
+                " result object")
+        }
+        
+        type <- 1L
         if (length(availablePlotTypes) > 0 && !(type %in% availablePlotTypes)) {
             type <- availablePlotTypes[1]
         }

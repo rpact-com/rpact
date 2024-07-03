@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7962 $
-## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1831,23 +1831,72 @@ plot.AnalysisResults <- function(x, y, ..., type = 1L,
         main = NA_character_, xlab = NA_character_, ylab = NA_character_,
         legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
         showSource = FALSE, grid = 1, plotSettings = NULL) {
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    args <- list(
+        x = x, 
+        y = NULL,
+        type = type,
+        nPlanned = nPlanned, 
+        allocationRatioPlanned = allocationRatioPlanned, 
+        main = main,
+        xlab = xlab,
+        ylab = ylab,
+        legendTitle = legendTitle,
+        palette = palette,
+        legendPosition = legendPosition,
+        showSource = showSource,
+        grid = grid,
+        plotSettings = plotSettings, 
+        ...)
+    
+    if (markdown) {
+        sep <- "\n\n-----\n\n"
+        print(do.call(.plot.AnalysisResults, args))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    } else {
+        return(do.call(.plot.AnalysisResults, args))
+    }
+}
+
+.plot.AnalysisResults <- function(x, y, ..., type = 1L,
+        nPlanned = NA_real_,
+        allocationRatioPlanned = NA_real_,
+        main = NA_character_, xlab = NA_character_, ylab = NA_character_,
+        legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
+        showSource = FALSE, grid = 1, plotSettings = NULL) {
     .assertGgplotIsInstalled()
     functionCall <- match.call(expand.dots = TRUE)
-    analysisResultsName <- as.character(functionCall$x)[1]
+    
+    analysisResultsName <- .getOptionalArgument("cmd", ..., 
+        optionalArgumentDefaultValue = as.character(functionCall)[1])
+    
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     typeNumbers <- .getPlotTypeNumber(type, x)
+    
     p <- NULL
     plotList <- list()
     for (typeNumber in typeNumbers) {
         p <- .plotAnalysisResults(
-            x = x, y = y, type = typeNumber,
+            x = x, 
+            y = y, 
+            type = typeNumber,
             nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
-            main = main, xlab = xlab, ylab = ylab,
-            legendTitle = legendTitle, palette = palette, legendPosition = legendPosition,
-            showSource = showSource, functionCall = functionCall,
-            analysisResultsName = analysisResultsName, plotSettings = plotSettings, ...
-        )
+            main = main, 
+            xlab = xlab, 
+            ylab = ylab,
+            legendTitle = legendTitle, 
+            palette = palette, 
+            legendPosition = legendPosition,
+            showSource = showSource, 
+            functionCall = functionCall,
+            analysisResultsName = analysisResultsName, 
+            plotSettings = plotSettings, 
+            ...)
         .printPlotShowSourceSeparator(showSource, typeNumber, typeNumbers)
         if (length(typeNumbers) > 1) {
             caption <- .getPlotCaption(x, typeNumber, stopIfNotFound = TRUE)
@@ -1935,6 +1984,101 @@ plot.AnalysisResults <- function(x, y, ..., type = 1L,
     return(p)
 }
 
+.getAnalysisPlotArgument <- function(functionCall, paramName, args) {
+    if (is.null(args) || length(args) == 0) {
+        return(eval.parent(functionCall[[paramName]]))
+    }
+    
+    if (paramName %in% names(args)) {
+        return(args[[paramName]])
+    }
+    
+    return(eval.parent(functionCall[[paramName]]))
+}
+
+.addAnalysisPlotArgumentsToFunctionCall <- function(x, functionCall, ..., result = NULL, args = list()) {
+    if (is.null(result)) {
+        result <- functionCall
+    }
+    
+    if (!inherits(x, "AnalysisResults")) {
+        return(result)
+    }
+    
+    if (.isTrialDesignFisher(x$.design)) {
+        result$iterations <- x$iterations
+        result$seed <- x$seed
+    }
+    
+    if (x$getDataInput()$isDatasetMeans()) {
+        if (.isMultiHypothesesAnalysisResults(x)) {
+            assumedStDevs <- .getAnalysisPlotArgument(functionCall, "assumedStDevs", args) 
+            if (is.null(assumedStDevs)) {
+                assumedStDevs <- as.numeric(x$assumedStDevs)
+            }
+            
+            gMax <- x$.stageResults$getGMax()
+            .assertIsValidAssumedStDevs(assumedStDevs, gMax)
+            
+            result$assumedStDevs <- assumedStDevs
+        } else {
+            assumedStDev <- .getAnalysisPlotArgument(functionCall, "assumedStDev", args)  
+            if (is.null(assumedStDev)) {
+                assumedStDev <- x$assumedStDev
+            }
+            result$assumedStDev <- assumedStDev
+        }
+    }
+    
+    if (x$getDataInput()$isDatasetMeans() || x$getDataInput()$isDatasetSurvival()) {
+        thetaRange <- .getAnalysisPlotArgument(functionCall, "thetaRange", args)  
+        if (is.null(thetaRange)) {
+            thetaRangeMin <- min(x$thetaH0, min(na.omit(as.numeric(x$thetaH1))))
+            thetaRangeMax <- 2 * max(x$thetaH0, max(na.omit(as.numeric(x$thetaH1))))
+            thetaRange <- seq(
+                thetaRangeMin, thetaRangeMax,
+                (thetaRangeMax - thetaRangeMin) / C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT
+            )
+        } else {
+            thetaRange <- .assertIsValidThetaRange(
+                thetaRange = thetaRange,
+                survivalDataEnabled = x$getDataInput()$isDatasetSurvival()
+            )
+        }
+        result$thetaRange <- thetaRange
+    } else if (x$getDataInput()$isDatasetRates()) {
+        if (.isMultiArmAnalysisResults(x)) {
+            piControl <- .getAnalysisPlotArgument(functionCall, "piControl", args) 
+            if (is.null(piControl)) {
+                piControl <- as.numeric(x$piControl)
+            }
+            result$piControl <- piControl
+        } else if (.isEnrichmentAnalysisResults(x)) {
+            piControl <- .getAnalysisPlotArgument(functionCall, "piControl", args) 
+            if (is.null(piControl)) {
+                piControls <- as.numeric(x$piControls)
+            }
+            result$piControls <- piControls
+        } else {
+            pi2 <- .getAnalysisPlotArgument(functionCall, "pi2", args) 
+            if (is.null(pi2)) {
+                pi2 <- x$pi2
+            }
+            result$pi2 <- pi2
+        }
+        
+        piTreatmentRange <- .getAnalysisPlotArgument(functionCall, "piTreatmentRange", args) 
+        if (is.null(piTreatmentRange)) {
+            piTreatmentRange <- seq(0, 1, 1 / C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT) # default
+        } else {
+            piTreatmentRange <- .assertIsValidPiTreatmentRange(piTreatmentRange = piTreatmentRange)
+        }
+        result$piTreatmentRange <- piTreatmentRange
+    }
+    
+    return(result)
+}
+
 .plotAnalysisResults <- function(...,
         x, y, type, nPlanned, allocationRatioPlanned, main, xlab, ylab,
         legendTitle, palette, legendPosition, showSource, functionCall,
@@ -1990,77 +2134,8 @@ plot.AnalysisResults <- function(x, y, ..., type = 1L,
     functionCall$type <- type
     functionCall$plotSettings <- plotSettings
     functionCall$allocationRatioPlanned <- plotArgs$allocationRatioPlanned
-    if (.isTrialDesignFisher(x$.design)) {
-        functionCall$iterations <- x$iterations
-        functionCall$seed <- x$seed
-    }
-
-    if (x$getDataInput()$isDatasetMeans()) {
-        if (.isMultiHypothesesAnalysisResults(x)) {
-            assumedStDevs <- eval.parent(functionCall$assumedStDevs)
-            if (is.null(assumedStDevs)) {
-                assumedStDevs <- as.numeric(x$assumedStDevs)
-            }
-
-            gMax <- x$.stageResults$getGMax()
-            .assertIsValidAssumedStDevs(assumedStDevs, gMax)
-
-            functionCall$assumedStDevs <- assumedStDevs
-        } else {
-            assumedStDev <- eval.parent(functionCall$assumedStDev)
-            if (is.null(assumedStDev)) {
-                assumedStDev <- x$assumedStDev
-            }
-            functionCall$assumedStDev <- assumedStDev
-        }
-    }
-
-    if (x$getDataInput()$isDatasetMeans() || x$getDataInput()$isDatasetSurvival()) {
-        thetaRange <- eval.parent(functionCall$thetaRange)
-        if (is.null(thetaRange)) {
-            thetaRangeMin <- min(x$thetaH0, min(na.omit(as.numeric(x$thetaH1))))
-            thetaRangeMax <- 2 * max(x$thetaH0, max(na.omit(as.numeric(x$thetaH1))))
-            thetaRange <- seq(
-                thetaRangeMin, thetaRangeMax,
-                (thetaRangeMax - thetaRangeMin) / C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT
-            )
-        } else {
-            thetaRange <- .assertIsValidThetaRange(
-                thetaRange = thetaRange,
-                survivalDataEnabled = x$getDataInput()$isDatasetSurvival()
-            )
-        }
-        functionCall$thetaRange <- thetaRange
-    } else if (x$getDataInput()$isDatasetRates()) {
-        if (.isMultiArmAnalysisResults(x)) {
-            piControl <- eval.parent(functionCall$piControl)
-            if (is.null(piControl)) {
-                piControl <- as.numeric(x$piControl)
-            }
-            functionCall$piControl <- piControl
-        } else if (.isEnrichmentAnalysisResults(x)) {
-            piControl <- eval.parent(functionCall$piControl)
-            if (is.null(piControl)) {
-                piControls <- as.numeric(x$piControls)
-            }
-            functionCall$piControls <- piControls
-        } else {
-            pi2 <- eval.parent(functionCall$pi2)
-            if (is.null(pi2)) {
-                pi2 <- x$pi2
-            }
-            functionCall$pi2 <- pi2
-        }
-
-        piTreatmentRange <- eval.parent(functionCall$piTreatmentRange)
-        if (is.null(piTreatmentRange)) {
-            piTreatmentRange <- seq(0, 1, 1 / C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT) # default
-        } else {
-            piTreatmentRange <- .assertIsValidPiTreatmentRange(piTreatmentRange = piTreatmentRange)
-        }
-        functionCall$piTreatmentRange <- piTreatmentRange
-    }
-
+    functionCall <- .addAnalysisPlotArgumentsToFunctionCall(x, functionCall, 
+        args = .getOptionalArgument("parentFunctionCallArgs", ..., optionalArgumentDefaultValue = list()))
     functionCall[[1L]] <- as.name("plot")
     return(eval.parent(functionCall))
 }

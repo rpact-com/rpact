@@ -86,5 +86,5 @@ Plots an object that inherits from class \code{\link{NumberOfSubjects}}.
 \details{
 Generic function to plot an "number of subjects" object.
 
-Generic function to plot a parameter set.
+Generic function to plot a "number of subjects" object.
 }

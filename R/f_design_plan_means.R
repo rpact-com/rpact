@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -498,7 +498,7 @@ NULL
     .assertIsSingleLogical(meanRatio, "meanRatio")
     .assertIsValidThetaH0(thetaH0, endpoint = "means", groups = groups, ratioEnabled = meanRatio)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
-
+    
     if (meanRatio) {
         if (identical(alternative, C_ALTERNATIVE_POWER_SIMULATION_DEFAULT)) {
             alternative <- C_ALTERNATIVE_POWER_SIMULATION_MEAN_RATIO_DEFAULT
@@ -670,6 +670,7 @@ getSampleSizeMeans <- function(design = NULL, ...,
         .assertIsTrialDesign(design)
         .warnInCaseOfUnknownArguments(functionName = "getSampleSizeMeans", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
+        design <- .resetPipeOperatorQueue(design)
     }
 
     designPlan <- .createDesignPlanMeans(
@@ -749,6 +750,7 @@ getPowerMeans <- function(design = NULL, ...,
         .assertIsTrialDesign(design)
         .warnInCaseOfTwoSidedPowerArgument(...)
         .warnInCaseOfTwoSidedPowerIsDisabled(design)
+        design <- .resetPipeOperatorQueue(design)
     }
 
     designPlan <- .createDesignPlanMeans(

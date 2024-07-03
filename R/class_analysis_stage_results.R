@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7962 $
-## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1540,11 +1540,67 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #'
 #' @export
 #'
-plot.StageResults <- function(x, y, ..., type = 1L,
-        nPlanned, allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
-        main = NA_character_, xlab = NA_character_, ylab = NA_character_,
-        legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
-        showSource = FALSE, plotSettings = NULL) {
+plot.StageResults <- function(
+        x, 
+        y, 
+        ..., 
+        type = 1L,
+        nPlanned, 
+        allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
+        main = NA_character_, 
+        xlab = NA_character_, 
+        ylab = NA_character_,
+        legendTitle = NA_character_, 
+        palette = "Set1", 
+        legendPosition = NA_integer_,
+        showSource = FALSE, 
+        plotSettings = NULL) {
+    
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    args <- list(
+        x = x, 
+        y = NULL,
+        type = type,
+        nPlanned = nPlanned,
+        allocationRatioPlanned = allocationRatioPlanned,
+        main = main,
+        xlab = xlab,
+        ylab = ylab,
+        legendTitle = legendTitle,
+        palette = palette,
+        legendPosition = legendPosition,
+        showSource = showSource,
+        plotSettings = plotSettings, 
+        ...)
+    
+    if (markdown) {
+        sep <- "\n\n-----\n\n"
+        print(do.call(.plot.StageResults, args))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    }
+    
+    return(do.call(.plot.StageResults, args))
+}
+
+.plot.StageResults <- function(
+        x, 
+        y, 
+        ..., 
+        type = 1L,
+        nPlanned, 
+        allocationRatioPlanned = 1, # C_ALLOCATION_RATIO_DEFAULT
+        main = NA_character_, 
+        xlab = NA_character_, 
+        ylab = NA_character_,
+        legendTitle = NA_character_, 
+        palette = "Set1", 
+        legendPosition = NA_integer_,
+        showSource = FALSE, 
+        plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
 
     .assertGgplotIsInstalled()
