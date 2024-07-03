@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7958 $
-## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
+## |  File version: $Revision: 8024 $
+## |  Last changed: $Date: 2024-07-02 13:50:24 +0200 (Di, 02 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -81,19 +81,67 @@ SummaryItem <- R6::R6Class("SummaryItem",
 #' @export
 #'
 plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
-    fCall <- match.call(expand.dots = FALSE)
+    fCall <- match.call(expand.dots = TRUE)
+    cmd <- paste0(paste(trimws(capture.output(print(fCall$x))), collapse = " "), "$object")
+    
+    parentFunctionCallArgs <- .addAnalysisPlotArgumentsToFunctionCall(x$object, fCall, result = list())
     if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
         markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
         if (is.na(markdown)) {
             markdown <- .isMarkdownEnabled()
         }
         if (markdown) {
-            x$.catMarkdownText()
+            sep <- "\n\n-----\n\n"
+
+            suppressWarnings(print(plot(x = x$object, y = NULL, markdown = FALSE, 
+                parentFunctionCallArgs = parentFunctionCallArgs, 
+                cmd = cmd, 
+                ...)))
+            return(.knitPrintQueue(x, sep = sep, prefix = sep))
         } else {
             x$show()
         }
     }
-    plot(x = x$object, y = y, ...)
+    suppressWarnings(print(plot(x = x$object, y = NULL, 
+        parentFunctionCallArgs = parentFunctionCallArgs, 
+        cmd = cmd, 
+        ...)))
+}
+
+.getKnitPrintPart <- function(x) {
+    part <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+    part <- na.omit(part)
+    return(part)
+}
+
+.addKnitPrintPart <- function(x, result, ..., sep = "\n\n-----\n\n", prefix = "", suffix = "") {
+    result <- na.omit(result)
+    return(paste0(prefix, paste0(c(result, .getKnitPrintPart(x)), collapse = sep), suffix))
+}
+
+.knitPrintQueue <- function(x, ..., sep = "\n\n-----\n\n", prefix = "") {
+    on.exit({attr(x, "queue") <- NULL})
+    result <- character()
+    if (inherits(x, "SummaryFactory")) {
+        queue <- attr(x$object, "queue")
+    } else {
+        queue <- attr(x, "queue")
+    }
+    
+    if (!is.null(queue) && length(queue) > 0) {
+        result <- ifelse(!inherits(x, "SummaryFactory"), "", result)
+        for (obj in queue) {
+            result <- .addKnitPrintPart(obj, result, sep = sep) 
+        }
+    }
+    if (inherits(x, "SummaryFactory")) {
+        result <- .addKnitPrintPart(x, result, sep = sep, prefix = prefix)
+    }
+    if (length(result) == 0 || all(nchar(trimws(result)) == 0)) {
+        return("")
+    }
+    
+    return(knitr::asis_output(result))
 }
 
 #'
@@ -125,25 +173,9 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
 #' @export
 #'
 knit_print.SummaryFactory <- function(x, ...) {
-    result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
-
-    if (isTRUE(base::attr(x$object, "printObject"))) {
-        sep <- base::attr(x$object, "printObjectSeparator")
-        if (is.null(sep) || !is.character(sep)) {
-            sep <- "\n-----\n\n"
-        }
-        result <- paste0(
-            result, sep,
-            paste0(utils::capture.output(x$object$.catMarkdownText()), collapse = "\n")
-        )
-    }
-
-    if (isTRUE(x[["markdown"]])) {
-        sep <- "\n-----\n\n"
-        result <- paste0(sep, result)
-    }
-
-    return(knitr::asis_output(result))
+    sep <- "\n\n-----\n\n"
+    
+    .knitPrintQueue(x, sep = sep, ...)
 }
 
 #'
@@ -167,16 +199,21 @@ knit_print.SummaryFactory <- function(x, ...) {
 #'
 print.SummaryFactory <- function(x, ...,
         markdown = NA,
-        sep = "\n-----\n\n") {
+        sep = "\n\n-----\n\n") {
+
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled()
     }
-
-    if (markdown || isTRUE(x[["markdown"]])) {
-        result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
-        cat(sep)
-        cat(trimws(result), "\n")
-        return(invisible())
+    
+    if (markdown || isTRUE(x[["markdown"]])) {  
+        queue <- attr(x$object, "queue")
+        if (is.null(queue)) {
+            queue <- list()
+        }
+        queue[[length(queue) + 1]] <- x$object
+        attr(x$object, "queue") <- queue
+        
+        return(.knitPrintQueue(x, sep = sep))
     }
 
     x$show()
@@ -377,7 +414,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             if (!is.null(parameterName) && length(parameterName) == 1 &&
                     inherits(parameterSet, "ParameterSet") &&
                     parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE) {
-                if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE") && validateParameterType) {
+                if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE") && 
+                        validateParameterType && !.isMarkdownEnabled()) {
                     warning(
                         "Failed to add parameter ", .arrayToString(parameterName), " (",
                         .arrayToString(values), ") stored in ",
@@ -1079,7 +1117,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 }
 
 .getSummaryObjectSettings <- function(object) {
-    multiArmEnabled <- grepl("MultiArm", .getClassName(object))
+    multiArmEnabled <- grepl("MultiArm", .getClassName(object)) || 
+        grepl("ConditionalDunnett", .getClassName(object)) 
     enrichmentEnabled <- grepl("Enrichment", .getClassName(object))
     simulationEnabled <- grepl("Simulation", .getClassName(object))
     countDataEnabled <- FALSE
@@ -3628,7 +3667,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (!countDataEnabled) {
             legendEntry <- list("(t)" = "treatment effect scale")
 
-            if (ncol(designPlan$criticalValuesEffectScale) > 0) {
+            if (ncol(designPlan$criticalValuesEffectScale) > 0 && !all(is.na(designPlan$criticalValuesEffectScale))) {
                 summaryFactory$addParameter(designPlan,
                     parameterName = "criticalValuesEffectScale",
                     parameterCaption = ifelse(.isDelayedInformationEnabled(design = design),

@@ -7,7 +7,7 @@
 \method{print}{Dataset}(
   x,
   ...,
-  markdown = FALSE,
+  markdown = NA,
   output = c("list", "long", "wide", "r", "rComplete")
 )
 }

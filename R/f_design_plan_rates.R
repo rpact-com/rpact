@@ -13,13 +13,18 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8027 $
+## |  Last changed: $Date: 2024-07-03 16:00:55 +0200 (Mi, 03 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
 NULL
+
+.getCorrectedEffectScaleBoundaryDataRates <- function(boundaries) {
+    boundaries[!is.na(boundaries) & (boundaries < 0 | boundaries > 1)] <- NA_real_
+    return(boundaries)
+}
 
 .getEffectScaleBoundaryDataRates <- function(designPlan) {
     design <- designPlan$.design
@@ -58,12 +63,19 @@ NULL
                     sqrt(n1[1:(design$kMax - 1), j])
             }
             if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-                    (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                    (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && 
+                    design$typeBetaSpending != "none")) {
                 futilityBoundsEffectScaleLower[, j] <- thetaH0 - (2 * directionUpper[j] - 1) *
                     futilityBounds * sqrt(thetaH0 * (1 - thetaH0)) /
                     sqrt(n1[1:(design$kMax - 1), j])
             }
         }
+        
+        criticalValuesEffectScaleLower <- .getCorrectedEffectScaleBoundaryDataRates(criticalValuesEffectScaleLower)
+        criticalValuesEffectScaleUpper <- .getCorrectedEffectScaleBoundaryDataRates(criticalValuesEffectScaleUpper)
+        futilityBoundsEffectScaleLower <- .getCorrectedEffectScaleBoundaryDataRates(futilityBoundsEffectScaleLower)
+        futilityBoundsEffectScaleUpper <- .getCorrectedEffectScaleBoundaryDataRates(futilityBoundsEffectScaleUpper)
+    
     } else if (!designPlan$riskRatio) {
         boundaries <- design$criticalValues
 
@@ -830,6 +842,7 @@ getPowerRates <- function(design = NULL, ...,
         .assertIsTrialDesign(design)
         .warnInCaseOfTwoSidedPowerArgument(...)
         .warnInCaseOfTwoSidedPowerIsDisabled(design)
+        design <- .resetPipeOperatorQueue(design)
     }
 
     designPlan <- .createDesignPlanRates(
@@ -981,6 +994,7 @@ getSampleSizeRates <- function(design = NULL, ...,
         .assertIsTrialDesign(design)
         .warnInCaseOfUnknownArguments(functionName = "getSampleSizeRates", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
+        design <- .resetPipeOperatorQueue(design)
     }
 
     designPlan <- .createDesignPlanRates(

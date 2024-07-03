@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7946 $
-## |  Last changed: $Date: 2024-05-28 12:08:57 +0200 (Di, 28 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -52,7 +52,7 @@ C_ALPHA_DEFAULT <- 0.025
 C_BETA_DEFAULT <- 0.2
 C_SIDED_DEFAULT <- 1L
 C_KMAX_DEFAULT <- 3L
-C_KMAX_UPPER_BOUND <- 20L
+C_KMAX_UPPER_BOUND <- 50L
 C_KMAX_UPPER_BOUND_FISHER <- 6L
 
 C_NA_MAX_DEFAULT <- 100L
@@ -1029,6 +1029,10 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
     
     if (!inherits(obj, "TrialDesign")) {
+        obj <- obj[[".design"]]
+    }
+    
+    if (is.null(obj) || !inherits(obj, "TrialDesign")) {
         return(parameterName)
     }
     

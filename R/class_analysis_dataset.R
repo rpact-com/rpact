@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7962 $
-## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -649,6 +649,7 @@ getDataset <- function(..., floatingPointNumbersEnabled = FALSE) {
             call. = FALSE
         )
     }
+    dataset <- .resetPipeOperatorQueue(dataset)
     return(dataset)
 }
 
@@ -2243,7 +2244,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
             self$.setDataToVariables()
         },
         getRandomData = function() {
-            return(self$.getRandomDataMeans(self))
+            return(.getRandomDataMeans(self))
         }
     )
 )
@@ -2531,10 +2532,37 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #'
 plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_character_,
         legendTitle = "Group", palette = "Set1", showSource = FALSE, plotSettings = NULL) {
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    args <- list(
+        x = x, 
+        y = NULL,
+        main = main,
+        xlab = xlab,
+        ylab = ylab,
+        legendTitle = legendTitle,
+        palette = palette,
+        plotSettings = plotSettings, 
+        ...)
+    
+    if (markdown) {
+        sep <- "\n\n-----\n\n"
+        print(do.call(.plot.Dataset, args))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    }
+    
+    return(do.call(.plot.Dataset, args))
+}
+
+.plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_character_,
+        legendTitle = "Group", palette = "Set1", showSource = FALSE, plotSettings = NULL) {
     if (x$.enrichmentEnabled) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of enrichment data is not implemented yet")
     }
-
+    
     .assertGgplotIsInstalled()
 
     if (x$isDatasetMeans()) {
@@ -2566,16 +2594,20 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
                 data = data,
                 ggplot2::aes(y = .data[["randomData"]], x = factor(.data[["stage"]]))
             )
-            p <- p + ggplot2::geom_boxplot(ggplot2::aes(fill = .data[["stage"]]))
+            p <- p + ggplot2::geom_boxplot(
+                ggplot2::aes(fill = .data[["stage"]]),
+                na.rm = TRUE)
             p <- p + ggplot2::geom_point(
                 colour = "#0e414e", shape = 20,
                 position = ggplot2::position_jitter(width = .1),
-                size = plotSettings$pointSize
+                size = plotSettings$pointSize,
+                na.rm = TRUE
             )
             p <- p + ggplot2::stat_summary(
                 fun = "mean", geom = "point",
                 shape = 21, position = ggplot2::position_dodge(.75), size = 4, fill = "white",
-                colour = "black", show.legend = FALSE
+                colour = "black", show.legend = FALSE,
+                na.rm = TRUE
             )
         } else if (x$isDatasetRates()) {
             p <- ggplot2::ggplot(show.legend = FALSE)
@@ -2587,7 +2619,8 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
                     y = .data[["sampleSize"]],
                     x = factor(.data[["stage"]]), fill = factor(.data[["stage"]])
                 ),
-                position = "dodge", stat = "identity", alpha = 0.4
+                position = "dodge", stat = "identity", alpha = 0.4,
+                na.rm = TRUE
             )
 
             # plot events
@@ -2597,7 +2630,8 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
                     y = .data[["event"]], x = factor(.data[["stage"]]),
                     fill = factor(.data[["stage"]])
                 ),
-                position = "dodge", stat = "identity"
+                position = "dodge", stat = "identity",
+                na.rm = TRUE
             )
         } else if (x$isDatasetSurvival()) {
             # implement survival plot here
@@ -2610,16 +2644,19 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
                 y = .data[["randomData"]], x = factor(.data[["stage"]]),
                 fill = factor(.data[["group"]])
             ), data = data)
-            p <- p + ggplot2::geom_point(ggplot2::aes(colour = .data[["group"]]),
+            p <- p + ggplot2::geom_point(
+                    ggplot2::aes(colour = .data[["group"]],
+                    na.rm = TRUE),
                 shape = 20,
                 position = ggplot2::position_dodge(.75),
                 size = plotSettings$pointSize
             )
-            p <- p + ggplot2::geom_boxplot()
+            p <- p + ggplot2::geom_boxplot(na.rm = TRUE)
             p <- p + ggplot2::stat_summary(ggplot2::aes(colour = .data[["group"]]),
                 fun = "mean", geom = "point",
                 shape = 21, position = ggplot2::position_dodge(.75), size = 4, fill = "white",
-                show.legend = FALSE
+                show.legend = FALSE,
+                na.rm = TRUE
             )
         } else if (x$isDatasetRates()) {
             p <- ggplot2::ggplot(show.legend = FALSE)
@@ -2630,7 +2667,8 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
                     y = .data[["sampleSize"]],
                     x = factor(.data[["stage"]]), fill = factor(.data[["group"]])
                 ),
-                data = data, position = "dodge", stat = "identity", alpha = 0.4
+                data = data, position = "dodge", stat = "identity", alpha = 0.4,
+                na.rm = TRUE
             )
 
             # plot events
@@ -2640,7 +2678,8 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
                     y = .data[["event"]], x = factor(.data[["stage"]]),
                     fill = factor(.data[["group"]])
                 ),
-                position = "dodge", stat = "identity"
+                position = "dodge", stat = "identity",
+                na.rm = TRUE
             )
         } else if (x$isDatasetSurvival()) {
             # implement survival plot here
@@ -2682,7 +2721,7 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
     }
     p <- plotSettings$addCompanyAnnotation(p, enabled = companyAnnotationEnabled)
 
-    suppressWarnings(print(p))
+    return(p)
 }
 
 #'
@@ -4165,6 +4204,31 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
     return(lines)
 }
 
+.isPrintSummaryCall <- function(sysCalls) {
+    if (is.null(sysCalls) || length(sysCalls) == 0) {
+        return(FALSE)
+    }
+    
+    callText <- character()
+    for (i in length(sysCalls):1) {
+        callObj <- sysCalls[[i]]
+        if (!is.null(callObj) && is.call(callObj)) {
+            callText <- c(callText, capture.output(print(callObj)))            
+        }
+    }
+    callText <- paste(callText, collapse = " ")
+    
+    if (grepl("plot\\(", callText)) {
+        return(FALSE)
+    }
+    
+    if (grepl("summary\\(print\\(", callText) && !grepl("getAnalysisResults", callText)) {
+        return(TRUE)
+    }
+    
+    return(FALSE)
+}
+
 #'
 #' @title
 #' Print Dataset Values
@@ -4184,21 +4248,41 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
 #'
 #' @keywords internal
 #'
-print.Dataset <- function(x, ..., markdown = FALSE, output = c("list", "long", "wide", "r", "rComplete")) {
+print.Dataset <- function(x, ..., markdown = NA, output = c("list", "long", "wide", "r", "rComplete")) {
     fCall <- match.call(expand.dots = FALSE)
+    sysCalls <- sys.calls()
+    
     datasetName <- deparse(fCall$x)
-
+    
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
     output <- match.arg(output)
 
-    if (markdown) {
+    if (isTRUE(markdown)) {
         if (output != "list") {
             warning("'output' (\"", output, "\") will be ignored ",
                 "because only \"list\" is supported yet if markdown is enabled",
                 call. = FALSE
             )
         }
-
-        x$.catMarkdownText()
+        
+        if (.isPrintCall(sysCalls)) { 
+            result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+            return(knitr::asis_output(result))
+        }
+        
+        if (.isPrintSummaryCall(sysCalls)) {
+            attr(x, "markdown") <- TRUE
+            queue <- attr(x, "queue")
+            if (is.null(queue)) {
+                queue <- list()
+            }
+            queue[[length(queue) + 1]] <- x
+            attr(x, "queue") <- queue
+        }
+        
         return(invisible(x))
     }
 

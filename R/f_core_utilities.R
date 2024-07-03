@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7940 $
-## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1491,4 +1491,9 @@ getParameterName <- function(obj, parameterCaption) {
     parameterSet[[fieldName]] <- fieldValues
     parameterSet$.setParameterType(fieldName, C_PARAM_NOT_APPLICABLE)
     parameterSet$.deprecatedFieldNames <- unique(c(parameterSet$.deprecatedFieldNames, fieldName))
+}
+
+.resetPipeOperatorQueue <- function(x) {
+    attr(x, "queue") <- NULL
+    return(x)
 }

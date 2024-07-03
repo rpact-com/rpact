@@ -15,9 +15,9 @@
 ## |  
 ## |  File name: test-f_design_group_sequential.R
 ## |  Creation date: 08 November 2023, 09:09:43
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |  
 
 test_plan_section("Testing the Group Sequential and Inverse Normal Design Functionality")
@@ -1876,29 +1876,29 @@ test_that("'getDesignInverseNormal': illegal arguments throw exceptions as expec
 	    fixed = TRUE
 	)
 
-	expect_error(getDesignInverseNormal(kMax = -Inf), "Argument out of bounds: 'kMax' (-Inf) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -10), "Argument out of bounds: 'kMax' (-10) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -9), "Argument out of bounds: 'kMax' (-9) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -8), "Argument out of bounds: 'kMax' (-8) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -7), "Argument out of bounds: 'kMax' (-7) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -6), "Argument out of bounds: 'kMax' (-6) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -5), "Argument out of bounds: 'kMax' (-5) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -4), "Argument out of bounds: 'kMax' (-4) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -3), "Argument out of bounds: 'kMax' (-3) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -2), "Argument out of bounds: 'kMax' (-2) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = -1), "Argument out of bounds: 'kMax' (-1) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 0), "Argument out of bounds: 'kMax' (0) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 21), "Argument out of bounds: 'kMax' (21) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 22), "Argument out of bounds: 'kMax' (22) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 23), "Argument out of bounds: 'kMax' (23) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 24), "Argument out of bounds: 'kMax' (24) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 25), "Argument out of bounds: 'kMax' (25) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 26), "Argument out of bounds: 'kMax' (26) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 27), "Argument out of bounds: 'kMax' (27) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 28), "Argument out of bounds: 'kMax' (28) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 29), "Argument out of bounds: 'kMax' (29) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 30), "Argument out of bounds: 'kMax' (30) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = Inf), "Argument out of bounds: 'kMax' (Inf) is out of bounds [1; 20]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -Inf), "Argument out of bounds: 'kMax' (-Inf) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -10), "Argument out of bounds: 'kMax' (-10) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -9), "Argument out of bounds: 'kMax' (-9) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -8), "Argument out of bounds: 'kMax' (-8) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -7), "Argument out of bounds: 'kMax' (-7) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -6), "Argument out of bounds: 'kMax' (-6) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -5), "Argument out of bounds: 'kMax' (-5) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -4), "Argument out of bounds: 'kMax' (-4) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -3), "Argument out of bounds: 'kMax' (-3) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -2), "Argument out of bounds: 'kMax' (-2) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -1), "Argument out of bounds: 'kMax' (-1) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 0), "Argument out of bounds: 'kMax' (0) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 51), "Argument out of bounds: 'kMax' (51) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 52), "Argument out of bounds: 'kMax' (52) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 53), "Argument out of bounds: 'kMax' (53) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 54), "Argument out of bounds: 'kMax' (54) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 55), "Argument out of bounds: 'kMax' (55) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 56), "Argument out of bounds: 'kMax' (56) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 57), "Argument out of bounds: 'kMax' (57) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 58), "Argument out of bounds: 'kMax' (58) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 59), "Argument out of bounds: 'kMax' (59) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 60), "Argument out of bounds: 'kMax' (60) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = Inf), "Argument out of bounds: 'kMax' (Inf) is out of bounds [1; 50]", fixed = TRUE)
 
 	expect_error(getDesignInverseNormal(kMax = 2, futilityBounds = c(0, 0, 1, 2)), "Conflicting arguments: length of 'futilityBounds' (4) must be equal to 'kMax' (2) - 1", fixed = TRUE)
 	expect_error(getDesignInverseNormal(kMax = 3, futilityBounds = c(0, 0, 1, 2)), "Conflicting arguments: length of 'futilityBounds' (4) must be equal to 'kMax' (3) - 1", fixed = TRUE)
@@ -2071,9 +2071,9 @@ test_that("'getDesignGroupSequential': illegal arguments throw exceptions as exp
 	    fixed = TRUE
 	)
 
-	expect_error(getDesignInverseNormal(kMax = -5), "Argument out of bounds: 'kMax' (-5) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 0), "Argument out of bounds: 'kMax' (0) is out of bounds [1; 20]", fixed = TRUE)
-	expect_error(getDesignInverseNormal(kMax = 21), "Argument out of bounds: 'kMax' (21) is out of bounds [1; 20]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = -5), "Argument out of bounds: 'kMax' (-5) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 0), "Argument out of bounds: 'kMax' (0) is out of bounds [1; 50]", fixed = TRUE)
+	expect_error(getDesignInverseNormal(kMax = 51), "Argument out of bounds: 'kMax' (51) is out of bounds [1; 50]", fixed = TRUE)
 
 	expect_error(getDesignInverseNormal(kMax = 2, futilityBounds = c(0, 0, 1, 2)), "Conflicting arguments: length of 'futilityBounds' (4) must be equal to 'kMax' (2) - 1", fixed = TRUE)
 	expect_error(getDesignInverseNormal(kMax = 3, futilityBounds = c(0, 0, 1, 2)), "Conflicting arguments: length of 'futilityBounds' (4) must be equal to 'kMax' (3) - 1", fixed = TRUE)

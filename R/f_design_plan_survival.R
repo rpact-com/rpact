@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7962 $
-## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2042,6 +2042,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
             ignore = c("accountForObservationTimes")
         )
         .warnInCaseOfTwoSidedPowerArgument(...)
+        design <- .resetPipeOperatorQueue(design)
     }
 
     if (!is.na(maxNumberOfSubjects) && maxNumberOfSubjects == 0) {
@@ -2508,6 +2509,7 @@ getPowerSurvival <- function(design = NULL, ...,
         .warnInCaseOfUnknownArguments(functionName = "getPowerSurvival", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
         .warnInCaseOfTwoSidedPowerIsDisabled(design)
+        design <- .resetPipeOperatorQueue(design)
     }
 
     designPlan <- .createDesignPlanSurvival(

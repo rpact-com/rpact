@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-class_design_set.R
 ## |  Creation date: 23 February 2024, 12:33:48
-## |  File version: $Revision: 7928 $
-## |  Last changed: $Date: 2024-05-23 16:35:16 +0200 (Do, 23 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -91,7 +91,6 @@ test_that("Testing 'TrialDesignSet' functions, warnings, and errors", {
     designSet <- getDesignSet(design = design, deltaWT = c(0.3, 0.4))
     designSet$addVariedParameters("deltaWT")
     expect_s3_class(plot(designSet), "gg")
-    expect_warning(designSet$.validateOptionalArguments(design))
     expect_error(getDesignSet()$.validateOptionalArguments(design = NULL, alpha = 0.1))
     expect_warning(getDesignSet()$.getArgumentNames(validatedDesign = design, 1))
     expect_error(getDesignSet()$add())

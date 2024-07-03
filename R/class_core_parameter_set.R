@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7962 $
-## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -163,6 +163,16 @@ FieldSet <- R6::R6Class("FieldSet",
                 self$.catLines <- c(self$.catLines, line)
             }
             return(invisible())
+        },
+        .catMarkdownText = function(...) {
+            self$.show(consoleOutputEnabled = FALSE, ...)
+            if (length(self$.catLines) == 0) {
+                return(invisible())
+            }
+            
+            for (line in self$.catLines) {
+                cat(line)
+            }
         },
         .getFields = function(values) {
             flds <- self$.getFieldNames()
@@ -377,16 +387,16 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 )
             }
         },
-        .catMarkdownText = function(...) {
-            self$.show(consoleOutputEnabled = FALSE, ...)
-            if (length(self$.catLines) == 0) {
-                return(invisible())
-            }
-
-            for (line in self$.catLines) {
-                cat(line)
-            }
-        },
+#        .catMarkdownText = function(...) { # TODO remove
+#            self$.show(consoleOutputEnabled = FALSE, ...)
+#            if (length(self$.catLines) == 0) {
+#                return(invisible())
+#            }
+#
+#            for (line in self$.catLines) {
+#                cat(line)
+#            }
+#        },
         .showParametersOfOneGroup = function(parameters, title,
                 orderByParameterName = TRUE, consoleOutputEnabled = TRUE) {
             output <- ""
@@ -431,7 +441,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                             consoleOutputEnabled = consoleOutputEnabled
                         ))
                     }
-
+                    
                     output <- ""
                     for (i in 1:length(params)) {
                         param <- params[[i]]
@@ -442,7 +452,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                             param$paramName <- parameterName
 
                             category <- parts[2]
-                            categoryCaption <- .getParameterCaption(category, self)
+                            
+                            categoryCaption <- .getParameterCaption(category, self[[parameterName]])
                             if (is.null(categoryCaption)) {
                                 categoryCaption <- paste0("%", category, "%")
                             }
@@ -1398,22 +1409,48 @@ names.FieldSet <- function(x) {
 #' @title
 #' Print Field Set Values
 #'
+
+#'
 #' @description
 #' \code{print} prints its \code{\link{FieldSet}} argument and returns it invisibly (via \code{invisible(x)}).
 #'
-#' @param x A \code{\link{FieldSet}} object.
+#' @param x The \code{\link{FieldSet}} object to print.
+#' @param markdown If \code{TRUE}, the object \code{x} will be printed using markdown syntax;
+#'        normal representation will be used otherwise (default is \code{FALSE})
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' Prints the field set.
+#' Prints the parameters and results of a field set.
 #'
 #' @export
 #'
 #' @keywords internal
 #'
-print.FieldSet <- function(x, ...) {
+print.FieldSet <- function(x, ..., markdown = NA) {
+    sysCalls <- sys.calls()
+    
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    if (isTRUE(markdown)) {
+        if (.isPrintCall(sysCalls)) {
+            result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+            return(knitr::asis_output(result))
+        }
+        
+        attr(x, "markdown") <- TRUE
+        queue <- attr(x, "queue")
+        if (is.null(queue)) {
+            queue <- list()
+        }
+        queue[[length(queue) + 1]] <- x
+        attr(x, "queue") <- queue
+        return(invisible(x))
+    }
+    
     x$show()
-    invisible(x)
+    return(invisible(x))
 }
 
 #'
@@ -1559,7 +1596,7 @@ summary.ParameterSet <- function(object, ...,
         digits = NA_integer_,
         output = c("all", "title", "overview", "body"),
         printObject = FALSE,
-        sep = "\n-----\n\n") {
+        sep = "\n\n-----\n\n") {
     .warnInCaseOfUnknownArguments(functionName = "summary", ignore = c("printObject"), ...)
 
     base::attr(object, "printObject") <- printObject
@@ -1605,6 +1642,23 @@ summary.ParameterSet <- function(object, ...,
     invisible(object)
 }
 
+.isPrintCall <- function(sysCalls) {
+    if (is.null(sysCalls) || length(sysCalls) == 0) {
+        return(TRUE)
+    }
+    
+    for (i in length(sysCalls):1) {
+        callObj <- sysCalls[[i]]
+        if (!is.null(callObj) && is.call(callObj)) {
+            callText <- capture.output(print(callObj))            
+            if (any(grepl("(plot|summary)\\(", callText))) {
+                return(FALSE)
+            }
+        }
+    }
+    return(TRUE)
+}
+
 #'
 #' @title
 #' Print Parameter Set Values
@@ -1625,20 +1679,29 @@ summary.ParameterSet <- function(object, ...,
 #' @keywords internal
 #'
 print.ParameterSet <- function(x, ..., markdown = NA) {
+    sysCalls <- sys.calls()
+    
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled()
     }
 
-    if (markdown) {
-        x$.catMarkdownText()
-    } else {
-        x$show()
+    if (isTRUE(markdown)) {
+        if (.isPrintCall(sysCalls)) {
+            result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+            return(knitr::asis_output(result))
+        }
+        
+        attr(x, "markdown") <- TRUE
+        queue <- attr(x, "queue")
+        if (is.null(queue)) {
+            queue <- list()
+        }
+        queue[[length(queue) + 1]] <- x
+        attr(x, "queue") <- queue
+        return(invisible(x))
     }
     
-    if (isTRUE(markdown)) {
-        attr(x, "markdown") <- TRUE
-    }
-
+    x$show()
     return(invisible(x))
 }
 
@@ -1826,7 +1889,7 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
         legendPosition = NA_integer_, showSource = FALSE, plotSettings = NULL) {
     .assertGgplotIsInstalled()
-
+    
     stop(
         C_EXCEPTION_TYPE_RUNTIME_ISSUE,
         "sorry, function 'plot' is not implemented yet for class '", .getClassName(x), "'"
@@ -1855,7 +1918,7 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
 #'
 #' @export
 #'
-knit_print.ParameterSet <- function(x, ...) {
+knit_print.ParameterSet <- function(x, ...) { 
     result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
     return(knitr::asis_output(result))
 }

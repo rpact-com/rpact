@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7958 $
-## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -267,17 +267,72 @@ NumberOfSubjects <- R6::R6Class("NumberOfSubjects",
 #' @inheritParams param_three_dots_plot
 #'
 #' @details
-#' Generic function to plot a parameter set.
+#' Generic function to plot an event probabilities object.
 #'
 #' @template return_object_ggplot
 #'
 #' @export
 #'
-plot.EventProbabilities <- function(x, y, ...,
+plot.EventProbabilities <- function(
+        x, 
+        y, 
+        ...,
         allocationRatioPlanned = x$allocationRatioPlanned,
-        main = NA_character_, xlab = NA_character_, ylab = NA_character_, type = 1L,
-        legendTitle = NA_character_, palette = "Set1",
-        plotPointsEnabled = NA, legendPosition = NA_integer_, showSource = FALSE,
+        main = NA_character_, 
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        type = 1L,
+        legendTitle = NA_character_, 
+        palette = "Set1",
+        plotPointsEnabled = NA, 
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        plotSettings = NULL) {
+        
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    args <- list(
+        x = x, 
+        y = NULL,
+        allocationRatioPlanned = allocationRatioPlanned,
+        main = main,
+        xlab = xlab,
+        ylab = ylab,
+        type = type,
+        legendTitle = legendTitle,
+        palette = palette,
+        plotPointsEnabled = plotPointsEnabled,
+        legendPosition = legendPosition,
+        showSource = showSource,
+        plotSettings = plotSettings, 
+        ...)
+    
+    if (markdown) {
+        sep <- "\n\n-----\n\n"
+        print(do.call(.plot.EventProbabilities, args))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    }
+    
+    return(do.call(.plot.EventProbabilities, args))
+}
+
+.plot.EventProbabilities <- function(
+        x, 
+        y, 
+        ...,
+        allocationRatioPlanned = x$allocationRatioPlanned,
+        main = NA_character_, 
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        type = 1L,
+        legendTitle = NA_character_, 
+        palette = "Set1",
+        plotPointsEnabled = NA, 
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
         plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
     xObjectName <- deparse(fCall$x)
@@ -449,13 +504,59 @@ plot.EventProbabilities <- function(x, y, ...,
 #' @inheritParams param_three_dots_plot
 #'
 #' @details
-#' Generic function to plot a parameter set.
+#' Generic function to plot a "number of subjects" object.
 #'
 #' @template return_object_ggplot
 #'
 #' @export
 #'
-plot.NumberOfSubjects <- function(x, y, ...,
+plot.NumberOfSubjects <- function(
+        x, 
+        y, 
+        ...,
+        allocationRatioPlanned = NA_real_,
+        main = NA_character_, 
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        type = 1L,
+        legendTitle = NA_character_, 
+        palette = "Set1",
+        plotPointsEnabled = NA, 
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        plotSettings = NULL) {
+
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled()
+    }
+    
+    args <- list(
+        x = x, 
+        y = NULL,
+        allocationRatioPlanned = allocationRatioPlanned,
+        main = main,
+        xlab = xlab,
+        ylab = ylab,
+        type = type,
+        legendTitle = legendTitle,
+        palette = palette,
+        plotPointsEnabled = plotPointsEnabled,
+        legendPosition = legendPosition,
+        showSource = showSource,
+        plotSettings = plotSettings, 
+        ...)
+    
+    if (markdown) {
+        sep <- "\n\n-----\n\n"
+        print(do.call(.plot.NumberOfSubjects, args))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    }
+    
+    return(do.call(.plot.NumberOfSubjects, args))    
+}
+
+.plot.NumberOfSubjects <- function(x, y, ...,
         allocationRatioPlanned = NA_real_,
         main = NA_character_, xlab = NA_character_, ylab = NA_character_, type = 1L,
         legendTitle = NA_character_, palette = "Set1",

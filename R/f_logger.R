@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7067 $
-## |  Last changed: $Date: 2023-06-09 12:58:32 +0200 (Fr, 09 Jun 2023) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -87,6 +87,10 @@
             C_LOG_LEVEL_INFO, C_LOG_LEVEL_WARN,
             C_LOG_LEVEL_ERROR, C_LOG_LEVEL_PROGRESS
         ))) {
+        return(invisible())
+    }
+    
+    if (.isMarkdownEnabled()) {
         return(invisible())
     }
 

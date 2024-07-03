@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-class_design_plan.R
 ## |  Creation date: 27 May 2024, 11:11:19
-## |  File version: $Revision: 7940 $
-## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
+## |  File version: $Revision: 7968 $
+## |  Last changed: $Date: 2024-06-07 15:03:21 +0200 (Fr, 07 Jun 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 

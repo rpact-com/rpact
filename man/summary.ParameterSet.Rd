@@ -11,7 +11,7 @@
   digits = NA_integer_,
   output = c("all", "title", "overview", "body"),
   printObject = FALSE,
-  sep = "\\n-----\\n\\n"
+  sep = "\\n\\n-----\\n\\n"
 )
 }
 \arguments{

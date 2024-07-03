@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_analysis_utilities.R
 ## |  Creation date: 08 November 2023, 09:09:34
-## |  File version: $Revision: 7920 $
-## |  Last changed: $Date: 2024-05-23 13:56:24 +0200 (Do, 23 Mai 2024) $
+## |  File version: $Revision: 8027 $
+## |  Last changed: $Date: 2024-07-03 16:00:55 +0200 (Mi, 03 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -104,6 +104,13 @@ test_that(".sigmaToBPD works correctly", {
 	bpd <- c(0.3, 0.4, 0.5) 
 	sigma <- bpd %*% t(bpd)
 	diag(sigma) <- 1
-
+    for (i in 1:1000) {
+        n <- 9
+        bpd <- runif(n, 0, 5)
+        sigma <- bpd %*% t(bpd)
+        diag(sigma) <- 1  
+        expect_equal(.sigmaToBPD(sigma), bpd, tolerance = 1e-12)
+    }
+    
 })
 

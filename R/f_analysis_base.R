@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7808 $
-## |  Last changed: $Date: 2024-04-05 18:22:34 +0200 (Fr, 05 Apr 2024) $
+## |  File version: $Revision: 8023 $
+## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -47,10 +47,11 @@ NULL
 
     .assertIsTrialDesign(design)
     .assertIsDataset(dataInput)
+    design <- .resetPipeOperatorQueue(design)
 
     return(list(
         design = design,
-        dataInput = dataInput$clone(deep = TRUE) 
+        dataInput = dataInput$clone(deep = TRUE)
     ))
 }
 
@@ -1984,11 +1985,16 @@ getFinalConfidenceInterval <- function(design, dataInput, ...,
     for (k in 1:min(kMax - 1, stageResults$stage)) {
         if (.isTrialDesignInverseNormal(design)) {
             # Shifted decision region for use in getGroupSeqProbs
-            shiftedDecision <- criticalValues[(k + 1):kMax] * sqrt(sum(weights[1:k]^2) +
+            upperShiftedDecision <- criticalValues[(k + 1):kMax] * sqrt(sum(weights[1:k]^2) +
                 cumsum(weights[(k + 1):kMax]^2)) / sqrt(cumsum(weights[(k + 1):kMax]^2)) -
                 as.vector(weights[1:k] %*% .getOneMinusQNorm(stageResults$pValues[1:k])) /
                     sqrt(cumsum(weights[(k + 1):kMax]^2))
-
+            if (design$sided == 2) {
+                lowerShiftedDecision <- -criticalValues[(k + 1):kMax] * sqrt(sum(weights[1:k]^2) +
+                    cumsum(weights[(k + 1):kMax]^2)) / sqrt(cumsum(weights[(k + 1):kMax]^2)) -
+                    as.vector(weights[1:k] %*% .getOneMinusQNorm(stageResults$pValues[1:k])) /
+                        sqrt(cumsum(weights[(k + 1):kMax]^2))
+            }
             if (k == kMax - 1) {
                 shiftedFutilityBounds <- c()
             } else {
@@ -2000,12 +2006,18 @@ getFinalConfidenceInterval <- function(design, dataInput, ...,
             }
         } else {
             # Shifted decision region for use in getGroupSeqProbs
-            shiftedDecision <- criticalValues[(k + 1):kMax] *
+            upperShiftedDecision <- criticalValues[(k + 1):kMax] *
                 sqrt(sum(weights[1:k]^2) + cumsum(weights[(k + 1):kMax]^2)) /
                 sqrt(cumsum(weights[(k + 1):kMax]^2)) -
                 .getOneMinusQNorm(stageResults$overallPValues[k]) * sqrt(sum(weights[1:k]^2)) /
                     sqrt(cumsum(weights[(k + 1):kMax]^2))
-
+            if (design$sided == 2) {
+                lowerShiftedDecision <- -criticalValues[(k + 1):kMax] *
+                    sqrt(sum(weights[1:k]^2) + cumsum(weights[(k + 1):kMax]^2)) /
+                    sqrt(cumsum(weights[(k + 1):kMax]^2)) -
+                    .getOneMinusQNorm(stageResults$overallPValues[k]) * sqrt(sum(weights[1:k]^2)) /
+                        sqrt(cumsum(weights[(k + 1):kMax]^2))
+            }
             if (k == kMax - 1) {
                 shiftedFutilityBounds <- c()
             } else {
@@ -2022,16 +2034,16 @@ getFinalConfidenceInterval <- function(design, dataInput, ...,
             (1 - informationRates[k])
 
         if (design$sided == 2) {
-            decisionMatrix <- matrix(c(-shiftedDecision, shiftedDecision), nrow = 2, byrow = TRUE)
+            decisionMatrix <- matrix(c(lowerShiftedDecision, upperShiftedDecision), nrow = 2, byrow = TRUE)
             probs <- .getGroupSequentialProbabilities(decisionMatrix = decisionMatrix, informationRates = scaledInformation)
             crp <- sum(probs[3, ] - probs[2, ] + probs[1, ])
         } else {
             if (design$bindingFutility) {
-                decisionMatrix <- matrix(c(shiftedFutilityBounds, C_FUTILITY_BOUNDS_DEFAULT, shiftedDecision),
+                decisionMatrix <- matrix(c(shiftedFutilityBounds, C_FUTILITY_BOUNDS_DEFAULT, upperShiftedDecision),
                     nrow = 2, byrow = TRUE
                 )
             } else {
-                decisionMatrix <- matrix(c(rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - k), shiftedDecision),
+                decisionMatrix <- matrix(c(rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - k), upperShiftedDecision),
                     nrow = 2, byrow = TRUE
                 )
             }
