@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7920 $
-## |  Last changed: $Date: 2024-05-23 13:56:24 +0200 (Do, 23 Mai 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -431,7 +431,7 @@ getSimulationCounts <- function(design = NULL,
                             idx <- as.integer(names(tab))
                             counts[idx] <- as.vector(tab)
                         }
-                        counts1 <- counts[1:length(timeUnderObservation1)]
+                        counts1 <- counts[seq_len(length(timeUnderObservation1))]
                         counts2 <- counts[(length(recruit1) + 1):(length(recruit1) + length(timeUnderObservation2))]
                     } else {
                         counts1 <- dfStartStop$nEvents[1:n1]
@@ -439,7 +439,8 @@ getSimulationCounts <- function(design = NULL,
                     }
                     nb <- .getNegativeBinomialEstimates(
                         counts1 = counts1, counts2 = counts2,
-                        t1 = timeUnderObservation1, t2 = timeUnderObservation2
+                        t1 = timeUnderObservation1, 
+                        t2 = timeUnderObservation2
                     )
                     info_Analysis <- .getInformationCountData(
                         lambda1 = nb[1],

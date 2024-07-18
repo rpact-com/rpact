@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -81,7 +81,7 @@ FieldSet <- R6::R6Class("FieldSet",
                 if (tableColumns > 0) {
                     values <- unlist(args, use.names = FALSE)
                     values <- values[values != "\n"]
-                    for (i in 1:length(values)) {
+                    for (i in seq_len(length(values))) {
                         values[i] <- gsub("\n", "", values[i])
                     }
                     if (!is.null(na) && length(na) == 1 && !is.na(na)) {
@@ -387,16 +387,6 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 )
             }
         },
-#        .catMarkdownText = function(...) { # TODO remove
-#            self$.show(consoleOutputEnabled = FALSE, ...)
-#            if (length(self$.catLines) == 0) {
-#                return(invisible())
-#            }
-#
-#            for (line in self$.catLines) {
-#                cat(line)
-#            }
-#        },
         .showParametersOfOneGroup = function(parameters, title,
                 orderByParameterName = TRUE, consoleOutputEnabled = TRUE) {
             output <- ""
@@ -443,7 +433,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                     }
                     
                     output <- ""
-                    for (i in 1:length(params)) {
+                    for (i in seq_len(length(params))) {
                         param <- params[[i]]
                         category <- NULL
                         parts <- strsplit(param$paramName, "$", fixed = TRUE)[[1]]
@@ -756,7 +746,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 parameterValues <- self[[parameterName]]
                 if (is.vector(parameterValues) && length(parameterValues) > numberOfRows) {
                     numberOfRows <- length(parameterValues)
-                } else if (is.matrix(parameterValues) && (nrow(parameterValues) == 1 || ncol(parameterValues) == 1) &&
+                } else if (is.matrix(parameterValues) && 
+                        (nrow(parameterValues) == 1 || ncol(parameterValues) == 1) &&
                         length(parameterValues) > numberOfRows) {
                     numberOfRows <- length(parameterValues)
                 }
@@ -1525,7 +1516,8 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
     if (inherits(x, "AnalysisResults")) {
         dfDesign <- as.data.frame(x$.design, niceColumnNamesEnabled = niceColumnNamesEnabled)
         dfStageResults <- as.data.frame(x$.stageResults, niceColumnNamesEnabled = niceColumnNamesEnabled)
-        dfStageResults <- dfStageResults[!is.na(dfStageResults[, grep("(test statistic)|(testStatistics)", colnames(dfStageResults))]), ]
+        dfStageResults <- dfStageResults[!is.na(dfStageResults[, 
+            grep("(test statistic)|(testStatistics)", colnames(dfStageResults))]), ]
         if (length(intersect(names(dfDesign), names(dfStageResults))) == 1) {
             dfTemp <- merge(dfDesign, dfStageResults)
             if (length(intersect(names(dfTemp), names(dataFrame))) >= 1) {

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7962 $
-## |  Last changed: $Date: 2024-05-31 13:41:37 +0200 (Fr, 31 Mai 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -714,7 +714,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 } else {
                     piecewiseSurvivalTimeStr <- format(self$piecewiseSurvivalTime)
                     lambda2Str <- format(self$lambda2)
-                    for (i in 1:length(self$piecewiseSurvivalTime)) {
+                    for (i in seq_len(length(self$piecewiseSurvivalTime))) {
                         if (i < length(self$piecewiseSurvivalTime)) {
                             self$.cat("  ", piecewiseSurvivalTimeStr[i], " - <",
                                 piecewiseSurvivalTimeStr[i + 1], ": ",
@@ -811,7 +811,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             pwSurvStartTimes <- c(0)
             pwSurvLambda2 <- c()
             pwSurvTimeNames <- names(pwSurvTimeList)
-            for (i in 1:length(pwSurvTimeNames)) {
+            for (i in seq_len(length(pwSurvTimeNames))) {
                 timePeriod <- pwSurvTimeNames[i]
                 lambdaValue <- pwSurvTimeList[[timePeriod]]
                 .assertIsSingleNumber(lambdaValue, paste0("pwSurvLambda[", i, "]"))
@@ -1497,7 +1497,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                     !self$absoluteAccrualIntensityEnabled) {
                 self$remainingTime <- NA_real_
                 self$.setParameterType("remainingTime", C_PARAM_NOT_APPLICABLE)
-                self$accrualTime <- self$accrualTime[1:length(self$accrualIntensity)]
+                self$accrualTime <- self$accrualTime[seq_len(length(self$accrualIntensity))]
             }
 
             self$.initAccrualIntensityAbsolute()
@@ -1556,7 +1556,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
                 } else {
                     accrualTimeStr <- format(self$accrualTime)
                     accrualIntensityStr <- format(self$accrualIntensity)
-                    for (i in 1:length(self$accrualTime)) {
+                    for (i in seq_len(length(self$accrualTime))) {
                         prefix <- ifelse(i == length(self$accrualTime) - 1, "<=", " <")
                         suffix <- ""
                         if (!self$maxNumberOfSubjectsIsUserDefined) {
@@ -1602,7 +1602,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
         },
         .getFormula = function() {
             s <- ""
-            for (i in 1:length(self$accrualTime)) {
+            for (i in seq_len(length(self$accrualTime))) {
                 if (i < length(self$accrualTime)) {
                     s <- paste0(
                         s, (round(self$accrualTime[i + 1], 4) - round(self$accrualTime[i], 4)),
@@ -1625,7 +1625,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
             }
 
             numberOfSubjects <- 0
-            for (i in 1:length(self$accrualTime)) {
+            for (i in seq_len(length(self$accrualTime))) {
                 if (i < length(self$accrualTime)) {
                     numberOfSubjects <- numberOfSubjects +
                         (self$accrualTime[i + 1] - self$accrualTime[i]) * self$accrualIntensity[i]
@@ -1967,7 +1967,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
             timeRegions <- names(accrualTimeList)
             endOfAccrualIsUndefined <- FALSE
             self$accrualTime <- c(self$accrualTime, 0)
-            for (i in 1:length(timeRegions)) {
+            for (i in seq_len(length(timeRegions))) {
                 timePeriod <- timeRegions[i]
                 accrualTimeValue <- accrualTimeList[[timePeriod]]
                 .assertIsSingleNumber(accrualTimeValue, paste0("accrualTime[", i, "]"))

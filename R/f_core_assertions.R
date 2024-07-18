@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -173,6 +173,16 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class 'TrialDesignInverseNormal' or 'TrialDesignGroupSequential' (is '",
+            .getClassName(design), "')"
+        )
+    }
+}
+
+.assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher <- function(design) {
+    if (!.isTrialDesignInverseNormalOrGroupSequential(design) && !.isTrialDesignFisher(design)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'design' must be an instance of class 'TrialDesignInverseNormal', 'TrialDesignGroupSequential', or 'TrialDesignFisher' (is '",
             .getClassName(design), "')"
         )
     }
@@ -1298,8 +1308,8 @@ NULL
 
     definedArguments <- c()
     undefinedArguments <- c()
-    for (i in 1:length(args)) {
-        arg <- args[i]
+    for (i in seq_len(length(args))) {
+        arg <- args[[i]]
         argName <- argNames[i]
         if (missing(arg) || (!is.null(arg) && sum(is.na(arg)) > 0)) {
             undefinedArguments <- c(undefinedArguments, argName)
@@ -1403,7 +1413,7 @@ NULL
     }
     ignore <- c(ignore, "showWarnings")
     argNames <- names(args)
-    for (i in 1:length(args)) {
+    for (i in seq_len(length(args))) {
         arg <- args[[i]]
         argName <- ifelse(is.null(argNames[i]) || argNames[i] == "",
             ifelse(inherits(arg, "StageResults"), "stageResultsName", paste0("%param", i, "%")),

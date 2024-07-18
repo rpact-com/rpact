@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -68,7 +68,7 @@ NULL
     indices <- gregexpr("[A-Z]", x)[[1]]
     parts <- strsplit(x, "[A-Z]")[[1]]
     result <- ""
-    for (i in 1:length(indices)) {
+    for (i in seq_len(length(indices))) {
         index <- indices[i]
         y <- tolower(substring(x, index, index))
         if (title) {
@@ -249,7 +249,7 @@ NULL
     }
 
     space <- ifelse(grepl(" $", separator), "", " ")
-    part1 <- x[1:length(x) - 1]
+    part1 <- x[seq_len(length(x)) - 1]
     part2 <- x[length(x)]
     return(paste0(paste(part1, collapse = separator), separator, space, mode, " ", part2))
 }

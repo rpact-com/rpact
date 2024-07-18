@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -186,7 +186,7 @@ getSimulationMeans <- function(design = NULL, ...,
             ), ...
         )
     } else {
-        .assertIsTrialDesign(design)
+        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design)
         .warnInCaseOfUnknownArguments(functionName = "getSimulationMeans", ignore = c("showStatistics"), ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
@@ -433,6 +433,8 @@ getSimulationMeans <- function(design = NULL, ...,
         designNumber <- 2L
     } else if (.isTrialDesignFisher(design)) {
         designNumber <- 3L
+    } else {
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "design type ", sQuote(.getClassName(design)), " not supported")
     }
 
     if (.isTrialDesignFisher(design)) {

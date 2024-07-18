@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8049 $
+## |  Last changed: $Date: 2024-07-17 17:03:09 +0200 (Mi, 17 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1479,7 +1479,7 @@ NULL
             }
 
             stoppingProbs[kMax] <- 1 - sum(stoppingProbs[1:(kMax - 1)])
-
+            
             studyDuration[i] <- analysisTime[, i] %*% stoppingProbs
 
             expectedNumberOfSubjectsH1[i] <- numberOfSubjects[, i] %*% stoppingProbs
@@ -2592,6 +2592,7 @@ getPowerSurvival <- function(design = NULL, ...,
         lambda1 <- rep(NA_real_, numberOfResults)
     }
 
+    studyDuration <- rep(NA_real_, numberOfResults)
     for (i in 1:numberOfResults) {
         # Analysis times
         up <- 2
@@ -2653,10 +2654,10 @@ getPowerSurvival <- function(design = NULL, ...,
             powerAndAverageSampleNumber$futilityPerStage[is.na(
                 powerAndAverageSampleNumber$futilityPerStage[, i]
             ), i] <- 0
-
+        
             stoppingProbs[, i] <- powerAndAverageSampleNumber$rejectPerStage[, i] +
                 c(powerAndAverageSampleNumber$futilityPerStage[, i], 0)
-
+            
             stoppingProbs[kMax, i] <- 1 - sum(stoppingProbs[1:(kMax - 1), i])
             designPlan$studyDuration[i] <- designPlan$analysisTime[, i] %*% stoppingProbs[, i]
             designPlan$.setParameterType("studyDuration", C_PARAM_GENERATED)

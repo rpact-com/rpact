@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -385,7 +385,7 @@ NULL
             accrualTime[1:(length(accrualTime) - 1)]
     }
     densityVector <- accrualIntensity / sum(densityIntervals * accrualIntensity)
-    for (l in 1:length(densityVector)) {
+    for (l in seq_len(length(densityVector))) {
         if (timeValue <= accrualTime[l]) {
             if (l == 1) {
                 return(timeValue * densityVector[l] * maxNumberOfSubjects)

@@ -5,6 +5,7 @@
 * When analyzing with a two-sided test, an issue with the calculation of the conditional rejection probability was fixed
 * Issue [#41](https://github.com/rpact-com/rpact/issues/41) fixed
 * Usage of pipe-operators improved
+* Minor summary improvements
 
 
 # rpact 4.0.0

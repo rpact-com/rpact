@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -149,7 +149,7 @@ NULL
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
     nFixed <- rep(NA_real_, length(alternative))
 
-    for (i in 1:length(alternative)) {
+    for (i in seq_len(length(alternative))) {
         theta <- alternative[i]
 
         if (groups == 1) {
@@ -409,7 +409,7 @@ NULL
 
     informationRates <- designCharacteristics$information / designCharacteristics$shift
 
-    for (i in 1:length(fixedSampleSize$alternative)) {
+    for (i in seq_len(length(fixedSampleSize$alternative))) {
         maxNumberOfSubjects[i] <- fixedSampleSize$nFixed[i] * designCharacteristics$inflationFactor
 
         numberOfSubjects[, i] <- maxNumberOfSubjects[i] *
