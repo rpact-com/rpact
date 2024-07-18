@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8054 $
+## |  Last changed: $Date: 2024-07-18 13:16:10 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1826,7 +1826,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
     header <- ""
     if (design$kMax == 1) {
-        header <- paste0(header, "Fixed sample analysis,")
+        header <- paste0(header, "Fixed sample analysis")
     } else {
         header <- paste0(header, "Sequential analysis with a maximum of ", design$kMax, " looks")
         prefix <- ifelse(design$.isDelayedResponseDesign(), "delayed response ", "")
