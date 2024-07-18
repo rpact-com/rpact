@@ -3,7 +3,7 @@
 
 * Minimum version of suggested package `ggplot2` changed from 2.2.0 to 3.2.0
 * When analyzing with a two-sided test, an issue with the calculation of the conditional rejection probability was fixed
-* Issue [#41](https://github.com/rpact-com/rpact/issues/41) fixed
+* Issues [#41](https://github.com/rpact-com/rpact/issues/41) and [#44](https://github.com/rpact-com/rpact/issues/44) fixed
 * Usage of pipe-operators improved
 * Minor summary improvements
 
