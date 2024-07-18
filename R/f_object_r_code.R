@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -108,7 +108,7 @@ NULL
         x <- t(x)
     }
 
-    for (i in 1:length(x)) {
+    for (i in seq_len(length(x))) {
         if (nchar(expectedResult) > 0) {
             expectedResult <- paste0(expectedResult, ", ")
         }

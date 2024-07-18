@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -404,7 +404,7 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
 
     datasetType <- NA_character_
     dataFrames <- NULL
-    for (i in 1:length(datasets)) {
+    for (i in seq_len(length(datasets))) {
         dataset <- datasets[[i]]
         .assertIsDataset(dataset)
         if (is.na(datasetType)) {
@@ -675,7 +675,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     }
 
     argNames <- names(args)
-    for (i in 1:length(args)) {
+    for (i in seq_len(length(args))) {
         arg <- args[[i]]
         if (!inherits(arg, "emmGrid")) {
             argName <- argNames[i]
@@ -715,7 +715,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(emmeansResults), " must be not empty")
     }
 
-    for (stage in 1:length(emmeansResults)) {
+    for (stage in seq_len(length(emmeansResults))) {
         if (!inherits(emmeansResults[[stage]], "emmGrid")) {
             stop(sprintf(
                 paste0(
@@ -769,7 +769,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     )
 
     stDevCalcMode <- getOption("rpact.dataset.stdev.calc.mode", "auto") # auto, sigma, norm, t
-    for (stage in 1:length(emmeansResults)) {
+    for (stage in seq_len(length(emmeansResults))) {
         emmeansResult <- emmeansResults[[stage]]
         emmeansResultsSummary <- summary(emmeansResult)
         emmeansResultsList <- as.list(emmeansResult)
@@ -797,7 +797,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 rpactGroupNumbers <- c(2:numberOfGroups, rpactGroupNumbers)
             }
         }
-        for (group in 1:length(emmeansResultsSummary$emmean)) {
+        for (group in seq_len(length(emmeansResultsSummary$emmean))) {
             stages <- c(stages, stage)
             groups <- c(groups, group)
             rpactGroupNumber <- rpactGroupNumbers[group]
@@ -884,7 +884,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     subsetNumbers <- as.integer(subsetNumbers)
     gMax <- max(subsetNumbers) + 1
     validSubsetNames <- .createSubsetsByGMax(gMax, stratifiedInput = stratifiedInput, all = FALSE)
-    for (i in 1:length(subsetNames)) {
+    for (i in seq_len(length(subsetNames))) {
         subsetName <- subsetNames[i]
         if (subsetName == "" && !inherits(args[[i]], "TrialDesign")) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all subsets must be named")
@@ -2438,7 +2438,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
                 }
 
                 fixedCovariateSample <- sample(values, length(subjects), replace = TRUE)
-                for (i in 1:length(subjects)) {
+                for (i in seq_len(length(subjects))) {
                     data[[fixedCovariateName]][data$subject == subjects[i]] <- fixedCovariateSample[i]
                 }
             } else if (is.numeric(values)) {
@@ -2448,7 +2448,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
                     covMean <- runif(1, minValue, maxValue)
                     covSD <- covMean * 0.1
                     showMessage <- TRUE
-                    for (i in 1:length(subjects)) {
+                    for (i in seq_len(length(subjects))) {
                         groupName <- as.character(data$group[data$subject == subjects[i]])[1]
                         covEffect <- 1
                         if (groupName == controlName && !is.null(covariateEffects)) {

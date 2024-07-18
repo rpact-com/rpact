@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -580,7 +580,7 @@ NULL
 }
 
 .removeDesignFromArgs <- function(args) {
-    for (i in 1:length(args)) {
+    for (i in seq_len(length(args))) {
         if (.isTrialDesign(args[[i]])) {
             return(args[-i])
         }
@@ -655,7 +655,7 @@ NULL
     }
 
     if (length(unknownArgs) > 0) {
-        for (i in 1:length(unknownArgs)) {
+        for (i in seq_len(length(unknownArgs))) {
             unknownArgs[i] <- argNames[argNamesLower == unknownArgs[i]][1]
         }
         if (length(unknownArgs) == 1) {
@@ -683,7 +683,7 @@ NULL
     indices <- gregexpr("[A-Z]", x)[[1]]
     parts <- strsplit(x, "[A-Z]")[[1]]
     result <- ""
-    for (i in 1:length(indices)) {
+    for (i in seq_len(length(indices))) {
         index <- indices[i]
         y <- tolower(substring(x, index, index))
         result <- paste0(result, parts[i], sep, y)

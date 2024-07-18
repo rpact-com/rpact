@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8027 $
-## |  Last changed: $Date: 2024-07-03 16:00:55 +0200 (Mi, 03 Jul 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -86,7 +86,7 @@ NULL
                 maxNumberOfSubjects[j] / (1 + allocationRatioPlanned[j])
             n2 <- n1 / allocationRatioPlanned[j]
 
-            for (i in (1:length(boundaries))) {
+            for (i in seq_len(length(boundaries))) {
                 tryCatch(
                     {
                         pi1Bound <- uniroot(
@@ -111,7 +111,7 @@ NULL
                 criticalValuesEffectScaleUpper[i, j] <- pi1Bound - pi2
             }
             if (design$sided == 2) {
-                for (i in (1:length(boundaries))) {
+                for (i in seq_len(length(boundaries))) {
                     tryCatch(
                         {
                             pi1Bound <- uniroot(
@@ -143,7 +143,7 @@ NULL
                 n1 <- allocationRatioPlanned[j] * design$informationRates *
                     maxNumberOfSubjects[j] / (1 + allocationRatioPlanned[j])
                 n2 <- n1 / allocationRatioPlanned[j]
-                for (i in (1:length(boundaries))) {
+                for (i in seq_len(length(boundaries))) {
                     tryCatch(
                         {
                             pi1Bound <- uniroot(
@@ -177,7 +177,7 @@ NULL
                 n1 <- allocationRatioPlanned[j] * design$informationRates *
                     maxNumberOfSubjects[j] / (1 + allocationRatioPlanned[j])
                 n2 <- n1 / allocationRatioPlanned[j]
-                for (i in (1:length(boundaries))) {
+                for (i in seq_len(length(boundaries))) {
                     tryCatch(
                         {
                             pi1Bound <- uniroot(
@@ -209,7 +209,7 @@ NULL
             n1 <- allocationRatioPlanned[j] * design$informationRates * maxNumberOfSubjects[j] /
                 (1 + allocationRatioPlanned[j])
             n2 <- n1 / allocationRatioPlanned[j]
-            for (i in (1:length(boundaries))) {
+            for (i in seq_len(length(boundaries))) {
                 tryCatch(
                     {
                         pi1Bound <- uniroot(
@@ -234,7 +234,7 @@ NULL
                 criticalValuesEffectScaleUpper[i, j] <- pi1Bound / pi2
             }
             if (design$sided == 2) {
-                for (i in (1:length(boundaries))) {
+                for (i in seq_len(length(boundaries))) {
                     tryCatch(
                         {
                             pi1Bound <- uniroot(
@@ -266,7 +266,7 @@ NULL
                 n1 <- allocationRatioPlanned[j] * design$informationRates * maxNumberOfSubjects[j] /
                     (1 + allocationRatioPlanned[j])
                 n2 <- n1 / allocationRatioPlanned[j]
-                for (i in (1:length(boundaries))) {
+                for (i in seq_len(length(boundaries))) {
                     tryCatch(
                         {
                             pi1Bound <- uniroot(
@@ -299,7 +299,7 @@ NULL
                 n1 <- allocationRatioPlanned[j] * design$informationRates * maxNumberOfSubjects[j] /
                     (1 + allocationRatioPlanned[j])
                 n2 <- n1 / allocationRatioPlanned[j]
-                for (i in (1:length(boundaries))) {
+                for (i in seq_len(length(boundaries))) {
                     tryCatch(
                         {
                             pi1Bound <- uniroot(
@@ -341,7 +341,7 @@ NULL
     if (groups == 1) {
         nFixed <- rep(NA_real_, length(pi1))
 
-        for (i in 1:length(pi1)) {
+        for (i in seq_len(length(pi1))) {
             if (normalApproximation) {
                 nFixed[i] <- (.getOneMinusQNorm(alpha / sided) * sqrt(thetaH0 * (1 - thetaH0)) +
                     .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i])))^2 /
@@ -435,7 +435,7 @@ NULL
             allocationRatioPlannedVec <- rep(NA_real_, length(pi1))
         }
 
-        for (i in 1:length(pi1)) {
+        for (i in seq_len(length(pi1))) {
             if (!riskRatio) {
                 # allocationRatioPlanned = 0 provides optimum sample size
                 if (allocationRatioPlanned == 0) {
@@ -538,7 +538,7 @@ NULL
 
     informationRates <- designCharacteristics$information / designCharacteristics$shift
 
-    for (i in 1:length(fixedSampleSize$pi1)) {
+    for (i in seq_len(length(fixedSampleSize$pi1))) {
         maxNumberOfSubjects[i] <- fixedSampleSize$nFixed[i] * designCharacteristics$inflationFactor
 
         numberOfSubjects[, i] <- maxNumberOfSubjects[i] * c(
@@ -868,7 +868,7 @@ getPowerRates <- function(design = NULL, ...,
     } else {
         if (!riskRatio) {
             designPlan$effect <- pi1 - pi2 - thetaH0
-            for (i in (1:length(pi1))) {
+            for (i in seq_len(length(pi1))) {
                 fm <- .getFarringtonManningValues(
                     rate1 = pi1[i], rate2 = pi2,
                     theta = thetaH0, allocation = allocationRatioPlanned, method = "diff"
@@ -883,7 +883,7 @@ getPowerRates <- function(design = NULL, ...,
             }
         } else {
             designPlan$effect <- pi1 / pi2 - thetaH0
-            for (i in (1:length(pi1))) {
+            for (i in seq_len(length(pi1))) {
                 fm <- .getFarringtonManningValues(
                     rate1 = pi1[i], rate2 = pi2,
                     theta = thetaH0, allocation = allocationRatioPlanned, method = "ratio"

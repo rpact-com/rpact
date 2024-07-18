@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -56,10 +56,11 @@ NULL
             } else {
                 actMl <- rep(NA_real_, length(subset))
                 ctrMl <- rep(NA_real_, length(subset))
-                for (population in (1:length(subset))) {
+                for (population in seq_len(length(subset))) {
                     y <- .getFarringtonManningValues(
                         rate1 = actEv[population] / actN[population],
-                        rate2 = ctrEv[population] / ctrN[population], theta = thetaH0, allocation = actN[population] / ctrN[population], method = "diff"
+                        rate2 = ctrEv[population] / ctrN[population], theta = thetaH0, 
+                            allocation = actN[population] / ctrN[population], method = "diff"
                     )
                     actMl[population] <- y$ml1
                     ctrMl[population] <- y$ml2

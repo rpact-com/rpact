@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -630,7 +630,7 @@ length.TrialDesignSet <- function(x) {
     }
 
     colNames <- character()
-    for (i in 1:length(colNames1)) {
+    for (i in seq_len(length(colNames1))) {
         colName1 <- colNames1[i]
         colName2 <- colNames2[i]
         if (!identical(colName1, colName2)) {

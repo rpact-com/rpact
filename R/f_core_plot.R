@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7750 $
-## |  Last changed: $Date: 2024-03-26 15:44:44 +0100 (Di, 26 Mrz 2024) $
+## |  File version: $Revision: 8052 $
+## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -633,7 +633,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         )
     }
 
-    yAxisCmds <- c()
+    yAxisCmds <- character()
     if (length(yParameterNames) == 1) {
         yAxisCmds <- .createValidParameterName(objectName, yParameterNames)
     } else {
@@ -645,7 +645,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         cat("  y-axis: ", yAxisCmds, "\n", sep = "")
     } else {
         cat("  y-axes:\n")
-        for (i in 1:length(yAxisCmds)) {
+        for (i in seq_len(length(yAxisCmds))) {
             cat("    y", i, ": ", yAxisCmds[i], "\n", sep = "")
         }
     }
@@ -1482,7 +1482,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         return(lambda2[1])
     }
 
-    for (i in 1:length(piecewiseSurvivalTime)) {
+    for (i in seq_len(length(piecewiseSurvivalTime))) {
         if (time <= piecewiseSurvivalTime[i]) {
             return(lambda2[i])
         }
