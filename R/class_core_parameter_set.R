@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8087 $
+## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1257,6 +1257,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 }
                 if (includeAllParameters || (
                         parameterSet$.getParameterType(parameterName) != C_PARAM_NOT_APPLICABLE &&
+                            !R6::is.R6(parameterValues) &&
                             sum(is.na(parameterValues)) < length(parameterValues))) {
                     if (is.null(dataFrame)) {
                         dataFrame <- data.frame(x = parameterValues)
@@ -1399,8 +1400,6 @@ names.FieldSet <- function(x) {
 #'
 #' @title
 #' Print Field Set Values
-#'
-
 #'
 #' @description
 #' \code{print} prints its \code{\link{FieldSet}} argument and returns it invisibly (via \code{invisible(x)}).
@@ -1927,20 +1926,39 @@ knit_print.ParameterSet <- function(x, ...) {
 #' @param  ... Other arguments (see \code{\link[knitr]{kable}}).
 #'
 #' @details
+#' This function is deprecated and should no longer be used.
+#' Manual use of kable() for rpact result objects is no longer needed, 
+#' as the formatting and display will be handled automatically by the rpact package. 
+#' Please remove any manual kable() calls from your code to avoid redundancy and potential issues. 
+#' The results will be displayed in a consistent format automatically.
+#' 
 #' Generic function to represent a parameter set in Markdown.
 #' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
 #' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
 #' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
 #' that all headings will be written bold but are not explicit defined as header.
-#'
+#' 
 #' @name kableParameterSet
+#' 
+#' @keywords internal
 #' 
 #' @export
 #'
 kable.ParameterSet <- function(x, ...) {
     fCall <- match.call(expand.dots = FALSE)
+    
+    lastWarningTime <- getOption("rpact.deprecated.message.time.function.kable")
+    if (is.null(lastWarningTime) || difftime(Sys.time(), lastWarningTime, units = "hours") > 8) {
+        options("rpact.deprecated.message.time.function.kable" = Sys.time())
+        .Deprecated(new = "",  
+            msg = paste0("Manual use of kable() for rpact result objects is no longer needed, ",
+                "as the formatting and display will be handled automatically by the rpact package"),
+            old = "kable")
+    }
+    
     if (inherits(x, "ParameterSet")) {
         objName <- deparse(fCall$x)
+        
         if (length(objName) > 0) {
             if (length(objName) > 1) {
                 objName <- paste0(objName[1], "...")

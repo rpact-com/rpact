@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8054 $
-## |  Last changed: $Date: 2024-07-18 13:16:10 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8087 $
+## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1396,14 +1396,15 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
     header <- ""
     if (design$kMax == 1) {
-        header <- paste0(header, "Fixed sample analysis.")
+        header <- paste0(header, "Fixed sample analysis")
     } else {
         header <- paste0(header, "Sequential analysis with ", design$kMax, " looks")
         header <- .concatenateSummaryText(header,
-            paste0("(", design$.toString(startWithUpperCase = FALSE), ")."),
+            paste0("(", design$.toString(startWithUpperCase = FALSE), ")"),
             sep = " "
         )
     }
+    header <- .addAlphaAndBetaToHeader(header, design, designPlan = NULL, powerEnabled = FALSE, endOfRecord = TRUE)
     header <- paste0(header, "\n")
 
     header <- paste0(header, "The results were calculated using a ")
@@ -1430,14 +1431,6 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             header <- paste0(header, "multi-arm logrank test")
         }
     }
-
-    header <- .concatenateSummaryText(header,
-        paste0(
-            "(", ifelse(design$sided == 1, "one", "two"),
-            "-sided, alpha = ", round(design$alpha, 4), ")"
-        ),
-        sep = " "
-    )
 
     if (!.isTrialDesignConditionalDunnett(design) && multiHypothesesEnabled) {
         if (stageResults$intersectionTest == "Dunnett") {
@@ -1563,7 +1556,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         paramName1, paramName2 = NA_character_,
         paramCaption1, paramCaption2 = NA_character_,
         shortcut1, shortcut2 = NA_character_,
-        digits1 = 2, digits2 = 2) {
+        digits1 = 3, digits2 = 3) {
     if (analysisResults$.design$kMax == 1) {
         return(header)
     }
@@ -1648,13 +1641,16 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     return(header)
 }
 
-.addAlphaAndBetaToHeader <- function(header, design, designPlan, ..., endOfRecord = FALSE) {
+.addAlphaAndBetaToHeader <- function(header, design, designPlan, ..., endOfRecord = FALSE, powerEnabled = NA) {
     header <- .concatenateSummaryText(header, paste0(
         ifelse(design$sided == 1, "one-sided", "two-sided"),
         ifelse(design$kMax == 1, "", " overall")
     ))
-    powerEnabled <- .isTrialDesignInverseNormalOrGroupSequential(design) && 
-        (is.null(designPlan) || (!.isSimulationResults(designPlan) && !identical("power", designPlan[[".objectType"]])))
+    if (is.na(powerEnabled)) {
+        powerEnabled <- .isTrialDesignInverseNormalOrGroupSequential(design) && 
+            (is.null(designPlan) || (!.isSimulationResults(designPlan) && 
+            !identical("power", designPlan[[".objectType"]])))
+    }
     header <- .concatenateSummaryText(header,
         paste0("significance level ", round(100 * design$alpha, 2), "%", 
             ifelse(!powerEnabled && endOfRecord, ".", "")),
@@ -1709,14 +1705,18 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
 .createSummaryHeaderDesign <- function(design, designPlan, summaryFactory) {
     if (is.null(designPlan)) {
-        if (.isTrialDesignFisher(design)) {
-            designType <- "Fisher's combination test"
-        } else if (.isTrialDesignConditionalDunnett(design)) {
-            designType <- "Conditional Dunnett test"
+        if (design$kMax == 1) {
+            header <- "Fixed"
         } else {
-            designType <- C_TYPE_OF_DESIGN_LIST[[design$typeOfDesign]]
+            if (.isTrialDesignFisher(design)) {
+                designType <- C_TYPE_OF_FISHER_LIST[[design$method]]
+            } else if (.isTrialDesignConditionalDunnett(design)) {
+                designType <- "Conditional Dunnett test"
+            } else {
+                designType <- C_TYPE_OF_DESIGN_LIST[[design$typeOfDesign]]
+            }
+            header <- .firstCharacterToUpperCase(designType)
         }
-        header <- .firstCharacterToUpperCase(designType)
         header <- paste0(header, " design")
         if (design$.isDelayedResponseDesign()) {
             header <- paste0(header, " with delayed response")
@@ -3593,6 +3593,24 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
 
         if (survivalEnabled) {
+            if (design$kMax > 1 && !(inherits(designPlan, "TrialDesignPlanSurvival") &&
+                    designPlan$.isSampleSizeObject())) {
+                summaryFactory$addParameter(designPlan,
+                    parameterName = "expectedNumberOfEvents",
+                    parameterCaption = "Expected number of events under H1",
+                    roundDigits = digitsSampleSize, transpose = TRUE
+                )
+            }
+
+            if (design$kMax > 1 && !(inherits(designPlan, "TrialDesignPlanSurvival") &&
+                    designPlan$.isSampleSizeObject())) {
+                summaryFactory$addParameter(designPlan,
+                    parameterName = "expectedNumberOfEvents",
+                    parameterCaption = "Expected number of events",
+                    roundDigits = digitsSampleSize, transpose = TRUE
+                )
+            }
+
             if (outputSize %in% c("medium", "large")) {
                 summaryFactory$addParameter(designPlan,
                     parameterName = parameterNameEvents,

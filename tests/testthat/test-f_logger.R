@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_logger.R
 ## |  Creation date: 06 February 2023, 12:13:45
-## |  File version: $Revision: 7644 $
-## |  Last changed: $Date: 2024-02-16 10:36:28 +0100 (Fr, 16 Feb 2024) $
+## |  File version: $Revision: 8087 $
+## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -30,7 +30,7 @@ test_that("Logger functions throw errors when arguments are missing or wrong", {
             expect_error(.logBase())
             expect_error(.logInfo())
             expect_error(.getRuntimeString())
-            expect_error(.logProgress())
+            expect_error(.logProgress(enforceLogging = TRUE))
             expect_no_error(setLogLevel())
             expect_no_error(resetLogLevel())
         },

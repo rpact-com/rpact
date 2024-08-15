@@ -15,9 +15,9 @@
 ## |  
 ## |  File name: test-class_summary.R
 ## |  Creation date: 08 November 2023, 08:49:48
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 8087 $
+## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |  
 
 test_plan_section("Testing Class 'SummaryFactory'")
@@ -399,7 +399,7 @@ test_that("Testing 'summary.ParameterSet': output will be produced", {
 
 	expect_output(summary(getDesignFisher())$show())
 	expect_output(summary(getDesignFisher(alpha0Vec = c(0.1, 0.2)))$show())
-	expect_output(summary(getDesignFisher(kMax = 1))$show())
+	expect_output(summary(getDesignFisher(kMax = 1))$show()) # TODO xxx
 	expect_output(summary(getDesignFisher(kMax = 4), digits = 5)$show())
 	expect_output(summary(getDesignFisher(kMax = 4), digits = 0)$show())
 	expect_output(summary(getDesignFisher(kMax = 1))$show())

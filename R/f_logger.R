@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8087 $
+## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -81,7 +81,11 @@
     return(timeStr)
 }
 
-.logProgress <- function(s, ..., startTime, runtimeUnits = c("secs", "auto")) {
+.logProgress <- function(s, ..., startTime, runtimeUnits = c("secs", "auto"), enforceLogging = FALSE) {
+    if (isFALSE(enforceLogging) && !interactive()) {
+        return(invisible())
+    }
+    
     if (!(getLogLevel() %in% c(
             C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG,
             C_LOG_LEVEL_INFO, C_LOG_LEVEL_WARN,

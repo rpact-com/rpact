@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8087 $
+## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -662,11 +662,7 @@ getSimulationSurvival <- function(design = NULL, ...,
     accrualTimeValue <- accrualTimeValue[1:accrualSetup$maxNumberOfSubjects]
 
     # to avoid last value to be NA_real_
-    i <- accrualSetup$maxNumberOfSubjects
-    while (is.na(accrualTimeValue[i])) {
-        accrualTimeValue[i] <- accrualTime[length(accrualTime)]
-        i <- i - 1
-    }
+    accrualTimeValue[is.na(accrualTimeValue)] <- accrualTime[length(accrualTime)]
 
     treatmentGroup <- rep(
         c(rep(1, allocation1), rep(2, allocation2)),
