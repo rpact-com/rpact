@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8059 $
+## |  Last changed: $Date: 2024-07-23 09:51:27 +0200 (Di, 23 Jul 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include class_dictionary.R
@@ -237,6 +237,13 @@ C_TYPE_OF_DESIGN_LIST <- createDictionary("C_TYPE_OF_DESIGN_LIST", list(
     "asHSD" = "Hwang, Shi & DeCani alpha spending",
     "asUser" = "User defined alpha spending",
     "noEarlyEfficacy" = "No early efficacy stop"
+))
+
+C_TYPE_OF_FISHER_LIST <- createDictionary("C_TYPE_OF_FISHER_LIST", list(
+    "equalAlpha" = "Constant levels",
+    "fullAlpha" = "Full last stage level",
+    "noInteraction" = "Levels with no Interaction",
+    "userDefinedAlpha" = "User defined levels"
 ))
 
 C_PLOT_SHOW_SOURCE_ARGUMENTS <- c("commands", "axes", "test", "validate")

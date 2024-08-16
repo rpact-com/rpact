@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8087 $
+## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -243,7 +243,8 @@ getAnalysisResults <- function(design, dataInput, ...,
 
                 designBefore <- eval(parse(text = getObjectRCode(design,
                     newArgumentValues = list(
-                        informationRates = observedInformationRatesBefore
+                        informationRates = observedInformationRatesBefore,
+                        kMax = NA_integer_
                     ),
                     stringWrapParagraphWidth = NULL
                 )))
@@ -280,6 +281,7 @@ getAnalysisResults <- function(design, dataInput, ...,
                 design <- eval(parse(text = getObjectRCode(design,
                     newArgumentValues = list(
                         informationRates = observedInformationRates,
+                        kMax = NA_integer_,
                         userAlphaSpending = userAlphaSpending,
                         typeOfDesign = C_TYPE_OF_DESIGN_AS_USER
                     ),
@@ -291,7 +293,10 @@ getAnalysisResults <- function(design, dataInput, ...,
                 )
             } else {
                 design <- eval(parse(text = getObjectRCode(design,
-                    newArgumentValues = list(informationRates = observedInformationRates),
+                    newArgumentValues = list(
+                        informationRates = observedInformationRates, 
+                        kMax = NA_integer_
+                    ),
                     stringWrapParagraphWidth = NULL
                 )))
             }
