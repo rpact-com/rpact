@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8087 $
-## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
+## |  File version: $Revision: 8104 $
+## |  Last changed: $Date: 2024-08-19 10:30:01 +0200 (Mo, 19 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -27,7 +27,7 @@ NULL
 }
 
 .getDefaultDesign <- function(...,
-        type = c("sampleSize", "power", "simulation", "analysis", "characteristics"),
+        type = c("sampleSize", "power", "simulation", "simulationCounts", "analysis", "characteristics"),
         ignore = c()) {
     type <- match.arg(type)
 
@@ -54,7 +54,7 @@ NULL
 
     twoSidedPower <- .getOptionalArgument("twoSidedPower", ...)
     if (is.null(twoSidedPower)) {
-        if (type %in% c("power", "simulation") && sided == 2) {
+        if (type %in% c("power", "simulation", "simulationCounts") && sided == 2) {
             twoSidedPower <- TRUE
         } else {
             twoSidedPower <- C_TWO_SIDED_POWER_DEFAULT

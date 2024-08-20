@@ -423,6 +423,10 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 .getDesignGroupSequentialKMax1 <- function(design) {
     design$criticalValues <- .getOneMinusQNorm(design$alpha / design$sided)
     design$alphaSpent[1] <- design$alpha
+    design$.setParameterType("typeOfDesign", C_PARAM_NOT_APPLICABLE)
+    if (!identical(design$typeOfDesign, C_DEFAULT_TYPE_OF_DESIGN)) {
+        warning("'typeOfDesign' (", design$typeOfDesign, ") will be ignored because design is fixed", call. = FALSE)
+    }
     return(invisible(design))
 }
 
