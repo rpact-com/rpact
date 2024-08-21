@@ -9,7 +9,7 @@ testing means rates for negative binomial distributed event numbers in the two t
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9247</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9248</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,6 +88,10 @@ that a warning will be displayed if unknown arguments are passed.</p></dd>
 <dt id="arg-plannedcalendartime">plannedCalendarTime<a class="anchor" aria-label="anchor" href="#arg-plannedcalendartime"></a></dt>
 <dd><p>For simulating count data, the time points where an analysis is planned to be performed.
 Should be a vector of length <code>kMax</code></p></dd>
+
+
+<dt id="arg-plannedmaxsubjects">plannedMaxSubjects<a class="anchor" aria-label="anchor" href="#arg-plannedmaxsubjects"></a></dt>
+<dd><p><code>plannedMaxSubjects &gt; 0</code> needs to be specified.</p></dd>
 
 
 <dt id="arg-lambda-">lambda1<a class="anchor" aria-label="anchor" href="#arg-lambda-"></a></dt>
@@ -243,6 +247,66 @@ There you can find, e.g., <code>plot.AnalysisResults</code> and
 obtain the specific help documentation linked above by typing <code><a href="plot.AnalysisResults.html">?plot.AnalysisResults</a></code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Fixed sample size design with two groups</span></span></span>
+<span class="r-in"><span><span class="fu">getSimulationCounts</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    plannedMaxSubjects <span class="op">=</span> <span class="fl">200</span>,</span></span>
+<span class="r-in"><span>    plannedCalendarTime <span class="op">=</span> <span class="fl">8</span>,</span></span>
+<span class="r-in"><span>    theta <span class="op">=</span> <span class="fl">1.8</span>,</span></span>
+<span class="r-in"><span>    lambda2 <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
+<span class="r-in"><span>    maxNumberOfIterations <span class="op">=</span> <span class="fl">1000</span>,</span></span>
+<span class="r-in"><span>    fixedExposureTime <span class="op">=</span> <span class="fl">6</span>,</span></span>
+<span class="r-in"><span>    accrualTime <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>    overdispersion <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The simulation count data feature is experimental and hence not fully validated (see www.rpact.com/experimental)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simulation of count data (fixed sample size design):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Design parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Critical values                        : 1.960 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Significance level                     : 0.0250 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Test                                   : one-sided </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Planned maximum number of subjects     : 200 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Planned calendar time                  : 8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                              : 0.200 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Effect                                 : 1.8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Overdispersion                         : 2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Fixed exposure time                    : 6.00 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Accrual time                           : 3.00 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Number of subjects                     : 200 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Maximum number of iterations           : 1000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Seed                                   : 1426212629 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Planned allocation ratio               : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Direction upper                        : TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Theta H0                               : 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Results:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                              : 0.360 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Iterations                             : 1000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Overall reject                         : 0.7520 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Legend:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (i): values of treatment arm i</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># Group sequential design alpha spending function design with O'Brien and </span></span></span>
+<span class="r-in"><span><span class="co"># Fleming type boundaries: Power and test characteristics for N = 1976, </span></span></span>
+<span class="r-in"><span><span class="co"># under variable exposure time with uniform recruitment over 1.25 months,</span></span></span>
+<span class="r-in"><span><span class="co"># study time (accrual + followup) = 4 (lambda1, lambda2, and overdispersion </span></span></span>
+<span class="r-in"><span><span class="co"># as specified, no futility stopping):</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="getPowerCounts.html">getPowerCounts</a></span><span class="op">(</span>design <span class="op">=</span> <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        kMax <span class="op">=</span> <span class="fl">3</span>, alpha <span class="op">=</span> <span class="fl">0.025</span>, beta <span class="op">=</span> <span class="fl">0.2</span>, typeOfDesign <span class="op">=</span> <span class="st">"asOF"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    lambda1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.08</span>, <span class="fl">0.09</span>, <span class="fl">0.0025</span><span class="op">)</span>, lambda2 <span class="op">=</span> <span class="fl">0.125</span>, </span></span>
+<span class="r-in"><span>    overdispersion <span class="op">=</span> <span class="fl">5</span>, directionUpper <span class="op">=</span> <span class="cn">FALSE</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">1976</span>, </span></span>
+<span class="r-in"><span>    followUpTime <span class="op">=</span> <span class="fl">2.75</span>, accrualTime <span class="op">=</span> <span class="fl">1.25</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

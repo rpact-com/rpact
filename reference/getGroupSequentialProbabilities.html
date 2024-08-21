@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9247</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9248</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,9 +70,9 @@ weights (scales) are w_k = sqrt((t_k - t_(k-1)) / t_1) (see the documentation).<
     <p>Given a sequence of information rates (fixing the correlation structure), and
 decisionMatrix with either 2 or 4 rows and kMax = length(informationRates) columns,
 this function calculates a probability matrix containing, for two rows, the probabilities:<br>
-P(Z_1 &lt;- l_1), P(l_1 &lt;- Z_1 &lt; u_1, Z_2 &lt; l_1),..., P(l_kMax-1 &lt;- Z_kMax-1 &lt; u_kMax-1, Z_kMax &lt; l_l_kMax)<br>
-P(Z_1 &lt;- u_1), P(l_1 &lt;- Z_1 &lt; u_1, Z_2 &lt; u_1),..., P(l_kMax-1 &lt;- Z_kMax-1 &lt; u_kMax-1, Z_kMax &lt; u_l_kMax)<br>
-P(Z_1 &lt;- Inf), P(l_1 &lt;- Z_1 &lt; u_1, Z_2 &lt; Inf),..., P(l_kMax-1 &lt;- Z_kMax-1 &lt; u_kMax-1, Z_kMax &lt; Inf)<br>
+P(Z_1 &lt; l_1), P(l_1 &lt; Z_1 &lt; u_1, Z_2 &lt; l_2),..., P(l_kMax-1 &lt; Z_kMax-1 &lt; u_kMax-1, Z_kMax &lt; l_l_kMax)<br>
+P(Z_1 &lt; u_1), P(l_1 &lt; Z_1 &lt; u_1, Z_2 &lt; u_2),..., P(l_kMax-1 &lt; Z_kMax-1 &lt; u_kMax-1, Z_kMax &lt; u_l_kMax)<br>
+P(Z_1 &lt; Inf), P(l_1 &lt; Z_1 &lt; u_1, Z_2 &lt; Inf),..., P(l_kMax-1 &lt; Z_kMax-1 &lt; u_kMax-1, Z_kMax &lt; Inf)<br>
 with continuation matrix<br>
 l_1,...,l_kMax<br>
 u_1,...,u_kMax<br>
