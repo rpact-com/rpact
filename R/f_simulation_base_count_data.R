@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8104 $
-## |  Last changed: $Date: 2024-08-19 10:30:01 +0200 (Mo, 19 Aug 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8112 $
+## |  Last changed: $Date: 2024-08-20 15:44:53 +0200 (Di, 20 Aug 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 .getInformationCountData <- function(lambda1,
@@ -101,18 +101,14 @@
 #' @inheritParams param_accrualTime_counts
 #' @inheritParams param_accrualIntensity_counts
 #' @inheritParams param_followUpTime_counts
-#' @inheritParams param_maxNumberOfSubjects
 #' @inheritParams param_overdispersion_counts
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
-#' @inheritParams param_plannedSubjects
-#' @inheritParams param_minNumberOfSubjectsPerStage
-#' @inheritParams param_maxNumberOfSubjectsPerStage
-#' @inheritParams param_conditionalPowerSimulation
+#' @inheritParams param_maxNumberOfSubjects_counts
 #' @inheritParams param_maxNumberOfIterations
-#' @inheritParams param_calcSubjectsFunction
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
+#' @inheritParams param_calcSubjectsFunction
 #' @inheritParams param_showStatistics
 #'
 #' @details
@@ -157,11 +153,9 @@
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
 #' 
-#' @template examples_get_simulation_means
+#' @template examples_get_simulation_counts
 #'
 #' @export
-#' 
-#' @export 
 #'
 getSimulationCounts <- function(design = NULL,
         ...,

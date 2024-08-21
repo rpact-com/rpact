@@ -49,3 +49,4 @@ testthat-problems\.rds
 ^README\.html$
 ^codecov\.yml$
 Rplots\.pdf
+^\.lintr$
