@@ -38,6 +38,8 @@ that a warning will be displayed if unknown arguments are passed.}
 \item{plannedCalendarTime}{For simulating count data, the time points where an analysis is planned to be performed.
 Should be a vector of length \code{kMax}}
 
+\item{plannedMaxSubjects}{\code{plannedMaxSubjects > 0} needs to be specified.}
+
 \item{lambda1}{A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
 the active treatment group, there is no default.}
 
@@ -169,4 +171,28 @@ There you can find, e.g., \code{plot.AnalysisResults} and
 obtain the specific help documentation linked above by typing \code{?plot.AnalysisResults}.
 }
 
-\keyword{internal}
+\examples{
+# Fixed sample size design with two groups
+getSimulationCounts(
+    plannedMaxSubjects = 200,
+    plannedCalendarTime = 8,
+    theta = 1.8,
+    lambda2 = 0.2,
+    maxNumberOfIterations = 1000,
+    fixedExposureTime = 6,
+    accrualTime = 3,
+    overdispersion = 2)
+\dontrun{
+# Group sequential design alpha spending function design with O'Brien and 
+# Fleming type boundaries: Power and test characteristics for N = 1976, 
+# under variable exposure time with uniform recruitment over 1.25 months,
+# study time (accrual + followup) = 4 (lambda1, lambda2, and overdispersion 
+# as specified, no futility stopping):
+getPowerCounts(design = getDesignGroupSequential(
+        kMax = 3, alpha = 0.025, beta = 0.2, typeOfDesign = "asOF"),
+    lambda1 = seq(0.08, 0.09, 0.0025), lambda2 = 0.125, 
+    overdispersion = 5, directionUpper = FALSE, maxNumberOfSubjects = 1976, 
+    followUpTime = 2.75, accrualTime = 1.25)
+}
+
+}

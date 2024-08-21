@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8087 $
-## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
+## |  File version: $Revision: 8111 $
+## |  Last changed: $Date: 2024-08-20 14:20:14 +0200 (Di, 20 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1641,20 +1641,19 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     return(header)
 }
 
-.addAlphaAndBetaToHeader <- function(header, design, designPlan, ..., endOfRecord = FALSE, powerEnabled = NA) {
-    header <- .concatenateSummaryText(header, paste0(
-        ifelse(design$sided == 1, "one-sided", "two-sided"),
-        ifelse(design$kMax == 1, "", " overall")
-    ))
+.addAlphaAndBetaToHeader <- function(header, design, designPlan, ..., endOfRecord = FALSE, powerEnabled = NA, sep = ", ") {
     if (is.na(powerEnabled)) {
         powerEnabled <- .isTrialDesignInverseNormalOrGroupSequential(design) && 
             (is.null(designPlan) || (!.isSimulationResults(designPlan) && 
             !identical("power", designPlan[[".objectType"]])))
     }
     header <- .concatenateSummaryText(header,
-        paste0("significance level ", round(100 * design$alpha, 2), "%", 
+        paste0(
+            ifelse(design$sided == 1, "one-sided", "two-sided"),
+            ifelse(design$kMax == 1, "", " overall"),
+            " significance level ", round(100 * design$alpha, 2), "%", 
             ifelse(!powerEnabled && endOfRecord, ".", "")),
-        sep = " "
+        sep = sep
     )
     if (powerEnabled) {
         header <- .concatenateSummaryText(header, 

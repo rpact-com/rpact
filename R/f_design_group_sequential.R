@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8112 $
+## |  Last changed: $Date: 2024-08-20 15:44:53 +0200 (Di, 20 Aug 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_constants.R
@@ -38,9 +38,9 @@ NULL
 #' Given a sequence of information rates (fixing the correlation structure), and
 #' decisionMatrix with either 2 or 4 rows and kMax = length(informationRates) columns,
 #' this function calculates a probability matrix containing, for two rows, the probabilities:\cr
-#' P(Z_1 <- l_1), P(l_1 <- Z_1 < u_1, Z_2 < l_1),..., P(l_kMax-1 <- Z_kMax-1 < u_kMax-1, Z_kMax < l_l_kMax)\cr
-#' P(Z_1 <- u_1), P(l_1 <- Z_1 < u_1, Z_2 < u_1),..., P(l_kMax-1 <- Z_kMax-1 < u_kMax-1, Z_kMax < u_l_kMax)\cr
-#' P(Z_1 <- Inf), P(l_1 <- Z_1 < u_1, Z_2 < Inf),..., P(l_kMax-1 <- Z_kMax-1 < u_kMax-1, Z_kMax < Inf)\cr
+#' P(Z_1 < l_1), P(l_1 < Z_1 < u_1, Z_2 < l_2),..., P(l_kMax-1 < Z_kMax-1 < u_kMax-1, Z_kMax < l_l_kMax)\cr
+#' P(Z_1 < u_1), P(l_1 < Z_1 < u_1, Z_2 < u_2),..., P(l_kMax-1 < Z_kMax-1 < u_kMax-1, Z_kMax < u_l_kMax)\cr
+#' P(Z_1 < Inf), P(l_1 < Z_1 < u_1, Z_2 < Inf),..., P(l_kMax-1 < Z_kMax-1 < u_kMax-1, Z_kMax < Inf)\cr
 #' with continuation matrix\cr
 #' l_1,...,l_kMax\cr
 #' u_1,...,u_kMax\cr
@@ -423,6 +423,10 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 .getDesignGroupSequentialKMax1 <- function(design) {
     design$criticalValues <- .getOneMinusQNorm(design$alpha / design$sided)
     design$alphaSpent[1] <- design$alpha
+    design$.setParameterType("typeOfDesign", C_PARAM_NOT_APPLICABLE)
+    if (!identical(design$typeOfDesign, C_DEFAULT_TYPE_OF_DESIGN)) {
+        warning("'typeOfDesign' (", design$typeOfDesign, ") will be ignored because design is fixed", call. = FALSE)
+    }
     return(invisible(design))
 }
 

@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8112 $
+## |  Last changed: $Date: 2024-08-20 15:44:53 +0200 (Di, 20 Aug 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 .getInformationCountData <- function(lambda1,
@@ -101,18 +101,14 @@
 #' @inheritParams param_accrualTime_counts
 #' @inheritParams param_accrualIntensity_counts
 #' @inheritParams param_followUpTime_counts
-#' @inheritParams param_maxNumberOfSubjects
 #' @inheritParams param_overdispersion_counts
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
-#' @inheritParams param_plannedSubjects
-#' @inheritParams param_minNumberOfSubjectsPerStage
-#' @inheritParams param_maxNumberOfSubjectsPerStage
-#' @inheritParams param_conditionalPowerSimulation
+#' @inheritParams param_maxNumberOfSubjects_counts
 #' @inheritParams param_maxNumberOfIterations
-#' @inheritParams param_calcSubjectsFunction
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
+#' @inheritParams param_calcSubjectsFunction
 #' @inheritParams param_showStatistics
 #'
 #' @details
@@ -156,8 +152,10 @@
 #'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
+#' 
+#' @template examples_get_simulation_counts
 #'
-#' @keywords internal
+#' @export
 #'
 getSimulationCounts <- function(design = NULL,
         ...,
@@ -183,7 +181,7 @@ getSimulationCounts <- function(design = NULL,
         directionUpper <- TRUE
     }
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(..., type = "simulationCounts")
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -192,7 +190,7 @@ getSimulationCounts <- function(design = NULL,
             )
         )
     } else {
-        .assertIsTrialDesign(design)
+        .assertIsTrialDesignGroupSequential(design)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationCounts",
             ignore = c("showStatistics"), ...
@@ -426,7 +424,7 @@ getSimulationCounts <- function(design = NULL,
                                 dfStartStop$output[, "recruitTime"] <= plannedCalendarTime[k] &
                                 dfStartStop$output[, "stopCalendar"] <= plannedCalendarTime[k],
                         ]
-                        if (length(kthStageWithEvents) > 0 && nrow(kthStageWithEvents) > 0) {
+                        if (length(kthStageWithEvents) > 0 && is.matrix(kthStageWithEvents) && nrow(kthStageWithEvents) > 0) {
                             tab <- table(kthStageWithEvents[, "id"])
                             idx <- as.integer(names(tab))
                             counts[idx] <- as.vector(tab)

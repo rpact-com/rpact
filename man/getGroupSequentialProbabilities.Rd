@@ -24,9 +24,9 @@ Calculates probabilities in the group sequential setting.
 Given a sequence of information rates (fixing the correlation structure), and
 decisionMatrix with either 2 or 4 rows and kMax = length(informationRates) columns,
 this function calculates a probability matrix containing, for two rows, the probabilities:\cr
-P(Z_1 <- l_1), P(l_1 <- Z_1 < u_1, Z_2 < l_1),..., P(l_kMax-1 <- Z_kMax-1 < u_kMax-1, Z_kMax < l_l_kMax)\cr
-P(Z_1 <- u_1), P(l_1 <- Z_1 < u_1, Z_2 < u_1),..., P(l_kMax-1 <- Z_kMax-1 < u_kMax-1, Z_kMax < u_l_kMax)\cr
-P(Z_1 <- Inf), P(l_1 <- Z_1 < u_1, Z_2 < Inf),..., P(l_kMax-1 <- Z_kMax-1 < u_kMax-1, Z_kMax < Inf)\cr
+P(Z_1 < l_1), P(l_1 < Z_1 < u_1, Z_2 < l_2),..., P(l_kMax-1 < Z_kMax-1 < u_kMax-1, Z_kMax < l_l_kMax)\cr
+P(Z_1 < u_1), P(l_1 < Z_1 < u_1, Z_2 < u_2),..., P(l_kMax-1 < Z_kMax-1 < u_kMax-1, Z_kMax < u_l_kMax)\cr
+P(Z_1 < Inf), P(l_1 < Z_1 < u_1, Z_2 < Inf),..., P(l_kMax-1 < Z_kMax-1 < u_kMax-1, Z_kMax < Inf)\cr
 with continuation matrix\cr
 l_1,...,l_kMax\cr
 u_1,...,u_kMax\cr
