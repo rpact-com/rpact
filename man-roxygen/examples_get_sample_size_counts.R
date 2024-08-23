@@ -1,4 +1,5 @@
 #' @examples
+#' \dontrun{
 #' # Fixed sample size trial where a therapy is assumed to decrease the 
 #' # exacerbation rate from 1.4 to 1.05 (25% decrease) within an observation 
 #' # period of 1 year, i.e., each subject has an equal follow-up of 1 year.
@@ -7,7 +8,7 @@
 #' # equal to 0.5, is obtained by
 #' getSampleSizeCounts(alpha = 0.025, beta = 0.1, lambda2 = 1.4, 
 #'     theta = 0.75, overdispersion = 0.5, fixedExposureTime = 1)
-#' \dontrun{
+#' 
 #' # Noninferiority test with blinded sample size reassessment to reproduce 
 #' # Table 2 from Friede and Schmidli (2010):
 #' getSampleSizeCounts(alpha = 0.025, beta = 0.2, lambda = 1, theta = 1,

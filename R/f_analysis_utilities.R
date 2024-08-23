@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1027,6 +1027,7 @@ getLongFormat <- function(dataInput) {
 #' }
 #'
 #' @examples
+#' \dontrun{
 #' # Absolute information epsilon:
 #' # decision rule 45 >= 46 - 1, i.e., under-running
 #' data <- getDataset(
@@ -1047,6 +1048,7 @@ getLongFormat <- function(dataInput) {
 #' getObservedInformationRates(data,
 #'     maxInformation = 46, informationEpsilon = 0.03
 #' )
+#' }
 #'
 #' @return Returns a list that summarizes the observed information rates.
 #'

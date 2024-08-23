@@ -664,14 +664,16 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             data <- data.frame(
                 piecewiseSurvivalTime = self$piecewiseSurvivalTime,
                 lambda1 = self$lambda1,
-                lambda2 = self$lambda2
+                lambda2 = self$lambda2,
+                hazardRatio = self$hazardRatio
             )
-            rownames(data) <- as.character(1:nrow(data))
             colnames(data) <- c(
                 "Start time",
                 .getParameterCaption("lambda1", tableOutputEnabled = TRUE),
-                .getParameterCaption("lambda2", tableOutputEnabled = TRUE)
+                .getParameterCaption("lambda2", tableOutputEnabled = TRUE),
+                .getParameterCaption("hazardRatio", tableOutputEnabled = TRUE)
             )
+            rownames(data) <- as.character(1:nrow(data))
             return(data)
         },
         .isPiBased = function() {

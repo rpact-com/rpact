@@ -47,10 +47,12 @@ Function to identify the available plot types of an object.
 }
 }
 \examples{
+\dontrun{
 design <- getDesignInverseNormal(kMax = 2)
 getAvailablePlotTypes(design, "numeric")
 plotTypes(design, "caption")
 getAvailablePlotTypes(design, "numcap")
 plotTypes(design, "capnum")
+}
 
 }

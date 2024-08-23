@@ -38,7 +38,9 @@ Each element of the \code{\link{TrialDesign}} is
 converted to a column in the data frame.
 }
 \examples{
+\dontrun{
 as.data.frame(getDesignGroupSequential())
+}
 
 }
 \keyword{internal}

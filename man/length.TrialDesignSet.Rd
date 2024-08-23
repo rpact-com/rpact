@@ -20,8 +20,10 @@ Returns the number of designs in a \code{TrialDesignSet}.
 Is helpful for iteration over all designs in a design set.
 }
 \examples{
+\dontrun{
 designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))
 length(designSet)
+}
 
 }
 \keyword{internal}

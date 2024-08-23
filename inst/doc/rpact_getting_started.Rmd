@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
     +	rates (binary endpoint)
     +	survival trials with flexible recruitment and survival time options
     +	count data 
-*	Simulation tool for means, rates, and survival data
+*	Simulation tool for means, rates, survival data, and count data
     +	Assessment of adaptive sample size/event number recalculations based on
         conditional power
     +   Assessment of treatment selection strategies in multi-arm trials

@@ -45,6 +45,7 @@ that the vector falls in a rectangle in n-space with error
 less than eps.
 }
 \examples{
+\dontrun{
 N <- 3
 RHO <- 0.5
 B <- rep(-5.0, length = N)
@@ -54,5 +55,6 @@ BPD <- rep(sqrt(RHO), length = N)
 D <- rep(0.0, length = N)
 result <- mvstud(NDF = 0, A = A, B = B, BPD = BPD, INF = INF, D = D)
 result
+}
 
 }

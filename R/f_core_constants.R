@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8059 $
-## |  Last changed: $Date: 2024-07-23 09:51:27 +0200 (Di, 23 Jul 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8124 $
+## |  Last changed: $Date: 2024-08-23 08:41:16 +0200 (Fr, 23 Aug 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include class_dictionary.R
@@ -1236,6 +1236,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     inflationFactor = ".formatProbabilities",
     information = ".formatRates",
     power = ".formatProbabilities",
+    sided = ".formatSided",
     rejectionProbabilities = ".formatProbabilities",
     futilityProbabilities = ".formatFutilityProbabilities",
     probs = ".formatProbabilities",

@@ -221,10 +221,11 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
+\dontrun{
 # Fixed sample size design with two groups, total sample size 40,
 # alternative = c(0, 0.2, 0.4, 0.8, 1), and standard deviation = 1 (the default)
 getSimulationMeans(plannedSubjects = 40, maxNumberOfIterations = 10)
-\dontrun{
+
 # Increase number of simulation iterations and compare results
 # with power calculator using normal approximation
 getSimulationMeans(

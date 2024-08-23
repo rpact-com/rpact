@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -45,9 +45,11 @@ createDictionary <- function(name, keyValuePairList = NULL) {
 
 #'
 #' @examples
+#' \dontrun{
 #' x <- createDictionary("x", list(a = 1, b = 2, c = 3))
 #' getDictionaryKeyByValue(x, 2)
-#'
+#' }
+#' 
 #' @noRd
 #'
 getDictionaryKeyByValue <- function(x, value) {
@@ -59,9 +61,11 @@ getDictionaryKeyByValue <- function(x, value) {
 
 #'
 #' @examples
+#' \dontrun{
 #' x <- createDictionary("x", list(a = 1, b = 2, c = 3))
 #' getDictionarySubset(x, c("b", "c"))
-#'
+#' }
+#' 
 #' @noRd
 #'
 getDictionarySubset <- function(x, subsetNames) {

@@ -19,8 +19,10 @@ Function to get the names of a \code{\link{TrialDesignSet}} object.
 Returns the names of a design set that can be accessed by the user.
 }
 \examples{
+\dontrun{
 designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))
 names(designSet)
+}
 
 }
 \keyword{internal}

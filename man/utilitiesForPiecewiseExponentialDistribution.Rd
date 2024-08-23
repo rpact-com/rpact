@@ -95,6 +95,7 @@ In this case, no piecewise definition is possible, i.e., only piecewiseLambda
 (as a single value) and kappa need to be specified.
 }
 \examples{
+\dontrun{
 # Calculate probabilties for a range of time values for a
 # piecewise exponential distribution with hazard rates
 # 0.025, 0.04, 0.015, and 0.007 in the intervals
@@ -112,5 +113,6 @@ y <- getPiecewiseExponentialDistribution(seq(0, 150, 15),
 getPiecewiseExponentialQuantile(y,
     piecewiseSurvivalTime = piecewiseSurvivalTime
 )
+}
 
 }

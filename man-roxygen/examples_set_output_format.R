@@ -1,7 +1,8 @@
 #' @examples 
+#' \dontrun{
 #' # show output format of p values
 #' getOutputFormat("p.value")
-#' \dontrun{
+#' 
 #' # set new p value output format
 #' setOutputFormat("p.value", digits = 5, nsmall = 5)
 #' 

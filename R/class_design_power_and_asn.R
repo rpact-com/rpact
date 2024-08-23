@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7958 $
-## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -310,10 +310,12 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
 #' @template return_dataframe
 #'
 #' @examples
+#' \dontrun{
 #' data <- as.data.frame(getPowerAndAverageSampleNumber(getDesignGroupSequential()))
 #' head(data)
 #' dim(data)
-#'
+#' }
+#' 
 #' @export
 #'
 #' @keywords internal

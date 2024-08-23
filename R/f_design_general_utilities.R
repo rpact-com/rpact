@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8104 $
-## |  Last changed: $Date: 2024-08-19 10:30:01 +0200 (Mo, 19 Aug 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -695,6 +695,7 @@ NULL
 #' @return A \code{\link[base]{numeric}} value or vector will be returned.
 #'
 #' @examples
+#' \dontrun{
 #' # Calculate probabilties for a range of time values for a
 #' # piecewise exponential distribution with hazard rates
 #' # 0.025, 0.04, 0.015, and 0.007 in the intervals
@@ -712,6 +713,7 @@ NULL
 #' getPiecewiseExponentialQuantile(y,
 #'     piecewiseSurvivalTime = piecewiseSurvivalTime
 #' )
+#' }
 #'
 #' @name utilitiesForPiecewiseExponentialDistribution
 #'

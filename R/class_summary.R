@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8111 $
-## |  Last changed: $Date: 2024-08-20 14:20:14 +0200 (Di, 20 Aug 2024) $
+## |  File version: $Revision: 8124 $
+## |  Last changed: $Date: 2024-08-23 08:41:16 +0200 (Fr, 23 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -88,7 +88,7 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
     if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
         markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
         if (is.na(markdown)) {
-            markdown <- .isMarkdownEnabled()
+            markdown <- .isMarkdownEnabled("plot")
         }
         if (markdown) {
             sep <- "\n\n-----\n\n"
@@ -138,7 +138,7 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
         result <- .addKnitPrintPart(x, result, sep = sep, prefix = prefix)
     }
     if (length(result) == 0 || all(nchar(trimws(result)) == 0)) {
-        return("")
+        return(invisible())
     }
     
     return(knitr::asis_output(result))
@@ -202,7 +202,7 @@ print.SummaryFactory <- function(x, ...,
         sep = "\n\n-----\n\n") {
 
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("summary")
     }
     
     if (markdown || isTRUE(x[["markdown"]])) {  

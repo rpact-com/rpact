@@ -103,6 +103,7 @@ the variables to be specified in \code{getDataset()} are \code{cumEvents}, \code
 and the independent increments are calculated.
 }
 \examples{
+\dontrun{
 # Create a Dataset of Means (one group):
 datasetOfMeans <- getDataset(
     n      = c(22, 11, 22, 11),
@@ -111,18 +112,18 @@ datasetOfMeans <- getDataset(
 )
 datasetOfMeans
 datasetOfMeans$show(showType = 2)
-\dontrun{
-datasetOfMeans <- getDataset(
+
+datasetOfMeans2 <- getDataset(
     cumulativeSampleSizes = c(22, 33, 55, 66),
     cumulativeMeans = c(1.000, 1.033, 1.020, 1.017),
     cumulativeStDevs = c(1.00, 1.38, 1.64, 1.58)
 )
-datasetOfMeans
-datasetOfMeans$show(showType = 2)
-as.data.frame(datasetOfMeans)
+datasetOfMeans2
+datasetOfMeans2$show(showType = 2)
+as.data.frame(datasetOfMeans2)
 
 # Create a Dataset of Means (two groups):
-datasetOfMeans <- getDataset(
+datasetOfMeans3 <- getDataset(
     n1 = c(22, 11, 22, 11),
     n2 = c(22, 13, 22, 13),
     means1  = c(1, 1.1, 1, 1),
@@ -130,9 +131,9 @@ datasetOfMeans <- getDataset(
     stDevs1 = c(1, 2, 2, 1.3),
     stDevs2 = c(1, 2, 2, 1.3)
 )
-datasetOfMeans
+datasetOfMeans3
 
-datasetOfMeans <- getDataset(
+datasetOfMeans4 <- getDataset(
     cumulativeSampleSizes1 = c(22, 33, 55, 66),
     cumulativeSampleSizes2 = c(22, 35, 57, 70),
     cumulativeMeans1  = c(1, 1.033, 1.020, 1.017),
@@ -140,7 +141,7 @@ datasetOfMeans <- getDataset(
     cumulativeStDevs1 = c(1, 1.38, 1.64, 1.58),
     cumulativeStDevs2 = c(1, 1.43, 1.82, 1.74)
 )
-datasetOfMeans
+datasetOfMeans4
 
 df <- data.frame(
     stages = 1:4,
@@ -151,12 +152,12 @@ df <- data.frame(
     stDevs1 = c(1, 2, 2, 1.3),
     stDevs2 = c(1, 2, 2, 1.3)
 )
-datasetOfMeans <- getDataset(df)
-datasetOfMeans
+datasetOfMeans5 <- getDataset(df)
+datasetOfMeans5
 
 # Create a Dataset of Means (three groups) where the comparison of 
 # treatment arm 1 to control is dropped at the second interim stage:
-datasetOfMeans <- getDataset(
+datasetOfMeans6 <- getDataset(
    cumN1      = c(22, 33, NA),
    cumN2      = c(20, 34, 56),
    cumN3      = c(22, 31, 52),
@@ -166,7 +167,7 @@ datasetOfMeans <- getDataset(
    cumStDevs1 = c(1.5, 1.9, NA),
    cumStDevs2 = c(1.3, 1.3, 1.1),
    cumStDevs3 = c(1, 1.3, 1.8))
-datasetOfMeans
+datasetOfMeans6
 
 # Create a Dataset of Rates (one group):
 datasetOfRates <- getDataset(
@@ -176,24 +177,24 @@ datasetOfRates <- getDataset(
 datasetOfRates
 
 # Create a Dataset of Rates (two groups):
-datasetOfRates <- getDataset(
+datasetOfRates2 <- getDataset(
     n2      = c(8, 10, 9, 11),
     n1      = c(11, 13, 12, 13),
     events2 = c(3, 5, 5, 6),
     events1 = c(10, 10, 12, 12)
 )
-datasetOfRates
+datasetOfRates2
 
 # Create a Dataset of Rates (three groups) where the comparison of 
 # treatment arm 2 to control is dropped at the first interim stage:
-datasetOfRates <- getDataset(
+datasetOfRates3 <- getDataset(
     cumN1      = c(22, 33, 44),
     cumN2      = c(20, NA, NA),
     cumN3      = c(20, 34, 44),
     cumEvents1 = c(11, 14, 22),
     cumEvents2 = c(17, NA, NA),
     cumEvents3 = c(17, 19, 33))
-datasetOfRates
+datasetOfRates3
 
 # Create a Survival Dataset
 datasetSurvival <- getDataset(
@@ -206,7 +207,7 @@ datasetSurvival
 # Create a Survival Dataset with four comparisons where treatment
 # arm 2 was dropped at the first interim stage, and treatment arm 4
 # at the second.
-datasetSurvival <- getDataset(
+datasetSurvival2 <- getDataset(
     cumEvents1   = c(18, 45, 56),
     cumEvents2   = c(22, NA, NA),
     cumEvents3   = c(12, 41, 56),
@@ -216,7 +217,7 @@ datasetSurvival <- getDataset(
     cumLogRanks3 = c(1.45, 1.67, 1.87),
     cumLogRanks4 = c(1.12, 1.33, NA)
 )
-datasetSurvival
+datasetSurvival2
 
 # Enrichment: Stratified and unstratified data input
 # The following data are from one study. Only the first 

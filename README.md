@@ -1,3 +1,5 @@
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
  <!-- badges: start -->
 [![](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact) 
 [![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml) 
@@ -11,7 +13,7 @@
 [![](https://img.shields.io/badge/RPACT-Cloud-blue.svg)](https://rpact.shinyapps.io/cloud)
  <!-- badges: end -->
 
-# rpact
+# rpact <a href="https://www.rpact.com"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
 
@@ -24,7 +26,7 @@ Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
     -   survival trials with flexible recruitment and survival time
         options
     -   count data
--   Simulation tool for means, rates, and survival data
+-   Simulation tool for means, rates, survival data, and count data
     -   Assessment of adaptive sample size/event number recalculations
         based on conditional power
     -   Assessment of treatment selection strategies in multi-arm trials

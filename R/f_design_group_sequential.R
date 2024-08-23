@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8112 $
-## |  Last changed: $Date: 2024-08-20 15:44:53 +0200 (Di, 20 Aug 2024) $
+## |  File version: $Revision: 8123 $
+## |  Last changed: $Date: 2024-08-23 08:37:23 +0200 (Fr, 23 Aug 2024) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -44,6 +44,9 @@ NULL
 #' with continuation matrix\cr
 #' l_1,...,l_kMax\cr
 #' u_1,...,u_kMax\cr
+#' That is, the output matrix of the function provides per stage (column) the cumulative probabilities 
+#' for values specified in decisionMatrix and Inf, and reaching the stage, i.e., the test 
+#' statistics is in the continuation region for the preceding stages. 
 #' For 4 rows, the continuation region contains of two regions and the probability matrix is
 #' obtained analogously (cf., Wassmer and Brannath, 2016).
 #'

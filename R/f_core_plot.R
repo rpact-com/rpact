@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -377,12 +377,14 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
 #' of numeric type for \code{option=numeric}.
 #'
 #' @examples
+#' \dontrun{
 #' design <- getDesignInverseNormal(kMax = 2)
 #' getAvailablePlotTypes(design, "numeric")
 #' plotTypes(design, "caption")
 #' getAvailablePlotTypes(design, "numcap")
 #' plotTypes(design, "capnum")
-#'
+#' }
+#' 
 #' @export
 #'
 getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),

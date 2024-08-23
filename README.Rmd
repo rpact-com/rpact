@@ -8,7 +8,8 @@ output:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-"
+  fig.path = "man/figures/README-",
+  out.width = "100%"
 )
 ```
 
@@ -25,7 +26,7 @@ knitr::opts_chunk$set(
 [![](https://img.shields.io/badge/RPACT-Cloud-blue.svg)](https://rpact.shinyapps.io/cloud)
  <!-- badges: end -->
 
-# rpact
+# rpact <a href="https://www.rpact.com"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
 
@@ -37,7 +38,7 @@ Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
     +	rates (binary endpoint)
     +	survival trials with flexible recruitment and survival time options
     +	count data 
-*	Simulation tool for means, rates, and survival data
+*	Simulation tool for means, rates, survival data, and count data
     +	Assessment of adaptive sample size/event number recalculations based on
         conditional power
     +   Assessment of treatment selection strategies in multi-arm trials

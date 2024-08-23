@@ -111,6 +111,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
+\dontrun{
 # Calculate event probabilities for staggered subjects' entry, piecewisely defined
 # survival time and hazards, and plot it.
 timeVector <- seq(0, 100, 1)
@@ -120,7 +121,6 @@ y <- getEventProbabilities(timeVector, accrualTime = c(0, 20, 60),
     lambda2 = c(0.02, 0.06, 0.1), 
     hazardRatio = 2
 )
-\dontrun{
 plot(timeVector, y$cumulativeEventProbabilities, type = 'l')
 }
 }

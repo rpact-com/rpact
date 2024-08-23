@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -286,10 +286,12 @@ writeDataset <- function(dataset, file, ..., append = FALSE, quote = TRUE, sep =
 #' }
 #'
 #' @examples
+#' \dontrun{
 #' dataFile <- system.file("extdata", "datasets_rates.csv", package = "rpact")
 #' if (dataFile != "") {
 #'     datasets <- readDatasets(dataFile)
 #'     datasets
+#' }
 #' }
 #' @export
 #'
@@ -2250,7 +2252,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 )
 
 #' @examples
-#'
+#' \dontrun{
 #' datasetExample <- getDataset(
 #'     means1 = c(112.3, 105.1, 121.3),
 #'     means2 = c(98.1, 99.3, 100.1),
@@ -2266,7 +2268,8 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #'     randomDataParamName = "outcome", numberOfVisits = 3,
 #'     fixedCovariates = list(gender = c("f", "m"), bmi = c(17, 40))
 #' )
-#'
+#' }
+#' 
 #' @noRd
 #'
 .getRandomDataMeans <- function(dataset, ...,
@@ -2504,6 +2507,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #' @template return_object_ggplot
 #'
 #' @examples
+#' \dontrun{
 #' # Plot a dataset of means
 #' dataExample <- getDataset(
 #'     n1 = c(22, 11, 22, 11),
@@ -2513,9 +2517,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #'     stDevs1 = c(1, 2, 2, 1.3),
 #'     stDevs2 = c(1, 2, 2, 1.3)
 #' )
-#' \dontrun{
 #' if (require(ggplot2)) plot(dataExample, main = "Comparison of Means")
-#' }
 #'
 #' # Plot a dataset of rates
 #' dataExample <- getDataset(
@@ -2524,7 +2526,6 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #'     events1 = c(3, 5, 5, 6),
 #'     events2 = c(8, 10, 12, 12)
 #' )
-#' \dontrun{
 #' if (require(ggplot2)) plot(dataExample, main = "Comparison of Rates")
 #' }
 #'
@@ -2534,7 +2535,7 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
         legendTitle = "Group", palette = "Set1", showSource = FALSE, plotSettings = NULL) {
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("plot")
     }
     
     args <- list(
@@ -4255,7 +4256,7 @@ print.Dataset <- function(x, ..., markdown = NA, output = c("list", "long", "wid
     datasetName <- deparse(fCall$x)
     
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("print")
     }
     
     output <- match.arg(output)

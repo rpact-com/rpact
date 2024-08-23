@@ -22,6 +22,7 @@ Returns test actions.
 Returns the test actions of the specified design and stage results at the specified stage.
 }
 \examples{
+\dontrun{
 design <- getDesignInverseNormal(kMax = 2)
 data <- getDataset(
     n      = c( 20,  30),
@@ -29,6 +30,7 @@ data <- getDataset(
     stDevs = c(130, 140)
 )
 getTestActions(getStageResults(design, dataInput = data))
+}
 
 }
 \seealso{

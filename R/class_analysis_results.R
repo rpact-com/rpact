@@ -1833,7 +1833,7 @@ plot.AnalysisResults <- function(x, y, ..., type = 1L,
         showSource = FALSE, grid = 1, plotSettings = NULL) {
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("plot")
     }
     
     args <- list(

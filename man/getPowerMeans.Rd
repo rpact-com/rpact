@@ -113,6 +113,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
+\dontrun{
 # Calculate the power, stopping probabilities, and expected sample size 
 # for testing H0: mu1 - mu2 = 0 in a two-armed design against a range of 
 # alternatives H1: mu1 - m2 = delta, delta = (0, 1, 2, 3, 4, 5), 
@@ -126,6 +127,7 @@ getPowerMeans(getDesignGroupSequential(alpha = 0.025,
     groups = 2, alternative = c(0:5), stDev = 8,
     normalApproximation = FALSE, maxNumberOfSubjects = 80, 
     allocationRatioPlanned = 2)
+}
 
 }
 \seealso{
