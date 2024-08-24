@@ -3,7 +3,7 @@
 by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3, doi:10.2307/2347754
 ."><meta property="og:description" content="Calculates the Multivariate Normal Distribution with Product Correlation Structure published
 by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3, doi:10.2307/2347754
-."></head><body>
+."><meta property="og:image" content="https://rpact-com.github.io/rpact/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -11,7 +11,7 @@ by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3, doi:1
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9248</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9250</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,8 +35,7 @@ by Charles Dunnett, Algorithm AS 251.1 Appl.Statist. (1989), Vol.38, No.3, doi:1
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Original Algorithm AS 251: Student T Distribution</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Original Algorithm AS 251: Student T Distribution</h1>
       <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/main/R/f_as251.R" class="external-link"><code>R/f_as251.R</code></a></small>
       <div class="d-none name"><code>mvstud.Rd</code></div>
     </div>
@@ -113,7 +112,8 @@ less than eps.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span><span class="va">RHO</span> <span class="op">&lt;-</span> <span class="fl">0.5</span></span></span>
 <span class="r-in"><span><span class="va">B</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5.0</span>, length <span class="op">=</span> <span class="va">N</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">5.0</span>, length <span class="op">=</span> <span class="va">N</span><span class="op">)</span></span></span>
@@ -122,11 +122,7 @@ less than eps.</p>
 <span class="r-in"><span><span class="va">D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.0</span>, length <span class="op">=</span> <span class="va">N</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">mvstud</span><span class="op">(</span>NDF <span class="op">=</span> <span class="fl">0</span>, A <span class="op">=</span> <span class="va">A</span>, B <span class="op">=</span> <span class="va">B</span>, BPD <span class="op">=</span> <span class="va">BPD</span>, INF <span class="op">=</span> <span class="va">INF</span>, D <span class="op">=</span> <span class="va">D</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.999998</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"bound")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9.592968e-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"iFault")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

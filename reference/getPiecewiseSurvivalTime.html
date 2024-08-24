@@ -3,7 +3,7 @@
 of an exponential survival time cumulative distribution function.
 Use names to obtain the field names."><meta property="og:description" content="Returns a PiecewiseSurvivalTime object that contains the all relevant parameters
 of an exponential survival time cumulative distribution function.
-Use names to obtain the field names."></head><body>
+Use names to obtain the field names."><meta property="og:image" content="https://rpact-com.github.io/rpact/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -11,7 +11,7 @@ Use names to obtain the field names."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9248</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9250</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,8 +35,7 @@ Use names to obtain the field names."></head><body>
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Get Piecewise Survival Time</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Get Piecewise Survival Time</h1>
       <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/main/R/class_time.R" class="external-link"><code>R/class_time.R</code></a></small>
       <div class="d-none name"><code>getPiecewiseSurvivalTime.Rd</code></div>
     </div>
@@ -171,190 +170,25 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span>lambda2 <span class="op">=</span> <span class="fl">0.5</span>, hazardRatio <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential survival times:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival is disabled.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                                  : 0.500 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hazard ratio                               : 0.800 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise survival times                   : 0.00 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   kappa                                      : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delayed response allowed                   : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                                  : 0.400 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(1)                                  : 1.7 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(2)                                  : 1.4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival enabled     : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span>lambda2 <span class="op">=</span> <span class="fl">0.5</span>, hazardRatio <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span>lambda2 <span class="op">=</span> <span class="fl">0.5</span>, lambda1 <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential survival times:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival is disabled.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                                  : 0.400 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                                  : 0.500 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise survival times                   : 0.00 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   kappa                                      : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delayed response allowed                   : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hazard ratio                               : 0.800 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(1)                                  : 1.7 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(2)                                  : 1.4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival enabled     : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span>pi2 <span class="op">=</span> <span class="fl">0.5</span>, hazardRatio <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential survival times:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival is disabled.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hazard ratio                               : 0.800 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed control rate                       : 0.500 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Event time                                 : 12 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   kappa                                      : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delayed response allowed                   : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                                  : 0.0462 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                                  : 0.0578 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed treatment rate                     : 0.426 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(1)                                  : 15.0 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(2)                                  : 12.0 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival enabled     : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span>pi2 <span class="op">=</span> <span class="fl">0.5</span>, pi1 <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential survival times:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival is disabled.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed treatment rate                     : 0.400 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed control rate                       : 0.500 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Event time                                 : 12 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   kappa                                      : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delayed response allowed                   : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                                  : 0.0426 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                                  : 0.0578 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hazard ratio                               : 0.737 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(1)                                  : 16.3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(2)                                  : 12.0 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival enabled     : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span>pi1 <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential survival times:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival is disabled.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed treatment rate                     : 0.300 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Assumed control rate                       : 0.200 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Event time                                 : 12 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   kappa                                      : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delayed response allowed                   : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                                  : 0.0297 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                                  : 0.0186 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hazard ratio                               : 1.598 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(1)                                  : 23.3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(2)                                  : 37.3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival enabled     : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span>hazardRatio <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.8</span><span class="op">)</span>, lambda2 <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential survival times:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival is disabled.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                                  : 0.400 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hazard ratio                               : 0.600, 0.800 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise survival times                   : 0.00 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   kappa                                      : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delayed response allowed                   : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                                  : 0.240, 0.320 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(1)                                  : 2.9, 2.2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   median(2)                                  : 1.7 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival enabled     : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span>piecewiseSurvivalTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">9</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>    lambda2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.04</span>, <span class="fl">0.015</span><span class="op">)</span>, hazardRatio <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential survival times:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0 - &lt;6: 0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   6 - &lt;9: 0.040</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &gt;=9: 0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise survival times                   : 0.00, 6.00, 9.00 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                                  : 0.025, 0.040, 0.015 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hazard ratio                               : 0.800 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   kappa                                      : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delayed response allowed                   : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                                  : 0.020, 0.032, 0.012 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival enabled     : TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span>piecewiseSurvivalTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span>, <span class="fl">9</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>    lambda2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.04</span>, <span class="fl">0.015</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>    lambda1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.04</span>, <span class="fl">0.015</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential survival times:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0 - &lt;6: 0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   6 - &lt;9: 0.040</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &gt;=9: 0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise survival times                   : 0.00, 6.00, 9.00 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                                  : 0.020, 0.032, 0.012 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                                  : 0.025, 0.040, 0.015 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   kappa                                      : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delayed response allowed                   : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hazard ratio                               : 0.800 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival enabled     : TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">pwst</span> <span class="op">&lt;-</span> <span class="fu">getPiecewiseSurvivalTime</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="st">"0 - &lt;6"</span>   <span class="op">=</span> <span class="fl">0.025</span>, </span></span>
@@ -363,29 +197,7 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 <span class="r-in"><span>    <span class="st">"15 - &lt;21"</span> <span class="op">=</span> <span class="fl">0.01</span>, </span></span>
 <span class="r-in"><span>    <span class="st">"&gt;=21"</span>     <span class="op">=</span> <span class="fl">0.007</span><span class="op">)</span>, hazardRatio <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pwst</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Piecewise exponential survival times:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    0 - &lt; 6: 0.025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    6 - &lt; 9: 0.040</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    9 - &lt;15: 0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   15 - &lt;21: 0.010</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &gt;=21: 0.007</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Details:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> User defined parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise survival times                   : 0.00, 6.00, 9.00, 15.00, 21.00 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(2)                                  : 0.025, 0.040, 0.015, 0.010, 0.007 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Hazard ratio                               : 0.750 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Default parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   kappa                                      : 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delayed response allowed                   : FALSE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Generated parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lambda(1)                                  : 0.01875, 0.03000, 0.01125, 0.00750, 0.00525 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Piecewise exponential survival enabled     : TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># The object created by getPiecewiseSurvivalTime() can be used directly in </span></span></span>
 <span class="r-in"><span><span class="co"># getSampleSizeSurvival():</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="getSampleSizeSurvival.html">getSampleSizeSurvival</a></span><span class="op">(</span>piecewiseSurvivalTime <span class="op">=</span> <span class="va">pwst</span><span class="op">)</span></span></span>

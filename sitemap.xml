@@ -153,6 +153,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/getWideFormat.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/index.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/kableParameterSet.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/knit_print.FieldSet.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/knit_print.ParameterSet.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/knit_print.SummaryFactory.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/length.TrialDesignSet.html</loc></url>
@@ -218,6 +219,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfIterations.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfSubjects.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfSubjectsPerStage.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfSubjects_counts.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfSubjects_survival.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_median1.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_median2.html</loc></url>
