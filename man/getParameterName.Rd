@@ -18,7 +18,9 @@ This function identifies and returns the parameter name for a given caption
 that will be used in print outputs of an rpact result object.
 }
 \examples{
+\dontrun{
 getParameterName(getDesignInverseNormal(), "Maximum number of stages")
+}
 
 }
 \seealso{

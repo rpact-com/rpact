@@ -17,7 +17,9 @@ Returns the parameter caption for a given object and parameter name.
 This function identifies and returns the caption that will be used in print outputs of an rpact result object.
 }
 \examples{
+\dontrun{
 getParameterCaption(getDesignInverseNormal(), "kMax")
+}
 
 }
 \seealso{

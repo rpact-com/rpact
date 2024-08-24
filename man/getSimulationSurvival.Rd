@@ -340,6 +340,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
+\dontrun{
 # Fixed sample size with minimum required definitions, pi1 = (0.3,0.4,0.5,0.6) and
 # pi2 = 0.3 at event time 12, and accrual time 24
 getSimulationSurvival(
@@ -347,7 +348,7 @@ getSimulationSurvival(
     accrualTime = 24, plannedEvents = 40, maxNumberOfSubjects = 200,
     maxNumberOfIterations = 10
 )
-\dontrun{
+
 # Increase number of simulation iterations
 getSimulationSurvival(
     pi1 = seq(0.3, 0.6, 0.1), pi2 = 0.3, eventTime = 12,

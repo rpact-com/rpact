@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -297,7 +297,7 @@ print.TrialDesignCharacteristics <- function(x, ..., markdown = NA, showDesign =
     sysCalls <- sys.calls()
     
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("print")
     }
     
     if (isTRUE(markdown)) {
@@ -344,8 +344,10 @@ print.TrialDesignCharacteristics <- function(x, ..., markdown = NA, showDesign =
 #' @template return_dataframe
 #'
 #' @examples
+#' \dontrun{
 #' as.data.frame(getDesignCharacteristics(getDesignGroupSequential()))
-#'
+#' }
+#' 
 #' @export
 #'
 #' @keywords internal
@@ -1120,7 +1122,7 @@ plot.TrialDesign <- function(
         
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("plot")
     }
     
     args <- list(
@@ -1211,7 +1213,7 @@ plot.TrialDesign <- function(
 plot.TrialDesignCharacteristics <- function(x, y, ...) {
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("plot")
     }
     
     if (markdown) {
@@ -1300,8 +1302,10 @@ plot.TrialDesignCharacteristics <- function(x, y, ...) {
 #' @template return_dataframe
 #'
 #' @examples
+#' \dontrun{
 #' as.data.frame(getDesignGroupSequential())
-#'
+#' }
+#' 
 #' @export
 #'
 #' @keywords internal

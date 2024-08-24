@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8124 $
+## |  Last changed: $Date: 2024-08-23 08:41:16 +0200 (Fr, 23 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -721,6 +721,10 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
         return(x)
     }
     return(.getFormattedValue(.getZeroCorrectedValue(value), digits = 3))
+}
+
+.formatSided <- function(value) {
+    return(ifelse(value == 1, "one-sided", "two-sided"))
 }
 
 .formatHowItIs <- function(value) {

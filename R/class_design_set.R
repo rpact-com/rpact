@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -54,6 +54,7 @@ NULL
 #' @template how_to_get_help_for_generics
 #'
 #' @examples
+#' \dontrun{
 #' # Example 1
 #' design <- getDesignGroupSequential(
 #'     alpha = 0.05, kMax = 6,
@@ -61,9 +62,7 @@ NULL
 #' )
 #' designSet <- getDesignSet()
 #' designSet$add(design = design, deltaWT = c(0.3, 0.4))
-#' \dontrun{
 #' if (require(ggplot2)) plot(designSet, type = 1)
-#' }
 #'
 #' # Example 2 (shorter script)
 #' design <- getDesignGroupSequential(
@@ -71,9 +70,7 @@ NULL
 #'     sided = 2, typeOfDesign = "WT", deltaWT = 0.1
 #' )
 #' designSet <- getDesignSet(design = design, deltaWT = c(0.3, 0.4))
-#' \dontrun{
 #' if (require(ggplot2)) plot(designSet, type = 1)
-#' }
 #'
 #' # Example 3 (use of designs instead of design)
 #' d1 <- getDesignGroupSequential(
@@ -90,7 +87,6 @@ NULL
 #'     designs = c(d1, d2),
 #'     variedParameters = c("typeOfDesign", "kMax")
 #' )
-#' \dontrun{
 #' if (require(ggplot2)) plot(designSet, type = 8, nMax = 20)
 #' }
 #'
@@ -580,9 +576,11 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 #' @template return_names
 #'
 #' @examples
+#' \dontrun{
 #' designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))
 #' names(designSet)
-#'
+#' }
+#' 
 #' @export
 #'
 #' @keywords internal
@@ -607,9 +605,11 @@ names.TrialDesignSet <- function(x) {
 #' representing the number of design in the \code{TrialDesignSet}.
 #'
 #' @examples
+#' \dontrun{
 #' designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))
 #' length(designSet)
-#'
+#' }
+#' 
 #' @export
 #'
 #' @keywords internal
@@ -704,9 +704,11 @@ length.TrialDesignSet <- function(x) {
 #' @template return_dataframe
 #'
 #' @examples
+#' \dontrun{
 #' designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))
 #' as.data.frame(designSet)
-#'
+#' }
+#' 
 #' @export
 #'
 #' @keywords internal
@@ -881,7 +883,7 @@ plot.TrialDesignSet <- function(
         
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("plot")
     }
     
     args <- list(

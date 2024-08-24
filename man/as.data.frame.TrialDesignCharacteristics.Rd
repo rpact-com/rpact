@@ -37,7 +37,9 @@ Returns the \code{TrialDesignCharacteristics} as data frame.
 Each element of the \code{\link{TrialDesignCharacteristics}} is converted to a column in the data frame.
 }
 \examples{
+\dontrun{
 as.data.frame(getDesignCharacteristics(getDesignGroupSequential()))
+}
 
 }
 \keyword{internal}

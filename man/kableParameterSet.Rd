@@ -3,10 +3,34 @@
 \name{kableParameterSet}
 \alias{kableParameterSet}
 \alias{kable.ParameterSet}
+\alias{kable.FieldSet}
+\alias{kable.data.frame}
+\alias{kable.table}
+\alias{kable.matrix}
+\alias{kable.array}
+\alias{kable.numeric}
+\alias{kable.character}
+\alias{kable.logical}
 \alias{kable}
 \title{Create output in Markdown}
 \usage{
 \method{kable}{ParameterSet}(x, ...)
+
+\method{kable}{FieldSet}(x, ..., enforceRowNames = TRUE, niceColumnNamesEnabled = TRUE)
+
+\method{kable}{data.frame}(x, ...)
+
+\method{kable}{table}(x, ...)
+
+\method{kable}{matrix}(x, ...)
+
+\method{kable}{array}(x, ...)
+
+\method{kable}{numeric}(x, ...)
+
+\method{kable}{character}(x, ...)
+
+\method{kable}{logical}(x, ...)
 
 kable(x, ...)
 }

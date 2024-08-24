@@ -47,6 +47,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
+\dontrun{
 # Example 1
 design <- getDesignGroupSequential(
     alpha = 0.05, kMax = 6,
@@ -54,9 +55,7 @@ design <- getDesignGroupSequential(
 )
 designSet <- getDesignSet()
 designSet$add(design = design, deltaWT = c(0.3, 0.4))
-\dontrun{
 if (require(ggplot2)) plot(designSet, type = 1)
-}
 
 # Example 2 (shorter script)
 design <- getDesignGroupSequential(
@@ -64,9 +63,7 @@ design <- getDesignGroupSequential(
     sided = 2, typeOfDesign = "WT", deltaWT = 0.1
 )
 designSet <- getDesignSet(design = design, deltaWT = c(0.3, 0.4))
-\dontrun{
 if (require(ggplot2)) plot(designSet, type = 1)
-}
 
 # Example 3 (use of designs instead of design)
 d1 <- getDesignGroupSequential(
@@ -83,7 +80,6 @@ designSet <- getDesignSet(
     designs = c(d1, d2),
     variedParameters = c("typeOfDesign", "kMax")
 )
-\dontrun{
 if (require(ggplot2)) plot(designSet, type = 8, nMax = 20)
 }
 

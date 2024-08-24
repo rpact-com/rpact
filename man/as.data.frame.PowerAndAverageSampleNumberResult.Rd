@@ -37,9 +37,11 @@ Returns the \code{\link{PowerAndAverageSampleNumberResult}} as data frame.
 Coerces the \code{\link{PowerAndAverageSampleNumberResult}} object to a data frame.
 }
 \examples{
+\dontrun{
 data <- as.data.frame(getPowerAndAverageSampleNumber(getDesignGroupSequential()))
 head(data)
 dim(data)
+}
 
 }
 \keyword{internal}

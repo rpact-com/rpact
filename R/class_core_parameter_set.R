@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8087 $
-## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
+## |  File version: $Revision: 8124 $
+## |  Last changed: $Date: 2024-08-23 08:41:16 +0200 (Fr, 23 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -719,10 +719,6 @@ ParameterSet <- R6::R6Class("ParameterSet",
         .printAsDataFrame = function(parameterNames, niceColumnNamesEnabled = FALSE,
                 includeAllParameters = FALSE, handleParameterNamesAsToBeExcluded = FALSE,
                 lineBreakEnabled = FALSE) {
-            if (.isTrialDesignPlan(self)) {
-                parameterNames <- NULL
-            }
-
             dataFrame <- .getAsDataFrame(
                 parameterSet = self,
                 parameterNames = parameterNames,
@@ -732,12 +728,6 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 returnParametersAsCharacter = TRUE
             )
             result <- as.matrix(dataFrame)
-            if (.isTrialDesignPlan(self)) {
-                dimnames(result)[[1]] <- paste("  ", c(1:nrow(dataFrame)))
-            } else if (!is.null(dataFrame[["stages"]])) {
-                dimnames(result)[[1]] <- paste("  Stage", dataFrame$stages)
-            }
-
             print(result, quote = FALSE, right = FALSE)
         },
         .getNumberOfRows = function(parameterNames) {
@@ -894,13 +884,6 @@ ParameterSet <- R6::R6Class("ParameterSet",
             }
 
             return(x[which(names(x) %in% listEntryNames)])
-        },
-        .isMultiHypothesesObject = function() {
-            return(.isEnrichmentAnalysisResults(self) || .isEnrichmentStageResults(self) ||
-                .isMultiArmAnalysisResults(self) || .isMultiArmStageResults(self))
-        },
-        .isEnrichmentObject = function() {
-            return(.isEnrichmentAnalysisResults(self) || .isEnrichmentStageResults(self))
         }
     )
 )
@@ -929,7 +912,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         parameterValues <- parameterSet[[parameterName]]
         if (!is.null(parameterValues) && (is.matrix(parameterValues) || !is.array(parameterValues))) {
             if (is.matrix(parameterValues)) {
-                if (parameterSet$.isMultiHypothesesObject()) {
+                if (.isMultiHypothesesObject(parameterSet)) {
                     if (nrow(parameterValues) > n && ncol(parameterValues) > 0) {
                         n <- nrow(parameterValues)
                     }
@@ -937,7 +920,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                     n <- ncol(parameterValues)
                 }
             } else if (length(parameterValues) > n &&
-                    !parameterSet$.isMultiHypothesesObject()) {
+                    !.isMultiHypothesesObject(parameterSet)) {
                 n <- length(parameterValues)
             }
         }
@@ -984,7 +967,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(rep(parameterValues, numberOfVariants * numberOfStages))
         }
 
-        if (parameterSet$.isMultiHypothesesObject()) {
+        if (.isMultiHypothesesObject(parameterSet)) {
             if (length(parameterValues) == numberOfStages) {
                 return(as.vector(sapply(FUN = rep, X = parameterValues, times = numberOfVariants)))
             }
@@ -1056,7 +1039,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
     }
 
     # applicable for analysis enrichment
-    if (parameterSet$.isMultiHypothesesObject()) {
+    if (.isMultiHypothesesObject(parameterSet)) {
         if (nrow(parameterValues) %in% c(1, numberOfVariants) &&
                 ncol(parameterValues) %in% c(1, numberOfStages)) {
             columnValues <- c()
@@ -1111,7 +1094,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
     )
     names(dataFrame) <- stagesCaption
 
-    if (parameterSet$.isEnrichmentObject()) {
+    if (.isEnrichmentObject(parameterSet)) {
         populations <- character()
         for (i in 1:numberOfVariants) {
             populations <- c(populations, ifelse(i == numberOfVariants, "F", paste0("S", i)))
@@ -1420,7 +1403,7 @@ print.FieldSet <- function(x, ..., markdown = NA) {
     sysCalls <- sys.calls()
     
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("print")
     }
     
     if (isTRUE(markdown)) {
@@ -1623,12 +1606,17 @@ summary.ParameterSet <- function(object, ...,
     }
 
     object$.cat(object$.toString(startWithUpperCase = TRUE), " table:\n", heading = 1)
-    parametersToShow <- object$.getParametersToShow()
-    for (parameter in parametersToShow) {
-        if (length(object[[parameter]]) == 1) {
-            parametersToShow <- parametersToShow[parametersToShow != parameter]
+    if (.isTrialDesignPlan(object)) {
+        parametersToShow <- NULL
+    } else {
+        parametersToShow <- object$.getParametersToShow()
+        for (parameter in parametersToShow) {
+            if (length(object[[parameter]]) == 1) {
+                parametersToShow <- parametersToShow[parametersToShow != parameter]
+            }
         }
     }
+    
     object$.printAsDataFrame(parameterNames = parametersToShow, niceColumnNamesEnabled = TRUE)
     invisible(object)
 }
@@ -1673,7 +1661,7 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     sysCalls <- sys.calls()
     
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("print")
     }
 
     if (isTRUE(markdown)) {
@@ -1889,6 +1877,35 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
 
 #'
 #' @title
+#' Print Field Set in Markdown Code Chunks
+#'
+#' @description
+#' The function `knit_print.FieldSet` is the default printing function for rpact result objects in knitr.
+#' The chunk option `render` uses this function by default.
+#' To fall back to the normal printing behavior set the chunk option `render = normal_print`.
+#' For more information see \code{\link[knitr]{knit_print}}.
+#'
+#' @param x A \code{FieldSet}.
+#' @param  ... Other arguments (see \code{\link[knitr]{knit_print}}).
+#'
+#' @details
+#' Generic function to print a field set in Markdown.
+#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
+#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
+#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
+#' that all headings will be written bold but are not explicit defined as header.
+#'
+#' @keywords internal
+#' 
+#' @export
+#'
+knit_print.FieldSet <- function(x, ...) { 
+    result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+    return(knitr::asis_output(result))
+}
+
+#'
+#' @title
 #' Print Parameter Set in Markdown Code Chunks
 #'
 #' @description
@@ -1907,6 +1924,8 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
 #' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
 #' that all headings will be written bold but are not explicit defined as header.
 #'
+#' @keywords internal
+#' 
 #' @export
 #'
 knit_print.ParameterSet <- function(x, ...) { 
@@ -1982,6 +2001,107 @@ kable.ParameterSet <- function(x, ...) {
 
 #' 
 #' @rdname kableParameterSet
+#'
+#' @keywords internal
+#' 
+#' @export 
+#' 
+kable.FieldSet <- function(x, ..., 
+        enforceRowNames = TRUE, niceColumnNamesEnabled = TRUE) {
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(as.matrix(x, 
+        enforceRowNames = enforceRowNames, 
+        niceColumnNamesEnabled = niceColumnNamesEnabled), ...)
+}
+
+#' 
+#' @rdname kableParameterSet
+#'
+#' @keywords internal
+#' 
+#' @export 
+#' 
+kable.data.frame <- function(x, ...) {
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(x, ...)
+}
+
+#' 
+#' @rdname kableParameterSet
+#'
+#' @keywords internal
+#' 
+#' @export 
+#' 
+kable.table <- function(x, ...) {
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(x, ...)
+}
+
+#' 
+#' @rdname kableParameterSet
+#'
+#' @keywords internal
+#' 
+#' @export 
+#' 
+kable.matrix <- function(x, ...) {
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(x, ...)
+}
+
+#' 
+#' @rdname kableParameterSet
+#'
+#' @keywords internal
+#' 
+#' @export 
+#' 
+kable.array <- function(x, ...) {
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(x, ...)
+}
+
+#' 
+#' @rdname kableParameterSet
+#'
+#' @keywords internal
+#' 
+#' @export 
+#' 
+kable.numeric <- function(x, ...) {
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(x, ...)
+}
+
+#' 
+#' @rdname kableParameterSet
+#'
+#' @keywords internal
+#' 
+#' @export 
+#' 
+kable.character <- function(x, ...) {
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(x, ...)
+}
+
+#' 
+#' @rdname kableParameterSet
+#'
+#' @keywords internal
+#' 
+#' @export 
+#' 
+kable.logical <- function(x, ...) {
+    .assertPackageIsInstalled("knitr")
+    knitr::kable(x, ...)
+}
+
+#' 
+#' @rdname kableParameterSet
+#'
+#' @keywords internal
 #' 
 #' @export 
 #' 

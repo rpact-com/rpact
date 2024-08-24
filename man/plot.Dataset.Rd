@@ -62,6 +62,7 @@ Plots a dataset.
 Generic function to plot all kinds of datasets.
 }
 \examples{
+\dontrun{
 # Plot a dataset of means
 dataExample <- getDataset(
     n1 = c(22, 11, 22, 11),
@@ -71,9 +72,7 @@ dataExample <- getDataset(
     stDevs1 = c(1, 2, 2, 1.3),
     stDevs2 = c(1, 2, 2, 1.3)
 )
-\dontrun{
 if (require(ggplot2)) plot(dataExample, main = "Comparison of Means")
-}
 
 # Plot a dataset of rates
 dataExample <- getDataset(
@@ -82,7 +81,6 @@ dataExample <- getDataset(
     events1 = c(3, 5, 5, 6),
     events2 = c(8, 10, 12, 12)
 )
-\dontrun{
 if (require(ggplot2)) plot(dataExample, main = "Comparison of Rates")
 }
 

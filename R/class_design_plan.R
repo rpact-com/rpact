@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -285,8 +285,10 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
 #' @template return_dataframe
 #'
 #' @examples
+#' \dontrun{
 #' as.data.frame(getSampleSizeMeans())
-#'
+#' }
+#' 
 #' @export
 #'
 #' @keywords internal

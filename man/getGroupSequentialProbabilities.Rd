@@ -30,12 +30,16 @@ P(Z_1 < Inf), P(l_1 < Z_1 < u_1, Z_2 < Inf),..., P(l_kMax-1 < Z_kMax-1 < u_kMax-
 with continuation matrix\cr
 l_1,...,l_kMax\cr
 u_1,...,u_kMax\cr
+That is, the output matrix of the function provides per stage (column) the cumulative probabilities
+for values specified in decisionMatrix and Inf, and reaching the stage, i.e., the test
+statistics is in the continuation region for the preceding stages.
 For 4 rows, the continuation region contains of two regions and the probability matrix is
 obtained analogously (cf., Wassmer and Brannath, 2016).
 }
 \examples{
+\dontrun{
 # Calculate Type I error rates in the two-sided group sequential setting when
-# performing kMax interim stages with constant critical boundaries at level alpha:
+# performing kMax stages with constant critical boundaries at level alpha:
 alpha <- 0.05
 kMax <- 10
 decisionMatrix <- matrix(c(
@@ -85,6 +89,7 @@ probs <- getGroupSequentialProbabilities(
     decisionMatrix = dm, informationRates = (1:3) / 3
 )
 sum(probs[5, ] - probs[4, ] + probs[1, ])
+}
 
 }
 \seealso{

@@ -1,4 +1,5 @@
 #' @examples 
+#' \dontrun{
 #' getPiecewiseSurvivalTime(lambda2 = 0.5, hazardRatio = 0.8)
 #' 
 #' getPiecewiseSurvivalTime(lambda2 = 0.5, lambda1 = 0.4)
@@ -25,7 +26,7 @@
 #'     "15 - <21" = 0.01, 
 #'     ">=21"     = 0.007), hazardRatio = 0.75)
 #' pwst
-#' \dontrun{
+#' 
 #' # The object created by getPiecewiseSurvivalTime() can be used directly in 
 #' # getSampleSizeSurvival():
 #' getSampleSizeSurvival(piecewiseSurvivalTime = pwst)

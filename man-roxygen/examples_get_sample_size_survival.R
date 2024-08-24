@@ -1,11 +1,12 @@
 #' @examples
+#' \dontrun{
 #' # Fixed sample size trial with median survival 20 vs. 30 months in treatment and 
 #' # reference group, respectively, alpha = 0.05 (two-sided), and power 1 - beta = 90%.
 #' # 20 subjects will be recruited per month up to 400 subjects, i.e., accrual time 
 #' # is 20 months.  
 #' getSampleSizeSurvival(alpha = 0.05, sided = 2, beta = 0.1, lambda1 = log(2) / 20, 
 #'     lambda2 = log(2) / 30, accrualTime = c(0,20), accrualIntensity = 20)
-#' \dontrun{
+#' 
 #' # Fixed sample size with minimum required definitions, pi1 = c(0.4,0.5,0.6) and 
 #' # pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default, 
 #' # only alpha = 0.01 is specified  

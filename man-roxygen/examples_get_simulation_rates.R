@@ -1,9 +1,10 @@
 #' @examples
+#' \dontrun{
 #' # Fixed sample size design (two groups) with total sample 
 #' # size 120, pi1 = (0.3,0.4,0.5,0.6) and pi2 = 0.3
 #' getSimulationRates(pi1 = seq(0.3, 0.6, 0.1), pi2 = 0.3, 
 #'     plannedSubjects = 120, maxNumberOfIterations = 10)
-#' \dontrun{
+#' 
 #' # Increase number of simulation iterations and compare results with power calculator
 #' getSimulationRates(pi1 = seq(0.3, 0.6, 0.1), pi2 = 0.3, 
 #'     plannedSubjects = 120, maxNumberOfIterations = 50)

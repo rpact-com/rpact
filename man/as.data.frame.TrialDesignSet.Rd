@@ -47,8 +47,10 @@ Returns the \code{TrialDesignSet} as data frame.
 Coerces the design set to a data frame.
 }
 \examples{
+\dontrun{
 designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))
 as.data.frame(designSet)
+}
 
 }
 \keyword{internal}

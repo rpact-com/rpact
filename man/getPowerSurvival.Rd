@@ -213,10 +213,11 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
+\dontrun{
 # Fixed sample size with minimum required definitions, pi1 = c(0.4,0.5,0.5) and 
 # pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default 
 getPowerSurvival(maxNumberOfEvents = 40, maxNumberOfSubjects = 200)
-\dontrun{
+
 # Four stage O'Brien & Fleming group sequential design with minimum required 
 # definitions, pi1 = c(0.4,0.5,0.5) and pi2 = 0.2 at event time 12, 
 # accrual time 12 and follow-up time 6 as default  

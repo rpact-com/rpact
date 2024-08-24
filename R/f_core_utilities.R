@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -133,11 +133,13 @@ NULL
 #' @return the value of the optional argument if it exists; NULL otherwise.
 #'
 #' @examples
+#' \dontrun{
 #' f <- function(...) {
 #'     print(.getOptionalArgument("x", ...))
 #' }
 #' f(x = 1)
 #' f(y = 1)
+#' }
 #'
 #' @keywords internal
 #'
@@ -256,6 +258,7 @@ NULL
 
 #'
 #' @examples
+#' \dontrun{
 #' .getConcatenatedValues(1)
 #' .getConcatenatedValues(1:2)
 #' .getConcatenatedValues(1:3)
@@ -271,7 +274,8 @@ NULL
 #' .getConcatenatedValues(1, mode = "or", separator = ";")
 #' .getConcatenatedValues(1:2, mode = "or", separator = ";")
 #' .getConcatenatedValues(1:3, mode = "or", separator = ";")
-#'
+#' }
+#' 
 #' @noRd
 #'
 .arrayToString <- function(x, ..., separator = ", ",
@@ -1043,8 +1047,10 @@ printCitation <- function(inclusiveR = TRUE, language = "en") {
 #' Returns \code{NULL} if the specified \code{parameterName} does not exist.
 #'
 #' @examples
+#' \dontrun{
 #' getParameterCaption(getDesignInverseNormal(), "kMax")
-#'
+#' }
+#' 
 #' @keywords internal
 #'
 #' @export
@@ -1076,8 +1082,10 @@ getParameterCaption <- function(obj, parameterName) {
 #' Returns \code{NULL} if the specified \code{parameterCaption} does not exist.
 #'
 #' @examples
+#' \dontrun{
 #' getParameterName(getDesignInverseNormal(), "Maximum number of stages")
-#'
+#' }
+#' 
 #' @keywords internal
 #'
 #' @export
@@ -1172,6 +1180,7 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 #' @examples
+#' \dontrun{
 #' or1 <- list(
 #'     and1 = FALSE,
 #'     and2 = TRUE,
@@ -1194,6 +1203,7 @@ getParameterName <- function(obj, parameterCaption) {
 #'         )
 #'     )
 #' )
+#' }
 #'
 #' @noRd
 #'
@@ -1391,7 +1401,12 @@ getParameterName <- function(obj, parameterCaption) {
     )
 }
 
-.isMarkdownEnabled <- function() {
+.isMarkdownEnabled <- function(type = c("all", "print", "summary", "plot")) {
+    type = match.arg(type)    
+    if (!as.logical(getOption(paste0("rpact.auto.markdown.", type), TRUE))) {
+        return(FALSE)
+    }
+    
     return(!is.null(knitr::current_input()))
 }
 

@@ -1,4 +1,5 @@
 #' @examples
+#' \dontrun{
 #' # Fixed sample size trial where a therapy is assumed to decrease the 
 #' # exacerbation rate from 1.4 to 1.05 (25% decrease) within an 
 #' # observation period of 1 year, i.e., each subject has a equal 
@@ -8,7 +9,7 @@
 #' # equal to 0.5, is obtained by
 #' getPowerCounts(alpha = 0.025, lambda1 = seq(1, 1.4, 0.05), lambda2 = 1.4, 
 #'     maxNumberOfSubjects = 180, overdispersion = 0.5, fixedExposureTime = 1)
-#' \dontrun{
+#' 
 #' # Group sequential alpha and beta spending function design with O'Brien and 
 #' # Fleming type boundaries: Power and test characteristics for N = 286, 
 #' # under the assumption of a fixed exposure time, and for a range of 

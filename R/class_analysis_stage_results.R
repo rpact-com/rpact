@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1520,21 +1520,18 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
 #' @template return_object_ggplot
 #'
 #' @examples
+#' \dontrun{
 #' design <- getDesignGroupSequential(
 #'     kMax = 4, alpha = 0.025,
 #'     informationRates = c(0.2, 0.5, 0.8, 1),
 #'     typeOfDesign = "WT", deltaWT = 0.25
 #' )
-#'
 #' dataExample <- getDataset(
 #'     n = c(20, 30, 30),
 #'     means = c(50, 51, 55),
 #'     stDevs = c(130, 140, 120)
 #' )
-#'
 #' stageResults <- getStageResults(design, dataExample, thetaH0 = 20)
-#'
-#' \dontrun{
 #' if (require(ggplot2)) plot(stageResults, nPlanned = c(30), thetaRange = c(0, 100))
 #' }
 #'
@@ -1558,7 +1555,7 @@ plot.StageResults <- function(
     
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
-        markdown <- .isMarkdownEnabled()
+        markdown <- .isMarkdownEnabled("plot")
     }
     
     args <- list(

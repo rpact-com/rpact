@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7947 $
-## |  Last changed: $Date: 2024-05-28 14:25:47 +0200 (Di, 28 Mai 2024) $
+## |  File version: $Revision: 8113 $
+## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -168,6 +168,7 @@ as251Normal <- function(lower, upper, sigma, ...,
 #' @param HINC Interval width for Simpson's rule. Value of zero caused a default .24 to be used
 #'
 #' @examples
+#' \dontrun{
 #' N <- 3
 #' RHO <- 0.5
 #' B <- rep(-5.0, length = N)
@@ -177,6 +178,7 @@ as251Normal <- function(lower, upper, sigma, ...,
 #' D <- rep(0.0, length = N)
 #' result <- mvstud(NDF = 0, A = A, B = B, BPD = BPD, INF = INF, D = D)
 #' result
+#' }
 #'
 #' @export
 #'

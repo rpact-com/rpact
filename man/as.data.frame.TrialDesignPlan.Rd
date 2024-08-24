@@ -37,7 +37,9 @@ Returns the \code{\link{TrialDesignPlan}} as data frame.
 Coerces the design plan to a data frame.
 }
 \examples{
+\dontrun{
 as.data.frame(getSampleSizeMeans())
+}
 
 }
 \keyword{internal}

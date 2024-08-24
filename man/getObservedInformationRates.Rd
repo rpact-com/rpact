@@ -41,6 +41,7 @@ for survival data it is the maximum number of events
 or the relative proportion if \code{informationEpsilon} < 1.
 }
 \examples{
+\dontrun{
 # Absolute information epsilon:
 # decision rule 45 >= 46 - 1, i.e., under-running
 data <- getDataset(
@@ -61,6 +62,7 @@ data <- getDataset(
 getObservedInformationRates(data,
     maxInformation = 46, informationEpsilon = 0.03
 )
+}
 
 }
 \seealso{

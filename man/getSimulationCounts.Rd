@@ -172,6 +172,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \examples{
+\dontrun{
 # Fixed sample size design with two groups
 getSimulationCounts(
     plannedMaxSubjects = 200,
@@ -182,7 +183,7 @@ getSimulationCounts(
     fixedExposureTime = 6,
     accrualTime = 3,
     overdispersion = 2)
-\dontrun{
+
 # Group sequential design alpha spending function design with O'Brien and 
 # Fleming type boundaries: Power and test characteristics for N = 1976, 
 # under variable exposure time with uniform recruitment over 1.25 months,

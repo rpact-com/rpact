@@ -53,10 +53,12 @@ Reads a data file and returns it as a list of dataset objects.
 Reads a file that was written by \code{\link[=writeDatasets]{writeDatasets()}} before.
 }
 \examples{
+\dontrun{
 dataFile <- system.file("extdata", "datasets_rates.csv", package = "rpact")
 if (dataFile != "") {
     datasets <- readDatasets(dataFile)
     datasets
+}
 }
 }
 \seealso{

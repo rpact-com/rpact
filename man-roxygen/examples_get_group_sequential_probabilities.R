@@ -1,6 +1,7 @@
 #' @examples
+#' \dontrun{
 #' # Calculate Type I error rates in the two-sided group sequential setting when
-#' # performing kMax interim stages with constant critical boundaries at level alpha:
+#' # performing kMax stages with constant critical boundaries at level alpha:
 #' alpha <- 0.05
 #' kMax <- 10
 #' decisionMatrix <- matrix(c(
@@ -50,4 +51,5 @@
 #'     decisionMatrix = dm, informationRates = (1:3) / 3
 #' )
 #' sum(probs[5, ] - probs[4, ] + probs[1, ])
-#'
+#' }
+#' 
