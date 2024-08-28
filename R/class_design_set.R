@@ -162,6 +162,19 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 #' Generic function to plot a \code{TrialDesignSummaries} object.
 #'
 #' @param x a \code{TrialDesignSummaries} object to plot.
+#' @inheritParams param_grid
+#' @param type The plot type (default = \code{1}). The following plot types are available:
+#' \itemize{
+#'   \item \code{1}: creates a 'Boundaries' plot
+#'   \item \code{3}: creates a 'Stage Levels' plot
+#'   \item \code{4}: creates a 'Error Spending' plot
+#'   \item \code{5}: creates a 'Power and Early Stopping' plot
+#'   \item \code{6}: creates an 'Average Sample Size and Power / Early Stop' plot
+#'   \item \code{7}: creates an 'Power' plot
+#'   \item \code{8}: creates an 'Early Stopping' plot
+#'   \item \code{9}: creates an 'Average Sample Size' plot
+#'   \item \code{"all"}: creates all available plots and returns it as a grid plot or list
+#' }
 #' @param ... further arguments passed to or from other methods.
 #' 
 #' @export
