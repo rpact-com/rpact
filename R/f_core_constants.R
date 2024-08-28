@@ -98,6 +98,8 @@ C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT <- "TrialDesignConditionalDunnett"
     return(trialDesignClassNames)
 }
 
+C_MARKDOWN_PLOT_PRINT_SEPARATOR <- "\n\n-----\n\n"
+
 C_EXCEPTION_TYPE_RUNTIME_ISSUE <- "Runtime exception: "
 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT <- "Illegal argument: "
 C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT <- "Illegal data input: "

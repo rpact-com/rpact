@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8127 $
+## |  Last changed: $Date: 2024-08-23 18:00:31 +0200 (Fr, 23 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -318,7 +318,6 @@ print.TrialDesignCharacteristics <- function(x, ..., markdown = NA, showDesign =
         attr(x, "queue") <- queue
         return(invisible(x))
     }
-    
     
     if (showDesign) {
         print.ParameterSet(x$.design, ..., markdown = markdown)
@@ -1120,6 +1119,8 @@ plot.TrialDesign <- function(
         grid = 1, 
         plotSettings = NULL) {
         
+    .assertIsIntegerVector(type, "type", naAllowed = FALSE, validateType = FALSE)
+    .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
@@ -1143,8 +1144,16 @@ plot.TrialDesign <- function(
         ...)
     
     if (markdown) {
-        sep <- "\n\n-----\n\n"
-        print(do.call(.plot.TrialDesign, args))
+        sep <- .getMarkdownPlotPrintSeparator()
+        if (length(type) > 1 && grid == 1) {
+            grid <- 0
+            args$grid <- 0
+        }
+        if (grid > 0) {
+            print(do.call(.plot.TrialDesign, args))
+        } else {
+            do.call(.plot.TrialDesign, args)
+        }
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
     
@@ -1210,15 +1219,25 @@ plot.TrialDesign <- function(
 
 #' @rdname plot.TrialDesign
 #' @export
-plot.TrialDesignCharacteristics <- function(x, y, ...) {
+plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
+    .assertIsIntegerVector(type, "type", naAllowed = FALSE, validateType = FALSE)
+    .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
     
     if (markdown) {
-        sep <- "\n\n-----\n\n"
-        print(.plot.TrialDesign(x = x$.design, y = y, ...))
+        sep <- .getMarkdownPlotPrintSeparator()
+        if (length(type) > 1 && grid == 1) {
+            grid <- 0
+            args$grid <- 0
+        }
+        if (grid > 0) {
+            print(.plot.TrialDesign(x = x$.design, y = y, type = type, grid = grid, ...))            
+        } else {
+            .plot.TrialDesign(x = x$.design, y = y, type = type, grid = grid, ...)
+        }
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
     

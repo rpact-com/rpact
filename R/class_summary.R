@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8124 $
-## |  Last changed: $Date: 2024-08-23 08:41:16 +0200 (Fr, 23 Aug 2024) $
+## |  File version: $Revision: 8127 $
+## |  Last changed: $Date: 2024-08-23 18:00:31 +0200 (Fr, 23 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -83,7 +83,7 @@ SummaryItem <- R6::R6Class("SummaryItem",
 plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
     fCall <- match.call(expand.dots = TRUE)
     cmd <- paste0(paste(trimws(capture.output(print(fCall$x))), collapse = " "), "$object")
-    
+
     parentFunctionCallArgs <- .addAnalysisPlotArgumentsToFunctionCall(x$object, fCall, result = list())
     if (isTRUE(showSummary) || .isSummaryPipe(fCall)) {
         markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
@@ -91,21 +91,41 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
             markdown <- .isMarkdownEnabled("plot")
         }
         if (markdown) {
-            sep <- "\n\n-----\n\n"
+            sep <- .getMarkdownPlotPrintSeparator()
+            type <- .getOptionalArgument("type", optionalArgumentDefaultValue = NA_integer_, ...)
+            grid <- .getOptionalArgument("grid", optionalArgumentDefaultValue = 1, ...)
+            .assertIsIntegerVector(type, "type", naAllowed = TRUE, validateType = FALSE)
+            .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
 
-            suppressWarnings(print(plot(x = x$object, y = NULL, markdown = FALSE, 
-                parentFunctionCallArgs = parentFunctionCallArgs, 
-                cmd = cmd, 
-                ...)))
+            if (!all(is.na(type)) && length(type) > 1 && grid == 1) {
+                grid <- 0
+            }
+            if (grid > 0) {
+                suppressWarnings(print(plot(
+                    x = x$object, y = NULL, markdown = FALSE,
+                    parentFunctionCallArgs = parentFunctionCallArgs,
+                    cmd = cmd,
+                    ...
+                )))
+            } else {
+                suppressWarnings(plot(
+                    x = x$object, y = NULL, markdown = TRUE,
+                    parentFunctionCallArgs = parentFunctionCallArgs,
+                    cmd = cmd,
+                    ...
+                ))
+            }
             return(.knitPrintQueue(x, sep = sep, prefix = sep))
         } else {
             x$show()
         }
     }
-    suppressWarnings(print(plot(x = x$object, y = NULL, 
-        parentFunctionCallArgs = parentFunctionCallArgs, 
-        cmd = cmd, 
-        ...)))
+    suppressWarnings(print(plot(
+        x = x$object, y = NULL,
+        parentFunctionCallArgs = parentFunctionCallArgs,
+        cmd = cmd,
+        ...
+    )))
 }
 
 .getKnitPrintPart <- function(x) {
@@ -114,24 +134,30 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
     return(part)
 }
 
-.addKnitPrintPart <- function(x, result, ..., sep = "\n\n-----\n\n", prefix = "", suffix = "") {
+.addKnitPrintPart <- function(x, result, ..., sep, prefix = "", suffix = "") {
     result <- na.omit(result)
     return(paste0(prefix, paste0(c(result, .getKnitPrintPart(x)), collapse = sep), suffix))
 }
 
-.knitPrintQueue <- function(x, ..., sep = "\n\n-----\n\n", prefix = "") {
-    on.exit({attr(x, "queue") <- NULL})
+.knitPrintQueue <- function(x, ..., sep = NA_character_, prefix = "") {
+    on.exit({
+        attr(x, "queue") <- NULL
+    })
     result <- character()
     if (inherits(x, "SummaryFactory")) {
         queue <- attr(x$object, "queue")
     } else {
         queue <- attr(x, "queue")
     }
-    
+
+    if (is.na(sep)) {
+        sep <- .getMarkdownPlotPrintSeparator()
+    }
+
     if (!is.null(queue) && length(queue) > 0) {
         result <- ifelse(!inherits(x, "SummaryFactory"), "", result)
         for (obj in queue) {
-            result <- .addKnitPrintPart(obj, result, sep = sep) 
+            result <- .addKnitPrintPart(obj, result, sep = sep)
         }
     }
     if (inherits(x, "SummaryFactory")) {
@@ -140,7 +166,7 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
     if (length(result) == 0 || all(nchar(trimws(result)) == 0)) {
         return(invisible())
     }
-    
+
     return(knitr::asis_output(result))
 }
 
@@ -161,21 +187,13 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
 #'
 #' @details
 #' Generic function to print a summary object in Markdown.
-#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")}
-#' (where \code{NUMBER} is an integer value >= -1) to
-#' specify the heading level. The default is
-#' \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
-#' top headings start with \code{##} in Markdown.
-#' \code{options("rpact.print.heading.base.number" = "-1")} means
-#' that all headings will be written bold but are not
-#' explicit defined as header.
+#' 
+#' @template details_knit_print
 #'
 #' @export
 #'
 knit_print.SummaryFactory <- function(x, ...) {
-    sep <- "\n\n-----\n\n"
-    
-    .knitPrintQueue(x, sep = sep, ...)
+    .knitPrintQueue(x, sep = .getMarkdownPlotPrintSeparator(), ...)
 }
 
 #'
@@ -186,7 +204,7 @@ knit_print.SummaryFactory <- function(x, ...) {
 #' @param markdown If \code{TRUE}, the object \code{x}
 #'        will be printed using markdown syntax;
 #'        normal representation will be used otherwise (default is \code{FALSE})
-#' @param sep The separator line between the summary and the print output.
+#' @param sep The separator line between the summary and the print output, default is \code{"\n\n-----\n\n"}.
 #' @inheritParams param_three_dots_plot
 #'
 #' @description
@@ -199,20 +217,24 @@ knit_print.SummaryFactory <- function(x, ...) {
 #'
 print.SummaryFactory <- function(x, ...,
         markdown = NA,
-        sep = "\n\n-----\n\n") {
+        sep = NA_character_) {
+    .assertIsSingleCharacter(sep, "sep", naAllowed = TRUE)
 
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("summary")
     }
-    
-    if (markdown || isTRUE(x[["markdown"]])) {  
+    if (is.na(sep)) {
+        sep <- .getMarkdownPlotPrintSeparator()
+    }
+
+    if (markdown || isTRUE(x[["markdown"]])) {
         queue <- attr(x$object, "queue")
         if (is.null(queue)) {
             queue <- list()
         }
         queue[[length(queue) + 1]] <- x$object
         attr(x$object, "queue") <- queue
-        
+
         return(.knitPrintQueue(x, sep = sep))
     }
 
@@ -414,7 +436,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             if (!is.null(parameterName) && length(parameterName) == 1 &&
                     inherits(parameterSet, "ParameterSet") &&
                     parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE) {
-                if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE") && 
+                if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE") &&
                         validateParameterType && !.isMarkdownEnabled()) {
                     warning(
                         "Failed to add parameter ", .arrayToString(parameterName), " (",
@@ -1117,8 +1139,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 }
 
 .getSummaryObjectSettings <- function(object) {
-    multiArmEnabled <- grepl("MultiArm", .getClassName(object)) || 
-        grepl("ConditionalDunnett", .getClassName(object)) 
+    multiArmEnabled <- grepl("MultiArm", .getClassName(object)) ||
+        grepl("ConditionalDunnett", .getClassName(object))
     enrichmentEnabled <- grepl("Enrichment", .getClassName(object))
     simulationEnabled <- grepl("Simulation", .getClassName(object))
     countDataEnabled <- FALSE
@@ -1643,21 +1665,24 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
 .addAlphaAndBetaToHeader <- function(header, design, designPlan, ..., endOfRecord = FALSE, powerEnabled = NA, sep = ", ") {
     if (is.na(powerEnabled)) {
-        powerEnabled <- .isTrialDesignInverseNormalOrGroupSequential(design) && 
-            (is.null(designPlan) || (!.isSimulationResults(designPlan) && 
-            !identical("power", designPlan[[".objectType"]])))
+        powerEnabled <- .isTrialDesignInverseNormalOrGroupSequential(design) &&
+            (is.null(designPlan) || (!.isSimulationResults(designPlan) &&
+                !identical("power", designPlan[[".objectType"]])))
     }
     header <- .concatenateSummaryText(header,
         paste0(
             ifelse(design$sided == 1, "one-sided", "two-sided"),
             ifelse(design$kMax == 1, "", " overall"),
-            " significance level ", round(100 * design$alpha, 2), "%", 
-            ifelse(!powerEnabled && endOfRecord, ".", "")),
+            " significance level ", round(100 * design$alpha, 2), "%",
+            ifelse(!powerEnabled && endOfRecord, ".", "")
+        ),
         sep = sep
     )
     if (powerEnabled) {
-        header <- .concatenateSummaryText(header, 
-            paste0("power ", round(100 * (1 - design$beta), 1), "%", ifelse(endOfRecord, ".", "")))
+        header <- .concatenateSummaryText(
+            header,
+            paste0("power ", round(100 * (1 - design$beta), 1), "%", ifelse(endOfRecord, ".", ""))
+        )
     }
     return(header)
 }
@@ -2684,14 +2709,14 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             }
             summaryFactory$addParameter(stageResults,
                 parameterName = treatmentRateParamName,
-                parameterCaption = "Cumulative treatment rate", 
+                parameterCaption = "Cumulative treatment rate",
                 roundDigits = digitsGeneral
             )
-            
+
             summaryFactory$addParameter(stageResults,
                 parameterName = controlRateParamName,
                 parameterCaption = "Cumulative control rate",
-                roundDigits = digitsGeneral, 
+                roundDigits = digitsGeneral,
                 enforceFirstCase = enforceFirstCase
             )
         }
@@ -3618,10 +3643,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     ),
                     roundDigits = digitsSampleSize, cumsumEnabled = FALSE
                 )
-                if (!enrichmentEnabled && design$kMax > 1) { 
+                if (!enrichmentEnabled && design$kMax > 1) {
                     summaryFactory$addParameter(designPlan,
-                        parameterName = ifelse(designPlan$.isSampleSizeObject(), 
-                            "expectedEventsH1", "expectedNumberOfEvents"),
+                        parameterName = ifelse(designPlan$.isSampleSizeObject(),
+                            "expectedEventsH1", "expectedNumberOfEvents"
+                        ),
                         parameterCaption = "Expected number of events under H1",
                         roundDigits = digitsSampleSize, cumsumEnabled = FALSE
                     )
@@ -3687,7 +3713,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (!countDataEnabled) {
             legendEntry <- list("(t)" = "treatment effect scale")
 
-            if (ncol(designPlan$criticalValuesEffectScale) > 0 && 
+            if (ncol(designPlan$criticalValuesEffectScale) > 0 &&
                     !all(is.na(designPlan$criticalValuesEffectScale))) {
                 summaryFactory$addParameter(designPlan,
                     parameterName = "criticalValuesEffectScale",

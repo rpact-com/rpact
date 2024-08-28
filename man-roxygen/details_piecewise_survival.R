@@ -4,3 +4,4 @@
 #' time intervals and hazard rates in the reference group. 
 #' The definition of the survival time in the treatment group is obtained by the specification 
 #' of the hazard ratio (see examples for details).
+#' 

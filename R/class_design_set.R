@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8127 $
+## |  Last changed: $Date: 2024-08-23 18:00:31 +0200 (Fr, 23 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -129,13 +129,93 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
             "cannot create summary because the design set is empty"
         )
     }
+    
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled("summary")
+    }
 
     summaries <- list()
     for (design in object$designs) {
         s <- .createSummary(design, digits = digits)
         summaries <- c(summaries, s)
     }
+    summaries <- structure(summaries, class = "TrialDesignSummaries")
+    attr(summaries, "object") <- object
+    if (isTRUE(markdown)) {
+        attr(object, "markdown") <- TRUE
+        queue <- attr(object, "queue")
+        if (is.null(queue)) {
+            queue <- list()
+        }
+        queue[[length(queue) + 1]] <- object
+        attr(object, "queue") <- queue
+    }
     return(summaries)
+}
+
+#'
+#' @title
+#' Plot Trial Design Summaries
+#'
+#' @description
+#' Generic function to plot a \code{TrialDesignSummaries} object.
+#'
+#' @param x a \code{TrialDesignSummaries} object to plot.
+#' @param ... further arguments passed to or from other methods.
+#' 
+#' @export
+#'
+plot.TrialDesignSummaries <- function(x, ..., type = 1L, grid = 1) {
+    .assertIsIntegerVector(type, "type", naAllowed = FALSE, validateType = FALSE)
+    .assertIsSingleInteger(grid, "grid", validateType = FALSE)
+    
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled("plot")
+    }
+    
+    trialDesignSet <- attr(x, "object")
+    
+    args <- list(
+        x = trialDesignSet,
+        type = type,
+        grid = grid,
+        ...)
+    args$markdown <- markdown
+    
+    if (markdown) {
+        sep <- .getMarkdownPlotPrintSeparator()
+        if (!all(is.na(type)) && length(type) > 1 && grid == 1) {
+            grid <- 0
+        }
+        if (grid > 0) {
+            print(do.call(.plot.TrialDesignSet, args))            
+        } else {
+            do.call(.plot.TrialDesignSet, args)
+        }
+        return(.knitPrintQueue(trialDesignSet, sep = sep, prefix = sep))
+    }
+    
+    plot(trialDesignSet, ...)
+}
+
+#'
+#' @title
+#' Print Trial Design Summaries
+#'
+#' @description
+#' Generic function to print a \code{TrialDesignSummaries} object.
+#'
+#' @param x a \code{TrialDesignSummaries} object to print.
+#' @param ... further arguments passed to or from other methods.
+#' 
+#' @export
+#'
+print.TrialDesignSummaries <- function(x, ...) {
+    attributes(x)[["class"]] <- NULL
+    attributes(x)[["object"]] <- NULL
+    print(x, ...)
 }
 
 #'
@@ -880,7 +960,9 @@ plot.TrialDesignSet <- function(
         showSource = FALSE,
         grid = 1, 
         plotSettings = NULL) {
-        
+     
+    .assertIsIntegerVector(type, "type", naAllowed = FALSE, validateType = FALSE)
+    .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
@@ -903,8 +985,16 @@ plot.TrialDesignSet <- function(
         ...)
     
     if (markdown) {
-        sep <- "\n\n-----\n\n"
-        print(do.call(.plot.TrialDesignSet, args))
+        sep <- .getMarkdownPlotPrintSeparator()
+        if (length(type) > 1 && grid == 1) {
+            grid <- 0
+            args$grid <- 0
+        }
+        if (grid > 0) {
+            print(do.call(.plot.TrialDesignSet, args))            
+        } else {
+            do.call(.plot.TrialDesignSet, args)
+        }
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
     
@@ -956,7 +1046,7 @@ plot.TrialDesignSet <- function(
     if (length(typeNumbers) == 1) {
         return(p)
     }
-
+    
     return(.createPlotResultObject(plotList, grid))
 }
 

@@ -234,6 +234,7 @@ NULL
         for (p in plotList) {
             suppressMessages(print(p))
         }
+        
         return(invisible(plotList))
     }
 

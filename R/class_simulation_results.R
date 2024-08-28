@@ -1754,3 +1754,4 @@ print.SimulationResults <- function(x, ..., showStatistics = FALSE, markdown = F
     x$show(showStatistics = showStatistics)
     invisible(x)
 }
+

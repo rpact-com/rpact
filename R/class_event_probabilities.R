@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8127 $
+## |  Last changed: $Date: 2024-08-23 18:00:31 +0200 (Fr, 23 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -311,7 +311,7 @@ plot.EventProbabilities <- function(
         ...)
     
     if (markdown) {
-        sep <- "\n\n-----\n\n"
+        sep <- .getMarkdownPlotPrintSeparator()
         print(do.call(.plot.EventProbabilities, args))
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
@@ -548,7 +548,7 @@ plot.NumberOfSubjects <- function(
         ...)
     
     if (markdown) {
-        sep <- "\n\n-----\n\n"
+        sep <- .getMarkdownPlotPrintSeparator()
         print(do.call(.plot.NumberOfSubjects, args))
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }

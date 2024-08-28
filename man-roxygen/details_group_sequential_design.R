@@ -11,4 +11,4 @@
 #' and the expected sample size under H1. 
 #'
 #' @seealso \code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare different designs.
-
+#' 

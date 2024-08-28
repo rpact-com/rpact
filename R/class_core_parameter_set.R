@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8124 $
-## |  Last changed: $Date: 2024-08-23 08:41:16 +0200 (Fr, 23 Aug 2024) $
+## |  File version: $Revision: 8127 $
+## |  Last changed: $Date: 2024-08-23 18:00:31 +0200 (Fr, 23 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1550,7 +1550,7 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
 #' @inheritParams param_digits
 #' @param output The output parts, default is \code{"all"}.
 #' @param printObject Show also the print output after the summary, default is \code{FALSE}.
-#' @param sep The separator line between the summary and the optional print output.
+#' @param sep The separator line between the summary and the optional print output, default is \code{"\n\n-----\n\n"}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -1570,9 +1570,14 @@ summary.ParameterSet <- function(object, ...,
         digits = NA_integer_,
         output = c("all", "title", "overview", "body"),
         printObject = FALSE,
-        sep = "\n\n-----\n\n") {
+        sep = NA_character_) {
+        
     .warnInCaseOfUnknownArguments(functionName = "summary", ignore = c("printObject"), ...)
-
+    .assertIsSingleCharacter(sep, "sep", naAllowed = TRUE)
+    if (is.na(sep)) {
+        sep <- .getMarkdownPlotPrintSeparator()
+    }
+    
     base::attr(object, "printObject") <- printObject
     base::attr(object, "printObjectSeparator") <- sep
 
@@ -1890,10 +1895,8 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
 #'
 #' @details
 #' Generic function to print a field set in Markdown.
-#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
-#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
-#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
-#' that all headings will be written bold but are not explicit defined as header.
+#' 
+#' @template details_knit_print
 #'
 #' @keywords internal
 #' 
@@ -1919,10 +1922,8 @@ knit_print.FieldSet <- function(x, ...) {
 #'
 #' @details
 #' Generic function to print a parameter set in Markdown.
-#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
-#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
-#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
-#' that all headings will be written bold but are not explicit defined as header.
+#' 
+#' @template details_knit_print
 #'
 #' @keywords internal
 #' 
@@ -1950,12 +1951,6 @@ knit_print.ParameterSet <- function(x, ...) {
 #' as the formatting and display will be handled automatically by the rpact package. 
 #' Please remove any manual kable() calls from your code to avoid redundancy and potential issues. 
 #' The results will be displayed in a consistent format automatically.
-#' 
-#' Generic function to represent a parameter set in Markdown.
-#' Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
-#' specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
-#' top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
-#' that all headings will be written bold but are not explicit defined as header.
 #' 
 #' @name kableParameterSet
 #' 
