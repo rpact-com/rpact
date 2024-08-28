@@ -180,7 +180,7 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 #' @export
 #'
 plot.TrialDesignSummaries <- function(x, ..., type = 1L, grid = 1) {
-    .assertIsIntegerVector(type, "type", naAllowed = FALSE, validateType = FALSE)
+    .assertIsValidPlotType(type, naAllowed = FALSE)
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
@@ -974,7 +974,7 @@ plot.TrialDesignSet <- function(
         grid = 1, 
         plotSettings = NULL) {
      
-    .assertIsIntegerVector(type, "type", naAllowed = FALSE, validateType = FALSE)
+    .assertIsValidPlotType(type, naAllowed = FALSE)
     .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {

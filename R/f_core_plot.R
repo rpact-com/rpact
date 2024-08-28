@@ -156,20 +156,7 @@ NULL
 }
 
 .getPlotTypeNumber <- function(type, x) {
-    if (missing(type) || is.null(type) || length(type) == 0 || all(is.na(type))) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'type' must be defined")
-    }
-
-    if (!is.numeric(type) && !is.character(type)) {
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'type' must be an integer or character value or vector (is ", .getClassName(type), ")"
-        )
-    }
-
-    if (is.numeric(type)) {
-        .assertIsIntegerVector(type, "type", naAllowed = FALSE, validateType = FALSE)
-    }
+    .assertIsValidPlotType(type, naAllowed = FALSE)
 
     if (is.character(type)) {
         if (length(type) == 1 && type == "all") {

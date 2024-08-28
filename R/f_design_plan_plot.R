@@ -1388,7 +1388,7 @@ plot.TrialDesignPlan <- function(
         grid = 1,
         plotSettings = NULL) {
         
-    .assertIsIntegerVector(type, "type", naAllowed = TRUE, validateType = FALSE)
+    .assertIsValidPlotType(type, naAllowed = TRUE)
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {

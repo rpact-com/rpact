@@ -94,7 +94,7 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
             sep <- .getMarkdownPlotPrintSeparator()
             type <- .getOptionalArgument("type", optionalArgumentDefaultValue = NA_integer_, ...)
             grid <- .getOptionalArgument("grid", optionalArgumentDefaultValue = 1, ...)
-            .assertIsIntegerVector(type, "type", naAllowed = TRUE, validateType = FALSE)
+            .assertIsValidPlotType(type, naAllowed = TRUE)
             .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
 
             if (!all(is.na(type)) && length(type) > 1 && grid == 1) {

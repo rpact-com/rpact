@@ -3096,3 +3096,20 @@ NULL
         ))
     }
 }
+
+.assertIsValidPlotType <- function(type, naAllowed = FALSE) {
+    if (is.null(type) || length(type) == 0 || (!naAllowed && all(is.na(type)))) {
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'type' must be defined")
+    }
+    
+    if (!is.numeric(type) && !is.character(type)) {
+        stop(
+            C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'type' must be an integer or character value or vector (is ", .getClassName(type), ")"
+        )
+    }
+    
+    if (is.numeric(type)) {
+        .assertIsIntegerVector(type, "type", naAllowed = naAllowed, validateType = FALSE)
+    }
+}
