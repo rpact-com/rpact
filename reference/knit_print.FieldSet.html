@@ -13,7 +13,7 @@ For more information see knit_print."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9250</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9252</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,11 +69,28 @@ For more information see <code><a href="https://rdrr.io/pkg/knitr/man/knit_print
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Generic function to print a field set in Markdown.
-Use <code>options("rpact.print.heading.base.number" = "NUMBER")</code> (where <code>NUMBER</code> is an integer value &gt;= -1) to
-specify the heading level. The default is <code>options("rpact.print.heading.base.number" = "0")</code>, i.e., the
-top headings start with <code>##</code> in Markdown. <code>options("rpact.print.heading.base.number" = "-1")</code> means
-that all headings will be written bold but are not explicit defined as header.</p>
+    <p>Generic function to print a field set in Markdown.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="markdown-options">Markdown options<a class="anchor" aria-label="anchor" href="#markdown-options"></a></h2>
+
+
+<p>Use <code>options("rpact.print.heading.base.number" = NUMBER)</code>
+(where <code>NUMBER</code> is an integer value &gt;= -2) to
+specify the heading level.</p>
+<p>NUMBER = 1 results in the heading prefix <code>#</code>, NUMBER = 2 results in <code>##</code>, ...</p>
+<p>The default is
+<code>options("rpact.print.heading.base.number" = -2)</code>, i.e., the
+top headings will be written italic but are not
+explicit defined as header.
+<code>options("rpact.print.heading.base.number" = -1)</code> means
+that all headings will be written bold but are not
+explicit defined as header.</p>
+<p>Furthermore the following options can be set globally:</p><ul><li><p><code>rpact.auto.markdown.all</code>: if <code>TRUE</code>, all output types will be rendered in Markdown format automatically.</p></li>
+<li><p><code>rpact.auto.markdown.print</code>: if <code>TRUE</code>, all print outputs will be rendered in Markdown format automatically.</p></li>
+<li><p><code>rpact.auto.markdown.summary</code>: if <code>TRUE</code>, all summary outputs will be rendered in Markdown format automatically.</p></li>
+<li><p><code>rpact.auto.markdown.plot</code>: if <code>TRUE</code>, all plot outputs will be rendered in Markdown format automatically.</p></li>
+</ul><p>Example: <code>options("rpact.auto.markdown.plot" = FALSE)</code> disables the automatic knitting of plots inside Markdown documents.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
