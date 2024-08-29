@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1825,12 +1825,22 @@ AnalysisResultsConditionalDunnett <- R6::R6Class("AnalysisResultsConditionalDunn
 #'
 #' @export
 #'
-plot.AnalysisResults <- function(x, y, ..., type = 1L,
+plot.AnalysisResults <- function(x, y, ..., 
+        type = 1L,
         nPlanned = NA_real_,
         allocationRatioPlanned = NA_real_,
-        main = NA_character_, xlab = NA_character_, ylab = NA_character_,
-        legendTitle = NA_character_, palette = "Set1", legendPosition = NA_integer_,
-        showSource = FALSE, grid = 1, plotSettings = NULL) {
+        main = NA_character_, 
+        xlab = NA_character_, 
+        ylab = NA_character_,
+        legendTitle = NA_character_, 
+        palette = "Set1", 
+        legendPosition = NA_integer_,
+        showSource = FALSE, 
+        grid = 1, 
+        plotSettings = NULL) {
+        
+    .assertIsValidPlotType(type, naAllowed = FALSE)
+    .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
@@ -1854,8 +1864,16 @@ plot.AnalysisResults <- function(x, y, ..., type = 1L,
         ...)
     
     if (markdown) {
-        sep <- "\n\n-----\n\n"
-        print(do.call(.plot.AnalysisResults, args))
+        sep <- .getMarkdownPlotPrintSeparator()
+        if (length(type) > 1 && grid == 1) {
+            grid <- 0
+            args$grid <- 0
+        }
+        if (grid > 0) {
+            print(do.call(.plot.AnalysisResults, args))            
+        } else {
+            do.call(.plot.AnalysisResults, args)
+        }
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     } else {
         return(do.call(.plot.AnalysisResults, args))

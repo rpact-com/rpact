@@ -4,7 +4,7 @@
 \alias{print.SummaryFactory}
 \title{Summary Factory Printing}
 \usage{
-\method{print}{SummaryFactory}(x, ..., markdown = NA, sep = "\\n\\n-----\\n\\n")
+\method{print}{SummaryFactory}(x, ..., markdown = NA, sep = NA_character_)
 }
 \arguments{
 \item{x}{The summary factory object.}
@@ -16,7 +16,7 @@ for changing x or y axis limits without dropping data observations.}
 will be printed using markdown syntax;
 normal representation will be used otherwise (default is \code{FALSE})}
 
-\item{sep}{The separator line between the summary and the print output.}
+\item{sep}{The separator line between the summary and the print output, default is \code{"\n\n-----\n\n"}.}
 }
 \description{
 Prints the result object stored inside a summary factory.

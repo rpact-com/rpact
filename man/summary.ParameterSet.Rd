@@ -11,7 +11,7 @@
   digits = NA_integer_,
   output = c("all", "title", "overview", "body"),
   printObject = FALSE,
-  sep = "\\n\\n-----\\n\\n"
+  sep = NA_character_
 )
 }
 \arguments{
@@ -26,7 +26,7 @@ that a warning will be displayed if unknown arguments are passed.}
 
 \item{printObject}{Show also the print output after the summary, default is \code{FALSE}.}
 
-\item{sep}{The separator line between the summary and the optional print output.}
+\item{sep}{The separator line between the summary and the optional print output, default is \code{"\n\n-----\n\n"}.}
 }
 \value{
 Returns a \code{\link{SummaryFactory}} object.

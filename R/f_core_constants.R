@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8124 $
-## |  Last changed: $Date: 2024-08-23 08:41:16 +0200 (Fr, 23 Aug 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -97,6 +97,8 @@ C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT <- "TrialDesignConditionalDunnett"
     }
     return(trialDesignClassNames)
 }
+
+C_MARKDOWN_PLOT_PRINT_SEPARATOR <- "\n\n-----\n\n"
 
 C_EXCEPTION_TYPE_RUNTIME_ISSUE <- "Runtime exception: "
 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT <- "Illegal argument: "

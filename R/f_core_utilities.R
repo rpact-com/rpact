@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -985,7 +985,7 @@ printCitation <- function(inclusiveR = TRUE, language = "en") {
     return(as.character(x))
 }
 
-.getFunctionAsString <- function(fun, stringWrapPrefix = " ", stringWrapParagraphWidth = 90) {
+.getFunctionAsString <- function(fun, stringWrapPrefix = " ") {
     .assertIsFunction(fun)
 
     s <- utils::capture.output(print(fun))
@@ -995,9 +995,6 @@ printCitation <- function(inclusiveR = TRUE, language = "en") {
         stringWrapPrefix <- " "
     }
     s <- gsub("\u0009", stringWrapPrefix, s) # \t
-    if (!is.null(stringWrapParagraphWidth) && !is.na(stringWrapParagraphWidth)) {
-        # s <- paste0(s, collapse = "\n")
-    }
     return(s)
 }
 
@@ -1407,7 +1404,9 @@ getParameterName <- function(obj, parameterCaption) {
         return(FALSE)
     }
     
-    return(!is.null(knitr::current_input()))
+    return(!is.null(knitr::current_input()) || 
+        knitr::is_html_output() || 
+        knitr::is_latex_output())
 }
 
 .isRMarkdownEnabled <- function() {
@@ -1511,4 +1510,8 @@ getParameterName <- function(obj, parameterCaption) {
 .resetPipeOperatorQueue <- function(x) {
     attr(x, "queue") <- NULL
     return(x)
+}
+
+.getMarkdownPlotPrintSeparator <- function() {
+    return(getOption("rpact.markdown.plot.print.separator", C_MARKDOWN_PLOT_PRINT_SEPARATOR))
 }

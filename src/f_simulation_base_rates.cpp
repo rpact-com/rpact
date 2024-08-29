@@ -409,7 +409,10 @@ List getSimulationStepRatesCpp(int k, int kMax, int designNumber, NumericVector 
 
 	double stageSubjects = plannedSubjects[0];
 
-	double allocationRatio = allocationRatioPlanned[k - 1];
+	double allocationRatio = 1;
+	if (groups == 2L) {
+		allocationRatio = allocationRatioPlanned[k - 1];
+	}
 
 	// perform event size recalculation for stages 2, ..., kMax
 	double simulatedConditionalPower = 0;

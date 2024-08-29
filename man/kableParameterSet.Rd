@@ -49,11 +49,5 @@ Manual use of kable() for rpact result objects is no longer needed,
 as the formatting and display will be handled automatically by the rpact package.
 Please remove any manual kable() calls from your code to avoid redundancy and potential issues.
 The results will be displayed in a consistent format automatically.
-
-Generic function to represent a parameter set in Markdown.
-Use \code{options("rpact.print.heading.base.number" = "NUMBER")} (where \code{NUMBER} is an integer value >= -1) to
-specify the heading level. The default is \code{options("rpact.print.heading.base.number" = "0")}, i.e., the
-top headings start with \code{##} in Markdown. \code{options("rpact.print.heading.base.number" = "-1")} means
-that all headings will be written bold but are not explicit defined as header.
 }
 \keyword{internal}

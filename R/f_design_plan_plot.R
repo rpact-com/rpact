@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1388,6 +1388,8 @@ plot.TrialDesignPlan <- function(
         grid = 1,
         plotSettings = NULL) {
         
+    .assertIsValidPlotType(type, naAllowed = TRUE)
+    .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
@@ -1410,8 +1412,16 @@ plot.TrialDesignPlan <- function(
         ...)
 
     if (markdown) {
-        sep <- "\n\n-----\n\n"
-        print(do.call(.plot.TrialDesignPlan, args))
+        sep <- .getMarkdownPlotPrintSeparator()
+        if (!all(is.na(type)) && length(type) > 1 && grid == 1) {
+            grid <- 0
+            args$grid <- 0
+        }
+        if (grid > 0) {
+            print(do.call(.plot.TrialDesignPlan, args))            
+        } else {
+            do.call(.plot.TrialDesignPlan, args)
+        }
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
     
@@ -1420,7 +1430,8 @@ plot.TrialDesignPlan <- function(
   
 .plot.TrialDesignPlan <- function(
         x, 
-        y, ...,
+        y, 
+        ...,
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,

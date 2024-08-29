@@ -23,7 +23,7 @@
   plotSettings = NULL
 )
 
-\method{plot}{TrialDesignCharacteristics}(x, y, ...)
+\method{plot}{TrialDesignCharacteristics}(x, y, ..., type = 1L, grid = 1)
 }
 \arguments{
 \item{x}{The trial design, obtained from \cr

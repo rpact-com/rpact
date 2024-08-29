@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -156,20 +156,7 @@ NULL
 }
 
 .getPlotTypeNumber <- function(type, x) {
-    if (missing(type) || is.null(type) || length(type) == 0 || all(is.na(type))) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'type' must be defined")
-    }
-
-    if (!is.numeric(type) && !is.character(type)) {
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'type' must be an integer or character value or vector (is ", .getClassName(type), ")"
-        )
-    }
-
-    if (is.numeric(type)) {
-        .assertIsIntegerVector(type, "type", naAllowed = FALSE, validateType = FALSE)
-    }
+    .assertIsValidPlotType(type, naAllowed = FALSE)
 
     if (is.character(type)) {
         if (length(type) == 1 && type == "all") {
@@ -234,6 +221,7 @@ NULL
         for (p in plotList) {
             suppressMessages(print(p))
         }
+        
         return(invisible(plotList))
     }
 

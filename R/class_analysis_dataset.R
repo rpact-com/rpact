@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2531,8 +2531,15 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #'
 #' @export
 #'
-plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_character_,
-        legendTitle = "Group", palette = "Set1", showSource = FALSE, plotSettings = NULL) {
+plot.Dataset <- function(x, y, ..., 
+        main = "Dataset", 
+        xlab = "Stage", 
+        ylab = NA_character_,
+        legendTitle = "Group", 
+        palette = "Set1", 
+        showSource = FALSE, 
+        plotSettings = NULL) {
+        
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
@@ -2550,7 +2557,7 @@ plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_
         ...)
     
     if (markdown) {
-        sep <- "\n\n-----\n\n"
+        sep <- .getMarkdownPlotPrintSeparator()
         print(do.call(.plot.Dataset, args))
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }

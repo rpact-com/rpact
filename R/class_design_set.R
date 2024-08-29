@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -129,13 +129,106 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
             "cannot create summary because the design set is empty"
         )
     }
+    
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled("summary")
+    }
 
     summaries <- list()
     for (design in object$designs) {
         s <- .createSummary(design, digits = digits)
         summaries <- c(summaries, s)
     }
+    summaries <- structure(summaries, class = "TrialDesignSummaries")
+    attr(summaries, "object") <- object
+    if (isTRUE(markdown)) {
+        attr(object, "markdown") <- TRUE
+        queue <- attr(object, "queue")
+        if (is.null(queue)) {
+            queue <- list()
+        }
+        queue[[length(queue) + 1]] <- object
+        attr(object, "queue") <- queue
+    }
     return(summaries)
+}
+
+#'
+#' @title
+#' Plot Trial Design Summaries
+#'
+#' @description
+#' Generic function to plot a \code{TrialDesignSummaries} object.
+#'
+#' @param x a \code{TrialDesignSummaries} object to plot.
+#' @inheritParams param_grid
+#' @param type The plot type (default = \code{1}). The following plot types are available:
+#' \itemize{
+#'   \item \code{1}: creates a 'Boundaries' plot
+#'   \item \code{3}: creates a 'Stage Levels' plot
+#'   \item \code{4}: creates a 'Error Spending' plot
+#'   \item \code{5}: creates a 'Power and Early Stopping' plot
+#'   \item \code{6}: creates an 'Average Sample Size and Power / Early Stop' plot
+#'   \item \code{7}: creates an 'Power' plot
+#'   \item \code{8}: creates an 'Early Stopping' plot
+#'   \item \code{9}: creates an 'Average Sample Size' plot
+#'   \item \code{"all"}: creates all available plots and returns it as a grid plot or list
+#' }
+#' @param ... further arguments passed to or from other methods.
+#' 
+#' @export
+#'
+plot.TrialDesignSummaries <- function(x, ..., type = 1L, grid = 1) {
+    .assertIsValidPlotType(type, naAllowed = FALSE)
+    .assertIsSingleInteger(grid, "grid", validateType = FALSE)
+    
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled("plot")
+    }
+    
+    trialDesignSet <- attr(x, "object")
+    
+    args <- list(
+        x = trialDesignSet,
+        type = type,
+        grid = grid,
+        ...)
+    args$markdown <- markdown
+    
+    if (markdown) {
+        sep <- .getMarkdownPlotPrintSeparator()
+        if (!all(is.na(type)) && length(type) > 1 && grid == 1) {
+            grid <- 0
+        }
+        if (grid > 0) {
+            print(do.call(.plot.TrialDesignSet, args))            
+        } else {
+            do.call(.plot.TrialDesignSet, args)
+        }
+        return(.knitPrintQueue(trialDesignSet, sep = sep, prefix = sep))
+    }
+    
+    plot(trialDesignSet, ...)
+}
+
+#'
+#' @title
+#' Print Trial Design Summaries
+#'
+#' @description
+#' Generic function to print a \code{TrialDesignSummaries} object.
+#'
+#' @param x a \code{TrialDesignSummaries} object to print.
+#' @param ... further arguments passed to or from other methods.
+#' 
+#' @export
+#'
+print.TrialDesignSummaries <- function(x, ...) {
+    attributes(x)[["class"]] <- NULL
+    attributes(x)[["object"]] <- NULL
+    print(x, ...)
 }
 
 #'
@@ -880,7 +973,9 @@ plot.TrialDesignSet <- function(
         showSource = FALSE,
         grid = 1, 
         plotSettings = NULL) {
-        
+     
+    .assertIsValidPlotType(type, naAllowed = FALSE)
+    .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
@@ -903,8 +998,16 @@ plot.TrialDesignSet <- function(
         ...)
     
     if (markdown) {
-        sep <- "\n\n-----\n\n"
-        print(do.call(.plot.TrialDesignSet, args))
+        sep <- .getMarkdownPlotPrintSeparator()
+        if (length(type) > 1 && grid == 1) {
+            grid <- 0
+            args$grid <- 0
+        }
+        if (grid > 0) {
+            print(do.call(.plot.TrialDesignSet, args))            
+        } else {
+            do.call(.plot.TrialDesignSet, args)
+        }
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
     
@@ -956,7 +1059,7 @@ plot.TrialDesignSet <- function(
     if (length(typeNumbers) == 1) {
         return(p)
     }
-
+    
     return(.createPlotResultObject(plotList, grid))
 }
 

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1575,7 +1575,7 @@ plot.StageResults <- function(
         ...)
     
     if (markdown) {
-        sep <- "\n\n-----\n\n"
+        sep <- .getMarkdownPlotPrintSeparator()
         print(do.call(.plot.StageResults, args))
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }

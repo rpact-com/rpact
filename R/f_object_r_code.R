@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -367,10 +367,7 @@ getObjectRCode <- function(obj, ...,
     }
 
     if (!is.null(obj) && is.function(obj)) {
-        lines <- .getFunctionAsString(obj,
-            stringWrapPrefix = stringWrapPrefix,
-            stringWrapParagraphWidth = stringWrapParagraphWidth
-        )
+        lines <- .getFunctionAsString(obj, stringWrapPrefix = stringWrapPrefix)
         if (length(lines) == 0) {
             return("")
         }
@@ -841,9 +838,10 @@ getObjectRCode <- function(obj, ...,
             is.character(stringWrapPrefix)) {
         rCodeNew <- character()
         for (rCodeLine in rCode) {
-            rCodeLine <- gsub("   ", "___", rCodeLine)
-            rCodeLine <- gsub("  ", "__", rCodeLine)
-            rCodeLines <- strwrap(rCodeLine, width = stringWrapParagraphWidth)
+            for (i in 12:2) {
+                rCodeLine <- gsub(paste(rep(" ", i), collapse = ""), paste(rep("_", i), collapse = ""), rCodeLine)
+            }
+            rCodeLines <- strwrap(rCodeLine, width = stringWrapParagraphWidth - 2)
             if (length(rCodeLines) > 1) {
                 for (i in 2:length(rCodeLines)) {
                     if (grepl("^ *(\\|>|%>%) *", rCodeLines[i])) {
@@ -854,8 +852,9 @@ getObjectRCode <- function(obj, ...,
                     }
                 }
             }
-            rCodeLines <- gsub("___", "   ", rCodeLines)
-            rCodeLines <- gsub("__", "  ", rCodeLines)
+            for (i in 12:2) {
+                rCodeLines <- gsub(paste(rep("_", i), collapse = ""), paste(rep(" ", i), collapse = ""), rCodeLines)
+            }
             rCodeLines <- rCodeLines[nchar(trimws(rCodeLines)) > 0]
             rCodeNew <- c(rCodeNew, rCodeLines)
         }

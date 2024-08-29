@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8141 $
+## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -961,11 +961,78 @@ NULL
 #'
 #' @export
 #'
-plot.SimulationResults <- function(x, y, ..., main = NA_character_,
-        xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
-        theta = seq(-1, 1, 0.01), plotPointsEnabled = NA,
-        legendPosition = NA_integer_, showSource = FALSE,
-        grid = 1, plotSettings = NULL) {
+plot.SimulationResults <- function(
+        x, 
+        y, 
+        ..., 
+        main = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        type = 1L, 
+        palette = "Set1",
+        theta = seq(-1, 1, 0.01), 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        grid = 1, 
+        plotSettings = NULL) {
+    
+    .assertIsValidPlotType(type, naAllowed = FALSE)
+    .assertIsSingleInteger(grid, "grid", validateType = FALSE)
+    markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled("plot")
+    }
+    
+    args <- list(
+        x = x, 
+        y = NULL,
+        main = main,
+        xlab = xlab,
+        ylab = ylab,
+        type = type,
+        palette = palette,
+        theta = theta, 
+        plotPointsEnabled = plotPointsEnabled,
+        legendPosition = legendPosition,
+        showSource = showSource,
+        grid = grid,
+        plotSettings = plotSettings, 
+        ...)
+    
+    if (markdown) {
+        sep <- .getMarkdownPlotPrintSeparator()
+        if (!all(is.na(type)) && length(type) > 1 && grid == 1) {
+            grid <- 0
+            args$grid <- 0
+        }
+        if (grid > 0) {
+            print(do.call(.plot.SimulationResults, args))            
+        } else {
+            do.call(.plot.SimulationResults, args)
+        }
+        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+    }
+    
+    return(do.call(.plot.SimulationResults, args))
+}
+
+.plot.SimulationResults <- function(
+        x, 
+        y, 
+        ..., 
+        main = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        type = 1L, 
+        palette = "Set1",
+        theta = seq(-1, 1, 0.01), 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        grid = 1, 
+        plotSettings = NULL) {
+        
     fCall <- match.call(expand.dots = FALSE)
     simulationResultsName <- deparse(fCall$x)
     .assertGgplotIsInstalled()

@@ -26,3 +26,4 @@
 #' is calculated for the calculated or given \code{maxNumberOfSubjects}.
 #' Note that the default is \code{accrualIntensity = 0.1} meaning that the *absolute* accrual intensity 
 #' will be calculated. 
+#' 
