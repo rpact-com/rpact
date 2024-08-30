@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7408 $
- * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
+ * File version: $Revision: 8151 $
+ * Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -516,12 +516,20 @@ List getDesignFisherTryCpp(int kMax, double alpha, double tolerance,
 		NumericVector criticalValues, NumericVector scale,
 		NumericVector alpha0Vec, NumericVector userAlphaSpending, String method) {
 
-    NumericVector cases = getFisherCombinationCasesCpp(kMax, scale);
+	if (kMax == 1) {
+	    return List::create(
+			_["criticalValues"] = alpha,
+			_["alphaSpent"] = alpha,
+			_["stageLevels"] = alpha,
+			_["nonStochasticCurtailment"] = false,
+	        _["size"] = 0.0);
+	}
+
+	NumericVector cases = getFisherCombinationCasesCpp(kMax, scale);
     NumericVector alphaSpent(kMax);
     NumericVector stageLevels(kMax);
     bool nonStochasticCurtailment;
-
-    double size = 0;
+	double size = 0;
     if (method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
         criticalValues[0] = userAlphaSpending[0];
         alphaSpent = clone(criticalValues);
@@ -615,9 +623,11 @@ List getDesignFisherTryCpp(int kMax, double alpha, double tolerance,
             stageLevels[k - 1] = getFisherCombinationSizeCpp(
 				k, rep(1.0, k - 1),
                 rep((double) criticalValues[k - 1], k), scale, cases);
-            alphaSpent[k - 1] = getFisherCombinationSizeCpp(
-            	k, rangeVector(alpha0Vec, 0, k - 2),
-                rangeVector(criticalValues, 0, k - 1), scale, cases);
+            if (k > 1) {
+				alphaSpent[k - 1] = getFisherCombinationSizeCpp(
+					k, rangeVector(alpha0Vec, 0, k - 2),
+					rangeVector(criticalValues, 0, k - 1), scale, cases);
+            }
         }
     }
     return List::create(

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8141 $
-## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
+## |  File version: $Revision: 8151 $
+## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1797,6 +1797,9 @@ fetch.ParameterSet <- function(x, var = -1, output = c("named", "value", "list")
     
     if (is.character(var)) {
         if (!(var %in% names(x))) {
+            var <- getParameterName(x, var)
+        }
+        if (length(var) == 0 || !(var %in% names(x))) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(var), " does not exist")
         }
         

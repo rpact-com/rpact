@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7461 $
- * Last changed: $Date: 2023-12-01 10:24:25 +0100 (Fr, 01 Dez 2023) $
+ * File version: $Revision: 8151 $
+ * Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -409,7 +409,7 @@ List getSimulationStepRatesCpp(int k, int kMax, int designNumber, NumericVector 
 
 	double stageSubjects = plannedSubjects[0];
 
-	double allocationRatio = 1;
+	double allocationRatio = NA_REAL;
 	if (groups == 2L) {
 		allocationRatio = allocationRatioPlanned[k - 1];
 	}

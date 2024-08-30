@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8049 $
-## |  Last changed: $Date: 2024-07-17 17:03:09 +0200 (Mi, 17 Jul 2024) $
+## |  File version: $Revision: 8151 $
+## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -615,7 +615,9 @@ NULL
 .createDesignPlanSurvival <- function(..., objectType = c("sampleSize", "power"),
         design,
         typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
-        thetaH0, pi2, pi1,
+        thetaH0, 
+        pi2, 
+        pi1,
         allocationRatioPlanned,
         accountForObservationTimes,
         eventTime,
