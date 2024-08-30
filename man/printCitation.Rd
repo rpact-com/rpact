@@ -4,12 +4,14 @@
 \alias{printCitation}
 \title{Print Citation}
 \usage{
-printCitation(inclusiveR = TRUE, language = "en")
+printCitation(inclusiveR = TRUE, language = "en", markdown = NA)
 }
 \arguments{
 \item{inclusiveR}{If \code{TRUE} (default) the information on how to cite the base R system in publications will be added.}
 
 \item{language}{Language code to use for the output, default is "en".}
+
+\item{markdown}{If \code{TRUE}, the output will be created in Markdown.}
 }
 \description{
 How to cite \code{rpact} and \code{R} in publications.
