@@ -1,11 +1,11 @@
 #' @examples
 #' \dontrun{
-#' # Fixed sample size with minimum required definitions, pi1 = c(0.4,0.5,0.5) and 
+#' # Fixed sample size with minimum required definitions, pi1 = c(0.2, 0.3, 0.4, 0.5) and 
 #' # pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default 
 #' getPowerSurvival(maxNumberOfEvents = 40, maxNumberOfSubjects = 200)
 #' 
 #' # Four stage O'Brien & Fleming group sequential design with minimum required 
-#' # definitions, pi1 = c(0.4,0.5,0.5) and pi2 = 0.2 at event time 12, 
+#' # definitions, pi1 = c(0.2, 0.3, 0.4, 0.5) and pi2 = 0.2 at event time 12, 
 #' # accrual time 12 and follow-up time 6 as default  
 #' getPowerSurvival(design = getDesignGroupSequential(kMax = 4), 
 #'     maxNumberOfEvents = 40, maxNumberOfSubjects = 200)
@@ -60,7 +60,7 @@
 #' 
 #' # Specification of piecewise exponential survival time and hazard ratios  
 #' getPowerSurvival(design = getDesignGroupSequential(kMax = 2), 
-#'     piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01,0.02,0.04), 
+#'     piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04), 
 #'     hazardRatio = c(1.5, 1.8, 2),  maxNumberOfEvents = 40, maxNumberOfSubjects = 200)
 #' 
 #' # Specification of piecewise exponential survival time as list and hazard ratios 

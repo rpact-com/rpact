@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8141 $
-## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
+## |  File version: $Revision: 8151 $
+## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -426,13 +426,24 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
             return(valuesToShow)
         },
-        addParameter = function(parameterSet, ...,
-                parameterName = NULL, values = NULL, parameterCaption,
-                roundDigits = NA_integer_, ceilingEnabled = FALSE, cumsumEnabled = FALSE,
-                twoSided = FALSE, transpose = FALSE, smoothedZeroFormat = FALSE,
-                parameterCaptionSingle = parameterCaption, legendEntry = list(),
-                enforceFirstCase = FALSE, formatRepeatedPValues = FALSE,
-                validateParameterType = TRUE) {
+        addParameter = function(
+                parameterSet, 
+                ...,
+                parameterName = NULL, 
+                values = NULL, 
+                parameterCaption,
+                roundDigits = NA_integer_, 
+                ceilingEnabled = FALSE, 
+                cumsumEnabled = FALSE,
+                twoSided = FALSE, 
+                transpose = FALSE, 
+                smoothedZeroFormat = FALSE,
+                parameterCaptionSingle = parameterCaption, 
+                legendEntry = list(),
+                enforceFirstCase = FALSE, 
+                formatRepeatedPValues = FALSE,
+                validateParameterType = TRUE,
+                lastStage = NA_integer_) {
             if (!is.null(parameterName) && length(parameterName) == 1 &&
                     inherits(parameterSet, "ParameterSet") &&
                     parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE) {
@@ -481,6 +492,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             if (transpose) {
                 if (!is.matrix(values)) {
                     values <- as.matrix(values)
+                    if (!is.na(lastStage) && lastStage > ncol(values)) {
+                        nCol <- lastStage - ncol(values)
+                        values <- cbind(matrix(rep(NA_real_, nCol * nrow(values)), nrow = nrow(values)), values)
+                    }
                 } else {
                     values <- t(values)
                 }
@@ -3313,6 +3328,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             parameterName = "rejectAtLeastOne",
             parameterCaption = "Reject at least one", roundDigits = digitsProbabilities,
             smoothedZeroFormat = TRUE, transpose = TRUE,
+            lastStage = design$kMax, 
             legendEntry = {
                 if (multiArmEnabled) list("(i)" = "treatment arm i") else list()
             }
@@ -3328,6 +3344,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 summaryFactory, roundDigits = digitsProbabilities, smoothedZeroFormat = TRUE
             )
         }
+        
         # simulation enrichment #2: rejectedPopulationsPerStage
         if (outputSize == "large" && enrichmentEnabled) {
             .addSimulationArrayToSummary(designPlan,
@@ -3941,7 +3958,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         return(paste0(listItemPrefix, categoryCaption))
     }
 
-    treatmentCaption <- ifelse(numberOfGroups > 2, paste0("Treatment arm ", groupNumber), "Treatment arm")
+    treatments <- ifelse(grepl("Survival", .getClassName(designPlan)), 1, 2)
+    treatmentCaption <- ifelse(numberOfGroups > treatments, paste0("Treatment arm ", groupNumber), "Treatment arm")
 
     if (!grepl("Survival", .getClassName(designPlan)) ||
             (inherits(designPlan, "SimulationResultsMultiArmSurvival") &&

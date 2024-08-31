@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8141 $
-## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
+## |  File version: $Revision: 8157 $
+## |  Last changed: $Date: 2024-08-30 15:00:37 +0200 (Fr, 30 Aug 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -902,6 +902,7 @@ NULL
 #'
 #' @param inclusiveR If \code{TRUE} (default) the information on how to cite the base R system in publications will be added.
 #' @param language Language code to use for the output, default is "en".
+#' @param markdown If \code{TRUE}, the output will be created in Markdown.
 #'
 #' @details
 #' This function shows how to cite \code{rpact} and \code{R} (\code{inclusiveR = TRUE}) in publications.
@@ -913,7 +914,21 @@ NULL
 #'
 #' @export
 #'
-printCitation <- function(inclusiveR = TRUE, language = "en") {
+printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
+    if (is.na(markdown)) {
+        markdown <- .isMarkdownEnabled("print")
+    }
+    
+    if (isTRUE(markdown)) {
+        result <- paste0(utils::capture.output(.printCitation(
+            inclusiveR = inclusiveR, language = language)), collapse = "\n")
+        return(knitr::asis_output(result))
+    }
+    
+    .printCitation(inclusiveR = inclusiveR, language = language)
+}
+
+.printCitation <- function(inclusiveR = TRUE, language = "en") {
     currentLanguage <- Sys.getenv("LANGUAGE")
     tryCatch(
         {
@@ -927,7 +942,7 @@ printCitation <- function(inclusiveR = TRUE, language = "en") {
                     index <- indices[length(indices)]
                     citR <- citR[1:min(index, length(citR))]
                 }
-                cat("\n", trimws(paste(citR, collapse = "\n")), "\n", sep = "")
+                cat("\n", trimws(paste(citR, collapse = "\n")), "\n\n", sep = "")
             }
 
             print(citation("rpact"), bibtex = FALSE)
