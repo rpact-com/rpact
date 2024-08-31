@@ -9,7 +9,7 @@ the hazard ratio in a two treatment groups survival design."><meta property="og:
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9252</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9254</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -307,12 +307,12 @@ obtain the specific help documentation linked above by typing <code><a href="plo
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># Fixed sample size with minimum required definitions, pi1 = c(0.4,0.5,0.5) and </span></span></span>
+<span class="r-in"><span><span class="co"># Fixed sample size with minimum required definitions, pi1 = c(0.2, 0.3, 0.4, 0.5) and </span></span></span>
 <span class="r-in"><span><span class="co"># pi2 = 0.2 at event time 12, accrual time 12 and follow-up time 6 as default </span></span></span>
 <span class="r-in"><span><span class="fu">getPowerSurvival</span><span class="op">(</span>maxNumberOfEvents <span class="op">=</span> <span class="fl">40</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Four stage O'Brien &amp; Fleming group sequential design with minimum required </span></span></span>
-<span class="r-in"><span><span class="co"># definitions, pi1 = c(0.4,0.5,0.5) and pi2 = 0.2 at event time 12, </span></span></span>
+<span class="r-in"><span><span class="co"># definitions, pi1 = c(0.2, 0.3, 0.4, 0.5) and pi2 = 0.2 at event time 12, </span></span></span>
 <span class="r-in"><span><span class="co"># accrual time 12 and follow-up time 6 as default  </span></span></span>
 <span class="r-in"><span><span class="fu">getPowerSurvival</span><span class="op">(</span>design <span class="op">=</span> <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>    maxNumberOfEvents <span class="op">=</span> <span class="fl">40</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></span>
@@ -367,7 +367,7 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Specification of piecewise exponential survival time and hazard ratios  </span></span></span>
 <span class="r-in"><span><span class="fu">getPowerSurvival</span><span class="op">(</span>design <span class="op">=</span> <span class="fu"><a href="getDesignGroupSequential.html">getDesignGroupSequential</a></span><span class="op">(</span>kMax <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>    piecewiseSurvivalTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, lambda2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">0.02</span>,<span class="fl">0.04</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>    piecewiseSurvivalTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, lambda2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.02</span>, <span class="fl">0.04</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>    hazardRatio <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">1.8</span>, <span class="fl">2</span><span class="op">)</span>,  maxNumberOfEvents <span class="op">=</span> <span class="fl">40</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Specification of piecewise exponential survival time as list and hazard ratios </span></span></span>

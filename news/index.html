@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9252</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9254</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@
 <li>Extension of the function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> for sample size recalculation rules to the setting of binary endpoints according to <a href="https://doi.org/10.1186/s12874-024-02150-4" class="external-link">Bokelmann et al. (2024)</a>
 </li>
 <li>The <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> functions now support an enhanced <code>selectArmsFunction</code> argument. Previously, only <code>effectVector</code> and <code>stage</code> were allowed as arguments. Now, users can optionally utilize additional arguments for more powerful custom function implementations, including <code>conditionalPower</code>, <code>conditionalCriticalValue</code>, <code>plannedSubjects/plannedEvents</code>, <code>allocationRatioPlanned</code>, <code>selectedArms</code>, <code>thetaH1</code> (for means and survival), <code>stDevH1</code> (for means), <code>overallEffects</code>, and for rates additionally: <code>piTreatmentsH1</code>, <code>piControlH1</code>, <code>overallRates</code>, and <code>overallRatesControl</code>.</li>
-<li>Same as above for<code><a href="../reference/getSimulationEnrichmentMeans.html">getSimulationEnrichmentMeans()</a></code>, <code><a href="../reference/getSimulationEnrichmentRates.html">getSimulationEnrichmentRates()</a></code>, and <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code>. Specifically, support for population selection with <code>selectPopulationsFunction</code> argument based on predictive/posterior probabilities added (see <a href="https://github.com/rpact-com/rpact/issues/32" class="external-link">#32</a>)</li>
+<li>Same as above for <code><a href="../reference/getSimulationEnrichmentMeans.html">getSimulationEnrichmentMeans()</a></code>, <code><a href="../reference/getSimulationEnrichmentRates.html">getSimulationEnrichmentRates()</a></code>, and <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code>. Specifically, support for population selection with <code>selectPopulationsFunction</code> argument based on predictive/posterior probabilities added (see <a href="https://github.com/rpact-com/rpact/issues/32" class="external-link">#32</a>)</li>
 <li>The <code><a href="../reference/fetch.ParameterSet.html">fetch()</a></code> and <code><a href="../reference/fetch.ParameterSet.html">obtain()</a></code> functions can be used to extract a single parameter from an rpact result object, which is useful for writing pipe-operator linked commands</li>
 </ul></div>
 <div class="section level3">
