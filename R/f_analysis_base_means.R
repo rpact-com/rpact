@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -47,11 +47,15 @@ NULL
 }
 
 .getAnalysisResultsMeansInverseNormal <- function(...,
-        design, dataInput, directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        design, 
+        dataInput, 
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT, thetaH1 = NA_real_,
-        nPlanned = NA_real_, assumedStDev = NA_real_,
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT, 
+        thetaH1 = NA_real_,
+        nPlanned = NA_real_, 
+        assumedStDev = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .assertIsTrialDesignInverseNormal(design)
@@ -65,12 +69,20 @@ NULL
     )
 
     results <- AnalysisResultsInverseNormal$new(design = design, dataInput = dataInput)
-
+    
     .getAnalysisResultsMeansAll(
-        results = results, design = design, dataInput = dataInput,
-        stage = stage, directionUpper = directionUpper, normalApproximation = normalApproximation,
-        equalVariances = equalVariances, thetaH0 = thetaH0, thetaH1 = thetaH1, nPlanned = nPlanned,
-        assumedStDev = assumedStDev, allocationRatioPlanned = allocationRatioPlanned,
+        results = results, 
+        design = design, 
+        dataInput = dataInput,
+        stage = stage, 
+        directionUpper = directionUpper, 
+        normalApproximation = normalApproximation,
+        equalVariances = equalVariances, 
+        thetaH0 = thetaH0, 
+        thetaH1 = thetaH1, 
+        nPlanned = nPlanned,
+        assumedStDev = assumedStDev, 
+        allocationRatioPlanned = allocationRatioPlanned,
         tolerance = tolerance
     )
 
@@ -78,9 +90,15 @@ NULL
 }
 
 .getAnalysisResultsMeansGroupSequential <- function(...,
-        design, dataInput, directionUpper = C_DIRECTION_UPPER_DEFAULT,
-        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT, thetaH1 = NA_real_, nPlanned = NA_real_, assumedStDev = NA_real_,
+        design, 
+        dataInput, 
+        directionUpper = NA,
+        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, 
+        equalVariances = C_EQUAL_VARIANCES_DEFAULT,
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT, 
+        thetaH1 = NA_real_, 
+        nPlanned = NA_real_, 
+        assumedStDev = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .assertIsTrialDesignGroupSequential(design)
@@ -107,10 +125,18 @@ NULL
     }
 
     .getAnalysisResultsMeansAll(
-        results = results, design = design, dataInput = dataInput,
-        stage = stage, directionUpper = directionUpper, normalApproximation = normalApproximation,
-        equalVariances = equalVariances, thetaH0 = thetaH0, thetaH1 = thetaH1, nPlanned = nPlanned,
-        assumedStDev = assumedStDev, allocationRatioPlanned = allocationRatioPlanned,
+        results = results, 
+        design = design, 
+        dataInput = dataInput,
+        stage = stage, 
+        directionUpper = directionUpper, 
+        normalApproximation = normalApproximation,
+        equalVariances = equalVariances, 
+        thetaH0 = thetaH0, 
+        thetaH1 = thetaH1, 
+        nPlanned = nPlanned,
+        assumedStDev = assumedStDev, 
+        allocationRatioPlanned = allocationRatioPlanned,
         tolerance = tolerance
     )
 
@@ -118,12 +144,19 @@ NULL
 }
 
 .getAnalysisResultsMeansFisher <- function(...,
-        design, dataInput, directionUpper = C_DIRECTION_UPPER_DEFAULT,
-        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT, thetaH1 = NA_real_, nPlanned = NA_real_, assumedStDev = NA_real_,
+        design, 
+        dataInput, 
+        directionUpper = NA,
+        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, 
+        equalVariances = C_EQUAL_VARIANCES_DEFAULT,
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT, 
+        thetaH1 = NA_real_, 
+        nPlanned = NA_real_, 
+        assumedStDev = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+        iterations = C_ITERATIONS_DEFAULT, 
+        seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -140,11 +173,20 @@ NULL
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
     .getAnalysisResultsMeansAll(
-        results = results, design = design, dataInput = dataInput,
-        stage = stage, directionUpper = directionUpper, normalApproximation = normalApproximation,
-        equalVariances = equalVariances, thetaH0 = thetaH0, thetaH1 = thetaH1, nPlanned = nPlanned,
-        assumedStDev = assumedStDev, allocationRatioPlanned = allocationRatioPlanned,
-        tolerance = tolerance, iterations = iterations,
+        results = results, 
+        design = design, 
+        dataInput = dataInput,
+        stage = stage, 
+        directionUpper = directionUpper, 
+        normalApproximation = normalApproximation,
+        equalVariances = equalVariances, 
+        thetaH0 = thetaH0, 
+        thetaH1 = thetaH1, 
+        nPlanned = nPlanned,
+        assumedStDev = assumedStDev, 
+        allocationRatioPlanned = allocationRatioPlanned,
+        tolerance = tolerance, 
+        iterations = iterations,
         seed = seed
     )
 
@@ -157,17 +199,32 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsMeansAll <- function(..., results, design, dataInput, stage,
-        directionUpper, normalApproximation = normalApproximation,
-        equalVariances = equalVariances, thetaH0, thetaH1, assumedStDev,
-        nPlanned, allocationRatioPlanned, tolerance,
-        iterations, seed) {
+.getAnalysisResultsMeansAll <- function(..., 
+        results, 
+        design, 
+        dataInput, 
+        stage,
+        directionUpper, 
+        normalApproximation,
+        equalVariances, 
+        thetaH0, 
+        thetaH1, 
+        assumedStDev,
+        nPlanned, 
+        allocationRatioPlanned, 
+        tolerance,
+        iterations, 
+        seed) {
     startTime <- Sys.time()
     .assertIsValidTolerance(tolerance)
     stageResults <- .getStageResultsMeans(
-        design = design, dataInput = dataInput, stage = stage,
-        thetaH0 = thetaH0, directionUpper = directionUpper,
-        normalApproximation = normalApproximation, equalVariances = equalVariances
+        design = design, 
+        dataInput = dataInput, 
+        stage = stage,
+        thetaH0 = thetaH0, 
+        directionUpper = directionUpper,
+        normalApproximation = normalApproximation, 
+        equalVariances = equalVariances
     )
     results$.setStageResults(stageResults)
     .logProgress("Stage results calculated", startTime = startTime)
@@ -240,8 +297,12 @@ NULL
     # RCI - repeated confidence interval
     startTime <- Sys.time()
     repeatedConfidenceIntervals <- .getRepeatedConfidenceIntervalsMeans(
-        design = design, dataInput = dataInput, stage = stage,
-        normalApproximation = normalApproximation, equalVariances = equalVariances,
+        design = design, 
+        dataInput = dataInput, 
+        stage = stage,
+        directionUpper = directionUpper,
+        normalApproximation = normalApproximation, 
+        equalVariances = equalVariances,
         tolerance = tolerance
     )
     results$repeatedConfidenceIntervalLowerBounds <- repeatedConfidenceIntervals[1, ]
@@ -306,17 +367,17 @@ NULL
     return(results)
 }
 
-.getStageResultsMeans <- function(..., design, dataInput,
+.getStageResultsMeans <- function(..., 
+        design, 
+        dataInput,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        stage = NA_integer_, userFunctionCallEnabled = FALSE) {
+        stage = NA_integer_, 
+        userFunctionCallEnabled = FALSE) {
     .assertIsDatasetMeans(dataInput = dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
-    .assertIsValidDirectionUpper(directionUpper, design$sided,
-        userFunctionCallEnabled = userFunctionCallEnabled
-    )
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsSingleLogical(equalVariances, "equalVariances")
     .warnInCaseOfUnknownArguments(
@@ -401,7 +462,7 @@ NULL
         }
         effectSizes[1:stage] <- dataInput$getOverallMeansUpTo(stage) - dataInput$getOverallMeansUpTo(stage, 2)
     }
-    if (!directionUpper) {
+    if (isFALSE(directionUpper)) {
         overallPValues <- 1 - overallPValues
     }
 
@@ -461,7 +522,7 @@ NULL
                 }
             }
         }
-        if (!directionUpper) {
+        if (isFALSE(directionUpper)) {
             pValues[k] <- 1 - pValues[k]
         }
 
@@ -471,6 +532,11 @@ NULL
 
         # Fisher combination test
         combFisher[k] <- prod(pValues[1:k]^weightsFisher[1:k])
+    }
+    
+    direction <- "undefined"
+    if (design$sided == 1) {
+        direction <- ifelse(directionUpper, C_DIRECTION_UPPER, C_DIRECTION_LOWER)
     }
 
     if (dataInput$getNumberOfGroups() == 1) {
@@ -495,7 +561,7 @@ NULL
             weightsFisher = weightsFisher,
             weightsInverseNormal = weightsInverseNormal,
             thetaH0 = thetaH0,
-            direction = ifelse(directionUpper, C_DIRECTION_UPPER, C_DIRECTION_LOWER),
+            direction = direction,
             normalApproximation = normalApproximation,
             equalVariances = equalVariances
         )
@@ -529,7 +595,7 @@ NULL
             weightsFisher = weightsFisher,
             weightsInverseNormal = weightsInverseNormal,
             thetaH0 = thetaH0,
-            direction = ifelse(directionUpper, C_DIRECTION_UPPER, C_DIRECTION_LOWER),
+            direction = direction,
             normalApproximation = normalApproximation,
             equalVariances = equalVariances
         )
@@ -585,16 +651,29 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getRootThetaMeans <- function(..., design, dataInput, stage,
-        directionUpper, normalApproximation = normalApproximation, equalVariances = equalVariances,
-        thetaLow, thetaUp, firstParameterName, secondValue, tolerance,
+.getRootThetaMeans <- function(..., 
+        design, 
+        dataInput, 
+        stage,
+        directionUpper, 
+        normalApproximation, 
+        equalVariances,
+        thetaLow, 
+        thetaUp, 
+        firstParameterName, 
+        secondValue, 
+        tolerance,
         callingFunctionInformation = NA_character_) {
     result <- .getOneDimensionalRoot(
         function(theta) {
             stageResults <- .getStageResultsMeans(
-                design = design, dataInput = dataInput,
-                stage = stage, thetaH0 = theta, directionUpper = directionUpper,
-                normalApproximation = normalApproximation, equalVariances = equalVariances
+                design = design, 
+                dataInput = dataInput,
+                stage = stage, 
+                thetaH0 = theta, 
+                directionUpper = directionUpper,
+                normalApproximation = normalApproximation, 
+                equalVariances = equalVariances
             )
             firstValue <- stageResults[[firstParameterName]][stage]
             if (.isTrialDesignGroupSequential(design)) {
@@ -608,14 +687,25 @@ NULL
     return(result)
 }
 
-.getUpperLowerThetaMeans <- function(..., design, dataInput, theta, stage,
-        directionUpper, normalApproximation = normalApproximation,
-        equalVariances = equalVariances, conditionFunction,
-        firstParameterName, secondValue) {
+.getUpperLowerThetaMeans <- function(..., 
+        design, 
+        dataInput, 
+        theta, 
+        stage,
+        directionUpper, 
+        normalApproximation,
+        equalVariances, 
+        conditionFunction,
+        firstParameterName, 
+        secondValue) {
     stageResults <- .getStageResultsMeans(
-        design = design, dataInput = dataInput,
-        stage = stage, thetaH0 = theta, directionUpper = directionUpper,
-        normalApproximation = normalApproximation, equalVariances = equalVariances
+        design = design, 
+        dataInput = dataInput,
+        stage = stage, 
+        thetaH0 = theta, 
+        directionUpper = directionUpper,
+        normalApproximation = normalApproximation, 
+        equalVariances = equalVariances
     )
 
     firstValue <- stageResults[[firstParameterName]][stage]
@@ -628,12 +718,17 @@ NULL
         theta <- 2 * theta
 
         stageResults <- .getStageResultsMeans(
-            design = design, dataInput = dataInput,
-            stage = stage, thetaH0 = theta, directionUpper = directionUpper,
-            normalApproximation = normalApproximation, equalVariances = equalVariances
+            design = design, 
+            dataInput = dataInput,
+            stage = stage, 
+            thetaH0 = theta, 
+            directionUpper = directionUpper,
+            normalApproximation = normalApproximation, 
+            equalVariances = equalVariances
         )
 
         firstValue <- stageResults[[firstParameterName]][stage]
+        
         if (.isTrialDesignGroupSequential(design)) {
             firstValue <- .getOneMinusQNorm(firstValue)
         }
@@ -655,15 +750,16 @@ NULL
 }
 
 .getRepeatedConfidenceIntervalsMeansAll <- function(...,
-        design, dataInput,
+        design, 
+        dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
         firstParameterName) {
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     futilityCorr <- rep(NA_real_, design$kMax) # necessary for adjustment for binding futility boundaries
-    criticalValues <- design$criticalValues
+    criticalValues <- .getCriticalValues(design)
     criticalValues[is.infinite(criticalValues) & criticalValues > 0] <- C_QNORM_MAXIMUM
     criticalValues[is.infinite(criticalValues) & criticalValues < 0] <- C_QNORM_MINIMUM
 
@@ -681,37 +777,62 @@ NULL
     for (k in 1:stage) {
         startTime <- Sys.time()
         if (criticalValues[k] < C_QNORM_MAXIMUM) {
+            
             # finding maximum upper and minimum lower bounds for RCIs
             thetaLow <- .getUpperLowerThetaMeans(
-                design = design, dataInput = dataInput,
-                theta = -1, stage = k, directionUpper = TRUE,
-                normalApproximation = normalApproximation, equalVariances = equalVariances,
+                design = design, 
+                dataInput = dataInput,
+                theta = -1, 
+                stage = k, 
+                directionUpper = TRUE,
+                normalApproximation = normalApproximation, 
+                equalVariances = equalVariances,
                 conditionFunction = conditionFunction,
-                firstParameterName = firstParameterName, secondValue = criticalValues[k]
+                firstParameterName = firstParameterName, 
+                secondValue = criticalValues[k]
             )
 
             thetaUp <- .getUpperLowerThetaMeans(
-                design = design, dataInput = dataInput,
-                theta = 1, stage = k, directionUpper = FALSE,
-                normalApproximation = normalApproximation, equalVariances = equalVariances,
+                design = design, 
+                dataInput = dataInput,
+                theta = 1, 
+                stage = k, 
+                directionUpper = FALSE,
+                normalApproximation = normalApproximation, 
+                equalVariances = equalVariances,
                 conditionFunction = conditionFunction,
-                firstParameterName = firstParameterName, secondValue = criticalValues[k]
+                firstParameterName = firstParameterName, 
+                secondValue = criticalValues[k]
             )
 
             # finding upper and lower RCI limits through root function
             repeatedConfidenceIntervals[1, k] <- .getRootThetaMeans(
-                design = design, dataInput = dataInput, stage = k,
-                directionUpper = TRUE, normalApproximation = normalApproximation,
-                equalVariances = equalVariances, thetaLow = thetaLow, thetaUp = thetaUp,
-                firstParameterName = firstParameterName, secondValue = criticalValues[k], tolerance = tolerance,
+                design = design, 
+                dataInput = dataInput, 
+                stage = k,
+                directionUpper = TRUE, 
+                normalApproximation = normalApproximation,
+                equalVariances = equalVariances, 
+                thetaLow = thetaLow, 
+                thetaUp = thetaUp,
+                firstParameterName = firstParameterName, 
+                secondValue = criticalValues[k], 
+                tolerance = tolerance,
                 callingFunctionInformation = paste0("Repeated confidence interval [1, ", k, "]")
             )
 
             repeatedConfidenceIntervals[2, k] <- .getRootThetaMeans(
-                design = design, dataInput = dataInput, stage = k,
-                directionUpper = FALSE, normalApproximation = normalApproximation,
-                equalVariances = equalVariances, thetaLow = thetaLow, thetaUp = thetaUp,
-                firstParameterName = firstParameterName, secondValue = criticalValues[k], tolerance = tolerance,
+                design = design, 
+                dataInput = dataInput, 
+                stage = k,
+                directionUpper = FALSE, 
+                normalApproximation = normalApproximation,
+                equalVariances = equalVariances, 
+                thetaLow = thetaLow, 
+                thetaUp = thetaUp,
+                firstParameterName = firstParameterName, 
+                secondValue = criticalValues[k], 
+                tolerance = tolerance,
                 callingFunctionInformation = paste0("Repeated confidence interval [2, ", k, "]")
             )
 
@@ -720,7 +841,7 @@ NULL
                 parameterName <- ifelse(.isTrialDesignFisher(design), "pValues", firstParameterName)
 
                 #  Calculate new lower and upper bounds
-                if (directionUpper) {
+                if (is.na(directionUpper) || isTRUE(directionUpper)) {
                     thetaLow <- .getUpperLowerThetaMeans(
                         design = design, dataInput = dataInput, theta = -1, stage = k - 1,
                         directionUpper = TRUE, normalApproximation = normalApproximation,
@@ -745,7 +866,7 @@ NULL
                         paste0("Repeated confidence interval, futility correction [", k, "]")
                 )
 
-                if (directionUpper) {
+                if (is.na(directionUpper) || isTRUE(directionUpper)) {
                     repeatedConfidenceIntervals[1, k] <- min(min(futilityCorr[2:k]), repeatedConfidenceIntervals[1, k])
                 } else {
                     repeatedConfidenceIntervals[2, k] <- max(max(futilityCorr[2:k]), repeatedConfidenceIntervals[2, k])
@@ -770,10 +891,11 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsMeansGroupSequential <- function(...,
-        design, dataInput,
+        design, 
+        dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
         functionName =
@@ -785,9 +907,14 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsMeansAll(
-        design = design, dataInput = dataInput,
-        normalApproximation = normalApproximation, equalVariances = equalVariances,
-        directionUpper = directionUpper, tolerance = tolerance, firstParameterName = "overallPValues", ...
+        design = design, 
+        dataInput = dataInput,
+        normalApproximation = normalApproximation, 
+        equalVariances = equalVariances,
+        directionUpper = directionUpper, 
+        tolerance = tolerance, 
+        firstParameterName = "overallPValues", 
+        ...
     ))
 }
 
@@ -800,7 +927,7 @@ NULL
         design, dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
         functionName =
@@ -812,10 +939,14 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsMeansAll(
-        design = design, dataInput = dataInput,
-        normalApproximation = normalApproximation, equalVariances = equalVariances,
-        directionUpper = directionUpper, tolerance = tolerance,
-        firstParameterName = "combInverseNormal", ...
+        design = design, 
+        dataInput = dataInput,
+        normalApproximation = normalApproximation, 
+        equalVariances = equalVariances,
+        directionUpper = directionUpper, 
+        tolerance = tolerance,
+        firstParameterName = "combInverseNormal", 
+        ...
     ))
 }
 
@@ -825,10 +956,11 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsMeansFisher <- function(...,
-        design, dataInput,
+        design, 
+        dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         equalVariances = C_EQUAL_VARIANCES_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
         functionName =
@@ -840,9 +972,14 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsMeansAll(
-        design = design, dataInput = dataInput,
-        normalApproximation = normalApproximation, equalVariances = equalVariances,
-        directionUpper = directionUpper, tolerance = tolerance, firstParameterName = "combFisher", ...
+        design = design, 
+        dataInput = dataInput,
+        normalApproximation = normalApproximation, 
+        equalVariances = equalVariances,
+        directionUpper = directionUpper, 
+        tolerance = tolerance, 
+        firstParameterName = "combFisher", 
+        ...
     ))
 }
 
@@ -851,9 +988,13 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansGroupSequential <- function(..., stageResults, stage = stageResults$stage,
-        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_,
-        thetaH1 = NA_real_, assumedStDev = NA_real_) {
+.getConditionalPowerMeansGroupSequential <- function(..., 
+        stageResults, 
+        stage = stageResults$stage,
+        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, 
+        nPlanned = NA_real_,
+        thetaH1 = NA_real_, 
+        assumedStDev = NA_real_) {
     design <- stageResults$.design
     .assertIsTrialDesignGroupSequential(design)
     .assertIsValidStage(stage, design$kMax)
@@ -885,7 +1026,7 @@ NULL
         ))
     }
 
-    criticalValues <- design$criticalValues
+    criticalValues <- .getCriticalValues(design)
 
     if (stageResults$isTwoSampleDataset()) {
         .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
@@ -969,9 +1110,13 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansInverseNormal <- function(..., stageResults, stage = stageResults$stage,
-        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_,
-        thetaH1 = NA_real_, assumedStDev = NA_real_) {
+.getConditionalPowerMeansInverseNormal <- function(..., 
+        stageResults, 
+        stage = stageResults$stage,
+        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, 
+        nPlanned = NA_real_,
+        thetaH1 = NA_real_, 
+        assumedStDev = NA_real_) {
     design <- stageResults$.design
     .assertIsTrialDesignInverseNormal(design)
     .assertIsValidStage(stage, design$kMax)
@@ -1003,7 +1148,7 @@ NULL
         ))
     }
 
-    criticalValuesInverseNormal <- design$criticalValues
+    criticalValuesInverseNormal <- .getCriticalValues(design)
 
     if (stageResults$isTwoSampleDataset()) {
         .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
@@ -1085,10 +1230,15 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansFisher <- function(..., stageResults, stage = stageResults$stage,
-        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, nPlanned = NA_real_,
-        thetaH1 = NA_real_, assumedStDev = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+.getConditionalPowerMeansFisher <- function(..., 
+        stageResults, 
+        stage = stageResults$stage,
+        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, 
+        nPlanned = NA_real_,
+        thetaH1 = NA_real_, 
+        assumedStDev = NA_real_,
+        iterations = C_ITERATIONS_DEFAULT, 
+        seed = NA_real_) {
     design <- stageResults$.design
     .assertIsTrialDesignFisher(design)
     .assertIsValidStage(stage, design$kMax)
@@ -1127,7 +1277,7 @@ NULL
         thetaH1 <- -(thetaH1 - stageResults$thetaH0) / assumedStDev
     }
 
-    criticalValues <- design$criticalValues
+    criticalValues <- .getCriticalValues(design)
     weightsFisher <- stageResults$weightsFisher
     pValues <- stageResults$pValues
 
@@ -1172,8 +1322,12 @@ NULL
     ))
 }
 
-.getConditionalPowerMeans <- function(..., stageResults, nPlanned,
-        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, thetaH1 = NA_real_, assumedStDev = NA_real_) {
+.getConditionalPowerMeans <- function(..., 
+        stageResults, 
+        nPlanned,
+        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT, 
+        thetaH1 = NA_real_, 
+        assumedStDev = NA_real_) {
     stDevH1 <- .getOptionalArgument("stDevH1", ...)
     if (!is.null(stDevH1) && !is.na(stDevH1)) {
         if (!is.na(assumedStDev)) {
@@ -1243,9 +1397,13 @@ NULL
     return(results)
 }
 
-.getConditionalPowerPlotMeans <- function(..., stageResults, stage,
-        nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        thetaRange, assumedStDev = NA_real_) {
+.getConditionalPowerPlotMeans <- function(..., 
+        stageResults, 
+        stage,
+        nPlanned, 
+        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
+        thetaRange, 
+        assumedStDev = NA_real_) {
     .associatedArgumentsAreDefined(nPlanned = nPlanned, thetaRange = thetaRange)
     .assertIsValidAllocationRatioPlanned(
         allocationRatioPlanned,
@@ -1347,13 +1505,22 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalMeansGroupSequential <- function(..., design, dataInput, stage,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
+.getFinalConfidenceIntervalMeansGroupSequential <- function(..., 
+        design, 
+        dataInput, 
+        stage,
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT, 
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
-        equalVariances = C_EQUAL_VARIANCES_DEFAULT, tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        equalVariances = C_EQUAL_VARIANCES_DEFAULT, 
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsMeans(
-        design = design, dataInput = dataInput, stage = stage,
-        thetaH0 = thetaH0, directionUpper = directionUpper, normalApproximation = normalApproximation,
+        design = design, 
+        dataInput = dataInput, 
+        stage = stage,
+        thetaH0 = thetaH0, 
+        directionUpper = directionUpper, 
+        normalApproximation = normalApproximation,
         equalVariances = equalVariances
     )
 
@@ -1376,8 +1543,14 @@ NULL
     ))
 }
 
-.getFinalConfidenceIntervalMeansValues <- function(design, dataInput,
-        stageResults, directionUpper, thetaH0, stage, tolerance) {
+.getFinalConfidenceIntervalMeansValues <- function(
+        design, 
+        dataInput,
+        stageResults, 
+        directionUpper, 
+        thetaH0, 
+        stage, 
+        tolerance) {
     finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
     medianUnbiasedGeneral <- NA_real_
 
@@ -1484,7 +1657,7 @@ NULL
         }
     }
 
-    if (!directionUpper) {
+    if (isFALSE(directionUpper)) {
         medianUnbiasedGeneral <- -medianUnbiasedGeneral
         finalConfidenceIntervalGeneral <- -finalConfidenceIntervalGeneral
         if (designStage > 1) {
@@ -1515,13 +1688,22 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalMeansInverseNormal <- function(..., design, dataInput, stage,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
-        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,
+.getFinalConfidenceIntervalMeansInverseNormal <- function(..., 
+        design, 
+        dataInput, 
+        stage,
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT, 
+        directionUpper = NA,
+        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, 
+        equalVariances = C_EQUAL_VARIANCES_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsMeans(
-        design = design, dataInput = dataInput, stage = stage,
-        thetaH0 = thetaH0, directionUpper = directionUpper, normalApproximation = normalApproximation,
+        design = design, 
+        dataInput = dataInput, 
+        stage = stage,
+        thetaH0 = thetaH0, 
+        directionUpper = directionUpper, 
+        normalApproximation = normalApproximation,
         equalVariances = equalVariances
     )
 
@@ -1548,15 +1730,23 @@ NULL
         directionUpper, normalApproximation, equalVariances) {
     if (dataInput$getNumberOfGroups() == 1) {
         stageResults <- .getStageResultsMeans(
-            design = design, dataInput = dataInput, stage = stage,
-            thetaH0 = theta, directionUpper = directionUpper, normalApproximation = normalApproximation
+            design = design, 
+            dataInput = dataInput, 
+            stage = stage,
+            thetaH0 = theta, 
+            directionUpper = directionUpper, 
+            normalApproximation = normalApproximation
         )
     }
 
     if (dataInput$getNumberOfGroups() == 2) {
         stageResults <- .getStageResultsMeans(
-            design = design, dataInput = dataInput, stage = stage,
-            thetaH0 = theta, directionUpper = directionUpper, normalApproximation = normalApproximation,
+            design = design, 
+            dataInput = dataInput, 
+            stage = stage,
+            thetaH0 = theta, 
+            directionUpper = directionUpper, 
+            normalApproximation = normalApproximation,
             equalVariances = equalVariances
         )
     }
@@ -1573,13 +1763,22 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalMeansFisher <- function(..., design, dataInput, stage,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT, directionUpper = C_DIRECTION_UPPER_DEFAULT,
-        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,
+.getFinalConfidenceIntervalMeansFisher <- function(..., 
+        design, 
+        dataInput, 
+        stage,
+        thetaH0 = C_THETA_H0_MEANS_DEFAULT, 
+        directionUpper = NA,
+        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, 
+        equalVariances = C_EQUAL_VARIANCES_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsMeans(
-        design = design, dataInput = dataInput, stage = stage,
-        thetaH0 = thetaH0, directionUpper = directionUpper, normalApproximation = normalApproximation,
+        design = design, 
+        dataInput = dataInput, 
+        stage = stage,
+        thetaH0 = thetaH0, 
+        directionUpper = directionUpper, 
+        normalApproximation = normalApproximation,
         equalVariances = equalVariances
     )
 
@@ -1722,9 +1921,13 @@ NULL
     ))
 }
 
-.getFinalConfidenceIntervalMeans <- function(..., design, dataInput,
-        thetaH0 = NA_real_, directionUpper = C_DIRECTION_UPPER_DEFAULT,
-        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, equalVariances = C_EQUAL_VARIANCES_DEFAULT,
+.getFinalConfidenceIntervalMeans <- function(..., 
+        design, 
+        dataInput,
+        thetaH0 = NA_real_, 
+        directionUpper = NA,
+        normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT, 
+        equalVariances = C_EQUAL_VARIANCES_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)

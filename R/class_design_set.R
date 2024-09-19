@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8151 $
-## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
+## |  File version: $Revision: 8195 $
+## |  Last changed: $Date: 2024-09-11 14:50:27 +0200 (Mi, 11 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1183,23 +1183,33 @@ plot.TrialDesignSet <- function(
     }
 
     p <- .plotParameterSet(
-        parameterSet = parameterSet, designMaster = designMaster,
+        parameterSet = parameterSet, 
+        designMaster = designMaster,
         xParameterName = xParameterName,
-        yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-        palette = palette, theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
-        legendPosition = legendPosition, plotSettings = plotSettings # , ...
+        yParameterNames = yParameterNames, 
+        mainTitle = main, 
+        xlab = xlab, 
+        ylab = ylab,
+        palette = palette, 
+        theta = theta, 
+        nMax = nMax, 
+        plotPointsEnabled = plotPointsEnabled,
+        legendPosition = legendPosition, 
+        plotSettings = plotSettings
     )
 
-    p <- .addDecistionCriticalValuesToPlot(p = p, designMaster = designMaster, type = type, nMax = nMax)
+    p <- .addDecisionCriticalValuesToPlot(
+        p = p, designMaster = designMaster, 
+        type = type, nMax = nMax)
 
     return(p)
 }
 
-.addDecistionCriticalValuesToPlot <- function(p, designMaster, type, nMax = NA_integer_) {
+.addDecisionCriticalValuesToPlot <- function(p, designMaster, type, nMax = NA_integer_) {
     if (type != 1 || !.isTrialDesignInverseNormalOrGroupSequential(designMaster)) {
         return(p)
     }
-
+    
     data <- as.data.frame(designMaster)
     xyNames <- c("delayedInformationRates", "decisionCriticalValues")
     if (!all(xyNames %in% colnames(data))) {

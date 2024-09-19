@@ -8,12 +8,12 @@ getSimulationCounts(
   design = NULL,
   ...,
   plannedCalendarTime,
-  plannedMaxSubjects = NA_real_,
+  maxNumberOfSubjects = NA_real_,
   lambda1 = NA_real_,
   lambda2 = NA_real_,
   lambda = NA_real_,
   theta = NA_real_,
-  directionUpper = TRUE,
+  directionUpper = NA,
   thetaH0 = 1,
   overdispersion = 0,
   fixedExposureTime = NA_real_,
@@ -23,7 +23,6 @@ getSimulationCounts(
   allocationRatioPlanned = NA_real_,
   maxNumberOfIterations = 1000L,
   seed = NA_real_,
-  calcSubjectsFunction = NULL,
   showStatistics = FALSE
 )
 }
@@ -38,7 +37,8 @@ that a warning will be displayed if unknown arguments are passed.}
 \item{plannedCalendarTime}{For simulating count data, the time points where an analysis is planned to be performed.
 Should be a vector of length \code{kMax}}
 
-\item{plannedMaxSubjects}{\code{plannedMaxSubjects > 0} needs to be specified.}
+\item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified for power calculations or calculation
+of necessary follow-up (count data). For two treatment arms, it is the maximum number of subjects for both treatment arms.}
 
 \item{lambda1}{A numeric value or vector that represents the assumed rate of a homogeneous Poisson process in
 the active treatment group, there is no default.}
@@ -95,10 +95,6 @@ Note that internally \code{allocationRatioPlanned} is treated as a vector of len
 
 \item{seed}{The seed to reproduce the simulation, default is a random seed.}
 
-\item{calcSubjectsFunction}{Optionally, a function can be entered that defines the way of performing the sample size
-recalculation. By default, sample size recalculation is performed with conditional power and specified
-\code{minNumberOfSubjectsPerStage} and \code{maxNumberOfSubjectsPerStage} (see details and examples).}
-
 \item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default
 is \code{FALSE}.}
@@ -117,12 +113,12 @@ The following generics (R generic functions) are available for this object:
 }
 \description{
 Returns the simulated power, stopping probabilities, conditional power, and expected sample size for
-testing means rates for negative binomial distributed event numbers in the two treatment groups testing situation.
+testing mean rates for negative binomial distributed event numbers in the two treatment groups testing situation.
 }
 \details{
 At given design the function simulates the power, stopping probabilities, conditional power, and expected
 sample size at given number of subjects and parameter configuration.
-Additionally, an allocation ratio = n1/n2 and a null hypothesis value thetaH0 can be specified.
+Additionally, an allocation \code{ratio = n1/n2} and a null hypothesis value \code{thetaH0} can be specified.
 }
 \section{Simulation Data}{
 
@@ -142,15 +138,9 @@ object as \code{\link[base]{data.frame}}. The data frame contains the following 
 (interim) analysis takes place.
 \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
 \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
-\item \code{testStatistic}: The test statistic that is used for the test decision,
-depends on which design was chosen (group sequential, inverse normal,
-or Fisher combination test)'
-\item \code{testStatisticsPerStage}: The test statistic for each stage if only data from
-the considered stage is taken into account.
+\item \code{testStatistic}: The test statistic that is used for the test decision
 \item \code{overallLambda1}: The cumulative rate in treatment group 1.
 \item \code{overallLambda2}: The cumulative rate in treatment group 2.
-\item \code{stagewiseLambda1}: The stage-wise rate in treatment group 1.
-\item \code{stagewiseLambda2}: The stage-wise rate in treatment group 2.
 \item \code{sampleSizesPerStage1}: The stage-wise sample size in treatment group 1.
 \item \code{sampleSizesPerStage2}: The stage-wise sample size in treatment group 2.
 \item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
@@ -173,27 +163,39 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 
 \examples{
 \dontrun{
-# Fixed sample size design with two groups
+# Fixed sample size design with two groups, fixed exposure time
 getSimulationCounts(
-    plannedMaxSubjects = 200,
-    plannedCalendarTime = 8,
     theta = 1.8,
     lambda2 = 0.2,
+    maxNumberOfSubjects = 200,
+    plannedCalendarTime = 8,
     maxNumberOfIterations = 1000,
     fixedExposureTime = 6,
     accrualTime = 3,
     overdispersion = 2)
 
 # Group sequential design alpha spending function design with O'Brien and 
-# Fleming type boundaries: Power and test characteristics for N = 1976, 
+# Fleming type boundaries: Power and test characteristics for N = 264, 
 # under variable exposure time with uniform recruitment over 1.25 months,
-# study time (accrual + followup) = 4 (lambda1, lambda2, and overdispersion 
-# as specified, no futility stopping):
-getPowerCounts(design = getDesignGroupSequential(
-        kMax = 3, alpha = 0.025, beta = 0.2, typeOfDesign = "asOF"),
-    lambda1 = seq(0.08, 0.09, 0.0025), lambda2 = 0.125, 
-    overdispersion = 5, directionUpper = FALSE, maxNumberOfSubjects = 1976, 
-    followUpTime = 2.75, accrualTime = 1.25)
+# study time (accrual + followup) = 4, interim analysis take place after
+# equidistant time points (lambda1, lambda2, and overdispersion as specified,
+# no futility stopping):
+dOF <- getDesignGroupSequential(
+    kMax = 3, 
+    alpha = 0.025, 
+    beta = 0.2, 
+    typeOfDesign = "asOF")
+
+getSimulationCounts(design = dOF,
+    lambda1 = seq(0.04, 0.12, 0.02), 
+    lambda2 = 0.12, 
+    directionUpper = FALSE,       
+    overdispersion = 5, 
+    plannedCalendarTime = (1:3)/3*4,
+    maxNumberOfSubjects = 264, 
+    followUpTime = 2.75, 
+    accrualTime = 1.25,
+    maxNumberOfIterations = 1000)
 }
 
 }

@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 8151 $
- * Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
+ * File version: $Revision: 8188 $
+ * Last changed: $Date: 2024-09-10 09:56:44 +0200 (Di, 10 Sep 2024) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -132,7 +132,7 @@ List getTestStatisticsRatesCpp(int designNumber, NumericVector informationRates,
 					value = getOneMinusQNorm(R::pbinom(e1, n1, thetaH0, true, false));
 				}
 			} else {
-				value = (r1 - thetaH0) / sqrt(thetaH0 * (1.0 - thetaH0)) * sqrt(n1);
+				value = (2.0 * directionUpper - 1.0) * (r1 - thetaH0) / sqrt(thetaH0 * (1.0 - thetaH0)) * sqrt(n1);
 			}
 		} else {
 			double n2 = sum(sampleSizesPerStage(1, _));
@@ -534,7 +534,7 @@ List getSimulationStepRatesCpp(int k, int kMax, int designNumber, NumericVector 
 				}
 			}
 		}
-		if (!directionUpper) {
+		if (!R_IsNA(directionUpper) && !directionUpper) {
 			theta = -theta;
 		}
 		simulatedConditionalPower = getOneMinusPNorm(conditionalCriticalValue - theta * sqrt(stageSubjects));

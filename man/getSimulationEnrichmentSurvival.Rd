@@ -10,7 +10,7 @@ getSimulationEnrichmentSurvival(
   effectList = NULL,
   intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
   stratifiedAnalysis = TRUE,
-  directionUpper = TRUE,
+  directionUpper = NA,
   adaptations = NA,
   typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
   effectMeasure = c("effectEstimate", "testStatistic"),

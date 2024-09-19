@@ -13,13 +13,15 @@ getTestActions(stageResults, ...)
 }
 \value{
 Returns a \code{\link[base]{character}} vector of length \code{kMax}
-Returns a \code{\link[base]{numeric}} vector of length \code{kMax}containing the test actions of each stage.
+Returns a \code{\link[base]{numeric}} vector of length \code{kMax}
+containing the test actions of each stage.
 }
 \description{
 Returns test actions.
 }
 \details{
-Returns the test actions of the specified design and stage results at the specified stage.
+Returns the test actions of the specified design and
+stage results at the specified stage.
 }
 \examples{
 \dontrun{

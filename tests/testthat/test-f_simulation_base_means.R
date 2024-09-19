@@ -14,7 +14,7 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_simulation_base_means.R
-## |  Creation date: 07 March 2024, 13:13:26
+## |  Creation date: 16 September 2024, 08:44:44
 ## |  File version: $Revision$
 ## |  Last changed: $Date$
 ## |  Last changed by: $Author$
@@ -210,7 +210,8 @@ test_that("'getSimulationMeans': several configurations", {
             informationRates = c(0.2, 0.5, 1)
         ), groups = 2, meanRatio = TRUE, thetaH0 = 1.1,
         plannedSubjects = plannedSubjects, maxNumberOfIterations = maxNumberOfIterations,
-        allocationRatioPlanned = 3, stDev = 1.5, directionUpper = FALSE, seed = seed
+        allocationRatioPlanned = 3, stDev = 1.5,
+        directionUpper = FALSE, seed = seed
     )
 
     ## Comparison of the results of SimulationResultsMeans object 'x4' with expected results
@@ -257,6 +258,37 @@ test_that("'getSimulationMeans': several configurations", {
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+
+    x4b <- getSimulationMeans(
+        design = getDesignInverseNormal(
+            futilityBounds = c(-0.5, 0.5),
+            informationRates = c(0.2, 0.5, 1),
+            directionUpper = FALSE
+        ), groups = 2, meanRatio = TRUE, thetaH0 = 1.1,
+        plannedSubjects = plannedSubjects, maxNumberOfIterations = maxNumberOfIterations,
+        allocationRatioPlanned = 3, stDev = 1.5, seed = seed
+    )
+
+    ## Pairwise comparison of the results of x4 with the results of x4b
+    expect_equal(x4$effect, x4b$effect, tolerance = 1e-07)
+    expect_equal(x4b$iterations[1, ], x4$iterations[1, ])
+    expect_equal(x4b$iterations[2, ], x4$iterations[2, ])
+    expect_equal(x4b$iterations[3, ], x4$iterations[3, ])
+    expect_equal(x4$overallReject, x4b$overallReject, tolerance = 1e-07)
+    expect_equal(x4b$rejectPerStage[1, ], x4$rejectPerStage[1, ])
+    expect_equal(x4b$rejectPerStage[2, ], x4$rejectPerStage[2, ])
+    expect_equal(x4b$rejectPerStage[3, ], x4$rejectPerStage[3, ], tolerance = 1e-07)
+    expect_equal(x4$futilityStop, x4b$futilityStop, tolerance = 1e-07)
+    expect_equal(x4b$futilityPerStage[1, ], x4$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(x4b$futilityPerStage[2, ], x4$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x4$earlyStop, x4b$earlyStop, tolerance = 1e-07)
+    expect_equal(x4$expectedNumberOfSubjects, x4b$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(x4b$sampleSizes[1, ], x4$sampleSizes[1, ])
+    expect_equal(x4b$sampleSizes[2, ], x4$sampleSizes[2, ])
+    expect_equal(x4b$sampleSizes[3, ], x4$sampleSizes[3, ])
+    expect_equal(x4b$conditionalPowerAchieved[1, ], x4$conditionalPowerAchieved[1, ])
+    expect_equal(x4b$conditionalPowerAchieved[2, ], x4$conditionalPowerAchieved[2, ], tolerance = 1e-07)
+    expect_equal(x4b$conditionalPowerAchieved[3, ], x4$conditionalPowerAchieved[3, ], tolerance = 1e-07)
 
     x5 <- getSimulationMeans(
         design = getDesignInverseNormal(
@@ -311,6 +343,37 @@ test_that("'getSimulationMeans': several configurations", {
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+
+    x5b <- getSimulationMeans(
+        design = getDesignInverseNormal(
+            futilityBounds = c(-0.5, 0.5),
+            informationRates = c(0.2, 0.5, 1),
+            directionUpper = FALSE
+        ), groups = 2, meanRatio = FALSE, thetaH0 = 1.1,
+        plannedSubjects = plannedSubjects, maxNumberOfIterations = maxNumberOfIterations,
+        allocationRatioPlanned = 3, stDev = 1.5, seed = seed
+    )
+
+    ## Pairwise comparison of the results of x5 with the results of x5b
+    expect_equal(x5$effect, x5b$effect, tolerance = 1e-07)
+    expect_equal(x5b$iterations[1, ], x5$iterations[1, ])
+    expect_equal(x5b$iterations[2, ], x5$iterations[2, ])
+    expect_equal(x5b$iterations[3, ], x5$iterations[3, ])
+    expect_equal(x5$overallReject, x5b$overallReject, tolerance = 1e-07)
+    expect_equal(x5b$rejectPerStage[1, ], x5$rejectPerStage[1, ])
+    expect_equal(x5b$rejectPerStage[2, ], x5$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x5b$rejectPerStage[3, ], x5$rejectPerStage[3, ], tolerance = 1e-07)
+    expect_equal(x5$futilityStop, x5b$futilityStop, tolerance = 1e-07)
+    expect_equal(x5b$futilityPerStage[1, ], x5$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(x5b$futilityPerStage[2, ], x5$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x5$earlyStop, x5b$earlyStop, tolerance = 1e-07)
+    expect_equal(x5$expectedNumberOfSubjects, x5b$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(x5b$sampleSizes[1, ], x5$sampleSizes[1, ])
+    expect_equal(x5b$sampleSizes[2, ], x5$sampleSizes[2, ])
+    expect_equal(x5b$sampleSizes[3, ], x5$sampleSizes[3, ])
+    expect_equal(x5b$conditionalPowerAchieved[1, ], x5$conditionalPowerAchieved[1, ])
+    expect_equal(x5b$conditionalPowerAchieved[2, ], x5$conditionalPowerAchieved[2, ], tolerance = 1e-07)
+    expect_equal(x5b$conditionalPowerAchieved[3, ], x5$conditionalPowerAchieved[3, ], tolerance = 1e-07)
 
     x6 <- getSimulationMeans(
         design = getDesignInverseNormal(

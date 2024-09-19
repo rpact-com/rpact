@@ -6,6 +6,11 @@
 \usage{
 getParameterName(obj, parameterCaption)
 }
+\arguments{
+\item{obj}{The rpact result object.}
+
+\item{parameterCaption}{The parameter caption.}
+}
 \value{
 Returns a \code{\link[base]{character}} of specifying the corresponding name of a given parameter caption.
 Returns \code{NULL} if the specified \code{parameterCaption} does not exist.

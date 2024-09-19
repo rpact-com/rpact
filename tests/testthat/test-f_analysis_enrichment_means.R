@@ -14,184 +14,11 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_analysis_enrichment_means.R
-## |  Creation date: 27 May 2024, 13:07:08
-## |  File version: $Revision: 7940 $
-## |  Last changed: $Date: 2024-05-27 15:47:41 +0200 (Mo, 27 Mai 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  Creation date: 12 September 2024, 12:50:03
+## |  File version: $Revision$
+## |  Last changed: $Date$
+## |  Last changed by: $Author$
 ## |
-
-test_plan_section("Testing Analysis Enrichment Means Function (one sub-population)")
-
-
-test_that("'getAnalysisResults': select S1 at first IA, gMax = 2, inverse normal design", {
-    .skipTestIfDisabled()
-
-    # @refFS[Formula]{fs:adjustedPValueBonferroniEnrichment}
-    # @refFS[Formula]{fs:adjustedPValueForRCIBonferroniSimesEnrichment}
-    # @refFS[Formula]{fs:adjustedPValueForRCISidakEnrichment}
-    # @refFS[Formula]{fs:adjustedPValueForRCISpiessensEnrichment}
-    # @refFS[Formula]{fs:adjustedPValueSidakEnrichment}
-    # @refFS[Formula]{fs:adjustedPValueSimesEnrichment}
-    # @refFS[Formula]{fs:adjustedPValueSpiessensDeboisEnrichment}
-    # @refFS[Formula]{fs:computeRCIsEnrichment}
-    # @refFS[Formula]{fs:conditionalPowerEnrichment}
-    # @refFS[Formula]{fs:conditionalRejectionProbabilityEnrichment}
-    # @refFS[Formula]{fs:stratifiedtTestEnrichment}
-    S1 <- getDataset(
-        sampleSize1 = c(12, 21),
-        sampleSize2 = c(18, 21),
-        mean1 = c(107.7, 84.9),
-        mean2 = c(165.6, 195.9),
-        stDev1 = c(128.5, 139.5),
-        stDev2 = c(120.1, 185.0)
-    )
-
-    F <- getDataset(
-        sampleSize1 = c(26, NA),
-        sampleSize2 = c(29, NA),
-        mean1 = c(86.48462, NA),
-        mean2 = c(148.34138, NA),
-        stDev1 = c(129.1485, NA),
-        stDev2 = c(122.888, NA)
-    )
-
-    dataInput1 <- getDataset(S1 = S1, F = F)
-
-    ## Comparison of the results of DatasetMeans object 'dataInput1' with expected results
-    expect_equal(dataInput1$overallSampleSizes, c(12, 26, 18, 29, 33, NA_real_, 39, NA_real_), label = paste0(dataInput1$overallSampleSizes))
-    expect_equal(dataInput1$overallMeans, c(107.7, 86.48462, 165.6, 148.34138, 93.190909, NA_real_, 181.91538, NA_real_), tolerance = 1e-07, label = paste0(dataInput1$overallMeans))
-    expect_equal(dataInput1$overallStDevs, c(128.5, 129.1485, 120.1, 122.888, 134.02535, NA_real_, 157.16289, NA_real_), tolerance = 1e-07, label = paste0(dataInput1$overallStDevs))
-    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(dataInput1), NA)))
-        expect_output(print(dataInput1)$show())
-        invisible(capture.output(expect_error(summary(dataInput1), NA)))
-        expect_output(summary(dataInput1)$show())
-        dataInput1CodeBased <- eval(parse(text = getObjectRCode(dataInput1, stringWrapParagraphWidth = NULL)))
-        expect_equal(dataInput1CodeBased$overallSampleSizes, dataInput1$overallSampleSizes, tolerance = 1e-07)
-        expect_equal(dataInput1CodeBased$overallMeans, dataInput1$overallMeans, tolerance = 1e-07)
-        expect_equal(dataInput1CodeBased$overallStDevs, dataInput1$overallStDevs, tolerance = 1e-07)
-        expect_type(names(dataInput1), "character")
-        df <- as.data.frame(dataInput1)
-        expect_s3_class(df, "data.frame")
-        expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(dataInput1)
-        expect_true(is.matrix(mtx))
-        expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
-    }
-
-    design1 <- getDesignInverseNormal(
-        kMax = 3, alpha = 0.02, futilityBounds = c(-0.5, 0),
-        bindingFutility = FALSE, typeOfDesign = "OF", informationRates = c(0.5, 0.7, 1)
-    )
-
-    repeatedConfidenceIntervals <- getRepeatedConfidenceIntervals(design1, dataInput1)
-
-    ## Comparison of the results of array object 'repeatedConfidenceIntervals' with expected results
-    expect_equal(unlist(as.list(repeatedConfidenceIntervals)), c(-220.29061, -176.00816, 104.49061, 52.294639, -176.90621, NA_real_, 23.990701, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(unlist(as.list(repeatedConfidenceIntervals))))
-
-    stageResults <- getStageResults(design1, dataInput1)
-
-    ## Comparison of the results of StageResultsEnrichmentMeans object 'stageResults' with expected results
-    expect_equal(stageResults$overallTestStatistics[1, ], c(NA_real_, NA_real_, NA_real_), label = paste0(stageResults$overallTestStatistics[1, ]))
-    expect_equal(stageResults$overallTestStatistics[2, ], c(NA_real_, NA_real_, NA_real_), label = paste0(stageResults$overallTestStatistics[2, ]))
-    expect_equal(stageResults$overallStDevs[1, ], c(123.46817, 147.03819, NA_real_), tolerance = 1e-07, label = paste0(stageResults$overallStDevs[1, ]))
-    expect_equal(stageResults$overallStDevs[2, ], c(125.87987, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(stageResults$overallStDevs[2, ]))
-    expect_equal(stageResults$testStatistics[1, ], c("stage 1" = -1.2583162, "stage 2" = -2.1953569, "stage 3" = NA_real_), tolerance = 1e-07, label = paste0(stageResults$testStatistics[1, ]))
-    expect_equal(stageResults$testStatistics[2, ], c("stage 1" = -1.8194295, "stage 2" = NA_real_, "stage 3" = NA_real_), tolerance = 1e-07, label = paste0(stageResults$testStatistics[2, ]))
-    expect_equal(stageResults$separatePValues[1, ], c("stage 1" = 0.89066535, "stage 2" = 0.98299949, "stage 3" = NA_real_), tolerance = 1e-07, label = paste0(stageResults$separatePValues[1, ]))
-    expect_equal(stageResults$separatePValues[2, ], c("stage 1" = 0.96275182, "stage 2" = NA_real_, "stage 3" = NA_real_), tolerance = 1e-07, label = paste0(stageResults$separatePValues[2, ]))
-    expect_equal(stageResults$effectSizes[1, ], c(-57.9, -88.724476, NA_real_), tolerance = 1e-07, label = paste0(stageResults$effectSizes[1, ]))
-    expect_equal(stageResults$effectSizes[2, ], c(-61.85676, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(stageResults$effectSizes[2, ]))
-    expect_equal(stageResults$weightsInverseNormal, c(0.70710678, 0.4472136, 0.54772256), tolerance = 1e-07, label = paste0(stageResults$weightsInverseNormal))
-    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(stageResults), NA)))
-        expect_output(print(stageResults)$show())
-        invisible(capture.output(expect_error(summary(stageResults), NA)))
-        expect_output(summary(stageResults)$show())
-        stageResultsCodeBased <- eval(parse(text = getObjectRCode(stageResults, stringWrapParagraphWidth = NULL)))
-        expect_equal(stageResultsCodeBased$overallTestStatistics, stageResults$overallTestStatistics, tolerance = 1e-07)
-        expect_equal(stageResultsCodeBased$overallPValues, stageResults$overallPValues, tolerance = 1e-07)
-        expect_equal(stageResultsCodeBased$overallStDevs, stageResults$overallStDevs, tolerance = 1e-07)
-        expect_equal(stageResultsCodeBased$overallPooledStDevs, stageResults$overallPooledStDevs, tolerance = 1e-07)
-        expect_equal(stageResultsCodeBased$testStatistics, stageResults$testStatistics, tolerance = 1e-07)
-        expect_equal(stageResultsCodeBased$separatePValues, stageResults$separatePValues, tolerance = 1e-07)
-        expect_equal(stageResultsCodeBased$effectSizes, stageResults$effectSizes, tolerance = 1e-07)
-        expect_equal(stageResultsCodeBased$weightsInverseNormal, stageResults$weightsInverseNormal, tolerance = 1e-07)
-        expect_type(names(stageResults), "character")
-        df <- as.data.frame(stageResults)
-        expect_s3_class(df, "data.frame")
-        expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(stageResults)
-        expect_true(is.matrix(mtx))
-        expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
-    }
-
-    conditionalPower <- getConditionalPower(stageResults, nPlanned = 50)
-
-    ## Comparison of the results of ConditionalPowerResultsEnrichmentMeans object 'conditionalPower' with expected results
-    expect_equal(conditionalPower$conditionalPower[1, ], c(NA_real_, NA_real_, 6.6613381e-16), tolerance = 1e-07, label = paste0(conditionalPower$conditionalPower[1, ]))
-    expect_equal(conditionalPower$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_), label = paste0(conditionalPower$conditionalPower[2, ]))
-
-    conditionalPowerPlot <- .getConditionalPowerPlot(
-        stageResults = stageResults,
-        thetaRange = seq(-0.8, 0.5, 0.1), nPlanned = 60, assumedStDev = 2, allocationRatioPlanned = 3
-    )
-
-    ## Comparison of the results of list object 'conditionalPowerPlot' with expected results
-    expect_equal(conditionalPowerPlot$populations, c(1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2), label = paste0(conditionalPowerPlot$populations))
-    expect_equal(conditionalPowerPlot$xValues, c(-0.8, -0.8, -0.7, -0.7, -0.6, -0.6, -0.5, -0.5, -0.4, -0.4, -0.3, -0.3, -0.2, -0.2, -0.1, -0.1, 0, 0, 0.1, 0.1, 0.2, 0.2, 0.3, 0.3, 0.4, 0.4, 0.5, 0.5), tolerance = 1e-07, label = paste0(conditionalPowerPlot$xValues))
-    expect_equal(conditionalPowerPlot$condPowerValues, c(1.4432899e-15, NA_real_, 1.4432899e-15, NA_real_, 1.5543122e-15, NA_real_, 1.5543122e-15, NA_real_, 1.5543122e-15, NA_real_, 1.5543122e-15, NA_real_, 1.6653345e-15, NA_real_, 1.6653345e-15, NA_real_, 1.6653345e-15, NA_real_, 1.7763568e-15, NA_real_, 1.7763568e-15, NA_real_, 1.7763568e-15, NA_real_, 1.7763568e-15, NA_real_, 1.8873791e-15, NA_real_), tolerance = 1e-07, label = paste0(conditionalPowerPlot$condPowerValues))
-    expect_equal(conditionalPowerPlot$likelihoodValues, c(0.012773695, NA_real_, 0.012647555, NA_real_, 0.012522519, NA_real_, 0.012398579, NA_real_, 0.012275728, NA_real_, 0.012153957, NA_real_, 0.012033258, NA_real_, 0.011913623, NA_real_, 0.011795044, NA_real_, 0.011677515, NA_real_, 0.011561025, NA_real_, 0.011445569, NA_real_, 0.011331138, NA_real_, 0.011217724, NA_real_), tolerance = 1e-07, label = paste0(conditionalPowerPlot$likelihoodValues))
-    expect_equal(conditionalPowerPlot$main, "Conditional Power with Likelihood", label = paste0(conditionalPowerPlot$main))
-    expect_equal(conditionalPowerPlot$xlab, "Effect size", label = paste0(conditionalPowerPlot$xlab))
-    expect_equal(conditionalPowerPlot$ylab, "Conditional power / Likelihood", label = paste0(conditionalPowerPlot$ylab))
-    expect_equal(conditionalPowerPlot$sub, "Intersection test = Simes, stage = 2, # of remaining subjects = 60, sd = (147, NA), allocation ratio = 3", label = paste0(conditionalPowerPlot$sub))
-
-    x1 <- getAnalysisResults(
-        design = design1, dataInput = dataInput1,
-        directionUpper = FALSE,
-        normalApproximation = FALSE,
-        varianceOption = "pooledFromFull",
-        intersectionTest = "Bonferroni",
-        stratifiedAnalysis = FALSE,
-        stage = 2,
-        thetaH1 = c(-30, NA),
-        assumedStDevs = c(88, NA),
-        nPlanned = c(30),
-        allocationRatioPlanned = 2
-    )
-
-    ## Comparison of the results of AnalysisResultsEnrichmentInverseNormal object 'x1' with expected results
-    expect_equal(x1$conditionalRejectionProbabilities[1, ], c(0.040655272, 0.29596348, NA_real_), tolerance = 1e-07, label = paste0(x1$conditionalRejectionProbabilities[1, ]))
-    expect_equal(x1$conditionalRejectionProbabilities[2, ], c(0.065736952, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(x1$conditionalRejectionProbabilities[2, ]))
-    expect_equal(x1$conditionalPower[1, ], c(NA_real_, NA_real_, 0.6346437), tolerance = 1e-07, label = paste0(x1$conditionalPower[1, ]))
-    expect_equal(x1$conditionalPower[2, ], c(NA_real_, NA_real_, NA_real_), label = paste0(x1$conditionalPower[2, ]))
-    expect_equal(x1$repeatedConfidenceIntervalLowerBounds[1, ], c(-215.41406, -176.0794, NA_real_), tolerance = 1e-07, label = paste0(x1$repeatedConfidenceIntervalLowerBounds[1, ]))
-    expect_equal(x1$repeatedConfidenceIntervalLowerBounds[2, ], c(-176.00816, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(x1$repeatedConfidenceIntervalLowerBounds[2, ]))
-    expect_equal(x1$repeatedConfidenceIntervalUpperBounds[1, ], c(99.614058, 24.117528, NA_real_), tolerance = 1e-07, label = paste0(x1$repeatedConfidenceIntervalUpperBounds[1, ]))
-    expect_equal(x1$repeatedConfidenceIntervalUpperBounds[2, ], c(52.294639, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(x1$repeatedConfidenceIntervalUpperBounds[2, ]))
-    expect_equal(x1$repeatedPValues[1, ], c(0.25380947, 0.041128123, NA_real_), tolerance = 1e-07, label = paste0(x1$repeatedPValues[1, ]))
-    expect_equal(x1$repeatedPValues[2, ], c(0.19818652, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(x1$repeatedPValues[2, ]))
-    if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(x1), NA)))
-        expect_output(print(x1)$show())
-        invisible(capture.output(expect_error(summary(x1), NA)))
-        expect_output(summary(x1)$show())
-        x1CodeBased <- eval(parse(text = getObjectRCode(x1, stringWrapParagraphWidth = NULL)))
-        expect_equal(x1CodeBased$conditionalRejectionProbabilities, x1$conditionalRejectionProbabilities, tolerance = 1e-07)
-        expect_equal(x1CodeBased$conditionalPower, x1$conditionalPower, tolerance = 1e-07)
-        expect_equal(x1CodeBased$repeatedConfidenceIntervalLowerBounds, x1$repeatedConfidenceIntervalLowerBounds, tolerance = 1e-07)
-        expect_equal(x1CodeBased$repeatedConfidenceIntervalUpperBounds, x1$repeatedConfidenceIntervalUpperBounds, tolerance = 1e-07)
-        expect_equal(x1CodeBased$repeatedPValues, x1$repeatedPValues, tolerance = 1e-07)
-        expect_type(names(x1), "character")
-        df <- as.data.frame(x1)
-        expect_s3_class(df, "data.frame")
-        expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(x1)
-        expect_true(is.matrix(mtx))
-        expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
-    }
-})
 
 test_that("'getAnalysisResults': stratified analysis, select S1 at first IA, gMax = 2, Fisher design", {
     .skipTestIfDisabled()
@@ -254,6 +81,12 @@ test_that("'getAnalysisResults': stratified analysis, select S1 at first IA, gMa
         bindingFutility = TRUE, informationRates = c(0.3, 0.7, 1)
     )
 
+    design2b <- getDesignFisher(
+        kMax = 3, alpha = 0.02, alpha0Vec = c(0.7, 0.5), method = "fullAlpha",
+        bindingFutility = TRUE, informationRates = c(0.3, 0.7, 1),
+        directionUpper = FALSE
+    )
+
     x2 <- getAnalysisResults(
         design = design2, dataInput = dataInput2,
         directionUpper = FALSE,
@@ -299,9 +132,40 @@ test_that("'getAnalysisResults': stratified analysis, select S1 at first IA, gMa
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
 
+    x2b <- getAnalysisResults(
+        design = design2b, dataInput = dataInput2,
+        normalApproximation = FALSE,
+        varianceOption = "pooledFromFull",
+        intersectionTest = "Bonferroni",
+        stratifiedAnalysis = FALSE,
+        stage = 2,
+        thetaH1 = c(-30, NA),
+        assumedStDevs = c(88, NA),
+        nPlanned = c(30),
+        allocationRatioPlanned = 2
+    )
+
+    ## Pairwise comparison of the results of x2 with the results of x2b
+    expect_equal(x2b$conditionalRejectionProbabilities[1, ], x2$conditionalRejectionProbabilities[1, ], tolerance = 1e-07)
+    expect_equal(x2b$conditionalRejectionProbabilities[2, ], x2$conditionalRejectionProbabilities[2, ], tolerance = 1e-07)
+    expect_equal(x2b$conditionalPower[1, ], x2$conditionalPower[1, ], tolerance = 1e-07)
+    expect_equal(x2b$conditionalPower[2, ], x2$conditionalPower[2, ])
+    expect_equal(x2b$repeatedConfidenceIntervalLowerBounds[1, ], x2$repeatedConfidenceIntervalLowerBounds[1, ], tolerance = 1e-07)
+    expect_equal(x2b$repeatedConfidenceIntervalLowerBounds[2, ], x2$repeatedConfidenceIntervalLowerBounds[2, ], tolerance = 1e-07)
+    expect_equal(x2b$repeatedConfidenceIntervalUpperBounds[1, ], x2$repeatedConfidenceIntervalUpperBounds[1, ], tolerance = 1e-07)
+    expect_equal(x2b$repeatedConfidenceIntervalUpperBounds[2, ], x2$repeatedConfidenceIntervalUpperBounds[2, ], tolerance = 1e-07)
+    expect_equal(x2b$repeatedPValues[1, ], x2$repeatedPValues[1, ], tolerance = 1e-07)
+    expect_equal(x2b$repeatedPValues[2, ], x2$repeatedPValues[2, ], tolerance = 1e-07)
+
     design1 <- getDesignInverseNormal(
         kMax = 3, alpha = 0.02, futilityBounds = c(-0.5, 0),
         bindingFutility = FALSE, typeOfDesign = "OF", informationRates = c(0.5, 0.7, 1)
+    )
+
+    design1b <- getDesignInverseNormal(
+        kMax = 3, alpha = 0.02, futilityBounds = c(-0.5, 0),
+        bindingFutility = FALSE, typeOfDesign = "OF", informationRates = c(0.5, 0.7, 1),
+        directionUpper = FALSE
     )
 
     x3 <- getAnalysisResults(
@@ -347,6 +211,30 @@ test_that("'getAnalysisResults': stratified analysis, select S1 at first IA, gMa
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+
+    x3b <- getAnalysisResults(
+        design = design1b, dataInput = dataInput2,
+        normalApproximation = FALSE,
+        intersectionTest = "Sidak",
+        stratifiedAnalysis = TRUE,
+        stage = 2,
+        thetaH1 = c(-30, NA),
+        assumedStDevs = c(88, NA),
+        nPlanned = c(30),
+        allocationRatioPlanned = 2
+    )
+
+    ## Pairwise comparison of the results of x3 with the results of x3b
+    expect_equal(x3b$conditionalRejectionProbabilities[1, ], x3$conditionalRejectionProbabilities[1, ], tolerance = 1e-07)
+    expect_equal(x3b$conditionalRejectionProbabilities[2, ], x3$conditionalRejectionProbabilities[2, ], tolerance = 1e-07)
+    expect_equal(x3b$conditionalPower[1, ], x3$conditionalPower[1, ], tolerance = 1e-07)
+    expect_equal(x3b$conditionalPower[2, ], x3$conditionalPower[2, ])
+    expect_equal(x3b$repeatedConfidenceIntervalLowerBounds[1, ], x3$repeatedConfidenceIntervalLowerBounds[1, ], tolerance = 1e-07)
+    expect_equal(x3b$repeatedConfidenceIntervalLowerBounds[2, ], x3$repeatedConfidenceIntervalLowerBounds[2, ], tolerance = 1e-07)
+    expect_equal(x3b$repeatedConfidenceIntervalUpperBounds[1, ], x3$repeatedConfidenceIntervalUpperBounds[1, ], tolerance = 1e-07)
+    expect_equal(x3b$repeatedConfidenceIntervalUpperBounds[2, ], x3$repeatedConfidenceIntervalUpperBounds[2, ], tolerance = 1e-07)
+    expect_equal(x3b$repeatedPValues[1, ], x3$repeatedPValues[1, ], tolerance = 1e-07)
+    expect_equal(x3b$repeatedPValues[2, ], x3$repeatedPValues[2, ], tolerance = 1e-07)
 })
 
 test_that("'getAnalysisResults': select S1 at first IA, gMax = 2, inverse normal design, Sidak and Spiessens & Debois", {
@@ -365,7 +253,14 @@ test_that("'getAnalysisResults': select S1 at first IA, gMax = 2, inverse normal
     # @refFS[Formula]{fs:stratifiedtTestEnrichment}
     design1 <- getDesignInverseNormal(
         kMax = 3, alpha = 0.02, futilityBounds = c(-0.5, 0),
-        bindingFutility = FALSE, typeOfDesign = "OF", informationRates = c(0.5, 0.7, 1)
+        bindingFutility = FALSE, typeOfDesign = "OF",
+        informationRates = c(0.5, 0.7, 1)
+    )
+
+    design1b <- getDesignInverseNormal(
+        kMax = 3, alpha = 0.02, futilityBounds = c(-0.5, 0),
+        bindingFutility = FALSE, typeOfDesign = "OF",
+        informationRates = c(0.5, 0.7, 1), directionUpper = FALSE
     )
 
     S1 <- getDataset(
@@ -437,6 +332,33 @@ test_that("'getAnalysisResults': select S1 at first IA, gMax = 2, inverse normal
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
 
+    x4b <- getAnalysisResults(
+        design = design1b, dataInput = dataInput1,
+        normalApproximation = FALSE,
+        varianceOption = "notPooled",
+        intersectionTest = "Sidak",
+        stratifiedAnalysis = FALSE,
+        stage = 2,
+        nPlanned = c(30),
+        allocationRatioPlanned = 2
+    )
+
+    ## Pairwise comparison of the results of x4 with the results of x4b
+    expect_equal(x4b$thetaH1[1, ], x4$thetaH1[1, ], tolerance = 1e-07)
+    expect_equal(x4b$thetaH1[2, ], x4$thetaH1[2, ])
+    expect_equal(x4b$assumedStDevs[1, ], x4$assumedStDevs[1, ], tolerance = 1e-07)
+    expect_equal(x4b$assumedStDevs[2, ], x4$assumedStDevs[2, ])
+    expect_equal(x4b$conditionalRejectionProbabilities[1, ], x4$conditionalRejectionProbabilities[1, ], tolerance = 1e-07)
+    expect_equal(x4b$conditionalRejectionProbabilities[2, ], x4$conditionalRejectionProbabilities[2, ], tolerance = 1e-07)
+    expect_equal(x4b$conditionalPower[1, ], x4$conditionalPower[1, ], tolerance = 1e-07)
+    expect_equal(x4b$conditionalPower[2, ], x4$conditionalPower[2, ])
+    expect_equal(x4b$repeatedConfidenceIntervalLowerBounds[1, ], x4$repeatedConfidenceIntervalLowerBounds[1, ], tolerance = 1e-07)
+    expect_equal(x4b$repeatedConfidenceIntervalLowerBounds[2, ], x4$repeatedConfidenceIntervalLowerBounds[2, ], tolerance = 1e-07)
+    expect_equal(x4b$repeatedConfidenceIntervalUpperBounds[1, ], x4$repeatedConfidenceIntervalUpperBounds[1, ], tolerance = 1e-07)
+    expect_equal(x4b$repeatedConfidenceIntervalUpperBounds[2, ], x4$repeatedConfidenceIntervalUpperBounds[2, ], tolerance = 1e-07)
+    expect_equal(x4b$repeatedPValues[1, ], x4$repeatedPValues[1, ], tolerance = 1e-07)
+    expect_equal(x4b$repeatedPValues[2, ], x4$repeatedPValues[2, ], tolerance = 1e-07)
+
     x5 <- getAnalysisResults(
         design = design1, dataInput = dataInput1,
         directionUpper = FALSE,
@@ -486,6 +408,33 @@ test_that("'getAnalysisResults': select S1 at first IA, gMax = 2, inverse normal
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
 
+    x5b <- getAnalysisResults(
+        design = design1b, dataInput = dataInput1,
+        normalApproximation = FALSE,
+        varianceOption = "pooledFromFull",
+        intersectionTest = "SpiessensDebois",
+        stratifiedAnalysis = TRUE,
+        stage = 2,
+        nPlanned = c(30),
+        allocationRatioPlanned = 2
+    )
+
+    ## Pairwise comparison of the results of x5 with the results of x5b
+    expect_equal(x5b$thetaH1[1, ], x5$thetaH1[1, ], tolerance = 1e-07)
+    expect_equal(x5b$thetaH1[2, ], x5$thetaH1[2, ])
+    expect_equal(x5b$assumedStDevs[1, ], x5$assumedStDevs[1, ], tolerance = 1e-07)
+    expect_equal(x5b$assumedStDevs[2, ], x5$assumedStDevs[2, ])
+    expect_equal(x5b$conditionalRejectionProbabilities[1, ], x5$conditionalRejectionProbabilities[1, ], tolerance = 1e-07)
+    expect_equal(x5b$conditionalRejectionProbabilities[2, ], x5$conditionalRejectionProbabilities[2, ], tolerance = 1e-07)
+    expect_equal(x5b$conditionalPower[1, ], x5$conditionalPower[1, ], tolerance = 1e-07)
+    expect_equal(x5b$conditionalPower[2, ], x5$conditionalPower[2, ])
+    expect_equal(x5b$repeatedConfidenceIntervalLowerBounds[1, ], x5$repeatedConfidenceIntervalLowerBounds[1, ], tolerance = 1e-07)
+    expect_equal(x5b$repeatedConfidenceIntervalLowerBounds[2, ], x5$repeatedConfidenceIntervalLowerBounds[2, ], tolerance = 1e-07)
+    expect_equal(x5b$repeatedConfidenceIntervalUpperBounds[1, ], x5$repeatedConfidenceIntervalUpperBounds[1, ], tolerance = 1e-07)
+    expect_equal(x5b$repeatedConfidenceIntervalUpperBounds[2, ], x5$repeatedConfidenceIntervalUpperBounds[2, ], tolerance = 1e-07)
+    expect_equal(x5b$repeatedPValues[1, ], x5$repeatedPValues[1, ], tolerance = 1e-07)
+    expect_equal(x5b$repeatedPValues[2, ], x5$repeatedPValues[2, ], tolerance = 1e-07)
+
     x6 <- getAnalysisResults(
         design = design1, dataInput = dataInput1,
         directionUpper = FALSE,
@@ -534,6 +483,33 @@ test_that("'getAnalysisResults': select S1 at first IA, gMax = 2, inverse normal
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+
+    x6b <- getAnalysisResults(
+        design = design1b, dataInput = dataInput1,
+        normalApproximation = TRUE,
+        varianceOption = "notPooled",
+        intersectionTest = "SpiessensDebois",
+        stratifiedAnalysis = FALSE,
+        stage = 2,
+        nPlanned = c(30),
+        allocationRatioPlanned = 2
+    )
+
+    ## Pairwise comparison of the results of x6 with the results of x6b
+    expect_equal(x6b$thetaH1[1, ], x6$thetaH1[1, ], tolerance = 1e-07)
+    expect_equal(x6b$thetaH1[2, ], x6$thetaH1[2, ])
+    expect_equal(x6b$assumedStDevs[1, ], x6$assumedStDevs[1, ], tolerance = 1e-07)
+    expect_equal(x6b$assumedStDevs[2, ], x6$assumedStDevs[2, ])
+    expect_equal(x6b$conditionalRejectionProbabilities[1, ], x6$conditionalRejectionProbabilities[1, ], tolerance = 1e-07)
+    expect_equal(x6b$conditionalRejectionProbabilities[2, ], x6$conditionalRejectionProbabilities[2, ], tolerance = 1e-07)
+    expect_equal(x6b$conditionalPower[1, ], x6$conditionalPower[1, ], tolerance = 1e-07)
+    expect_equal(x6b$conditionalPower[2, ], x6$conditionalPower[2, ])
+    expect_equal(x6b$repeatedConfidenceIntervalLowerBounds[1, ], x6$repeatedConfidenceIntervalLowerBounds[1, ], tolerance = 1e-07)
+    expect_equal(x6b$repeatedConfidenceIntervalLowerBounds[2, ], x6$repeatedConfidenceIntervalLowerBounds[2, ], tolerance = 1e-07)
+    expect_equal(x6b$repeatedConfidenceIntervalUpperBounds[1, ], x6$repeatedConfidenceIntervalUpperBounds[1, ], tolerance = 1e-07)
+    expect_equal(x6b$repeatedConfidenceIntervalUpperBounds[2, ], x6$repeatedConfidenceIntervalUpperBounds[2, ], tolerance = 1e-07)
+    expect_equal(x6b$repeatedPValues[1, ], x6$repeatedPValues[1, ], tolerance = 1e-07)
+    expect_equal(x6b$repeatedPValues[2, ], x6$repeatedPValues[2, ], tolerance = 1e-07)
 })
 
 test_that("'getAnalysisResults': select S1 at first IA, gMax = 2, Fisher design, Sidak and Bonferroni", {

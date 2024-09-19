@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -78,8 +78,10 @@ NULL
             designPlan$cumulativeEventsPerStage <- matrix(designPlan$eventsFixed, nrow = 1)
         }
         boundaries <- .getEffectScaleBoundaryDataSurvival(designPlan)
+    } else if (.isTrialDesignPlanCountData(designPlan)) {
+        boundaries <- .getEffectScaleBoundaryDataCounts(designPlan)
     }
-
+    
     if (designPlan$.design$sided == 1) {
         designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleUpper
         designPlan$.setParameterType("criticalValuesEffectScale", C_PARAM_GENERATED)
@@ -95,7 +97,7 @@ NULL
         designPlan$.setParameterType("criticalValuesEffectScaleLower", C_PARAM_GENERATED)
     }
 
-    if (!.isTrialDesignFisher(design) && any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
+    if (.hasApplicableFutilityBounds(design)) {
         if (design$sided == 1) {
             designPlan$futilityBoundsEffectScale <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
             designPlan$.setParameterType("futilityBoundsEffectScale", C_PARAM_GENERATED)
@@ -438,3 +440,5 @@ NULL
         }
     }
 }
+
+

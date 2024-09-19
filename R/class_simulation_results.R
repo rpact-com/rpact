@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8141 $
-## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
+## |  File version: $Revision: 8232 $
+## |  Last changed: $Date: 2024-09-19 08:22:37 +0200 (Do, 19 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -67,6 +67,7 @@ names.SimulationResults <- function(x) {
 #'   \item \code{\link{SimulationResultsMeans}},
 #'   \item \code{\link{SimulationResultsRates}},
 #'   \item \code{\link{SimulationResultsSurvival}},
+#'   \item \code{\link{SimulationResultsCountData}},
 #'   \item \code{\link{SimulationResultsMultiArmMeans}},
 #'   \item \code{\link{SimulationResultsMultiArmRates}},
 #'   \item \code{\link{SimulationResultsMultiArmSurvival}},
@@ -519,7 +520,7 @@ SimulationResults <- R6::R6Class("SimulationResults",
                 s <- paste(s, "rates")
             } else if (inherits(self, "SimulationResultsBaseSurvival")) {
                 s <- paste(s, "survival data")
-            } else if (inherits(self, "SimulationResultsBaseCountData")) {
+            } else if (inherits(self, "SimulationResultsCountData")) {
                 s <- paste(s, "count data")
             } else {
                 s <- paste(s, "UNDEFINED")
@@ -907,6 +908,7 @@ SimulationResultsRates <- R6::R6Class("SimulationResultsRates",
         effect = NULL,
         earlyStop = NULL,
         sampleSizes = NULL,
+        expectedNumberOfSubjects = NULL,
         overallReject = NULL,
         rejectPerStage = NULL,
         conditionalPowerAchieved = matrix(),
@@ -1650,7 +1652,7 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentS
 )
 
 #'
-#' @name SimulationResultsBaseCountData
+#' @name SimulationResultsCountData
 #'
 #' @title
 #' Class for Simulation Results Count Data
@@ -1671,6 +1673,7 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentS
 #' @template field_directionUpper
 #' @template field_earlyStop
 #' @template field_sampleSizes
+#' @template field_expectedNumberOfSubjects
 #' @template field_overallReject
 #' @template field_rejectPerStage
 #'
@@ -1688,10 +1691,10 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentS
 #'
 #' @importFrom methods new
 #'
-SimulationResultsBaseCountData <- R6::R6Class("SimulationResultsBaseCountData",
+SimulationResultsCountData <- R6::R6Class("SimulationResultsCountData",
     inherit = SimulationResults,
     public = list(
-        plannedMaxSubjects = NULL,
+        maxNumberOfSubjects = NULL,
         plannedCalendarTime = NULL,
         directionUpper = NULL,
         lambda1 = NULL,
@@ -1708,6 +1711,7 @@ SimulationResultsBaseCountData <- R6::R6Class("SimulationResultsBaseCountData",
         numberOfSubjects = NULL,
         numberOfSubjects1 = NULL,
         numberOfSubjects2 = NULL,
+        expectedNumberOfSubjects = NULL,
         iterations = NULL,
         futilityStop = NULL,
         futilityPerStage = NULL,
@@ -1720,6 +1724,8 @@ SimulationResultsBaseCountData <- R6::R6Class("SimulationResultsBaseCountData",
             self$groups <- 2L
             self$.setParameterType("conditionalPower", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("futilityStop", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("numberOfSubjects", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("expectedNumberOfSubjects", C_PARAM_NOT_APPLICABLE)
         }
     )
 )

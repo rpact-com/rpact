@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8151 $
-## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -389,13 +389,12 @@ NULL
     futilityBounds <- design$futilityBounds
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
 
-    criticalValues <- design$criticalValues
-
     criticalValuesEffectScaleUpper <- matrix(, nrow = design$kMax, ncol = nParameters)
     criticalValuesEffectScaleLower <- matrix(, nrow = design$kMax, ncol = nParameters)
     futilityBoundsEffectScaleUpper <- matrix(, nrow = design$kMax - 1, ncol = nParameters)
     futilityBoundsEffectScaleLower <- matrix(, nrow = design$kMax - 1, ncol = nParameters)
 
+    criticalValues <- .getCriticalValues(design)
     for (j in (1:nParameters)) {
         if (design$sided == 1) {
             criticalValuesEffectScaleUpper[, j] <- thetaH0 * (exp((2 * directionUpper[j] - 1) * criticalValues *
@@ -651,9 +650,7 @@ NULL
         .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
         .assertIsValidKappa(kappa)
         directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-            design$sided, objectType,
-            userFunctionCallEnabled = TRUE
-        )
+            design, objectType = objectType, userFunctionCallEnabled = TRUE)
 
         if (objectType == "power") {
             .assertIsSingleNumber(maxNumberOfEvents, "maxNumberOfEvents")
@@ -764,7 +761,7 @@ NULL
         designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_GENERATED)
     }
 
-    if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
+    if (.hasApplicableFutilityBounds(design)) {
         designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }

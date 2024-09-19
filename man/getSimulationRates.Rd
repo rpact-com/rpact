@@ -14,7 +14,7 @@ getSimulationRates(
   pi1 = seq(0.2, 0.5, 0.1),
   pi2 = NA_real_,
   plannedSubjects = NA_real_,
-  directionUpper = TRUE,
+  directionUpper = NA,
   allocationRatioPlanned = NA_real_,
   minNumberOfSubjectsPerStage = NA_real_,
   maxNumberOfSubjectsPerStage = NA_real_,

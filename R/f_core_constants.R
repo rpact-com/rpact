@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8141 $
-## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
+## |  File version: $Revision: 8238 $
+## |  Last changed: $Date: 2024-09-19 13:06:01 +0200 (Do, 19 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -712,7 +712,6 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
     expectedInformationH1 = "Expected information under H1",
-    plannedMaxSubjects = "Planned maximum number of subjects",
     plannedCalendarTime = "Planned calendar time"
 ))
 
@@ -1018,7 +1017,6 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
     expectedInformationH1 = "Expected information under H1",
-    plannedMaxSubjects = "Planned max. number of subjects",
     plannedCalendarTime = "Planned calendar time"
 ))
 
@@ -1330,6 +1328,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     overallEvents = ".formatEvents",
     expectedNumberOfEvents = ".formatEvents",
     expectedNumberOfEventsPerStage = ".formatEvents",
+    cumulativeEventsPerStage = ".formatEvents",
     eventsNotAchieved = ".formatRates",
     subjects = ".formatSampleSizes",
     futilityStop = ".formatProbabilities",
@@ -1416,6 +1415,5 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     informationOverStages = ".formatRatesDynamic",
     expectedInformationH0 = ".formatRatesDynamic",
     expectedInformationH01 = ".formatRatesDynamic",
-    expectedInformationH1 = ".formatRatesDynamic",
-    plannedMaxSubjects = ".formatSampleSizes"
+    expectedInformationH1 = ".formatRatesDynamic"
 ))

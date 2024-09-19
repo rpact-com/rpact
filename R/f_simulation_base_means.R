@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -165,7 +165,7 @@ getSimulationMeans <- function(design = NULL, ...,
         alternative = seq(0, 1, 0.2), # C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         stDev = 1, # C_STDEV_DEFAULT
         plannedSubjects = NA_real_,
-        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         allocationRatioPlanned = NA_real_,
         minNumberOfSubjectsPerStage = NA_real_,
         maxNumberOfSubjectsPerStage = NA_real_,
@@ -191,7 +191,8 @@ getSimulationMeans <- function(design = NULL, ...,
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
     }
-    .assertIsSingleLogical(directionUpper, "directionUpper")
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
+        design, objectType = "power", userFunctionCallEnabled = TRUE)
     .assertIsSingleNumber(thetaH0, "thetaH0")
     if (meanRatio) {
         .assertIsInOpenInterval(thetaH0, "thetaH0", 0, NULL, naAllowed = TRUE)
@@ -466,7 +467,7 @@ getSimulationMeans <- function(design = NULL, ...,
         informationRates = design$informationRates,
         futilityBounds = futilityBounds,
         alpha0Vec = alpha0Vec,
-        criticalValues = design$criticalValues,
+        criticalValues = .getCriticalValues(design),
         meanRatio = meanRatio,
         thetaH0 = thetaH0,
         stDev = stDev,

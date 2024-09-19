@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8183 $
+## |  Last changed: $Date: 2024-09-06 12:08:59 +0200 (Fr, 06 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1075,8 +1075,15 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
         expectedInformationH0 = NULL,
         expectedInformationH01 = NULL,
         expectedInformationH1 = NULL,
-        maxInformation = NULL,
+        criticalValuesEffectScale = matrix(),
+        criticalValuesEffectScaleLower = NULL,
+        criticalValuesEffectScaleUpper = NULL,
+        criticalValuesPValueScale = NULL,
+        futilityBoundsEffectScale = NULL,
+        futilityBoundsEffectScaleLower = NULL,
+        futilityBoundsEffectScaleUpper = NULL,
         futilityBoundsPValueScale = NULL,
+        maxInformation = NULL,
         initialize = function(...,
                 designCharacteristics,
                 lambda1 = NA_real_,
@@ -1109,6 +1116,14 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
             self$.setParameterType("groups", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("optimumAllocationRatio", C_PARAM_NOT_APPLICABLE)
+            
+            self$.setParameterType("criticalValuesEffectScale", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("criticalValuesEffectScaleLower", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("criticalValuesEffectScaleUpper", C_PARAM_NOT_APPLICABLE)
+            
+            self$.setParameterType("futilityBoundsEffectScale", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("futilityBoundsEffectScaleLower", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("futilityBoundsEffectScaleUpper", C_PARAM_NOT_APPLICABLE)
         },
         .toString = function(startWithUpperCase = FALSE) {
             s <- "count data"

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7910 $
-## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -39,7 +39,7 @@ NULL
     if (!is.na(conditionalPower)) {
         if (any(selectedArms[1:gMax, stage + 1], na.rm = TRUE)) {
             if (is.na(thetaH1)) {
-                if (directionUpper) {
+                if (is.na(directionUpper) || isTRUE(directionUpper)) {
                     thetaStandardized <- log(max(min(
                         overallEffects[selectedArms[1:gMax, stage + 1], stage],
                         na.rm = TRUE
@@ -51,11 +51,10 @@ NULL
                     ), 1 - 1e-07))
                 }
             } else {
-                if (directionUpper) {
-                    thetaStandardized <- log(max(thetaH1, 1 + 1e-07))
-                } else {
-                    thetaStandardized <- log(min(thetaH1, 1 - 1e-07))
-                }
+                thetaStandardized <- log(min(
+                    thetaH1,
+                    1 + ifelse(is.na(directionUpper) || isTRUE(directionUpper), 1e-07, -1e-07)
+                ))
             }
             if (conditionalCriticalValue[stage] > 8) {
                 newEvents <- maxNumberOfEventsPerStage[stage + 1]
@@ -200,11 +199,12 @@ NULL
                 conditionalCriticalValue[k] <- (.getOneMinusQNorm(design$alpha) - .getOneMinusQNorm(adjustedPValues[k]) *
                     sqrt(design$informationAtInterim)) / sqrt(1 - design$informationAtInterim)
             } else {
+                criticalValues <- .getCriticalValues(design)
                 if (.isTrialDesignFisher(design)) {
-                    conditionalCriticalValue[k] <- .getOneMinusQNorm(min((design$criticalValues[k + 1] /
+                    conditionalCriticalValue[k] <- .getOneMinusQNorm(min((criticalValues[k + 1] /
                         prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-07))
                 } else {
-                    conditionalCriticalValue[k] <- (design$criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
+                    conditionalCriticalValue[k] <- (criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
                         .getOneMinusQNorm(adjustedPValues[1:k]) %*% weights[1:k]) /
                         sqrt(design$informationRates[k + 1] - design$informationRates[k])
                 }
@@ -237,7 +237,7 @@ NULL
                 if (effectMeasure == "testStatistic") {
                     selectArmsFunctionArgs$effectVector <- overallTestStatistics[, k]
                 } else if (effectMeasure == "effectEstimate") {
-                    if (directionUpper) {
+                    if (is.na(directionUpper) || isTRUE(directionUpper)) {
                         selectArmsFunctionArgs$effectVector <- overallEffects[, k]
                     } else {
                         selectArmsFunctionArgs$effectVector <- 1 / overallEffects[, k]
@@ -396,7 +396,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
         gED50 = NA_real_,
         slope = 1,
         intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
         typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
         effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
@@ -436,6 +436,9 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
+        design, objectType = "power", userFunctionCallEnabled = TRUE)
+    
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,

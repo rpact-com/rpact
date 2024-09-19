@@ -8,7 +8,7 @@ getSimulationSurvival(
   design = NULL,
   ...,
   thetaH0 = 1,
-  directionUpper = TRUE,
+  directionUpper = NA,
   pi1 = NA_real_,
   pi2 = NA_real_,
   lambda1 = NA_real_,

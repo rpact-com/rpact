@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8241 $
+## |  Last changed: $Date: 2024-09-19 17:11:12 +0200 (Do, 19 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -88,7 +88,7 @@
 #'
 #' @description
 #' Returns the simulated power, stopping probabilities, conditional power, and expected sample size for
-#' testing means rates for negative binomial distributed event numbers in the two treatment groups testing situation.
+#' testing mean rates for negative binomial distributed event numbers in the two treatment groups testing situation.
 #'
 #' @inheritParams param_design_with_default
 #' @inheritParams param_plannedCalendarTime
@@ -104,17 +104,16 @@
 #' @inheritParams param_overdispersion_counts
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
-#' @inheritParams param_maxNumberOfSubjects_counts
+#' @inheritParams param_maxNumberOfSubjects
 #' @inheritParams param_maxNumberOfIterations
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
-#' @inheritParams param_calcSubjectsFunction
 #' @inheritParams param_showStatistics
 #'
 #' @details
 #' At given design the function simulates the power, stopping probabilities, conditional power, and expected
 #' sample size at given number of subjects and parameter configuration.
-#' Additionally, an allocation ratio = n1/n2 and a null hypothesis value thetaH0 can be specified.
+#' Additionally, an allocation `ratio = n1/n2` and a null hypothesis value `thetaH0` can be specified.
 #'
 #' @section Simulation Data:
 #' The summary statistics "Simulated data" contains the following parameters: median [range]; mean +/-sd\cr
@@ -133,15 +132,9 @@
 #'         (interim) analysis takes place.
 #'   \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
 #'   \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
-#'   \item \code{testStatistic}: The test statistic that is used for the test decision,
-#'         depends on which design was chosen (group sequential, inverse normal,
-#'         or Fisher combination test)'
-#'   \item \code{testStatisticsPerStage}: The test statistic for each stage if only data from
-#'         the considered stage is taken into account.
+#'   \item \code{testStatistic}: The test statistic that is used for the test decision
 #'   \item \code{overallLambda1}: The cumulative rate in treatment group 1.
 #'   \item \code{overallLambda2}: The cumulative rate in treatment group 2.
-#'   \item \code{stagewiseLambda1}: The stage-wise rate in treatment group 1.
-#'   \item \code{stagewiseLambda2}: The stage-wise rate in treatment group 2.
 #'   \item \code{sampleSizesPerStage1}: The stage-wise sample size in treatment group 1.
 #'   \item \code{sampleSizesPerStage2}: The stage-wise sample size in treatment group 2.
 #'   \item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
@@ -152,7 +145,7 @@
 #'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
-#' 
+#'
 #' @template examples_get_simulation_counts
 #'
 #' @export
@@ -160,12 +153,12 @@
 getSimulationCounts <- function(design = NULL,
         ...,
         plannedCalendarTime,
-        plannedMaxSubjects = NA_real_,
+        maxNumberOfSubjects = NA_real_,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
         lambda = NA_real_,
         theta = NA_real_,
-        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         thetaH0 = 1,
         overdispersion = 0,
         fixedExposureTime = NA_real_,
@@ -175,11 +168,7 @@ getSimulationCounts <- function(design = NULL,
         allocationRatioPlanned = NA_real_,
         maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
         seed = NA_real_,
-        calcSubjectsFunction = NULL,
         showStatistics = FALSE) {
-    if (is.na(directionUpper)) {
-        directionUpper <- TRUE
-    }
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "simulationCounts")
         .warnInCaseOfUnknownArguments(
@@ -198,6 +187,12 @@ getSimulationCounts <- function(design = NULL,
         .warnInCaseOfTwoSidedPowerArgument(...)
         .warnInCaseOfTwoSidedPowerIsDisabled(design)
     }
+
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
+
     if (!any(is.na(theta))) {
         totalCases <- length(theta)
         lambda1 <- rep(NA_real_, totalCases)
@@ -212,7 +207,9 @@ getSimulationCounts <- function(design = NULL,
     sided <- design$sided
     sampleSizeEnabled <- FALSE
 
-    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, plannedMaxSubjects)
+    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(
+        allocationRatioPlanned, maxNumberOfSubjects
+    )
     .assertIsValidEffectCountData(
         sampleSizeEnabled, sided, lambda1, lambda2, lambda, theta,
         thetaH0, overdispersion
@@ -229,7 +226,8 @@ getSimulationCounts <- function(design = NULL,
         followUpTime = followUpTime,
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
-        maxNumberOfSubjects = plannedMaxSubjects
+        maxNumberOfSubjects = maxNumberOfSubjects,
+        accrualIntensityValidationEnabled = FALSE
     )
     .assertAreValidCalendarTimes(plannedCalendarTime, kMax)
     if (any(is.na(accrualTime))) {
@@ -239,21 +237,18 @@ getSimulationCounts <- function(design = NULL,
         )
     }
 
-    simulationResults <- SimulationResultsBaseCountData$new(design = design)
+    simulationResults <- SimulationResultsCountData$new(design = design)
 
-    if ((length(accrualTime) > 1) && (accrualTime[1] == 0)) {
+    if (length(accrualTime) > 1 && accrualTime[1] == 0) {
         accrualTime <- accrualTime[-1]
     }
 
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
-    if (!is.null(calcSubjectsFunction) && design$kMax == 1) {
-        warning("'calcSubjectsFunction' will be ignored for fixed sample design", call. = FALSE)
-    }
 
     .setValueAndParameterType(simulationResults, "plannedCalendarTime", plannedCalendarTime, NA_real_)
-    .setValueAndParameterType(simulationResults, "plannedMaxSubjects", plannedMaxSubjects, NA_real_, notApplicableIfNA = TRUE)
+    .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "lambda1", lambda1, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "lambda2", lambda2, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "lambda", lambda, NA_real_, notApplicableIfNA = TRUE)
@@ -267,14 +262,7 @@ getSimulationCounts <- function(design = NULL,
     .setValueAndParameterType(simulationResults, "followUpTime", followUpTime, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(simulationResults, "maxNumberOfIterations", as.integer(maxNumberOfIterations), C_MAX_SIMULATION_ITERATIONS_DEFAULT)
     .setValueAndParameterType(simulationResults, "allocationRatioPlanned", allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
-    simulationResults$.setParameterType(
-        "calcSubjectsFunction",
-        ifelse(design$kMax == 1, C_PARAM_NOT_APPLICABLE,
-            ifelse(!is.null(calcSubjectsFunction) && design$kMax > 1,
-                C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE
-            )
-        )
-    )
+
     simulationResults$.setParameterType("seed", ifelse(is.na(seed), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
     simulationResults$seed <- .setSeed(seed)
 
@@ -302,9 +290,33 @@ getSimulationCounts <- function(design = NULL,
     }
     overallReject <- rep(NA_real_, totalCases)
     iterations <- matrix(0, kMax, totalCases)
+    sampleSizePerStage <- matrix(0, kMax, totalCases)
+    expectedSampleSize <- rep(0, totalCases)
+    nTotal <- NA_integer_
 
+    len <- totalCases * maxNumberOfIterations * kMax
+
+    dataCase <- rep(NA_real_, len)
+    dataIterationNumber <- rep(NA_real_, len)
+    dataStageNumber <- rep(NA_real_, len)
+    dataAccrualTime <- rep(NA_real_, len)
+    dataFollowUpTime <- rep(NA_real_, len)
+    dataLambda1 <- rep(NA_real_, len)
+    dataLambda2 <- rep(NA_real_, len)
+    dataOverdispersion <- rep(NA_real_, len)
+    dataFixedFollowUp <- rep(NA_real_, len)
+    dataNegativeBinomialEstimate1 <- rep(NA_real_, len)
+    dataNegativeBinomialEstimate2 <- rep(NA_real_, len)
+    dataNegativeBinomialOverdispersion <- rep(NA_real_, len)
+    dataInfoAnalysis <- rep(NA_real_, len)
+    dataTestStatistic <- rep(NA_real_, len)
+    dataTrialStop <- rep(NA, len)
+    dataConditionalPower <- rep(NA_real_, len)
+
+    index <- 1
+    messageShown <- FALSE
     for (iCase in 1:totalCases) {
-        if (!(is.na(lambda)) && !any(is.na(theta))) {
+        if (!is.na(lambda) && !any(is.na(theta))) {
             lambda2 <- (1 + allocationRatioPlanned) * lambda / (1 + allocationRatioPlanned * theta[iCase])
             lambda1[iCase] <- lambda2 * theta[iCase]
         }
@@ -337,11 +349,18 @@ getSimulationCounts <- function(design = NULL,
             n2 <- length(recruit2)
             nTotal <- n1 + n2
         } else {
-            n2 <- plannedMaxSubjects / (1 + allocationRatioPlanned)
+            n2 <- maxNumberOfSubjects / (1 + allocationRatioPlanned)
             n1 <- allocationRatioPlanned * n2
             nTotal <- n1 + n2
             recruit1 <- seq(0, accrualTime, length.out = n1)
             recruit2 <- seq(0, accrualTime, length.out = n2)
+        }
+        if (nTotal > 1000 && maxNumberOfIterations > 10 && !messageShown) {
+            message(
+                "The simulation of count data may take a very long time ",
+                "because the maximum number of subjects is very large (", nTotal, ")"
+            )
+            messageShown <- TRUE
         }
 
         reject <- rep(0, kMax)
@@ -349,7 +368,7 @@ getSimulationCounts <- function(design = NULL,
         if (!is.na(fixedExposureTime)) {
             followUpTime <- fixedExposureTime
         }
-        for (i in 1:maxNumberOfIterations) {
+        for (iterationNumber in 1:maxNumberOfIterations) {
             if (kMax == 1) {
                 recruit1 <- seq(0, accrualTime, length.out = n1)
                 recruit2 <- seq(0, accrualTime, length.out = n2)
@@ -367,35 +386,59 @@ getSimulationCounts <- function(design = NULL,
                     ), 0)
                 }
                 counts1 <- rnbinom(
-                    n = n1, mu = lambda1[iCase] * timeUnderObservation1,
+                    n = n1,
+                    mu = lambda1[iCase] * timeUnderObservation1,
                     size = 1 / overdispersion
                 )
                 counts2 <- rnbinom(
-                    n = n2, mu = lambda2 * timeUnderObservation2,
+                    n = n2,
+                    mu = lambda2 * timeUnderObservation2,
                     size = 1 / overdispersion
                 )
                 nb <- .getNegativeBinomialEstimates(
-                    counts1 = counts1, counts2 = counts2,
-                    t1 = timeUnderObservation1, t2 = timeUnderObservation2
+                    counts1 = counts1,
+                    counts2 = counts2,
+                    t1 = timeUnderObservation1,
+                    t2 = timeUnderObservation2
                 )
-                info_Analysis <- .getInformationCountData(
+                infoAnalysis <- .getInformationCountData(
                     lambda1 = nb[1],
                     lambda2 = nb[2],
                     overdispersion = nb[3],
                     recruit1 = timeUnderObservation1,
                     recruit2 = timeUnderObservation2
                 )
-                z <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(info_Analysis)
-                if (!is.na(z) && z > design$criticalValues[1]) {
+                zValue <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(infoAnalysis)
+                if (!is.na(zValue) && zValue > .getCriticalValues(design, 1)) {
                     reject[1] <- reject[1] + 1
                 }
                 iterations[1, iCase] <- iterations[1, iCase] + 1
+                nTotal <- nTotal + n1 + n2
+
+                dataCase[index] <- iCase
+                dataIterationNumber[index] <- iterationNumber
+                dataStageNumber[index] <- 1
+                dataAccrualTime[index] <- accrualTime[length(accrualTime)]
+                dataFollowUpTime[index] <- followUpTime
+                dataLambda1[index] <- lambda1[iCase]
+                dataLambda2[index] <- lambda2
+                dataOverdispersion[index] <- overdispersion
+                dataFixedFollowUp[index] <- !is.na(fixedExposureTime)
+                dataNegativeBinomialEstimate1[index] <- nb[1]
+                dataNegativeBinomialEstimate2[index] <- nb[2]
+                dataNegativeBinomialOverdispersion[index] <- nb[3]
+                dataInfoAnalysis[index] <- infoAnalysis
+                dataTestStatistic[index] <- zValue
+                dataTrialStop[index] <- TRUE
+                dataConditionalPower[index] <- NA_real_
+
+                index <- index + 1
             } else {
                 counts <- rep(0, length(recruit1) + length(recruit2))
                 dfStartStop <- .getGeneratedEventTimesCountData(
                     recruit1 = recruit1,
                     recruit2 = recruit2,
-                    accrualTime = accrualTime,
+                    accrualTime = accrualTime[length(accrualTime)],
                     followUpTime = followUpTime,
                     lambda1 = lambda1[iCase],
                     lambda2 = lambda2,
@@ -431,43 +474,81 @@ getSimulationCounts <- function(design = NULL,
                         }
                         counts1 <- counts[seq_len(length(timeUnderObservation1))]
                         counts2 <- counts[(length(recruit1) + 1):(length(recruit1) + length(timeUnderObservation2))]
+                        sampleSizePerStage[k, iCase] <- sampleSizePerStage[k, iCase] +
+                            length(timeUnderObservation1) + length(timeUnderObservation2)
                     } else {
                         counts1 <- dfStartStop$nEvents[1:n1]
                         counts2 <- dfStartStop$nEvents[(n1 + 1):(n1 + n2)]
+                        sampleSizePerStage[k, iCase] <- sampleSizePerStage[k, iCase] + n1 + n2
                     }
                     nb <- .getNegativeBinomialEstimates(
-                        counts1 = counts1, counts2 = counts2,
-                        t1 = timeUnderObservation1, 
+                        counts1 = counts1,
+                        counts2 = counts2,
+                        t1 = timeUnderObservation1,
                         t2 = timeUnderObservation2
                     )
-                    info_Analysis <- .getInformationCountData(
-                        lambda1 = nb[1],
-                        lambda2 = nb[2],
-                        overdispersion = nb[3],
+                    infoAnalysis <- .getInformationCountData(
+                        lambda1 = nb[1], # negative binomial estimate 1
+                        lambda2 = nb[2], # negative binomial estimate 1
+                        overdispersion = nb[3], # negative binomial overdispersion
                         recruit1 = timeUnderObservation1,
                         recruit2 = timeUnderObservation2
                     )
-                    z <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(info_Analysis)
+                    zValue <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(infoAnalysis)
                     iterations[k, iCase] <- iterations[k, iCase] + 1
-                    if (!is.na(z)) {
-                        if (z > design$criticalValues[k]) {
+
+                    conditionalPowerAchieved <- NA_real_
+
+                    dataCase[index] <- iCase
+                    dataIterationNumber[index] <- iterationNumber
+                    dataStageNumber[index] <- k
+                    dataAccrualTime[index] <- accrualTime[length(accrualTime)]
+                    dataFollowUpTime[index] <- followUpTime
+                    dataLambda1[index] <- lambda1[iCase]
+                    dataLambda2[index] <- lambda2
+                    dataOverdispersion[index] <- overdispersion
+                    dataFixedFollowUp[index] <- !is.na(fixedExposureTime)
+                    dataNegativeBinomialEstimate1[index] <- nb[1]
+                    dataNegativeBinomialEstimate2[index] <- nb[2]
+                    dataNegativeBinomialOverdispersion[index] <- nb[3]
+                    dataInfoAnalysis[index] <- infoAnalysis
+                    dataTestStatistic[index] <- zValue
+                    dataConditionalPower[index] <- conditionalPowerAchieved
+                    dataTrialStop[index] <- FALSE
+
+                    if (!is.na(zValue)) {
+                        if (zValue > .getCriticalValues(design, k)) {
                             reject[k] <- reject[k] + 1
+                            dataTrialStop[index] <- TRUE
+                            index <- index + 1
                             break
                         }
-                        if (z < design$futilityBounds[k] && k < kMax) {
+                        if (zValue < design$futilityBounds[k] && k < kMax) {
                             futility[k] <- futility[k] + 1
+                            dataTrialStop[index] <- TRUE
+                            index <- index + 1
                             break
+                        }
+                        if (k == kMax) {
+                            dataTrialStop[index] <- TRUE
                         }
                     }
+
+                    index <- index + 1
                 }
+                expectedSampleSize[iCase] <- expectedSampleSize[iCase] +
+                    length(timeUnderObservation1) + length(timeUnderObservation2)
             }
         }
+
+        sampleSizePerStage[, iCase] <- sampleSizePerStage[, iCase] / iterations[, iCase]
+
         if (kMax > 1) {
-            futilityPerStage[, iCase] <- futility / i
-            rejectPerStage[, iCase] <- reject / i
-            earlyStop[1, iCase] <- sum(reject[1:(kMax - 1)] + futility) / i
+            futilityPerStage[, iCase] <- futility / iterationNumber
+            rejectPerStage[, iCase] <- reject / iterationNumber
+            earlyStop[1, iCase] <- sum(reject[1:(kMax - 1)] + futility) / iterationNumber
         }
-        overallReject[iCase] <- cumsum(reject / i)[kMax]
+        overallReject[iCase] <- cumsum(reject / iterationNumber)[kMax]
     }
 
     if (design$kMax > 1) {
@@ -496,15 +577,22 @@ getSimulationCounts <- function(design = NULL,
         simulationResults$.setParameterType(
             "earlyStop", ifelse(!all(is.na(earlyStop)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
         )
+
+        expectedSampleSize <- expectedSampleSize / maxNumberOfIterations
     }
 
     simulationResults$iterations <- iterations
     simulationResults$.setParameterType("iterations", C_PARAM_GENERATED)
 
-    simulationResults$numberOfSubjects <- n1 + n2
+    simulationResults$numberOfSubjects <- sampleSizePerStage
     simulationResults$.setParameterType(
         "numberOfSubjects",
-        ifelse(any(is.na(accrualIntensity)), C_PARAM_USER_DEFINED, C_PARAM_GENERATED)
+        ifelse(is.na(nTotal), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+    )
+    simulationResults$expectedNumberOfSubjects <- expectedSampleSize
+    simulationResults$.setParameterType(
+        "expectedNumberOfSubjects",
+        ifelse(all(is.na(expectedSampleSize)), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
 
     simulationResults$numberOfSubjects1 <- n1
@@ -525,7 +613,28 @@ getSimulationCounts <- function(design = NULL,
         simulationResults$theta <- lambda1 / lambda2
         simulationResults$.setParameterType("theta", C_PARAM_GENERATED)
     }
-    
+
+    data <- data.frame(
+        caseNumber = dataCase,
+        iterationNumber = dataIterationNumber,
+        stageNumber = dataStageNumber,
+        accrualTime = dataAccrualTime,
+        followUpTime = dataFollowUpTime,
+        lambda1 = dataLambda1,
+        lambda2 = dataLambda2,
+        overdispersion = dataOverdispersion,
+        fixedFollowUp = dataFixedFollowUp,
+        negativeBinomialEstimate1 = dataNegativeBinomialEstimate1,
+        negativeBinomialEstimate2 = dataNegativeBinomialEstimate2,
+        nbOverdispersion = dataNegativeBinomialOverdispersion,
+        infoAnalysis = dataInfoAnalysis,
+        testStatistic = dataTestStatistic,
+        trialStop = dataTrialStop,
+        conditionalPowerAchieved = dataConditionalPower
+    )
+    data <- data[!is.na(data$iterationNumber), ]
+    simulationResults$.data <- data
+
     warning("The simulation count data feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
         call. = FALSE

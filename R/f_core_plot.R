@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8151 $
-## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -443,13 +443,16 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         }
         types <- c(types, 4)
         if (!grepl("MultiArm", .getClassName(obj)) || obj$.design$kMax > 1) {
-            types <- c(types, 5:6)
+            types <- c(types, 5)
+            if (!grepl("CountData", .getClassName(obj))) {
+                types <- c(types, 6)
+            }
         }
         types <- c(types, 7)
         if (obj$.design$kMax > 1) {
             types <- c(types, 8)
         }
-        if (!grepl("MultiArm", .getClassName(obj)) || obj$.design$kMax > 1) {
+        if (!grepl("(MultiArm|CountData)", .getClassName(obj)) || obj$.design$kMax > 1) {
             types <- c(types, 9)
         }
         if (inherits(obj, "SimulationResultsSurvival")) {
@@ -824,14 +827,25 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(TRUE)
 }
 
-.plotParameterSet <- function(..., parameterSet, designMaster, xParameterName, yParameterNames,
-        mainTitle = NA_character_, xlab = NA_character_, ylab = NA_character_,
-        palette = "Set1", theta = seq(-1, 1, 0.02), nMax = NA_integer_,
-        plotPointsEnabled = NA, legendPosition = NA_integer_,
+.plotParameterSet <- function(..., 
+        parameterSet, 
+        designMaster, 
+        xParameterName, 
+        yParameterNames,
+        mainTitle = NA_character_, 
+        xlab = NA_character_, 
+        ylab = NA_character_,
+        palette = "Set1", 
+        theta = seq(-1, 1, 0.02), 
+        nMax = NA_integer_,
+        plotPointsEnabled = NA, 
+        legendPosition = NA_integer_,
         variedParameters = logical(0),
         qnormAlphaLineEnabled = TRUE,
         yAxisScalingEnabled = TRUE,
-        ratioEnabled = NA, plotSettings = NULL) {
+        ratioEnabled = NA, 
+        plotSettings = NULL) {
+        
     simulationEnrichmentEnmabled <- grepl("SimulationResultsEnrichment", .getClassName(parameterSet))
     if (.isParameterSet(parameterSet) || .isTrialDesignSet(parameterSet)) {
         parameterNames <- c(xParameterName, yParameterNames)
@@ -840,7 +854,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             "overallEarlyStop", "calculatedPower"
         ))]
         fieldNames <- c(
-            names(parameterSet), # alternatively use parameterSet$.getFieldNames()
+            names(parameterSet), 
             names(designMaster) 
         )
         if (simulationEnrichmentEnmabled) {
@@ -1112,15 +1126,28 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     plotDashedHorizontalLine <- "criticalValuesEffectScale" %in% yParameterNames && designMaster$sided == 2
     p <- .plotDataFrame(data,
-        mainTitle = mainTitle, xlab = xlab, ylab = ylab,
-        xAxisLabel = xAxisLabel, yAxisLabel1 = yAxisLabel1, yAxisLabel2 = yAxisLabel2,
-        palette = palette, plotPointsEnabled = plotPointsEnabled, legendTitle = legendTitle,
-        legendPosition = legendPosition, scalingFactor1 = scalingFactor1, scalingFactor2 = scalingFactor2,
+        mainTitle = mainTitle, 
+        xlab = xlab, 
+        ylab = ylab,
+        xAxisLabel = xAxisLabel, 
+        yAxisLabel1 = yAxisLabel1, 
+        yAxisLabel2 = yAxisLabel2,
+        palette = palette, 
+        plotPointsEnabled = plotPointsEnabled, 
+        legendTitle = legendTitle,
+        legendPosition = legendPosition, 
+        scalingFactor1 = scalingFactor1, 
+        scalingFactor2 = scalingFactor2,
         addPowerAndAverageSampleNumber = addPowerAndAverageSampleNumber,
-        mirrorModeEnabled = mirrorModeEnabled, plotDashedHorizontalLine = plotDashedHorizontalLine,
-        ratioEnabled = ratioEnabled, plotSettings = plotSettings, sided = designMaster$sided, ...
+        mirrorModeEnabled = mirrorModeEnabled, 
+        plotDashedHorizontalLine = plotDashedHorizontalLine,
+        ratioEnabled = ratioEnabled, 
+        plotSettings = plotSettings, 
+        sided = designMaster$sided, 
+        directionUpper = designMaster$directionUpper, 
+        ...
     )
-
+    
     if (xParameterName == "informationRates") {
         p <- p + ggplot2::scale_x_continuous(breaks = c(0, round(data$xValues, 3)))
     } else if (xParameterName == "situation") { # simulation enrichment
@@ -1233,13 +1260,30 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(list(scalingFactor1 = scalingFactor1, scalingFactor2 = scalingFactor2))
 }
 
-.plotDataFrame <- function(data, ..., mainTitle = NA_character_,
-        xlab = NA_character_, ylab = NA_character_, xAxisLabel = NA_character_,
-        yAxisLabel1 = NA_character_, yAxisLabel2 = NA_character_,
-        palette = "Set1", plotPointsEnabled = NA, legendTitle = NA_character_,
-        legendPosition = NA_integer_, scalingFactor1 = 1, scalingFactor2 = 1,
-        addPowerAndAverageSampleNumber = FALSE, mirrorModeEnabled = FALSE, plotDashedHorizontalLine = FALSE,
-        ratioEnabled = FALSE, plotSettings = NULL, sided = 1, discreteXAxis = FALSE) {
+.plotDataFrame <- function(
+        data, 
+        ..., 
+        mainTitle = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        xAxisLabel = NA_character_,
+        yAxisLabel1 = NA_character_, 
+        yAxisLabel2 = NA_character_,
+        palette = "Set1", 
+        plotPointsEnabled = NA, 
+        legendTitle = NA_character_,
+        legendPosition = NA_integer_, 
+        scalingFactor1 = 1, 
+        scalingFactor2 = 1,
+        addPowerAndAverageSampleNumber = FALSE, 
+        mirrorModeEnabled = FALSE, 
+        plotDashedHorizontalLine = FALSE,
+        ratioEnabled = FALSE, 
+        plotSettings = NULL, 
+        sided = 1, 
+        discreteXAxis = FALSE,
+        directionUpper = NA) {
+        
     if (!is.data.frame(data)) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'data' must be a data.frame (is ", .getClassName(data), ")")
     }
@@ -1297,7 +1341,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     } else {
         p <- ggplot2::ggplot(data, ggplot2::aes(x = .data[["xValues"]], y = .data[["yValues"]]))
     }
-
+    
     p <- plotSettings$setTheme(p)
     p <- plotSettings$hideGridLines(p)
 
@@ -1317,22 +1361,32 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         p <- plotSettings$setLegendTitle(p, legendTitle)
         p <- plotSettings$setLegendLabelSize(p)
     }
-
+    
     # set optional scale limits
     xLim <- .getOptionalArgument("xlim", ...)
     yLim <- .getOptionalArgument("ylim", ...)
     if (is.null(yLim) && !missing(yAxisLabel1) &&
             !is.na(yAxisLabel1) && yAxisLabel1 == "Critical value") {
-        yMax <- max(na.omit(data$yValues))
-        if (length(yMax) == 1 && yMax < 0.1) {
-            yLim <- c(0, 2 * yMax)
+        yMax <- .applyDirectionOfAlternative(na.omit(data$yValues), 
+            directionUpper, type = "maxMin", phase = "design")
+        if (length(yMax) == 1) {
+            if (yMax > 0 && yMax < 0.1) {
+                yLim <- c(0, 2 * yMax)
+            }
+            else if (yMax < 0 && yMax > -0.1) {
+                yLim <- c(0, 2 * yMax)
+            }
         }
     }
+    
     if ((!is.null(xLim) && is.numeric(xLim) && length(xLim) == 2) ||
             (!is.null(yLim) && is.numeric(yLim) && length(yLim) == 2)) {
         p <- p + ggplot2::coord_cartesian(
-            xlim = xLim, ylim = yLim, expand = TRUE,
-            default = FALSE, clip = "on"
+            xlim = sort(xLim), 
+            ylim = sort(yLim), 
+            expand = TRUE,
+            default = FALSE, 
+            clip = "on"
         )
     }
 
@@ -1346,8 +1400,13 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     yAxisLabel2 <- .toCapitalized(yAxisLabel2)
 
     p <- plotSettings$setAxesLabels(p,
-        xAxisLabel = xAxisLabel, yAxisLabel1 = yAxisLabel1, yAxisLabel2 = yAxisLabel2,
-        xlab = xlab, ylab = ylab, scalingFactor1 = scalingFactor1, scalingFactor2 = scalingFactor2
+        xAxisLabel = xAxisLabel, 
+        yAxisLabel1 = yAxisLabel1, 
+        yAxisLabel2 = yAxisLabel2,
+        xlab = xlab, 
+        ylab = ylab, 
+        scalingFactor1 = scalingFactor1, 
+        scalingFactor2 = scalingFactor2
     )
 
     # plot lines and points
@@ -1434,8 +1493,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (designMaster$sided == 2) {
         alpha <- alpha / 2
     }
-    yValue <- .getOneMinusQNorm(alpha)
-    yValueLabel <- paste0("qnorm(1 - ", alpha, " ) == ", round(yValue, 4))
+    yValue <- .applyDirectionOfAlternative(.getOneMinusQNorm(alpha), 
+        designMaster$directionUpper, type = "negateIfLower", phase = "design")
+    prefix <- ifelse(isFALSE(designMaster$directionUpper), "-", "")
+    yValueLabel <- paste0(prefix, "qnorm(1 - ", alpha, " ) == ", round(yValue, 4))
     if (designMaster$sided == 1) {
         p <- p + ggplot2::geom_hline(yintercept = yValue, linetype = "dashed")
     } else {
@@ -1455,9 +1516,12 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     # expand y-axis range
     if (designMaster$sided == 1) {
-        yMax <- max(stats::na.omit(data$yValues))
+        yMax <- .applyDirectionOfAlternative(na.omit(data$yValues), 
+            designMaster$directionUpper, type = "maxMin", phase = "design")
         if (!is.null(data$yValues2) && length(data$yValues2) > 0) {
-            yMax <- max(yMax, stats::na.omit(data$yValues2))
+            yMax <- .applyDirectionOfAlternative(c(yMax, 
+                stats::na.omit(data$yValues2)), 
+                designMaster$directionUpper, type = "maxMin", phase = "design")
         }
         eps <- (yMax - yValue) * 0.15
 

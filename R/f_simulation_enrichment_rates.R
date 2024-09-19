@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7910 $
-## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -617,6 +617,7 @@ NULL
 
         separatePValues[, k] <- 1 - stats::pnorm(testStatistics[, k])
 
+        criticalValues <- .getCriticalValues(design)
         if (k < kMax) {
             if (colSums(selectedPopulations)[k] == 0) {
                 break
@@ -628,13 +629,13 @@ NULL
 
             # conditional critical value to reject the null hypotheses at the next stage of the trial
             if (.isTrialDesignFisher(design)) {
-                conditionalCriticalValue[k] <- .getOneMinusQNorm(min((design$criticalValues[k + 1] /
+                conditionalCriticalValue[k] <- .getOneMinusQNorm(min((criticalValues[k + 1] /
                     prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-07))
             } else {
-                if (design$criticalValues[k + 1] >= 6) {
+                if (criticalValues[k + 1] >= 6) {
                     conditionalCriticalValue[k] <- Inf
                 } else {
-                    conditionalCriticalValue[k] <- (design$criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
+                    conditionalCriticalValue[k] <- (criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
                         .getOneMinusQNorm(adjustedPValues[1:k]) %*% weights[1:k]) /
                         sqrt(design$informationRates[k + 1] - design$informationRates[k])
                 }
@@ -838,7 +839,7 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
         stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT,
-        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
         typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
         effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
@@ -877,6 +878,9 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
 
     calcSubjectsFunctionIsUserDefined <- !is.null(calcSubjectsFunction)
 
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
+        design, objectType = "power", userFunctionCallEnabled = TRUE)
+    
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design = design,
         effectList = effectList,

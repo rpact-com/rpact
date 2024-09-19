@@ -14,9 +14,9 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7679 $
- * Last changed: $Date: 2024-03-04 15:00:35 +0100 (Mon, 04 Mar 2024) $
- * Last changed by: $Author: wassmer $
+ * File version: $Revision: 8188 $
+ * Last changed: $Date: 2024-09-10 09:56:44 +0200 (Di, 10 Sep 2024) $
+ * Last changed by: $Author: pahlke $
  *
  */
 
@@ -137,7 +137,7 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		logRank = R_NegInf;
 	}
 
-	if (!directionUpper) {
+	if (!R_IsNA(directionUpper) && !directionUpper) {
 		logRank = -logRank;
 	}
 

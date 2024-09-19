@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8195 $
+## |  Last changed: $Date: 2024-09-11 14:50:27 +0200 (Mi, 11 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -44,6 +44,7 @@ NULL
 #' @inheritParams param_sided
 #' @param bindingFutility If \code{bindingFutility = TRUE} is specified the calculation of
 #'        the critical values is affected by the futility bounds (default is \code{TRUE}).
+#' @inheritParams param_directionUpper
 #' @param tolerance The numerical tolerance, default is \code{1e-14}.
 #' @param iterations The number of simulation iterations, e.g.,
 #'        \code{getDesignFisher(iterations = 100000)} checks the validity of the critical values for the design.
@@ -76,6 +77,7 @@ getDesignFisher <- function(...,
         informationRates = NA_real_,
         sided = 1, # C_SIDED_DEFAULT
         bindingFutility = NA,
+        directionUpper = NA,
         tolerance = 1e-14, # C_ANALYSIS_TOLERANCE_FISHER_DEFAULT
         iterations = 0,
         seed = NA_real_) {
@@ -84,10 +86,19 @@ getDesignFisher <- function(...,
     .warnInCaseOfUnknownArguments(functionName = "getDesignFisher", ...)
 
     return(.getDesignFisher(
-        kMax = kMax, alpha = alpha, method = method,
-        userAlphaSpending = userAlphaSpending, alpha0Vec = alpha0Vec, informationRates = informationRates,
-        sided = sided, bindingFutility = bindingFutility,
-        tolerance = tolerance, iterations = iterations, seed = seed, userFunctionCallEnabled = TRUE
+        kMax = kMax, 
+        alpha = alpha, 
+        method = method,
+        userAlphaSpending = userAlphaSpending, 
+        alpha0Vec = alpha0Vec, 
+        informationRates = informationRates,
+        sided = sided, 
+        bindingFutility = bindingFutility,
+        directionUpper = directionUpper,
+        tolerance = tolerance, 
+        iterations = iterations, 
+        seed = seed, 
+        userFunctionCallEnabled = TRUE
     ))
 }
 
@@ -112,14 +123,24 @@ getDesignFisher <- function(...,
 #'
 #' @noRd
 #'
-.getDesignFisher <- function(kMax = NA_integer_, alpha = NA_real_, method = C_FISHER_METHOD_DEFAULT,
-        userAlphaSpending = NA_real_, alpha0Vec = NA_real_, informationRates = NA_real_,
-        sided = 1, bindingFutility = C_BINDING_FUTILITY_FISHER_DEFAULT,
-        tolerance = C_ANALYSIS_TOLERANCE_FISHER_DEFAULT, iterations = 0, seed = NA_real_,
+.getDesignFisher <- function(
+        kMax = NA_integer_, 
+        alpha = NA_real_, 
+        method = C_FISHER_METHOD_DEFAULT,
+        userAlphaSpending = NA_real_, 
+        alpha0Vec = NA_real_, 
+        informationRates = NA_real_,
+        sided = 1, 
+        bindingFutility = C_BINDING_FUTILITY_FISHER_DEFAULT,
+        directionUpper = NA,
+        tolerance = C_ANALYSIS_TOLERANCE_FISHER_DEFAULT, 
+        iterations = 0, 
+        seed = NA_real_,
         userFunctionCallEnabled = FALSE) {
     method <- .matchArgument(method, C_FISHER_METHOD_DEFAULT)
 
     .assertIsNumericVector(alpha0Vec, "alpha0Vec", naAllowed = TRUE)
+    .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
 
     if (.isDefinedArgument(kMax, argumentExistsValidationEnabled = userFunctionCallEnabled)) {
         .assertIsValidKMax(kMax, kMaxUpperBound = C_KMAX_UPPER_BOUND_FISHER)
@@ -154,11 +175,14 @@ getDesignFisher <- function(...,
         alpha0Vec = alpha0Vec,
         informationRates = informationRates,
         bindingFutility = bindingFutility,
+        directionUpper = directionUpper,
         tolerance = tolerance,
         iterations = as.integer(iterations),
         seed = seed
     )
 
+    design$.setParameterType("directionUpper", ifelse(!is.na(directionUpper), 
+        C_PARAM_USER_DEFINED, C_PARAM_NOT_APPLICABLE))
     .assertDesignParameterExists(design, "sided", C_SIDED_DEFAULT)
     .assertIsValidSidedParameter(design$sided)
 
@@ -284,8 +308,11 @@ getDesignFisher <- function(...,
                 design$stageLevels <- sapply(
                     1:design$kMax,
                     function(k) {
-                        .getFisherCombinationSize(k, rep(1, k - 1),
-                            rep(design$criticalValues[k], k), design$scale,
+                        .getFisherCombinationSize(
+                            k, 
+                            rep(1, k - 1),
+                            rep(design$criticalValues[k], k), 
+                            design$scale,
                             cases = cases
                         )
                     }
@@ -293,8 +320,11 @@ getDesignFisher <- function(...,
                 design$alphaSpent <- sapply(
                     1:design$kMax,
                     function(k) {
-                        .getFisherCombinationSize(k, alpha0Vec[1:(k - 1)],
-                            design$criticalValues[1:k], design$scale,
+                        .getFisherCombinationSize(
+                            k, 
+                            alpha0Vec[1:(k - 1)],
+                            design$criticalValues[1:k], 
+                            design$scale,
                             cases = cases
                         )
                     }

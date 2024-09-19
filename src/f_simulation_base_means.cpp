@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7701 $
- * Last changed: $Date: 2024-03-07 11:44:08 +0100 (Do, 07 Mrz 2024) $
+ * File version: $Revision: 8188 $
+ * Last changed: $Date: 2024-09-10 09:56:44 +0200 (Di, 10 Sep 2024) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -219,7 +219,7 @@ List getSimulationStepMeans(
 		}
 		thetaStandardized = thetaH1 / stDevH1;
 
-		if (!directionUpper) {
+		if (!R_IsNA(directionUpper) && !directionUpper) {
 			thetaH1 = -thetaH1;
 			thetaStandardized = -thetaStandardized;
 		}
@@ -357,7 +357,7 @@ List getSimulationStepMeans(
 		}
 	}
 
-	if (!directionUpper) {
+	if (!R_IsNA(directionUpper) && !directionUpper) {
 		effectEstimate = -effectEstimate;
 	}
 

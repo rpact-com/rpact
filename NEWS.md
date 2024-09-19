@@ -1,13 +1,22 @@
 
-# rpact 4.0.1
+# rpact 4.1.0
 
-* Minimum version of suggested package `ggplot2` changed from 2.2.0 to 3.2.0
-* When analyzing with a two-sided test, an issue with the calculation of the conditional rejection probability was fixed
-* Issues [#41](https://github.com/rpact-com/rpact/issues/41), [#44](https://github.com/rpact-com/rpact/issues/44), [#46](https://github.com/rpact-com/rpact/issues/46), and [#47](https://github.com/rpact-com/rpact/issues/47) fixed
+## New features
+
+* The new function `getSimulationCounts()` can be used to perform power simulations for clinical trials with negative binomial distributed count data. The function returns the simulated power, stopping probabilities, conditional power, and expected sample size for testing mean rates for negative binomial distributed event numbers in the two treatment groups testing situation.
+* The functions `getDesignGroupSequential()`, `getDesignInverseNormal()`, and `getDesignFisher()` now support the argument `directionUpper` to specify the direction of the alternative for one-sided testing early at the design phase, see enhancement [#26](https://github.com/rpact-com/rpact/issues/26)
+* `getSampleSizeCounts()` and `getPowerCounts()` output boundary values also on the treatment effect scale, see enhancement [#40](https://github.com/rpact-com/rpact/issues/40)
+
+## Improvements, issues, and changes
+
 * Usage of pipe-operators improved
 * Analysis progress messages are only displayed when R is used interactively
-* Manual use of kable() for rpact result objects marked as deprecated, as the formatting and display will be handled automatically by rpact
+* Manual use of `kable()` for rpact result objects marked as deprecated, as the formatting and display will be handled automatically by rpact
 * Minor summary improvements
+* Minimum version of suggested package `ggplot2` changed from 2.2.0 to 3.2.0
+* Issues [#41](https://github.com/rpact-com/rpact/issues/41), [#44](https://github.com/rpact-com/rpact/issues/44), [#46](https://github.com/rpact-com/rpact/issues/46), and [#47](https://github.com/rpact-com/rpact/issues/47) fixed
+* When analyzing with a two-sided test, an issue with the calculation of the conditional rejection probability was fixed
+* Bug is fixed: `directionUpper = FALSE` has no influence in simulation for testing rates in one-sample situation
 
 
 # rpact 4.0.0

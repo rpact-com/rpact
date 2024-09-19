@@ -14,10 +14,10 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_design_plan_survival.R
-## |  Creation date: 23 February 2024, 07:51:59
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  Creation date: 18 September 2024, 21:05:30
+## |  File version: $Revision: 8230 $
+## |  Last changed: $Date: 2024-09-19 07:57:21 +0200 (Do, 19 Sep 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing the Sample Size Calculation of Survival Designs for Different Designs and Arguments")
@@ -5995,6 +5995,14 @@ test_that("'getEventProbabilities': check expected events over time for overall 
         bindingFutility = FALSE
     )
 
+    design2 <- getDesignGroupSequential(
+        sided = 1, alpha = 0.025, beta = 0.2,
+        informationRates = c(0.33, 0.7, 1),
+        futilityBounds = c(0, 0),
+        bindingFutility = FALSE,
+        directionUpper = FALSE
+    )
+
     piecewiseSurvivalTime <- list(
         "0 - <6"   = 0.025,
         "6 - <9"   = 0.04,
@@ -6044,6 +6052,49 @@ test_that("'getEventProbabilities': check expected events over time for overall 
 
     expect_equal(round(timeOS, 2), c(37.60, 46.72, 59.00))
     expect_equal(round(eventsOS, 1), c(194.1, 288.7, 365.1))
+
+    powerResults2 <- getPowerSurvival(
+        design = design2, typeOfComputation = "Schoenfeld", thetaH0 = 1,
+        dropoutRate1 = 0.05, dropoutRate2 = 0.05, dropoutTime = 12,
+        allocationRatioPlanned = 1,
+        accrualTime = accrualTime,
+        piecewiseSurvivalTime = piecewiseSurvivalTime,
+        hazardRatio = seq(0.6, 1, 0.05),
+        maxNumberOfEvents = 404,
+        maxNumberOfSubjects = 1405
+    )
+
+    ## Pairwise comparison of the results of powerResults with the results of powerResults2
+    expect_equal(powerResults2$numberOfSubjects[1, ], powerResults$numberOfSubjects[1, ], tolerance = 1e-07)
+    expect_equal(powerResults2$numberOfSubjects[2, ], powerResults$numberOfSubjects[2, ], tolerance = 1e-07)
+    expect_equal(powerResults2$numberOfSubjects[3, ], powerResults$numberOfSubjects[3, ])
+    expect_equal(powerResults$totalAccrualTime, powerResults2$totalAccrualTime, tolerance = 1e-07)
+    expect_equal(powerResults$followUpTime, powerResults2$followUpTime, tolerance = 1e-07)
+    expect_equal(powerResults$expectedNumberOfEvents, powerResults2$expectedNumberOfEvents, tolerance = 1e-07)
+    expect_equal(powerResults$overallReject, powerResults2$overallReject, tolerance = 1e-07)
+    expect_equal(powerResults2$rejectPerStage[1, ], powerResults$rejectPerStage[1, ], tolerance = 1e-07)
+    expect_equal(powerResults2$rejectPerStage[2, ], powerResults$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(powerResults2$rejectPerStage[3, ], powerResults$rejectPerStage[3, ], tolerance = 1e-07)
+    expect_equal(powerResults$futilityStop, powerResults2$futilityStop, tolerance = 1e-07)
+    expect_equal(powerResults2$futilityPerStage[1, ], powerResults$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(powerResults2$futilityPerStage[2, ], powerResults$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(powerResults$earlyStop, powerResults2$earlyStop, tolerance = 1e-07)
+    expect_equal(powerResults2$analysisTime[1, ], powerResults$analysisTime[1, ], tolerance = 1e-07)
+    expect_equal(powerResults2$analysisTime[2, ], powerResults$analysisTime[2, ], tolerance = 1e-07)
+    expect_equal(powerResults2$analysisTime[3, ], powerResults$analysisTime[3, ], tolerance = 1e-07)
+    expect_equal(powerResults$studyDuration, powerResults2$studyDuration, tolerance = 1e-07)
+    expect_equal(powerResults$maxStudyDuration, powerResults2$maxStudyDuration, tolerance = 1e-07)
+    expect_equal(powerResults2$cumulativeEventsPerStage[1, ], powerResults$cumulativeEventsPerStage[1, ], tolerance = 1e-07)
+    expect_equal(powerResults2$cumulativeEventsPerStage[2, ], powerResults$cumulativeEventsPerStage[2, ], tolerance = 1e-07)
+    expect_equal(powerResults2$cumulativeEventsPerStage[3, ], powerResults$cumulativeEventsPerStage[3, ])
+    expect_equal(powerResults$expectedNumberOfSubjects, powerResults2$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(powerResults2$criticalValuesEffectScale[1, ], powerResults$criticalValuesEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(powerResults2$criticalValuesEffectScale[2, ], powerResults$criticalValuesEffectScale[2, ], tolerance = 1e-07)
+    expect_equal(powerResults2$criticalValuesEffectScale[3, ], powerResults$criticalValuesEffectScale[3, ], tolerance = 1e-07)
+    expect_equal(powerResults2$futilityBoundsEffectScale[1, ], powerResults$futilityBoundsEffectScale[1, ])
+    expect_equal(powerResults2$futilityBoundsEffectScale[2, ], powerResults$futilityBoundsEffectScale[2, ])
+    expect_equal(powerResults2$futilityBoundsPValueScale[1, ], powerResults$futilityBoundsPValueScale[1, ], tolerance = 1e-07)
+    expect_equal(powerResults2$futilityBoundsPValueScale[2, ], powerResults$futilityBoundsPValueScale[2, ], tolerance = 1e-07)
 })
 
 test_that("'getEventProbabilities': check expected events over time for overall survival (case 2)", {
@@ -6747,6 +6798,12 @@ test_that("'getPowerSurvival': Power calculation of survival designs for one-sid
         beta = 0.1, futilityBounds = c(-0.5, 0.5), typeOfDesign = "WT", deltaWT = 0.22
     )
 
+    designGS1b <- getDesignGroupSequential(
+        informationRates = c(0.3, 0.7, 1), sided = 1, alpha = 0.07,
+        beta = 0.1, futilityBounds = c(-0.5, 0.5),
+        typeOfDesign = "WT", deltaWT = 0.22, directionUpper = FALSE
+    )
+
     # @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
     # @refFS[Formula]{fs:PowerGroupSequentialOneSided}
     # @refFS[Formula]{fs:ShiftParameterSurvivalSchoenfeld}
@@ -6754,81 +6811,81 @@ test_that("'getPowerSurvival': Power calculation of survival designs for one-sid
     # @refFS[Formula]{fs:sampleSizeSurvivalEventsPerStage}
     # @refFS[Formula]{fs:sampleSizeSurvivalFindFollowUpTime}
     # @refFS[Formula]{fs:sampleSizeSurvivalEventProbabilityAcccountForOberservationTimes}
-    powerResult <- getPowerSurvival(designGS1,
+    powerResults <- getPowerSurvival(designGS1,
         pi2 = 0.4, pi1 = c(0.4, 0.5, 0.6),
         dropoutRate1 = 0.1, dropoutTime = 12, eventTime = 24,
         maxNumberOfSubjects = 80, maxNumberOfEvents = 45, allocationRatioPlanned = 3
     )
 
-    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
-    expect_equal(powerResult$median1, c(32.565971, 24, 18.155299), tolerance = 1e-07, label = paste0(powerResult$median1))
-    expect_equal(powerResult$median2, 32.565971, tolerance = 1e-07, label = paste0(powerResult$median2))
-    expect_equal(powerResult$lambda1, c(0.021284401, 0.028881133, 0.03817878), tolerance = 1e-07, label = paste0(powerResult$lambda1))
-    expect_equal(powerResult$lambda2, 0.021284401, tolerance = 1e-07, label = paste0(powerResult$lambda2))
-    expect_equal(powerResult$hazardRatio, c(1, 1.3569154, 1.7937447), tolerance = 1e-07, label = paste0(powerResult$hazardRatio))
-    expect_equal(powerResult$numberOfSubjects[1, ], c(80, 80, 78.932452), tolerance = 1e-07, label = paste0(powerResult$numberOfSubjects[1, ]))
-    expect_equal(powerResult$numberOfSubjects[2, ], c(80, 80, 80), label = paste0(powerResult$numberOfSubjects[2, ]))
-    expect_equal(powerResult$numberOfSubjects[3, ], c(80, 80, 80), label = paste0(powerResult$numberOfSubjects[3, ]))
-    expect_equal(powerResult$accrualIntensity, 6.6666667, tolerance = 1e-07, label = paste0(powerResult$accrualIntensity))
-    expect_equal(powerResult$followUpTime, c(41.628872, 30.417026, 22.638977), tolerance = 1e-07, label = paste0(powerResult$followUpTime))
-    expect_equal(powerResult$expectedNumberOfEvents, c(29.092161, 33.496718, 34.368969), tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfEvents))
-    expect_equal(powerResult$overallReject, c(0.067448723, 0.25463139, 0.54601962), tolerance = 1e-07, label = paste0(powerResult$overallReject))
-    expect_equal(powerResult$rejectPerStage[1, ], c(0.011170644, 0.036015488, 0.087726198), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[1, ]))
-    expect_equal(powerResult$rejectPerStage[2, ], c(0.030436001, 0.11913846, 0.27563412), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[2, ]))
-    expect_equal(powerResult$rejectPerStage[3, ], c(0.025842077, 0.099477436, 0.1826593), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[3, ]))
-    expect_equal(powerResult$futilityStop, c(0.71047424, 0.43269831, 0.2052719), tolerance = 1e-07, label = paste0(powerResult$futilityStop))
-    expect_equal(powerResult$futilityPerStage[1, ], c(0.30853754, 0.16216653, 0.076412449), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[1, ]))
-    expect_equal(powerResult$futilityPerStage[2, ], c(0.40193671, 0.27053178, 0.12885945), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[2, ]))
-    expect_equal(powerResult$earlyStop, c(0.75208089, 0.58785226, 0.56863222), tolerance = 1e-07, label = paste0(powerResult$earlyStop))
-    expect_equal(powerResult$analysisTime[1, ], c(15.123713, 13.244904, 11.839868), tolerance = 1e-07, label = paste0(powerResult$analysisTime[1, ]))
-    expect_equal(powerResult$analysisTime[2, ], c(32.118539, 26.401459, 22.217088), tolerance = 1e-07, label = paste0(powerResult$analysisTime[2, ]))
-    expect_equal(powerResult$analysisTime[3, ], c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResult$analysisTime[3, ]))
-    expect_equal(powerResult$studyDuration, c(32.017976, 30.394846, 25.872188), tolerance = 1e-07, label = paste0(powerResult$studyDuration))
-    expect_equal(powerResult$maxStudyDuration, c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResult$maxStudyDuration))
-    expect_equal(powerResult$cumulativeEventsPerStage[1, ], 13.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[1, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[2, ], 31.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[2, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[3, ], 45, label = paste0(powerResult$cumulativeEventsPerStage[3, ]))
-    expect_equal(powerResult$expectedNumberOfSubjects, c(80, 80, 79.824774), tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfSubjects))
-    expect_equal(powerResult$criticalValuesEffectScale[1, ], 4.203458, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[1, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[2, ], 2.0990582, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[2, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[3, ], 1.7531447, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[3, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[1, ], 0.73032205, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[1, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[2, ], 1.2284311, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[2, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[1, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[2, ]))
+    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResults' with expected results
+    expect_equal(powerResults$median1, c(32.565971, 24, 18.155299), tolerance = 1e-07, label = paste0(powerResults$median1))
+    expect_equal(powerResults$median2, 32.565971, tolerance = 1e-07, label = paste0(powerResults$median2))
+    expect_equal(powerResults$lambda1, c(0.021284401, 0.028881133, 0.03817878), tolerance = 1e-07, label = paste0(powerResults$lambda1))
+    expect_equal(powerResults$lambda2, 0.021284401, tolerance = 1e-07, label = paste0(powerResults$lambda2))
+    expect_equal(powerResults$hazardRatio, c(1, 1.3569154, 1.7937447), tolerance = 1e-07, label = paste0(powerResults$hazardRatio))
+    expect_equal(powerResults$numberOfSubjects[1, ], c(80, 80, 78.932452), tolerance = 1e-07, label = paste0(powerResults$numberOfSubjects[1, ]))
+    expect_equal(powerResults$numberOfSubjects[2, ], c(80, 80, 80), label = paste0(powerResults$numberOfSubjects[2, ]))
+    expect_equal(powerResults$numberOfSubjects[3, ], c(80, 80, 80), label = paste0(powerResults$numberOfSubjects[3, ]))
+    expect_equal(powerResults$accrualIntensity, 6.6666667, tolerance = 1e-07, label = paste0(powerResults$accrualIntensity))
+    expect_equal(powerResults$followUpTime, c(41.628872, 30.417026, 22.638977), tolerance = 1e-07, label = paste0(powerResults$followUpTime))
+    expect_equal(powerResults$expectedNumberOfEvents, c(29.092161, 33.496718, 34.368969), tolerance = 1e-07, label = paste0(powerResults$expectedNumberOfEvents))
+    expect_equal(powerResults$overallReject, c(0.067448723, 0.25463139, 0.54601962), tolerance = 1e-07, label = paste0(powerResults$overallReject))
+    expect_equal(powerResults$rejectPerStage[1, ], c(0.011170644, 0.036015488, 0.087726198), tolerance = 1e-07, label = paste0(powerResults$rejectPerStage[1, ]))
+    expect_equal(powerResults$rejectPerStage[2, ], c(0.030436001, 0.11913846, 0.27563412), tolerance = 1e-07, label = paste0(powerResults$rejectPerStage[2, ]))
+    expect_equal(powerResults$rejectPerStage[3, ], c(0.025842077, 0.099477436, 0.1826593), tolerance = 1e-07, label = paste0(powerResults$rejectPerStage[3, ]))
+    expect_equal(powerResults$futilityStop, c(0.71047424, 0.43269831, 0.2052719), tolerance = 1e-07, label = paste0(powerResults$futilityStop))
+    expect_equal(powerResults$futilityPerStage[1, ], c(0.30853754, 0.16216653, 0.076412449), tolerance = 1e-07, label = paste0(powerResults$futilityPerStage[1, ]))
+    expect_equal(powerResults$futilityPerStage[2, ], c(0.40193671, 0.27053178, 0.12885945), tolerance = 1e-07, label = paste0(powerResults$futilityPerStage[2, ]))
+    expect_equal(powerResults$earlyStop, c(0.75208089, 0.58785226, 0.56863222), tolerance = 1e-07, label = paste0(powerResults$earlyStop))
+    expect_equal(powerResults$analysisTime[1, ], c(15.123713, 13.244904, 11.839868), tolerance = 1e-07, label = paste0(powerResults$analysisTime[1, ]))
+    expect_equal(powerResults$analysisTime[2, ], c(32.118539, 26.401459, 22.217088), tolerance = 1e-07, label = paste0(powerResults$analysisTime[2, ]))
+    expect_equal(powerResults$analysisTime[3, ], c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResults$analysisTime[3, ]))
+    expect_equal(powerResults$studyDuration, c(32.017976, 30.394846, 25.872188), tolerance = 1e-07, label = paste0(powerResults$studyDuration))
+    expect_equal(powerResults$maxStudyDuration, c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResults$maxStudyDuration))
+    expect_equal(powerResults$cumulativeEventsPerStage[1, ], 13.5, tolerance = 1e-07, label = paste0(powerResults$cumulativeEventsPerStage[1, ]))
+    expect_equal(powerResults$cumulativeEventsPerStage[2, ], 31.5, tolerance = 1e-07, label = paste0(powerResults$cumulativeEventsPerStage[2, ]))
+    expect_equal(powerResults$cumulativeEventsPerStage[3, ], 45, label = paste0(powerResults$cumulativeEventsPerStage[3, ]))
+    expect_equal(powerResults$expectedNumberOfSubjects, c(80, 80, 79.824774), tolerance = 1e-07, label = paste0(powerResults$expectedNumberOfSubjects))
+    expect_equal(powerResults$criticalValuesEffectScale[1, ], 4.203458, tolerance = 1e-07, label = paste0(powerResults$criticalValuesEffectScale[1, ]))
+    expect_equal(powerResults$criticalValuesEffectScale[2, ], 2.0990582, tolerance = 1e-07, label = paste0(powerResults$criticalValuesEffectScale[2, ]))
+    expect_equal(powerResults$criticalValuesEffectScale[3, ], 1.7531447, tolerance = 1e-07, label = paste0(powerResults$criticalValuesEffectScale[3, ]))
+    expect_equal(powerResults$futilityBoundsEffectScale[1, ], 0.73032205, tolerance = 1e-07, label = paste0(powerResults$futilityBoundsEffectScale[1, ]))
+    expect_equal(powerResults$futilityBoundsEffectScale[2, ], 1.2284311, tolerance = 1e-07, label = paste0(powerResults$futilityBoundsEffectScale[2, ]))
+    expect_equal(powerResults$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResults$futilityBoundsPValueScale[1, ]))
+    expect_equal(powerResults$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResults$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(powerResult), NA)))
-        expect_output(print(powerResult)$show())
-        invisible(capture.output(expect_error(summary(powerResult), NA)))
-        expect_output(summary(powerResult)$show())
-        powerResultCodeBased <- eval(parse(text = getObjectRCode(powerResult, stringWrapParagraphWidth = NULL)))
-        expect_equal(powerResultCodeBased$median1, powerResult$median1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$median2, powerResult$median2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda1, powerResult$lambda1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda2, powerResult$lambda2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$hazardRatio, powerResult$hazardRatio, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$numberOfSubjects, powerResult$numberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$accrualIntensity, powerResult$accrualIntensity, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$followUpTime, powerResult$followUpTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfEvents, powerResult$expectedNumberOfEvents, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$overallReject, powerResult$overallReject, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$rejectPerStage, powerResult$rejectPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityStop, powerResult$futilityStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityPerStage, powerResult$futilityPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$earlyStop, powerResult$earlyStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$analysisTime, powerResult$analysisTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$studyDuration, powerResult$studyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$maxStudyDuration, powerResult$maxStudyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$cumulativeEventsPerStage, powerResult$cumulativeEventsPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfSubjects, powerResult$expectedNumberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$criticalValuesEffectScale, powerResult$criticalValuesEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsEffectScale, powerResult$futilityBoundsEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsPValueScale, powerResult$futilityBoundsPValueScale, tolerance = 1e-07)
-        expect_type(names(powerResult), "character")
-        df <- as.data.frame(powerResult)
+        invisible(capture.output(expect_error(print(powerResults), NA)))
+        expect_output(print(powerResults)$show())
+        invisible(capture.output(expect_error(summary(powerResults), NA)))
+        expect_output(summary(powerResults)$show())
+        powerResultsCodeBased <- eval(parse(text = getObjectRCode(powerResults, stringWrapParagraphWidth = NULL)))
+        expect_equal(powerResultsCodeBased$median1, powerResults$median1, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$median2, powerResults$median2, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$lambda1, powerResults$lambda1, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$lambda2, powerResults$lambda2, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$hazardRatio, powerResults$hazardRatio, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$numberOfSubjects, powerResults$numberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$accrualIntensity, powerResults$accrualIntensity, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$followUpTime, powerResults$followUpTime, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$expectedNumberOfEvents, powerResults$expectedNumberOfEvents, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$overallReject, powerResults$overallReject, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$rejectPerStage, powerResults$rejectPerStage, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$futilityStop, powerResults$futilityStop, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$futilityPerStage, powerResults$futilityPerStage, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$earlyStop, powerResults$earlyStop, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$analysisTime, powerResults$analysisTime, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$studyDuration, powerResults$studyDuration, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$maxStudyDuration, powerResults$maxStudyDuration, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$cumulativeEventsPerStage, powerResults$cumulativeEventsPerStage, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$expectedNumberOfSubjects, powerResults$expectedNumberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$criticalValuesEffectScale, powerResults$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$futilityBoundsEffectScale, powerResults$futilityBoundsEffectScale, tolerance = 1e-07)
+        expect_equal(powerResultsCodeBased$futilityBoundsPValueScale, powerResults$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_type(names(powerResults), "character")
+        df <- as.data.frame(powerResults)
         expect_s3_class(df, "data.frame")
         expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(powerResult)
+        mtx <- as.matrix(powerResults)
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
@@ -6840,81 +6897,81 @@ test_that("'getPowerSurvival': Power calculation of survival designs for one-sid
     # @refFS[Formula]{fs:sampleSizeSurvivalEventsPerStage}
     # @refFS[Formula]{fs:sampleSizeSurvivalFindFollowUpTime}
     # @refFS[Formula]{fs:sampleSizeSurvivalEventProbabilityAcccountForOberservationTimes}
-    powerResult <- getPowerSurvival(designGS1,
+    powerResults2 <- getPowerSurvival(designGS1,
         typeOfComputation = "Freedman",
         pi2 = 0.4, pi1 = c(0.4, 0.5, 0.6), dropoutRate1 = 0.1, dropoutTime = 12, eventTime = 24,
         maxNumberOfSubjects = 80, maxNumberOfEvents = 45, allocationRatioPlanned = 3
     )
 
-    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
-    expect_equal(powerResult$median1, c(32.565971, 24, 18.155299), tolerance = 1e-07, label = paste0(powerResult$median1))
-    expect_equal(powerResult$median2, 32.565971, tolerance = 1e-07, label = paste0(powerResult$median2))
-    expect_equal(powerResult$lambda1, c(0.021284401, 0.028881133, 0.03817878), tolerance = 1e-07, label = paste0(powerResult$lambda1))
-    expect_equal(powerResult$lambda2, 0.021284401, tolerance = 1e-07, label = paste0(powerResult$lambda2))
-    expect_equal(powerResult$hazardRatio, c(1, 1.3569154, 1.7937447), tolerance = 1e-07, label = paste0(powerResult$hazardRatio))
-    expect_equal(powerResult$numberOfSubjects[1, ], c(80, 80, 78.932452), tolerance = 1e-07, label = paste0(powerResult$numberOfSubjects[1, ]))
-    expect_equal(powerResult$numberOfSubjects[2, ], c(80, 80, 80), label = paste0(powerResult$numberOfSubjects[2, ]))
-    expect_equal(powerResult$numberOfSubjects[3, ], c(80, 80, 80), label = paste0(powerResult$numberOfSubjects[3, ]))
-    expect_equal(powerResult$accrualIntensity, 6.6666667, tolerance = 1e-07, label = paste0(powerResult$accrualIntensity))
-    expect_equal(powerResult$followUpTime, c(41.628872, 30.417026, 22.638977), tolerance = 1e-07, label = paste0(powerResult$followUpTime))
-    expect_equal(powerResult$expectedNumberOfEvents, c(29.092161, 33.256688, 34.504982), tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfEvents))
-    expect_equal(powerResult$overallReject, c(0.067448723, 0.23410594, 0.44983629), tolerance = 1e-07, label = paste0(powerResult$overallReject))
-    expect_equal(powerResult$rejectPerStage[1, ], c(0.011170644, 0.033136424, 0.067729226), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[1, ]))
-    expect_equal(powerResult$rejectPerStage[2, ], c(0.030436001, 0.10902189, 0.22109606), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[2, ]))
-    expect_equal(powerResult$rejectPerStage[3, ], c(0.025842077, 0.091947627, 0.16101101), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[3, ]))
-    expect_equal(powerResult$futilityStop, c(0.71047424, 0.45476178, 0.26727979), tolerance = 1e-07, label = paste0(powerResult$futilityStop))
-    expect_equal(powerResult$futilityPerStage[1, ], c(0.30853754, 0.1715797, 0.098248524), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[1, ]))
-    expect_equal(powerResult$futilityPerStage[2, ], c(0.40193671, 0.28318207, 0.16903127), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[2, ]))
-    expect_equal(powerResult$earlyStop, c(0.75208089, 0.59692009, 0.55610508), tolerance = 1e-07, label = paste0(powerResult$earlyStop))
-    expect_equal(powerResult$analysisTime[1, ], c(15.123713, 13.244904, 11.839868), tolerance = 1e-07, label = paste0(powerResult$analysisTime[1, ]))
-    expect_equal(powerResult$analysisTime[2, ], c(32.118539, 26.401459, 22.217088), tolerance = 1e-07, label = paste0(powerResult$analysisTime[2, ]))
-    expect_equal(powerResult$analysisTime[3, ], c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResult$analysisTime[3, ]))
-    expect_equal(powerResult$studyDuration, c(32.017976, 30.163653, 26.008714), tolerance = 1e-07, label = paste0(powerResult$studyDuration))
-    expect_equal(powerResult$maxStudyDuration, c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResult$maxStudyDuration))
-    expect_equal(powerResult$cumulativeEventsPerStage[1, ], 13.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[1, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[2, ], 31.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[2, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[3, ], 45, label = paste0(powerResult$cumulativeEventsPerStage[3, ]))
-    expect_equal(powerResult$expectedNumberOfSubjects, c(80, 80, 79.822811), tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfSubjects))
-    expect_equal(powerResult$criticalValuesEffectScale[1, ], 4.203458, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[1, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[2, ], 2.0990582, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[2, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[3, ], 1.7531447, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[3, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[1, ], 0.73032205, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[1, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[2, ], 1.2284311, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[2, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[1, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[2, ]))
+    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResults2' with expected results
+    expect_equal(powerResults2$median1, c(32.565971, 24, 18.155299), tolerance = 1e-07, label = paste0(powerResults2$median1))
+    expect_equal(powerResults2$median2, 32.565971, tolerance = 1e-07, label = paste0(powerResults2$median2))
+    expect_equal(powerResults2$lambda1, c(0.021284401, 0.028881133, 0.03817878), tolerance = 1e-07, label = paste0(powerResults2$lambda1))
+    expect_equal(powerResults2$lambda2, 0.021284401, tolerance = 1e-07, label = paste0(powerResults2$lambda2))
+    expect_equal(powerResults2$hazardRatio, c(1, 1.3569154, 1.7937447), tolerance = 1e-07, label = paste0(powerResults2$hazardRatio))
+    expect_equal(powerResults2$numberOfSubjects[1, ], c(80, 80, 78.932452), tolerance = 1e-07, label = paste0(powerResults2$numberOfSubjects[1, ]))
+    expect_equal(powerResults2$numberOfSubjects[2, ], c(80, 80, 80), label = paste0(powerResults2$numberOfSubjects[2, ]))
+    expect_equal(powerResults2$numberOfSubjects[3, ], c(80, 80, 80), label = paste0(powerResults2$numberOfSubjects[3, ]))
+    expect_equal(powerResults2$accrualIntensity, 6.6666667, tolerance = 1e-07, label = paste0(powerResults2$accrualIntensity))
+    expect_equal(powerResults2$followUpTime, c(41.628872, 30.417026, 22.638977), tolerance = 1e-07, label = paste0(powerResults2$followUpTime))
+    expect_equal(powerResults2$expectedNumberOfEvents, c(29.092161, 33.256688, 34.504982), tolerance = 1e-07, label = paste0(powerResults2$expectedNumberOfEvents))
+    expect_equal(powerResults2$overallReject, c(0.067448723, 0.23410594, 0.44983629), tolerance = 1e-07, label = paste0(powerResults2$overallReject))
+    expect_equal(powerResults2$rejectPerStage[1, ], c(0.011170644, 0.033136424, 0.067729226), tolerance = 1e-07, label = paste0(powerResults2$rejectPerStage[1, ]))
+    expect_equal(powerResults2$rejectPerStage[2, ], c(0.030436001, 0.10902189, 0.22109606), tolerance = 1e-07, label = paste0(powerResults2$rejectPerStage[2, ]))
+    expect_equal(powerResults2$rejectPerStage[3, ], c(0.025842077, 0.091947627, 0.16101101), tolerance = 1e-07, label = paste0(powerResults2$rejectPerStage[3, ]))
+    expect_equal(powerResults2$futilityStop, c(0.71047424, 0.45476178, 0.26727979), tolerance = 1e-07, label = paste0(powerResults2$futilityStop))
+    expect_equal(powerResults2$futilityPerStage[1, ], c(0.30853754, 0.1715797, 0.098248524), tolerance = 1e-07, label = paste0(powerResults2$futilityPerStage[1, ]))
+    expect_equal(powerResults2$futilityPerStage[2, ], c(0.40193671, 0.28318207, 0.16903127), tolerance = 1e-07, label = paste0(powerResults2$futilityPerStage[2, ]))
+    expect_equal(powerResults2$earlyStop, c(0.75208089, 0.59692009, 0.55610508), tolerance = 1e-07, label = paste0(powerResults2$earlyStop))
+    expect_equal(powerResults2$analysisTime[1, ], c(15.123713, 13.244904, 11.839868), tolerance = 1e-07, label = paste0(powerResults2$analysisTime[1, ]))
+    expect_equal(powerResults2$analysisTime[2, ], c(32.118539, 26.401459, 22.217088), tolerance = 1e-07, label = paste0(powerResults2$analysisTime[2, ]))
+    expect_equal(powerResults2$analysisTime[3, ], c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResults2$analysisTime[3, ]))
+    expect_equal(powerResults2$studyDuration, c(32.017976, 30.163653, 26.008714), tolerance = 1e-07, label = paste0(powerResults2$studyDuration))
+    expect_equal(powerResults2$maxStudyDuration, c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResults2$maxStudyDuration))
+    expect_equal(powerResults2$cumulativeEventsPerStage[1, ], 13.5, tolerance = 1e-07, label = paste0(powerResults2$cumulativeEventsPerStage[1, ]))
+    expect_equal(powerResults2$cumulativeEventsPerStage[2, ], 31.5, tolerance = 1e-07, label = paste0(powerResults2$cumulativeEventsPerStage[2, ]))
+    expect_equal(powerResults2$cumulativeEventsPerStage[3, ], 45, label = paste0(powerResults2$cumulativeEventsPerStage[3, ]))
+    expect_equal(powerResults2$expectedNumberOfSubjects, c(80, 80, 79.822811), tolerance = 1e-07, label = paste0(powerResults2$expectedNumberOfSubjects))
+    expect_equal(powerResults2$criticalValuesEffectScale[1, ], 4.203458, tolerance = 1e-07, label = paste0(powerResults2$criticalValuesEffectScale[1, ]))
+    expect_equal(powerResults2$criticalValuesEffectScale[2, ], 2.0990582, tolerance = 1e-07, label = paste0(powerResults2$criticalValuesEffectScale[2, ]))
+    expect_equal(powerResults2$criticalValuesEffectScale[3, ], 1.7531447, tolerance = 1e-07, label = paste0(powerResults2$criticalValuesEffectScale[3, ]))
+    expect_equal(powerResults2$futilityBoundsEffectScale[1, ], 0.73032205, tolerance = 1e-07, label = paste0(powerResults2$futilityBoundsEffectScale[1, ]))
+    expect_equal(powerResults2$futilityBoundsEffectScale[2, ], 1.2284311, tolerance = 1e-07, label = paste0(powerResults2$futilityBoundsEffectScale[2, ]))
+    expect_equal(powerResults2$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResults2$futilityBoundsPValueScale[1, ]))
+    expect_equal(powerResults2$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResults2$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(powerResult), NA)))
-        expect_output(print(powerResult)$show())
-        invisible(capture.output(expect_error(summary(powerResult), NA)))
-        expect_output(summary(powerResult)$show())
-        powerResultCodeBased <- eval(parse(text = getObjectRCode(powerResult, stringWrapParagraphWidth = NULL)))
-        expect_equal(powerResultCodeBased$median1, powerResult$median1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$median2, powerResult$median2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda1, powerResult$lambda1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda2, powerResult$lambda2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$hazardRatio, powerResult$hazardRatio, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$numberOfSubjects, powerResult$numberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$accrualIntensity, powerResult$accrualIntensity, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$followUpTime, powerResult$followUpTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfEvents, powerResult$expectedNumberOfEvents, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$overallReject, powerResult$overallReject, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$rejectPerStage, powerResult$rejectPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityStop, powerResult$futilityStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityPerStage, powerResult$futilityPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$earlyStop, powerResult$earlyStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$analysisTime, powerResult$analysisTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$studyDuration, powerResult$studyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$maxStudyDuration, powerResult$maxStudyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$cumulativeEventsPerStage, powerResult$cumulativeEventsPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfSubjects, powerResult$expectedNumberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$criticalValuesEffectScale, powerResult$criticalValuesEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsEffectScale, powerResult$futilityBoundsEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsPValueScale, powerResult$futilityBoundsPValueScale, tolerance = 1e-07)
-        expect_type(names(powerResult), "character")
-        df <- as.data.frame(powerResult)
+        invisible(capture.output(expect_error(print(powerResults2), NA)))
+        expect_output(print(powerResults2)$show())
+        invisible(capture.output(expect_error(summary(powerResults2), NA)))
+        expect_output(summary(powerResults2)$show())
+        powerResults2CodeBased <- eval(parse(text = getObjectRCode(powerResults2, stringWrapParagraphWidth = NULL)))
+        expect_equal(powerResults2CodeBased$median1, powerResults2$median1, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$median2, powerResults2$median2, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$lambda1, powerResults2$lambda1, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$lambda2, powerResults2$lambda2, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$hazardRatio, powerResults2$hazardRatio, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$numberOfSubjects, powerResults2$numberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$accrualIntensity, powerResults2$accrualIntensity, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$followUpTime, powerResults2$followUpTime, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$expectedNumberOfEvents, powerResults2$expectedNumberOfEvents, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$overallReject, powerResults2$overallReject, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$rejectPerStage, powerResults2$rejectPerStage, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$futilityStop, powerResults2$futilityStop, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$futilityPerStage, powerResults2$futilityPerStage, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$earlyStop, powerResults2$earlyStop, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$analysisTime, powerResults2$analysisTime, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$studyDuration, powerResults2$studyDuration, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$maxStudyDuration, powerResults2$maxStudyDuration, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$cumulativeEventsPerStage, powerResults2$cumulativeEventsPerStage, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$expectedNumberOfSubjects, powerResults2$expectedNumberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$criticalValuesEffectScale, powerResults2$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$futilityBoundsEffectScale, powerResults2$futilityBoundsEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults2CodeBased$futilityBoundsPValueScale, powerResults2$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_type(names(powerResults2), "character")
+        df <- as.data.frame(powerResults2)
         expect_s3_class(df, "data.frame")
         expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(powerResult)
+        mtx <- as.matrix(powerResults2)
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
@@ -6926,81 +6983,81 @@ test_that("'getPowerSurvival': Power calculation of survival designs for one-sid
     # @refFS[Formula]{fs:sampleSizeSurvivalEventsPerStage}
     # @refFS[Formula]{fs:sampleSizeSurvivalFindFollowUpTime}
     # @refFS[Formula]{fs:sampleSizeSurvivalEventProbabilityAcccountForOberservationTimes}
-    powerResult <- getPowerSurvival(designGS1,
+    powerResults3 <- getPowerSurvival(designGS1,
         typeOfComputation = "HsiehFreedman",
         pi2 = 0.4, pi1 = c(0.4, 0.5, 0.6), dropoutRate1 = 0.1, dropoutTime = 12, eventTime = 24,
         maxNumberOfSubjects = 80, maxNumberOfEvents = 45, allocationRatioPlanned = 3
     )
 
-    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
-    expect_equal(powerResult$median1, c(32.565971, 24, 18.155299), tolerance = 1e-07, label = paste0(powerResult$median1))
-    expect_equal(powerResult$median2, 32.565971, tolerance = 1e-07, label = paste0(powerResult$median2))
-    expect_equal(powerResult$lambda1, c(0.021284401, 0.028881133, 0.03817878), tolerance = 1e-07, label = paste0(powerResult$lambda1))
-    expect_equal(powerResult$lambda2, 0.021284401, tolerance = 1e-07, label = paste0(powerResult$lambda2))
-    expect_equal(powerResult$hazardRatio, c(1, 1.3569154, 1.7937447), tolerance = 1e-07, label = paste0(powerResult$hazardRatio))
-    expect_equal(powerResult$numberOfSubjects[1, ], c(80, 80, 78.932452), tolerance = 1e-07, label = paste0(powerResult$numberOfSubjects[1, ]))
-    expect_equal(powerResult$numberOfSubjects[2, ], c(80, 80, 80), label = paste0(powerResult$numberOfSubjects[2, ]))
-    expect_equal(powerResult$numberOfSubjects[3, ], c(80, 80, 80), label = paste0(powerResult$numberOfSubjects[3, ]))
-    expect_equal(powerResult$accrualIntensity, 6.6666667, tolerance = 1e-07, label = paste0(powerResult$accrualIntensity))
-    expect_equal(powerResult$followUpTime, c(41.628872, 30.417026, 22.638977), tolerance = 1e-07, label = paste0(powerResult$followUpTime))
-    expect_equal(powerResult$expectedNumberOfEvents, c(29.092161, 33.473935, 34.421802), tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfEvents))
-    expect_equal(powerResult$overallReject, c(0.067448723, 0.25255296, 0.52822452), tolerance = 1e-07, label = paste0(powerResult$overallReject))
-    expect_equal(powerResult$rejectPerStage[1, ], c(0.011170644, 0.03572104, 0.083721511), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[1, ]))
-    expect_equal(powerResult$rejectPerStage[2, ], c(0.030436001, 0.11810922, 0.2653086), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[2, ]))
-    expect_equal(powerResult$rejectPerStage[3, ], c(0.025842077, 0.098722701, 0.17919441), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[3, ]))
-    expect_equal(powerResult$futilityStop, c(0.71047424, 0.43487767, 0.2160418), tolerance = 1e-07, label = paste0(powerResult$futilityStop))
-    expect_equal(powerResult$futilityPerStage[1, ], c(0.30853754, 0.16308496, 0.080152238), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[1, ]))
-    expect_equal(powerResult$futilityPerStage[2, ], c(0.40193671, 0.27179271, 0.13588956), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[2, ]))
-    expect_equal(powerResult$earlyStop, c(0.75208089, 0.58870793, 0.56507191), tolerance = 1e-07, label = paste0(powerResult$earlyStop))
-    expect_equal(powerResult$analysisTime[1, ], c(15.123713, 13.244904, 11.839868), tolerance = 1e-07, label = paste0(powerResult$analysisTime[1, ]))
-    expect_equal(powerResult$analysisTime[2, ], c(32.118539, 26.401459, 22.217088), tolerance = 1e-07, label = paste0(powerResult$analysisTime[2, ]))
-    expect_equal(powerResult$analysisTime[3, ], c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResult$analysisTime[3, ]))
-    expect_equal(powerResult$studyDuration, c(32.017976, 30.372933, 25.919163), tolerance = 1e-07, label = paste0(powerResult$studyDuration))
-    expect_equal(powerResult$maxStudyDuration, c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResult$maxStudyDuration))
-    expect_equal(powerResult$cumulativeEventsPerStage[1, ], 13.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[1, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[2, ], 31.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[2, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[3, ], 45, label = paste0(powerResult$cumulativeEventsPerStage[3, ]))
-    expect_equal(powerResult$expectedNumberOfSubjects, c(80, 80, 79.825057), tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfSubjects))
-    expect_equal(powerResult$criticalValuesEffectScale[1, ], 4.203458, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[1, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[2, ], 2.0990582, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[2, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[3, ], 1.7531447, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[3, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[1, ], 0.73032205, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[1, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[2, ], 1.2284311, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[2, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[1, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[2, ]))
+    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResults3' with expected results
+    expect_equal(powerResults3$median1, c(32.565971, 24, 18.155299), tolerance = 1e-07, label = paste0(powerResults3$median1))
+    expect_equal(powerResults3$median2, 32.565971, tolerance = 1e-07, label = paste0(powerResults3$median2))
+    expect_equal(powerResults3$lambda1, c(0.021284401, 0.028881133, 0.03817878), tolerance = 1e-07, label = paste0(powerResults3$lambda1))
+    expect_equal(powerResults3$lambda2, 0.021284401, tolerance = 1e-07, label = paste0(powerResults3$lambda2))
+    expect_equal(powerResults3$hazardRatio, c(1, 1.3569154, 1.7937447), tolerance = 1e-07, label = paste0(powerResults3$hazardRatio))
+    expect_equal(powerResults3$numberOfSubjects[1, ], c(80, 80, 78.932452), tolerance = 1e-07, label = paste0(powerResults3$numberOfSubjects[1, ]))
+    expect_equal(powerResults3$numberOfSubjects[2, ], c(80, 80, 80), label = paste0(powerResults3$numberOfSubjects[2, ]))
+    expect_equal(powerResults3$numberOfSubjects[3, ], c(80, 80, 80), label = paste0(powerResults3$numberOfSubjects[3, ]))
+    expect_equal(powerResults3$accrualIntensity, 6.6666667, tolerance = 1e-07, label = paste0(powerResults3$accrualIntensity))
+    expect_equal(powerResults3$followUpTime, c(41.628872, 30.417026, 22.638977), tolerance = 1e-07, label = paste0(powerResults3$followUpTime))
+    expect_equal(powerResults3$expectedNumberOfEvents, c(29.092161, 33.473935, 34.421802), tolerance = 1e-07, label = paste0(powerResults3$expectedNumberOfEvents))
+    expect_equal(powerResults3$overallReject, c(0.067448723, 0.25255296, 0.52822452), tolerance = 1e-07, label = paste0(powerResults3$overallReject))
+    expect_equal(powerResults3$rejectPerStage[1, ], c(0.011170644, 0.03572104, 0.083721511), tolerance = 1e-07, label = paste0(powerResults3$rejectPerStage[1, ]))
+    expect_equal(powerResults3$rejectPerStage[2, ], c(0.030436001, 0.11810922, 0.2653086), tolerance = 1e-07, label = paste0(powerResults3$rejectPerStage[2, ]))
+    expect_equal(powerResults3$rejectPerStage[3, ], c(0.025842077, 0.098722701, 0.17919441), tolerance = 1e-07, label = paste0(powerResults3$rejectPerStage[3, ]))
+    expect_equal(powerResults3$futilityStop, c(0.71047424, 0.43487767, 0.2160418), tolerance = 1e-07, label = paste0(powerResults3$futilityStop))
+    expect_equal(powerResults3$futilityPerStage[1, ], c(0.30853754, 0.16308496, 0.080152238), tolerance = 1e-07, label = paste0(powerResults3$futilityPerStage[1, ]))
+    expect_equal(powerResults3$futilityPerStage[2, ], c(0.40193671, 0.27179271, 0.13588956), tolerance = 1e-07, label = paste0(powerResults3$futilityPerStage[2, ]))
+    expect_equal(powerResults3$earlyStop, c(0.75208089, 0.58870793, 0.56507191), tolerance = 1e-07, label = paste0(powerResults3$earlyStop))
+    expect_equal(powerResults3$analysisTime[1, ], c(15.123713, 13.244904, 11.839868), tolerance = 1e-07, label = paste0(powerResults3$analysisTime[1, ]))
+    expect_equal(powerResults3$analysisTime[2, ], c(32.118539, 26.401459, 22.217088), tolerance = 1e-07, label = paste0(powerResults3$analysisTime[2, ]))
+    expect_equal(powerResults3$analysisTime[3, ], c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResults3$analysisTime[3, ]))
+    expect_equal(powerResults3$studyDuration, c(32.017976, 30.372933, 25.919163), tolerance = 1e-07, label = paste0(powerResults3$studyDuration))
+    expect_equal(powerResults3$maxStudyDuration, c(53.628872, 42.417026, 34.638977), tolerance = 1e-07, label = paste0(powerResults3$maxStudyDuration))
+    expect_equal(powerResults3$cumulativeEventsPerStage[1, ], 13.5, tolerance = 1e-07, label = paste0(powerResults3$cumulativeEventsPerStage[1, ]))
+    expect_equal(powerResults3$cumulativeEventsPerStage[2, ], 31.5, tolerance = 1e-07, label = paste0(powerResults3$cumulativeEventsPerStage[2, ]))
+    expect_equal(powerResults3$cumulativeEventsPerStage[3, ], 45, label = paste0(powerResults3$cumulativeEventsPerStage[3, ]))
+    expect_equal(powerResults3$expectedNumberOfSubjects, c(80, 80, 79.825057), tolerance = 1e-07, label = paste0(powerResults3$expectedNumberOfSubjects))
+    expect_equal(powerResults3$criticalValuesEffectScale[1, ], 4.203458, tolerance = 1e-07, label = paste0(powerResults3$criticalValuesEffectScale[1, ]))
+    expect_equal(powerResults3$criticalValuesEffectScale[2, ], 2.0990582, tolerance = 1e-07, label = paste0(powerResults3$criticalValuesEffectScale[2, ]))
+    expect_equal(powerResults3$criticalValuesEffectScale[3, ], 1.7531447, tolerance = 1e-07, label = paste0(powerResults3$criticalValuesEffectScale[3, ]))
+    expect_equal(powerResults3$futilityBoundsEffectScale[1, ], 0.73032205, tolerance = 1e-07, label = paste0(powerResults3$futilityBoundsEffectScale[1, ]))
+    expect_equal(powerResults3$futilityBoundsEffectScale[2, ], 1.2284311, tolerance = 1e-07, label = paste0(powerResults3$futilityBoundsEffectScale[2, ]))
+    expect_equal(powerResults3$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResults3$futilityBoundsPValueScale[1, ]))
+    expect_equal(powerResults3$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResults3$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(powerResult), NA)))
-        expect_output(print(powerResult)$show())
-        invisible(capture.output(expect_error(summary(powerResult), NA)))
-        expect_output(summary(powerResult)$show())
-        powerResultCodeBased <- eval(parse(text = getObjectRCode(powerResult, stringWrapParagraphWidth = NULL)))
-        expect_equal(powerResultCodeBased$median1, powerResult$median1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$median2, powerResult$median2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda1, powerResult$lambda1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda2, powerResult$lambda2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$hazardRatio, powerResult$hazardRatio, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$numberOfSubjects, powerResult$numberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$accrualIntensity, powerResult$accrualIntensity, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$followUpTime, powerResult$followUpTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfEvents, powerResult$expectedNumberOfEvents, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$overallReject, powerResult$overallReject, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$rejectPerStage, powerResult$rejectPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityStop, powerResult$futilityStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityPerStage, powerResult$futilityPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$earlyStop, powerResult$earlyStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$analysisTime, powerResult$analysisTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$studyDuration, powerResult$studyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$maxStudyDuration, powerResult$maxStudyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$cumulativeEventsPerStage, powerResult$cumulativeEventsPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfSubjects, powerResult$expectedNumberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$criticalValuesEffectScale, powerResult$criticalValuesEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsEffectScale, powerResult$futilityBoundsEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsPValueScale, powerResult$futilityBoundsPValueScale, tolerance = 1e-07)
-        expect_type(names(powerResult), "character")
-        df <- as.data.frame(powerResult)
+        invisible(capture.output(expect_error(print(powerResults3), NA)))
+        expect_output(print(powerResults3)$show())
+        invisible(capture.output(expect_error(summary(powerResults3), NA)))
+        expect_output(summary(powerResults3)$show())
+        powerResults3CodeBased <- eval(parse(text = getObjectRCode(powerResults3, stringWrapParagraphWidth = NULL)))
+        expect_equal(powerResults3CodeBased$median1, powerResults3$median1, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$median2, powerResults3$median2, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$lambda1, powerResults3$lambda1, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$lambda2, powerResults3$lambda2, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$hazardRatio, powerResults3$hazardRatio, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$numberOfSubjects, powerResults3$numberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$accrualIntensity, powerResults3$accrualIntensity, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$followUpTime, powerResults3$followUpTime, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$expectedNumberOfEvents, powerResults3$expectedNumberOfEvents, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$overallReject, powerResults3$overallReject, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$rejectPerStage, powerResults3$rejectPerStage, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$futilityStop, powerResults3$futilityStop, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$futilityPerStage, powerResults3$futilityPerStage, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$earlyStop, powerResults3$earlyStop, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$analysisTime, powerResults3$analysisTime, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$studyDuration, powerResults3$studyDuration, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$maxStudyDuration, powerResults3$maxStudyDuration, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$cumulativeEventsPerStage, powerResults3$cumulativeEventsPerStage, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$expectedNumberOfSubjects, powerResults3$expectedNumberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$criticalValuesEffectScale, powerResults3$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$futilityBoundsEffectScale, powerResults3$futilityBoundsEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults3CodeBased$futilityBoundsPValueScale, powerResults3$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_type(names(powerResults3), "character")
+        df <- as.data.frame(powerResults3)
         expect_s3_class(df, "data.frame")
         expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(powerResult)
+        mtx <- as.matrix(powerResults3)
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
@@ -7012,77 +7069,77 @@ test_that("'getPowerSurvival': Power calculation of survival designs for one-sid
     # @refFS[Formula]{fs:sampleSizeSurvivalEventsPerStage}
     # @refFS[Formula]{fs:sampleSizeSurvivalFindFollowUpTime}
     # @refFS[Formula]{fs:sampleSizeSurvivalEventProbabilityAcccountForOberservationTimes}
-    powerResult <- getPowerSurvival(designGS1,
+    powerResults4 <- getPowerSurvival(designGS1,
         lambda2 = 0.04, thetaH0 = 1.25,
         hazardRatio = 0.8, directionUpper = FALSE,
         maxNumberOfSubjects = 200, maxNumberOfEvents = 65, allocationRatioPlanned = 3
     )
 
-    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
-    expect_equal(powerResult$median1, 21.660849, tolerance = 1e-07, label = paste0(powerResult$median1))
-    expect_equal(powerResult$median2, 17.32868, tolerance = 1e-07, label = paste0(powerResult$median2))
-    expect_equal(powerResult$lambda1, 0.032, tolerance = 1e-07, label = paste0(powerResult$lambda1))
-    expect_equal(powerResult$numberOfSubjects[1, ], 145.15218, tolerance = 1e-07, label = paste0(powerResult$numberOfSubjects[1, ]))
-    expect_equal(powerResult$numberOfSubjects[2, ], 200, label = paste0(powerResult$numberOfSubjects[2, ]))
-    expect_equal(powerResult$numberOfSubjects[3, ], 200, label = paste0(powerResult$numberOfSubjects[3, ]))
-    expect_equal(powerResult$accrualIntensity, 16.666667, tolerance = 1e-07, label = paste0(powerResult$accrualIntensity))
-    expect_equal(powerResult$followUpTime, 5.7883102, tolerance = 1e-07, label = paste0(powerResult$followUpTime))
-    expect_equal(powerResult$expectedNumberOfEvents, 49.818428, tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfEvents))
-    expect_equal(powerResult$overallReject, 0.49283375, tolerance = 1e-07, label = paste0(powerResult$overallReject))
-    expect_equal(powerResult$rejectPerStage[1, ], c("stage = 1" = 0.076192913), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[1, ]))
-    expect_equal(powerResult$rejectPerStage[2, ], c("stage = 2" = 0.24509523), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[2, ]))
-    expect_equal(powerResult$rejectPerStage[3, ], c("stage = 3" = 0.17154561), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[3, ]))
-    expect_equal(powerResult$futilityStop, 0.2383697, tolerance = 1e-07, label = paste0(powerResult$futilityStop))
-    expect_equal(powerResult$futilityPerStage[1, ], c("stage = 1" = 0.087970326), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[1, ]))
-    expect_equal(powerResult$futilityPerStage[2, ], c("stage = 2" = 0.15039938), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[2, ]))
-    expect_equal(powerResult$earlyStop, 0.55965784, tolerance = 1e-07, label = paste0(powerResult$earlyStop))
-    expect_equal(powerResult$analysisTime[1, ], 8.7091306, tolerance = 1e-07, label = paste0(powerResult$analysisTime[1, ]))
-    expect_equal(powerResult$analysisTime[2, ], 13.807185, tolerance = 1e-07, label = paste0(powerResult$analysisTime[2, ]))
-    expect_equal(powerResult$analysisTime[3, ], 17.78831, tolerance = 1e-07, label = paste0(powerResult$analysisTime[3, ]))
-    expect_equal(powerResult$studyDuration, 14.723329, tolerance = 1e-07, label = paste0(powerResult$studyDuration))
-    expect_equal(powerResult$maxStudyDuration, 17.78831, tolerance = 1e-07, label = paste0(powerResult$maxStudyDuration))
-    expect_equal(powerResult$cumulativeEventsPerStage[1, ], 19.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[1, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[2, ], 45.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[2, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[3, ], 65, label = paste0(powerResult$cumulativeEventsPerStage[3, ]))
-    expect_equal(powerResult$expectedNumberOfSubjects, 190.996, tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfSubjects))
-    expect_equal(powerResult$criticalValuesEffectScale[1, ], 0.37847558, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[1, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[2, ], 0.67448058, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[2, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[3, ], 0.78350426, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[3, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[1, ], 1.623577, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[1, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[2, ], 1.0533329, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[2, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[1, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[2, ]))
+    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResults4' with expected results
+    expect_equal(powerResults4$median1, 21.660849, tolerance = 1e-07, label = paste0(powerResults4$median1))
+    expect_equal(powerResults4$median2, 17.32868, tolerance = 1e-07, label = paste0(powerResults4$median2))
+    expect_equal(powerResults4$lambda1, 0.032, tolerance = 1e-07, label = paste0(powerResults4$lambda1))
+    expect_equal(powerResults4$numberOfSubjects[1, ], 145.15218, tolerance = 1e-07, label = paste0(powerResults4$numberOfSubjects[1, ]))
+    expect_equal(powerResults4$numberOfSubjects[2, ], 200, label = paste0(powerResults4$numberOfSubjects[2, ]))
+    expect_equal(powerResults4$numberOfSubjects[3, ], 200, label = paste0(powerResults4$numberOfSubjects[3, ]))
+    expect_equal(powerResults4$accrualIntensity, 16.666667, tolerance = 1e-07, label = paste0(powerResults4$accrualIntensity))
+    expect_equal(powerResults4$followUpTime, 5.7883102, tolerance = 1e-07, label = paste0(powerResults4$followUpTime))
+    expect_equal(powerResults4$expectedNumberOfEvents, 49.818428, tolerance = 1e-07, label = paste0(powerResults4$expectedNumberOfEvents))
+    expect_equal(powerResults4$overallReject, 0.49283375, tolerance = 1e-07, label = paste0(powerResults4$overallReject))
+    expect_equal(powerResults4$rejectPerStage[1, ], c("stage = 1" = 0.076192913), tolerance = 1e-07, label = paste0(powerResults4$rejectPerStage[1, ]))
+    expect_equal(powerResults4$rejectPerStage[2, ], c("stage = 2" = 0.24509523), tolerance = 1e-07, label = paste0(powerResults4$rejectPerStage[2, ]))
+    expect_equal(powerResults4$rejectPerStage[3, ], c("stage = 3" = 0.17154561), tolerance = 1e-07, label = paste0(powerResults4$rejectPerStage[3, ]))
+    expect_equal(powerResults4$futilityStop, 0.2383697, tolerance = 1e-07, label = paste0(powerResults4$futilityStop))
+    expect_equal(powerResults4$futilityPerStage[1, ], c("stage = 1" = 0.087970326), tolerance = 1e-07, label = paste0(powerResults4$futilityPerStage[1, ]))
+    expect_equal(powerResults4$futilityPerStage[2, ], c("stage = 2" = 0.15039938), tolerance = 1e-07, label = paste0(powerResults4$futilityPerStage[2, ]))
+    expect_equal(powerResults4$earlyStop, 0.55965784, tolerance = 1e-07, label = paste0(powerResults4$earlyStop))
+    expect_equal(powerResults4$analysisTime[1, ], 8.7091306, tolerance = 1e-07, label = paste0(powerResults4$analysisTime[1, ]))
+    expect_equal(powerResults4$analysisTime[2, ], 13.807185, tolerance = 1e-07, label = paste0(powerResults4$analysisTime[2, ]))
+    expect_equal(powerResults4$analysisTime[3, ], 17.78831, tolerance = 1e-07, label = paste0(powerResults4$analysisTime[3, ]))
+    expect_equal(powerResults4$studyDuration, 14.723329, tolerance = 1e-07, label = paste0(powerResults4$studyDuration))
+    expect_equal(powerResults4$maxStudyDuration, 17.78831, tolerance = 1e-07, label = paste0(powerResults4$maxStudyDuration))
+    expect_equal(powerResults4$cumulativeEventsPerStage[1, ], 19.5, tolerance = 1e-07, label = paste0(powerResults4$cumulativeEventsPerStage[1, ]))
+    expect_equal(powerResults4$cumulativeEventsPerStage[2, ], 45.5, tolerance = 1e-07, label = paste0(powerResults4$cumulativeEventsPerStage[2, ]))
+    expect_equal(powerResults4$cumulativeEventsPerStage[3, ], 65, label = paste0(powerResults4$cumulativeEventsPerStage[3, ]))
+    expect_equal(powerResults4$expectedNumberOfSubjects, 190.996, tolerance = 1e-07, label = paste0(powerResults4$expectedNumberOfSubjects))
+    expect_equal(powerResults4$criticalValuesEffectScale[1, ], 0.37847558, tolerance = 1e-07, label = paste0(powerResults4$criticalValuesEffectScale[1, ]))
+    expect_equal(powerResults4$criticalValuesEffectScale[2, ], 0.67448058, tolerance = 1e-07, label = paste0(powerResults4$criticalValuesEffectScale[2, ]))
+    expect_equal(powerResults4$criticalValuesEffectScale[3, ], 0.78350426, tolerance = 1e-07, label = paste0(powerResults4$criticalValuesEffectScale[3, ]))
+    expect_equal(powerResults4$futilityBoundsEffectScale[1, ], 1.623577, tolerance = 1e-07, label = paste0(powerResults4$futilityBoundsEffectScale[1, ]))
+    expect_equal(powerResults4$futilityBoundsEffectScale[2, ], 1.0533329, tolerance = 1e-07, label = paste0(powerResults4$futilityBoundsEffectScale[2, ]))
+    expect_equal(powerResults4$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResults4$futilityBoundsPValueScale[1, ]))
+    expect_equal(powerResults4$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResults4$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(powerResult), NA)))
-        expect_output(print(powerResult)$show())
-        invisible(capture.output(expect_error(summary(powerResult), NA)))
-        expect_output(summary(powerResult)$show())
-        powerResultCodeBased <- eval(parse(text = getObjectRCode(powerResult, stringWrapParagraphWidth = NULL)))
-        expect_equal(powerResultCodeBased$median1, powerResult$median1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$median2, powerResult$median2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda1, powerResult$lambda1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$numberOfSubjects, powerResult$numberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$accrualIntensity, powerResult$accrualIntensity, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$followUpTime, powerResult$followUpTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfEvents, powerResult$expectedNumberOfEvents, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$overallReject, powerResult$overallReject, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$rejectPerStage, powerResult$rejectPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityStop, powerResult$futilityStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityPerStage, powerResult$futilityPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$earlyStop, powerResult$earlyStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$analysisTime, powerResult$analysisTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$studyDuration, powerResult$studyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$maxStudyDuration, powerResult$maxStudyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$cumulativeEventsPerStage, powerResult$cumulativeEventsPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfSubjects, powerResult$expectedNumberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$criticalValuesEffectScale, powerResult$criticalValuesEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsEffectScale, powerResult$futilityBoundsEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsPValueScale, powerResult$futilityBoundsPValueScale, tolerance = 1e-07)
-        expect_type(names(powerResult), "character")
-        df <- as.data.frame(powerResult)
+        invisible(capture.output(expect_error(print(powerResults4), NA)))
+        expect_output(print(powerResults4)$show())
+        invisible(capture.output(expect_error(summary(powerResults4), NA)))
+        expect_output(summary(powerResults4)$show())
+        powerResults4CodeBased <- eval(parse(text = getObjectRCode(powerResults4, stringWrapParagraphWidth = NULL)))
+        expect_equal(powerResults4CodeBased$median1, powerResults4$median1, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$median2, powerResults4$median2, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$lambda1, powerResults4$lambda1, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$numberOfSubjects, powerResults4$numberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$accrualIntensity, powerResults4$accrualIntensity, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$followUpTime, powerResults4$followUpTime, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$expectedNumberOfEvents, powerResults4$expectedNumberOfEvents, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$overallReject, powerResults4$overallReject, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$rejectPerStage, powerResults4$rejectPerStage, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$futilityStop, powerResults4$futilityStop, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$futilityPerStage, powerResults4$futilityPerStage, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$earlyStop, powerResults4$earlyStop, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$analysisTime, powerResults4$analysisTime, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$studyDuration, powerResults4$studyDuration, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$maxStudyDuration, powerResults4$maxStudyDuration, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$cumulativeEventsPerStage, powerResults4$cumulativeEventsPerStage, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$expectedNumberOfSubjects, powerResults4$expectedNumberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$criticalValuesEffectScale, powerResults4$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$futilityBoundsEffectScale, powerResults4$futilityBoundsEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults4CodeBased$futilityBoundsPValueScale, powerResults4$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_type(names(powerResults4), "character")
+        df <- as.data.frame(powerResults4)
         expect_s3_class(df, "data.frame")
         expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(powerResult)
+        mtx <- as.matrix(powerResults4)
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
@@ -7094,77 +7151,125 @@ test_that("'getPowerSurvival': Power calculation of survival designs for one-sid
     # @refFS[Formula]{fs:sampleSizeSurvivalEventsPerStage}
     # @refFS[Formula]{fs:sampleSizeSurvivalFindFollowUpTime}
     # @refFS[Formula]{fs:sampleSizeSurvivalEventProbabilityAcccountForOberservationTimes}
-    powerResult <- getPowerSurvival(designGS1,
+    powerResults5 <- getPowerSurvival(designGS1b,
+        lambda2 = 0.04, thetaH0 = 1.25, hazardRatio = 0.8,
+        maxNumberOfSubjects = 200, maxNumberOfEvents = 65,
+        allocationRatioPlanned = 3
+    )
+
+    ## Pairwise comparison of the results of powerResults4 with the results of powerResults5
+    expect_equal(powerResults4$median1, powerResults5$median1, tolerance = 1e-07)
+    expect_equal(powerResults4$median2, powerResults5$median2, tolerance = 1e-07)
+    expect_equal(powerResults4$lambda1, powerResults5$lambda1, tolerance = 1e-07)
+    expect_equal(powerResults5$numberOfSubjects[1, ], powerResults4$numberOfSubjects[1, ], tolerance = 1e-07)
+    expect_equal(powerResults5$numberOfSubjects[2, ], powerResults4$numberOfSubjects[2, ])
+    expect_equal(powerResults5$numberOfSubjects[3, ], powerResults4$numberOfSubjects[3, ])
+    expect_equal(powerResults4$accrualIntensity, powerResults5$accrualIntensity, tolerance = 1e-07)
+    expect_equal(powerResults4$followUpTime, powerResults5$followUpTime, tolerance = 1e-07)
+    expect_equal(powerResults4$expectedNumberOfEvents, powerResults5$expectedNumberOfEvents, tolerance = 1e-07)
+    expect_equal(powerResults4$overallReject, powerResults5$overallReject, tolerance = 1e-07)
+    expect_equal(powerResults5$rejectPerStage[1, ], powerResults4$rejectPerStage[1, ], tolerance = 1e-07)
+    expect_equal(powerResults5$rejectPerStage[2, ], powerResults4$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(powerResults5$rejectPerStage[3, ], powerResults4$rejectPerStage[3, ], tolerance = 1e-07)
+    expect_equal(powerResults4$futilityStop, powerResults5$futilityStop, tolerance = 1e-07)
+    expect_equal(powerResults5$futilityPerStage[1, ], powerResults4$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(powerResults5$futilityPerStage[2, ], powerResults4$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(powerResults4$earlyStop, powerResults5$earlyStop, tolerance = 1e-07)
+    expect_equal(powerResults5$analysisTime[1, ], powerResults4$analysisTime[1, ], tolerance = 1e-07)
+    expect_equal(powerResults5$analysisTime[2, ], powerResults4$analysisTime[2, ], tolerance = 1e-07)
+    expect_equal(powerResults5$analysisTime[3, ], powerResults4$analysisTime[3, ], tolerance = 1e-07)
+    expect_equal(powerResults4$studyDuration, powerResults5$studyDuration, tolerance = 1e-07)
+    expect_equal(powerResults4$maxStudyDuration, powerResults5$maxStudyDuration, tolerance = 1e-07)
+    expect_equal(powerResults5$cumulativeEventsPerStage[1, ], powerResults4$cumulativeEventsPerStage[1, ], tolerance = 1e-07)
+    expect_equal(powerResults5$cumulativeEventsPerStage[2, ], powerResults4$cumulativeEventsPerStage[2, ], tolerance = 1e-07)
+    expect_equal(powerResults5$cumulativeEventsPerStage[3, ], powerResults4$cumulativeEventsPerStage[3, ])
+    expect_equal(powerResults4$expectedNumberOfSubjects, powerResults5$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(powerResults5$criticalValuesEffectScale[1, ], powerResults4$criticalValuesEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(powerResults5$criticalValuesEffectScale[2, ], powerResults4$criticalValuesEffectScale[2, ], tolerance = 1e-07)
+    expect_equal(powerResults5$criticalValuesEffectScale[3, ], powerResults4$criticalValuesEffectScale[3, ], tolerance = 1e-07)
+    expect_equal(powerResults5$futilityBoundsEffectScale[1, ], powerResults4$futilityBoundsEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(powerResults5$futilityBoundsEffectScale[2, ], powerResults4$futilityBoundsEffectScale[2, ], tolerance = 1e-07)
+    expect_equal(powerResults5$futilityBoundsPValueScale[1, ], powerResults4$futilityBoundsPValueScale[1, ], tolerance = 1e-07)
+    expect_equal(powerResults5$futilityBoundsPValueScale[2, ], powerResults4$futilityBoundsPValueScale[2, ], tolerance = 1e-07)
+
+    # @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
+    # @refFS[Formula]{fs:PowerGroupSequentialOneSided}
+    # @refFS[Formula]{fs:ShiftParameterSurvivalSchoenfeld}
+    # @refFS[Formula]{fs:sampleSizeSurvivalExpectedPatientAccrual}
+    # @refFS[Formula]{fs:sampleSizeSurvivalEventsPerStage}
+    # @refFS[Formula]{fs:sampleSizeSurvivalFindFollowUpTime}
+    # @refFS[Formula]{fs:sampleSizeSurvivalEventProbabilityAcccountForOberservationTimes}
+    powerResults6 <- getPowerSurvival(designGS1,
         lambda2 = 0.04, thetaH0 = 0.8,
         hazardRatio = seq(0.8, 1.4, 0.2), directionUpper = TRUE,
         maxNumberOfSubjects = 200, maxNumberOfEvents = 65, allocationRatioPlanned = 1
     )
 
-    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
-    expect_equal(powerResult$median1, c(21.660849, 17.32868, 14.440566, 12.377628), tolerance = 1e-07, label = paste0(powerResult$median1))
-    expect_equal(powerResult$median2, 17.32868, tolerance = 1e-07, label = paste0(powerResult$median2))
-    expect_equal(powerResult$lambda1, c(0.032, 0.04, 0.048, 0.056), tolerance = 1e-07, label = paste0(powerResult$lambda1))
-    expect_equal(powerResult$numberOfSubjects[1, ], c(141.27981, 134.32068, 128.46086, 123.43376), tolerance = 1e-07, label = paste0(powerResult$numberOfSubjects[1, ]))
-    expect_equal(powerResult$numberOfSubjects[2, ], c(200, 200, 200, 194.7445), tolerance = 1e-07, label = paste0(powerResult$numberOfSubjects[2, ]))
-    expect_equal(powerResult$numberOfSubjects[3, ], c(200, 200, 200, 200), label = paste0(powerResult$numberOfSubjects[3, ]))
-    expect_equal(powerResult$accrualIntensity, 16.666667, tolerance = 1e-07, label = paste0(powerResult$accrualIntensity))
-    expect_equal(powerResult$followUpTime, c(5.1617391, 4.0656056, 3.2120436, 2.5256004), tolerance = 1e-07, label = paste0(powerResult$followUpTime))
-    expect_equal(powerResult$expectedNumberOfEvents, c(42.02201, 48.445748, 49.742518, 47.47852), tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfEvents))
-    expect_equal(powerResult$overallReject, c(0.067448723, 0.25860493, 0.52208361, 0.74266051), tolerance = 1e-07, label = paste0(powerResult$overallReject))
-    expect_equal(powerResult$rejectPerStage[1, ], c(0.011170644, 0.03658032, 0.082375002, 0.14710823), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[1, ]))
-    expect_equal(powerResult$rejectPerStage[2, ], c(0.030436001, 0.12110923, 0.26177073, 0.39724295), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[2, ]))
-    expect_equal(powerResult$rejectPerStage[3, ], c(0.025842077, 0.10091538, 0.17793787, 0.19830932), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[3, ]))
-    expect_equal(powerResult$futilityStop, c(0.71047424, 0.42856456, 0.21982747, 0.10295201), tolerance = 1e-07, label = paste0(powerResult$futilityStop))
-    expect_equal(powerResult$futilityPerStage[1, ], c(0.30853754, 0.1604311, 0.08147133, 0.041317452), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[1, ]))
-    expect_equal(powerResult$futilityPerStage[2, ], c(0.40193671, 0.26813346, 0.13835614, 0.061634556), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[2, ]))
-    expect_equal(powerResult$earlyStop, c(0.75208089, 0.58625412, 0.5639732, 0.6473032), tolerance = 1e-07, label = paste0(powerResult$earlyStop))
-    expect_equal(powerResult$analysisTime[1, ], c(8.4767885, 8.0592408, 7.7076518, 7.4060255), tolerance = 1e-07, label = paste0(powerResult$analysisTime[1, ]))
-    expect_equal(powerResult$analysisTime[2, ], c(13.399188, 12.692623, 12.137705, 11.68467), tolerance = 1e-07, label = paste0(powerResult$analysisTime[2, ]))
-    expect_equal(powerResult$analysisTime[3, ], c(17.161739, 16.065606, 15.212044, 14.5256), tolerance = 1e-07, label = paste0(powerResult$analysisTime[3, ]))
-    expect_equal(powerResult$studyDuration, c(12.758265, 13.175351, 12.752351, 11.880451), tolerance = 1e-07, label = paste0(powerResult$studyDuration))
-    expect_equal(powerResult$maxStudyDuration, c(17.161739, 16.065606, 15.212044, 14.5256), tolerance = 1e-07, label = paste0(powerResult$maxStudyDuration))
-    expect_equal(powerResult$cumulativeEventsPerStage[1, ], 19.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[1, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[2, ], 45.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[2, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[3, ], 65, label = paste0(powerResult$cumulativeEventsPerStage[3, ]))
-    expect_equal(powerResult$expectedNumberOfSubjects, c(181.22667, 187.06042, 188.27858, 183.16132), tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfSubjects))
-    expect_equal(powerResult$criticalValuesEffectScale[1, ], 2.2513678, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[1, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[2, ], 1.3650021, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[2, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[3, ], 1.1988902, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[3, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[1, ], 0.63788392, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[1, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[2, ], 0.92784212, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[2, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[1, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[2, ]))
+    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResults6' with expected results
+    expect_equal(powerResults6$median1, c(21.660849, 17.32868, 14.440566, 12.377628), tolerance = 1e-07, label = paste0(powerResults6$median1))
+    expect_equal(powerResults6$median2, 17.32868, tolerance = 1e-07, label = paste0(powerResults6$median2))
+    expect_equal(powerResults6$lambda1, c(0.032, 0.04, 0.048, 0.056), tolerance = 1e-07, label = paste0(powerResults6$lambda1))
+    expect_equal(powerResults6$numberOfSubjects[1, ], c(141.27981, 134.32068, 128.46086, 123.43376), tolerance = 1e-07, label = paste0(powerResults6$numberOfSubjects[1, ]))
+    expect_equal(powerResults6$numberOfSubjects[2, ], c(200, 200, 200, 194.7445), tolerance = 1e-07, label = paste0(powerResults6$numberOfSubjects[2, ]))
+    expect_equal(powerResults6$numberOfSubjects[3, ], c(200, 200, 200, 200), label = paste0(powerResults6$numberOfSubjects[3, ]))
+    expect_equal(powerResults6$accrualIntensity, 16.666667, tolerance = 1e-07, label = paste0(powerResults6$accrualIntensity))
+    expect_equal(powerResults6$followUpTime, c(5.1617391, 4.0656056, 3.2120436, 2.5256004), tolerance = 1e-07, label = paste0(powerResults6$followUpTime))
+    expect_equal(powerResults6$expectedNumberOfEvents, c(42.02201, 48.445748, 49.742518, 47.47852), tolerance = 1e-07, label = paste0(powerResults6$expectedNumberOfEvents))
+    expect_equal(powerResults6$overallReject, c(0.067448723, 0.25860493, 0.52208361, 0.74266051), tolerance = 1e-07, label = paste0(powerResults6$overallReject))
+    expect_equal(powerResults6$rejectPerStage[1, ], c(0.011170644, 0.03658032, 0.082375002, 0.14710823), tolerance = 1e-07, label = paste0(powerResults6$rejectPerStage[1, ]))
+    expect_equal(powerResults6$rejectPerStage[2, ], c(0.030436001, 0.12110923, 0.26177073, 0.39724295), tolerance = 1e-07, label = paste0(powerResults6$rejectPerStage[2, ]))
+    expect_equal(powerResults6$rejectPerStage[3, ], c(0.025842077, 0.10091538, 0.17793787, 0.19830932), tolerance = 1e-07, label = paste0(powerResults6$rejectPerStage[3, ]))
+    expect_equal(powerResults6$futilityStop, c(0.71047424, 0.42856456, 0.21982747, 0.10295201), tolerance = 1e-07, label = paste0(powerResults6$futilityStop))
+    expect_equal(powerResults6$futilityPerStage[1, ], c(0.30853754, 0.1604311, 0.08147133, 0.041317452), tolerance = 1e-07, label = paste0(powerResults6$futilityPerStage[1, ]))
+    expect_equal(powerResults6$futilityPerStage[2, ], c(0.40193671, 0.26813346, 0.13835614, 0.061634556), tolerance = 1e-07, label = paste0(powerResults6$futilityPerStage[2, ]))
+    expect_equal(powerResults6$earlyStop, c(0.75208089, 0.58625412, 0.5639732, 0.6473032), tolerance = 1e-07, label = paste0(powerResults6$earlyStop))
+    expect_equal(powerResults6$analysisTime[1, ], c(8.4767885, 8.0592408, 7.7076518, 7.4060255), tolerance = 1e-07, label = paste0(powerResults6$analysisTime[1, ]))
+    expect_equal(powerResults6$analysisTime[2, ], c(13.399188, 12.692623, 12.137705, 11.68467), tolerance = 1e-07, label = paste0(powerResults6$analysisTime[2, ]))
+    expect_equal(powerResults6$analysisTime[3, ], c(17.161739, 16.065606, 15.212044, 14.5256), tolerance = 1e-07, label = paste0(powerResults6$analysisTime[3, ]))
+    expect_equal(powerResults6$studyDuration, c(12.758265, 13.175351, 12.752351, 11.880451), tolerance = 1e-07, label = paste0(powerResults6$studyDuration))
+    expect_equal(powerResults6$maxStudyDuration, c(17.161739, 16.065606, 15.212044, 14.5256), tolerance = 1e-07, label = paste0(powerResults6$maxStudyDuration))
+    expect_equal(powerResults6$cumulativeEventsPerStage[1, ], 19.5, tolerance = 1e-07, label = paste0(powerResults6$cumulativeEventsPerStage[1, ]))
+    expect_equal(powerResults6$cumulativeEventsPerStage[2, ], 45.5, tolerance = 1e-07, label = paste0(powerResults6$cumulativeEventsPerStage[2, ]))
+    expect_equal(powerResults6$cumulativeEventsPerStage[3, ], 65, label = paste0(powerResults6$cumulativeEventsPerStage[3, ]))
+    expect_equal(powerResults6$expectedNumberOfSubjects, c(181.22667, 187.06042, 188.27858, 183.16132), tolerance = 1e-07, label = paste0(powerResults6$expectedNumberOfSubjects))
+    expect_equal(powerResults6$criticalValuesEffectScale[1, ], 2.2513678, tolerance = 1e-07, label = paste0(powerResults6$criticalValuesEffectScale[1, ]))
+    expect_equal(powerResults6$criticalValuesEffectScale[2, ], 1.3650021, tolerance = 1e-07, label = paste0(powerResults6$criticalValuesEffectScale[2, ]))
+    expect_equal(powerResults6$criticalValuesEffectScale[3, ], 1.1988902, tolerance = 1e-07, label = paste0(powerResults6$criticalValuesEffectScale[3, ]))
+    expect_equal(powerResults6$futilityBoundsEffectScale[1, ], 0.63788392, tolerance = 1e-07, label = paste0(powerResults6$futilityBoundsEffectScale[1, ]))
+    expect_equal(powerResults6$futilityBoundsEffectScale[2, ], 0.92784212, tolerance = 1e-07, label = paste0(powerResults6$futilityBoundsEffectScale[2, ]))
+    expect_equal(powerResults6$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResults6$futilityBoundsPValueScale[1, ]))
+    expect_equal(powerResults6$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResults6$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(powerResult), NA)))
-        expect_output(print(powerResult)$show())
-        invisible(capture.output(expect_error(summary(powerResult), NA)))
-        expect_output(summary(powerResult)$show())
-        powerResultCodeBased <- eval(parse(text = getObjectRCode(powerResult, stringWrapParagraphWidth = NULL)))
-        expect_equal(powerResultCodeBased$median1, powerResult$median1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$median2, powerResult$median2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda1, powerResult$lambda1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$numberOfSubjects, powerResult$numberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$accrualIntensity, powerResult$accrualIntensity, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$followUpTime, powerResult$followUpTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfEvents, powerResult$expectedNumberOfEvents, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$overallReject, powerResult$overallReject, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$rejectPerStage, powerResult$rejectPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityStop, powerResult$futilityStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityPerStage, powerResult$futilityPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$earlyStop, powerResult$earlyStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$analysisTime, powerResult$analysisTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$studyDuration, powerResult$studyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$maxStudyDuration, powerResult$maxStudyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$cumulativeEventsPerStage, powerResult$cumulativeEventsPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfSubjects, powerResult$expectedNumberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$criticalValuesEffectScale, powerResult$criticalValuesEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsEffectScale, powerResult$futilityBoundsEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsPValueScale, powerResult$futilityBoundsPValueScale, tolerance = 1e-07)
-        expect_type(names(powerResult), "character")
-        df <- as.data.frame(powerResult)
+        invisible(capture.output(expect_error(print(powerResults6), NA)))
+        expect_output(print(powerResults6)$show())
+        invisible(capture.output(expect_error(summary(powerResults6), NA)))
+        expect_output(summary(powerResults6)$show())
+        powerResults6CodeBased <- eval(parse(text = getObjectRCode(powerResults6, stringWrapParagraphWidth = NULL)))
+        expect_equal(powerResults6CodeBased$median1, powerResults6$median1, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$median2, powerResults6$median2, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$lambda1, powerResults6$lambda1, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$numberOfSubjects, powerResults6$numberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$accrualIntensity, powerResults6$accrualIntensity, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$followUpTime, powerResults6$followUpTime, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$expectedNumberOfEvents, powerResults6$expectedNumberOfEvents, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$overallReject, powerResults6$overallReject, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$rejectPerStage, powerResults6$rejectPerStage, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$futilityStop, powerResults6$futilityStop, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$futilityPerStage, powerResults6$futilityPerStage, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$earlyStop, powerResults6$earlyStop, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$analysisTime, powerResults6$analysisTime, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$studyDuration, powerResults6$studyDuration, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$maxStudyDuration, powerResults6$maxStudyDuration, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$cumulativeEventsPerStage, powerResults6$cumulativeEventsPerStage, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$expectedNumberOfSubjects, powerResults6$expectedNumberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$criticalValuesEffectScale, powerResults6$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$futilityBoundsEffectScale, powerResults6$futilityBoundsEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults6CodeBased$futilityBoundsPValueScale, powerResults6$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_type(names(powerResults6), "character")
+        df <- as.data.frame(powerResults6)
         expect_s3_class(df, "data.frame")
         expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(powerResult)
+        mtx <- as.matrix(powerResults6)
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
@@ -7176,81 +7281,81 @@ test_that("'getPowerSurvival': Power calculation of survival designs for one-sid
     # @refFS[Formula]{fs:sampleSizeSurvivalEventsPerStage}
     # @refFS[Formula]{fs:sampleSizeSurvivalFindFollowUpTime}
     # @refFS[Formula]{fs:sampleSizeSurvivalEventProbabilityAcccountForOberservationTimes}
-    powerResult <- getPowerSurvival(designGS1,
+    powerResults7 <- getPowerSurvival(designGS1,
         eventTime = 120, pi2 = 0.4,
         thetaH0 = 0.8, hazardRatio = seq(0.8, 1.4, 0.2), directionUpper = TRUE,
         maxNumberOfSubjects = 200, maxNumberOfEvents = 65, allocationRatioPlanned = 1
     )
 
-    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
-    expect_equal(powerResult$pi1, c(0.33546019, 0.4, 0.45827173, 0.51088413), tolerance = 1e-07, label = paste0(powerResult$pi1))
-    expect_equal(powerResult$median1, c(203.53732, 162.82985, 135.69154, 116.30704), tolerance = 1e-07, label = paste0(powerResult$median1))
-    expect_equal(powerResult$median2, 162.82985, tolerance = 1e-07, label = paste0(powerResult$median2))
-    expect_equal(powerResult$lambda1, c(0.0034055042, 0.0042568802, 0.0051082562, 0.0059596323), tolerance = 1e-07, label = paste0(powerResult$lambda1))
-    expect_equal(powerResult$lambda2, 0.0042568802, tolerance = 1e-07, label = paste0(powerResult$lambda2))
-    expect_equal(powerResult$numberOfSubjects[1, ], c(200, 200, 200, 200), label = paste0(powerResult$numberOfSubjects[1, ]))
-    expect_equal(powerResult$numberOfSubjects[2, ], c(200, 200, 200, 200), label = paste0(powerResult$numberOfSubjects[2, ]))
-    expect_equal(powerResult$numberOfSubjects[3, ], c(200, 200, 200, 200), label = paste0(powerResult$numberOfSubjects[3, ]))
-    expect_equal(powerResult$accrualIntensity, 16.666667, tolerance = 1e-07, label = paste0(powerResult$accrualIntensity))
-    expect_equal(powerResult$followUpTime, c(96.86335, 86.356678, 78.102375, 71.398147), tolerance = 1e-07, label = paste0(powerResult$followUpTime))
-    expect_equal(powerResult$expectedNumberOfEvents, c(42.02201, 48.445748, 49.742518, 47.47852), tolerance = 1e-07, label = paste0(powerResult$expectedNumberOfEvents))
-    expect_equal(powerResult$overallReject, c(0.067448723, 0.25860493, 0.52208361, 0.74266051), tolerance = 1e-07, label = paste0(powerResult$overallReject))
-    expect_equal(powerResult$rejectPerStage[1, ], c(0.011170644, 0.03658032, 0.082375002, 0.14710823), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[1, ]))
-    expect_equal(powerResult$rejectPerStage[2, ], c(0.030436001, 0.12110923, 0.26177073, 0.39724295), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[2, ]))
-    expect_equal(powerResult$rejectPerStage[3, ], c(0.025842077, 0.10091538, 0.17793787, 0.19830932), tolerance = 1e-07, label = paste0(powerResult$rejectPerStage[3, ]))
-    expect_equal(powerResult$futilityStop, c(0.71047424, 0.42856456, 0.21982747, 0.10295201), tolerance = 1e-07, label = paste0(powerResult$futilityStop))
-    expect_equal(powerResult$futilityPerStage[1, ], c(0.30853754, 0.1604311, 0.08147133, 0.041317452), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[1, ]))
-    expect_equal(powerResult$futilityPerStage[2, ], c(0.40193671, 0.26813346, 0.13835614, 0.061634556), tolerance = 1e-07, label = paste0(powerResult$futilityPerStage[2, ]))
-    expect_equal(powerResult$earlyStop, c(0.75208089, 0.58625412, 0.5639732, 0.6473032), tolerance = 1e-07, label = paste0(powerResult$earlyStop))
-    expect_equal(powerResult$analysisTime[1, ], c(32.816894, 30.124548, 27.945787, 26.142615), tolerance = 1e-07, label = paste0(powerResult$analysisTime[1, ]))
-    expect_equal(powerResult$analysisTime[2, ], c(73.505015, 66.662265, 61.211479, 56.744296), tolerance = 1e-07, label = paste0(powerResult$analysisTime[2, ]))
-    expect_equal(powerResult$analysisTime[3, ], c(108.86335, 98.356678, 90.102375, 83.398147), tolerance = 1e-07, label = paste0(powerResult$analysisTime[3, ]))
-    expect_equal(powerResult$studyDuration, c(69.262697, 72.57735, 68.358222, 60.378881), tolerance = 1e-07, label = paste0(powerResult$studyDuration))
-    expect_equal(powerResult$maxStudyDuration, c(108.86335, 98.356678, 90.102375, 83.398147), tolerance = 1e-07, label = paste0(powerResult$maxStudyDuration))
-    expect_equal(powerResult$cumulativeEventsPerStage[1, ], 19.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[1, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[2, ], 45.5, tolerance = 1e-07, label = paste0(powerResult$cumulativeEventsPerStage[2, ]))
-    expect_equal(powerResult$cumulativeEventsPerStage[3, ], 65, label = paste0(powerResult$cumulativeEventsPerStage[3, ]))
-    expect_equal(powerResult$expectedNumberOfSubjects, c(200, 200, 200, 200), label = paste0(powerResult$expectedNumberOfSubjects))
-    expect_equal(powerResult$criticalValuesEffectScale[1, ], 2.2513678, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[1, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[2, ], 1.3650021, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[2, ]))
-    expect_equal(powerResult$criticalValuesEffectScale[3, ], 1.1988902, tolerance = 1e-07, label = paste0(powerResult$criticalValuesEffectScale[3, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[1, ], 0.63788392, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[1, ]))
-    expect_equal(powerResult$futilityBoundsEffectScale[2, ], 0.92784212, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsEffectScale[2, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[1, ]))
-    expect_equal(powerResult$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResult$futilityBoundsPValueScale[2, ]))
+    ## Comparison of the results of TrialDesignPlanSurvival object 'powerResults7' with expected results
+    expect_equal(powerResults7$pi1, c(0.33546019, 0.4, 0.45827173, 0.51088413), tolerance = 1e-07, label = paste0(powerResults7$pi1))
+    expect_equal(powerResults7$median1, c(203.53732, 162.82985, 135.69154, 116.30704), tolerance = 1e-07, label = paste0(powerResults7$median1))
+    expect_equal(powerResults7$median2, 162.82985, tolerance = 1e-07, label = paste0(powerResults7$median2))
+    expect_equal(powerResults7$lambda1, c(0.0034055042, 0.0042568802, 0.0051082562, 0.0059596323), tolerance = 1e-07, label = paste0(powerResults7$lambda1))
+    expect_equal(powerResults7$lambda2, 0.0042568802, tolerance = 1e-07, label = paste0(powerResults7$lambda2))
+    expect_equal(powerResults7$numberOfSubjects[1, ], c(200, 200, 200, 200), label = paste0(powerResults7$numberOfSubjects[1, ]))
+    expect_equal(powerResults7$numberOfSubjects[2, ], c(200, 200, 200, 200), label = paste0(powerResults7$numberOfSubjects[2, ]))
+    expect_equal(powerResults7$numberOfSubjects[3, ], c(200, 200, 200, 200), label = paste0(powerResults7$numberOfSubjects[3, ]))
+    expect_equal(powerResults7$accrualIntensity, 16.666667, tolerance = 1e-07, label = paste0(powerResults7$accrualIntensity))
+    expect_equal(powerResults7$followUpTime, c(96.86335, 86.356678, 78.102375, 71.398147), tolerance = 1e-07, label = paste0(powerResults7$followUpTime))
+    expect_equal(powerResults7$expectedNumberOfEvents, c(42.02201, 48.445748, 49.742518, 47.47852), tolerance = 1e-07, label = paste0(powerResults7$expectedNumberOfEvents))
+    expect_equal(powerResults7$overallReject, c(0.067448723, 0.25860493, 0.52208361, 0.74266051), tolerance = 1e-07, label = paste0(powerResults7$overallReject))
+    expect_equal(powerResults7$rejectPerStage[1, ], c(0.011170644, 0.03658032, 0.082375002, 0.14710823), tolerance = 1e-07, label = paste0(powerResults7$rejectPerStage[1, ]))
+    expect_equal(powerResults7$rejectPerStage[2, ], c(0.030436001, 0.12110923, 0.26177073, 0.39724295), tolerance = 1e-07, label = paste0(powerResults7$rejectPerStage[2, ]))
+    expect_equal(powerResults7$rejectPerStage[3, ], c(0.025842077, 0.10091538, 0.17793787, 0.19830932), tolerance = 1e-07, label = paste0(powerResults7$rejectPerStage[3, ]))
+    expect_equal(powerResults7$futilityStop, c(0.71047424, 0.42856456, 0.21982747, 0.10295201), tolerance = 1e-07, label = paste0(powerResults7$futilityStop))
+    expect_equal(powerResults7$futilityPerStage[1, ], c(0.30853754, 0.1604311, 0.08147133, 0.041317452), tolerance = 1e-07, label = paste0(powerResults7$futilityPerStage[1, ]))
+    expect_equal(powerResults7$futilityPerStage[2, ], c(0.40193671, 0.26813346, 0.13835614, 0.061634556), tolerance = 1e-07, label = paste0(powerResults7$futilityPerStage[2, ]))
+    expect_equal(powerResults7$earlyStop, c(0.75208089, 0.58625412, 0.5639732, 0.6473032), tolerance = 1e-07, label = paste0(powerResults7$earlyStop))
+    expect_equal(powerResults7$analysisTime[1, ], c(32.816894, 30.124548, 27.945787, 26.142615), tolerance = 1e-07, label = paste0(powerResults7$analysisTime[1, ]))
+    expect_equal(powerResults7$analysisTime[2, ], c(73.505015, 66.662265, 61.211479, 56.744296), tolerance = 1e-07, label = paste0(powerResults7$analysisTime[2, ]))
+    expect_equal(powerResults7$analysisTime[3, ], c(108.86335, 98.356678, 90.102375, 83.398147), tolerance = 1e-07, label = paste0(powerResults7$analysisTime[3, ]))
+    expect_equal(powerResults7$studyDuration, c(69.262697, 72.57735, 68.358222, 60.378881), tolerance = 1e-07, label = paste0(powerResults7$studyDuration))
+    expect_equal(powerResults7$maxStudyDuration, c(108.86335, 98.356678, 90.102375, 83.398147), tolerance = 1e-07, label = paste0(powerResults7$maxStudyDuration))
+    expect_equal(powerResults7$cumulativeEventsPerStage[1, ], 19.5, tolerance = 1e-07, label = paste0(powerResults7$cumulativeEventsPerStage[1, ]))
+    expect_equal(powerResults7$cumulativeEventsPerStage[2, ], 45.5, tolerance = 1e-07, label = paste0(powerResults7$cumulativeEventsPerStage[2, ]))
+    expect_equal(powerResults7$cumulativeEventsPerStage[3, ], 65, label = paste0(powerResults7$cumulativeEventsPerStage[3, ]))
+    expect_equal(powerResults7$expectedNumberOfSubjects, c(200, 200, 200, 200), label = paste0(powerResults7$expectedNumberOfSubjects))
+    expect_equal(powerResults7$criticalValuesEffectScale[1, ], 2.2513678, tolerance = 1e-07, label = paste0(powerResults7$criticalValuesEffectScale[1, ]))
+    expect_equal(powerResults7$criticalValuesEffectScale[2, ], 1.3650021, tolerance = 1e-07, label = paste0(powerResults7$criticalValuesEffectScale[2, ]))
+    expect_equal(powerResults7$criticalValuesEffectScale[3, ], 1.1988902, tolerance = 1e-07, label = paste0(powerResults7$criticalValuesEffectScale[3, ]))
+    expect_equal(powerResults7$futilityBoundsEffectScale[1, ], 0.63788392, tolerance = 1e-07, label = paste0(powerResults7$futilityBoundsEffectScale[1, ]))
+    expect_equal(powerResults7$futilityBoundsEffectScale[2, ], 0.92784212, tolerance = 1e-07, label = paste0(powerResults7$futilityBoundsEffectScale[2, ]))
+    expect_equal(powerResults7$futilityBoundsPValueScale[1, ], 0.69146246, tolerance = 1e-07, label = paste0(powerResults7$futilityBoundsPValueScale[1, ]))
+    expect_equal(powerResults7$futilityBoundsPValueScale[2, ], 0.30853754, tolerance = 1e-07, label = paste0(powerResults7$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(powerResult), NA)))
-        expect_output(print(powerResult)$show())
-        invisible(capture.output(expect_error(summary(powerResult), NA)))
-        expect_output(summary(powerResult)$show())
-        powerResultCodeBased <- eval(parse(text = getObjectRCode(powerResult, stringWrapParagraphWidth = NULL)))
-        expect_equal(powerResultCodeBased$pi1, powerResult$pi1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$median1, powerResult$median1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$median2, powerResult$median2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda1, powerResult$lambda1, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$lambda2, powerResult$lambda2, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$numberOfSubjects, powerResult$numberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$accrualIntensity, powerResult$accrualIntensity, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$followUpTime, powerResult$followUpTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfEvents, powerResult$expectedNumberOfEvents, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$overallReject, powerResult$overallReject, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$rejectPerStage, powerResult$rejectPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityStop, powerResult$futilityStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityPerStage, powerResult$futilityPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$earlyStop, powerResult$earlyStop, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$analysisTime, powerResult$analysisTime, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$studyDuration, powerResult$studyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$maxStudyDuration, powerResult$maxStudyDuration, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$cumulativeEventsPerStage, powerResult$cumulativeEventsPerStage, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$expectedNumberOfSubjects, powerResult$expectedNumberOfSubjects, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$criticalValuesEffectScale, powerResult$criticalValuesEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsEffectScale, powerResult$futilityBoundsEffectScale, tolerance = 1e-07)
-        expect_equal(powerResultCodeBased$futilityBoundsPValueScale, powerResult$futilityBoundsPValueScale, tolerance = 1e-07)
-        expect_type(names(powerResult), "character")
-        df <- as.data.frame(powerResult)
+        invisible(capture.output(expect_error(print(powerResults7), NA)))
+        expect_output(print(powerResults7)$show())
+        invisible(capture.output(expect_error(summary(powerResults7), NA)))
+        expect_output(summary(powerResults7)$show())
+        powerResults7CodeBased <- eval(parse(text = getObjectRCode(powerResults7, stringWrapParagraphWidth = NULL)))
+        expect_equal(powerResults7CodeBased$pi1, powerResults7$pi1, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$median1, powerResults7$median1, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$median2, powerResults7$median2, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$lambda1, powerResults7$lambda1, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$lambda2, powerResults7$lambda2, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$numberOfSubjects, powerResults7$numberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$accrualIntensity, powerResults7$accrualIntensity, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$followUpTime, powerResults7$followUpTime, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$expectedNumberOfEvents, powerResults7$expectedNumberOfEvents, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$overallReject, powerResults7$overallReject, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$rejectPerStage, powerResults7$rejectPerStage, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$futilityStop, powerResults7$futilityStop, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$futilityPerStage, powerResults7$futilityPerStage, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$earlyStop, powerResults7$earlyStop, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$analysisTime, powerResults7$analysisTime, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$studyDuration, powerResults7$studyDuration, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$maxStudyDuration, powerResults7$maxStudyDuration, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$cumulativeEventsPerStage, powerResults7$cumulativeEventsPerStage, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$expectedNumberOfSubjects, powerResults7$expectedNumberOfSubjects, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$criticalValuesEffectScale, powerResults7$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$futilityBoundsEffectScale, powerResults7$futilityBoundsEffectScale, tolerance = 1e-07)
+        expect_equal(powerResults7CodeBased$futilityBoundsPValueScale, powerResults7$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_type(names(powerResults7), "character")
+        df <- as.data.frame(powerResults7)
         expect_s3_class(df, "data.frame")
         expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(powerResult)
+        mtx <- as.matrix(powerResults7)
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
@@ -8109,7 +8214,8 @@ test_that("'getPowerSurvival': Specify effect size for a two-stage group design 
     # @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
     powerResult <- getPowerSurvival(
         design = getDesignGroupSequential(kMax = 2),
-        pi1 = 0.2, pi2 = 0.3, eventTime = 24, maxNumberOfEvents = 40, maxNumberOfSubjects = 200, directionUpper = FALSE
+        pi1 = 0.2, pi2 = 0.3, eventTime = 24, maxNumberOfEvents = 40,
+        maxNumberOfSubjects = 200, directionUpper = FALSE
     )
 
     ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
@@ -8168,6 +8274,40 @@ test_that("'getPowerSurvival': Specify effect size for a two-stage group design 
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+
+    # @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
+    # @refFS[Formula]{fs:ShiftParameterSurvivalSchoenfeld}
+    # @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
+    powerResult2 <- getPowerSurvival(
+        design = getDesignGroupSequential(kMax = 2, directionUpper = FALSE),
+        pi1 = 0.2, pi2 = 0.3, eventTime = 24, maxNumberOfEvents = 40,
+        maxNumberOfSubjects = 200
+    )
+
+    ## Pairwise comparison of the results of powerResult with the results of powerResult2
+    expect_equal(powerResult$median1, powerResult2$median1, tolerance = 1e-07)
+    expect_equal(powerResult$median2, powerResult2$median2, tolerance = 1e-07)
+    expect_equal(powerResult$lambda1, powerResult2$lambda1, tolerance = 1e-07)
+    expect_equal(powerResult$lambda2, powerResult2$lambda2, tolerance = 1e-07)
+    expect_equal(powerResult$hazardRatio, powerResult2$hazardRatio, tolerance = 1e-07)
+    expect_equal(powerResult2$numberOfSubjects[1, ], powerResult$numberOfSubjects[1, ])
+    expect_equal(powerResult2$numberOfSubjects[2, ], powerResult$numberOfSubjects[2, ])
+    expect_equal(powerResult$accrualIntensity, powerResult2$accrualIntensity, tolerance = 1e-07)
+    expect_equal(powerResult$followUpTime, powerResult2$followUpTime, tolerance = 1e-07)
+    expect_equal(powerResult$expectedNumberOfEvents, powerResult2$expectedNumberOfEvents, tolerance = 1e-07)
+    expect_equal(powerResult$overallReject, powerResult2$overallReject, tolerance = 1e-07)
+    expect_equal(powerResult2$rejectPerStage[1, ], powerResult$rejectPerStage[1, ], tolerance = 1e-07)
+    expect_equal(powerResult2$rejectPerStage[2, ], powerResult$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(powerResult$earlyStop, powerResult2$earlyStop, tolerance = 1e-07)
+    expect_equal(powerResult2$analysisTime[1, ], powerResult$analysisTime[1, ], tolerance = 1e-07)
+    expect_equal(powerResult2$analysisTime[2, ], powerResult$analysisTime[2, ], tolerance = 1e-07)
+    expect_equal(powerResult$studyDuration, powerResult2$studyDuration, tolerance = 1e-07)
+    expect_equal(powerResult$maxStudyDuration, powerResult2$maxStudyDuration, tolerance = 1e-07)
+    expect_equal(powerResult2$cumulativeEventsPerStage[1, ], powerResult$cumulativeEventsPerStage[1, ])
+    expect_equal(powerResult2$cumulativeEventsPerStage[2, ], powerResult$cumulativeEventsPerStage[2, ])
+    expect_equal(powerResult$expectedNumberOfSubjects, powerResult2$expectedNumberOfSubjects)
+    expect_equal(powerResult2$criticalValuesEffectScale[1, ], powerResult$criticalValuesEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(powerResult2$criticalValuesEffectScale[2, ], powerResult$criticalValuesEffectScale[2, ], tolerance = 1e-07)
 })
 
 test_that("'getPowerSurvival': Effect size is based on event rate at specified event time for the reference group and hazard ratio, directionUpper = FALSE needs to be specified because it should be shown that hazard ratio < 1", {
@@ -8178,7 +8318,8 @@ test_that("'getPowerSurvival': Effect size is based on event rate at specified e
     # @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
     powerResult <- getPowerSurvival(
         design = getDesignGroupSequential(kMax = 2),
-        hazardRatio = 0.5, pi2 = 0.3, eventTime = 24, maxNumberOfEvents = 40, maxNumberOfSubjects = 200, directionUpper = FALSE
+        hazardRatio = 0.5, pi2 = 0.3, eventTime = 24, maxNumberOfEvents = 40,
+        maxNumberOfSubjects = 200, directionUpper = FALSE
     )
 
     ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
@@ -8237,6 +8378,40 @@ test_that("'getPowerSurvival': Effect size is based on event rate at specified e
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+
+    # @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
+    # @refFS[Formula]{fs:ShiftParameterSurvivalSchoenfeld}
+    # @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
+    powerResult2 <- getPowerSurvival(
+        design = getDesignGroupSequential(kMax = 2, directionUpper = FALSE),
+        hazardRatio = 0.5, pi2 = 0.3, eventTime = 24, maxNumberOfEvents = 40,
+        maxNumberOfSubjects = 200
+    )
+
+    ## Pairwise comparison of the results of powerResult with the results of powerResult2
+    expect_equal(powerResult$pi1, powerResult2$pi1, tolerance = 1e-07)
+    expect_equal(powerResult$median1, powerResult2$median1, tolerance = 1e-07)
+    expect_equal(powerResult$median2, powerResult2$median2, tolerance = 1e-07)
+    expect_equal(powerResult$lambda1, powerResult2$lambda1, tolerance = 1e-07)
+    expect_equal(powerResult$lambda2, powerResult2$lambda2, tolerance = 1e-07)
+    expect_equal(powerResult2$numberOfSubjects[1, ], powerResult$numberOfSubjects[1, ])
+    expect_equal(powerResult2$numberOfSubjects[2, ], powerResult$numberOfSubjects[2, ])
+    expect_equal(powerResult$accrualIntensity, powerResult2$accrualIntensity, tolerance = 1e-07)
+    expect_equal(powerResult$followUpTime, powerResult2$followUpTime, tolerance = 1e-07)
+    expect_equal(powerResult$expectedNumberOfEvents, powerResult2$expectedNumberOfEvents, tolerance = 1e-07)
+    expect_equal(powerResult$overallReject, powerResult2$overallReject, tolerance = 1e-07)
+    expect_equal(powerResult2$rejectPerStage[1, ], powerResult$rejectPerStage[1, ], tolerance = 1e-07)
+    expect_equal(powerResult2$rejectPerStage[2, ], powerResult$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(powerResult$earlyStop, powerResult2$earlyStop, tolerance = 1e-07)
+    expect_equal(powerResult2$analysisTime[1, ], powerResult$analysisTime[1, ], tolerance = 1e-07)
+    expect_equal(powerResult2$analysisTime[2, ], powerResult$analysisTime[2, ], tolerance = 1e-07)
+    expect_equal(powerResult$studyDuration, powerResult2$studyDuration, tolerance = 1e-07)
+    expect_equal(powerResult$maxStudyDuration, powerResult2$maxStudyDuration, tolerance = 1e-07)
+    expect_equal(powerResult2$cumulativeEventsPerStage[1, ], powerResult$cumulativeEventsPerStage[1, ])
+    expect_equal(powerResult2$cumulativeEventsPerStage[2, ], powerResult$cumulativeEventsPerStage[2, ])
+    expect_equal(powerResult$expectedNumberOfSubjects, powerResult2$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(powerResult2$criticalValuesEffectScale[1, ], powerResult$criticalValuesEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(powerResult2$criticalValuesEffectScale[2, ], powerResult$criticalValuesEffectScale[2, ], tolerance = 1e-07)
 })
 
 test_that("'getPowerSurvival': Effect size is based on hazard rate for the reference group and hazard ratio, directionUpper = FALSE needs to be specified because it should be shown that hazard ratio < 1", {
@@ -8246,7 +8421,8 @@ test_that("'getPowerSurvival': Effect size is based on hazard rate for the refer
     # @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
     powerResult <- getPowerSurvival(
         design = getDesignGroupSequential(kMax = 2),
-        hazardRatio = 0.5, lambda2 = 0.02, maxNumberOfEvents = 40, maxNumberOfSubjects = 200, directionUpper = FALSE
+        hazardRatio = 0.5, lambda2 = 0.02, maxNumberOfEvents = 40,
+        maxNumberOfSubjects = 200, directionUpper = FALSE
     )
 
     ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
@@ -8301,6 +8477,37 @@ test_that("'getPowerSurvival': Effect size is based on hazard rate for the refer
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+
+    # @refFS[Tab.]{fs:tab:output:getSampleSizeSurvival}
+    # @refFS[Formula]{fs:sampleSizeSurvivalDefinitionPieceWiseAccrual}
+    powerResult2 <- getPowerSurvival(
+        design = getDesignGroupSequential(kMax = 2, directionUpper = FALSE),
+        hazardRatio = 0.5, lambda2 = 0.02, maxNumberOfEvents = 40,
+        maxNumberOfSubjects = 200
+    )
+
+    ## Pairwise comparison of the results of powerResult with the results of powerResult2
+    expect_equal(powerResult$median1, powerResult2$median1, tolerance = 1e-07)
+    expect_equal(powerResult$median2, powerResult2$median2, tolerance = 1e-07)
+    expect_equal(powerResult$lambda1, powerResult2$lambda1, tolerance = 1e-07)
+    expect_equal(powerResult2$numberOfSubjects[1, ], powerResult$numberOfSubjects[1, ])
+    expect_equal(powerResult2$numberOfSubjects[2, ], powerResult$numberOfSubjects[2, ])
+    expect_equal(powerResult$accrualIntensity, powerResult2$accrualIntensity, tolerance = 1e-07)
+    expect_equal(powerResult$followUpTime, powerResult2$followUpTime, tolerance = 1e-07)
+    expect_equal(powerResult$expectedNumberOfEvents, powerResult2$expectedNumberOfEvents, tolerance = 1e-07)
+    expect_equal(powerResult$overallReject, powerResult2$overallReject, tolerance = 1e-07)
+    expect_equal(powerResult2$rejectPerStage[1, ], powerResult$rejectPerStage[1, ], tolerance = 1e-07)
+    expect_equal(powerResult2$rejectPerStage[2, ], powerResult$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(powerResult$earlyStop, powerResult2$earlyStop, tolerance = 1e-07)
+    expect_equal(powerResult2$analysisTime[1, ], powerResult$analysisTime[1, ], tolerance = 1e-07)
+    expect_equal(powerResult2$analysisTime[2, ], powerResult$analysisTime[2, ], tolerance = 1e-07)
+    expect_equal(powerResult$studyDuration, powerResult2$studyDuration, tolerance = 1e-07)
+    expect_equal(powerResult$maxStudyDuration, powerResult2$maxStudyDuration, tolerance = 1e-07)
+    expect_equal(powerResult2$cumulativeEventsPerStage[1, ], powerResult$cumulativeEventsPerStage[1, ])
+    expect_equal(powerResult2$cumulativeEventsPerStage[2, ], powerResult$cumulativeEventsPerStage[2, ])
+    expect_equal(powerResult$expectedNumberOfSubjects, powerResult2$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(powerResult2$criticalValuesEffectScale[1, ], powerResult$criticalValuesEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(powerResult2$criticalValuesEffectScale[2, ], powerResult$criticalValuesEffectScale[2, ], tolerance = 1e-07)
 })
 
 test_that("'getPowerSurvival': Specification of piecewise exponential survival time and hazard ratios", {
@@ -8312,7 +8519,9 @@ test_that("'getPowerSurvival': Specification of piecewise exponential survival t
     # @refFS[Formula]{fs:pieceWiseExponentialSurvival}
     powerResult <- getPowerSurvival(
         design = getDesignGroupSequential(kMax = 2),
-        piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04), hazardRatio = c(1.5, 1.8, 2), maxNumberOfEvents = 40, maxNumberOfSubjects = 200
+        piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04),
+        hazardRatio = c(1.5, 1.8, 2),
+        maxNumberOfEvents = 40, maxNumberOfSubjects = 200
     )
 
     ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
@@ -8372,7 +8581,8 @@ test_that("'getPowerSurvival': Specification of piecewise exponential survival t
     pws <- list("0 - <5" = 0.01, "5 - <10" = 0.02, ">=10" = 0.04)
     powerResult <- getPowerSurvival(
         design = getDesignGroupSequential(kMax = 2),
-        piecewiseSurvivalTime = pws, hazardRatio = c(1.5, 1.8, 2), maxNumberOfEvents = 40, maxNumberOfSubjects = 200
+        piecewiseSurvivalTime = pws, hazardRatio = c(1.5, 1.8, 2),
+        maxNumberOfEvents = 40, maxNumberOfSubjects = 200
     )
 
     ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
@@ -8431,7 +8641,8 @@ test_that("'getPowerSurvival': Specification of piecewise exponential survival t
     # @refFS[Formula]{fs:pieceWiseExponentialSurvival}
     powerResult <- getPowerSurvival(
         design = getDesignGroupSequential(kMax = 2),
-        piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04), lambda1 = c(0.015, 0.03, 0.06), maxNumberOfEvents = 40, maxNumberOfSubjects = 200
+        piecewiseSurvivalTime = c(0, 5, 10), lambda2 = c(0.01, 0.02, 0.04),
+        lambda1 = c(0.015, 0.03, 0.06), maxNumberOfEvents = 40, maxNumberOfSubjects = 200
     )
 
     ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results
@@ -8551,7 +8762,8 @@ test_that("'getPowerSurvival': Specify effect size based on median survival time
     # @refFS[Formula]{fs:lambdabymedian}
     powerResult <- getPowerSurvival(
         lambda1 = log(2) / 5, lambda2 = log(2) / 3,
-        maxNumberOfEvents = 40, maxNumberOfSubjects = 200, directionUpper = FALSE
+        maxNumberOfEvents = 40, maxNumberOfSubjects = 200,
+        directionUpper = FALSE
     )
 
     ## Comparison of the results of TrialDesignPlanSurvival object 'powerResult' with expected results

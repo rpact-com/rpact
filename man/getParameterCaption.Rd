@@ -4,7 +4,12 @@
 \alias{getParameterCaption}
 \title{Get Parameter Caption}
 \usage{
-getParameterCaption(obj, parameterName)
+getParameterCaption(obj, var)
+}
+\arguments{
+\item{obj}{The rpact result object.}
+
+\item{var}{The variable/parameter name.}
 }
 \value{
 Returns a \code{\link[base]{character}} of specifying the corresponding caption of a given parameter name.

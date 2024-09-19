@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8151 $
-## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
+## |  File version: $Revision: 8180 $
+## |  Last changed: $Date: 2024-09-06 10:13:14 +0200 (Fr, 06 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -75,6 +75,7 @@ TrialDesign <- R6::R6Class("TrialDesign",
         stageLevels = NULL,
         alphaSpent = NULL,
         bindingFutility = NULL,
+        directionUpper = NULL,
         tolerance = NULL,
         initialize = function(...,
                 kMax = NA_integer_,
@@ -85,6 +86,7 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 stageLevels = NA_real_,
                 alphaSpent = NA_real_,
                 bindingFutility = NA,
+                directionUpper = NA,
                 tolerance = 1e-06 # C_ANALYSIS_TOLERANCE_DEFAULT
                 ) {
             self$kMax <- kMax
@@ -95,6 +97,7 @@ TrialDesign <- R6::R6Class("TrialDesign",
             self$stageLevels <- stageLevels
             self$alphaSpent <- alphaSpent
             self$bindingFutility <- bindingFutility
+            self$directionUpper <- directionUpper
             self$tolerance <- tolerance
             super$initialize(...)
 
@@ -493,6 +496,7 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
                 "alpha",
                 "alpha0Vec",
                 "bindingFutility",
+                "directionUpper",
                 "sided",
                 "tolerance",
                 "iterations",
@@ -814,6 +818,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 "deltaPT0",
                 "futilityBounds",
                 "bindingFutility",
+                "directionUpper",
                 "constantBoundsHP",
                 "gammaA",
                 "gammaB",
