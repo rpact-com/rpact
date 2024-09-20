@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8200 $
-## |  Last changed: $Date: 2024-09-12 15:05:38 +0200 (Do, 12 Sep 2024) $
+## |  File version: $Revision: 8246 $
+## |  Last changed: $Date: 2024-09-20 12:10:36 +0200 (Fr, 20 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -987,7 +987,7 @@ plot.SimulationResults <- function(
         plotSettings = NULL) {
     
     .assertIsValidPlotType(type, naAllowed = TRUE)
-    if (is.na(type)) {
+    if (all(is.na(type))) {
         type <- na.omit(getAvailablePlotTypes(x))
         if (length(type) == 0) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "not plot type available")

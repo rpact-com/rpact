@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8247 $
+## |  Last changed: $Date: 2024-09-20 12:27:05 +0200 (Fr, 20 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -45,7 +45,8 @@ NULL
         # outside validated range
         numberOfNAs <- sum(as.vector(criticalValues) > 50, na.rm = TRUE)
         criticalValues[criticalValues > 50] <- NA_real_
-        if (any(is.na(criticalValues) & criticalValues < 8)) {
+        
+        if (any(is.na(criticalValues))) {
             warning("The computation of ", .integerToWrittenNumber(numberOfNAs),
                 " efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " on ",
                 "treatment effect scale not performed presumably due to too small df",
