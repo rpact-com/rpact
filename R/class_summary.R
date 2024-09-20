@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8240 $
-## |  Last changed: $Date: 2024-09-19 16:58:11 +0200 (Do, 19 Sep 2024) $
+## |  File version: $Revision: 8243 $
+## |  Last changed: $Date: 2024-09-20 07:33:34 +0200 (Fr, 20 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -444,7 +444,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 formatRepeatedPValues = FALSE,
                 validateParameterType = TRUE,
                 lastStage = NA_integer_,
-                roundDigitsAsInformation = FALSE) {
+                roundDigitsAsInformation = FALSE,
+                showNA = FALSE) {
             if (!is.null(parameterName) && length(parameterName) == 1 &&
                     inherits(parameterSet, "ParameterSet") &&
                     parameterSet$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE) {
@@ -584,7 +585,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     cumsumEnabled = cumsumEnabled,
                     smoothedZeroFormat = smoothedZeroFormat,
                     formatRepeatedPValues = formatRepeatedPValues,
-                    roundDigitsAsInformation = roundDigitsAsInformation
+                    roundDigitsAsInformation = roundDigitsAsInformation,
+                    showNA = showNA
                 )
 
                 if (parameterName1 %in% c("piControl", "overallPiControl", "overallPooledStDevs")) {
@@ -602,7 +604,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                         cumsumEnabled = cumsumEnabled,
                         smoothedZeroFormat = smoothedZeroFormat,
                         formatRepeatedPValues = formatRepeatedPValues,
-                        roundDigitsAsInformation = roundDigitsAsInformation
+                        roundDigitsAsInformation = roundDigitsAsInformation,
+                        showNA = showNA
                     )
                     valuesToShow2 <- self$.getInnerValues(valuesToShow2, transpose = transpose)
                 }
@@ -777,23 +780,31 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
                 for (variantIndex in 1:numberOfVariants) {
                     colValues <- self$.getColumnValues(parameterName, values, variantIndex, transposed)
-                    colValues <- .getSummaryValuesFormatted(parameterSet, parameterName1,
-                        colValues,
+                    colValues <- .getSummaryValuesFormatted(
+                        parameterSet, 
+                        parameterName1,
+                        values = colValues,
                         roundDigits = roundDigits,
                         ceilingEnabled = ceilingEnabled, cumsumEnabled = cumsumEnabled,
                         smoothedZeroFormat = smoothedZeroFormat,
                         formatRepeatedPValues = formatRepeatedPValues,
-                        roundDigitsAsInformation = roundDigitsAsInformation
+                        roundDigitsAsInformation = roundDigitsAsInformation,
+                        showNA = showNA
                     )
                     colValues2 <- NA_real_
                     if (!all(is.na(values2))) {
                         colValues2 <- self$.getColumnValues(parameterName, values2, variantIndex, transposed)
-                        colValues2 <- .getSummaryValuesFormatted(parameterSet, parameterName2, colValues2,
-                            roundDigits = roundDigits, ceilingEnabled = ceilingEnabled,
+                        colValues2 <- .getSummaryValuesFormatted(
+                            parameterSet, 
+                            parameterName2, 
+                            values = colValues2,
+                            roundDigits = roundDigits, 
+                            ceilingEnabled = ceilingEnabled,
                             cumsumEnabled = cumsumEnabled,
                             smoothedZeroFormat = smoothedZeroFormat,
                             formatRepeatedPValues = formatRepeatedPValues,
-                            roundDigitsAsInformation = roundDigitsAsInformation
+                            roundDigitsAsInformation = roundDigitsAsInformation,
+                            showNA = showNA
                         )
                     }
                     colValues <- self$.getFormattedParameterValue(valuesToShow = colValues, valuesToShow2 = colValues2)
@@ -923,7 +934,14 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     )
 )
 
-.formatSummaryValues <- function(values, digits, smoothedZeroFormat = FALSE, formatRepeatedPValues = FALSE) {
+.formatSummaryValues <- function(
+        values, 
+        ...,
+        digits, 
+        smoothedZeroFormat = FALSE, 
+        formatRepeatedPValues = FALSE,
+        showNA = FALSE) {
+        
     if (is.na(digits)) {
         digits <- 3
     }
@@ -974,7 +992,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
     }
 
-    formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <- getOption("rpact.summary.na", "")
+    formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <- 
+        ifelse(showNA, "n/a", getOption("rpact.summary.na", ""))
 
     return(formattedValue)
 }
@@ -989,7 +1008,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         cumsumEnabled = FALSE,
         smoothedZeroFormat = FALSE, 
         formatRepeatedPValues = FALSE,
-        roundDigitsAsInformation = FALSE) {
+        roundDigitsAsInformation = FALSE,
+        showNA = FALSE) {
         
     if (!is.numeric(values)) {
         return(values)
@@ -1048,7 +1068,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     values <- .formatSummaryValues(values,
                         digits = roundDigits,
                         smoothedZeroFormat = smoothedZeroFormat,
-                        formatRepeatedPValues = formatRepeatedPValues
+                        formatRepeatedPValues = formatRepeatedPValues,
+                        showNA = showNA
                     )
                 }
             },
@@ -3234,7 +3255,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         )
     }
 
-    return(invisible(summaryFactory))
+    return(summaryFactory)
 }
 
 #'
@@ -3576,7 +3597,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             parameterName = parameterNameSubjects,
             parameterCaption = subjectsCaption, 
             roundDigits = digitSettings$digitsSampleSize,
-            validateParameterType = !countDataEnabled
+            validateParameterType = !countDataEnabled,
+            showNA = TRUE
         )
     }
 

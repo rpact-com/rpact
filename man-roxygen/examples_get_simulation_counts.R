@@ -18,19 +18,19 @@
 #' # equidistant time points (lambda1, lambda2, and overdispersion as specified,
 #' # no futility stopping):
 #' dOF <- getDesignGroupSequential(
-#'     kMax = 3, 
-#'     alpha = 0.025, 
-#'     beta = 0.2, 
+#'     kMax = 3,
+#'     alpha = 0.025,
+#'     beta = 0.2,
 #'     typeOfDesign = "asOF")
-#'
+#' 
 #' getSimulationCounts(design = dOF,
-#'     lambda1 = seq(0.04, 0.12, 0.02), 
-#'     lambda2 = 0.12, 
-#'     directionUpper = FALSE,       
-#'     overdispersion = 5, 
+#'     lambda1 = seq(0.04, 0.12, 0.02),
+#'     lambda2 = 0.12,
+#'     directionUpper = FALSE,
+#'     overdispersion = 5,
 #'     plannedCalendarTime = (1:3)/3*4,
-#'     maxNumberOfSubjects = 264, 
-#'     followUpTime = 2.75, 
+#'     maxNumberOfSubjects = 264,
+#'     followUpTime = 2.75,
 #'     accrualTime = 1.25,
 #'     maxNumberOfIterations = 1000)
 #' }

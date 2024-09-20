@@ -12,7 +12,7 @@
 * Usage of pipe-operators improved
 * Analysis progress messages are only displayed when R is used interactively
 * Manual use of `kable()` for rpact result objects marked as deprecated, as the formatting and display will be handled automatically by rpact
-* Minor summary improvements
+* The order of all summary entries has been revised and optimized
 * Minimum version of suggested package `ggplot2` changed from 2.2.0 to 3.2.0
 * Issues [#41](https://github.com/rpact-com/rpact/issues/41), [#44](https://github.com/rpact-com/rpact/issues/44), [#46](https://github.com/rpact-com/rpact/issues/46), and [#47](https://github.com/rpact-com/rpact/issues/47) fixed
 * When analyzing with a two-sided test, an issue with the calculation of the conditional rejection probability was fixed

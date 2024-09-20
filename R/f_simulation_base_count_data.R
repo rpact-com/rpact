@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8241 $
-## |  Last changed: $Date: 2024-09-19 17:11:12 +0200 (Do, 19 Sep 2024) $
+## |  File version: $Revision: 8243 $
+## |  Last changed: $Date: 2024-09-20 07:33:34 +0200 (Fr, 20 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -126,21 +126,22 @@
 #' \enumerate{
 #'   \item \code{iterationNumber}: The number of the simulation iteration.
 #'   \item \code{stageNumber}: The stage.
-#'   \item \code{lambda1}: The assumed or derived event rate in the treatment group (if available).
-#'   \item \code{lambda2}: The assumed or derived event rate in the control group (if available).
-#'   \item \code{numberOfSubjects}: The number of subjects under consideration when the
-#'         (interim) analysis takes place.
+#'   \item \code{lambda1}: The assumed or derived event rate in the treatment group.
+#'   \item \code{lambda2}: The assumed or derived event rate in the control group.
+#'   \item \code{accrualTime}: The assumed accrualTime.
+#'   \item \code{followUpTime}: The  assumed followUpTime.
+#'   \item \code{overdispersion}: The  assumed overdispersion.
+#'   \item \code{fixedFollowUp}: The  assumed fixedFollowUp.
+#'   \item \code{numberOfSubjects}: The number of subjects under consideration when the (interim) analysis takes place.
 #'   \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
 #'   \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
 #'   \item \code{testStatistic}: The test statistic that is used for the test decision
-#'   \item \code{overallLambda1}: The cumulative rate in treatment group 1.
-#'   \item \code{overallLambda2}: The cumulative rate in treatment group 2.
-#'   \item \code{sampleSizesPerStage1}: The stage-wise sample size in treatment group 1.
-#'   \item \code{sampleSizesPerStage2}: The stage-wise sample size in treatment group 2.
+#'   \item \code{estimatedLambda1}: The estimated rate in treatment group 1.
+#'   \item \code{estimatedLambda2}: The estimated rate in treatment group 2.
+#'   \item \code{estimatedOverdispersion}: The estimated overdispersion.
+#'   \item \code{infoAnalysis}: The Fisher information at interim stage.
 #'   \item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
-#'   \item \code{conditionalPowerAchieved}: The conditional power for the subsequent stage of the trial for
-#'         selected sample size and effect. The effect is either estimated from the data or can be
-#'         user defined with \code{lambda1H1} and \code{lambda2H1}.
+#'   \item \code{conditionalPowerAchieved}: Not yet available
 #' }
 #'
 #' @template return_object_simulation_results
@@ -312,6 +313,9 @@ getSimulationCounts <- function(design = NULL,
     dataTestStatistic <- rep(NA_real_, len)
     dataTrialStop <- rep(NA, len)
     dataConditionalPower <- rep(NA_real_, len)
+    dataSampleSizes <- rep(NA_real_, len)
+    dataReject <- rep(0, len)
+    dataFutility <- rep(0, len)
 
     index <- 1
     messageShown <- FALSE
@@ -411,6 +415,7 @@ getSimulationCounts <- function(design = NULL,
                 zValue <- (2 * directionUpper - 1) * (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(infoAnalysis)
                 if (!is.na(zValue) && zValue > .getCriticalValues(design, 1)) {
                     reject[1] <- reject[1] + 1
+                    dataReject[index] <- 1
                 }
                 iterations[1, iCase] <- iterations[1, iCase] + 1
                 nTotal <- nTotal + n1 + n2
@@ -423,7 +428,7 @@ getSimulationCounts <- function(design = NULL,
                 dataLambda1[index] <- lambda1[iCase]
                 dataLambda2[index] <- lambda2
                 dataOverdispersion[index] <- overdispersion
-                dataFixedFollowUp[index] <- !is.na(fixedExposureTime)
+                dataFixedFollowUp[index] <- fixedExposureTime
                 dataNegativeBinomialEstimate1[index] <- nb[1]
                 dataNegativeBinomialEstimate2[index] <- nb[2]
                 dataNegativeBinomialOverdispersion[index] <- nb[3]
@@ -431,6 +436,7 @@ getSimulationCounts <- function(design = NULL,
                 dataTestStatistic[index] <- zValue
                 dataTrialStop[index] <- TRUE
                 dataConditionalPower[index] <- NA_real_
+                dataSampleSizes[index] <- n1 + n2
 
                 index <- index + 1
             } else {
@@ -507,7 +513,7 @@ getSimulationCounts <- function(design = NULL,
                     dataLambda1[index] <- lambda1[iCase]
                     dataLambda2[index] <- lambda2
                     dataOverdispersion[index] <- overdispersion
-                    dataFixedFollowUp[index] <- !is.na(fixedExposureTime)
+                    dataFixedFollowUp[index] <- fixedExposureTime
                     dataNegativeBinomialEstimate1[index] <- nb[1]
                     dataNegativeBinomialEstimate2[index] <- nb[2]
                     dataNegativeBinomialOverdispersion[index] <- nb[3]
@@ -515,17 +521,20 @@ getSimulationCounts <- function(design = NULL,
                     dataTestStatistic[index] <- zValue
                     dataConditionalPower[index] <- conditionalPowerAchieved
                     dataTrialStop[index] <- FALSE
+                    dataSampleSizes[index] <- length(timeUnderObservation1) + length(timeUnderObservation2)
 
                     if (!is.na(zValue)) {
                         if (zValue > .getCriticalValues(design, k)) {
                             reject[k] <- reject[k] + 1
                             dataTrialStop[index] <- TRUE
+                            dataReject[index] <- 1
                             index <- index + 1
                             break
                         }
                         if (zValue < design$futilityBounds[k] && k < kMax) {
                             futility[k] <- futility[k] + 1
                             dataTrialStop[index] <- TRUE
+                            dataFutility[index] <- 1
                             index <- index + 1
                             break
                         }
@@ -584,6 +593,7 @@ getSimulationCounts <- function(design = NULL,
     simulationResults$iterations <- iterations
     simulationResults$.setParameterType("iterations", C_PARAM_GENERATED)
 
+    sampleSizePerStage[is.nan(sampleSizePerStage)] <- NA_integer_
     simulationResults$numberOfSubjects <- sampleSizePerStage
     simulationResults$.setParameterType(
         "numberOfSubjects",
@@ -615,20 +625,22 @@ getSimulationCounts <- function(design = NULL,
     }
 
     data <- data.frame(
-        caseNumber = dataCase,
         iterationNumber = dataIterationNumber,
         stageNumber = dataStageNumber,
-        accrualTime = dataAccrualTime,
-        followUpTime = dataFollowUpTime,
         lambda1 = dataLambda1,
         lambda2 = dataLambda2,
         overdispersion = dataOverdispersion,
+        accrualTime = dataAccrualTime,
+        followUpTime = dataFollowUpTime,
         fixedFollowUp = dataFixedFollowUp,
-        negativeBinomialEstimate1 = dataNegativeBinomialEstimate1,
-        negativeBinomialEstimate2 = dataNegativeBinomialEstimate2,
-        nbOverdispersion = dataNegativeBinomialOverdispersion,
-        infoAnalysis = dataInfoAnalysis,
+        numberOfSubjects = dataSampleSizes,
+        rejectPerStage = dataReject,
+        futilityPerStage = dataFutility,
         testStatistic = dataTestStatistic,
+        estimatedLambda1 = dataNegativeBinomialEstimate1,
+        estimatedLambda2 = dataNegativeBinomialEstimate2,
+        estimatedOverdispersion = dataNegativeBinomialOverdispersion,
+        infoAnalysis = dataInfoAnalysis,
         trialStop = dataTrialStop,
         conditionalPowerAchieved = dataConditionalPower
     )

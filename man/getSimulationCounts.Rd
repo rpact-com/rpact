@@ -132,21 +132,22 @@ object as \code{\link[base]{data.frame}}. The data frame contains the following 
 \enumerate{
 \item \code{iterationNumber}: The number of the simulation iteration.
 \item \code{stageNumber}: The stage.
-\item \code{lambda1}: The assumed or derived event rate in the treatment group (if available).
-\item \code{lambda2}: The assumed or derived event rate in the control group (if available).
-\item \code{numberOfSubjects}: The number of subjects under consideration when the
-(interim) analysis takes place.
+\item \code{lambda1}: The assumed or derived event rate in the treatment group.
+\item \code{lambda2}: The assumed or derived event rate in the control group.
+\item \code{accrualTime}: The assumed accrualTime.
+\item \code{followUpTime}: The  assumed followUpTime.
+\item \code{overdispersion}: The  assumed overdispersion.
+\item \code{fixedFollowUp}: The  assumed fixedFollowUp.
+\item \code{numberOfSubjects}: The number of subjects under consideration when the (interim) analysis takes place.
 \item \code{rejectPerStage}: 1 if null hypothesis can be rejected, 0 otherwise.
 \item \code{futilityPerStage}: 1 if study should be stopped for futility, 0 otherwise.
 \item \code{testStatistic}: The test statistic that is used for the test decision
-\item \code{overallLambda1}: The cumulative rate in treatment group 1.
-\item \code{overallLambda2}: The cumulative rate in treatment group 2.
-\item \code{sampleSizesPerStage1}: The stage-wise sample size in treatment group 1.
-\item \code{sampleSizesPerStage2}: The stage-wise sample size in treatment group 2.
+\item \code{estimatedLambda1}: The estimated rate in treatment group 1.
+\item \code{estimatedLambda2}: The estimated rate in treatment group 2.
+\item \code{estimatedOverdispersion}: The estimated overdispersion.
+\item \code{infoAnalysis}: The Fisher information at interim stage.
 \item \code{trialStop}: \code{TRUE} if study should be stopped for efficacy or futility or final stage, \code{FALSE} otherwise.
-\item \code{conditionalPowerAchieved}: The conditional power for the subsequent stage of the trial for
-selected sample size and effect. The effect is either estimated from the data or can be
-user defined with \code{lambda1H1} and \code{lambda2H1}.
+\item \code{conditionalPowerAchieved}: Not yet available
 }
 }
 
@@ -181,19 +182,19 @@ getSimulationCounts(
 # equidistant time points (lambda1, lambda2, and overdispersion as specified,
 # no futility stopping):
 dOF <- getDesignGroupSequential(
-    kMax = 3, 
-    alpha = 0.025, 
-    beta = 0.2, 
+    kMax = 3,
+    alpha = 0.025,
+    beta = 0.2,
     typeOfDesign = "asOF")
 
 getSimulationCounts(design = dOF,
-    lambda1 = seq(0.04, 0.12, 0.02), 
-    lambda2 = 0.12, 
-    directionUpper = FALSE,       
-    overdispersion = 5, 
+    lambda1 = seq(0.04, 0.12, 0.02),
+    lambda2 = 0.12,
+    directionUpper = FALSE,
+    overdispersion = 5,
     plannedCalendarTime = (1:3)/3*4,
-    maxNumberOfSubjects = 264, 
-    followUpTime = 2.75, 
+    maxNumberOfSubjects = 264,
+    followUpTime = 2.75,
     accrualTime = 1.25,
     maxNumberOfIterations = 1000)
 }
