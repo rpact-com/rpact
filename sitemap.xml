@@ -38,7 +38,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/PlotSettings.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/PowerAndAverageSampleNumberResult.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/SimulationResults.html</loc></url>
-<url><loc>https://rpact-com.github.io/rpact/reference/SimulationResultsBaseCountData.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/SimulationResultsCountData.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/SimulationResultsEnrichmentMeans.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/SimulationResultsEnrichmentRates.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/SimulationResultsEnrichmentSurvival.html</loc></url>
@@ -123,6 +123,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/getOutputFormat.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getParameterCaption.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getParameterName.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/getParameterType.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getPerformanceScore.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getPiecewiseSurvivalTime.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getPlotSettings.html</loc></url>
@@ -219,7 +220,6 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfIterations.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfSubjects.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfSubjectsPerStage.html</loc></url>
-<url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfSubjects_counts.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_maxNumberOfSubjects_survival.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_median1.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_median2.html</loc></url>

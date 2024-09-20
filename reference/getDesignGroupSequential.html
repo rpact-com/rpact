@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9254</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9261</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +62,7 @@
 <span>  userBetaSpending <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  gammaB <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  bindingFutility <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  directionUpper <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  betaAdjustment <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  constantBoundsHP <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  twoSidedPower <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -175,6 +176,12 @@ the critical values is affected by the futility bounds and the futility threshol
 sense that the study must be stopped if the futility condition was reached (default is <code>FALSE</code>).</p></dd>
 
 
+<dt id="arg-directionupper">directionUpper<a class="anchor" aria-label="anchor" href="#arg-directionupper"></a></dt>
+<dd><p>Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is <code>TRUE</code>
+which means that larger values of the test statistics yield smaller p-values.</p></dd>
+
+
 <dt id="arg-betaadjustment">betaAdjustment<a class="anchor" aria-label="anchor" href="#arg-betaadjustment"></a></dt>
 <dd><p>For two-sided beta spending designs, if <code>betaAdjustement = TRUE</code> a linear
 adjustment of the beta spending values is performed if an overlapping of decision regions for futility
@@ -279,7 +286,7 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

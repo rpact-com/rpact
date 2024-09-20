@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9254</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.0.1.9261</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,6 +52,7 @@
 <span>  informationRates <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  sided <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bindingFutility <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  directionUpper <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  tolerance <span class="op">=</span> <span class="fl">1e-14</span>,</span>
 <span>  iterations <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NA_real_</span></span>
@@ -108,6 +109,12 @@ Must be a positive integer of length 1.</p></dd>
 <dt id="arg-bindingfutility">bindingFutility<a class="anchor" aria-label="anchor" href="#arg-bindingfutility"></a></dt>
 <dd><p>If <code>bindingFutility = TRUE</code> is specified the calculation of
 the critical values is affected by the futility bounds (default is <code>TRUE</code>).</p></dd>
+
+
+<dt id="arg-directionupper">directionUpper<a class="anchor" aria-label="anchor" href="#arg-directionupper"></a></dt>
+<dd><p>Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is <code>TRUE</code>
+which means that larger values of the test statistics yield smaller p-values.</p></dd>
 
 
 <dt id="arg-tolerance">tolerance<a class="anchor" aria-label="anchor" href="#arg-tolerance"></a></dt>
@@ -184,7 +191,7 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
