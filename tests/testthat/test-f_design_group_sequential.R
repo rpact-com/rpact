@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_design_group_sequential.R
 ## |  Creation date: 08 November 2023, 09:09:43
-## |  File version: $Revision: 8023 $
-## |  Last changed: $Date: 2024-07-01 08:50:30 +0200 (Mo, 01 Jul 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 

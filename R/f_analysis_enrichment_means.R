@@ -13,15 +13,22 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_logger.R
 NULL
 
-.calcMeansVariancesTestStatistics <- function(dataInput, subset, stage, thetaH0, stratifiedAnalysis, varianceOption) {
+.calcMeansVariancesTestStatistics <- function(
+        dataInput, 
+        subset, 
+        stage, 
+        thetaH0, 
+        stratifiedAnalysis, 
+        varianceOption) {
+        
     .assertIsSingleInteger(stage, "stage")
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsSingleLogical(stratifiedAnalysis, "stratifiedAnalysis")
@@ -183,7 +190,9 @@ NULL
     ))
 }
 
-.getStageResultsMeansEnrichment <- function(..., design, dataInput,
+.getStageResultsMeansEnrichment <- function(..., 
+        design, 
+        dataInput,
         thetaH0 = C_THETA_H0_MEANS_DEFAULT,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -195,13 +204,13 @@ NULL
     .assertIsTrialDesign(design)
     .assertIsDatasetMeans(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
-    .assertIsValidDirectionUpper(directionUpper, design$sided)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsValidVarianceOptionEnrichment(design, varianceOption)
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
     .warnInCaseOfUnknownArguments(
         functionName = ".getStageResultsMeansEnrichment",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"), ...
+        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+            design, powerCalculationEnabled = TRUE), "stage"), ...
     )
 
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -294,7 +303,10 @@ NULL
         paste("stage ", (1:kMax), sep = "")
     )
 
-    subsets <- .createSubsetsByGMax(gMax = gMax, stratifiedInput = dataInput$isStratified(), subsetIdPrefix = "S")
+    subsets <- .createSubsetsByGMax(
+        gMax = gMax, 
+        stratifiedInput = dataInput$isStratified(), 
+        subsetIdPrefix = "S")
     for (k in 1:stage) {
         for (population in 1:gMax) {
             subset <- subsets[[population]]
@@ -309,7 +321,7 @@ NULL
             overallSampleSizes1[population, k] <- results$overallSampleSizes1
             overallSampleSizes2[population, k] <- results$overallSampleSizes2
             overallStDevs[population, k] <- results$overallStDevs
-            if (!directionUpper) {
+            if (isFALSE(directionUpper)) {
                 separatePValues[population, k] <- 1 - separatePValues[population, k]
             }
         }
@@ -415,20 +427,23 @@ NULL
 
 .getAnalysisResultsMeansEnrichment <- function(..., design, dataInput) {
     if (.isTrialDesignInverseNormal(design)) {
-        return(.getAnalysisResultsMeansInverseNormalEnrichment(design = design, dataInput = dataInput, ...))
+        return(.getAnalysisResultsMeansInverseNormalEnrichment(
+                design = design, dataInput = dataInput, ...))
     }
 
     if (.isTrialDesignFisher(design)) {
-        return(.getAnalysisResultsMeansFisherEnrichment(design = design, dataInput = dataInput, ...))
+        return(.getAnalysisResultsMeansFisherEnrichment(
+                design = design, dataInput = dataInput, ...))
     }
 
     .stopWithWrongDesignMessageEnrichment(design)
 }
 
 .getAnalysisResultsMeansInverseNormalEnrichment <- function(...,
-        design, dataInput,
+        design, 
+        dataInput,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_ENRICHMENT_DEFAULT,
@@ -447,14 +462,19 @@ NULL
     results <- AnalysisResultsEnrichmentInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansEnrichmentAll(
-        results = results, design = design, dataInput = dataInput,
-        intersectionTest = intersectionTest, stage = stage,
+        results = results, 
+        design = design, 
+        dataInput = dataInput,
+        intersectionTest = intersectionTest, 
+        stage = stage,
         directionUpper = directionUpper,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
         varianceOption = varianceOption,
-        thetaH0 = thetaH0, thetaH1 = thetaH1,
-        assumedStDevs = assumedStDevs, nPlanned = nPlanned,
+        thetaH0 = thetaH0, 
+        thetaH1 = thetaH1,
+        assumedStDevs = assumedStDevs, 
+        nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
         tolerance = tolerance
     )
@@ -463,9 +483,10 @@ NULL
 }
 
 .getAnalysisResultsMeansFisherEnrichment <- function(...,
-        design, dataInput,
+        design, 
+        dataInput,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_ENRICHMENT_DEFAULT,
@@ -474,7 +495,8 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+        iterations = C_ITERATIONS_DEFAULT, 
+        seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -491,31 +513,55 @@ NULL
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
     results <- .getAnalysisResultsMeansEnrichmentAll(
-        results = results, design = design, dataInput = dataInput,
-        intersectionTest = intersectionTest, stage = stage, directionUpper = directionUpper,
+        results = results, 
+        design = design, 
+        dataInput = dataInput,
+        intersectionTest = intersectionTest, 
+        stage = stage, 
+        directionUpper = directionUpper,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
         varianceOption = varianceOption,
-        thetaH0 = thetaH0, thetaH1 = thetaH1,
-        assumedStDevs = assumedStDevs, nPlanned = nPlanned,
+        thetaH0 = thetaH0, 
+        thetaH1 = thetaH1,
+        assumedStDevs = assumedStDevs, 
+        nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
-        tolerance = tolerance, iterations = iterations, seed = seed
+        tolerance = tolerance, 
+        iterations = iterations, 
+        seed = seed
     )
 
     return(results)
 }
 
 .getAnalysisResultsMeansEnrichmentAll <- function(...,
-        results, design, dataInput, intersectionTest, stage,
-        directionUpper, normalApproximation, stratifiedAnalysis,
-        varianceOption, thetaH0, thetaH1, assumedStDevs,
-        nPlanned, allocationRatioPlanned, tolerance, iterations, seed) {
+        results, 
+        design, 
+        dataInput, 
+        intersectionTest, 
+        stage,
+        directionUpper, 
+        normalApproximation, 
+        stratifiedAnalysis,
+        varianceOption, 
+        thetaH0, 
+        thetaH1, 
+        assumedStDevs,
+        nPlanned, 
+        allocationRatioPlanned, 
+        tolerance, 
+        iterations, 
+        seed) {
     startTime <- Sys.time()
 
     stageResults <- .getStageResultsMeansEnrichment(
-        design = design, dataInput = dataInput,
-        intersectionTest = intersectionTest, stage = stage,
-        thetaH0 = thetaH0, directionUpper = directionUpper,
+        design = design, 
+        dataInput = dataInput,
+        intersectionTest = intersectionTest, 
+        stage = stage,
+        thetaH0 = thetaH0, 
+        directionUpper = directionUpper,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
         varianceOption = varianceOption,
@@ -542,8 +588,10 @@ NULL
         results, "normalApproximation",
         normalApproximation, C_NORMAL_APPROXIMATION_MEANS_DEFAULT
     )
-    .setValueAndParameterType(results, "stratifiedAnalysis", stratifiedAnalysis, C_STRATIFIED_ANALYSIS_DEFAULT)
-    .setValueAndParameterType(results, "varianceOption", varianceOption, C_VARIANCE_OPTION_ENRICHMENT_DEFAULT)
+    .setValueAndParameterType(results, "stratifiedAnalysis", 
+        stratifiedAnalysis, C_STRATIFIED_ANALYSIS_DEFAULT)
+    .setValueAndParameterType(results, "varianceOption", 
+        varianceOption, C_VARIANCE_OPTION_ENRICHMENT_DEFAULT)
     .setValueAndParameterType(results, "thetaH0", thetaH0, C_THETA_H0_MEANS_DEFAULT)
     .setConditionalPowerArguments(results, dataInput, nPlanned, allocationRatioPlanned)
     .setNPlannedAndThetaH1AndAssumedStDevs(results, nPlanned, thetaH1, assumedStDevs)
@@ -567,8 +615,11 @@ NULL
         } else {
             results$.conditionalPowerResults <- .getConditionalPowerMeansEnrichment(
                 stageResults = stageResults,
-                stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
-                thetaH1 = thetaH1, assumedStDevs = assumedStDevs
+                stage = stage, 
+                nPlanned = nPlanned, 
+                allocationRatioPlanned = allocationRatioPlanned,
+                thetaH1 = thetaH1, 
+                assumedStDevs = assumedStDevs
             )
             results$conditionalPower <- results$.conditionalPowerResults$conditionalPower
             results$.setParameterType("conditionalPower", C_PARAM_GENERATED)
@@ -592,8 +643,11 @@ NULL
 
     # RCI - repeated confidence interval
     repeatedConfidenceIntervals <- .getRepeatedConfidenceIntervalsMeansEnrichment(
-        design = design, dataInput = dataInput,
-        intersectionTest = intersectionTest, stage = stage,
+        design = design, 
+        dataInput = dataInput,
+        intersectionTest = intersectionTest, 
+        stage = stage,
+        directionUpper = directionUpper,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
         varianceOption = varianceOption,
@@ -627,14 +681,29 @@ NULL
     return(results)
 }
 
-.getRootThetaMeansEnrichment <- function(..., design, dataInput, population, stage,
-        directionUpper, normalApproximation, stratifiedAnalysis, varianceOption, intersectionTest,
-        thetaLow, thetaUp, firstParameterName, secondValue, tolerance) {
+.getRootThetaMeansEnrichment <- function(..., 
+        design, 
+        dataInput, 
+        population, 
+        stage,
+        directionUpper, 
+        normalApproximation, 
+        stratifiedAnalysis, 
+        varianceOption, 
+        intersectionTest,
+        thetaLow, 
+        thetaUp, 
+        firstParameterName, 
+        secondValue, 
+        tolerance) {
     result <- .getOneDimensionalRoot(
         function(theta) {
             stageResults <- .getStageResultsMeansEnrichment(
-                design = design, dataInput = dataInput,
-                stage = stage, thetaH0 = theta, directionUpper = directionUpper,
+                design = design, 
+                dataInput = dataInput,
+                stage = stage, 
+                thetaH0 = theta, 
+                directionUpper = directionUpper,
                 intersectionTest = intersectionTest,
                 normalApproximation = normalApproximation,
                 stratifiedAnalysis = stratifiedAnalysis,
@@ -647,18 +716,34 @@ NULL
             }
             return(firstValue - secondValue)
         },
-        lower = thetaLow, upper = thetaUp, tolerance = tolerance,
+        lower = thetaLow, 
+        upper = thetaUp, 
+        tolerance = tolerance,
         callingFunctionInformation = ".getRootThetaMeansEnrichment"
     )
     return(result)
 }
 
-.getUpperLowerThetaMeansEnrichment <- function(..., design, dataInput, theta, population, stage,
-        directionUpper, normalApproximation, stratifiedAnalysis, varianceOption, conditionFunction,
-        intersectionTest, firstParameterName, secondValue) {
+.getUpperLowerThetaMeansEnrichment <- function(..., 
+        design, 
+        dataInput, 
+        theta, 
+        population, 
+        stage,
+        directionUpper, 
+        normalApproximation, 
+        stratifiedAnalysis, 
+        varianceOption, 
+        conditionFunction,
+        intersectionTest, 
+        firstParameterName, 
+        secondValue) {
     stageResults <- .getStageResultsMeansEnrichment(
-        design = design, dataInput = dataInput,
-        stage = stage, thetaH0 = theta, directionUpper = directionUpper,
+        design = design, 
+        dataInput = dataInput,
+        stage = stage, 
+        thetaH0 = theta, 
+        directionUpper = directionUpper,
         intersectionTest = intersectionTest,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
@@ -671,9 +756,13 @@ NULL
     while (conditionFunction(secondValue, firstValue)) {
         theta <- 2 * theta
         stageResults <- .getStageResultsMeansEnrichment(
-            design = design, dataInput = dataInput,
-            stage = stage, thetaH0 = theta, directionUpper = directionUpper,
-            intersectionTest = intersectionTest, normalApproximation = normalApproximation,
+            design = design, 
+            dataInput = dataInput,
+            stage = stage, 
+            thetaH0 = theta, 
+            directionUpper = directionUpper,
+            intersectionTest = intersectionTest, 
+            normalApproximation = normalApproximation,
             stratifiedAnalysis = stratifiedAnalysis,
             varianceOption = varianceOption,
             calculateSingleStepAdjusted = TRUE
@@ -700,8 +789,9 @@ NULL
 }
 
 .getRepeatedConfidenceIntervalsMeansEnrichmentAll <- function(...,
-        design, dataInput,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        design, 
+        dataInput,
+        directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_ENRICHMENT_DEFAULT,
@@ -711,12 +801,16 @@ NULL
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     stageResults <- .getStageResultsMeansEnrichment(
-        design = design, dataInput = dataInput,
-        stage = stage, thetaH0 = 0, directionUpper = directionUpper,
+        design = design, 
+        dataInput = dataInput,
+        stage = stage, 
+        thetaH0 = 0, 
+        directionUpper = directionUpper,
         intersectionTest = intersectionTest,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
-        varianceOption = varianceOption, calculateSingleStepAdjusted = FALSE
+        varianceOption = varianceOption, 
+        calculateSingleStepAdjusted = FALSE
     )
 
     gMax <- stageResults$getGMax()
@@ -727,12 +821,12 @@ NULL
     if (.isTrialDesignFisher(design)) {
         bounds <- design$alpha0Vec
         border <- C_ALPHA_0_VEC_DEFAULT
-        criticalValues <- design$criticalValues
+        criticalValues <- .getCriticalValues(design)
         conditionFunction <- .isFirstValueSmallerThanSecondValue
     } else if (.isTrialDesignInverseNormal(design)) {
         bounds <- design$futilityBounds
         border <- C_FUTILITY_BOUNDS_DEFAULT
-        criticalValues <- design$criticalValues
+        criticalValues <- .getCriticalValues(design)
         criticalValues[is.infinite(criticalValues) & criticalValues > 0] <- C_QNORM_MAXIMUM
         criticalValues[is.infinite(criticalValues) & criticalValues < 0] <- C_QNORM_MINIMUM
         conditionFunction <- .isFirstValueGreaterThanSecondValue
@@ -748,8 +842,12 @@ NULL
             if (!is.na(stageResults$testStatistics[population, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
                 # finding maximum upper and minimum lower bounds for RCIs
                 thetaLow <- .getUpperLowerThetaMeansEnrichment(
-                    design = design, dataInput = dataInput,
-                    theta = -1, population = population, stage = k, directionUpper = TRUE,
+                    design = design, 
+                    dataInput = dataInput,
+                    theta = -1, 
+                    population = population, 
+                    stage = k, 
+                    directionUpper = TRUE,
                     normalApproximation = normalApproximation,
                     stratifiedAnalysis = stratifiedAnalysis,
                     varianceOption = varianceOption,
@@ -760,38 +858,52 @@ NULL
                 )
 
                 thetaUp <- .getUpperLowerThetaMeansEnrichment(
-                    design = design, dataInput = dataInput,
-                    theta = 1, population = population, stage = k, directionUpper = FALSE,
+                    design = design, 
+                    dataInput = dataInput,
+                    theta = 1, 
+                    population = population, 
+                    stage = k, 
+                    directionUpper = FALSE,
                     normalApproximation = normalApproximation,
-                    stratifiedAnalysis = stratifiedAnalysis, varianceOption = varianceOption,
+                    stratifiedAnalysis = stratifiedAnalysis, 
+                    varianceOption = varianceOption,
                     conditionFunction = conditionFunction,
-                    intersectionTest = intersectionTest, firstParameterName = firstParameterName,
+                    intersectionTest = intersectionTest, 
+                    firstParameterName = firstParameterName,
                     secondValue = criticalValues[k]
                 )
 
                 # finding upper and lower RCI limits through root function
                 repeatedConfidenceIntervals[population, 1, k] <- .getRootThetaMeansEnrichment(
                     design = design,
-                    dataInput = dataInput, population = population, stage = k, directionUpper = TRUE,
+                    dataInput = dataInput, 
+                    population = population, 
+                    stage = k, 
+                    directionUpper = TRUE,
                     normalApproximation = normalApproximation,
                     stratifiedAnalysis = stratifiedAnalysis,
                     varianceOption = varianceOption,
                     thetaLow = thetaLow, thetaUp = thetaUp,
                     intersectionTest = intersectionTest,
                     firstParameterName = firstParameterName,
-                    secondValue = criticalValues[k], tolerance = tolerance
+                    secondValue = criticalValues[k], 
+                    tolerance = tolerance
                 )
 
                 repeatedConfidenceIntervals[population, 2, k] <- .getRootThetaMeansEnrichment(
                     design = design,
-                    dataInput = dataInput, population = population, stage = k, directionUpper = FALSE,
+                    dataInput = dataInput, 
+                    population = population, 
+                    stage = k, 
+                    directionUpper = FALSE,
                     normalApproximation = normalApproximation,
                     stratifiedAnalysis = stratifiedAnalysis,
                     varianceOption = varianceOption,
                     thetaLow = thetaLow, thetaUp = thetaUp,
                     intersectionTest = intersectionTest,
                     firstParameterName = firstParameterName,
-                    secondValue = criticalValues[k], tolerance = tolerance
+                    secondValue = criticalValues[k], 
+                    tolerance = tolerance
                 )
 
                 # adjustment for binding futility bounds
@@ -801,11 +913,14 @@ NULL
                     )
 
                     #  Calculate new lower and upper bounds
-                    if (directionUpper) {
+                    if (is.na(directionUpper) || isTRUE(directionUpper)) {
                         thetaLow <- .getUpperLowerThetaMeansEnrichment(
                             design = design,
                             dataInput = dataInput,
-                            theta = -1, population = population, stage = k - 1, directionUpper = TRUE,
+                            theta = -1, 
+                            population = population, 
+                            stage = k - 1, 
+                            directionUpper = TRUE,
                             normalApproximation = normalApproximation,
                             stratifiedAnalysis = stratifiedAnalysis,
                             varianceOption = varianceOption,
@@ -818,7 +933,10 @@ NULL
                         thetaUp <- .getUpperLowerThetaMeansEnrichment(
                             design = design,
                             dataInput = dataInput,
-                            theta = 1, population = population, stage = k - 1, directionUpper = FALSE,
+                            theta = 1, 
+                            population = population, 
+                            stage = k - 1, 
+                            directionUpper = FALSE,
                             normalApproximation = normalApproximation,
                             stratifiedAnalysis = stratifiedAnalysis,
                             varianceOption = varianceOption,
@@ -830,18 +948,23 @@ NULL
                     }
 
                     futilityCorr[k] <- .getRootThetaMeansEnrichment(
-                        design = design, dataInput = dataInput,
-                        population = population, stage = k - 1, directionUpper = directionUpper,
+                        design = design, 
+                        dataInput = dataInput,
+                        population = population, 
+                        stage = k - 1, 
+                        directionUpper = directionUpper,
                         normalApproximation = normalApproximation,
                         stratifiedAnalysis = stratifiedAnalysis,
                         varianceOption = varianceOption,
-                        thetaLow = thetaLow, thetaUp = thetaUp,
+                        thetaLow = thetaLow, 
+                        thetaUp = thetaUp,
                         intersectionTest = intersectionTest,
                         firstParameterName = parameterName,
-                        secondValue = bounds[k - 1], tolerance = tolerance
+                        secondValue = bounds[k - 1], 
+                        tolerance = tolerance
                     )
 
-                    if (directionUpper) {
+                    if (is.na(directionUpper) || isTRUE(directionUpper)) {
                         repeatedConfidenceIntervals[population, 1, k] <- min(
                             min(futilityCorr[2:k]),
                             repeatedConfidenceIntervals[population, 1, k]
@@ -872,11 +995,12 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsMeansEnrichmentInverseNormal <- function(...,
-        design, dataInput,
+        design, 
+        dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_ENRICHMENT_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
@@ -886,13 +1010,16 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsMeansEnrichmentAll(
-        design = design, dataInput = dataInput,
+        design = design, 
+        dataInput = dataInput,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
         varianceOption = varianceOption,
         directionUpper = directionUpper,
         intersectionTest = intersectionTest,
-        tolerance = tolerance, firstParameterName = "combInverseNormal", ...
+        tolerance = tolerance, 
+        firstParameterName = "combInverseNormal", 
+        ...
     ))
 }
 
@@ -902,28 +1029,32 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsMeansEnrichmentFisher <- function(...,
-        design, dataInput,
+        design, 
+        dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_ENRICHMENT_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
         functionName =
             ".getRepeatedConfidenceIntervalsMeansEnrichmentFisher",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"), ...
+        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+            design, powerCalculationEnabled = TRUE), "stage"), ...
     )
 
     return(.getRepeatedConfidenceIntervalsMeansEnrichmentAll(
-        design = design, dataInput = dataInput,
+        design = design, 
+        dataInput = dataInput,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
         varianceOption = varianceOption,
         directionUpper = directionUpper,
         intersectionTest = intersectionTest,
         tolerance = tolerance,
-        firstParameterName = "combFisher", ...
+        firstParameterName = "combFisher", 
+        ...
     ))
 }
 
@@ -949,10 +1080,15 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansEnrichment <- function(..., stageResults, stage = stageResults$stage,
-        nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        thetaH1 = NA_real_, assumedStDevs = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+.getConditionalPowerMeansEnrichment <- function(..., 
+        stageResults, 
+        stage = stageResults$stage,
+        nPlanned, 
+        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
+        thetaH1 = NA_real_, 
+        assumedStDevs = NA_real_,
+        iterations = C_ITERATIONS_DEFAULT, 
+        seed = NA_real_) {
     design <- stageResults$.design
     gMax <- stageResults$getGMax()
     kMax <- design$kMax
@@ -960,7 +1096,8 @@ NULL
     stDevsH1 <- .getOptionalArgument("stDevsH1", ...)
     if (!is.null(stDevsH1) && !is.na(stDevsH1)) {
         if (!is.na(assumedStDevs)) {
-            warning(sQuote("assumedStDevs"), " will be ignored because ", sQuote("stDevsH1"), " is defined", call. = FALSE)
+            warning(sQuote("assumedStDevs"), " will be ignored because ", 
+                sQuote("stDevsH1"), " is defined", call. = FALSE)
         }
         assumedStDevs <- stDevsH1
     }
@@ -993,8 +1130,10 @@ NULL
 
     .assertIsValidNPlanned(nPlanned, kMax, stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
-    .setValueAndParameterType(results, "allocationRatioPlanned", allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
+        0, C_ALLOCATION_RATIO_MAXIMUM)
+    .setValueAndParameterType(results, "allocationRatioPlanned", 
+        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
     assumedStDevs <- .assertIsValidAssumedStDevForMultiHypotheses(
         assumedStDevs, stageResults, stage,
         results = results
@@ -1062,8 +1201,14 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansEnrichmentInverseNormal <- function(..., results, stageResults, stage,
-        allocationRatioPlanned, nPlanned, thetaH1, assumedStDevs) {
+.getConditionalPowerMeansEnrichmentInverseNormal <- function(..., 
+        results, 
+        stageResults, 
+        stage,
+        allocationRatioPlanned, 
+        nPlanned, 
+        thetaH1, 
+        assumedStDevs) {
     design <- stageResults$.design
     .assertIsTrialDesignInverseNormal(design)
     .warnInCaseOfUnknownArguments(
@@ -1097,7 +1242,7 @@ NULL
         standardizedEffect <- -(thetaH1 - stageResults$thetaH0) / assumedStDevs
     }
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
-    criticalValues <- design$criticalValues
+    criticalValues <- .getCriticalValues(design)
 
     for (population in 1:gMax) {
         if (!is.na(ctr$separatePValues[population, stage])) {
@@ -1158,9 +1303,16 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansEnrichmentFisher <- function(..., results, stageResults, stage,
-        allocationRatioPlanned, nPlanned, thetaH1, assumedStDevs,
-        iterations, seed) {
+.getConditionalPowerMeansEnrichmentFisher <- function(..., 
+        results, 
+        stageResults, 
+        stage,
+        allocationRatioPlanned, 
+        nPlanned, 
+        thetaH1, 
+        assumedStDevs,
+        iterations, 
+        seed) {
     design <- stageResults$.design
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
@@ -1170,7 +1322,7 @@ NULL
     )
     kMax <- design$kMax
     gMax <- stageResults$getGMax()
-    criticalValues <- design$criticalValues
+    criticalValues <- .getCriticalValues(design)
     weightsFisher <- .getWeightsFisher(design)
 
     results$conditionalPower <- matrix(NA_real_, nrow = gMax, ncol = kMax)
@@ -1260,15 +1412,19 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerLikelihoodMeansEnrichment <- function(..., stageResults, stage,
+.getConditionalPowerLikelihoodMeansEnrichment <- function(..., 
+        stageResults, 
+        stage,
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaRange,
         assumedStDevs = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+        iterations = C_ITERATIONS_DEFAULT, 
+        seed = NA_real_) {
     .associatedArgumentsAreDefined(nPlanned = nPlanned, thetaRange = thetaRange)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
+        0, C_ALLOCATION_RATIO_MAXIMUM)
 
     design <- stageResults$.design
     kMax <- design$kMax
@@ -1289,7 +1445,8 @@ NULL
     likelihoodValues <- numeric(gMax * length(thetaRange))
 
     stdErr <- stageResults$overallStDevs[stage] *
-        sqrt(1 / stageResults$.overallSampleSizes1[, stage] + 1 / stageResults$.overallSampleSizes2[, stage])
+        sqrt(1 / stageResults$.overallSampleSizes1[, stage] + 
+        1 / stageResults$.overallSampleSizes2[, stage])
 
     results <- ConditionalPowerResultsEnrichmentMeans$new(
         .design = design,

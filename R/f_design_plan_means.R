@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8052 $
-## |  Last changed: $Date: 2024-07-18 11:19:40 +0200 (Do, 18 Jul 2024) $
+## |  File version: $Revision: 8247 $
+## |  Last changed: $Date: 2024-09-20 12:27:05 +0200 (Fr, 20 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -34,7 +34,7 @@ NULL
     futilityBoundsEffectScaleLower <- rep(NA_real_, design$kMax - 1)
 
     if (designPlan$normalApproximation) {
-        criticalValues <- design$criticalValues
+        criticalValues <- .getCriticalValues(design)
         futilityBounds <- design$futilityBounds
     } else {
         criticalValues <- stats::qt(
@@ -45,7 +45,8 @@ NULL
         # outside validated range
         numberOfNAs <- sum(as.vector(criticalValues) > 50, na.rm = TRUE)
         criticalValues[criticalValues > 50] <- NA_real_
-        if (any(is.na(criticalValues) & (design$criticalValues < 8))) {
+        
+        if (any(is.na(criticalValues))) {
             warning("The computation of ", .integerToWrittenNumber(numberOfNAs),
                 " efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " on ",
                 "treatment effect scale not performed presumably due to too small df",
@@ -481,11 +482,17 @@ NULL
 
 # Note that 'directionUpper' and 'maxNumberOfSubjects' are only applicable
 # for 'objectType' = "power"
-.createDesignPlanMeans <- function(..., objectType = c("sampleSize", "power"),
-        design, normalApproximation = FALSE, meanRatio = FALSE,
-        thetaH0 = ifelse(meanRatio, 1, 0), alternative = NA_real_,
-        stDev = C_STDEV_DEFAULT, directionUpper = NA,
-        maxNumberOfSubjects = NA_real_, groups = 2,
+.createDesignPlanMeans <- function(..., 
+        objectType = c("sampleSize", "power"),
+        design, 
+        normalApproximation = FALSE, 
+        meanRatio = FALSE,
+        thetaH0 = ifelse(meanRatio, 1, 0), 
+        alternative = NA_real_,
+        stDev = C_STDEV_DEFAULT, 
+        directionUpper = NA,
+        maxNumberOfSubjects = NA_real_, 
+        groups = 2,
         allocationRatioPlanned = NA_real_) {
     objectType <- match.arg(objectType)
 
@@ -506,7 +513,8 @@ NULL
         .assertIsInOpenInterval(alternative, "alternative", 0, NULL, naAllowed = TRUE)
     }
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, design$sided, objectType, userFunctionCallEnabled = TRUE)
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
+        design, objectType = objectType, userFunctionCallEnabled = TRUE)
 
     if (objectType == "sampleSize" && !any(is.na(alternative))) {
         if (design$sided == 1 && any(alternative - thetaH0 <= 0)) {
@@ -535,7 +543,7 @@ NULL
         designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_GENERATED)
     }
 
-    if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
+    if (.hasApplicableFutilityBounds(design)) {
         designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }
@@ -675,9 +683,15 @@ getSampleSizeMeans <- function(design = NULL, ...,
 
     designPlan <- .createDesignPlanMeans(
         objectType = "sampleSize",
-        design = design, normalApproximation = normalApproximation, meanRatio = meanRatio,
-        thetaH0 = thetaH0, alternative = alternative, stDev = stDev, groups = groups,
-        allocationRatioPlanned = allocationRatioPlanned, ...
+        design = design, 
+        normalApproximation = normalApproximation, 
+        meanRatio = meanRatio,
+        thetaH0 = thetaH0, 
+        alternative = alternative, 
+        stDev = stDev, 
+        groups = groups,
+        allocationRatioPlanned = allocationRatioPlanned, 
+        ...
     )
 
     return(.calculateSampleSizeMeansAndRates(designPlan))
@@ -755,10 +769,17 @@ getPowerMeans <- function(design = NULL, ...,
 
     designPlan <- .createDesignPlanMeans(
         objectType = "power",
-        design = design, normalApproximation = normalApproximation, meanRatio = meanRatio,
-        thetaH0 = thetaH0, alternative = alternative, stDev = stDev, directionUpper = directionUpper,
-        maxNumberOfSubjects = maxNumberOfSubjects, groups = groups,
-        allocationRatioPlanned = allocationRatioPlanned, ...
+        design = design, 
+        normalApproximation = normalApproximation, 
+        meanRatio = meanRatio,
+        thetaH0 = thetaH0, 
+        alternative = alternative, 
+        stDev = stDev, 
+        directionUpper = directionUpper,
+        maxNumberOfSubjects = maxNumberOfSubjects, 
+        groups = groups,
+        allocationRatioPlanned = allocationRatioPlanned, 
+        ...
     )
 
     if (designPlan$groups == 1) {

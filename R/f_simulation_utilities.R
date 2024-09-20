@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8200 $
+## |  Last changed: $Date: 2024-09-12 15:05:38 +0200 (Do, 12 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -70,7 +70,7 @@ NULL
         },
         error = function(e) {
             .logError("Failed to set seed to '%s' (%s): %s", seed, .getClassName(seed), e)
-            seed <- NA_real_
+            seed <<- NA_real_
             traceback()
         }
     )

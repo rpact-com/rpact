@@ -14,7 +14,7 @@ getSimulationMeans(
   alternative = seq(0, 1, 0.2),
   stDev = 1,
   plannedSubjects = NA_real_,
-  directionUpper = TRUE,
+  directionUpper = NA,
   allocationRatioPlanned = NA_real_,
   minNumberOfSubjectsPerStage = NA_real_,
   maxNumberOfSubjectsPerStage = NA_real_,

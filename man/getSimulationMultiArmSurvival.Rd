@@ -14,7 +14,7 @@ getSimulationMultiArmSurvival(
   gED50 = NA_real_,
   slope = 1,
   intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
-  directionUpper = TRUE,
+  directionUpper = NA,
   adaptations = NA,
   typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
   effectMeasure = c("effectEstimate", "testStatistic"),

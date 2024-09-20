@@ -8,7 +8,7 @@ getFinalConfidenceInterval(
   design,
   dataInput,
   ...,
-  directionUpper = TRUE,
+  directionUpper = NA,
   thetaH0 = NA_real_,
   tolerance = 1e-06,
   stage = NA_integer_

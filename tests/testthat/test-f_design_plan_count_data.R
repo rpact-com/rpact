@@ -14,9 +14,9 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_design_plan_count_data.R
-## |  Creation date: 28 May 2024, 09:45:32
-## |  File version: $Revision: 7946 $
-## |  Last changed: $Date: 2024-05-28 12:08:57 +0200 (Di, 28 Mai 2024) $
+## |  Creation date: 18 September 2024, 16:26:40
+## |  File version: $Revision: 8230 $
+## |  Last changed: $Date: 2024-09-19 07:57:21 +0200 (Do, 19 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -46,6 +46,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result1$calendarTime[1, ], 8, label = paste0(result1$calendarTime[1, ]))
     expect_equal(result1$expectedStudyDurationH1, 8, label = paste0(result1$expectedStudyDurationH1))
     expect_equal(result1$expectedNumberOfSubjectsH1, 2540, label = paste0(result1$expectedNumberOfSubjectsH1))
+    expect_equal(result1$criticalValuesEffectScale[1, ], 0.81779599, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScale[1, ]))
     expect_equal(result1$maxInformation, 123.96487, tolerance = 1e-07, label = paste0(result1$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result1), NA)))
@@ -63,6 +64,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result1CodeBased$calendarTime, result1$calendarTime, tolerance = 1e-07)
         expect_equal(result1CodeBased$expectedStudyDurationH1, result1$expectedStudyDurationH1, tolerance = 1e-07)
         expect_equal(result1CodeBased$expectedNumberOfSubjectsH1, result1$expectedNumberOfSubjectsH1, tolerance = 1e-07)
+        expect_equal(result1CodeBased$criticalValuesEffectScale, result1$criticalValuesEffectScale, tolerance = 1e-07)
         expect_equal(result1CodeBased$maxInformation, result1$maxInformation, tolerance = 1e-07)
         expect_type(names(result1), "character")
         df <- as.data.frame(result1)
@@ -92,6 +94,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result2$calendarTime[1, ], 8, label = paste0(result2$calendarTime[1, ]))
     expect_equal(result2$expectedStudyDurationH1, 8, label = paste0(result2$expectedStudyDurationH1))
     expect_equal(result2$expectedNumberOfSubjectsH1, 886, label = paste0(result2$expectedNumberOfSubjectsH1))
+    expect_equal(result2$criticalValuesEffectScale[1, ], 0.81563484, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScale[1, ]))
     expect_equal(result2$maxInformation, 123.96487, tolerance = 1e-07, label = paste0(result2$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result2), NA)))
@@ -109,6 +112,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result2CodeBased$calendarTime, result2$calendarTime, tolerance = 1e-07)
         expect_equal(result2CodeBased$expectedStudyDurationH1, result2$expectedStudyDurationH1, tolerance = 1e-07)
         expect_equal(result2CodeBased$expectedNumberOfSubjectsH1, result2$expectedNumberOfSubjectsH1, tolerance = 1e-07)
+        expect_equal(result2CodeBased$criticalValuesEffectScale, result2$criticalValuesEffectScale, tolerance = 1e-07)
         expect_equal(result2CodeBased$maxInformation, result2$maxInformation, tolerance = 1e-07)
         expect_type(names(result2), "character")
         df <- as.data.frame(result2)
@@ -138,6 +142,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result3$calendarTime[1, ], c(9, 9), label = paste0(result3$calendarTime[1, ]))
     expect_equal(result3$expectedStudyDurationH1, c(9, 9), label = paste0(result3$expectedStudyDurationH1))
     expect_equal(result3$expectedNumberOfSubjectsH1, c(21550, 52228), label = paste0(result3$expectedNumberOfSubjectsH1))
+    expect_equal(result3$criticalValuesEffectScale[1, ], c(0.81650902, 0.87944876), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScale[1, ]))
     expect_equal(result3$maxInformation, c(123.96487, 316.71977), tolerance = 1e-07, label = paste0(result3$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result3), NA)))
@@ -154,6 +159,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result3CodeBased$calendarTime, result3$calendarTime, tolerance = 1e-07)
         expect_equal(result3CodeBased$expectedStudyDurationH1, result3$expectedStudyDurationH1, tolerance = 1e-07)
         expect_equal(result3CodeBased$expectedNumberOfSubjectsH1, result3$expectedNumberOfSubjectsH1, tolerance = 1e-07)
+        expect_equal(result3CodeBased$criticalValuesEffectScale, result3$criticalValuesEffectScale, tolerance = 1e-07)
         expect_equal(result3CodeBased$maxInformation, result3$maxInformation, tolerance = 1e-07)
         expect_type(names(result3), "character")
         df <- as.data.frame(result3)
@@ -182,6 +188,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result4$calendarTime[1, ], c(15.898439, 30.542203, 356.98795), tolerance = 1e-07, label = paste0(result4$calendarTime[1, ]))
     expect_equal(result4$expectedStudyDurationH1, c(15.898439, 30.542203, 356.98795), tolerance = 1e-07, label = paste0(result4$expectedStudyDurationH1))
     expect_equal(result4$expectedNumberOfSubjectsH1, c(78, 100, 100), label = paste0(result4$expectedNumberOfSubjectsH1))
+    expect_equal(result4$criticalValuesEffectScale[1, ], c(0.84978374, 0.91507462, 0.97900095), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScale[1, ]))
     expect_equal(result4$maxInformation, c(190.55408, 663.67118, 11923.768), tolerance = 1e-07, label = paste0(result4$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result4), NA)))
@@ -197,6 +204,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result4CodeBased$calendarTime, result4$calendarTime, tolerance = 1e-07)
         expect_equal(result4CodeBased$expectedStudyDurationH1, result4$expectedStudyDurationH1, tolerance = 1e-07)
         expect_equal(result4CodeBased$expectedNumberOfSubjectsH1, result4$expectedNumberOfSubjectsH1, tolerance = 1e-07)
+        expect_equal(result4CodeBased$criticalValuesEffectScale, result4$criticalValuesEffectScale, tolerance = 1e-07)
         expect_equal(result4CodeBased$maxInformation, result4$maxInformation, tolerance = 1e-07)
         expect_type(names(result4), "character")
         df <- as.data.frame(result4)
@@ -231,6 +239,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result5$calendarTime[1, ], c(3.4107281, 4.9286263), tolerance = 1e-07, label = paste0(result5$calendarTime[1, ]))
     expect_equal(result5$expectedStudyDurationH1, c(3.4107281, 4.9286263), tolerance = 1e-07, label = paste0(result5$expectedStudyDurationH1))
     expect_equal(result5$expectedNumberOfSubjectsH1, c(300, 300), label = paste0(result5$expectedNumberOfSubjectsH1))
+    expect_equal(result5$criticalValuesEffectScale[1, ], c(0.7453374, 0.76349165), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScale[1, ]))
     expect_equal(result5$maxInformation, c(144.85307, 193.47016), tolerance = 1e-07, label = paste0(result5$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result5), NA)))
@@ -246,6 +255,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result5CodeBased$calendarTime, result5$calendarTime, tolerance = 1e-07)
         expect_equal(result5CodeBased$expectedStudyDurationH1, result5$expectedStudyDurationH1, tolerance = 1e-07)
         expect_equal(result5CodeBased$expectedNumberOfSubjectsH1, result5$expectedNumberOfSubjectsH1, tolerance = 1e-07)
+        expect_equal(result5CodeBased$criticalValuesEffectScale, result5$criticalValuesEffectScale, tolerance = 1e-07)
         expect_equal(result5CodeBased$maxInformation, result5$maxInformation, tolerance = 1e-07)
         expect_type(names(result5), "character")
         df <- as.data.frame(result5)
@@ -274,6 +284,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result6$calendarTime[1, ], c(134.88407, 19.983394, 12.884843), tolerance = 1e-07, label = paste0(result6$calendarTime[1, ]))
     expect_equal(result6$expectedStudyDurationH1, c(134.88407, 19.983394, 12.884843), tolerance = 1e-07, label = paste0(result6$expectedStudyDurationH1))
     expect_equal(result6$expectedNumberOfSubjectsH1, c(150, 148, 78), label = paste0(result6$expectedNumberOfSubjectsH1))
+    expect_equal(result6$criticalValuesEffectScale[1, ], c(NA_real_, NA_real_, 1.1546407), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScale[1, ]))
     expect_equal(result6$maxInformation, c(6624.8994, 474.42526, 175.10501), tolerance = 1e-07, label = paste0(result6$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result6), NA)))
@@ -290,6 +301,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result6CodeBased$calendarTime, result6$calendarTime, tolerance = 1e-07)
         expect_equal(result6CodeBased$expectedStudyDurationH1, result6$expectedStudyDurationH1, tolerance = 1e-07)
         expect_equal(result6CodeBased$expectedNumberOfSubjectsH1, result6$expectedNumberOfSubjectsH1, tolerance = 1e-07)
+        expect_equal(result6CodeBased$criticalValuesEffectScale, result6$criticalValuesEffectScale, tolerance = 1e-07)
         expect_equal(result6CodeBased$maxInformation, result6$maxInformation, tolerance = 1e-07)
         expect_type(names(result6), "character")
         df <- as.data.frame(result6)
@@ -321,6 +333,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result7$calendarTime[1, ], c(8, 8), label = paste0(result7$calendarTime[1, ]))
     expect_equal(result7$expectedStudyDurationH1, c(8, 8), label = paste0(result7$expectedStudyDurationH1))
     expect_equal(result7$expectedNumberOfSubjectsH1, c(597, 11849), label = paste0(result7$expectedNumberOfSubjectsH1))
+    expect_equal(result7$criticalValuesEffectScale[1, ], c(0.64086599, 0.91355137), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScale[1, ]))
     expect_equal(result7$maxInformation, c(21.819851, 639.7699), tolerance = 1e-07, label = paste0(result7$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result7), NA)))
@@ -338,6 +351,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result7CodeBased$calendarTime, result7$calendarTime, tolerance = 1e-07)
         expect_equal(result7CodeBased$expectedStudyDurationH1, result7$expectedStudyDurationH1, tolerance = 1e-07)
         expect_equal(result7CodeBased$expectedNumberOfSubjectsH1, result7$expectedNumberOfSubjectsH1, tolerance = 1e-07)
+        expect_equal(result7CodeBased$criticalValuesEffectScale, result7$criticalValuesEffectScale, tolerance = 1e-07)
         expect_equal(result7CodeBased$maxInformation, result7$maxInformation, tolerance = 1e-07)
         expect_type(names(result7), "character")
         df <- as.data.frame(result7)
@@ -368,6 +382,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result8$calendarTime[1, ], c(8, 8), label = paste0(result8$calendarTime[1, ]))
     expect_equal(result8$expectedStudyDurationH1, c(8, 8), label = paste0(result8$expectedStudyDurationH1))
     expect_equal(result8$expectedNumberOfSubjectsH1, c(135, 2633), label = paste0(result8$expectedNumberOfSubjectsH1))
+    expect_equal(result8$criticalValuesEffectScale[1, ], c(0.64698239, 0.9135826), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScale[1, ]))
     expect_equal(result8$maxInformation, c(21.819851, 639.7699), tolerance = 1e-07, label = paste0(result8$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result8), NA)))
@@ -385,6 +400,7 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result8CodeBased$calendarTime, result8$calendarTime, tolerance = 1e-07)
         expect_equal(result8CodeBased$expectedStudyDurationH1, result8$expectedStudyDurationH1, tolerance = 1e-07)
         expect_equal(result8CodeBased$expectedNumberOfSubjectsH1, result8$expectedNumberOfSubjectsH1, tolerance = 1e-07)
+        expect_equal(result8CodeBased$criticalValuesEffectScale, result8$criticalValuesEffectScale, tolerance = 1e-07)
         expect_equal(result8CodeBased$maxInformation, result8$maxInformation, tolerance = 1e-07)
         expect_type(names(result8), "character")
         df <- as.data.frame(result8)
@@ -441,9 +457,14 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result1$expectedInformationH0, 58.055315, tolerance = 1e-07, label = paste0(result1$expectedInformationH0))
     expect_equal(result1$expectedInformationH01, 74.084094, tolerance = 1e-07, label = paste0(result1$expectedInformationH01))
     expect_equal(result1$expectedInformationH1, 61.480008, tolerance = 1e-07, label = paste0(result1$expectedInformationH1))
-    expect_equal(result1$maxInformation, 88.099238, tolerance = 1e-07, label = paste0(result1$maxInformation))
+    expect_equal(result1$criticalValuesEffectScale[1, ], 0.61429731, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScale[1, ]))
+    expect_equal(result1$criticalValuesEffectScale[2, ], 0.73022688, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScale[2, ]))
+    expect_equal(result1$criticalValuesEffectScale[3, ], 0.808242, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScale[3, ]))
+    expect_equal(result1$futilityBoundsEffectScale[1, ], 1.064186, tolerance = 1e-07, label = paste0(result1$futilityBoundsEffectScale[1, ]))
+    expect_equal(result1$futilityBoundsEffectScale[2, ], 0.98776443, tolerance = 1e-07, label = paste0(result1$futilityBoundsEffectScale[2, ]))
     expect_equal(result1$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result1$futilityBoundsPValueScale[1, ]))
     expect_equal(result1$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result1$futilityBoundsPValueScale[2, ]))
+    expect_equal(result1$maxInformation, 88.099238, tolerance = 1e-07, label = paste0(result1$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result1), NA)))
         expect_output(print(result1)$show())
@@ -468,8 +489,10 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result1CodeBased$expectedInformationH0, result1$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result1CodeBased$expectedInformationH01, result1$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result1CodeBased$expectedInformationH1, result1$expectedInformationH1, tolerance = 1e-07)
-        expect_equal(result1CodeBased$maxInformation, result1$maxInformation, tolerance = 1e-07)
+        expect_equal(result1CodeBased$criticalValuesEffectScale, result1$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result1CodeBased$futilityBoundsEffectScale, result1$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result1CodeBased$futilityBoundsPValueScale, result1$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_equal(result1CodeBased$maxInformation, result1$maxInformation, tolerance = 1e-07)
         expect_type(names(result1), "character")
         df <- as.data.frame(result1)
         expect_s3_class(df, "data.frame")
@@ -515,9 +538,14 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result2$expectedInformationH0, 58.055315, tolerance = 1e-07, label = paste0(result2$expectedInformationH0))
     expect_equal(result2$expectedInformationH01, 74.084094, tolerance = 1e-07, label = paste0(result2$expectedInformationH01))
     expect_equal(result2$expectedInformationH1, 61.480008, tolerance = 1e-07, label = paste0(result2$expectedInformationH1))
-    expect_equal(result2$maxInformation, 88.099238, tolerance = 1e-07, label = paste0(result2$maxInformation))
+    expect_equal(result2$criticalValuesEffectScale[1, ], 0.70286729, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScale[1, ]))
+    expect_equal(result2$criticalValuesEffectScale[2, ], 0.76674751, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScale[2, ]))
+    expect_equal(result2$criticalValuesEffectScale[3, ], 0.80614927, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScale[3, ]))
+    expect_equal(result2$futilityBoundsEffectScale[1, ], 1.0498512, tolerance = 1e-07, label = paste0(result2$futilityBoundsEffectScale[1, ]))
+    expect_equal(result2$futilityBoundsEffectScale[2, ], 0.9892924, tolerance = 1e-07, label = paste0(result2$futilityBoundsEffectScale[2, ]))
     expect_equal(result2$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result2$futilityBoundsPValueScale[1, ]))
     expect_equal(result2$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result2$futilityBoundsPValueScale[2, ]))
+    expect_equal(result2$maxInformation, 88.099238, tolerance = 1e-07, label = paste0(result2$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result2), NA)))
         expect_output(print(result2)$show())
@@ -542,8 +570,10 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result2CodeBased$expectedInformationH0, result2$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result2CodeBased$expectedInformationH01, result2$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result2CodeBased$expectedInformationH1, result2$expectedInformationH1, tolerance = 1e-07)
-        expect_equal(result2CodeBased$maxInformation, result2$maxInformation, tolerance = 1e-07)
+        expect_equal(result2CodeBased$criticalValuesEffectScale, result2$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result2CodeBased$futilityBoundsEffectScale, result2$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result2CodeBased$futilityBoundsPValueScale, result2$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_equal(result2CodeBased$maxInformation, result2$maxInformation, tolerance = 1e-07)
         expect_type(names(result2), "character")
         df <- as.data.frame(result2)
         expect_s3_class(df, "data.frame")
@@ -589,9 +619,14 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result3$expectedInformationH0, c(58.055315, 148.32642), tolerance = 1e-07, label = paste0(result3$expectedInformationH0))
     expect_equal(result3$expectedInformationH01, c(74.084094, 189.27859), tolerance = 1e-07, label = paste0(result3$expectedInformationH01))
     expect_equal(result3$expectedInformationH1, c(61.480008, 157.07622), tolerance = 1e-07, label = paste0(result3$expectedInformationH1))
-    expect_equal(result3$maxInformation, c(88.099238, 225.0861), tolerance = 1e-07, label = paste0(result3$maxInformation))
+    expect_equal(result3$criticalValuesEffectScale[1, ], c(0.64257713, 0.76066619), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScale[1, ]))
+    expect_equal(result3$criticalValuesEffectScale[2, ], c(0.74424294, 0.83009872), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScale[2, ]))
+    expect_equal(result3$criticalValuesEffectScale[3, ], c(0.80924697, 0.87396071), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScale[3, ]))
+    expect_equal(result3$futilityBoundsEffectScale[1, ], c(1.0576632, 1.0372934), tolerance = 1e-07, label = paste0(result3$futilityBoundsEffectScale[1, ]))
+    expect_equal(result3$futilityBoundsEffectScale[2, ], c(0.98858146, 0.992571), tolerance = 1e-07, label = paste0(result3$futilityBoundsEffectScale[2, ]))
     expect_equal(result3$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result3$futilityBoundsPValueScale[1, ]))
     expect_equal(result3$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result3$futilityBoundsPValueScale[2, ]))
+    expect_equal(result3$maxInformation, c(88.099238, 225.0861), tolerance = 1e-07, label = paste0(result3$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result3), NA)))
         expect_output(print(result3)$show())
@@ -615,8 +650,10 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result3CodeBased$expectedInformationH0, result3$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result3CodeBased$expectedInformationH01, result3$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result3CodeBased$expectedInformationH1, result3$expectedInformationH1, tolerance = 1e-07)
-        expect_equal(result3CodeBased$maxInformation, result3$maxInformation, tolerance = 1e-07)
+        expect_equal(result3CodeBased$criticalValuesEffectScale, result3$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result3CodeBased$futilityBoundsEffectScale, result3$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result3CodeBased$futilityBoundsPValueScale, result3$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_equal(result3CodeBased$maxInformation, result3$maxInformation, tolerance = 1e-07)
         expect_type(names(result3), "character")
         df <- as.data.frame(result3)
         expect_s3_class(df, "data.frame")
@@ -660,9 +697,14 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result4$expectedInformationH0, c(89.240417, 310.81094, 5584.1471), tolerance = 1e-07, label = paste0(result4$expectedInformationH0))
     expect_equal(result4$expectedInformationH01, c(113.87925, 396.62427, 7125.9019), tolerance = 1e-07, label = paste0(result4$expectedInformationH01))
     expect_equal(result4$expectedInformationH1, c(94.504724, 329.14573, 5913.5569), tolerance = 1e-07, label = paste0(result4$expectedInformationH1))
-    expect_equal(result4$maxInformation, c(135.42279, 471.6572, 8473.9719), tolerance = 1e-07, label = paste0(result4$maxInformation))
+    expect_equal(result4$criticalValuesEffectScale[1, ], c(0.76653028, 0.87450792, 0.9705568), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScale[1, ]))
+    expect_equal(result4$criticalValuesEffectScale[2, ], c(0.81162036, 0.89657211, 0.97447326), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScale[2, ]))
+    expect_equal(result4$criticalValuesEffectScale[3, ], c(0.83901226, 0.90963245, 0.97779), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScale[3, ]))
+    expect_equal(result4$futilityBoundsEffectScale[1, ], c(1.0381141, 1.0193604, 1.0043368), tolerance = 1e-07, label = paste0(result4$futilityBoundsEffectScale[1, ]))
+    expect_equal(result4$futilityBoundsEffectScale[2, ], c(0.99146894, 0.99547853, 0.99891815), tolerance = 1e-07, label = paste0(result4$futilityBoundsEffectScale[2, ]))
     expect_equal(result4$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result4$futilityBoundsPValueScale[1, ]))
     expect_equal(result4$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result4$futilityBoundsPValueScale[2, ]))
+    expect_equal(result4$maxInformation, c(135.42279, 471.6572, 8473.9719), tolerance = 1e-07, label = paste0(result4$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result4), NA)))
         expect_output(print(result4)$show())
@@ -685,8 +727,10 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result4CodeBased$expectedInformationH0, result4$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result4CodeBased$expectedInformationH01, result4$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result4CodeBased$expectedInformationH1, result4$expectedInformationH1, tolerance = 1e-07)
-        expect_equal(result4CodeBased$maxInformation, result4$maxInformation, tolerance = 1e-07)
+        expect_equal(result4CodeBased$criticalValuesEffectScale, result4$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result4CodeBased$futilityBoundsEffectScale, result4$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result4CodeBased$futilityBoundsPValueScale, result4$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_equal(result4CodeBased$maxInformation, result4$maxInformation, tolerance = 1e-07)
         expect_type(names(result4), "character")
         df <- as.data.frame(result4)
         expect_s3_class(df, "data.frame")
@@ -731,9 +775,14 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result5$expectedInformationH0, c(89.240417, 310.81094, 5584.1471), tolerance = 1e-07, label = paste0(result5$expectedInformationH0))
     expect_equal(result5$expectedInformationH01, c(113.87925, 396.62427, 7125.9019), tolerance = 1e-07, label = paste0(result5$expectedInformationH01))
     expect_equal(result5$expectedInformationH1, c(94.504724, 329.14573, 5913.5569), tolerance = 1e-07, label = paste0(result5$expectedInformationH1))
-    expect_equal(result5$maxInformation, c(135.42279, 471.6572, 8473.9719), tolerance = 1e-07, label = paste0(result5$maxInformation))
+    expect_equal(result5$criticalValuesEffectScale[1, ], c(0.78602077, 0.88010496, NA_real_), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScale[1, ]))
+    expect_equal(result5$criticalValuesEffectScale[2, ], c(0.83437305, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScale[2, ]))
+    expect_equal(result5$criticalValuesEffectScale[3, ], c(0.8739701, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScale[3, ]))
+    expect_equal(result5$futilityBoundsEffectScale[1, ], c(1.0330938, 1.0180366, NA_real_), tolerance = 1e-07, label = paste0(result5$futilityBoundsEffectScale[1, ]))
+    expect_equal(result5$futilityBoundsEffectScale[2, ], c(0.99276542, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result5$futilityBoundsEffectScale[2, ]))
     expect_equal(result5$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result5$futilityBoundsPValueScale[1, ]))
     expect_equal(result5$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result5$futilityBoundsPValueScale[2, ]))
+    expect_equal(result5$maxInformation, c(135.42279, 471.6572, 8473.9719), tolerance = 1e-07, label = paste0(result5$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result5), NA)))
         expect_output(print(result5)$show())
@@ -757,8 +806,10 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result5CodeBased$expectedInformationH0, result5$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result5CodeBased$expectedInformationH01, result5$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result5CodeBased$expectedInformationH1, result5$expectedInformationH1, tolerance = 1e-07)
-        expect_equal(result5CodeBased$maxInformation, result5$maxInformation, tolerance = 1e-07)
+        expect_equal(result5CodeBased$criticalValuesEffectScale, result5$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result5CodeBased$futilityBoundsEffectScale, result5$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result5CodeBased$futilityBoundsPValueScale, result5$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_equal(result5CodeBased$maxInformation, result5$maxInformation, tolerance = 1e-07)
         expect_type(names(result5), "character")
         df <- as.data.frame(result5)
         expect_s3_class(df, "data.frame")
@@ -802,9 +853,14 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result6$expectedInformationH0, c(67.837688, 90.60608), tolerance = 1e-07, label = paste0(result6$expectedInformationH0))
     expect_equal(result6$expectedInformationH01, c(86.56733, 115.62196), tolerance = 1e-07, label = paste0(result6$expectedInformationH01))
     expect_equal(result6$expectedInformationH1, c(71.839444, 95.950948), tolerance = 1e-07, label = paste0(result6$expectedInformationH1))
-    expect_equal(result6$maxInformation, c(102.94404, 137.49519), tolerance = 1e-07, label = paste0(result6$maxInformation))
+    expect_equal(result6$criticalValuesEffectScale[1, ], c(0.6596081, 0.69245977), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScale[1, ]))
+    expect_equal(result6$criticalValuesEffectScale[2, ], c(0.7092043, 0.73677378), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScale[2, ]))
+    expect_equal(result6$criticalValuesEffectScale[3, ], c(0.73784384, 0.75697706), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScale[3, ]))
+    expect_equal(result6$futilityBoundsEffectScale[1, ], c(0.93896334, 0.93329151), tolerance = 1e-07, label = paste0(result6$futilityBoundsEffectScale[1, ]))
+    expect_equal(result6$futilityBoundsEffectScale[2, ], c(0.89141562, 0.89270734), tolerance = 1e-07, label = paste0(result6$futilityBoundsEffectScale[2, ]))
     expect_equal(result6$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result6$futilityBoundsPValueScale[1, ]))
     expect_equal(result6$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result6$futilityBoundsPValueScale[2, ]))
+    expect_equal(result6$maxInformation, c(102.94404, 137.49519), tolerance = 1e-07, label = paste0(result6$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result6), NA)))
         expect_output(print(result6)$show())
@@ -827,8 +883,10 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result6CodeBased$expectedInformationH0, result6$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result6CodeBased$expectedInformationH01, result6$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result6CodeBased$expectedInformationH1, result6$expectedInformationH1, tolerance = 1e-07)
-        expect_equal(result6CodeBased$maxInformation, result6$maxInformation, tolerance = 1e-07)
+        expect_equal(result6CodeBased$criticalValuesEffectScale, result6$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result6CodeBased$futilityBoundsEffectScale, result6$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result6CodeBased$futilityBoundsPValueScale, result6$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_equal(result6CodeBased$maxInformation, result6$maxInformation, tolerance = 1e-07)
         expect_type(names(result6), "character")
         df <- as.data.frame(result6)
         expect_s3_class(df, "data.frame")
@@ -873,9 +931,14 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result7$expectedInformationH0, c(89.240417, 310.81094, 5584.1471), tolerance = 1e-07, label = paste0(result7$expectedInformationH0))
     expect_equal(result7$expectedInformationH01, c(113.87925, 396.62427, 7125.9019), tolerance = 1e-07, label = paste0(result7$expectedInformationH01))
     expect_equal(result7$expectedInformationH1, c(94.504724, 329.14573, 5913.5569), tolerance = 1e-07, label = paste0(result7$expectedInformationH1))
-    expect_equal(result7$maxInformation, c(135.42279, 471.6572, 8473.9719), tolerance = 1e-07, label = paste0(result7$maxInformation))
+    expect_equal(result7$criticalValuesEffectScale[1, ], c(0.78602077, 0.88010496, NA_real_), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScale[1, ]))
+    expect_equal(result7$criticalValuesEffectScale[2, ], c(0.83437305, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScale[2, ]))
+    expect_equal(result7$criticalValuesEffectScale[3, ], c(0.8739701, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScale[3, ]))
+    expect_equal(result7$futilityBoundsEffectScale[1, ], c(1.0330938, 1.0180366, NA_real_), tolerance = 1e-07, label = paste0(result7$futilityBoundsEffectScale[1, ]))
+    expect_equal(result7$futilityBoundsEffectScale[2, ], c(0.99276542, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result7$futilityBoundsEffectScale[2, ]))
     expect_equal(result7$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result7$futilityBoundsPValueScale[1, ]))
     expect_equal(result7$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result7$futilityBoundsPValueScale[2, ]))
+    expect_equal(result7$maxInformation, c(135.42279, 471.6572, 8473.9719), tolerance = 1e-07, label = paste0(result7$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result7), NA)))
         expect_output(print(result7)$show())
@@ -899,8 +962,10 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result7CodeBased$expectedInformationH0, result7$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result7CodeBased$expectedInformationH01, result7$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result7CodeBased$expectedInformationH1, result7$expectedInformationH1, tolerance = 1e-07)
-        expect_equal(result7CodeBased$maxInformation, result7$maxInformation, tolerance = 1e-07)
+        expect_equal(result7CodeBased$criticalValuesEffectScale, result7$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result7CodeBased$futilityBoundsEffectScale, result7$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result7CodeBased$futilityBoundsPValueScale, result7$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_equal(result7CodeBased$maxInformation, result7$maxInformation, tolerance = 1e-07)
         expect_type(names(result7), "character")
         df <- as.data.frame(result7)
         expect_s3_class(df, "data.frame")
@@ -948,9 +1013,14 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result8$expectedInformationH0, c(10.218688, 299.61748), tolerance = 1e-07, label = paste0(result8$expectedInformationH0))
     expect_equal(result8$expectedInformationH01, c(13.040016, 382.34035), tolerance = 1e-07, label = paste0(result8$expectedInformationH01))
     expect_equal(result8$expectedInformationH1, c(10.82149, 317.29196), tolerance = 1e-07, label = paste0(result8$expectedInformationH1))
-    expect_equal(result8$maxInformation, c(15.506911, 454.67106), tolerance = 1e-07, label = paste0(result8$maxInformation))
+    expect_equal(result8$criticalValuesEffectScale[1, ], c(0.2749711, 0.81123217), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScale[1, ]))
+    expect_equal(result8$criticalValuesEffectScale[2, ], c(0.4815344, 0.87032088), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScale[2, ]))
+    expect_equal(result8$criticalValuesEffectScale[3, ], c(0.62333802, 0.90884477), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScale[3, ]))
+    expect_equal(result8$futilityBoundsEffectScale[1, ], c(1.13668, 1.0290463), tolerance = 1e-07, label = paste0(result8$futilityBoundsEffectScale[1, ]))
+    expect_equal(result8$futilityBoundsEffectScale[2, ], c(0.97451334, 0.99437756), tolerance = 1e-07, label = paste0(result8$futilityBoundsEffectScale[2, ]))
     expect_equal(result8$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result8$futilityBoundsPValueScale[1, ]))
     expect_equal(result8$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result8$futilityBoundsPValueScale[2, ]))
+    expect_equal(result8$maxInformation, c(15.506911, 454.67106), tolerance = 1e-07, label = paste0(result8$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result8), NA)))
         expect_output(print(result8)$show())
@@ -975,8 +1045,10 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result8CodeBased$expectedInformationH0, result8$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result8CodeBased$expectedInformationH01, result8$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result8CodeBased$expectedInformationH1, result8$expectedInformationH1, tolerance = 1e-07)
-        expect_equal(result8CodeBased$maxInformation, result8$maxInformation, tolerance = 1e-07)
+        expect_equal(result8CodeBased$criticalValuesEffectScale, result8$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result8CodeBased$futilityBoundsEffectScale, result8$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result8CodeBased$futilityBoundsPValueScale, result8$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_equal(result8CodeBased$maxInformation, result8$maxInformation, tolerance = 1e-07)
         expect_type(names(result8), "character")
         df <- as.data.frame(result8)
         expect_s3_class(df, "data.frame")
@@ -1023,9 +1095,14 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result9$expectedInformationH0, c(10.218688, 299.61748), tolerance = 1e-07, label = paste0(result9$expectedInformationH0))
     expect_equal(result9$expectedInformationH01, c(13.040016, 382.34035), tolerance = 1e-07, label = paste0(result9$expectedInformationH01))
     expect_equal(result9$expectedInformationH1, c(10.82149, 317.29196), tolerance = 1e-07, label = paste0(result9$expectedInformationH1))
-    expect_equal(result9$maxInformation, c(15.506911, 454.67106), tolerance = 1e-07, label = paste0(result9$maxInformation))
+    expect_equal(result9$criticalValuesEffectScale[1, ], c(0.47622567, 0.86765325), tolerance = 1e-07, label = paste0(result9$criticalValuesEffectScale[1, ]))
+    expect_equal(result9$criticalValuesEffectScale[2, ], c(0.56926601, 0.89293731), tolerance = 1e-07, label = paste0(result9$criticalValuesEffectScale[2, ]))
+    expect_equal(result9$criticalValuesEffectScale[3, ], c(0.62999522, 0.90885553), tolerance = 1e-07, label = paste0(result9$criticalValuesEffectScale[3, ]))
+    expect_equal(result9$futilityBoundsEffectScale[1, ], c(1.0897585, 1.0200295), tolerance = 1e-07, label = paste0(result9$futilityBoundsEffectScale[1, ]))
+    expect_equal(result9$futilityBoundsEffectScale[2, ], c(0.97976605, 0.99538227), tolerance = 1e-07, label = paste0(result9$futilityBoundsEffectScale[2, ]))
     expect_equal(result9$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result9$futilityBoundsPValueScale[1, ]))
     expect_equal(result9$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result9$futilityBoundsPValueScale[2, ]))
+    expect_equal(result9$maxInformation, c(15.506911, 454.67106), tolerance = 1e-07, label = paste0(result9$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result9), NA)))
         expect_output(print(result9)$show())
@@ -1050,8 +1127,10 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result9CodeBased$expectedInformationH0, result9$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result9CodeBased$expectedInformationH01, result9$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result9CodeBased$expectedInformationH1, result9$expectedInformationH1, tolerance = 1e-07)
-        expect_equal(result9CodeBased$maxInformation, result9$maxInformation, tolerance = 1e-07)
+        expect_equal(result9CodeBased$criticalValuesEffectScale, result9$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result9CodeBased$futilityBoundsEffectScale, result9$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result9CodeBased$futilityBoundsPValueScale, result9$futilityBoundsPValueScale, tolerance = 1e-07)
+        expect_equal(result9CodeBased$maxInformation, result9$maxInformation, tolerance = 1e-07)
         expect_type(names(result9), "character")
         df <- as.data.frame(result9)
         expect_s3_class(df, "data.frame")
@@ -1104,6 +1183,15 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result1$expectedInformationH0, 75.621421, tolerance = 1e-07, label = paste0(result1$expectedInformationH0))
     expect_equal(result1$expectedInformationH01, 74.163254, tolerance = 1e-07, label = paste0(result1$expectedInformationH01))
     expect_equal(result1$expectedInformationH1, 65.08419, tolerance = 1e-07, label = paste0(result1$expectedInformationH1))
+    expect_equal(result1$criticalValuesEffectScaleLower[1, ], 0.47951967, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result1$criticalValuesEffectScaleLower[2, ], 0.65967031, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result1$criticalValuesEffectScaleLower[3, ], 0.77516818, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleLower[3, ]))
+    expect_equal(result1$criticalValuesEffectScaleUpper[1, ], 1.7380324, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result1$criticalValuesEffectScaleUpper[2, ], 1.4233975, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result1$criticalValuesEffectScaleUpper[3, ], 1.258526, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleUpper[3, ]))
+    expect_equal(result1$criticalValuesPValueScale[1, ], 0.00033282204, tolerance = 1e-07, label = paste0(result1$criticalValuesPValueScale[1, ]))
+    expect_equal(result1$criticalValuesPValueScale[2, ], 0.0043939994, tolerance = 1e-07, label = paste0(result1$criticalValuesPValueScale[2, ]))
+    expect_equal(result1$criticalValuesPValueScale[3, ], 0.022915626, tolerance = 1e-07, label = paste0(result1$criticalValuesPValueScale[3, ]))
     expect_equal(result1$maxInformation, 75.776183, tolerance = 1e-07, label = paste0(result1$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result1), NA)))
@@ -1127,6 +1215,9 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result1CodeBased$expectedInformationH0, result1$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result1CodeBased$expectedInformationH01, result1$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result1CodeBased$expectedInformationH1, result1$expectedInformationH1, tolerance = 1e-07)
+        expect_equal(result1CodeBased$criticalValuesEffectScaleLower, result1$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result1CodeBased$criticalValuesEffectScaleUpper, result1$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result1CodeBased$criticalValuesPValueScale, result1$criticalValuesPValueScale, tolerance = 1e-07)
         expect_equal(result1CodeBased$maxInformation, result1$maxInformation, tolerance = 1e-07)
         expect_type(names(result1), "character")
         df <- as.data.frame(result1)
@@ -1170,6 +1261,15 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result2$expectedInformationH0, 75.621421, tolerance = 1e-07, label = paste0(result2$expectedInformationH0))
     expect_equal(result2$expectedInformationH01, 74.163254, tolerance = 1e-07, label = paste0(result2$expectedInformationH01))
     expect_equal(result2$expectedInformationH1, 65.08419, tolerance = 1e-07, label = paste0(result2$expectedInformationH1))
+    expect_equal(result2$criticalValuesEffectScaleLower[1, ], 0.60166076, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result2$criticalValuesEffectScaleLower[2, ], 0.70742668, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result2$criticalValuesEffectScaleLower[3, ], 0.77346041, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleLower[3, ]))
+    expect_equal(result2$criticalValuesEffectScaleUpper[1, ], 1.5732828, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result2$criticalValuesEffectScaleUpper[2, ], 1.3749548, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result2$criticalValuesEffectScaleUpper[3, ], 1.2719746, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleUpper[3, ]))
+    expect_equal(result2$criticalValuesPValueScale[1, ], 0.00033282204, tolerance = 1e-07, label = paste0(result2$criticalValuesPValueScale[1, ]))
+    expect_equal(result2$criticalValuesPValueScale[2, ], 0.0043939994, tolerance = 1e-07, label = paste0(result2$criticalValuesPValueScale[2, ]))
+    expect_equal(result2$criticalValuesPValueScale[3, ], 0.022915626, tolerance = 1e-07, label = paste0(result2$criticalValuesPValueScale[3, ]))
     expect_equal(result2$maxInformation, 75.776183, tolerance = 1e-07, label = paste0(result2$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result2), NA)))
@@ -1193,6 +1293,9 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result2CodeBased$expectedInformationH0, result2$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result2CodeBased$expectedInformationH01, result2$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result2CodeBased$expectedInformationH1, result2$expectedInformationH1, tolerance = 1e-07)
+        expect_equal(result2CodeBased$criticalValuesEffectScaleLower, result2$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result2CodeBased$criticalValuesEffectScaleUpper, result2$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result2CodeBased$criticalValuesPValueScale, result2$criticalValuesPValueScale, tolerance = 1e-07)
         expect_equal(result2CodeBased$maxInformation, result2$maxInformation, tolerance = 1e-07)
         expect_type(names(result2), "character")
         df <- as.data.frame(result2)
@@ -1236,6 +1339,15 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result3$expectedInformationH0, c(75.621421, 193.20633), tolerance = 1e-07, label = paste0(result3$expectedInformationH0))
     expect_equal(result3$expectedInformationH01, c(74.163254, 189.48084), tolerance = 1e-07, label = paste0(result3$expectedInformationH01))
     expect_equal(result3$expectedInformationH1, c(65.08419, 166.2846), tolerance = 1e-07, label = paste0(result3$expectedInformationH1))
+    expect_equal(result3$criticalValuesEffectScaleLower[1, ], c(0.51320533, 0.67113082), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result3$criticalValuesEffectScaleLower[2, ], c(0.67581764, 0.78345117), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result3$criticalValuesEffectScaleLower[3, ], c(0.77579718, 0.85147557), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleLower[3, ]))
+    expect_equal(result3$criticalValuesEffectScaleUpper[1, ], c(1.6430957, 1.394873), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result3$criticalValuesEffectScaleUpper[2, ], c(1.3881626, 1.24353), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result3$criticalValuesEffectScaleUpper[3, ], c(1.253242, 1.16077), tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleUpper[3, ]))
+    expect_equal(result3$criticalValuesPValueScale[1, ], 0.00033282204, tolerance = 1e-07, label = paste0(result3$criticalValuesPValueScale[1, ]))
+    expect_equal(result3$criticalValuesPValueScale[2, ], 0.0043939994, tolerance = 1e-07, label = paste0(result3$criticalValuesPValueScale[2, ]))
+    expect_equal(result3$criticalValuesPValueScale[3, ], 0.022915626, tolerance = 1e-07, label = paste0(result3$criticalValuesPValueScale[3, ]))
     expect_equal(result3$maxInformation, c(75.776183, 193.60174), tolerance = 1e-07, label = paste0(result3$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result3), NA)))
@@ -1258,6 +1370,9 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result3CodeBased$expectedInformationH0, result3$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result3CodeBased$expectedInformationH01, result3$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result3CodeBased$expectedInformationH1, result3$expectedInformationH1, tolerance = 1e-07)
+        expect_equal(result3CodeBased$criticalValuesEffectScaleLower, result3$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result3CodeBased$criticalValuesEffectScaleUpper, result3$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result3CodeBased$criticalValuesPValueScale, result3$criticalValuesPValueScale, tolerance = 1e-07)
         expect_equal(result3CodeBased$maxInformation, result3$maxInformation, tolerance = 1e-07)
         expect_type(names(result3), "character")
         df <- as.data.frame(result3)
@@ -1299,6 +1414,15 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result4$expectedInformationH0, c(116.24237, 404.85466, 7273.7722), tolerance = 1e-07, label = paste0(result4$expectedInformationH0))
     expect_equal(result4$expectedInformationH01, c(114.00093, 397.04807, 7133.516), tolerance = 1e-07, label = paste0(result4$expectedInformationH01))
     expect_equal(result4$expectedInformationH1, c(100.04494, 348.44146, 6260.2312), tolerance = 1e-07, label = paste0(result4$expectedInformationH1))
+    expect_equal(result4$criticalValuesEffectScaleLower[1, ], c(0.68929529, 0.82506795, 0.95881668), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result4$criticalValuesEffectScaleLower[2, ], c(0.76211004, 0.868304, 0.96719654), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result4$criticalValuesEffectScaleLower[3, ], c(0.81274746, 0.89366882, 0.97373211), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScaleLower[3, ]))
+    expect_equal(result4$criticalValuesEffectScaleUpper[1, ], c(1.4125054, 1.2033407, 1.0425864), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result4$criticalValuesEffectScaleUpper[2, ], c(1.2934374, 1.147198, 1.0336875), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result4$criticalValuesEffectScaleUpper[3, ], c(1.2201127, 1.1162144, 1.0268317), tolerance = 1e-07, label = paste0(result4$criticalValuesEffectScaleUpper[3, ]))
+    expect_equal(result4$criticalValuesPValueScale[1, ], 0.00033282204, tolerance = 1e-07, label = paste0(result4$criticalValuesPValueScale[1, ]))
+    expect_equal(result4$criticalValuesPValueScale[2, ], 0.0043939994, tolerance = 1e-07, label = paste0(result4$criticalValuesPValueScale[2, ]))
+    expect_equal(result4$criticalValuesPValueScale[3, ], 0.022915626, tolerance = 1e-07, label = paste0(result4$criticalValuesPValueScale[3, ]))
     expect_equal(result4$maxInformation, c(116.48026, 405.68322, 7288.6583), tolerance = 1e-07, label = paste0(result4$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result4), NA)))
@@ -1320,6 +1444,9 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result4CodeBased$expectedInformationH0, result4$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result4CodeBased$expectedInformationH01, result4$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result4CodeBased$expectedInformationH1, result4$expectedInformationH1, tolerance = 1e-07)
+        expect_equal(result4CodeBased$criticalValuesEffectScaleLower, result4$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result4CodeBased$criticalValuesEffectScaleUpper, result4$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result4CodeBased$criticalValuesPValueScale, result4$criticalValuesPValueScale, tolerance = 1e-07)
         expect_equal(result4CodeBased$maxInformation, result4$maxInformation, tolerance = 1e-07)
         expect_type(names(result4), "character")
         df <- as.data.frame(result4)
@@ -1362,6 +1489,15 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result5$expectedInformationH0, c(116.24237, 404.85466, 7273.7722), tolerance = 1e-07, label = paste0(result5$expectedInformationH0))
     expect_equal(result5$expectedInformationH01, c(114.00093, 397.04807, 7133.516), tolerance = 1e-07, label = paste0(result5$expectedInformationH01))
     expect_equal(result5$expectedInformationH1, c(100.04494, 348.44146, 6260.2312), tolerance = 1e-07, label = paste0(result5$expectedInformationH1))
+    expect_equal(result5$criticalValuesEffectScaleLower[1, ], c(0.70286645, 0.83276325, NA_real_), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result5$criticalValuesEffectScaleLower[2, ], c(0.78664528, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result5$criticalValuesEffectScaleLower[3, ], c(0.85137262, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScaleLower[3, ]))
+    expect_equal(result5$criticalValuesEffectScaleUpper[1, ], c(1.3484329, 1.182454, NA_real_), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result5$criticalValuesEffectScaleUpper[2, ], c(1.2387093, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result5$criticalValuesEffectScaleUpper[3, ], c(1.1605332, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result5$criticalValuesEffectScaleUpper[3, ]))
+    expect_equal(result5$criticalValuesPValueScale[1, ], 0.00033282204, tolerance = 1e-07, label = paste0(result5$criticalValuesPValueScale[1, ]))
+    expect_equal(result5$criticalValuesPValueScale[2, ], 0.0043939994, tolerance = 1e-07, label = paste0(result5$criticalValuesPValueScale[2, ]))
+    expect_equal(result5$criticalValuesPValueScale[3, ], 0.022915626, tolerance = 1e-07, label = paste0(result5$criticalValuesPValueScale[3, ]))
     expect_equal(result5$maxInformation, c(116.48026, 405.68322, 7288.6583), tolerance = 1e-07, label = paste0(result5$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result5), NA)))
@@ -1384,6 +1520,9 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result5CodeBased$expectedInformationH0, result5$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result5CodeBased$expectedInformationH01, result5$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result5CodeBased$expectedInformationH1, result5$expectedInformationH1, tolerance = 1e-07)
+        expect_equal(result5CodeBased$criticalValuesEffectScaleLower, result5$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result5CodeBased$criticalValuesEffectScaleUpper, result5$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result5CodeBased$criticalValuesPValueScale, result5$criticalValuesPValueScale, tolerance = 1e-07)
         expect_equal(result5CodeBased$maxInformation, result5$maxInformation, tolerance = 1e-07)
         expect_type(names(result5), "character")
         df <- as.data.frame(result5)
@@ -1426,6 +1565,15 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result6$expectedInformationH0, c(116.24237, 404.85466, 7273.7722), tolerance = 1e-07, label = paste0(result6$expectedInformationH0))
     expect_equal(result6$expectedInformationH01, c(114.00093, 397.04807, 7133.516), tolerance = 1e-07, label = paste0(result6$expectedInformationH01))
     expect_equal(result6$expectedInformationH1, c(100.04494, 348.44146, 6260.2312), tolerance = 1e-07, label = paste0(result6$expectedInformationH1))
+    expect_equal(result6$criticalValuesEffectScaleLower[1, ], c(0.70286645, 0.83276325, NA_real_), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result6$criticalValuesEffectScaleLower[2, ], c(0.78664528, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result6$criticalValuesEffectScaleLower[3, ], c(0.85137262, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScaleLower[3, ]))
+    expect_equal(result6$criticalValuesEffectScaleUpper[1, ], c(1.3484329, 1.182454, NA_real_), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result6$criticalValuesEffectScaleUpper[2, ], c(1.2387093, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result6$criticalValuesEffectScaleUpper[3, ], c(1.1605332, NA_real_, NA_real_), tolerance = 1e-07, label = paste0(result6$criticalValuesEffectScaleUpper[3, ]))
+    expect_equal(result6$criticalValuesPValueScale[1, ], 0.00033282204, tolerance = 1e-07, label = paste0(result6$criticalValuesPValueScale[1, ]))
+    expect_equal(result6$criticalValuesPValueScale[2, ], 0.0043939994, tolerance = 1e-07, label = paste0(result6$criticalValuesPValueScale[2, ]))
+    expect_equal(result6$criticalValuesPValueScale[3, ], 0.022915626, tolerance = 1e-07, label = paste0(result6$criticalValuesPValueScale[3, ]))
     expect_equal(result6$maxInformation, c(116.48026, 405.68322, 7288.6583), tolerance = 1e-07, label = paste0(result6$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result6), NA)))
@@ -1448,6 +1596,9 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result6CodeBased$expectedInformationH0, result6$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result6CodeBased$expectedInformationH01, result6$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result6CodeBased$expectedInformationH1, result6$expectedInformationH1, tolerance = 1e-07)
+        expect_equal(result6CodeBased$criticalValuesEffectScaleLower, result6$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result6CodeBased$criticalValuesEffectScaleUpper, result6$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result6CodeBased$criticalValuesPValueScale, result6$criticalValuesPValueScale, tolerance = 1e-07)
         expect_equal(result6CodeBased$maxInformation, result6$maxInformation, tolerance = 1e-07)
         expect_type(names(result6), "character")
         df <- as.data.frame(result6)
@@ -1493,6 +1644,15 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result7$expectedInformationH0, c(13.31061, 390.27433), tolerance = 1e-07, label = paste0(result7$expectedInformationH0))
     expect_equal(result7$expectedInformationH01, c(13.053949, 382.74888), tolerance = 1e-07, label = paste0(result7$expectedInformationH01))
     expect_equal(result7$expectedInformationH1, c(11.455885, 335.89278), tolerance = 1e-07, label = paste0(result7$expectedInformationH1))
+    expect_equal(result7$criticalValuesEffectScaleLower[1, ], c(NA_real_, 0.73970897), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result7$criticalValuesEffectScaleLower[2, ], c(0.35692922, 0.83445167), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result7$criticalValuesEffectScaleLower[3, ], c(0.56281797, 0.89247788), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScaleLower[3, ]))
+    expect_equal(result7$criticalValuesEffectScaleUpper[1, ], c(2.9733627, 1.3007095), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result7$criticalValuesEffectScaleUpper[2, ], c(2.0223717, 1.1810895), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result7$criticalValuesEffectScaleUpper[3, ], c(1.591041, 1.1138785), tolerance = 1e-07, label = paste0(result7$criticalValuesEffectScaleUpper[3, ]))
+    expect_equal(result7$criticalValuesPValueScale[1, ], 0.00033282204, tolerance = 1e-07, label = paste0(result7$criticalValuesPValueScale[1, ]))
+    expect_equal(result7$criticalValuesPValueScale[2, ], 0.0043939994, tolerance = 1e-07, label = paste0(result7$criticalValuesPValueScale[2, ]))
+    expect_equal(result7$criticalValuesPValueScale[3, ], 0.022915626, tolerance = 1e-07, label = paste0(result7$criticalValuesPValueScale[3, ]))
     expect_equal(result7$maxInformation, c(13.337851, 391.07305), tolerance = 1e-07, label = paste0(result7$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result7), NA)))
@@ -1516,6 +1676,9 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result7CodeBased$expectedInformationH0, result7$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result7CodeBased$expectedInformationH01, result7$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result7CodeBased$expectedInformationH1, result7$expectedInformationH1, tolerance = 1e-07)
+        expect_equal(result7CodeBased$criticalValuesEffectScaleLower, result7$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result7CodeBased$criticalValuesEffectScaleUpper, result7$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result7CodeBased$criticalValuesPValueScale, result7$criticalValuesPValueScale, tolerance = 1e-07)
         expect_equal(result7CodeBased$maxInformation, result7$maxInformation, tolerance = 1e-07)
         expect_type(names(result7), "character")
         df <- as.data.frame(result7)
@@ -1560,6 +1723,15 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
     expect_equal(result8$expectedInformationH0, c(13.31061, 390.27433), tolerance = 1e-07, label = paste0(result8$expectedInformationH0))
     expect_equal(result8$expectedInformationH01, c(13.053949, 382.74888), tolerance = 1e-07, label = paste0(result8$expectedInformationH01))
     expect_equal(result8$expectedInformationH1, c(11.455885, 335.89278), tolerance = 1e-07, label = paste0(result8$expectedInformationH1))
+    expect_equal(result8$criticalValuesEffectScaleLower[1, ], c(0.30267461, 0.81655903), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result8$criticalValuesEffectScaleLower[2, ], c(0.45992853, 0.8631403), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result8$criticalValuesEffectScaleLower[3, ], c(0.56508097, 0.89252094), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScaleLower[3, ]))
+    expect_equal(result8$criticalValuesEffectScaleUpper[1, ], c(2.2123023, 1.2029584), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result8$criticalValuesEffectScaleUpper[2, ], c(1.8164468, 1.1474537), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result8$criticalValuesEffectScaleUpper[3, ], c(1.5993712, 1.1139101), tolerance = 1e-07, label = paste0(result8$criticalValuesEffectScaleUpper[3, ]))
+    expect_equal(result8$criticalValuesPValueScale[1, ], 0.00033282204, tolerance = 1e-07, label = paste0(result8$criticalValuesPValueScale[1, ]))
+    expect_equal(result8$criticalValuesPValueScale[2, ], 0.0043939994, tolerance = 1e-07, label = paste0(result8$criticalValuesPValueScale[2, ]))
+    expect_equal(result8$criticalValuesPValueScale[3, ], 0.022915626, tolerance = 1e-07, label = paste0(result8$criticalValuesPValueScale[3, ]))
     expect_equal(result8$maxInformation, c(13.337851, 391.07305), tolerance = 1e-07, label = paste0(result8$maxInformation))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result8), NA)))
@@ -1583,6 +1755,9 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_equal(result8CodeBased$expectedInformationH0, result8$expectedInformationH0, tolerance = 1e-07)
         expect_equal(result8CodeBased$expectedInformationH01, result8$expectedInformationH01, tolerance = 1e-07)
         expect_equal(result8CodeBased$expectedInformationH1, result8$expectedInformationH1, tolerance = 1e-07)
+        expect_equal(result8CodeBased$criticalValuesEffectScaleLower, result8$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result8CodeBased$criticalValuesEffectScaleUpper, result8$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result8CodeBased$criticalValuesPValueScale, result8$criticalValuesPValueScale, tolerance = 1e-07)
         expect_equal(result8CodeBased$maxInformation, result8$maxInformation, tolerance = 1e-07)
         expect_type(names(result8), "character")
         df <- as.data.frame(result8)
@@ -1605,11 +1780,18 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
         sided = 1, beta = 0.1, typeOfDesign = "WT", deltaWT = 0.25
     )
 
+    designGS1b <- getDesignGroupSequential(
+        informationRates = c(0.32, 0.57, 1), futilityBounds = c(-0.4, 0.1),
+        sided = 1, beta = 0.1, typeOfDesign = "WT",
+        deltaWT = 0.25, directionUpper = FALSE
+    )
+
     # @refFS[Formula]{fs:ShiftParameterCountData}
     # @refFS[Formula]{fs:VarianceEstimateFixedCountData}
     result1 <- getPowerCounts(
         design = designGS1, maxNumberOfSubjects = 400, directionUpper = FALSE,
-        overdispersion = 1, fixedExposureTime = 1, lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
+        overdispersion = 1, fixedExposureTime = 1,
+        lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
     )
 
     ## Comparison of the results of TrialDesignPlanCountData object 'result1' with expected results
@@ -1622,6 +1804,11 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
     expect_equal(result1$futilityPerStage[1, ], c(0.054589249, 0.10911095, 0.18844857, 0.28892653, 0.40212886, 0.5176485), tolerance = 1e-07, label = paste0(result1$futilityPerStage[1, ]))
     expect_equal(result1$futilityPerStage[2, ], c(0.038867123, 0.086387802, 0.14978727, 0.21187124, 0.25362007, 0.26482046), tolerance = 1e-07, label = paste0(result1$futilityPerStage[2, ]))
     expect_equal(result1$earlyStop, c(0.32131159, 0.30410558, 0.38379367, 0.51799816, 0.66172612, 0.78442244), tolerance = 1e-07, label = paste0(result1$earlyStop))
+    expect_equal(result1$criticalValuesEffectScale[1, ], 0.68574202, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScale[1, ]))
+    expect_equal(result1$criticalValuesEffectScale[2, ], 0.72310269, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScale[2, ]))
+    expect_equal(result1$criticalValuesEffectScale[3, ], 0.75572857, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScale[3, ]))
+    expect_equal(result1$futilityBoundsEffectScale[1, ], 1.0534754, tolerance = 1e-07, label = paste0(result1$futilityBoundsEffectScale[1, ]))
+    expect_equal(result1$futilityBoundsEffectScale[2, ], 0.98697452, tolerance = 1e-07, label = paste0(result1$futilityBoundsEffectScale[2, ]))
     expect_equal(result1$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result1$futilityBoundsPValueScale[1, ]))
     expect_equal(result1$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result1$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -1636,6 +1823,8 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
         expect_equal(result1CodeBased$futilityStop, result1$futilityStop, tolerance = 1e-07)
         expect_equal(result1CodeBased$futilityPerStage, result1$futilityPerStage, tolerance = 1e-07)
         expect_equal(result1CodeBased$earlyStop, result1$earlyStop, tolerance = 1e-07)
+        expect_equal(result1CodeBased$criticalValuesEffectScale, result1$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result1CodeBased$futilityBoundsEffectScale, result1$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result1CodeBased$futilityBoundsPValueScale, result1$futilityBoundsPValueScale, tolerance = 1e-07)
         expect_type(names(result1), "character")
         df <- as.data.frame(result1)
@@ -1648,9 +1837,36 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
 
     # @refFS[Formula]{fs:ShiftParameterCountData}
     # @refFS[Formula]{fs:VarianceEstimateFixedCountData}
+    result1b <- getPowerCounts(
+        design = designGS1b, maxNumberOfSubjects = 400,
+        overdispersion = 1, fixedExposureTime = 1,
+        lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
+    )
+
+    ## Pairwise comparison of the results of result1 with the results of result1b
+    expect_equal(result1$theta, result1b$theta, tolerance = 1e-07)
+    expect_equal(result1$overallReject, result1b$overallReject, tolerance = 1e-07)
+    expect_equal(result1b$rejectPerStage[1, ], result1$rejectPerStage[1, ], tolerance = 1e-07)
+    expect_equal(result1b$rejectPerStage[2, ], result1$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(result1b$rejectPerStage[3, ], result1$rejectPerStage[3, ], tolerance = 1e-07)
+    expect_equal(result1$futilityStop, result1b$futilityStop, tolerance = 1e-07)
+    expect_equal(result1b$futilityPerStage[1, ], result1$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(result1b$futilityPerStage[2, ], result1$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(result1$earlyStop, result1b$earlyStop, tolerance = 1e-07)
+    expect_equal(result1b$criticalValuesEffectScale[1, ], result1$criticalValuesEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(result1b$criticalValuesEffectScale[2, ], result1$criticalValuesEffectScale[2, ], tolerance = 1e-07)
+    expect_equal(result1b$criticalValuesEffectScale[3, ], result1$criticalValuesEffectScale[3, ], tolerance = 1e-07)
+    expect_equal(result1b$futilityBoundsEffectScale[1, ], result1$futilityBoundsEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(result1b$futilityBoundsEffectScale[2, ], result1$futilityBoundsEffectScale[2, ], tolerance = 1e-07)
+    expect_equal(result1b$futilityBoundsPValueScale[1, ], result1$futilityBoundsPValueScale[1, ], tolerance = 1e-07)
+    expect_equal(result1b$futilityBoundsPValueScale[2, ], result1$futilityBoundsPValueScale[2, ], tolerance = 1e-07)
+
+    # @refFS[Formula]{fs:ShiftParameterCountData}
+    # @refFS[Formula]{fs:VarianceEstimateFixedCountData}
     result2 <- getPowerCounts(
         design = designGS1, maxNumberOfSubjects = 400, directionUpper = FALSE,
-        thetaH0 = 0.9, overdispersion = 0.3, fixedExposureTime = 1, lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
+        thetaH0 = 0.9, overdispersion = 0.3, fixedExposureTime = 1,
+        lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
     )
 
     ## Comparison of the results of TrialDesignPlanCountData object 'result2' with expected results
@@ -1663,6 +1879,11 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
     expect_equal(result2$futilityPerStage[1, ], c(0.085530884, 0.18552122, 0.32857927, 0.49402485, 0.65311126, 0.78343373), tolerance = 1e-07, label = paste0(result2$futilityPerStage[1, ]))
     expect_equal(result2$futilityPerStage[2, ], c(0.065908377, 0.14764931, 0.22997091, 0.26507798, 0.23884734, 0.17639285), tolerance = 1e-07, label = paste0(result2$futilityPerStage[2, ]))
     expect_equal(result2$earlyStop, c(0.29758523, 0.3801076, 0.57042459, 0.76157553, 0.89240487, 0.9599004), tolerance = 1e-07, label = paste0(result2$earlyStop))
+    expect_equal(result2$criticalValuesEffectScale[1, ], 0.66626497, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScale[1, ]))
+    expect_equal(result2$criticalValuesEffectScale[2, ], 0.69545576, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScale[2, ]))
+    expect_equal(result2$criticalValuesEffectScale[3, ], 0.7206046, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScale[3, ]))
+    expect_equal(result2$futilityBoundsEffectScale[1, ], 0.93743746, tolerance = 1e-07, label = paste0(result2$futilityBoundsEffectScale[1, ]))
+    expect_equal(result2$futilityBoundsEffectScale[2, ], 0.89078982, tolerance = 1e-07, label = paste0(result2$futilityBoundsEffectScale[2, ]))
     expect_equal(result2$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result2$futilityBoundsPValueScale[1, ]))
     expect_equal(result2$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result2$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -1677,6 +1898,8 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
         expect_equal(result2CodeBased$futilityStop, result2$futilityStop, tolerance = 1e-07)
         expect_equal(result2CodeBased$futilityPerStage, result2$futilityPerStage, tolerance = 1e-07)
         expect_equal(result2CodeBased$earlyStop, result2$earlyStop, tolerance = 1e-07)
+        expect_equal(result2CodeBased$criticalValuesEffectScale, result2$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result2CodeBased$futilityBoundsEffectScale, result2$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result2CodeBased$futilityBoundsPValueScale, result2$futilityBoundsPValueScale, tolerance = 1e-07)
         expect_type(names(result2), "character")
         df <- as.data.frame(result2)
@@ -1688,10 +1911,37 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
     }
 
     # @refFS[Formula]{fs:ShiftParameterCountData}
+    # @refFS[Formula]{fs:VarianceEstimateFixedCountData}
+    result2b <- getPowerCounts(
+        design = designGS1b, maxNumberOfSubjects = 400,
+        thetaH0 = 0.9, overdispersion = 0.3, fixedExposureTime = 1,
+        lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
+    )
+
+    ## Pairwise comparison of the results of result2 with the results of result2b
+    expect_equal(result2$theta, result2b$theta, tolerance = 1e-07)
+    expect_equal(result2$overallReject, result2b$overallReject, tolerance = 1e-07)
+    expect_equal(result2b$rejectPerStage[1, ], result2$rejectPerStage[1, ], tolerance = 1e-07)
+    expect_equal(result2b$rejectPerStage[2, ], result2$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(result2b$rejectPerStage[3, ], result2$rejectPerStage[3, ], tolerance = 1e-07)
+    expect_equal(result2$futilityStop, result2b$futilityStop, tolerance = 1e-07)
+    expect_equal(result2b$futilityPerStage[1, ], result2$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(result2b$futilityPerStage[2, ], result2$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(result2$earlyStop, result2b$earlyStop, tolerance = 1e-07)
+    expect_equal(result2b$criticalValuesEffectScale[1, ], result2$criticalValuesEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(result2b$criticalValuesEffectScale[2, ], result2$criticalValuesEffectScale[2, ], tolerance = 1e-07)
+    expect_equal(result2b$criticalValuesEffectScale[3, ], result2$criticalValuesEffectScale[3, ], tolerance = 1e-07)
+    expect_equal(result2b$futilityBoundsEffectScale[1, ], result2$futilityBoundsEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(result2b$futilityBoundsEffectScale[2, ], result2$futilityBoundsEffectScale[2, ], tolerance = 1e-07)
+    expect_equal(result2b$futilityBoundsPValueScale[1, ], result2$futilityBoundsPValueScale[1, ], tolerance = 1e-07)
+    expect_equal(result2b$futilityBoundsPValueScale[2, ], result2$futilityBoundsPValueScale[2, ], tolerance = 1e-07)
+
+    # @refFS[Formula]{fs:ShiftParameterCountData}
     # @refFS[Formula]{fs:VarianceEstimateVariableCountData}
     result3 <- getPowerCounts(
         design = designGS1, maxNumberOfSubjects = 400, directionUpper = FALSE,
-        overdispersion = 0.4, accrualTime = 4, followUpTime = 3, lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
+        overdispersion = 0.4, accrualTime = 4, followUpTime = 3,
+        lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
     )
 
     ## Comparison of the results of TrialDesignPlanCountData object 'result3' with expected results
@@ -1704,6 +1954,11 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
     expect_equal(result3$futilityPerStage[1, ], c(0.005399273, 0.03001657, 0.10411951, 0.24920632, 0.44771069, 0.64885499), tolerance = 1e-07, label = paste0(result3$futilityPerStage[1, ]))
     expect_equal(result3$futilityPerStage[2, ], c(0.0018120439, 0.018406224, 0.082090356, 0.19004311, 0.26179813, 0.24028283), tolerance = 1e-07, label = paste0(result3$futilityPerStage[2, ]))
     expect_equal(result3$earlyStop, c(0.70142213, 0.40118557, 0.3016123, 0.46431042, 0.71338823, 0.88960734), tolerance = 1e-07, label = paste0(result3$earlyStop))
+    expect_equal(result3$criticalValuesEffectScale[1, ], 0.81295886, tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScale[1, ]))
+    expect_equal(result3$criticalValuesEffectScale[2, ], 0.83623437, tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScale[2, ]))
+    expect_equal(result3$criticalValuesEffectScale[3, ], 0.8563166, tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScale[3, ]))
+    expect_equal(result3$futilityBoundsEffectScale[1, ], 1.0300193, tolerance = 1e-07, label = paste0(result3$futilityBoundsEffectScale[1, ]))
+    expect_equal(result3$futilityBoundsEffectScale[2, ], 0.99261485, tolerance = 1e-07, label = paste0(result3$futilityBoundsEffectScale[2, ]))
     expect_equal(result3$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result3$futilityBoundsPValueScale[1, ]))
     expect_equal(result3$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result3$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -1718,6 +1973,8 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
         expect_equal(result3CodeBased$futilityStop, result3$futilityStop, tolerance = 1e-07)
         expect_equal(result3CodeBased$futilityPerStage, result3$futilityPerStage, tolerance = 1e-07)
         expect_equal(result3CodeBased$earlyStop, result3$earlyStop, tolerance = 1e-07)
+        expect_equal(result3CodeBased$criticalValuesEffectScale, result3$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result3CodeBased$futilityBoundsEffectScale, result3$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result3CodeBased$futilityBoundsPValueScale, result3$futilityBoundsPValueScale, tolerance = 1e-07)
         expect_type(names(result3), "character")
         df <- as.data.frame(result3)
@@ -1727,6 +1984,32 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+
+    # @refFS[Formula]{fs:ShiftParameterCountData}
+    # @refFS[Formula]{fs:VarianceEstimateVariableCountData}
+    result3b <- getPowerCounts(
+        design = designGS1b, maxNumberOfSubjects = 400,
+        overdispersion = 0.4, accrualTime = 4, followUpTime = 3,
+        lambda1 = seq(1.05, 1.55, 0.1), lambda2 = 1.4
+    )
+
+    ## Pairwise comparison of the results of result3 with the results of result3b
+    expect_equal(result3$theta, result3b$theta, tolerance = 1e-07)
+    expect_equal(result3$overallReject, result3b$overallReject, tolerance = 1e-07)
+    expect_equal(result3b$rejectPerStage[1, ], result3$rejectPerStage[1, ], tolerance = 1e-07)
+    expect_equal(result3b$rejectPerStage[2, ], result3$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(result3b$rejectPerStage[3, ], result3$rejectPerStage[3, ], tolerance = 1e-07)
+    expect_equal(result3$futilityStop, result3b$futilityStop, tolerance = 1e-07)
+    expect_equal(result3b$futilityPerStage[1, ], result3$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(result3b$futilityPerStage[2, ], result3$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(result3$earlyStop, result3b$earlyStop, tolerance = 1e-07)
+    expect_equal(result3b$criticalValuesEffectScale[1, ], result3$criticalValuesEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(result3b$criticalValuesEffectScale[2, ], result3$criticalValuesEffectScale[2, ], tolerance = 1e-07)
+    expect_equal(result3b$criticalValuesEffectScale[3, ], result3$criticalValuesEffectScale[3, ], tolerance = 1e-07)
+    expect_equal(result3b$futilityBoundsEffectScale[1, ], result3$futilityBoundsEffectScale[1, ], tolerance = 1e-07)
+    expect_equal(result3b$futilityBoundsEffectScale[2, ], result3$futilityBoundsEffectScale[2, ], tolerance = 1e-07)
+    expect_equal(result3b$futilityBoundsPValueScale[1, ], result3$futilityBoundsPValueScale[1, ], tolerance = 1e-07)
+    expect_equal(result3b$futilityBoundsPValueScale[2, ], result3$futilityBoundsPValueScale[2, ], tolerance = 1e-07)
 
     # @refFS[Formula]{fs:ShiftParameterCountData}
     # @refFS[Formula]{fs:VarianceEstimateVariableCountData}
@@ -1746,6 +2029,11 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
     expect_equal(result4$futilityPerStage[1, ], c(0.93451839, 0.34457826, 0.014907497, 6.6590384e-05), tolerance = 1e-07, label = paste0(result4$futilityPerStage[1, ]))
     expect_equal(result4$futilityPerStage[2, ], c(0.06207409, 0.23621548, 0.007330601, 2.7319617e-06), tolerance = 1e-07, label = paste0(result4$futilityPerStage[2, ]))
     expect_equal(result4$earlyStop, c(0.9965944, 0.59102491, 0.52565069, 0.98607433), tolerance = 1e-07, label = paste0(result4$earlyStop))
+    expect_equal(result4$criticalValuesEffectScale[1, ], NA_real_, label = paste0(result4$criticalValuesEffectScale[1, ]))
+    expect_equal(result4$criticalValuesEffectScale[2, ], NA_real_, label = paste0(result4$criticalValuesEffectScale[2, ]))
+    expect_equal(result4$criticalValuesEffectScale[3, ], NA_real_, label = paste0(result4$criticalValuesEffectScale[3, ]))
+    expect_equal(result4$futilityBoundsEffectScale[1, ], NA_real_, label = paste0(result4$futilityBoundsEffectScale[1, ]))
+    expect_equal(result4$futilityBoundsEffectScale[2, ], NA_real_, label = paste0(result4$futilityBoundsEffectScale[2, ]))
     expect_equal(result4$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result4$futilityBoundsPValueScale[1, ]))
     expect_equal(result4$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result4$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -1761,6 +2049,8 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
         expect_equal(result4CodeBased$futilityStop, result4$futilityStop, tolerance = 1e-07)
         expect_equal(result4CodeBased$futilityPerStage, result4$futilityPerStage, tolerance = 1e-07)
         expect_equal(result4CodeBased$earlyStop, result4$earlyStop, tolerance = 1e-07)
+        expect_equal(result4CodeBased$criticalValuesEffectScale, result4$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result4CodeBased$futilityBoundsEffectScale, result4$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result4CodeBased$futilityBoundsPValueScale, result4$futilityBoundsPValueScale, tolerance = 1e-07)
         expect_type(names(result4), "character")
         df <- as.data.frame(result4)
@@ -1789,6 +2079,11 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
     expect_equal(result5$futilityPerStage[1, ], c(0.99573866, 0.77896313, 0.16758257, 0.0049698331), tolerance = 1e-07, label = paste0(result5$futilityPerStage[1, ]))
     expect_equal(result5$futilityPerStage[2, ], c(0.0042472923, 0.17911229, 0.13417722, 0.0016126572), tolerance = 1e-07, label = paste0(result5$futilityPerStage[2, ]))
     expect_equal(result5$earlyStop, c(0.99998595, 0.95815478, 0.35826962, 0.71404723), tolerance = 1e-07, label = paste0(result5$earlyStop))
+    expect_equal(result5$criticalValuesEffectScale[1, ], NA_real_, label = paste0(result5$criticalValuesEffectScale[1, ]))
+    expect_equal(result5$criticalValuesEffectScale[2, ], NA_real_, label = paste0(result5$criticalValuesEffectScale[2, ]))
+    expect_equal(result5$criticalValuesEffectScale[3, ], NA_real_, label = paste0(result5$criticalValuesEffectScale[3, ]))
+    expect_equal(result5$futilityBoundsEffectScale[1, ], NA_real_, label = paste0(result5$futilityBoundsEffectScale[1, ]))
+    expect_equal(result5$futilityBoundsEffectScale[2, ], NA_real_, label = paste0(result5$futilityBoundsEffectScale[2, ]))
     expect_equal(result5$futilityBoundsPValueScale[1, ], 0.65542174, tolerance = 1e-07, label = paste0(result5$futilityBoundsPValueScale[1, ]))
     expect_equal(result5$futilityBoundsPValueScale[2, ], 0.46017216, tolerance = 1e-07, label = paste0(result5$futilityBoundsPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
@@ -1804,6 +2099,8 @@ test_that("'getPowerCounts': Power calculation of testing count data for one-sid
         expect_equal(result5CodeBased$futilityStop, result5$futilityStop, tolerance = 1e-07)
         expect_equal(result5CodeBased$futilityPerStage, result5$futilityPerStage, tolerance = 1e-07)
         expect_equal(result5CodeBased$earlyStop, result5$earlyStop, tolerance = 1e-07)
+        expect_equal(result5CodeBased$criticalValuesEffectScale, result5$criticalValuesEffectScale, tolerance = 1e-07)
+        expect_equal(result5CodeBased$futilityBoundsEffectScale, result5$futilityBoundsEffectScale, tolerance = 1e-07)
         expect_equal(result5CodeBased$futilityBoundsPValueScale, result5$futilityBoundsPValueScale, tolerance = 1e-07)
         expect_type(names(result5), "character")
         df <- as.data.frame(result5)
@@ -1837,6 +2134,12 @@ test_that("'getPowerCounts': Power calculation of testing count data for two-sid
     expect_equal(result1$rejectPerStage[1, ], c(0.10712223, 0.024389615, 0.005305078, 0.0078168805, 0.02989557), tolerance = 1e-07, label = paste0(result1$rejectPerStage[1, ]))
     expect_equal(result1$rejectPerStage[2, ], c(0.33962809, 0.11253177, 0.025178725, 0.038005557, 0.13413929), tolerance = 1e-07, label = paste0(result1$rejectPerStage[2, ]))
     expect_equal(result1$earlyStop, c(0.10712223, 0.024389615, 0.005305078, 0.0078168805, 0.02989557), tolerance = 1e-07, label = paste0(result1$earlyStop))
+    expect_equal(result1$criticalValuesEffectScaleLower[1, ], 0.67654302, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result1$criticalValuesEffectScaleLower[2, ], 0.73446739, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result1$criticalValuesEffectScaleUpper[1, ], 1.434327, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result1$criticalValuesEffectScaleUpper[2, ], 1.3360312, tolerance = 1e-07, label = paste0(result1$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result1$criticalValuesPValueScale[1, ], 0.0044259026, tolerance = 1e-07, label = paste0(result1$criticalValuesPValueScale[1, ]))
+    expect_equal(result1$criticalValuesPValueScale[2, ], 0.023026225, tolerance = 1e-07, label = paste0(result1$criticalValuesPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result1), NA)))
         expect_output(print(result1)$show())
@@ -1847,6 +2150,9 @@ test_that("'getPowerCounts': Power calculation of testing count data for two-sid
         expect_equal(result1CodeBased$overallReject, result1$overallReject, tolerance = 1e-07)
         expect_equal(result1CodeBased$rejectPerStage, result1$rejectPerStage, tolerance = 1e-07)
         expect_equal(result1CodeBased$earlyStop, result1$earlyStop, tolerance = 1e-07)
+        expect_equal(result1CodeBased$criticalValuesEffectScaleLower, result1$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result1CodeBased$criticalValuesEffectScaleUpper, result1$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result1CodeBased$criticalValuesPValueScale, result1$criticalValuesPValueScale, tolerance = 1e-07)
         expect_type(names(result1), "character")
         df <- as.data.frame(result1)
         expect_s3_class(df, "data.frame")
@@ -1869,6 +2175,12 @@ test_that("'getPowerCounts': Power calculation of testing count data for two-sid
     expect_equal(result2$rejectPerStage[1, ], c(0.36176735, 0.019313406, 0.017184738, 0.21355347, 0.65145735), tolerance = 1e-07, label = paste0(result2$rejectPerStage[1, ]))
     expect_equal(result2$rejectPerStage[2, ], c(0.48881593, 0.091343983, 0.082061991, 0.46267692, 0.32690808), tolerance = 1e-07, label = paste0(result2$rejectPerStage[2, ]))
     expect_equal(result2$earlyStop, c(0.36176735, 0.019313406, 0.017184738, 0.21355347, 0.65145735), tolerance = 1e-07, label = paste0(result2$earlyStop))
+    expect_equal(result2$criticalValuesEffectScaleLower[1, ], 0.737833, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result2$criticalValuesEffectScaleLower[2, ], 0.78695838, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result2$criticalValuesEffectScaleUpper[1, ], 1.3155614, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result2$criticalValuesEffectScaleUpper[2, ], 1.2470602, tolerance = 1e-07, label = paste0(result2$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result2$criticalValuesPValueScale[1, ], 0.0044259026, tolerance = 1e-07, label = paste0(result2$criticalValuesPValueScale[1, ]))
+    expect_equal(result2$criticalValuesPValueScale[2, ], 0.023026225, tolerance = 1e-07, label = paste0(result2$criticalValuesPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result2), NA)))
         expect_output(print(result2)$show())
@@ -1879,6 +2191,9 @@ test_that("'getPowerCounts': Power calculation of testing count data for two-sid
         expect_equal(result2CodeBased$overallReject, result2$overallReject, tolerance = 1e-07)
         expect_equal(result2CodeBased$rejectPerStage, result2$rejectPerStage, tolerance = 1e-07)
         expect_equal(result2CodeBased$earlyStop, result2$earlyStop, tolerance = 1e-07)
+        expect_equal(result2CodeBased$criticalValuesEffectScaleLower, result2$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result2CodeBased$criticalValuesEffectScaleUpper, result2$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result2CodeBased$criticalValuesPValueScale, result2$criticalValuesPValueScale, tolerance = 1e-07)
         expect_type(names(result2), "character")
         df <- as.data.frame(result2)
         expect_s3_class(df, "data.frame")
@@ -1901,6 +2216,12 @@ test_that("'getPowerCounts': Power calculation of testing count data for two-sid
     expect_equal(result3$rejectPerStage[1, ], c(0.50887066, 0.19212331, 0.044559304, 0.007285927, 0.0071055093, 0.035814782), tolerance = 1e-07, label = paste0(result3$rejectPerStage[1, ]))
     expect_equal(result3$rejectPerStage[2, ], c(0.42884152, 0.447296, 0.1857513, 0.035333539, 0.034420876, 0.15594129), tolerance = 1e-07, label = paste0(result3$rejectPerStage[2, ]))
     expect_equal(result3$earlyStop, c(0.50887066, 0.19212331, 0.044559304, 0.007285927, 0.0071055093, 0.035814782), tolerance = 1e-07, label = paste0(result3$earlyStop))
+    expect_equal(result3$criticalValuesEffectScaleLower[1, ], 0.80718148, tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result3$criticalValuesEffectScaleLower[2, ], 0.84325518, tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result3$criticalValuesEffectScaleUpper[1, ], 1.2314417, tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result3$criticalValuesEffectScaleUpper[2, ], 1.1813518, tolerance = 1e-07, label = paste0(result3$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result3$criticalValuesPValueScale[1, ], 0.0044259026, tolerance = 1e-07, label = paste0(result3$criticalValuesPValueScale[1, ]))
+    expect_equal(result3$criticalValuesPValueScale[2, ], 0.023026225, tolerance = 1e-07, label = paste0(result3$criticalValuesPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result3), NA)))
         expect_output(print(result3)$show())
@@ -1911,6 +2232,9 @@ test_that("'getPowerCounts': Power calculation of testing count data for two-sid
         expect_equal(result3CodeBased$overallReject, result3$overallReject, tolerance = 1e-07)
         expect_equal(result3CodeBased$rejectPerStage, result3$rejectPerStage, tolerance = 1e-07)
         expect_equal(result3CodeBased$earlyStop, result3$earlyStop, tolerance = 1e-07)
+        expect_equal(result3CodeBased$criticalValuesEffectScaleLower, result3$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result3CodeBased$criticalValuesEffectScaleUpper, result3$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result3CodeBased$criticalValuesPValueScale, result3$criticalValuesPValueScale, tolerance = 1e-07)
         expect_type(names(result3), "character")
         df <- as.data.frame(result3)
         expect_s3_class(df, "data.frame")
@@ -1934,6 +2258,12 @@ test_that("'getPowerCounts': Power calculation of testing count data for two-sid
     expect_equal(result4$rejectPerStage[1, ], c(0.38341552, 0.0044259026, 0.31547093, 0.9571951), tolerance = 1e-07, label = paste0(result4$rejectPerStage[1, ]))
     expect_equal(result4$rejectPerStage[2, ], c(0.48406154, 0.020574097, 0.49281187, 0.042726555), tolerance = 1e-07, label = paste0(result4$rejectPerStage[2, ]))
     expect_equal(result4$earlyStop, c(0.38341552, 0.0044259026, 0.31547093, 0.9571951), tolerance = 1e-07, label = paste0(result4$earlyStop))
+    expect_equal(result4$criticalValuesEffectScaleLower[1, ], NA_real_, label = paste0(result4$criticalValuesEffectScaleLower[1, ]))
+    expect_equal(result4$criticalValuesEffectScaleLower[2, ], NA_real_, label = paste0(result4$criticalValuesEffectScaleLower[2, ]))
+    expect_equal(result4$criticalValuesEffectScaleUpper[1, ], NA_real_, label = paste0(result4$criticalValuesEffectScaleUpper[1, ]))
+    expect_equal(result4$criticalValuesEffectScaleUpper[2, ], NA_real_, label = paste0(result4$criticalValuesEffectScaleUpper[2, ]))
+    expect_equal(result4$criticalValuesPValueScale[1, ], 0.0044259026, tolerance = 1e-07, label = paste0(result4$criticalValuesPValueScale[1, ]))
+    expect_equal(result4$criticalValuesPValueScale[2, ], 0.023026225, tolerance = 1e-07, label = paste0(result4$criticalValuesPValueScale[2, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result4), NA)))
         expect_output(print(result4)$show())
@@ -1945,6 +2275,9 @@ test_that("'getPowerCounts': Power calculation of testing count data for two-sid
         expect_equal(result4CodeBased$overallReject, result4$overallReject, tolerance = 1e-07)
         expect_equal(result4CodeBased$rejectPerStage, result4$rejectPerStage, tolerance = 1e-07)
         expect_equal(result4CodeBased$earlyStop, result4$earlyStop, tolerance = 1e-07)
+        expect_equal(result4CodeBased$criticalValuesEffectScaleLower, result4$criticalValuesEffectScaleLower, tolerance = 1e-07)
+        expect_equal(result4CodeBased$criticalValuesEffectScaleUpper, result4$criticalValuesEffectScaleUpper, tolerance = 1e-07)
+        expect_equal(result4CodeBased$criticalValuesPValueScale, result4$criticalValuesPValueScale, tolerance = 1e-07)
         expect_type(names(result4), "character")
         df <- as.data.frame(result4)
         expect_s3_class(df, "data.frame")

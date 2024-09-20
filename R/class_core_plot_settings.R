@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7958 $
-## |  Last changed: $Date: 2024-05-30 09:56:27 +0200 (Do, 30 Mai 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -671,10 +671,10 @@ PlotSettings <- R6::R6Class("PlotSettings",
         },
         expandAxesRange = function(p, x = NA_real_, y = NA_real_) {
             "Expands the axes range"
-            if (!is.na(x)) {
+            if (!all(is.na(x))) {
                 p <- p + ggplot2::expand_limits(x = x)
             }
-            if (!is.na(y)) {
+            if (!all(is.na(y))) {
                 p <- p + ggplot2::expand_limits(y = y)
             }
             return(p)

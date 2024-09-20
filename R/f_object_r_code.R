@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8141 $
-## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
+## |  File version: $Revision: 8216 $
+## |  Last changed: $Date: 2024-09-16 11:45:02 +0200 (Mo, 16 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -189,6 +189,10 @@ NULL
         return("getSimulationSurvival")
     }
 
+    if (inherits(obj, "SimulationResultsCountData")) {
+        return("getSimulationCounts")
+    }
+
     if (inherits(obj, "SimulationResultsMultiArmMeans")) {
         return("getSimulationMultiArmMeans")
     }
@@ -257,14 +261,21 @@ NULL
 
 #' @rdname getObjectRCode
 #' @export
-rcmd <- function(obj, ...,
+rcmd <- function(
+        obj, 
+        ...,
         leadingArguments = NULL,
         includeDefaultParameters = FALSE,
         stringWrapParagraphWidth = 90,
         prefix = "",
         postfix = "",
         stringWrapPrefix = "",
-        newArgumentValues = list()) {
+        newArgumentValues = list(),
+        
+        tolerance = 1e-07,
+        pipeOperator = c("auto", "none", "magrittr", "R"),
+        output = c("vector", "cat", "test", "markdown", "internal"),
+        explicitPrint = FALSE) {
     getObjectRCode(
         obj = obj,
         leadingArguments = leadingArguments,
@@ -273,7 +284,11 @@ rcmd <- function(obj, ...,
         prefix = prefix,
         postfix = postfix,
         stringWrapPrefix = stringWrapPrefix,
-        newArgumentValues = newArgumentValues
+        newArgumentValues = newArgumentValues,
+        tolerance = tolerance,
+        pipeOperator = pipeOperator,
+        output = output,
+        explicitPrint = explicitPrint
     )
 }
 
@@ -311,7 +326,9 @@ rcmd <- function(obj, ...,
 #'
 #' @export
 #'
-getObjectRCode <- function(obj, ...,
+getObjectRCode <- function(
+        obj, 
+        ...,
         leadingArguments = NULL,
         includeDefaultParameters = FALSE,
         stringWrapParagraphWidth = 90,
@@ -839,7 +856,8 @@ getObjectRCode <- function(obj, ...,
         rCodeNew <- character()
         for (rCodeLine in rCode) {
             for (i in 12:2) {
-                rCodeLine <- gsub(paste(rep(" ", i), collapse = ""), paste(rep("_", i), collapse = ""), rCodeLine)
+                rCodeLine <- gsub(paste(rep(" ", i), collapse = ""), 
+                    paste(rep("_", i), collapse = ""), rCodeLine)
             }
             rCodeLines <- strwrap(rCodeLine, width = stringWrapParagraphWidth - 2)
             if (length(rCodeLines) > 1) {
@@ -847,13 +865,15 @@ getObjectRCode <- function(obj, ...,
                     if (grepl("^ *(\\|>|%>%) *", rCodeLines[i])) {
                         rCodeLines[i - 1] <- paste0(rCodeLines[i - 1], pipeOperatorPostfix)
                         rCodeLines[i] <- sub("^ *(\\|>|%>%) *", "", rCodeLines[i])
-                    } else if (!grepl("^ *([a-zA-Z0-9]+ *<-)|(^ *get[a-zA-Z]+\\()|summary\\(", rCodeLines[i])) {
+                    } else if (!grepl("^ *([a-zA-Z0-9]+ *<-)|(^ *get[a-zA-Z]+\\()|summary\\(", 
+                            rCodeLines[i])) {
                         rCodeLines[i] <- paste0(stringWrapPrefix, rCodeLines[i])
                     }
                 }
             }
             for (i in 12:2) {
-                rCodeLines <- gsub(paste(rep("_", i), collapse = ""), paste(rep(" ", i), collapse = ""), rCodeLines)
+                rCodeLines <- gsub(paste(rep("_", i), collapse = ""), 
+                    paste(rep(" ", i), collapse = ""), rCodeLines)
             }
             rCodeLines <- rCodeLines[nchar(trimws(rCodeLines)) > 0]
             rCodeNew <- c(rCodeNew, rCodeLines)

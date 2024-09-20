@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8151 $
-## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
+## |  File version: $Revision: 8180 $
+## |  Last changed: $Date: 2024-09-06 10:13:14 +0200 (Fr, 06 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -731,7 +731,13 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
         pi2 = NULL,
         nPlanned = NULL,
         allocationRatioPlanned = NULL,
-        initialize = function(design, dataInput, ..., .stageResults = NULL, .conditionalPowerResults = NULL, directionUpper = NULL, thetaH0 = NULL) {
+        initialize = function(
+                design, 
+                dataInput, ..., 
+                .stageResults = NULL, 
+                .conditionalPowerResults = NULL, 
+                directionUpper = NULL, 
+                thetaH0 = NULL) {
             self$.design <- design
             self$.dataInput <- dataInput
             self$.stageResults <- .stageResults

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7126 $
-## |  Last changed: $Date: 2023-06-23 14:26:39 +0200 (Fr, 23 Jun 2023) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -30,9 +30,11 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsEnrichment <- function(design, dataInput, ...,
+.getAnalysisResultsEnrichment <- function(design,
+        dataInput,
+        ...,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
-        directionUpper = C_DIRECTION_UPPER_DEFAULT,
+        directionUpper = NA,
         thetaH0 = NA_real_,
         nPlanned = NA_real_) {
     .assertIsTrialDesignInverseNormalOrFisher(design)
@@ -82,45 +84,75 @@ NULL
         ))
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
+    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
+        "'", .getClassName(dataInput), "' is not implemented yet")
 }
 
 #'
 #' Get Stage Results
 #'
-#' Returns summary statistics and p-values for a given data set and a given enrichment design.
+#' Returns summary statistics and p-values for a 
+#' given data set and a given enrichment design.
 #'
 #' @noRd
 #'
-.getStageResultsEnrichment <- function(design, dataInput, ...) {
+.getStageResultsEnrichment <- function(design,
+        dataInput,
+        ...,
+        directionUpper = C_DIRECTION_UPPER_DEFAULT) {
     .assertIsTrialDesignInverseNormalOrFisher(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
 
     if (dataInput$isDatasetMeans()) {
-        return(.getStageResultsMeansEnrichment(design = design, dataInput = dataInput, userFunctionCallEnabled = TRUE, ...))
+        return(.getStageResultsMeansEnrichment(
+            design = design,
+            dataInput = dataInput,
+            directionUpper = directionUpper,
+            userFunctionCallEnabled = TRUE,
+            ...
+        ))
     }
 
     if (dataInput$isDatasetRates()) {
-        return(.getStageResultsRatesEnrichment(design = design, dataInput = dataInput, userFunctionCallEnabled = TRUE, ...))
+        return(.getStageResultsRatesEnrichment(
+            design = design,
+            dataInput = dataInput,
+            directionUpper = directionUpper,
+            userFunctionCallEnabled = TRUE,
+            ...
+        ))
     }
 
     if (dataInput$isDatasetSurvival()) {
-        return(.getStageResultsSurvivalEnrichment(design = design, dataInput = dataInput, userFunctionCallEnabled = TRUE, ...))
+        return(.getStageResultsSurvivalEnrichment(
+            design = design,
+            dataInput = dataInput,
+            directionUpper = directionUpper,
+            userFunctionCallEnabled = TRUE,
+            ...
+        ))
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not supported")
+    stop(
+        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
+        "'", .getClassName(dataInput), "' is not supported"
+    )
 }
 
 #'
 #' Get Repeated Confidence Intervals for enrichment case
 #'
-#' Calculates and returns the lower and upper limit of the repeated confidence intervals of the trial for enrichment designs.
+#' Calculates and returns the lower and upper limit of the repeated 
+#' confidence intervals of the trial for enrichment designs.
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsEnrichment <- function(design, dataInput, ...) {
+.getRepeatedConfidenceIntervalsEnrichment <- function(
+        design, 
+        dataInput, 
+        ...) {
     .assertIsTrialDesignInverseNormalOrFisher(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
@@ -128,23 +160,32 @@ NULL
 
     if (dataInput$isDatasetMeans()) {
         return(.getRepeatedConfidenceIntervalsMeansEnrichment(
-            design = design, dataInput = dataInput, ...
+            design = design, 
+            dataInput = dataInput, 
+            ...
         ))
     }
 
     if (dataInput$isDatasetRates()) {
         return(.getRepeatedConfidenceIntervalsRatesEnrichment(
-            design = design, dataInput = dataInput, ...
+            design = design, 
+            dataInput = dataInput, 
+            ...
         ))
     }
 
     if (dataInput$isDatasetSurvival()) {
         return(.getRepeatedConfidenceIntervalsSurvivalEnrichment(
-            design = design, dataInput = dataInput, ...
+            design = design, 
+            dataInput = dataInput, 
+            ...
         ))
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
+    stop(
+        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
+        "'", .getClassName(dataInput), "' is not implemented yet"
+    )
 }
 
 #'
@@ -253,8 +294,7 @@ NULL
     informationRates <- design$informationRates
 
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
-    criticalValues <- design$criticalValues
-
+    criticalValues <- .getCriticalValues(design)
     for (stageIndex in (1:min(stage, kMax - 1))) {
         for (g in 1:gMax) {
             if (!is.na(ctr$separatePValues[g, stageIndex])) {
@@ -282,7 +322,8 @@ NULL
                     (1 - informationRates[stageIndex])
 
                 decisionMatrix <- matrix(c(
-                    shiftedFutilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
+                    shiftedFutilityBounds, 
+                    C_FUTILITY_BOUNDS_DEFAULT,
                     shiftedDecisionRegionUpper
                 ), nrow = 2, byrow = TRUE)
 
@@ -314,7 +355,7 @@ NULL
         return(as.matrix(NA_real_))
     }
     gMax <- stageResults$getGMax()
-    criticalValues <- design$criticalValues
+    criticalValues <- .getCriticalValues(design)
     weights <- .getWeightsFisher(design)
     intersectionTest <- stageResults$intersectionTest
 

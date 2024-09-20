@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8151 $
-## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
+## |  File version: $Revision: 8246 $
+## |  Last changed: $Date: 2024-09-20 12:10:36 +0200 (Fr, 20 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -91,6 +91,10 @@ NULL
 
     if (grepl("Survival", .getClassName(simulationResults))) {
         return("hazardRatio")
+    }
+
+    if (grepl("CountData", .getClassName(simulationResults))) {
+        return("lambda1")
     }
 
     return("effect")
@@ -198,7 +202,9 @@ NULL
     meansEnabled <- grepl("Means", .getClassName(simulationResults))
     multiArmEnabled <- grepl("MultiArm", .getClassName(simulationResults))
     enrichmentEnabled <- grepl("Enrichment", .getClassName(simulationResults))
-    userDefinedEffectMatrix <- multiArmEnabled && simulationResults$.getParameterType("effectMatrix") == C_PARAM_USER_DEFINED
+    countDataEnabled <- grepl("CountData", .getClassName(simulationResults))
+    userDefinedEffectMatrix <- multiArmEnabled && 
+        simulationResults$.getParameterType("effectMatrix") == C_PARAM_USER_DEFINED
 
     gMax <- NA_integer_
     if (multiArmEnabled || enrichmentEnabled) {
@@ -208,10 +214,13 @@ NULL
         )
     }
 
+    # use first value for plotting
     if (survivalEnabled) {
-        nMax <- simulationResults$expectedNumberOfEvents[1] # use first value for plotting
+        nMax <- simulationResults$expectedNumberOfEvents[1] 
+    } else if (countDataEnabled) {
+        nMax <- simulationResults$numberOfSubjects[1] 
     } else {
-        nMax <- simulationResults$expectedNumberOfSubjects[1] # use first value for plotting
+        nMax <- simulationResults$expectedNumberOfSubjects[1] 
     }
 
     if (type %in% c(1:3) && !multiArmEnabled && !enrichmentEnabled) {
@@ -968,7 +977,7 @@ plot.SimulationResults <- function(
         main = NA_character_,
         xlab = NA_character_, 
         ylab = NA_character_, 
-        type = 1L, 
+        type = NA_integer_, 
         palette = "Set1",
         theta = seq(-1, 1, 0.01), 
         plotPointsEnabled = NA,
@@ -977,7 +986,15 @@ plot.SimulationResults <- function(
         grid = 1, 
         plotSettings = NULL) {
     
-    .assertIsValidPlotType(type, naAllowed = FALSE)
+    .assertIsValidPlotType(type, naAllowed = TRUE)
+    if (all(is.na(type))) {
+        type <- na.omit(getAvailablePlotTypes(x))
+        if (length(type) == 0) {
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "not plot type available")
+        }
+        
+        type <- type[1]
+    }
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {

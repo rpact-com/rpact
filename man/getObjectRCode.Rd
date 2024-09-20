@@ -14,7 +14,11 @@ rcmd(
   prefix = "",
   postfix = "",
   stringWrapPrefix = "",
-  newArgumentValues = list()
+  newArgumentValues = list(),
+  tolerance = 1e-07,
+  pipeOperator = c("auto", "none", "magrittr", "R"),
+  output = c("vector", "cat", "test", "markdown", "internal"),
+  explicitPrint = FALSE
 )
 
 getObjectRCode(

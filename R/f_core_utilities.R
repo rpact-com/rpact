@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8157 $
-## |  Last changed: $Date: 2024-08-30 15:00:37 +0200 (Fr, 30 Aug 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -33,10 +33,9 @@ NULL
         {
             return(environmentName(environment(base::get(functionName))))
         },
-        error = function(e) {
-            return(NA_character_)
-        }
+        error = function(e) {}
     )
+    return(NA_character_)
 }
 
 .toCapitalized <- function(x, ignoreBlackList = FALSE) {
@@ -168,7 +167,7 @@ NULL
             if (length(arg) > 1) {
                 return(FALSE)
             }
-            
+
             return(is.na(arg))
         },
         warning = function(w) {
@@ -180,7 +179,7 @@ NULL
             return(FALSE)
         }
     )
-    
+
     return(FALSE)
 }
 
@@ -217,7 +216,7 @@ NULL
             if (length(arg) > 1) {
                 return(TRUE)
             }
-            
+
             return(!is.na(arg))
         },
         warning = function(e) {
@@ -275,7 +274,7 @@ NULL
 #' .getConcatenatedValues(1:2, mode = "or", separator = ";")
 #' .getConcatenatedValues(1:3, mode = "or", separator = ";")
 #' }
-#' 
+#'
 #' @noRd
 #'
 .arrayToString <- function(x, ..., separator = ", ",
@@ -918,13 +917,14 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("print")
     }
-    
+
     if (isTRUE(markdown)) {
         result <- paste0(utils::capture.output(.printCitation(
-            inclusiveR = inclusiveR, language = language)), collapse = "\n")
+            inclusiveR = inclusiveR, language = language
+        )), collapse = "\n")
         return(knitr::asis_output(result))
     }
-    
+
     .printCitation(inclusiveR = inclusiveR, language = language)
 }
 
@@ -1049,6 +1049,9 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
 #' @description
 #' Returns the parameter caption for a given object and parameter name.
 #'
+#' @param obj The rpact result object.
+#' @param var The variable/parameter name.
+#'
 #' @details
 #' This function identifies and returns the caption that will be used in print outputs of an rpact result object.
 #'
@@ -1062,14 +1065,19 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
 #' \dontrun{
 #' getParameterCaption(getDesignInverseNormal(), "kMax")
 #' }
-#' 
+#'
 #' @keywords internal
 #'
 #' @export
 #'
-getParameterCaption <- function(obj, parameterName) {
+getParameterCaption <- function(obj, var) {
+    fCall <- match.call(expand.dots = FALSE)
+    parameterName <- .getParameterSetVar(fCall, var)
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
+            "(", .getClassName(obj), ") must be an rpact result object"
+        )
     }
     .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
 
@@ -1078,10 +1086,57 @@ getParameterCaption <- function(obj, parameterName) {
 
 #'
 #' @title
+#' Get Parameter Type
+#'
+#' @description
+#' Returns the parameter type for a given object and parameter name.
+#'
+#' @param obj The rpact result object.
+#' @param var The variable/parameter name.
+#'
+#' @details
+#' This function identifies and returns the type that will be used in print outputs of an rpact result object.
+#'
+#' @seealso
+#' \code{\link[=getParameterName]{getParameterName()}} for getting the parameter name for a given caption.
+#' \code{\link[=getParameterCaption]{getParameterCaption()}} for getting the parameter caption for a given name.
+#'
+#' @return Returns a \code{\link[base]{character}} of specifying the corresponding type of a given parameter name.
+#' Returns \code{NULL} if the specified \code{parameterName} does not exist.
+#'
+#' @examples
+#' \dontrun{
+#' getParameterType(getDesignInverseNormal(), "kMax")
+#' }
+#'
+#' @keywords internal
+#'
+#' @export
+#'
+getParameterType <- function(obj, var) {
+    fCall <- match.call(expand.dots = FALSE)
+    parameterName <- .getParameterSetVar(fCall, var)
+    if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
+            "(", .getClassName(obj), ") must be an rpact result object"
+        )
+    }
+
+    .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
+
+    obj$.getParameterType(parameterName)
+}
+
+#'
+#' @title
 #' Get Parameter Name
 #'
 #' @description
 #' Returns the parameter name for a given object and parameter caption.
+#'
+#' @param obj The rpact result object.
+#' @param parameterCaption The parameter caption.
 #'
 #' @details
 #' This function identifies and returns the parameter name for a given caption
@@ -1097,14 +1152,17 @@ getParameterCaption <- function(obj, parameterName) {
 #' \dontrun{
 #' getParameterName(getDesignInverseNormal(), "Maximum number of stages")
 #' }
-#' 
+#'
 #' @keywords internal
 #'
 #' @export
 #'
 getParameterName <- function(obj, parameterCaption) {
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' (", .getClassName(obj), ") must be an rpact result object")
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
+            "(", .getClassName(obj), ") must be an rpact result object"
+        )
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
 
@@ -1407,20 +1465,19 @@ getParameterName <- function(obj, parameterCaption) {
             xCall <- deparse(fCall$x)
             return(identical(xCall[1], ".") || grepl("^summary\\(", xCall[1]))
         },
-        error = function(e) {
-            return(FALSE)
-        }
+        error = function(e) {}
     )
+    return(FALSE)
 }
 
 .isMarkdownEnabled <- function(type = c("all", "print", "summary", "plot")) {
-    type = match.arg(type)    
+    type <- match.arg(type)
     if (!as.logical(getOption(paste0("rpact.auto.markdown.", type), TRUE))) {
         return(FALSE)
     }
-    
-    return(!is.null(knitr::current_input()) || 
-        knitr::is_html_output() || 
+
+    return(!is.null(knitr::current_input()) ||
+        knitr::is_html_output() ||
         knitr::is_latex_output())
 }
 
@@ -1529,4 +1586,133 @@ getParameterName <- function(obj, parameterCaption) {
 
 .getMarkdownPlotPrintSeparator <- function() {
     return(getOption("rpact.markdown.plot.print.separator", C_MARKDOWN_PLOT_PRINT_SEPARATOR))
+}
+
+.getCriticalValues <- function(design, indices = NULL) {
+    if (!is.null(indices)) {
+        return(design$criticalValues[indices])
+    }
+    
+    return(design$criticalValues)
+}
+
+.applyDirectionOfAlternative <- function(
+        value,
+        directionUpper,
+        ...,
+        type = c(
+            "oneMinusValue",
+            "valueMinusOne",
+            "negateIfUpper",
+            "negateIfLower",
+            "minMax",
+            "maxMin"
+        ),
+        phase = c("unknown", "design", "planning", "analysis"), 
+        syncLength = FALSE) {
+        
+    type <- match.arg(type)
+    phase <- match.arg(phase)
+
+    if (phase == "design") {
+        return(value) # deactivate for current release
+    }
+    
+    if (is.null(value) || length(value) == 0 || all(is.na(value))) {
+        return(value)
+    }
+    
+    if (syncLength && length(directionUpper) > 1 && length(directionUpper) > length(value)) {
+        directionUpper <- directionUpper[1:length(value)]
+    }
+
+    if (length(directionUpper) > 1 && length(value) != length(directionUpper)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'value' (", .arrayToString(value), ") and ",
+            "'directionUpper' (", .arrayToString(directionUpper), ") must have the same length"
+        )
+    }
+
+    if (length(value) <= 1 || length(directionUpper) == 1) {
+        return(.applyDirectionOfAlternativeSingle(
+            value = value,
+            directionUpper = directionUpper,
+            type = type
+        ))
+    }
+
+    values <- c()
+    for (i in 1:length(value)) {
+        values <- c(
+            values,
+            .applyDirectionOfAlternativeSingle(
+                value = value[i],
+                directionUpper = ifelse(length(directionUpper) == 1, directionUpper, directionUpper[i]),
+                type = type
+            )
+        )
+    }
+    return(values)
+}
+
+.applyDirectionOfAlternativeSingle <- function(
+        ...,
+        value,
+        directionUpper,
+        type = c(
+            "oneMinusValue",
+            "valueMinusOne",
+            "negateIfUpper",
+            "negateIfLower",
+            "minMax",
+            "maxMin"
+        )) {
+    type <- match.arg(type)
+    if (is.null(value) || length(value) == 0 || all(is.na(value))) {
+        return(value)
+    }
+
+    if (is.na(directionUpper) || isTRUE(directionUpper)) {
+        if (type == "oneMinusValue") {
+            return(1 - value)
+        }
+        if (type == "valueMinusOne") {
+            return(value - 1)
+        }
+        if (type == "negateIfLower") {
+            return(value)
+        }
+        if (type == "negateIfUpper") {
+            if (is.logical(value)) {
+                return(!value)
+            }
+
+            return(-value)
+        }
+        if (type == "minMax") {
+            return(min(value, na.rm = TRUE))
+        }
+        if (type == "maxMin") {
+            return(max(value, na.rm = TRUE))
+        }
+    }
+
+    if (type == "negateIfLower") {
+        if (is.logical(value)) {
+            return(!value)
+        }
+
+        return(-value)
+    }
+    if (type == "negateIfUpper") {
+        return(value)
+    }
+    if (type == "minMax") {
+        return(max(value, na.rm = TRUE))
+    }
+    if (type == "maxMin") {
+        return(min(value, na.rm = TRUE))
+    }
+
+    return(value)
 }

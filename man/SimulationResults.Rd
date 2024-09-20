@@ -12,6 +12,7 @@ A class for simulation results.
 \item \code{\link{SimulationResultsMeans}},
 \item \code{\link{SimulationResultsRates}},
 \item \code{\link{SimulationResultsSurvival}},
+\item \code{\link{SimulationResultsCountData}},
 \item \code{\link{SimulationResultsMultiArmMeans}},
 \item \code{\link{SimulationResultsMultiArmRates}},
 \item \code{\link{SimulationResultsMultiArmSurvival}},

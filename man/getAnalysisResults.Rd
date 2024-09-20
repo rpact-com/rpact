@@ -8,7 +8,7 @@ getAnalysisResults(
   design,
   dataInput,
   ...,
-  directionUpper = TRUE,
+  directionUpper = NA,
   thetaH0 = NA_real_,
   nPlanned = NA_real_,
   allocationRatioPlanned = 1,

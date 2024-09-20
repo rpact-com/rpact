@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7910 $
-## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -39,7 +39,7 @@ NULL
     if (!is.na(conditionalPower)) {
         if (any(selectedPopulations[1:gMax, stage + 1], na.rm = TRUE)) {
             if (is.na(thetaH1)) {
-                if (directionUpper) {
+                if (is.na(directionUpper) || isTRUE(directionUpper)) {
                     thetaStandardized <- log(max(min(
                         overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
                         na.rm = TRUE
@@ -51,11 +51,7 @@ NULL
                     ), 1 - 1e-07))
                 }
             } else {
-                if (directionUpper) {
-                    thetaStandardized <- log(max(thetaH1, 1 + 1e-07))
-                } else {
-                    thetaStandardized <- log(min(thetaH1, 1 - 1e-07))
-                }
+                thetaStandardized <- log(min(thetaH1, 1 + ifelse(is.na(directionUpper) || isTRUE(directionUpper), 1e-07, -1e-07)))
             }
 
             if (conditionalCriticalValue[stage] > 8) {
@@ -268,11 +264,12 @@ NULL
             adjustedPValues[k] <- min(min(separatePValues[, k], na.rm = TRUE) * (colSums(selectedPopulations)[k]), 1 - 1e-07)
 
             # conditional critical value to reject the null hypotheses at the next stage of the trial
+            criticalValues <- .getCriticalValues(design)
             if (.isTrialDesignFisher(design)) {
-                conditionalCriticalValue[k] <- .getOneMinusQNorm(min((design$criticalValues[k + 1] /
+                conditionalCriticalValue[k] <- .getOneMinusQNorm(min((criticalValues[k + 1] /
                     prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-07))
             } else {
-                conditionalCriticalValue[k] <- (design$criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
+                conditionalCriticalValue[k] <- (criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
                     .getOneMinusQNorm(adjustedPValues[1:k]) %*% weights[1:k]) /
                     sqrt(design$informationRates[k + 1] - design$informationRates[k])
             }
@@ -302,7 +299,7 @@ NULL
                 if (effectMeasure == "testStatistic") {
                     selectPopulationsFunctionArgs$effectVector <- overallTestStatistics[, k]
                 } else if (effectMeasure == "effectEstimate") {
-                    if (directionUpper) {
+                    if (is.na(directionUpper) || isTRUE(directionUpper)) {
                         selectPopulationsFunctionArgs$effectVector <- overallEffects[, k]
                     } else {
                         selectPopulationsFunctionArgs$effectVector <- 1 / overallEffects[, k]
@@ -344,11 +341,10 @@ NULL
             }
 
             if (is.na(thetaH1)) {
-                if (directionUpper) {
-                    thetaStandardized <- log(min(overallEffects[selectedPopulations[1:gMax, k], k], na.rm = TRUE))
-                } else {
-                    thetaStandardized <- log(max(overallEffects[selectedPopulations[1:gMax, k], k], na.rm = TRUE))
-                }
+                thetaStandardized <- log(.applyDirectionOfAlternative(
+                    overallEffects[selectedPopulations[1:gMax, k], k], 
+                    directionUpper, type = "minMax", phase = "planning"
+                ))
             } else {
                 thetaStandardized <- log(thetaH1)
             }
@@ -447,7 +443,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
         stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
-        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
         typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
         effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
@@ -485,6 +481,9 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
+        design, objectType = "power", userFunctionCallEnabled = TRUE)
+    
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design                      = design,
         effectList                  = effectList,

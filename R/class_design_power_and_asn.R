@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -182,7 +182,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             kMax <- self$.design$kMax
             futilityBounds <- self$.design$futilityBounds
             informationRates <- self$.design$informationRates
-            criticalValues <- self$.design$criticalValues
+            criticalValues <- .getCriticalValues(self$.design)
             sided <- self$.design$sided
             delayedInformation <- self$.design$delayedInformation
 
@@ -195,7 +195,11 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                 decisionCriticalValues <- self$.design$decisionCriticalValues
                 probs <- .calculateDecisionProbabilities(
                     sqrtShift = sqrt(self$nMax) * theta,
-                    informationRates, delayedInformation, contRegionUpper, contRegionLower, decisionCriticalValues
+                    informationRates, 
+                    delayedInformation, 
+                    contRegionUpper, 
+                    contRegionLower, 
+                    decisionCriticalValues
                 )
 
                 .averageSampleNumber <- self$nMax - sum(probs$stoppingProbabilities *

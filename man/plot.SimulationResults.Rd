@@ -11,7 +11,7 @@
   main = NA_character_,
   xlab = NA_character_,
   ylab = NA_character_,
-  type = 1L,
+  type = NA_integer_,
   palette = "Set1",
   theta = seq(-1, 1, 0.01),
   plotPointsEnabled = NA,

@@ -4,7 +4,13 @@
 \alias{getStageResults}
 \title{Get Stage Results}
 \usage{
-getStageResults(design, dataInput, ..., stage = NA_integer_)
+getStageResults(
+  design,
+  dataInput,
+  ...,
+  stage = NA_integer_,
+  directionUpper = NA
+)
 }
 \arguments{
 \item{design}{The trial design.}
@@ -40,9 +46,6 @@ In the survival setting, \code{normalApproximation = FALSE} has no effect.}
 \item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
 the t test assuming that the variances are equal or the t test without assuming this,
 i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
-\item{\code{directionUpper}}{The direction of one-sided testing.
-Default is \code{TRUE} which means that larger values of the
-test statistics yield smaller p-values.}
 \item{\code{intersectionTest}}{Defines the multiple test for the intersection
 hypotheses in the closed system of hypotheses when testing multiple hypotheses.
 Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"},
@@ -60,6 +63,10 @@ For survival data, only a stratified analysis is possible (see Brannath et al., 
 }}
 
 \item{stage}{The stage number (optional). Default: total number of existing stages in the data input.}
+
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is \code{TRUE}
+which means that larger values of the test statistics yield smaller p-values.}
 }
 \value{
 Returns a \code{\link{StageResults}} object.

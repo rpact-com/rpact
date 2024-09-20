@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
+## |  File version: $Revision: 8200 $
+## |  Last changed: $Date: 2024-09-12 15:05:38 +0200 (Do, 12 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -52,6 +52,13 @@ NULL
         ignore <- c(ignore, "sided")
     }
 
+    directionUpper <- .getOptionalArgument("directionUpper", ...)
+    if (is.null(directionUpper)) {
+        directionUpper <- NA
+    } else {
+        ignore <- c(ignore, "directionUpper")
+    }
+
     twoSidedPower <- .getOptionalArgument("twoSidedPower", ...)
     if (is.null(twoSidedPower)) {
         if (type %in% c("power", "simulation", "simulationCounts") && sided == 2) {
@@ -64,13 +71,21 @@ NULL
     }
     if (type %in% c("analysis", "simulation")) {
         design <- getDesignInverseNormal(
-            kMax = 1, alpha = alpha, beta = beta,
-            sided = sided, twoSidedPower = twoSidedPower
+            kMax = 1, 
+            alpha = alpha, 
+            beta = beta,
+            sided = sided, 
+            twoSidedPower = twoSidedPower,
+            directionUpper = directionUpper
         )
     } else {
         design <- getDesignGroupSequential(
-            kMax = 1, alpha = alpha, beta = beta,
-            sided = sided, twoSidedPower = twoSidedPower
+            kMax = 1, 
+            alpha = alpha, 
+            beta = beta,
+            sided = sided, 
+            twoSidedPower = twoSidedPower,
+            directionUpper = directionUpper
         )
     }
     return(design)

@@ -24,6 +24,7 @@ getDesignGroupSequential(
   userBetaSpending = NA_real_,
   gammaB = NA_real_,
   bindingFutility = NA,
+  directionUpper = NA,
   betaAdjustment = NA,
   constantBoundsHP = 3,
   twoSidedPower = NA,
@@ -96,6 +97,10 @@ beta-spending up to each interim stage.}
 \item{bindingFutility}{Logical. If \code{bindingFutility = TRUE} is specified the calculation of
 the critical values is affected by the futility bounds and the futility threshold is binding in the
 sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
+
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is \code{TRUE}
+which means that larger values of the test statistics yield smaller p-values.}
 
 \item{betaAdjustment}{For two-sided beta spending designs, if \code{betaAdjustement = TRUE} a linear
 adjustment of the beta spending values is performed if an overlapping of decision regions for futility

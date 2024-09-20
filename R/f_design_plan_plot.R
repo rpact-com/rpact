@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8151 $
-## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
+## |  File version: $Revision: 8212 $
+## |  Last changed: $Date: 2024-09-13 14:01:23 +0200 (Fr, 13 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -274,7 +274,7 @@
 
             xParameterName <- "cumulativeEventsPerStage"
             if (designMaster$sided == 1) {
-                if (any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
+                if (!all(is.na(designMaster$futilityBounds))) {
                     yParameterNames <- c("futilityBounds", "criticalValues")
                 } else {
                     yParameterNames <- "criticalValues"
@@ -351,7 +351,7 @@
         groupedPlotEnabled <- FALSE
         yParameterNamesSrc <- c()
         if (designMaster$sided == 1) {
-            if (any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
+            if (!all(is.na(designMaster$futilityBounds))) {
                 data <- data.frame(
                     criticalValuesEffectScale = designPlan$criticalValuesEffectScale[, 1],
                     futilityBoundsEffectScale = c(
@@ -413,7 +413,7 @@
             data <- cbind(data.frame(informationRates = designMaster$informationRates), data)
         }
         if (designMaster$sided == 1 || designMaster$typeOfDesign == C_TYPE_OF_DESIGN_PT) {
-            if (any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
+            if (!all(is.na(designMaster$futilityBounds))) {
                 yParameterNames <- c("futilityBoundsEffectScale", "criticalValuesEffectScale")
             } else {
                 yParameterNames <- "criticalValuesEffectScale"
@@ -943,7 +943,7 @@
     )
 
     if (type == 1 && survivalDesignPlanEnabled) {
-        p <- .addDecistionCriticalValuesToPlot(p = p, designMaster = designMaster, type = type, nMax = nMax)
+        p <- .addDecisionCriticalValuesToPlot(p = p, designMaster = designMaster, type = type, nMax = nMax)
     }
     return(p)
 }

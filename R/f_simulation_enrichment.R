@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7910 $
-## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -217,13 +217,14 @@ NULL
                 }
             }
 
+            criticalValues <- .getCriticalValues(design)
             if (.isTrialDesignFisher(design)) {
-                rejectedIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] <= design$criticalValues[k])
+                rejectedIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] <= criticalValues[k])
                 if (k < kMax) {
                     futilityIntersections[i, k] <- (adjustedStageWisePValues[i, k] >= design$alpha0Vec[k])
                 }
             } else if (.isTrialDesignInverseNormal(design)) {
-                rejectedIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] >= design$criticalValues[k])
+                rejectedIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] >= criticalValues[k])
                 if (k < kMax) {
                     futilityIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] <= design$futilityBounds[k])
                 }

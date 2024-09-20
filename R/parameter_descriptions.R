@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8112 $
-## |  Last changed: $Date: 2024-08-20 15:44:53 +0200 (Di, 20 Aug 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8232 $
+## |  Last changed: $Date: 2024-09-19 08:22:37 +0200 (Do, 19 Sep 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' Parameter Description: "..."
@@ -341,12 +341,6 @@ NULL
 #' @param followUpTime If specified, the assumed (additional) follow-up time for the study, there is no default.
 #'        The total study duration is \code{accrualTime + followUpTime}.
 #' @name param_followUpTime_counts
-#' @keywords internal
-NULL
-
-#' Parameter Description: plannedMaxSubjects for Counts
-#' @param plannedMaxSubjects \code{plannedMaxSubjects > 0} needs to be specified.
-#' @name param_maxNumberOfSubjects_counts
 #' @keywords internal
 NULL
 

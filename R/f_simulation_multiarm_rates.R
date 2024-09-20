@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7910 $
-## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
+## |  File version: $Revision: 8225 $
+## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -46,11 +46,10 @@ NULL
                 piAssumedControlH1 <- piControlH1
             }
             if (is.na(piTreatmentsH1)) {
-                if (directionUpper) {
-                    piAssumedH1 <- min(overallRates[selectedArms[1:gMax, stage + 1], stage], na.rm = TRUE)
-                } else {
-                    piAssumedH1 <- max(overallRates[selectedArms[1:gMax, stage + 1], stage], na.rm = TRUE)
-                }
+                piAssumedH1 <- .applyDirectionOfAlternative(
+                    overallRates[selectedArms[1:gMax, stage + 1], stage], 
+                    directionUpper, type = "minMax", phase = "planning"
+                )
             } else {
                 piAssumedH1 <- piTreatmentsH1
             }
@@ -105,7 +104,7 @@ NULL
         weights <- .getWeightsInverseNormal(design)
     }
 
-    for (k in (1:kMax)) {
+    for (k in 1:kMax) {
         if (k == 1) {
             subjectsPerStage[gMax + 1, k] <- trunc(plannedSubjects[k] / allocationRatioPlanned[k])
         } else {
@@ -175,14 +174,15 @@ NULL
                     .getOneMinusQNorm(adjustedPValues[k]) * sqrt(design$informationAtInterim)) /
                     sqrt(1 - design$informationAtInterim)
             } else {
+                criticalValues <- .getCriticalValues(design)
                 if (.isTrialDesignFisher(design)) {
-                    conditionalCriticalValue[k] <- .getOneMinusQNorm(min((design$criticalValues[k + 1] /
+                    conditionalCriticalValue[k] <- .getOneMinusQNorm(min((criticalValues[k + 1] /
                         prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-07))
                 } else {
-                    if (design$criticalValues[k + 1] >= 6) {
+                    if (criticalValues[k + 1] >= 6) {
                         conditionalCriticalValue[k] <- Inf
                     } else {
-                        conditionalCriticalValue[k] <- (design$criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
+                        conditionalCriticalValue[k] <- (criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
                             .getOneMinusQNorm(adjustedPValues[1:k]) %*% weights[1:k]) /
                             sqrt(design$informationRates[k + 1] - design$informationRates[k])
                     }
@@ -262,11 +262,10 @@ NULL
             }
 
             if (is.na(piTreatmentsH1)) {
-                if (directionUpper) {
-                    piAssumedH1 <- min(overallRates[selectedArms[1:gMax, k], k], na.rm = TRUE)
-                } else {
-                    piAssumedH1 <- max(overallRates[selectedArms[1:gMax, k], k], na.rm = TRUE)
-                }
+                piAssumedH1 <- .applyDirectionOfAlternative(
+                    overallRates[selectedArms[1:gMax, k], k], 
+                    directionUpper, type = "minMax", phase = "planning"
+                )
             } else {
                 piAssumedH1 <- piTreatmentsH1
             }
@@ -402,7 +401,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         gED50 = NA_real_,
         slope = 1,
         intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        directionUpper = TRUE, # C_DIRECTION_UPPER_DEFAULT
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
         typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
         effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
@@ -444,6 +443,9 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
 
     calcSubjectsFunctionIsUserDefined <- !is.null(calcSubjectsFunction)
 
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
+        design, objectType = "power", userFunctionCallEnabled = TRUE)
+    
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,

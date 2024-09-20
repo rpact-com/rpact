@@ -14,7 +14,7 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File name: test-f_simulation_multiarm_rates.R
-## |  Creation date: 09 February 2024, 10:57:39
+## |  Creation date: 16 September 2024, 09:45:13
 ## |  File version: $Revision$
 ## |  Last changed: $Date$
 ## |  Last changed by: $Author$
@@ -681,6 +681,38 @@ test_that("'getSimulationMultiArmRates': several configurations", {
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+
+    x11b <- getSimulationMultiArmRates(
+        seed = 1234, getDesignFisher(informationRates = c(0.2, 0.6, 1), directionUpper = FALSE),
+        activeArms = 4, threshold = 0,
+        plannedSubjects = c(10, 30, 50), piControl = 0.3, piMaxVector = seq(0.1, 0.3, 0.1), intersectionTest = "Bonferroni",
+        conditionalPower = 0.8, minNumberOfSubjectsPerStage = c(10, 4, 4), maxNumberOfSubjectsPerStage = c(10, 100, 100),
+        maxNumberOfIterations = 10
+    )
+
+    ## Pairwise comparison of the results of x11 with the results of x11b
+    expect_equal(x11b$iterations[1, ], x11$iterations[1, ])
+    expect_equal(x11b$iterations[2, ], x11$iterations[2, ])
+    expect_equal(x11b$iterations[3, ], x11$iterations[3, ])
+    expect_equal(x11$rejectAtLeastOne, x11b$rejectAtLeastOne, tolerance = 1e-07)
+    expect_equal(unlist(as.list(x11$rejectedArmsPerStage)), unlist(as.list(x11b$rejectedArmsPerStage)), tolerance = 1e-07)
+    expect_equal(x11$futilityStop, x11b$futilityStop, tolerance = 1e-07)
+    expect_equal(x11b$futilityPerStage[1, ], x11$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(x11b$futilityPerStage[2, ], x11$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x11b$earlyStop[1, ], x11$earlyStop[1, ], tolerance = 1e-07)
+    expect_equal(x11b$earlyStop[2, ], x11$earlyStop[2, ], tolerance = 1e-07)
+    expect_equal(x11b$successPerStage[1, ], x11$successPerStage[1, ])
+    expect_equal(x11b$successPerStage[2, ], x11$successPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x11b$successPerStage[3, ], x11$successPerStage[3, ])
+    expect_equal(unlist(as.list(x11$selectedArms)), unlist(as.list(x11b$selectedArms)), tolerance = 1e-07)
+    expect_equal(x11b$numberOfActiveArms[1, ], x11$numberOfActiveArms[1, ])
+    expect_equal(x11b$numberOfActiveArms[2, ], x11$numberOfActiveArms[2, ])
+    expect_equal(x11b$numberOfActiveArms[3, ], x11$numberOfActiveArms[3, ])
+    expect_equal(x11$expectedNumberOfSubjects, x11b$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(unlist(as.list(x11$sampleSizes)), unlist(as.list(x11b$sampleSizes)), tolerance = 1e-07)
+    expect_equal(x11b$conditionalPowerAchieved[1, ], x11$conditionalPowerAchieved[1, ])
+    expect_equal(x11b$conditionalPowerAchieved[2, ], x11$conditionalPowerAchieved[2, ], tolerance = 1e-07)
+    expect_equal(x11b$conditionalPowerAchieved[3, ], x11$conditionalPowerAchieved[3, ], tolerance = 1e-07)
 
     x12 <- getSimulationMultiArmRates(
         seed = 1234, getDesignFisher(informationRates = c(0.2, 0.6, 1)),
@@ -1579,6 +1611,11 @@ test_that("'getSimulationMultiArmRates': comparison of base and multi-arm", {
         typeOfDesign = "WT", deltaWT = 0.15,
         futilityBounds = c(-0.5, 0.5), informationRates = c(0.2, 0.8, 1)
     )
+    design2 <- getDesignInverseNormal(
+        typeOfDesign = "WT", deltaWT = 0.15,
+        futilityBounds = c(-0.5, 0.5), informationRates = c(0.2, 0.8, 1),
+        directionUpper = FALSE
+    )
 
     x <- getSimulationMultiArmRates(design,
         activeArms = 1, plannedSubjects = c(20, 40, 60),
@@ -1607,20 +1644,20 @@ test_that("'getSimulationMultiArmRates': comparison of base and multi-arm", {
 
     comp2 <- y$rejectPerStage - x$rejectedArmsPerStage[, , 1]
 
-    ## Comparison of the results of matrixarray object 'comp2' with expected results
+    ## Comparison of the results of matrix object 'comp2' with expected results
     expect_equal(comp2[1, ], c(0, 0, 0, 0), label = paste0(comp2[1, ]))
     expect_equal(comp2[2, ], c(0.09, -0.01, 0.06, 0.02), tolerance = 1e-07, label = paste0(comp2[2, ]))
     expect_equal(comp2[3, ], c(-0.12, -0.01, 0.03, 0.01), tolerance = 1e-07, label = paste0(comp2[3, ]))
 
     comp3 <- y$futilityPerStage - x$futilityPerStage
 
-    ## Comparison of the results of matrixarray object 'comp3' with expected results
+    ## Comparison of the results of matrix object 'comp3' with expected results
     expect_equal(comp3[1, ], c(0.04, 0.04, -0.12, -0.03), tolerance = 1e-07, label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(0.01, 0.02, -0.05, 0.03), tolerance = 1e-07, label = paste0(comp3[2, ]))
 
     comp4 <- round(y$sampleSizes - (x$sampleSizes[, , 1] + x$sampleSizes[, , 2]), 1)
 
-    ## Comparison of the results of matrixarray object 'comp4' with expected results
+    ## Comparison of the results of matrix object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0, 0), label = paste0(comp4[1, ]))
     expect_equal(comp4[2, ], c(1.1, 0.3, 0, 0), tolerance = 1e-07, label = paste0(comp4[2, ]))
     expect_equal(comp4[3, ], c(-44.7, 9.7, 1.3, -3.2), tolerance = 1e-07, label = paste0(comp4[3, ]))
@@ -1632,9 +1669,43 @@ test_that("'getSimulationMultiArmRates': comparison of base and multi-arm", {
 
     comp6 <- x$earlyStop - y$earlyStop
 
-    ## Comparison of the results of matrixarray object 'comp6' with expected results
+    ## Comparison of the results of matrix object 'comp6' with expected results
     expect_equal(comp6[1, ], c(-0.96, -0.39, -0.75, -0.06), tolerance = 1e-07, label = paste0(comp6[1, ]))
     expect_equal(comp6[2, ], c(0.1, -0.16, -0.38, -0.43), tolerance = 1e-07, label = paste0(comp6[2, ]))
+
+    x2 <- getSimulationMultiArmRates(design2,
+        activeArms = 1, plannedSubjects = c(20, 40, 60),
+        piControl = 0.6, piMaxVector = seq(0.3, 0.6, 0.1),
+        conditionalPower = 0.6, minNumberOfSubjectsPerStage = c(NA, 20, 20),
+        maxNumberOfSubjectsPerStage = c(NA, 80, 80),
+        piControlH1 = 0.4,
+        piTreatmentsH1 = 0.3,
+        maxNumberOfIterations = 100, allocationRatioPlanned = allocationRatioPlanned, seed = 1234
+    )
+
+    ## Pairwise comparison of the results of x with the results of x2
+    expect_equal(x2$iterations[1, ], x$iterations[1, ])
+    expect_equal(x2$iterations[2, ], x$iterations[2, ])
+    expect_equal(x2$iterations[3, ], x$iterations[3, ])
+    expect_equal(x$rejectAtLeastOne, x2$rejectAtLeastOne, tolerance = 1e-07)
+    expect_equal(unlist(as.list(x$rejectedArmsPerStage)), unlist(as.list(x2$rejectedArmsPerStage)), tolerance = 1e-07)
+    expect_equal(x$futilityStop, x2$futilityStop, tolerance = 1e-07)
+    expect_equal(x2$futilityPerStage[1, ], x$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(x2$futilityPerStage[2, ], x$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x2$earlyStop[1, ], x$earlyStop[1, ], tolerance = 1e-07)
+    expect_equal(x2$earlyStop[2, ], x$earlyStop[2, ], tolerance = 1e-07)
+    expect_equal(x2$successPerStage[1, ], x$successPerStage[1, ], tolerance = 1e-07)
+    expect_equal(x2$successPerStage[2, ], x$successPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x2$successPerStage[3, ], x$successPerStage[3, ], tolerance = 1e-07)
+    expect_equal(unlist(as.list(x$selectedArms)), unlist(as.list(x2$selectedArms)), tolerance = 1e-07)
+    expect_equal(x2$numberOfActiveArms[1, ], x$numberOfActiveArms[1, ])
+    expect_equal(x2$numberOfActiveArms[2, ], x$numberOfActiveArms[2, ])
+    expect_equal(x2$numberOfActiveArms[3, ], x$numberOfActiveArms[3, ])
+    expect_equal(x$expectedNumberOfSubjects, x2$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(unlist(as.list(x$sampleSizes)), unlist(as.list(x2$sampleSizes)), tolerance = 1e-07)
+    expect_equal(x2$conditionalPowerAchieved[1, ], x$conditionalPowerAchieved[1, ])
+    expect_equal(x2$conditionalPowerAchieved[2, ], x$conditionalPowerAchieved[2, ], tolerance = 1e-07)
+    expect_equal(x2$conditionalPowerAchieved[3, ], x$conditionalPowerAchieved[3, ], tolerance = 1e-07)
 })
 
 test_that("'getSimulationMultiArmRates': comparison of base and multi-arm, Fisher design", {
@@ -1652,7 +1723,13 @@ test_that("'getSimulationMultiArmRates': comparison of base and multi-arm, Fishe
     # @refFS[Formula]{fs:simulationMultiArmSelections}
     # @refFS[Formula]{fs:multiarmRejectionRule}
     allocationRatioPlanned <- 1
+
     design <- getDesignFisher(alpha0Vec = c(0.3, 0.4), informationRates = c(0.5, 0.7, 1))
+
+    design2 <- getDesignFisher(
+        alpha0Vec = c(0.3, 0.4),
+        informationRates = c(0.5, 0.7, 1), directionUpper = FALSE
+    )
 
     x <- getSimulationMultiArmRates(design,
         activeArms = 1, plannedSubjects = c(20, 40, 60),
@@ -1676,20 +1753,20 @@ test_that("'getSimulationMultiArmRates': comparison of base and multi-arm, Fishe
 
     comp2 <- y$rejectPerStage - x$rejectedArmsPerStage[, , 1]
 
-    ## Comparison of the results of matrixarray object 'comp2' with expected results
+    ## Comparison of the results of matrix object 'comp2' with expected results
     expect_equal(comp2[1, ], c(0.05, 0.01, 0.02, 0.03), tolerance = 1e-07, label = paste0(comp2[1, ]))
     expect_equal(comp2[2, ], c(-0.03, 0.04, -0.01, -0.01), tolerance = 1e-07, label = paste0(comp2[2, ]))
     expect_equal(comp2[3, ], c(0.03, 0.05, 0.06, 0), tolerance = 1e-07, label = paste0(comp2[3, ]))
 
     comp3 <- y$futilityPerStage - x$futilityPerStage
 
-    ## Comparison of the results of matrixarray object 'comp3' with expected results
+    ## Comparison of the results of matrix object 'comp3' with expected results
     expect_equal(comp3[1, ], c(-0.05, -0.09, 0, 0), tolerance = 1e-07, label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(0, 0, -0.05, 0.01), tolerance = 1e-07, label = paste0(comp3[2, ]))
 
     comp4 <- round(y$sampleSizes - (x$sampleSizes[, , 1] + x$sampleSizes[, , 2]), 1)
 
-    ## Comparison of the results of matrixarray object 'comp4' with expected results
+    ## Comparison of the results of matrix object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0, 0), label = paste0(comp4[1, ]))
     expect_equal(comp4[2, ], c(7.4, 3.6, -6.3, 6.6), tolerance = 1e-07, label = paste0(comp4[2, ]))
     expect_equal(comp4[3, ], c(0.5, 12.9, -5, 26), tolerance = 1e-07, label = paste0(comp4[3, ]))
@@ -1701,7 +1778,38 @@ test_that("'getSimulationMultiArmRates': comparison of base and multi-arm, Fishe
 
     comp6 <- x$earlyStop - y$earlyStop
 
-    ## Comparison of the results of matrixarray object 'comp6' with expected results
+    ## Comparison of the results of matrix object 'comp6' with expected results
     expect_equal(comp6[1, ], c(-0.38, -0.17, -0.41, 0.14), tolerance = 1e-07, label = paste0(comp6[1, ]))
     expect_equal(comp6[2, ], c(-0.29, -0.61, -0.52, -0.78), tolerance = 1e-07, label = paste0(comp6[2, ]))
+
+    x2 <- getSimulationMultiArmRates(design2,
+        activeArms = 1, plannedSubjects = c(20, 40, 60),
+        piControl = 0.6, piMaxVector = seq(0.3, 0.6, 0.1),
+        conditionalPower = 0.6, minNumberOfSubjectsPerStage = c(NA, 20, 20), maxNumberOfSubjectsPerStage = c(NA, 80, 80),
+        maxNumberOfIterations = 100, allocationRatioPlanned = allocationRatioPlanned, seed = -1008239793
+    )
+
+    ## Pairwise comparison of the results of x with the results of x2
+    expect_equal(x2$iterations[1, ], x$iterations[1, ])
+    expect_equal(x2$iterations[2, ], x$iterations[2, ])
+    expect_equal(x2$iterations[3, ], x$iterations[3, ])
+    expect_equal(x$rejectAtLeastOne, x2$rejectAtLeastOne, tolerance = 1e-07)
+    expect_equal(unlist(as.list(x$rejectedArmsPerStage)), unlist(as.list(x2$rejectedArmsPerStage)), tolerance = 1e-07)
+    expect_equal(x$futilityStop, x2$futilityStop, tolerance = 1e-07)
+    expect_equal(x2$futilityPerStage[1, ], x$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(x2$futilityPerStage[2, ], x$futilityPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x2$earlyStop[1, ], x$earlyStop[1, ], tolerance = 1e-07)
+    expect_equal(x2$earlyStop[2, ], x$earlyStop[2, ], tolerance = 1e-07)
+    expect_equal(x2$successPerStage[1, ], x$successPerStage[1, ], tolerance = 1e-07)
+    expect_equal(x2$successPerStage[2, ], x$successPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x2$successPerStage[3, ], x$successPerStage[3, ], tolerance = 1e-07)
+    expect_equal(unlist(as.list(x$selectedArms)), unlist(as.list(x2$selectedArms)), tolerance = 1e-07)
+    expect_equal(x2$numberOfActiveArms[1, ], x$numberOfActiveArms[1, ])
+    expect_equal(x2$numberOfActiveArms[2, ], x$numberOfActiveArms[2, ])
+    expect_equal(x2$numberOfActiveArms[3, ], x$numberOfActiveArms[3, ])
+    expect_equal(x$expectedNumberOfSubjects, x2$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(unlist(as.list(x$sampleSizes)), unlist(as.list(x2$sampleSizes)), tolerance = 1e-07)
+    expect_equal(x2$conditionalPowerAchieved[1, ], x$conditionalPowerAchieved[1, ])
+    expect_equal(x2$conditionalPowerAchieved[2, ], x$conditionalPowerAchieved[2, ], tolerance = 1e-07)
+    expect_equal(x2$conditionalPowerAchieved[3, ], x$conditionalPowerAchieved[3, ], tolerance = 1e-07)
 })

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8151 $
-## |  Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
+## |  File version: $Revision: 8230 $
+## |  Last changed: $Date: 2024-09-19 07:57:21 +0200 (Do, 19 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -895,13 +895,22 @@ ParameterSet <- R6::R6Class("ParameterSet",
     }
 
     parameterNames <- parameterNames[!(parameterNames %in% c(
-        "accrualTime", "accrualIntensity",
-        "plannedSubjects", "plannedEvents",
-        "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage",
-        "minNumberOfEventsPerStage", "maxNumberOfEventsPerStage",
-        "piecewiseSurvivalTime", "lambda2", "adaptations",
-        "adjustedStageWisePValues", "overallAdjustedTestStatistics"
+        "accrualTime", 
+        "accrualIntensity",
+        "plannedSubjects", 
+        "plannedEvents",
+        "minNumberOfSubjectsPerStage", 
+        "maxNumberOfSubjectsPerStage",
+        "minNumberOfEventsPerStage", 
+        "maxNumberOfEventsPerStage",
+        "piecewiseSurvivalTime", 
+        "lambda2", 
+        "adaptations",
+        "adjustedStageWisePValues", 
+        "overallAdjustedTestStatistics",
+        "plannedCalendarTime"
     ))]
+
     if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
             parameterSet$.piecewiseSurvivalTime$piecewiseSurvivalEnabled) {
         parameterNames <- parameterNames[!(parameterNames %in% c("lambda1"))]
@@ -1128,7 +1137,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
     for (parameterName in parameterNames) {
         tryCatch(
             {
-                if (!(parameterName %in% c("stages", "adaptations", "effectList")) &&
+                if (!(parameterName %in% c("stages", "adaptations", "effectList", "plannedCalendarTime")) &&
                         !grepl("Function$", parameterName) &&
                         (is.null(variedParameter) || parameterName != variedParameter)) {
                     columnValues <- .getDataFrameColumnValues(
