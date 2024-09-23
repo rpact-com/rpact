@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-f_analysis_base_rates.R
 ## |  Creation date: 12 September 2024, 12:49:04
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 8200 $
+## |  Last changed: $Date: 2024-09-12 15:05:38 +0200 (Do, 12 Sep 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing the Analysis Rates Functionality for One Treatment")

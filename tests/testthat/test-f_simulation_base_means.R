@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-f_simulation_base_means.R
 ## |  Creation date: 16 September 2024, 08:44:44
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 8214 $
+## |  Last changed: $Date: 2024-09-16 09:57:16 +0200 (Mo, 16 Sep 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing Simulation Means Function")

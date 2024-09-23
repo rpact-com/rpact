@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-f_simulation_multiarm_means.R
 ## |  Creation date: 09 February 2024, 10:57:28
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 7910 $
+## |  Last changed: $Date: 2024-05-22 10:02:23 +0200 (Mi, 22 Mai 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing Simulation Multi-Arm Means Function")

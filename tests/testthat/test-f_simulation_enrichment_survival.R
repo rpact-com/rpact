@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-f_simulation_enrichment_survival.R
 ## |  Creation date: 16 September 2024, 09:45:06
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 8252 $
+## |  Last changed: $Date: 2024-09-23 13:03:24 +0200 (Mo, 23 Sep 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing Simulation Enrichment Survival Function")
@@ -57,7 +57,7 @@ test_that("'getSimulationEnrichmentSurvival': gMax = 2", {
     )
 
     design <- getDesignInverseNormal(
-        informationRates = c(0.3, 1),
+        informationRates = c(0.3, 1), 
         typeOfDesign = "asUser", userAlphaSpending = c(0.01, 0.025)
     )
 

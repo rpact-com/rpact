@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8246 $
-## |  Last changed: $Date: 2024-09-20 12:10:36 +0200 (Fr, 20 Sep 2024) $
+## |  File version: $Revision: 8252 $
+## |  Last changed: $Date: 2024-09-23 13:03:24 +0200 (Mo, 23 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1035,7 +1035,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     }
                 } else if (!is.null(parameterName) && length(parameterName) == 1 && !is.na(parameterName)) {
                     if (parameterName == "futilityBounds") {
-                        values[!is.na(values) & values <= -6] <- -Inf
+                        values[!is.na(values) & values <= C_FUTILITY_BOUNDS_DEFAULT] <- -Inf
                     } else if (parameterName %in% c(
                             "criticalValues",
                             "decisionCriticalValue", "overallAdjustedTestStatistics"
@@ -1899,7 +1899,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
         if (!.isDelayedInformationEnabled(design = design) &&
                 ((.isTrialDesignInverseNormalOrGroupSequential(design) &&
-                    any(design$futilityBounds > -6, na.rm = TRUE)) ||
+                    any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) ||
                     (.isTrialDesignFisher(design) && any(design$alpha0Vec < 1)))) {
             header <- .concatenateSummaryText(
                 header,
@@ -3194,7 +3194,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
     } else {
-        if (any(design$futilityBounds > -6)) {
+        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
             summaryFactory$addParameter(design,
                 parameterName = "futilityBounds",
                 parameterCaption = .getSummaryParameterCaptionFutilityBounds(design),
@@ -3462,18 +3462,6 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         )
     }
 
-    if (simulationEnabled && (multiArmEnabled || enrichmentEnabled || countDataEnabled)) {
-        if (!planningEnabled && !baseEnabled && any(designPlan$futilityPerStage != 0)) {
-            summaryFactory$addParameter(designPlan,
-                parameterName = "futilityPerStage",
-                parameterCaption = "Exit probability for futility", # (under H1)
-                roundDigits = digitSettings$digitsProbabilities,
-                smoothedZeroFormat = TRUE,
-                transpose = TRUE
-            )
-        }
-    }
-
     if (baseEnabled) {
         parameterName <- "rejectPerStage"
         if (design$kMax == 1) {
@@ -3556,15 +3544,6 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     if (simulationEnabled && (multiArmEnabled || enrichmentEnabled || countDataEnabled)) {
-        if (!planningEnabled && !baseEnabled && any(designPlan$futilityPerStage != 0)) {
-            summaryFactory$addParameter(designPlan,
-                parameterName = "futilityPerStage",
-                parameterCaption = "Exit probability for futility", # (under H1)
-                roundDigits = digitSettings$digitsProbabilities,
-                smoothedZeroFormat = TRUE,
-                transpose = TRUE
-            )
-        }
 
         if (survivalEnabled) {
             summaryFactory$addParameter(designPlan,
@@ -3820,17 +3799,6 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         )
     }
 
-    if (baseEnabled && !planningEnabled && !is.null(designPlan[["futilityPerStage"]]) &&
-            !any(is.na(designPlan[["futilityPerStage"]])) &&
-            any(designPlan$futilityPerStage != 0) && any(designPlan$futilityPerStage > 1e-08)) {
-        summaryFactory$addParameter(designPlan,
-            parameterName = "futilityPerStage",
-            parameterCaption = "Exit probability for futility", # (under H1)
-            roundDigits = digitSettings$digitsProbabilities,
-            smoothedZeroFormat = TRUE
-        )
-    }
-
     probsH0 <- NULL
     probsH1 <- NULL
     if (design$kMax > 1) {
@@ -3862,24 +3830,6 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
     }
 
-    if (baseEnabled && simulationEnabled && design$kMax > 1) {
-        values <- NULL
-        if (!is.null(probsH1)) {
-            if (is.matrix(probsH1$rejectPerStage)) {
-                values <- matrix(probsH1$rejectPerStage[1:(design$kMax - 1), ], ncol = ncol(probsH1$rejectPerStage))
-            } else {
-                values <- probsH1$rejectPerStage[1:(design$kMax - 1)]
-            }
-        }
-        summaryFactory$addParameter(designPlan,
-            parameterName = "rejectPerStage",
-            values = values,
-            parameterCaption = "Exit probability for efficacy",
-            roundDigits = digitSettings$digitsProbabilities,
-            smoothedZeroFormat = TRUE
-        )
-    }
-
     if (planningEnabled) {
         if (!is.null(probsH1) && !is.null(probsH0) && design$kMax > 1) {
             probsH0$earlyStop <- matrix(probsH0$earlyStop[1:(design$kMax - 1), 1], ncol = 1)
@@ -3897,7 +3847,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 probsH1$rejectPerStage <- probsH1$rejectPerStage[1:(design$kMax - 1)]
             }
 
-            if (any(design$futilityBounds > -6)) {
+            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
                 if (is.matrix(probsH1$earlyStop)) {
                     probsH1$earlyStop <- matrix(probsH1$earlyStop[1:(design$kMax - 1), ],
                         ncol = ncol(probsH1$earlyStop)
@@ -3946,22 +3896,18 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 )
             }
 
-            if (any(design$futilityBounds > -6)) {
+            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
                 summaryFactory$addParameter(probsH0,
                     parameterName = "futilityPerStage",
                     parameterCaption = "Exit probability for futility (under H0)",
                     roundDigits = digitSettings$digitsProbabilities,
                     smoothedZeroFormat = TRUE
                 )
-                x <- designPlan
-                if (is.null(x)) {
-                    x <- design
-                }
                 futilityPerStage <- probsH1$futilityPerStage
-                if (.isTrialDesignPlan(x) && x$.isSampleSizeObject() && ncol(futilityPerStage) > 1) {
+                if (designPlan$.isSampleSizeObject() && ncol(futilityPerStage) > 1) {
                     futilityPerStage <- futilityPerStage[, 1]
                 }
-                summaryFactory$addParameter(x,
+                summaryFactory$addParameter(designPlan,
                     parameterName = "futilityPerStage",
                     values = futilityPerStage,
                     parameterCaption = "Exit probability for futility (under H1)",
@@ -3969,6 +3915,37 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     smoothedZeroFormat = TRUE
                 )
             }
+        }
+    } else {
+        rejectPerStageValues <- NULL
+        if (!is.null(probsH1)) {
+            if (is.matrix(probsH1$rejectPerStage)) {
+                rejectPerStageValues <- matrix(probsH1$rejectPerStage[1:(design$kMax - 1), ], ncol = ncol(probsH1$rejectPerStage))
+            } else {
+                rejectPerStageValues <- probsH1$rejectPerStage[1:(design$kMax - 1)]
+            }
+        }
+        if (!is.null(rejectPerStageValues)) {
+            summaryFactory$addParameter(designPlan,
+                parameterName = "rejectPerStage",
+                values = rejectPerStageValues,
+                parameterCaption = "Exit probability for efficacy",
+                roundDigits = digitSettings$digitsProbabilities,
+                smoothedZeroFormat = TRUE
+            )
+        }
+        
+        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE) &&
+                !is.null(designPlan[["futilityPerStage"]]) &&
+                !any(is.na(designPlan[["futilityPerStage"]])) &&
+                any(designPlan$futilityPerStage != 0) && any(designPlan$futilityPerStage > 1e-08)) {
+            summaryFactory$addParameter(designPlan,
+                parameterName = "futilityPerStage",
+                parameterCaption = "Exit probability for futility", # under H1
+                roundDigits = digitSettings$digitsProbabilities,
+                smoothedZeroFormat = TRUE,
+                transpose = grepl("MultiArm|Enrichment", .getClassName(designPlan)) 
+            )
         }
     }
 
