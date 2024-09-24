@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-f_analysis_enrichment_rates.R
 ## |  Creation date: 12 September 2024, 12:51:07
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 8200 $
+## |  Last changed: $Date: 2024-09-12 15:05:38 +0200 (Do, 12 Sep 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing Analysis Enrichment Rates Function")

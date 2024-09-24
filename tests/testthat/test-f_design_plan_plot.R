@@ -16,7 +16,7 @@
 ## |  File name: test-f_design_plan_means.R
 ## |  Creation date: 21 December 2023, 08:52:45
 ## |  File version: $Revision: 7961 $
-## |  Last changed: $Date: 2024-05-30 14:58:05 +0200 (Thu, 30 May 2024) $
+## |  Last changed: $Date: 2024-05-30 14:58:05 +0200 (Do, 30 Mai 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 

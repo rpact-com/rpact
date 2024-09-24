@@ -15,9 +15,9 @@
 ## |
 ## |  File name: test-f_as251.R
 ## |  Creation date: 16 January 2024, 07:16:35
-## |  File version: $Revision$
-## |  Last changed: $Date$
-## |  Last changed by: $Author$
+## |  File version: $Revision: 7662 $
+## |  Last changed: $Date: 2024-02-23 12:42:26 +0100 (Fr, 23 Feb 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing Dunnett AS 251 Functions")
