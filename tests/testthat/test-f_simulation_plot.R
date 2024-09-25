@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_performance_score.R
 ## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 7682 $
-## |  Last changed: $Date: 2024-03-05 07:53:40 +0100 (Di, 05 Mrz 2024) $
+## |  File version: $Revision: 8260 $
+## |  Last changed: $Date: 2024-09-25 10:42:43 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -198,7 +198,7 @@ test_that("Plot simulation multi-arm means results", {
         informationRates = c(0.2, 0.6, 1),
         futilityBounds = c(-0.5, 0.5)
     )
-    x <- getSimulationMultiArmMeans(
+    design <- getSimulationMultiArmMeans(
         design = design, typeOfShape = "linear",
         activeArms = 4, plannedSubjects = c(10, 30, 50), stDev = 1.2,
         muMaxVector = seq(0.3, 0.6, 0.1), adaptations = rep(TRUE, 2),
@@ -206,7 +206,7 @@ test_that("Plot simulation multi-arm means results", {
         maxNumberOfSubjectsPerStage = c(10, 100, 100),
         maxNumberOfIterations = 500, seed = 1234567890
     )
-    expect_silent(plot(x, type = "all", grid = 0))
+    expect_silent(plot(design, type = "all", grid = 0))
 })
 
 test_that("Plot simulation multi-arm rates results", {
@@ -216,7 +216,7 @@ test_that("Plot simulation multi-arm rates results", {
         informationRates = c(0.2, 0.6, 1),
         futilityBounds = c(-0.5, 0.5)
     )
-    x <- getSimulationMultiArmRates(
+    design <- getSimulationMultiArmRates(
         design = design, typeOfShape = "linear",
         activeArms = 4, plannedSubjects = c(10, 30, 50),
         piControl = 0.3, piMaxVector = seq(0.3, 0.6, 0.1),
@@ -225,7 +225,7 @@ test_that("Plot simulation multi-arm rates results", {
         maxNumberOfSubjectsPerStage = c(10, 100, 100),
         maxNumberOfIterations = 500, seed = 1234567890
     )
-    expect_silent(plot(x, type = "all", grid = 0))
+    expect_silent(plot(design, type = "all", grid = 0))
 })
 
 test_that("Plot simulation multi-arm survival results", {
@@ -235,7 +235,7 @@ test_that("Plot simulation multi-arm survival results", {
         informationRates = c(0.2, 0.6, 1),
         futilityBounds = c(-0.5, 0.5)
     )
-    x <- getSimulationMultiArmSurvival(
+    design <- getSimulationMultiArmSurvival(
         design = design, activeArms = 4,
         typeOfSelection = "rBest", rValue = 2, plannedEvents = c(10, 30, 50),
         omegaMaxVector = seq(1, 1.6, 0.2), adaptations = rep(TRUE, 2),
@@ -243,7 +243,7 @@ test_that("Plot simulation multi-arm survival results", {
         maxNumberOfEventsPerStage = c(10, 100, 100),
         maxNumberOfIterations = 500, seed = 1234567890
     )
-    expect_silent(plot(x, type = "all", grid = 0))
+    expect_silent(plot(design, type = "all", grid = 0))
 })
 
 test_that("Plot simulation enrichment means results", {
@@ -273,7 +273,7 @@ test_that("Plot simulation enrichment means results", {
         stDevs = stDev, effects = effects
     )
 
-    suppressWarnings(x <- getSimulationEnrichmentMeans(
+    suppressWarnings(design <- getSimulationEnrichmentMeans(
         design = design,
         plannedSubjects = c(10, 30, 50),
         effectList = el,
@@ -285,7 +285,7 @@ test_that("Plot simulation enrichment means results", {
         seed = 1234567890
     ))
 
-    suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
+    suppressWarnings(expect_silent(plot(design, type = "all", grid = 0)))
 })
 
 test_that("Plot simulation enrichment rates results", {
@@ -316,7 +316,7 @@ test_that("Plot simulation enrichment rates results", {
         )
     )
 
-    suppressWarnings(x <- getSimulationEnrichmentRates(
+    suppressWarnings(design <- getSimulationEnrichmentRates(
         design = design,
         plannedSubjects = c(10, 30, 50),
         effectList = el,
@@ -324,7 +324,7 @@ test_that("Plot simulation enrichment rates results", {
         seed = 1234567890
     ))
 
-    suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
+    suppressWarnings(expect_silent(plot(design, type = "all", grid = 0)))
 })
 
 
@@ -348,7 +348,7 @@ test_that("Plot simulation enrichment survival results", {
     )
 
     # Perform simulation
-    suppressWarnings(x <- getSimulationEnrichmentSurvival(
+    suppressWarnings(design <- getSimulationEnrichmentSurvival(
         design = getDesignInverseNormal(typeOfDesign = "noEarlyEfficacy"),
         effectList = el,
         typeOfSelection = "rbest",
@@ -359,7 +359,7 @@ test_that("Plot simulation enrichment survival results", {
         directionUpper = FALSE
     ))
 
-    suppressWarnings(expect_silent(plot(x, type = "all", grid = 0)))
+    suppressWarnings(expect_silent(plot(design, type = "all", grid = 0)))
 })
 
 test_that("Plot simulation results with wrong plot types", {

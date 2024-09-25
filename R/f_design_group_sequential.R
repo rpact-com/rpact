@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8266 $
+## |  Last changed: $Date: 2024-09-25 15:19:20 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -402,14 +402,23 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             call. = FALSE
         )
     }
-    if (is.na(twoSidedPower)) {
+    if (design$sided == 1) {
         design$twoSidedPower <- C_TWO_SIDED_POWER_DEFAULT
-        design$.setParameterType("twoSidedPower", C_PARAM_DEFAULT_VALUE)
+        design$.setParameterType("twoSidedPower", C_PARAM_NOT_APPLICABLE)
+        if (!is.na(twoSidedPower)) {
+            warning("'twoSidedPower' (", twoSidedPower, ") will be ignored because it is ",
+                "only applicable for two-sided testing", call. = FALSE)
+        }
     } else {
-        design$twoSidedPower <- twoSidedPower
-        design$.setParameterType("twoSidedPower", ifelse(
-            twoSidedPower == C_TWO_SIDED_POWER_DEFAULT, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-        ))
+        if (is.na(twoSidedPower)) {
+            design$twoSidedPower <- C_TWO_SIDED_POWER_DEFAULT
+            design$.setParameterType("twoSidedPower", C_PARAM_DEFAULT_VALUE)
+        } else {
+            design$twoSidedPower <- twoSidedPower
+            design$.setParameterType("twoSidedPower", ifelse(
+                twoSidedPower == C_TWO_SIDED_POWER_DEFAULT, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            ))
+        }
     }
     if (design$sided == 2 && grepl("^bs", design$typeBetaSpending)) {
         if (is.na(betaAdjustment)) {

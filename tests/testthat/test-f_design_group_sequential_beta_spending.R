@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_design_group_sequential_beta_spending.R
 ## |  Creation date: 08 November 2023, 09:09:55
-## |  File version: $Revision: 7560 $
-## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
+## |  File version: $Revision: 8260 $
+## |  Last changed: $Date: 2024-09-25 10:42:43 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -24,41 +24,41 @@ test_plan_section("Testing the Group Sequential Design Functionality with Beta S
 
 
 test_that("'getDesignGroupSequential' with two-sided beta spending (1)", {
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.3, 0.4, 0.8, 1),
 	    alpha = 0.05, typeOfDesign = "asKD", gammaA = 2.5, beta = 0.1, sided = 2,
 	    typeBetaSpending = "bsKD", gammaB = 1.5, bindingFutility = FALSE
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(0.12305271, 0.24472466, 0.79581714, 0.89999927), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(NA_real_, 0.13460523, 1.5007674), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(0.0024647515, 0.0050596443, 0.028621671, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0, 0.010609935, 0.065960997, 0.1), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(3.0276355, 2.8984727, 2.2289649, 2.0639032), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(0.0012323758, 0.0018749246, 0.01290812, 0.019513449), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(0.12305271, 0.24472466, 0.79581714, 0.89999927), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(NA_real_, 0.13460523, 1.5007674), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(0.0024647515, 0.0050596443, 0.028621671, 0.05), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0, 0.010609935, 0.065960997, 0.1), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(3.0276355, 2.8984727, 2.2289649, 2.0639032), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(0.0012323758, 0.0018749246, 0.01290812, 0.019513449), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 10.507423, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))
@@ -102,41 +102,41 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (2)", {
 
 	.skipTestIfDisabled()
 
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.4, 0.65, 0.8, 1),
 	    alpha = 0.05, typeOfDesign = "asKD", gammaA = 2.5, beta = 0.1, sided = 2,
 	    typeBetaSpending = "bsKD", gammaB = 1.5, bindingFutility = TRUE
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(0.25984202, 0.62910001, 0.78681992, 0.89999952), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(0.3085062, 0.97461473, 1.3896954), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(0.0050596443, 0.017031519, 0.02862167, 0.04999999), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0.025298221, 0.052404675, 0.071554176, 0.1), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(2.8032117, 2.4453423, 2.2956849, 1.9878913), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(0.0025298221, 0.0072357361, 0.010846951, 0.023411854), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(0.25984202, 0.62910001, 0.78681992, 0.89999952), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(0.3085062, 0.97461473, 1.3896954), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(0.0050596443, 0.017031519, 0.02862167, 0.04999999), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0.025298221, 0.052404675, 0.071554176, 0.1), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(2.8032117, 2.4453423, 2.2956849, 1.9878913), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(0.0025298221, 0.0072357361, 0.010846951, 0.023411854), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 10.507423, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))
@@ -180,7 +180,7 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (3)", {
 
 	.skipTestIfDisabled()
 
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.15, 0.25, 0.8, 1),
 	    alpha = 0.025, typeOfDesign = "asOF", beta = 0.07, sided = 2,
 	    typeBetaSpending = "bsUser", userBetaSpending = c(0.15, 0.25, 0.8, 1) * 0.07, 
@@ -188,34 +188,34 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (3)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(6.6585296e-07, 0.0017900571, 0.82193405, 0.93), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(NA_real_, NA_real_, 1.8509555), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(2.2511014e-10, 1.1742122e-06, 0.01045986, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0, 0, 0.051333333, 0.07), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(6.3431527, 4.8600403, 2.560259, 2.292451), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(1.1255508e-10, 5.8680939e-07, 0.0052297087, 0.010939815), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(6.6585296e-07, 0.0017900571, 0.82193405, 0.93), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(NA_real_, NA_real_, 1.8509555), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(2.2511014e-10, 1.1742122e-06, 0.01045986, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0, 0, 0.051333333, 0.07), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(6.3431527, 4.8600403, 2.560259, 2.292451), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(1.1255508e-10, 5.8680939e-07, 0.0052297087, 0.010939815), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 13.817529, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))
@@ -259,7 +259,7 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (4)", {
 
 	.skipTestIfDisabled()
 
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.35, 0.55, 0.8, 1),
 	    alpha = 0.035, beta = 0.065, sided = 2,
 	    typeOfDesign = "asKD", gammaA = 1.44,
@@ -267,34 +267,34 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (4)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(0.36066758, 0.64302509, 0.86790998, 0.93499965), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(0.26890478, 0.80339676, 1.6440939), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(0.0077183777, 0.014797567, 0.02538152, 0.035), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0.015754521, 0.029000333, 0.048093329, 0.065), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(2.6641472, 2.5778904, 2.3970592, 2.2417317), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(0.0038591889, 0.0049702762, 0.0082636274, 0.01248936), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(0.36066758, 0.64302509, 0.86790998, 0.93499965), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(0.26890478, 0.80339676, 1.6440939), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(0.0077183777, 0.014797567, 0.02538152, 0.035), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0.015754521, 0.029000333, 0.048093329, 0.065), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(2.6641472, 2.5778904, 2.3970592, 2.2417317), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(0.0038591889, 0.0049702762, 0.0082636274, 0.01248936), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 13.122219, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))
@@ -338,41 +338,41 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (5)", {
 
 	.skipTestIfDisabled()
 
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.35, 0.4, 0.8, 1),
 	    alpha = 0.025, typeOfDesign = "asOF", beta = 0.07, sided = 2,
 	    typeBetaSpending = "bsKD", gammaB = 1, bindingFutility = TRUE
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(0.040854387, 0.095590648, 0.8243805, 0.93), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(0.406132, 0.29663146, 1.735038), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(4.8451862e-05, 0.00015681311, 0.01045986, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0.0245, 0.028, 0.056, 0.07), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(4.0629719, 3.8052638, 2.5524084, 2.1888975), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(2.4225931e-05, 7.0826557e-05, 0.0053490513, 0.014302145), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(0.040854387, 0.095590648, 0.8243805, 0.93), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(0.406132, 0.29663146, 1.735038), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(4.8451862e-05, 0.00015681311, 0.01045986, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0.0245, 0.028, 0.056, 0.07), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(4.0629719, 3.8052638, 2.5524084, 2.1888975), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(2.4225931e-05, 7.0826557e-05, 0.0053490513, 0.014302145), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 13.817529, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))
@@ -416,7 +416,7 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (6)", {
 
 	.skipTestIfDisabled()
 
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.35, 0.4, 0.8, 1),
 	    alpha = 0.025, typeOfDesign = "asOF", beta = 0.07, sided = 2,
 	    typeBetaSpending = "bsUser", userBetaSpending = c(0.15, 0.4, 0.8, 1) * 0.01, 
@@ -424,34 +424,34 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (6)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(0.10679919, 0.21860669, 0.95487449, 0.99), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(NA_real_, 0.30649567, 1.7163392), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(4.8451862e-05, 0.00015681312, 0.01045986, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0, 0.0029411764, 0.0076470588, 0.01), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(4.0629719, 3.8052638, 2.559217, 2.2179478), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(2.4225931e-05, 7.0826578e-05, 0.0052454112, 0.013279197), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(0.10679919, 0.21860669, 0.95487449, 0.99), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(NA_real_, 0.30649567, 1.7163392), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(4.8451862e-05, 0.00015681312, 0.01045986, 0.025), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0, 0.0029411764, 0.0076470588, 0.01), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(4.0629719, 3.8052638, 2.559217, 2.2179478), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(2.4225931e-05, 7.0826578e-05, 0.0052454112, 0.013279197), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 13.817529, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))
@@ -495,41 +495,41 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (7)", {
 
 	.skipTestIfDisabled()
 
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.15, 0.4, 0.8, 1),
 	    alpha = 0.025, typeOfDesign = "asOF", beta = 0.01, sided = 2,
 	    typeBetaSpending = "bsKD", gammaB = 1, bindingFutility = FALSE
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(3.8817384e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(NA_real_, 0.33832477, 1.7778049), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(2.2511014e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0, 0.0029411765, 0.0076470589, 0.0099999999), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(6.3431527, 3.7800251, 2.5620799, 2.2927506), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(1.1255508e-10, 7.8406284e-05, 0.0052023689, 0.010931184), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(3.8817384e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(NA_real_, 0.33832477, 1.7778049), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(2.2511014e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0, 0.0029411765, 0.0076470589, 0.0099999999), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(6.3431527, 3.7800251, 2.5620799, 2.2927506), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(1.1255508e-10, 7.8406284e-05, 0.0052023689, 0.010931184), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 20.864346, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))
@@ -573,7 +573,7 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (8)", {
 
 	.skipTestIfDisabled()
 
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.15, 0.4, 0.8, 1),
 	    alpha = 0.025, typeOfDesign = "asOF", beta = 0.01, sided = 2,
 	    typeBetaSpending = "bsUser", userBetaSpending = c(0.15, 0.4, 0.8, 1) * 0.01, 
@@ -581,34 +581,34 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (8)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(3.8817384e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(NA_real_, 0.33832477, 1.7778049), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(2.2511014e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0, 0.0029411765, 0.0076470589, 0.0099999999), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(6.3431527, 3.7800251, 2.5620799, 2.2927506), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(1.1255508e-10, 7.8406284e-05, 0.0052023689, 0.010931184), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(3.8817384e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(NA_real_, 0.33832477, 1.7778049), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(2.2511014e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0, 0.0029411765, 0.0076470589, 0.0099999999), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(6.3431527, 3.7800251, 2.5620799, 2.2927506), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(1.1255508e-10, 7.8406284e-05, 0.0052023689, 0.010931184), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 20.864346, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))
@@ -652,7 +652,7 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (9)", {
 
 	.skipTestIfDisabled()
 
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.35, 0.55, 0.8, 1),
 	    alpha = 0.035, beta = 0.065, sided = 2,
 	    typeOfDesign = "asKD", gammaA = 1.44,
@@ -660,34 +660,34 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (9)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(0.37576504, 0.66123596, 0.8775957, 0.93499972), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(0.29185889, 0.85901114, 1.708006), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(0.0077183777, 0.014797567, 0.02538152, 0.03499999), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0.015754521, 0.029000333, 0.048093329, 0.065), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(2.6641472, 2.5781312, 2.4084661, 2.3291234), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(0.0038591889, 0.0049668138, 0.0080098571, 0.0099262635), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(0.37576504, 0.66123596, 0.8775957, 0.93499972), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(0.29185889, 0.85901114, 1.708006), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(0.0077183777, 0.014797567, 0.02538152, 0.03499999), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0.015754521, 0.029000333, 0.048093329, 0.065), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(2.6641472, 2.5781312, 2.4084661, 2.3291234), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(0.0038591889, 0.0049668138, 0.0080098571, 0.0099262635), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 13.122219, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))
@@ -731,7 +731,7 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (10)", {
 
 	.skipTestIfDisabled()
 
-	suppressWarnings(x <- getDesignGroupSequential(
+	suppressWarnings(design <- getDesignGroupSequential(
 	    informationRates = c(0.15, 0.4, 0.8, 1),
 	    alpha = 0.025, typeOfDesign = "asOF", beta = 0.01, sided = 2,
 	    typeBetaSpending = "bsUser", userBetaSpending = c(0.15, 0.4, 0.8, 1) * 0.01, 
@@ -739,34 +739,34 @@ test_that("'getDesignGroupSequential' with two-sided beta spending (10)", {
 	))
 
 	## Comparison of the results of TrialDesignGroupSequential object 'x' with expected results
-	expect_equal(x$power, c(3.8817384e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07, label = paste0("c(", paste0(x$power, collapse = ", "), ")"))
-	expect_equal(x$futilityBounds, c(NA_real_, 0.33832477, 1.7778049), tolerance = 1e-07, label = paste0("c(", paste0(x$futilityBounds, collapse = ", "), ")"))
-	expect_equal(x$alphaSpent, c(2.2511014e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(x$alphaSpent, collapse = ", "), ")"))
-	expect_equal(x$betaSpent, c(0, 0.0029411765, 0.0076470589, 0.0099999999), tolerance = 1e-07, label = paste0("c(", paste0(x$betaSpent, collapse = ", "), ")"))
-	expect_equal(x$criticalValues, c(6.3431527, 3.7800251, 2.5620799, 2.2927506), tolerance = 1e-07, label = paste0("c(", paste0(x$criticalValues, collapse = ", "), ")"))
-	expect_equal(x$stageLevels, c(1.1255508e-10, 7.8406284e-05, 0.0052023689, 0.010931184), tolerance = 1e-07, label = paste0("c(", paste0(x$stageLevels, collapse = ", "), ")"))
+	expect_equal(design$power, c(3.8817384e-06, 0.23459419, 0.95988861, 0.99), tolerance = 1e-07, label = paste0("c(", paste0(design$power, collapse = ", "), ")"))
+	expect_equal(design$futilityBounds, c(NA_real_, 0.33832477, 1.7778049), tolerance = 1e-07, label = paste0("c(", paste0(design$futilityBounds, collapse = ", "), ")"))
+	expect_equal(design$alphaSpent, c(2.2511014e-10, 0.00015681311, 0.010459859, 0.02499999), tolerance = 1e-07, label = paste0("c(", paste0(design$alphaSpent, collapse = ", "), ")"))
+	expect_equal(design$betaSpent, c(0, 0.0029411765, 0.0076470589, 0.0099999999), tolerance = 1e-07, label = paste0("c(", paste0(design$betaSpent, collapse = ", "), ")"))
+	expect_equal(design$criticalValues, c(6.3431527, 3.7800251, 2.5620799, 2.2927506), tolerance = 1e-07, label = paste0("c(", paste0(design$criticalValues, collapse = ", "), ")"))
+	expect_equal(design$stageLevels, c(1.1255508e-10, 7.8406284e-05, 0.0052023689, 0.010931184), tolerance = 1e-07, label = paste0("c(", paste0(design$stageLevels, collapse = ", "), ")"))
 	if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-	    invisible(capture.output(expect_error(print(x), NA)))
-	    expect_output(print(x)$show())
-	    invisible(capture.output(expect_error(summary(x), NA)))
-	    expect_output(summary(x)$show())
-	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL))))
-	    expect_equal(xCodeBased$power, x$power, tolerance = 1e-07)
-	    expect_equal(xCodeBased$futilityBounds, x$futilityBounds, tolerance = 1e-07)
-	    expect_equal(xCodeBased$alphaSpent, x$alphaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$betaSpent, x$betaSpent, tolerance = 1e-07)
-	    expect_equal(xCodeBased$criticalValues, x$criticalValues, tolerance = 1e-07)
-	    expect_equal(xCodeBased$stageLevels, x$stageLevels, tolerance = 1e-07)
-	    expect_type(names(x), "character")
-	    df <- as.data.frame(x)
+	    invisible(capture.output(expect_error(print(design), NA)))
+	    expect_output(print(design)$show())
+	    invisible(capture.output(expect_error(summary(design), NA)))
+	    expect_output(summary(design)$show())
+	    suppressWarnings(xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL))))
+	    expect_equal(xCodeBased$power, design$power, tolerance = 1e-07)
+	    expect_equal(xCodeBased$futilityBounds, design$futilityBounds, tolerance = 1e-07)
+	    expect_equal(xCodeBased$alphaSpent, design$alphaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$betaSpent, design$betaSpent, tolerance = 1e-07)
+	    expect_equal(xCodeBased$criticalValues, design$criticalValues, tolerance = 1e-07)
+	    expect_equal(xCodeBased$stageLevels, design$stageLevels, tolerance = 1e-07)
+	    expect_type(names(design), "character")
+	    df <- as.data.frame(design)
 	    expect_s3_class(df, "data.frame")
 	    expect_true(nrow(df) > 0 && ncol(df) > 0)
-	    mtx <- as.matrix(x)
+	    mtx <- as.matrix(design)
 	    expect_true(is.matrix(mtx))
 	    expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
 	}
 
-	y <- getDesignCharacteristics(x)
+	y <- getDesignCharacteristics(design)
 
 	## Comparison of the results of TrialDesignCharacteristics object 'y' with expected results
 	expect_equal(y$nFixed, 20.864346, tolerance = 1e-07, label = paste0("c(", paste0(y$nFixed, collapse = ", "), ")"))

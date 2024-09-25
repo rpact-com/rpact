@@ -9,22 +9,22 @@
 \alias{fetch.ParameterSet}
 \title{Extract a single parameter}
 \usage{
-pull(x, var, output)
+pull(x, ..., output)
 
-\method{pull}{ParameterSet}(x, var = -1, output = c("named", "value", "list"))
+\method{pull}{ParameterSet}(x, ..., output = c("named", "labeled", "value", "list"))
 
-obtain(x, var, output)
+obtain(x, ..., output)
 
-\method{obtain}{ParameterSet}(x, var = -1, output = c("named", "value", "list"))
+\method{obtain}{ParameterSet}(x, ..., output = c("named", "labeled", "value", "list"))
 
-fetch(x, var, output)
+fetch(x, ..., output)
 
-\method{fetch}{ParameterSet}(x, var = -1, output = c("named", "value", "list"))
+\method{fetch}{ParameterSet}(x, ..., output = c("named", "labeled", "value", "list"))
 }
 \arguments{
 \item{x}{The \code{\link{ParameterSet}} object to fetch from.}
 
-\item{var}{A variable specified as:
+\item{...}{One or more variables specified as:
 \itemize{
 \item a literal variable name
 \item a positive integer, giving the position counting from the left

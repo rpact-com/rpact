@@ -6,6 +6,7 @@
 * The new function `getSimulationCounts()` can be used to perform power simulations for clinical trials with negative binomial distributed count data. The function returns the simulated power, stopping probabilities, conditional power, and expected sample size for testing mean rates for negative binomial distributed event numbers in the two treatment groups testing situation.
 * The functions `getDesignGroupSequential()`, `getDesignInverseNormal()`, and `getDesignFisher()` now support the argument `directionUpper` to specify the direction of the alternative for one-sided testing early at the design phase, see enhancement [#26](https://github.com/rpact-com/rpact/issues/26)
 * `getSampleSizeCounts()` and `getPowerCounts()` output boundary values also on the treatment effect scale, see enhancement [#40](https://github.com/rpact-com/rpact/issues/40)
+* The `fetch()` and `obtain()` functions can be used to extract multiple parameters from an rpact result object and support various output formats
 
 ## Improvements, issues, and changes
 

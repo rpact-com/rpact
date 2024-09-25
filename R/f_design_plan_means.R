@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8252 $
-## |  Last changed: $Date: 2024-09-23 13:03:24 +0200 (Mo, 23 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8268 $
+## |  Last changed: $Date: 2024-09-25 16:14:45 +0200 (Mi, 25 Sep 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -64,11 +64,10 @@ NULL
             # outside validated range
             futilityBounds[abs(futilityBounds) > 50] <- NA_real_
             if (any(is.na(futilityBounds))) {
-                warning("The computation of futility boundar",
-                    ifelse(numberOfNAs == 1, "y", "ies"), " ",
-                    "on treatment effect scale not performed presumably ",
-                    "due to too small degrees of freedom",
-                    call. = FALSE
+                warning("The computation of futility boundaries on ",
+                        "treatment effect scale not performed presumably ",
+                        "due to too small degrees of freedom",
+                        call. = FALSE
                 )
             }
         } else {
@@ -575,8 +574,8 @@ NULL
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {
         designPlan$criticalValuesPValueScale <- designPlan$criticalValuesPValueScale * 2
-        designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_GENERATED)
     }
+    designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_NOT_APPLICABLE)
 
     if (.hasApplicableFutilityBounds(design)) {
         designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)

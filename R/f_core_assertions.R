@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8232 $
-## |  Last changed: $Date: 2024-09-19 08:22:37 +0200 (Do, 19 Sep 2024) $
+## |  File version: $Revision: 8262 $
+## |  Last changed: $Date: 2024-09-25 10:43:45 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -617,15 +617,25 @@ NULL
 .assertIsSingleInteger <- function(x, argumentName, ..., naAllowed = FALSE,
         validateType = TRUE, noDefaultAvailable = FALSE, call. = TRUE) {
     .assertIsSinglePositiveInteger(
-        x = x, argumentName = argumentName,
-        naAllowed = naAllowed, validateType = validateType,
-        mustBePositive = FALSE, noDefaultAvailable = noDefaultAvailable,
+        x = x, 
+        argumentName = argumentName,
+        naAllowed = naAllowed, 
+        validateType = validateType,
+        mustBePositive = FALSE, 
+        noDefaultAvailable = noDefaultAvailable,
         call. = call.
     )
 }
 
-.assertIsSinglePositiveInteger <- function(x, argumentName, ...,
-        naAllowed = FALSE, validateType = TRUE, mustBePositive = TRUE, noDefaultAvailable = FALSE, call. = TRUE) {
+.assertIsSinglePositiveInteger <- function(
+        x, 
+        argumentName, 
+        ...,
+        naAllowed = FALSE, 
+        validateType = TRUE, 
+        mustBePositive = TRUE, 
+        noDefaultAvailable = FALSE, 
+        call. = TRUE) {
     prefix <- ifelse(mustBePositive, "single positive ", "single ")
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)

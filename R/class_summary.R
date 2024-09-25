@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8252 $
-## |  Last changed: $Date: 2024-09-23 13:03:24 +0200 (Mo, 23 Sep 2024) $
+## |  File version: $Revision: 8266 $
+## |  Last changed: $Date: 2024-09-25 15:19:20 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -989,6 +989,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (sum(zeroes) > 0) {
             formattedValue[zeroes] <- "0"
         }
+    }
+    
+    if (any(is.nan(formattedValue)) || any(trimws(formattedValue) == "NaN")) {
+        formattedValue[is.nan(formattedValue) | trimws(formattedValue) == "NaN"] <- NA_real_
+        showNA <- TRUE
     }
 
     formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <-
@@ -3557,7 +3562,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 parameterName = "expectedNumberOfSubjects",
                 parameterCaption = "Expected number of subjects under H1",
                 roundDigits = digitSettings$digitsSampleSize,
-                transpose = TRUE
+                transpose = TRUE,
+                lastStage = design$kMax
             )
         }
 
@@ -3660,7 +3666,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             parameterCaption = "Expected number of subjects under H1",
             roundDigits = digitSettings$digitsSampleSize,
             transpose = TRUE,
-            validateParameterType = !countDataEnabled
+            validateParameterType = !countDataEnabled,
+            lastStage = design$kMax
         )
     }
 

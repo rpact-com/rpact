@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8230 $
-## |  Last changed: $Date: 2024-09-19 07:57:21 +0200 (Do, 19 Sep 2024) $
+## |  File version: $Revision: 8270 $
+## |  Last changed: $Date: 2024-09-25 16:37:39 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1698,54 +1698,22 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     return(invisible(x))
 }
 
-.getParameterSetVar <- function(fCall, var) {
-    varName <- deparse(fCall$var)
-    if (identical(varName, "NULL")) {
-        return(var)
-    }
-    
-    varNameExists <- !is.null(varName) && exists(varName)
-    if (varNameExists) {
-        return(var)
-    }
-    
-    if (grepl("\"|'", varName)) {
-        varName <- gsub('"', "", varName)
-        varName <- gsub("'", "", varName)
-        return(varName)
-    }
-
-    if (!varNameExists) {
-        var <- suppressWarnings(as.integer(varName))
-        if (!is.na(var)) {
-            return(var)
-        }
-        
-        varName <- gsub('"', "", varName)
-        varName <- gsub("'", "", varName)
-        return(varName)
-    }
-    
-    return(var)
-}
-
 #' 
 #' @rdname fetch.ParameterSet
 #' 
 #' @export 
 #' 
-pull <- function(x, var, output) UseMethod("pull")
+obtain <- function(x, ..., output) UseMethod("obtain")
 
 #'
 #' @rdname fetch.ParameterSet
 #' 
 #' @export 
 #' 
-pull.ParameterSet <- function(x, var = -1, output = c("named", "value", "list")) {
-    fCall <- match.call(expand.dots = FALSE)
-    var <- .getParameterSetVar(fCall, var)
+obtain.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "list")) {
+    fCall <- match.call(expand.dots = TRUE)
     output <- match.arg(output)
-    return(fetch.ParameterSet(x, var = var, output = output))
+    return(.fetchParameterSetValues(x, fCall, output))   
 }
 
 #' 
@@ -1753,26 +1721,7 @@ pull.ParameterSet <- function(x, var = -1, output = c("named", "value", "list"))
 #' 
 #' @export 
 #' 
-obtain <- function(x, var, output) UseMethod("obtain")
-
-#'
-#' @rdname fetch.ParameterSet
-#' 
-#' @export 
-#' 
-obtain.ParameterSet <- function(x, var = -1, output = c("named", "value", "list")) {
-    fCall <- match.call(expand.dots = FALSE)
-    var <- .getParameterSetVar(fCall, var)
-    output <- match.arg(output)
-    return(fetch.ParameterSet(x, var = var, output = output))
-}
-
-#' 
-#' @rdname fetch.ParameterSet
-#' 
-#' @export 
-#' 
-fetch <- function(x, var, output) UseMethod("fetch")
+fetch <- function(x, ..., output) UseMethod("fetch")
 
 #'
 #' @title
@@ -1782,7 +1731,7 @@ fetch <- function(x, var, output) UseMethod("fetch")
 #' Fetch a parameter from a parameter set.
 #' 
 #' @param x The \code{\link{ParameterSet}} object to fetch from.
-#' @param var A variable specified as: 
+#' @param ... One or more variables specified as: 
 #'  - a literal variable name 
 #'  - a positive integer, giving the position counting from the left 
 #'  - a negative integer, giving the position counting from the right. 
@@ -1797,19 +1746,164 @@ fetch <- function(x, var, output) UseMethod("fetch")
 #' 
 #' @export 
 #' 
-fetch.ParameterSet <- function(x, var = -1, output = c("named", "value", "list")) {
-    fCall <- match.call(expand.dots = FALSE)
-    var <- .getParameterSetVar(fCall, var)
+fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "list")) {
+    fCall <- match.call(expand.dots = TRUE)
     output <- match.arg(output)
+    return(.fetchParameterSetValues(x, fCall, output))   
+}
 
-    .assertIsParameterSetClass(x, "x")
+.getParameterSetVarIndices <- function(var, x) {
+    if (!is.character(var) && !is.call(var)) {
+        return(var)
+    }
     
+    if (is.character(var) && var %in% names(x)) {
+        return(var)
+    }
+    
+    if (is.call(var) ) {
+        var <- as.character(var)
+    }
+    
+    result <- try(eval(parse(text = var)), silent = TRUE)
+    if (methods::is(result, "try-error")) {
+        return(var)
+    }
+    
+    return(result)
+}
+
+.fetchParameterSetValues <- function(x, fCall, output) {
+    .assertIsParameterSetClass(x, "x")
+    vars <- c()
+    for (i in 2:length(fCall)) {
+        varValue <- fCall[[i]]
+        varName <- names(fCall)[i]
+        if (identical(varName, "")) {
+            varName <- deparse(varValue)
+        }
+        if (!(varName %in% c("x", "output"))) {
+            if (is.pairlist(varValue)) {
+                for (j in 1:length(varValue)) {
+                    var <- .getParameterSetVarNameOrIndex(
+                        varName = deparse(varValue[[j]]), 
+                        var = .getParameterSetVarIndices(varValue[[j]], x))
+                    vars <- c(vars, var)
+                }
+            } else {
+                var <- .getParameterSetVarNameOrIndex(varName, varValue)
+                var <- .getParameterSetVarIndices(var, x)
+                vars <- c(vars, var)
+            }
+        }
+    }
+    
+    if (length(vars) == 0) {
+        vars <- -1 
+    }
+    
+    if (length(vars) == 1) {
+        return(.getParameterSetValue(x = x, var = vars[[1]], output = output))
+    }
+    
+    results <- list()
+    for (var in vars) {
+        result <- .getParameterSetValue(x = x, var = var, output = output)
+        if (is.list(result) || (!is.null(names(result)) && !all(identical(names(result), "")))) {
+            results <- c(results, result)
+        } else {
+            results[[length(results) + 1]] <- result
+        }
+    }
+    return(results)  
+}
+
+.getParameterSetVar <- function(fCall, var) {
+    varName <- deparse(fCall$var)
+    return(.getParameterSetVarNameOrIndex(varName, var))
+}
+
+#' 
+#' @examples 
+#' .getParameterSetVarNameOrIndex("a", "a")
+#' .getParameterSetVarNameOrIndex("a", a)
+#' b <- 1
+#' .getParameterSetVarNameOrIndex("b", b)
+#' 
+#' @noRd 
+#' 
+.getParameterSetVarNameOrIndex <- function(varName, var) {
+    if (identical(varName, "NULL")) {
+        return(var)
+    }
+    
+    varNameExists <- !is.null(varName) && exists(varName)
+    if (varNameExists) {
+        return(var)
+    }
+    
+    if (grepl("\"|'", varName)) {
+        varName <- gsub('"', "", varName)
+        varName <- gsub("'", "", varName)
+        return(varName)
+    }
+    
+    var <- suppressWarnings(as.integer(varName))
+    if (!is.na(var)) {
+        return(var)
+    }
+    
+    varName <- gsub('"', "", varName)
+    varName <- gsub("'", "", varName)
+    return(varName)
+}
+
+.getParameterSetValue <- function(..., x, var, output) {
+    if (is.character(var) && 
+            identical(as.character(suppressWarnings(as.integer(var))), var)) {
+        var <- as.integer(var)
+    }
+    if (is.call(var)) {
+        var <- as.character(var)
+    }
+    if (is.list(var) && length(var) == 1) {
+        var <- var[[1]]
+    }
+    if (is.name(var)) {
+        var <- as.character(var)
+    }
     if (is.character(var)) {
+        varRoot <- var
+        varOriginal <- NA_character_
         if (!(var %in% names(x))) {
             var <- getParameterName(x, var)
+            if (is.na(var) && !is.null(x[[".design"]])) {
+                result <- getParameterName(x$.design, varRoot)
+                if (!is.na(result)) {
+                    var <- paste0(".design$", result)
+                }
+            }
+            if (length(var) > 1) {
+                var <- var[!grepl("^\\.", var)]
+            }
+            if (length(var) > 1) {
+                var <- var[1]
+            }
+            if (length(var) == 1 && !(var %in% names(x))) {
+                if (grepl("\\$", var)) {
+                    parts <- strsplit(var, "\\$")[[1]]
+                    if (length(parts) == 2) {
+                        x <- x[[parts[1]]]
+                        varOriginal <- var
+                        var <- parts[2]
+                    }
+                } else if (!is.null(x[[".design"]])) {
+                    x <- x$.design
+                }
+            }
         }
         if (length(var) == 0 || !(var %in% names(x))) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(var), " does not exist")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(varRoot), " does not exist")
         }
         
         value <- x[[var]]
@@ -1818,13 +1912,20 @@ fetch.ParameterSet <- function(x, var = -1, output = c("named", "value", "list")
             return(value)
         }
         
-        if (output == "named" && is.vector(value) && length(value) <= 1) {
-            names(value) <- var
+        label <- var
+        if (output == "labeled") {
+            label <- getParameterCaption(x, var)
+        } else if (!is.na(varOriginal)) {
+            label <- varOriginal
+        }
+        
+        if (output %in% c("named", "labeled") && is.vector(value) && length(value) <= 1) {
+            names(value) <- label
             return(value)
         }
         
         result <- list(value = value)
-        names(result) <- var
+        names(result) <- label
         return(result)
     }
     
@@ -1845,13 +1946,18 @@ fetch.ParameterSet <- function(x, var = -1, output = c("named", "value", "list")
         return(value)
     }
     
-    if (output == "named" && is.vector(value) && length(value) <= 1) {
-        names(value) <- names(x)[var]
+    label <- names(x)[var]
+    if (output == "labeled") {
+        label <- getParameterCaption(x, names(x)[var])
+    }
+    
+    if (output %in% c("named", "labeled") && is.vector(value) && length(value) <= 1) {
+        names(value) <- label
         return(value)
     }
     
     result <- list(value = value)
-    names(result) <- names(x)[var]
+    names(result) <- label
     return(result)
 }
 

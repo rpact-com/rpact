@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_core_output_formats.R
 ## |  Creation date: 08 November 2023, 09:09:35
-## |  File version: $Revision: 7665 $
-## |  Last changed: $Date: 2024-02-23 17:33:46 +0100 (Fr, 23 Feb 2024) $
+## |  File version: $Revision: 8260 $
+## |  Last changed: $Date: 2024-09-25 10:42:43 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -26,35 +26,35 @@ test_plan_section("Testing the Output Format Functions")
 test_that("'.formatPValues'", {
 	# @refFS[Sec.]{fs:sec:outputFormats}
 	# @refFS[Tab.]{fs:tab:outputFormats}
-	x <- .formatPValues(0.0000234)
+	design <- .formatPValues(0.0000234)
 
 	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, "<0.0001", label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, "<0.0001", label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
-	x <- .formatPValues(c(0.0000234, 0.0000134, 0.1234))
-
-	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("<0.0001", "<0.0001", "0.1234"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
-
-	x <- .formatPValues(c(0.0002345678, 0.0000134, 0.1234, 0.000000000001, .00000009999))
+	design <- .formatPValues(c(0.0000234, 0.0000134, 0.1234))
 
 	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("0.0002346", "0.0000134", "0.1234000", "<0.000001", "<0.000001"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, c("<0.0001", "<0.0001", "0.1234"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
-	x <- .formatPValues(c(0.00234, 0.000013, 0.1234, 0.000000000001, .00000009999))
-
-	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("0.00234", "<0.0001", "0.12340", "<0.0001", "<0.0001"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
-
-	x <- .formatPValues(c(6.244e-05, 4.906e-02, 1.446e-02, NA_real_))
+	design <- .formatPValues(c(0.0002345678, 0.0000134, 0.1234, 0.000000000001, .00000009999))
 
 	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("<0.0001", "0.04906", "0.01446", "NA"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, c("0.0002346", "0.0000134", "0.1234000", "<0.000001", "<0.000001"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
-	x <- .formatPValues(c(6.24408201934656e-05, 7.55449751868031e-05, 1.23207030919836e-05, NA_real_))
+	design <- .formatPValues(c(0.00234, 0.000013, 0.1234, 0.000000000001, .00000009999))
 
 	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("<0.0001", "<0.0001", "<0.0001", "NA"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, c("0.00234", "<0.0001", "0.12340", "<0.0001", "<0.0001"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
+
+	design <- .formatPValues(c(6.244e-05, 4.906e-02, 1.446e-02, NA_real_))
+
+	## Comparison of the results of character object 'x' with expected results
+	expect_equal(design, c("<0.0001", "0.04906", "0.01446", "NA"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
+
+	design <- .formatPValues(c(6.24408201934656e-05, 7.55449751868031e-05, 1.23207030919836e-05, NA_real_))
+
+	## Comparison of the results of character object 'x' with expected results
+	expect_equal(design, c("<0.0001", "<0.0001", "<0.0001", "NA"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
 })
 
@@ -62,20 +62,20 @@ test_that("'.formatRepeatedPValues'", {
 
 	# @refFS[Sec.]{fs:sec:outputFormats}
 	# @refFS[Tab.]{fs:tab:outputFormats}
-	x <- .formatRepeatedPValues(c(0.0000234, 0.0000134, 0.1234))
+	design <- .formatRepeatedPValues(c(0.0000234, 0.0000134, 0.1234))
 
 	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("<0.0001", "<0.0001", "0.1234"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, c("<0.0001", "<0.0001", "0.1234"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
-	x <- .formatRepeatedPValues(c(0.0000234, 0.0000134, 0.5234))
-
-	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("<0.0001", "<0.0001", ">0.5"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
-
-	x <- .formatRepeatedPValues(c(0.0000234, 0.0000134, 0.5234, NA_real_))
+	design <- .formatRepeatedPValues(c(0.0000234, 0.0000134, 0.5234))
 
 	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("<0.0001", "<0.0001", ">0.5", "NA"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, c("<0.0001", "<0.0001", ">0.5"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
+
+	design <- .formatRepeatedPValues(c(0.0000234, 0.0000134, 0.5234, NA_real_))
+
+	## Comparison of the results of character object 'x' with expected results
+	expect_equal(design, c("<0.0001", "<0.0001", ">0.5", "NA"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
 })
 
@@ -83,15 +83,15 @@ test_that("'.formatConditionalPower'", {
 
 	# @refFS[Sec.]{fs:sec:outputFormats}
 	# @refFS[Tab.]{fs:tab:outputFormats}
-	x <- .formatConditionalPower(c(0.0000234, 0.0000134, 0.5234, NA_real_))
+	design <- .formatConditionalPower(c(0.0000234, 0.0000134, 0.5234, NA_real_))
 
 	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("0", "0", "0.5234", "NA"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, c("0", "0", "0.5234", "NA"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
-	x <- .formatConditionalPower(c(0.234, 0.123456, 0.6, 0.000001))
+	design <- .formatConditionalPower(c(0.234, 0.123456, 0.6, 0.000001))
 
 	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("0.2340", "0.1235", "0.6000", "0"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, c("0.2340", "0.1235", "0.6000", "0"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
 })
 
@@ -99,10 +99,10 @@ test_that("'.formatProbabilities'", {
 
 	# @refFS[Sec.]{fs:sec:outputFormats}
 	# @refFS[Tab.]{fs:tab:outputFormats}
-	x <- .formatProbabilities(c(NA_real_, NA_real_, 0.4536623, 0.7713048))
+	design <- .formatProbabilities(c(NA_real_, NA_real_, 0.4536623, 0.7713048))
 
 	## Comparison of the results of character object 'x' with expected results
-	expect_equal(x, c("NA", "NA", "0.4537", "0.7713"), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, c("NA", "NA", "0.4537", "0.7713"), label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
 })
 
@@ -110,25 +110,25 @@ test_that("'.getDecimalPlaces'", {
 
 	# @refFS[Sec.]{fs:sec:outputFormats}
 	# @refFS[Tab.]{fs:tab:outputFormats}
-	x <- .getDecimalPlaces(NA)
+	design <- .getDecimalPlaces(NA)
 
 	## Comparison of the results of integer object 'x' with expected results
-	expect_equal(x, 0, label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, 0, label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
-	x <- .getDecimalPlaces(12.123)
-
-	## Comparison of the results of integer object 'x' with expected results
-	expect_equal(x, 3, label = paste0("c(", paste0(x, collapse = ", "), ")"))
-
-	x <- .getDecimalPlaces(c(6.661338e-16, 8.000000e-01, NA_real_))
+	design <- .getDecimalPlaces(12.123)
 
 	## Comparison of the results of integer object 'x' with expected results
-	expect_equal(x, c(15, 1, 0), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, 3, label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
-	x <- .getDecimalPlaces(c(6.661338e-16, 8.12300000e-02))
+	design <- .getDecimalPlaces(c(6.661338e-16, 8.000000e-01, NA_real_))
 
 	## Comparison of the results of integer object 'x' with expected results
-	expect_equal(x, c(15, 5), label = paste0("c(", paste0(x, collapse = ", "), ")"))
+	expect_equal(design, c(15, 1, 0), label = paste0("c(", paste0(design, collapse = ", "), ")"))
+
+	design <- .getDecimalPlaces(c(6.661338e-16, 8.12300000e-02))
+
+	## Comparison of the results of integer object 'x' with expected results
+	expect_equal(design, c(15, 5), label = paste0("c(", paste0(design, collapse = ", "), ")"))
 
 })
 

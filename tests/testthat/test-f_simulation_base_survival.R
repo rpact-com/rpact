@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_base_survival.R
 ## |  Creation date: 16 September 2024, 08:44:51
-## |  File version: $Revision: 8214 $
-## |  Last changed: $Date: 2024-09-16 09:57:16 +0200 (Mo, 16 Sep 2024) $
+## |  File version: $Revision: 8260 $
+## |  Last changed: $Date: 2024-09-25 10:42:43 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -24,6 +24,8 @@ test_plan_section("Testing Simulation Survival Function")
 
 
 test_that("'getSimulationSurvival': configuration 1", {
+    .skipTestIfDisabled()
+    
     # @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
     # @refFS[Sec.]{fs:sec:simulatingTestingOneHypothesis}
     # @refFS[Tab.]{fs:tab:output:getSimulationSurvival}

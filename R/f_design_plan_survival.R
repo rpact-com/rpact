@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8266 $
+## |  Last changed: $Date: 2024-09-25 15:19:20 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -758,8 +758,8 @@ NULL
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {
         designPlan$criticalValuesPValueScale <- designPlan$criticalValuesPValueScale * 2
-        designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_GENERATED)
     }
+    designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_NOT_APPLICABLE)
 
     if (.hasApplicableFutilityBounds(design)) {
         designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)
