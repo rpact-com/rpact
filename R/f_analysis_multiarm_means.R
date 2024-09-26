@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8276 $
+## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -383,7 +383,7 @@ NULL
         design = design,
         dataInput = dataInput,
         thetaH0 = thetaH0,
-        direction = ifelse(directionUpper, C_DIRECTION_UPPER, C_DIRECTION_LOWER),
+        direction = ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER),
         normalApproximation = normalApproximation,
         directionUpper = directionUpper,
         varianceOption = varianceOption,
@@ -570,8 +570,9 @@ NULL
                         }
                         singleStepAdjustedPValues[treatmentArm, k] <- 1 - .getMultivariateDistribution(
                             type = ifelse(normalApproximation, "normal", "t"),
-                            upper = ifelse(directionUpper,
-                                testStatistics[treatmentArm, k], -testStatistics[treatmentArm, k]
+                            upper = ifelse(!isFALSE(directionUpper),
+                                testStatistics[treatmentArm, k], 
+                                -testStatistics[treatmentArm, k]
                             ),
                             sigma = sigma, df = df
                         )

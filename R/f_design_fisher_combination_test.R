@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8195 $
-## |  Last changed: $Date: 2024-09-11 14:50:27 +0200 (Mi, 11 Sep 2024) $
+## |  File version: $Revision: 8274 $
+## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -102,8 +102,8 @@ getDesignFisher <- function(...,
     ))
 }
 
-.getDesignFisherDefaultValues <- function() {
-    return(list(
+.getDesignFisherDefaultValues <- function(designFun = NULL) {
+    defaultValues <- list(
         kMax = NA_integer_,
         alpha = NA_real_,
         method = C_FISHER_METHOD_DEFAULT,
@@ -112,10 +112,18 @@ getDesignFisher <- function(...,
         informationRates = NA_real_,
         sided = 1,
         bindingFutility = C_BINDING_FUTILITY_FISHER_DEFAULT,
+        directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_FISHER_DEFAULT,
         iterations = 0,
         seed = NA_real_
-    ))
+    )
+
+    if (is.null(designFun)) {
+        return(defaultValues)
+    }
+    
+    .assertAllArgumentsHaveDefaultValues(designFun, defaultValues)
+    return(defaultValues)
 }
 
 #'

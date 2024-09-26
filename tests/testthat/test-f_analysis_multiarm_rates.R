@@ -15,14 +15,16 @@
 ## |
 ## |  File name: test-f_analysis_multiarm_rates.R
 ## |  Creation date: 08 November 2023, 09:07:05
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8260 $
+## |  Last changed: $Date: 2024-09-25 10:42:43 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing the Analysis Rates Functionality for Three or More Treatments")
 
 test_that("'getAnalysisResultsMultiArm' with dataset of rates", {
+    .skipTestIfDisabled()
+        
     design1 <- getDesignInverseNormal(
         kMax = 4, alpha = 0.02, futilityBounds = c(-0.5, 0, 0.5),
         bindingFutility = FALSE, typeOfDesign = "asKD", gammaA = 1.2, informationRates = c(0.15, 0.4, 0.7, 1)
@@ -116,8 +118,6 @@ test_that("'getAnalysisResultsMultiArm' with dataset of rates", {
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
-
-    .skipTestIfDisabled()
 
     # @refFS[Formula]{fs:multiarmRejectionRule}
     # @refFS[Formula]{fs:adjustedPValueDunnett}

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8276 $
+## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -409,7 +409,7 @@ NULL
         weightsFisher = weightsFisher,
         weightsInverseNormal = weightsInverseNormal,
         thetaH0 = thetaH0,
-        direction = ifelse(directionUpper, C_DIRECTION_UPPER, C_DIRECTION_LOWER)
+        direction = ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER)
     )
 
     if (.isTrialDesignFisher(design)) {
@@ -1241,8 +1241,7 @@ NULL
         stderr <- (1 + y$overallAllocationRatios[finalStage]) / sqrt(y$overallAllocationRatios[finalStage]) /
             sqrt(stageResults$overallEvents[finalStage])
 
-        directionUpperSign <- ifelse(directionUpper, 1, -1)
-
+        directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
         if (stageGroupSeq == 1) {
             finalConfidenceInterval <- exp(stderr * finalConfidenceIntervalGeneral + log(thetaH0))
             medianUnbiased <- exp(stderr * medianUnbiasedGeneral + log(thetaH0))
@@ -1371,7 +1370,7 @@ NULL
         stderr <- (1 + y$overallAllocationRatios[finalStage]) / sqrt(y$overallAllocationRatios[finalStage]) /
             sqrt(stageResults$overallEvents[finalStage])
 
-        directionUpperSign <- ifelse(directionUpper, 1, -1)
+        directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
         if (stageInvNormal == 1) {
             finalConfidenceInterval <- exp(stderr * finalConfidenceIntervalGeneral + log(thetaH0))
             medianUnbiased <- exp(stderr * medianUnbiasedGeneral + log(thetaH0))

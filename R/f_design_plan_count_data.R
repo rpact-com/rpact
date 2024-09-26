@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8227 $
-## |  Last changed: $Date: 2024-09-18 14:47:52 +0200 (Mi, 18 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8268 $
+## |  Last changed: $Date: 2024-09-25 16:14:45 +0200 (Mi, 25 Sep 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 .getVarianceEstimate <- function(lambda1,
@@ -224,13 +224,13 @@
                 recruit2 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] / (1 + ar))
             }
         }
-
+        
         # calculate theta that solves (ln(theta) - ln(thetaH0) sqrt(FisherInformation_k) = boundary
         for (j in seq_len(length(criticalValues))) {
             if (all(is.na(numberOfSubjects[, iCase]))) {
-                numberOfSubjectsStage <- maxNumberOfSubjects[iCase]
+                numberOfSubjectsPerStage <- maxNumberOfSubjects[iCase]
             } else {
-                numberOfSubjectsStage <- numberOfSubjects[j, iCase]
+                numberOfSubjectsPerStage <- numberOfSubjects[j, iCase]
             }
             criticalValuesEffectScaleUpper[j, iCase] <- .findThetaUniRoot(
                 criticalValues[j],
@@ -238,9 +238,9 @@
                 directionUpper[iCase],
                 ar, overdispersion, accrualTime,
                 followUpTime[iCase], fixedExposureTime,
-                numberOfSubjectsStage,
-                recruit1[1:(ar * numberOfSubjectsStage / (1 + ar))],
-                recruit2[1:(numberOfSubjectsStage / (1 + ar))]
+                numberOfSubjectsPerStage,
+                recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
+                recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
             )
 
             if (design$sided == 2) {
@@ -250,9 +250,9 @@
                     directionUpper[iCase],
                     ar, overdispersion, accrualTime,
                     followUpTime[iCase], fixedExposureTime,
-                    numberOfSubjectsStage,
-                    recruit1[1:(ar * numberOfSubjectsStage / (1 + ar))],
-                    recruit2[1:(numberOfSubjectsStage / (1 + ar))]
+                    numberOfSubjectsPerStage,
+                    recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
+                    recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
                 )
             }
         }
@@ -260,9 +260,9 @@
         if (!all(is.na(futilityBounds))) {
             for (j in seq_len(length(futilityBounds))) {
                 if (all(is.na(numberOfSubjects[, iCase]))) {
-                    numberOfSubjectsStage <- maxNumberOfSubjects[iCase]
+                    numberOfSubjectsPerStage <- maxNumberOfSubjects[iCase]
                 } else {
-                    numberOfSubjectsStage <- numberOfSubjects[j, iCase]
+                    numberOfSubjectsPerStage <- numberOfSubjects[j, iCase]
                 }
                 futilityBoundsEffectScaleUpper[j, iCase] <- .findThetaUniRoot(
                     futilityBounds[j],
@@ -270,9 +270,9 @@
                     directionUpper[iCase],
                     ar, overdispersion, accrualTime,
                     followUpTime[iCase], fixedExposureTime,
-                    numberOfSubjectsStage,
-                    recruit1[1:(ar * numberOfSubjectsStage / (1 + ar))],
-                    recruit2[1:(numberOfSubjectsStage / (1 + ar))]
+                    numberOfSubjectsPerStage,
+                    recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
+                    recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
                 )
             }
 
@@ -285,9 +285,9 @@
                     directionUpper[iCase],
                     ar, overdispersion, accrualTime,
                     followUpTime[iCase], fixedExposureTime,
-                    numberOfSubjectsStage,
-                    recruit1[1:(ar * numberOfSubjectsStage / (1 + ar))],
-                    recruit2[1:(numberOfSubjectsStage / (1 + ar))]
+                    numberOfSubjectsPerStage,
+                    recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
+                    recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
                 )
             }
         }
@@ -546,10 +546,8 @@
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {
         designPlan$criticalValuesPValueScale <- designPlan$criticalValuesPValueScale * 2
-        designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_GENERATED)
-    } else {
-        designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_NOT_APPLICABLE)
     }
+    designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_NOT_APPLICABLE)
 
     if (.hasApplicableFutilityBounds(design)) {
         designPlan$futilityBoundsPValueScale <-

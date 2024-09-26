@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8276 $
+## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -337,10 +337,14 @@ NULL
         # final confidence interval & median unbiased estimate
         startTime <- Sys.time()
         finalConfidenceIntervals <- .getFinalConfidenceIntervalMeans(
-            design = design, dataInput = dataInput,
-            thetaH0 = thetaH0, stage = stage, directionUpper = directionUpper,
+            design = design, 
+            dataInput = dataInput,
+            thetaH0 = thetaH0, 
+            stage = stage, 
+            directionUpper = directionUpper,
             normalApproximation = normalApproximation,
-            equalVariances = equalVariances, tolerance = tolerance
+            equalVariances = equalVariances, 
+            tolerance = tolerance
         )
 
         if (!is.null(finalConfidenceIntervals)) {
@@ -536,7 +540,7 @@ NULL
     
     direction <- "undefined"
     if (design$sided == 1) {
-        direction <- ifelse(directionUpper, C_DIRECTION_UPPER, C_DIRECTION_LOWER)
+        direction <- ifelse(!isFALSE(directionUpper), C_DIRECTION_UPPER, C_DIRECTION_LOWER)
     }
 
     if (dataInput$getNumberOfGroups() == 1) {
@@ -1604,21 +1608,27 @@ NULL
 
             finalConfidenceIntervalGeneral[1] <- .getDecisionMatrixRoot(
                 design = design,
-                stage = finalStage, stageResults = stageResults, tolerance = tolerance,
+                stage = finalStage, 
+                stageResults = stageResults, 
+                tolerance = tolerance,
                 firstParameterName = firstParameterName,
                 case = "finalConfidenceIntervalGeneralLower"
             )
 
             finalConfidenceIntervalGeneral[2] <- .getDecisionMatrixRoot(
                 design = design,
-                stage = finalStage, stageResults = stageResults, tolerance = tolerance,
+                stage = finalStage, 
+                stageResults = stageResults, 
+                tolerance = tolerance,
                 firstParameterName = firstParameterName,
                 case = "finalConfidenceIntervalGeneralUpper"
             )
 
             medianUnbiasedGeneral <- .getDecisionMatrixRoot(
                 design = design,
-                stage = finalStage, stageResults = stageResults, tolerance = tolerance,
+                stage = finalStage, 
+                stageResults = stageResults, 
+                tolerance = tolerance,
                 firstParameterName = firstParameterName,
                 case = "medianUnbiasedGeneral"
             )
@@ -1649,7 +1659,7 @@ NULL
             finalConfidenceInterval[1] <- medianUnbiased - value
             finalConfidenceInterval[2] <- medianUnbiased + value
         } else {
-            directionUpperSign <- ifelse(directionUpper, 1, -1)
+            directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
             finalConfidenceInterval <- finalConfidenceIntervalGeneral *
                 stageResults$overallStDevs[finalStage] + directionUpperSign * thetaH0
             medianUnbiased <- medianUnbiasedGeneral *
@@ -1933,7 +1943,8 @@ NULL
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
     .warnInCaseOfUnknownArguments(
         functionName = "getFinalConfidenceIntervalMeans",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"), ...
+        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+            design, powerCalculationEnabled = TRUE), "stage"), ...
     )
 
     if (design$kMax == 1) {
@@ -1952,25 +1963,40 @@ NULL
 
     if (.isTrialDesignGroupSequential(design)) {
         return(.getFinalConfidenceIntervalMeansGroupSequential(
-            design = design, dataInput = dataInput, stage = stage, thetaH0 = thetaH0,
-            directionUpper = directionUpper, normalApproximation = normalApproximation,
-            equalVariances = equalVariances, tolerance = tolerance
+            design = design, 
+            dataInput = dataInput, 
+            stage = stage, 
+            thetaH0 = thetaH0,
+            directionUpper = directionUpper, 
+            normalApproximation = normalApproximation,
+            equalVariances = equalVariances, 
+            tolerance = tolerance
         ))
     }
 
     if (.isTrialDesignInverseNormal(design)) {
         return(.getFinalConfidenceIntervalMeansInverseNormal(
-            design = design, dataInput = dataInput, stage = stage, thetaH0 = thetaH0,
-            directionUpper = directionUpper, normalApproximation = normalApproximation,
-            equalVariances = equalVariances, tolerance = tolerance
+            design = design, 
+            dataInput = dataInput, 
+            stage = stage, 
+            thetaH0 = thetaH0,
+            directionUpper = directionUpper, 
+            normalApproximation = normalApproximation,
+            equalVariances = equalVariances, 
+            tolerance = tolerance
         ))
     }
 
     if (.isTrialDesignFisher(design)) {
         return(.getFinalConfidenceIntervalMeansFisher(
-            design = design, dataInput = dataInput, stage = stage, thetaH0 = thetaH0,
-            directionUpper = directionUpper, normalApproximation = normalApproximation,
-            equalVariances = equalVariances, tolerance = tolerance
+            design = design, 
+            dataInput = dataInput, 
+            stage = stage, 
+            thetaH0 = thetaH0,
+            directionUpper = directionUpper, 
+            normalApproximation = normalApproximation,
+            equalVariances = equalVariances, 
+            tolerance = tolerance
         ))
     }
 

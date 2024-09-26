@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8274 $
+## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -402,14 +402,23 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             call. = FALSE
         )
     }
-    if (is.na(twoSidedPower)) {
+    if (design$sided == 1) {
         design$twoSidedPower <- C_TWO_SIDED_POWER_DEFAULT
-        design$.setParameterType("twoSidedPower", C_PARAM_DEFAULT_VALUE)
+        design$.setParameterType("twoSidedPower", C_PARAM_NOT_APPLICABLE)
+        if (!is.na(twoSidedPower)) {
+            warning("'twoSidedPower' (", twoSidedPower, ") will be ignored because it is ",
+                "only applicable for two-sided testing", call. = FALSE)
+        }
     } else {
-        design$twoSidedPower <- twoSidedPower
-        design$.setParameterType("twoSidedPower", ifelse(
-            twoSidedPower == C_TWO_SIDED_POWER_DEFAULT, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
-        ))
+        if (is.na(twoSidedPower)) {
+            design$twoSidedPower <- C_TWO_SIDED_POWER_DEFAULT
+            design$.setParameterType("twoSidedPower", C_PARAM_DEFAULT_VALUE)
+        } else {
+            design$twoSidedPower <- twoSidedPower
+            design$.setParameterType("twoSidedPower", ifelse(
+                twoSidedPower == C_TWO_SIDED_POWER_DEFAULT, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+            ))
+        }
     }
     if (design$sided == 2 && grepl("^bs", design$typeBetaSpending)) {
         if (is.na(betaAdjustment)) {
@@ -1118,8 +1127,19 @@ getDesignInverseNormal <- function(...,
     ))
 }
 
-.getDesignGroupSequentialDefaultValues <- function() {
-    return(list(
+.assertAllArgumentsHaveDefaultValues <- function(designFun, defaultValues) {
+    argNames <- methods::formalArgs(designFun)
+    argNames <- argNames[argNames != "..."]
+    missingArgNames <- argNames[!(argNames %in% names(defaultValues))]
+    if (length(missingArgNames) > 0) {
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+            ".getDesignGroupSequentialDefaultValues() does return the arguments ",
+            .arrayToString(missingArgNames, encapsulate = TRUE))
+    }
+}
+
+.getDesignGroupSequentialDefaultValues <- function(designFun = NULL) {
+    defaultValues <- list(
         kMax = NA_integer_,
         alpha = NA_real_,
         beta = NA_real_,
@@ -1136,9 +1156,20 @@ getDesignInverseNormal <- function(...,
         userAlphaSpending = NA_real_,
         userBetaSpending = NA_real_,
         gammaB = NA_real_,
-        twoSidedPower = C_TWO_SIDED_POWER_DEFAULT,
+        bindingFutility = NA,
+        directionUpper = NA,
+        betaAdjustment = NA,
+        constantBoundsHP = C_CONST_BOUND_HP_DEFAULT,
+        twoSidedPower = NA,
+        delayedInformation = NA_real_,
         tolerance = C_DESIGN_TOLERANCE_DEFAULT
-    ))
+    )
+    if (is.null(designFun)) {
+        return(defaultValues)
+    }
+    
+    .assertAllArgumentsHaveDefaultValues(designFun, defaultValues)
+    return(defaultValues)
 }
 
 .getDesignInverseNormalDefaultValues <- function() {
@@ -1661,7 +1692,8 @@ getDesignInverseNormal <- function(...,
 #'
 #' @export
 #'
-getDesignGroupSequential <- function(...,
+getDesignGroupSequential <- function(
+        ...,
         kMax = NA_integer_,
         alpha = NA_real_,
         beta = NA_real_,
@@ -1686,6 +1718,7 @@ getDesignGroupSequential <- function(...,
         delayedInformation = NA_real_,
         tolerance = 1e-08 # C_DESIGN_TOLERANCE_DEFAULT
         ) {
+            
     .warnInCaseOfUnknownArguments(functionName = "getDesignGroupSequential", ...)
     return(.getDesignGroupSequential(
         designClass = C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL,
@@ -1716,14 +1749,14 @@ getDesignGroupSequential <- function(...,
     ))
 }
 
-.getFixedSampleSize <- function(alpha, beta, sided, twoSidedPower = C_TWO_SIDED_POWER_DEFAULT) {
+.getFixedSampleSize <- function(..., alpha, beta, sided, twoSidedPower) {
     .assertIsValidAlphaAndBeta(alpha = alpha, beta = beta)
     .assertIsValidSidedParameter(sided)
 
     if (sided == 1) {
         return((.getOneMinusQNorm(alpha) + .getOneMinusQNorm(beta))^2)
     }
-    if (twoSidedPower) {
+    if (isTRUE(twoSidedPower)) {
         n <- .getOneDimensionalRoot(
             function(n) {
                 stats::pnorm(-.getOneMinusQNorm(alpha / 2) - sqrt(n)) -
@@ -1817,8 +1850,10 @@ getDesignCharacteristics <- function(design = NULL, ...) {
     designCharacteristics$.setParameterType("futilityProbabilities", C_PARAM_NOT_APPLICABLE)
 
     nFixed <- .getFixedSampleSize(
-        alpha = design$alpha, beta = design$beta,
-        sided = design$sided, twoSidedPower = design$twoSidedPower
+        alpha = design$alpha, 
+        beta = design$beta,
+        sided = design$sided, 
+        twoSidedPower = design$twoSidedPower
     )
     designCharacteristics$nFixed <- nFixed
     designCharacteristics$.setParameterType("nFixed", C_PARAM_GENERATED)

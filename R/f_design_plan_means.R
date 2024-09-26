@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8252 $
-## |  Last changed: $Date: 2024-09-23 13:03:24 +0200 (Mo, 23 Sep 2024) $
+## |  File version: $Revision: 8274 $
+## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -64,11 +64,10 @@ NULL
             # outside validated range
             futilityBounds[abs(futilityBounds) > 50] <- NA_real_
             if (any(is.na(futilityBounds))) {
-                warning("The computation of futility boundar",
-                    ifelse(numberOfNAs == 1, "y", "ies"), " ",
-                    "on treatment effect scale not performed presumably ",
-                    "due to too small degrees of freedom",
-                    call. = FALSE
+                warning("The computation of futility boundaries on ",
+                        "treatment effect scale not performed presumably ",
+                        "due to too small degrees of freedom",
+                        call. = FALSE
                 )
             }
         } else {
@@ -174,11 +173,18 @@ NULL
     ))
 }
 
-.getSampleSizeFixedMeans <- function(..., alpha = 0.025, beta = 0.2, sided = 1,
+.getSampleSizeFixedMeans <- function(
+        ..., 
+        alpha = 0.025, 
+        beta = 0.2, 
+        sided = 1,
         twoSidedPower = C_TWO_SIDED_POWER_DEFAULT,
-        normalApproximation = FALSE, meanRatio = FALSE,
-        thetaH0 = 0, alternative = C_ALTERNATIVE_DEFAULT,
-        stDev = C_STDEV_DEFAULT, groups = 2,
+        normalApproximation = FALSE, 
+        meanRatio = FALSE,
+        thetaH0 = 0, 
+        alternative = C_ALTERNATIVE_DEFAULT,
+        stDev = C_STDEV_DEFAULT, 
+        groups = 2,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
     nFixed <- rep(NA_real_, length(alternative))
 
@@ -575,8 +581,8 @@ NULL
     designPlan$criticalValuesPValueScale <- matrix(design$stageLevels, ncol = 1)
     if (design$sided == 2) {
         designPlan$criticalValuesPValueScale <- designPlan$criticalValuesPValueScale * 2
-        designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_GENERATED)
     }
+    designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_NOT_APPLICABLE)
 
     if (.hasApplicableFutilityBounds(design)) {
         designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)

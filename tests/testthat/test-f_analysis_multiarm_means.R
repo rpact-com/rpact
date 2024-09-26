@@ -15,14 +15,17 @@
 ## |
 ## |  File name: test-f_analysis_multiarm_means.R
 ## |  Creation date: 08 November 2023, 08:56:03
-## |  File version: $Revision: 7928 $
-## |  Last changed: $Date: 2024-05-23 16:35:16 +0200 (Do, 23 Mai 2024) $
+## |  File version: $Revision: 8260 $
+## |  Last changed: $Date: 2024-09-25 10:42:43 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 test_plan_section("Testing the Analysis Means Functionality for Three or More Treatments")
 
 test_that("'getAnalysisResultsMultiArm' with dataset of means", {
+        
+    .skipTestIfDisabled()
+        
     design1 <- getDesignInverseNormal(
         kMax = 4, alpha = 0.02, futilityBounds = c(-0.5, 0, 0.5),
         bindingFutility = FALSE, typeOfDesign = "asKD", gammaA = 1.2, informationRates = c(0.15, 0.4, 0.7, 1)
@@ -135,8 +138,6 @@ test_that("'getAnalysisResultsMultiArm' with dataset of means", {
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
-
-    .skipTestIfDisabled()
 
     # @refFS[Formula]{fs:multiarmRejectionRule}
     # @refFS[Formula]{fs:adjustedPValueDunnett}

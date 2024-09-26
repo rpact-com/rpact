@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_base_rates.R
 ## |  Creation date: 16 September 2024, 08:44:48
-## |  File version: $Revision: 8214 $
-## |  Last changed: $Date: 2024-09-16 09:57:16 +0200 (Mo, 16 Sep 2024) $
+## |  File version: $Revision: 8274 $
+## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -24,6 +24,8 @@ test_plan_section("Testing Simulation Rates Function")
 
 
 test_that("'getSimulationRates': check several configurations", {
+    .skipTestIfDisabled()
+    
     # @refFS[Sec.]{fs:sec:reproducibilityOfSimulationResults}
     # @refFS[Sec.]{fs:sec:simulatingTestingOneHypothesis}
     # @refFS[Tab.]{fs:tab:output:getSimulationRates}
@@ -152,8 +154,6 @@ test_that("'getSimulationRates': check several configurations", {
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
-
-    .skipTestIfDisabled()
 
     x3 <- getSimulationRates(
         design = getDesignInverseNormal(
@@ -740,10 +740,8 @@ test_that("'getSimulationRates': comparison with getPowerRates() results for a i
     # @refFS[Formula]{fs:testStatisticNormalCombinationTest}
     # @refFS[Formula]{fs:testStatisticFisherCombinationTest}
     design <- getDesignInverseNormal(futilityBounds = c(-1), informationRates = c(0.5, 1), typeOfDesign = "P")
-    design2 <- getDesignInverseNormal(
-        futilityBounds = c(-1),
-        informationRates = c(0.5, 1), typeOfDesign = "P", directionUpper = FALSE
-    )
+    design2 <- getDesignInverseNormal(futilityBounds = c(-1), 
+        informationRates = c(0.5, 1), typeOfDesign = "P", directionUpper = FALSE)
     x <- getSimulationRates(design,
         thetaH0 = 0.4, groups = 1, plannedSubjects = c(150, 300), pi1 = seq(0.3, 0.4, 0.02),
         maxNumberOfIterations = 1000,
@@ -781,7 +779,6 @@ test_that("'getSimulationRates': comparison with getPowerRates() results for a i
 
     ## Comparison of the results of matrix object 'futilityPerStageDiff' with expected results
     expect_equal(futilityPerStageDiff[1, ], c(-0.9426, -0.8457, -0.6878, -0.4828, -0.2656, -0.0147), tolerance = 1e-07, label = paste0(futilityPerStageDiff[1, ]))
-
 
     ## Pairwise comparison of the results of x with the results of x2
     expect_equal(x$effect, x2$effect, tolerance = 1e-07)

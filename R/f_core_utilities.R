@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8276 $
+## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1072,15 +1072,14 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
 #'
 getParameterCaption <- function(obj, var) {
     fCall <- match.call(expand.dots = FALSE)
-    parameterName <- .getParameterSetVar(fCall, var)
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
             "(", .getClassName(obj), ") must be an rpact result object"
         )
     }
+    parameterName <- .getParameterSetVar(fCall, var)
     .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
-
     return(.getParameterCaption(parameterName, obj))
 }
 
@@ -1165,18 +1164,22 @@ getParameterName <- function(obj, parameterCaption) {
         )
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
+    parameterCaption <- trimws(parameterCaption)
+    if (parameterCaption %in% names(obj)) {
+        return(parameterCaption)
+    }
 
+    fieldNames <- obj$.getVisibleFieldNames()
     parameterName <- getDictionaryKeyByValue(C_PARAMETER_NAMES, parameterCaption)
-    if (!is.null(parameterName)) {
+    if (!is.null(parameterName) && length(parameterName) == 1 && parameterName %in% fieldNames) {
         return(parameterName)
     }
 
     parameterName <- getDictionaryKeyByValue(C_PARAMETER_NAMES_PLOT_SETTINGS, parameterCaption)
-    if (!is.null(parameterName)) {
+    if (!is.null(parameterName) && length(parameterName) == 1 && parameterName %in% fieldNames) {
         return(parameterName)
     }
 
-    fieldNames <- obj$.getVisibleFieldNames()
     for (parameterName in fieldNames) {
         if (identical(.getParameterCaption(parameterName, obj), parameterCaption)) {
             return(parameterName)
@@ -1186,8 +1189,15 @@ getParameterName <- function(obj, parameterCaption) {
             return(parameterName)
         }
     }
+    
+    if (!is.null(obj[[".design"]])) {
+        result <- getParameterName(obj$.design, parameterCaption)
+        if (!is.na(result)) {
+            return(paste0(".design$", result))
+        }
+    }
 
-    return("unknown")
+    return(NA_character_)
 }
 
 .removeLastEntryFromArray <- function(x) {

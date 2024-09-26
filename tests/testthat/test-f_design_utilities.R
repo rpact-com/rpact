@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_design_utilities.R
 ## |  Creation date: 08 November 2023, 09:10:53
-## |  File version: $Revision: 7560 $
-## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
+## |  File version: $Revision: 8274 $
+## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
@@ -351,5 +351,10 @@ test_that("'.convertStageWiseToOverallValues': test that function is working as 
 	## Comparison of the results of matrixarray object 'x5' with expected results
 	expect_equal(x5[1, ], c(1, 2, 3, 4, 5), label = paste0("c(", paste0(x5[1, ], collapse = ", "), ")"))
 	expect_equal(x5[2, ], c(2, 4, 6, 8, 10), label = paste0("c(", paste0(x5[2, ], collapse = ", "), ")"))
+})
+
+test_that("The default value functions for all designs have all arguments included", {
+    testthat::expect_error(.getDesignGroupSequentialDefaultValues(designFun = getDesignGroupSequential), NA)
+    testthat::expect_error(.getDesignFisherDefaultValues(designFun = getDesignFisher), NA)
 })
 

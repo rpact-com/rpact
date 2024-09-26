@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8238 $
-## |  Last changed: $Date: 2024-09-19 13:06:01 +0200 (Do, 19 Sep 2024) $
+## |  File version: $Revision: 8274 $
+## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1069,6 +1069,18 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
 }
 
 .getParameterCaption <- function(parameterName, obj = NULL, ..., tableOutputEnabled = FALSE) {
+    .assertIsSingleCharacter(parameterName, "parameterName")
+    
+    if (grepl("\\$", parameterName)) {
+        parts <- strsplit(parameterName, "\\$", fixed = TRUE)[[1]]
+        if (length(parts) == 2) {
+            if (!is.null(obj[[parts[1]]])) {
+                obj <- obj[[parts[1]]]
+            }
+            parameterName <- parts[2]
+        }
+    }
+    
     if (is.null(obj)) {
         if (tableOutputEnabled) {
             return(C_TABLE_COLUMN_NAMES[[parameterName]])
