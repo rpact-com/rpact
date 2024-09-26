@@ -102,8 +102,8 @@ getDesignFisher <- function(...,
     ))
 }
 
-.getDesignFisherDefaultValues <- function() {
-    return(list(
+.getDesignFisherDefaultValues <- function(designFun = NULL) {
+    defaultValues <- list(
         kMax = NA_integer_,
         alpha = NA_real_,
         method = C_FISHER_METHOD_DEFAULT,
@@ -112,10 +112,18 @@ getDesignFisher <- function(...,
         informationRates = NA_real_,
         sided = 1,
         bindingFutility = C_BINDING_FUTILITY_FISHER_DEFAULT,
+        directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_FISHER_DEFAULT,
         iterations = 0,
         seed = NA_real_
-    ))
+    )
+
+    if (is.null(designFun)) {
+        return(defaultValues)
+    }
+    
+    .assertAllArgumentsHaveDefaultValues(designFun, defaultValues)
+    return(defaultValues)
 }
 
 #'

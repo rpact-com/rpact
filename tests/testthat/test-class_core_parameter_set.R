@@ -30,7 +30,7 @@ test_that("Test fetch method", {
     
     kMax <- 7
     design |> fetch(kMax) |> expect_equal(c(kMax = 3))
-    design |> fetch(kMax = 4) |> expect_equal(
+    design |> fetch(informationRates = 4) |> expect_equal(
         list(informationRates = c(0.3333333, 0.6666667, 1)), tolerance = 1e-6)
     
     i <- 7
@@ -65,7 +65,7 @@ test_that("Test obtain method", {
     
     kMax <- 7
     design |> obtain(kMax) |> expect_equal(c(kMax = 3))
-    design |> obtain(kMax = 4) |> expect_equal(
+    design |> obtain(informationRates = 4) |> expect_equal(
         list(informationRates = c(0.3333333, 0.6666667, 1)), tolerance = 1e-6)
     
     i <- 7

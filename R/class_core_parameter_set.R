@@ -469,7 +469,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         warning("Failed to show parameter '", parameterName, "': ", e$message)
                     }
                 }
-            )
+            ) 
         },
         .showParameterSingle = function(param,
                 parameterName, ...,
@@ -591,12 +591,21 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 )
             }
         },
-        .showParameterFormatted = function(paramName, paramValue, ..., paramValueFormatted = NA_character_,
-                showParameterType = FALSE, category = NULL, matrixRow = NA_integer_, consoleOutputEnabled = TRUE,
-                paramNameRaw = NA_character_, numberOfCategories = NA_integer_) {
+        .showParameterFormatted = function(
+                paramName, 
+                paramValue, 
+                ..., 
+                paramValueFormatted = NA_character_,
+                showParameterType = FALSE, 
+                category = NULL, 
+                matrixRow = NA_integer_, 
+                consoleOutputEnabled = TRUE,
+                paramNameRaw = NA_character_, 
+                numberOfCategories = NA_integer_) {
                 
+            paramCaption <- NULL
             if (!is.na(paramNameRaw)) {
-                paramCaption <- .getParameterCaption(paramNameRaw, self)
+                paramCaption <- .getParameterCaption(paramNameRaw, self) 
             }
             if (is.null(paramCaption)) {
                 paramCaption <- .getParameterCaption(paramName, self)

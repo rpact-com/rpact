@@ -1072,9 +1072,11 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     .assertIsSingleCharacter(parameterName, "parameterName")
     
     if (grepl("\\$", parameterName)) {
-        parts <- strsplit(var, "\\$")[[1]]
-        if (length(parts) == 2 && !is.null(obj[[parts[1]]])) {
-            obj <- obj[[parts[1]]]
+        parts <- strsplit(parameterName, "\\$", fixed = TRUE)[[1]]
+        if (length(parts) == 2) {
+            if (!is.null(obj[[parts[1]]])) {
+                obj <- obj[[parts[1]]]
+            }
             parameterName <- parts[2]
         }
     }

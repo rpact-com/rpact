@@ -740,11 +740,9 @@ test_that("'getSimulationRates': comparison with getPowerRates() results for a i
     # @refFS[Formula]{fs:testStatisticNormalCombinationTest}
     # @refFS[Formula]{fs:testStatisticFisherCombinationTest}
     design <- getDesignInverseNormal(futilityBounds = c(-1), informationRates = c(0.5, 1), typeOfDesign = "P")
-    design2 <- getDesignInverseNormal(
-        futilityBounds = c(-1),
-        informationRates = c(0.5, 1), typeOfDesign = "P", directionUpper = FALSE
-    )
-    design <- getSimulationRates(design,
+    design2 <- getDesignInverseNormal(futilityBounds = c(-1), 
+        informationRates = c(0.5, 1), typeOfDesign = "P", directionUpper = FALSE)
+    x <- getSimulationRates(design,
         thetaH0 = 0.4, groups = 1, plannedSubjects = c(150, 300), pi1 = seq(0.3, 0.4, 0.02),
         maxNumberOfIterations = 1000,
         conditionalPower = 0.8, minNumberOfSubjectsPerStage = c(NA_real_, 100),
@@ -761,42 +759,41 @@ test_that("'getSimulationRates': comparison with getPowerRates() results for a i
         maxNumberOfSubjects = 300
     )
 
-    expectedNumberOfSubjectsDiff <- round((design$expectedNumberOfSubjects - y$expectedNumberOfSubjects) / 300, 4)
+    expectedNumberOfSubjectsDiff <- round((x$expectedNumberOfSubjects - y$expectedNumberOfSubjects) / 300, 4)
 
     ## Comparison of the results of numeric object 'expectedNumberOfSubjectsDiff' with expected results
     expect_equal(expectedNumberOfSubjectsDiff, c(0.364, 0.6296, 0.8433, 0.9941, 1.0617, 0.9543), tolerance = 1e-07, label = paste0(expectedNumberOfSubjectsDiff))
 
-    overallRejectDiff <- round(design$overallReject - y$overallReject, 4)
+    overallRejectDiff <- round(x$overallReject - y$overallReject, 4)
 
     ## Comparison of the results of numeric object 'overallRejectDiff' with expected results
     expect_equal(overallRejectDiff, c(0.988, 0.934, 0.7369, 0.3941, 0.1117, -0.008), tolerance = 1e-07, label = paste0(overallRejectDiff))
 
-    rejectPerStageDiff <- round(design$rejectPerStage - y$rejectPerStage, 4)
+    rejectPerStageDiff <- round(x$rejectPerStage - y$rejectPerStage, 4)
 
     ## Comparison of the results of matrix object 'rejectPerStageDiff' with expected results
     expect_equal(rejectPerStageDiff[1, ], c(0.611, 0.377, 0.2229, 0.1032, 0.0462, -0.0067), tolerance = 1e-07, label = paste0(rejectPerStageDiff[1, ]))
     expect_equal(rejectPerStageDiff[2, ], c(0.377, 0.557, 0.514, 0.2909, 0.0655, -0.0013), tolerance = 1e-07, label = paste0(rejectPerStageDiff[2, ]))
 
-    futilityPerStageDiff <- round(design$futilityPerStage - y$futilityPerStage, 4)
+    futilityPerStageDiff <- round(x$futilityPerStage - y$futilityPerStage, 4)
 
     ## Comparison of the results of matrix object 'futilityPerStageDiff' with expected results
     expect_equal(futilityPerStageDiff[1, ], c(-0.9426, -0.8457, -0.6878, -0.4828, -0.2656, -0.0147), tolerance = 1e-07, label = paste0(futilityPerStageDiff[1, ]))
 
-
     ## Pairwise comparison of the results of x with the results of x2
-    expect_equal(design$effect, x2$effect, tolerance = 1e-07)
-    expect_equal(x2$iterations[1, ], design$iterations[1, ])
-    expect_equal(x2$iterations[2, ], design$iterations[2, ])
-    expect_equal(design$overallReject, x2$overallReject, tolerance = 1e-07)
-    expect_equal(x2$rejectPerStage[1, ], design$rejectPerStage[1, ], tolerance = 1e-07)
-    expect_equal(x2$rejectPerStage[2, ], design$rejectPerStage[2, ], tolerance = 1e-07)
-    expect_equal(x2$futilityPerStage[1, ], design$futilityPerStage[1, ], tolerance = 1e-07)
-    expect_equal(design$earlyStop, x2$earlyStop, tolerance = 1e-07)
-    expect_equal(design$expectedNumberOfSubjects, x2$expectedNumberOfSubjects, tolerance = 1e-07)
-    expect_equal(x2$sampleSizes[1, ], design$sampleSizes[1, ])
-    expect_equal(x2$sampleSizes[2, ], design$sampleSizes[2, ], tolerance = 1e-07)
-    expect_equal(x2$conditionalPowerAchieved[1, ], design$conditionalPowerAchieved[1, ])
-    expect_equal(x2$conditionalPowerAchieved[2, ], design$conditionalPowerAchieved[2, ], tolerance = 1e-07)
+    expect_equal(x$effect, x2$effect, tolerance = 1e-07)
+    expect_equal(x2$iterations[1, ], x$iterations[1, ])
+    expect_equal(x2$iterations[2, ], x$iterations[2, ])
+    expect_equal(x$overallReject, x2$overallReject, tolerance = 1e-07)
+    expect_equal(x2$rejectPerStage[1, ], x$rejectPerStage[1, ], tolerance = 1e-07)
+    expect_equal(x2$rejectPerStage[2, ], x$rejectPerStage[2, ], tolerance = 1e-07)
+    expect_equal(x2$futilityPerStage[1, ], x$futilityPerStage[1, ], tolerance = 1e-07)
+    expect_equal(x$earlyStop, x2$earlyStop, tolerance = 1e-07)
+    expect_equal(x$expectedNumberOfSubjects, x2$expectedNumberOfSubjects, tolerance = 1e-07)
+    expect_equal(x2$sampleSizes[1, ], x$sampleSizes[1, ])
+    expect_equal(x2$sampleSizes[2, ], x$sampleSizes[2, ], tolerance = 1e-07)
+    expect_equal(x2$conditionalPowerAchieved[1, ], x$conditionalPowerAchieved[1, ])
+    expect_equal(x2$conditionalPowerAchieved[2, ], x$conditionalPowerAchieved[2, ], tolerance = 1e-07)
 })
 
 test_that("'getSimulationRates': comparison with getPowerRates() results for a group sequential design", {
@@ -815,7 +812,7 @@ test_that("'getSimulationRates': comparison with getPowerRates() results for a g
     # @refFS[Formula]{fs:testStatisticNormalCombinationTest}
     # @refFS[Formula]{fs:testStatisticFisherCombinationTest}
     design <- getDesignGroupSequential(futilityBounds = c(-1, 1), typeOfDesign = "P")
-    design <- getSimulationRates(design,
+    x <- getSimulationRates(design,
         thetaH0 = 0.3, groups = 2, allocationRatioPlanned = 2, plannedSubjects = (1:3) * 100,
         pi1 = seq(0.2, 0.4, 0.05), pi2 = 0.1,
         conditionalPower = 0.8, minNumberOfSubjectsPerStage = c(100, 100, 100),
@@ -827,24 +824,24 @@ test_that("'getSimulationRates': comparison with getPowerRates() results for a g
         pi2 = 0.1, directionUpper = FALSE, maxNumberOfSubjects = 300
     )
 
-    expectedNumberOfSubjectsDiff <- round((design$expectedNumberOfSubjects - y$expectedNumberOfSubjects) / 300, 4)
+    expectedNumberOfSubjectsDiff <- round((x$expectedNumberOfSubjects - y$expectedNumberOfSubjects) / 300, 4)
 
     ## Comparison of the results of numeric object 'expectedNumberOfSubjectsDiff' with expected results
     expect_equal(expectedNumberOfSubjectsDiff, c(-0.0076, -0.0264, -0.0251, -0.0066, -0.0023), tolerance = 1e-07, label = paste0(expectedNumberOfSubjectsDiff))
 
-    overallRejectDiff <- round(design$overallReject - y$overallReject, 4)
+    overallRejectDiff <- round(x$overallReject - y$overallReject, 4)
 
     ## Comparison of the results of numeric object 'overallRejectDiff' with expected results
     expect_equal(overallRejectDiff, c(9e-04, 0.0072, 0.0177, -9e-04, -6e-04), tolerance = 1e-07, label = paste0(overallRejectDiff))
 
-    rejectPerStageDiff <- round(design$rejectPerStage - y$rejectPerStage, 4)
+    rejectPerStageDiff <- round(x$rejectPerStage - y$rejectPerStage, 4)
 
     ## Comparison of the results of matrix object 'rejectPerStageDiff' with expected results
     expect_equal(rejectPerStageDiff[1, ], c(0.0121, 0.0444, 0.0355, 0.0081, 0.001), tolerance = 1e-07, label = paste0(rejectPerStageDiff[1, ]))
     expect_equal(rejectPerStageDiff[2, ], c(-0.0032, -0.0171, 0.009, -0.0062, -0.0019), tolerance = 1e-07, label = paste0(rejectPerStageDiff[2, ]))
     expect_equal(rejectPerStageDiff[3, ], c(-0.008, -0.02, -0.0268, -0.0028, 3e-04), tolerance = 1e-07, label = paste0(rejectPerStageDiff[3, ]))
 
-    futilityPerStageDiff <- round(design$futilityPerStage - y$futilityPerStage, 4)
+    futilityPerStageDiff <- round(x$futilityPerStage - y$futilityPerStage, 4)
 
     ## Comparison of the results of matrix object 'futilityPerStageDiff' with expected results
     expect_equal(futilityPerStageDiff[1, ], c(-1e-04, 0, 0.0049, 0.0058, 0.0053), tolerance = 1e-07, label = paste0(futilityPerStageDiff[1, ]))

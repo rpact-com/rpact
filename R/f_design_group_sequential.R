@@ -1127,8 +1127,19 @@ getDesignInverseNormal <- function(...,
     ))
 }
 
-.getDesignGroupSequentialDefaultValues <- function() {
-    return(list(
+.assertAllArgumentsHaveDefaultValues <- function(designFun, defaultValues) {
+    argNames <- methods::formalArgs(designFun)
+    argNames <- argNames[argNames != "..."]
+    missingArgNames <- argNames[!(argNames %in% names(defaultValues))]
+    if (length(missingArgNames) > 0) {
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+            ".getDesignGroupSequentialDefaultValues() does return the arguments ",
+            .arrayToString(missingArgNames, encapsulate = TRUE))
+    }
+}
+
+.getDesignGroupSequentialDefaultValues <- function(designFun = NULL) {
+    defaultValues <- list(
         kMax = NA_integer_,
         alpha = NA_real_,
         beta = NA_real_,
@@ -1145,9 +1156,20 @@ getDesignInverseNormal <- function(...,
         userAlphaSpending = NA_real_,
         userBetaSpending = NA_real_,
         gammaB = NA_real_,
-        twoSidedPower = C_TWO_SIDED_POWER_DEFAULT,
+        bindingFutility = NA,
+        directionUpper = NA,
+        betaAdjustment = NA,
+        constantBoundsHP = C_CONST_BOUND_HP_DEFAULT,
+        twoSidedPower = NA,
+        delayedInformation = NA_real_,
         tolerance = C_DESIGN_TOLERANCE_DEFAULT
-    ))
+    )
+    if (is.null(designFun)) {
+        return(defaultValues)
+    }
+    
+    .assertAllArgumentsHaveDefaultValues(designFun, defaultValues)
+    return(defaultValues)
 }
 
 .getDesignInverseNormalDefaultValues <- function() {
@@ -1670,7 +1692,8 @@ getDesignInverseNormal <- function(...,
 #'
 #' @export
 #'
-getDesignGroupSequential <- function(...,
+getDesignGroupSequential <- function(
+        ...,
         kMax = NA_integer_,
         alpha = NA_real_,
         beta = NA_real_,
@@ -1695,6 +1718,7 @@ getDesignGroupSequential <- function(...,
         delayedInformation = NA_real_,
         tolerance = 1e-08 # C_DESIGN_TOLERANCE_DEFAULT
         ) {
+            
     .warnInCaseOfUnknownArguments(functionName = "getDesignGroupSequential", ...)
     return(.getDesignGroupSequential(
         designClass = C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL,
@@ -1725,14 +1749,14 @@ getDesignGroupSequential <- function(...,
     ))
 }
 
-.getFixedSampleSize <- function(alpha, beta, sided, twoSidedPower = C_TWO_SIDED_POWER_DEFAULT) {
+.getFixedSampleSize <- function(..., alpha, beta, sided, twoSidedPower) {
     .assertIsValidAlphaAndBeta(alpha = alpha, beta = beta)
     .assertIsValidSidedParameter(sided)
 
     if (sided == 1) {
         return((.getOneMinusQNorm(alpha) + .getOneMinusQNorm(beta))^2)
     }
-    if (twoSidedPower) {
+    if (isTRUE(twoSidedPower)) {
         n <- .getOneDimensionalRoot(
             function(n) {
                 stats::pnorm(-.getOneMinusQNorm(alpha / 2) - sqrt(n)) -
@@ -1826,8 +1850,10 @@ getDesignCharacteristics <- function(design = NULL, ...) {
     designCharacteristics$.setParameterType("futilityProbabilities", C_PARAM_NOT_APPLICABLE)
 
     nFixed <- .getFixedSampleSize(
-        alpha = design$alpha, beta = design$beta,
-        sided = design$sided, twoSidedPower = design$twoSidedPower
+        alpha = design$alpha, 
+        beta = design$beta,
+        sided = design$sided, 
+        twoSidedPower = design$twoSidedPower
     )
     designCharacteristics$nFixed <- nFixed
     designCharacteristics$.setParameterType("nFixed", C_PARAM_GENERATED)

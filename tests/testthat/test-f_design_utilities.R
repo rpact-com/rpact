@@ -353,3 +353,8 @@ test_that("'.convertStageWiseToOverallValues': test that function is working as 
 	expect_equal(x5[2, ], c(2, 4, 6, 8, 10), label = paste0("c(", paste0(x5[2, ], collapse = ", "), ")"))
 })
 
+test_that("The default value functions for all designs have all arguments included", {
+    testthat::expect_error(.getDesignGroupSequentialDefaultValues(designFun = getDesignGroupSequential), NA)
+    testthat::expect_error(.getDesignFisherDefaultValues(designFun = getDesignFisher), NA)
+})
+

@@ -1618,7 +1618,7 @@ test_that("'getSimulationMultiArmSurvival': comparison of base and multi-arm, in
         futilityBounds = c(-0.5, 0.5), informationRates = c(0.2, 0.8, 1)
     )
 
-    design <- getSimulationMultiArmSurvival(design,
+    x <- getSimulationMultiArmSurvival(design,
         activeArms = 1, omegaMaxVector = 1 / seq(1, 1.8, 0.4), plannedEvents = c(20, 40, 60),
         conditionalPower = 0.99, maxNumberOfEventsPerStage = c(NA, 100, 100), minNumberOfEventsPerStage = c(NA, 10, 10),
         maxNumberOfIterations = 100, directionUpper = FALSE, allocationRatioPlanned = allocationRatioPlanned, seed = 1234
@@ -1631,37 +1631,37 @@ test_that("'getSimulationMultiArmSurvival': comparison of base and multi-arm, in
         maxNumberOfIterations = 100, directionUpper = FALSE, allocation1 = 1, allocation2 = 1, seed = 1234
     )
 
-    comp1 <- y$overallReject - design$rejectAtLeastOne
+    comp1 <- y$overallReject - x$rejectAtLeastOne
 
     ## Comparison of the results of numeric object 'comp1' with expected results
     expect_equal(comp1, c(-0.02, 0.01, 0.06), tolerance = 1e-07, label = paste0(comp1))
 
-    comp2 <- y$rejectPerStage - design$rejectedArmsPerStage[, , 1]
+    comp2 <- y$rejectPerStage - x$rejectedArmsPerStage[, , 1]
 
     ## Comparison of the results of matrix object 'comp2' with expected results
     expect_equal(comp2[1, ], c(0, 0, 0), label = paste0(comp2[1, ]))
     expect_equal(comp2[2, ], c(-0.02, 0.02, 0.03), tolerance = 1e-07, label = paste0(comp2[2, ]))
     expect_equal(comp2[3, ], c(0, -0.01, 0.03), tolerance = 1e-07, label = paste0(comp2[3, ]))
 
-    comp3 <- y$futilityPerStage - design$futilityPerStage
+    comp3 <- y$futilityPerStage - x$futilityPerStage
 
     ## Comparison of the results of matrix object 'comp3' with expected results
     expect_equal(comp3[1, ], c(-0.06, -0.02, -0.03), tolerance = 1e-07, label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(0.08, 0.06, 0), tolerance = 1e-07, label = paste0(comp3[2, ]))
 
-    comp4 <- round(y$cumulativeEventsPerStage - design$cumulativeEventsPerStage[, , 1], 1)
+    comp4 <- round(y$cumulativeEventsPerStage - x$cumulativeEventsPerStage[, , 1], 1)
 
     ## Comparison of the results of matrix object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0), label = paste0(comp4[1, ]))
     expect_equal(comp4[2, ], c(1.2, -0.4, 1), tolerance = 1e-07, label = paste0(comp4[2, ]))
     expect_equal(comp4[3, ], c(1.7, -0.8, 1), tolerance = 1e-07, label = paste0(comp4[3, ]))
 
-    comp5 <- round(y$expectedNumberOfEvents - design$expectedNumberOfEvents, 1)
+    comp5 <- round(y$expectedNumberOfEvents - x$expectedNumberOfEvents, 1)
 
     ## Comparison of the results of numeric object 'comp5' with expected results
     expect_equal(comp5, c(6.9, -4.7, 3.6), tolerance = 1e-07, label = paste0(comp5))
 
-    comp6 <- design$earlyStop - y$earlyStop
+    comp6 <- x$earlyStop - y$earlyStop
 
     ## Comparison of the results of matrix object 'comp6' with expected results
     expect_equal(comp6[1, ], c(-0.43, -0.73, -0.52), tolerance = 1e-07, label = paste0(comp6[1, ]))
@@ -1685,7 +1685,7 @@ test_that("'getSimulationMultiArmSurvival': comparison of base and multi-arm, Fi
     # @refFS[Formula]{fs:multiarmRejectionRule}
     design <- getDesignFisher(alpha0Vec = c(0.6, 0.4), informationRates = c(0.5, 0.6, 1))
 
-    design <- getSimulationMultiArmSurvival(design,
+    x <- getSimulationMultiArmSurvival(design,
         activeArms = 1, omegaMaxVector = 1 / seq(1, 1.8, 0.4),
         plannedEvents = c(20, 40, 60),
         conditionalPower = 0.99, maxNumberOfEventsPerStage = c(NA, 100, 100), minNumberOfEventsPerStage = c(NA, 10, 10),
@@ -1699,37 +1699,37 @@ test_that("'getSimulationMultiArmSurvival': comparison of base and multi-arm, Fi
         maxNumberOfIterations = 100, directionUpper = FALSE, allocation1 = 1, allocation2 = 1, seed = 1234
     )
 
-    comp1 <- y$overallReject - design$rejectAtLeastOne
+    comp1 <- y$overallReject - x$rejectAtLeastOne
 
     ## Comparison of the results of numeric object 'comp1' with expected results
     expect_equal(comp1, c(-0.02, -0.01, 0.02), tolerance = 1e-07, label = paste0(comp1))
 
-    comp2 <- y$rejectPerStage - design$rejectedArmsPerStage[, , 1]
+    comp2 <- y$rejectPerStage - x$rejectedArmsPerStage[, , 1]
 
     ## Comparison of the results of matrix object 'comp2' with expected results
     expect_equal(comp2[1, ], c(-0.02, 0.01, -0.01), tolerance = 1e-07, label = paste0(comp2[1, ]))
     expect_equal(comp2[2, ], c(0, -0.03, 0.01), tolerance = 1e-07, label = paste0(comp2[2, ]))
     expect_equal(comp2[3, ], c(0, 0.01, 0.02), tolerance = 1e-07, label = paste0(comp2[3, ]))
 
-    comp3 <- y$futilityPerStage - design$futilityPerStage
+    comp3 <- y$futilityPerStage - x$futilityPerStage
 
     ## Comparison of the results of matrix object 'comp3' with expected results
     expect_equal(comp3[1, ], c(-0.03, 0.01, -0.01), tolerance = 1e-07, label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(0.05, 0.05, -0.01), tolerance = 1e-07, label = paste0(comp3[2, ]))
 
-    comp4 <- round(y$cumulativeEventsPerStage - design$cumulativeEventsPerStage[, , 1], 1)
+    comp4 <- round(y$cumulativeEventsPerStage - x$cumulativeEventsPerStage[, , 1], 1)
 
     ## Comparison of the results of matrix object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0), label = paste0(comp4[1, ]))
     expect_equal(comp4[2, ], c(-0.6, 0.8, -0.3), tolerance = 1e-07, label = paste0(comp4[2, ]))
     expect_equal(comp4[3, ], c(-0.6, 0.8, -0.3), tolerance = 1e-07, label = paste0(comp4[3, ]))
 
-    comp5 <- round(y$expectedNumberOfEvents - design$expectedNumberOfEvents, 1)
+    comp5 <- round(y$expectedNumberOfEvents - x$expectedNumberOfEvents, 1)
 
     ## Comparison of the results of numeric object 'comp5' with expected results
     expect_equal(comp5, c(4.7, -5.3, 3.6), tolerance = 1e-07, label = paste0(comp5))
 
-    comp6 <- design$earlyStop - y$earlyStop
+    comp6 <- x$earlyStop - y$earlyStop
 
     ## Comparison of the results of matrix object 'comp6' with expected results
     expect_equal(comp6[1, ], c(-0.27, -0.42, -0.29), tolerance = 1e-07, label = paste0(comp6[1, ]))
@@ -1756,7 +1756,7 @@ test_that("'getSimulationMultiArmSurvival': comparison of base and multi-arm, in
         userAlphaSpending = c(0, 0, 0.025), informationRates = c(0.2, 0.8, 1)
     )
 
-    design <- getSimulationMultiArmSurvival(design,
+    x <- getSimulationMultiArmSurvival(design,
         activeArms = 1, omegaMaxVector = 1 / seq(1, 1.8, 0.4), plannedEvents = c(20, 40, 60),
         conditionalPower = 0.99, maxNumberOfEventsPerStage = c(NA, 100, 100), minNumberOfEventsPerStage = c(NA, 10, 10),
         maxNumberOfIterations = 100, directionUpper = FALSE, seed = 1234
@@ -1769,37 +1769,37 @@ test_that("'getSimulationMultiArmSurvival': comparison of base and multi-arm, in
         maxNumberOfIterations = 100, directionUpper = FALSE, allocation1 = 1, allocation2 = 1, seed = 1234
     )
 
-    comp1 <- y$overallReject - design$rejectAtLeastOne
+    comp1 <- y$overallReject - x$rejectAtLeastOne
 
     ## Comparison of the results of numeric object 'comp1' with expected results
     expect_equal(comp1, c(-0.01, 0.02, 0.01), tolerance = 1e-07, label = paste0(comp1))
 
-    comp2 <- y$rejectPerStage - design$rejectedArmsPerStage[, , 1]
+    comp2 <- y$rejectPerStage - x$rejectedArmsPerStage[, , 1]
 
     ## Comparison of the results of matrix object 'comp2' with expected results
     expect_equal(comp2[1, ], c(0, 0, 0), label = paste0(comp2[1, ]))
     expect_equal(comp2[2, ], c(0, 0, 0), label = paste0(comp2[2, ]))
     expect_equal(comp2[3, ], c(-0.01, 0.02, 0.01), tolerance = 1e-07, label = paste0(comp2[3, ]))
 
-    comp3 <- y$futilityPerStage - design$futilityPerStage
+    comp3 <- y$futilityPerStage - x$futilityPerStage
 
     ## Comparison of the results of matrix object 'comp3' with expected results
     expect_equal(comp3[1, ], c(0, 0, 0), label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(0, 0, 0), label = paste0(comp3[2, ]))
 
-    comp4 <- round(y$cumulativeEventsPerStage - design$cumulativeEventsPerStage[, , 1], 1)
+    comp4 <- round(y$cumulativeEventsPerStage - x$cumulativeEventsPerStage[, , 1], 1)
 
     ## Comparison of the results of matrix object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0), label = paste0(comp4[1, ]))
     expect_equal(comp4[2, ], c(0, 0, 0), label = paste0(comp4[2, ]))
     expect_equal(comp4[3, ], c(-0.2, -3.5, 0.6), tolerance = 1e-07, label = paste0(comp4[3, ]))
 
-    comp5 <- round(y$expectedNumberOfEvents - design$expectedNumberOfEvents, 1)
+    comp5 <- round(y$expectedNumberOfEvents - x$expectedNumberOfEvents, 1)
 
     ## Comparison of the results of numeric object 'comp5' with expected results
     expect_equal(comp5, c(-0.2, -3.5, 0.6), tolerance = 1e-07, label = paste0(comp5))
 
-    comp6 <- design$earlyStop - y$earlyStop
+    comp6 <- x$earlyStop - y$earlyStop
 
     ## Comparison of the results of matrix object 'comp6' with expected results
     expect_equal(comp6[1, ], c(0, 0, 0), label = paste0(comp6[1, ]))

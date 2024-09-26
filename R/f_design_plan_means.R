@@ -173,11 +173,18 @@ NULL
     ))
 }
 
-.getSampleSizeFixedMeans <- function(..., alpha = 0.025, beta = 0.2, sided = 1,
+.getSampleSizeFixedMeans <- function(
+        ..., 
+        alpha = 0.025, 
+        beta = 0.2, 
+        sided = 1,
         twoSidedPower = C_TWO_SIDED_POWER_DEFAULT,
-        normalApproximation = FALSE, meanRatio = FALSE,
-        thetaH0 = 0, alternative = C_ALTERNATIVE_DEFAULT,
-        stDev = C_STDEV_DEFAULT, groups = 2,
+        normalApproximation = FALSE, 
+        meanRatio = FALSE,
+        thetaH0 = 0, 
+        alternative = C_ALTERNATIVE_DEFAULT,
+        stDev = C_STDEV_DEFAULT, 
+        groups = 2,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
     nFixed <- rep(NA_real_, length(alternative))
 

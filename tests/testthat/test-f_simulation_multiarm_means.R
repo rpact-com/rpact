@@ -1575,7 +1575,7 @@ test_that("'getSimulationMultiArmMeans': comparison of base and multi-arm", {
     # @refFS[Formula]{fs:simulationMultiArmSelections}
     # @refFS[Formula]{fs:multiarmRejectionRule}
     design <- getDesignInverseNormal(typeOfDesign = "WT", deltaWT = 0.15, futilityBounds = c(-0.5, 0), informationRates = c(0.4, 0.8, 1))
-    design <- getSimulationMultiArmMeans(
+    x <- getSimulationMultiArmMeans(
         design = design, activeArms = 1,
         plannedSubjects = c(20, 40, 60), stDev = 1.5, muMaxVector = seq(0, 1, 0.2),
         conditionalPower = 0.80, minNumberOfSubjectsPerStage = c(NA, 20, 20),
@@ -1584,51 +1584,51 @@ test_that("'getSimulationMultiArmMeans': comparison of base and multi-arm", {
     )
 
     ## Comparison of the results of SimulationResultsMultiArmMeans object 'x' with expected results
-    expect_equal(design$iterations[1, ], c(100, 100, 100, 100, 100, 100), label = paste0(design$iterations[1, ]))
-    expect_equal(design$iterations[2, ], c(81, 88, 89, 88, 93, 79), label = paste0(design$iterations[2, ]))
-    expect_equal(design$iterations[3, ], c(53, 70, 64, 51, 37, 12), label = paste0(design$iterations[3, ]))
-    expect_equal(design$rejectAtLeastOne, c(0.01, 0.11, 0.39, 0.73, 0.93, 0.98), tolerance = 1e-07, label = paste0(design$rejectAtLeastOne))
-    expect_equal(unlist(as.list(design$rejectedArmsPerStage)), c(0, 0, 0.01, 0, 0.05, 0.06, 0.01, 0.22, 0.16, 0.02, 0.37, 0.34, 0.06, 0.56, 0.31, 0.2, 0.67, 0.11), tolerance = 1e-07, label = paste0(unlist(as.list(design$rejectedArmsPerStage))))
-    expect_equal(design$futilityStop, c(0.47, 0.25, 0.13, 0.1, 0.01, 0.01), tolerance = 1e-07, label = paste0(design$futilityStop))
-    expect_equal(design$futilityPerStage[1, ], c(0.19, 0.12, 0.1, 0.1, 0.01, 0.01), tolerance = 1e-07, label = paste0(design$futilityPerStage[1, ]))
-    expect_equal(design$futilityPerStage[2, ], c(0.28, 0.13, 0.03, 0, 0, 0), tolerance = 1e-07, label = paste0(design$futilityPerStage[2, ]))
-    expect_equal(design$earlyStop[1, ], c(0.19, 0.12, 0.11, 0.12, 0.07, 0.21), tolerance = 1e-07, label = paste0(design$earlyStop[1, ]))
-    expect_equal(design$earlyStop[2, ], c(0.28, 0.18, 0.25, 0.37, 0.56, 0.67), tolerance = 1e-07, label = paste0(design$earlyStop[2, ]))
-    expect_equal(design$successPerStage[1, ], c(0, 0, 0.01, 0.02, 0.06, 0.2), tolerance = 1e-07, label = paste0(design$successPerStage[1, ]))
-    expect_equal(design$successPerStage[2, ], c(0, 0.05, 0.22, 0.37, 0.56, 0.67), tolerance = 1e-07, label = paste0(design$successPerStage[2, ]))
-    expect_equal(design$successPerStage[3, ], c(0.01, 0.06, 0.16, 0.34, 0.31, 0.11), tolerance = 1e-07, label = paste0(design$successPerStage[3, ]))
-    expect_equal(unlist(as.list(design$selectedArms)), c(1, 0.81, 0.53, 1, 0.88, 0.7, 1, 0.89, 0.64, 1, 0.88, 0.51, 1, 0.93, 0.37, 1, 0.79, 0.12, 1, 0.81, 0.53, 1, 0.88, 0.7, 1, 0.89, 0.64, 1, 0.88, 0.51, 1, 0.93, 0.37, 1, 0.79, 0.12), tolerance = 1e-07, label = paste0(unlist(as.list(design$selectedArms))))
-    expect_equal(design$numberOfActiveArms[1, ], c(1, 1, 1, 1, 1, 1), label = paste0(design$numberOfActiveArms[1, ]))
-    expect_equal(design$numberOfActiveArms[2, ], c(1, 1, 1, 1, 1, 1), label = paste0(design$numberOfActiveArms[2, ]))
-    expect_equal(design$numberOfActiveArms[3, ], c(1, 1, 1, 1, 1, 1), label = paste0(design$numberOfActiveArms[3, ]))
-    expect_equal(design$expectedNumberOfSubjects, c(182.97526, 204.64426, 195.25807, 156.41809, 139.22312, 94.296637), tolerance = 1e-07, label = paste0(design$expectedNumberOfSubjects))
-    expect_equal(unlist(as.list(design$sampleSizes)), c(20, 74.777896, 78.138507, 20, 71.766138, 76.107578, 20, 69.720212, 75.189157, 20, 60.637889, 60.622327, 20, 55.732819, 56.713222, 20, 47.895918, 41.888746, 10, 37.388948, 39.069254, 10, 35.883069, 38.053789, 10, 34.860106, 37.594578, 10, 30.318944, 30.311164, 10, 27.86641, 28.356611, 10, 23.947959, 20.944373), tolerance = 1e-07, label = paste0(unlist(as.list(design$sampleSizes))))
-    expect_equal(design$conditionalPowerAchieved[1, ], c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_), label = paste0(design$conditionalPowerAchieved[1, ]))
-    expect_equal(design$conditionalPowerAchieved[2, ], c(0.22017652, 0.27054625, 0.3536952, 0.48224278, 0.56831776, 0.65933958), tolerance = 1e-07, label = paste0(design$conditionalPowerAchieved[2, ]))
-    expect_equal(design$conditionalPowerAchieved[3, ], c(0.12006552, 0.18276066, 0.26908136, 0.50518351, 0.66786884, 0.67359844), tolerance = 1e-07, label = paste0(design$conditionalPowerAchieved[3, ]))
+    expect_equal(x$iterations[1, ], c(100, 100, 100, 100, 100, 100), label = paste0(x$iterations[1, ]))
+    expect_equal(x$iterations[2, ], c(81, 88, 89, 88, 93, 79), label = paste0(x$iterations[2, ]))
+    expect_equal(x$iterations[3, ], c(53, 70, 64, 51, 37, 12), label = paste0(x$iterations[3, ]))
+    expect_equal(x$rejectAtLeastOne, c(0.01, 0.11, 0.39, 0.73, 0.93, 0.98), tolerance = 1e-07, label = paste0(x$rejectAtLeastOne))
+    expect_equal(unlist(as.list(x$rejectedArmsPerStage)), c(0, 0, 0.01, 0, 0.05, 0.06, 0.01, 0.22, 0.16, 0.02, 0.37, 0.34, 0.06, 0.56, 0.31, 0.2, 0.67, 0.11), tolerance = 1e-07, label = paste0(unlist(as.list(x$rejectedArmsPerStage))))
+    expect_equal(x$futilityStop, c(0.47, 0.25, 0.13, 0.1, 0.01, 0.01), tolerance = 1e-07, label = paste0(x$futilityStop))
+    expect_equal(x$futilityPerStage[1, ], c(0.19, 0.12, 0.1, 0.1, 0.01, 0.01), tolerance = 1e-07, label = paste0(x$futilityPerStage[1, ]))
+    expect_equal(x$futilityPerStage[2, ], c(0.28, 0.13, 0.03, 0, 0, 0), tolerance = 1e-07, label = paste0(x$futilityPerStage[2, ]))
+    expect_equal(x$earlyStop[1, ], c(0.19, 0.12, 0.11, 0.12, 0.07, 0.21), tolerance = 1e-07, label = paste0(x$earlyStop[1, ]))
+    expect_equal(x$earlyStop[2, ], c(0.28, 0.18, 0.25, 0.37, 0.56, 0.67), tolerance = 1e-07, label = paste0(x$earlyStop[2, ]))
+    expect_equal(x$successPerStage[1, ], c(0, 0, 0.01, 0.02, 0.06, 0.2), tolerance = 1e-07, label = paste0(x$successPerStage[1, ]))
+    expect_equal(x$successPerStage[2, ], c(0, 0.05, 0.22, 0.37, 0.56, 0.67), tolerance = 1e-07, label = paste0(x$successPerStage[2, ]))
+    expect_equal(x$successPerStage[3, ], c(0.01, 0.06, 0.16, 0.34, 0.31, 0.11), tolerance = 1e-07, label = paste0(x$successPerStage[3, ]))
+    expect_equal(unlist(as.list(x$selectedArms)), c(1, 0.81, 0.53, 1, 0.88, 0.7, 1, 0.89, 0.64, 1, 0.88, 0.51, 1, 0.93, 0.37, 1, 0.79, 0.12, 1, 0.81, 0.53, 1, 0.88, 0.7, 1, 0.89, 0.64, 1, 0.88, 0.51, 1, 0.93, 0.37, 1, 0.79, 0.12), tolerance = 1e-07, label = paste0(unlist(as.list(x$selectedArms))))
+    expect_equal(x$numberOfActiveArms[1, ], c(1, 1, 1, 1, 1, 1), label = paste0(x$numberOfActiveArms[1, ]))
+    expect_equal(x$numberOfActiveArms[2, ], c(1, 1, 1, 1, 1, 1), label = paste0(x$numberOfActiveArms[2, ]))
+    expect_equal(x$numberOfActiveArms[3, ], c(1, 1, 1, 1, 1, 1), label = paste0(x$numberOfActiveArms[3, ]))
+    expect_equal(x$expectedNumberOfSubjects, c(182.97526, 204.64426, 195.25807, 156.41809, 139.22312, 94.296637), tolerance = 1e-07, label = paste0(x$expectedNumberOfSubjects))
+    expect_equal(unlist(as.list(x$sampleSizes)), c(20, 74.777896, 78.138507, 20, 71.766138, 76.107578, 20, 69.720212, 75.189157, 20, 60.637889, 60.622327, 20, 55.732819, 56.713222, 20, 47.895918, 41.888746, 10, 37.388948, 39.069254, 10, 35.883069, 38.053789, 10, 34.860106, 37.594578, 10, 30.318944, 30.311164, 10, 27.86641, 28.356611, 10, 23.947959, 20.944373), tolerance = 1e-07, label = paste0(unlist(as.list(x$sampleSizes))))
+    expect_equal(x$conditionalPowerAchieved[1, ], c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_), label = paste0(x$conditionalPowerAchieved[1, ]))
+    expect_equal(x$conditionalPowerAchieved[2, ], c(0.22017652, 0.27054625, 0.3536952, 0.48224278, 0.56831776, 0.65933958), tolerance = 1e-07, label = paste0(x$conditionalPowerAchieved[2, ]))
+    expect_equal(x$conditionalPowerAchieved[3, ], c(0.12006552, 0.18276066, 0.26908136, 0.50518351, 0.66786884, 0.67359844), tolerance = 1e-07, label = paste0(x$conditionalPowerAchieved[3, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(design), NA)))
-        expect_output(print(design)$show())
-        invisible(capture.output(expect_error(summary(design), NA)))
-        expect_output(summary(design)$show())
-        xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL)))
-        expect_equal(xCodeBased$iterations, design$iterations, tolerance = 1e-07)
-        expect_equal(xCodeBased$rejectAtLeastOne, design$rejectAtLeastOne, tolerance = 1e-07)
-        expect_equal(xCodeBased$rejectedArmsPerStage, design$rejectedArmsPerStage, tolerance = 1e-07)
-        expect_equal(xCodeBased$futilityStop, design$futilityStop, tolerance = 1e-07)
-        expect_equal(xCodeBased$futilityPerStage, design$futilityPerStage, tolerance = 1e-07)
-        expect_equal(xCodeBased$earlyStop, design$earlyStop, tolerance = 1e-07)
-        expect_equal(xCodeBased$successPerStage, design$successPerStage, tolerance = 1e-07)
-        expect_equal(xCodeBased$selectedArms, design$selectedArms, tolerance = 1e-07)
-        expect_equal(xCodeBased$numberOfActiveArms, design$numberOfActiveArms, tolerance = 1e-07)
-        expect_equal(xCodeBased$expectedNumberOfSubjects, design$expectedNumberOfSubjects, tolerance = 1e-07)
-        expect_equal(xCodeBased$sampleSizes, design$sampleSizes, tolerance = 1e-07)
-        expect_equal(xCodeBased$conditionalPowerAchieved, design$conditionalPowerAchieved, tolerance = 1e-07)
-        expect_type(names(design), "character")
-        df <- as.data.frame(design)
+        invisible(capture.output(expect_error(print(x), NA)))
+        expect_output(print(x)$show())
+        invisible(capture.output(expect_error(summary(x), NA)))
+        expect_output(summary(x)$show())
+        xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL)))
+        expect_equal(xCodeBased$iterations, x$iterations, tolerance = 1e-07)
+        expect_equal(xCodeBased$rejectAtLeastOne, x$rejectAtLeastOne, tolerance = 1e-07)
+        expect_equal(xCodeBased$rejectedArmsPerStage, x$rejectedArmsPerStage, tolerance = 1e-07)
+        expect_equal(xCodeBased$futilityStop, x$futilityStop, tolerance = 1e-07)
+        expect_equal(xCodeBased$futilityPerStage, x$futilityPerStage, tolerance = 1e-07)
+        expect_equal(xCodeBased$earlyStop, x$earlyStop, tolerance = 1e-07)
+        expect_equal(xCodeBased$successPerStage, x$successPerStage, tolerance = 1e-07)
+        expect_equal(xCodeBased$selectedArms, x$selectedArms, tolerance = 1e-07)
+        expect_equal(xCodeBased$numberOfActiveArms, x$numberOfActiveArms, tolerance = 1e-07)
+        expect_equal(xCodeBased$expectedNumberOfSubjects, x$expectedNumberOfSubjects, tolerance = 1e-07)
+        expect_equal(xCodeBased$sampleSizes, x$sampleSizes, tolerance = 1e-07)
+        expect_equal(xCodeBased$conditionalPowerAchieved, x$conditionalPowerAchieved, tolerance = 1e-07)
+        expect_type(names(x), "character")
+        df <- as.data.frame(x)
         expect_s3_class(df, "data.frame")
         expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(design)
+        mtx <- as.matrix(x)
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
@@ -1642,37 +1642,37 @@ test_that("'getSimulationMultiArmMeans': comparison of base and multi-arm", {
         maxNumberOfIterations = 100, allocationRatioPlanned = allocationRatioPlanned, seed = 5678
     )
 
-    comp1 <- y$overallReject - design$rejectAtLeastOne
+    comp1 <- y$overallReject - x$rejectAtLeastOne
 
     ## Comparison of the results of numeric object 'comp1' with expected results
     expect_equal(comp1, c(0.03, 0.07, -0.04, 0.01, 0.02, -0.02), tolerance = 1e-07, label = paste0(comp1))
 
-    comp2 <- y$rejectPerStage - design$rejectedArmsPerStage[, , 1]
+    comp2 <- y$rejectPerStage - x$rejectedArmsPerStage[, , 1]
 
     ## Comparison of the results of matrixarray object 'comp2' with expected results
     expect_equal(comp2[1, ], c(0, 0.02, 0.01, -0.01, 0.04, -0.09), tolerance = 1e-07, label = paste0(comp2[1, ]))
     expect_equal(comp2[2, ], c(0.03, 0, -0.07, 0.06, 0.02, 0.03), tolerance = 1e-07, label = paste0(comp2[2, ]))
     expect_equal(comp2[3, ], c(0, 0.05, 0.02, -0.04, -0.04, 0.04), tolerance = 1e-07, label = paste0(comp2[3, ]))
 
-    comp3 <- y$futilityPerStage - design$futilityPerStage
+    comp3 <- y$futilityPerStage - x$futilityPerStage
 
     ## Comparison of the results of matrixarray object 'comp3' with expected results
     expect_equal(comp3[1, ], c(0.17, 0, 0.04, -0.04, 0, 0.02), tolerance = 1e-07, label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(-0.05, 0.01, 0, 0, 0, 0), tolerance = 1e-07, label = paste0(comp3[2, ]))
 
-    comp4 <- round(y$sampleSizes - (design$sampleSizes[, , 1] + design$sampleSizes[, , 2]), 1)
+    comp4 <- round(y$sampleSizes - (x$sampleSizes[, , 1] + x$sampleSizes[, , 2]), 1)
 
     ## Comparison of the results of matrixarray object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0, 0, 0, 0), label = paste0(comp4[1, ]))
     expect_equal(comp4[2, ], c(-2.8, -1.3, -0.3, -0.1, -1.4, 10.8), tolerance = 1e-07, label = paste0(comp4[2, ]))
     expect_equal(comp4[3, ], c(1.7, -3.3, -3.4, 13.2, -9.7, -6.7), tolerance = 1e-07, label = paste0(comp4[3, ]))
 
-    comp5 <- round(y$expectedNumberOfSubjects - design$expectedNumberOfSubjects, 1)
+    comp5 <- round(y$expectedNumberOfSubjects - x$expectedNumberOfSubjects, 1)
 
     ## Comparison of the results of numeric object 'comp5' with expected results
     expect_equal(comp5, c(-37.8, -8.9, -5.5, 10.1, -12.7, 15.8), tolerance = 1e-07, label = paste0(comp5))
 
-    comp6 <- design$earlyStop - y$earlyStop
+    comp6 <- x$earlyStop - y$earlyStop
 
     ## Comparison of the results of matrixarray object 'comp6' with expected results
     expect_equal(comp6[1, ], c(-0.43, -0.22, -0.58, -0.5, -0.27, -0.48), tolerance = 1e-07, label = paste0(comp6[1, ]))
@@ -1693,7 +1693,7 @@ test_that("'getSimulationMultiArmMeans': comparison of base and multi-arm, Fishe
     # @refFS[Formula]{fs:simulationMultiArmSelections}
     # @refFS[Formula]{fs:multiarmRejectionRule}
     design <- getDesignFisher(alpha0Vec = c(0.3, 0.4), informationRates = c(0.3, 0.6, 1))
-    design <- getSimulationMultiArmMeans(
+    x <- getSimulationMultiArmMeans(
         design = design, activeArms = 1,
         plannedSubjects = c(20, 40, 60), stDev = 1.5, muMaxVector = seq(0, 1, 0.2),
         conditionalPower = 0.80, minNumberOfSubjectsPerStage = c(NA, 20, 20),
@@ -1702,51 +1702,51 @@ test_that("'getSimulationMultiArmMeans': comparison of base and multi-arm, Fishe
     )
 
     ## Comparison of the results of SimulationResultsMultiArmMeans object 'x' with expected results
-    expect_equal(design$iterations[1, ], c(100, 100, 100, 100, 100, 100), label = paste0(design$iterations[1, ]))
-    expect_equal(design$iterations[2, ], c(28, 41, 50, 54, 56, 51), label = paste0(design$iterations[2, ]))
-    expect_equal(design$iterations[3, ], c(7, 24, 27, 21, 24, 7), label = paste0(design$iterations[3, ]))
-    expect_equal(design$rejectAtLeastOne, c(0.03, 0.08, 0.28, 0.61, 0.75, 0.89), tolerance = 1e-07, label = paste0(design$rejectAtLeastOne))
-    expect_equal(unlist(as.list(design$rejectedArmsPerStage)), c(0.02, 0, 0.01, 0.05, 0.01, 0.02, 0.05, 0.16, 0.07, 0.17, 0.3, 0.14, 0.24, 0.31, 0.2, 0.39, 0.44, 0.06), tolerance = 1e-07, label = paste0(unlist(as.list(design$rejectedArmsPerStage))))
-    expect_equal(design$futilityStop, c(0.91, 0.7, 0.52, 0.32, 0.21, 0.1), tolerance = 1e-07, label = paste0(design$futilityStop))
-    expect_equal(design$futilityPerStage[1, ], c(0.7, 0.54, 0.45, 0.29, 0.2, 0.1), tolerance = 1e-07, label = paste0(design$futilityPerStage[1, ]))
-    expect_equal(design$futilityPerStage[2, ], c(0.21, 0.16, 0.07, 0.03, 0.01, 0), tolerance = 1e-07, label = paste0(design$futilityPerStage[2, ]))
-    expect_equal(design$earlyStop[1, ], c(0.72, 0.59, 0.5, 0.46, 0.44, 0.49), tolerance = 1e-07, label = paste0(design$earlyStop[1, ]))
-    expect_equal(design$earlyStop[2, ], c(0.21, 0.17, 0.23, 0.33, 0.32, 0.44), tolerance = 1e-07, label = paste0(design$earlyStop[2, ]))
-    expect_equal(design$successPerStage[1, ], c(0.02, 0.05, 0.05, 0.17, 0.24, 0.39), tolerance = 1e-07, label = paste0(design$successPerStage[1, ]))
-    expect_equal(design$successPerStage[2, ], c(0, 0.01, 0.16, 0.3, 0.31, 0.44), tolerance = 1e-07, label = paste0(design$successPerStage[2, ]))
-    expect_equal(design$successPerStage[3, ], c(0.01, 0.02, 0.07, 0.14, 0.2, 0.06), tolerance = 1e-07, label = paste0(design$successPerStage[3, ]))
-    expect_equal(unlist(as.list(design$selectedArms)), c(1, 0.28, 0.07, 1, 0.41, 0.24, 1, 0.5, 0.27, 1, 0.54, 0.21, 1, 0.56, 0.24, 1, 0.51, 0.07, 1, 0.28, 0.07, 1, 0.41, 0.24, 1, 0.5, 0.27, 1, 0.54, 0.21, 1, 0.56, 0.24, 1, 0.51, 0.07), tolerance = 1e-07, label = paste0(unlist(as.list(design$selectedArms))))
-    expect_equal(design$numberOfActiveArms[1, ], c(1, 1, 1, 1, 1, 1), label = paste0(design$numberOfActiveArms[1, ]))
-    expect_equal(design$numberOfActiveArms[2, ], c(1, 1, 1, 1, 1, 1), label = paste0(design$numberOfActiveArms[2, ]))
-    expect_equal(design$numberOfActiveArms[3, ], c(1, 1, 1, 1, 1, 1), label = paste0(design$numberOfActiveArms[3, ]))
-    expect_equal(design$expectedNumberOfSubjects, c(68.211396, 101.92536, 114.30453, 107.14861, 109.24288, 79.622055), tolerance = 1e-07, label = paste0(design$expectedNumberOfSubjects))
-    expect_equal(unlist(as.list(design$sampleSizes)), c(20, 70.979514, 80, 20, 71.410143, 77.800325, 20, 69.572428, 79.321509, 20, 66.884783, 72.926791, 20, 62.423876, 74.4634, 20, 55.785406, 66.154471, 10, 35.489757, 40, 10, 35.705072, 38.900163, 10, 34.786214, 39.660755, 10, 33.442392, 36.463396, 10, 31.211938, 37.2317, 10, 27.892703, 33.077236), tolerance = 1e-07, label = paste0(unlist(as.list(design$sampleSizes))))
-    expect_equal(design$conditionalPowerAchieved[1, ], c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_), label = paste0(design$conditionalPowerAchieved[1, ]))
-    expect_equal(design$conditionalPowerAchieved[2, ], c(0.53965216, 0.44870166, 0.54176291, 0.51257459, 0.62161545, 0.65580386), tolerance = 1e-07, label = paste0(design$conditionalPowerAchieved[2, ]))
-    expect_equal(design$conditionalPowerAchieved[3, ], c(0.33271205, 0.28302479, 0.35942136, 0.59988705, 0.63386368, 0.5469144), tolerance = 1e-07, label = paste0(design$conditionalPowerAchieved[3, ]))
+    expect_equal(x$iterations[1, ], c(100, 100, 100, 100, 100, 100), label = paste0(x$iterations[1, ]))
+    expect_equal(x$iterations[2, ], c(28, 41, 50, 54, 56, 51), label = paste0(x$iterations[2, ]))
+    expect_equal(x$iterations[3, ], c(7, 24, 27, 21, 24, 7), label = paste0(x$iterations[3, ]))
+    expect_equal(x$rejectAtLeastOne, c(0.03, 0.08, 0.28, 0.61, 0.75, 0.89), tolerance = 1e-07, label = paste0(x$rejectAtLeastOne))
+    expect_equal(unlist(as.list(x$rejectedArmsPerStage)), c(0.02, 0, 0.01, 0.05, 0.01, 0.02, 0.05, 0.16, 0.07, 0.17, 0.3, 0.14, 0.24, 0.31, 0.2, 0.39, 0.44, 0.06), tolerance = 1e-07, label = paste0(unlist(as.list(x$rejectedArmsPerStage))))
+    expect_equal(x$futilityStop, c(0.91, 0.7, 0.52, 0.32, 0.21, 0.1), tolerance = 1e-07, label = paste0(x$futilityStop))
+    expect_equal(x$futilityPerStage[1, ], c(0.7, 0.54, 0.45, 0.29, 0.2, 0.1), tolerance = 1e-07, label = paste0(x$futilityPerStage[1, ]))
+    expect_equal(x$futilityPerStage[2, ], c(0.21, 0.16, 0.07, 0.03, 0.01, 0), tolerance = 1e-07, label = paste0(x$futilityPerStage[2, ]))
+    expect_equal(x$earlyStop[1, ], c(0.72, 0.59, 0.5, 0.46, 0.44, 0.49), tolerance = 1e-07, label = paste0(x$earlyStop[1, ]))
+    expect_equal(x$earlyStop[2, ], c(0.21, 0.17, 0.23, 0.33, 0.32, 0.44), tolerance = 1e-07, label = paste0(x$earlyStop[2, ]))
+    expect_equal(x$successPerStage[1, ], c(0.02, 0.05, 0.05, 0.17, 0.24, 0.39), tolerance = 1e-07, label = paste0(x$successPerStage[1, ]))
+    expect_equal(x$successPerStage[2, ], c(0, 0.01, 0.16, 0.3, 0.31, 0.44), tolerance = 1e-07, label = paste0(x$successPerStage[2, ]))
+    expect_equal(x$successPerStage[3, ], c(0.01, 0.02, 0.07, 0.14, 0.2, 0.06), tolerance = 1e-07, label = paste0(x$successPerStage[3, ]))
+    expect_equal(unlist(as.list(x$selectedArms)), c(1, 0.28, 0.07, 1, 0.41, 0.24, 1, 0.5, 0.27, 1, 0.54, 0.21, 1, 0.56, 0.24, 1, 0.51, 0.07, 1, 0.28, 0.07, 1, 0.41, 0.24, 1, 0.5, 0.27, 1, 0.54, 0.21, 1, 0.56, 0.24, 1, 0.51, 0.07), tolerance = 1e-07, label = paste0(unlist(as.list(x$selectedArms))))
+    expect_equal(x$numberOfActiveArms[1, ], c(1, 1, 1, 1, 1, 1), label = paste0(x$numberOfActiveArms[1, ]))
+    expect_equal(x$numberOfActiveArms[2, ], c(1, 1, 1, 1, 1, 1), label = paste0(x$numberOfActiveArms[2, ]))
+    expect_equal(x$numberOfActiveArms[3, ], c(1, 1, 1, 1, 1, 1), label = paste0(x$numberOfActiveArms[3, ]))
+    expect_equal(x$expectedNumberOfSubjects, c(68.211396, 101.92536, 114.30453, 107.14861, 109.24288, 79.622055), tolerance = 1e-07, label = paste0(x$expectedNumberOfSubjects))
+    expect_equal(unlist(as.list(x$sampleSizes)), c(20, 70.979514, 80, 20, 71.410143, 77.800325, 20, 69.572428, 79.321509, 20, 66.884783, 72.926791, 20, 62.423876, 74.4634, 20, 55.785406, 66.154471, 10, 35.489757, 40, 10, 35.705072, 38.900163, 10, 34.786214, 39.660755, 10, 33.442392, 36.463396, 10, 31.211938, 37.2317, 10, 27.892703, 33.077236), tolerance = 1e-07, label = paste0(unlist(as.list(x$sampleSizes))))
+    expect_equal(x$conditionalPowerAchieved[1, ], c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_), label = paste0(x$conditionalPowerAchieved[1, ]))
+    expect_equal(x$conditionalPowerAchieved[2, ], c(0.53965216, 0.44870166, 0.54176291, 0.51257459, 0.62161545, 0.65580386), tolerance = 1e-07, label = paste0(x$conditionalPowerAchieved[2, ]))
+    expect_equal(x$conditionalPowerAchieved[3, ], c(0.33271205, 0.28302479, 0.35942136, 0.59988705, 0.63386368, 0.5469144), tolerance = 1e-07, label = paste0(x$conditionalPowerAchieved[3, ]))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
-        invisible(capture.output(expect_error(print(design), NA)))
-        expect_output(print(design)$show())
-        invisible(capture.output(expect_error(summary(design), NA)))
-        expect_output(summary(design)$show())
-        xCodeBased <- eval(parse(text = getObjectRCode(design, stringWrapParagraphWidth = NULL)))
-        expect_equal(xCodeBased$iterations, design$iterations, tolerance = 1e-07)
-        expect_equal(xCodeBased$rejectAtLeastOne, design$rejectAtLeastOne, tolerance = 1e-07)
-        expect_equal(xCodeBased$rejectedArmsPerStage, design$rejectedArmsPerStage, tolerance = 1e-07)
-        expect_equal(xCodeBased$futilityStop, design$futilityStop, tolerance = 1e-07)
-        expect_equal(xCodeBased$futilityPerStage, design$futilityPerStage, tolerance = 1e-07)
-        expect_equal(xCodeBased$earlyStop, design$earlyStop, tolerance = 1e-07)
-        expect_equal(xCodeBased$successPerStage, design$successPerStage, tolerance = 1e-07)
-        expect_equal(xCodeBased$selectedArms, design$selectedArms, tolerance = 1e-07)
-        expect_equal(xCodeBased$numberOfActiveArms, design$numberOfActiveArms, tolerance = 1e-07)
-        expect_equal(xCodeBased$expectedNumberOfSubjects, design$expectedNumberOfSubjects, tolerance = 1e-07)
-        expect_equal(xCodeBased$sampleSizes, design$sampleSizes, tolerance = 1e-07)
-        expect_equal(xCodeBased$conditionalPowerAchieved, design$conditionalPowerAchieved, tolerance = 1e-07)
-        expect_type(names(design), "character")
-        df <- as.data.frame(design)
+        invisible(capture.output(expect_error(print(x), NA)))
+        expect_output(print(x)$show())
+        invisible(capture.output(expect_error(summary(x), NA)))
+        expect_output(summary(x)$show())
+        xCodeBased <- eval(parse(text = getObjectRCode(x, stringWrapParagraphWidth = NULL)))
+        expect_equal(xCodeBased$iterations, x$iterations, tolerance = 1e-07)
+        expect_equal(xCodeBased$rejectAtLeastOne, x$rejectAtLeastOne, tolerance = 1e-07)
+        expect_equal(xCodeBased$rejectedArmsPerStage, x$rejectedArmsPerStage, tolerance = 1e-07)
+        expect_equal(xCodeBased$futilityStop, x$futilityStop, tolerance = 1e-07)
+        expect_equal(xCodeBased$futilityPerStage, x$futilityPerStage, tolerance = 1e-07)
+        expect_equal(xCodeBased$earlyStop, x$earlyStop, tolerance = 1e-07)
+        expect_equal(xCodeBased$successPerStage, x$successPerStage, tolerance = 1e-07)
+        expect_equal(xCodeBased$selectedArms, x$selectedArms, tolerance = 1e-07)
+        expect_equal(xCodeBased$numberOfActiveArms, x$numberOfActiveArms, tolerance = 1e-07)
+        expect_equal(xCodeBased$expectedNumberOfSubjects, x$expectedNumberOfSubjects, tolerance = 1e-07)
+        expect_equal(xCodeBased$sampleSizes, x$sampleSizes, tolerance = 1e-07)
+        expect_equal(xCodeBased$conditionalPowerAchieved, x$conditionalPowerAchieved, tolerance = 1e-07)
+        expect_type(names(x), "character")
+        df <- as.data.frame(x)
         expect_s3_class(df, "data.frame")
         expect_true(nrow(df) > 0 && ncol(df) > 0)
-        mtx <- as.matrix(design)
+        mtx <- as.matrix(x)
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
@@ -1760,37 +1760,37 @@ test_that("'getSimulationMultiArmMeans': comparison of base and multi-arm, Fishe
         maxNumberOfIterations = 100, allocationRatioPlanned = allocationRatioPlanned, seed = 5678
     )
 
-    comp1 <- y$overallReject - design$rejectAtLeastOne
+    comp1 <- y$overallReject - x$rejectAtLeastOne
 
     ## Comparison of the results of numeric object 'comp1' with expected results
     expect_equal(comp1, c(-0.01, 0.02, 0.05, -0.03, -0.04, -0.04), tolerance = 1e-07, label = paste0(comp1))
 
-    comp2 <- y$rejectPerStage - design$rejectedArmsPerStage[, , 1]
+    comp2 <- y$rejectPerStage - x$rejectedArmsPerStage[, , 1]
 
     ## Comparison of the results of matrixarray object 'comp2' with expected results
     expect_equal(comp2[1, ], c(-0.01, -0.02, 0.05, -0.01, -0.05, -0.06), tolerance = 1e-07, label = paste0(comp2[1, ]))
     expect_equal(comp2[2, ], c(0.01, 0.03, -0.07, -0.08, 0.04, 0.05), tolerance = 1e-07, label = paste0(comp2[2, ]))
     expect_equal(comp2[3, ], c(-0.01, 0.01, 0.07, 0.06, -0.03, -0.03), tolerance = 1e-07, label = paste0(comp2[3, ]))
 
-    comp3 <- y$futilityPerStage - design$futilityPerStage
+    comp3 <- y$futilityPerStage - x$futilityPerStage
 
     ## Comparison of the results of matrixarray object 'comp3' with expected results
     expect_equal(comp3[1, ], c(0.08, 0.03, 0.01, 0.04, 0.02, 0.04), tolerance = 1e-07, label = paste0(comp3[1, ]))
     expect_equal(comp3[2, ], c(-0.1, 0.03, 0, 0, 0.03, 0.01), tolerance = 1e-07, label = paste0(comp3[2, ]))
 
-    comp4 <- round(y$sampleSizes - (design$sampleSizes[, , 1] + design$sampleSizes[, , 2]), 1)
+    comp4 <- round(y$sampleSizes - (x$sampleSizes[, , 1] + x$sampleSizes[, , 2]), 1)
 
     ## Comparison of the results of matrixarray object 'comp4' with expected results
     expect_equal(comp4[1, ], c(0, 0, 0, 0, 0, 0), label = paste0(comp4[1, ]))
     expect_equal(comp4[2, ], c(-3.6, -5.8, 8.4, 5.5, -3.5, 4.7), tolerance = 1e-07, label = paste0(comp4[2, ]))
     expect_equal(comp4[3, ], c(0, -1.8, -3.2, 7.1, -0.8, -19), tolerance = 1e-07, label = paste0(comp4[3, ]))
 
-    comp5 <- round(y$expectedNumberOfSubjects - design$expectedNumberOfSubjects, 1)
+    comp5 <- round(y$expectedNumberOfSubjects - x$expectedNumberOfSubjects, 1)
 
     ## Comparison of the results of numeric object 'comp5' with expected results
     expect_equal(comp5, c(-5.8, -11.9, -2.3, 7.1, -3.9, -0.3), tolerance = 1e-07, label = paste0(comp5))
 
-    comp6 <- design$earlyStop - y$earlyStop
+    comp6 <- x$earlyStop - y$earlyStop
 
     ## Comparison of the results of matrixarray object 'comp6' with expected results
     expect_equal(comp6[1, ], c(-0.19, -0.13, -0.3, -0.45, -0.28, -0.31), tolerance = 1e-07, label = paste0(comp6[1, ]))

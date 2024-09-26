@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8200 $
-## |  Last changed: $Date: 2024-09-12 15:05:38 +0200 (Do, 12 Sep 2024) $
+## |  File version: $Revision: 8273 $
+## |  Last changed: $Date: 2024-09-25 17:19:43 +0200 (Mi, 25 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -64,7 +64,7 @@ NULL
         if (type %in% c("power", "simulation", "simulationCounts") && sided == 2) {
             twoSidedPower <- TRUE
         } else {
-            twoSidedPower <- C_TWO_SIDED_POWER_DEFAULT
+            twoSidedPower <- NA
         }
     } else {
         ignore <- c(ignore, "twoSidedPower")
