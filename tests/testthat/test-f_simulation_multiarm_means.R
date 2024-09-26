@@ -15,8 +15,8 @@
 ## |
 ## |  File name: test-f_simulation_multiarm_means.R
 ## |  Creation date: 09 February 2024, 10:57:28
-## |  File version: $Revision: 8260 $
-## |  Last changed: $Date: 2024-09-25 10:42:43 +0200 (Mi, 25 Sep 2024) $
+## |  File version: $Revision: 8274 $
+## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8273 $
-## |  Last changed: $Date: 2024-09-25 17:19:43 +0200 (Mi, 25 Sep 2024) $
+## |  File version: $Revision: 8276 $
+## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -406,15 +406,15 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             naText <- getOption("rpact.summary.na", "")
             if (length(valuesToShow) == length(valuesToShow2) && !all(is.na(valuesToShow2))) {
                 for (variantIndex in seq_len(length(valuesToShow))) {
-                    value1 <- as.character(valuesToShow[variantIndex])
-                    value2 <- as.character(valuesToShow2[variantIndex])
+                    value1 <- trimws(as.character(valuesToShow[variantIndex]))
+                    value2 <- trimws(as.character(valuesToShow2[variantIndex]))
                     if (grepl("^ *NA *$", value1)) {
                         value1 <- naText
                     }
                     if (grepl("^ *NA *$", value2)) {
                         value2 <- naText
                     }
-                    if (trimws(value1) == "" && trimws(value2) == "") {
+                    if (value1 == "" && value2 == "") {
                         valuesToShow[variantIndex] <- naText
                     } else {
                         valuesToShow[variantIndex] <- sprintf(self$intervalFormat, value1, value2)
@@ -1296,7 +1296,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     comparisonH0 <- " = "
     comparisonH1 <- NA_character_
     if (inherits(object, "AnalysisResults") && !is.null(directionUpper)) {
-        comparisonH1 <- ifelse(sided == 2, " != ", ifelse(directionUpper, " > ", " < "))
+        comparisonH1 <- ifelse(sided == 2, " != ", ifelse(!isFALSE(directionUpper), " > ", " < "))
     }
 
     if (!is.null(object[["thetaH0"]])) {
@@ -2093,9 +2093,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             inherits(designPlan, "SimulationResults"))) {
         if (settings$groups == 1) {
             if (!is.null(designPlan[["pi1"]]) && length(designPlan$pi1) == 1) {
-                treatmentRateText <- paste0("H1: treatment rate pi = ", round(designPlan$pi1, 3))
+                treatmentRateText <- paste0("H1: pi = ", round(designPlan$pi1, 3))
             } else {
-                treatmentRateText <- "H1: treatment rate pi as specified"
+                treatmentRateText <- "H1: pi as specified"
             }
 
             header <- paste0(header, ",\n", .createSummaryHypothesisText(designPlan, summaryFactory))
@@ -2103,10 +2103,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
         } else {
             if (!is.null(designPlan[["pi1"]]) && length(designPlan$pi1) == 1) {
-                treatmentRateText <- paste0("H1: treatment rate pi(1) = ", round(designPlan$pi1, 3))
+                treatmentRateText <- paste0("H1: pi(1) = ", round(designPlan$pi1, 3))
             } else if (!is.null(designPlan[["piMaxVector"]]) && length(designPlan$piMaxVector) == 1) {
                 treatmentRateText <- paste0(
-                    "H1: treatment rate pi_max = ",
+                    "H1: pi_max = ",
                     .arrayToString(round(designPlan$piMaxVector, 3), vectorLookAndFeelEnabled = TRUE)
                 )
             } else if (settings$enrichmentEnabled && !is.null(designPlan[["effectList"]]) &&
@@ -2114,15 +2114,15 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 piTreatments <- designPlan$effectList[["piTreatments"]]
                 if (is.matrix(piTreatments) && nrow(piTreatments) == 1) {
                     treatmentRateText <- paste0(
-                        "H1: assumed treatment rate pi(treatment) = ",
+                        "H1: assumed pi(treatment) = ",
                         .arrayToString(round(designPlan$effectList$piTreatments, 3), vectorLookAndFeelEnabled = TRUE)
                     )
                 } else {
-                    treatmentRateText <- paste0("H1: assumed treatment rate pi(treatment) as specified")
+                    treatmentRateText <- paste0("H1: assumed pi(treatment) as specified")
                 }
             } else {
                 treatmentRateText <- paste0(
-                    "H1: treatment rate pi",
+                    "H1: pi",
                     ifelse(settings$multiArmEnabled, "_max", "(1)"), " as specified"
                 )
             }
@@ -2742,7 +2742,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
     summaryFactory <- SummaryFactory$new(
         object = object,
-        intervalFormat = intervalFormat, output = output, markdown = markdown
+        intervalFormat = intervalFormat, 
+        output = output, 
+        markdown = markdown
     )
 
     .addDesignInformationToSummary(design, object, summaryFactory,

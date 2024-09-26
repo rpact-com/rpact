@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8270 $
-## |  Last changed: $Date: 2024-09-25 16:37:39 +0200 (Mi, 25 Sep 2024) $
+## |  File version: $Revision: 8276 $
+## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1164,6 +1164,7 @@ getParameterName <- function(obj, parameterCaption) {
         )
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
+    parameterCaption <- trimws(parameterCaption)
     if (parameterCaption %in% names(obj)) {
         return(parameterCaption)
     }

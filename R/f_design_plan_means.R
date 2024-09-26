@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8268 $
-## |  Last changed: $Date: 2024-09-25 16:14:45 +0200 (Mi, 25 Sep 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8274 $
+## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R

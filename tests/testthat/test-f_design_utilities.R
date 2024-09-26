@@ -15,8 +15,8 @@
 ## |  
 ## |  File name: test-f_design_utilities.R
 ## |  Creation date: 08 November 2023, 09:10:53
-## |  File version: $Revision: 7560 $
-## |  Last changed: $Date: 2024-01-15 14:20:32 +0100 (Mo, 15 Jan 2024) $
+## |  File version: $Revision: 8274 $
+## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |  
 
