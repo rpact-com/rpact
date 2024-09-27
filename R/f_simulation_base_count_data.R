@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8243 $
-## |  Last changed: $Date: 2024-09-20 07:33:34 +0200 (Fr, 20 Sep 2024) $
+## |  File version: $Revision: 8277 $
+## |  Last changed: $Date: 2024-09-27 08:16:45 +0200 (Fr, 27 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -593,27 +593,33 @@ getSimulationCounts <- function(design = NULL,
     simulationResults$iterations <- iterations
     simulationResults$.setParameterType("iterations", C_PARAM_GENERATED)
 
+    if (kMax == 1) {
+        sampleSizePerStage <- rep(maxNumberOfSubjects, totalCases)
+        expectedSampleSize <- sampleSizePerStage
+    }
+    
     sampleSizePerStage[is.nan(sampleSizePerStage)] <- NA_integer_
     simulationResults$numberOfSubjects <- sampleSizePerStage
     simulationResults$.setParameterType(
         "numberOfSubjects",
-        ifelse(is.na(nTotal), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(kMax == 1 || is.na(nTotal), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
+    
     simulationResults$expectedNumberOfSubjects <- expectedSampleSize
     simulationResults$.setParameterType(
         "expectedNumberOfSubjects",
-        ifelse(all(is.na(expectedSampleSize)), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(kMax == 1 || all(is.na(expectedSampleSize)), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
 
     simulationResults$numberOfSubjects1 <- n1
     simulationResults$.setParameterType(
         "numberOfSubjects1",
-        ifelse(allocationRatioPlanned == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(kMax == 1 && allocationRatioPlanned != 1, C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
     )
     simulationResults$numberOfSubjects2 <- n2
     simulationResults$.setParameterType(
         "numberOfSubjects2",
-        ifelse(allocationRatioPlanned == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(kMax == 1 && allocationRatioPlanned != 1, C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
     )
 
     simulationResults$overallReject <- overallReject

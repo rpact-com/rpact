@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8268 $
-## |  Last changed: $Date: 2024-09-25 16:14:45 +0200 (Mi, 25 Sep 2024) $
+## |  File version: $Revision: 8279 $
+## |  Last changed: $Date: 2024-09-27 10:49:35 +0200 (Fr, 27 Sep 2024) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -162,7 +162,7 @@
         followUpTime <- studyTime - max(accrualTime)
     }
 
-    if (designPlan$.objectType == "power"){
+    if (designPlan$.objectType == "power") {
         nParameters <- 1
     } else {
         nParameters <- length(lambda1)
@@ -192,7 +192,7 @@
     criticalValues <- .getCriticalValues(design)
     futilityBounds <- design$futilityBounds
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
-    
+
     for (iCase in 1:nParameters) {
         ar <- allocationRatioPlanned[iCase]
 
@@ -224,7 +224,7 @@
                 recruit2 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] / (1 + ar))
             }
         }
-        
+
         # calculate theta that solves (ln(theta) - ln(thetaH0) sqrt(FisherInformation_k) = boundary
         for (j in seq_len(length(criticalValues))) {
             if (all(is.na(numberOfSubjects[, iCase]))) {
@@ -354,12 +354,13 @@
             )$root)
         },
         error = function(e) {
-            stop("Failed to calculate the calendar time. ",
+            warning("Failed to calculate the calendar time. ",
                 "Fisher information might be bounded, e.g., due to overdispersion > 0",
                 call. = FALSE
             )
         }
     )
+    return(NA_real_)
 }
 
 .getMaximumSampleSizeTwoGroups <- function(allocationRatioPlanned,
@@ -402,8 +403,7 @@
     ))
 }
 
-.getDesignPlanCountData <- function(
-        design,
+.getDesignPlanCountData <- function(design,
         designCharacteristics,
         objectType,
         sided,
@@ -1137,7 +1137,9 @@ getPowerCounts <- function(design = NULL, ...,
         accrualTime <- accrualTime[-1]
     }
     directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
     .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
 
     futilityPerStage <- matrix(NA_real_, kMax - 1, totalCases)

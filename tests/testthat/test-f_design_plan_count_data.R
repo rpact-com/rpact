@@ -178,7 +178,6 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         lambda2 = 1.4, accrualTime = c(0, 20), allocationRatioPlanned = 1, maxNumberOfSubjects = 100
     )
 
-
     ## Comparison of the results of TrialDesignPlanCountData object 'result4' with expected results
     expect_equal(result4$directionUpper, c(FALSE, FALSE, FALSE), label = paste0(result4$directionUpper))
     expect_equal(result4$theta, c(0.75, 0.85714286, 0.96428571), tolerance = 1e-07, label = paste0(result4$theta))
@@ -214,10 +213,11 @@ test_that("'getSampleSizeCounts': Sample size calculation of testing count data 
         expect_true(is.matrix(mtx))
         expect_true(nrow(mtx) > 0 && ncol(mtx) > 0)
     }
+    
     # @refFS[Formula]{fs:FisherInfCounts}
     # @refFS[Formula]{fs:maximumSampleSizeVariableExposureCounts}
     # @refFS[Formula]{fs:observationTimePerStageCounts}
-    expect_error(getSampleSizeCounts(
+    expect_warning(getSampleSizeCounts(
         alpha = 0.01, beta = 0.05, lambda1 = seq(1.35, 1.35, 0.15),
         overdispersion = 0.01, lambda2 = 1.4, accrualTime = c(0, 10, 20), accrualIntensity = c(5, 10)
     ))

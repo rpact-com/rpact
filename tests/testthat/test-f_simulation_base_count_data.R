@@ -269,10 +269,8 @@ test_that("'getSimulationCounts': fixed exposure", {
 
     ## Comparison of the results of SimulationResultsCountData object 'result2' with expected results
     expect_equal(result2$lambda1, c(1.05, 1.5866662), tolerance = 1e-07, label = paste0(result2$lambda1))
-    expect_equal(result2$numberOfSubjects[1, ], c(0, 0), label = paste0(result2$numberOfSubjects[1, ]))
     expect_equal(result2$iterations[1, ], c(100, 100), label = paste0(result2$iterations[1, ]))
     expect_equal(result2$overallReject, c(0.14, 0), tolerance = 1e-07, label = paste0(result2$overallReject))
-    expect_equal(result2$expectedNumberOfSubjects, c(0, 0), label = paste0(result2$expectedNumberOfSubjects))
     if (isTRUE(.isCompleteUnitTestSetEnabled())) {
         invisible(capture.output(expect_error(print(result2), NA)))
         expect_output(print(result2)$show())
@@ -280,10 +278,8 @@ test_that("'getSimulationCounts': fixed exposure", {
         expect_output(summary(result2)$show())
         suppressWarnings(result2CodeBased <- eval(parse(text = getObjectRCode(result2, stringWrapParagraphWidth = NULL))))
         expect_equal(result2CodeBased$lambda1, result2$lambda1, tolerance = 1e-07)
-        expect_equal(result2CodeBased$numberOfSubjects, result2$numberOfSubjects, tolerance = 1e-07)
         expect_equal(result2CodeBased$iterations, result2$iterations, tolerance = 1e-07)
         expect_equal(result2CodeBased$overallReject, result2$overallReject, tolerance = 1e-07)
-        expect_equal(result2CodeBased$expectedNumberOfSubjects, result2$expectedNumberOfSubjects, tolerance = 1e-07)
         expect_type(names(result2), "character")
         df <- as.data.frame(result2)
         expect_s3_class(df, "data.frame")
