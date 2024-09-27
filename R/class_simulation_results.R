@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8232 $
-## |  Last changed: $Date: 2024-09-19 08:22:37 +0200 (Do, 19 Sep 2024) $
+## |  File version: $Revision: 8277 $
+## |  Last changed: $Date: 2024-09-27 08:16:45 +0200 (Fr, 27 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -567,6 +567,9 @@ SimulationResults <- R6::R6Class("SimulationResults",
                 "numberOfPopulations",
                 "expectedNumberOfSubjects",
                 "expectedNumberOfEvents",
+                "numberOfSubjects",
+                "numberOfSubjects1",
+                "numberOfSubjects2",
                 "sampleSizes",
                 "singleEventsPerArmAndStage",
                 "singleEventsPerSubsetAndStage",
@@ -1708,10 +1711,10 @@ SimulationResultsCountData <- R6::R6Class("SimulationResultsCountData",
         accrualIntensity = NULL,
         followUpTime = NULL,
         groups = NULL,
+        expectedNumberOfSubjects = NULL,
         numberOfSubjects = NULL,
         numberOfSubjects1 = NULL,
         numberOfSubjects2 = NULL,
-        expectedNumberOfSubjects = NULL,
         iterations = NULL,
         futilityStop = NULL,
         futilityPerStage = NULL,

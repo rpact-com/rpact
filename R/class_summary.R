@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8276 $
-## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
+## |  File version: $Revision: 8277 $
+## |  Last changed: $Date: 2024-09-27 08:16:45 +0200 (Fr, 27 Sep 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -506,7 +506,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                                 "expectedEventsH1", 
                                 "expectedNumberOfEvents", 
                                 "expectedStudyDurationH1",
-                                "studyDuration")) {
+                                "studyDuration",
+                                "earlyStop")) {
                             transposed <- TRUE
                         }
                     }
@@ -3552,8 +3553,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
         
         if (designPlan$.getParameterType(parameterNameSubjects) == C_PARAM_GENERATED) {
-            subjectsCaption <- ifelse(design$kMax > 1 && inherits(designPlan, "SimulationResults") &&
-                    !survivalEnabled, "Stage-wise number of subjects", "Number of subjects")
+            subjectsCaption <- ifelse(design$kMax > 1 && 
+                    inherits(designPlan, "SimulationResults") && !survivalEnabled, 
+                    "Stage-wise number of subjects", "Number of subjects")
             summaryFactory$addParameter(designPlan,
                 parameterName = parameterNameSubjects,
                 parameterCaption = subjectsCaption,
@@ -3564,33 +3566,6 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 lastStage = lastStage
             )
         }
-    }
-    
-    if (baseEnabled && countDataEnabled && design$kMax > 1 &&
-        !is.null(designPlan[["maxNumberOfSubjects"]]) &&
-        designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED) {
-        summaryFactory$addParameter(designPlan,
-            parameterName = "maxNumberOfSubjects",
-            parameterCaption = "Maximum number of subjects",
-            roundDigits = digitSettings$digitsSampleSize
-        )
-        summaryFactory$addParameter(designPlan,
-            parameterName = "expectedNumberOfSubjectsH1", 
-            parameterCaption = "Expected number of subjects",
-            roundDigits = digitSettings$digitsSampleSize
-        )
-    }
-    if (baseEnabled && !countDataEnabled && design$kMax > 1) {
-        summaryFactory$addParameter(designPlan,
-            parameterName = ifelse(inherits(designPlan, "TrialDesignPlan") &&
-                    (designPlan$.isSampleSizeObject() || countDataEnabled),
-                "expectedNumberOfSubjectsH1", "expectedNumberOfSubjects"), 
-            parameterCaption = "Expected number of subjects under H1",
-            roundDigits = digitSettings$digitsSampleSize,
-            transpose = TRUE,
-            validateParameterType = !countDataEnabled,
-            lastStage = design$kMax
-        )
     }
     
     if (simulationEnabled && (multiArmEnabled || enrichmentEnabled || countDataEnabled)) {
@@ -3609,6 +3584,29 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 roundDigits = digitSettings$digitsSampleSize,
                 transpose = TRUE,
                 lastStage = design$kMax
+            )
+        }
+    }
+    else if (baseEnabled && design$kMax > 1) {
+        parameterName <- ifelse(inherits(designPlan, "TrialDesignPlan") &&
+            (designPlan$.isSampleSizeObject() || countDataEnabled),
+            "expectedNumberOfSubjectsH1", "expectedNumberOfSubjects") 
+        summaryFactory$addParameter(designPlan,
+            parameterName = parameterName, 
+            parameterCaption = "Expected number of subjects under H1",
+            roundDigits = digitSettings$digitsSampleSize,
+            transpose = TRUE,
+            validateParameterType = !countDataEnabled,
+            lastStage = design$kMax
+        )
+        if (countDataEnabled &&
+                (is.null(designPlan[[parameterName]]) || all(is.na(designPlan[[parameterName]]))) &&
+                !is.null(designPlan[["maxNumberOfSubjects"]]) &&
+                designPlan$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED) {
+            summaryFactory$addParameter(designPlan,
+                parameterName = "maxNumberOfSubjects",
+                parameterCaption = "Maximum number of subjects",
+                roundDigits = digitSettings$digitsSampleSize
             )
         }
     }
@@ -3671,7 +3669,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             parameterCaption = "Overall exit probability", # (under H1)
             roundDigits = digitSettings$digitsProbabilities,
             smoothedZeroFormat = TRUE,
-            transpose = TRUE
+            transpose = TRUE,
+            lastStage = design$kMax 
         )
     }
 
