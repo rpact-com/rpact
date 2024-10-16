@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8277 $
-## |  Last changed: $Date: 2024-09-27 08:16:45 +0200 (Fr, 27 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8282 $
+## |  Last changed: $Date: 2024-09-27 14:02:44 +0200 (Fr, 27 Sep 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 .getInformationCountData <- function(lambda1,
@@ -153,7 +153,7 @@
 #'
 getSimulationCounts <- function(design = NULL,
         ...,
-        plannedCalendarTime,
+        plannedCalendarTime = NA_real_,
         maxNumberOfSubjects = NA_real_,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
@@ -230,7 +230,19 @@ getSimulationCounts <- function(design = NULL,
         maxNumberOfSubjects = maxNumberOfSubjects,
         accrualIntensityValidationEnabled = FALSE
     )
-    .assertAreValidCalendarTimes(plannedCalendarTime, kMax)
+    
+    if (kMax > 1){
+        .assertAreValidCalendarTimes(plannedCalendarTime, kMax)
+        if (!is.na(followUpTime)){
+            if (abs(plannedCalendarTime[kMax] - max(accrualTime) - followUpTime) > 1E-4){
+                stop("Last plannedCalendarTime must be equal accrualTime + followUpTime")
+            }
+        }
+    } else if (!is.na(plannedCalendarTime)){
+        warning ("plannedCalendarTime has no influence on simulation",
+                call. = FALSE)
+    }        
+    
     if (any(is.na(accrualTime))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,

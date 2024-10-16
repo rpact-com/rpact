@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8277 $
-## |  Last changed: $Date: 2024-09-27 08:16:45 +0200 (Fr, 27 Sep 2024) $
+## |  File version: $Revision: 8323 $
+## |  Last changed: $Date: 2024-10-15 09:20:06 +0200 (Tue, 15 Oct 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -490,7 +490,8 @@ SimulationResults <- R6::R6Class("SimulationResults",
                         "median [range]: ", round(stats::median(paramValue), 3),
                         " [", paste(round(base::range(paramValue), 3), collapse = " - "), "]; ",
                         "mean +/-sd: ", round(base::mean(paramValue), 3),
-                        " +/-", round(stats::sd(paramValue), 3)
+                        " +/-", round(stats::sd(paramValue), 3), "; ",
+                        "n = ", length(paramValue)
                     )
                 } else {
                     paramValueFormatted <- "median [range]: NA [NA - NA]; mean +/sd: NA +/-NA"

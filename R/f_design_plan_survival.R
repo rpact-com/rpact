@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8266 $
-## |  Last changed: $Date: 2024-09-25 15:19:20 +0200 (Mi, 25 Sep 2024) $
+## |  File version: $Revision: 8323 $
+## |  Last changed: $Date: 2024-10-15 09:20:06 +0200 (Tue, 15 Oct 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1696,19 +1696,24 @@ getEventProbabilities <- function(time, ...,
 
     setting <- getPiecewiseSurvivalTime(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
-        lambda2 = lambda2, lambda1 = lambda1,
-        hazardRatio = hazardRatio, kappa = kappa,
+        lambda2 = lambda2, 
+        lambda1 = lambda1,
+        hazardRatio = hazardRatio, 
+        kappa = kappa,
         delayedResponseAllowed = TRUE,
         .lambdaBased = TRUE
     )
 
     if (!setting$delayedResponseEnabled && length(setting$lambda1) > 1 &&
             setting$.getParameterType("lambda1") == C_PARAM_USER_DEFINED) {
-        warning("Only the first 'lambda1' (", lambda1[1], ") was used to calculate event probabilities", call. = FALSE)
+        warning("Only the first 'lambda1' (", lambda1[1], ") ",
+            "was used to calculate event probabilities", call. = FALSE)
         setting <- getPiecewiseSurvivalTime(
             piecewiseSurvivalTime = piecewiseSurvivalTime,
-            lambda2 = lambda2, lambda1 = lambda1[1],
-            hazardRatio = hazardRatio, kappa = kappa,
+            lambda2 = lambda2, 
+            lambda1 = lambda1[1],
+            hazardRatio = hazardRatio, 
+            kappa = kappa,
             delayedResponseAllowed = TRUE,
             .lambdaBased = TRUE
         )

@@ -2,9 +2,13 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: 
+      - main
+      - 'dev/*'
   pull_request:
-    branches: [main, master]
+    branches:
+      - main
+      - 'dev/*'
   workflow_dispatch:
 
 name: test-coverage
@@ -16,7 +20,18 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout this package repository 
+        uses: actions/checkout@v4
+
+      - name: Checkout the private tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'rpact-com/rpact.tests'
+          ref: main
+          token: ${{ secrets.RPACT_TESTS_ACCESS_TOKEN }}
+          path: 'private-tests'
+          sparse-checkout: |
+            tests
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -24,8 +39,14 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr
+          extra-packages: any::covr, any::xml2
           needs: coverage
+
+      - name: Add private tests
+        run: |
+          find ./private-tests/tests -maxdepth 1 -name \*.R -exec cp {} ./tests \;
+          find ./private-tests/tests/testthat -maxdepth 1 -name \*.R -exec cp {} ./tests/testthat \;
+        shell: bash
 
       - name: Test coverage
         run: |

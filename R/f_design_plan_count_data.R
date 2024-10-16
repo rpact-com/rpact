@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8279 $
-## |  Last changed: $Date: 2024-09-27 10:49:35 +0200 (Fr, 27 Sep 2024) $
+## |  File version: $Revision: 8289 $
+## |  Last changed: $Date: 2024-09-30 13:29:37 +0200 (Mo, 30 Sep 2024) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -274,22 +274,21 @@
                     recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
                     recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
                 )
-            }
-
-            if (design$sided == 2 && design$kMax > 1 &&
-                    (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-                        !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
-                futilityBoundsEffectScaleLower[j, iCase] <- .findThetaUniRoot(
-                    -futilityBounds[j],
-                    lambda2, thetaH0,
-                    directionUpper[iCase],
-                    ar, overdispersion, accrualTime,
-                    followUpTime[iCase], fixedExposureTime,
-                    numberOfSubjectsPerStage,
-                    recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
-                    recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
-                )
-            }
+                if (design$sided == 2 && design$kMax > 1 &&
+                        (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                            !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                    futilityBoundsEffectScaleLower[j, iCase] <- .findThetaUniRoot(
+                        -futilityBounds[j],
+                        lambda2, thetaH0,
+                        directionUpper[iCase],
+                        ar, overdispersion, accrualTime,
+                        followUpTime[iCase], fixedExposureTime,
+                        numberOfSubjectsPerStage,
+                        recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
+                        recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
+                    )
+                }
+            }    
         }
     }
 
