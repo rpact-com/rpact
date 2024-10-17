@@ -464,8 +464,9 @@ NULL
 #' @inheritParams param_three_dots
 #'
 #' @details
-#' This function creates the subdirectory \code{rpact-tests} in the specified output directory
-#' and copies all unit test files of the package to this newly created directory.
+#' This function creates a subdirectory named \code{rpact-tests} in the 
+#' specified output directory, downloads all unit test files of the package 
+#' from an online resource, and copies them to this newly created directory.
 #' Then the function runs all tests (or a subset of all tests if
 #' \code{completeUnitTestSetEnabled} is \code{FALSE}) using
 #' \code{\link[tools]{testInstalledPackage}}.
