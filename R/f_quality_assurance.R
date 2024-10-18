@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7961 $
-## |  Last changed: $Date: 2024-05-30 14:58:05 +0200 (Thu, 30 May 2024) $
+## |  File version: $Revision: 8333 $
+## |  Last changed: $Date: 2024-10-18 10:54:09 +0200 (Fr, 18 Okt 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -144,7 +144,10 @@ NULL
     if (cleanOldFiles) {
         unlink(testFileTargetDirectory, recursive = TRUE)
     }
-    dir.create(testFileTargetDirectory, recursive = TRUE)
+    
+    if (!dir.exists(testFileTargetDirectory)) {
+        dir.create(testFileTargetDirectory, recursive = TRUE)
+    }
 
     testthatSubDirectory <- file.path(testFileTargetDirectory, "testthat")
     if (!dir.exists(testthatSubDirectory)) {
@@ -461,6 +464,8 @@ NULL
 #' @param connection A \code{list} where owners of the rpact validation documentation
 #'     can enter a \code{token} and a \code{secret} to get full access to all unit tests, e.g.,
 #'     to fulfill regulatory requirements (see \href{https://www.rpact.com}{www.rpact.com} for more information).
+#' @param testFileDirectory An optional path that points to a local directory where the test files are located. 
+#' @param downloadTestsOnly If \code{TRUE}, the unit test files are only downloaded and not executed, default is \code{FALSE}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -482,21 +487,40 @@ NULL
 #'
 #' @export
 #'
-testPackage <- function(outDir = ".", ...,
+testPackage <- function(
+        outDir = ".", 
+        ...,
         completeUnitTestSetEnabled = TRUE,
         types = "tests",
-        connection = list(token = NULL, secret = NULL)) {
+        connection = list(token = NULL, secret = NULL),
+        testFileDirectory = NA_character_,
+        downloadTestsOnly = FALSE) {
     .assertTestthatIsInstalled()
-
     .assertIsSingleCharacter(outDir, "outDir", naAllowed = FALSE)
+    .assertIsSingleLogical(completeUnitTestSetEnabled, "completeUnitTestSetEnabled", naAllowed = FALSE)
+    .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = TRUE)
+    .assertIsSingleLogical(downloadTestsOnly, "downloadTestsOnly", naAllowed = FALSE)
     if (!dir.exists(outDir)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "test output directory '", outDir, "' does not exist"
         )
     }
-
+    
+    if (!is.na(testFileDirectory) && !dir.exists(testFileDirectory)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "test file directory '", testFileDirectory, "' does not exist"
+        )
+    }
+  
     startTime <- Sys.time()
+    
+    if (!is.na(testFileDirectory) && !dir.exists(file.path(testFileDirectory, "testthat"))) {
+        warning("'testFileDirectory' (", testFileDirectory, ") will be ignored ",
+            "because it does not contain a 'testthat' subfolder", call. = FALSE)
+        testFileDirectory <- NA_character_
+    }
 
     Sys.setenv("LANGUAGE" = "EN")
     on.exit(Sys.unsetenv("LANGUAGE"))
@@ -519,7 +543,20 @@ testPackage <- function(outDir = ".", ...,
         length(token) == 1 && length(secret) == 1 &&
         !is.na(token) && !is.na(secret))
 
-    if (completeUnitTestSetEnabled && fullTestEnabled) {
+    downloadOnlyModeEnabled <- is.na(testFileDirectory) && 
+        isTRUE(downloadTestsOnly) && isTRUE(fullTestEnabled)
+
+    if (!is.na(testFileDirectory)) {
+        if (fullTestEnabled) {
+            warning("The connection token and secret will be ignored ",
+                "because 'testFileDirectory' is defined", call. = FALSE)
+        }
+        fullTestEnabled <- TRUE
+    }
+
+    if (downloadOnlyModeEnabled) {
+        cat("The unit test files are only downloaded and not executed.\n")
+    } else if (completeUnitTestSetEnabled && fullTestEnabled) {
         cat("Run all tests. Please wait...\n")
         cat("Have a break - it takes about 20 minutes.\n")
         cat("Exceution of all available unit tests startet at ",
@@ -554,21 +591,30 @@ testPackage <- function(outDir = ".", ...,
     if (!fullTestEnabled) {
         tools::testInstalledPackage(pkg = pkgName, outDir = outDir, types = types)
     } else {
-        testFileTargetDirectory <- file.path(outDir, paste0(pkgName, "-tests"))
-        .downloadUnitTests(
-            testFileTargetDirectory = testFileTargetDirectory,
-            token = token,
-            secret = secret,
-            method = .getConnectionArgument(connection, "method"),
-            mode = .getConnectionArgument(connection, "mode"),
-            cacheOK = .getConnectionArgument(connection, "cacheEnabled"),
-            extra = .getConnectionArgument(connection, "extra"),
-            cleanOldFiles = .getConnectionArgument(connection, "cleanOldFiles"),
-            connectionType = .getConnectionArgument(connection, "connectionType")
-        )
+        if (!is.na(testFileDirectory)) {
+            testFileTargetDirectory <- testFileDirectory
+        } else {
+            testFileTargetDirectory <- file.path(outDir, paste0(pkgName, "-tests"))
+            .downloadUnitTests(
+                testFileTargetDirectory = testFileTargetDirectory,
+                token = token,
+                secret = secret,
+                method = .getConnectionArgument(connection, "method"),
+                mode = .getConnectionArgument(connection, "mode"),
+                cacheOK = .getConnectionArgument(connection, "cacheEnabled"),
+                extra = .getConnectionArgument(connection, "extra"),
+                cleanOldFiles = .getConnectionArgument(connection, "cleanOldFiles"),
+                connectionType = .getConnectionArgument(connection, "connectionType")
+            )
+            if (downloadOnlyModeEnabled) {
+                return(invisible())
+            }
+        }
         .testInstalledPackage(
             testFileDirectory = testFileTargetDirectory,
-            pkgName = pkgName, outDir = testFileTargetDirectory, Ropts = ""
+            pkgName = pkgName, 
+            outDir = testFileTargetDirectory, 
+            Ropts = ""
         )
     }
 

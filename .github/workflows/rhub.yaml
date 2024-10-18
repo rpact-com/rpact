@@ -51,7 +51,17 @@ jobs:
       image: ${{ matrix.config.container }}
 
     steps:
-      - uses: r-hub/actions/checkout@v1
+      - name: Checkout this package repository 
+        uses: r-hub/actions/checkout@v1
+      - name: Checkout the private tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'rpact-com/rpact.tests'
+          ref: main
+          token: ${{ secrets.RPACT_TESTS_ACCESS_TOKEN }}
+          path: 'private-tests'
+          sparse-checkout: |
+            tests
       - uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
@@ -60,6 +70,11 @@ jobs:
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
+      - name: Add private tests
+        run: |
+          find ./private-tests/tests -maxdepth 1 -name \*.R -exec cp {} ./tests \;
+          find ./private-tests/tests/testthat -maxdepth 1 -name \*.R -exec cp {} ./tests/testthat \;
+        shell: bash
       - uses: r-hub/actions/run-check@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
@@ -76,7 +91,17 @@ jobs:
         config: ${{ fromJson(needs.setup.outputs.platforms) }}
 
     steps:
-      - uses: r-hub/actions/checkout@v1
+      - name: Checkout this package repository 
+        uses: r-hub/actions/checkout@v1
+      - name: Checkout the private tests repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'rpact-com/rpact.tests'
+          ref: main
+          token: ${{ secrets.RPACT_TESTS_ACCESS_TOKEN }}
+          path: 'private-tests'
+          sparse-checkout: |
+            tests
       - uses: r-hub/actions/setup-r@v1
         with:
           job-config: ${{ matrix.config.job-config }}
@@ -89,6 +114,11 @@ jobs:
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
+      - name: Add private tests
+        run: |
+          find ./private-tests/tests -maxdepth 1 -name \*.R -exec cp {} ./tests \;
+          find ./private-tests/tests/testthat -maxdepth 1 -name \*.R -exec cp {} ./tests/testthat \;
+        shell: bash
       - uses: r-hub/actions/run-check@v1
         with:
           job-config: ${{ matrix.config.job-config }}

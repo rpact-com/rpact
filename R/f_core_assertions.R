@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8262 $
-## |  Last changed: $Date: 2024-09-25 10:43:45 +0200 (Mi, 25 Sep 2024) $
+## |  File version: $Revision: 8333 $
+## |  Last changed: $Date: 2024-10-18 10:54:09 +0200 (Fr, 18 Okt 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -3020,13 +3020,14 @@ NULL
         accrualTime,
         accrualIntensity,
         maxNumberOfSubjects,
-        accrualIntensityValidationEnabled = TRUE) {
+        accrualIntensityValidationEnabled = TRUE,
+        accrualTimeIsMandatory = FALSE) {
     .assertIsSingleLogical(sampleSizeEnabled, "sampleSizeEnabled")
     .assertIsSingleNumber(fixedExposureTime, "fixedExposureTime", naAllowed = TRUE)
     .assertIsInOpenInterval(fixedExposureTime, "fixedExposureTime", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsSingleNumber(followUpTime, "followUpTime", naAllowed = TRUE)
     .assertIsInClosedInterval(followUpTime, "followUpTime", lower = 0, upper = NULL, naAllowed = TRUE)
-    .assertIsValidAccrualTime(accrualTime)
+    .assertIsValidAccrualTime(accrualTime, naAllowed = isFALSE(accrualTimeIsMandatory))
     .assertIsNumericVector(accrualIntensity, "accrualIntensity", naAllowed = TRUE)
     .assertIsInClosedInterval(accrualIntensity, "accrualIntensity", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
