@@ -38,6 +38,12 @@ jobs:
         config: ${{ github.event.inputs.config }}
       id: rhub-setup
 
+    # Set the GitHub username and email for commits
+    - name: Set GitHub user
+      run: |
+        git config --global user.name "RPACT GitHub Action RHub"
+        git config --global user.email "info@rpact.com"
+
   linux-containers:
     needs: setup
     if: ${{ needs.setup.outputs.containers != '[]' }}

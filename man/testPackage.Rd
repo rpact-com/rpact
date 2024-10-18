@@ -9,7 +9,9 @@ testPackage(
   ...,
   completeUnitTestSetEnabled = TRUE,
   types = "tests",
-  connection = list(token = NULL, secret = NULL)
+  connection = list(token = NULL, secret = NULL),
+  testFileDirectory = NA_character_,
+  downloadTestsOnly = FALSE
 )
 }
 \arguments{
@@ -28,6 +30,10 @@ be executed; a subset of all unit tests will be used otherwise.}
 \item{connection}{A \code{list} where owners of the rpact validation documentation
 can enter a \code{token} and a \code{secret} to get full access to all unit tests, e.g.,
 to fulfill regulatory requirements (see \href{https://www.rpact.com}{www.rpact.com} for more information).}
+
+\item{testFileDirectory}{An optional path that points to a local directory where the test files are located.}
+
+\item{downloadTestsOnly}{If \code{TRUE}, the unit test files are only downloaded and not executed, default is \code{FALSE}.}
 }
 \value{
 The value of \code{completeUnitTestSetEnabled} will be returned invisible.
@@ -36,8 +42,9 @@ The value of \code{completeUnitTestSetEnabled} will be returned invisible.
 This function allows the installed package \code{rpact} to be tested.
 }
 \details{
-This function creates the subdirectory \code{rpact-tests} in the specified output directory
-and copies all unit test files of the package to this newly created directory.
+This function creates a subdirectory named \code{rpact-tests} in the
+specified output directory, downloads all unit test files of the package
+from an online resource, and copies them to this newly created directory.
 Then the function runs all tests (or a subset of all tests if
 \code{completeUnitTestSetEnabled} is \code{FALSE}) using
 \code{\link[tools]{testInstalledPackage}}.

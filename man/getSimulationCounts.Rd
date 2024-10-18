@@ -7,7 +7,7 @@
 getSimulationCounts(
   design = NULL,
   ...,
-  plannedCalendarTime,
+  plannedCalendarTime = NA_real_,
   maxNumberOfSubjects = NA_real_,
   lambda1 = NA_real_,
   lambda2 = NA_real_,
