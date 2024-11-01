@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8343 $
+## |  Last changed: $Date: 2024-11-01 10:37:53 +0100 (Fr, 01 Nov 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_simulation_enrichment.R
@@ -952,9 +952,9 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
     dataPopulationNumber <- rep(NA_real_, len)
     dataEffect <- rep(NA_real_, len)
     dataSubjectsPopulation <- rep(NA_real_, len)
-    dataSubjectsActivePopulation <- rep(NA_real_, len)
-    dataNumberOfSubjects <- rep(NA_real_, len)
-    dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
+    # dataSubjectsActivePopulation <- rep(NA_real_, len)
+    # dataNumberOfSubjects <- rep(NA_real_, len)
+    # dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
     dataRejectPerStage <- rep(NA, len)
     dataFutilityStop <- rep(NA_real_, len)
     dataSuccessStop <- rep(NA, len)
@@ -1047,8 +1047,8 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
                     dataPopulationNumber[index] <- g
                     dataEffect[index] <- i
                     dataSubjectsPopulation[index] <- stageResults$populationSubjectsPerStage[g, k]
-                    dataNumberOfSubjects[index] <- round(sum(stageResults$subjectsPerStage[, k], na.rm = TRUE), 1)
-                    dataNumberOfCumulatedSubjects[index] <- sum(stageResults$subjectsPerStage[, 1:k], na.rm = TRUE)
+                    # dataNumberOfSubjects[index] <- round(sum(stageResults$subjectsPerStage[, k], na.rm = TRUE), 1)
+                    # dataNumberOfCumulatedSubjects[index] <- sum(stageResults$subjectsPerStage[, 1:k], na.rm = TRUE)
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -1135,8 +1135,8 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
         stageNumber = dataStageNumber,
         populationNumber = dataPopulationNumber,
         effect = dataEffect,
-        numberOfSubjects = dataNumberOfSubjects,
-        numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,
+        # numberOfSubjects = dataNumberOfSubjects,
+        # numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,
         subjectsPopulation = dataSubjectsPopulation,
         effectEstimate = dataEffectEstimate,
         testStatistics = dataTestStatistics,

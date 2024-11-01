@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8343 $
+## |  Last changed: $Date: 2024-11-01 10:37:53 +0100 (Fr, 01 Nov 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_simulation_enrichment.R
@@ -538,9 +538,9 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
     dataPopulationNumber <- rep(NA_real_, len)
     dataEffect <- rep(NA_real_, len)
     dataSubjectsPopulation <- rep(NA_real_, len)
-    dataSubjectsActivePopulation <- rep(NA_real_, len)
-    dataNumberOfSubjects <- rep(NA_real_, len)
-    dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
+    # dataSubjectsActivePopulation <- rep(NA_real_, len)
+    # dataNumberOfSubjects <- rep(NA_real_, len)
+    # dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
     dataRejectPerStage <- rep(NA, len)
     dataFutilityStop <- rep(NA_real_, len)
     dataSuccessStop <- rep(NA, len)
@@ -629,18 +629,17 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
                     }
                 }
 
-                for (g in 1:gMax) {
+                for (g in 1:gMax){ 
                     dataIterationNumber[index] <- j
                     dataStageNumber[index] <- k
                     dataPopulationNumber[index] <- g
                     dataEffect[index] <- i
                     dataSubjectsPopulation[index] <- round(stageResults$populationSubjectsPerStage[g, k], 1)
-                    dataSubjectsActivePopulation[index] <- round(stageResults$populationSubjectsPerStage[g, k], 1)
-                    dataNumberOfSubjects[index] <- round(sum(stageResults$populationSubjectsPerStage[, k], na.rm = TRUE), 1)
-                    dataNumberOfCumulatedSubjects[index] <- round(sum(
-                        stageResults$populationSubjectsPerStage[, 1:k],
-                        na.rm = TRUE
-                    ), 1)
+                    # dataSubjectsActivePopulation[index] <- round(stageResults$populationSubjectsPerStage[g, k], 1)
+                    # dataNumberOfSubjects[index] <- round(
+                    #     sum(stageResults$populationSubjectsPerStage[, k], na.rm = TRUE), 1)
+                    # dataNumberOfCumulatedSubjects[index] <- round(
+                    #     sum(stageResults$populationSubjectsPerStage[, 1:k], na.rm = TRUE), 1)
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -725,8 +724,8 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
         stageNumber = dataStageNumber,
         populationNumber = dataPopulationNumber,
         effect = dataEffect,
-        numberOfSubjects = dataNumberOfSubjects,
-        numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,
+        # numberOfSubjects = dataNumberOfSubjects,
+        # numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,
         subjectsPopulation = dataSubjectsPopulation,
         effectEstimate = dataEffectEstimate,
         testStatistic = dataTestStatistics,
