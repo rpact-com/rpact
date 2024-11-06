@@ -1,3 +1,13 @@
+# rpact 4.1.1
+
+## New features
+
+* For the functions `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()` it is now possible to specify a parameter `doseLevels` to define the dose levels for a `linear` or `sigmoidEmax` dose-response relationship (see feature request [#63](https://github.com/rpact-com/rpact/issues/63)).  
+
+## Improvements, issues, and changes
+
+* Minor improvements and 
+
 
 # rpact 4.1.0
 

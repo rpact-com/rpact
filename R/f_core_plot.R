@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8360 $
+## |  Last changed: $Date: 2024-11-04 15:40:23 +0100 (Mo, 04 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -536,8 +536,9 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 }
 
 .getRexepSaveCharacter <- function(x) {
-    x <- gsub("\\$", "\\\\$", x)
-    x <- gsub("\\.", "\\\\.", x)
+    for (s in c("$", ".", "{", "}", "(", ")", "[", "]", "+", "-", "*", "/", "^", "?", "|")) {
+        x <- gsub(paste0("\\", s), paste0("\\\\", s), x)
+    }
     return(x)
 }
 
@@ -558,15 +559,26 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (grepl("^rpact::", parameterName)) {
         return(parameterName)
     }
+    
+    if (grepl("^function", objectName) || nchar(objectName) > 40) {
+        objectName <- "x"
+    }
 
     return(paste0(objectName, "$", parameterName))
 }
 
-.showPlotSourceInformation <- function(objectName, ...,
-        xParameterName, yParameterNames,
-        hint = NA_character_, nMax = NA_integer_, type = NA_integer_,
-        showSource = FALSE, xValues = NA_real_,
+.showPlotSourceInformation <- function(
+        objectName, 
+        ...,
+        xParameterName, 
+        yParameterNames,
+        hint = NA_character_, 
+        nMax = NA_integer_, 
+        type = NA_integer_,
+        showSource = FALSE, 
+        xValues = NA_real_,
         lineType = TRUE) {
+        
     if (is.character(showSource)) {
         if (length(showSource) != 1 || trimws(showSource) == "") {
             return(invisible(NULL))
@@ -596,6 +608,11 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         type, ")"
     ), ""), ":\n", sep = "")
 
+    if (grepl("^function", xParameterName) || nchar(xParameterName) > 40 ||
+            any(grepl("^function", yParameterNames)) || any(nchar(yParameterNames) > 40)) {
+        return(invisible(NULL))
+    }
+    
     xAxisCmd <- .reconstructSequenceCommand(xValues)
     if (is.na(xAxisCmd)) {
         if (!grepl("(\\$)|(^c\\()", xParameterName) || grepl("^\\.design", xParameterName)) {

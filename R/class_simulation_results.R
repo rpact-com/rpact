@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8323 $
-## |  Last changed: $Date: 2024-10-15 09:20:06 +0200 (Tue, 15 Oct 2024) $
+## |  File version: $Revision: 8361 $
+## |  Last changed: $Date: 2024-11-04 16:27:39 +0100 (Mo, 04 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -774,6 +774,7 @@ SimulationResultsMultiArmMeans <- R6::R6Class("SimulationResultsMultiArmMeans",
         muMaxVector = NULL,
         gED50 = NULL,
         slope = NULL,
+        doseLevels = NULL,
         intersectionTest = NULL,
         adaptations = NULL,
         typeOfSelection = NULL,
@@ -1018,6 +1019,7 @@ SimulationResultsMultiArmRates <- R6::R6Class("SimulationResultsMultiArmRates",
         piControlH1 = NULL,
         gED50 = NULL,
         slope = NULL,
+        doseLevels = NULL,
         intersectionTest = NULL,
         adaptations = NULL,
         typeOfSelection = NULL,
@@ -1310,6 +1312,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvi
         omegaMaxVector = NULL,
         gED50 = NULL,
         slope = NULL,
+        doseLevels = NULL,
         intersectionTest = NULL,
         adaptations = NULL,
         typeOfSelection = NULL,

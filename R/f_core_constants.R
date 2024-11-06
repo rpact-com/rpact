@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8274 $
-## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
+## |  File version: $Revision: 8361 $
+## |  Last changed: $Date: 2024-11-04 16:27:39 +0100 (Mo, 04 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -649,6 +649,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     typeOfShape = "Type of shape",
     gED50 = "ED50",
     slope = "Slope",
+    doseLevels = "Dose levels",
     adaptations = "Adaptations",
     typeOfSelection = "Type of selection",
     effectMeasure = "Effect measure",
@@ -958,6 +959,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     typeOfShape = "Type of shape",
     gED50 = "ED50",
     slope = "Slope",
+    doseLevels = "Dose levels",
     adaptations = "Adaptations",
     typeOfSelection = "Type of selection",
     effectMeasure = "Effect measure",
@@ -1388,6 +1390,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     effectMatrix = ".formatMeans",
     gED50 = ".formatHowItIs",
     slope = ".formatHowItIs",
+    doseLevels = ".formatHowItIs",
     epsilonValue = ".formatHowItIs",
     threshold = ".formatHowItIs",
     rejectAtLeastOne = ".formatProbabilities",

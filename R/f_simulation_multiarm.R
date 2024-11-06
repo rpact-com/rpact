@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8361 $
+## |  Last changed: $Date: 2024-11-04 16:27:39 +0100 (Mo, 04 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -383,6 +383,7 @@ NULL
         omegaMaxVector = NA_real_, # survival only
         gED50,
         slope,
+        doseLevels,
         intersectionTest,
         stDev = NA_real_, # means only
         directionUpper = NA, # rates + survival only
@@ -504,8 +505,14 @@ NULL
 
     if (endpoint == "means") {
         effectMatrix <- .assertIsValidEffectMatrixMeans(
-            typeOfShape = typeOfShape, effectMatrix = effectMatrix,
-            muMaxVector = muMaxVector, gED50 = gED50, gMax = gMax, slope = slope
+            simulationResults = simulationResults,
+            typeOfShape = typeOfShape, 
+            effectMatrix = effectMatrix,
+            muMaxVector = muMaxVector, 
+            gED50 = gED50, 
+            gMax = gMax, 
+            slope = slope,
+            doseLevels = doseLevels
         )
         if (typeOfShape == "userDefined") {
             muMaxVector <- effectMatrix[, gMax]
@@ -543,8 +550,15 @@ NULL
         .setValueAndParameterType(simulationResults, "piControlH1", piControlH1, NA_real_)
 
         effectMatrix <- .assertIsValidEffectMatrixRates(
-            typeOfShape = typeOfShape, effectMatrix = effectMatrix,
-            piMaxVector = piMaxVector, piControl = piControl, gED50 = gED50, gMax = gMax, slope = slope
+            simulationResults = simulationResults,
+            typeOfShape = typeOfShape, 
+            effectMatrix = effectMatrix,
+            piMaxVector = piMaxVector, 
+            piControl = piControl, 
+            gED50 = gED50, 
+            gMax = gMax, 
+            slope = slope,
+            doseLevels = doseLevels
         )
 
         if (typeOfShape == "userDefined") {
@@ -555,7 +569,16 @@ NULL
             simulationResults$.setParameterType("piMaxVector", C_PARAM_DERIVED)
         }
     } else if (endpoint == "survival") {
-        effectMatrix <- .assertIsValidEffectMatrixSurvival(typeOfShape, effectMatrix, omegaMaxVector, gED50, gMax, slope)
+        effectMatrix <- .assertIsValidEffectMatrixSurvival(
+            simulationResults = simulationResults,
+            typeOfShape = typeOfShape, 
+            effectMatrix = effectMatrix,
+            omegaMaxVector = omegaMaxVector, 
+            gED50 = gED50, 
+            gMax = gMax, 
+            slope = slope,
+            doseLevels = doseLevels
+        )
         if (typeOfShape == "userDefined") {
             omegaMaxVector <- effectMatrix[, gMax]
         }
@@ -576,7 +599,7 @@ NULL
         .assertValuesAreStrictlyIncreasing(plannedEvents, "plannedEvents")
         .setValueAndParameterType(simulationResults, "plannedEvents", plannedEvents, NA_real_)
     }
-
+    
     .assertIsValidThreshold(threshold, gMax)
 
     if (endpoint %in% c("means", "rates")) {
@@ -812,7 +835,6 @@ NULL
         )
     }
 
-    .setValueAndParameterType(simulationResults, "effectMatrix", t(effectMatrix), NULL)
     if (endpoint %in% c("means", "rates")) {
         .setValueAndParameterType(simulationResults, "plannedSubjects", plannedSubjects, NA_real_)
         .setValueAndParameterType(simulationResults, "minNumberOfSubjectsPerStage",
@@ -859,10 +881,6 @@ NULL
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))
 
-    simulationResults$.setParameterType(
-        "effectMatrix",
-        ifelse(typeOfShape == "userDefined", C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE)
-    )
     .setValueAndParameterType(simulationResults, "activeArms", as.integer(activeArms), 3L)
     if (typeOfShape == "sigmoidEmax") {
         .setValueAndParameterType(simulationResults, "gED50", gED50, NA_real_)

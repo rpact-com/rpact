@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8343 $
-## |  Last changed: $Date: 2024-11-01 10:37:53 +0100 (Fr, 01 Nov 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8349 $
+## |  Last changed: $Date: 2024-11-01 14:50:21 +0100 (Fr, 01 Nov 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_enrichment.R
@@ -116,19 +116,17 @@ NULL
     }
 
 
-    for (k in 1:kMax) {
+    for (k in seq_len(kMax)) {
         const <- allocationRatioPlanned[k] / (1 + allocationRatioPlanned[k])^2
 
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
 
         if (k == 1) {
-            # subjectsPerStage[, k] <- stats::rmultinom(1, plannedSubjects[k], prevalences)
             subjectsPerStage[, k] <- plannedSubjects[k] * prevalences
         } else {
             prevSelected <- prevalences / sum(prevalences[selectedSubsets[, k]])
             prevSelected[!selectedSubsets[, k]] <- 0
             if (sum(prevSelected, na.rm = TRUE) > 0) {
-                # subjectsPerStage[, k] <- stats::rmultinom(1, plannedSubjects[k] - plannedSubjects[k - 1], prevSelected)
                 subjectsPerStage[, k] <- (plannedSubjects[k] - plannedSubjects[k - 1]) * prevSelected
             } else {
                 break
@@ -538,9 +536,6 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
     dataPopulationNumber <- rep(NA_real_, len)
     dataEffect <- rep(NA_real_, len)
     dataSubjectsPopulation <- rep(NA_real_, len)
-    # dataSubjectsActivePopulation <- rep(NA_real_, len)
-    # dataNumberOfSubjects <- rep(NA_real_, len)
-    # dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
     dataRejectPerStage <- rep(NA, len)
     dataFutilityStop <- rep(NA_real_, len)
     dataSuccessStop <- rep(NA, len)
@@ -561,8 +556,8 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
     }
 
     index <- 1
-    for (i in 1:cols) {
-        for (j in 1:maxNumberOfIterations) {
+    for (i in seq_len(cols)) {
+        for (j in seq_len(maxNumberOfIterations)) {
             stageResults <- .getSimulatedStageMeansEnrichment(
                 design = design,
                 subsets = effectList$subsets,
@@ -597,7 +592,7 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
             rejectAtSomeStage <- FALSE
             rejectedPopulationsBefore <- rep(FALSE, gMax)
 
-            for (k in 1:kMax) {
+            for (k in seq_len(kMax)) {
                 simulatedRejections[k, i, ] <- simulatedRejections[k, i, ] +
                     (closedTest$rejected[, k] & closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore)
                 simulatedSelections[k, i, ] <- simulatedSelections[k, i, ] + closedTest$selectedPopulations[, k]
@@ -609,7 +604,7 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
                     simulatedSuccessStopping[k, i] <- simulatedSuccessStopping[k, i] + closedTest$successStop[k]
                 }
 
-                if ((kMax > 1) && (k < kMax)) {
+                if (kMax > 1 && k < kMax) {
                     if (!any(is.na(closedTest$futilityStop))) {
                         simulatedFutilityStopping[k, i] <- simulatedFutilityStopping[k, i] +
                             (closedTest$futilityStop[k] && !closedTest$successStop[k])
@@ -622,24 +617,19 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
 
                 iterations[k, i] <- iterations[k, i] + 1
 
-                for (p in 1:2^(gMax - 1)) {
+                for (p in seq_len(2^(gMax - 1))) {
                     if (!is.na(stageResults$subjectsPerStage[p, k])) {
                         simulatedSubjectsPerStage[k, i, p] <- simulatedSubjectsPerStage[k, i, p] +
                             stageResults$subjectsPerStage[p, k]
                     }
                 }
 
-                for (g in 1:gMax){ 
+                for (g in seq_len(gMax)) {
                     dataIterationNumber[index] <- j
                     dataStageNumber[index] <- k
                     dataPopulationNumber[index] <- g
                     dataEffect[index] <- i
                     dataSubjectsPopulation[index] <- round(stageResults$populationSubjectsPerStage[g, k], 1)
-                    # dataSubjectsActivePopulation[index] <- round(stageResults$populationSubjectsPerStage[g, k], 1)
-                    # dataNumberOfSubjects[index] <- round(
-                    #     sum(stageResults$populationSubjectsPerStage[, k], na.rm = TRUE), 1)
-                    # dataNumberOfCumulatedSubjects[index] <- round(
-                    #     sum(stageResults$populationSubjectsPerStage[, 1:k], na.rm = TRUE), 1)
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -659,7 +649,7 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
                     rejectAtSomeStage <- TRUE
                 }
 
-                if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
+                if (k < kMax && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
                     # rejected hypotheses remain rejected also in case of early stopping
                     simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
                         matrix(
@@ -716,7 +706,8 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+            "internal error, simulation not possible due to numerical overflow")
     }
 
     data <- data.frame(
@@ -724,8 +715,6 @@ getSimulationEnrichmentMeans <- function(design = NULL, ...,
         stageNumber = dataStageNumber,
         populationNumber = dataPopulationNumber,
         effect = dataEffect,
-        # numberOfSubjects = dataNumberOfSubjects,
-        # numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,
         subjectsPopulation = dataSubjectsPopulation,
         effectEstimate = dataEffectEstimate,
         testStatistic = dataTestStatistics,

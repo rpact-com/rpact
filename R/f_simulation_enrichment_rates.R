@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8343 $
-## |  Last changed: $Date: 2024-11-01 10:37:53 +0100 (Fr, 01 Nov 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8349 $
+## |  Last changed: $Date: 2024-11-01 14:50:21 +0100 (Fr, 01 Nov 2024) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_enrichment.R
@@ -129,19 +129,17 @@ NULL
         weights <- .getWeightsInverseNormal(design)
     }
 
-    for (k in 1:kMax) {
+    for (k in seq_len(kMax)) {
         const <- allocationRatioPlanned[k]
 
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
 
         if (k == 1) {
-            # subjectsPerStage[, k] <- stats::rmultinom(1, plannedSubjects[k], prevalences)
             subjectsPerStage[, k] <- plannedSubjects[k] * prevalences
         } else {
             prevSelected <- prevalences / sum(prevalences[selectedSubsets[, k]])
             prevSelected[!selectedSubsets[, k]] <- 0
             if (sum(prevSelected, na.rm = TRUE) > 0) {
-                # subjectsPerStage[, k] <- stats::rmultinom(1, plannedSubjects[k] - plannedSubjects[k - 1], prevSelected)
                 subjectsPerStage[, k] <- (plannedSubjects[k] - plannedSubjects[k - 1]) * prevSelected
             } else {
                 break
@@ -194,7 +192,6 @@ NULL
                     sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[1, 1:k]) * const / (1 + const)^2)
             }
         } else if (gMax == 2) {
-            
             # Population S1
             rm <- (simEventsControl[1, k] + simEventsTreatment[1, k]) / subjectsPerStage[1, k]
             if (!is.na(rm)) {
@@ -223,7 +220,7 @@ NULL
                         sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[1, 1:k]) * const / (1 + const)^2)
                 }
             }
-            
+
             # Full population
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[1:2, k] + simEventsTreatment[1:2, k]) / subjectsPerStage[1:2, k]
@@ -272,7 +269,6 @@ NULL
                 }
             }
         } else if (gMax == 3) {
-            
             # Population S1
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[c(1, 3), k] + simEventsTreatment[c(1, 3), k]) / subjectsPerStage[c(1, 3), k]
@@ -320,7 +316,7 @@ NULL
                         sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(1, 3), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
-            
+
             # Population S2
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[c(2, 3), k] + simEventsTreatment[c(2, 3), k]) / subjectsPerStage[c(2, 3), k]
@@ -368,7 +364,7 @@ NULL
                         sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(2, 3), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
-            
+
             # Full population
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[1:4, k] + simEventsTreatment[1:4, k]) / subjectsPerStage[1:4, k]
@@ -417,10 +413,10 @@ NULL
                 }
             }
         } else if (gMax == 4) {
-            
             # Population S1
             if (stratifiedAnalysis) {
-                rm <- (simEventsControl[c(1, 4, 5, 7), k] + simEventsTreatment[c(1, 4, 5, 7), k]) / subjectsPerStage[c(1, 4, 5, 7), k]
+                rm <- (simEventsControl[c(1, 4, 5, 7), k] + 
+                    simEventsTreatment[c(1, 4, 5, 7), k]) / subjectsPerStage[c(1, 4, 5, 7), k]
                 rm[!is.na(rm) & (rm <= 0 | rm >= 1)] <- 0
                 if (!all(is.na(rm))) {
                     if (all(na.omit(rm) == 0) || all(na.omit(rm) == 1)) {
@@ -461,14 +457,16 @@ NULL
                 if (rm <= 0 || rm >= 1) {
                     overallTestStatistics[1, k] <- 0
                 } else {
-                    overallTestStatistics[1, k] <- overallEffectSizes[1, k] /
-                        sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(1, 4, 5, 7), 1:k], na.rm = TRUE) * const / (1 + const)^2)
+                    overallTestStatistics[1, k] <- overallEffectSizes[1, k] / sqrt(rm * (1 - rm)) * 
+                        sqrt(sum(subjectsPerStage[c(1, 4, 5, 7), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
-            
+
             # Population S2
             if (stratifiedAnalysis) {
-                rm <- (simEventsControl[c(2, 4, 6, 7), k] + simEventsTreatment[c(2, 4, 6, 7), k]) / subjectsPerStage[c(2, 4, 6, 7), k]
+                rm <- (simEventsControl[c(2, 4, 6, 7), k] + 
+                    simEventsTreatment[c(2, 4, 6, 7), k]) / 
+                    subjectsPerStage[c(2, 4, 6, 7), k]
                 rm[!is.na(rm) & (rm <= 0 | rm >= 1)] <- 0
                 if (!all(is.na(rm))) {
                     if (all(na.omit(rm) == 0) || all(na.omit(rm) == 1)) {
@@ -482,14 +480,16 @@ NULL
                     }
                 }
             } else {
-                rm <- sum(simEventsControl[c(2, 4, 6, 7), k] + simEventsTreatment[c(2, 4, 6, 7), k], na.rm = TRUE) /
+                rm <- sum(simEventsControl[c(2, 4, 6, 7), k] + 
+                    simEventsTreatment[c(2, 4, 6, 7), k], na.rm = TRUE) /
                     sum(subjectsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE)
                 if (!is.na(rm)) {
                     if (rm <= 0 || rm >= 1) {
                         testStatistics[2, k] <- 0
                     } else {
                         testStatistics[2, k] <- (2 * directionUpper - 1) *
-                            sum(simEventsTreatment[c(2, 4, 6, 7), k] * (1 + const) / const - simEventsControl[c(2, 4, 6, 7), k] *
+                            sum(simEventsTreatment[c(2, 4, 6, 7), k] * (1 + const) / 
+                                const - simEventsControl[c(2, 4, 6, 7), k] *
                                 (1 + const), na.rm = TRUE) /
                             sum(subjectsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE) / sqrt(rm * (1 - rm)) *
                             sqrt(sum(subjectsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE) * const / (1 + const)^2)
@@ -509,14 +509,15 @@ NULL
                 if (rm <= 0 || rm >= 1) {
                     overallTestStatistics[2, k] <- 0
                 } else {
-                    overallTestStatistics[2, k] <- overallEffectSizes[2, k] /
-                        sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(2, 4, 6, 7), 1:k], na.rm = TRUE) * const / (1 + const)^2)
+                    overallTestStatistics[2, k] <- overallEffectSizes[2, k] / sqrt(rm * (1 - rm)) * 
+                        sqrt(sum(subjectsPerStage[c(2, 4, 6, 7), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
-            
+
             # Population S3
             if (stratifiedAnalysis) {
-                rm <- (simEventsControl[c(3, 5, 6, 7), k] + simEventsTreatment[c(3, 5, 6, 7), k]) / subjectsPerStage[c(3, 5, 6, 7), k]
+                rm <- (simEventsControl[c(3, 5, 6, 7), k] + simEventsTreatment[c(3, 5, 6, 7), k]) / 
+                    subjectsPerStage[c(3, 5, 6, 7), k]
                 rm[!is.na(rm) & (rm <= 0 | rm >= 1)] <- 0
                 if (!all(is.na(rm))) {
                     if (all(na.omit(rm) == 0) || all(na.omit(rm) == 1)) {
@@ -557,11 +558,11 @@ NULL
                 if (rm <= 0 || rm >= 1) {
                     overallTestStatistics[3, k] <- 0
                 } else {
-                    overallTestStatistics[3, k] <- overallEffectSizes[3, k] /
-                        sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[c(3, 5, 6, 7), 1:k], na.rm = TRUE) * const / (1 + const)^2)
+                    overallTestStatistics[3, k] <- overallEffectSizes[3, k] / sqrt(rm * (1 - rm)) * 
+                        sqrt(sum(subjectsPerStage[c(3, 5, 6, 7), 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
-            
+
             # Full population
             if (stratifiedAnalysis) {
                 rm <- (simEventsControl[1:8, k] + simEventsTreatment[1:8, k]) / subjectsPerStage[1:8, k]
@@ -605,8 +606,8 @@ NULL
                 if (rm <= 0 || rm >= 1) {
                     overallTestStatistics[4, k] <- 0
                 } else {
-                    overallTestStatistics[4, k] <- overallEffectSizes[4, k] /
-                        sqrt(rm * (1 - rm)) * sqrt(sum(subjectsPerStage[1:8, 1:k], na.rm = TRUE) * const / (1 + const)^2)
+                    overallTestStatistics[4, k] <- overallEffectSizes[4, k] / sqrt(rm * (1 - rm)) * 
+                        sqrt(sum(subjectsPerStage[1:8, 1:k], na.rm = TRUE) * const / (1 + const)^2)
                 }
             }
         }
@@ -635,7 +636,8 @@ NULL
                 if (criticalValues[k + 1] >= 6) {
                     conditionalCriticalValue[k] <- Inf
                 } else {
-                    conditionalCriticalValue[k] <- (criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
+                    conditionalCriticalValue[k] <- (criticalValues[k + 1] * 
+                        sqrt(design$informationRates[k + 1]) -
                         .getOneMinusQNorm(adjustedPValues[1:k]) %*% weights[1:k]) /
                         sqrt(design$informationRates[k + 1] - design$informationRates[k])
                 }
@@ -657,9 +659,11 @@ NULL
                     overallRatesControl = overallRatesControl
                 )
                 if (effectMeasure == "testStatistic") {
-                    selectPopulationsFunctionArgs$effectVector <- overallTestStatistics[, k] + runif(gMax, -1e-05, 1e-05)
+                    selectPopulationsFunctionArgs$effectVector <- 
+                        overallTestStatistics[, k] + runif(gMax, -1e-05, 1e-05)
                 } else if (effectMeasure == "effectEstimate") {
-                    selectPopulationsFunctionArgs$effectVector <- overallEffectSizes[, k] + runif(gMax, -1e-05, 1e-05)
+                    selectPopulationsFunctionArgs$effectVector <- 
+                        overallEffectSizes[, k] + runif(gMax, -1e-05, 1e-05)
                 }
 
                 args <- list(
@@ -689,10 +693,12 @@ NULL
                     maxNumberOfSubjectsPerStage = maxNumberOfSubjectsPerStage
                 )
 
-                if (is.null(newSubjects) || length(newSubjects) != 1 || !is.numeric(newSubjects) || is.na(newSubjects)) {
+                if (is.null(newSubjects) || length(newSubjects) != 1 || 
+                        !is.numeric(newSubjects) || is.na(newSubjects)) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
+                        "'calcSubjectsFunction' returned an illegal or ",
+                        "undefined result (", newSubjects, "); ",
                         "the output must be a single numeric value"
                     )
                 }
@@ -727,7 +733,8 @@ NULL
                         sign(pi1H1 - pi2H1) * conditionalCriticalValue[k] *
                             (1 - sqrt(pim * (1 - pim) + allocationRatioPlanned[k] * pim * (1 - pim)) /
                                 sqrt(pi1H1 * (1 - pi1H1) + allocationRatioPlanned[k] * pi2H1 * (1 - pi2H1))) *
-                            (1 + allocationRatioPlanned[k]) / sqrt(allocationRatioPlanned[k] * (plannedSubjects[k + 1] - plannedSubjects[k]))
+                            (1 + allocationRatioPlanned[k]) / sqrt(allocationRatioPlanned[k] * 
+                                (plannedSubjects[k + 1] - plannedSubjects[k]))
                 )
             }
 
@@ -870,7 +877,9 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
         )
     } else {
         .assertIsTrialDesignInverseNormalOrFisher(design)
-        .warnInCaseOfUnknownArguments(functionName = "getSimulationEnrichmentRates", ignore = "showStatistics", ...)
+        .warnInCaseOfUnknownArguments(
+            functionName = "getSimulationEnrichmentRates", 
+            ignore = "showStatistics", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
     }
 
@@ -878,9 +887,11 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
 
     calcSubjectsFunctionIsUserDefined <- !is.null(calcSubjectsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
-    
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
+
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design = design,
         effectList = effectList,
@@ -952,9 +963,6 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
     dataPopulationNumber <- rep(NA_real_, len)
     dataEffect <- rep(NA_real_, len)
     dataSubjectsPopulation <- rep(NA_real_, len)
-    # dataSubjectsActivePopulation <- rep(NA_real_, len)
-    # dataNumberOfSubjects <- rep(NA_real_, len)
-    # dataNumberOfCumulatedSubjects <- rep(NA_real_, len)
     dataRejectPerStage <- rep(NA, len)
     dataFutilityStop <- rep(NA_real_, len)
     dataSuccessStop <- rep(NA, len)
@@ -972,8 +980,8 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
 
     index <- 1
 
-    for (i in 1:cols) {
-        for (j in 1:maxNumberOfIterations) {
+    for (i in seq_len(cols)) {
+        for (j in seq_len(maxNumberOfIterations)) {
             stageResults <- .getSimulatedStageRatesEnrichment(
                 design = design,
                 subsets = effectList$subsets,
@@ -1009,7 +1017,7 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
             rejectAtSomeStage <- FALSE
             rejectedPopulationsBefore <- rep(FALSE, gMax)
 
-            for (k in 1:kMax) {
+            for (k in seq_len(kMax)) {
                 simulatedRejections[k, i, ] <- simulatedRejections[k, i, ] +
                     (closedTest$rejected[, k] & closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore)
                 simulatedSelections[k, i, ] <- simulatedSelections[k, i, ] + closedTest$selectedPopulations[, k]
@@ -1021,7 +1029,7 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
                     simulatedSuccessStopping[k, i] <- simulatedSuccessStopping[k, i] + closedTest$successStop[k]
                 }
 
-                if ((kMax > 1) && (k < kMax)) {
+                if (kMax > 1 && k < kMax) {
                     if (!any(is.na(closedTest$futilityStop))) {
                         simulatedFutilityStopping[k, i] <- simulatedFutilityStopping[k, i] +
                             (closedTest$futilityStop[k] && !closedTest$successStop[k])
@@ -1034,21 +1042,19 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
 
                 iterations[k, i] <- iterations[k, i] + 1
 
-                for (p in 1:2^(gMax - 1)) {
+                for (p in seq_len(2^(gMax - 1))) {
                     if (!is.na(stageResults$subjectsPerStage[p, k])) {
                         simulatedSubjectsPerStage[k, i, p] <- simulatedSubjectsPerStage[k, i, p] +
                             stageResults$subjectsPerStage[p, k]
                     }
                 }
 
-                for (g in 1:gMax) {
+                for (g in seq_len(gMax)) {
                     dataIterationNumber[index] <- j
                     dataStageNumber[index] <- k
                     dataPopulationNumber[index] <- g
                     dataEffect[index] <- i
                     dataSubjectsPopulation[index] <- stageResults$populationSubjectsPerStage[g, k]
-                    # dataNumberOfSubjects[index] <- round(sum(stageResults$subjectsPerStage[, k], na.rm = TRUE), 1)
-                    # dataNumberOfCumulatedSubjects[index] <- sum(stageResults$subjectsPerStage[, 1:k], na.rm = TRUE)
                     dataRejectPerStage[index] <- closedTest$rejected[g, k]
                     dataTestStatistics[index] <- stageResults$testStatistics[g, k]
                     dataSuccessStop[index] <- closedTest$successStop[k]
@@ -1069,7 +1075,7 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
                     rejectAtSomeStage <- TRUE
                 }
 
-                if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
+                if (k < kMax && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
                     # rejected hypotheses remain rejected also in case of early stopping
                     simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
                         matrix(
@@ -1127,7 +1133,8 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+            "internal error, simulation not possible due to numerical overflow")
     }
 
     data <- data.frame(
@@ -1135,8 +1142,6 @@ getSimulationEnrichmentRates <- function(design = NULL, ...,
         stageNumber = dataStageNumber,
         populationNumber = dataPopulationNumber,
         effect = dataEffect,
-        # numberOfSubjects = dataNumberOfSubjects,
-        # numberOfCumulatedSubjects = dataNumberOfCumulatedSubjects,
         subjectsPopulation = dataSubjectsPopulation,
         effectEstimate = dataEffectEstimate,
         testStatistics = dataTestStatistics,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8200 $
-## |  Last changed: $Date: 2024-09-12 15:05:38 +0200 (Do, 12 Sep 2024) $
+## |  File version: $Revision: 8361 $
+## |  Last changed: $Date: 2024-11-04 16:27:39 +0100 (Mo, 04 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -876,3 +876,96 @@ getRawData <- function(x, aggregate = FALSE) {
 
     return(.getAggregatedData(rawData))
 }
+
+.nameEffectMatrixRowsAndColumns = function(effectMatrix, ..., transpose = FALSE) {
+    if (is.null(effectMatrix) || !is.matrix(effectMatrix)) {
+        return(effectMatrix)
+    }
+    
+    if (isTRUE(transpose)) {
+        effectMatrix <- t(effectMatrix)
+    }
+    
+    if (nrow(effectMatrix) == 0 || ncol(effectMatrix) == 0) {
+        return(effectMatrix)
+    }
+    
+    rownames(effectMatrix) <- paste("Situation", 1:nrow(effectMatrix))
+    colnames(effectMatrix) <- paste("Arm", 1:ncol(effectMatrix))
+    return(effectMatrix)
+}
+
+.createEffectMatrix <- function(
+        ...,
+        simulationResults,
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+        effectMatrix,
+        valueMaxVector,
+        valueMaxVectorName = c("muMaxVector", "piMaxVector", "omegaMaxVector"),
+        piControl = NULL,
+        gED50,
+        gMax,
+        slope,
+        doseLevels) {
+        
+    typeOfShape <- match.arg(typeOfShape)
+    valueMaxVectorName <- match.arg(valueMaxVectorName)
+    
+    if (typeOfShape == "userDefined") {
+        simulationResults$.setParameterType("effectMatrix", C_PARAM_USER_DEFINED)
+        return(.nameEffectMatrixRowsAndColumns(effectMatrix))
+    }
+    
+    simulationResults$doseLevels <- doseLevels
+    simulationResults$.setParameterType("doseLevels", 
+        ifelse(is.null(doseLevels) || all(is.na(doseLevels)), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED))
+        
+    if (typeOfShape == "sigmoidEmax") {
+        .assertIsSingleNumber(gED50, "gED50", naAllowed = FALSE, noDefaultAvailable = TRUE)
+        if (valueMaxVectorName == "omegaMaxVector") {
+            effectMatrix <- matrix(valueMaxVector - 1, nrow = length(valueMaxVector), ncol = 1) %*%
+                matrix(doseLevels^slope / (gED50^slope + doseLevels^slope), nrow = 1, ncol = gMax) + 1
+        } else {
+            effectMatrix <- matrix(valueMaxVector, nrow = length(valueMaxVector), ncol = 1) %*%
+                matrix(doseLevels^slope / (gED50^slope + doseLevels^slope), nrow = 1, ncol = gMax)
+        }
+        simulationResults$.setParameterType("effectMatrix", C_PARAM_DERIVED)
+        return(.nameEffectMatrixRowsAndColumns(effectMatrix))
+    }
+    
+    if (typeOfShape == "linear") {
+        if (valueMaxVectorName == "muMaxVector") {
+            effectMatrix <-
+                matrix(valueMaxVector, nrow = length(valueMaxVector), ncol = 1) %*%
+                matrix(doseLevels / max(doseLevels), nrow = 1, ncol = gMax)
+        } else if (valueMaxVectorName == "piMaxVector") {
+            .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE, noDefaultAvailable = TRUE)
+            .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = FALSE)
+            effectMatrix <- piControl +
+                matrix(valueMaxVector - piControl, nrow = length(valueMaxVector), ncol = 1) %*%
+                matrix(doseLevels / max(doseLevels), nrow = 1, ncol = gMax)
+        } else if (valueMaxVectorName == "omegaMaxVector") {
+            effectMatrix <-
+                matrix(valueMaxVector - 1, nrow = length(valueMaxVector), ncol = 1) %*%
+                matrix(doseLevels / max(doseLevels), nrow = 1, ncol = gMax) + 1
+        }
+        simulationResults$.setParameterType("effectMatrix", C_PARAM_DERIVED)
+        if (!is.null(gED50) && !is.na(gED50)) {
+            warning("'gED50' (", gED50, ") will be ignored because 'typeOfShape' ",
+                "is defined as '", typeOfShape, "'",
+                call. = FALSE
+            )
+        }
+        if (!is.null(slope) && !is.na(slope) && slope != 1) {
+            warning("'slope' (", slope, ") will be ignored because 'typeOfShape' ",
+                "is defined as '", typeOfShape, "'",
+                call. = FALSE
+            )
+        }
+        
+        return(.nameEffectMatrixRowsAndColumns(effectMatrix))
+    }
+    
+    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'typeOfShape' (", typeOfShape, ") not yet implemented")
+}
+

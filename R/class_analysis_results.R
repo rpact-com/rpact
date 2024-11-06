@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8180 $
-## |  Last changed: $Date: 2024-09-06 10:13:14 +0200 (Fr, 06 Sep 2024) $
+## |  File version: $Revision: 8360 $
+## |  Last changed: $Date: 2024-11-04 15:40:23 +0100 (Mo, 04 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1942,9 +1942,22 @@ plot.AnalysisResults <- function(x, y, ...,
     return(.createPlotResultObject(plotList, grid))
 }
 
-.plotAnalysisResultsRCI <- function(...,
-        x, y, nPlanned, allocationRatioPlanned, main, xlab, ylab,
-        legendTitle, palette, legendPosition, showSource, analysisResultsName, plotSettings = NULL) {
+.plotAnalysisResultsRCI <- function(
+        ...,
+        x, 
+        y, 
+        nPlanned, 
+        allocationRatioPlanned, 
+        main, 
+        xlab, 
+        ylab,
+        legendTitle, 
+        palette, 
+        legendPosition, 
+        showSource, 
+        analysisResultsName, 
+        plotSettings = NULL) {
+        
     .assertIsAnalysisResults(x)
     .warnInCaseOfUnknownArguments(functionName = "plot", ignore = c("treatmentArms", "populations"), ...)
 
@@ -2103,10 +2116,24 @@ plot.AnalysisResults <- function(x, y, ...,
     return(result)
 }
 
-.plotAnalysisResults <- function(...,
-        x, y, type, nPlanned, allocationRatioPlanned, main, xlab, ylab,
-        legendTitle, palette, legendPosition, showSource, functionCall,
-        analysisResultsName, plotSettings = NULL) {
+.plotAnalysisResults <- function(
+        ...,
+        x, 
+        y, 
+        type, 
+        nPlanned, 
+        allocationRatioPlanned, 
+        main, 
+        xlab, 
+        ylab,
+        legendTitle, 
+        palette, 
+        legendPosition, 
+        showSource, 
+        functionCall,
+        analysisResultsName, 
+        plotSettings = NULL) {
+        
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
     if (!(type %in% c(1, 2))) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1 or 2")
@@ -2117,12 +2144,20 @@ plot.AnalysisResults <- function(x, y, ...,
 
     if (type == 2) {
         return(.plotAnalysisResultsRCI(
-            x = x, y = y, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
-            main = main, xlab = xlab, ylab = ylab,
-            legendTitle = legendTitle, palette = palette,
-            legendPosition = legendPosition, showSource = showSource,
+            x = x, 
+            y = y, 
+            nPlanned = nPlanned, 
+            allocationRatioPlanned = allocationRatioPlanned,
+            main = main, 
+            xlab = xlab, 
+            ylab = ylab,
+            legendTitle = legendTitle, 
+            palette = palette,
+            legendPosition = legendPosition, 
+            showSource = showSource,
             analysisResultsName = analysisResultsName,
-            plotSettings = plotSettings, ...
+            plotSettings = plotSettings, 
+            ...
         ))
     }
 
