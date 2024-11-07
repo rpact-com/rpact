@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.0.9268</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,14 +32,26 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/rpact-com/rpact/blob/v4.1.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/rpact-com/rpact/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="4.1.1" id="rpact-411">rpact 4.1.1<a class="anchor" aria-label="anchor" href="#rpact-411"></a></h2>
+<div class="section level3">
+<h3 id="new-features-4-1-1">New features<a class="anchor" aria-label="anchor" href="#new-features-4-1-1"></a></h3>
+<ul><li>For the functions <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> it is now possible to specify a parameter <code>doseLevels</code> to define the dose levels for a <code>linear</code> or <code>sigmoidEmax</code> dose-response relationship (see feature request <a href="https://github.com/rpact-com/rpact/issues/63" class="external-link">#63</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-issues-and-changes-4-1-1">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-1-1"></a></h3>
+<ul><li>Issue <a href="https://github.com/rpact-com/rpact/issues/61" class="external-link">#61</a>) fixed</li>
+<li>Minor improvements</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="4.1.0" id="rpact-410">rpact 4.1.0<a class="anchor" aria-label="anchor" href="#rpact-410"></a></h2><p class="text-muted">CRAN release: 2024-09-27</p>
 <div class="section level3">
 <h3 id="new-features-4-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-1-0"></a></h3>
-<ul><li>The new function <code><a href="../reference/getSimulationCounts.html">getSimulationCounts()</a></code> can be used to perform power simulations for clinical trials with negative binomial distributed count data. The function returns the simulated power, stopping probabilities, conditional power, and expected sample size for testing mean rates for negative binomial distributed event numbers in the two treatment groups testing situation.</li>
+<ul><li>The new function <code><a href="../reference/getSimulationCounts.html">getSimulationCounts()</a></code> can be used to perform power simulations for clinical trials with negative binomial distributed count data. The function returns the simulated power, stopping probabilities, conditional power, and expected sample size for testing mean rates for negative binomial distributed event numbers in the two treatment groups testing situation</li>
 <li>The functions <code><a href="../reference/getDesignGroupSequential.html">getDesignGroupSequential()</a></code>, <code><a href="../reference/getDesignInverseNormal.html">getDesignInverseNormal()</a></code>, and <code><a href="../reference/getDesignFisher.html">getDesignFisher()</a></code> now support the argument <code>directionUpper</code> to specify the direction of the alternative for one-sided testing early at the design phase, see enhancement <a href="https://github.com/rpact-com/rpact/issues/26" class="external-link">#26</a>
 </li>
 <li>
@@ -63,10 +75,11 @@
 <h2 class="pkg-version" data-toc-text="4.0.0" id="rpact-400">rpact 4.0.0<a class="anchor" aria-label="anchor" href="#rpact-400"></a></h2><p class="text-muted">CRAN release: 2024-05-31</p>
 <div class="section level3">
 <h3 id="new-features-4-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-0-0"></a></h3>
-<ul><li>All reference classes in the package have been replaced by <a href="https://cran.r-project.org/package=R6" class="external-link">R6</a> classes. This change brings significant advantages, including improved performance, more flexible and cleaner object-oriented programming, and enhanced encapsulation of methods and properties. The transition to R6 classes allows for more efficient memory management and faster execution, making the package more robust and scalable. Additionally, R6 classes provide a more intuitive and user-friendly interface for developers, facilitating the creation and maintenance of complex data structures and workflows.</li>
+<ul><li>All reference classes in the package have been replaced by <a href="https://cran.r-project.org/package=R6" class="external-link">R6</a> classes. This change brings significant advantages, including improved performance, more flexible and cleaner object-oriented programming, and enhanced encapsulation of methods and properties. The transition to R6 classes allows for more efficient memory management and faster execution, making the package more robust and scalable. Additionally, R6 classes provide a more intuitive and user-friendly interface for developers, facilitating the creation and maintenance of complex data structures and workflows</li>
 <li>Extension of the function <code><a href="../reference/getPerformanceScore.html">getPerformanceScore()</a></code> for sample size recalculation rules to the setting of binary endpoints according to <a href="https://doi.org/10.1186/s12874-024-02150-4" class="external-link">Bokelmann et al. (2024)</a>
 </li>
-<li>The <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> functions now support an enhanced <code>selectArmsFunction</code> argument. Previously, only <code>effectVector</code> and <code>stage</code> were allowed as arguments. Now, users can optionally utilize additional arguments for more powerful custom function implementations, including <code>conditionalPower</code>, <code>conditionalCriticalValue</code>, <code>plannedSubjects/plannedEvents</code>, <code>allocationRatioPlanned</code>, <code>selectedArms</code>, <code>thetaH1</code> (for means and survival), <code>stDevH1</code> (for means), <code>overallEffects</code>, and for rates additionally: <code>piTreatmentsH1</code>, <code>piControlH1</code>, <code>overallRates</code>, and <code>overallRatesControl</code>.</li>
+<li>The <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> functions now support an enhanced <code>selectArmsFunction</code> argument. Previously, only <code>effectVector</code> and <code>stage</code> were allowed as arguments. Now, users can optionally utilize additional arguments for more powerful custom function implementations, including <code>conditionalPower</code>, <code>conditionalCriticalValue</code>, <code>plannedSubjects/plannedEvents</code>, <code>allocationRatioPlanned</code>, <code>selectedArms</code>, <code>thetaH1</code> (for means and survival), <code>stDevH1</code> (for means), <code>overallEffects</code>, and for rates additionally: <code>piTreatmentsH1</code>, <code>piControlH1</code>, <code>overallRates</code>, and <code>overallRatesControl</code>
+</li>
 <li>Same as above for <code><a href="../reference/getSimulationEnrichmentMeans.html">getSimulationEnrichmentMeans()</a></code>, <code><a href="../reference/getSimulationEnrichmentRates.html">getSimulationEnrichmentRates()</a></code>, and <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code>. Specifically, support for population selection with <code>selectPopulationsFunction</code> argument based on predictive/posterior probabilities added (see <a href="https://github.com/rpact-com/rpact/issues/32" class="external-link">#32</a>)</li>
 <li>The <code><a href="../reference/fetch.ParameterSet.html">fetch()</a></code> and <code><a href="../reference/fetch.ParameterSet.html">obtain()</a></code> functions can be used to extract a single parameter from an rpact result object, which is useful for writing pipe-operator linked commands</li>
 </ul></div>

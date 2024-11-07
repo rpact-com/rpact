@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.0.9268</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,7 +32,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Test Package</h1>
-      <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/v4.1.0/R/f_quality_assurance.R" class="external-link"><code>R/f_quality_assurance.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/main/R/f_quality_assurance.R" class="external-link"><code>R/f_quality_assurance.R</code></a></small>
       <div class="d-none name"><code>testPackage.Rd</code></div>
     </div>
 
@@ -47,7 +47,9 @@
 <span>  <span class="va">...</span>,</span>
 <span>  completeUnitTestSetEnabled <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  types <span class="op">=</span> <span class="st">"tests"</span>,</span>
-<span>  connection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>token <span class="op">=</span> <span class="cn">NULL</span>, secret <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span>  connection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>token <span class="op">=</span> <span class="cn">NULL</span>, secret <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>,</span>
+<span>  testFileDirectory <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  downloadTestsOnly <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -80,6 +82,14 @@ be executed; a subset of all unit tests will be used otherwise.</p></dd>
 can enter a <code>token</code> and a <code>secret</code> to get full access to all unit tests, e.g.,
 to fulfill regulatory requirements (see <a href="https://www.rpact.com" class="external-link">www.rpact.com</a> for more information).</p></dd>
 
+
+<dt id="arg-testfiledirectory">testFileDirectory<a class="anchor" aria-label="anchor" href="#arg-testfiledirectory"></a></dt>
+<dd><p>An optional path that points to a local directory where the test files are located.</p></dd>
+
+
+<dt id="arg-downloadtestsonly">downloadTestsOnly<a class="anchor" aria-label="anchor" href="#arg-downloadtestsonly"></a></dt>
+<dd><p>If <code>TRUE</code>, the unit test files are only downloaded and not executed, default is <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -87,8 +97,9 @@ to fulfill regulatory requirements (see <a href="https://www.rpact.com" class="e
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function creates the subdirectory <code>rpact-tests</code> in the specified output directory
-and copies all unit test files of the package to this newly created directory.
+    <p>This function creates a subdirectory named <code>rpact-tests</code> in the
+specified output directory, downloads all unit test files of the package
+from an online resource, and copies them to this newly created directory.
 Then the function runs all tests (or a subset of all tests if
 <code>completeUnitTestSetEnabled</code> is <code>FALSE</code>) using
 <code><a href="https://rdrr.io/r/tools/testInstalledPackage.html" class="external-link">testInstalledPackage</a></code>.
