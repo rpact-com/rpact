@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8274 $
-## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
+## |  File version: $Revision: 8323 $
+## |  Last changed: $Date: 2024-10-15 09:20:06 +0200 (Tue, 15 Oct 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -416,7 +416,9 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         } else {
             design$twoSidedPower <- twoSidedPower
             design$.setParameterType("twoSidedPower", ifelse(
-                twoSidedPower == C_TWO_SIDED_POWER_DEFAULT, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+                twoSidedPower == C_TWO_SIDED_POWER_DEFAULT, 
+                C_PARAM_DEFAULT_VALUE, 
+                C_PARAM_USER_DEFINED
             ))
         }
     }
@@ -426,7 +428,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             design$.setParameterType("betaAdjustment", C_PARAM_DEFAULT_VALUE)
         } else {
             design$betaAdjustment <- betaAdjustment
-            design$.setParameterType("betaAdjustment", ifelse(betaAdjustment, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
+            design$.setParameterType("betaAdjustment", ifelse(
+                betaAdjustment, C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
         }
     } else if (!is.na(betaAdjustment)) {
         warning(

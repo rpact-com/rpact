@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8232 $
-## |  Last changed: $Date: 2024-09-19 08:22:37 +0200 (Do, 19 Sep 2024) $
+## |  File version: $Revision: 8355 $
+## |  Last changed: $Date: 2024-11-04 08:55:52 +0100 (Mo, 04 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -888,6 +888,13 @@ NULL
 #' @param slope If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"slope"} can be entered
 #'   to specify the slope of the sigmoid Emax model, default is 1.
 #' @name param_slope
+#' @keywords internal
+NULL
+
+#' Parameter Description: Dose Levels
+#' @param doseLevels The dose levels for the dose response relationship. 
+#'   If not specified, these dose levels are \code{1, ..., gMax}.
+#' @name param_doseLevels
 #' @keywords internal
 NULL
 

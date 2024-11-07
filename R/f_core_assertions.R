@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8262 $
-## |  Last changed: $Date: 2024-09-25 10:43:45 +0200 (Mi, 25 Sep 2024) $
+## |  File version: $Revision: 8361 $
+## |  Last changed: $Date: 2024-11-04 16:27:39 +0100 (Mo, 04 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -118,7 +118,7 @@ NULL
     if (!.isTrialDesignPlan(designPlan)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'designPlan' must be an instance of 'TrialDesignPlan' (is '", .getClassName(designPlan), "')", 
+            "'designPlan' must be an instance of 'TrialDesignPlan' (is '", .getClassName(designPlan), "')",
             call. = FALSE
         )
     }
@@ -138,7 +138,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal' (is '", .getClassName(design), "')", 
+            "'TrialDesignInverseNormal' (is '", .getClassName(design), "')",
             call. = FALSE
         )
     }
@@ -149,7 +149,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class ",
-            "'TrialDesignFisher' (is '", .getClassName(design), "')", 
+            "'TrialDesignFisher' (is '", .getClassName(design), "')",
             call. = FALSE
         )
     }
@@ -160,7 +160,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class ",
-            "'TrialDesignGroupSequential' (is '", .getClassName(design), "')", 
+            "'TrialDesignGroupSequential' (is '", .getClassName(design), "')",
             call. = FALSE
         )
     }
@@ -171,7 +171,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class ",
-            "'TrialDesignConditionalDunnett' (is '", .getClassName(design), "')", 
+            "'TrialDesignConditionalDunnett' (is '", .getClassName(design), "')",
             call. = FALSE
         )
     }
@@ -183,7 +183,8 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class ",
             "'TrialDesignInverseNormal' or 'TrialDesignGroupSequential' (is '",
-            .getClassName(design), "')", call. = FALSE
+            .getClassName(design), "')",
+            call. = FALSE
         )
     }
 }
@@ -194,7 +195,8 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class 'TrialDesignInverseNormal', ",
             "'TrialDesignGroupSequential', or 'TrialDesignFisher' (is '",
-            .getClassName(design), "')", call. = FALSE
+            .getClassName(design), "')",
+            call. = FALSE
         )
     }
 }
@@ -205,7 +207,8 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class ",
             "'TrialDesignInverseNormal' or 'TrialDesignFisher' (is '",
-            .getClassName(design), "')", call. = FALSE
+            .getClassName(design), "')",
+            call. = FALSE
         )
     }
 }
@@ -617,24 +620,23 @@ NULL
 .assertIsSingleInteger <- function(x, argumentName, ..., naAllowed = FALSE,
         validateType = TRUE, noDefaultAvailable = FALSE, call. = TRUE) {
     .assertIsSinglePositiveInteger(
-        x = x, 
+        x = x,
         argumentName = argumentName,
-        naAllowed = naAllowed, 
+        naAllowed = naAllowed,
         validateType = validateType,
-        mustBePositive = FALSE, 
+        mustBePositive = FALSE,
         noDefaultAvailable = noDefaultAvailable,
         call. = call.
     )
 }
 
-.assertIsSinglePositiveInteger <- function(
-        x, 
-        argumentName, 
+.assertIsSinglePositiveInteger <- function(x,
+        argumentName,
         ...,
-        naAllowed = FALSE, 
-        validateType = TRUE, 
-        mustBePositive = TRUE, 
-        noDefaultAvailable = FALSE, 
+        naAllowed = FALSE,
+        validateType = TRUE,
+        mustBePositive = TRUE,
+        noDefaultAvailable = FALSE,
         call. = TRUE) {
     prefix <- ifelse(mustBePositive, "single positive ", "single ")
     if (missing(x) || is.null(x) || length(x) == 0) {
@@ -811,8 +813,7 @@ NULL
     }
 }
 
-.showParameterOutOfValidatedBoundsMessage <- function(
-        parameterValue,
+.showParameterOutOfValidatedBoundsMessage <- function(parameterValue,
         parameterName, ...,
         lowerBound = NA_real_,
         upperBound = NA_real_,
@@ -942,10 +943,10 @@ NULL
         )
     }
     if (identical(accrualTime, 0) || identical(accrualTime, 0L)) {
-      stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "single 'accrualTime' is not allowed to be 0"
-      )
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "single 'accrualTime' is not allowed to be 0"
+        )
     }
     .assertIsInClosedInterval(accrualTime, "accrualTime", lower = 0, upper = NULL, naAllowed = naAllowed)
     .assertValuesAreStrictlyIncreasing(accrualTime, "accrualTime")
@@ -955,8 +956,10 @@ NULL
     .assertIsSingleNumber(stDev, "stDev")
 
     if (stDev <= 0) {
-        stop(C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, 
-            "standard deviation 'stDev' (", stDev, ") must be > 0")
+        stop(
+            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
+            "standard deviation 'stDev' (", stDev, ") must be > 0"
+        )
     }
 }
 
@@ -1167,7 +1170,15 @@ NULL
     }
 }
 
-.assertValuesAreStrictlyIncreasing <- function(values, parameterName, endingNasAllowed = FALSE) {
+.assertValuesAreStrictlyIncreasing <- function(values,
+        parameterName,
+        ...,
+        endingNasAllowed = FALSE,
+        naAllowed = FALSE) {
+    if (isTRUE(naAllowed) && all(is.na(values))) {
+        return(invisible())
+    }
+
     len <- length(values)
     if (len <= 1) {
         return(invisible())
@@ -1937,23 +1948,23 @@ NULL
     }
 }
 
-.assertIsValidDirectionUpper <- function(
-        directionUpper, 
+.assertIsValidDirectionUpper <- function(directionUpper,
         design,
-        ..., 
-        objectType = c("sampleSize", "power", "analysis"), 
+        ...,
+        objectType = c("sampleSize", "power", "analysis"),
         userFunctionCallEnabled = FALSE) {
     objectType <- match.arg(objectType)
 
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
-    
-    if (!is.na(directionUpper) && !is.na(design$directionUpper) && 
+
+    if (!is.na(directionUpper) && !is.na(design$directionUpper) &&
             !identical(directionUpper, design$directionUpper)) {
-        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, 
+        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
             "in the design directionUpper = ", design$directionUpper, " is defined. ",
-            "In the ", ifelse(objectType == "sampleSize", "sample size", objectType), 
-            " function the same direction must be specified, but it is ", directionUpper, 
-            call. = FALSE)
+            "In the ", ifelse(objectType == "sampleSize", "sample size", objectType),
+            " function the same direction must be specified, but it is ", directionUpper,
+            call. = FALSE
+        )
     }
 
     if (objectType %in% c("power", "analysis")) {
@@ -1978,7 +1989,7 @@ NULL
             directionUpper <- C_DIRECTION_UPPER_DEFAULT
         }
     }
-    
+
     return(directionUpper)
 }
 
@@ -2293,12 +2304,12 @@ NULL
         grepl("Enrichment", .getClassName(conditionalPowerResults)))
 }
 
-.isMultiHypothesesObject = function(x) {
+.isMultiHypothesesObject <- function(x) {
     return(.isEnrichmentAnalysisResults(x) || .isEnrichmentStageResults(x) ||
-            .isMultiArmAnalysisResults(x) || .isMultiArmStageResults(x))
+        .isMultiArmAnalysisResults(x) || .isMultiArmStageResults(x))
 }
 
-.isEnrichmentObject = function(x) {
+.isEnrichmentObject <- function(x) {
     return(.isEnrichmentAnalysisResults(x) || .isEnrichmentStageResults(x))
 }
 
@@ -2707,139 +2718,177 @@ NULL
     return(typeOfShape)
 }
 
-.assertIsValidEffectMatrixMeans <- function(typeOfShape, effectMatrix, muMaxVector, gED50, gMax, slope) {
+.assertHasLength <- function(x, argumentName, len, lenArgName, ..., naAllowed = FALSE) {
+    if (isTRUE(naAllowed) && all(is.na(x))) {
+        return(invisible())
+    }
+
+    if (length(x) != len) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            sQuote(argumentName), " (", .arrayToString(x), ") ",
+            "must have length ", sQuote(lenArgName), " (", len, ")"
+        )
+    }
+}
+
+.assertIsValidEffectMatrix <- function(
+        ...,
+        simulationResults,
+        typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
+        effectMatrix,
+        valueMaxVector,
+        valueMaxVectorName = c("muMaxVector", "piMaxVector", "omegaMaxVector"),
+        piControl = NULL,
+        gED50,
+        gMax,
+        slope,
+        doseLevels) {
+        
+    typeOfShape <- match.arg(typeOfShape)
+    valueMaxVectorName <- match.arg(valueMaxVectorName)
+
+    .assertIsNumericVector(doseLevels, "doseLevels", naAllowed = TRUE)
+    .assertHasLength(doseLevels, "doseLevels", gMax, "gMax", naAllowed = TRUE)
+    .assertValuesAreStrictlyIncreasing(doseLevels, "doseLevels", naAllowed = TRUE)
+    .assertIsInOpenInterval(doseLevels, "doseLevels", lower = 0, upper = NULL, naAllowed = TRUE)
+
     if (typeOfShape == "userDefined") {
         effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
             expectedNumberOfColumns = gMax, naAllowed = FALSE, returnSingleValueAsMatrix = TRUE
         )
-
-        .assertIsNumericVector(muMaxVector, "muMaxVector", naAllowed = TRUE)
-        if (!all(is.na(muMaxVector)) && !identical(muMaxVector, C_ALTERNATIVE_POWER_SIMULATION_DEFAULT)) {
-            warning("'muMaxVector' (", .arrayToString(muMaxVector),
+        if (valueMaxVectorName %in% c("piMaxVector", "omegaMaxVector")) {
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, 1, naAllowed = FALSE)
+        }
+        .assertIsNumericVector(valueMaxVector, valueMaxVectorName, naAllowed = TRUE)
+        valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
+        if (valueMaxVectorName == "piMaxVector") {
+            valueMaxVectorDefault <- C_PI_1_DEFAULT
+        } else if (valueMaxVectorName == "omegaMaxVector") {
+            valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+        }
+        if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {
+            warning(sQuote(valueMaxVectorName), " (", .arrayToString(valueMaxVector),
                 ") will be ignored because it will be set to first column of 'effectMatrix'",
                 call. = FALSE
             )
         }
+        if (!is.null(doseLevels) && !any(is.na(doseLevels))) {
+            warning("'doseLevels' (", .arrayToString(doseLevels), ") ",
+                "will be ignored because 'typeOfShape' ",
+                "is defined as '", typeOfShape, "'",
+                call. = FALSE
+            )
+        }
     } else if (!is.null(effectMatrix)) {
-        warning("'effectMatrix' will be ignored because 'typeOfShape' is defined as '", typeOfShape, "'", call. = FALSE)
+        warning("'effectMatrix' will be ignored because 'typeOfShape' ",
+            "is defined as '", typeOfShape, "'",
+            call. = FALSE
+        )
     }
 
-    if (typeOfShape == "sigmoidEmax") {
-        .assertIsNumericVector(muMaxVector, "muMaxVector", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        .assertIsSingleNumber(gED50, "gED50", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        effectMatrix <- matrix(muMaxVector, nrow = length(muMaxVector), ncol = 1) %*%
-            matrix((1:gMax)^slope / (gED50^slope + (1:gMax)^slope), nrow = 1, ncol = gMax)
-        return(effectMatrix)
+    if (any(is.na(doseLevels))) {
+        doseLevels <- 1:gMax
     }
 
-    if (!is.null(gED50) && !is.na(gED50)) {
-        warning("'gED50' (", gED50, ") will be ignored because 'typeOfShape' is defined as '", typeOfShape, "'", call. = FALSE)
+    if (typeOfShape %in% c("sigmoidEmax", "linear")) {
+        .assertIsNumericVector(valueMaxVector, valueMaxVectorName, 
+            naAllowed = FALSE, noDefaultAvailable = TRUE)
+        if (valueMaxVectorName %in% c("piMaxVector", "omegaMaxVector")) {
+            .assertIsInOpenInterval(
+                valueMaxVector,
+                valueMaxVectorName,
+                lower = 0,
+                upper = if (valueMaxVectorName == "piMaxVector") 1 else NULL,
+                naAllowed = FALSE
+            )
+        }
     }
-
-    if (typeOfShape == "linear") {
-        .assertIsNumericVector(muMaxVector, "muMaxVector", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        effectMatrix <- matrix(muMaxVector, nrow = length(muMaxVector), ncol = 1) %*%
-            matrix((1:gMax) / gMax, nrow = 1, ncol = gMax)
-    }
-
-    if (!is.null(slope) && !is.na(slope) && slope != 1) {
-        warning("'slope' (", slope, ") will be ignored because 'typeOfShape' is defined as '", typeOfShape, "'", call. = FALSE)
-    }
-
+    
+    effectMatrix <- .createEffectMatrix(
+        simulationResults = simulationResults,
+        typeOfShape = typeOfShape,
+        effectMatrix = effectMatrix,
+        valueMaxVector = valueMaxVector,
+        valueMaxVectorName = valueMaxVectorName,
+        piControl = piControl,
+        gED50 = gED50,
+        gMax = gMax,
+        slope = slope,
+        doseLevels = doseLevels)
+    simulationResults$effectMatrix <- t(effectMatrix)
     return(effectMatrix)
 }
 
-.assertIsValidEffectMatrixRates <- function(typeOfShape, effectMatrix, piMaxVector, piControl, gED50, gMax, slope) {
-    if (typeOfShape == "userDefined") {
-        effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
-            expectedNumberOfColumns = gMax, naAllowed = FALSE, returnSingleValueAsMatrix = TRUE
-        )
-        .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, 1, naAllowed = FALSE)
-
-        .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = TRUE)
-        if (!all(is.na(piMaxVector)) && !identical(piMaxVector, C_PI_1_DEFAULT)) {
-            warning("'piMaxVector' (", .arrayToString(piMaxVector),
-                ") will be ignored because it will be set to first column of 'effectMatrix'",
-                call. = FALSE
-            )
-        }
-    } else if (!is.null(effectMatrix)) {
-        warning("'effectMatrix' will be ignored because 'typeOfShape' is defined as '", typeOfShape, "'", call. = FALSE)
-    }
-
-    if (typeOfShape == "sigmoidEmax") {
-        .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        .assertIsInOpenInterval(piMaxVector, "piMaxVector", 0, 1, naAllowed = FALSE)
-        .assertIsSingleNumber(gED50, "gED50", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        effectMatrix <- matrix(piMaxVector, nrow = length(piMaxVector), ncol = 1) %*%
-            matrix((1:gMax)^slope / (gED50^slope + (1:gMax)^slope), nrow = 1, ncol = gMax)
-        return(effectMatrix)
-    }
-
-    if (!is.null(gED50) && !is.na(gED50)) {
-        warning("'gED50' (", gED50, ") will be ignored because 'typeOfShape' is defined as '", typeOfShape, "'", call. = FALSE)
-    }
-
-    if (typeOfShape == "linear") {
-        .assertIsNumericVector(piMaxVector, "piMaxVector", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        .assertIsInOpenInterval(piMaxVector, "piMaxVector", 0, 1, naAllowed = FALSE)
-        .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = FALSE)
-        effectMatrix <- piControl + matrix(piMaxVector - piControl, nrow = length(piMaxVector), ncol = 1) %*%
-            matrix((1:gMax) / gMax, nrow = 1, ncol = gMax)
-    }
-
-    if (!is.null(slope) && !is.na(slope) && slope != 1) {
-        warning("'slope' (", slope, ") will be ignored because 'typeOfShape' is defined as '", typeOfShape, "'", call. = FALSE)
-    }
-
-    return(effectMatrix)
+.assertIsValidEffectMatrixMeans <- function(
+        ...,
+        simulationResults,
+        typeOfShape,
+        effectMatrix,
+        muMaxVector,
+        gED50,
+        gMax,
+        slope,
+        doseLevels) {
+    return(.assertIsValidEffectMatrix(
+        simulationResults = simulationResults,
+        typeOfShape = typeOfShape,
+        effectMatrix = effectMatrix, 
+        valueMaxVector = muMaxVector, 
+        valueMaxVectorName = "muMaxVector",
+        gED50 = gED50,
+        gMax = gMax,
+        slope = slope,
+        doseLevels = doseLevels
+    ))
 }
 
-.assertIsValidEffectMatrixSurvival <- function(typeOfShape, effectMatrix, omegaMaxVector, gED50, gMax, slope) {
-    if (typeOfShape == "userDefined") {
-        effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
-            expectedNumberOfColumns = gMax, naAllowed = FALSE, returnSingleValueAsMatrix = TRUE
-        )
-        .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, NULL, naAllowed = FALSE)
+.assertIsValidEffectMatrixRates <- function(
+        ...,
+        simulationResults,
+        typeOfShape,
+        effectMatrix,
+        piMaxVector,
+        piControl,
+        gED50,
+        gMax,
+        slope,
+        doseLevels) {
+    return(.assertIsValidEffectMatrix(
+        simulationResults = simulationResults,
+        typeOfShape = typeOfShape,
+        effectMatrix = effectMatrix, 
+        valueMaxVector = piMaxVector, 
+        valueMaxVectorName = "piMaxVector",
+        piControl = piControl,
+        gED50 = gED50,
+        gMax = gMax,
+        slope = slope,
+        doseLevels = doseLevels
+    ))
+}
 
-        .assertIsNumericVector(omegaMaxVector, "omegaMaxVector", naAllowed = TRUE)
-        if (!all(is.na(omegaMaxVector)) && !identical(omegaMaxVector, C_RANGE_OF_HAZARD_RATIOS_DEFAULT)) {
-            warning("'omegaMaxVector' (", .arrayToString(omegaMaxVector),
-                ") will be ignored because it will be set to first column of 'effectMatrix'",
-                call. = FALSE
-            )
-        }
-    } else if (!is.null(effectMatrix)) {
-        warning("'effectMatrix' will be ignored because 'typeOfShape' is defined as '", typeOfShape, "'", call. = FALSE)
-    }
-
-    if (typeOfShape == "sigmoidEmax") {
-        .assertIsNumericVector(omegaMaxVector, "omegaMaxVector", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        .assertIsInOpenInterval(omegaMaxVector, "omegaMaxVector", 0, NULL, naAllowed = FALSE)
-        .assertIsSingleNumber(gED50, "gED50", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        effectMatrix <- matrix(omegaMaxVector - 1, nrow = length(omegaMaxVector), ncol = 1) %*%
-            matrix((1:gMax)^slope / (gED50^slope + (1:gMax)^slope), nrow = 1, ncol = gMax) + 1
-
-        return(effectMatrix)
-    }
-
-    if (!is.null(gED50) && !is.na(gED50)) {
-        warning("'gED50' (", gED50, ") will be ignored because 'typeOfShape' is defined as '", typeOfShape, "'", call. = FALSE)
-    }
-
-    if (typeOfShape == "linear") {
-        .assertIsNumericVector(omegaMaxVector, "omegaMaxVector", naAllowed = FALSE, noDefaultAvailable = TRUE)
-        .assertIsInOpenInterval(omegaMaxVector, "omegaMaxVector", 0, NULL, naAllowed = FALSE)
-        effectMatrix <- matrix(omegaMaxVector - 1, nrow = length(omegaMaxVector), ncol = 1) %*%
-            matrix((1:gMax) / gMax, nrow = 1, ncol = gMax) + 1
-    }
-
-    if (!is.null(slope) && !is.na(slope) && slope != 1) {
-        warning("'slope' (", slope, ") will be ignored because 'typeOfShape' is defined as '", typeOfShape, "'", call. = FALSE)
-    }
-
-    return(effectMatrix)
+.assertIsValidEffectMatrixSurvival <- function(
+        ...,
+        simulationResults,
+        typeOfShape,
+        effectMatrix,
+        omegaMaxVector,
+        gED50,
+        gMax,
+        slope,
+        doseLevels) {
+    return(.assertIsValidEffectMatrix(
+        simulationResults = simulationResults,
+        typeOfShape = typeOfShape,
+        effectMatrix = effectMatrix, 
+        valueMaxVector = omegaMaxVector, 
+        valueMaxVectorName = "omegaMaxVector",
+        gED50 = gED50,
+        gMax = gMax,
+        slope = slope,
+        doseLevels = doseLevels
+    ))
 }
 
 .assertIsValidPlannedSubjects <- function(plannedSubjects, kMax) {
@@ -3020,13 +3069,14 @@ NULL
         accrualTime,
         accrualIntensity,
         maxNumberOfSubjects,
-        accrualIntensityValidationEnabled = TRUE) {
+        accrualIntensityValidationEnabled = TRUE,
+        accrualTimeIsMandatory = FALSE) {
     .assertIsSingleLogical(sampleSizeEnabled, "sampleSizeEnabled")
     .assertIsSingleNumber(fixedExposureTime, "fixedExposureTime", naAllowed = TRUE)
     .assertIsInOpenInterval(fixedExposureTime, "fixedExposureTime", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsSingleNumber(followUpTime, "followUpTime", naAllowed = TRUE)
     .assertIsInClosedInterval(followUpTime, "followUpTime", lower = 0, upper = NULL, naAllowed = TRUE)
-    .assertIsValidAccrualTime(accrualTime)
+    .assertIsValidAccrualTime(accrualTime, naAllowed = isFALSE(accrualTimeIsMandatory))
     .assertIsNumericVector(accrualIntensity, "accrualIntensity", naAllowed = TRUE)
     .assertIsInClosedInterval(accrualIntensity, "accrualIntensity", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
@@ -3127,15 +3177,15 @@ NULL
         )
     }
     if (!any(is.na(accrualIntensity)) && (length(accrualIntensity) > 1) &&
-        length(accrualTime) != length(accrualIntensity) + 1) {
-      stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'accrualTime' (", .arrayToString(accrualTime), ") and ",
-        "'accrualIntensity' (", .arrayToString(accrualIntensity), ") does not match"
-      )
-    }    
-    if (accrualIntensityValidationEnabled && any(is.na(accrualIntensity)) && 
-        length(accrualTime) > 1) {
+            length(accrualTime) != length(accrualIntensity) + 1) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'accrualTime' (", .arrayToString(accrualTime), ") and ",
+            "'accrualIntensity' (", .arrayToString(accrualIntensity), ") does not match"
+        )
+    }
+    if (accrualIntensityValidationEnabled && any(is.na(accrualIntensity)) &&
+            length(accrualTime) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'accrualIntensity' (", .arrayToString(accrualIntensity), ") is not correctly specified"
@@ -3162,14 +3212,14 @@ NULL
     if (is.null(type) || length(type) == 0 || (!naAllowed && all(is.na(type)))) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'type' must be defined")
     }
-    
+
     if (!is.numeric(type) && !is.character(type)) {
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT,
             "'type' must be an integer or character value or vector (is ", .getClassName(type), ")"
         )
     }
-    
+
     if (is.numeric(type)) {
         .assertIsIntegerVector(type, "type", naAllowed = naAllowed, validateType = FALSE)
     }
@@ -3177,7 +3227,7 @@ NULL
 
 .hasApplicableFutilityBounds <- function(design) {
     return(
-        !all(is.na(design$futilityBounds)) && 
-        any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
+        !all(is.na(design$futilityBounds)) &&
+            any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
     )
 }

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8349 $
+## |  Last changed: $Date: 2024-11-01 14:50:21 +0100 (Fr, 01 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -51,7 +51,8 @@ NULL
                     ), 1 - 1e-07))
                 }
             } else {
-                thetaStandardized <- log(min(thetaH1, 1 + ifelse(is.na(directionUpper) || isTRUE(directionUpper), 1e-07, -1e-07)))
+                thetaStandardized <- log(min(thetaH1, 1 + ifelse(is.na(directionUpper) ||
+                    isTRUE(directionUpper), 1e-07, -1e-07)))
             }
 
             if (conditionalCriticalValue[stage] > 8) {
@@ -125,7 +126,7 @@ NULL
         weights <- .getWeightsInverseNormal(design)
     }
 
-    for (k in 1:kMax) {
+    for (k in seq_len(kMax)) {
         const <- allocationRatioPlanned[k] / (1 + allocationRatioPlanned[k])^2
 
         selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
@@ -342,8 +343,9 @@ NULL
 
             if (is.na(thetaH1)) {
                 thetaStandardized <- log(.applyDirectionOfAlternative(
-                    overallEffects[selectedPopulations[1:gMax, k], k], 
-                    directionUpper, type = "minMax", phase = "planning"
+                    overallEffects[selectedPopulations[1:gMax, k], k],
+                    directionUpper,
+                    type = "minMax", phase = "planning"
                 ))
             } else {
                 thetaStandardized <- log(thetaH1)
@@ -473,7 +475,9 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
         )
     } else {
         .assertIsTrialDesignInverseNormalOrFisher(design)
-        .warnInCaseOfUnknownArguments(functionName = "getSimulationEnrichmentSurvival", ignore = "showStatistics", ...)
+        .warnInCaseOfUnknownArguments(
+            functionName = "getSimulationEnrichmentSurvival", 
+            ignore = "showStatistics", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
     }
 
@@ -481,9 +485,11 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
-    
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
+
     simulationResults <- .createSimulationResultsEnrichmentObject(
         design                      = design,
         effectList                  = effectList,
@@ -567,8 +573,8 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
     dataPValuesSeparate <- rep(NA_real_, len)
 
     index <- 1
-    for (i in 1:cols) {
-        for (j in 1:maxNumberOfIterations) {
+    for (i in seq_len(cols)) {
+        for (j in seq_len(maxNumberOfIterations)) {
             stageResults <- .getSimulatedStageSurvivalEnrichment(
                 design = design,
                 subsets = effectList$subsets,
@@ -604,7 +610,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
             rejectAtSomeStage <- FALSE
             rejectedPopulationsBefore <- rep(FALSE, gMax)
 
-            for (k in 1:kMax) {
+            for (k in seq_len(kMax)) {
                 simulatedRejections[k, i, ] <- simulatedRejections[k, i, ] +
                     (closedTest$rejected[, k] & closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore)
                 simulatedSelections[k, i, ] <- simulatedSelections[k, i, ] + closedTest$selectedPopulations[, k]
@@ -638,7 +644,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
                         stageResults$plannedEvents[k] - stageResults$plannedEvents[k - 1]
                 }
 
-                for (g in 1:gMax) {
+                for (g in seq_len(gMax)) {
                     dataIterationNumber[index] <- j
                     dataStageNumber[index] <- k
                     dataArmNumber[index] <- g
@@ -727,7 +733,8 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+            "internal error, simulation not possible due to numerical overflow")
     }
 
     data <- data.frame(

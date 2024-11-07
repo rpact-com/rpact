@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8277 $
-## |  Last changed: $Date: 2024-09-27 08:16:45 +0200 (Fr, 27 Sep 2024) $
+## |  File version: $Revision: 8363 $
+## |  Last changed: $Date: 2024-11-07 07:18:40 +0100 (Do, 07 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -490,7 +490,8 @@ SimulationResults <- R6::R6Class("SimulationResults",
                         "median [range]: ", round(stats::median(paramValue), 3),
                         " [", paste(round(base::range(paramValue), 3), collapse = " - "), "]; ",
                         "mean +/-sd: ", round(base::mean(paramValue), 3),
-                        " +/-", round(stats::sd(paramValue), 3)
+                        " +/-", round(stats::sd(paramValue), 3), "; ",
+                        "n = ", length(paramValue)
                     )
                 } else {
                     paramValueFormatted <- "median [range]: NA [NA - NA]; mean +/sd: NA +/-NA"
@@ -773,6 +774,7 @@ SimulationResultsMultiArmMeans <- R6::R6Class("SimulationResultsMultiArmMeans",
         muMaxVector = NULL,
         gED50 = NULL,
         slope = NULL,
+        doseLevels = NULL,
         intersectionTest = NULL,
         adaptations = NULL,
         typeOfSelection = NULL,
@@ -1017,6 +1019,7 @@ SimulationResultsMultiArmRates <- R6::R6Class("SimulationResultsMultiArmRates",
         piControlH1 = NULL,
         gED50 = NULL,
         slope = NULL,
+        doseLevels = NULL,
         intersectionTest = NULL,
         adaptations = NULL,
         typeOfSelection = NULL,
@@ -1309,6 +1312,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvi
         omegaMaxVector = NULL,
         gED50 = NULL,
         slope = NULL,
+        doseLevels = NULL,
         intersectionTest = NULL,
         adaptations = NULL,
         typeOfSelection = NULL,
@@ -1688,7 +1692,7 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentS
 #' @include class_core_plot_settings.R
 #' @include class_design.R
 #' @include f_core_constants.R
-#' @include f_simulation_base_count_data.R
+#' @include f_simulation_base_counts.R
 #'
 #' @keywords internal
 #'

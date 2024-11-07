@@ -13,6 +13,7 @@ getSimulationMultiArmMeans(
   muMaxVector = seq(0, 1, 0.2),
   gED50 = NA_real_,
   slope = 1,
+  doseLevels = NA_real_,
   intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
   stDev = 1,
   adaptations = NA,
@@ -68,6 +69,9 @@ to specify the ED50 of the sigmoid Emax model.}
 
 \item{slope}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"slope"} can be entered
 to specify the slope of the sigmoid Emax model, default is 1.}
+
+\item{doseLevels}{The dose levels for the dose response relationship.
+If not specified, these dose levels are \code{1, ..., gMax}.}
 
 \item{intersectionTest}{Defines the multiple test for the intersection
 hypotheses in the closed system of hypotheses.

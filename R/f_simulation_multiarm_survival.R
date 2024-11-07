@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8349 $
+## |  Last changed: $Date: 2024-11-01 14:50:21 +0100 (Fr, 01 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -350,6 +350,7 @@ NULL
 #' @inheritParams param_epsilonValue
 #' @inheritParams param_gED50
 #' @inheritParams param_slope
+#' @inheritParams param_doseLevels
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
 #' @inheritParams param_showStatistics
@@ -395,6 +396,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
         omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         gED50 = NA_real_,
         slope = 1,
+        doseLevels = NA_real_,
         intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
         directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         adaptations = NA,
@@ -447,6 +449,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
         omegaMaxVector              = omegaMaxVector, # survival only
         gED50                       = gED50,
         slope                       = slope,
+        doseLevels                  = doseLevels,
         intersectionTest            = intersectionTest,
         directionUpper              = directionUpper, # rates + survival only
         adaptations                 = adaptations,
