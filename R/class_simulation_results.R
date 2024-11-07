@@ -1692,7 +1692,7 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentS
 #' @include class_core_plot_settings.R
 #' @include class_design.R
 #' @include f_core_constants.R
-#' @include f_simulation_base_count_data.R
+#' @include f_simulation_base_counts.R
 #'
 #' @keywords internal
 #'

@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.1.0.9266
-Date: 2024-11-06
+Version: 4.1.0.9267
+Date: 2024-11-07
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -93,7 +93,7 @@ Collate:
     'class_design_plan.R'
     'class_design_power_and_asn.R'
     'class_event_probabilities.R'
-    'f_simulation_base_count_data.R'
+    'f_simulation_base_counts.R'
     'f_simulation_utilities.R'
     'f_simulation_base_survival.R'
     'class_simulation_results.R'
@@ -115,7 +115,7 @@ Collate:
     'f_core_output_formats.R'
     'f_design_fisher_combination_test.R'
     'f_design_group_sequential.R'
-    'f_design_plan_count_data.R'
+    'f_design_plan_counts.R'
     'f_design_plan_means.R'
     'f_design_plan_plot.R'
     'f_design_plan_rates.R'
