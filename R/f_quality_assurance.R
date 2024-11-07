@@ -577,10 +577,11 @@ testPackage <- function(
         outDir <- getwd()
     }
 
-    oldResultFiles <- c(
-        file.path(outDir, "rpact-tests", "testthat.Rout"),
-        file.path(outDir, "rpact-tests", "testthat.Rout.fail")
-    )
+    oldResultFiles <- list.files(
+        path = outDir, 
+        pattern = "^testthat\\.Rout(\\.fail)?$", 
+        recursive = TRUE, 
+        full.names = TRUE)
     for (oldResultFile in oldResultFiles) {
         if (file.exists(oldResultFile)) {
             file.remove(oldResultFile)
@@ -612,13 +613,23 @@ testPackage <- function(
         }
         .testInstalledPackage(
             testFileDirectory = testFileTargetDirectory,
-            pkgName = pkgName, 
-            outDir = testFileTargetDirectory, 
-            Ropts = ""
+            pkgName = pkgName
         )
     }
+    
+    newResultFiles <- list.files(
+        path = outDir, 
+        pattern = "^testthat\\.Rout(\\.fail)?$", 
+        recursive = TRUE, 
+        full.names = TRUE)
 
-    outDir <- file.path(outDir, paste0(pkgName, "-tests"))
+    resultDir <- file.path(outDir, paste0(pkgName, "-tests"))
+    if (!dir.exists(resultDir)) {
+        dir.create(resultDir)
+    }
+    if (length(newResultFiles) > 0) {
+        file.copy(newResultFiles, resultDir)
+    }
 
     endTime <- Sys.time()
 
@@ -633,7 +644,7 @@ testPackage <- function(
         endTime = endTime, runtimeUnits = "auto"
     ), ".\n", sep = "")
 
-    inputFileName <- file.path(outDir, "testthat.Rout")
+    inputFileName <- file.path(resultDir, "testthat.Rout")
     if (file.exists(inputFileName)) {
         fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
         if (completeUnitTestSetEnabled && fullTestEnabled) {
@@ -648,7 +659,7 @@ testPackage <- function(
         cat(.getTestthatResultLine(fileContent), "\n")
         cat("\n")
         cat("Test results were written to directory \n",
-            "'", outDir, "' (see file 'testthat.Rout')\n",
+            "'", resultDir, "' (see file 'testthat.Rout')\n",
             sep = ""
         )
         skipped <- .getTestthatResultNumberOfSkippedTests(fileContent)
@@ -669,7 +680,7 @@ testPackage <- function(
             sep = ""
         )
     } else {
-        inputFileName <- file.path(outDir, "testthat.Rout.fail")
+        inputFileName <- file.path(resultDir, "testthat.Rout.fail")
         if (file.exists(inputFileName)) {
             fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
             if (completeUnitTestSetEnabled) {
@@ -682,7 +693,9 @@ testPackage <- function(
             }
             cat("Results:\n")
             cat(.getTestthatResultLine(fileContent), "\n")
-            cat("Test results were written to directory '", outDir, "' (see file 'testthat.Rout.fail')\n", sep = "")
+            cat("Test results were written to directory '", resultDir, "' (see file 'testthat.Rout.fail')\n", sep = "")
+        } else {
+            cat("No test results found in directory '", resultDir, "'\n", sep = "")
         }
     }
     if (!fullTestEnabled) {
@@ -699,13 +712,13 @@ testPackage <- function(
     invisible(.isCompleteUnitTestSetEnabled())
 }
 
-.testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", outDir = ".", Ropts = "") {
+.testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", Ropts = "") {
     .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = FALSE)
     if (!dir.exists(testFileDirectory)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'testFileDirectory' (", testFileDirectory, ") does not exist")
     }
 
-    workingDirectoryBefore <- setwd(outDir)
+    workingDirectoryBefore <- getwd()
     on.exit(setwd(workingDirectoryBefore))
 
     setwd(testFileDirectory)
@@ -739,7 +752,6 @@ testPackage <- function(
             if (!res) message(" OK")
         }
     }
-    setwd(workingDirectoryBefore)
 
     return(invisible(0L))
 }

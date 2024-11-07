@@ -2595,6 +2595,16 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         header <- .concatenateSummaryText(header, paste0("slope = ", designPlan$slope))
         header <- .concatenateSummaryText(header, paste0("ED50 = ", designPlan$gED50))
     }
+    if (!is.null(designPlan[["doseLevels"]]) && 
+            designPlan$.getParameterType("doseLevels") == C_PARAM_USER_DEFINED && 
+            !all(is.na(designPlan$doseLevels))) {
+        header <- .concatenateSummaryText(header, paste0(
+            "dose levels = ",
+            .arrayToString(designPlan$doseLevels,
+                vectorLookAndFeelEnabled = (length(designPlan$doseLevels) > 1)
+            )
+        ))
+    }
 
     return(header)
 }

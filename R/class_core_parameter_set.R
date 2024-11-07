@@ -917,7 +917,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
         "adaptations",
         "adjustedStageWisePValues", 
         "overallAdjustedTestStatistics",
-        "plannedCalendarTime"
+        "plannedCalendarTime",
+        "doseLevels"
     ))]
 
     if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
@@ -997,9 +998,12 @@ ParameterSet <- R6::R6Class("ParameterSet",
 
         if (length(parameterValues) == numberOfStages &&
                 parameterName %in% c(
-                    "plannedEvents", "plannedSubjects",
-                    "minNumberOfEventsPerStage", "maxNumberOfEventsPerStage",
-                    "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage",
+                    "plannedEvents", 
+                    "plannedSubjects",
+                    "minNumberOfEventsPerStage", 
+                    "maxNumberOfEventsPerStage",
+                    "minNumberOfSubjectsPerStage", 
+                    "maxNumberOfSubjectsPerStage",
                     "allocationRatioPlanned"
                 )) {
             values <- c()
@@ -1010,11 +1014,16 @@ ParameterSet <- R6::R6Class("ParameterSet",
         }
 
         if (parameterName %in% c(
-                "accrualTime", "accrualIntensity",
-                "plannedEvents", "plannedSubjects",
-                "minNumberOfEventsPerStage", "maxNumberOfEventsPerStage",
-                "minNumberOfSubjectsPerStage", "maxNumberOfSubjectsPerStage",
-                "piecewiseSurvivalTime", "lambda2"
+                "accrualTime", 
+                "accrualIntensity",
+                "plannedEvents", 
+                "plannedSubjects",
+                "minNumberOfEventsPerStage", 
+                "maxNumberOfEventsPerStage",
+                "minNumberOfSubjectsPerStage", 
+                "maxNumberOfSubjectsPerStage",
+                "piecewiseSurvivalTime", 
+                "lambda2"
             )) {
             return(NULL)
         }
@@ -1146,7 +1155,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
     for (parameterName in parameterNames) {
         tryCatch(
             {
-                if (!(parameterName %in% c("stages", "adaptations", "effectList", "plannedCalendarTime")) &&
+                if (!(parameterName %in% c("stages", "adaptations", "effectList", "doseLevels", "plannedCalendarTime")) &&
                         !grepl("Function$", parameterName) &&
                         (is.null(variedParameter) || parameterName != variedParameter)) {
                     columnValues <- .getDataFrameColumnValues(
