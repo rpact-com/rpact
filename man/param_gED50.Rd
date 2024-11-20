@@ -4,7 +4,7 @@
 \alias{param_gED50}
 \title{Parameter Description: G ED50}
 \arguments{
-\item{gED50}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"gED50"} has to be entered
+\item{gED50}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{gED50} has to be entered
 to specify the ED50 of the sigmoid Emax model.}
 }
 \description{

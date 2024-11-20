@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8360 $
-## |  Last changed: $Date: 2024-11-04 15:40:23 +0100 (Mo, 04 Nov 2024) $
+## |  File version: $Revision: 8416 $
+## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -412,7 +412,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             if (obj$.design$kMax > 1) {
                 types <- c(types, 8)
                 if (!.isTrialDesignPlanCountData(obj) ||
-                        obj$.getParameterType("expectedNumberOfSubjectsH1") == C_PARAM_GENERATED) {
+                        obj$isGeneratedParameter("expectedNumberOfSubjectsH1")) {
                     types <- c(types, 9)
                 }
             }

@@ -4,7 +4,7 @@
 \alias{param_slope}
 \title{Parameter Description: Slope}
 \arguments{
-\item{slope}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"slope"} can be entered
+\item{slope}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{slope} can be entered
 to specify the slope of the sigmoid Emax model, default is 1.}
 }
 \description{

@@ -11,7 +11,8 @@ testPackage(
   types = "tests",
   connection = list(token = NULL, secret = NULL),
   testFileDirectory = NA_character_,
-  downloadTestsOnly = FALSE
+  downloadTestsOnly = FALSE,
+  addWarningDetailsToReport = TRUE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ to fulfill regulatory requirements (see \href{https://www.rpact.com}{www.rpact.c
 \item{testFileDirectory}{An optional path that points to a local directory where the test files are located.}
 
 \item{downloadTestsOnly}{If \code{TRUE}, the unit test files are only downloaded and not executed, default is \code{FALSE}.}
+
+\item{addWarningDetailsToReport}{If \code{TRUE}, additional warning details will be added to the test report, default is \code{TRUE}.}
 }
 \value{
 The value of \code{completeUnitTestSetEnabled} will be returned invisible.

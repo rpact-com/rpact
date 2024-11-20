@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8333 $
-## |  Last changed: $Date: 2024-10-18 10:54:09 +0200 (Fr, 18 Okt 2024) $
+## |  File version: $Revision: 8426 $
+## |  Last changed: $Date: 2024-11-20 13:43:12 +0100 (Mi, 20 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -466,6 +466,7 @@ NULL
 #'     to fulfill regulatory requirements (see \href{https://www.rpact.com}{www.rpact.com} for more information).
 #' @param testFileDirectory An optional path that points to a local directory where the test files are located. 
 #' @param downloadTestsOnly If \code{TRUE}, the unit test files are only downloaded and not executed, default is \code{FALSE}.
+#' @param addWarningDetailsToReport If \code{TRUE}, additional warning details will be added to the test report, default is \code{TRUE}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -494,7 +495,8 @@ testPackage <- function(
         types = "tests",
         connection = list(token = NULL, secret = NULL),
         testFileDirectory = NA_character_,
-        downloadTestsOnly = FALSE) {
+        downloadTestsOnly = FALSE,
+        addWarningDetailsToReport = TRUE) {
     .assertTestthatIsInstalled()
     .assertIsSingleCharacter(outDir, "outDir", naAllowed = FALSE)
     .assertIsSingleLogical(completeUnitTestSetEnabled, "completeUnitTestSetEnabled", naAllowed = FALSE)
@@ -512,6 +514,12 @@ testPackage <- function(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "test file directory '", testFileDirectory, "' does not exist"
         )
+    }
+    
+    if (isTRUE(addWarningDetailsToReport)) {
+        valueBefore <- Sys.getenv("NOT_CRAN")
+        on.exit(Sys.setenv(NOT_CRAN = valueBefore))
+        Sys.setenv(NOT_CRAN = "true")
     }
   
     startTime <- Sys.time()
@@ -712,7 +720,7 @@ testPackage <- function(
     invisible(.isCompleteUnitTestSetEnabled())
 }
 
-.testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", Ropts = "") {
+.testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", Ropts = character()) {
     .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = FALSE)
     if (!dir.exists(testFileDirectory)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'testFileDirectory' (", testFileDirectory, ") does not exist")
@@ -729,8 +737,12 @@ testPackage <- function(
         outfile <- paste0(testFile, "out")
         cmd <- paste(
             shQuote(file.path(R.home("bin"), "R")),
-            "CMD BATCH --vanilla --no-timing", Ropts,
-            shQuote(testFile), shQuote(outfile)
+            "CMD BATCH",
+            "--vanilla",
+            "--no-timing", 
+            Ropts,
+            shQuote(testFile), 
+            shQuote(outfile)
         )
         cmd <- if (.Platform$OS.type == "windows") paste(cmd, "LANGUAGE=C") else paste("LANGUAGE=C", cmd)
         res <- system(cmd)

@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8355 $
-## |  Last changed: $Date: 2024-11-04 08:55:52 +0100 (Mo, 04 Nov 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8415 $
+## |  Last changed: $Date: 2024-11-18 16:01:59 +0100 (Mo, 18 Nov 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' Parameter Description: "..."
@@ -374,10 +374,10 @@ NULL
 #' Parameter Description: Allocation Ratio Planned
 #' @param allocationRatioPlanned The planned allocation ratio \code{n1 / n2} for a two treatment groups
 #'   design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
-#'   For simulating means and rates for a two treatment groups design, it can be a vector of length `kMax`, the number of stages.
-#'   It can be a vector of length kMax, too, for multi-arm and enrichment designs.
+#'   For simulating means and rates for a two treatment groups design, it can be a vector of length \code{kMax}, the number of stages.
+#'   It can be a vector of length \code{kMax}, too, for multi-arm and enrichment designs.
 #' 	 In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.
-#'   Note that internally `allocationRatioPlanned` is treated as a vector of length `kMax`, not a scalar.
+#'   Note that internally \code{allocationRatioPlanned} is treated as a vector of length \code{kMax}, not a scalar.
 #' @name param_allocationRatioPlanned
 #' @keywords internal
 NULL
@@ -485,7 +485,7 @@ NULL
 
 #' Parameter Description: Max Number Of Events Per Stage
 #' @param maxNumberOfEventsPerStage When performing a data driven sample size recalculation,
-#'   the numeric vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number
+#'   the numeric vector \code{maxNumberOfEventsPerStage} with length \code{kMax} determines the maximum number
 #'   of events per stage (i.e., not cumulated), the first element is not taken into account.
 #' @name param_maxNumberOfEventsPerStage
 #' @keywords internal
@@ -793,13 +793,13 @@ NULL
 #' @param typeOfShape The shape of the dose-response relationship over the treatment groups.
 #'   This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"},
 #'   default is \code{"linear"}.\cr
-#'   For \code{"linear"}, \code{"muMaxVector"} specifies the range
+#'   For \code{"linear"}, \code{muMaxVector}, \code{muMaxVector}, or \code{omegaMaxVector} specifies the range
 #'   of effect sizes for the treatment group with highest response.
-#'   If \code{"sigmoidEmax"} is selected, \code{"gED50"} and \code{"slope"} has to be entered
+#'   If \code{"sigmoidEmax"} is selected, \code{gED50} and \code{slope} has to be entered
 #'   to specify the ED50 and the slope of the sigmoid Emax model.
-#'   For \code{"sigmoidEmax"}, \code{"muMaxVector"} specifies the range
+#'   For \code{"sigmoidEmax"}, \code{muMaxVector}, \code{muMaxVector}, or \code{omegaMaxVector} specifies the range
 #'   of effect sizes for the treatment group with response according to infinite dose.
-#'   If \code{"userDefined"} is selected, \code{"effectMatrix"} has to be entered.
+#'   If \code{"userDefined"} is selected, \code{effectMatrix} has to be entered.
 #' @name param_typeOfShape
 #' @keywords internal
 NULL
@@ -817,10 +817,10 @@ NULL
 #' Parameter Description: Select Arms Function
 #' @param selectArmsFunction Optionally, a function can be entered that defines the way of how treatment arms
 #' are selected. This function is allowed to depend on \code{effectVector} with length \code{activeArms}, 
-#' \code{stage}, \code{"conditionalPower"}, \code{"conditionalCriticalValue"}, \code{"plannedSubjects/plannedEvents"}, 
-#' \code{"allocationRatioPlanned"}, \code{"selectedArms"}, \code{"thetaH1"} (for means and survival), \code{"stDevH1"} (for means), 
-#' \code{"overallEffects"}, and for rates additionally: \code{"piTreatmentsH1"}, \code{"piControlH1"}, \code{"overallRates"}, and 
-#' \code{"overallRatesControl"}. 
+#' \code{stage}, \code{conditionalPower}, \code{conditionalCriticalValue}, \code{plannedSubjects/plannedEvents}, 
+#' \code{allocationRatioPlanned}, \code{selectedArms}, \code{thetaH1} (for means and survival), \code{stDevH1} (for means), 
+#' \code{overallEffects}, and for rates additionally: \code{piTreatmentsH1}, \code{piControlH1}, \code{overallRates}, and 
+#' \code{overallRatesControl} (see examples). 
 #' @name param_selectArmsFunction
 #' @keywords internal
 NULL
@@ -828,10 +828,10 @@ NULL
 #' Parameter Description: Select Populations Function
 #' @param selectPopulationsFunction Optionally, a function can be entered that defines the way of how populations
 #' are selected. This function is allowed to depend on \code{effectVector} with length \code{populations}
-#' \code{stage}, \code{"conditionalPower"}, \code{"conditionalCriticalValue"}, \code{"plannedSubjects/plannedEvents"}, 
-#' \code{"allocationRatioPlanned"}, \code{"selectedPopulations"}, \code{"thetaH1"} (for means and survival), \code{"stDevH1"} (for means), 
-#' \code{"overallEffects"}, and for rates additionally: \code{"piTreatmentsH1"}, \code{"piControlH1"}, \code{"overallRates"}, and 
-#' \code{"overallRatesControl"}. 
+#' \code{stage}, \code{conditionalPower}, \code{conditionalCriticalValue}, \code{plannedSubjects/plannedEvents}, 
+#' \code{allocationRatioPlanned}, \code{selectedPopulations}, \code{thetaH1} (for means and survival), \code{stDevH1} (for means), 
+#' \code{overallEffects}, and for rates additionally: \code{piTreatmentsH1}, \code{piControlH1}, \code{overallRates}, and 
+#' \code{overallRatesControl} (see examples). 
 #' @name param_selectPopulationsFunction
 #' @keywords internal
 NULL
@@ -878,14 +878,14 @@ NULL
 NULL
 
 #' Parameter Description: G ED50
-#' @param gED50 If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"gED50"} has to be entered
+#' @param gED50 If \code{typeOfShape = "sigmoidEmax"} is selected, \code{gED50} has to be entered
 #'   to specify the ED50 of the sigmoid Emax model.
 #' @name param_gED50
 #' @keywords internal
 NULL
 
 #' Parameter Description: Slope
-#' @param slope If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"slope"} can be entered
+#' @param slope If \code{typeOfShape = "sigmoidEmax"} is selected, \code{slope} can be entered
 #'   to specify the slope of the sigmoid Emax model, default is 1.
 #' @name param_slope
 #' @keywords internal
@@ -893,13 +893,13 @@ NULL
 
 #' Parameter Description: Dose Levels
 #' @param doseLevels The dose levels for the dose response relationship. 
-#'   If not specified, these dose levels are \code{1, ..., gMax}.
+#'   If not specified, these dose levels are \code{1,...,activeArms}.
 #' @name param_doseLevels
 #' @keywords internal
 NULL
 
 #' Parameter Description: Maximum Information
-#' @param maxInformation Positive integer value specifying the maximum information.
+#' @param maxInformation Positive value specifying the maximum information.
 #' @name param_maxInformation
 #' @keywords internal
 NULL

@@ -7,7 +7,9 @@
 getDesignConditionalDunnett(
   alpha = 0.025,
   informationAtInterim = 0.5,
-  secondStageConditioning = TRUE
+  ...,
+  secondStageConditioning = TRUE,
+  directionUpper = NA
 )
 }
 \arguments{
@@ -15,10 +17,17 @@ getDesignConditionalDunnett(
 
 \item{informationAtInterim}{The information to be expected at interim, default is \code{informationAtInterim = 0.5}.}
 
+\item{...}{Ensures that all arguments (starting from the "...") are to be named and
+that a warning will be displayed if unknown arguments are passed.}
+
 \item{secondStageConditioning}{The way the second stage p-values are calculated within the closed system of hypotheses.
 If \code{secondStageConditioning = FALSE} is specified, the unconditional adjusted p-values are used, otherwise
 conditional adjusted p-values are calculated, default is \code{secondStageConditioning = TRUE}
 (for details, see Koenig et al., 2008).}
+
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is \code{TRUE}
+which means that larger values of the test statistics yield smaller p-values.}
 }
 \value{
 Returns a \code{\link{TrialDesign}} object.

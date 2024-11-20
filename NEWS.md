@@ -6,7 +6,14 @@
 
 ## Improvements, issues, and changes
 
+* The full set of unit tests for rpact is now stored in a private repository. 
+  Only members of the 'RPACT User Group' have access to the tests.
+  For more information, please visit: [rpact.org/iq](www.rpact.org/iq)
+* Usage of `maxInformation` improved (see enhancement [#65](https://github.com/rpact-com/rpact/issues/65))
+* `testPackage()`: additional warning details will be added to the test report if warnings exist
 * Issue [#61](https://github.com/rpact-com/rpact/issues/61)) fixed
+* Flexibility of function `getPiecewiseSurvivalTime()` improved
+* Test coverage improved
 * Minor improvements
 
 

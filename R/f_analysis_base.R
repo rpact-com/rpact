@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8426 $
+## |  Last changed: $Date: 2024-11-20 13:43:12 +0100 (Mi, 20 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -179,172 +179,46 @@ getAnalysisResults <- function(
         stage = NA_integer_,
         maxInformation = NULL,
         informationEpsilon = NULL) {
+        
+    on.exit(options("rpact.analyis.repeated.p.values.warnings.enabled" = "TRUE"))
     designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
     design <- designAndDataInput$design
     dataInput <- designAndDataInput$dataInput
     directionUpper <- .assertIsValidDirectionUpper(directionUpper, design,
         objectType = "analysis", userFunctionCallEnabled = TRUE)
     
-    repeatedPValues <- NULL
-    informationRatesRecalculated <- FALSE
-
-    if (.isAlphaSpendingDesign(design) && (design$typeBetaSpending == "none") &&
-            .isTrialDesignGroupSequential(design) && !.isMultiArmDataset(dataInput)) {
-        observedInformationRates <- NULL
-        absoluteInformations <- NULL
-        status <- NULL
-        if (!is.null(maxInformation) && !is.na(maxInformation)) {
-            showObservedInformationRatesMessage <- .getOptionalArgument(
-                "showObservedInformationRatesMessage",
-                optionalArgumentDefaultValue = TRUE, ...
-            )
-            observedInformation <- getObservedInformationRates(
-                dataInput,
-                maxInformation = maxInformation,
-                informationEpsilon = informationEpsilon, stage = stage,
-                showObservedInformationRatesMessage = showObservedInformationRatesMessage
-            )
-            observedInformationRates <- observedInformation$informationRates
-            absoluteInformations <- observedInformation$absoluteInformations
-            status <- observedInformation$status
-        } else if (!is.null(informationEpsilon) && !is.na(informationEpsilon)) {
-            warning("'informationEpsilon' (", .arrayToString(informationEpsilon),
-                ") will be ignored because 'maxInformation' is undefined",
-                call. = FALSE
-            )
-        }
-        if (!is.null(observedInformationRates)) {
-            stageFromData <- dataInput$getNumberOfStages()
-            if (!is.null(status) && status %in% c("under-running", "over-running") &&
-                    length(observedInformationRates) > 1) {
-                if (stageFromData == 1) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "Recalculation of the information rates not possible at stage 1"
-                    )
-                }
-
-                if (!(getLogLevel() %in% c(C_LOG_LEVEL_DISABLED, C_LOG_LEVEL_PROGRESS))) {
-                    message(
-                        "Calculate alpha values that have actually been spent ",
-                        "at earlier interim analyses at stage ", (stageFromData - 1)
-                    )
-                }
-                .assertIsSingleInteger(stage, "stage", naAllowed = TRUE, validateType = FALSE)
-                observedInformationRatesBefore <- getObservedInformationRates(
-                    dataInput,
-                    maxInformation = maxInformation,
-                    informationEpsilon = informationEpsilon,
-                    stage = ifelse(!is.na(stage), stage - 1, stageFromData - 1),
-                    showObservedInformationRatesMessage = FALSE
-                )$informationRates
-                if (length(observedInformationRatesBefore) < length(design$informationRates)) {
-                    for (i in (length(observedInformationRatesBefore) + 1):length(design$informationRates)) {
-                        if (observedInformationRatesBefore[length(observedInformationRatesBefore)] < 1) {
-                            observedInformationRatesBefore <- c(observedInformationRatesBefore, design$informationRates[i])
-                        }
-                    }
-                }
-
-                designBefore <- eval(parse(text = getObjectRCode(design,
-                    newArgumentValues = list(
-                        informationRates = observedInformationRatesBefore,
-                        kMax = NA_integer_
-                    ),
-                    stringWrapParagraphWidth = NULL
-                )))
-
-                if (is.na(stage) || stage == stageFromData) {
-                    repeatedPValues <- getAnalysisResults(
-                        design = designBefore,
-                        dataInput = dataInput,
-                        directionUpper = directionUpper,
-                        thetaH0 = thetaH0,
-                        nPlanned = nPlanned,
-                        allocationRatioPlanned = allocationRatioPlanned,
-                        stage = stageFromData - 1,
-                        maxInformation = maxInformation,
-                        informationEpsilon = informationEpsilon,
-                        showObservedInformationRatesMessage = FALSE
-                    )$repeatedPValues
-                }
-
-                userAlphaSpending <- designBefore$alphaSpent
-                message(
-                    "Use alpha values that have actually been spent at earlier stages ",
-                    "and spend all remaining alpha at the final analysis, ",
-                    "i.e., userAlphaSpending = (",
-                    .arrayToString(userAlphaSpending, digits = 6), ") "
-                )
-                observedInformationRates <- getObservedInformationRates(
-                    dataInput,
-                    maxInformation = absoluteInformations[stageFromData],
-                    informationEpsilon = informationEpsilon,
-                    stage = stage,
-                    showObservedInformationRatesMessage = FALSE
-                )$informationRates
-                design <- eval(parse(text = getObjectRCode(design,
-                    newArgumentValues = list(
-                        informationRates = observedInformationRates,
-                        kMax = NA_integer_,
-                        userAlphaSpending = userAlphaSpending,
-                        typeOfDesign = C_TYPE_OF_DESIGN_AS_USER
-                    ),
-                    stringWrapParagraphWidth = NULL
-                )))
-                options("rpact.analyis.repeated.p.values.warnings.enabled" = "FALSE")
-                warning("Repeated p-values not available for automatic recalculation of boundaries at final stage",
-                    call. = FALSE
-                )
-            } else {
-                design <- eval(parse(text = getObjectRCode(design,
-                    newArgumentValues = list(
-                        informationRates = observedInformationRates, 
-                        kMax = NA_integer_
-                    ),
-                    stringWrapParagraphWidth = NULL
-                )))
-            }
-            informationRatesRecalculated <- TRUE
-        }
-    } else {
-        if (!is.null(maxInformation) && !is.na(maxInformation)) {
-            warning("'maxInformation' (", .arrayToString(maxInformation),
-                ") will be ignored because it is only applicable for alpha spending", "\n",
-                "group sequential designs with no or fixed futility bounds and a single hypothesis",
-                call. = FALSE
-            )
-        }
-        if (!is.null(informationEpsilon) && !is.na(informationEpsilon)) {
-            warning("'informationEpsilon' (", .arrayToString(informationEpsilon),
-                ") will be ignored because it is only applicable for alpha spending", "\n",
-                "group sequential designs with no or fixed futility bounds and a single hypothesis",
-                call. = FALSE
-            )
-        }
-    }
+    recalculationResult <- .getDesignWithRecalculatedBoundaries(
+        design = design,
+        dataInput = dataInput,
+        directionUpper =  directionUpper,
+        thetaH0 = thetaH0,
+        nPlanned = nPlanned,
+        allocationRatioPlanned = allocationRatioPlanned,
+        stage = stage,
+        maxInformation = maxInformation,
+        informationEpsilon = informationEpsilon,
+        ...)
+    design <- recalculationResult$design
+    
+    args <- list(
+        design = design, 
+        dataInput = dataInput,
+        directionUpper = directionUpper, 
+        thetaH0 = thetaH0, 
+        nPlanned = nPlanned,
+        allocationRatioPlanned = allocationRatioPlanned, 
+        stage = stage,
+        ...
+    )
 
     result <- NULL
-    if (.isEnrichmentDataset(dataInput)) {
-        result <- .getAnalysisResultsEnrichment(
-            design = design, dataInput = dataInput,
-            directionUpper = directionUpper,
-            thetaH0 = thetaH0,
-            nPlanned = nPlanned,
-            allocationRatioPlanned = allocationRatioPlanned,
-            stage = stage, 
-            ...
-        )
-    } else if (.isMultiArmDataset(dataInput)) {
-        result <- .getAnalysisResultsMultiArm(
-            design = design, dataInput = dataInput,
-            directionUpper = directionUpper,
-            thetaH0 = thetaH0,
-            nPlanned = nPlanned,
-            allocationRatioPlanned = allocationRatioPlanned,
-            stage = stage, 
-            ...
-        )
+    if (.isEnrichmentDataset(dataInput) || .isMultiArmDataset(dataInput)) {
+        if (.isEnrichmentDataset(dataInput)) {
+            fun <- .getAnalysisResultsEnrichment
+        } else {
+            fun <- .getAnalysisResultsMultiArm
+        }
+        result <- do.call(fun, args)
     } else {
         stage <- .getStageFromOptionalArguments(...,
             dataInput = dataInput,
@@ -364,56 +238,36 @@ getAnalysisResults <- function(
             numberOfGroups = dataInput$getNumberOfGroups()
         )
         
+        fun <- NULL
         if (dataInput$isDatasetMeans()) {
             if (is.na(thetaH0)) {
                 thetaH0 <- C_THETA_H0_MEANS_DEFAULT
             }
-            result <- .getAnalysisResultsMeans(
-                design = design, 
-                dataInput = dataInput,
-                directionUpper = directionUpper, 
-                thetaH0 = thetaH0, 
-                nPlanned = nPlanned,
-                allocationRatioPlanned = allocationRatioPlanned, 
-                stage = stage, 
-                ...
-            )
+            fun <- .getAnalysisResultsMeans
         } else if (dataInput$isDatasetRates()) {
             if (is.na(thetaH0)) {
                 thetaH0 <- C_THETA_H0_RATES_DEFAULT
             }
-            result <- .getAnalysisResultsRates(
-                design = design, 
-                dataInput = dataInput,
-                directionUpper = directionUpper, 
-                thetaH0 = thetaH0, 
-                nPlanned = nPlanned,
-                allocationRatioPlanned = allocationRatioPlanned, 
-                stage = stage, 
-                ...
-            )
+            fun <- .getAnalysisResultsRates
         } else if (dataInput$isDatasetSurvival()) {
             if (is.na(thetaH0)) {
                 thetaH0 <- C_THETA_H0_SURVIVAL_DEFAULT
             }
-            result <- .getAnalysisResultsSurvival(
-                design = design, 
-                dataInput = dataInput,
-                directionUpper = directionUpper, 
-                thetaH0 = thetaH0, 
-                nPlanned = nPlanned,
-                allocationRatioPlanned = allocationRatioPlanned, 
-                stage = stage, 
-                ...
-            )
+            fun <- .getAnalysisResultsSurvival
+        } else {
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
+                "'", .getClassName(dataInput), "' is not supported")
         }
+        
+        args$thetaH0 <- thetaH0
+        result <- do.call(fun, args)
 
         if (is.null(result)) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
+                "'", .getClassName(dataInput), "' is not implemented yet")
         }
 
-        if (informationRatesRecalculated) {
-            result$maxInformation <- as.integer(maxInformation)
+        if (isTRUE(recalculationResult$informationRatesRecalculated)) {
             result$.setParameterType("maxInformation", C_PARAM_USER_DEFINED)
             if (!is.null(informationEpsilon) && !is.na(informationEpsilon)) {
                 result$informationEpsilon <- informationEpsilon
@@ -422,8 +276,8 @@ getAnalysisResults <- function(
         }
     }
 
-    if (!is.null(result) && !is.null(repeatedPValues)) {
-        result$repeatedPValues <- repeatedPValues
+    if (!is.null(result) && !is.null(recalculationResult$repeatedPValues)) {
+        result$repeatedPValues <- recalculationResult$repeatedPValues
     }
 
     if (design$kMax > 1 && .isTrialDesignInverseNormalOrGroupSequential(design) &&
@@ -439,8 +293,6 @@ getAnalysisResults <- function(
             result$repeatedPValues[indices] <- NA_real_
         }
     }
-
-    options("rpact.analyis.repeated.p.values.warnings.enabled" = "TRUE")
 
     return(result)
 }

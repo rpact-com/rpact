@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8361 $
-## |  Last changed: $Date: 2024-11-04 16:27:39 +0100 (Mo, 04 Nov 2024) $
+## |  File version: $Revision: 8385 $
+## |  Last changed: $Date: 2024-11-13 11:30:34 +0100 (Mi, 13 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2757,14 +2757,13 @@ NULL
         effectMatrix <- .assertIsValidMatrix(effectMatrix, "effectMatrix",
             expectedNumberOfColumns = gMax, naAllowed = FALSE, returnSingleValueAsMatrix = TRUE
         )
-        if (valueMaxVectorName %in% c("piMaxVector", "omegaMaxVector")) {
-            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, 1, naAllowed = FALSE)
-        }
         .assertIsNumericVector(valueMaxVector, valueMaxVectorName, naAllowed = TRUE)
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         if (valueMaxVectorName == "piMaxVector") {
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, 1, naAllowed = FALSE)
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, NULL, naAllowed = FALSE)
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {

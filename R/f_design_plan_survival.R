@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8323 $
-## |  Last changed: $Date: 2024-10-15 09:20:06 +0200 (Tue, 15 Oct 2024) $
+## |  File version: $Revision: 8416 $
+## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -450,8 +450,8 @@ NULL
     .addDeprecatedFieldValues(designPlan, "eventsPerStage", designPlan$cumulativeEventsPerStage)
 
     paramName <- ifelse(designPlan$.design$kMax == 1, "nFixed", "maxNumberOfSubjects")
-    if (designPlan$.getParameterType(paramName) == C_PARAM_GENERATED &&
-            designPlan$.accrualTime$.getParameterType("maxNumberOfSubjects") != C_PARAM_GENERATED &&
+    if (designPlan$isGeneratedParameter(paramName) &&
+            !designPlan$.accrualTime$isGeneratedParameter("maxNumberOfSubjects") &&
             all(designPlan$accrualIntensity < 1)) {
         numberOfDefinedAccrualIntensities <- length(designPlan$accrualIntensity)
 
