@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8212 $
-## |  Last changed: $Date: 2024-09-13 14:01:23 +0200 (Fr, 13 Sep 2024) $
+## |  File version: $Revision: 8416 $
+## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -811,8 +811,9 @@
                 }
             }
         } else if (.isTrialDesignPlanCountData(designPlan)) {
-            if (designPlan$.getParameterType("expectedNumberOfSubjectsH1") != C_PARAM_GENERATED) {
-                stop("Plot type 9 is only available for count data endpoint if 'expectedNumberOfSubjectsH1' was not calculated")
+            if (!designPlan$isGeneratedParameter("expectedNumberOfSubjectsH1")) {
+                stop("Plot type 9 is only available for count data endpoint ",
+                    "if 'expectedNumberOfSubjectsH1' was not calculated")
             }
 
             xParameterName <- "theta"
@@ -1480,11 +1481,18 @@ plot.TrialDesignPlan <- function(
     for (typeNumber in typeNumbers) {
         p <- .plotTrialDesignPlan(
             designPlan = x,
-            main = main, xlab = xlab, ylab = ylab, type = typeNumber,
-            palette = palette, theta = theta, plotPointsEnabled = plotPointsEnabled,
+            main = main, 
+            xlab = xlab, 
+            ylab = ylab, 
+            type = typeNumber,
+            palette = palette, 
+            theta = theta, 
+            plotPointsEnabled = plotPointsEnabled,
             legendPosition = .getGridLegendPosition(legendPosition, typeNumbers, grid),
-            showSource = showSource, designPlanName = designPlanName,
-            plotSettings = plotSettings, ...
+            showSource = showSource, 
+            designPlanName = designPlanName,
+            plotSettings = plotSettings, 
+            ...
         )
         .printPlotShowSourceSeparator(showSource, typeNumber, typeNumbers)
         if (length(typeNumbers) > 1) {

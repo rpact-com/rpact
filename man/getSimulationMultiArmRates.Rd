@@ -54,13 +54,13 @@ reflecting the different situations to consider.}
 \item{typeOfShape}{The shape of the dose-response relationship over the treatment groups.
 This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"},
 default is \code{"linear"}.\cr
-For \code{"linear"}, \code{"muMaxVector"} specifies the range
+For \code{"linear"}, \code{muMaxVector}, \code{muMaxVector}, or \code{omegaMaxVector} specifies the range
 of effect sizes for the treatment group with highest response.
-If \code{"sigmoidEmax"} is selected, \code{"gED50"} and \code{"slope"} has to be entered
+If \code{"sigmoidEmax"} is selected, \code{gED50} and \code{slope} has to be entered
 to specify the ED50 and the slope of the sigmoid Emax model.
-For \code{"sigmoidEmax"}, \code{"muMaxVector"} specifies the range
+For \code{"sigmoidEmax"}, \code{muMaxVector}, \code{muMaxVector}, or \code{omegaMaxVector} specifies the range
 of effect sizes for the treatment group with response according to infinite dose.
-If \code{"userDefined"} is selected, \code{"effectMatrix"} has to be entered.}
+If \code{"userDefined"} is selected, \code{effectMatrix} has to be entered.}
 
 \item{piMaxVector}{Range of assumed probabilities for the treatment group with
 highest response for \code{"linear"} and \code{"sigmoidEmax"} model,
@@ -69,14 +69,14 @@ default is \code{seq(0, 1, 0.2)}.}
 \item{piControl}{If specified, the assumed probability in the control arm
 for simulation and under which the sample size recalculation is performed.}
 
-\item{gED50}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"gED50"} has to be entered
+\item{gED50}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{gED50} has to be entered
 to specify the ED50 of the sigmoid Emax model.}
 
-\item{slope}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{"slope"} can be entered
+\item{slope}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{slope} can be entered
 to specify the slope of the sigmoid Emax model, default is 1.}
 
 \item{doseLevels}{The dose levels for the dose response relationship.
-If not specified, these dose levels are \code{1, ..., gMax}.}
+If not specified, these dose levels are \code{1,...,activeArms}.}
 
 \item{intersectionTest}{Defines the multiple test for the intersection
 hypotheses in the closed system of hypotheses.
@@ -127,7 +127,7 @@ For multi-arm designs, \code{plannedSubjects} refers to the number of subjects p
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
 For simulating means and rates for a two treatment groups design, it can be a vector of length \code{kMax}, the number of stages.
-It can be a vector of length kMax, too, for multi-arm and enrichment designs.
+It can be a vector of length \code{kMax}, too, for multi-arm and enrichment designs.
 In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.
 Note that internally \code{allocationRatioPlanned} is treated as a vector of length \code{kMax}, not a scalar.}
 
@@ -169,10 +169,10 @@ recalculation. By default, sample size recalculation is performed with condition
 
 \item{selectArmsFunction}{Optionally, a function can be entered that defines the way of how treatment arms
 are selected. This function is allowed to depend on \code{effectVector} with length \code{activeArms},
-\code{stage}, \code{"conditionalPower"}, \code{"conditionalCriticalValue"}, \code{"plannedSubjects/plannedEvents"},
-\code{"allocationRatioPlanned"}, \code{"selectedArms"}, \code{"thetaH1"} (for means and survival), \code{"stDevH1"} (for means),
-\code{"overallEffects"}, and for rates additionally: \code{"piTreatmentsH1"}, \code{"piControlH1"}, \code{"overallRates"}, and
-\code{"overallRatesControl"}.}
+\code{stage}, \code{conditionalPower}, \code{conditionalCriticalValue}, \code{plannedSubjects/plannedEvents},
+\code{allocationRatioPlanned}, \code{selectedArms}, \code{thetaH1} (for means and survival), \code{stDevH1} (for means),
+\code{overallEffects}, and for rates additionally: \code{piTreatmentsH1}, \code{piControlH1}, \code{overallRates}, and
+\code{overallRatesControl} (see examples).}
 
 \item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default

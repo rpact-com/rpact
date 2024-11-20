@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8273 $
-## |  Last changed: $Date: 2024-09-25 17:19:43 +0200 (Mi, 25 Sep 2024) $
+## |  File version: $Revision: 8416 $
+## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -247,7 +247,7 @@ NULL
             ") will be ignored because it will be calculated",
             call. = FALSE
         )
-    } else if (design$.getParameterType(parameterName) == C_PARAM_GENERATED) {
+    } else if (design$isGeneratedParameter(parameterName)) {
         return(FALSE)
     }
 
@@ -888,7 +888,7 @@ getLambdaByPi <- function(piValue,
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
     for (value in piValue) {
-        if (value > 1 - 1e-16 && value < 1 + 1e-16) {
+        if (!is.na(value) && value > 1 - 1e-16 && value < 1 + 1e-16) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'pi' must be != 1")
         }
     }
@@ -926,7 +926,7 @@ getPiByLambda <- function(lambda,
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
     x <- exp(-(lambda * eventTime)^kappa)
-    if (any(x < 1e-15)) {
+    if (any(x < 1e-15, na.rm = TRUE)) {
         warning("Calculation of pi (1) by lambda (", .arrayToString(round(lambda, 4)),
             ") results in a possible loss of precision because pi = 1 was returned but pi is not exactly 1",
             call. = FALSE

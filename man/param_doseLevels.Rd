@@ -5,7 +5,7 @@
 \title{Parameter Description: Dose Levels}
 \arguments{
 \item{doseLevels}{The dose levels for the dose response relationship.
-If not specified, these dose levels are \code{1, ..., gMax}.}
+If not specified, these dose levels are \code{1,...,activeArms}.}
 }
 \description{
 Parameter Description: Dose Levels

@@ -96,7 +96,7 @@ For multi-arm designs, \code{plannedEvents} refers to the overall number of even
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. For multi-arm designs, it is the allocation ratio relating the active arm(s) to the control.
 For simulating means and rates for a two treatment groups design, it can be a vector of length \code{kMax}, the number of stages.
-It can be a vector of length kMax, too, for multi-arm and enrichment designs.
+It can be a vector of length \code{kMax}, too, for multi-arm and enrichment designs.
 In these cases, a change of allocating subjects to treatment groups over the stages can be assessed.
 Note that internally \code{allocationRatioPlanned} is treated as a vector of length \code{kMax}, not a scalar.}
 
@@ -106,7 +106,7 @@ minimum number of events per stage (i.e., not cumulated), the first element
 is not taken into account.}
 
 \item{maxNumberOfEventsPerStage}{When performing a data driven sample size recalculation,
-the numeric vector \code{maxNumberOfEventsPerStage} with length kMax determines the maximum number
+the numeric vector \code{maxNumberOfEventsPerStage} with length \code{kMax} determines the maximum number
 of events per stage (i.e., not cumulated), the first element is not taken into account.}
 
 \item{conditionalPower}{If \code{conditionalPower} together with \code{minNumberOfSubjectsPerStage} and
@@ -130,10 +130,10 @@ recalculation. By default, event number recalculation is performed with conditio
 
 \item{selectPopulationsFunction}{Optionally, a function can be entered that defines the way of how populations
 are selected. This function is allowed to depend on \code{effectVector} with length \code{populations}
-\code{stage}, \code{"conditionalPower"}, \code{"conditionalCriticalValue"}, \code{"plannedSubjects/plannedEvents"},
-\code{"allocationRatioPlanned"}, \code{"selectedPopulations"}, \code{"thetaH1"} (for means and survival), \code{"stDevH1"} (for means),
-\code{"overallEffects"}, and for rates additionally: \code{"piTreatmentsH1"}, \code{"piControlH1"}, \code{"overallRates"}, and
-\code{"overallRatesControl"}.}
+\code{stage}, \code{conditionalPower}, \code{conditionalCriticalValue}, \code{plannedSubjects/plannedEvents},
+\code{allocationRatioPlanned}, \code{selectedPopulations}, \code{thetaH1} (for means and survival), \code{stDevH1} (for means),
+\code{overallEffects}, and for rates additionally: \code{piTreatmentsH1}, \code{piControlH1}, \code{overallRates}, and
+\code{overallRatesControl} (see examples).}
 
 \item{showStatistics}{Logical. If \code{TRUE}, summary statistics of the simulated data
 are displayed for the \code{print} command, otherwise the output is suppressed, default

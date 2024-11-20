@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8274 $
-## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
+## |  File version: $Revision: 8416 $
+## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -284,6 +284,9 @@ ParameterSet <- R6::R6Class("ParameterSet",
         },
         isUndefinedParameter = function(parameterName) {
             return(self$.getParameterType(parameterName) == C_PARAM_TYPE_UNKNOWN)
+        },
+        isNotApplicableParameter = function(parameterName) {
+            return(self$.getParameterType(parameterName) == C_PARAM_NOT_APPLICABLE)
         },
         .getInputParameters = function() {
             params <- self$.getParametersOfOneGroup(c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))
@@ -1323,7 +1326,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         parametersToIgnore <- intersect(parametersToIgnore, parameterNames)
     }
 
-    if (parameterSet$.getParameterType("hazardRatio") == C_PARAM_GENERATED &&
+    if (parameterSet$isGeneratedParameter("hazardRatio") &&
             !is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
             isTRUE(parameterSet$.piecewiseSurvivalTime$piecewiseSurvivalEnabled)) {
         parametersToIgnore <- c(parametersToIgnore, "hazardRatio")

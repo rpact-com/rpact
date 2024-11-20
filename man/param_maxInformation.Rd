@@ -4,7 +4,7 @@
 \alias{param_maxInformation}
 \title{Parameter Description: Maximum Information}
 \arguments{
-\item{maxInformation}{Positive integer value specifying the maximum information.}
+\item{maxInformation}{Positive value specifying the maximum information.}
 }
 \description{
 Parameter Description: Maximum Information

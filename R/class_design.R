@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8180 $
-## |  Last changed: $Date: 2024-09-06 10:13:14 +0200 (Fr, 06 Sep 2024) $
+## |  File version: $Revision: 8416 $
+## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -736,7 +736,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                     informationRatesTemp, self$informationRates
                 ))
             }
-            if (self$.getParameterType("futilityBounds") != C_PARAM_GENERATED &&
+            if (!self$isGeneratedParameter("futilityBounds") &&
                     (!grepl("^as.*", typeOfDesign) || typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) &&
                     !identical(futilityBoundsTemp, self$futilityBounds)) {
                 return(self$.pasteComparisonResult(
@@ -953,10 +953,14 @@ TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
         informationAtInterim = NULL,
         secondStageConditioning = NULL,
         sided = NULL,
-        initialize = function(..., informationAtInterim = NULL, secondStageConditioning = NULL) {
+        initialize = function(..., 
+                informationAtInterim = NULL, 
+                secondStageConditioning = NULL,
+                directionUpper = NA) {
             super$initialize(...)
             self$informationAtInterim <- informationAtInterim
             self$secondStageConditioning <- secondStageConditioning
+            self$directionUpper <- directionUpper
             notApplicableParameters <- c(
                 "kMax",
                 "stages",
@@ -1009,6 +1013,7 @@ TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
 #'        If \code{secondStageConditioning = FALSE} is specified, the unconditional adjusted p-values are used, otherwise
 #'  	  conditional adjusted p-values are calculated, default is \code{secondStageConditioning = TRUE}
 #'        (for details, see Koenig et al., 2008).
+#' @inheritParams param_directionUpper
 #'
 #' @details
 #' For performing the conditional Dunnett test the design must be defined through this function.
@@ -1025,16 +1030,25 @@ TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
 #'
 #' @export
 #'
-getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
-        informationAtInterim = 0.5, secondStageConditioning = TRUE) {
+getDesignConditionalDunnett <- function(
+        alpha = 0.025, # C_ALPHA_DEFAULT
+        informationAtInterim = 0.5,
+        ..., 
+        secondStageConditioning = TRUE,
+        directionUpper = NA) {
     .assertIsValidAlpha(alpha)
     .assertIsSingleNumber(informationAtInterim, "informationAtInterim")
     .assertIsInOpenInterval(informationAtInterim, "informationAtInterim", 0, 1)
-    return(TrialDesignConditionalDunnett$new(
+    .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
+    design <- TrialDesignConditionalDunnett$new(
         alpha = alpha,
         informationAtInterim = informationAtInterim,
-        secondStageConditioning = secondStageConditioning
-    ))
+        secondStageConditioning = secondStageConditioning,
+        directionUpper = directionUpper
+    )
+    design$.setParameterType("directionUpper", ifelse(!is.na(directionUpper), 
+        C_PARAM_USER_DEFINED, C_PARAM_NOT_APPLICABLE))
+    return(design)
 }
 
 #'
