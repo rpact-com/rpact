@@ -1014,6 +1014,7 @@ TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
 #'  	  conditional adjusted p-values are calculated, default is \code{secondStageConditioning = TRUE}
 #'        (for details, see Koenig et al., 2008).
 #' @inheritParams param_directionUpper
+#' @inheritParams param_three_dots
 #'
 #' @details
 #' For performing the conditional Dunnett test the design must be defined through this function.
