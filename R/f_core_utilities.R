@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8276 $
-## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
+## |  File version: $Revision: 8436 $
+## |  Last changed: $Date: 2024-12-03 16:19:16 +0100 (Di, 03 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -39,6 +39,14 @@ NULL
 }
 
 .toCapitalized <- function(x, ignoreBlackList = FALSE) {
+    result <- character()
+    for (s in x) {
+        result <- c(result, .toCapitalizedSingleCharacter(s, ignoreBlackList = ignoreBlackList))
+    }
+    return(result)
+}
+
+.toCapitalizedSingleCharacter <- function(x, ignoreBlackList = FALSE) {
     if (is.null(x) || is.na(x) || !is.character(x)) {
         return(x)
     }
