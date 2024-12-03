@@ -3,6 +3,7 @@
 ## New features
 
 * For the functions `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()` it is now possible to specify a parameter `doseLevels` to define the dose levels for a `linear` or `sigmoidEmax` dose-response relationship (see feature request [#63](https://github.com/rpact-com/rpact/issues/63))
+* `testPackage()` produces a comprehensive installation qualification report in html and pdf format (see new vignette [Installation Qualification of rpact](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification))
 
 ## Improvements, issues, and changes
 
