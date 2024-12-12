@@ -31,6 +31,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/DatasetSurvival.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/EventProbabilities.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/FieldSet.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/MarkdownReporter.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/NumberOfSubjects.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/ParameterSet.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/PerformanceScore.html</loc></url>
@@ -150,6 +151,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/getSimulationRates.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getSimulationSurvival.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getStageResults.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/getSystemIdentifier.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getTestActions.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getWideFormat.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/index.html</loc></url>
@@ -269,7 +271,9 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/param_typeOfComputation.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_typeOfDesign.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_typeOfSelection.html</loc></url>
-<url><loc>https://rpact-com.github.io/rpact/reference/param_typeOfShape.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/param_typeOfShapeMeans.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/param_typeOfShapeRates.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/param_typeOfShapeSurvival.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_userAlphaSpending.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_varianceOption.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.html</loc></url>
@@ -287,7 +291,6 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/print.Dataset.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.FieldSet.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.ParameterSet.html</loc></url>
-<url><loc>https://rpact-com.github.io/rpact/reference/print.SimulationResults.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.SummaryFactory.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.TrialDesignCharacteristics.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.TrialDesignSummaries.html</loc></url>
@@ -296,9 +299,12 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/readDataset.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/readDatasets.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/resetLogLevel.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/resetOptions.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/rpact.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/saveOptions.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/setLogLevel.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/setOutputFormat.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/setupPackageTests.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/summary.AnalysisResults.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/summary.Dataset.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/summary.ParameterSet.html</loc></url>

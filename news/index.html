@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.0.9271</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.1.9273</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,13 +36,21 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="4.1.1" id="rpact-411">rpact 4.1.1<a class="anchor" aria-label="anchor" href="#rpact-411"></a></h2>
+<h2 class="pkg-version" data-toc-text="4.2.0" id="rpact-420">rpact 4.2.0<a class="anchor" aria-label="anchor" href="#rpact-420"></a></h2>
 <div class="section level3">
-<h3 id="new-features-4-1-1">New features<a class="anchor" aria-label="anchor" href="#new-features-4-1-1"></a></h3>
+<h3 id="new-features-4-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-2-0"></a></h3>
 <ul><li>For the functions <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> it is now possible to specify a parameter <code>doseLevels</code> to define the dose levels for a <code>linear</code> or <code>sigmoidEmax</code> dose-response relationship (see feature request <a href="https://github.com/rpact-com/rpact/issues/63" class="external-link">#63</a>)</li>
+<li>
+<code><a href="../reference/testPackage.html">testPackage()</a></code> produces a comprehensive installation qualification report in html and pdf format (see new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_installation_qualification" class="external-link">Installation Qualification of rpact</a>)</li>
+<li>
+<code><a href="../reference/setupPackageTests.html">setupPackageTests()</a></code> sets up the package tests by downloading the test files and copying them to the rpact installation directory.</li>
+<li>
+<code><a href="../reference/saveOptions.html">saveOptions()</a></code> saves the current <code>rpact</code> options to a configuration file.</li>
+<li>
+<code><a href="../reference/resetOptions.html">resetOptions()</a></code> resets the <code>rpact</code> options to their default values.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="improvements-issues-and-changes-4-1-1">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-1-1"></a></h3>
+<h3 id="improvements-issues-and-changes-4-2-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-2-0"></a></h3>
 <ul><li>The full set of unit tests for rpact is now stored in a private repository. Only members of the ‘RPACT User Group’ have access to the tests. For more information, please visit: <a href="www.rpact.org/iq">rpact.org/iq</a>
 </li>
 <li>Usage of <code>maxInformation</code> improved (see enhancement <a href="https://github.com/rpact-com/rpact/issues/65" class="external-link">#65</a>)</li>
