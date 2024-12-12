@@ -13,7 +13,8 @@ setOutputFormat(
   futilityProbabilityEnabled = NA,
   file = NA_character_,
   resetToDefault = FALSE,
-  roundFunction = NA_character_
+  roundFunction = NA_character_,
+  persist = TRUE
 )
 }
 \arguments{
@@ -47,6 +48,9 @@ Note that other settings will be executed afterwards if specified, default is \c
 \item{roundFunction}{A character value that specifies the R base round function
 to use, default is \code{NA_character_}.
 Allowed values are "ceiling", "floor", "trunc", "round", "signif", and \code{NA_character_}.}
+
+\item{persist}{A logical value indicating whether the output format settings
+should be saved persistently. Default is \code{TRUE}.}
 }
 \description{
 With this function the format of the standard outputs of all \code{rpact}

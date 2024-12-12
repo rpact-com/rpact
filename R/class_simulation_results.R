@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8363 $
-## |  Last changed: $Date: 2024-11-07 07:18:40 +0100 (Do, 07 Nov 2024) $
+## |  File version: $Revision: 8451 $
+## |  Last changed: $Date: 2024-12-10 13:26:18 +0100 (Di, 10 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1736,35 +1736,4 @@ SimulationResultsCountData <- R6::R6Class("SimulationResultsCountData",
         }
     )
 )
-
-#'
-#' @title
-#' Print Simulation Results
-#'
-#' @description
-#' \code{print} prints its \code{SimulationResults} argument and
-#' returns it invisibly (via \code{invisible(x)}).
-#'
-#' @param x The \code{\link{SimulationResults}} object to print.
-#' @param markdown If \code{TRUE}, the object \code{x}
-#'        will be printed using markdown syntax;
-#'        normal representation will be used otherwise (default is \code{FALSE})
-#' @inheritParams param_three_dots
-#'
-#' @details
-#' Prints the parameters and results of an \code{SimulationResults} object.
-#'
-#' @export
-#'
-#' @keywords internal
-#'
-print.SimulationResults <- function(x, ..., showStatistics = FALSE, markdown = FALSE) {
-    if (markdown) {
-        x$.catMarkdownText(showStatistics = showStatistics)
-        return(invisible(x))
-    }
-
-    x$show(showStatistics = showStatistics)
-    invisible(x)
-}
 

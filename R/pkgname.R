@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7408 $
-## |  Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
+## |  File version: $Revision: 8455 $
+## |  Last changed: $Date: 2024-12-12 09:33:14 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -78,13 +78,31 @@
 "_PACKAGE"
 #> [1] "_PACKAGE"
 
+.onLoad <- function(libname, pkgname) {
+    .loadOptions()
+}
+
 .onAttach <- function(libname, pkgname) {
-    if (grepl("^\\d\\.\\d\\.\\d\\.\\d{4,4}$", packageVersion("rpact"))) {
-        packageStartupMessage(paste0("rpact developer version ", packageVersion("rpact"), " loaded"))
+    if (grepl("^\\d\\.\\d\\.\\d\\.\\d{4,4}$", .getPackageVersionString())) {
+        packageStartupMessage(paste0("rpact developer version ", 
+            .getPackageVersionString(), " loaded"))
+    } else if (!isTRUE(.installationQualificationDone())) {
+        packageStartupMessage(paste0("Installation qualification for rpact ", 
+            .getPackageVersionString(), " has not yet been performed."))
+        packageStartupMessage(paste0("Please run testPackage() before ",
+            "using the package in GxP relevant environments."))
+    }
+}
+
+.onDetach <- function(libpath) {
+    if (grepl("^\\d\\.\\d\\.\\d\\.\\d{4,4}$", .getPackageVersionString())) {
+        packageStartupMessage(paste0("rpact developer version ", .getPackageVersionString(), 
+            " successfully unloaded"))
     }
 }
 
 .onUnload <- function(libpath) {
+    saveOptions()
     tryCatch(
         {
             library.dynam.unload("rpact", libpath)
@@ -95,6 +113,3 @@
     )
 }
 
-.onDetach <- function(libpath) {
-    packageStartupMessage(paste0("rpact ", packageVersion("rpact"), " successfully unloaded\n"))
-}

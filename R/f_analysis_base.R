@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8426 $
-## |  Last changed: $Date: 2024-11-20 13:43:12 +0100 (Mi, 20 Nov 2024) $
+## |  File version: $Revision: 8454 $
+## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -180,7 +180,7 @@ getAnalysisResults <- function(
         maxInformation = NULL,
         informationEpsilon = NULL) {
         
-    on.exit(options("rpact.analyis.repeated.p.values.warnings.enabled" = "TRUE"))
+    on.exit(base::options("rpact.analyis.repeated.p.values.warnings.enabled" = "TRUE"))
     designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
     design <- designAndDataInput$design
     dataInput <- designAndDataInput$dataInput

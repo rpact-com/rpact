@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8276 $
-## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
+## |  File version: $Revision: 8454 $
+## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -39,6 +39,14 @@ NULL
 }
 
 .toCapitalized <- function(x, ignoreBlackList = FALSE) {
+    result <- character()
+    for (s in x) {
+        result <- c(result, .toCapitalizedSingleCharacter(s, ignoreBlackList = ignoreBlackList))
+    }
+    return(result)
+}
+
+.toCapitalizedSingleCharacter <- function(x, ignoreBlackList = FALSE) {
     if (is.null(x) || is.na(x) || !is.character(x)) {
         return(x)
     }
@@ -1726,3 +1734,147 @@ getParameterName <- function(obj, parameterCaption) {
 
     return(value)
 }
+
+#' 
+#' @title
+#' Save Options
+#'
+#' @description
+#' Saves the current `rpact` options to a configuration file.
+#'
+#' @details
+#' This function attempts to save the current `rpact` options to a configuration file
+#' located in the user's configuration directory. If the `rappdirs` package is not installed,
+#' the function will not perform any action. The options are saved in a YAML file.
+#'
+#' @return
+#' Returns `TRUE` if the options were successfully saved, `FALSE` otherwise.
+#'
+#' @examples
+#' \dontrun{
+#' saveOptions()
+#' }
+#'
+#' @export
+#' 
+#' @keywords internal
+#' 
+saveOptions <- function() {
+    tryCatch({
+        if (!requireNamespace("rappdirs", quietly = TRUE)) {
+            return(invisible(FALSE))
+        }
+            
+        pkgConfigDir <- rappdirs::user_config_dir("rpact")
+        if (!dir.exists(pkgConfigDir)) {
+            dir.create(pkgConfigDir, recursive = TRUE, showWarnings = FALSE)
+        }
+        if (!dir.exists(pkgConfigDir)) {
+            return(invisible(FALSE))
+        }
+        
+        optionNames <- make.names(names(base::options()))
+        optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
+        optionFileContent <- character()
+        for (optionName in optionNames) {
+            optionValue <- getOption(optionName)
+            if (!is.null(optionValue)) {
+                optionFileContent <- c(optionFileContent, paste0(optionName, ": ", optionValue))
+            }
+        }
+        optionsFile <- file.path(pkgConfigDir, "options.yml")
+        cat(optionFileContent, file = optionsFile, sep = "\n")
+        return(invisible(file.exists(optionsFile)))
+    }, error = function(e) {
+        warning("Failed to save rpact options: ", e$message, call. = FALSE)
+        return(invisible(FALSE))
+    })
+}
+
+#' 
+#' @title
+#' Reset Options
+#'
+#' @description
+#' Resets the `rpact` options to their default values.
+#'
+#' @param persist A logical value indicating whether the reset options should be saved persistently.
+#'        If `TRUE`, the options will be saved after resetting. Default is `TRUE`.
+#'
+#' @details
+#' This function resets all `rpact` options to their default values. If the `persist` parameter is set to `TRUE`,
+#' the reset options will be saved to a configuration file.
+#'
+#' @return
+#' Returns `TRUE` if the options were successfully reset, `FALSE` otherwise.
+#'
+#' @examples
+#' \dontrun{
+#' resetOptions()
+#' resetOptions(persist = FALSE)
+#' }
+#'
+#' @export
+#' 
+#' @keywords internal
+#' 
+resetOptions <- function(persist = TRUE) {
+    .assertIsSingleLogical(persist, "persist")
+    tryCatch({
+        optionNames <- make.names(names(base::options()))
+        optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
+        if (length(optionNames) == 0) {
+            return(invisible(TRUE))
+        }
+        
+        for (optionName in optionNames) {
+            eval(parse(text = paste0('base::options("', optionName, '" = NULL)')))
+        }
+        if (persist) {
+            saveOptions()
+        }
+        return(invisible(TRUE))
+    }, error = function(e) {
+        warning("Failed to reset rpact options: ", e$message, call. = FALSE)
+        return(invisible(FALSE))
+    })
+}
+
+.loadOptions <- function() {
+    tryCatch({
+        if (!requireNamespace("rappdirs", quietly = TRUE)) { 
+            packageStartupMessage("Package \"rappdirs\" is needed for saving and loading rpact options. ",
+                "Please install using, e.g., install.packages(\"rappdirs\")",
+                call. = FALSE
+            )
+            return(invisible(FALSE))
+        }
+            
+        pkgConfigDir <- rappdirs::user_config_dir("rpact")
+        if (!dir.exists(pkgConfigDir)) {
+            return(invisible(FALSE))
+        }
+        
+        optionFileContent <- readLines(file.path(pkgConfigDir, "options.yml"))
+        if (length(optionFileContent) == 0) {
+            return(invisible(TRUE))
+        }
+        
+        optionsList <- list()
+        for (line in optionFileContent) {
+            optionName <- sub(":.*", "", line)
+            optionValue <- sub(".*: ", "", line)
+            optionsList[[optionName]] <- optionValue
+        }
+        if (length(optionsList) == 0) {
+            return(invisible(TRUE))
+        }
+        
+        base::options(optionsList)
+        return(invisible(TRUE))
+    }, error = function(e) {
+        warning("Failed to load and set rpact options: ", e$message, call. = FALSE)
+        return(invisible(FALSE))
+    })
+}
+

@@ -441,7 +441,7 @@ getObservedInformationRates <- function(dataInput,
             typeOfDesign = C_TYPE_OF_DESIGN_AS_USER
         )
     )
-    options("rpact.analyis.repeated.p.values.warnings.enabled" = "FALSE")
+    base::options("rpact.analyis.repeated.p.values.warnings.enabled" = "FALSE")
     warning("Repeated p-values not available for automatic ",
         "recalculation of boundaries at final stage",
         call. = FALSE
