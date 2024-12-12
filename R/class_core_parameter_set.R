@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8454 $
-## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
+## |  File version: $Revision: 8455 $
+## |  Last changed: $Date: 2024-12-12 09:33:14 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1702,7 +1702,9 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     showStatistics <- NULL
     if (inherits(x, "SimulationResults")) {
         showStatistics <- .getOptionalArgument("showStatistics", ...)
-        .assertIsSingleLogical(showStatistics, "showStatistics")
+        if (!is.null(showStatistics)) {
+            .assertIsSingleLogical(showStatistics, "showStatistics")
+        }
     }
 
     if (isTRUE(markdown)) {

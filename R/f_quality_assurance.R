@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8454 $
-## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
+## |  File version: $Revision: 8455 $
+## |  Last changed: $Date: 2024-12-12 09:33:14 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -760,17 +760,17 @@ setupPackageTests <- function(token, secret) {
 #' @export
 #'
 testPackage <- function(outDir = ".",
-    ...,
-    completeUnitTestSetEnabled = TRUE,
-    connection = list(token = NULL, secret = NULL),
-    testFileDirectory = NA_character_,
-    downloadTestsOnly = FALSE,
-    addWarningDetailsToReport = TRUE,
-    reportType = c("compact", "detailed", "Rout"),
-    testInstalledBasicPackages = TRUE,
-    scope = c("basic", "devel", "both", "internet", "all"),
-    openHtmlReport = TRUE,
-    keepSourceFiles = FALSE) {
+        ...,
+        completeUnitTestSetEnabled = TRUE,
+        connection = list(token = NULL, secret = NULL),
+        testFileDirectory = NA_character_,
+        downloadTestsOnly = FALSE,
+        addWarningDetailsToReport = TRUE,
+        reportType = c("compact", "detailed", "Rout"),
+        testInstalledBasicPackages = TRUE,
+        scope = c("basic", "devel", "both", "internet", "all"),
+        openHtmlReport = TRUE,
+        keepSourceFiles = FALSE) {
     .assertTestthatIsInstalled()
     .assertIsSingleCharacter(outDir, "outDir", naAllowed = FALSE)
     .assertIsSingleLogical(completeUnitTestSetEnabled, "completeUnitTestSetEnabled", naAllowed = FALSE)
@@ -1193,7 +1193,7 @@ test_plan_section <- function(section) {
 }
 
 .getTestExpectationType <- function(exp) {
-    stopifnot(is.expectation(exp))
+    stopifnot(testthat::is.expectation(exp))
     gsub("^expectation_", "", class(exp)[[1]])
 }
 

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8454 $
-## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
+## |  File version: $Revision: 8455 $
+## |  Last changed: $Date: 2024-12-12 09:33:14 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -78,6 +78,10 @@
 "_PACKAGE"
 #> [1] "_PACKAGE"
 
+.onLoad <- function(libname, pkgname) {
+    .loadOptions()
+}
+
 .onAttach <- function(libname, pkgname) {
     if (grepl("^\\d\\.\\d\\.\\d\\.\\d{4,4}$", .getPackageVersionString())) {
         packageStartupMessage(paste0("rpact developer version ", 
@@ -90,16 +94,15 @@
     }
 }
 
-.onLoad <- function(libname, pkgname) {
-    if (.loadOptions()) {
-        packageStartupMessage("rpact options loaded successfully")
+.onDetach <- function(libpath) {
+    if (grepl("^\\d\\.\\d\\.\\d\\.\\d{4,4}$", .getPackageVersionString())) {
+        packageStartupMessage(paste0("rpact developer version ", .getPackageVersionString(), 
+            " successfully unloaded"))
     }
 }
 
 .onUnload <- function(libpath) {
-    if (saveOptions()) {
-        packageStartupMessage("rpact options saved successfully")
-    }
+    saveOptions()
     tryCatch(
         {
             library.dynam.unload("rpact", libpath)
@@ -108,10 +111,5 @@
             .logWarn("Failed to unload dynamic C library", e)
         }
     )
-}
-
-.onDetach <- function(libpath) {
-    packageStartupMessage(paste0("rpact ", .getPackageVersionString(), 
-        " successfully unloaded\n"))
 }
 
