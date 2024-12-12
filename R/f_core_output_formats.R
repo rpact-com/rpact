@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8124 $
-## |  Last changed: $Date: 2024-08-23 08:41:16 +0200 (Fr, 23 Aug 2024) $
+## |  File version: $Revision: 8454 $
+## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -791,6 +791,8 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 #' @param roundFunction A character value that specifies the R base round function
 #'        to use, default is \code{NA_character_}.
 #'        Allowed values are "ceiling", "floor", "trunc", "round", "signif", and \code{NA_character_}.
+#' @param persist A logical value indicating whether the output format settings 
+#'        should be saved persistently. Default is \code{TRUE}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -824,7 +826,8 @@ setOutputFormat <- function(parameterName = NA_character_, ...,
         futilityProbabilityEnabled = NA,
         file = NA_character_,
         resetToDefault = FALSE,
-        roundFunction = NA_character_) {
+        roundFunction = NA_character_,
+        persist = TRUE) {
     .assertIsCharacter(parameterName, "parameterName", naAllowed = TRUE)
     .assertIsSingleInteger(digits, "digits", naAllowed = TRUE, validateType = FALSE)
     .assertIsInClosedInterval(digits, "digits", lower = 0, upper = 20, naAllowed = TRUE)
@@ -835,7 +838,8 @@ setOutputFormat <- function(parameterName = NA_character_, ...,
     .assertIsSingleCharacter(file, "file", naAllowed = TRUE)
     .assertIsSingleLogical(resetToDefault, "resetToDefault")
     .assertIsSingleCharacter(roundFunction, "roundFunction", naAllowed = TRUE)
-
+    .assertIsSingleLogical(persist, "persist")
+    
     .warnInCaseOfUnknownArguments(functionName = "setOutputFormat", ...)
 
     if (resetToDefault) {
@@ -931,6 +935,10 @@ setOutputFormat <- function(parameterName = NA_character_, ...,
                 warning("The output format ", key, " affects no parameters", call. = FALSE)
             }
         }
+    }
+    
+    if (persist) {
+        saveOptions()
     }
 }
 

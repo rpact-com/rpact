@@ -53,11 +53,11 @@ reflecting the different situations to consider.}
 \item{typeOfShape}{The shape of the dose-response relationship over the treatment groups.
 This can be either \code{"linear"}, \code{"sigmoidEmax"}, or \code{"userDefined"},
 default is \code{"linear"}.\cr
-For \code{"linear"}, \code{muMaxVector}, \code{muMaxVector}, or \code{omegaMaxVector} specifies the range
+For \code{"linear"}, \code{omegaMaxVector} specifies the range
 of effect sizes for the treatment group with highest response.
 If \code{"sigmoidEmax"} is selected, \code{gED50} and \code{slope} has to be entered
 to specify the ED50 and the slope of the sigmoid Emax model.
-For \code{"sigmoidEmax"}, \code{muMaxVector}, \code{muMaxVector}, or \code{omegaMaxVector} specifies the range
+For \code{"sigmoidEmax"}, \code{omegaMaxVector} specifies the range
 of effect sizes for the treatment group with response according to infinite dose.
 If \code{"userDefined"} is selected, \code{effectMatrix} has to be entered.}
 

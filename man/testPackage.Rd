@@ -2,61 +2,104 @@
 % Please edit documentation in R/f_quality_assurance.R
 \name{testPackage}
 \alias{testPackage}
-\title{Test Package}
+\title{Test and Validate the rpact Package Installation}
 \usage{
 testPackage(
   outDir = ".",
   ...,
   completeUnitTestSetEnabled = TRUE,
-  types = "tests",
   connection = list(token = NULL, secret = NULL),
   testFileDirectory = NA_character_,
   downloadTestsOnly = FALSE,
-  addWarningDetailsToReport = TRUE
+  addWarningDetailsToReport = TRUE,
+  reportType = c("compact", "detailed", "Rout"),
+  testInstalledBasicPackages = TRUE,
+  scope = c("basic", "devel", "both", "internet", "all"),
+  openHtmlReport = TRUE,
+  keepSourceFiles = FALSE
 )
 }
 \arguments{
-\item{outDir}{The output directory where all test results shall be saved.
-By default the current working directory is used.}
+\item{outDir}{The absolute path to the output directory where all test results will be saved.
+By default, the current working directory is used.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
 
-\item{completeUnitTestSetEnabled}{If \code{TRUE} (default) all existing unit tests will
-be executed; a subset of all unit tests will be used otherwise.}
+\item{completeUnitTestSetEnabled}{If \code{TRUE} (default), all existing unit tests will
+be executed; if \code{FALSE}, only a subset of tests is run.}
 
-\item{types}{The type(s) of tests to be done. Can be one or more of
-\code{c("tests", "examples", "vignettes")}, default is "tests" only.}
+\item{connection}{A \code{list} allowing owners of the rpact validation documentation
+to provide \code{token} and \code{secret} credentials for full access to unit tests,
+enabling them to meet regulatory requirements (see \href{https://www.rpact.com}{www.rpact.com} for more information).}
 
-\item{connection}{A \code{list} where owners of the rpact validation documentation
-can enter a \code{token} and a \code{secret} to get full access to all unit tests, e.g.,
-to fulfill regulatory requirements (see \href{https://www.rpact.com}{www.rpact.com} for more information).}
+\item{testFileDirectory}{An optional path pointing to a local directory containing test files.}
 
-\item{testFileDirectory}{An optional path that points to a local directory where the test files are located.}
+\item{downloadTestsOnly}{If \code{TRUE}, the unit test files are only downloaded and not executed.
+Default is \code{FALSE}.}
 
-\item{downloadTestsOnly}{If \code{TRUE}, the unit test files are only downloaded and not executed, default is \code{FALSE}.}
+\item{addWarningDetailsToReport}{If \code{TRUE}, additional warning details are included in the test report.
+Default is \code{TRUE}.}
 
-\item{addWarningDetailsToReport}{If \code{TRUE}, additional warning details will be added to the test report, default is \code{TRUE}.}
+\item{reportType}{The type of report to generate.
+Can be \code{"compact"}, \code{"detailed"}, or \code{"Rout"}.}
+
+\item{testInstalledBasicPackages}{If \code{TRUE}, tests for installed
+basic R packages are included, default is \code{TRUE}.
+For more information, see \code{\link[tools]{testInstalledBasic}}.}
+
+\item{scope}{The scope of the basic R package tests to run. Can be \code{"basic"},
+\code{"devel"}, \code{"both"}, \code{"internet"}, or \code{"all"}. Default is \code{"basic"}.
+For more information, see \code{\link[tools]{testInstalledBasic}}.
+Only available if \code{testInstalledBasicPackages = TRUE}.}
+
+\item{openHtmlReport}{If \code{TRUE}, the HTML report is opened after the tests are completed, default is \code{TRUE}.}
+
+\item{keepSourceFiles}{If \code{TRUE}, the source files are kept after the tests are completed.
+A copy of them can be found in the subdirectory \code{src}.}
 }
 \value{
-The value of \code{completeUnitTestSetEnabled} will be returned invisible.
+Invisibly returns the value of \code{completeUnitTestSetEnabled}.
 }
 \description{
-This function allows the installed package \code{rpact} to be tested.
+This function ensures the correct installation of the \code{rpact} package by performing
+various tests. It supports a comprehensive validation process, essential for GxP compliance
+and other regulatory requirements.
 }
 \details{
-This function creates a subdirectory named \code{rpact-tests} in the
-specified output directory, downloads all unit test files of the package
-from an online resource, and copies them to this newly created directory.
-Then the function runs all tests (or a subset of all tests if
-\code{completeUnitTestSetEnabled} is \code{FALSE}) using
-\code{\link[tools]{testInstalledPackage}}.
-The test results will be saved to the text file \code{testthat.Rout} that can be found
-in the subdirectory \code{rpact-tests}.
+This function is integral to the installation qualification (IQ) process of the \code{rpact} package,
+ensuring it meets quality standards and functions as expected. A directory named \code{rpact-tests}
+is created within the specified output directory, where all test files are downloaded from a secure
+resource and executed. Results are saved in the file \code{testthat.Rout}, located in the
+\code{rpact-tests} directory.
+
+Installation qualification is a critical step in the validation process. Without successful IQ,
+the package cannot be considered fully validated. To gain access to the full set of unit tests,
+users must provide \code{token} and \code{secret} credentials, which are distributed to
+members of the rpact user group as part of the validation documentation.
+For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification}{rpact_installation_qualification}.
 }
 \examples{
 \dontrun{
+# Set the output directory
+setwd("/path/to/output")
+
+# Basic usage
 testPackage()
+
+# Perform all unit tests with access credentials
+testPackage(
+    connection = list(
+        token = "your_token_here",
+        secret = "your_secret_here"
+    )
+)
+
+# Download test files without executing them
+testPackage(downloadTestsOnly = TRUE)
 }
 
+}
+\references{
+For more information, please visit: \url{https://www.rpact.org/iq}
 }
