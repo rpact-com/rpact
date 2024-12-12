@@ -4,7 +4,10 @@
 \alias{getSystemIdentifier}
 \title{Get System Identifier}
 \usage{
-getSystemIdentifier()
+getSystemIdentifier(date = NULL)
+}
+\arguments{
+\item{date}{A character string or \code{Date} representing the date. Default is \code{Sys.Date()}.}
 }
 \value{
 A character string representing the unique system identifier.

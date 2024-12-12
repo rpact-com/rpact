@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8352 $
-## |  Last changed: $Date: 2024-11-02 10:42:16 +0100 (Sa, 02 Nov 2024) $
+## |  File version: $Revision: 8449 $
+## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Tue, 10 Dec 2024) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -263,7 +263,7 @@ NULL
 #' @inheritParams param_stDevSimulation
 #' @inheritParams param_activeArms
 #' @inheritParams param_successCriterion
-#' @inheritParams param_typeOfShape
+#' @inheritParams param_typeOfShapeMeans
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
 #' @inheritParams param_allocationRatioPlanned

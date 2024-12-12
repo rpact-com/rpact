@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8416 $
-## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
+## |  File version: $Revision: 8454 $
+## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1698,10 +1698,20 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("print")
     }
+    
+    showStatistics <- NULL
+    if (inherits(x, "SimulationResults")) {
+        showStatistics <- .getOptionalArgument("showStatistics", ...)
+        .assertIsSingleLogical(showStatistics, "showStatistics")
+    }
 
     if (isTRUE(markdown)) {
         if (.isPrintCall(sysCalls)) {
-            result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+            if (!is.null(showStatistics)) {
+                result <- paste0(utils::capture.output(x$.catMarkdownText(showStatistics = showStatistics)), collapse = "\n")
+            } else {
+                result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
+            }
             return(knitr::asis_output(result))
         }
         
@@ -1715,7 +1725,11 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
         return(invisible(x))
     }
     
-    x$show()
+    if (!is.null(showStatistics)) {
+        x$show(showStatistics = showStatistics)
+    } else {
+        x$show()
+    }
     return(invisible(x))
 }
 
@@ -2102,7 +2116,7 @@ kable.ParameterSet <- function(x, ...) {
     
     lastWarningTime <- getOption("rpact.deprecated.message.time.function.kable")
     if (is.null(lastWarningTime) || difftime(Sys.time(), lastWarningTime, units = "hours") > 8) {
-        options("rpact.deprecated.message.time.function.kable" = Sys.time())
+        base::options("rpact.deprecated.message.time.function.kable" = Sys.time())
         .Deprecated(new = "",  
             msg = paste0("Manual use of kable() for rpact result objects is no longer needed, ",
                 "as the formatting and display will be handled automatically by the rpact package"),

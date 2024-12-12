@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8349 $
-## |  Last changed: $Date: 2024-11-01 14:50:21 +0100 (Fr, 01 Nov 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8449 $
+## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Tue, 10 Dec 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_simulation_multiarm.R
@@ -333,7 +333,7 @@ NULL
 #'        if \code{correlationComputation = "null"}, a constant correlation matrix valid
 #'        under the null, i.e., not accounting for the alternative is used,
 #'         default is \code{"alternative"}.
-#' @inheritParams param_typeOfShape
+#' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
 #' @inheritParams param_directionUpper

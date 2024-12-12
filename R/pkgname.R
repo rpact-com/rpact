@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8436 $
-## |  Last changed: $Date: 2024-12-03 16:19:16 +0100 (Di, 03 Dez 2024) $
+## |  File version: $Revision: 8454 $
+## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -82,7 +82,7 @@
     if (grepl("^\\d\\.\\d\\.\\d\\.\\d{4,4}$", .getPackageVersionString())) {
         packageStartupMessage(paste0("rpact developer version ", 
             .getPackageVersionString(), " loaded"))
-    } else if (!identical(getOption("rpact.system.identifier"), getSystemIdentifier())) {
+    } else if (!isTRUE(.installationQualificationDone())) {
         packageStartupMessage(paste0("Installation qualification for rpact ", 
             .getPackageVersionString(), " has not yet been performed."))
         packageStartupMessage(paste0("Please run testPackage() before ",
@@ -90,7 +90,16 @@
     }
 }
 
+.onLoad <- function(libname, pkgname) {
+    if (.loadOptions()) {
+        packageStartupMessage("rpact options loaded successfully")
+    }
+}
+
 .onUnload <- function(libpath) {
+    if (saveOptions()) {
+        packageStartupMessage("rpact options saved successfully")
+    }
     tryCatch(
         {
             library.dynam.unload("rpact", libpath)

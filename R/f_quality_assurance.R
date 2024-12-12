@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8436 $
-## |  Last changed: $Date: 2024-12-03 16:19:16 +0100 (Di, 03 Dez 2024) $
+## |  File version: $Revision: 8454 $
+## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -535,9 +535,26 @@ NULL
     return(paste(unlist(utils::packageVersion("rpact")), collapse = "."))
 }
 
+.installationQualificationDone <- function() {
+    return(identical(getOption("rpact.system.identifier"), 
+        getSystemIdentifier(getOption("rpact.system.test.date"))))
+}
+
+.setSystemIdentifier <- function() {
+    date <- getOption("rpact.system.test.date")
+    if (is.null(date)) {
+        date <- Sys.Date()
+        base::options("rpact.system.test.date" = date)
+    }
+    base::options("rpact.system.identifier" = getSystemIdentifier(date))
+    saveOptions()
+}
+
 #'
 #' @title
 #' Get System Identifier
+#' 
+#' @param date A character string or \code{Date} representing the date. Default is \code{Sys.Date()}.
 #'
 #' @description
 #' This function generates a unique system identifier based on the platform, R version, and rpact package version.
@@ -554,11 +571,18 @@ NULL
 #'
 #' @keywords internal
 #'
-getSystemIdentifier <- function() {
+getSystemIdentifier <- function(date = NULL) {
+    if (is.null(date) || length(date) != 1 || is.na(date) || identical(date, "")) {
+        date <- Sys.Date()
+    }
+    if (methods::is(date, "Date")) {
+        date <- format(date, "%Y-%m-%d")
+    }
     return(.getHashValue(paste0(
         "System_", R.version$platform,
         "_R", R.version$minor,
-        "_rpact", .getPackageVersionString()
+        "_rpact", .getPackageVersionString(),
+        "_date", date
     )))
 }
 
@@ -1003,7 +1027,7 @@ testPackage <- function(outDir = ".",
         fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
         totalNumberOfTests <- .getTestthatResultNumberOfTests(fileContent)
         if (completeUnitTestSetEnabled && minNumberOfExpectedTests <= totalNumberOfTests) {
-            options("rpact.system.identifier" = getSystemIdentifier())
+            .setSystemIdentifier()
             cat("All unit tests were completed successfully, i.e., the installation \n",
                 "qualification was successful.\n",
                 sep = ""
