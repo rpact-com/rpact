@@ -1598,7 +1598,17 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 .resetPipeOperatorQueue <- function(x) {
-    attr(x, "queue") <- NULL
+    for (attrName in c("queue", "printObject", "printObjectSeparator")) {
+        tryCatch({
+            if (inherits(x, "SummaryFactory")) {
+                attr(x$object, attrName) <- NULL
+            } else {
+                attr(x, attrName) <- NULL
+            }
+        }, error = function(e) {
+            message("Failed to reset pipe operator queue attribute ", sQuote(attrName), ": ", e$message)
+        })
+    }
     return(x)
 }
 

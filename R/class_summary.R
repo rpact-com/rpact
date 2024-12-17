@@ -140,9 +140,7 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
 }
 
 .knitPrintQueue <- function(x, ..., sep = NA_character_, prefix = "") {
-    on.exit({
-        attr(x, "queue") <- NULL
-    })
+    on.exit(.resetPipeOperatorQueue(x))
     result <- character()
     if (inherits(x, "SummaryFactory")) {
         queue <- attr(x$object, "queue")
@@ -234,7 +232,6 @@ print.SummaryFactory <- function(x, ...,
         }
         queue[[length(queue) + 1]] <- x$object
         attr(x$object, "queue") <- queue
-
         return(.knitPrintQueue(x, sep = sep))
     }
 
