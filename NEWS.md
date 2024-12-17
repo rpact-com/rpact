@@ -15,7 +15,8 @@
   For more information, please visit: [rpact.org/iq](www.rpact.org/iq)
 * Usage of `maxInformation` improved (see enhancement [#65](https://github.com/rpact-com/rpact/issues/65))
 * `testPackage()`: additional warning details will be added to the test report if warnings exist
-* Issue [#61](https://github.com/rpact-com/rpact/issues/61)) fixed
+* Issue [#61](https://github.com/rpact-com/rpact/issues/61) fixed
+* Issue [#68](https://github.com/rpact-com/rpact/issues/68) fixed
 * Flexibility of function `getPiecewiseSurvivalTime()` improved
 * Test coverage improved
 * Minor improvements
