@@ -713,7 +713,7 @@ setupPackageTests <- function(token, secret) {
             return(paste(result, collapse = "\n"))
         },
         error = function(e) {
-            return("Failed to test installed R basic packages: ", e$message)
+            return(paste0("Failed to test installed R basic packages: ", e$message))
         }
     )
 }
@@ -1435,7 +1435,6 @@ MarkdownReporter <- R6::R6Class(
 
             basicPackageTestResult <- NULL
             if (self$testInstalledBasicPackages) {
-                # cat("Test installed R basic packages. Please wait...\n")
                 basicPackageTestResult <- .testInstalledBasicPackages(scope = self$scope, headingLevel = 4)
             }
 
