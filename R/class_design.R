@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8429 $
-## |  Last changed: $Date: 2024-11-20 14:14:32 +0100 (Mi, 20 Nov 2024) $
+## |  File version: $Revision: 8495 $
+## |  Last changed: $Date: 2025-01-21 08:10:38 +0100 (Di, 21 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -648,8 +648,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
         },
         .pasteComparisonResult = function(name, newValue, oldValue) {
             return(paste0(
-                name, "_new = ", .arrayToString(.formatComparisonResult(newValue)), " (", .getClassName(newValue), "), ",
-                name, "_old = ", .arrayToString(.formatComparisonResult(oldValue)), " (", .getClassName(oldValue), ")"
+                name, "_new = ", .arrayToString(self$.formatComparisonResult(newValue)), " (", .getClassName(newValue), "), ",
+                name, "_old = ", .arrayToString(self$.formatComparisonResult(oldValue)), " (", .getClassName(oldValue), ")"
             ))
         },
         hasChanged = function(...,
@@ -1274,7 +1274,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
     if (any(.isTrialDesignFisher(x)) && !(type %in% c(1, 3, 4))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4"
+            "'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4", 
+            call. = FALSE
         )
     }
 
@@ -1302,7 +1303,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
                 stop(
                     C_EXCEPTION_TYPE_MISSING_ARGUMENT,
                     "'variedParameters' needs to be specified, ",
-                    "e.g., variedParameters = \"typeOfDesign\""
+                    "e.g., variedParameters = \"typeOfDesign\"", 
+                    call. = FALSE
                 )
             }
         }

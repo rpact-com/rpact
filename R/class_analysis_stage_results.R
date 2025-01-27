@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8141 $
-## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
+## |  File version: $Revision: 8474 $
+## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1411,7 +1411,9 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         dataInput <- x[[".dataInput"]]
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "failed to get 'dataInput' from ", .getClassName(x))
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+            "failed to get 'dataInput' from ", .getClassName(x), 
+            call. = FALSE)
     }
 
     numberOfTreatments <- dataInput$getNumberOfGroups()
@@ -1432,7 +1434,8 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'treatmentArms' (",
             .arrayToString(treatmentArmsToShow), ") must be a vector ",
-            "containing one or more values of ", .arrayToString(validComparisons)
+            "containing one or more values of ", .arrayToString(validComparisons), 
+            call. = FALSE
         )
     }
     treatmentArmsToShow <- sort(unique(treatmentArmsToShow))
@@ -1445,7 +1448,9 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         dataInput <- x[[".dataInput"]]
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "failed to get 'dataInput' from ", .getClassName(x))
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+            "failed to get 'dataInput' from ", .getClassName(x), 
+            call. = FALSE)
     }
 
     numberOfPopulations <- gMax
@@ -1467,7 +1472,8 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (",
             .arrayToString(populationsToShow), ") must be a vector ",
-            "containing one or more values of ", .arrayToString(validComparisons)
+            "containing one or more values of ", .arrayToString(validComparisons), 
+            call. = FALSE
         )
     }
     populationsToShow <- sort(unique(populationsToShow))
@@ -1609,7 +1615,9 @@ plot.StageResults <- function(
     .stopInCaseOfIllegalStageDefinition2(...)
 
     if (x$.design$kMax == 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot plot stage results of a fixed design")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            "cannot plot stage results of a fixed design", 
+            call. = FALSE)
     }
 
     if (!is.logical(showSource) || isTRUE(showSource)) {

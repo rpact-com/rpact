@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8427 $
-## |  Last changed: $Date: 2024-11-20 13:43:52 +0100 (Mi, 20 Nov 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8464 $
+## |  Last changed: $Date: 2024-12-20 15:27:24 +0100 (Fr, 20 Dez 2024) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_design_general_utilities.R
@@ -548,7 +548,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     self$.getParameterType("pi2") != C_PARAM_USER_DEFINED &&
                     self$.getParameterType("pi2") != C_PARAM_DEFAULT_VALUE) {
                 if (self$.getParameterType("eventTime") == C_PARAM_USER_DEFINED) {
-                    warning("'eventTime' (", round(self$eventTime, 3), ") will be ignored", call. = FALSE)
+                    warning("'eventTime' (", round(self$eventTime, 3), ") has no influence on simulated results", call. = FALSE)
                 }
                 self$.setParameterType("eventTime", C_PARAM_NOT_APPLICABLE)
                 self$eventTime <- NA_real_

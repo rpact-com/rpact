@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8141 $
-## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
+## |  File version: $Revision: 8474 $
+## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -361,9 +361,10 @@ plot.EventProbabilities <- function(
         maxNumberOfSubjectsToUse <- x$maxNumberOfSubjects
     } else if (!is.na(x$maxNumberOfSubjects) &&
             x$maxNumberOfSubjects != maxNumberOfSubjectsToUse) {
-        stop(
+        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, 
             "'x' (EventProbabilities) and 'y' (NumberOfSubjects) ",
-            "must have the same 'maxNumberOfSubjects' defined"
+            "must have the same 'maxNumberOfSubjects' defined", 
+            call. = FALSE
         )
     }
 

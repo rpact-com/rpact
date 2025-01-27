@@ -290,7 +290,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // getSimulationMeansLoopCpp
-List getSimulationMeansLoopCpp(NumericVector alternative, int kMax, int maxNumberOfIterations, int designNumber, NumericVector informationRates, NumericVector futilityBounds, NumericVector alpha0Vec, NumericVector criticalValues, bool meanRatio, double thetaH0, double stDev, int groups, bool normalApproximation, NumericVector plannedSubjects, bool directionUpper, NumericVector allocationRatioPlanned, NumericVector minNumberOfSubjectsPerStage, NumericVector maxNumberOfSubjectsPerStage, double conditionalPower, double thetaH1, double stDevH1, int calcSubjectsFunctionType, Nullable<Function> calcSubjectsFunctionR, SEXP calcSubjectsFunctionCpp);
+List getSimulationMeansLoopCpp(NumericVector alternative, int kMax, int maxNumberOfIterations, int designNumber, NumericVector informationRates, NumericVector futilityBounds, NumericVector alpha0Vec, NumericVector criticalValues, bool meanRatio, double thetaH0, NumericVector stDev, int groups, bool normalApproximation, NumericVector plannedSubjects, bool directionUpper, NumericVector allocationRatioPlanned, NumericVector minNumberOfSubjectsPerStage, NumericVector maxNumberOfSubjectsPerStage, double conditionalPower, double thetaH1, NumericVector stDevH1, int calcSubjectsFunctionType, Nullable<Function> calcSubjectsFunctionR, SEXP calcSubjectsFunctionCpp);
 RcppExport SEXP _rpact_getSimulationMeansLoopCpp(SEXP alternativeSEXP, SEXP kMaxSEXP, SEXP maxNumberOfIterationsSEXP, SEXP designNumberSEXP, SEXP informationRatesSEXP, SEXP futilityBoundsSEXP, SEXP alpha0VecSEXP, SEXP criticalValuesSEXP, SEXP meanRatioSEXP, SEXP thetaH0SEXP, SEXP stDevSEXP, SEXP groupsSEXP, SEXP normalApproximationSEXP, SEXP plannedSubjectsSEXP, SEXP directionUpperSEXP, SEXP allocationRatioPlannedSEXP, SEXP minNumberOfSubjectsPerStageSEXP, SEXP maxNumberOfSubjectsPerStageSEXP, SEXP conditionalPowerSEXP, SEXP thetaH1SEXP, SEXP stDevH1SEXP, SEXP calcSubjectsFunctionTypeSEXP, SEXP calcSubjectsFunctionRSEXP, SEXP calcSubjectsFunctionCppSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -305,7 +305,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type criticalValues(criticalValuesSEXP);
     Rcpp::traits::input_parameter< bool >::type meanRatio(meanRatioSEXP);
     Rcpp::traits::input_parameter< double >::type thetaH0(thetaH0SEXP);
-    Rcpp::traits::input_parameter< double >::type stDev(stDevSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type stDev(stDevSEXP);
     Rcpp::traits::input_parameter< int >::type groups(groupsSEXP);
     Rcpp::traits::input_parameter< bool >::type normalApproximation(normalApproximationSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type plannedSubjects(plannedSubjectsSEXP);
@@ -315,7 +315,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type maxNumberOfSubjectsPerStage(maxNumberOfSubjectsPerStageSEXP);
     Rcpp::traits::input_parameter< double >::type conditionalPower(conditionalPowerSEXP);
     Rcpp::traits::input_parameter< double >::type thetaH1(thetaH1SEXP);
-    Rcpp::traits::input_parameter< double >::type stDevH1(stDevH1SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type stDevH1(stDevH1SEXP);
     Rcpp::traits::input_parameter< int >::type calcSubjectsFunctionType(calcSubjectsFunctionTypeSEXP);
     Rcpp::traits::input_parameter< Nullable<Function> >::type calcSubjectsFunctionR(calcSubjectsFunctionRSEXP);
     Rcpp::traits::input_parameter< SEXP >::type calcSubjectsFunctionCpp(calcSubjectsFunctionCppSEXP);

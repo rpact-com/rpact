@@ -14,9 +14,9 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6617 $
- * Last changed: $Date: 2022-10-18 13:06:16 +0200 (Di, 18 Okt 2022) $
- * Last changed by: $Author: pahlke $
+ * File version: $Revision: 8463 $
+ * Last changed: $Date: 2024-12-20 15:26:37 +0100 (Fr, 20 Dez 2024) $
+ * Last changed by: $Author: wassmer $
  *
  */
 
@@ -47,7 +47,7 @@ double findObservationTime(
 			}
 		}
 		upperBound = 2 * upperBound;
-		if (numberOfEvents > requiredStageEvents || upperBound > 1E12) {
+		if (numberOfEvents >= requiredStageEvents || upperBound > 1E12) {
 			break;
 		}
 	}

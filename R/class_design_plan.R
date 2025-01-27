@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8183 $
-## |  Last changed: $Date: 2024-09-06 12:08:59 +0200 (Fr, 06 Sep 2024) $
+## |  File version: $Revision: 8474 $
+## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -144,7 +144,8 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             if (length(objectType) == 0 || !(objectType %in% c("sampleSize", "power"))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'.objectType' (", objectType,
-                    ") must be specified as 'sampleSize' or 'power'"
+                    ") must be specified as 'sampleSize' or 'power'", 
+                    call. = FALSE
                 )
             }
             self$.objectType <- objectType
@@ -153,7 +154,8 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "'.objectType' must be specified as 'sampleSize' or 'power'"
+                    "'.objectType' must be specified as 'sampleSize' or 'power'", 
+                    call. = FALSE
                 )
             }
             return(self$.objectType == "sampleSize")
@@ -162,7 +164,8 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "'.objectType' must be specified as 'sampleSize' or 'power'"
+                    "'.objectType' must be specified as 'sampleSize' or 'power'", 
+                    call. = FALSE
                 )
             }
             return(self$.objectType == "power")

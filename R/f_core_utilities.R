@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8454 $
-## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
+## |  File version: $Revision: 8473 $
+## |  Last changed: $Date: 2025-01-13 18:47:32 +0100 (Mo, 13 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -110,10 +110,15 @@ NULL
 }
 
 .firstCharacterToUpperCase <- function(x, ..., sep = "") {
+    if (is.null(x) || length(x) == 0) {
+        return(x)
+    }
+    
     args <- list(...)
     if (length(args) > 0) {
-        x <- paste(x, unlist(args, use.names = FALSE), collapse = sep, sep = sep)
+        x <- paste(c(x, unlist(args, use.names = FALSE)), collapse = sep, sep = sep)
     }
+    x <- as.character(x)
     substr(x, 1, 1) <- toupper(substr(x, 1, 1))
     return(x)
 }
@@ -1854,9 +1859,7 @@ resetOptions <- function(persist = TRUE) {
     tryCatch({
         if (!requireNamespace("rappdirs", quietly = TRUE)) { 
             packageStartupMessage("Package \"rappdirs\" is needed for saving and loading rpact options. ",
-                "Please install using, e.g., install.packages(\"rappdirs\")",
-                call. = FALSE
-            )
+                "Please install using, e.g., install.packages(\"rappdirs\")")
             return(invisible(FALSE))
         }
             
@@ -1865,7 +1868,12 @@ resetOptions <- function(persist = TRUE) {
             return(invisible(FALSE))
         }
         
-        optionFileContent <- readLines(file.path(pkgConfigDir, "options.yml"))
+        pkgConfigFile <- file.path(pkgConfigDir, "options.yml")
+        if (!file.exists(pkgConfigFile)) {
+            return(invisible(FALSE))
+        }
+        
+        optionFileContent <- readLines(pkgConfigFile)
         if (length(optionFileContent) == 0) {
             return(invisible(TRUE))
         }
@@ -1873,9 +1881,18 @@ resetOptions <- function(persist = TRUE) {
         optionsList <- list()
         for (line in optionFileContent) {
             optionName <- sub(":.*", "", line)
+            if (is.null(optionName) || length(optionName) != 1 || nchar(trimws(optionName)) == 0) {
+                next
+            }
+            
             optionValue <- sub(".*: ", "", line)
+            if (is.null(optionValue) || length(optionValue) != 1 || nchar(trimws(optionValue)) == 0) {
+                next
+            }
+            
             optionsList[[optionName]] <- optionValue
         }
+        
         if (length(optionsList) == 0) {
             return(invisible(TRUE))
         }
@@ -1883,7 +1900,7 @@ resetOptions <- function(persist = TRUE) {
         base::options(optionsList)
         return(invisible(TRUE))
     }, error = function(e) {
-        warning("Failed to load and set rpact options: ", e$message, call. = FALSE)
+        packageStartupMessage("Failed to load and set rpact options: ", e$message)
         return(invisible(FALSE))
     })
 }

@@ -3,10 +3,11 @@
 ## New features
 
 * For the functions `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()` it is now possible to specify a parameter `doseLevels` to define the dose levels for a `linear` or `sigmoidEmax` dose-response relationship (see feature request [#63](https://github.com/rpact-com/rpact/issues/63))
+* Added support for unequal variances between two groups in `getSampleSizeMeans()`, `getPowerMeans()`, and `getSimulationMeans()` functions, see enhancement [#70](https://github.com/rpact-com/rpact/issues/70)
 * `testPackage()` produces a comprehensive installation qualification report in html and pdf format (see new vignette [Installation Qualification of rpact](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification))
-* `setupPackageTests()` sets up the package tests by downloading the test files and copying them to the rpact installation directory.
-* `saveOptions()` saves the current `rpact` options to a configuration file.
-* `resetOptions()` resets the `rpact` options to their default values.
+* `setupPackageTests()` sets up the package tests by downloading the test files and copying them to the rpact installation directory
+* `saveOptions()` saves the current `rpact` options to a configuration file
+* `resetOptions()` resets the `rpact` options to their default values
 
 ## Improvements, issues, and changes
 
@@ -18,6 +19,7 @@
 * Issue [#61](https://github.com/rpact-com/rpact/issues/61) fixed
 * Issue [#68](https://github.com/rpact-com/rpact/issues/68) fixed
 * Flexibility of function `getPiecewiseSurvivalTime()` improved
+* Simulation allows the case #events = #patients
 * Test coverage improved
 * Minor improvements
 

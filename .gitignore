@@ -37,3 +37,9 @@ testthat-problems.rds
 /figure/create_designPlan-1.png
 /figure/create_designPlan-2.png
 /hs_err_pid51656.log
+/log.txt
+/rpact-Ex.R
+/rpact-Ex.Rout
+/rpact-Ex.pdf
+/tests/rpact_test_result_report.pdf
+/tests/testthat.Rout

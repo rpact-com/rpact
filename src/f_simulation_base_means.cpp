@@ -14,9 +14,9 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 8188 $
- * Last changed: $Date: 2024-09-10 09:56:44 +0200 (Di, 10 Sep 2024) $
- * Last changed by: $Author: pahlke $
+ * File version: $Revision: 8491 $
+ * Last changed: $Date: 2025-01-20 11:02:58 +0100 (Mo, 20 Jan 2025) $
+ * Last changed by: $Author: wassmer $
  *
  */
 
@@ -145,7 +145,7 @@ double getSimulationMeansStageSubjects(
 		NumericVector maxNumberOfSubjectsPerStage,
 		NumericVector sampleSizesPerStage,
 		double thetaH1,
-		double stDevH1,
+		NumericVector stDevH1,
 		double conditionalPower,
 		double conditionalCriticalValue) {
 
@@ -153,17 +153,26 @@ double getSimulationMeansStageSubjects(
 		return plannedSubjects[stage - 1] - plannedSubjects[stage - 2];
 	}
 
-	double thetaStandardized = thetaH1 / stDevH1;
-
-	double mult = 1;
-	if (groups == 2) {
-		double allocationRatio = allocationRatioPlanned[stage - 1];
-		thetaH0 = meanRatio ? thetaH0 : 1;
-		mult = 1.0 + 1.0 / allocationRatio + pow(thetaH0, 2) * (1.0 + allocationRatio);
+	double stDev1H1 = stDevH1[0];
+	double stDev2H1 = stDev1H1;
+	if (stDevH1.length() > 1) {
+		stDev2H1 = stDevH1[1];
 	}
 
-	double stageSubjects = pow(std::max(0.0, conditionalCriticalValue + getQNorm(conditionalPower)), 2) *
-			mult / pow(std::max(1e-12, thetaStandardized), 2);
+	double thetaStandardized;
+	
+	if (groups == 1) {
+	  thetaStandardized = thetaH1 / stDev1H1;
+	} else {
+	  double allocationRatio = allocationRatioPlanned[stage - 1];	  
+	  thetaH0 = meanRatio ? thetaH0 : 1;
+    thetaStandardized = thetaH1 /
+	      sqrt(pow(stDev1H1, 2) * (1.0 + 1 / allocationRatio) + 
+	        pow(stDev2H1, 2) * pow(thetaH0, 2) * (1.0 + allocationRatio)); 
+	}
+
+	double stageSubjects = pow(std::max(0.0, conditionalCriticalValue + getQNorm(conditionalPower)), 2) /
+			  pow(std::max(1e-12, thetaStandardized), 2);
 
 	return std::min(
 		std::max((double) minNumberOfSubjectsPerStage[stage - 1], stageSubjects),
@@ -181,7 +190,7 @@ List getSimulationStepMeans(
 		bool meanRatio,
 		double thetaH0,
 		double alternative,
-		double stDev,
+		NumericVector stDev,
 		int groups,
 		bool normalApproximation,
 		NumericVector plannedSubjects,
@@ -191,7 +200,7 @@ List getSimulationStepMeans(
 		NumericVector maxNumberOfSubjectsPerStage,
 		double conditionalPower,
 		double thetaH1,
-		double stDevH1,
+		NumericVector stDevH1,
 		double effectEstimate,
 		NumericVector sampleSizesPerStage,
 		NumericVector testStatisticsPerStage,
@@ -205,7 +214,13 @@ List getSimulationStepMeans(
 	double testStatisticValue;
 	double criticalValue = criticalValues[k - 1];
 
-	// perform sample size size recalculation for stages 2, ..., kMax
+	double stDev1H1 = stDevH1[0];
+	double stDev2H1 = stDev1H1; 
+	if (stDevH1.length() > 1) {
+		stDev2H1 = stDevH1[1];
+	}
+
+	// perform sample size size recalculation for stages 2,..., kMax
 	simulatedConditionalPower = 0;
 	if (k > 1) {
 
@@ -217,8 +232,21 @@ List getSimulationStepMeans(
 		} else {
 			thetaH1 = thetaH1 - thetaH0;
 		}
-		thetaStandardized = thetaH1 / stDevH1;
-
+		if (groups == 1) {
+		  thetaStandardized = thetaH1 / stDev1H1;
+		} else {
+		  double allocationRatio = allocationRatioPlanned[k - 1];	  
+		  if (!meanRatio) {
+		    thetaStandardized = thetaH1 / 
+		      sqrt(pow(stDev1H1, 2) * (1.0 + 1 / allocationRatio) + 
+		      pow(stDev2H1, 2) * (1.0 + allocationRatio)); 
+		  } else {
+		    thetaStandardized = thetaH1 /
+		      sqrt(pow(stDev1H1, 2) * (1.0 + 1 / allocationRatio) + 
+		        pow(stDev2H1, 2) * pow(thetaH0, 2) * (1.0 + allocationRatio)); 
+		  }
+		}
+		
 		if (!R_IsNA(directionUpper) && !directionUpper) {
 			thetaH1 = -thetaH1;
 			thetaStandardized = -thetaStandardized;
@@ -271,22 +299,18 @@ List getSimulationStepMeans(
 				conditionalCriticalValue);
 		}
 
-		// calculate conditional power for computed stageSubjects
-		if (groups == 2) {
-			double allocationRatio = allocationRatioPlanned[k - 1];
-			if (!meanRatio) {
-				thetaStandardized = thetaStandardized * sqrt(allocationRatio) / (1.0 + allocationRatio);
-			} else {
-				thetaStandardized = thetaStandardized * sqrt(allocationRatio) /
-						sqrt((1.0 + allocationRatio) * (1.0 + pow(thetaH0, 2) * allocationRatio));
-			}
-		}
 		simulatedConditionalPower = getOneMinusPNorm(conditionalCriticalValue -
 			thetaStandardized * sqrt(stageSubjects));
 	}
 
+	double stDev1 = stDev[0];
+	double stDev2 = stDev1; 
+	if (stDev.length() > 1) {
+		stDev2 = stDev[1];
+	}
+
 	if (groups == 1) {
-		nz = (alternative - thetaH0) / stDev * sqrt(stageSubjects);
+		nz = (alternative - thetaH0) / stDev1 * sqrt(stageSubjects);
 		if (normalApproximation) {
 			testResult = (2.0 * directionUpper - 1.0) * R::rnorm(nz, 1.0);
 		} else {
@@ -296,11 +320,13 @@ List getSimulationStepMeans(
 	} else {
 		double allocationRatio = allocationRatioPlanned[k - 1];
 		if (!meanRatio) {
-			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatio * stageSubjects) /
-					(1.0 + allocationRatio);
+			nz = (alternative - thetaH0) * sqrt(stageSubjects) / 
+			  sqrt(pow(stDev1, 2) * (1.0 + 1 / allocationRatio) + 
+			  pow(stDev2, 2) * (1.0 + allocationRatio)); 
 		} else {
-			nz = (alternative - thetaH0) / stDev * sqrt(allocationRatio * stageSubjects) /
-					sqrt((1.0 + allocationRatio) * (1.0 + pow(thetaH0, 2) * allocationRatio));
+			nz = (alternative - thetaH0) * sqrt(stageSubjects) /
+			  sqrt(pow(stDev1, 2) * (1.0 + 1 / allocationRatio) + 
+			    pow(stDev2, 2) * pow(thetaH0, 2) * (1.0 + allocationRatio)); 
 		}
 		if (normalApproximation) {
 			testResult = (2.0 * directionUpper - 1.0) * R::rnorm(nz, 1.0);
@@ -322,7 +348,7 @@ List getSimulationStepMeans(
 			thetaH0, allocationRatioPlanned, sampleSizesPerStage,
 			testStatisticsPerStage);
 	testStatisticValue = testStatistic[0]; // value
-	effectEstimate = testStatistic[2] * stDev; // standardizedEffectEstimate
+	effectEstimate = testStatistic[2] * stDev1; // standardizedEffectEstimate
 
 	double simulatedRejections = 0;
 	double simulatedFutilityStop = 0;
@@ -390,7 +416,7 @@ List getSimulationMeansLoopCpp(
 		NumericVector criticalValues,
 		bool meanRatio,
 		double thetaH0,
-		double stDev,
+		NumericVector stDev,
 		int groups,
 		bool normalApproximation,
 		NumericVector plannedSubjects,
@@ -400,7 +426,7 @@ List getSimulationMeansLoopCpp(
 		NumericVector maxNumberOfSubjectsPerStage,
 		double conditionalPower,
 		double thetaH1,
-		double stDevH1,
+		NumericVector stDevH1,
 		int calcSubjectsFunctionType,
 		Nullable<Function> calcSubjectsFunctionR,
 		SEXP calcSubjectsFunctionCpp) {
