@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.1.9273</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.1.9279</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,14 +40,16 @@
 <div class="section level3">
 <h3 id="new-features-4-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-2-0"></a></h3>
 <ul><li>For the functions <code><a href="../reference/getSimulationMultiArmMeans.html">getSimulationMultiArmMeans()</a></code>, <code><a href="../reference/getSimulationMultiArmRates.html">getSimulationMultiArmRates()</a></code>, and <code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> it is now possible to specify a parameter <code>doseLevels</code> to define the dose levels for a <code>linear</code> or <code>sigmoidEmax</code> dose-response relationship (see feature request <a href="https://github.com/rpact-com/rpact/issues/63" class="external-link">#63</a>)</li>
+<li>Added support for unequal variances between two groups in <code><a href="../reference/getSampleSizeMeans.html">getSampleSizeMeans()</a></code>, <code><a href="../reference/getPowerMeans.html">getPowerMeans()</a></code>, and <code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code> functions, see enhancement <a href="https://github.com/rpact-com/rpact/issues/70" class="external-link">#70</a>
+</li>
 <li>
 <code><a href="../reference/testPackage.html">testPackage()</a></code> produces a comprehensive installation qualification report in html and pdf format (see new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_installation_qualification" class="external-link">Installation Qualification of rpact</a>)</li>
 <li>
-<code><a href="../reference/setupPackageTests.html">setupPackageTests()</a></code> sets up the package tests by downloading the test files and copying them to the rpact installation directory.</li>
+<code><a href="../reference/setupPackageTests.html">setupPackageTests()</a></code> sets up the package tests by downloading the test files and copying them to the rpact installation directory</li>
 <li>
-<code><a href="../reference/saveOptions.html">saveOptions()</a></code> saves the current <code>rpact</code> options to a configuration file.</li>
+<code><a href="../reference/saveOptions.html">saveOptions()</a></code> saves the current <code>rpact</code> options to a configuration file</li>
 <li>
-<code><a href="../reference/resetOptions.html">resetOptions()</a></code> resets the <code>rpact</code> options to their default values.</li>
+<code><a href="../reference/resetOptions.html">resetOptions()</a></code> resets the <code>rpact</code> options to their default values</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-2-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-2-0"></a></h3>
@@ -59,6 +61,7 @@
 <li>Issue <a href="https://github.com/rpact-com/rpact/issues/61" class="external-link">#61</a> fixed</li>
 <li>Issue <a href="https://github.com/rpact-com/rpact/issues/68" class="external-link">#68</a> fixed</li>
 <li>Flexibility of function <code><a href="../reference/getPiecewiseSurvivalTime.html">getPiecewiseSurvivalTime()</a></code> improved</li>
+<li>Simulation allows the case #events = #patients</li>
 <li>Test coverage improved</li>
 <li>Minor improvements</li>
 </ul></div>
