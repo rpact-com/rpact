@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Tue, 10 Dec 2024) $
+## |  File version: $Revision: 8464 $
+## |  Last changed: $Date: 2024-12-20 15:27:24 +0100 (Fr, 20 Dez 2024) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -148,7 +148,7 @@ NULL
                 criticalValues <- .getCriticalValues(design)
                 if (.isTrialDesignFisher(design)) {
                     conditionalCriticalValue[k] <- .getOneMinusQNorm(min((criticalValues[k + 1] /
-                        prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-07))
+                        prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-12))
                 } else {
                     conditionalCriticalValue[k] <- (criticalValues[k + 1] *
                         sqrt(design$informationRates[k + 1]) -

@@ -8,9 +8,9 @@
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) 
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0) 
 [![Codecov test coverage](https://codecov.io/gh/rpact-com/rpact/branch/main/graph/badge.svg)](https://app.codecov.io/gh/rpact-com/rpact?branch=main)
-[![](https://img.shields.io/badge/doi-10.1007/978--3--319--32562--0-yellow.svg)](https://doi.org/10.1007/978-3-319-32562-0) 
-[![shinyapps.io](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://rpact.shinyapps.io/public) 
-[![](https://img.shields.io/badge/RPACT-Cloud-blue.svg)](https://rpact.shinyapps.io/cloud)
+[![](https://img.shields.io/badge/DOI-10.1007/978--3--319--32562--0-yellow.svg?logo=doi)](https://doi.org/10.1007/978-3-319-32562-0) 
+[![](https://img.shields.io/badge/RPACT-Cloud-blue.svg?logo=r)](https://rpact.shinyapps.io/cloud)
+[![](https://img.shields.io/badge/RPACT-Connect-669999.svg?labelColor=336699)](https://rpact.shinyapps.io/connect)
  <!-- badges: end -->
 
 # rpact <a href="https://www.rpact.com"><img src="man/figures/logo.png" align="right" height="138" /></a>

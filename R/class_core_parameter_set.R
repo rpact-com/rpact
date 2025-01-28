@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8455 $
-## |  Last changed: $Date: 2024-12-12 09:33:14 +0100 (Do, 12 Dez 2024) $
+## |  File version: $Revision: 8508 $
+## |  Last changed: $Date: 2025-01-24 09:01:34 +0100 (Fr, 24 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -921,7 +921,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
         "adjustedStageWisePValues", 
         "overallAdjustedTestStatistics",
         "plannedCalendarTime",
-        "doseLevels"
+        "doseLevels",
+        "stDev"
     ))]
 
     if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
@@ -1158,7 +1159,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
     for (parameterName in parameterNames) {
         tryCatch(
             {
-                if (!(parameterName %in% c("stages", "adaptations", "effectList", "doseLevels", "plannedCalendarTime")) &&
+                if (!(parameterName %in% c("stages", "adaptations", "effectList", "doseLevels", "plannedCalendarTime", "stDev")) &&
                         !grepl("Function$", parameterName) &&
                         (is.null(variedParameter) || parameterName != variedParameter)) {
                     columnValues <- .getDataFrameColumnValues(

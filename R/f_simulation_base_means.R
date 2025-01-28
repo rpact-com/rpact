@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8490 $
+## |  Last changed: $Date: 2025-01-20 09:58:53 +0100 (Mo, 20 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -35,15 +35,15 @@
         return(plannedSubjects[stage] - plannedSubjects[stage - 1])
     }
 
-    thetaStandardized <- thetaH1 / stDevH1
-
-    mult <- 1
-    if (groups == 2) {
+    if (groups == 1) {
+        thetaStandardized <- thetaH1 / stDevH1
+    } else {
         thetaH0 <- ifelse(meanRatio, thetaH0, 1)
-        mult <- 1 + 1 / allocationRatioPlanned[stage] + thetaH0^2 * (1 + allocationRatioPlanned[stage])
+        r <- allocationRatioPlanned[stage]
+        thetaStandardized <- thetaH1 / sqrt(stDevH1[1]^2 * (1 + r) / r + thetaH0^2 * stDevH1[2]^2 * (1 + r))
     }
 
-    stageSubjects <- (max(0, conditionalCriticalValue + .getQNorm(conditionalPower)))^2 * mult /
+    stageSubjects <- (max(0, conditionalCriticalValue + .getQNorm(conditionalPower)))^2 /
         (max(1e-12, thetaStandardized))^2
 
     stageSubjects <- min(
@@ -191,8 +191,10 @@ getSimulationMeans <- function(design = NULL, ...,
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
     }
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     if (meanRatio) {
         .assertIsInOpenInterval(thetaH0, "thetaH0", 0, NULL, naAllowed = TRUE)
@@ -209,13 +211,12 @@ getSimulationMeans <- function(design = NULL, ...,
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
     .assertIsInOpenInterval(conditionalPower, "conditionalPower", 0, 1, naAllowed = TRUE)
     .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE)
-    .assertIsSingleNumber(stDevH1, "stDevH1", naAllowed = TRUE)
-    .assertIsInOpenInterval(stDevH1, "stDevH1", 0, NULL, naAllowed = TRUE)
+    .assertIsValidStandardDeviation(stDevH1, groups = groups, name = "stDevH1", naAllowed = TRUE)
     .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE)
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
-    .assertIsValidStandardDeviation(stDev)
+    .assertIsValidStandardDeviation(stDev, groups = groups)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
     .assertIsSingleLogical(normalApproximation, "normalApproximation", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
@@ -282,8 +283,9 @@ getSimulationMeans <- function(design = NULL, ...,
         "stDevH1", stDevH1, design$kMax > 1,
         "design is fixed ('kMax' = 1)", "Assumed effect"
     )
-    if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !is.na(stDevH1)) {
-        warning("'stDevH1' will be ignored because neither 'conditionalPower' nor ",
+    if (is.na(conditionalPower) && is.null(calcSubjectsFunction) && !all(is.na(stDevH1))) {
+        warning("'stDevH1' (", .arrayToString(stDevH1), ") will be ignored ",
+            "because neither 'conditionalPower' nor ",
             "'calcSubjectsFunction' is defined",
             call. = FALSE
         )
@@ -445,7 +447,16 @@ getSimulationMeans <- function(design = NULL, ...,
         alpha0Vec <- rep(NA_real_, design$kMax - 1)
         futilityBounds <- design$futilityBounds
     }
-    if (is.na(stDevH1)) {
+
+    if ((length(stDev) == 1) && (groups == 2)) {
+        stDev <- rep(stDev, 2)
+    }
+
+    if ((length(stDevH1) == 1) && (groups == 2)) {
+        stDevH1 <- rep(stDevH1, 2)
+    }
+
+    if (all(is.na(stDevH1))) {
         stDevH1 <- stDev
     }
 
@@ -495,6 +506,7 @@ getSimulationMeans <- function(design = NULL, ...,
     simulationResults$overallReject <- cppResult$overallReject
     simulationResults$futilityPerStage <- cppResult$futilityPerStage
     simulationResults$futilityStop <- cppResult$futilityStop
+
     if (design$kMax > 1) {
         if (length(alternative) == 1) {
             simulationResults$earlyStop <- sum(cppResult$futilityPerStage) + sum(cppResult$rejectPerStage[1:(design$kMax - 1)])

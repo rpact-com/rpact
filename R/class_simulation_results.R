@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8451 $
-## |  Last changed: $Date: 2024-12-10 13:26:18 +0100 (Di, 10 Dez 2024) $
+## |  File version: $Revision: 8474 $
+## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -140,7 +140,8 @@ SimulationResults <- R6::R6Class("SimulationResults",
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "'showStatistics' (", .arrayToString(showStatistics),
-                        ") must be a single logical or character"
+                        ") must be a single logical or character", 
+                        call. = FALSE
                     )
                 }
 

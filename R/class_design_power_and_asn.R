@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8474 $
+## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -119,7 +119,9 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             .assertIsValidSidedParameter(self$.design$sided)
 
             if (self$nMax <= 0) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'nMax' must be an integer > 0")
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+                    "'nMax' must be an integer > 0", 
+                    call. = FALSE)
             }
 
             self$.setParameterType("nMax", ifelse(self$nMax == C_NA_MAX_DEFAULT,

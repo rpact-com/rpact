@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8276 $
-## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
+## |  File version: $Revision: 8474 $
+## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -417,7 +417,9 @@ NULL
 
     if (dataInput$getNumberOfGroups() == 1) {
         if (is.na(thetaH0)) {
-            stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'thetaH0' must be defined")
+            stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
+                "'thetaH0' must be defined", 
+                call. = FALSE)
         }
 
         if (normalApproximation) {
@@ -493,7 +495,8 @@ NULL
                 if (thetaH0 != 0) {
                     stop(
                         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "thetaH0 must be equal 0 for performing Fisher's exact test"
+                        "thetaH0 must be equal 0 for performing Fisher's exact test", 
+                        call. = FALSE
                     )
                 }
 

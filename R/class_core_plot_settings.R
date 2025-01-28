@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8490 $
+## |  Last changed: $Date: 2025-01-20 09:58:53 +0100 (Mo, 20 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -26,11 +26,18 @@ PlotSubTitleItem <- R6::R6Class("PlotSubTitleItem",
         digits = NULL,
         initialize = function(..., title, value, subscript = NA_character_, digits = 3L) {
             self$title <- trimws(title)
-            self$value <- value
             self$subscript <- trimws(subscript)
             self$digits <- digits
 
-            self$value <- round(value, digits)
+            if (is.numeric(value)) {
+                self$value <- round(value, digits)
+            } else {
+                self$value <- value
+            }
+            
+            if (length(self$value) > 1) {
+                self$value <- .arrayToString(self$value, vectorLookAndFeelEnabled = TRUE)
+            }
         },
         show = function() {
             cat(self$toString(), "\n")
@@ -663,7 +670,8 @@ PlotSettings <- R6::R6Class("PlotSettings",
             if (!(length(margin) %in% c(1, 4))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'margin' (", .arrayToString(margin),
-                    ") must be a numeric vector with length 1 or 4"
+                    ") must be a numeric vector with length 1 or 4", 
+                    call. = FALSE
                 )
             }
             p <- p + ggplot2::theme(plot.margin = ggplot2::unit(margin, "cm"))

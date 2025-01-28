@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8274 $
-## |  Last changed: $Date: 2024-09-26 11:33:59 +0200 (Do, 26 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8484 $
+## |  Last changed: $Date: 2025-01-16 10:28:39 +0100 (Do, 16 Jan 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -76,6 +76,10 @@ NULL
     }
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
 
+    if ((length(stDev) == 1) && (designPlan$groups == 2)){
+        stDev <- rep(stDev, 2)
+    } 
+    
     if (designPlan$groups == 1) {
         criticalValuesEffectScaleUpper <- thetaH0 + criticalValues * stDev /
             sqrt(design$informationRates %*% t(maxNumberOfSubjects))
@@ -92,43 +96,53 @@ NULL
                 sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects))
         }
     } else if (!designPlan$meanRatio) {
-        criticalValuesEffectScaleUpper <- thetaH0 + criticalValues * stDev *
-            (1 + allocationRatioPlanned) / (sqrt(allocationRatioPlanned *
+        criticalValuesEffectScaleUpper <- thetaH0 + criticalValues * 
+                sqrt(1 + allocationRatioPlanned) * 
+                sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) / 
+                (sqrt(allocationRatioPlanned *
                 design$informationRates %*% t(maxNumberOfSubjects)))
-        criticalValuesEffectScaleLower <- thetaH0 - criticalValues * stDev *
-            (1 + allocationRatioPlanned) / (sqrt(allocationRatioPlanned *
+        criticalValuesEffectScaleLower <- thetaH0 - criticalValues * 
+                sqrt(1 + allocationRatioPlanned) * 
+                sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) / 
+                (sqrt(allocationRatioPlanned *
                 design$informationRates %*% t(maxNumberOfSubjects)))
         if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
-            futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds * stDev *
-                (1 + allocationRatioPlanned) / (sqrt(allocationRatioPlanned *
-                    design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
+            futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds * 
+                sqrt(1 + allocationRatioPlanned) * 
+                sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) / 
+                (sqrt(allocationRatioPlanned *
+                design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
         if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
-            futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * stDev *
-                (1 + allocationRatioPlanned) / (sqrt(allocationRatioPlanned *
+            futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * 
+                stDev * (1 + allocationRatioPlanned) / 
+                    (sqrt(allocationRatioPlanned *
                     design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
     } else {
-        criticalValuesEffectScaleUpper <- thetaH0 + criticalValues * stDev *
-            sqrt(1 + 1 / allocationRatioPlanned + thetaH0^2 * (1 + allocationRatioPlanned)) /
+        criticalValuesEffectScaleUpper <- thetaH0 + criticalValues * 
+            sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
+            sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
             (sqrt(design$informationRates %*% t(maxNumberOfSubjects)))
-        criticalValuesEffectScaleLower <- thetaH0 - criticalValues * stDev *
-            sqrt(1 + 1 / allocationRatioPlanned + thetaH0^2 * (1 + allocationRatioPlanned)) /
+        criticalValuesEffectScaleLower <- thetaH0 - criticalValues * 
+            sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
+            sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
             (sqrt(design$informationRates %*% t(maxNumberOfSubjects)))
-
 
         if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
-            futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds * stDev *
-                sqrt(1 + 1 / allocationRatioPlanned + thetaH0^2 * (1 + allocationRatioPlanned)) /
+            futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds *
+                sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
+                sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
                 (sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
         if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
-            futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * stDev *
-                sqrt(1 + 1 / allocationRatioPlanned + thetaH0^2 * (1 + allocationRatioPlanned)) /
+            futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * 
+                sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
+                sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
                 (sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
     }
@@ -186,7 +200,12 @@ NULL
         stDev = C_STDEV_DEFAULT, 
         groups = 2,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
+    
     nFixed <- rep(NA_real_, length(alternative))
+    
+    if ((length(stDev) == 1) && (groups == 2)){
+        stDev <- rep(stDev, 2)
+    } 
 
     for (i in seq_len(length(alternative))) {
         theta <- alternative[i]
@@ -233,8 +252,7 @@ NULL
                             return(stats::pt(
                                 stats::qt(1 - alpha / 2, max(0.001, n - 1)), max(0.001, n - 1),
                                 sqrt(n) * (theta - thetaH0) / stDev
-                            ) -
-                                stats::pt(
+                            ) - stats::pt(
                                     -stats::qt(1 - alpha / 2, max(0.001, n - 1)),
                                     max(0.001, n - 1), sqrt(n) * (theta - thetaH0) / stDev
                                 ) - beta)
@@ -259,7 +277,7 @@ NULL
                 if (!meanRatio) {
                     # allocationRatioPlanned = 0 provides optimum sample size
                     if (allocationRatioPlanned == 0) {
-                        allocationRatioPlanned <- 1
+                        allocationRatioPlanned <- stDev[1] / stDev[2]
                     }
                     if (!normalApproximation) {
                         up <- 2
@@ -267,22 +285,25 @@ NULL
                             stats::qt(1 - alpha / sided, up *
                                 (1 + allocationRatioPlanned) - 2),
                             up * (1 + allocationRatioPlanned) - 2,
-                            sqrt(up) * sqrt(allocationRatioPlanned / (1 + allocationRatioPlanned)) *
-                                abs(theta - thetaH0) / stDev
+                            sqrt(up) * 
+                                abs(theta - thetaH0) / 
+                                sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)
                         ) > beta) {
                             up <- 2 * up
                         }
                         n2Fixed <- .getOneDimensionalRoot(
-                            function(x) {
+                            function(n2) {
+                                if (stDev[1] == stDev[2]){
+                                    df <- max(0.001, n2 * (1 + allocationRatioPlanned) - 2)
+                                } else {
+                                    n1 <- allocationRatioPlanned * n2
+                                    u <- stDev[1]^2 / n1 / (stDev[1]^2 / n1 + stDev[2]^2 / n2)
+                                    df <- max(0.001, 1 / (u^2 / (n1 - 1) + (1 - u)^2 / (n2 - 1)))
+                                }    
                                 return(stats::pt(
-                                    stats::qt(1 - alpha / sided, max(
-                                        0.001,
-                                        x * (1 + allocationRatioPlanned) - 2
-                                    )),
-                                    max(0.001, x * (1 + allocationRatioPlanned) - 2),
-                                    sqrt(x) * sqrt(allocationRatioPlanned /
-                                        (1 + allocationRatioPlanned)) *
-                                        abs(theta - thetaH0) / stDev
+                                    stats::qt(1 - alpha / sided, df), df,
+                                    sqrt(n2) * abs(theta - thetaH0) / 
+                                    sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)
                                 ) - beta)
                             },
                             lower = 0.001, upper = up, tolerance = 1e-04,
@@ -290,14 +311,15 @@ NULL
                         )
                         nFixed[i] <- n2Fixed * (1 + allocationRatioPlanned)
                     } else {
-                        nFixed[i] <- (1 + allocationRatioPlanned)^2 / allocationRatioPlanned *
+                        nFixed[i] <- (1 + allocationRatioPlanned) *
+                            (stDev[1]^2 + allocationRatioPlanned*stDev[2]^2) / allocationRatioPlanned *
                             (.getOneMinusQNorm(alpha / sided) + .getOneMinusQNorm(beta))^2 /
-                            ((theta - thetaH0) / stDev)^2
+                            (theta - thetaH0)^2
                     }
                 } else {
                     # allocationRatioPlanned = 0 provides optimum sample size
                     if (allocationRatioPlanned == 0) {
-                        allocationRatioPlanned <- 1 / thetaH0
+                        allocationRatioPlanned <- 1 / thetaH0 * stDev[1] / stDev[2]
                     }
                     if (!normalApproximation) {
                         up <- 2
@@ -307,23 +329,24 @@ NULL
                                 up * (1 + allocationRatioPlanned) - 2
                             ),
                             up * (1 + allocationRatioPlanned) - 2,
-                            sqrt(up * allocationRatioPlanned /
-                                (1 + allocationRatioPlanned * thetaH0^2)) *
-                                abs(theta - thetaH0) / stDev
+                            sqrt(up) *abs(theta - thetaH0) /
+                                sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2 * thetaH0^2) 
                         ) > beta) {
                             up <- 2 * up
                         }
                         n2Fixed <- .getOneDimensionalRoot(
                             function(n2) {
+                                if (stDev[1] == stDev[2]){
+                                    df <- max(0.001, n2 * (1 + allocationRatioPlanned) - 2)
+                                } else {
+                                    n1 <- allocationRatioPlanned * n2
+                                    u <- stDev[1]^2 / n1 / (stDev[1]^2 / n1 + stDev[2]^2 / n2)
+                                    df <- max(0.001, 1 / (u^2 / (n1 - 1) + (1 - u)^2 / (n2 - 1)))
+                                }    
                                 return(stats::pt(
-                                    stats::qt(1 - alpha / sided, max(
-                                        0.001,
-                                        n2 * (1 + allocationRatioPlanned) - 2
-                                    )),
-                                    max(0.001, n2 * (1 + allocationRatioPlanned) - 2),
-                                    sqrt(n2 * allocationRatioPlanned /
-                                        (1 + allocationRatioPlanned * thetaH0^2)) *
-                                        abs(theta - thetaH0) / stDev
+                                    stats::qt(1 - alpha / sided, df), df,
+                                    sqrt(n2) * abs(theta - thetaH0) /
+                                        sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2 * thetaH0^2) 
                                 ) - beta)
                             },
                             lower = 0.001, upper = up, tolerance = 1e-04,
@@ -331,50 +354,56 @@ NULL
                         )
                         nFixed[i] <- n2Fixed * (1 + allocationRatioPlanned)
                     } else {
-                        nFixed[i] <- (1 + 1 / allocationRatioPlanned + thetaH0^2 *
-                            (1 + allocationRatioPlanned)) *
+                        nFixed[i] <- (1 + allocationRatioPlanned) *
+                            (stDev[1]^2 / allocationRatioPlanned + thetaH0^2 * stDev[2]^2) *
                             (.getOneMinusQNorm(alpha / sided) + .getOneMinusQNorm(beta))^2 /
-                            ((theta - thetaH0) / stDev)^2
+                            (theta - thetaH0)^2 
                     }
                 }
             } else {
                 if (!normalApproximation) {
                     if (allocationRatioPlanned == 0) {
-                        allocationRatioPlanned <- 1
+                        allocationRatioPlanned <- stDev[1] / stDev[2]
                     }
                     up <- 2
                     while (stats::pt(
-                        stats::qt(1 - alpha / 2, max(0.001, up * (1 + allocationRatioPlanned) - 2)),
-                        max(0.001, up * (1 + allocationRatioPlanned) - 2),
-                        sqrt(up) * sqrt(allocationRatioPlanned / (1 + allocationRatioPlanned)) *
-                            (theta - thetaH0) / stDev
+                        stats::qt(
+                            1 - alpha / 2,
+                            up * (1 + allocationRatioPlanned) - 2
+                        ),
+                        up * (1 + allocationRatioPlanned) - 2,
+                        sqrt(up) * (theta - thetaH0) / 
+                        sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)                            
                     ) - stats::pt(
                         -stats::qt(
                             1 - alpha / 2,
                             up * (1 + allocationRatioPlanned) - 2
                         ),
                         up * (1 + allocationRatioPlanned) - 2,
-                        sqrt(up) * sqrt(allocationRatioPlanned / (1 + allocationRatioPlanned)) *
-                            (theta - thetaH0) / stDev
+                        sqrt(up) * (theta - thetaH0) / 
+                        sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)                            
                     ) > beta) {
                         up <- 2 * up
                     }
                     n2Fixed <- .getOneDimensionalRoot(
                         function(n2) {
+                            if (stDev[1] == stDev[2]){
+                                df <- max(0.001, n2 * (1 + allocationRatioPlanned) - 2)
+                            } else {
+                                n1 <- allocationRatioPlanned * n2
+                                u <- stDev[1]^2 / n1 / (stDev[1]^2 / n1 + stDev[2]^2 / n2)
+                                df <- max(0.001, 1 / (u^2 / (n1 - 1) + (1 - u)^2 / (n2 - 1)))
+                            }    
                             return(stats::pt(
-                                stats::qt(1 - alpha / 2, max(0.001, n2 * (1 + allocationRatioPlanned) - 2)),
-                                max(0.001, n2 * (1 + allocationRatioPlanned) - 2),
-                                sqrt(n2) * sqrt(allocationRatioPlanned / (1 + allocationRatioPlanned)) *
-                                    (theta - thetaH0) / stDev
-                            ) - stats::pt(
+                                stats::qt(1 - alpha / 2, df), df,
+                                    sqrt(n2) * (theta - thetaH0) / 
+                                    sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)  
+                                ) - stats::pt(
                                 -stats::qt(
-                                    1 - alpha / 2,
-                                    max(0.001, n2 * (1 + allocationRatioPlanned) - 2)
-                                ),
-                                max(0.001, n2 * (1 + allocationRatioPlanned) - 2),
-                                sqrt(n2) * sqrt(allocationRatioPlanned / (1 + allocationRatioPlanned)) *
-                                    (theta - thetaH0) / stDev
-                            ) - beta)
+                                    1 - alpha / 2, df), df, 
+                                    sqrt(n2) * (theta - thetaH0) / 
+                                    sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)                            
+                                ) - beta)
                         },
                         lower = 0.001, upper = up, tolerance = 1e-04,
                         callingFunctionInformation = ".getSampleSizeFixedMeans"
@@ -382,23 +411,30 @@ NULL
                     nFixed[i] <- n2Fixed * (1 + allocationRatioPlanned)
                 } else {
                     up <- 2
-                    while (stats::pnorm(.getOneMinusQNorm(alpha / 2) - sqrt(up / 4) * (theta - thetaH0) / stDev) -
-                        stats::pnorm(-.getOneMinusQNorm(alpha / 2) - sqrt(up / 4) *
-                            (theta - thetaH0) / stDev) > beta) {
-                        up <- 2 * up
+                    while (stats::pnorm(.getOneMinusQNorm(alpha / 2) - 
+                                sqrt(up) * (theta - thetaH0) / 
+                                sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)) -  
+                           stats::pnorm(-.getOneMinusQNorm(alpha / 2) - 
+                                sqrt(up) * (theta - thetaH0) / 
+                                sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2))   
+                                 > beta) {
+                            up <- 2 * up
                     }
-
-                    nFixed[i] <- (1 + allocationRatioPlanned)^2 / (4 * allocationRatioPlanned) *
+                    n2Fixed <- 
                         .getOneDimensionalRoot(
-                            function(n) {
+                            function(n2) {
                                 return(stats::pnorm(.getOneMinusQNorm(alpha / 2) -
-                                    sqrt(n / 4) * (theta - thetaH0) / stDev) -
-                                    stats::pnorm(-.getOneMinusQNorm(alpha / 2) - sqrt(n / 4) *
-                                        (theta - thetaH0) / stDev) - beta)
+                                            sqrt(n2) * (theta - thetaH0) / 
+                                            sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)) -  
+                                        stats::pnorm(-.getOneMinusQNorm(alpha / 2) -                                         
+                                            sqrt(n2) * (theta - thetaH0) / 
+                                            sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2))   
+                                - beta)
                             },
                             lower = 0.001, upper = up, tolerance = 1e-04,
                             callingFunctionInformation = ".getSampleSizeFixedMeans"
                         )
+                    nFixed[i] <- n2Fixed * (1 + allocationRatioPlanned)                    
                 }
             }
         }
@@ -412,7 +448,7 @@ NULL
             groups = groups,
             thetaH0 = thetaH0,
             alternative = alternative,
-            stDev = stDev,
+            stDev = stDev, 
             normalApproximation = normalApproximation,
             nFixed = nFixed
         ))
@@ -428,7 +464,7 @@ NULL
             thetaH0 = thetaH0,
             meanRatio = meanRatio,
             alternative = alternative,
-            stDev = stDev,
+            stDev = stDev, 
             normalApproximation = normalApproximation,
             n1Fixed = n1Fixed,
             n2Fixed = n2Fixed,
@@ -538,8 +574,8 @@ NULL
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     .assertIsValidAlphaAndBeta(design$alpha, design$beta)
     .assertIsValidSidedParameter(design$sided)
-    .assertIsValidStandardDeviation(stDev)
     .assertIsValidGroupsParameter(groups)
+    .assertIsValidStandardDeviation(stDev, groups = groups)
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsSingleLogical(meanRatio, "meanRatio")
     .assertIsValidThetaH0(thetaH0, endpoint = "means", groups = groups, ratioEnabled = meanRatio)
@@ -807,6 +843,10 @@ getPowerMeans <- function(design = NULL, ...,
         allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
         ) {
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
+    
+    if ((length(stDev) == 1) && (groups == 2)){
+        stDev <- rep(stDev, 2)
+    } 
 
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "power")
@@ -852,7 +892,8 @@ getPowerMeans <- function(design = NULL, ...,
         } else {
             thetaAdj <- (sign(theta) * .getOneMinusQNorm(design$alpha / design$sided) -
                 .getQNorm(stats::pt(
-                    sign(theta) * stats::qt(1 - design$alpha / design$sided, maxNumberOfSubjects - 1),
+                    sign(theta) * stats::qt(1 - design$alpha / design$sided, 
+                                            maxNumberOfSubjects - 1),
                     maxNumberOfSubjects - 1,
                     theta * sqrt(maxNumberOfSubjects)
                 ))) / sqrt(maxNumberOfSubjects)
@@ -863,13 +904,16 @@ getPowerMeans <- function(design = NULL, ...,
     } else {
         if (!designPlan$meanRatio) {
             theta <- sqrt(designPlan$allocationRatioPlanned) /
-                (1 + designPlan$allocationRatioPlanned) *
-                (designPlan$alternative - designPlan$thetaH0) / designPlan$stDev
+                sqrt(1 + designPlan$allocationRatioPlanned) / 
+                sqrt(designPlan$stDev[1]^2 + 
+                     designPlan$allocationRatioPlanned * designPlan$stDev[2]^2) *
+                (designPlan$alternative - designPlan$thetaH0)
         } else {
             theta <- sqrt(designPlan$allocationRatioPlanned) /
-                sqrt((1 + designPlan$allocationRatioPlanned * designPlan$thetaH0^2) *
-                    (1 + designPlan$allocationRatioPlanned)) *
-                (designPlan$alternative - designPlan$thetaH0) / designPlan$stDev
+                sqrt((designPlan$stDev[1]^2 + designPlan$allocationRatioPlanned * 
+                     designPlan$stDev[2]^2 * designPlan$thetaH0^2) *
+                     (1 + designPlan$allocationRatioPlanned)) *
+                (designPlan$alternative - designPlan$thetaH0) 
         }
         if (!is.na(designPlan$directionUpper) && !designPlan$directionUpper) {
             theta <- -theta
@@ -879,13 +923,20 @@ getPowerMeans <- function(design = NULL, ...,
                 design, theta, maxNumberOfSubjects
             )
         } else {
+            if (designPlan$stDev[1] == designPlan$stDev[2]){
+                df <- maxNumberOfSubjects - 2
+            } else {
+                n2 <- maxNumberOfSubjects / (1 +  designPlan$allocationRatioPlanned)
+                n1 <- designPlan$allocationRatioPlanned * n2
+                u <- designPlan$stDev[1]^2 / n1 / 
+                    (designPlan$stDev[1]^2 / n1 + designPlan$stDev[2]^2 / n2)
+                df <- 1 / (u^2 / (n1 - 1) + (1 - u)^2 / (n2 - 1))
+            }    
             thetaAdj <- (sign(theta) * .getOneMinusQNorm(design$alpha / design$sided) -
                 .getQNorm(stats::pt(
                     sign(theta) * stats::qt(
                         1 - design$alpha / design$sided,
-                        maxNumberOfSubjects - 2
-                    ),
-                    maxNumberOfSubjects - 2,
+                        df), df,
                     theta * sqrt(maxNumberOfSubjects)
                 ))) / sqrt(maxNumberOfSubjects)
             powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(

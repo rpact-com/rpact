@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8416 $
-## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
+## |  File version: $Revision: 8508 $
+## |  Last changed: $Date: 2025-01-24 09:01:34 +0100 (Fr, 24 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2090,7 +2090,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             stDevCaption <- ifelse(.isRatioComparisonEnabled(designPlan),
                 "coefficient of variation", "standard deviation"
             )
-            header <- .concatenateSummaryText(header, paste0(stDevCaption, " = ", round(designPlan$stDev, 3)))
+            stDev <- designPlan$stDev
+            if (length(unique(stDev)) == 1) {
+                stDev <- unique(stDev)
+            }
+            header <- .concatenateSummaryText(header, paste0(stDevCaption, " = ", 
+                .arrayToString(round(stDev, 3), vectorLookAndFeelEnabled = TRUE)))
         }
         header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
     } else if (settings$ratesEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||

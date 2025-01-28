@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8360 $
-## |  Last changed: $Date: 2024-11-04 15:40:23 +0100 (Mo, 04 Nov 2024) $
+## |  File version: $Revision: 8474 $
+## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1972,7 +1972,8 @@ plot.AnalysisResults <- function(x, y, ...,
     if (nrow(data) == 0) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "unable to create plot because no RCIs are available in the specified analysis result"
+            "unable to create plot because no RCIs are available in the specified analysis result", 
+            call. = FALSE
         )
     }
 
@@ -2136,7 +2137,9 @@ plot.AnalysisResults <- function(x, y, ...,
         
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
     if (!(type %in% c(1, 2))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1 or 2")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            "'type' (", type, ") is not allowed; must be 1 or 2", 
+            call. = FALSE)
     }
 
     .assertIsAnalysisResults(x)
@@ -2162,7 +2165,9 @@ plot.AnalysisResults <- function(x, y, ...,
     }
 
     if (!.isConditionalPowerEnabled(x$nPlanned) && !.isConditionalPowerEnabled(nPlanned)) {
-        stop("'nPlanned' must be defined to create conditional power plot")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'nPlanned' must be defined to create conditional power plot", 
+            call. = FALSE)
     }
 
     .warnInCaseOfUnknownArguments(

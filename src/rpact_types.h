@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 6784 $
- * Last changed: $Date: 2023-01-31 10:11:06 +0100 (Di, 31 Jan 2023) $
+ * File version: $Revision: 8474 $
+ * Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -40,7 +40,7 @@ typedef double (*calcSubjectsFunctionMeansPtr)(
 	NumericVector maxNumberOfSubjectsPerStage,
 	NumericVector sampleSizesPerStage,
 	double thetaH1,
-	double stDevH1,
+	NumericVector stDevH1,
 	double conditionalPower,
 	double conditionalCriticalValue);
 

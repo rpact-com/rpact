@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8276 $
-## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
+## |  File version: $Revision: 8474 $
+## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -512,14 +512,16 @@ NULL
 
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stop(sprintf(
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+                sprintf(
                 paste0(
-                    "Failed to find theta (k = %s, firstValue = %s, ",
+                    "failed to find theta (k = %s, firstValue = %s, ",
                     "secondValue = %s, levels(firstValue) = %s, theta = %s)"
                 ),
                 stage, stageResults[[firstParameterName]][stage], secondValue,
                 firstValue, theta
-            ))
+            ), 
+            call. = FALSE)
         }
     }
 

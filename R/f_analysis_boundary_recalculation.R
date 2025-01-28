@@ -44,7 +44,8 @@
     } else {
         stop(
             C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'dataInput' class ",
-            .getClassName(dataInput), " is not supported"
+            .getClassName(dataInput), " is not supported", 
+            call. = FALSE
         )
     }
 
@@ -334,7 +335,8 @@ getObservedInformationRates <- function(dataInput,
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "recalculation of the information rates not possible ",
-            "for user-defined alpha spending designs"
+            "for user-defined alpha spending designs", 
+            call. = FALSE
         )
     }
 
@@ -372,7 +374,8 @@ getObservedInformationRates <- function(dataInput,
     if (stageFromData == 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "recalculation of the information rates not possible at stage 1"
+            "recalculation of the information rates not possible at stage 1", 
+            call. = FALSE
         )
     }
 
