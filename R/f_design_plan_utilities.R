@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
+## |  File version: $Revision: 8518 $
+## |  Last changed: $Date: 2025-01-29 15:42:08 +0100 (Mi, 29 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -243,7 +243,7 @@ NULL
             designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
         }
         if (!is.null(sampleSizeSequential$futilityPerStage) &&
-                any(designPlan$.design$futilityBounds != C_FUTILITY_BOUNDS_DEFAULT)) {
+                any(designPlan$.design$futilityBounds != C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
             designPlan$futilityPerStage <- matrix(sampleSizeSequential$futilityPerStage,
                 nrow = designPlan$.design$kMax - 1
             )

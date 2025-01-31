@@ -65,6 +65,11 @@ The documentation is hosted at [www.rpact.org](https://www.rpact.org)
 The vignettes are hosted at
 [www.rpact.org/vignettes](https://www.rpact.org/vignettes/)
 
+## RPACT Connect 
+
+Connecting you to insights, downloads, and premium support:
+[connect.rpact.com](https://connect.rpact.com)
+
 ## The rpact user group
 
 The *rpact project* has an active user group consisting of

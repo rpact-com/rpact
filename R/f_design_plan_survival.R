@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8416 $
-## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
+## |  File version: $Revision: 8518 $
+## |  Last changed: $Date: 2025-01-29 15:42:08 +0100 (Mi, 29 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1512,7 +1512,7 @@ NULL
     }
 
     if (!is.null(designCharacteristics$futilityProbabilities) &&
-            any(designPlan$.design$futilityBounds != C_FUTILITY_BOUNDS_DEFAULT)) {
+            any(designPlan$.design$futilityBounds != C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
         designPlan$futilityPerStage <- matrix(designCharacteristics$futilityProbabilities,
             nrow = designPlan$.design$kMax - 1
         )

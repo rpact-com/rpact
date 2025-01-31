@@ -1038,13 +1038,34 @@ getDesignInverseNormal <- function(...,
         sided = 1L, # C_SIDED_DEFAULT
         informationRates = NA_real_,
         futilityBounds = NA_real_,
-        typeOfDesign = c("OF", "P", "WT", "PT", "HP", "WToptimum", "asP", "asOF", "asKD", "asHSD", "asUser", "noEarlyEfficacy"), # C_DEFAULT_TYPE_OF_DESIGN,
+        typeOfDesign = c(
+            "OF", 
+            "P", 
+            "WT", 
+            "PT", 
+            "HP", 
+            "WToptimum", 
+            "asP", 
+            "asOF", 
+            "asKD", 
+            "asHSD", 
+            "asUser", 
+            "noEarlyEfficacy"), # C_DEFAULT_TYPE_OF_DESIGN,
         deltaWT = NA_real_,
         deltaPT1 = NA_real_,
         deltaPT0 = NA_real_,
-        optimizationCriterion = c("ASNH1", "ASNIFH1", "ASNsum"), # C_OPTIMIZATION_CRITERION_DEFAULT
+        optimizationCriterion = c(
+            "ASNH1", 
+            "ASNIFH1", 
+            "ASNsum"), # C_OPTIMIZATION_CRITERION_DEFAULT
         gammaA = NA_real_,
-        typeBetaSpending = c("none", "bsP", "bsOF", "bsKD", "bsHSD", "bsUser"), # C_TYPE_OF_DESIGN_BS_NONE
+        typeBetaSpending = c(
+            "none", 
+            "bsP", 
+            "bsOF", 
+            "bsKD", 
+            "bsHSD", 
+            "bsUser"), # C_TYPE_OF_DESIGN_BS_NONE
         userAlphaSpending = NA_real_,
         userBetaSpending = NA_real_,
         gammaB = NA_real_,
@@ -1713,13 +1734,34 @@ getDesignGroupSequential <- function(
         sided = 1L, # C_SIDED_DEFAULT
         informationRates = NA_real_,
         futilityBounds = NA_real_,
-        typeOfDesign = c("OF", "P", "WT", "PT", "HP", "WToptimum", "asP", "asOF", "asKD", "asHSD", "asUser", "noEarlyEfficacy"), # C_DEFAULT_TYPE_OF_DESIGN,
+        typeOfDesign = c(
+            "OF", 
+            "P", 
+            "WT", 
+            "PT", 
+            "HP", 
+            "WToptimum", 
+            "asP", 
+            "asOF", 
+            "asKD", 
+            "asHSD", 
+            "asUser", 
+            "noEarlyEfficacy"), # C_DEFAULT_TYPE_OF_DESIGN,
         deltaWT = NA_real_,
         deltaPT1 = NA_real_,
         deltaPT0 = NA_real_,
-        optimizationCriterion = c("ASNH1", "ASNIFH1", "ASNsum"), # C_OPTIMIZATION_CRITERION_DEFAULT
+        optimizationCriterion = c(
+            "ASNH1", 
+            "ASNIFH1", 
+            "ASNsum"), # C_OPTIMIZATION_CRITERION_DEFAULT
         gammaA = NA_real_,
-        typeBetaSpending = c("none", "bsP", "bsOF", "bsKD", "bsHSD", "bsUser"), # C_TYPE_OF_DESIGN_BS_NONE
+        typeBetaSpending = c(
+            "none", 
+            "bsP", 
+            "bsOF", 
+            "bsKD", 
+            "bsHSD", 
+            "bsUser"), # C_TYPE_OF_DESIGN_BS_NONE
         userAlphaSpending = NA_real_,
         userBetaSpending = NA_real_,
         gammaB = NA_real_,
