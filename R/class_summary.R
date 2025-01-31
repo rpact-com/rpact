@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8508 $
-## |  Last changed: $Date: 2025-01-24 09:01:34 +0100 (Fr, 24 Jan 2025) $
+## |  File version: $Revision: 8518 $
+## |  Last changed: $Date: 2025-01-29 15:42:08 +0100 (Mi, 29 Jan 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1008,7 +1008,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
     }
 
-    if (any(is.nan(formattedValue)) || any(trimws(formattedValue) == "NaN")) {
+    if (any(is.nan(formattedValue), na.rm = TRUE) || any(trimws(formattedValue) == "NaN", na.rm = TRUE)) {
         formattedValue[is.nan(formattedValue) | trimws(formattedValue) == "NaN"] <- NA_real_
         showNA <- TRUE
     }
@@ -1922,7 +1922,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (!.isDelayedInformationEnabled(design = design) &&
                 ((.isTrialDesignInverseNormalOrGroupSequential(design) &&
                     any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) ||
-                    (.isTrialDesignFisher(design) && any(design$alpha0Vec < 1)))) {
+                    (.isTrialDesignFisher(design) && any(design$alpha0Vec < 1, na.rm = TRUE)))) {
             header <- .concatenateSummaryText(
                 header,
                 paste0(ifelse(design$bindingFutility, "binding", "non-binding"), " futility")
@@ -3224,7 +3224,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     )
 
     if (.isTrialDesignFisher(design)) {
-        if (any(design$alpha0Vec < 1)) {
+        if (any(design$alpha0Vec < 1, na.rm = TRUE)) {
             summaryFactory$addParameter(design,
                 parameterName = "alpha0Vec",
                 parameterCaption = "Futility boundary (separate p-value scale)",
@@ -3233,7 +3233,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
     } else {
-        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
+        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
             summaryFactory$addParameter(design,
                 parameterName = "futilityBounds",
                 parameterCaption = .getSummaryParameterCaptionFutilityBounds(design),
@@ -3892,7 +3892,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 probsH1$rejectPerStage <- probsH1$rejectPerStage[1:(design$kMax - 1)]
             }
 
-            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT)) {
+            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
                 if (is.matrix(probsH1$earlyStop)) {
                     probsH1$earlyStop <- matrix(probsH1$earlyStop[1:(design$kMax - 1), ],
                         ncol = ncol(probsH1$earlyStop)
@@ -3983,7 +3983,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE) &&
                 !is.null(designPlan[["futilityPerStage"]]) &&
                 !any(is.na(designPlan[["futilityPerStage"]])) &&
-                any(designPlan$futilityPerStage != 0) && any(designPlan$futilityPerStage > 1e-08)) {
+                any(designPlan$futilityPerStage != 0) && 
+                any(designPlan$futilityPerStage > 1e-08)) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "futilityPerStage",
                 parameterCaption = "Exit probability for futility", # under H1
