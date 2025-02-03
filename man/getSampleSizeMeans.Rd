@@ -54,8 +54,10 @@ alternatives, default is \code{seq(0, 1, 0.2)} (power calculations) or \code{seq
 
 \item{stDev}{The standard deviation under which the sample size or power
 calculation is performed, default is \code{1}.
+For two-armed trials, it is allowed to specify the standard deviations separately,
+i.e., as vector with two elements.
 If \code{meanRatio = TRUE} is specified, \code{stDev} defines
-the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.}
+the coefficient of variation \code{sigma / mu2}.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered,
@@ -111,6 +113,14 @@ getSampleSizeMeans(alpha = 0.05, beta = 0.1, sided = 2, groups = 2,
 getSampleSizeMeans(getDesignGroupSequential(typeOfDesign = "P", alpha = 0.05, 
     sided = 1, beta = 0.1), groups = 1, thetaH0 = 2, 
     alternative = seq(3, 5, 1), stDev = 3.5)
+    
+# Calculate sample sizes in a three-stage Pocock two-armed design testing 
+# H0: mu = 2 for a range of alternative values 3,4,5 with assumed standard 
+# deviations = 3 and 4, respectively, in the two groups of observations; 
+# one-sided alpha = 0.05, power 1 - beta = 90\%:
+getSampleSizeMeans(getDesignGroupSequential(typeOfDesign = "P", alpha = 0.05, 
+    sided = 1, beta = 0.1), groups = 2,
+    alternative = seq(3, 5, 1), stDev = c(3, 4))
 }
 
 }
