@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8276 $
-## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8545 $
+## |  Last changed: $Date: 2025-02-10 12:37:59 +0100 (Mo, 10 Feb 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_logger.R
@@ -383,8 +383,9 @@ NULL
 
     .setWeightsToStageResults(design, stageResults)
 
+    
     # Calculation of single stage adjusted p-Values and overall test statistics
-    # for determination of RCIs
+    # for determination of RCIs for combination tests
     if (calculateSingleStepAdjusted) {
         singleStepAdjustedPValues <- matrix(NA_real_, nrow = gMax, ncol = kMax)
         combInverseNormal <- matrix(NA_real_, nrow = gMax, ncol = kMax)

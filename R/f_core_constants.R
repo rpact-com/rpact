@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8416 $
-## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
+## |  File version: $Revision: 8556 $
+## |  Last changed: $Date: 2025-02-17 09:49:01 +0100 (Mo, 17 Feb 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -54,6 +54,8 @@ C_SIDED_DEFAULT <- 1L
 C_KMAX_DEFAULT <- 3L
 C_KMAX_UPPER_BOUND <- 50L
 C_KMAX_UPPER_BOUND_FISHER <- 6L
+
+C_MAX_NUMBER_OF_EFFECTS <- 50L
 
 C_NA_MAX_DEFAULT <- 100L
 C_POWER_ASN_THETA_DEFAULT <- seq(-1, 1, 0.02)
@@ -1145,22 +1147,13 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (inherits(obj, "AnalysisResults")) {
-        if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds")) {
-            if (.isTrialDesignConditionalDunnett(obj$.design)) {
-                return(paste0("Overall confidence interval", pluralExt, " (lower)"))
-            } else {
-                return(paste0("Confidence interval", pluralExt, " (lower)"))
-            }
+        if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds") && 
+                .isTrialDesignConditionalDunnett(obj$.design)) {
+            return(paste0("Overall confidence interval", pluralExt, " (lower)"))
         }
-        if (identical(parameterName, "repeatedConfidenceIntervalUpperBounds")) {
-            if (.isTrialDesignConditionalDunnett(obj$.design)) {
-                return(paste0("Overall confidence interval", pluralExt, " (upper)"))
-            } else {
-                return(paste0("Confidence interval", pluralExt, " (upper)"))
-            }
-        }
-        if (identical(parameterName, "repeatedPValues")) {
-            return(paste0("Overall p-value", pluralExt))
+        if (identical(parameterName, "repeatedConfidenceIntervalUpperBounds") && 
+                .isTrialDesignConditionalDunnett(obj$.design)) {
+            return(paste0("Overall confidence interval", pluralExt, " (upper)"))
         }
     }
 

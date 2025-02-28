@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8490 $
-## |  Last changed: $Date: 2025-01-20 09:58:53 +0100 (Mo, 20 Jan 2025) $
+## |  File version: $Revision: 8570 $
+## |  Last changed: $Date: 2025-02-27 08:56:30 +0100 (Do, 27 Feb 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -592,6 +592,7 @@ PlotSettings <- R6::R6Class("PlotSettings",
             "Sets the main title"
 
             caption <- NA_character_
+            self$.htmlTitle <- NA_character_
             if (!is.null(mainTitle) && inherits(mainTitle, "PlotSubTitleItems")) {
                 plotLabsType <- getOption("rpact.plot.labs.type", "quote")
                 if (plotLabsType == "quote") {
@@ -626,6 +627,8 @@ PlotSettings <- R6::R6Class("PlotSettings",
                         self$.htmlTitle <- items$toHtml()
                     }
                 }
+            } else if (!is.null(mainTitle)) {
+                self$.htmlTitle <- mainTitle
             }
 
             subtitleFontSize <- NA_real_

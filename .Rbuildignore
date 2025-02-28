@@ -50,3 +50,4 @@ testthat-problems\.rds
 ^codecov\.yml$
 Rplots\.pdf
 ^\.lintr$
+index\.txt$

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8508 $
-## |  Last changed: $Date: 2025-01-24 09:01:34 +0100 (Fr, 24 Jan 2025) $
+## |  File version: $Revision: 8575 $
+## |  Last changed: $Date: 2025-02-28 14:45:47 +0100 (Fr, 28 Feb 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1478,8 +1478,13 @@ print.FieldSet <- function(x, ..., markdown = NA) {
 #'
 #' @keywords internal
 #'
-as.data.frame.ParameterSet <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
+as.data.frame.ParameterSet <- function(
+        x, 
+        row.names = NULL,
+        optional = FALSE, 
+        ..., 
+        niceColumnNamesEnabled = FALSE, 
+        includeAllParameters = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame", ...)
 
     return(.getAsDataFrame(
@@ -1711,7 +1716,8 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     if (isTRUE(markdown)) {
         if (.isPrintCall(sysCalls)) {
             if (!is.null(showStatistics)) {
-                result <- paste0(utils::capture.output(x$.catMarkdownText(showStatistics = showStatistics)), collapse = "\n")
+                result <- paste0(utils::capture.output(
+                    x$.catMarkdownText(showStatistics = showStatistics)), collapse = "\n")
             } else {
                 result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
             }

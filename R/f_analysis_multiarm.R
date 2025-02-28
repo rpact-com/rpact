@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8558 $
+## |  Last changed: $Date: 2025-02-17 10:11:35 +0100 (Mo, 17 Feb 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -778,7 +778,7 @@ getClosedConditionalDunnettTestResults <- function(
         if (stage == 2) {
             frac2 <- stageResults$.dataInput$sampleSizes[stageResults$.dataInput$stages == 2 &
                 stageResults$.dataInput$groups <= gMax] /
-                (stageResults$.dataInput$sampleSizes[stageResults$.dataInput$stages == 2 &
+               (stageResults$.dataInput$sampleSizes[stageResults$.dataInput$stages == 2 &
                     stageResults$.dataInput$groups <= gMax] +
                     stageResults$.dataInput$sampleSizes[stageResults$.dataInput$stages == 2 &
                         stageResults$.dataInput$groups == (gMax + 1)])
@@ -954,8 +954,8 @@ getClosedConditionalDunnettTestResults <- function(
         innerProduct <- 1
         for (g in (1:gMax)) {
             innerProduct <- innerProduct * stats::pnorm(((crit -
-                sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
-                sqrt(1 - informationAtInterim) * sqrt(frac1[g]) * x)) /
+              sqrt(informationAtInterim) * signedTestStatistics[treatmentArm, 1] +
+              sqrt(1 - informationAtInterim) * sqrt(frac1[g]) * x)) /
                 sqrt((1 - informationAtInterim) * (1 - frac1[g])))
         }
         return(innerProduct * dnorm(x))
@@ -971,9 +971,9 @@ getClosedConditionalDunnettTestResults <- function(
                     if (!is.na(stageResults$overallTestStatistics[g, 2])) {
                         innerProduct <- innerProduct *
                             stats::pnorm(((maxOverallTestStatistic -
-                                sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
-                                sqrt(1 - informationAtInterim) * sqrt(frac2[g]) * x)) /
-                                sqrt((1 - informationAtInterim) * (1 - frac2[g])))
+                               sqrt(informationAtInterim) * signedTestStatistics[treatmentArm, 1] +
+                               sqrt(1 - informationAtInterim) * sqrt(frac2[g]) * x)) /
+                               sqrt((1 - informationAtInterim) * (1 - frac2[g])))
                     }
                 }
                 return(innerProduct * dnorm(x))
@@ -995,6 +995,11 @@ getClosedConditionalDunnettTestResults <- function(
         }
     }
 
+    # cat("upper = ", stageResults$directionUpper , ", gMax = ", gMax, 
+    #     ", selected = ", selected, ", treatmentArm = ", treatmentArm, 
+    #     ", conditionalErrorRate = ", conditionalErrorRate,
+    #     ", secondStagePValues = ", secondStagePValues, "\n")
+    
     return(secondStagePValues <= conditionalErrorRate)
 }
 

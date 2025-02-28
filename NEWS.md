@@ -11,6 +11,8 @@
 
 ## Improvements, issues, and changes
 
+* Issue for calculation of confidence intervals when using the conditional Dunnett test design 
+  (`getDesignConditionalDunnett()`) in analysis tool is fixed.
 * The full set of unit tests for rpact is now stored in a private repository. 
   Only members of the 'RPACT User Group' have access to the tests.
   For more information, please visit: [rpact.org/iq](https://www.rpact.org/iq) and [RPACT Connect](https://connect.rpact.com/)
