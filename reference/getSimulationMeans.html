@@ -9,7 +9,7 @@ for testing means in a one or two treatment groups testing situation."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.1.9280</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.1.9282</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -123,8 +123,10 @@ This can be a vector of assumed alternatives, default is <code>seq(0, 1, 0.2)</c
 <dt id="arg-stdev">stDev<a class="anchor" aria-label="anchor" href="#arg-stdev"></a></dt>
 <dd><p>The standard deviation under which the data is simulated,
 default is <code>1</code>.
+For two-armed trials, it is allowed to specify the standard deviations separately,
+i.e., as vector with two elements.
 If <code>meanRatio = TRUE</code> is specified, <code>stDev</code> defines
-the coefficient of variation <code>sigma / mu2</code>. Must be a positive numeric of length 1.</p></dd>
+the coefficient of variation <code>sigma / mu2</code>.</p></dd>
 
 
 <dt id="arg-plannedsubjects">plannedSubjects<a class="anchor" aria-label="anchor" href="#arg-plannedsubjects"></a></dt>
@@ -185,7 +187,7 @@ the conditional power or sample size recalculation calculation is performed. Mus
 <dt id="arg-stdevh-">stDevH1<a class="anchor" aria-label="anchor" href="#arg-stdevh-"></a></dt>
 <dd><p>If specified, the value of the standard deviation under which
 the conditional power or sample size recalculation calculation is performed,
-default is the value of <code>stDev</code>. Must be a positive numeric of length 1.</p></dd>
+default is the value of <code>stDev</code>.</p></dd>
 
 
 <dt id="arg-maxnumberofiterations">maxNumberOfIterations<a class="anchor" aria-label="anchor" href="#arg-maxnumberofiterations"></a></dt>
