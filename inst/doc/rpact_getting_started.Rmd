@@ -148,6 +148,11 @@ on FDA/GxP-compliant validated corporate computer systems and how to get a copy
 of the formal validation documentation that is customized and licensed for
 exclusive use by your company, e.g., to fulfill regulatory requirements.
 
+## RPACT Connect 
+
+Connecting you to insights, downloads, and premium support:
+[connect.rpact.com](https://connect.rpact.com)
+
 ## About
 
 * **rpact** is a comprehensive validated^[The rpact validation documentation is

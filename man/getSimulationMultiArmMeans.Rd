@@ -80,8 +80,10 @@ Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonfer
 
 \item{stDev}{The standard deviation under which the data is simulated,
 default is \code{1}.
+For two-armed trials, it is allowed to specify the standard deviations separately,
+i.e., as vector with two elements.
 If \code{meanRatio = TRUE} is specified, \code{stDev} defines
-the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.}
+the coefficient of variation \code{sigma / mu2}.}
 
 \item{adaptations}{A logical vector of length \code{kMax - 1} indicating whether or not an adaptation takes
 place at interim k, default is \code{rep(TRUE, kMax - 1)}.}
@@ -154,7 +156,7 @@ the conditional power or sample size recalculation calculation is performed. Mus
 
 \item{stDevH1}{If specified, the value of the standard deviation under which
 the conditional power or sample size recalculation calculation is performed,
-default is the value of \code{stDev}. Must be a positive numeric of length 1.}
+default is the value of \code{stDev}.}
 
 \item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
 

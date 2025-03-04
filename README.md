@@ -65,18 +65,18 @@ The documentation is hosted at [www.rpact.org](https://www.rpact.org)
 The vignettes are hosted at
 [www.rpact.org/vignettes](https://www.rpact.org/vignettes/)
 
-## RPACT Connect 
+## RPACT Connect
 
 Connecting you to insights, downloads, and premium support:
 [connect.rpact.com](https://connect.rpact.com)
 
-## The rpact user group
+## The RPACT User Group
 
 The *rpact project* has an active user group consisting of
 decision-makers and users from the pharmaceutical industry and CROs, who
 meet regularly and, e.g., discuss best practices.
 
-We invite you to be part of the *rpact user group*: benefit from
+We invite you to be part of the *RPACT User Group*: benefit from
 know-how, shape open source development in Pharma!
 
 ## Use on corporate computer systems

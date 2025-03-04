@@ -123,7 +123,7 @@ the conditional power or sample size recalculation calculation is performed. Mus
 
 \item{stDevH1}{If specified, the value of the standard deviation under which
 the conditional power or sample size recalculation calculation is performed,
-default is the value of \code{stDev}. Must be a positive numeric of length 1.}
+default is the value of \code{stDev}.}
 
 \item{maxNumberOfIterations}{The number of simulation iterations, default is \code{1000}. Must be a positive integer of length 1.}
 

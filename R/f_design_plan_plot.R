@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8501 $
-## |  Last changed: $Date: 2025-01-21 09:39:32 +0100 (Di, 21 Jan 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8570 $
+## |  Last changed: $Date: 2025-02-27 08:56:30 +0100 (Do, 27 Feb 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 
@@ -309,12 +309,20 @@
             designSet$.plotSettings <- designPlan$.plotSettings
             designPlanName <- paste0(designPlanName, "$.design")
             return(.plotTrialDesignSet(
-                x = designSet, y = NULL, main = main,
-                xlab = xlab, ylab = ylab, type = type,
-                palette = palette, theta = .plotTheta(theta), nMax = nMax,
-                plotPointsEnabled = plotPointsEnabled, legendPosition = legendPosition,
-                designSetName = designPlanName, showSource = showSource,
-                plotSettings = plotSettings # , ...
+                x = designSet, 
+                y = NULL, 
+                main = main,
+                xlab = xlab, 
+                ylab = ylab, 
+                type = type,
+                palette = palette, 
+                theta = .plotTheta(theta), 
+                nMax = nMax,
+                plotPointsEnabled = plotPointsEnabled, 
+                legendPosition = legendPosition,
+                designSetName = designPlanName, 
+                showSource = showSource,
+                plotSettings = plotSettings 
             ))
         }
     } else if (type == 2) { # Effect Scale Boundary plot
@@ -619,14 +627,22 @@
             }
 
             return(.plotParameterSet(
-                parameterSet = designPlan, designMaster = designMaster,
+                parameterSet = designPlan, 
+                designMaster = designMaster,
                 xParameterName = xParameterName,
-                yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-                palette = palette, theta = .plotTheta(theta),
-                nMax = nMax, plotPointsEnabled = plotPointsEnabled,
-                legendPosition = legendPosition, variedParameters = variedParameters,
-                qnormAlphaLineEnabled = FALSE, yAxisScalingEnabled = FALSE,
-                plotSettings = plotSettings # , ...
+                yParameterNames = yParameterNames, 
+                mainTitle = main, 
+                xlab = xlab, 
+                ylab = ylab,
+                palette = palette, 
+                theta = .plotTheta(theta),
+                nMax = nMax, 
+                plotPointsEnabled = plotPointsEnabled,
+                legendPosition = legendPosition, 
+                variedParameters = variedParameters,
+                qnormAlphaLineEnabled = FALSE, 
+                yAxisScalingEnabled = FALSE,
+                plotSettings = plotSettings 
             ))
         } else {
             if (is.na(main)) {

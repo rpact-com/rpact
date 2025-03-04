@@ -6,8 +6,10 @@
 \arguments{
 \item{stDev}{The standard deviation under which the sample size or power
 calculation is performed, default is \code{1}.
+For two-armed trials, it is allowed to specify the standard deviations separately,
+i.e., as vector with two elements.
 If \code{meanRatio = TRUE} is specified, \code{stDev} defines
-the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.}
+the coefficient of variation \code{sigma / mu2}.}
 }
 \description{
 Parameter Description: Standard Deviation

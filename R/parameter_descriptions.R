@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Tue, 10 Dec 2024) $
+## |  File version: $Revision: 8522 $
+## |  Last changed: $Date: 2025-01-31 17:10:41 +0100 (Fr, 31 Jan 2025) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -140,8 +140,10 @@ NULL
 #' Parameter Description: Standard Deviation
 #' @param stDev The standard deviation under which the sample size or power
 #'   calculation is performed, default is \code{1}.
+#'   For two-armed trials, it is allowed to specify the standard deviations separately, 
+#'   i.e., as vector with two elements. 
 #'   If \code{meanRatio = TRUE} is specified, \code{stDev} defines
-#'   the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.
+#'   the coefficient of variation \code{sigma / mu2}. 
 #' @name param_stDev
 #' @keywords internal
 NULL
@@ -616,8 +618,8 @@ NULL
 
 #' Parameter Description: Accrual Intensity Type
 #' @param accrualIntensityType A character value specifying the accrual intensity input type.
-#'        Must be one of \code{"auto"}, \code{"absolute"}, or \code{"relative"}; default is \code{"auto"},
-#'        i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code{"absolute"}.
+#'   Must be one of \code{"auto"}, \code{"absolute"}, or \code{"relative"}; default is \code{"auto"},
+#'   i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code{"absolute"}.
 #' @name param_accrualIntensityType
 #' @keywords internal
 NULL
@@ -625,16 +627,18 @@ NULL
 #' Parameter Description: Standard Deviation Under Alternative
 #' @param stDevH1 If specified, the value of the standard deviation under which
 #'   the conditional power or sample size recalculation calculation is performed,
-#'   default is the value of \code{stDev}. Must be a positive numeric of length 1.
+#'   default is the value of \code{stDev}.
 #' @name param_stDevH1
 #' @keywords internal
 NULL
 
 #' Parameter Description: Standard Deviation for Simulation
 #' @param stDev The standard deviation under which the data is simulated,
-#' default is \code{1}.
-#' If \code{meanRatio = TRUE} is specified, \code{stDev} defines
-#' the coefficient of variation \code{sigma / mu2}. Must be a positive numeric of length 1.
+#'   default is \code{1}.
+#'   For two-armed trials, it is allowed to specify the standard deviations separately, 
+#'   i.e., as vector with two elements. 
+#'   If \code{meanRatio = TRUE} is specified, \code{stDev} defines
+#'   the coefficient of variation \code{sigma / mu2}. 
 #' @name param_stDevSimulation
 #' @keywords internal
 NULL
