@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8195 $
-## |  Last changed: $Date: 2024-09-11 14:50:27 +0200 (Mi, 11 Sep 2024) $
+## |  File version: $Revision: 8578 $
+## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -143,13 +143,7 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
     summaries <- structure(summaries, class = "TrialDesignSummaries")
     attr(summaries, "object") <- object
     if (isTRUE(markdown)) {
-        attr(object, "markdown") <- TRUE
-        queue <- attr(object, "queue")
-        if (is.null(queue)) {
-            queue <- list()
-        }
-        queue[[length(queue) + 1]] <- object
-        attr(object, "queue") <- queue
+        .addObjectToPipeOperatorQueue(object)
     }
     return(summaries)
 }
@@ -1041,14 +1035,24 @@ plot.TrialDesignSet <- function(
     }
     p <- NULL
     plotList <- list()
+    
     for (typeNumber in typeNumbers) {
         p <- .plotTrialDesignSet(
-            x = x, y = y, type = typeNumber, main = main,
-            xlab = xlab, ylab = ylab, palette = palette,
-            theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
+            x = x, 
+            y = y, 
+            type = typeNumber, 
+            main = main,
+            xlab = xlab, 
+            ylab = ylab, 
+            palette = palette,
+            theta = theta, 
+            nMax = nMax, 
+            plotPointsEnabled = plotPointsEnabled,
             legendPosition = .getGridLegendPosition(legendPosition, typeNumbers, grid),
-            showSource = showSource, designSetName = designSetName,
-            plotSettings = plotSettings, ...
+            showSource = showSource, 
+            designSetName = designSetName,
+            plotSettings = plotSettings, 
+            ...
         )
         .printPlotShowSourceSeparator(showSource, typeNumber, typeNumbers)
         if (length(typeNumbers) > 1) {
@@ -1061,6 +1065,18 @@ plot.TrialDesignSet <- function(
     }
     
     return(.createPlotResultObject(plotList, grid))
+}
+
+.getMainTitle <- function(main, ..., title, nMax = NA_integer_) {
+    if (is.call(main) || .isResultObjectBaseClass(main) || !is.na(main)) {
+        return(main)
+    }
+    
+    main <- PlotSubTitleItems$new(title = title)
+    if (!is.na(nMax)) {
+        main$add("N", nMax, "max")
+    }
+    return(main)
 }
 
 .plotTrialDesignSet <- function(..., x, y, type = 1L, main = NA_character_,
@@ -1087,10 +1103,9 @@ plot.TrialDesignSet <- function(
     .assertIsTrialDesign(designMaster)
 
     if (type == 1) {
-        main <- if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) "Boundaries" else main
+        main <- .getMainTitle(main, title = "Boundaries", nMax = nMax)
         xParameterName <- "informationRates"
         yParameterNames <- "criticalValues"
-
         if (designMaster$sided == 1 || (.isTrialDesignInverseNormalOrGroupSequential(designMaster) &&
                 (designMaster$typeOfDesign == C_TYPE_OF_DESIGN_PT || grepl("^bs", designMaster$typeBetaSpending)))) {
             if (.isTrialDesignWithValidFutilityBounds(designMaster)) {
@@ -1103,11 +1118,11 @@ plot.TrialDesignSet <- function(
     } else if (type == 2) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "designs with undefined endpoint do not support plot type 2")
     } else if (type == 3) {
-        main <- if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) "Stage Levels" else main
+        main <- .getMainTitle(main, title = "Stage Levels", nMax = nMax)
         xParameterName <- "informationRates"
         yParameterNames <- "stageLevels"
     } else if (type == 4) {
-        main <- if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) "Error Spending" else main
+        main <- .getMainTitle(main, title = "Error Spending", nMax = nMax)
         xParameterName <- "informationRates"
         yParameterNames <- c("alphaSpent")
         if (!.isTrialDesignFisher(designMaster) &&
@@ -1117,38 +1132,23 @@ plot.TrialDesignSet <- function(
         }
         plotPointsEnabled <- ifelse(is.na(plotPointsEnabled), FALSE, plotPointsEnabled)
     } else if (type == 5) {
-        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
-            main <- PlotSubTitleItems$new(title = "Power and Early Stopping")
-            main$add("N", nMax, "max")
-        }
+        main <- .getMainTitle(main, title = "Power and Early Stopping", nMax = nMax)
         xParameterName <- "theta"
         yParameterNames <- c("overallEarlyStop", "calculatedPower")
     } else if (type == 6) {
-        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
-            main <- PlotSubTitleItems$new(title = "Average Sample Size and Power / Early Stop")
-            main$add("N", nMax, "max")
-        }
+        main <- .getMainTitle(main, title = "Average Sample Size and Power / Early Stop", nMax = nMax)
         xParameterName <- "theta"
         yParameterNames <- c("averageSampleNumber", "overallEarlyStop", "calculatedPower")
     } else if (type == 7) {
-        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
-            main <- PlotSubTitleItems$new(title = "Power")
-            main$add("N", nMax, "max")
-        }
+        main <- .getMainTitle(main, title = "Power", nMax = nMax)
         xParameterName <- "theta"
         yParameterNames <- "calculatedPower"
     } else if (type == 8) {
-        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
-            main <- PlotSubTitleItems$new(title = "Early Stopping")
-            main$add("N", nMax, "max")
-        }
+        main <- .getMainTitle(main, title = "Early Stopping", nMax = nMax)
         xParameterName <- "theta"
         yParameterNames <- "overallEarlyStop"
     } else if (type == 9) {
-        if (!is.call(main) && !.isResultObjectBaseClass(main) && is.na(main)) {
-            main <- PlotSubTitleItems$new(title = "Average Sample Size")
-            main$add("N", nMax, "max")
-        }
+        main <- .getMainTitle(main, title = "Average Sample Size", nMax = nMax)
         xParameterName <- "theta"
         yParameterNames <- "averageSampleNumber"
     } else {

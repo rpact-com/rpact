@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8518 $
-## |  Last changed: $Date: 2025-01-29 15:42:08 +0100 (Mi, 29 Jan 2025) $
+## |  File version: $Revision: 8578 $
+## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1602,8 +1602,34 @@ getParameterName <- function(obj, parameterCaption) {
     parameterSet$.deprecatedFieldNames <- unique(c(parameterSet$.deprecatedFieldNames, fieldName))
 }
 
+.getPipeOperatorQueue <- function(x) {
+    queue <- attr(x, "queue")
+    if (is.null(queue)) {
+        queue <- list()
+    }
+    if (!is.null(x[["object"]])) {
+        objectQueue <- attr(x$object, "queue")
+        if (!is.null(objectQueue)) {
+            queue <- c(queue, objectQueue)
+        }
+    }
+    return(queue)
+}
+
+.addObjectToPipeOperatorQueue <- function(x) {
+    if (inherits(x, "SummaryFactory")) {
+        x <- x$object
+    }
+    
+    queue <- .getPipeOperatorQueue(x)
+    queue[[length(queue) + 1]] <- x
+    attr(x, "markdown") <- TRUE
+    attr(x, "queue") <- queue
+    return(x)
+}
+
 .resetPipeOperatorQueue <- function(x) {
-    for (attrName in c("queue", "printObject", "printObjectSeparator")) {
+    for (attrName in c("queue", "printObject", "printObjectSeparator", "markdown")) {
         tryCatch({
             if (inherits(x, "SummaryFactory")) {
                 attr(x$object, attrName) <- NULL

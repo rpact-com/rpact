@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8495 $
-## |  Last changed: $Date: 2025-01-21 08:10:38 +0100 (Di, 21 Jan 2025) $
+## |  File version: $Revision: 8579 $
+## |  Last changed: $Date: 2025-03-04 16:57:07 +0100 (Di, 04 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1135,6 +1135,10 @@ NULL
     if (is.na(legendPosition)) {
         return(invisible())
     }
+    
+    if (grepl("^-?[0-9]+$", legendPosition)) {
+        legendPosition <- as.integer(legendPosition)
+    }
 
     if (!is.numeric(legendPosition) && !is.character(legendPosition)) {
         stop(
@@ -1149,7 +1153,7 @@ NULL
         .assertIsSingleInteger(legendPosition, "legendPosition", validateType = FALSE)
         .assertIsInClosedInterval(legendPosition, "legendPosition", lower = -1, upper = 6)
     } else {
-        validLegendPositions <- c("none", "top", "bottom", "left", "right")
+        validLegendPositions <- c("none", "left", "right", "bottom", "top")
         if (!(legendPosition %in% validLegendPositions)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -2786,6 +2790,26 @@ NULL
     }
 }
 
+
+#' 
+#' @title
+#' Check if Show Source Argument is Special Plot
+#'
+#' @description
+#' The `.isSpecialPlotShowSourceArgument` function checks if the `showSource` argument
+#' is a character and if it is one of the special plot show source arguments defined in `C_PLOT_SHOW_SOURCE_ARGUMENTS`.
+#'
+#' @param showSource The argument to be checked.
+#'
+#' @return
+#' Returns `TRUE` if `showSource` is a character and is in `C_PLOT_SHOW_SOURCE_ARGUMENTS`, otherwise `FALSE`.
+#'
+#' @examples
+#' .isSpecialPlotShowSourceArgument("commands")
+#' .isSpecialPlotShowSourceArgument("invalidSource")
+#' 
+#' @noRd 
+#' 
 .isSpecialPlotShowSourceArgument <- function(showSource) {
     return(is.character(showSource) && showSource %in% C_PLOT_SHOW_SOURCE_ARGUMENTS)
 }

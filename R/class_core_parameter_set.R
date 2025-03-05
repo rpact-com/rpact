@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8575 $
-## |  Last changed: $Date: 2025-02-28 14:45:47 +0100 (Fr, 28 Feb 2025) $
+## |  File version: $Revision: 8578 $
+## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1443,13 +1443,7 @@ print.FieldSet <- function(x, ..., markdown = NA) {
             return(knitr::asis_output(result))
         }
         
-        attr(x, "markdown") <- TRUE
-        queue <- attr(x, "queue")
-        if (is.null(queue)) {
-            queue <- list()
-        }
-        queue[[length(queue) + 1]] <- x
-        attr(x, "queue") <- queue
+        .addObjectToPipeOperatorQueue(x)
         return(invisible(x))
     }
     
@@ -1712,7 +1706,7 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
             .assertIsSingleLogical(showStatistics, "showStatistics")
         }
     }
-
+    
     if (isTRUE(markdown)) {
         if (.isPrintCall(sysCalls)) {
             if (!is.null(showStatistics)) {
@@ -1724,13 +1718,7 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
             return(knitr::asis_output(result))
         }
         
-        attr(x, "markdown") <- TRUE
-        queue <- attr(x, "queue")
-        if (is.null(queue)) {
-            queue <- list()
-        }
-        queue[[length(queue) + 1]] <- x
-        attr(x, "queue") <- queue
+        .addObjectToPipeOperatorQueue(x)
         return(invisible(x))
     }
     

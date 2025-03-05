@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8141 $
-## |  Last changed: $Date: 2024-08-28 15:03:46 +0200 (Mi, 28 Aug 2024) $
+## |  File version: $Revision: 8578 $
+## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -4282,13 +4282,7 @@ print.Dataset <- function(x, ..., markdown = NA, output = c("list", "long", "wid
         }
         
         if (.isPrintSummaryCall(sysCalls)) {
-            attr(x, "markdown") <- TRUE
-            queue <- attr(x, "queue")
-            if (is.null(queue)) {
-                queue <- list()
-            }
-            queue[[length(queue) + 1]] <- x
-            attr(x, "queue") <- queue
+            .addObjectToPipeOperatorQueue(x)
         }
         
         return(invisible(x))
