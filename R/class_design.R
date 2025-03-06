@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8495 $
-## |  Last changed: $Date: 2025-01-21 08:10:38 +0100 (Di, 21 Jan 2025) $
+## |  File version: $Revision: 8578 $
+## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -309,16 +309,10 @@ print.TrialDesignCharacteristics <- function(x, ..., markdown = NA, showDesign =
             return(knitr::asis_output(result))
         }
         
-        attr(x, "markdown") <- TRUE
-        queue <- attr(x, "queue")
-        if (is.null(queue)) {
-            queue <- list()
-        }
         if (showDesign) {
-            queue[[length(queue) + 1]] <- x$.design
+            .addObjectToPipeOperatorQueue(x$.design)
         }
-        queue[[length(queue) + 1]] <- x
-        attr(x, "queue") <- queue
+        .addObjectToPipeOperatorQueue(x)
         return(invisible(x))
     }
     
@@ -1209,12 +1203,21 @@ plot.TrialDesign <- function(
     plotList <- list()
     for (typeNumber in typeNumbers) {
         p <- .plotTrialDesign(
-            x = x, y = y, main = main,
-            xlab = xlab, ylab = ylab, type = typeNumber, palette = palette,
-            theta = theta, nMax = nMax, plotPointsEnabled = plotPointsEnabled,
+            x = x, 
+            y = y, 
+            main = main,
+            xlab = xlab, 
+            ylab = ylab, 
+            type = typeNumber, 
+            palette = palette,
+            theta = theta, 
+            nMax = nMax, 
+            plotPointsEnabled = plotPointsEnabled,
             legendPosition = .getGridLegendPosition(legendPosition, typeNumbers, grid),
-            showSource = showSource, designName = designName,
-            plotSettings = plotSettings, ...
+            showSource = showSource, 
+            designName = designName,
+            plotSettings = plotSettings, 
+            ...
         )
         .printPlotShowSourceSeparator(showSource, typeNumber, typeNumbers)
         if (length(typeNumbers) > 1) {
@@ -1317,10 +1320,20 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
     }
 
     .plotTrialDesignSet(
-        x = designSet, y = y, main = main, xlab = xlab, ylab = ylab, type = type,
-        palette = palette, theta = theta, nMax = nMax,
-        plotPointsEnabled = plotPointsEnabled, legendPosition = legendPosition,
-        showSource = showSource, designSetName = designName, ...
+        x = designSet, 
+        y = y, 
+        main = main, 
+        xlab = xlab, 
+        ylab = ylab, 
+        type = type,
+        palette = palette, 
+        theta = theta, 
+        nMax = nMax,
+        plotPointsEnabled = plotPointsEnabled, 
+        legendPosition = legendPosition,
+        showSource = showSource, 
+        designSetName = designName, 
+        ...
     )
 }
 

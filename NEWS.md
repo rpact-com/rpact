@@ -23,6 +23,7 @@
 * Flexibility of function `getPiecewiseSurvivalTime()` improved
 * Simulation allows the case #events = #patients
 * Test coverage improved
+* Plot subtitles improved
 * Minor improvements
 
 

@@ -13,49 +13,57 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8570 $
-## |  Last changed: $Date: 2025-02-27 08:56:30 +0100 (Do, 27 Feb 2025) $
+## |  File version: $Revision: 8579 $
+## |  Last changed: $Date: 2025-03-04 16:57:07 +0100 (Di, 04 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 
-.addPlotSubTitleItems <- function(designPlan, designMaster, items, type) {
+.addPlotSubTitleItems <- function(designPlan, designMaster, main, type, ..., warningEnabled = FALSE) {
+    reducedParam <- NULL
+    if (warningEnabled && type %in% c(1:4)) {
+        reducedParam <- .warnInCaseOfUnusedValuesForPlotting(designPlan)
+    }
+    
     if (type %in% c(1, 3, 4)) {
-        return(invisible())
+        if (!is.null(reducedParam)) {
+            main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
+        }
+        return(invisible(main))
     }
 
     if (.isTrialDesignPlanMeans(designPlan)) {
         nMax <- designPlan$maxNumberOfSubjects[1] # use first value for plotting
 
         if (!(type %in% c(5))) {
-            items$add("N", round(nMax, 1), "max")
+            main$add("N", round(nMax, 1), "max")
         }
 
-        if ((type %in% c(5)) && !(items$title == "Sample Size")) {
-            items$add("N", round(nMax, 1), "max")
+        if ((type %in% c(5)) && !(main$title == "Sample Size")) {
+            main$add("N", round(nMax, 1), "max")
         }
 
         if (designPlan$meanRatio) {
-            items$add("coefficient of variation", designPlan$stDev)
+            main$add("coefficient of variation", designPlan$stDev)
         } else {
-            items$add("standard deviation", designPlan$stDev)
+            main$add("standard deviation", designPlan$stDev)
         }
 
         if (designPlan$groups == 1) {
             if (type %in% c(2, (5:9))) {
-                items$add("H0: mu", designPlan$thetaH0)
-                items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+                main$add("H0: mu", designPlan$thetaH0)
+                main$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
                     condition = (designPlan$allocationRatioPlanned != 1)
                 )
             }
         } else {
             if (type %in% c(2, (5:9))) {
                 if (designPlan$meanRatio) {
-                    items$add("H0: mean ratio", designPlan$thetaH0)
+                    main$add("H0: mean ratio", designPlan$thetaH0)
                 } else {
-                    items$add("H0: mean difference", designPlan$thetaH0)
+                    main$add("H0: mean difference", designPlan$thetaH0)
                 }
-                items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+                main$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
                     condition = (designPlan$allocationRatioPlanned != 1)
                 )
             }
@@ -64,58 +72,63 @@
         nMax <- designPlan$maxNumberOfSubjects[1] # use first value for plotting
 
         if (!(type %in% c(5))) {
-            items$add("N", round(nMax, 1), "max")
+            main$add("N", round(nMax, 1), "max")
         }
 
-        if ((type %in% c(5)) && !(items$title == "Sample Size")) {
-            items$add("N", round(nMax, 1), "max")
+        if ((type %in% c(5)) && !(main$title == "Sample Size")) {
+            main$add("N", round(nMax, 1), "max")
         }
 
         if (designPlan$groups == 2 && !(type %in% c(3, 4)) &&
                 length(designPlan$pi2) == 1 && !is.na(designPlan$pi2)) {
-            items$add("pi", designPlan$pi2, 2)
+            main$add("pi", designPlan$pi2, 2)
         }
 
         if (designPlan$groups == 1) {
             if (type %in% c(2, (5:9))) {
-                items$add("H0: pi", designPlan$thetaH0)
+                main$add("H0: pi", designPlan$thetaH0)
             }
         } else {
             if (type %in% c(2, (5:9))) {
                 if (designPlan$riskRatio) {
-                    items$add("H0: risk ratio", designPlan$thetaH0)
+                    main$add("H0: risk ratio", designPlan$thetaH0)
                 } else {
-                    items$add("H0: risk difference", designPlan$thetaH0)
+                    main$add("H0: risk difference", designPlan$thetaH0)
                 }
-                items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+                main$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
                     condition = (designPlan$allocationRatioPlanned != 1)
                 )
             }
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
         if (designPlan$.isPowerObject() && !(type %in% (13:14))) {
-            items$add("maximum number of events", designPlan$maxNumberOfEvents[1])
+            main$add("maximum number of events", designPlan$maxNumberOfEvents[1])
         }
         if (type %in% (10:12)) {
-            items$add("maximum number of subjects", designPlan$maxNumberOfSubjects[1])
+            main$add("maximum number of subjects", designPlan$maxNumberOfSubjects[1])
         }
         if (type %in% c(2, (5:12))) {
-            items$add("H0: hazard ratio", designPlan$thetaH0)
-            items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+            main$add("H0: hazard ratio", designPlan$thetaH0)
+            main$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
                 condition = (designPlan$allocationRatioPlanned != 1)
             )
         }
     } else if (.isTrialDesignPlanCountData(designPlan)) {
         if (type %in% c(2, (5:9))) {
-            items$add("H0: lambda(1) / lambda(2)", designPlan$thetaH0)
+            main$add("H0: lambda(1) / lambda(2)", designPlan$thetaH0)
             if (length(designPlan$theta) == 1) {
-                items$add("H1: effect", designPlan$theta)
+                main$add("H1: effect", designPlan$theta)
             }
-            items$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
+            main$add("allocation ratio", round(designPlan$allocationRatioPlanned, 2),
                 condition = (designPlan$allocationRatioPlanned != 1)
             )
         }
     }
+    
+    if (!is.null(reducedParam)) {
+        main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
+    }
+    return(invisible(main))
 }
 
 .assertIsValidVariedParameterVectorForPlotting <- function(designPlan, plotType) {
@@ -242,20 +255,11 @@
     }
 
     srcCmd <- NULL
-
-    reducedParam <- NULL
-    if (type %in% c(1:4)) {
-        reducedParam <- .warnInCaseOfUnusedValuesForPlotting(designPlan)
-    }
-
     if (type == 1) { # Boundary plot
         if (survivalDesignPlanEnabled) {
             if (is.na(main)) {
                 main <- PlotSubTitleItems$new(title = "Boundaries Z Scale")
-                .addPlotSubTitleItems(designPlan, designMaster, main, type)
-                if (!is.null(reducedParam)) {
-                    main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
-                }
+                .addPlotSubTitleItems(designPlan, designMaster, main, type, warningEnabled = TRUE)
             }
 
             if (designMaster$sided == 1) {
@@ -299,10 +303,7 @@
         } else {
             if (is.na(main)) {
                 main <- PlotSubTitleItems$new(title = "Boundaries")
-                .addPlotSubTitleItems(designPlan, designMaster, main, type)
-                if (!is.null(reducedParam)) {
-                    main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
-                }
+                .addPlotSubTitleItems(designPlan, designMaster, main, type, warningEnabled = TRUE)
             }
 
             designSet <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
@@ -328,10 +329,7 @@
     } else if (type == 2) { # Effect Scale Boundary plot
         if (is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Boundaries Effect Scale")
-            .addPlotSubTitleItems(designPlan, designMaster, main, type)
-            if (!is.null(reducedParam)) {
-                main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
-            }
+            .addPlotSubTitleItems(designPlan, designMaster, main, type, warningEnabled = TRUE)
         }
 
         if (is.na(ylab)) {
@@ -434,10 +432,6 @@
             legendPosition <- C_POSITION_RIGHT_TOP
         }
 
-        if (is.na(legendPosition)) {
-            legendPosition <- C_POSITION_RIGHT_TOP
-        }
-
         srcCmd <- .showPlotSourceInformation(
             objectName = designPlanName,
             xParameterName = xParameterNameSrc,
@@ -468,10 +462,7 @@
     } else if (type == 3) { # Stage Levels
         if (is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Boundaries p Values Scale")
-            .addPlotSubTitleItems(designPlan, designMaster, main, type)
-            if (!is.null(reducedParam)) {
-                main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
-            }
+            .addPlotSubTitleItems(designPlan, designMaster, main, type, warningEnabled = TRUE)
         }
 
         if (survivalDesignPlanEnabled) {
@@ -501,10 +492,7 @@
     } else if (type == 4) { # Alpha Spending
         if (is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Error Spending")
-            .addPlotSubTitleItems(designPlan, designMaster, main, type)
-            if (!is.null(reducedParam)) {
-                main$add(reducedParam$title, reducedParam$value, reducedParam$subscript)
-            }
+            .addPlotSubTitleItems(designPlan, designMaster, main, type, warningEnabled = TRUE)
         }
         if (survivalDesignPlanEnabled) {
             xParameterName <- "cumulativeEventsPerStage"
@@ -1426,6 +1414,7 @@ plot.TrialDesignPlan <- function(
         showSource = showSource,
         grid = grid,
         plotSettings = plotSettings, 
+        markdown = markdown, 
         ...)
 
     if (markdown) {
@@ -1434,12 +1423,20 @@ plot.TrialDesignPlan <- function(
             grid <- 0
             args$grid <- 0
         }
+        if (!all(is.na(type)) && length(type) == 1 && grid == 0) {
+            grid <- 1
+            args$grid <- 1
+        }
+        
         if (grid > 0) {
             print(do.call(.plot.TrialDesignPlan, args))            
         } else {
-            do.call(.plot.TrialDesignPlan, args)
+            # if grid = 0 the charts will be printed later in .createPlotResultObject()
+            do.call(.plot.TrialDesignPlan, args) 
         }
-        return(.knitPrintQueue(x, sep = sep, prefix = sep))
+        return(.knitPrintQueue(x, sep = sep, prefix = sep, 
+            resetPipeOperatorQueue = (all(is.na(type)) || length(type) == 1)
+        ))
     }
     
     return(do.call(.plot.TrialDesignPlan, args))

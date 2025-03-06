@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8518 $
-## |  Last changed: $Date: 2025-01-29 15:42:08 +0100 (Mi, 29 Jan 2025) $
+## |  File version: $Revision: 8578 $
+## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1325,7 +1325,17 @@ MarkdownReporter <- R6::R6Class(
             SUCCESS = list(color = "blue", unicode = "&#x2705;", latex = "\\testsuccess{}", label = "OK"),
             FAILURE = list(color = "red", unicode = "&#x274C;", latex = "\\testfail{}", label = "X"),
             WARNING = list(color = "orange", unicode = "&#x1F525;", latex = "\\testwarning{}", label = "[!]")
-        )
+        ),
+        finalize = function() {
+            cat("\n")
+            cat("[ FAIL ", self$numberOfFailures,
+                " | WARN ", self$numberOfWarnings,
+                " | SKIP ", self$numberOfSkips,
+                " | PASS ", self$numberOfPassedTests, " ]",
+                sep = ""
+            )
+            cat("\n")
+        }
     ),
     public = list(
         startTime = NULL,
@@ -1738,16 +1748,6 @@ MarkdownReporter <- R6::R6Class(
                     warning("Failed to render ", sQuote(mdFileForTex), " to pdf: ", e$message, call. = FALSE)
                 }
             )
-        },
-        finalize = function() {
-            cat("\n")
-            cat("[ FAIL ", self$numberOfFailures,
-                " | WARN ", self$numberOfWarnings,
-                " | SKIP ", self$numberOfSkips,
-                " | PASS ", self$numberOfPassedTests, " ]",
-                sep = ""
-            )
-            cat("\n")
         }
     )
 )

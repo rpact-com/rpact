@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8416 $
-## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
+## |  File version: $Revision: 8578 $
+## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1695,11 +1695,11 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
 
 .getGridLegendPosition <- function(legendPosition, typeNumbers, grid) {
     if (length(typeNumbers) <= 3 || grid <= 1) {
-        return(NA_integer_)
+        return(legendPosition)
     }
 
     if (is.na(legendPosition)) {
-        return(-1L) # hide legend
+        return(-1L) # hide legend for more than 3 plots
     }
 
     return(legendPosition)
