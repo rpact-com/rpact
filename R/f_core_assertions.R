@@ -605,7 +605,7 @@ NULL
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
-    if ((!naAllowed && all(is.na(x))) || !is.logical(x)) {
+    if ((!naAllowed && any(is.na(x))) || !is.logical(x)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (", x, ") ",
             "must be a valid logical value or vector",
             call. = call.
