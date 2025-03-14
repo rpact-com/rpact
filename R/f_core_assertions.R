@@ -1421,7 +1421,7 @@ NULL
 }
 
 .assertIsValidCipher <- function(key, value) {
-    if (getCipheredValue(value) != C_CIPHERS[[key]]) {
+    if (!(key %in% names(C_CIPHERS)) || (getCipheredValue(value) != C_CIPHERS[[key]])) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'token' and/or 'secret' unkown",
             call. = FALSE
