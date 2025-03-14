@@ -44,7 +44,9 @@ NULL
     if (!.isParameterSet(x)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", objectName, "' (", .getClassName(x), ") must be a S4 class ",
-            "which inherits from class 'ParameterSet' ", call. = FALSE)
+            "which inherits from class 'ParameterSet' ",
+            call. = FALSE
+        )
     }
 }
 
@@ -52,7 +54,9 @@ NULL
     if (!.isTrialDesignSet(x)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'designSet' must be an instance of 'TrialDesignSet' ",
-            "(is '", .getClassName(x), "')", call. = FALSE)
+            "(is '", .getClassName(x), "')",
+            call. = FALSE
+        )
     }
 }
 
@@ -217,7 +221,7 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class 'TrialDesignInverseNormal', ",
             "'TrialDesignFisher', or 'TrialDesignConditionalDunnett' (is '",
-            .getClassName(design), "')", 
+            .getClassName(design), "')",
             call. = FALSE
         )
     }
@@ -232,7 +236,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'simulationResults' must be an instance of SimulationResults ",
-            "(is '", .getClassName(simulationResults), "')", 
+            "(is '", .getClassName(simulationResults), "')",
             call. = FALSE
         )
     }
@@ -263,7 +267,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'stageResults' ",
             "must be a 'StageResults' object",
-            " (is '", .getClassName(stageResults), "')", 
+            " (is '", .getClassName(stageResults), "')",
             call. = FALSE
         )
     }
@@ -310,7 +314,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", xName, "' (", .arrayToString(x), ") ",
-            "must be a valid numeric vector or a single NA", 
+            "must be a valid numeric vector or a single NA",
             call. = call.
         )
     }
@@ -344,7 +348,7 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
             "only population enrichment data with 2 groups can be analyzed but ",
             dataInput$getNumberOfGroups(), " group",
-            ifelse(dataInput$getNumberOfGroups() == 1, " is", "s are"), " defined", 
+            ifelse(dataInput$getNumberOfGroups() == 1, " is", "s are"), " defined",
             call. = FALSE
         )
     }
@@ -357,7 +361,7 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
                 "all parameters must have the same length ('stages' has length ", l1,
-                ", '", fieldName, "' has length ", l2, ")", 
+                ", '", fieldName, "' has length ", l2, ")",
                 call. = FALSE
             )
         }
@@ -367,80 +371,92 @@ NULL
         if (dataInput$getNumberOfGroups() == 1) {
             if (.isDatasetMeans(dataInput)) {
                 if (any(na.omit(dataInput$getStDevsUpTo(stage)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all standard deviations must be > 0", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all standard deviations must be > 0",
+                        call. = FALSE
+                    )
                 }
                 if (any(na.omit(dataInput$getSampleSizesUpTo(stage)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all sample sizes must be > 0", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all sample sizes must be > 0",
+                        call. = FALSE
+                    )
                 }
             } else if (.isDatasetRates(dataInput)) {
                 if (any(na.omit(dataInput$getEventsUpTo(stage)) < 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all events must be >= 0", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all events must be >= 0",
+                        call. = FALSE
+                    )
                 }
                 if (any(na.omit(dataInput$getSampleSizesUpTo(stage)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all sample sizes must be > 0", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all sample sizes must be > 0",
+                        call. = FALSE
+                    )
                 }
-                if (any(na.omit(dataInput$getEventsUpTo(stage)) > 
+                if (any(na.omit(dataInput$getEventsUpTo(stage)) >
                         na.omit(dataInput$getSampleSizesUpTo(stage)))) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all events must be <= corresponding sample size", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all events must be <= corresponding sample size",
+                        call. = FALSE
+                    )
                 }
             }
         } else if (dataInput$getNumberOfGroups() == 2) {
             if (.isDatasetMeans(dataInput)) {
                 if (any(na.omit(dataInput$getStDevsUpTo(stage, 1)) <= 0) ||
                         any(na.omit(dataInput$getStDevsUpTo(stage, 2)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all standard deviations must be > 0", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all standard deviations must be > 0",
+                        call. = FALSE
+                    )
                 }
                 if (any(na.omit(dataInput$getSampleSizesUpTo(stage, 1)) <= 0) ||
                         any(na.omit(dataInput$getSampleSizesUpTo(stage, 2)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all sample sizes must be > 0", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all sample sizes must be > 0",
+                        call. = FALSE
+                    )
                 }
             } else if (.isDatasetRates(dataInput)) {
                 if (any(na.omit(dataInput$getEventsUpTo(stage, 1)) < 0) ||
                         any(na.omit(dataInput$getEventsUpTo(stage, 2)) < 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all events must be >= 0", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all events must be >= 0",
+                        call. = FALSE
+                    )
                 }
                 if (any(na.omit(dataInput$getSampleSizesUpTo(stage, 1)) <= 0) ||
                         any(na.omit(dataInput$getSampleSizesUpTo(stage, 2)) <= 0)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all sample sizes must be > 0", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all sample sizes must be > 0",
+                        call. = FALSE
+                    )
                 }
                 if (any(na.omit(dataInput$getEventsUpTo(stage, 1)) > na.omit(dataInput$getSampleSizesUpTo(stage, 1))) ||
                         any(na.omit(dataInput$getEventsUpTo(stage, 2)) > na.omit(dataInput$getSampleSizesUpTo(stage, 2)))) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                        "all events must be <= corresponding sample size", 
-                        call. = FALSE)
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                        "all events must be <= corresponding sample size",
+                        call. = FALSE
+                    )
                 }
             }
         }
 
         if (.isDatasetSurvival(dataInput)) {
             if (any(na.omit(dataInput$getOverallEventsUpTo(stage)) < 0)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                    "all cumulative events must be >= 0", 
-                    call. = FALSE)
+                stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                    "all cumulative events must be >= 0",
+                    call. = FALSE
+                )
             }
 
             if (any(na.omit(dataInput$getOverallAllocationRatiosUpTo(stage)) <= 0)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT, 
-                    "all cumulative allocation ratios must be > 0", 
-                    call. = FALSE)
+                stop(C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
+                    "all cumulative allocation ratios must be > 0",
+                    call. = FALSE
+                )
             }
         }
     }
@@ -469,10 +485,10 @@ NULL
 .assertIsDataset <- function(dataInput) {
     if (!.isDataset(dataInput)) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'dataInput' must be an instance of class ",
             "'DatasetMeans', 'DatasetRates' or 'DatasetSurvival' ",
-            "(is '", .getClassName(dataInput), "')", 
+            "(is '", .getClassName(dataInput), "')",
             call. = FALSE
         )
     }
@@ -481,9 +497,9 @@ NULL
 .assertIsDatasetMeans <- function(dataInput) {
     if (!.isDatasetMeans(dataInput = dataInput)) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'dataInput' must be an instance of class ",
-            "'DatasetMeans' (is '", .getClassName(dataInput), "')", 
+            "'DatasetMeans' (is '", .getClassName(dataInput), "')",
             call. = FALSE
         )
     }
@@ -493,7 +509,7 @@ NULL
     if (!.isDatasetRates(dataInput = dataInput)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' must be an instance of class ",
-            "'DatasetRates' (is '", .getClassName(dataInput), "')", 
+            "'DatasetRates' (is '", .getClassName(dataInput), "')",
             call. = FALSE
         )
     }
@@ -502,18 +518,18 @@ NULL
 .assertIsDatasetSurvival <- function(dataInput) {
     if (!.isDatasetSurvival(dataInput = dataInput)) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'dataInput' must be an instance of class ",
             "'DatasetSurvival' or 'DatasetEnrichmentSurvival' ",
-            "(is '", .getClassName(dataInput), "')", 
+            "(is '", .getClassName(dataInput), "')",
             call. = FALSE
         )
     }
 }
 
 .isDataset <- function(dataInput) {
-    return(.isDatasetMeans(dataInput) || 
-        .isDatasetRates(dataInput) || 
+    return(.isDatasetMeans(dataInput) ||
+        .isDatasetRates(dataInput) ||
         .isDatasetSurvival(dataInput))
 }
 
@@ -529,15 +545,13 @@ NULL
     return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
-.assertIsNumericVector <- function(
-        x, 
-        argumentName, 
-        ..., 
-        naAllowed = FALSE, 
+.assertIsNumericVector <- function(x,
+        argumentName,
+        ...,
+        naAllowed = FALSE,
         noDefaultAvailable = FALSE,
         len = NA_integer_,
         call. = FALSE) {
-        
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(
@@ -556,7 +570,7 @@ NULL
             call. = call.
         )
     }
-    
+
     if (!any(is.na(len)) && !length(x) %in% len) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
@@ -736,14 +750,12 @@ NULL
     }
 }
 
-.assertIsSingleCharacter <- function(
-        x, 
-        argumentName, 
-        ..., 
-        naAllowed = FALSE, 
-        noDefaultAvailable = FALSE, 
+.assertIsSingleCharacter <- function(x,
+        argumentName,
+        ...,
+        naAllowed = FALSE,
+        noDefaultAvailable = FALSE,
         call. = FALSE) {
-        
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid character value",
@@ -818,28 +830,31 @@ NULL
 
 .assertDesignParameterExists <- function(design, parameterName, defaultValue) {
     if (missing(design)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'design' must be defined", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'design' must be defined",
+            call. = FALSE
+        )
     }
 
     if (missing(parameterName)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'parameterName' must be defined", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'parameterName' must be defined",
+            call. = FALSE
+        )
     }
 
     if (missing(defaultValue)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'defaultValue' must be defined", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'defaultValue' must be defined",
+            call. = FALSE
+        )
     }
 
     value <- design[[parameterName]]
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT, "parameter '", parameterName,
-            "' must be specified in design", 
+            "' must be specified in design",
             call. = FALSE
         )
     }
@@ -858,15 +873,17 @@ NULL
 
 .designParameterExists <- function(design, parameterName) {
     if (missing(design)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'design' must be defined", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'design' must be defined",
+            call. = FALSE
+        )
     }
 
     if (missing(parameterName)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'parameterName' must be defined", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'parameterName' must be defined",
+            call. = FALSE
+        )
     }
 
     value <- design[[parameterName]]
@@ -885,16 +902,15 @@ NULL
     if (!.isOptimizationCriterion(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "optimization criterion must be one of the following: ", 
-            .printOptimizationCriterion(), 
+            "optimization criterion must be one of the following: ",
+            .printOptimizationCriterion(),
             call. = FALSE
         )
     }
 }
 
-.showParameterOutOfValidatedBoundsMessage <- function(
-        parameterValue,
-        parameterName, 
+.showParameterOutOfValidatedBoundsMessage <- function(parameterValue,
+        parameterName,
         ...,
         lowerBound = NA_real_,
         upperBound = NA_real_,
@@ -903,17 +919,17 @@ NULL
         closedUpperBound = TRUE,
         suffix = NA_character_,
         naAllowed = FALSE) {
-        
     if (naAllowed && is.na(parameterValue)) {
         return(invisible())
     }
-        
+
     .assertIsSingleNumber(lowerBound, "lowerBound", naAllowed = TRUE)
     .assertIsSingleNumber(upperBound, "upperBound", naAllowed = TRUE)
     if (is.na(lowerBound) && is.na(upperBound)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'lowerBound' or 'upperBound' must be defined", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'lowerBound' or 'upperBound' must be defined",
+            call. = FALSE
+        )
     }
 
     if (is.na(lowerBound)) {
@@ -987,7 +1003,7 @@ NULL
     if (any(is.na(lambda))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(lambda), ") must be a valid numeric vector", 
+            .arrayToString(lambda), ") must be a valid numeric vector",
             call. = FALSE
         )
     }
@@ -997,7 +1013,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(lambda), ") not allowed: ",
-            "at least one lambda value must be > 0", 
+            "at least one lambda value must be > 0",
             call. = FALSE
         )
     }
@@ -1010,9 +1026,10 @@ NULL
 
     .assertIsSingleNumber(followUpTime, "followUpTime", naAllowed = TRUE)
     if (followUpTime < 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'followUpTime' (", followUpTime, ") must be >= 0", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'followUpTime' (", followUpTime, ") must be >= 0",
+            call. = FALSE
+        )
     }
 }
 
@@ -1027,19 +1044,19 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "the first value of 'accrualTime' ",
-            "(", .arrayToString(accrualTime), ") must be 0", 
+            "(", .arrayToString(accrualTime), ") must be 0",
             call. = FALSE
         )
     }
-    
+
     if (identical(accrualTime, 0) || identical(accrualTime, 0L)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "single 'accrualTime' is not allowed to be 0", 
+            "single 'accrualTime' is not allowed to be 0",
             call. = FALSE
         )
     }
-    
+
     .assertIsInClosedInterval(accrualTime, "accrualTime", lower = 0, upper = NULL, naAllowed = naAllowed)
     .assertValuesAreStrictlyIncreasing(accrualTime, "accrualTime")
 }
@@ -1048,9 +1065,9 @@ NULL
     if (groups == 1L) {
         .assertIsSingleNumber(stDev, name, naAllowed = naAllowed)
     } else {
-        .assertIsNumericVector(stDev, name, len = unique(c(1L, groups)), naAllowed = naAllowed) 
+        .assertIsNumericVector(stDev, name, len = unique(c(1L, groups)), naAllowed = naAllowed)
     }
-    
+
     if (naAllowed && all(is.na(stDev))) {
         return(invisible())
     }
@@ -1058,7 +1075,7 @@ NULL
     if (any(stDev <= 0)) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "standard deviation '", name, "' (", .arrayToString(stDev), ") must be > 0", 
+            "standard deviation '", name, "' (", .arrayToString(stDev), ") must be > 0",
             call. = FALSE
         )
     }
@@ -1067,9 +1084,10 @@ NULL
 .assertIsValidAlpha <- function(alpha, ..., naAllowed = FALSE) {
     .assertIsSingleNumber(alpha, "alpha", naAllowed = naAllowed)
     .assertIsInOpenInterval(alpha, "alpha", lower = 0, upper = 1, naAllowed = naAllowed)
-    .showParameterOutOfValidatedBoundsMessage(alpha, "alpha", 
-        lowerBound = 1e-06, upperBound = 0.5, 
-        closedUpperBound = FALSE, naAllowed = naAllowed)
+    .showParameterOutOfValidatedBoundsMessage(alpha, "alpha",
+        lowerBound = 1e-06, upperBound = 0.5,
+        closedUpperBound = FALSE, naAllowed = naAllowed
+    )
 }
 
 .assertIsValidBeta <- function(beta, alpha, ..., naAllowed = FALSE) {
@@ -1094,7 +1112,7 @@ NULL
     if (stage < 1 || stage > kMax) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'stage' (", stage, ") is out of bounds [1; ", kMax, "]", 
+            "'stage' (", stage, ") is out of bounds [1; ", kMax, "]",
             call. = FALSE
         )
     }
@@ -1107,7 +1125,7 @@ NULL
         if (iterations < 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'iterations' (", iterations, ") must be >= 0", 
+                "'iterations' (", iterations, ") must be >= 0",
                 call. = FALSE
             )
         }
@@ -1115,7 +1133,7 @@ NULL
         if (iterations < 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'iterations' (", iterations, ") must be > 0", 
+                "'iterations' (", iterations, ") must be > 0",
                 call. = FALSE
             )
         }
@@ -1124,7 +1142,7 @@ NULL
     if (is.null(seed) || length(seed) == 0 || (!is.na(seed) && !is.numeric(seed))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'seed' (", seed, ") must be a valid integer value", 
+            "'seed' (", seed, ") must be a valid integer value",
             call. = FALSE
         )
     }
@@ -1135,7 +1153,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'legendPosition' (", .arrayToString(legendPosition), ") ",
-            "must be a single integer or character value", 
+            "must be a single integer or character value",
             call. = FALSE
         )
     }
@@ -1143,7 +1161,7 @@ NULL
     if (is.na(legendPosition)) {
         return(invisible())
     }
-    
+
     if (grepl("^-?[0-9]+$", legendPosition)) {
         legendPosition <- as.integer(legendPosition)
     }
@@ -1152,7 +1170,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'legendPosition' (", legendPosition, ") ",
-            "must be a single integer or character value", 
+            "must be a single integer or character value",
             call. = FALSE
         )
     }
@@ -1167,7 +1185,7 @@ NULL
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'legendPosition' (", legendPosition, ") ",
                 "must be one of the following values: ",
-                .arrayToString(validLegendPositions), 
+                .arrayToString(validLegendPositions),
                 call. = FALSE
             )
         }
@@ -1186,28 +1204,32 @@ NULL
 .assertAreValidInformationRates <- function(informationRates, kMax = length(informationRates),
         kMaxLowerBound = 1L, kMaxUpperBound = C_KMAX_UPPER_BOUND) {
     if (length(informationRates) < kMaxLowerBound) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
-                "length of 'informationRates' (%s) is out of bounds [%s; %s]"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
+                    "length of 'informationRates' (%s) is out of bounds [%s; %s]"
+                ),
+                length(informationRates), kMaxLowerBound,
+                ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND, kMax, C_KMAX_UPPER_BOUND)
             ),
-            length(informationRates), kMaxLowerBound,
-            ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND, kMax, C_KMAX_UPPER_BOUND)
-        ), 
-        call. = FALSE)
+            call. = FALSE
+        )
     }
 
     .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
 
     if (length(informationRates) != kMax) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                "length of 'informationRates' (%s) must be equal to 'kMax' (%s)"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+                    "length of 'informationRates' (%s) must be equal to 'kMax' (%s)"
+                ),
+                length(informationRates), kMax
             ),
-            length(informationRates), kMax
-        ), 
-        call. = FALSE)
+            call. = FALSE
+        )
     }
 
     if (kMax == 1) {
@@ -1221,14 +1243,16 @@ NULL
 
     if (min(informationRates) <= 0 || max(informationRates) > 1 ||
             any(informationRates[2:kMax] <= informationRates[1:(kMax - 1)])) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'informationRates' (%s) ",
-                "must be strictly increasing: 0 < x_1 < .. < x_%s <= 1"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'informationRates' (%s) ",
+                    "must be strictly increasing: 0 < x_1 < .. < x_%s <= 1"
+                ),
+                .arrayToString(informationRates, vectorLookAndFeelEnabled = FALSE), kMax
             ),
-            .arrayToString(informationRates, vectorLookAndFeelEnabled = FALSE), kMax
-        ), 
-        call. = FALSE)
+            call. = FALSE
+        )
     }
 }
 
@@ -1240,30 +1264,34 @@ NULL
     upperInvalid <- ifelse(upperBoundInclusive, upper > upperBound, upper >= upperBound)
     if (!is.na(lowerInvalid)) {
         if (lowerInvalid || upperInvalid) {
-            stop(sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                    "'%s' (%s) is out of bounds %s%s; %s%s"
+            stop(
+                sprintf(
+                    paste0(
+                        C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
+                        "'%s' (%s) is out of bounds %s%s; %s%s"
+                    ),
+                    parameterName, .arrayToString(values, vectorLookAndFeelEnabled = FALSE),
+                    ifelse(lowerBoundInclusive, "[", "("), lowerBound,
+                    upperBound, ifelse(upperBoundInclusive, "]", ")")
                 ),
-                parameterName, .arrayToString(values, vectorLookAndFeelEnabled = FALSE),
-                ifelse(lowerBoundInclusive, "[", "("), lowerBound,
-                upperBound, ifelse(upperBoundInclusive, "]", ")")
-            ), 
-            call. = FALSE)
+                call. = FALSE
+            )
         }
     }
 }
 
 .assertContainsNoNas <- function(values, parameterName) {
     if (any(is.na(values))) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
-                "must contain valid numeric values (NA is not allowed)"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
+                    "must contain valid numeric values (NA is not allowed)"
+                ),
+                parameterName, .arrayToString(values, vectorLookAndFeelEnabled = FALSE)
             ),
-            parameterName, .arrayToString(values, vectorLookAndFeelEnabled = FALSE)
-        ), 
-        call. = FALSE)
+            call. = FALSE
+        )
     }
 }
 
@@ -1274,14 +1302,16 @@ NULL
 
     for (i in length(values):2) {
         if (!is.na(values[i]) && is.na(values[i - 1])) {
-            stop(sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
-                    "must contain valid numeric values (NAs are only allowed at the end of the vector)"
+            stop(
+                sprintf(
+                    paste0(
+                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
+                        "must contain valid numeric values (NAs are only allowed at the end of the vector)"
+                    ),
+                    parameterName, .arrayToString(values, vectorLookAndFeelEnabled = FALSE)
                 ),
-                parameterName, .arrayToString(values, vectorLookAndFeelEnabled = FALSE)
-            ), 
-            call. = FALSE)
+                call. = FALSE
+            )
         }
     }
 }
@@ -1314,14 +1344,16 @@ NULL
     }
 
     if (any(values[2:len] <= values[1:(len - 1)])) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
-                "must be strictly increasing: x_1 < .. < x_%s"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
+                    "must be strictly increasing: x_1 < .. < x_%s"
+                ),
+                parameterName, .arrayToString(valuesTemp, vectorLookAndFeelEnabled = FALSE), len
             ),
-            parameterName, .arrayToString(valuesTemp, vectorLookAndFeelEnabled = FALSE), len
-        ), 
-        call. = FALSE)
+            call. = FALSE
+        )
     }
 }
 
@@ -1345,29 +1377,33 @@ NULL
     }
 
     if (any(values[2:len] < values[1:(len - 1)])) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
-                "must be increasing: x_1 <= .. <= x_%s"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'%s' (%s) ",
+                    "must be increasing: x_1 <= .. <= x_%s"
+                ),
+                parameterName, .arrayToString(valuesTemp, vectorLookAndFeelEnabled = FALSE), len
             ),
-            parameterName, .arrayToString(valuesTemp, vectorLookAndFeelEnabled = FALSE), len
-        ), 
-        call. = FALSE)
+            call. = FALSE
+        )
     }
 }
 
 .assertAreValidFutilityBounds <- function(futilityBounds, kMax = length(futilityBounds) + 1,
         kMaxLowerBound = 1, kMaxUpperBound = C_KMAX_UPPER_BOUND) {
     if (length(futilityBounds) < kMaxLowerBound - 1) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
-                "length of 'futilityBounds' (%s) is out of bounds [%s; %s]"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
+                    "length of 'futilityBounds' (%s) is out of bounds [%s; %s]"
+                ),
+                length(futilityBounds), kMaxLowerBound - 1,
+                ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND, kMax - 1, C_KMAX_UPPER_BOUND - 1)
             ),
-            length(futilityBounds), kMaxLowerBound - 1,
-            ifelse(kMax >= kMaxLowerBound && kMax < C_KMAX_UPPER_BOUND, kMax - 1, C_KMAX_UPPER_BOUND - 1)
-        ), 
-        call. = FALSE)
+            call. = FALSE
+        )
     }
 
     .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
@@ -1376,7 +1412,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
             "length of 'futilityBounds' (", length(futilityBounds),
-            ") must be equal to 'kMax' (", kMax, ") - 1", 
+            ") must be equal to 'kMax' (", kMax, ") - 1",
             call. = FALSE
         )
     }
@@ -1386,23 +1422,26 @@ NULL
 
 .assertIsValidCipher <- function(key, value) {
     if (getCipheredValue(value) != C_CIPHERS[[key]]) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'token' and/or 'secret' unkown", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'token' and/or 'secret' unkown",
+            call. = FALSE
+        )
     }
 }
 
 .assertIsValidAlpha0Vec <- function(alpha0Vec, kMax = length(alpha0Vec) - 1,
         kMaxLowerBound = 1, kMaxUpperBound = C_KMAX_UPPER_BOUND) {
     if (length(alpha0Vec) < kMaxLowerBound - 1) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
-                "length of 'alpha0Vec' (%s) is out of bounds [%s; %s]"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
+                    "length of 'alpha0Vec' (%s) is out of bounds [%s; %s]"
+                ),
+                length(alpha0Vec), kMaxLowerBound - 1, kMax - 1
             ),
-            length(alpha0Vec), kMaxLowerBound - 1, kMax - 1
-        ), 
-        call. = FALSE)
+            call. = FALSE
+        )
     }
 
     .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
@@ -1411,7 +1450,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
             "length of 'alpha0Vec' (", length(alpha0Vec),
-            ") must be equal to 'kMax' (", kMax, ") - 1", 
+            ") must be equal to 'kMax' (", kMax, ") - 1",
             call. = FALSE
         )
     }
@@ -1421,27 +1460,31 @@ NULL
 
 .assertIsValidSidedParameter <- function(sided) {
     if (is.null(match.call(expand.dots = FALSE)[["sided"]])) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'sided' must be defined", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'sided' must be defined",
+            call. = FALSE
+        )
     }
     if (sided != 1 && sided != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'sided' (", sided, ") must be 1 or 2", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'sided' (", sided, ") must be 1 or 2",
+            call. = FALSE
+        )
     }
 }
 
 .assertIsValidGroupsParameter <- function(groups) {
     if (is.null(match.call(expand.dots = FALSE)[["groups"]])) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'groups' must be defined", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'groups' must be defined",
+            call. = FALSE
+        )
     }
     if (groups != 1 && groups != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'groups' (", groups, ") must be 1 or 2", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'groups' (", groups, ") must be 1 or 2",
+            call. = FALSE
+        )
     }
 }
 
@@ -1466,7 +1509,7 @@ NULL
         args <- list(...)
     }, error = function(e) {
         stop(
-            simpleError(paste0(C_EXCEPTION_TYPE_MISSING_ARGUMENT, e$message), call = e$call), 
+            simpleError(paste0(C_EXCEPTION_TYPE_MISSING_ARGUMENT, e$message), call = e$call),
             call. = FALSE
         )
     })
@@ -1478,9 +1521,10 @@ NULL
     args <- args[args != "warningOnlyEnabled" & !is.null(args)]
     argNames <- names(args)
     if (sum(argNames == "") > 0) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
-            "each argument must have a name defined, e.g. a = a", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+            "each argument must have a name defined, e.g. a = a",
+            call. = FALSE
+        )
     }
 
     definedArguments <- c()
@@ -1517,9 +1561,10 @@ NULL
         if (!required) {
             return(invisible())
         }
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'nPlanned' must be specified", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'nPlanned' must be specified",
+            call. = FALSE
+        )
     }
 
     if (length(nPlanned) != kMax - stage) {
@@ -1531,7 +1576,7 @@ NULL
                     "length must be equal to %s (kMax - stage = %s - %s)"
                 ),
                 .arrayToString(nPlanned), kMax - stage, kMax, stage
-            ), 
+            ),
             call. = FALSE
         )
     }
@@ -1545,7 +1590,7 @@ NULL
                     "all values must be > 0"
                 ),
                 .arrayToString(nPlanned)
-            ), 
+            ),
             call. = FALSE
         )
     }
@@ -1718,18 +1763,20 @@ NULL
     }
 
     if (!is.numeric(thetaH0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'thetaH0' must be a valid numeric value", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'thetaH0' must be a valid numeric value",
+            call. = FALSE
+        )
     }
 
     endpoint <- match.arg(endpoint)
     if (endpoint == "means" || endpoint == "rates") {
         if (groups == 2 && ratioEnabled) {
             if (thetaH0 <= 0) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-                    "'thetaH0' (", thetaH0, ") must be > 0", 
-                    call. = FALSE)
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                    "'thetaH0' (", thetaH0, ") must be > 0",
+                    call. = FALSE
+                )
             }
             return(invisible())
         }
@@ -1740,7 +1787,7 @@ NULL
             if (thetaH0 <= 0 || thetaH0 >= 1) {
                 stop(
                     C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                    "'thetaH0' (", thetaH0, ") is out of bounds (0; 1) or not specified", 
+                    "'thetaH0' (", thetaH0, ") is out of bounds (0; 1) or not specified",
                     call. = FALSE
                 )
             }
@@ -1748,16 +1795,17 @@ NULL
             if (thetaH0 <= -1 || thetaH0 >= 1) {
                 stop(
                     C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                    "'thetaH0' (", thetaH0, ") is out of bounds (-1; 1)", 
+                    "'thetaH0' (", thetaH0, ") is out of bounds (-1; 1)",
                     call. = FALSE
                 )
             }
         }
     } else if (endpoint %in% c("survival", "counts")) {
         if (thetaH0 <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-                "'thetaH0' (", thetaH0, ") must be > 0", 
-                call. = FALSE)
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'thetaH0' (", thetaH0, ") must be > 0",
+                call. = FALSE
+            )
         }
     }
 }
@@ -1780,7 +1828,7 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'thetaRange' (", .arrayToString(thetaRange), ") must be a vector ",
             "with two entries defining minimum and maximum ",
-            "or a sequence of numeric values with length > 2", 
+            "or a sequence of numeric values with length > 2",
             call. = FALSE
         )
     } else if (length(thetaRange) == 2 && thetaAutoSeqEnabled) {
@@ -1794,7 +1842,7 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'thetaRange' with length 2 must contain minimum < maximum (",
-                minValue, " >= ", maxValue, ")", 
+                minValue, " >= ", maxValue, ")",
                 call. = FALSE
             )
         }
@@ -1812,7 +1860,7 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'piTreatmentRange' (", .arrayToString(piTreatmentRange), ") must be a vector ",
             "with two entries defining minimum and maximum ",
-            "or a sequence of numeric values with length > 2", 
+            "or a sequence of numeric values with length > 2",
             call. = FALSE
         )
     } else if (length(piTreatmentRange) == 2) {
@@ -1831,7 +1879,7 @@ NULL
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'piTreatmentRange' with length 2 must contain minimum < maximum (",
-                    minValue, " >= ", maxValue, ")", 
+                    minValue, " >= ", maxValue, ")",
                     call. = FALSE
                 )
             }
@@ -1847,7 +1895,7 @@ NULL
     if (is.null(piValue) || length(piValue) == 0) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", piName, "' must be a valid numeric value", 
+            "'", piName, "' must be a valid numeric value",
             call. = FALSE
         )
     }
@@ -1859,7 +1907,7 @@ NULL
     if (!is.numeric(piValue) || any(is.na(piValue))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", piName, "' (", .arrayToString(piValue), ") must be a valid numeric value", 
+            "'", piName, "' (", .arrayToString(piValue), ") must be a valid numeric value",
             call. = FALSE
         )
     }
@@ -1868,7 +1916,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
             "'", piName, "' (", .arrayToString(piValue), ") ",
-            "is out of bounds (0; 1) or event time too long", 
+            "is out of bounds (0; 1) or event time too long",
             call. = FALSE
         )
     }
@@ -1931,7 +1979,7 @@ NULL
             "determination of optimal allocation ratio not possible ",
             "if explicit or implicit 'maxNumberOfSubjects' (", maxNumberOfSubjects,
             ") > 0, i.e., follow-up time should be calculated ",
-            "(please specify an 'allocationRatioPlanned' > 0)", 
+            "(please specify an 'allocationRatioPlanned' > 0)",
             call. = FALSE
         )
     }
@@ -1963,7 +2011,7 @@ NULL
     if (assumedStDev <= 0) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'assumedStDev' (", assumedStDev, ") must be > 0", 
+            "'assumedStDev' (", assumedStDev, ") must be > 0",
             call. = FALSE
         )
     }
@@ -2008,7 +2056,7 @@ NULL
     if (any(assumedStDev <= 0, na.rm = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'assumedStDev' (", .arrayToString(assumedStDev), ") must be > 0", 
+            "'assumedStDev' (", .arrayToString(assumedStDev), ") must be > 0",
             call. = FALSE
         )
     }
@@ -2023,7 +2071,7 @@ NULL
             sprintf(paste0(
                 "length of 'assumedStDevs' (%s) ",
                 "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(assumedStDevs), gMax), 
+            ), .arrayToString(assumedStDevs), gMax),
             call. = FALSE
         )
     }
@@ -2089,7 +2137,7 @@ NULL
             "alternative not correctly specified: ",
             "each hazard ratio (",
             .arrayToString(hazardRatio[1:min(length(hazardRatio), 10)]),
-            ") must be unequal to 'thetaH0' (", thetaH0, ")", 
+            ") must be unequal to 'thetaH0' (", thetaH0, ")",
             call. = FALSE
         )
     }
@@ -2099,14 +2147,15 @@ NULL
     .assertIsNumericVector(hazardRatio, "hazardRatio")
     if (any(hazardRatio <= 0)) {
         if (length(hazardRatio) == 1) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-                "'hazardRatio' (", hazardRatio, ") must be > 0", 
-                call. = FALSE)
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'hazardRatio' (", hazardRatio, ") must be > 0",
+                call. = FALSE
+            )
         } else {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "each 'hazardRatio' (",
                 .arrayToString(hazardRatio[1:min(length(hazardRatio), 10)]),
-                ") must be > 0", 
+                ") must be > 0",
                 call. = FALSE
             )
         }
@@ -2160,14 +2209,16 @@ NULL
 
 .assertIsFunction <- function(fun) {
     if (is.null(fun)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'fun' must be a valid function", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'fun' must be a valid function",
+            call. = FALSE
+        )
     }
     if (!is.function(fun)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'fun' must be a function (is ", .getClassName(fun), ")", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'fun' must be a function (is ", .getClassName(fun), ")",
+            call. = FALSE
+        )
     }
 }
 
@@ -2184,7 +2235,7 @@ NULL
     if (is.null(expectedArguments) && is.null(expectedFunction)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'expectedArguments' or 'expectedFunction' must be not NULL", 
+            "'expectedArguments' or 'expectedFunction' must be not NULL",
             call. = FALSE
         )
     }
@@ -2192,7 +2243,7 @@ NULL
     if (!is.function(fun)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", funArgName, "' must be a function", 
+            "'", funArgName, "' must be a function",
             call. = FALSE
         )
     }
@@ -2209,7 +2260,7 @@ NULL
         if (!is.function(expectedFunction)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'expectedFunction' must be a function", 
+                "'expectedFunction' must be a function",
                 call. = FALSE
             )
         }
@@ -2221,7 +2272,7 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'", funArgName, "' must contain the three-dots argument '...', e.g., ",
-                funArgName, " = ", functionName, "(", .arrayToString(argNames), ", ...)", 
+                funArgName, " = ", functionName, "(", .arrayToString(argNames), ", ...)",
                 call. = FALSE
             )
         }
@@ -2246,7 +2297,7 @@ NULL
             }
             stop(
                 msg, "\n\n", "Use one or more of the following arguments:\n ",
-                .arrayToString(argNamesExpected, encapsulate = TRUE), 
+                .arrayToString(argNamesExpected, encapsulate = TRUE),
                 call. = FALSE
             )
         }
@@ -2258,7 +2309,7 @@ NULL
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'", funArgName, "' (", functionName, ") must contain ",
-                    "an argument with name '", argNameExpected, "'", 
+                    "an argument with name '", argNameExpected, "'",
                     call. = FALSE
                 )
             }
@@ -2281,7 +2332,7 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", funArgName, "' (", functionName, ") must contain at ",
             "least one of the following arguments: ",
-            .arrayToString(argNamesExpected), 
+            .arrayToString(argNamesExpected),
             call. = FALSE
         )
     }
@@ -2300,7 +2351,7 @@ NULL
     if ((length(threshold) != 1) && (length(threshold) != activeArms)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'threshold' (", .arrayToString(threshold),
-            ") must be a single value or a vector of length ", activeArms, 
+            ") must be a single value or a vector of length ", activeArms,
             call. = FALSE
         )
     }
@@ -2315,7 +2366,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", parameterName, "' (", .arrayToString(plannedValues), ") ",
-            "must have length ", design$kMax, 
+            "must have length ", design$kMax,
             call. = FALSE
         )
     }
@@ -2364,14 +2415,14 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_MISSING_ARGUMENT,
                 "'", parameterName, "' must be defined ",
-                "because 'conditionalPower' or '", calcSubjectsFunctionName, "' is defined", 
+                "because 'conditionalPower' or '", calcSubjectsFunctionName, "' is defined",
                 call. = FALSE
             )
         } else {
             stop(
                 C_EXCEPTION_TYPE_MISSING_ARGUMENT,
                 "'", parameterName, "' must be defined ",
-                "because 'conditionalPower' is defined", 
+                "because 'conditionalPower' is defined",
                 call. = FALSE
             )
         }
@@ -2380,7 +2431,7 @@ NULL
     if (length(parameterValues) != kMax) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", parameterName, "' (",
-            .arrayToString(parameterValues), ") must have length ", kMax, 
+            .arrayToString(parameterValues), ") must have length ", kMax,
             call. = FALSE
         )
     }
@@ -2388,14 +2439,16 @@ NULL
     if (any(is.na(parameterValues[2:length(parameterValues)]))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", parameterName, "' (",
-            .arrayToString(parameterValues), ") must contain valid numeric values", 
+            .arrayToString(parameterValues), ") must contain valid numeric values",
             call. = FALSE
         )
     }
 
     if (!is.na(parameterValues[1]) && parameterValues[1] != plannedSubjects[1]) {
         warning("First value of '", parameterName, "' ",
-            "(", parameterValues[1], ") will be ignored", call. = FALSE)
+            "(", parameterValues[1], ") will be ignored",
+            call. = FALSE
+        )
     }
 
     parameterValues[1] <- plannedSubjects[1]
@@ -2466,7 +2519,7 @@ NULL
         engineType <- match.arg(engineType)
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            designType, " ", engineType, " is only applicable for one-sided testing", 
+            designType, " ", engineType, " is only applicable for one-sided testing",
             call. = FALSE
         )
     }
@@ -2527,7 +2580,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a multi-arm stage results object ",
-            "(is ", .getClassName(stageResults), ")", 
+            "(is ", .getClassName(stageResults), ")",
             call. = FALSE
         )
     }
@@ -2536,7 +2589,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a multi-arm object ",
-            "(is ", .getClassName(stageResults), ")", 
+            "(is ", .getClassName(stageResults), ")",
             call. = FALSE
         )
     }
@@ -2547,7 +2600,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a non-multi-arm object ",
-            "(is ", .getClassName(stageResults), ")", 
+            "(is ", .getClassName(stageResults), ")",
             call. = FALSE
         )
     }
@@ -2556,7 +2609,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stageResults' must be a non-enrichment object ",
-            "(is ", .getClassName(stageResults), ")", 
+            "(is ", .getClassName(stageResults), ")",
             call. = FALSE
         )
     }
@@ -2570,7 +2623,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'stageResults' must be an instance of ",
             .arrayToString(allowedClasses, vectorLookAndFeelEnabled = FALSE),
-            " (is '", .getClassName(stageResults), "')", 
+            " (is '", .getClassName(stageResults), "')",
             call. = FALSE
         )
     }
@@ -2581,7 +2634,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'dataInput' must be a non-multi-arm dataset ",
-            "(has ", dataInput$getNumberOfGroups(), " treatment arms)", 
+            "(has ", dataInput$getNumberOfGroups(), " treatment arms)",
             call. = FALSE
         )
     }
@@ -2589,7 +2642,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'dataInput' must be a non-enrichment dataset ",
-            "(has ", dataInput$getNumberOfSubsets(), " subsets)", 
+            "(has ", dataInput$getNumberOfSubsets(), " subsets)",
             call. = FALSE
         )
     }
@@ -2600,7 +2653,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'analysisResults' ",
             "must be a valid 'AnalysisResults' object ",
-            " (is '", .getClassName(analysisResults), "')", 
+            " (is '", .getClassName(analysisResults), "')",
             call. = FALSE
         )
     }
@@ -2640,7 +2693,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'intersectionTest' ",
             "(", intersectionTest, ") must be one of ",
-            .arrayToString(C_INTERSECTION_TESTS_MULTIARMED, encapsulate = TRUE), 
+            .arrayToString(C_INTERSECTION_TESTS_MULTIARMED, encapsulate = TRUE),
             call. = FALSE
         )
     }
@@ -2648,7 +2701,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "intersection test ",
             "('", intersectionTest, "') must be 'Dunnett' ",
-            "because conditional Dunnett test was specified as design", 
+            "because conditional Dunnett test was specified as design",
             call. = FALSE
         )
     }
@@ -2666,7 +2719,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'intersectionTest' ",
             "(", intersectionTest, ") must be one of ",
-            .arrayToString(C_INTERSECTION_TESTS_ENRICHMENT, encapsulate = TRUE), 
+            .arrayToString(C_INTERSECTION_TESTS_ENRICHMENT, encapsulate = TRUE),
             call. = FALSE
         )
     }
@@ -2712,7 +2765,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stage' (", stage, ") can only be defined in ",
-            "getStageResults() or getAnalysisResults()", 
+            "getStageResults() or getAnalysisResults()",
             call. = FALSE
         )
     }
@@ -2724,7 +2777,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stage' (", forbiddenStage, ") can only be defined in ",
-            "getStageResults() or getAnalysisResults()", 
+            "getStageResults() or getAnalysisResults()",
             call. = FALSE
         )
     }
@@ -2744,7 +2797,7 @@ NULL
     if (!.isValidVarianceOptionMultiArmed(varianceOption)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'varianceOption' should be one of ",
-            .arrayToString(C_VARIANCE_OPTIONS_MULTIARMED, encapsulate = TRUE), 
+            .arrayToString(C_VARIANCE_OPTIONS_MULTIARMED, encapsulate = TRUE),
             call. = FALSE
         )
     }
@@ -2752,7 +2805,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "variance option ('", varianceOption, "') must be '", C_VARIANCE_OPTION_DUNNETT, "' ",
-            "because conditional Dunnett test was specified as design", 
+            "because conditional Dunnett test was specified as design",
             call. = FALSE
         )
     }
@@ -2767,7 +2820,7 @@ NULL
     if (!.isValidVarianceOptionEnrichment(varianceOption)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'varianceOption' should be one of ",
-            .arrayToString(C_VARIANCE_OPTIONS_ENRICHMENT, encapsulate = TRUE), 
+            .arrayToString(C_VARIANCE_OPTIONS_ENRICHMENT, encapsulate = TRUE),
             call. = FALSE
         )
     }
@@ -2781,14 +2834,14 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'intervalFormat' (", intervalFormat, ") has an invalid format; ",
             "the control character %s must appear exactly twice; ",
-            "to change it use 'options(\"rpact.summary.intervalFormat\" = \"[%s; %s]\")'", 
+            "to change it use 'options(\"rpact.summary.intervalFormat\" = \"[%s; %s]\")'",
             call. = FALSE
         )
     }
 }
 
 
-#' 
+#'
 #' @title
 #' Check if Show Source Argument is Special Plot
 #'
@@ -2804,9 +2857,9 @@ NULL
 #' @examples
 #' .isSpecialPlotShowSourceArgument("commands")
 #' .isSpecialPlotShowSourceArgument("invalidSource")
-#' 
-#' @noRd 
-#' 
+#'
+#' @noRd
+#'
 .isSpecialPlotShowSourceArgument <- function(showSource) {
     return(is.character(showSource) && showSource %in% C_PLOT_SHOW_SOURCE_ARGUMENTS)
 }
@@ -2821,7 +2874,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'typeOfSelection' ",
             "(", typeOfSelection, ") must be one of ",
-            .arrayToString(C_TYPES_OF_SELECTION, encapsulate = TRUE), 
+            .arrayToString(C_TYPES_OF_SELECTION, encapsulate = TRUE),
             call. = FALSE
         )
     }
@@ -2863,7 +2916,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'successCriterion' ",
             "(", successCriterion, ") must be one of ",
-            .arrayToString(C_SUCCESS_CRITERIONS, encapsulate = TRUE), 
+            .arrayToString(C_SUCCESS_CRITERIONS, encapsulate = TRUE),
             call. = FALSE
         )
     }
@@ -2877,7 +2930,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'effectMeasure' ",
             "(", effectMeasure, ") must be one of ",
-            .arrayToString(C_EFFECT_MEASURES, encapsulate = TRUE), 
+            .arrayToString(C_EFFECT_MEASURES, encapsulate = TRUE),
             call. = FALSE
         )
     }
@@ -2887,9 +2940,10 @@ NULL
 .assertIsValidMatrix <- function(x, argumentName, ...,
         expectedNumberOfColumns = NA_integer_, naAllowed = FALSE, returnSingleValueAsMatrix = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "'", argumentName, "' must be a valid matrix", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "'", argumentName, "' must be a valid matrix",
+            call. = FALSE
+        )
     }
 
     if (returnSingleValueAsMatrix && !is.matrix(x) && (is.numeric(x) || is.character(x) || is.logical(x))) {
@@ -2900,7 +2954,7 @@ NULL
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "the length of ",
                     "'", argumentName, "' (", .arrayToString(x),
-                    ") must be a divisor or a multiple ", expectedNumberOfColumns, 
+                    ") must be a divisor or a multiple ", expectedNumberOfColumns,
                     call. = FALSE
                 )
             }
@@ -2910,21 +2964,23 @@ NULL
     }
 
     if (!is.matrix(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'", argumentName, "' (", .getClassName(x), ") must be a valid matrix", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'", argumentName, "' (", .getClassName(x), ") must be a valid matrix",
+            call. = FALSE
+        )
     }
 
     if (!naAllowed && any(is.na(x))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'", argumentName, "' (", .arrayToString(x), ") must not contain NA's", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'", argumentName, "' (", .arrayToString(x), ") must not contain NA's",
+            call. = FALSE
+        )
     }
 
     if (!is.numeric(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must be a valid numeric matrix", 
+            .arrayToString(x), ") must be a valid numeric matrix",
             call. = FALSE
         )
     }
@@ -2932,7 +2988,7 @@ NULL
     if (!is.na(expectedNumberOfColumns) && ncol(x) != expectedNumberOfColumns) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must be a numeric matrix with ", expectedNumberOfColumns, " columns", 
+            .arrayToString(x), ") must be a numeric matrix with ", expectedNumberOfColumns, " columns",
             call. = FALSE
         )
     }
@@ -2943,22 +2999,24 @@ NULL
 .assertIsValidDecisionMatrix <- function(decisionMatrix, kMax) {
     .assertIsValidMatrix(decisionMatrix, "decisionMatrix", naAllowed = FALSE)
     if (!(nrow(decisionMatrix) %in% c(2, 4))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'decisionMatrix' must have two or four rows", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'decisionMatrix' must have two or four rows",
+            call. = FALSE
+        )
     }
     if (ncol(decisionMatrix) != kMax) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'decisionMatrix' must have 'kMax' ",
-            "(= length(informationRates) = ", kMax, ") columns", 
+            "(= length(informationRates) = ", kMax, ") columns",
             call. = FALSE
         )
     }
     if (any(decisionMatrix[2:nrow(decisionMatrix), ] < decisionMatrix[1:(nrow(decisionMatrix) - 1), ])) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'decisionMatrix' needs to be increasing in each column", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'decisionMatrix' needs to be increasing in each column",
+            call. = FALSE
+        )
     }
 }
 
@@ -2969,7 +3027,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'typeOfShape' ",
             "(", typeOfShape, ") must be one of ",
-            .arrayToString(C_TYPES_OF_SHAPE, encapsulate = TRUE), 
+            .arrayToString(C_TYPES_OF_SHAPE, encapsulate = TRUE),
             call. = FALSE
         )
     }
@@ -2985,14 +3043,13 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             sQuote(argumentName), " (", .arrayToString(x), ") ",
-            "must have length ", sQuote(lenArgName), " (", len, ")", 
+            "must have length ", sQuote(lenArgName), " (", len, ")",
             call. = FALSE
         )
     }
 }
 
-.assertIsValidEffectMatrix <- function(
-        ...,
+.assertIsValidEffectMatrix <- function(...,
         simulationResults,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
         effectMatrix,
@@ -3003,7 +3060,6 @@ NULL
         gMax,
         slope,
         doseLevels) {
-        
     typeOfShape <- match.arg(typeOfShape)
     valueMaxVectorName <- match.arg(valueMaxVectorName)
 
@@ -3050,8 +3106,9 @@ NULL
     }
 
     if (typeOfShape %in% c("sigmoidEmax", "linear")) {
-        .assertIsNumericVector(valueMaxVector, valueMaxVectorName, 
-            naAllowed = FALSE, noDefaultAvailable = TRUE)
+        .assertIsNumericVector(valueMaxVector, valueMaxVectorName,
+            naAllowed = FALSE, noDefaultAvailable = TRUE
+        )
         if (valueMaxVectorName %in% c("piMaxVector", "omegaMaxVector")) {
             .assertIsInOpenInterval(
                 valueMaxVector,
@@ -3062,7 +3119,7 @@ NULL
             )
         }
     }
-    
+
     effectMatrix <- .createEffectMatrix(
         simulationResults = simulationResults,
         typeOfShape = typeOfShape,
@@ -3073,13 +3130,13 @@ NULL
         gED50 = gED50,
         gMax = gMax,
         slope = slope,
-        doseLevels = doseLevels)
+        doseLevels = doseLevels
+    )
     simulationResults$effectMatrix <- t(effectMatrix)
     return(effectMatrix)
 }
 
-.assertIsValidEffectMatrixMeans <- function(
-        ...,
+.assertIsValidEffectMatrixMeans <- function(...,
         simulationResults,
         typeOfShape,
         effectMatrix,
@@ -3091,8 +3148,8 @@ NULL
     return(.assertIsValidEffectMatrix(
         simulationResults = simulationResults,
         typeOfShape = typeOfShape,
-        effectMatrix = effectMatrix, 
-        valueMaxVector = muMaxVector, 
+        effectMatrix = effectMatrix,
+        valueMaxVector = muMaxVector,
         valueMaxVectorName = "muMaxVector",
         gED50 = gED50,
         gMax = gMax,
@@ -3101,8 +3158,7 @@ NULL
     ))
 }
 
-.assertIsValidEffectMatrixRates <- function(
-        ...,
+.assertIsValidEffectMatrixRates <- function(...,
         simulationResults,
         typeOfShape,
         effectMatrix,
@@ -3115,8 +3171,8 @@ NULL
     return(.assertIsValidEffectMatrix(
         simulationResults = simulationResults,
         typeOfShape = typeOfShape,
-        effectMatrix = effectMatrix, 
-        valueMaxVector = piMaxVector, 
+        effectMatrix = effectMatrix,
+        valueMaxVector = piMaxVector,
         valueMaxVectorName = "piMaxVector",
         piControl = piControl,
         gED50 = gED50,
@@ -3126,8 +3182,7 @@ NULL
     ))
 }
 
-.assertIsValidEffectMatrixSurvival <- function(
-        ...,
+.assertIsValidEffectMatrixSurvival <- function(...,
         simulationResults,
         typeOfShape,
         effectMatrix,
@@ -3139,8 +3194,8 @@ NULL
     return(.assertIsValidEffectMatrix(
         simulationResults = simulationResults,
         typeOfShape = typeOfShape,
-        effectMatrix = effectMatrix, 
-        valueMaxVector = omegaMaxVector, 
+        effectMatrix = effectMatrix,
+        valueMaxVector = omegaMaxVector,
         valueMaxVectorName = "omegaMaxVector",
         gED50 = gED50,
         gMax = gMax,
@@ -3155,7 +3210,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'plannedSubjects' (", .arrayToString(plannedSubjects),
-            ") must have length 'kMax' (", kMax, ")", 
+            ") must have length 'kMax' (", kMax, ")",
             call. = FALSE
         )
     }
@@ -3173,9 +3228,10 @@ NULL
 
 .isDelayedInformationEnabled <- function(..., design = NULL, delayedInformation = NULL) {
     if (is.null(design) && is.null(delayedInformation)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-            "either 'design' or 'delayedInformation' must be specified", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "either 'design' or 'delayedInformation' must be specified",
+            call. = FALSE
+        )
     }
 
     if (!is.null(design)) {
@@ -3202,9 +3258,10 @@ NULL
         overdispersion) {
     .assertIsSingleInteger(sided, "sided", validateType = FALSE)
     if (sided != 1 && sided != 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'sided' (", sided, ") must be defined as 1 or 2", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'sided' (", sided, ") must be defined as 1 or 2",
+            call. = FALSE
+        )
     }
     .assertIsSingleNumber(lambda, "lambda", naAllowed = TRUE)
     .assertIsInOpenInterval(lambda, "lambda", lower = 0, upper = NULL, naAllowed = TRUE)
@@ -3221,14 +3278,14 @@ NULL
         if (all(!is.na(lambda1)) || !is.na(lambda2)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda1' and/or 'lambda2' need not to be specified if 'lambda' and 'theta' are specified", 
+                "'lambda1' and/or 'lambda2' need not to be specified if 'lambda' and 'theta' are specified",
                 call. = FALSE
             )
         }
         if (length(theta) > 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "theta cannot be specified as vector if lambda is specified", 
+                "theta cannot be specified as vector if lambda is specified",
                 call. = FALSE
             )
         }
@@ -3236,7 +3293,7 @@ NULL
         if (all(!is.na(lambda1)) || !is.na(lambda)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda1' and/or 'lambda' need not to be specified if 'lambda2' and 'theta' are specified", 
+                "'lambda1' and/or 'lambda' need not to be specified if 'lambda2' and 'theta' are specified",
                 call. = FALSE
             )
         }
@@ -3244,14 +3301,14 @@ NULL
         if (!is.na(lambda2) || !is.na(lambda)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda2' and/or 'lambda' need not to be specified if 'lambda1' and 'theta' are specified", 
+                "'lambda2' and/or 'lambda' need not to be specified if 'lambda1' and 'theta' are specified",
                 call. = FALSE
             )
         }
         if (length(theta) > 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "theta cannot be specified as vector if lambda1 is specified", 
+                "theta cannot be specified as vector if lambda1 is specified",
                 call. = FALSE
             )
         }
@@ -3259,27 +3316,27 @@ NULL
         if (!is.na(lambda) || all(!is.na(theta))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda' and/or 'theta' need not to be specified if 'lambda1' and 'lambda2' are specified", 
+                "'lambda' and/or 'theta' need not to be specified if 'lambda1' and 'lambda2' are specified",
                 call. = FALSE
             )
         }
     } else if (!is.na(lambda) && all(!is.na(lambda1))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'lambda2' and/or 'theta' need not to be specified if 'lambda' and 'lambda1' are specified", 
+            "'lambda2' and/or 'theta' need not to be specified if 'lambda' and 'lambda1' are specified",
             call. = FALSE
         )
     } else if (!is.na(lambda) && !is.na(lambda2)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'lambda1' and/or 'theta' need not to be specified if 'lambda' and 'lambda2' are specified", 
+            "'lambda1' and/or 'theta' need not to be specified if 'lambda' and 'lambda2' are specified",
             call. = FALSE
         )
     } else if (sum(is.na(lambda2), any(is.na(lambda1)), is.na(lambda), any(is.na(theta))) != 2) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "this parameter configuration is not possible: exactly two of the ",
-            "parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified", 
+            "parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified",
             call. = FALSE
         )
     }
@@ -3292,7 +3349,7 @@ NULL
             sampleSizeEnabled) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "any 'lambda1 / lambda2' (", .arrayToString(lambda1 / lambda2), ") must be != 'thetaH0' (", thetaH0, ")", 
+            "any 'lambda1 / lambda2' (", .arrayToString(lambda1 / lambda2), ") must be != 'thetaH0' (", thetaH0, ")",
             call. = FALSE
         )
     }
@@ -3322,7 +3379,7 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             sQuote(paramNames[1]), " (", .arrayToString(params[[1]]), ") ",
             "and ", sQuote(paramNames[2]), " (", .arrayToString(params[[2]]), ") ",
-            "cannot be specified together", 
+            "cannot be specified together",
             call. = FALSE
         )
     } else if (case == "eitherOr" && all(is.na(params[[1]])) && all(is.na(params[[2]]))) {
@@ -3330,7 +3387,7 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "either ", sQuote(paramNames[1]), " ",
             "or ", sQuote(paramNames[2]), " ",
-            "needs to be specified", 
+            "needs to be specified",
             call. = FALSE
         )
     }
@@ -3388,7 +3445,7 @@ NULL
     if (any(is.na(accrualTime)) && !is.na(followUpTime)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualTime' needs to be specified if 'followUpTime' (", followUpTime, ") is specified", 
+            "'accrualTime' needs to be specified if 'followUpTime' (", followUpTime, ") is specified",
             call. = FALSE
         )
     }
@@ -3413,7 +3470,7 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' needs to be specified if 'maxNumberOfSubjects' ",
-                "(", maxNumberOfSubjects, ") is specified", 
+                "(", maxNumberOfSubjects, ") is specified",
                 call. = FALSE
             )
         }
@@ -3421,7 +3478,7 @@ NULL
         if (is.na(maxNumberOfSubjects) && (any(is.na(accrualIntensity)) || any(is.na(accrualTime)))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified", 
+                "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified",
                 call. = FALSE
             )
         }
@@ -3435,7 +3492,7 @@ NULL
         if (is.na(maxNumberOfSubjects) && (any(is.na(accrualIntensity)) || any(is.na(accrualTime)))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified", 
+                "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified",
                 call. = FALSE
             )
         }
@@ -3453,7 +3510,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'accrualTime' (", .arrayToString(accrualTime), ") and ",
-            "'accrualIntensity' (", .arrayToString(accrualIntensity), ") does not match", 
+            "'accrualIntensity' (", .arrayToString(accrualIntensity), ") does not match",
             call. = FALSE
         )
     }
@@ -3462,7 +3519,7 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'accrualTime' (", .arrayToString(accrualTime), ") and ",
-            "'accrualIntensity' (", .arrayToString(accrualIntensity), ") does not match", 
+            "'accrualIntensity' (", .arrayToString(accrualIntensity), ") does not match",
             call. = FALSE
         )
     }
@@ -3470,7 +3527,7 @@ NULL
             length(accrualTime) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'accrualIntensity' (", .arrayToString(accrualIntensity), ") is not correctly specified", 
+            "'accrualIntensity' (", .arrayToString(accrualIntensity), ") is not correctly specified",
             call. = FALSE
         )
     }
@@ -3481,14 +3538,16 @@ NULL
     .assertValuesAreStrictlyIncreasing(plannedCalendarTime, "plannedCalendarTime")
     .assertIsInOpenInterval(plannedCalendarTime, "plannedCalendarTime", lower = 0, upper = NULL, naAllowed = FALSE)
     if (length(plannedCalendarTime) != kMax) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                "length of 'plannedCalendarTime' (%s) must be equal to 'kMax' (%s)"
+        stop(
+            sprintf(
+                paste0(
+                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+                    "length of 'plannedCalendarTime' (%s) must be equal to 'kMax' (%s)"
+                ),
+                length(plannedCalendarTime), kMax
             ),
-            length(plannedCalendarTime), kMax
-        ), 
-        call. = FALSE)
+            call. = FALSE
+        )
     }
 }
 
@@ -3500,7 +3559,7 @@ NULL
     if (!is.numeric(type) && !is.character(type)) {
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'type' must be an integer or character value or vector (is ", .getClassName(type), ")", 
+            "'type' must be an integer or character value or vector (is ", .getClassName(type), ")",
             call. = FALSE
         )
     }
