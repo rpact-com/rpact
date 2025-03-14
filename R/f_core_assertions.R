@@ -1431,6 +1431,8 @@ NULL
 
 .assertIsValidAlpha0Vec <- function(alpha0Vec, kMax = length(alpha0Vec) - 1,
         kMaxLowerBound = 1, kMaxUpperBound = C_KMAX_UPPER_BOUND) {
+    .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
+    
     if (length(alpha0Vec) < kMaxLowerBound - 1) {
         stop(
             sprintf(
@@ -1443,8 +1445,6 @@ NULL
             call. = FALSE
         )
     }
-
-    .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
 
     if (length(alpha0Vec) != kMax - 1) {
         stop(
