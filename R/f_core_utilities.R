@@ -1776,6 +1776,10 @@ getParameterName <- function(obj, parameterCaption) {
     return(value)
 }
 
+#' @keywords internal
+#' @note This is only needed such that we can mock the function in the tests.
+wrapRequireNamespace <- base::requireNamespace
+
 #' 
 #' @title
 #' Save Options
@@ -1802,7 +1806,7 @@ getParameterName <- function(obj, parameterCaption) {
 #' 
 saveOptions <- function() {
     tryCatch({
-        if (!requireNamespace("rappdirs", quietly = TRUE)) {
+        if (!wrapRequireNamespace("rappdirs", quietly = TRUE)) {
             return(invisible(FALSE))
         }
             
@@ -1883,7 +1887,7 @@ resetOptions <- function(persist = TRUE) {
 
 .loadOptions <- function() {
     tryCatch({
-        if (!requireNamespace("rappdirs", quietly = TRUE)) { 
+        if (!wrapRequireNamespace("rappdirs", quietly = TRUE)) { 
             packageStartupMessage("Package \"rappdirs\" is needed for saving and loading rpact options. ",
                 "Please install using, e.g., install.packages(\"rappdirs\")")
             return(invisible(FALSE))

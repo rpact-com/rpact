@@ -1731,7 +1731,7 @@ NULL
 }
 
 .assertPackageIsInstalled <- function(packageName) {
-    if (!requireNamespace(packageName, quietly = TRUE)) {
+    if (!wrapRequireNamespace(packageName, quietly = TRUE)) {
         stop("Package \"", packageName, "\" is needed for this function to work. ",
             "Please install using, e.g., install.packages(\"", packageName, "\")",
             call. = FALSE

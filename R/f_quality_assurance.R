@@ -24,7 +24,7 @@ NULL
 # See testthat::skip_on_cran()
 .skipTestIfDisabled <- function(msg = "Test is disabled", ..., ignoreInTestPlan = FALSE) {
     if (!isTRUE(.isCompleteUnitTestSetEnabled()) &&
-            base::requireNamespace("testthat", quietly = TRUE)) {
+            wrapRequireNamespace("testthat", quietly = TRUE)) {
         if (isTRUE(ignoreInTestPlan)) {
             msg <- paste(msg, "and ignored in test plan")
         }
@@ -46,7 +46,7 @@ NULL
 }
 
 .skipTestIfNotX64 <- function() {
-    if (!.isMachine64Bit() && !.isMinimumRVersion4() && base::requireNamespace("testthat", quietly = TRUE)) {
+    if (!.isMachine64Bit() && !.isMinimumRVersion4() && wrapRequireNamespace("testthat", quietly = TRUE)) {
         testthat::skip("The test is only intended for R version 4.x or 64-bit computers (x86-64)")
     }
 }
