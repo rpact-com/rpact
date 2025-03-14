@@ -1432,7 +1432,7 @@ NULL
 .assertIsValidAlpha0Vec <- function(alpha0Vec, kMax = length(alpha0Vec) - 1,
         kMaxLowerBound = 1, kMaxUpperBound = C_KMAX_UPPER_BOUND) {
     .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
-    
+
     if (length(alpha0Vec) < kMaxLowerBound - 1) {
         stop(
             sprintf(
@@ -1508,10 +1508,7 @@ NULL
     tryCatch(expr = {
         args <- list(...)
     }, error = function(e) {
-        stop(
-            simpleError(paste0(C_EXCEPTION_TYPE_MISSING_ARGUMENT, e$message), call = e$call),
-            call. = FALSE
-        )
+        stop(simpleError(paste0(C_EXCEPTION_TYPE_MISSING_ARGUMENT, e$message), call = e$call))
     })
 
     if (.allArgumentsAreNotNull(...)) {
