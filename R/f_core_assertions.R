@@ -1077,6 +1077,7 @@ NULL
 }
 
 .assertIsValidStage <- function(stage, kMax) {
+    .assertIsSingleNumber(stage, "stage")
     if (stage < 1 || stage > kMax) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
