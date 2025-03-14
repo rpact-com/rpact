@@ -57,14 +57,7 @@ with suitable arguments to create the analysis results of a group sequential des
 
 \item{\code{maxInformation}}{The maximum information. Is a numeric vector of length 1 containing a whole number.}
 
-\item{\code{informationEpsilon}}{The absolute information epsilon, which defines
-the maximum distance from the observed information to the maximum
-information that causes the final analysis.
-Updates at the final analysis if the observed information at the
-final analysis is smaller ("under-running") than the planned
-maximum information. Is either a positive integer value specifying
-the absolute information epsilon or a floating point number >0 and
-<1 to define a relative information epsilon.}
+\item{\code{informationEpsilon}}{The absolute information epsilon, which defines the maximum distance from the observed information to the maximum information that causes the final analysis. Updates at the final analysis if the observed information at the final analysis is smaller ("under-running") than the planned maximum information. Is either a positive integer value specifying the absolute information epsilon or a floating point number >0 and <1 to define a relative information epsilon.}
 }}
 
 \keyword{internal}

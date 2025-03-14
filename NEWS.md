@@ -8,6 +8,7 @@
 * `setupPackageTests()` sets up the package tests by downloading the test files and copying them to the rpact installation directory
 * `saveOptions()` saves the current `rpact` options to a configuration file
 * `resetOptions()` resets the `rpact` options to their default values
+* Argument `conservative` added to `getSampleSizeRates()` function, see enhancement [#39](https://github.com/rpact-com/rpact/issues/39)
 
 ## Improvements, issues, and changes
 

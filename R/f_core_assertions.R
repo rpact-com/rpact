@@ -892,14 +892,22 @@ NULL
     }
 }
 
-.showParameterOutOfValidatedBoundsMessage <- function(parameterValue,
-        parameterName, ...,
+.showParameterOutOfValidatedBoundsMessage <- function(
+        parameterValue,
+        parameterName, 
+        ...,
         lowerBound = NA_real_,
         upperBound = NA_real_,
         spendingFunctionName = NA_character_,
         closedLowerBound = TRUE,
         closedUpperBound = TRUE,
-        suffix = NA_character_) {
+        suffix = NA_character_,
+        naAllowed = FALSE) {
+        
+    if (naAllowed && is.na(parameterValue)) {
+        return(invisible())
+    }
+        
     .assertIsSingleNumber(lowerBound, "lowerBound", naAllowed = TRUE)
     .assertIsSingleNumber(upperBound, "upperBound", naAllowed = TRUE)
     if (is.na(lowerBound) && is.na(upperBound)) {
@@ -959,12 +967,6 @@ NULL
             )
         }
     }
-}
-
-.assertIsValidAlpha <- function(alpha) {
-    .assertIsSingleNumber(alpha, "alpha")
-    .assertIsInOpenInterval(alpha, "alpha", lower = 0, upper = NULL)
-    .showParameterOutOfValidatedBoundsMessage(alpha, "alpha", lowerBound = 1e-06, upperBound = 0.5, closedUpperBound = FALSE)
 }
 
 .assertIsValidKappa <- function(kappa) {
@@ -1060,20 +1062,29 @@ NULL
     }
 }
 
-.assertIsValidBeta <- function(beta, alpha) {
-    .assertIsSingleNumber(beta, "beta")
-    .assertIsSingleNumber(alpha, "alpha")
-    .assertIsInOpenInterval(beta, "beta", lower = 0, upper = NULL)
+.assertIsValidAlpha <- function(alpha, ..., naAllowed = FALSE) {
+    .assertIsSingleNumber(alpha, "alpha", naAllowed = naAllowed)
+    .assertIsInOpenInterval(alpha, "alpha", lower = 0, upper = 1, naAllowed = naAllowed)
+    .showParameterOutOfValidatedBoundsMessage(alpha, "alpha", 
+        lowerBound = 1e-06, upperBound = 0.5, 
+        closedUpperBound = FALSE, naAllowed = naAllowed)
+}
+
+.assertIsValidBeta <- function(beta, alpha, ..., naAllowed = FALSE) {
+    .assertIsSingleNumber(beta, "beta", naAllowed = naAllowed)
+    .assertIsSingleNumber(alpha, "alpha", naAllowed = naAllowed)
+    .assertIsInOpenInterval(beta, "beta", lower = 0, upper = 1, naAllowed = naAllowed)
     .showParameterOutOfValidatedBoundsMessage(beta, "beta",
         lowerBound = 1e-04,
         upperBound = 1 - alpha, closedUpperBound = FALSE,
-        suffix = "condition: 1e-06 <= alpha < 1 - beta <= 1 - 1e-04"
+        suffix = "condition: 1e-06 <= alpha < 1 - beta <= 1 - 1e-04",
+        naAllowed = naAllowed
     )
 }
 
-.assertIsValidAlphaAndBeta <- function(alpha, beta) {
-    .assertIsValidAlpha(alpha)
-    .assertIsValidBeta(beta, alpha)
+.assertIsValidAlphaAndBeta <- function(alpha, beta, ..., naAllowed = FALSE) {
+    .assertIsValidAlpha(alpha, naAllowed = naAllowed)
+    .assertIsValidBeta(beta, alpha, naAllowed = naAllowed)
 }
 
 .assertIsValidStage <- function(stage, kMax) {
