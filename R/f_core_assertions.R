@@ -1029,13 +1029,15 @@ NULL
             call. = FALSE
         )
     }
-    if (identical(accrualTime, 0)) {
+    
+    if (identical(accrualTime, 0) || identical(accrualTime, 0L)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "single 'accrualTime' is not allowed to be 0", 
             call. = FALSE
         )
     }
+    
     .assertIsInClosedInterval(accrualTime, "accrualTime", lower = 0, upper = NULL, naAllowed = naAllowed)
     .assertValuesAreStrictlyIncreasing(accrualTime, "accrualTime")
 }
