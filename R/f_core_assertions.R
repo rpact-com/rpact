@@ -1610,7 +1610,7 @@ NULL
             return(FALSE)
         }
 
-        if (sum(is.na(nPlanned)) > 0 || sum(nPlanned <= 0) > 0) {
+        if (sum(nPlanned <= 0) > 0) {
             warning(sprintf(
                 paste0(
                     "'nPlanned' (%s) will be ignored: ",
