@@ -1941,20 +1941,20 @@ NULL
 
 .assertIsValidAllocationRatioPlanned <- function(allocationRatioPlanned, numberOfGroups) {
     if (numberOfGroups == 1) {
+        if (allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT) {
+            warning(
+                "Planned allocation ratio ", allocationRatioPlanned, " will be ignored ",
+                "because the specified data has only one group",
+                call. = FALSE
+            )
+        }
         return(invisible())
     }
-
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM
     )
-    if (allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT && numberOfGroups == 1) {
-        warning("Planned allocation ratio ", allocationRatioPlanned, " will be ignored ",
-            "because the specified data has only one group",
-            call. = FALSE
-        )
-    }
 }
 
 .assertIsValidAllocationRatioPlannedSampleSize <- function(allocationRatioPlanned, maxNumberOfSubjects = NA_integer_) {
