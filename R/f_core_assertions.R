@@ -1029,7 +1029,7 @@ NULL
             call. = FALSE
         )
     }
-    if (identical(accrualTime, 0) || identical(accrualTime, 0L)) {
+    if (identical(accrualTime, 0)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "single 'accrualTime' is not allowed to be 0", 
