@@ -1088,13 +1088,7 @@ NULL
 }
 
 .assertIsValidIterationsAndSeed <- function(iterations, seed, ..., zeroIterationsAllowed = TRUE) {
-    if (is.null(iterations) || length(iterations) == 0 || !is.numeric(iterations)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'iterations' must be a valid integer value", 
-            call. = FALSE
-        )
-    }
+    .assertIsSingleInteger(iterations, "iterations", validateType = FALSE)
 
     if (zeroIterationsAllowed) {
         if (iterations < 0) {
@@ -1199,17 +1193,6 @@ NULL
                 "length of 'informationRates' (%s) must be equal to 'kMax' (%s)"
             ),
             length(informationRates), kMax
-        ), 
-        call. = FALSE)
-    }
-
-    if (length(informationRates) > kMaxUpperBound) {
-        stop(sprintf(
-            paste0(
-                C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
-                "length of 'informationRates' (%s) is out of bounds [%s; %s]"
-            ),
-            length(informationRates), kMaxLowerBound, kMax
         ), 
         call. = FALSE)
     }
