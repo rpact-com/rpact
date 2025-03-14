@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8607 $
+## |  Last changed: $Date: 2025-03-12 12:57:53 +0100 (Mi, 12 Mrz 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -143,7 +143,7 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
 #' Knit Print Queue
 #'
 #' @description
-#' The `.knitPrintQueue` function handles the printing of objects in a queue, 
+#' The `.knitPrintQueue` function handles the printing of objects in a queue,
 #' specifically for `SummaryFactory` objects, in a format suitable for `knitr`.
 #' It ensures that the queue is reset after execution.
 #'
@@ -156,34 +156,34 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
 #' Returns a `knitr::asis_output` object containing the formatted output, or `invisible()` if the result is empty.
 #'
 #' @details
-#' The function starts by initializing an empty character vector `result`. 
-#' It then checks if the input object `x` inherits from `SummaryFactory`. 
+#' The function starts by initializing an empty character vector `result`.
+#' It then checks if the input object `x` inherits from `SummaryFactory`.
 #' Depending on this, it retrieves the `queue` attribute from either `x$object` or `x` itself.
 #' If the `sep` parameter is `NA`, it is set to the default markdown plot print separator.
 #' The function processes each object in the `queue` and appends the formatted part to the `result` vector.
 #' If `x` inherits from `SummaryFactory`, it adds the formatted part of `x` itself to the `result` vector.
-#' Finally, if the `result` vector is empty or contains only whitespace, the function returns `invisible()`. 
+#' Finally, if the `result` vector is empty or contains only whitespace, the function returns `invisible()`.
 #' Otherwise, it returns the `result` as a `knitr::asis_output` object.
-#' 
-#' @noRd 
-#' 
+#'
+#' @noRd
+#'
 .knitPrintQueue <- function(x, ..., sep = NA_character_, prefix = "", resetPipeOperatorQueue = TRUE) {
     # ensure the queue is reset after execution
     if (isTRUE(resetPipeOperatorQueue)) {
-        on.exit(.resetPipeOperatorQueue(x)) 
+        on.exit(.resetPipeOperatorQueue(x))
     }
-    
+
     # initialize an empty character vector for the result
     result <- character()
-    
+
     # get queue from x
     queue <- .getPipeOperatorQueue(x)
-    
+
     # set the separator to the default markdown plot print separator if it is NA
     if (is.na(sep)) {
         sep <- .getMarkdownPlotPrintSeparator()
     }
-    
+
     # process each object in the queue and append the formatted part to the result
     if (!is.null(queue) && length(queue) > 0) {
         result <- ifelse(!inherits(x, "SummaryFactory"), "", result)
@@ -191,17 +191,17 @@ plot.SummaryFactory <- function(x, y, ..., showSummary = FALSE) {
             result <- .addKnitPrintPart(obj, result, sep = sep)
         }
     }
-    
+
     # add the formatted part of x itself to the result if it inherits from SummaryFactory
     if (inherits(x, "SummaryFactory")) {
         result <- .addKnitPrintPart(x, result, sep = sep, prefix = prefix)
     }
-    
+
     # return invisible() if the result is empty or contains only whitespace
     if (length(result) == 0 || all(nchar(trimws(result)) == 0)) {
         return(invisible())
     }
-    
+
     # return the result as a knitr::asis_output object
     return(knitr::asis_output(result))
 }
@@ -2063,6 +2063,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 part <- .concatenateSummaryText(part, ifelse(designPlan$normalApproximation,
                     "normal approximation", "exact test"
                 ))
+                if (.isTrialDesignPlan(designPlan) && !designPlan$normalApproximation) {
+                    part <- .concatenateSummaryText(part, ifelse(designPlan$conservative,
+                        "conservative solution", "non-conservative solution"
+                    ))
+                }
             } else {
                 part <- .concatenateSummaryText(part, ifelse(designPlan$normalApproximation,
                     "normal approximation", "exact test of Fisher"
@@ -2127,8 +2132,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             if (length(unique(stDev)) == 1) {
                 stDev <- unique(stDev)
             }
-            header <- .concatenateSummaryText(header, paste0(stDevCaption, " = ", 
-                .arrayToString(round(stDev, 3), vectorLookAndFeelEnabled = TRUE)))
+            header <- .concatenateSummaryText(header, paste0(
+                stDevCaption, " = ",
+                .arrayToString(round(stDev, 3), vectorLookAndFeelEnabled = TRUE)
+            ))
         }
         header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
     } else if (settings$ratesEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
@@ -4016,7 +4023,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE) &&
                 !is.null(designPlan[["futilityPerStage"]]) &&
                 !any(is.na(designPlan[["futilityPerStage"]])) &&
-                any(designPlan$futilityPerStage != 0) && 
+                any(designPlan$futilityPerStage != 0) &&
                 any(designPlan$futilityPerStage > 1e-08)) {
             summaryFactory$addParameter(designPlan,
                 parameterName = "futilityPerStage",

@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8556 $
-## |  Last changed: $Date: 2025-02-17 09:49:01 +0100 (Mo, 17 Feb 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8603 $
+## |  Last changed: $Date: 2025-03-11 17:40:42 +0100 (Tue, 11 Mar 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include class_dictionary.R
@@ -458,6 +458,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     theta = "Effect",
     direction = "Direction",
     normalApproximation = "Normal approximation",
+    conservative = "Conservative",
     equalVariances = "Equal variances",
     shift = "Shift",
     inflationFactor = "Inflation factor",
@@ -774,6 +775,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     theta = "Effect",
     direction = "Direction",
     normalApproximation = "Normal approximation",
+    conservative = "Conservative",
     equalVariances = "Equal variance",
     assumedStDev = "Assumed standard deviation",
     assumedStDevs = "Assumed standard deviation",
@@ -1038,15 +1040,15 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     if (inherits(obj, "TrialDesignSet") && length(obj$designs) > 0) {
         obj <- obj$designs[[1]]
     }
-    
+
     if (!inherits(obj, "TrialDesign")) {
         obj <- obj[[".design"]]
     }
-    
+
     if (is.null(obj) || !inherits(obj, "TrialDesign")) {
         return(parameterName)
     }
-    
+
     if (identical(parameterName, "futilityBounds")) {
         if (.isDelayedInformationEnabled(design = obj)) {
             if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
@@ -1074,7 +1076,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
 
 .getParameterCaption <- function(parameterName, obj = NULL, ..., tableOutputEnabled = FALSE) {
     .assertIsSingleCharacter(parameterName, "parameterName")
-    
+
     if (grepl("\\$", parameterName)) {
         parts <- strsplit(parameterName, "\\$", fixed = TRUE)[[1]]
         if (length(parts) == 2) {
@@ -1084,7 +1086,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
             parameterName <- parts[2]
         }
     }
-    
+
     if (is.null(obj)) {
         if (tableOutputEnabled) {
             return(C_TABLE_COLUMN_NAMES[[parameterName]])
@@ -1092,7 +1094,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
 
         return(C_PARAMETER_NAMES[[parameterName]])
     }
-    
+
     parameterName <- .getParameterNameTrialDesign(parameterName, obj)
 
     if (inherits(obj, "PlotSettings")) {
@@ -1100,7 +1102,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     parameterName <- .getParameterNameTrialDesign(parameterName, obj)
-    
+
     pluralExt <- ifelse(tableOutputEnabled, "", "s")
 
     if (identical(parameterName, "futilityBounds") &&
@@ -1147,11 +1149,11 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (inherits(obj, "AnalysisResults")) {
-        if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds") && 
+        if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds") &&
                 .isTrialDesignConditionalDunnett(obj$.design)) {
             return(paste0("Overall confidence interval", pluralExt, " (lower)"))
         }
-        if (identical(parameterName, "repeatedConfidenceIntervalUpperBounds") && 
+        if (identical(parameterName, "repeatedConfidenceIntervalUpperBounds") &&
                 .isTrialDesignConditionalDunnett(obj$.design)) {
             return(paste0("Overall confidence interval", pluralExt, " (upper)"))
         }

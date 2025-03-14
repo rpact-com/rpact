@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8266 $
-## |  Last changed: $Date: 2024-09-25 15:19:20 +0200 (Mi, 25 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8607 $
+## |  Last changed: $Date: 2025-03-12 12:57:53 +0100 (Mi, 12 Mrz 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -252,7 +252,7 @@ NULL
 }
 
 .getSampleSizeFixedRates <- function(..., alpha = 0.025, beta = 0.2, sided = 1,
-        normalApproximation = TRUE, riskRatio = FALSE,
+        normalApproximation = TRUE, conservative = TRUE, riskRatio = FALSE,
         thetaH0 = 0, pi1 = seq(0.4, 0.6, 0.1), pi2 = 0.2,
         groups = 2, allocationRatioPlanned = 1) {
     if (groups == 1) {
@@ -267,92 +267,48 @@ NULL
             } else {
                 ifelse(pi1[i] > thetaH0, lower.tail <- FALSE, lower.tail <- TRUE)
                 iterations <- 1
-                if (lower.tail) {
-                    nup <- 2
-                    while ((stats::pbinom(
-                        stats::qbinom(alpha, nup,
-                            thetaH0,
-                            lower.tail = lower.tail
-                        ) - 1,
-                        nup, pi1[i],
+                nup <- 2
+                while ((stats::pbinom(
+                    stats::qbinom(alpha, nup,
+                        thetaH0,
                         lower.tail = lower.tail
-                    ) < 1 - beta) && (iterations <= 50)) {
-                        nup <- 2 * nup
-                        iterations <- iterations + 1
-                    }
-                    if (iterations > 50) {
-                        nFixed[i] <- Inf
-                    } else {
-                        prec <- 2
-                        nlow <- 2
-                        while (prec > 1) {
-                            nFixed[i] <- round((nlow + nup) / 2)
-                            ifelse(stats::pbinom(
-                                stats::qbinom(alpha, nFixed[i],
-                                    thetaH0,
-                                    lower.tail = lower.tail
-                                ) - 1,
-                                nFixed[i], pi1[i],
-                                lower.tail = lower.tail
-                            ) < 1 - beta,
-                            nlow <- nFixed[i], nup <- nFixed[i]
-                            )
-                            prec <- nup - nlow
-                        }
-                        if (stats::pbinom(
-                                stats::qbinom(alpha, nFixed[i],
-                                    thetaH0,
-                                    lower.tail = lower.tail
-                                ) - 1,
-                                nFixed[i], pi1[i],
-                                lower.tail = lower.tail
-                            ) < 1 - beta) {
-                            nFixed[i] <- nFixed[i] + 1
-                        }
-                    }
+                    ) - as.integer(lower.tail),
+                    nup, pi1[i],
+                    lower.tail = lower.tail
+                ) < 1 - beta) && (iterations <= 50)) {
+                    nup <- 2 * nup
+                    iterations <- iterations + 1
+                }
+                if (iterations > 50) {
+                    nFixed[i] <- Inf
                 } else {
-                    nup <- 2
-                    while ((stats::pbinom(
-                        stats::qbinom(alpha, nup,
-                            thetaH0,
-                            lower.tail = lower.tail
-                        ),
-                        nup, pi1[i],
-                        lower.tail = lower.tail
-                    ) < 1 - beta) && (iterations <= 50)) {
-                        nup <- 2 * nup
-                        iterations <- iterations + 1
-                    }
-                    if (iterations > 50) {
-                        nFixed[i] <- Inf
-                    } else {
-                        prec <- 2
-                        nlow <- 2
-                        while (prec > 1) {
-                            nFixed[i] <- round((nlow + nup) / 2)
-                            ifelse(stats::pbinom(
-                                stats::qbinom(alpha, nFixed[i],
+                    tryCatch(
+                        if (conservative) {
+                            nFixed[i] <- max(which(stats::pbinom(
+                                stats::qbinom(alpha, (1:(2 * nup)),
                                     thetaH0,
                                     lower.tail = lower.tail
-                                ),
-                                nFixed[i], pi1[i],
+                                ) - as.integer(lower.tail),
+                                (1:(2 * nup)), pi1[i],
                                 lower.tail = lower.tail
-                            ) < 1 - beta,
-                            nlow <- nFixed[i], nup <- nFixed[i]
-                            )
-                            prec <- nup - nlow
-                        }
-                        if (stats::pbinom(
-                                stats::qbinom(alpha, nFixed[i],
+                            ) < 1 - beta)) + 1
+                        } else {
+                            nFixed[i] <- min(which(stats::pbinom(
+                                stats::qbinom(alpha, (1:nup),
                                     thetaH0,
                                     lower.tail = lower.tail
-                                ),
-                                nFixed[i], pi1[i],
+                                ) - as.integer(lower.tail),
+                                (1:nup), pi1[i],
                                 lower.tail = lower.tail
-                            ) < 1 - beta) {
-                            nFixed[i] <- nFixed[i] + 1
+                            ) >= 1 - beta))
+                        },
+                        error = function(e) {
+                            nFixed[i] <<- NA_real_
+                        },
+                        warning = function(e) {
+                            nFixed[i] <<- NA_real_
                         }
-                    }
+                    )
                 }
             }
         }
@@ -365,6 +321,7 @@ NULL
             thetaH0 = thetaH0,
             pi1 = pi1,
             normalApproximation = normalApproximation,
+            conservative = conservative,
             nFixed = nFixed
         ))
     }
@@ -561,6 +518,7 @@ NULL
         objectType = c("sampleSize", "power"),
         design,
         normalApproximation = TRUE,
+        conservative = TRUE,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
         pi1 = C_PI_1_SAMPLE_SIZE_DEFAULT,
@@ -575,6 +533,10 @@ NULL
     .assertIsValidAlphaAndBeta(design$alpha, design$beta)
     .assertIsValidSidedParameter(design$sided)
     .assertIsValidGroupsParameter(groups)
+    .assertIsSingleLogical(conservative, "conservative", naAllowed = TRUE)
+    if (is.na(conservative)) {
+        conservative <- TRUE
+    }
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsSingleLogical(riskRatio, "riskRatio")
     directionUpper <- .assertIsValidDirectionUpper(
@@ -608,6 +570,13 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "exact sample size calculation not available for two-sided testing"
+            )
+        }
+
+        if (normalApproximation && !conservative && (objectType == "sampleSize")) {
+            stop(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'conservative' (", conservative, ") has no effect on sample size calculation"
             )
         }
     } else if (groups == 2) {
@@ -660,6 +629,14 @@ NULL
             )
         }
 
+        if (!conservative) {
+            stop(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'conservative' (", conservative, ") has no effect on sample size calculation for two groups"
+            )
+        }
+
+
         if (is.na(allocationRatioPlanned)) {
             allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
         }
@@ -704,6 +681,10 @@ NULL
     }
 
     .setValueAndParameterType(designPlan, "normalApproximation", normalApproximation, TRUE)
+    .setValueAndParameterType(designPlan, "conservative", conservative, TRUE)
+    if (groups == 2) {
+        designPlan$.setParameterType("conservative", C_PARAM_NOT_APPLICABLE)
+    }
     .setValueAndParameterType(designPlan, "thetaH0", thetaH0, ifelse(riskRatio, 1, 0))
     .assertIsValidThetaH0(thetaH0, endpoint = "rates", groups = groups, ratioEnabled = riskRatio)
     if (objectType == "power") {
@@ -820,7 +801,7 @@ getPowerRates <- function(design = NULL, ...,
     designPlan <- .createDesignPlanRates(
         objectType = "power",
         design = design, riskRatio = riskRatio,
-        thetaH0 = thetaH0, pi1 = pi1, pi2 = pi2, 
+        thetaH0 = thetaH0, pi1 = pi1, pi2 = pi2,
         directionUpper = directionUpper,
         maxNumberOfSubjects = maxNumberOfSubjects, groups = groups,
         allocationRatioPlanned = allocationRatioPlanned, ...
@@ -921,6 +902,10 @@ getPowerRates <- function(design = NULL, ...,
 #' @param normalApproximation If \code{FALSE}, the sample size
 #'        for the case of one treatment group is calculated exactly using the binomial distribution,
 #'        default is \code{TRUE}.
+#' @param conservative For the case of one treatment group and \code{normalApproximation = FALSE}, if
+#'        \code{TRUE}, the sample size is calculated such that for larger sample size
+#'        than the calculated, the power is larger than 1 - beta, for \code{conservative = FALSE}, the minimum
+#'        sample size, for which power exceeds 1 - beta is calculated, default is \code{TRUE}.
 #' @param riskRatio If \code{TRUE}, the sample size for one-sided
 #'        testing of H0: \code{pi1 / pi2 = thetaH0} is calculated, default is \code{FALSE}.
 #' @inheritParams param_thetaH0
@@ -953,6 +938,7 @@ getPowerRates <- function(design = NULL, ...,
 getSampleSizeRates <- function(design = NULL, ...,
         groups = 2L,
         normalApproximation = TRUE,
+        conservative = TRUE,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
         pi1 = c(0.4, 0.5, 0.6), # C_PI_1_SAMPLE_SIZE_DEFAULT
@@ -977,9 +963,16 @@ getSampleSizeRates <- function(design = NULL, ...,
 
     designPlan <- .createDesignPlanRates(
         objectType = "sampleSize",
-        design = design, normalApproximation = normalApproximation, riskRatio = riskRatio,
-        thetaH0 = thetaH0, pi1 = pi1, pi2 = pi2, groups = groups,
-        allocationRatioPlanned = allocationRatioPlanned, ...
+        design = design, 
+        normalApproximation = normalApproximation, 
+        conservative = conservative,
+        riskRatio = riskRatio, 
+        thetaH0 = thetaH0, 
+        pi1 = pi1, 
+        pi2 = pi2, 
+        groups = groups,
+        allocationRatioPlanned = allocationRatioPlanned, 
+        ...
     )
 
     return(.calculateSampleSizeMeansAndRates(designPlan))

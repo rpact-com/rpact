@@ -525,7 +525,11 @@
 
         if (designPlan$.isSampleSizeObject()) {
             if (is.na(main)) {
-                main <- PlotSubTitleItems$new(title = "Sample Size")
+                main <- PlotSubTitleItems$new(title = ifelse(
+                    survivalDesignPlanEnabled || inherits(designPlan, "SimulationResultsSurvival"),
+                    "Number of Events", 
+                    "Sample Size"
+                ))
                 .addPlotSubTitleItems(designPlan, designMaster, main, type)
             }
 

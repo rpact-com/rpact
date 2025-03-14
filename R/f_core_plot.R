@@ -53,25 +53,25 @@ NULL
     }
 
     if (.isMultiArmSimulationResults(obj)) {
-        if (type == 1) { # Multi-arm, Overall Success
+        if (type == 1) { 
             return(.addNumberToPlotCaption("Overall Success", type, numberInCaptionEnabled))
-        } else if (type == 2) { # Multi-arm, Success per Stage
+        } else if (type == 2) { 
             return(.addNumberToPlotCaption("Success per Stage", type, numberInCaptionEnabled))
-        } else if (type == 3) { # Multi-arm, Selected Arms per Stage
+        } else if (type == 3) { 
             return(.addNumberToPlotCaption("Selected Arms per Stage", type, numberInCaptionEnabled))
-        } else if (type == 4) { # Multi-arm, Rejected Arms per Stage
+        } else if (type == 4) { 
             return(.addNumberToPlotCaption(ifelse(obj$.design$kMax > 1,
                 "Rejected Arms per Stage", "Rejected Arms"
             ), type, numberInCaptionEnabled))
         }
     } else if (.isEnrichmentSimulationResults(obj)) {
-        if (type == 1) { # Enrichment, Overall Success
+        if (type == 1) { 
             return(.addNumberToPlotCaption("Overall Success", type, numberInCaptionEnabled))
-        } else if (type == 2) { # Enrichment, Success per Stage
+        } else if (type == 2) { 
             return(.addNumberToPlotCaption("Success per Stage", type, numberInCaptionEnabled))
-        } else if (type == 3) { # Enrichment, Selected Populations per Stage
+        } else if (type == 3) { 
             return(.addNumberToPlotCaption("Selected Populations per Stage", type, numberInCaptionEnabled))
-        } else if (type == 4) { # Enrichment, Rejected Populations per Stage
+        } else if (type == 4) { 
             return(.addNumberToPlotCaption(ifelse(obj$.design$kMax > 1,
                 "Rejected Populations per Stage", "Rejected Populations"
             ), type, numberInCaptionEnabled))
@@ -83,7 +83,12 @@ NULL
     if (inherits(obj, "TrialDesignPlan") || inherits(obj, "SimulationResults")) {
         if (type == 5) {
             if (obj$.isSampleSizeObject()) {
-                return(.addNumberToPlotCaption("Sample Size", type, numberInCaptionEnabled))
+                return(.addNumberToPlotCaption(
+                    ifelse(
+                        .isTrialDesignPlanSurvival(obj) || inherits(obj, "SimulationResultsSurvival"),
+                        "Number of Events", 
+                        "Sample Size"
+                    ), type, numberInCaptionEnabled))
             } else {
                 return(.addNumberToPlotCaption(
                     "Overall Power and Early Stopping",
@@ -91,10 +96,12 @@ NULL
                 ))
             }
         } else if (type == 6) {
-            return(.addNumberToPlotCaption(ifelse(.isTrialDesignPlanSurvival(obj) ||
-                inherits(obj, "SimulationResultsSurvival"),
-            "Number of Events", "Sample Size"
-            ), type, numberInCaptionEnabled))
+            return(.addNumberToPlotCaption(
+                ifelse(
+                    .isTrialDesignPlanSurvival(obj) || inherits(obj, "SimulationResultsSurvival"),
+                    "Expected Number of Events and Power / Early Stop", 
+                    "Expected Sample Size and Power / Early Stop"
+                ), type, numberInCaptionEnabled))
         } else if (type == 7) {
             return(.addNumberToPlotCaption("Overall Power", type, numberInCaptionEnabled))
         } else if (type == 8) {
@@ -108,7 +115,7 @@ NULL
             }
         } else if (type == 10) {
             return(.addNumberToPlotCaption("Study Duration", type, numberInCaptionEnabled))
-        } else if (type == 11) {
+        } else if (type == 11) { # TODO check for different endpoints
             return(.addNumberToPlotCaption("Expected Number of Subjects", type, numberInCaptionEnabled))
         } else if (type == 12) {
             return(.addNumberToPlotCaption("Analysis Time", type, numberInCaptionEnabled))
