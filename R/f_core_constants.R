@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8603 $
-## |  Last changed: $Date: 2025-03-11 17:40:42 +0100 (Tue, 11 Mar 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8614 $
+## |  Last changed: $Date: 2025-03-17 14:21:31 +0100 (Mo, 17 Mrz 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include class_dictionary.R
@@ -41,6 +41,7 @@ C_POSITION_LEFT_BOTTOM <- 3
 C_POSITION_RIGHT_TOP <- 4
 C_POSITION_RIGHT_CENTER <- 5
 C_POSITION_RIGHT_BOTTOM <- 6
+C_POSITION_OUTSIDE_BOTTOM <- "bottom"
 
 C_DESIGN_TOLERANCE_DEFAULT <- 1e-08
 C_CONST_NEWTON_COTES <- 15

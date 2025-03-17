@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
+## |  File version: $Revision: 8614 $
+## |  Last changed: $Date: 2025-03-17 14:21:31 +0100 (Mo, 17 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -963,6 +963,14 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         categoryParameterName <- NA_character_
     }
 
+    tryCatch({
+        if (all(c("criticalValuesPValueScale", "futilityBoundsPValueScale") %in% yParameterNames)) {
+            data$futilityBoundsPValueScale[nrow(data)] <- data$criticalValuesPValueScale[nrow(data)]
+        }
+    }, error = function(e) {
+        .logError("Failed to set last 'futilityBoundsPValueScale' value: ", e$message)
+    })
+    
     yParameterName1 <- yParameterNames[1]
     yParameterName2 <- NULL
     yParameterName3 <- NULL
@@ -1127,6 +1135,11 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         # sort categories for pairwise printing of the legend
         unqiueValues <- unique(as.character(data$categories))
         decreasing <- addPowerAndAverageSampleNumber && xParameterName %in% c("effect", "effectMatrix")
+        
+        if (all(c("criticalValuesPValueScale", "futilityBoundsPValueScale") %in% yParameterNames)) {
+            decreasing <- TRUE
+        }
+        
         catLevels <- unqiueValues[order(unqiueValues, decreasing = decreasing)]
         data$categories <- factor(data$categories, levels = catLevels)
         if (!is.na(legendTitle) && yParameterName1 == "alphaSpent" && yParameterName2 == "betaSpent") {
@@ -1134,7 +1147,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             legendTitle <- paste(legendTitle, "Type of error", sep = sep)
         }
     }
-
+    
     if (is.na(legendPosition)) {
         legendPosition <- .getLegendPosition(
             plotSettings, designMaster, data, yParameterName1,
@@ -1149,7 +1162,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     plotDashedHorizontalLine <- "criticalValuesEffectScale" %in% yParameterNames && designMaster$sided == 2
-    p <- .plotDataFrame(data,
+    p <- .plotDataFrame(
+        data,
         mainTitle = mainTitle, 
         xlab = xlab, 
         ylab = ylab,
@@ -1479,8 +1493,14 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(pointBorder)
 }
 
-.getLegendPosition <- function(plotSettings, designMaster, data, yParameterName1,
-        yParameterName2, addPowerAndAverageSampleNumber) {
+.getLegendPosition <- function(
+        plotSettings, 
+        designMaster, 
+        data, 
+        yParameterName1,
+        yParameterName2, 
+        addPowerAndAverageSampleNumber) {
+        
     if (length(unique(data$categories)) > 6) {
         plotSettings$adjustPointSize(0.8)
         plotSettings$adjustLegendFontSize(0.8)

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8216 $
-## |  Last changed: $Date: 2024-09-16 11:45:02 +0200 (Mo, 16 Sep 2024) $
+## |  File version: $Revision: 8614 $
+## |  Last changed: $Date: 2025-03-17 14:21:31 +0100 (Mo, 17 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -595,7 +595,7 @@ getObjectRCode <- function(
 
     thetaH0 <- NA_real_
     if (inherits(obj, "SimulationResultsSurvival") &&
-            obj$.getParameterType("thetaH1") == "g") {
+            obj$.getParameterType("thetaH1") == C_PARAM_GENERATED) {
         objNames <- c(objNames, "thetaH1")
         thetaH0 <- obj[["thetaH0"]]
     }
@@ -632,7 +632,8 @@ getObjectRCode <- function(
     }
 
     if (!("accrualIntensity" %in% objNames) && !is.null(obj[[".accrualTime"]]) &&
-            !obj$.accrualTime$absoluteAccrualIntensityEnabled) {
+            !obj$.accrualTime$absoluteAccrualIntensityEnabled && 
+            obj$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED) {
         objNames <- c(objNames, "accrualIntensity")
         objNames <- objNames[objNames != "accrualIntensityRelative"]
     }
@@ -711,7 +712,7 @@ getObjectRCode <- function(
                     if (!is.null(optimumAllocationRatio) && isTRUE(optimumAllocationRatio)) {
                         value <- 0
                     } else if (inherits(obj, "ParameterSet")) {
-                        if (obj$.getParameterType("allocationRatioPlanned") == "g") {
+                        if (obj$.getParameterType("allocationRatioPlanned") == C_PARAM_GENERATED) {
                             value <- 0
                         }
                     }
@@ -756,43 +757,47 @@ getObjectRCode <- function(
 
         if (inherits(obj, "TrialDesignPlanSurvival")) {
             if (!("accrualTime" %in% objNames) &&
-                    obj$.getParameterType("accrualTime") == "g" && !all(is.na(obj$accrualTime))) {
+                    obj$.getParameterType("accrualTime") == C_PARAM_GENERATED && !all(is.na(obj$accrualTime))) {
                 # case 2: follow-up time and absolute intensity given
                 accrualType2 <- (length(obj$accrualIntensity) == 1 && obj$accrualIntensity >= 1 &&
-                    obj$.getParameterType("accrualIntensity") == "u" &&
-                    obj$.getParameterType("followUpTime") == "u" &&
-                    obj$.getParameterType("maxNumberOfSubjects") == "g")
+                    obj$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED &&
+                    obj$.getParameterType("followUpTime") == C_PARAM_USER_DEFINED &&
+                    obj$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED)
 
                 if (!accrualType2) {
-                    accrualTime <- .getArgumentValueRCode(obj$accrualTime, "accrualTime")
-                    if (length(obj$accrualTime) > 1 && length(obj$accrualTime) == length(obj$accrualIntensity) &&
-                            (obj$.getParameterType("maxNumberOfSubjects") == "u" ||
-                                obj$.getParameterType("followUpTime") == "u")) {
-                        accrualTime <- .getArgumentValueRCode(obj$accrualTime[1:(length(obj$accrualTime) - 1)], "accrualTime")
+                    if (obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
+                        accrualTime <- .getArgumentValueRCode(obj$accrualTime, "accrualTime")
+                        if (length(obj$accrualTime) > 1 && length(obj$accrualTime) == length(obj$accrualIntensity) &&
+                            (obj$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED ||
+                                obj$.getParameterType("followUpTime") == C_PARAM_USER_DEFINED)) {
+                            accrualTime <- .getArgumentValueRCode(obj$accrualTime[1:(length(obj$accrualTime) - 1)], "accrualTime")
+                        }
+                        accrualTimeArg <- paste0("accrualTime = ", accrualTime)
+                        
+                        index <- which(grepl("^accrualIntensity", arguments))
+                        if (length(index) == 1 && index > 1) {
+                            arguments <- c(arguments[1:(index - 1)], accrualTimeArg, arguments[index:length(arguments)])
+                        } else {
+                            arguments <- c(arguments, accrualTimeArg)
+                        }
                     }
-                    accrualTimeArg <- paste0("accrualTime = ", accrualTime)
-
-                    index <- which(grepl("^accrualIntensity", arguments))
-                    if (length(index) == 1 && index > 1) {
-                        arguments <- c(arguments[1:(index - 1)], accrualTimeArg, arguments[index:length(arguments)])
-                    } else {
-                        arguments <- c(arguments, accrualTimeArg)
-                    }
-                } else if (obj$.getParameterType("followUpTime") == "u") {
+                } else if (obj$.getParameterType("followUpTime") == C_PARAM_USER_DEFINED) {
                     arguments <- c(arguments, "accrualTime = 0")
                 }
             }
 
             accrualIntensityRelative <- obj$.accrualTime$accrualIntensityRelative
-            if (!("accrualIntensity" %in% objNames) && !all(is.na(accrualIntensityRelative))) {
+            if (!("accrualIntensity" %in% objNames) && !all(is.na(accrualIntensityRelative)) && 
+                    obj$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED) {
                 arguments <- c(arguments, paste0(
                     "accrualIntensity = ",
                     .getArgumentValueRCode(accrualIntensityRelative, "accrualIntensity")
                 ))
             }
 
-            if (!("maxNumberOfSubjects" %in% objNames) && obj$.accrualTime$.getParameterType("maxNumberOfSubjects") == "u" &&
-                    !(obj$.getParameterType("followUpTime") %in% c("u", "d"))) {
+            if (!("maxNumberOfSubjects" %in% objNames) && 
+                obj$.accrualTime$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED &&
+                    !(obj$.getParameterType("followUpTime") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))) {
                 arguments <- c(arguments, paste0(
                     "maxNumberOfSubjects = ",
                     .getArgumentValueRCode(obj$maxNumberOfSubjects[1], "maxNumberOfSubjects")

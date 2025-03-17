@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8579 $
-## |  Last changed: $Date: 2025-03-04 16:57:07 +0100 (Di, 04 Mrz 2025) $
+## |  File version: $Revision: 8614 $
+## |  Last changed: $Date: 2025-03-17 14:21:31 +0100 (Mo, 17 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -467,27 +467,48 @@
 
         if (survivalDesignPlanEnabled) {
             xParameterName <- "cumulativeEventsPerStage"
-            yParameterNames <- "stageLevels"
-            designPlan <- data.frame(
-                cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
-                stageLevels = designMaster$stageLevels
-            )
+            if (!all(is.na(designMaster$futilityBounds)) && 
+                    any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+                designPlan <- data.frame(
+                    cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
+                    stageLevels = designMaster$stageLevels,
+                    criticalValuesPValueScale = designPlan$criticalValuesPValueScale,
+                    futilityBoundsPValueScale = c(designPlan$futilityBoundsPValueScale, 
+                        designPlan$criticalValuesPValueScale[length(designPlan$criticalValuesPValueScale)])
+                )
+            } else {
+                designPlan <- data.frame(
+                    cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
+                    stageLevels = designMaster$stageLevels,
+                    criticalValuesPValueScale = designPlan$criticalValuesPValueScale
+                )
+            }
             xParameterNameSrc <- "cumulativeEventsPerStage[, 1]"
-            yParameterNamesSrc <- ".design$stageLevels"
         } else {
             xParameterName <- "informationRates"
-            yParameterNames <- "stageLevels"
-            designPlan <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             xParameterNameSrc <- ".design$informationRates"
-            yParameterNamesSrc <- ".design$stageLevels"
         }
-
+        
+        if (!all(is.na(designMaster$futilityBounds)) && 
+                any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+            yParameterNames <- c("criticalValuesPValueScale", "futilityBoundsPValueScale")
+        } else {
+            yParameterNames <- "criticalValuesPValueScale"
+        }
+        yParameterNamesSrc <- yParameterNames
+        
+        if (is.na(legendPosition)) {
+            legendPosition <- C_POSITION_OUTSIDE_BOTTOM
+        }
+        
         srcCmd <- .showPlotSourceInformation(
             objectName = designPlanName,
             xParameterName = xParameterNameSrc,
             yParameterNames = yParameterNamesSrc,
-            hint = showSourceHint, nMax = nMax,
-            type = type, showSource = showSource
+            hint = showSourceHint, 
+            nMax = nMax,
+            type = type, 
+            showSource = showSource
         )
     } else if (type == 4) { # Alpha Spending
         if (is.na(main)) {

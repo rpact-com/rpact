@@ -24,9 +24,17 @@ Authors@R: c(
     	role = c("ctb")
 	),
     person(
+    	given = "Daniel", 
+    	family = "Sabanes Bove", 
+    	email = "daniel.sabanes_bove@rconis.com",
+        comment = c(ORCID = "0000-0002-0176-9239"), 
+    	role = c("ctb")
+	),
+    person(
     	given = "Stephen", 
     	family = "Schueuerhuis", 
     	email = "stephen.schueuerhuis@charite.de",
+        comment = c(ORCID = "0009-0006-3124-6056"), 
     	role = c("ctb")
 	),
     person(
