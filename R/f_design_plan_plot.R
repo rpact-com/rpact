@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8614 $
-## |  Last changed: $Date: 2025-03-17 14:21:31 +0100 (Mo, 17 Mrz 2025) $
+## |  File version: $Revision: 8615 $
+## |  Last changed: $Date: 2025-03-17 16:43:46 +0100 (Mo, 17 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -485,8 +485,8 @@
             }
             xParameterNameSrc <- "cumulativeEventsPerStage[, 1]"
         } else {
-            xParameterName <- "informationRates"
-            xParameterNameSrc <- ".design$informationRates"
+            xParameterName <- "numberOfSubjects"
+            xParameterNameSrc <- xParameterName
         }
         
         if (!all(is.na(designMaster$futilityBounds)) && 
@@ -933,19 +933,31 @@
 
             return(.plotDataFrame(data,
                 mainTitle = main,
-                xlab = NA_character_, ylab = NA_character_, xAxisLabel = "Hazard Ratio",
-                yAxisLabel1 = "Analysis Time", yAxisLabel2 = NA_character_,
-                plotPointsEnabled = TRUE, legendTitle = "Stage",
-                legendPosition = legendPosition, sided = designMaster$sided,
+                xlab = NA_character_, 
+                ylab = NA_character_, 
+                xAxisLabel = "Hazard Ratio",
+                yAxisLabel1 = "Analysis Time", 
+                yAxisLabel2 = NA_character_,
+                plotPointsEnabled = TRUE, 
+                legendTitle = "Stage",
+                legendPosition = legendPosition, 
+                sided = designMaster$sided,
                 plotSettings = plotSettings, ...
             ))
         } else if (type == 13 || type == 14) { # Cumulative Distribution Function / Survival function
-            return(.plotSurvivalFunction(designPlan,
-                designMaster = designMaster, type = type, main = main,
-                xlab = xlab, ylab = ylab, palette = palette,
-                legendPosition = legendPosition, showSource = showSource,
+            return(.plotSurvivalFunction(
+                designPlan,
+                designMaster = designMaster, 
+                type = type, 
+                main = main,
+                xlab = xlab, 
+                ylab = ylab, 
+                palette = palette,
+                legendPosition = legendPosition, 
+                showSource = showSource,
                 designPlanName = designPlanName,
-                plotSettings = plotSettings, ...
+                plotSettings = plotSettings, 
+                ...
             ))
         } else {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1, 2, ..., 14")
@@ -960,16 +972,24 @@
         }
         return(srcCmd)
     }
-
+    
     p <- .plotParameterSet(
-        parameterSet = designPlan, designMaster = designMaster,
+        parameterSet = designPlan, 
+        designMaster = designMaster,
         xParameterName = xParameterName,
-        yParameterNames = yParameterNames, mainTitle = main, xlab = xlab, ylab = ylab,
-        palette = palette, theta = .plotTheta(theta),
-        nMax = nMax, plotPointsEnabled = plotPointsEnabled,
-        legendPosition = legendPosition, variedParameters = variedParameters,
-        qnormAlphaLineEnabled = (type != 2), ratioEnabled = ratioEnabled,
-        plotSettings = plotSettings # , ...
+        yParameterNames = yParameterNames, 
+        mainTitle = main, 
+        xlab = xlab, 
+        ylab = ylab,
+        palette = palette, 
+        theta = .plotTheta(theta),
+        nMax = nMax, 
+        plotPointsEnabled = plotPointsEnabled,
+        legendPosition = legendPosition, 
+        variedParameters = variedParameters,
+        qnormAlphaLineEnabled = (type != 2), 
+        ratioEnabled = ratioEnabled,
+        plotSettings = plotSettings 
     )
 
     if (type == 1 && survivalDesignPlanEnabled) {
@@ -1289,11 +1309,18 @@
 
     return(.plotDataFrame(data2,
         mainTitle = main,
-        xlab = xlab, ylab = ylab, xAxisLabel = "Time",
-        yAxisLabel1 = yAxisLabel1, yAxisLabel2 = "Lambda",
-        plotPointsEnabled = FALSE, legendTitle = NA_character_,
-        legendPosition = legendPosition, scalingFactor1 = 1,
-        scalingFactor2 = scalingFactor, palette = palette, sided = designMaster$sided,
+        xlab = xlab, 
+        ylab = ylab, 
+        xAxisLabel = "Time",
+        yAxisLabel1 = yAxisLabel1, 
+        yAxisLabel2 = "Lambda",
+        plotPointsEnabled = FALSE, 
+        legendTitle = NA_character_,
+        legendPosition = legendPosition, 
+        scalingFactor1 = 1,
+        scalingFactor2 = scalingFactor, 
+        palette = palette, 
+        sided = designMaster$sided,
         plotSettings = plotSettings
     ))
 }

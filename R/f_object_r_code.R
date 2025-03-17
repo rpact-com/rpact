@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8614 $
-## |  Last changed: $Date: 2025-03-17 14:21:31 +0100 (Mo, 17 Mrz 2025) $
+## |  File version: $Revision: 8615 $
+## |  Last changed: $Date: 2025-03-17 16:43:46 +0100 (Mo, 17 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -755,7 +755,7 @@ getObjectRCode <- function(
             }
         }
 
-        if (inherits(obj, "TrialDesignPlanSurvival")) {
+        if (inherits(obj, "TrialDesignPlanSurvival") || inherits(obj, "SimulationResultsSurvival")) {
             if (!("accrualTime" %in% objNames) &&
                     obj$.getParameterType("accrualTime") == C_PARAM_GENERATED && !all(is.na(obj$accrualTime))) {
                 # case 2: follow-up time and absolute intensity given
@@ -765,13 +765,14 @@ getObjectRCode <- function(
                     obj$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED)
 
                 if (!accrualType2) {
-                    if (obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
-                        accrualTime <- .getArgumentValueRCode(obj$accrualTime, "accrualTime")
-                        if (length(obj$accrualTime) > 1 && length(obj$accrualTime) == length(obj$accrualIntensity) &&
-                            (obj$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED ||
-                                obj$.getParameterType("followUpTime") == C_PARAM_USER_DEFINED)) {
-                            accrualTime <- .getArgumentValueRCode(obj$accrualTime[1:(length(obj$accrualTime) - 1)], "accrualTime")
-                        }
+                    accrualTime <- .getArgumentValueRCode(obj$accrualTime, "accrualTime")
+                    if (length(obj$accrualTime) > 1 && length(obj$accrualTime) == length(obj$accrualIntensity) &&
+                        (obj$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED ||
+                            obj$.getParameterType("followUpTime") == C_PARAM_USER_DEFINED)) {
+                        accrualTime <- .getArgumentValueRCode(obj$accrualTime[1:(length(obj$accrualTime) - 1)], "accrualTime")
+                    }
+                    
+                    if (!identical(accrualTime, c(0, 12)) && !identical(accrualTime, c(0L, 12L))) {
                         accrualTimeArg <- paste0("accrualTime = ", accrualTime)
                         
                         index <- which(grepl("^accrualIntensity", arguments))
@@ -788,7 +789,7 @@ getObjectRCode <- function(
 
             accrualIntensityRelative <- obj$.accrualTime$accrualIntensityRelative
             if (!("accrualIntensity" %in% objNames) && !all(is.na(accrualIntensityRelative)) && 
-                    obj$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED) {
+                    obj$.accrualTime$.getParameterType("accrualIntensityRelative") == C_PARAM_USER_DEFINED) {
                 arguments <- c(arguments, paste0(
                     "accrualIntensity = ",
                     .getArgumentValueRCode(accrualIntensityRelative, "accrualIntensity")

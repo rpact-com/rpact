@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
+## |  File version: $Revision: 8615 $
+## |  Last changed: $Date: 2025-03-17 16:43:46 +0100 (Mo, 17 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -909,6 +909,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
     parameterNames <- parameterNames[!(parameterNames %in% c(
         "accrualTime", 
         "accrualIntensity",
+        "accrualIntensityRelative",
         "plannedSubjects", 
         "plannedEvents",
         "minNumberOfSubjectsPerStage", 

@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8607 $
-## |  Last changed: $Date: 2025-03-12 12:57:53 +0100 (Mi, 12 Mrz 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8615 $
+## |  Last changed: $Date: 2025-03-17 16:43:46 +0100 (Mo, 17 Mrz 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -583,7 +583,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     numberOfStages <- ncol(values)
                 }
             }
-
+            
             if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
                     isTRUE(parameterSet[[".piecewiseSurvivalTime"]]$delayedResponseEnabled)) {
                 numberOfVariants <- 1
@@ -801,7 +801,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                         if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE")) {
                             warning(
                                 "Failed to get varied parameter from ", .getClassName(parameterSet),
-                                " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ")"
+                                " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ";", 
+                                length(variedParameter),  " varied parameter values)"
                             )
                         }
                         return(invisible())

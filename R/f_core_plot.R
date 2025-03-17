@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8614 $
-## |  Last changed: $Date: 2025-03-17 14:21:31 +0100 (Mo, 17 Mrz 2025) $
+## |  File version: $Revision: 8615 $
+## |  Last changed: $Date: 2025-03-17 16:43:46 +0100 (Mo, 17 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -830,6 +830,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (is.null(axisLabel)) {
         return(paste0("%", parameterName, "%"))
     }
+    axisLabel <- gsub(" \\(one-sided P-value Scale\\)$", "", axisLabel, ignore.case = TRUE) # TODO check
     return(axisLabel)
 }
 
@@ -954,7 +955,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             "or an object that inherits from 'ParameterSet'"
         )
     }
-
+    
     if (length(variedParameters) > 0) {
         legendTitle <- .firstCharacterToUpperCase(paste(names(variedParameters), collapse = "\n"))
         categoryParameterName <- variedParameters[1]
@@ -980,7 +981,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (length(yParameterNames) >= 3) {
         yParameterName3 <- yParameterNames[3]
     }
-
+    
     mirrorModeEnabled <- any(grepl("Mirrored$", yParameterNames))
     xAxisLabel <- .getAxisLabel(xParameterName, parameterSet)
     yAxisLabel1 <- .getAxisLabel(yParameterName1, parameterSet)
@@ -1023,10 +1024,11 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
         if (!(xParameterName %in% colnames(data))) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset")
+            print(colnames(data))
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset (x-axis)")
         }
         if (!(yParameterName1 %in% colnames(data))) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName1), " is not available in dataset")
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName1), " is not available in dataset (y-axis)")
         }
 
         data$xValues <- data[[xParameterName]]
@@ -1042,7 +1044,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$yValues2 <- rep(NA_real_, nrow(data))
         } else {
             if (!(yParameterName2 %in% colnames(data))) {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName2), " is not available in dataset")
+                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName2), " is not available in dataset (y-axis 2)")
             }
             data$yValues2 <- data[[yParameterName2]]
         }
@@ -1050,7 +1052,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$yValues3 <- rep(NA_real_, nrow(data))
         } else {
             if (!(yParameterName3 %in% colnames(data))) {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName3), " is not available in dataset")
+                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName3), " is not available in dataset (y-axis 3)")
             }
             data$yValues3 <- data[[yParameterName3]]
         }
@@ -1067,7 +1069,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$categories <- rep(NA_character_, nrow(data))
         }
     }
-
+    
     if (!is.na(nMax) && is.null(yParameterName3) && xParameterName == "informationRates") {
         xAxisLabel <- "Sample Size"
         data$xValues <- data$xValues * nMax
@@ -1359,7 +1361,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     data$yValues[!is.na(data$yValues) & is.infinite(data$yValues)] <- NA_real_
     data <- data[!is.na(data$yValues), ]
-
+    
     if (categoryEnabled && groupEnabled) {
         p <- ggplot2::ggplot(data, ggplot2::aes(
             x = .data[["xValues"]], y = .data[["yValues"]],
@@ -1386,7 +1388,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (discreteXAxis) {
         p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
     }
-
+    
     # set main title
     p <- plotSettings$setMainTitle(p, mainTitle)
 
