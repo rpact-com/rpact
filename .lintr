@@ -1,0 +1,5 @@
+linters: linters_with_defaults(
+    line_length_linter = NULL,
+    indentation_linter = indentation_linter(4),
+    object_name_linter = NULL
+  )

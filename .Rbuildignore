@@ -51,3 +51,4 @@ testthat-problems\.rds
 Rplots\.pdf
 ^\.lintr$
 index\.txt$
+^air\.toml$

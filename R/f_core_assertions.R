@@ -1421,7 +1421,7 @@ NULL
 }
 
 .assertIsValidCipher <- function(key, value) {
-    if (getCipheredValue(value) != C_CIPHERS[[key]]) {
+    if (!(key %in% names(C_CIPHERS)) || (getCipheredValue(value) != C_CIPHERS[[key]])) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'token' and/or 'secret' unkown",
             call. = FALSE
@@ -1431,6 +1431,8 @@ NULL
 
 .assertIsValidAlpha0Vec <- function(alpha0Vec, kMax = length(alpha0Vec) - 1,
         kMaxLowerBound = 1, kMaxUpperBound = C_KMAX_UPPER_BOUND) {
+    .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
+
     if (length(alpha0Vec) < kMaxLowerBound - 1) {
         stop(
             sprintf(
@@ -1443,8 +1445,6 @@ NULL
             call. = FALSE
         )
     }
-
-    .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
 
     if (length(alpha0Vec) != kMax - 1) {
         stop(
@@ -1601,29 +1601,33 @@ NULL
         warning("'nPlanned' is missing", call. = FALSE)
         return(FALSE)
     }
-    if (!any(is.na(nPlanned))) {
-        if ((length(nPlanned) != kMax - stage)) {
-            warning(sprintf(
-                paste0(
-                    "'nPlanned' (%s) will be ignored: ",
-                    "length must be equal to %s (kMax - stage = %s - %s)"
-                ),
-                .arrayToString(nPlanned), kMax - stage, kMax, stage
-            ), call. = FALSE)
-            return(FALSE)
-        }
 
-        if (sum(is.na(nPlanned)) > 0 || sum(nPlanned <= 0) > 0) {
-            warning(sprintf(
-                paste0(
-                    "'nPlanned' (%s) will be ignored: ",
-                    "all values must be > 0"
-                ),
-                .arrayToString(nPlanned)
-            ), call. = FALSE)
-            return(FALSE)
-        }
+    if (all(is.na(nPlanned))) {
+        return(TRUE)
     }
+
+    if (length(nPlanned) != kMax - stage) {
+        warning(sprintf(
+            paste0(
+                "'nPlanned' (%s) will be ignored: ",
+                "length must be equal to %s (kMax - stage = %s - %s)"
+            ),
+            .arrayToString(nPlanned), kMax - stage, kMax, stage
+        ), call. = FALSE)
+        return(FALSE)
+    }
+
+    if (sum(nPlanned <= 0, na.rm = TRUE) > 0) {
+        warning(sprintf(
+            paste0(
+                "'nPlanned' (%s) will be ignored: ",
+                "all values must be > 0"
+            ),
+            .arrayToString(nPlanned)
+        ), call. = FALSE)
+        return(FALSE)
+    }
+
     return(TRUE)
 }
 
@@ -1734,7 +1738,7 @@ NULL
 }
 
 .assertPackageIsInstalled <- function(packageName) {
-    if (!requireNamespace(packageName, quietly = TRUE)) {
+    if (!wrapRequireNamespace(packageName, quietly = TRUE)) {
         stop("Package \"", packageName, "\" is needed for this function to work. ",
             "Please install using, e.g., install.packages(\"", packageName, "\")",
             call. = FALSE
@@ -1944,20 +1948,20 @@ NULL
 
 .assertIsValidAllocationRatioPlanned <- function(allocationRatioPlanned, numberOfGroups) {
     if (numberOfGroups == 1) {
+        if (allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT) {
+            warning(
+                "Planned allocation ratio ", allocationRatioPlanned, " will be ignored ",
+                "because the specified data has only one group",
+                call. = FALSE
+            )
+        }
         return(invisible())
     }
-
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM
     )
-    if (allocationRatioPlanned != C_ALLOCATION_RATIO_DEFAULT && numberOfGroups == 1) {
-        warning("Planned allocation ratio ", allocationRatioPlanned, " will be ignored ",
-            "because the specified data has only one group",
-            call. = FALSE
-        )
-    }
 }
 
 .assertIsValidAllocationRatioPlannedSampleSize <- function(allocationRatioPlanned, maxNumberOfSubjects = NA_integer_) {

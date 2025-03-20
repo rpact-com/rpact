@@ -190,7 +190,7 @@
 
 .getPlotAlphaBetaSpentParameterNames <- function(designMaster, ...) {
     if (length(list(...)) == 0) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "The argument '...' is missing")
+        return("alphaSpent")
     }
     
     if (.isTrialDesignFisher(designMaster) ||
