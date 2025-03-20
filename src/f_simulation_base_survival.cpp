@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 8188 $
- * Last changed: $Date: 2024-09-10 09:56:44 +0200 (Di, 10 Sep 2024) $
+ * File version: $Revision: 8620 $
+ * Last changed: $Date: 2025-03-20 09:03:31 +0100 (Do, 20 Mrz 2025) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -288,7 +288,7 @@ double getEstimatedTheta(
 /**
  * Get recalculated event sizes (only for stage > 1)
  */
-double getSimulationSuvivalStageEventsCpp(
+double getSimulationSurvivalStageEventsCpp(
 		int stage,
 		double conditionalPower,
 		double thetaH0,
@@ -314,8 +314,8 @@ double getSimulationSuvivalStageEventsCpp(
 	return requiredStageEvents;
 }
 
-Rcpp::XPtr<calcEventsFunctionSurvivalPtr> getSimulationSuvivalStageEventsXPtrCpp() {
-  return(Rcpp::XPtr<calcEventsFunctionSurvivalPtr>(new calcEventsFunctionSurvivalPtr(&getSimulationSuvivalStageEventsCpp)));
+Rcpp::XPtr<calcEventsFunctionSurvivalPtr> getSimulationSurvivalStageEventsXPtrCpp() {
+  return(Rcpp::XPtr<calcEventsFunctionSurvivalPtr>(new calcEventsFunctionSurvivalPtr(&getSimulationSurvivalStageEventsCpp)));
 }
 
 NumericMatrix getSimulationStepResultsSurvival(
@@ -621,7 +621,7 @@ List getSimulationSurvivalCpp(
 		Nullable<Function> calcEventsFunctionR,
 		SEXP calcEventsFunctionCpp) {
 
-	Rcpp::XPtr<calcEventsFunctionSurvivalPtr> calcEventsFunctionCppXPtr = getSimulationSuvivalStageEventsXPtrCpp();
+	Rcpp::XPtr<calcEventsFunctionSurvivalPtr> calcEventsFunctionCppXPtr = getSimulationSurvivalStageEventsXPtrCpp();
 	if (calcEventsFunctionType == 0) {
 		calcEventsFunctionR = NULL;
 	}

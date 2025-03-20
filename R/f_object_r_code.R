@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8615 $
-## |  Last changed: $Date: 2025-03-17 16:43:46 +0100 (Mo, 17 Mrz 2025) $
+## |  File version: $Revision: 8619 $
+## |  Last changed: $Date: 2025-03-20 08:20:53 +0100 (Do, 20 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -772,7 +772,8 @@ getObjectRCode <- function(
                         accrualTime <- .getArgumentValueRCode(obj$accrualTime[1:(length(obj$accrualTime) - 1)], "accrualTime")
                     }
                     
-                    if (!identical(accrualTime, c(0, 12)) && !identical(accrualTime, c(0L, 12L))) {
+                    if (!identical(accrualTime, c(0, 12)) && !identical(accrualTime, c(0L, 12L)) &&
+                            getParameterType(obj$.accrualTime, "accrualTime") != C_PARAM_GENERATED) {
                         accrualTimeArg <- paste0("accrualTime = ", accrualTime)
                         
                         index <- which(grepl("^accrualIntensity", arguments))

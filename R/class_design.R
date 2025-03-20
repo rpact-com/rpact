@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
+## |  File version: $Revision: 8620 $
+## |  Last changed: $Date: 2025-03-20 09:03:31 +0100 (Do, 20 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1264,10 +1264,23 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
     plot(x = x$.design, y = y, ...)
 }
 
-.plotTrialDesign <- function(..., x, y, main,
-        xlab, ylab, type, palette,
-        theta, nMax, plotPointsEnabled,
-        legendPosition, showSource, designName, plotSettings = NULL) {
+.plotTrialDesign <- function(
+        ..., 
+        x, 
+        y, 
+        main,
+        xlab, 
+        ylab, 
+        type, 
+        palette,
+        theta, 
+        nMax, 
+        plotPointsEnabled,
+        legendPosition, 
+        showSource, 
+        designName, 
+        plotSettings = NULL) {
+        
     .assertGgplotIsInstalled()
 
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
@@ -1281,7 +1294,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
 
     .warnInCaseOfUnknownArguments(
         functionName = "plot",
-        ignore = c("xlim", "ylim", "companyAnnotationEnabled", "variedParameters"), ...
+        ignore = c("xlim", "ylim", "companyAnnotationEnabled", 
+            "variedParameters", "showAlphaSpent", "showBetaSpent"), ...
     )
 
     if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {

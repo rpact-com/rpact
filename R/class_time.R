@@ -312,7 +312,8 @@ getPiecewiseSurvivalTime <- function(piecewiseSurvivalTime = NA_real_,
 #'
 #' @export
 #'
-getAccrualTime <- function(accrualTime = NA_real_,
+getAccrualTime <- function(
+        accrualTime = NA_real_,
         ...,
         accrualIntensity = NA_real_,
         accrualIntensityType = c("auto", "absolute", "relative"),
@@ -349,6 +350,21 @@ getAccrualTime <- function(accrualTime = NA_real_,
     .assertIsNumericVector(accrualIntensity, "accrualIntensity", naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
     .assertIsSingleCharacter(accrualIntensityType, "accrualIntensityType")
+    
+    if (!is.null(accrualTime) && is.numeric(accrualTime) && !all(is.na(accrualTime)) &&
+            !all(is.na(accrualIntensity))) {
+        accrualTimeLength <- length(accrualTime)
+        accrualIntensityLength <- length(accrualIntensity)
+        if (!accrualIntensityLength %in% c(accrualTimeLength, accrualTimeLength - 1)) {
+            stop(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "length of 'accrualIntensity' (", accrualIntensityLength, ") must be ",
+                "equal to the length of 'accrualTime' (", accrualTimeLength, ") or ",
+                "one element shorter"
+            )
+        }
+    }
+    
     absoluteAccrualIntensityEnabled <- NA
     if (accrualIntensityType == "absolute") {
         absoluteAccrualIntensityEnabled <- TRUE

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
+## |  File version: $Revision: 8620 $
+## |  Last changed: $Date: 2025-03-20 09:03:31 +0100 (Do, 20 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1079,11 +1079,23 @@ plot.TrialDesignSet <- function(
     return(main)
 }
 
-.plotTrialDesignSet <- function(..., x, y, type = 1L, main = NA_character_,
-        xlab = NA_character_, ylab = NA_character_, palette = "Set1",
-        theta = seq(-1, 1, 0.02), nMax = NA_integer_, plotPointsEnabled = NA,
-        legendPosition = NA_integer_, showSource = FALSE,
-        designSetName = NA_character_, plotSettings = NULL) {
+.plotTrialDesignSet <- function(
+        ..., 
+        x, 
+        y, 
+        type = 1L, 
+        main = NA_character_,
+        xlab = NA_character_, 
+        ylab = NA_character_, 
+        palette = "Set1",
+        theta = seq(-1, 1, 0.02), 
+        nMax = NA_integer_, 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_, 
+        showSource = FALSE,
+        designSetName = NA_character_, 
+        plotSettings = NULL) {
+      
     .assertGgplotIsInstalled()
     if (!is.call(main) && !.isResultObjectBaseClass(main)) {
         .assertIsSingleCharacter(main, "main", naAllowed = TRUE)
@@ -1124,12 +1136,7 @@ plot.TrialDesignSet <- function(
     } else if (type == 4) {
         main <- .getMainTitle(main, title = "Error Spending", nMax = nMax)
         xParameterName <- "informationRates"
-        yParameterNames <- c("alphaSpent")
-        if (!.isTrialDesignFisher(designMaster) &&
-                designMaster$typeBetaSpending != C_TYPE_OF_DESIGN_BS_NONE) {
-            yParameterNames <- c(yParameterNames, "betaSpent")
-            palette <- "Paired"
-        }
+        yParameterNames <- .getPlotAlphaBetaSpentParameterNames(designMaster, ...)
         plotPointsEnabled <- ifelse(is.na(plotPointsEnabled), FALSE, plotPointsEnabled)
     } else if (type == 5) {
         main <- .getMainTitle(main, title = "Power and Early Stopping", nMax = nMax)

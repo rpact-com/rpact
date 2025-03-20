@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8615 $
-## |  Last changed: $Date: 2025-03-17 16:43:46 +0100 (Mo, 17 Mrz 2025) $
+## |  File version: $Revision: 8619 $
+## |  Last changed: $Date: 2025-03-20 08:20:53 +0100 (Do, 20 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -115,7 +115,7 @@ NULL
             }
         } else if (type == 10) {
             return(.addNumberToPlotCaption("Study Duration", type, numberInCaptionEnabled))
-        } else if (type == 11) { # TODO check for different endpoints
+        } else if (type == 11) {
             return(.addNumberToPlotCaption("Expected Number of Subjects", type, numberInCaptionEnabled))
         } else if (type == 12) {
             return(.addNumberToPlotCaption("Analysis Time", type, numberInCaptionEnabled))
@@ -766,7 +766,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             mandatoryParameterNames = mandatoryParameterNames
         ))
     }
-
+    
     if (!.isTrialDesignSet(parameterSet)) {
         variedParameters <- logical(0)
         if ("stages" %in% colnames(data)) {
@@ -830,7 +830,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (is.null(axisLabel)) {
         return(paste0("%", parameterName, "%"))
     }
-    axisLabel <- gsub(" \\(one-sided P-value Scale\\)$", "", axisLabel, ignore.case = TRUE) # TODO check
+    axisLabel <- gsub(" \\(one-sided P-value Scale\\)$", "", axisLabel, ignore.case = TRUE)
     return(axisLabel)
 }
 
@@ -852,7 +852,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(TRUE)
 }
 
-.plotParameterSet <- function(..., 
+.plotParameterSet <- function(
+        ..., 
         parameterSet, 
         designMaster, 
         xParameterName, 
@@ -936,7 +937,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             yParameterNames = yParameterNames
         )
         data <- df$data
-
+        
         variedParameters <- df$variedParameters
         variedParameters <- na.omit(variedParameters)
         variedParameters <- variedParameters[variedParameters != "NA"]
@@ -966,12 +967,17 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     tryCatch({
         if (all(c("criticalValuesPValueScale", "futilityBoundsPValueScale") %in% yParameterNames)) {
-            data$futilityBoundsPValueScale[nrow(data)] <- data$criticalValuesPValueScale[nrow(data)]
+            index <- nrow(data)
+            if ("stages" %in% colnames(data)) {
+                index <- which(data$stages == max(data$stages))
+            }
+            data$futilityBoundsPValueScale[index] <- data$criticalValuesPValueScale[index]
+            data <- unique(data[, c(xParameterName, yParameterNames)])
         }
     }, error = function(e) {
         .logError("Failed to set last 'futilityBoundsPValueScale' value: ", e$message)
     })
-    
+
     yParameterName1 <- yParameterNames[1]
     yParameterName2 <- NULL
     yParameterName3 <- NULL
@@ -1021,7 +1027,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         "Lower and", yAxisLabel1,
         fixed = TRUE
     )
-
+    
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
         if (!(xParameterName %in% colnames(data))) {
             print(colnames(data))
@@ -1094,11 +1100,11 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             categories = uc
         ), data)
     }
-
+    
     scalingFactor1 <- 1
     scalingFactor2 <- 1
-    if (!is.null(yParameterName2) && "yValues2" %in% colnames(data) && "yValues3" %in% colnames(data)) {
-        if (yAxisScalingEnabled && !is.null(yParameterName3)) {
+    if (!is.null(yParameterName2) && "yValues2" %in% colnames(data)) {
+        if (yAxisScalingEnabled && !is.null(yParameterName3) && "yValues3" %in% colnames(data)) {
             if (is.na(yParameterName2)) {
                 scalingFactors <- .getScalingFactors(data$yValues, data$yValues3)
             } else {
@@ -1119,7 +1125,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
                 categories = .getCategories(data, yParameterName2, parameterSet)
             )
         }
-        if (!is.null(yParameterName3)) {
+        if (!is.null(yParameterName3) && "yValues3" %in% colnames(data)) {
             df3 <- data.frame(
                 xValues = data$xValues,
                 yValues = data$yValues3 * scalingFactor2,
@@ -1164,6 +1170,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     plotDashedHorizontalLine <- "criticalValuesEffectScale" %in% yParameterNames && designMaster$sided == 2
+    
     p <- .plotDataFrame(
         data,
         mainTitle = mainTitle, 
@@ -1346,7 +1353,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             removedRows1, removedRows2
         ), call. = FALSE)
     }
-
+    
     categoryEnabled <- !is.null(data[["categories"]]) && !all(is.na(data$categories))
     groupEnabled <- !is.null(data[["groups"]]) && !all(is.na(data$groups))
     if (categoryEnabled && groupEnabled) {

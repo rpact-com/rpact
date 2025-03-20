@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8615 $
-## |  Last changed: $Date: 2025-03-17 16:43:46 +0100 (Mo, 17 Mrz 2025) $
+## |  File version: $Revision: 8620 $
+## |  Last changed: $Date: 2025-03-20 09:03:31 +0100 (Do, 20 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -188,6 +188,44 @@
     return(list(theta = designPlan[[thetaName]], thetaName = thetaName))
 }
 
+.getPlotAlphaBetaSpentParameterNames <- function(designMaster, ...) {
+    if (length(list(...)) == 0) {
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "The argument '...' is missing")
+    }
+    
+    if (.isTrialDesignFisher(designMaster) ||
+            designMaster$typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) {
+        return("alphaSpent")
+    }
+    
+    alphaSpentEnabled <- .getOptionalArgument("showAlphaSpent", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(alphaSpentEnabled)) {
+        alphaSpentEnabled <- isTRUE(as.logical(getOption("rpact.plot.show.alpha.spent", TRUE)))
+    }
+    betaSpentEnabled <- isTRUE(as.logical(getOption("rpact.plot.show.beta.spent", FALSE))) || 
+        isTRUE(.getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = FALSE))
+    yParameterNames <- character()
+    if (alphaSpentEnabled) {
+        yParameterNames <- c(yParameterNames, "alphaSpent")
+    }
+    if (betaSpentEnabled) {
+        yParameterNames <- c(yParameterNames, "betaSpent")
+    }
+    if (length(yParameterNames) == 0) {
+        yParameterNames <- "alphaSpent"
+        if (isFALSE(as.logical(getOption("rpact.plot.show.alpha.spent", TRUE))) &&
+                isFALSE(as.logical(getOption("rpact.plot.show.beta.spent", TRUE)))) {
+            warning("Options 'rpact.plot.show.alpha.spent' and ",
+                "'rpact.plot.show.beta.spent' are both FALSE; ",
+                "'alphaSpent' will be shown", call. = FALSE)
+        } else {
+            warning("'showAlphaSpent' and 'showBetaSpent' are both FALSE; ",
+                "'alphaSpent' will be shown", call. = FALSE)
+        }
+    }
+    return(yParameterNames)
+}
+
 .plotTrialDesignPlan <- function(designPlan,
         type = 1L,
         main = NA_character_,
@@ -199,7 +237,9 @@
         legendPosition = NA_integer_,
         showSource = FALSE,
         designPlanName = NA_character_,
-        plotSettings = NULL, ...) {
+        plotSettings = NULL, 
+        ...) {
+        
     .assertGgplotIsInstalled()
     .assertIsTrialDesignPlan(designPlan)
     .assertIsValidLegendPosition(legendPosition)
@@ -255,7 +295,7 @@
     }
 
     srcCmd <- NULL
-    if (type == 1) { # Boundary plot
+    if (type == 1) { # Boundaries Z Scale
         if (survivalDesignPlanEnabled) {
             if (is.na(main)) {
                 main <- PlotSubTitleItems$new(title = "Boundaries Z Scale")
@@ -326,7 +366,7 @@
                 plotSettings = plotSettings 
             ))
         }
-    } else if (type == 2) { # Effect Scale Boundary plot
+    } else if (type == 2) { # Boundaries Effect Scale
         if (is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Boundaries Effect Scale")
             .addPlotSubTitleItems(designPlan, designMaster, main, type, warningEnabled = TRUE)
@@ -459,43 +499,47 @@
         } else {
             designPlan <- data
         }
-    } else if (type == 3) { # Stage Levels
+    } else if (type == 3) { # Boundaries p Values Scale
         if (is.na(main)) {
             main <- PlotSubTitleItems$new(title = "Boundaries p Values Scale")
             .addPlotSubTitleItems(designPlan, designMaster, main, type, warningEnabled = TRUE)
         }
 
+        df <- NULL
         if (survivalDesignPlanEnabled) {
             xParameterName <- "cumulativeEventsPerStage"
-            if (!all(is.na(designMaster$futilityBounds)) && 
-                    any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
-                designPlan <- data.frame(
-                    cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
-                    stageLevels = designMaster$stageLevels,
-                    criticalValuesPValueScale = designPlan$criticalValuesPValueScale,
-                    futilityBoundsPValueScale = c(designPlan$futilityBoundsPValueScale, 
-                        designPlan$criticalValuesPValueScale[length(designPlan$criticalValuesPValueScale)])
-                )
-            } else {
-                designPlan <- data.frame(
-                    cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
-                    stageLevels = designMaster$stageLevels,
-                    criticalValuesPValueScale = designPlan$criticalValuesPValueScale
-                )
-            }
             xParameterNameSrc <- "cumulativeEventsPerStage[, 1]"
+            df <- data.frame(
+                cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
+                criticalValuesPValueScale = designPlan$criticalValuesPValueScale
+            )
         } else {
             xParameterName <- "numberOfSubjects"
             xParameterNameSrc <- xParameterName
+            df <- data.frame(
+                numberOfSubjects = designPlan$numberOfSubjects[, 1],
+                criticalValuesPValueScale = designPlan$criticalValuesPValueScale,
+                futilityBoundsPValueScale = c(designPlan$futilityBoundsPValueScale, 
+                    designPlan$criticalValuesPValueScale[length(designPlan$criticalValuesPValueScale)])
+            )
         }
         
-        if (!all(is.na(designMaster$futilityBounds)) && 
+        yParameterNames <- "criticalValuesPValueScale"
+        futilityBoundsPValueScaleEnabled <- isTRUE(as.logical(
+            getOption("rpact.plot.show.futility.on.pvalue.scale", FALSE))) || 
+            isTRUE(.getOptionalArgument("showFutilityBounds", ..., optionalArgumentDefaultValue = FALSE))
+        if (futilityBoundsPValueScaleEnabled && 
+                !all(is.na(designMaster$futilityBounds)) && 
                 any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
-            yParameterNames <- c("criticalValuesPValueScale", "futilityBoundsPValueScale")
-        } else {
-            yParameterNames <- "criticalValuesPValueScale"
+            yParameterNames <- c(yParameterNames, "futilityBoundsPValueScale")
+            df$futilityBoundsPValueScale = c(designPlan$futilityBoundsPValueScale, 
+                designPlan$criticalValuesPValueScale[length(designPlan$criticalValuesPValueScale)])
         }
         yParameterNamesSrc <- yParameterNames
+        
+        if (!is.null(df)) {
+            designPlan <- df
+        }
         
         if (is.na(legendPosition)) {
             legendPosition <- C_POSITION_OUTSIDE_BOTTOM
@@ -517,7 +561,6 @@
         }
         if (survivalDesignPlanEnabled) {
             xParameterName <- "cumulativeEventsPerStage"
-            yParameterNames <- "alphaSpent"
             designPlan <- data.frame(
                 cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
                 alphaSpent = designMaster$alphaSpent
@@ -526,11 +569,11 @@
             yParameterNamesSrc <- ".design$alphaSpent"
         } else {
             xParameterName <- "informationRates"
-            yParameterNames <- "alphaSpent"
             designPlan <- TrialDesignSet$new(design = designMaster, singleDesign = TRUE)
             xParameterNameSrc <- ".design$informationRates"
             yParameterNamesSrc <- ".design$alphaSpent"
         }
+        yParameterNames <- .getPlotAlphaBetaSpentParameterNames(designMaster, ...)
         plotPointsEnabled <- ifelse(is.na(plotPointsEnabled), FALSE, plotPointsEnabled)
 
         srcCmd <- .showPlotSourceInformation(
@@ -973,7 +1016,7 @@
         return(srcCmd)
     }
     
-    p <- .plotParameterSet(
+    args <- list(
         parameterSet = designPlan, 
         designMaster = designMaster,
         xParameterName = xParameterName,
@@ -991,6 +1034,17 @@
         ratioEnabled = ratioEnabled,
         plotSettings = plotSettings 
     )
+    
+    showBetaSpent <- .getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = NA)
+    if (!is.na(showBetaSpent)) {
+        args$showBetaSpent <- showBetaSpent
+    }
+    showFutilityBound <- .getOptionalArgument("showFutilityBound", ..., optionalArgumentDefaultValue = NA)
+    if (!is.na(showFutilityBound)) {
+        args$showFutilityBound <- showFutilityBound
+    }
+    
+    p <- do.call(.plotParameterSet, args = args)
 
     if (type == 1 && survivalDesignPlanEnabled) {
         p <- .addDecisionCriticalValuesToPlot(p = p, designMaster = designMaster, type = type, nMax = nMax)
@@ -1368,6 +1422,28 @@
     if (.isTrialDesignPlanSurvival(designPlan) && designPlan$.isSampleSizeObject()) {
         return(.warnInCaseOfUnusedValuesForPlottingSurvival(designPlan$hazardRatio))
     }
+    return(NULL)
+}
+
+.getUsedValueForPlotting <- function(designPlan) {
+    if (.isTrialDesignPlanMeans(designPlan) && designPlan$.isSampleSizeObject()) {
+        value <- designPlan$alternative[1]
+        names(value) <- "alternative"
+        return(value)
+    }
+    
+    if (.isTrialDesignPlanRates(designPlan) && designPlan$.isSampleSizeObject()) {
+        value <- designPlan$pi1[1]
+        names(value) <- "pi1"
+        return(value)
+    }
+    
+    if (.isTrialDesignPlanSurvival(designPlan) && designPlan$.isSampleSizeObject()) {
+        value <- designPlan$hazardRatio[1]
+        names(value) <- "hazardRatio"
+        return(value)
+    }
+    
     return(NULL)
 }
 

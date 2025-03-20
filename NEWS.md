@@ -9,6 +9,10 @@
 * `saveOptions()` saves the current `rpact` options to a configuration file
 * `resetOptions()` resets the `rpact` options to their default values
 * Argument `conservative` added to `getSampleSizeRates()` function, see enhancement [#39](https://github.com/rpact-com/rpact/issues/39)
+* Enable futility boundaries in *Boundaries p Values Scale plot* plot (type = 3) using `options("rpact.plot.show.futility.on.pvalue.scale" = TRUE)` or argument `showFutilityBounds = TRUE`, see enhancement [#79](https://github.com/rpact-com/rpact/issues/79)
+* Enable beta-spending in *Error Spending* plot (type = 4) using `options("rpact.plot.show.beta.spent" = TRUE)` or argument `showBetaSpent = TRUE`, see enhancement [#80](https://github.com/rpact-com/rpact/issues/80). Furthermore, `options("rpact.plot.show.alpha.spent" = FALSE)` or argument `showAlphaSpent = FALSE` can be used to show only beta-spending in the plot
+
+`showAlphaSpent = TRUE`
 
 ## Improvements, issues, and changes
 
@@ -18,8 +22,7 @@
   Only members of the 'RPACT User Group' have access to the tests.
   For more information, please visit: [rpact.org/iq](https://www.rpact.org/iq) and [RPACT Connect](https://connect.rpact.com/)
 * Usage of `maxInformation` improved (see enhancement [#65](https://github.com/rpact-com/rpact/issues/65))
-* `testPackage()`: additional warning details will be added to the test report if warnings exist
-* Issue [#61](https://github.com/rpact-com/rpact/issues/61) fixed
+* `testPackage()`: additional warning details will be added to the test report if warnings exist* Issue [#61](https://github.com/rpact-com/rpact/issues/61) fixed
 * Issue [#68](https://github.com/rpact-com/rpact/issues/68) fixed
 * Flexibility of function `getPiecewiseSurvivalTime()` improved
 * Simulation allows the case #events = #patients
