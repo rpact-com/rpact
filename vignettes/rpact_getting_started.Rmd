@@ -143,7 +143,7 @@ Several utility functions are available, e.g.
 
 ## Validation
 
-Please [contact](https://www.rpact.com/contact) us to learn how to use `rpact`
+Please [contact](https://www.rpact.com/contact/) us to learn how to use `rpact`
 on FDA/GxP-compliant validated corporate computer systems and how to get a copy
 of the formal validation documentation that is customized and licensed for
 exclusive use by your company, e.g., to fulfill regulatory requirements.
@@ -151,7 +151,7 @@ exclusive use by your company, e.g., to fulfill regulatory requirements.
 ## RPACT Connect 
 
 Connecting you to insights, downloads, and premium support:
-[connect.rpact.com](https://connect.rpact.com)
+[connect.rpact.com](https://rpact.shinyapps.io/connect)
 
 ## About
 
@@ -182,4 +182,4 @@ Connecting you to insights, downloads, and premium support:
 ## Contact
 
 * [info@rpact.com](mailto:info@rpact.com)
-* [www.rpact.com/contact](https://www.rpact.com/contact)
+* [www.rpact.com/contact](https://www.rpact.com/contact/)

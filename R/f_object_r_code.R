@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8624 $
-## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
+## |  File version: $Revision: 8625 $
+## |  Last changed: $Date: 2025-03-21 14:46:59 +0100 (Fr, 21 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -877,10 +877,18 @@ getObjectRCode <- function(
         rCodeNew <- character()
         for (rCodeLine in rCode) {
             for (i in 12:2) {
-                rCodeLine <- gsub(paste(rep(" ", i), collapse = ""), 
-                    paste(rep("_", i), collapse = ""), rCodeLine)
+                rCodeLine <- gsub(
+                    pattern = paste(rep(" ", i), collapse = ""), 
+                    replacement = paste(rep("_", i), collapse = ""), 
+                    x = rCodeLine)
             }
-            rCodeLines <- strwrap(rCodeLine, width = stringWrapParagraphWidth - 2)
+            if (!grepl("^__", rCodeLine)) {
+                rCodeLine <- gsub(" = ", "_=_", rCodeLine)
+                rCodeLines <- strwrap(rCodeLine, width = stringWrapParagraphWidth - 2)
+                rCodeLines <- gsub("_=_", " = ", rCodeLines)
+            } else {
+                rCodeLines <- rCodeLine
+            }
             if (length(rCodeLines) > 1) {
                 for (i in 2:length(rCodeLines)) {
                     if (grepl("^ *(\\|>|%>%) *", rCodeLines[i])) {
@@ -893,8 +901,10 @@ getObjectRCode <- function(
                 }
             }
             for (i in 12:2) {
-                rCodeLines <- gsub(paste(rep("_", i), collapse = ""), 
-                    paste(rep(" ", i), collapse = ""), rCodeLines)
+                rCodeLines <- gsub(
+                    pattern = paste(rep("_", i), collapse = ""), 
+                    replacement = paste(rep(" ", i), collapse = ""), 
+                    x = rCodeLines)
             }
             rCodeLines <- rCodeLines[nchar(trimws(rCodeLines)) > 0]
             rCodeNew <- c(rCodeNew, rCodeLines)
