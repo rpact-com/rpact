@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8558 $
-## |  Last changed: $Date: 2025-02-17 10:11:35 +0100 (Mo, 17 Feb 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -54,9 +54,13 @@ NULL
         }
         return(.getAnalysisResultsMeansMultiArm(
             design = design,
-            dataInput = dataInput, intersectionTest = intersectionTest,
-            directionUpper = directionUpper, thetaH0 = thetaH0,
-            nPlanned = nPlanned, stage = stage, ...
+            dataInput = dataInput, 
+            intersectionTest = intersectionTest,
+            directionUpper = directionUpper, 
+            thetaH0 = thetaH0,
+            nPlanned = nPlanned, 
+            stage = stage, 
+            ...
         ))
     }
 
@@ -66,9 +70,13 @@ NULL
         }
         return(.getAnalysisResultsRatesMultiArm(
             design = design,
-            dataInput = dataInput, intersectionTest = intersectionTest,
-            directionUpper = directionUpper, thetaH0 = thetaH0,
-            nPlanned = nPlanned, stage = stage, ...
+            dataInput = dataInput, 
+            intersectionTest = intersectionTest,
+            directionUpper = directionUpper, 
+            thetaH0 = thetaH0,
+            nPlanned = nPlanned, 
+            stage = stage, 
+            ...
         ))
     }
 
@@ -78,9 +86,13 @@ NULL
         }
         return(.getAnalysisResultsSurvivalMultiArm(
             design = design,
-            dataInput = dataInput, intersectionTest = intersectionTest,
-            directionUpper = directionUpper, thetaH0 = thetaH0,
-            nPlanned = nPlanned, stage = stage, ...
+            dataInput = dataInput, 
+            intersectionTest = intersectionTest,
+            directionUpper = directionUpper, 
+            thetaH0 = thetaH0,
+            nPlanned = nPlanned, 
+            stage = stage, 
+            ...
         ))
     }
 

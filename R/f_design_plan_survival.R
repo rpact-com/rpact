@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8518 $
-## |  Last changed: $Date: 2025-01-29 15:42:08 +0100 (Mi, 29 Jan 2025) $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1925,7 +1925,7 @@ getNumberOfSubjects <- function(time, ...,
     )
 
     result <- NumberOfSubjects$new(
-        .accrualTime = accrualSetup,
+        accrualSetup = accrualSetup,
         time = time,
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,

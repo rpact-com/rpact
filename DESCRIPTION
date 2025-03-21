@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.1.1.9285
-Date: 2025-03-20
+Version: 4.2.0
+Date: 2025-03-21
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -51,7 +51,7 @@ LazyData: true
 URL: https://www.rpact.org,
     https://www.rpact.com,
     https://github.com/rpact-com/rpact,
-    https://rpact-com.github.io/rpact,
+    https://rpact-com.github.io/rpact/,
     https://rpact.shinyapps.io/connect
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US

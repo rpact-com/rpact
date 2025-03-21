@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1776,9 +1776,16 @@ getParameterName <- function(obj, parameterCaption) {
     return(value)
 }
 
-#' @keywords internal
+#' 
 #' @note This is only needed such that we can mock the function in the tests.
-wrapRequireNamespace <- base::requireNamespace
+#' 
+#' @keywords internal
+#' 
+#' @noRd 
+#' 
+.isPackageNamespaceLoaded <- function(package, ..., quietly = FALSE) {
+    base::requireNamespace(package, quietly = quietly, ...)
+}
 
 #' 
 #' @title
@@ -1806,7 +1813,7 @@ wrapRequireNamespace <- base::requireNamespace
 #' 
 saveOptions <- function() {
     tryCatch({
-        if (!wrapRequireNamespace("rappdirs", quietly = TRUE)) {
+        if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
             return(invisible(FALSE))
         }
             
@@ -1887,7 +1894,7 @@ resetOptions <- function(persist = TRUE) {
 
 .loadOptions <- function() {
     tryCatch({
-        if (!wrapRequireNamespace("rappdirs", quietly = TRUE)) { 
+        if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) { 
             packageStartupMessage("Package \"rappdirs\" is needed for saving and loading rpact options. ",
                 "Please install using, e.g., install.packages(\"rappdirs\")")
             return(invisible(FALSE))

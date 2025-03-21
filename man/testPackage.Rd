@@ -77,7 +77,7 @@ Installation qualification is a critical step in the validation process. Without
 the package cannot be considered fully validated. To gain access to the full set of unit tests,
 users must provide \code{token} and \code{secret} credentials, which are distributed to
 members of the rpact user group as part of the validation documentation.
-For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification}{rpact_installation_qualification}.
+For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}{rpact_installation_qualification}.
 }
 \examples{
 \dontrun{
@@ -101,5 +101,5 @@ testPackage(downloadTestsOnly = TRUE)
 
 }
 \references{
-For more information, please visit: \url{https://www.rpact.org/iq}
+For more information, please visit: \url{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}
 }

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8474 $
-## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -189,7 +189,9 @@ NumberOfSubjects <- R6::R6Class("NumberOfSubjects",
         accrualIntensity = NULL,
         maxNumberOfSubjects = NULL,
         numberOfSubjects = NULL,
-        initialize = function(..., accrualSetup = NULL,
+        initialize = function(
+                ..., 
+                accrualSetup = NULL,
                 time = NULL,
                 accrualTime = NULL,
                 accrualIntensity = NULL,

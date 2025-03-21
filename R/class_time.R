@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8464 $
-## |  Last changed: $Date: 2024-12-20 15:27:24 +0100 (Fr, 20 Dez 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_design_general_utilities.R
@@ -1534,6 +1534,7 @@ AccrualTime <- R6::R6Class("AccrualTime",
         maxNumberOfSubjectsCanBeCalculatedDirectly = NULL,
         absoluteAccrualIntensityEnabled = NULL,
         accrualTime = NULL,
+        accrualTimeOriginal = NULL,
         accrualIntensity = NULL,
         accrualIntensityRelative = NULL,
         maxNumberOfSubjects = NULL,
@@ -1567,6 +1568,8 @@ AccrualTime <- R6::R6Class("AccrualTime",
                 )
             )
 
+            self$accrualTimeOriginal <- NA_real_
+            self$.setParameterType("accrualTimeOriginal", C_PARAM_NOT_APPLICABLE)
             self$accrualIntensityRelative <- NA_real_
             self$.setParameterType("accrualIntensityRelative", C_PARAM_NOT_APPLICABLE)
             self$remainingTime <- NA_real_
@@ -2460,6 +2463,15 @@ AccrualTime <- R6::R6Class("AccrualTime",
                 )
             )
             if (length(self$accrualTime) == length(self$accrualIntensity)) {
+                if (self$.getParameterType("remainingTime") == C_PARAM_GENERATED) {
+                    self$accrualTimeOriginal <- self$accrualTime
+                    if (identical(self$accrualTime, c(0, 12)) || identical(self$accrualTime, C_ACCRUAL_TIME_DEFAULT)) {
+                        self$.setParameterType("accrualTimeOriginal", C_PARAM_DEFAULT_VALUE) 
+                    } else {
+                        self$.setParameterType("accrualTimeOriginal", C_PARAM_USER_DEFINED)
+                    }
+                    self$.setParameterType("accrualTime", C_PARAM_GENERATED)
+                }
                 self$accrualTime <- c(self$accrualTime, self$accrualTime[length(self$accrualTime)] + self$remainingTime)
             }
             if (any(self$accrualTime < 0)) {

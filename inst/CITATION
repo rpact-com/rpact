@@ -1,0 +1,18 @@
+bibentry(
+  bibtype  = "Manual",
+  title    = "rpact: Confirmatory Adaptive Clinical Trial Design and Analysis",
+  author   = c(
+	person(
+		given = "Gernot", 
+		family = "Wassmer"
+	),
+    person(
+    	given = "Friedrich", 
+    	family = "Pahlke"
+    )
+  ),
+  year     = "2025",
+  note     = "R package version 4.2.0",
+  doi      = "10.32614/CRAN.package.rpact",
+  url      = "https://cran.r-project.org/package=rpact"
+)

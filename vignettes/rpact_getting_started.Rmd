@@ -42,11 +42,11 @@ knitr::opts_chunk$set(
 
 We recommend three ways to learn how to use `rpact`:
 
-> 1. Use the Shiny app: [shiny.rpact.com](https://www.rpact.com/products#public-rpact-shiny-app)
+> 1. Use the Shiny app: [shiny.rpact.com](https://www.rpact.com/products/#public-rpact-shiny-app)
 > 2. Use the Vignettes:
 >    [www.rpact.org/vignettes](https://www.rpact.org/vignettes/)
 > 3. Book a training:
->    [www.rpact.com](https://www.rpact.com/services#learning-and-training)
+>    [www.rpact.com](https://www.rpact.com/services/#learning-and-training)
 
 ### Vignettes
 
@@ -158,7 +158,7 @@ Connecting you to insights, downloads, and premium support:
 * **rpact** is a comprehensive validated^[The rpact validation documentation is
   available exclusively for our customers and supporting companies. For more
   information visit
-  [www.rpact.com/services/sla](https://www.rpact.com/services/sla)] R package
+  [www.rpact.com/services/sla](https://www.rpact.com/services/service-level-agreement/)] R package
   for clinical research which
     + enables the design and analysis of confirmatory adaptive group sequential
       designs

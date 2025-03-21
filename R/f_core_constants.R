@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8614 $
-## |  Last changed: $Date: 2025-03-17 14:21:31 +0100 (Mo, 17 Mrz 2025) $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -559,6 +559,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     accountForObservationTimes = "Account for observation times",
     eventTime = "Event time",
     accrualTime = "Accrual time",
+    accrualTimeOriginal = "Accrual time",
     totalAccrualTime = "Total accrual time",
     remainingTime = "Remaining time",
     followUpTime = "Follow up time",
@@ -872,6 +873,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     accountForObservationTimes = "Account for observation times",
     eventTime = "Event time",
     accrualTime = "Accrual time",
+    accrualTimeOriginal = "Accrual time",
     totalAccrualTime = "Total accrual time",
     remainingTime = "Remaining time",
     followUpTime = "Follow up time",
@@ -1208,10 +1210,14 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
         return(".formatCriticalValuesFisher")
     }
 
-    if (parameterName == "accrualTime" && inherits(obj, "TrialDesignPlanCountData")) {
-        if (obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
-            return(".formatHowItIs")
-        }
+    if (parameterName == "accrualTime" && inherits(obj, "TrialDesignPlanCountData") &&
+            obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
+        return(".formatHowItIs")
+    }
+    
+    if (parameterName == "accrualTimeOriginal" && inherits(obj, "TrialDesignPlanCountData") &&
+            obj$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED) {
+        return(".formatHowItIs")
     }
 
     return(C_PARAMETER_FORMAT_FUNCTIONS[[parameterName]])
@@ -1318,6 +1324,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     lambda1 = ".formatRates",
     eventTime = ".formatEventTime",
     accrualTime = ".formatTime",
+    accrualTimeOriginal = ".formatTime",
     totalAccrualTime = ".formatTime",
     remainingTime = ".formatTime",
     followUpTime = ".formatTime",

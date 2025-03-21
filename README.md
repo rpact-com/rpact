@@ -68,7 +68,7 @@ The vignettes are hosted at
 ## RPACT Connect
 
 Connecting you to insights, downloads, and premium support:
-[connect.rpact.com](https://connect.rpact.com)
+[connect.rpact.com](https://rpact.shinyapps.io/connect)
 
 ## The RPACT User Group
 
@@ -81,7 +81,7 @@ know-how, shape open source development in Pharma!
 
 ## Use on corporate computer systems
 
-Please [contact](https://www.rpact.com/contact) us to learn how to use
+Please [contact](https://www.rpact.com/contact/) us to learn how to use
 `rpact` on FDA/GxP-compliant validated corporate computer systems and
 how to get a copy of the formal validation documentation that is
 customized and licensed for exclusive use by your company, e.g., to
@@ -89,7 +89,7 @@ fulfill regulatory requirements. The validation documentation contains
 the personal access data for performing the installation qualification
 with `testPackage()`.
 
-> [www.rpact.com/contact](https://www.rpact.com/contact)
+> [www.rpact.com/contact](https://www.rpact.com/contact/)
 
 # About
 
@@ -120,4 +120,4 @@ with `testPackage()`.
 
 [^1]: The rpact validation documentation is available exclusively for
     our customers and supporting members. For more information visit
-    [www.rpact.com/services/sla](https://www.rpact.com/services/sla)
+    [www.rpact.com/services/sla](https://www.rpact.com/services/service-level-agreement/)

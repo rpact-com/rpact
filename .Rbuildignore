@@ -52,3 +52,4 @@ Rplots\.pdf
 ^\.lintr$
 index\.txt$
 ^air\.toml$
+^log\.txt$

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8613 $
-## |  Last changed: $Date: 2025-03-14 07:53:35 +0100 (Fr, 14 Mrz 2025) $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1557,7 +1557,7 @@ NULL
 }
 
 .assertIsValidNPlanned <- function(nPlanned, kMax, stage, ..., required = TRUE) {
-    if (is.null(nPlanned) || (length(nPlanned) > 0 && all(is.na(nPlanned)))) {
+    if (length(nPlanned) > 0 && all(is.na(nPlanned))) {
         if (!required) {
             return(invisible())
         }
@@ -1566,8 +1566,11 @@ NULL
             call. = FALSE
         )
     }
+    
+    .assertIsSingleInteger(kMax, "kMax", validateType = FALSE)
+    .assertIsSingleInteger(stage, "stage", validateType = FALSE)
 
-    if (length(nPlanned) != kMax - stage) {
+    if (is.null(nPlanned) || length(nPlanned) != kMax - stage) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             sprintf(
@@ -1738,7 +1741,7 @@ NULL
 }
 
 .assertPackageIsInstalled <- function(packageName) {
-    if (!wrapRequireNamespace(packageName, quietly = TRUE)) {
+    if (!.isPackageNamespaceLoaded(packageName, quietly = TRUE)) {
         stop("Package \"", packageName, "\" is needed for this function to work. ",
             "Please install using, e.g., install.packages(\"", packageName, "\")",
             call. = FALSE
