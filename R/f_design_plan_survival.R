@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8518 $
-## |  Last changed: $Date: 2025-01-29 15:42:08 +0100 (Mi, 29 Jan 2025) $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1925,7 +1925,7 @@ getNumberOfSubjects <- function(time, ...,
     )
 
     result <- NumberOfSubjects$new(
-        .accrualTime = accrualSetup,
+        accrualSetup = accrualSetup,
         time = time,
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
@@ -2160,13 +2160,15 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                 maxNumberOfSubjectsLowerBefore <- 0
                 sampleSize <- NULL
                 expectionMessage <- NA_character_
+                steps <- 0
 
                 while (searchAccrualTimeEnabled && maxSearchIterations >= 0 &&
-                    (is.na(maxNumberOfSubjectsLower) ||
+                        (is.na(maxNumberOfSubjectsLower) ||
                         maxNumberOfSubjectsLower < maxNumberOfSubjectsLowerBefore ||
                         maxNumberOfSubjectsLower < 1e8)) {
                     tryCatch(
                         {
+                            steps <- steps + 1
                             maxNumberOfSubjectsLowerBefore <- ifelse(is.na(maxNumberOfSubjectsLower),
                                 0, maxNumberOfSubjectsLower
                             )
@@ -2179,15 +2181,25 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                             sampleSize <- .getSampleSizeSurvival(
                                 design = design,
                                 typeOfComputation = typeOfComputation,
-                                thetaH0 = thetaH0, pi2 = pi2, pi1 = pi1,
+                                thetaH0 = thetaH0, 
+                                pi2 = pi2, 
+                                pi1 = pi1,
                                 allocationRatioPlanned = allocationRatioPlanned,
                                 accountForObservationTimes = accountForObservationTimes,
-                                eventTime = eventTime, accrualTime = accrualSetup$accrualTime,
-                                accrualIntensity = accrualSetup$accrualIntensity, kappa = kappa,
+                                eventTime = eventTime, 
+                                accrualTime = accrualSetup$accrualTime,
+                                accrualIntensity = accrualSetup$accrualIntensity, 
+                                kappa = kappa,
                                 piecewiseSurvivalTime = piecewiseSurvivalTime,
-                                lambda2 = lambda2, lambda1 = lambda1, median1 = median1, median2 = median2,
-                                followUpTime = NA_real_, maxNumberOfSubjects = maxNumberOfSubjectsLower,
-                                dropoutRate1 = dropoutRate1, dropoutRate2 = dropoutRate2, dropoutTime = dropoutTime,
+                                lambda2 = lambda2, 
+                                lambda1 = lambda1, 
+                                median1 = median1, 
+                                median2 = median2,
+                                followUpTime = NA_real_, 
+                                maxNumberOfSubjects = maxNumberOfSubjectsLower,
+                                dropoutRate1 = dropoutRate1, 
+                                dropoutRate2 = dropoutRate2, 
+                                dropoutTime = dropoutTime,
                                 hazardRatio = hazardRatio
                             )
                             searchAccrualTimeEnabled <- FALSE
@@ -2204,7 +2216,8 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                         stop(expectionMessage, call. = FALSE)
                     }
                     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                        "'additionalAccrual' could not be found, change accrual time specification",
+                        "'additionalAccrual' could not be found in ", steps, 
+                        " search iterations, change accrual time specification",
                         call. = FALSE
                     )
                 }

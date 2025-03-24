@@ -33,7 +33,12 @@
 #' 
 #' # The object created by getPiecewiseSurvivalTime() can be used directly in 
 #' # getPowerSurvival():
-#' getPowerSurvival(piecewiseSurvivalTime = pwst, 
+#' getPowerSurvival(piecewiseSurvivalTime = pwst, directionUpper = FALSE, 
 #'     maxNumberOfEvents = 40, maxNumberOfSubjects = 100)
+#' 
+#' # The object created by getPiecewiseSurvivalTime() can be used directly in 
+#' # getSimulationSurvival():
+#' getSimulationSurvival(piecewiseSurvivalTime = pwst, directionUpper = FALSE,
+#'     plannedEvents = 40, maxNumberOfSubjects = 100)
 #' }
 #'  

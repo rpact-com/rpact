@@ -23,6 +23,6 @@ If they do not exist, it stops with an error. It then downloads the test files t
 to the \code{tests} directory of the \code{rpact} package. If all test files are copied successfully, it removes the default test file.
 }
 \references{
-For more information, please visit: \url{https://www.rpact.org/iq}
+For more information, please visit: \url{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}
 }
 \keyword{internal}

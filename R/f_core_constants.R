@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8556 $
-## |  Last changed: $Date: 2025-02-17 09:49:01 +0100 (Mo, 17 Feb 2025) $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -41,6 +41,7 @@ C_POSITION_LEFT_BOTTOM <- 3
 C_POSITION_RIGHT_TOP <- 4
 C_POSITION_RIGHT_CENTER <- 5
 C_POSITION_RIGHT_BOTTOM <- 6
+C_POSITION_OUTSIDE_BOTTOM <- "bottom"
 
 C_DESIGN_TOLERANCE_DEFAULT <- 1e-08
 C_CONST_NEWTON_COTES <- 15
@@ -458,6 +459,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     theta = "Effect",
     direction = "Direction",
     normalApproximation = "Normal approximation",
+    conservative = "Conservative",
     equalVariances = "Equal variances",
     shift = "Shift",
     inflationFactor = "Inflation factor",
@@ -557,6 +559,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     accountForObservationTimes = "Account for observation times",
     eventTime = "Event time",
     accrualTime = "Accrual time",
+    accrualTimeOriginal = "Accrual time",
     totalAccrualTime = "Total accrual time",
     remainingTime = "Remaining time",
     followUpTime = "Follow up time",
@@ -774,6 +777,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     theta = "Effect",
     direction = "Direction",
     normalApproximation = "Normal approximation",
+    conservative = "Conservative",
     equalVariances = "Equal variance",
     assumedStDev = "Assumed standard deviation",
     assumedStDevs = "Assumed standard deviation",
@@ -869,6 +873,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     accountForObservationTimes = "Account for observation times",
     eventTime = "Event time",
     accrualTime = "Accrual time",
+    accrualTimeOriginal = "Accrual time",
     totalAccrualTime = "Total accrual time",
     remainingTime = "Remaining time",
     followUpTime = "Follow up time",
@@ -1038,15 +1043,15 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     if (inherits(obj, "TrialDesignSet") && length(obj$designs) > 0) {
         obj <- obj$designs[[1]]
     }
-    
+
     if (!inherits(obj, "TrialDesign")) {
         obj <- obj[[".design"]]
     }
-    
+
     if (is.null(obj) || !inherits(obj, "TrialDesign")) {
         return(parameterName)
     }
-    
+
     if (identical(parameterName, "futilityBounds")) {
         if (.isDelayedInformationEnabled(design = obj)) {
             if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
@@ -1074,7 +1079,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
 
 .getParameterCaption <- function(parameterName, obj = NULL, ..., tableOutputEnabled = FALSE) {
     .assertIsSingleCharacter(parameterName, "parameterName")
-    
+
     if (grepl("\\$", parameterName)) {
         parts <- strsplit(parameterName, "\\$", fixed = TRUE)[[1]]
         if (length(parts) == 2) {
@@ -1084,7 +1089,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
             parameterName <- parts[2]
         }
     }
-    
+
     if (is.null(obj)) {
         if (tableOutputEnabled) {
             return(C_TABLE_COLUMN_NAMES[[parameterName]])
@@ -1092,7 +1097,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
 
         return(C_PARAMETER_NAMES[[parameterName]])
     }
-    
+
     parameterName <- .getParameterNameTrialDesign(parameterName, obj)
 
     if (inherits(obj, "PlotSettings")) {
@@ -1100,7 +1105,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     parameterName <- .getParameterNameTrialDesign(parameterName, obj)
-    
+
     pluralExt <- ifelse(tableOutputEnabled, "", "s")
 
     if (identical(parameterName, "futilityBounds") &&
@@ -1147,11 +1152,11 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (inherits(obj, "AnalysisResults")) {
-        if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds") && 
+        if (identical(parameterName, "repeatedConfidenceIntervalLowerBounds") &&
                 .isTrialDesignConditionalDunnett(obj$.design)) {
             return(paste0("Overall confidence interval", pluralExt, " (lower)"))
         }
-        if (identical(parameterName, "repeatedConfidenceIntervalUpperBounds") && 
+        if (identical(parameterName, "repeatedConfidenceIntervalUpperBounds") &&
                 .isTrialDesignConditionalDunnett(obj$.design)) {
             return(paste0("Overall confidence interval", pluralExt, " (upper)"))
         }
@@ -1205,10 +1210,14 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
         return(".formatCriticalValuesFisher")
     }
 
-    if (parameterName == "accrualTime" && inherits(obj, "TrialDesignPlanCountData")) {
-        if (obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
-            return(".formatHowItIs")
-        }
+    if (parameterName == "accrualTime" && inherits(obj, "TrialDesignPlanCountData") &&
+            obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
+        return(".formatHowItIs")
+    }
+    
+    if (parameterName == "accrualTimeOriginal" && inherits(obj, "TrialDesignPlanCountData") &&
+            obj$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED) {
+        return(".formatHowItIs")
     }
 
     return(C_PARAMETER_FORMAT_FUNCTIONS[[parameterName]])
@@ -1315,6 +1324,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     lambda1 = ".formatRates",
     eventTime = ".formatEventTime",
     accrualTime = ".formatTime",
+    accrualTimeOriginal = ".formatTime",
     totalAccrualTime = ".formatTime",
     remainingTime = ".formatTime",
     followUpTime = ".formatTime",

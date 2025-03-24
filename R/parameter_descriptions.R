@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8522 $
-## |  Last changed: $Date: 2025-01-31 17:10:41 +0100 (Fr, 31 Jan 2025) $
+## |  File version: $Revision: 8623 $
+## |  Last changed: $Date: 2025-03-20 14:21:02 +0100 (Do, 20 Mrz 2025) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -238,7 +238,7 @@ NULL
 #'   of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
 #'   For example,
 #'   \code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
-#'   and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample result.
+#'   and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the same result.
 #' @name param_kappa
 #' @keywords internal
 NULL

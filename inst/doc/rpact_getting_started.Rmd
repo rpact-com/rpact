@@ -42,11 +42,11 @@ knitr::opts_chunk$set(
 
 We recommend three ways to learn how to use `rpact`:
 
-> 1. Use the Shiny app: [shiny.rpact.com](https://www.rpact.com/products#public-rpact-shiny-app)
+> 1. Use the Shiny app: [shiny.rpact.com](https://www.rpact.com/products/#public-rpact-shiny-app)
 > 2. Use the Vignettes:
 >    [www.rpact.org/vignettes](https://www.rpact.org/vignettes/)
 > 3. Book a training:
->    [www.rpact.com](https://www.rpact.com/services#learning-and-training)
+>    [www.rpact.com](https://www.rpact.com/services/#learning-and-training)
 
 ### Vignettes
 
@@ -143,7 +143,7 @@ Several utility functions are available, e.g.
 
 ## Validation
 
-Please [contact](https://www.rpact.com/contact) us to learn how to use `rpact`
+Please [contact](https://www.rpact.com/contact/) us to learn how to use `rpact`
 on FDA/GxP-compliant validated corporate computer systems and how to get a copy
 of the formal validation documentation that is customized and licensed for
 exclusive use by your company, e.g., to fulfill regulatory requirements.
@@ -151,14 +151,14 @@ exclusive use by your company, e.g., to fulfill regulatory requirements.
 ## RPACT Connect 
 
 Connecting you to insights, downloads, and premium support:
-[connect.rpact.com](https://connect.rpact.com)
+[connect.rpact.com](https://rpact.shinyapps.io/connect)
 
 ## About
 
 * **rpact** is a comprehensive validated^[The rpact validation documentation is
   available exclusively for our customers and supporting companies. For more
   information visit
-  [www.rpact.com/services/sla](https://www.rpact.com/services/sla)] R package
+  [www.rpact.com/services/sla](https://www.rpact.com/services/service-level-agreement/)] R package
   for clinical research which
     + enables the design and analysis of confirmatory adaptive group sequential
       designs
@@ -182,4 +182,4 @@ Connecting you to insights, downloads, and premium support:
 ## Contact
 
 * [info@rpact.com](mailto:info@rpact.com)
-* [www.rpact.com/contact](https://www.rpact.com/contact)
+* [www.rpact.com/contact](https://www.rpact.com/contact/)

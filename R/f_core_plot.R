@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
+## |  File version: $Revision: 8629 $
+## |  Last changed: $Date: 2025-03-24 09:50:39 +0100 (Mo, 24 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -53,25 +53,25 @@ NULL
     }
 
     if (.isMultiArmSimulationResults(obj)) {
-        if (type == 1) { # Multi-arm, Overall Success
+        if (type == 1) { 
             return(.addNumberToPlotCaption("Overall Success", type, numberInCaptionEnabled))
-        } else if (type == 2) { # Multi-arm, Success per Stage
+        } else if (type == 2) { 
             return(.addNumberToPlotCaption("Success per Stage", type, numberInCaptionEnabled))
-        } else if (type == 3) { # Multi-arm, Selected Arms per Stage
+        } else if (type == 3) { 
             return(.addNumberToPlotCaption("Selected Arms per Stage", type, numberInCaptionEnabled))
-        } else if (type == 4) { # Multi-arm, Rejected Arms per Stage
+        } else if (type == 4) { 
             return(.addNumberToPlotCaption(ifelse(obj$.design$kMax > 1,
                 "Rejected Arms per Stage", "Rejected Arms"
             ), type, numberInCaptionEnabled))
         }
     } else if (.isEnrichmentSimulationResults(obj)) {
-        if (type == 1) { # Enrichment, Overall Success
+        if (type == 1) { 
             return(.addNumberToPlotCaption("Overall Success", type, numberInCaptionEnabled))
-        } else if (type == 2) { # Enrichment, Success per Stage
+        } else if (type == 2) { 
             return(.addNumberToPlotCaption("Success per Stage", type, numberInCaptionEnabled))
-        } else if (type == 3) { # Enrichment, Selected Populations per Stage
+        } else if (type == 3) { 
             return(.addNumberToPlotCaption("Selected Populations per Stage", type, numberInCaptionEnabled))
-        } else if (type == 4) { # Enrichment, Rejected Populations per Stage
+        } else if (type == 4) { 
             return(.addNumberToPlotCaption(ifelse(obj$.design$kMax > 1,
                 "Rejected Populations per Stage", "Rejected Populations"
             ), type, numberInCaptionEnabled))
@@ -83,7 +83,12 @@ NULL
     if (inherits(obj, "TrialDesignPlan") || inherits(obj, "SimulationResults")) {
         if (type == 5) {
             if (obj$.isSampleSizeObject()) {
-                return(.addNumberToPlotCaption("Sample Size", type, numberInCaptionEnabled))
+                return(.addNumberToPlotCaption(
+                    ifelse(
+                        .isTrialDesignPlanSurvival(obj) || inherits(obj, "SimulationResultsSurvival"),
+                        "Number of Events", 
+                        "Sample Size"
+                    ), type, numberInCaptionEnabled))
             } else {
                 return(.addNumberToPlotCaption(
                     "Overall Power and Early Stopping",
@@ -91,10 +96,12 @@ NULL
                 ))
             }
         } else if (type == 6) {
-            return(.addNumberToPlotCaption(ifelse(.isTrialDesignPlanSurvival(obj) ||
-                inherits(obj, "SimulationResultsSurvival"),
-            "Number of Events", "Sample Size"
-            ), type, numberInCaptionEnabled))
+            return(.addNumberToPlotCaption(
+                ifelse(
+                    .isTrialDesignPlanSurvival(obj) || inherits(obj, "SimulationResultsSurvival"),
+                    "Expected Number of Events and Power / Early Stop", 
+                    "Expected Sample Size and Power / Early Stop"
+                ), type, numberInCaptionEnabled))
         } else if (type == 7) {
             return(.addNumberToPlotCaption("Overall Power", type, numberInCaptionEnabled))
         } else if (type == 8) {
@@ -759,7 +766,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             mandatoryParameterNames = mandatoryParameterNames
         ))
     }
-
+    
     if (!.isTrialDesignSet(parameterSet)) {
         variedParameters <- logical(0)
         if ("stages" %in% colnames(data)) {
@@ -823,6 +830,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (is.null(axisLabel)) {
         return(paste0("%", parameterName, "%"))
     }
+    axisLabel <- gsub(" \\(one-sided P-value Scale\\)$", "", axisLabel, ignore.case = TRUE)
     return(axisLabel)
 }
 
@@ -844,7 +852,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(TRUE)
 }
 
-.plotParameterSet <- function(..., 
+.plotParameterSet <- function(
+        ..., 
         parameterSet, 
         designMaster, 
         xParameterName, 
@@ -928,7 +937,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             yParameterNames = yParameterNames
         )
         data <- df$data
-
+        
         variedParameters <- df$variedParameters
         variedParameters <- na.omit(variedParameters)
         variedParameters <- variedParameters[variedParameters != "NA"]
@@ -947,7 +956,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             "or an object that inherits from 'ParameterSet'"
         )
     }
-
+    
     if (length(variedParameters) > 0) {
         legendTitle <- .firstCharacterToUpperCase(paste(names(variedParameters), collapse = "\n"))
         categoryParameterName <- variedParameters[1]
@@ -955,6 +964,19 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         legendTitle <- NA_character_
         categoryParameterName <- NA_character_
     }
+
+    tryCatch({
+        if (all(c("criticalValuesPValueScale", "futilityBoundsPValueScale") %in% yParameterNames)) {
+            index <- nrow(data)
+            if ("stages" %in% colnames(data)) {
+                index <- which(data$stages == max(data$stages))
+            }
+            data$futilityBoundsPValueScale[index] <- data$criticalValuesPValueScale[index]
+            data <- unique(data[, c(xParameterName, yParameterNames)])
+        }
+    }, error = function(e) {
+        .logError("Failed to set last 'futilityBoundsPValueScale' value: ", e$message)
+    })
 
     yParameterName1 <- yParameterNames[1]
     yParameterName2 <- NULL
@@ -965,7 +987,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (length(yParameterNames) >= 3) {
         yParameterName3 <- yParameterNames[3]
     }
-
+    
     mirrorModeEnabled <- any(grepl("Mirrored$", yParameterNames))
     xAxisLabel <- .getAxisLabel(xParameterName, parameterSet)
     yAxisLabel1 <- .getAxisLabel(yParameterName1, parameterSet)
@@ -1005,13 +1027,14 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         "Lower and", yAxisLabel1,
         fixed = TRUE
     )
-
+    
     if (!("xValues" %in% colnames(data)) || !("yValues" %in% colnames(data))) {
         if (!(xParameterName %in% colnames(data))) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset")
+            print(colnames(data))
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(xParameterName), " is not available in dataset (x-axis)")
         }
         if (!(yParameterName1 %in% colnames(data))) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName1), " is not available in dataset")
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName1), " is not available in dataset (y-axis)")
         }
 
         data$xValues <- data[[xParameterName]]
@@ -1027,7 +1050,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$yValues2 <- rep(NA_real_, nrow(data))
         } else {
             if (!(yParameterName2 %in% colnames(data))) {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName2), " is not available in dataset")
+                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName2), " is not available in dataset (y-axis 2)")
             }
             data$yValues2 <- data[[yParameterName2]]
         }
@@ -1035,7 +1058,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$yValues3 <- rep(NA_real_, nrow(data))
         } else {
             if (!(yParameterName3 %in% colnames(data))) {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName3), " is not available in dataset")
+                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, sQuote(yParameterName3), " is not available in dataset (y-axis 3)")
             }
             data$yValues3 <- data[[yParameterName3]]
         }
@@ -1052,7 +1075,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             data$categories <- rep(NA_character_, nrow(data))
         }
     }
-
+    
     if (!is.na(nMax) && is.null(yParameterName3) && xParameterName == "informationRates") {
         xAxisLabel <- "Sample Size"
         data$xValues <- data$xValues * nMax
@@ -1077,11 +1100,11 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             categories = uc
         ), data)
     }
-
+    
     scalingFactor1 <- 1
     scalingFactor2 <- 1
-    if (!is.null(yParameterName2) && "yValues2" %in% colnames(data) && "yValues3" %in% colnames(data)) {
-        if (yAxisScalingEnabled && !is.null(yParameterName3)) {
+    if (!is.null(yParameterName2) && "yValues2" %in% colnames(data)) {
+        if (yAxisScalingEnabled && !is.null(yParameterName3) && "yValues3" %in% colnames(data)) {
             if (is.na(yParameterName2)) {
                 scalingFactors <- .getScalingFactors(data$yValues, data$yValues3)
             } else {
@@ -1102,7 +1125,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
                 categories = .getCategories(data, yParameterName2, parameterSet)
             )
         }
-        if (!is.null(yParameterName3)) {
+        if (!is.null(yParameterName3) && "yValues3" %in% colnames(data)) {
             df3 <- data.frame(
                 xValues = data$xValues,
                 yValues = data$yValues3 * scalingFactor2,
@@ -1120,6 +1143,11 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         # sort categories for pairwise printing of the legend
         unqiueValues <- unique(as.character(data$categories))
         decreasing <- addPowerAndAverageSampleNumber && xParameterName %in% c("effect", "effectMatrix")
+        
+        if (all(c("criticalValuesPValueScale", "futilityBoundsPValueScale") %in% yParameterNames)) {
+            decreasing <- TRUE
+        }
+        
         catLevels <- unqiueValues[order(unqiueValues, decreasing = decreasing)]
         data$categories <- factor(data$categories, levels = catLevels)
         if (!is.na(legendTitle) && yParameterName1 == "alphaSpent" && yParameterName2 == "betaSpent") {
@@ -1127,7 +1155,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             legendTitle <- paste(legendTitle, "Type of error", sep = sep)
         }
     }
-
+    
     if (is.na(legendPosition)) {
         legendPosition <- .getLegendPosition(
             plotSettings, designMaster, data, yParameterName1,
@@ -1142,7 +1170,9 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     }
 
     plotDashedHorizontalLine <- "criticalValuesEffectScale" %in% yParameterNames && designMaster$sided == 2
-    p <- .plotDataFrame(data,
+    
+    p <- .plotDataFrame(
+        data,
         mainTitle = mainTitle, 
         xlab = xlab, 
         ylab = ylab,
@@ -1323,7 +1353,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             removedRows1, removedRows2
         ), call. = FALSE)
     }
-
+    
     categoryEnabled <- !is.null(data[["categories"]]) && !all(is.na(data$categories))
     groupEnabled <- !is.null(data[["groups"]]) && !all(is.na(data$groups))
     if (categoryEnabled && groupEnabled) {
@@ -1338,7 +1368,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 
     data$yValues[!is.na(data$yValues) & is.infinite(data$yValues)] <- NA_real_
     data <- data[!is.na(data$yValues), ]
-
+    
     if (categoryEnabled && groupEnabled) {
         p <- ggplot2::ggplot(data, ggplot2::aes(
             x = .data[["xValues"]], y = .data[["yValues"]],
@@ -1365,7 +1395,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (discreteXAxis) {
         p <- p + ggplot2::scale_x_continuous(breaks = round(data$xValues))
     }
-
+    
     # set main title
     p <- plotSettings$setMainTitle(p, mainTitle)
 
@@ -1472,8 +1502,14 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     return(pointBorder)
 }
 
-.getLegendPosition <- function(plotSettings, designMaster, data, yParameterName1,
-        yParameterName2, addPowerAndAverageSampleNumber) {
+.getLegendPosition <- function(
+        plotSettings, 
+        designMaster, 
+        data, 
+        yParameterName1,
+        yParameterName2, 
+        addPowerAndAverageSampleNumber) {
+        
     if (length(unique(data$categories)) > 6) {
         plotSettings$adjustPointSize(0.8)
         plotSettings$adjustLegendFontSize(0.8)
@@ -1727,4 +1763,32 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     }
 
     return(.arrayToString(round(value, 2)))
+}
+
+.showWarningIfPlotArgumentWillBeIgnored <- function(type, ..., obj = NULL) {
+    if (any(type == "all") && (is.null(obj) || inherits(obj, "TrialDesignPlan"))) {
+        return(invisible())
+    }
+    
+    showFutilityBounds <- .getOptionalArgument("showFutilityBounds", ...)
+    if ((all(type != 3) || (!is.null(obj) && !inherits(obj, "TrialDesignPlan"))) && !is.null(showFutilityBounds)) {
+        objTypeInfo <- ifelse(!is.null(obj) && !inherits(obj, "TrialDesignPlan"), " design plan", "")
+        warning("Argument 'showFutilityBounds' (", showFutilityBounds, ") is only available for", objTypeInfo, " plot type 3; ",
+            "it will be ignored", call. = FALSE)
+    }
+    
+    showAlphaSpent <- .getOptionalArgument("showAlphaSpent", ...)
+    showBetaSpent <- .getOptionalArgument("showBetaSpent", ...)
+    if (all(type != 4) && all(type != "all") && (!is.null(showAlphaSpent) || !is.null(showBetaSpent))) {
+        if (!is.null(showAlphaSpent) && !is.null(showBetaSpent)) {
+            warning("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
+                "are only available for plot type 4; they will be ignored", call. = FALSE)
+        } else if (!is.null(showAlphaSpent)) {
+            warning("Argument 'showAlphaSpent' (", showAlphaSpent, ") is only available for plot type 4; ",
+                "it will be ignored", call. = FALSE)
+        } else {
+            warning("Argument 'showBetaSpent' (", showBetaSpent, ") is only available for plot type 4; ",
+                "it will be ignored", call. = FALSE)
+        }
+    }
 }

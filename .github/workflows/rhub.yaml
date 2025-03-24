@@ -68,11 +68,13 @@ jobs:
           path: 'private-tests'
           sparse-checkout: |
             tests
-      - uses: r-hub/actions/platform-info@v1
+      - name: R platform information
+        uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
-      - uses: r-hub/actions/setup-deps@v1
+      - name: Install dependencies for the current R environment
+        uses: r-hub/actions/setup-deps@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
@@ -81,7 +83,15 @@ jobs:
           find ./private-tests/tests -maxdepth 1 -name \*.R -exec cp {} ./tests \;
           find ./private-tests/tests/testthat -maxdepth 1 -name \*.R -exec cp {} ./tests/testthat \;
         shell: bash
-      - uses: r-hub/actions/run-check@v1
+      - name: Remove private tests folder
+        run: rm -rf ./private-tests
+        shell: bash
+      - name: Enable complete test set
+        run: |
+          Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
+        shell: Rscript {0}
+      - name: Check R package
+        uses: r-hub/actions/run-check@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
@@ -108,15 +118,18 @@ jobs:
           path: 'private-tests'
           sparse-checkout: |
             tests
-      - uses: r-hub/actions/setup-r@v1
+      - name: Setup R
+        uses: r-hub/actions/setup-r@v1
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
-      - uses: r-hub/actions/platform-info@v1
+      - name: R platform information
+        uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
-      - uses: r-hub/actions/setup-deps@v1
+      - name: Install dependencies for the current R environment
+        uses: r-hub/actions/setup-deps@v1
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
@@ -125,7 +138,15 @@ jobs:
           find ./private-tests/tests -maxdepth 1 -name \*.R -exec cp {} ./tests \;
           find ./private-tests/tests/testthat -maxdepth 1 -name \*.R -exec cp {} ./tests/testthat \;
         shell: bash
-      - uses: r-hub/actions/run-check@v1
+      - name: Remove private tests folder
+        run: rm -rf ./private-tests
+        shell: bash
+      - name: Enable complete test set
+        run: |
+          Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
+        shell: Rscript {0}
+      - name: Check R package
+        uses: r-hub/actions/run-check@v1
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}

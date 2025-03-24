@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8518 $
-## |  Last changed: $Date: 2025-01-29 15:42:08 +0100 (Mi, 29 Jan 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8603 $
+## |  Last changed: $Date: 2025-03-11 17:40:42 +0100 (Tue, 11 Mar 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -81,7 +81,7 @@ NULL
     } else if (.isTrialDesignPlanCountData(designPlan)) {
         boundaries <- .getEffectScaleBoundaryDataCounts(designPlan)
     }
-    
+
     if (designPlan$.design$sided == 1) {
         designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleUpper
         designPlan$.setParameterType("criticalValuesEffectScale", C_PARAM_GENERATED)
@@ -141,6 +141,7 @@ NULL
             beta = designPlan$getBeta(),
             sided = designPlan$getSided(),
             normalApproximation = designPlan$normalApproximation,
+            conservative = designPlan$conservative,
             riskRatio = designPlan$riskRatio,
             thetaH0 = designPlan$thetaH0,
             pi1 = designPlan$pi1,
@@ -440,5 +441,3 @@ NULL
         }
     }
 }
-
-

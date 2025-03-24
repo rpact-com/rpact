@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
+## |  File version: $Revision: 8624 $
+## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -24,7 +24,7 @@ NULL
 # See testthat::skip_on_cran()
 .skipTestIfDisabled <- function(msg = "Test is disabled", ..., ignoreInTestPlan = FALSE) {
     if (!isTRUE(.isCompleteUnitTestSetEnabled()) &&
-            base::requireNamespace("testthat", quietly = TRUE)) {
+            .isPackageNamespaceLoaded("testthat", quietly = TRUE)) {
         if (isTRUE(ignoreInTestPlan)) {
             msg <- paste(msg, "and ignored in test plan")
         }
@@ -46,7 +46,7 @@ NULL
 }
 
 .skipTestIfNotX64 <- function() {
-    if (!.isMachine64Bit() && !.isMinimumRVersion4() && base::requireNamespace("testthat", quietly = TRUE)) {
+    if (!.isMachine64Bit() && !.isMinimumRVersion4() && .isPackageNamespaceLoaded("testthat", quietly = TRUE)) {
         testthat::skip("The test is only intended for R version 4.x or 64-bit computers (x86-64)")
     }
 }
@@ -631,7 +631,7 @@ getSystemIdentifier <- function(date = NULL) {
 #' @return
 #' The function returns \code{TRUE} if all test files are downloaded and copied successfully to the rpact installation directory; otherwise, it returns \code{FALSE}.
 #'
-#' @references For more information, please visit: <https://www.rpact.org/iq>
+#' @references For more information, please visit: <https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/>
 #'
 #' @export
 #'
@@ -763,11 +763,11 @@ setupPackageTests <- function(token, secret) {
 #' the package cannot be considered fully validated. To gain access to the full set of unit tests,
 #' users must provide \code{token} and \code{secret} credentials, which are distributed to
 #' members of the rpact user group as part of the validation documentation.
-#' For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification}{rpact_installation_qualification}.
+#' For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}{rpact_installation_qualification}.
 #'
 #' @return Invisibly returns the value of \code{completeUnitTestSetEnabled}.
 #'
-#' @references For more information, please visit: <https://www.rpact.org/iq>
+#' @references For more information, please visit: <https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/>
 #'
 #' @examples
 #' \dontrun{
@@ -1614,7 +1614,7 @@ MarkdownReporter <- R6::R6Class(
                     )
                     self$log(
                         "Please read the vignette [Installation Qualification of rpact]",
-                        "(https://www.rpact.org/vignettes/utilities/rpact_installation_qualification) ",
+                        "(https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/) ",
                         "to learn how to qualify ", self$rpactCranReference, " for reliable ",
                         "statistical planning, simulation, and analyses in regulated areas."
                     )

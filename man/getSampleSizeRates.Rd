@@ -9,6 +9,7 @@ getSampleSizeRates(
   ...,
   groups = 2L,
   normalApproximation = TRUE,
+  conservative = TRUE,
   riskRatio = FALSE,
   thetaH0 = ifelse(riskRatio, 1, 0),
   pi1 = c(0.4, 0.5, 0.6),
@@ -29,6 +30,11 @@ that a warning will be displayed if unknown arguments are passed.}
 \item{normalApproximation}{If \code{FALSE}, the sample size
 for the case of one treatment group is calculated exactly using the binomial distribution,
 default is \code{TRUE}.}
+
+\item{conservative}{For the case of one treatment group and \code{normalApproximation = FALSE}, if
+\code{TRUE}, the sample size is calculated such that for larger sample size
+than the calculated, the power is larger than 1 - beta, for \code{conservative = FALSE}, the minimum
+sample size, for which power exceeds 1 - beta is calculated, default is \code{TRUE}.}
 
 \item{riskRatio}{If \code{TRUE}, the sample size for one-sided
 testing of H0: \code{pi1 / pi2 = thetaH0} is calculated, default is \code{FALSE}.}

@@ -58,7 +58,7 @@ This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lamb
 of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
 For example,
 \code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
-and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample result.}
+and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the same result.}
 
 \item{delayedResponseAllowed}{If \code{TRUE}, delayed response is allowed;
 otherwise it will be validated that the response is not delayed, default is \code{FALSE}.}
@@ -135,8 +135,13 @@ getSampleSizeSurvival(piecewiseSurvivalTime = pwst)
 
 # The object created by getPiecewiseSurvivalTime() can be used directly in 
 # getPowerSurvival():
-getPowerSurvival(piecewiseSurvivalTime = pwst, 
+getPowerSurvival(piecewiseSurvivalTime = pwst, directionUpper = FALSE, 
     maxNumberOfEvents = 40, maxNumberOfSubjects = 100)
+
+# The object created by getPiecewiseSurvivalTime() can be used directly in 
+# getSimulationSurvival():
+getSimulationSurvival(piecewiseSurvivalTime = pwst, directionUpper = FALSE,
+    plannedEvents = 40, maxNumberOfSubjects = 100)
 }
  
 }

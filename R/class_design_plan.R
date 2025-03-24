@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8474 $
-## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8603 $
+## |  Last changed: $Date: 2025-03-11 17:40:42 +0100 (Tue, 11 Mar 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_constants.R
@@ -39,6 +39,7 @@ C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS <- list(
 
 C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES <- list(
     normalApproximation = TRUE,
+    conservative = TRUE,
     riskRatio = FALSE,
     thetaH0 = 0,
     pi1 = C_PI_1_SAMPLE_SIZE_DEFAULT,
@@ -499,6 +500,7 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
 #' @template field_riskRatio
 #' @template field_thetaH0
 #' @template field_normalApproximation
+#' @template field_conservative
 #' @template field_pi1
 #' @template field_pi2
 #' @template field_groups
@@ -553,6 +555,7 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
         riskRatio = NULL,
         thetaH0 = NULL,
         normalApproximation = NULL,
+        conservative = NULL,
         pi1 = NULL,
         pi2 = NULL,
         groups = NULL,
@@ -645,7 +648,8 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
                     pi1 = pi1Temp,
                     pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
                     groups = self$.getParameterValueIfUserDefinedOrDefault("groups"),
-                    allocationRatioPlanned = self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned")
+                    allocationRatioPlanned = self$.getParameterValueIfUserDefinedOrDefault("allocationRatioPlanned"),
+                    conservative = self$.getParameterValueIfUserDefinedOrDefault("conservative")
                 ))
             } else {
                 return(getPowerRates(
