@@ -1766,12 +1766,13 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
 }
 
 .showWarningIfPlotArgumentWillBeIgnored <- function(type, ..., obj = NULL) {
-    if (any(type == "all") && (is.null(obj) || inherits(obj, "TrialDesignPlan"))) {
+    if ((is.null(type) || all(is.na(type)) || any(type == "all", na.rm = TRUE)) && 
+            (is.null(obj) || inherits(obj, "TrialDesignPlan"))) {
         return(invisible())
     }
     
     showFutilityBounds <- .getOptionalArgument("showFutilityBounds", ...)
-    if ((all(type != 3) || (!is.null(obj) && !inherits(obj, "TrialDesignPlan"))) && !is.null(showFutilityBounds)) {
+    if ((all(type != 3, na.rm = TRUE) || (!is.null(obj) && !inherits(obj, "TrialDesignPlan"))) && !is.null(showFutilityBounds)) {
         objTypeInfo <- ifelse(!is.null(obj) && !inherits(obj, "TrialDesignPlan"), " design plan", "")
         warning("Argument 'showFutilityBounds' (", showFutilityBounds, ") is only available for", objTypeInfo, " plot type 3; ",
             "it will be ignored", call. = FALSE)
@@ -1779,7 +1780,8 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     
     showAlphaSpent <- .getOptionalArgument("showAlphaSpent", ...)
     showBetaSpent <- .getOptionalArgument("showBetaSpent", ...)
-    if (all(type != 4) && all(type != "all") && (!is.null(showAlphaSpent) || !is.null(showBetaSpent))) {
+    if (all(type != 4, na.rm = TRUE) && all(type != "all", na.rm = TRUE) && 
+            (!is.null(showAlphaSpent) || !is.null(showBetaSpent))) {
         if (!is.null(showAlphaSpent) && !is.null(showBetaSpent)) {
             warning("Arguments 'showAlphaSpent' (", showAlphaSpent, ") and 'showBetaSpent' (", showBetaSpent, ") ",
                 "are only available for plot type 4; they will be ignored", call. = FALSE)
