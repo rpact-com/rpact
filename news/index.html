@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.1.9283</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,28 +43,35 @@
 <li>Added support for unequal variances between two groups in <code><a href="../reference/getSampleSizeMeans.html">getSampleSizeMeans()</a></code>, <code><a href="../reference/getPowerMeans.html">getPowerMeans()</a></code>, and <code><a href="../reference/getSimulationMeans.html">getSimulationMeans()</a></code> functions, see enhancement <a href="https://github.com/rpact-com/rpact/issues/70" class="external-link">#70</a>
 </li>
 <li>
-<code><a href="../reference/testPackage.html">testPackage()</a></code> produces a comprehensive installation qualification report in html and pdf format (see new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_installation_qualification" class="external-link">Installation Qualification of rpact</a>)</li>
+<code><a href="../reference/testPackage.html">testPackage()</a></code> produces a comprehensive installation qualification report in html and pdf format (see new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/" class="external-link">Installation Qualification of rpact</a>)</li>
 <li>
 <code><a href="../reference/setupPackageTests.html">setupPackageTests()</a></code> sets up the package tests by downloading the test files and copying them to the rpact installation directory</li>
 <li>
 <code><a href="../reference/saveOptions.html">saveOptions()</a></code> saves the current <code>rpact</code> options to a configuration file</li>
 <li>
 <code><a href="../reference/resetOptions.html">resetOptions()</a></code> resets the <code>rpact</code> options to their default values</li>
-</ul></div>
+<li>Argument <code>conservative</code> added to <code><a href="../reference/getSampleSizeRates.html">getSampleSizeRates()</a></code> function, see enhancement <a href="https://github.com/rpact-com/rpact/issues/39" class="external-link">#39</a>
+</li>
+<li>Enable futility boundaries in <em>Boundaries p Values Scale plot</em> plot (type = 3) using <code>options("rpact.plot.show.futility.on.pvalue.scale" = TRUE)</code> or argument <code>showFutilityBounds = TRUE</code>, see enhancement <a href="https://github.com/rpact-com/rpact/issues/79" class="external-link">#79</a>
+</li>
+<li>Enable beta-spending in <em>Error Spending</em> plot (type = 4) using <code>options("rpact.plot.show.beta.spent" = TRUE)</code> or argument <code>showBetaSpent = TRUE</code>, see enhancement <a href="https://github.com/rpact-com/rpact/issues/80" class="external-link">#80</a>. Furthermore, <code>options("rpact.plot.show.alpha.spent" = FALSE)</code> or argument <code>showAlphaSpent = FALSE</code> can be used to show only beta-spending in the plot</li>
+</ul><p><code>showAlphaSpent = TRUE</code></p>
+</div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-2-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-2-0"></a></h3>
 <ul><li>Issue for calculation of confidence intervals when using the conditional Dunnett test design (<code><a href="../reference/getDesignConditionalDunnett.html">getDesignConditionalDunnett()</a></code>) in analysis tool is fixed.</li>
-<li>The full set of unit tests for rpact is now stored in a private repository. Only members of the ‘RPACT User Group’ have access to the tests. For more information, please visit: <a href="https://www.rpact.org/iq" class="external-link">rpact.org/iq</a> and <a href="https://connect.rpact.com/" class="external-link">RPACT Connect</a>
+<li>The full set of unit tests for rpact is now stored in a private repository. Only members of the ‘RPACT User Group’ have access to the tests. For more information, please visit: <a href="https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/" class="external-link">rpact.org/iq</a> and <a href="https://rpact.shinyapps.io/connect" class="external-link">RPACT Connect</a>
 </li>
 <li>Usage of <code>maxInformation</code> improved (see enhancement <a href="https://github.com/rpact-com/rpact/issues/65" class="external-link">#65</a>)</li>
+<li>Line breaks in the output of <code><a href="../reference/getObjectRCode.html">getObjectRCode()</a></code> improved (see <a href="https://github.com/rpact-com/rpact/issues/81" class="external-link">#81</a>)</li>
 <li>
-<code><a href="../reference/testPackage.html">testPackage()</a></code>: additional warning details will be added to the test report if warnings exist</li>
-<li>Issue <a href="https://github.com/rpact-com/rpact/issues/61" class="external-link">#61</a> fixed</li>
+<code><a href="../reference/testPackage.html">testPackage()</a></code>: additional warning details will be added to the test report if warnings exist* Issue <a href="https://github.com/rpact-com/rpact/issues/61" class="external-link">#61</a> fixed</li>
 <li>Issue <a href="https://github.com/rpact-com/rpact/issues/68" class="external-link">#68</a> fixed</li>
 <li>Flexibility of function <code><a href="../reference/getPiecewiseSurvivalTime.html">getPiecewiseSurvivalTime()</a></code> improved</li>
 <li>Simulation allows the case #events = #patients</li>
 <li>Test coverage improved</li>
 <li>Plot subtitles improved</li>
+<li>Warning message added for extreme choice of <code>informationRates</code>, <code>userAlphaSpending</code>, and <code>userBetaSpending</code><br></li>
 <li>Minor improvements</li>
 </ul></div>
 </div>

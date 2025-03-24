@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.1.9283</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@
 <span>  <span class="va">...</span>,</span>
 <span>  groups <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  normalApproximation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  conservative <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  riskRatio <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  thetaH0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">riskRatio</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>  pi1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.6</span><span class="op">)</span>,</span>
@@ -78,6 +79,13 @@ that a warning will be displayed if unknown arguments are passed.</p></dd>
 <dd><p>If <code>FALSE</code>, the sample size
 for the case of one treatment group is calculated exactly using the binomial distribution,
 default is <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-conservative">conservative<a class="anchor" aria-label="anchor" href="#arg-conservative"></a></dt>
+<dd><p>For the case of one treatment group and <code>normalApproximation = FALSE</code>, if
+<code>TRUE</code>, the sample size is calculated such that for larger sample size
+than the calculated, the power is larger than 1 - beta, for <code>conservative = FALSE</code>, the minimum
+sample size, for which power exceeds 1 - beta is calculated, default is <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-riskratio">riskRatio<a class="anchor" aria-label="anchor" href="#arg-riskratio"></a></dt>

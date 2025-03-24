@@ -11,7 +11,7 @@ Use names to obtain the field names."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.1.1.9283</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,7 +127,7 @@ This function is equivalent to <code>pweibull(t, shape = kappa, scale = 1 / lamb
 of the <code>stats</code> package, i.e., the scale parameter is <code>1 / 'hazard rate'</code>.<br>
 For example,
 <code>getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)</code>
-and <code>pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)</code> provide the sample result.</p></dd>
+and <code>pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)</code> provide the same result.</p></dd>
 
 
 <dt id="arg-delayedresponseallowed">delayedResponseAllowed<a class="anchor" aria-label="anchor" href="#arg-delayedresponseallowed"></a></dt>
@@ -204,8 +204,13 @@ obtain the specific help documentation linked above by typing <code><a href="plo
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># The object created by getPiecewiseSurvivalTime() can be used directly in </span></span></span>
 <span class="r-in"><span><span class="co"># getPowerSurvival():</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="getPowerSurvival.html">getPowerSurvival</a></span><span class="op">(</span>piecewiseSurvivalTime <span class="op">=</span> <span class="va">pwst</span>, </span></span>
+<span class="r-in"><span><span class="fu"><a href="getPowerSurvival.html">getPowerSurvival</a></span><span class="op">(</span>piecewiseSurvivalTime <span class="op">=</span> <span class="va">pwst</span>, directionUpper <span class="op">=</span> <span class="cn">FALSE</span>, </span></span>
 <span class="r-in"><span>    maxNumberOfEvents <span class="op">=</span> <span class="fl">40</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The object created by getPiecewiseSurvivalTime() can be used directly in </span></span></span>
+<span class="r-in"><span><span class="co"># getSimulationSurvival():</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="getSimulationSurvival.html">getSimulationSurvival</a></span><span class="op">(</span>piecewiseSurvivalTime <span class="op">=</span> <span class="va">pwst</span>, directionUpper <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>    plannedEvents <span class="op">=</span> <span class="fl">40</span>, maxNumberOfSubjects <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span> </span></span>
 </code></pre></div>
