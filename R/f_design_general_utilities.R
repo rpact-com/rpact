@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8416 $
-## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8630 $
+## |  Last changed: $Date: 2025-03-24 09:59:32 +0100 (Mo, 24 Mrz 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_assertions.R
@@ -71,19 +71,19 @@ NULL
     }
     if (type %in% c("analysis", "simulation")) {
         design <- getDesignInverseNormal(
-            kMax = 1, 
-            alpha = alpha, 
+            kMax = 1,
+            alpha = alpha,
             beta = beta,
-            sided = sided, 
+            sided = sided,
             twoSidedPower = twoSidedPower,
             directionUpper = directionUpper
         )
     } else {
         design <- getDesignGroupSequential(
-            kMax = 1, 
-            alpha = alpha, 
+            kMax = 1,
+            alpha = alpha,
             beta = beta,
-            sided = sided, 
+            sided = sided,
             twoSidedPower = twoSidedPower,
             directionUpper = directionUpper
         )
@@ -148,7 +148,7 @@ NULL
             )
         }
     }
-    
+
     if (design$sided == 2 && .isDefinedArgument(parameterValues) &&
             (!.isTrialDesignInverseNormalOrGroupSequential(design) ||
                 (design$typeOfDesign != C_TYPE_OF_DESIGN_PT) && !.isBetaSpendingDesignType(design$typeBetaSpending)
@@ -397,6 +397,13 @@ NULL
             design$kMax, design$alpha
         ))
     }
+
+    if (design$kMax > 2 && (any(design$userAlphaSpending[2:design$kMax] - design$userAlphaSpending[1:(design$kMax - 1)] < design$tolerance))) {
+        warning("Chosen 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = FALSE),
+            ") might yield imprecise critical values due to numerical inaccuracy",
+            call. = FALSE
+        )
+    }
 }
 
 .validateUserBetaSpending <- function(design) {
@@ -455,6 +462,13 @@ NULL
             .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = TRUE),
             design$kMax, design$beta
         ))
+    }
+
+    if (design$kMax > 2 && (any(design$userBetaSpending[2:design$kMax] - design$userBetaSpending[1:(design$kMax - 1)] < design$tolerance))) {
+        warning("Chosen 'userBetaSpending' (", .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = FALSE),
+            ") might yield imprecise futility bounds due to numerical inaccuracy",
+            call. = FALSE
+        )
     }
 }
 

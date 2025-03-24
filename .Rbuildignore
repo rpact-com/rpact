@@ -53,3 +53,4 @@ Rplots\.pdf
 index\.txt$
 ^air\.toml$
 ^log\.txt$
+^private-tests$

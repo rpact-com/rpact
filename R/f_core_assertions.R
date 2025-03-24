@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8624 $
-## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
+## |  File version: $Revision: 8629 $
+## |  Last changed: $Date: 2025-03-24 09:50:39 +0100 (Mo, 24 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1217,8 +1217,6 @@ NULL
         )
     }
 
-    .assertIsValidKMax(kMax, kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound)
-
     if (length(informationRates) != kMax) {
         stop(
             sprintf(
@@ -1251,6 +1249,14 @@ NULL
                 ),
                 .arrayToString(informationRates, vectorLookAndFeelEnabled = FALSE), kMax
             ),
+            call. = FALSE
+        )
+    }
+
+    if (kMax > 1 && kMax <= 10 && (any(informationRates[2:kMax] - informationRates[1:(kMax - 1)] < 0.05 - 1E-10))) {
+        warning("Chosen 'informationRates' (",
+            .arrayToString(informationRates, vectorLookAndFeelEnabled = FALSE),
+            ") outside validated range",
             call. = FALSE
         )
     }
@@ -1566,7 +1572,7 @@ NULL
             call. = FALSE
         )
     }
-    
+
     .assertIsSingleInteger(kMax, "kMax", validateType = FALSE)
     .assertIsSingleInteger(stage, "stage", validateType = FALSE)
 

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8624 $
-## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
+## |  File version: $Revision: 8629 $
+## |  Last changed: $Date: 2025-03-24 09:50:39 +0100 (Mo, 24 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1528,6 +1528,8 @@ plot.TrialDesignPlan <- function(
         markdown <- .isMarkdownEnabled("plot")
     }
     
+    .showWarningIfPlotArgumentWillBeIgnored(type, ..., obj = x)
+    
     args <- list(
         x = x, 
         y = NULL,
@@ -1595,7 +1597,8 @@ plot.TrialDesignPlan <- function(
     if (!is.null(nMax)) {
         warning(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'nMax' (", nMax,
-            ") will be ignored because it will be taken from design plan"
+            ") will be ignored because it will be taken from design plan",
+            call. = FALSE
         )
     }
 

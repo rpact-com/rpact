@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8620 $
-## |  Last changed: $Date: 2025-03-20 09:03:31 +0100 (Do, 20 Mrz 2025) $
+## |  File version: $Revision: 8629 $
+## |  Last changed: $Date: 2025-03-24 09:50:39 +0100 (Mo, 24 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1116,7 +1116,8 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #'
 #' @export
 #'
-plot.TrialDesign <- function(x,
+plot.TrialDesign <- function(
+        x,
         y,
         ...,
         main = NA_character_,
@@ -1137,6 +1138,13 @@ plot.TrialDesign <- function(x,
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
+    
+    .warnInCaseOfUnknownArguments(
+        functionName = "plot",
+        ignore = c("xlim", "ylim", "companyAnnotationEnabled", "variedParameters", 
+            "showFutilityBounds", "showAlphaSpent", "showBetaSpent"), ...
+    )
+    .showWarningIfPlotArgumentWillBeIgnored(type, ..., obj = x)
 
     args <- list(
         x = x,
@@ -1291,12 +1299,6 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
             call. = FALSE
         )
     }
-
-    .warnInCaseOfUnknownArguments(
-        functionName = "plot",
-        ignore = c("xlim", "ylim", "companyAnnotationEnabled", 
-            "variedParameters", "showAlphaSpent", "showBetaSpent"), ...
-    )
 
     if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {
         warning("'theta' (", .reconstructSequenceCommand(theta), ") ",
