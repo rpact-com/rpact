@@ -31,6 +31,9 @@ jobs:
       containers: ${{ steps.rhub-setup.outputs.containers }}
       platforms: ${{ steps.rhub-setup.outputs.platforms }}
 
+    env:
+      RPACT_COMPLETE_UNIT_TEST_SET_ENABLED: "TRUE"
+
     steps:
     # NO NEED TO CHECKOUT HERE
     - uses: r-hub/actions/setup@v1
@@ -86,12 +89,10 @@ jobs:
       - name: Remove private tests folder
         run: rm -rf ./private-tests
         shell: bash
-      - name: Enable complete test set
-        run: |
-          Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
-        shell: Rscript {0}
       - name: Check R package
         uses: r-hub/actions/run-check@v1
+        env:
+          RPACT_COMPLETE_UNIT_TEST_SET_ENABLED: "TRUE"
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
@@ -141,12 +142,10 @@ jobs:
       - name: Remove private tests folder
         run: rm -rf ./private-tests
         shell: bash
-      - name: Enable complete test set
-        run: |
-          Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
-        shell: Rscript {0}
       - name: Check R package
         uses: r-hub/actions/run-check@v1
+        env:
+          RPACT_COMPLETE_UNIT_TEST_SET_ENABLED: "TRUE"
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
