@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8520 $
-## |  Last changed: $Date: 2025-01-31 14:15:36 +0100 (Fr, 31 Jan 2025) $
+## |  File version: $Revision: 8633 $
+## |  Last changed: $Date: 2025-03-25 14:14:39 +0100 (Di, 25 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1242,6 +1242,10 @@ getDesignInverseNormal <- function(...,
         if (!is.integer(kMax)) {
             kMax <- as.integer(kMax)
         }
+    }
+    else if (.isDefinedArgument(informationRates, argumentExistsValidationEnabled = userFunctionCallEnabled) &&
+            length(informationRates) > 10) {
+        warning("The usage of 'kMax' (", length(informationRates), ") > 10 is not validated", call. = FALSE)
     }
 
     if (is.na(bindingFutility)) {

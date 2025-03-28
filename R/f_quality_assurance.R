@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8624 $
-## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
+## |  File version: $Revision: 8633 $
+## |  Last changed: $Date: 2025-03-25 14:14:39 +0100 (Di, 25 Mrz 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -926,9 +926,8 @@ testPackage <- function(outDir = ".",
     }
 
     if (executionMode == "default") {
-        cat("Run a small subset of all tests. Please wait...\n")
-        cat("This is just a quick test (see comments below).\n")
-        cat("The entire test will take only some seconds.\n")
+        cat("Run a small subset of the available rpact unit tests. Please wait...\n") # TODO optimize wording
+        cat("The test will take about a minute.\n")
     } else if (executionMode == "downloadOnly") {
         cat("The unit test files are only downloaded and not executed.\n")
     } else if (executionMode %in% c("downloadAndRunTests", "runTestsInTestFileDirectory")) {
@@ -942,7 +941,7 @@ testPackage <- function(outDir = ".",
         } else {
             cat("Run a subset of all tests. Please wait...\n")
             cat("This is just a quick test, i.e., all time consuming tests will be skipped.\n")
-            cat("The entire test will take about a minute.\n")
+            cat("The test will take about a minute.\n")
         }
     }
 
@@ -1111,7 +1110,7 @@ testPackage <- function(outDir = ".",
         cat("-------------------------------------------------------------------------\n")
         cat("Please visit www.rpact.com to learn how to use rpact on FDA/GxP-compliant \n",
             "validated corporate computer systems and how to get a copy of the formal \n",
-            "validation documentation that is customized and licensed for exclusive use \n",
+            "validation documentation that is customized and licensed for exclusive use \n", 
             "by your company/organization, e.g., to fulfill regulatory requirements.\n",
             sep = ""
         )
@@ -1152,7 +1151,7 @@ testPackage <- function(outDir = ".",
         cat("Note that only a small subset of all available unit tests were executed.\n")
         cat("You need a personal 'token' and 'secret' to perform all unit tests.\n")
         cat("You can find these data in the appendix of the validation documentation \n")
-        cat("licensed for your company/organization.\n")
+        cat("licensed for your company/organization or at https://connect.rpact.com.\n")
     } else if (!completeUnitTestSetEnabled) {
         cat("Note that only a small subset of all available unit tests were executed.\n")
         cat("Use testPackage(completeUnitTestSetEnabled = TRUE) to perform all unit tests.\n")
