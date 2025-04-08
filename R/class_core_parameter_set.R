@@ -338,6 +338,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             } else {
                 parameterNames <- names(self$.parameterTypes[which(self$.parameterTypes %in% parameterType)])
             }
+            
             parametersToShow <- self$.getParametersToShow()
             if (is.null(parametersToShow) || length(parametersToShow) == 0) {
                 return(parameterNames)

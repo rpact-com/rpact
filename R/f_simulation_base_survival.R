@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8662 $
+## |  Last changed: $Date: 2025-04-01 12:56:03 +0200 (Di, 01 Apr 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include class_simulation_results.R
@@ -315,28 +315,24 @@ getSimulationSurvival <- function(design = NULL, ...,
     if (!is.na(dropoutTime) && dropoutTime <= 0) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0", call. = FALSE)
     }
-
     if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
             "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)"
         )
     }
-
     if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
             "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)"
         )
     }
-
     if (design$sided == 2) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "Only one-sided case is implemented for the survival simulation design"
         )
     }
-
     if (!all(is.na(lambda2)) && !all(is.na(lambda1)) &&
             length(lambda2) != length(lambda1) && length(lambda2) > 1) {
         stop(
@@ -344,7 +340,6 @@ getSimulationSurvival <- function(design = NULL, ...,
             ") must be equal to length of 'lambda1' (", length(lambda1), ")"
         )
     }
-
     if (all(is.na(lambda2)) && !all(is.na(lambda1))) {
         warning("'lambda1' (", .arrayToString(lambda1), ") will be ignored ",
             "because 'lambda2' (", .arrayToString(lambda2), ") is undefined",
@@ -352,7 +347,6 @@ getSimulationSurvival <- function(design = NULL, ...,
         )
         lambda1 <- NA_real_
     }
-
     if (!all(is.na(lambda2)) && is.list(piecewiseSurvivalTime)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -360,7 +354,6 @@ getSimulationSurvival <- function(design = NULL, ...,
             "because 'lambda2' (", .arrayToString(lambda2), ") is defined separately"
         )
     }
-
     thetaH1 <- .ignoreParameterIfNotUsed(
         "thetaH1", thetaH1, design$kMax > 1,
         "design is fixed ('kMax' = 1)", "Assumed effect"
@@ -589,7 +582,7 @@ getSimulationSurvival <- function(design = NULL, ...,
     .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, C_DROP_OUT_TIME_DEFAULT)
     .setValueAndParameterType(simulationResults, "thetaH0", thetaH0, C_THETA_H0_SURVIVAL_DEFAULT)
 
-    allocationFraction <- getFraction(allocation1 / allocation2)
+    allocationFraction <- .getFraction(allocation1 / allocation2)
     if (allocationFraction[1] != allocation1 || allocationFraction[2] != allocation2) {
         warning(sprintf(
             "allocation1 = %s and allocation2 = %s was replaced by allocation1 = %s and allocation2 = %s",
@@ -626,50 +619,59 @@ getSimulationSurvival <- function(design = NULL, ...,
 
     phi <- -c(log(1 - dropoutRate1), log(1 - dropoutRate2)) / dropoutTime
 
-    densityIntervals <- accrualTime
-    if (length(accrualTime) > 1) {
-        densityIntervals[2:length(accrualTime)] <-
-            accrualTime[2:length(accrualTime)] - accrualTime[1:(length(accrualTime) - 1)]
-    }
-    densityVector <- accrualSetup$accrualIntensity / sum(densityIntervals * accrualSetup$accrualIntensity)
-
-    intensityReplications <- round(densityVector * densityIntervals * accrualSetup$maxNumberOfSubjects)
-
-    if (all(intensityReplications > 0)) {
-        accrualTimeValue <- cumsum(rep(
-            1 / (densityVector * accrualSetup$maxNumberOfSubjects), intensityReplications
-        ))
-    } else {
-        accrualTimeValue <- cumsum(rep(
-            1 / (densityVector[1] * accrualSetup$maxNumberOfSubjects),
-            intensityReplications[1]
-        ))
-        if (length(accrualIntensity) > 1 && length(intensityReplications) > 1) {
-            for (i in 2:min(length(accrualIntensity), length(intensityReplications))) {
-                if (intensityReplications[i] > 0) {
-                    accrualTimeValue <- c(
-                        accrualTimeValue,
-                        accrualTime[i - 1] +
-                            cumsum(rep(
-                                1 / (densityVector[i] * accrualSetup$maxNumberOfSubjects),
-                                intensityReplications[i]
-                            ))
-                    )
-                }
-            }
-        }
-    }
-
-    accrualTimeValue <- accrualTimeValue[1:accrualSetup$maxNumberOfSubjects]
-
-    # to avoid last value to be NA_real_
-    accrualTimeValue[is.na(accrualTimeValue)] <- accrualTime[length(accrualTime)]
-
-    treatmentGroup <- rep(
-        c(rep(1, allocation1), rep(2, allocation2)),
-        ceiling(accrualSetup$maxNumberOfSubjects /
-            (allocation1 + allocation2))
-    )[1:accrualSetup$maxNumberOfSubjects]
+    # build up general recruitment times
+    recruitmentTimes <- .generateRecruitmentTimes(
+        allocation1 / allocation2,
+        accrualTime,
+        accrualIntensity
+    )
+    accrualTimeValue <- recruitmentTimes$recruit
+    treatmentGroup <- recruitmentTimes$treatments
+    
+    # densityIntervals <- accrualTime
+    # if (length(accrualTime) > 1) {
+    #     densityIntervals[2:length(accrualTime)] <-
+    #         accrualTime[2:length(accrualTime)] - accrualTime[1:(length(accrualTime) - 1)]
+    # }
+    # densityVector <- accrualSetup$accrualIntensity / sum(densityIntervals * accrualSetup$accrualIntensity)
+    # 
+    # intensityReplications <- round(densityVector * densityIntervals * accrualSetup$maxNumberOfSubjects)
+    # 
+    # if (all(intensityReplications > 0)) {
+    #     accrualTimeValue <- cumsum(rep(
+    #         1 / (densityVector * accrualSetup$maxNumberOfSubjects), intensityReplications
+    #     ))
+    # } else {
+    #     accrualTimeValue <- cumsum(rep(
+    #         1 / (densityVector[1] * accrualSetup$maxNumberOfSubjects),
+    #         intensityReplications[1]
+    #     ))
+    #     if (length(accrualIntensity) > 1 && length(intensityReplications) > 1) {
+    #         for (i in 2:min(length(accrualIntensity), length(intensityReplications))) {
+    #             if (intensityReplications[i] > 0) {
+    #                 accrualTimeValue <- c(
+    #                     accrualTimeValue,
+    #                     accrualTime[i - 1] +
+    #                         cumsum(rep(
+    #                             1 / (densityVector[i] * accrualSetup$maxNumberOfSubjects),
+    #                             intensityReplications[i]
+    #                         ))
+    #                 )
+    #             }
+    #         }
+    #     }
+    # }
+    # 
+    # accrualTimeValue <- accrualTimeValue[1:accrualSetup$maxNumberOfSubjects]
+    # 
+    # # to avoid last value to be NA_real_
+    # accrualTimeValue[is.na(accrualTimeValue)] <- accrualTime[length(accrualTime)]
+    # 
+    # treatmentGroup <- rep(
+    #     c(rep(1, allocation1), rep(2, allocation2)),
+    #     ceiling(accrualSetup$maxNumberOfSubjects /
+    #         (allocation1 + allocation2))
+    # )[1:accrualSetup$maxNumberOfSubjects]
 
     if (.isTrialDesignFisher(design)) {
         alpha0Vec <- design$alpha0Vec

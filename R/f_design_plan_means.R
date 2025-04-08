@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8575 $
-## |  Last changed: $Date: 2025-02-28 14:45:47 +0100 (Fr, 28 Feb 2025) $
+## |  File version: $Revision: 8658 $
+## |  Last changed: $Date: 2025-04-01 08:15:28 +0200 (Di, 01 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -853,7 +853,7 @@ getPowerMeans <- function(design = NULL, ...,
         allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
         ) {
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
-
+    
     if ((length(stDev) == 1) && (groups == 2)) {
         stDev <- rep(stDev, 2)
     }

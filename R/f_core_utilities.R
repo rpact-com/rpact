@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8624 $
-## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
+## |  File version: $Revision: 8660 $
+## |  Last changed: $Date: 2025-04-01 11:45:17 +0200 (Di, 01 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -113,7 +113,7 @@ NULL
     if (is.null(x) || length(x) == 0) {
         return(x)
     }
-    
+
     args <- list(...)
     if (length(args) > 0) {
         x <- paste(c(x, unlist(args, use.names = FALSE)), collapse = sep, sep = sep)
@@ -1202,7 +1202,7 @@ getParameterName <- function(obj, parameterCaption) {
             return(parameterName)
         }
     }
-    
+
     if (!is.null(obj[[".design"]])) {
         result <- getParameterName(obj$.design, parameterCaption)
         if (!is.na(result)) {
@@ -1620,7 +1620,7 @@ getParameterName <- function(obj, parameterCaption) {
     if (inherits(x, "SummaryFactory")) {
         x <- x$object
     }
-    
+
     queue <- .getPipeOperatorQueue(x)
     queue[[length(queue) + 1]] <- x
     attr(x, "markdown") <- TRUE
@@ -1630,15 +1630,18 @@ getParameterName <- function(obj, parameterCaption) {
 
 .resetPipeOperatorQueue <- function(x) {
     for (attrName in c("queue", "printObject", "printObjectSeparator", "markdown")) {
-        tryCatch({
-            if (inherits(x, "SummaryFactory")) {
-                attr(x$object, attrName) <- NULL
-            } else {
-                attr(x, attrName) <- NULL
+        tryCatch(
+            {
+                if (inherits(x, "SummaryFactory")) {
+                    attr(x$object, attrName) <- NULL
+                } else {
+                    attr(x, attrName) <- NULL
+                }
+            },
+            error = function(e) {
+                message("Failed to reset pipe operator queue attribute ", sQuote(attrName), ": ", e$message)
             }
-        }, error = function(e) {
-            message("Failed to reset pipe operator queue attribute ", sQuote(attrName), ": ", e$message)
-        })
+        )
     }
     return(x)
 }
@@ -1651,12 +1654,11 @@ getParameterName <- function(obj, parameterCaption) {
     if (!is.null(indices)) {
         return(design$criticalValues[indices])
     }
-    
+
     return(design$criticalValues)
 }
 
-.applyDirectionOfAlternative <- function(
-        value,
+.applyDirectionOfAlternative <- function(value,
         directionUpper,
         ...,
         type = c(
@@ -1667,20 +1669,19 @@ getParameterName <- function(obj, parameterCaption) {
             "minMax",
             "maxMin"
         ),
-        phase = c("unknown", "design", "planning", "analysis"), 
+        phase = c("unknown", "design", "planning", "analysis"),
         syncLength = FALSE) {
-        
     type <- match.arg(type)
     phase <- match.arg(phase)
 
     if (phase == "design") {
         return(value) # deactivate for current release
     }
-    
+
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
         return(value)
     }
-    
+
     if (syncLength && length(directionUpper) > 1 && length(directionUpper) > length(value)) {
         directionUpper <- directionUpper[1:length(value)]
     }
@@ -1714,8 +1715,7 @@ getParameterName <- function(obj, parameterCaption) {
     return(values)
 }
 
-.applyDirectionOfAlternativeSingle <- function(
-        ...,
+.applyDirectionOfAlternativeSingle <- function(...,
         value,
         directionUpper,
         type = c(
@@ -1776,18 +1776,18 @@ getParameterName <- function(obj, parameterCaption) {
     return(value)
 }
 
-#' 
+#'
 #' @note This is only needed such that we can mock the function in the tests.
-#' 
+#'
 #' @keywords internal
-#' 
-#' @noRd 
-#' 
+#'
+#' @noRd
+#'
 .isPackageNamespaceLoaded <- function(package, ..., quietly = FALSE) {
     base::requireNamespace(package, quietly = quietly, ...)
 }
 
-#' 
+#'
 #' @title
 #' Save Options
 #'
@@ -1808,42 +1808,45 @@ getParameterName <- function(obj, parameterCaption) {
 #' }
 #'
 #' @export
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 saveOptions <- function() {
-    tryCatch({
-        if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
-            return(invisible(FALSE))
-        }
-            
-        pkgConfigDir <- rappdirs::user_config_dir("rpact")
-        if (!dir.exists(pkgConfigDir)) {
-            dir.create(pkgConfigDir, recursive = TRUE, showWarnings = FALSE)
-        }
-        if (!dir.exists(pkgConfigDir)) {
-            return(invisible(FALSE))
-        }
-        
-        optionNames <- make.names(names(base::options()))
-        optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
-        optionFileContent <- character()
-        for (optionName in optionNames) {
-            optionValue <- getOption(optionName)
-            if (!is.null(optionValue)) {
-                optionFileContent <- c(optionFileContent, paste0(optionName, ": ", optionValue))
+    tryCatch(
+        {
+            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                return(invisible(FALSE))
             }
+
+            pkgConfigDir <- rappdirs::user_config_dir("rpact")
+            if (!dir.exists(pkgConfigDir)) {
+                dir.create(pkgConfigDir, recursive = TRUE, showWarnings = FALSE)
+            }
+            if (!dir.exists(pkgConfigDir)) {
+                return(invisible(FALSE))
+            }
+
+            optionNames <- make.names(names(base::options()))
+            optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
+            optionFileContent <- character()
+            for (optionName in optionNames) {
+                optionValue <- getOption(optionName)
+                if (!is.null(optionValue)) {
+                    optionFileContent <- c(optionFileContent, paste0(optionName, ": ", optionValue))
+                }
+            }
+            optionsFile <- file.path(pkgConfigDir, "options.yml")
+            cat(optionFileContent, file = optionsFile, sep = "\n")
+            return(invisible(file.exists(optionsFile)))
+        },
+        error = function(e) {
+            warning("Failed to save rpact options: ", e$message, call. = FALSE)
+            return(invisible(FALSE))
         }
-        optionsFile <- file.path(pkgConfigDir, "options.yml")
-        cat(optionFileContent, file = optionsFile, sep = "\n")
-        return(invisible(file.exists(optionsFile)))
-    }, error = function(e) {
-        warning("Failed to save rpact options: ", e$message, call. = FALSE)
-        return(invisible(FALSE))
-    })
+    )
 }
 
-#' 
+#'
 #' @title
 #' Reset Options
 #'
@@ -1867,78 +1870,87 @@ saveOptions <- function() {
 #' }
 #'
 #' @export
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 resetOptions <- function(persist = TRUE) {
     .assertIsSingleLogical(persist, "persist")
-    tryCatch({
-        optionNames <- make.names(names(base::options()))
-        optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
-        if (length(optionNames) == 0) {
+    tryCatch(
+        {
+            optionNames <- make.names(names(base::options()))
+            optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
+            if (length(optionNames) == 0) {
+                return(invisible(TRUE))
+            }
+
+            for (optionName in optionNames) {
+                eval(parse(text = paste0('base::options("', optionName, '" = NULL)')))
+            }
+            if (persist) {
+                saveOptions()
+            }
             return(invisible(TRUE))
+        },
+        error = function(e) {
+            warning("Failed to reset rpact options: ", e$message, call. = FALSE)
+            return(invisible(FALSE))
         }
-        
-        for (optionName in optionNames) {
-            eval(parse(text = paste0('base::options("', optionName, '" = NULL)')))
-        }
-        if (persist) {
-            saveOptions()
-        }
-        return(invisible(TRUE))
-    }, error = function(e) {
-        warning("Failed to reset rpact options: ", e$message, call. = FALSE)
-        return(invisible(FALSE))
-    })
+    )
 }
 
 .loadOptions <- function() {
-    tryCatch({
-        if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) { 
-            packageStartupMessage("Package \"rappdirs\" is needed for saving and loading rpact options. ",
-                "Please install using, e.g., install.packages(\"rappdirs\")")
-            return(invisible(FALSE))
-        }
-            
-        pkgConfigDir <- rappdirs::user_config_dir("rpact")
-        if (!dir.exists(pkgConfigDir)) {
-            return(invisible(FALSE))
-        }
-        
-        pkgConfigFile <- file.path(pkgConfigDir, "options.yml")
-        if (!file.exists(pkgConfigFile)) {
-            return(invisible(FALSE))
-        }
-        
-        optionFileContent <- readLines(pkgConfigFile)
-        if (length(optionFileContent) == 0) {
-            return(invisible(TRUE))
-        }
-        
-        optionsList <- list()
-        for (line in optionFileContent) {
-            optionName <- sub(":.*", "", line)
-            if (is.null(optionName) || length(optionName) != 1 || nchar(trimws(optionName)) == 0) {
-                next
+    tryCatch(
+        {
+            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                packageStartupMessage(
+                    "Package \"rappdirs\" is needed for saving and loading rpact options. ",
+                    "Please install using, e.g., install.packages(\"rappdirs\")"
+                )
+                return(invisible(FALSE))
             }
-            
-            optionValue <- sub(".*: ", "", line)
-            if (is.null(optionValue) || length(optionValue) != 1 || nchar(trimws(optionValue)) == 0) {
-                next
+
+            pkgConfigDir <- rappdirs::user_config_dir("rpact")
+            if (!dir.exists(pkgConfigDir)) {
+                return(invisible(FALSE))
             }
-            
-            optionsList[[optionName]] <- optionValue
-        }
-        
-        if (length(optionsList) == 0) {
+
+            pkgConfigFile <- file.path(pkgConfigDir, "options.yml")
+            if (!file.exists(pkgConfigFile)) {
+                return(invisible(FALSE))
+            }
+
+            optionFileContent <- readLines(pkgConfigFile)
+            if (length(optionFileContent) == 0) {
+                return(invisible(TRUE))
+            }
+
+            optionsList <- list()
+            for (line in optionFileContent) {
+                optionName <- sub(":.*", "", line)
+                if (is.null(optionName) || length(optionName) != 1 || nchar(trimws(optionName)) == 0) {
+                    next
+                }
+
+                optionValue <- sub(".*: ", "", line)
+                if (is.null(optionValue) || length(optionValue) != 1 || nchar(trimws(optionValue)) == 0) {
+                    next
+                }
+
+                optionsList[[optionName]] <- optionValue
+            }
+
+            if (length(optionsList) == 0) {
+                return(invisible(TRUE))
+            }
+
+            base::options(optionsList)
             return(invisible(TRUE))
+        },
+        error = function(e) {
+            packageStartupMessage("Failed to load and set rpact options: ", e$message)
+            return(invisible(FALSE))
         }
-        
-        base::options(optionsList)
-        return(invisible(TRUE))
-    }, error = function(e) {
-        packageStartupMessage("Failed to load and set rpact options: ", e$message)
-        return(invisible(FALSE))
-    })
+    )
 }
+
 

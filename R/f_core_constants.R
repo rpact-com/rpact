@@ -718,7 +718,9 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
     expectedInformationH1 = "Expected information under H1",
-    plannedCalendarTime = "Planned calendar time"
+    plannedCalendarTime = "Planned calendar time",
+    efficacyStops = "Efficacy stops",
+    futilityStops = "Futility stops"
 ))
 
 C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
@@ -1026,7 +1028,9 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
     expectedInformationH1 = "Expected information under H1",
-    plannedCalendarTime = "Planned calendar time"
+    plannedCalendarTime = "Planned calendar time",
+    efficacyStops = "Efficacy stops",
+    futilityStops = "Futility stops"
 ))
 
 C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETTINGS", list(

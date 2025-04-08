@@ -247,7 +247,8 @@ getSimulationCounts <- function(design = NULL,
         }
     } else if (!all(is.na(plannedCalendarTime))) {
         warning("'plannedCalendarTime' (", .arrayToString(plannedCalendarTime), ") ",
-            "has no influence on simulation", call. = FALSE
+            "has no influence on simulation",
+            call. = FALSE
         )
     }
 
@@ -261,39 +262,70 @@ getSimulationCounts <- function(design = NULL,
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
 
-    .setValueAndParameterType(simulationResults, "plannedCalendarTime", 
-        plannedCalendarTime, NA_real_)
-    .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", 
-        maxNumberOfSubjects, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "lambda1", 
-        lambda1, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "lambda2", 
-        lambda2, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "lambda", 
-        lambda, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "theta", 
-        theta, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "thetaH0", 
-        thetaH0, 1, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "directionUpper", 
-        directionUpper, C_DIRECTION_UPPER_DEFAULT)
-    .setValueAndParameterType(simulationResults, "overdispersion", 
-        overdispersion, 0)
-    .setValueAndParameterType(simulationResults, "fixedExposureTime", 
-        fixedExposureTime, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "accrualTime", 
-        accrualTime, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "accrualIntensity", 
-        accrualIntensity, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "followUpTime", 
-        followUpTime, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(simulationResults, "maxNumberOfIterations", 
-        as.integer(maxNumberOfIterations), C_MAX_SIMULATION_ITERATIONS_DEFAULT)
-    .setValueAndParameterType(simulationResults, "allocationRatioPlanned", 
-        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
+    .setValueAndParameterType(
+        simulationResults, "plannedCalendarTime",
+        plannedCalendarTime, NA_real_
+    )
+    .setValueAndParameterType(simulationResults, "maxNumberOfSubjects",
+        maxNumberOfSubjects, NA_real_,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(simulationResults, "lambda1",
+        lambda1, NA_real_,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(simulationResults, "lambda2",
+        lambda2, NA_real_,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(simulationResults, "lambda",
+        lambda, NA_real_,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(simulationResults, "theta",
+        theta, NA_real_,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(simulationResults, "thetaH0",
+        thetaH0, 1,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(
+        simulationResults, "directionUpper",
+        directionUpper, C_DIRECTION_UPPER_DEFAULT
+    )
+    .setValueAndParameterType(
+        simulationResults, "overdispersion",
+        overdispersion, 0
+    )
+    .setValueAndParameterType(simulationResults, "fixedExposureTime",
+        fixedExposureTime, NA_real_,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(simulationResults, "accrualTime",
+        accrualTime, NA_real_,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(simulationResults, "accrualIntensity",
+        accrualIntensity, NA_real_,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(simulationResults, "followUpTime",
+        followUpTime, NA_real_,
+        notApplicableIfNA = TRUE
+    )
+    .setValueAndParameterType(
+        simulationResults, "maxNumberOfIterations",
+        as.integer(maxNumberOfIterations), C_MAX_SIMULATION_ITERATIONS_DEFAULT
+    )
+    .setValueAndParameterType(
+        simulationResults, "allocationRatioPlanned",
+        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
+    )
 
-    simulationResults$.setParameterType("seed", ifelse(is.na(seed), 
-        C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
+    simulationResults$.setParameterType("seed", ifelse(is.na(seed),
+        C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED
+    ))
     simulationResults$seed <- .setSeed(seed)
 
     if (!is.na(lambda2) && !any(is.na(theta))) {
@@ -354,32 +386,15 @@ getSimulationCounts <- function(design = NULL,
             lambda1[iCase] <- lambda2 * theta[iCase]
         }
         if (!any(is.na(accrualIntensity))) {
-            const <- allocationRatioPlanned / (1 + allocationRatioPlanned)
-            if (length(unique(accrualIntensity)) == 1) {
-                recruit1 <- seq(0, accrualTime[length(accrualIntensity)],
-                    length.out = accrualTime[length(accrualIntensity)] * accrualIntensity[1] * const
-                )
-                recruit2 <- seq(0, accrualTime[length(accrualIntensity)],
-                    length.out = accrualTime[length(accrualIntensity)] * accrualIntensity[1] * (1 - const)
-                )
-            } else {
-                recruit1 <- seq(0, accrualTime[1], 
-                    length.out = accrualTime[1] * accrualIntensity[1] * const)
-                recruit2 <- seq(0, accrualTime[1], 
-                    length.out = accrualTime[1] * accrualIntensity[1] * (1 - const))
-                for (i in 2:length(accrualIntensity)) {
-                    recruit1 <- c(recruit1, seq(accrualTime[i - 1] + 1 / accrualIntensity[i],
-                        accrualTime[i],
-                        length.out = (accrualTime[i] - accrualTime[i - 1]) *
-                            accrualIntensity[i] * const
-                    ))
-                    recruit2 <- c(recruit2, seq(accrualTime[i - 1] + 1 / accrualIntensity[i],
-                        accrualTime[i],
-                        length.out = (accrualTime[i] - accrualTime[i - 1]) *
-                            accrualIntensity[i] * (1 - const)
-                    ))
-                }
-            }
+            # build up general recruitment times
+            recruitmentTimes <- .generateRecruitmentTimes(
+                allocationRatioPlanned,
+                accrualTime,
+                accrualIntensity
+            )
+            recruit1 <- recruitmentTimes$recruit1
+            recruit2 <- recruitmentTimes$recruit2
+
             n1 <- length(recruit1)
             n2 <- length(recruit2)
             nTotal <- n1 + n2
@@ -405,18 +420,18 @@ getSimulationCounts <- function(design = NULL,
         }
         for (iterationNumber in 1:maxNumberOfIterations) {
             if (kMax == 1) {
-                recruit1 <- seq(0, accrualTime, length.out = n1)
-                recruit2 <- seq(0, accrualTime, length.out = n2)
+                # recruit1 <- seq(0, accrualTime, length.out = n1) # TODO @Gernot: remove?
+                # recruit2 <- seq(0, accrualTime, length.out = n2) # TODO @Gernot: remove?
                 if (is.na(fixedExposureTime)) {
-                    timeUnderObservation1 <- pmax(accrualTime + followUpTime - recruit1, 0)
-                    timeUnderObservation2 <- pmax(accrualTime + followUpTime - recruit2, 0)
+                    timeUnderObservation1 <- pmax(accrualTime[length(accrualTime)] + followUpTime - recruit1, 0)
+                    timeUnderObservation2 <- pmax(accrualTime[length(accrualTime)] + followUpTime - recruit2, 0)
                 } else {
                     timeUnderObservation1 <- pmax(pmin(
-                        accrualTime + followUpTime - recruit1,
+                        accrualTime[length(accrualTime)] + followUpTime - recruit1,
                         fixedExposureTime
                     ), 0)
                     timeUnderObservation2 <- pmax(pmin(
-                        accrualTime + followUpTime - recruit2,
+                        accrualTime[length(accrualTime)] + followUpTime - recruit2,
                         fixedExposureTime
                     ), 0)
                 }
@@ -443,7 +458,7 @@ getSimulationCounts <- function(design = NULL,
                     recruit1 = timeUnderObservation1,
                     recruit2 = timeUnderObservation2
                 )
-                zValue <- (2 * directionUpper - 1) * 
+                zValue <- (2 * directionUpper - 1) *
                     (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(infoAnalysis)
                 if (!is.na(zValue) && zValue > .getCriticalValues(design, 1)) {
                     reject[1] <- reject[1] + 1
@@ -505,14 +520,14 @@ getSimulationCounts <- function(design = NULL,
                                 dfStartStop$output[, "recruitTime"] <= plannedCalendarTime[k] &
                                 dfStartStop$output[, "stopCalendar"] <= plannedCalendarTime[k],
                         ]
-                        if (length(kthStageWithEvents) > 0 && 
+                        if (length(kthStageWithEvents) > 0 &&
                                 is.matrix(kthStageWithEvents) && nrow(kthStageWithEvents) > 0) {
                             tab <- table(kthStageWithEvents[, "id"])
                             idx <- as.integer(names(tab))
                             counts[idx] <- as.vector(tab)
                         }
                         counts1 <- counts[seq_len(length(timeUnderObservation1))]
-                        counts2 <- counts[(length(recruit1) + 1):(length(recruit1) + 
+                        counts2 <- counts[(length(recruit1) + 1):(length(recruit1) +
                             length(timeUnderObservation2))]
                         sampleSizePerStage[k, iCase] <- sampleSizePerStage[k, iCase] +
                             length(timeUnderObservation1) + length(timeUnderObservation2)
@@ -534,7 +549,7 @@ getSimulationCounts <- function(design = NULL,
                         recruit1 = timeUnderObservation1,
                         recruit2 = timeUnderObservation2
                     )
-                    zValue <- (2 * directionUpper - 1) * 
+                    zValue <- (2 * directionUpper - 1) *
                         (log(nb[1]) - log(nb[2]) - log(thetaH0)) * sqrt(infoAnalysis)
                     iterations[k, iCase] <- iterations[k, iCase] + 1
 
