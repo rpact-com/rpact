@@ -14,7 +14,7 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 ## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Tue, 10 Dec 2024) $
+## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Di, 10 Dez 2024) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
