@@ -18,105 +18,164 @@
 ## |  Last changed by: $Author: wassmer $
 ## |
 
+.warnInCaseOfExtremeAllocationRatios <- function(allocation1, allocation2) {
+    if (abs(allocation1 - allocation2) > 4) {
+        warning(
+            "Choice of allocation scheme ('allocation1' = ", allocation1,
+            ", 'allocation2' = ", allocation2, ") might yield unreliable results",
+            call. = FALSE
+        )
+    }
+}
+
+.generateSingleRecruitmentTimes <- function(x, accrualTime, informationRates) {
+    if (x <= informationRates[1]) {
+        return(accrualTime[1] / informationRates[1] * x)
+    }
+    
+    for (i in 2:length(accrualTime)) {
+        if (x <= informationRates[i]) {
+            return(accrualTime[i] + (accrualTime[i] - accrualTime[i - 1]) /
+                (informationRates[i] - informationRates[i - 1]) * (x - informationRates[i]))
+        }
+    }
+    
+    return(NA_real_)
+}
+
 .generateRecruitmentTimes <- function(
         allocationRatio,
         accrualTime,
         accrualIntensity) {
-    
+
     if (length(accrualTime) != length(accrualIntensity)) {
         stop(
             C_EXCEPTION_TYPE_RUNTIME_ISSUE,
             "length of accrualTime (", length(accrualTime), ") and ",
-            "accrualIntensity (", length(accrualIntensity), ") are not the identical"
+            "accrualIntensity (", length(accrualIntensity), ") must be identical"
         )
     }
-    
+
     densityIntervals <- accrualTime
     if (length(densityIntervals) > 1) {
         densityIntervals[2:length(densityIntervals)] <-
-            densityIntervals[2:length(densityIntervals)] - 
+            densityIntervals[2:length(densityIntervals)] -
             densityIntervals[1:(length(densityIntervals) - 1)]
-        maxNumberOfSubjects <- ceiling(getNumberOfSubjects(
-            time = 0,
-            accrualTime = c(0, accrualTime),
-            accrualIntensity = accrualIntensity
-        )$maxNumberOfSubjects)
+        maxNumberOfSubjects <- ceiling(sum(densityIntervals * accrualIntensity))
     } else {
-        maxNumberOfSubjects <- accrualTime * accrualIntensity
+        maxNumberOfSubjects <- ceiling(accrualTime * accrualIntensity)
     }
-    densityVector <- accrualIntensity / sum(densityIntervals * accrualIntensity)
-    
-    intensityReplications <- round(densityVector * densityIntervals * maxNumberOfSubjects)
-    
-    if (all(intensityReplications > 0)) {
-        recruit <- cumsum(rep(
-            1 / (densityVector * maxNumberOfSubjects), intensityReplications
-        ))
-    } else {
-        recruit <- cumsum(rep(
-            1 / (densityVector[1] * maxNumberOfSubjects),
-            intensityReplications[1]
-        ))
-        if (length(accrualIntensity) > 1 && length(intensityReplications) > 1) {
-            for (i in 2:min(length(accrualIntensity), length(intensityReplications))) {
-                if (intensityReplications[i] > 0) {
-                    recruit <- c(
-                        recruit,
-                        accrualTime[i - 1] +
-                            cumsum(rep(
-                                1 / (densityVector[i] * maxNumberOfSubjects),
-                                intensityReplications[i]
-                            ))
-                    )
-                }
-            }
-        }
+    informationRates <- cumsum(densityIntervals * accrualIntensity) / maxNumberOfSubjects
+    informationRates[length(accrualTime)] <- 1
+
+    recruit <- numeric()
+    for (x in (1:maxNumberOfSubjects) / maxNumberOfSubjects) {
+        recruit <- c(recruit, .generateSingleRecruitmentTimes(x, accrualTime, informationRates))
     }
+
     recruit <- recruit[1:maxNumberOfSubjects]
-    
-    # to avoid last value to be NA_real_
-    recruit[is.na(recruit)] <- accrualTime[length(accrualTime)]
-    
+
     # to force last value to be last accrualTime
     recruit[length(recruit)] <- accrualTime[length(accrualTime)]
-    
-    fractions <- .getFraction(allocationRatio)   
-    allocation1 <- fractions[1]
-    allocation2 <- fractions[2]
-    
-    if (allocation1 - allocation2 > 4 || allocation2  - allocation1 > 4) {
-        warning(
-            "Choice of allocation scheme ('allocation1' = ", allocation1,
-            ", 'allocation2' = ", allocation2, ") might yield unreliable results",
-            call. = FALSE)
-    }
-    
+
+    allocationFraction <- .getFraction(allocationRatio)
+    allocation1 <- allocationFraction[1]
+    allocation2 <- allocationFraction[2]
+    .warnInCaseOfExtremeAllocationRatios(allocation1, allocation2)
+
     treatments <- c()
-    while(length(treatments) < maxNumberOfSubjects){
-        ifelse(allocation1 > allocation2,
-               treatments <- c(treatments, rep(c(1,2), allocation2), rep(1, allocation1 - allocation2)), 
-               treatments <- c(treatments, rep(c(1,2), allocation1), rep(2, allocation2 - allocation1))
-        )  
+    while (length(treatments) < maxNumberOfSubjects) {
+        if (allocation1 > allocation2) {
+            treatments <- c(treatments, rep(c(1, 2), allocation2), rep(1, allocation1 - allocation2))
+        } else {
+            treatments <- c(treatments, rep(c(1, 2), allocation1), rep(2, allocation2 - allocation1))
+        }
     }
-    treatments <- treatments[1 : maxNumberOfSubjects]
-    recruit1 <- recruit[treatments == 1]
-    recruit2 <- recruit[treatments == 2]
-    
-    if (length(recruit1) == 0 || length(recruit2) == 0) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "calculation of recruitment times failed, presumably due to unsuitable allocation ratio"
-        )
-    }
-    
-    return(list(
+    treatments <- treatments[1:maxNumberOfSubjects]
+
+    return(data.frame(
         treatments = treatments,
-        recruit = recruit,
-        recruit1 = recruit1,
-        recruit2 = recruit2,
-        maxNumberOfSubjects = length(recruit)
+        recruit = recruit
     ))
 }
+
+#.generateRecruitmentTimesOld <- function(allocationRatio,
+#        accrualTime,
+#        accrualIntensity) {
+#    if (length(accrualTime) != length(accrualIntensity)) {
+#        stop(
+#            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+#            "length of accrualTime (", length(accrualTime), ") and ",
+#            "accrualIntensity (", length(accrualIntensity), ") are not the identical"
+#        )
+#    }
+#
+#    densityIntervals <- accrualTime
+#    if (length(densityIntervals) > 1) {
+#        densityIntervals[2:length(densityIntervals)] <-
+#            densityIntervals[2:length(densityIntervals)] -
+#            densityIntervals[1:(length(densityIntervals) - 1)]
+#        maxNumberOfSubjects <- ceiling(sum(densityIntervals * accrualIntensity))
+#    } else {
+#        maxNumberOfSubjects <- accrualTime * accrualIntensity
+#    }
+#    densityVector <- accrualIntensity / sum(densityIntervals * accrualIntensity)
+#
+#    intensityReplications <- ceiling(densityVector * densityIntervals * maxNumberOfSubjects)
+#
+#    if (all(intensityReplications > 0)) {
+#        recruit <- cumsum(rep(
+#            1 / (densityVector * maxNumberOfSubjects), intensityReplications
+#        ))
+#    } else {
+#        recruit <- cumsum(rep(
+#            1 / (densityVector[1] * maxNumberOfSubjects),
+#            intensityReplications[1]
+#        ))
+#        if (length(accrualIntensity) > 1 && length(intensityReplications) > 1) {
+#            for (i in 2:min(length(accrualIntensity), length(intensityReplications))) {
+#                if (intensityReplications[i] > 0) {
+#                    recruit <- c(
+#                        recruit,
+#                        accrualTime[i - 1] +
+#                            cumsum(rep(
+#                                1 / (densityVector[i] * maxNumberOfSubjects),
+#                                intensityReplications[i]
+#                            ))
+#                    )
+#                }
+#            }
+#        }
+#    }
+#    recruit <- recruit[1:maxNumberOfSubjects]
+#
+#    # to avoid last value to be NA_real_
+#    recruit[is.na(recruit)] <- accrualTime[length(accrualTime)]
+#
+#    # to force last value to be last accrualTime
+#    recruit[length(recruit)] <- accrualTime[length(accrualTime)]
+#
+#    allocationFraction <- .getFraction(allocationRatio)
+#    allocation1 <- allocationFraction[1]
+#    allocation2 <- allocationFraction[2]
+#    .warnInCaseOfExtremeAllocationRatios(allocation1, allocation2)
+#
+#    treatments <- c()
+#    while (length(treatments) < maxNumberOfSubjects) {
+#        if (allocation1 > allocation2) {
+#            treatments <- c(treatments, rep(c(1, 2), allocation2), rep(1, allocation1 - allocation2))
+#        } else {
+#            treatments <- c(treatments, rep(c(1, 2), allocation1), rep(2, allocation2 - allocation1))
+#        }
+#    }
+#    treatments <- treatments[1:maxNumberOfSubjects]
+#
+#    return(list(
+#        treatments = treatments,
+#        recruit = recruit,
+#        maxNumberOfSubjects = length(recruit)
+#    ))
+#}
 
 
 .getVarianceEstimate <- function(lambda1,
@@ -309,11 +368,11 @@
             )
             recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
             recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
+        } else if (!any(is.na(accrualTime))) {
+            recruit1 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] * allocationRatio / (1 + allocationRatio))
+            recruit2 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] / (1 + allocationRatio))
         } else {
-            if (!any(is.na(accrualTime))) {
-                recruit1 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] * allocationRatio / (1 + allocationRatio))
-                recruit2 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] / (1 + allocationRatio))
-            }
+            # TODO @Gernot: init recruit1 and recruit2 with NA_real_?
         }
 
         # calculate theta that solves (ln(theta) - ln(thetaH0) sqrt(FisherInformation_k) = boundary
@@ -1234,8 +1293,9 @@ getPowerCounts <- function(design = NULL, ...,
             accrualTime,
             accrualIntensity
         )
-        recruit1 <- recruitmentTimes$recruit1
-        recruit2 <- recruitmentTimes$recruit2
+
+        recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
+        recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
 
         n1 <- length(recruit1)
         n2 <- length(recruit2)

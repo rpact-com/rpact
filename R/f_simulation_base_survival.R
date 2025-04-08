@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8662 $
-## |  Last changed: $Date: 2025-04-01 12:56:03 +0200 (Di, 01 Apr 2025) $
+## |  File version: $Revision: 8667 $
+## |  Last changed: $Date: 2025-04-07 14:22:01 +0200 (Mo, 07 Apr 2025) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -286,8 +286,10 @@ getSimulationSurvival <- function(design = NULL, ...,
         design <- .resetPipeOperatorQueue(design)
     }
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsInOpenInterval(thetaH0, "thetaH0", 0, NULL, naAllowed = TRUE)
     .assertIsNumericVector(minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
@@ -591,6 +593,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         allocation1 <- allocationFraction[1]
         allocation2 <- allocationFraction[2]
     }
+    .warnInCaseOfExtremeAllocationRatios(allocation1, allocation2)
 
     .setValueAndParameterType(simulationResults, "allocation1", allocation1, C_ALLOCATION_1_DEFAULT)
     .setValueAndParameterType(simulationResults, "allocation2", allocation2, C_ALLOCATION_2_DEFAULT)
@@ -619,59 +622,65 @@ getSimulationSurvival <- function(design = NULL, ...,
 
     phi <- -c(log(1 - dropoutRate1), log(1 - dropoutRate2)) / dropoutTime
 
-    # build up general recruitment times
-    recruitmentTimes <- .generateRecruitmentTimes(
-        allocation1 / allocation2,
-        accrualTime,
-        accrualIntensity
-    )
-    accrualTimeValue <- recruitmentTimes$recruit
-    treatmentGroup <- recruitmentTimes$treatments
-    
-    # densityIntervals <- accrualTime
-    # if (length(accrualTime) > 1) {
-    #     densityIntervals[2:length(accrualTime)] <-
-    #         accrualTime[2:length(accrualTime)] - accrualTime[1:(length(accrualTime) - 1)]
-    # }
-    # densityVector <- accrualSetup$accrualIntensity / sum(densityIntervals * accrualSetup$accrualIntensity)
-    # 
-    # intensityReplications <- round(densityVector * densityIntervals * accrualSetup$maxNumberOfSubjects)
-    # 
-    # if (all(intensityReplications > 0)) {
-    #     accrualTimeValue <- cumsum(rep(
-    #         1 / (densityVector * accrualSetup$maxNumberOfSubjects), intensityReplications
-    #     ))
-    # } else {
-    #     accrualTimeValue <- cumsum(rep(
-    #         1 / (densityVector[1] * accrualSetup$maxNumberOfSubjects),
-    #         intensityReplications[1]
-    #     ))
-    #     if (length(accrualIntensity) > 1 && length(intensityReplications) > 1) {
-    #         for (i in 2:min(length(accrualIntensity), length(intensityReplications))) {
-    #             if (intensityReplications[i] > 0) {
-    #                 accrualTimeValue <- c(
-    #                     accrualTimeValue,
-    #                     accrualTime[i - 1] +
-    #                         cumsum(rep(
-    #                             1 / (densityVector[i] * accrualSetup$maxNumberOfSubjects),
-    #                             intensityReplications[i]
-    #                         ))
-    #                 )
-    #             }
-    #         }
-    #     }
-    # }
-    # 
-    # accrualTimeValue <- accrualTimeValue[1:accrualSetup$maxNumberOfSubjects]
-    # 
-    # # to avoid last value to be NA_real_
-    # accrualTimeValue[is.na(accrualTimeValue)] <- accrualTime[length(accrualTime)]
-    # 
-    # treatmentGroup <- rep(
+    densityIntervals <- accrualTime
+    if (length(accrualTime) > 1) {
+        densityIntervals[2:length(accrualTime)] <-
+            accrualTime[2:length(accrualTime)] - accrualTime[1:(length(accrualTime) - 1)]
+    }
+    densityVector <- accrualSetup$accrualIntensity / sum(densityIntervals * accrualSetup$accrualIntensity)
+
+    intensityReplications <- round(densityVector * densityIntervals * accrualSetup$maxNumberOfSubjects)
+
+    if (all(intensityReplications > 0)) {
+        recruit <- cumsum(rep(
+            1 / (densityVector * accrualSetup$maxNumberOfSubjects), intensityReplications
+        ))
+    } else {
+        recruit <- cumsum(rep(
+            1 / (densityVector[1] * accrualSetup$maxNumberOfSubjects),
+            intensityReplications[1]
+        ))
+        if (length(accrualIntensity) > 1 && length(intensityReplications) > 1) {
+            for (i in 2:min(length(accrualIntensity), length(intensityReplications))) {
+                if (intensityReplications[i] > 0) {
+                    recruit <- c(
+                        recruit,
+                        accrualTime[i - 1] +
+                            cumsum(rep(
+                                1 / (densityVector[i] * accrualSetup$maxNumberOfSubjects),
+                                intensityReplications[i]
+                            ))
+                    )
+                }
+            }
+        }
+    }
+
+    recruit <- recruit[1:accrualSetup$maxNumberOfSubjects]
+
+    # to avoid last value to be NA_real_
+    recruit[is.na(recruit)] <- accrualTime[length(accrualTime)]
+
+    # to force last value to be last accrualTime
+    recruit[length(recruit)] <- accrualTime[length(accrualTime)]
+
+    # Former definition (up to release 4.2.0)
+    #
+    # treatments <- rep(
     #     c(rep(1, allocation1), rep(2, allocation2)),
     #     ceiling(accrualSetup$maxNumberOfSubjects /
     #         (allocation1 + allocation2))
     # )[1:accrualSetup$maxNumberOfSubjects]
+
+    treatments <- c()
+    while (length(treatments) < accrualSetup$maxNumberOfSubjects) {
+        if (allocation1 > allocation2) {
+            treatments <- c(treatments, rep(c(1, 2), allocation2), rep(1, allocation1 - allocation2))
+        } else {
+            treatments <- c(treatments, rep(c(1, 2), allocation1), rep(2, allocation2 - allocation1))
+        }
+    }
+    treatments <- treatments[1:accrualSetup$maxNumberOfSubjects]
 
     if (.isTrialDesignFisher(design)) {
         alpha0Vec <- design$alpha0Vec
@@ -723,8 +732,8 @@ getSimulationSurvival <- function(design = NULL, ...,
         maxNumberOfEventsPerStage      = maxNumberOfEventsPerStage,
         directionUpper                 = directionUpper,
         allocationRatioPlanned         = allocationRatioPlanned,
-        accrualTime                    = accrualTimeValue,
-        treatmentGroup                 = treatmentGroup,
+        accrualTime                    = recruit,
+        treatmentGroup                 = treatments,
         thetaH0                        = thetaH0,
         futilityBounds                 = futilityBounds,
         alpha0Vec                      = alpha0Vec,
@@ -912,7 +921,7 @@ getSimulationSurvival <- function(design = NULL, ...,
             pi2 = numeric(0),
             subjectId = numeric(0),
             accrualTime = numeric(0),
-            treatmentGroup = numeric(0),
+            treatments = numeric(0),
             survivalTime = numeric(0),
             dropoutTime = numeric(0),
             observationTime = numeric(0),

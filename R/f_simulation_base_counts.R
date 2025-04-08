@@ -392,9 +392,8 @@ getSimulationCounts <- function(design = NULL,
                 accrualTime,
                 accrualIntensity
             )
-            recruit1 <- recruitmentTimes$recruit1
-            recruit2 <- recruitmentTimes$recruit2
-
+            recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
+            recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
             n1 <- length(recruit1)
             n2 <- length(recruit2)
             nTotal <- n1 + n2
@@ -420,8 +419,6 @@ getSimulationCounts <- function(design = NULL,
         }
         for (iterationNumber in 1:maxNumberOfIterations) {
             if (kMax == 1) {
-                # recruit1 <- seq(0, accrualTime, length.out = n1) # TODO @Gernot: remove?
-                # recruit2 <- seq(0, accrualTime, length.out = n2) # TODO @Gernot: remove?
                 if (is.na(fixedExposureTime)) {
                     timeUnderObservation1 <- pmax(accrualTime[length(accrualTime)] + followUpTime - recruit1, 0)
                     timeUnderObservation2 <- pmax(accrualTime[length(accrualTime)] + followUpTime - recruit2, 0)
