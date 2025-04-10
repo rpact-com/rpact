@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8633 $
-## |  Last changed: $Date: 2025-03-25 14:14:39 +0100 (Di, 25 Mrz 2025) $
+## |  File version: $Revision: 8674 $
+## |  Last changed: $Date: 2025-04-10 15:45:44 +0200 (Do, 10 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1307,6 +1307,11 @@ getDesignInverseNormal <- function(...,
     )
     
     kMax <- coreDesign$kMax
+    betaSpendingEnabled <- !identical(typeBetaSpending, C_TYPE_OF_DESIGN_BS_NONE)
+    
+    if (length(efficacyStops) == 1 && is.na(efficacyStops)) {
+        efficacyStops <- rep(TRUE, kMax - 1)
+    }
 
     if (length(efficacyStops) != kMax - 1) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -1316,8 +1321,12 @@ getDesignInverseNormal <- function(...,
             call. = FALSE
         )
     }
+    
+    if (betaSpendingEnabled && length(futilityStops) == 1 && is.na(futilityStops)) {
+        futilityStops <- rep(TRUE, kMax - 1)
+    }
 
-    if (length(futilityStops) != kMax - 1) {
+    if (betaSpendingEnabled && length(futilityStops) != kMax - 1) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'futilityStops' (", .arrayToString(futilityStops, 
                 vectorLookAndFeelEnabled = FALSE),
@@ -1356,7 +1365,7 @@ getDesignInverseNormal <- function(...,
         userDefinedInterimStops = TRUE
     )
     
-    if (!identical(typeBetaSpending, C_TYPE_OF_DESIGN_BS_NONE)) {
+    if (betaSpendingEnabled) {
         newBetaSpending <- coreDesign$betaSpent
         for (k in 1:(kMax - 1)) {
             if (!futilityStops[k]) {
@@ -1374,7 +1383,7 @@ getDesignInverseNormal <- function(...,
     newDesign$efficacyStops <- efficacyStops
     newDesign$.setParameterType("efficacyStops", C_PARAM_USER_DEFINED)
     
-    if (!identical(typeBetaSpending, C_TYPE_OF_DESIGN_BS_NONE)) {
+    if (betaSpendingEnabled) {
         if (coreDesign$sided == 2) {
             newDesign$futilityBounds[!futilityStops] <- 0
         }
@@ -1382,17 +1391,36 @@ getDesignInverseNormal <- function(...,
         newDesign$.setParameterType("futilityStops", C_PARAM_USER_DEFINED)
     }
     
+    if (max(abs(newDesign$userAlphaSpending - newDesign$alphaSpent), na.rm = TRUE) <= 1e-07) {
+        newDesign$.setParameterType("userAlphaSpending", C_PARAM_NOT_APPLICABLE)
+    }
+    
+    if (betaSpendingEnabled && max(abs(newDesign$userBetaSpending - newDesign$betaSpent), na.rm = TRUE) <= 1e-07) {
+        newDesign$.setParameterType("userBetaSpending", C_PARAM_NOT_APPLICABLE)
+    }
+    
     for (paramName in coreDesign$.getUserDefinedParameters()) {
         newDesign[[paramName]] <- coreDesign[[paramName]]
         newDesign$.setParameterType(paramName, C_PARAM_USER_DEFINED)
     }
     
+    indices <- which(
+        !is.na(newDesign$stageLevels) & 
+        newDesign$stageLevels < 1e-07 & 
+        !is.na(newDesign$criticalValues) & 
+        is.infinite(newDesign$criticalValues))
+    if (length(indices) > 0) {
+        newDesign$stageLevels[indices] <- 0
+    }
+    
     return(newDesign)
 }
 
-#
-# Param: userFunctionCallEnabled if \code{TRUE}, additional parameter validation methods will be called.
-#
+#'
+#' @param userFunctionCallEnabled if \code{TRUE}, additional parameter validation methods will be called.
+#' 
+#' @noRd 
+#'
 .getDesignGroupSequential <- function(...,
         designClass = C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL,
         kMax = NA_integer_,
@@ -1411,7 +1439,7 @@ getDesignInverseNormal <- function(...,
         userAlphaSpending = NA_real_,
         userBetaSpending = NA_real_,
         gammaB = NA_real_,
-        bindingFutility = C_BINDING_FUTILITY_DEFAULT,
+        bindingFutility = NA,
         directionUpper = NA,
         constantBoundsHP = C_CONST_BOUND_HP_DEFAULT,
         twoSidedPower = NA,
@@ -1917,6 +1945,8 @@ getDesignInverseNormal <- function(...,
 #' 		  numeric vector of length \code{kMax - 1}
 #' @param userBetaSpending The user defined beta spending. Vector of length \code{kMax} containing the cumulative
 #'        beta-spending up to each interim stage.
+#' @param efficacyStops Logical vector of length \code{kMax - 1} indicating efficacy stops. Default is \code{NA}.
+#' @param futilityStops Logical vector of length \code{kMax - 1} indicating futility stops. Default is \code{NA}.
 #' @param twoSidedPower For two-sided testing, if \code{twoSidedPower = TRUE} is specified
 #'        the sample size calculation is performed by considering both tails of the distribution.
 #'        Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power

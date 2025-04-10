@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8658 $
-## |  Last changed: $Date: 2025-04-01 08:15:28 +0200 (Di, 01 Apr 2025) $
+## |  File version: $Revision: 8674 $
+## |  Last changed: $Date: 2025-04-10 15:45:44 +0200 (Do, 10 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -54,8 +54,8 @@ NULL
                 )
             }
         } else {
-            numberOfNAs <- sum(as.vector(criticalValues) > 50, na.rm = TRUE)
-            if (any(is.na(criticalValues))) {
+            numberOfNAs <- sum(is.na(criticalValues))
+            if (numberOfNAs > 0) {
                 warning("The computation of ", .integerToWrittenNumber(numberOfNAs), " ",
                     "efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " ",
                     "on treatment effect scale not performed presumably ",

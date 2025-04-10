@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8629 $
-## |  Last changed: $Date: 2025-03-24 09:50:39 +0100 (Mo, 24 Mrz 2025) $
+## |  File version: $Revision: 8670 $
+## |  Last changed: $Date: 2025-04-10 08:07:04 +0200 (Do, 10 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -539,6 +539,8 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
 #' @template field_betaSpent
 #' @template field_typeBetaSpending
 #' @template field_userBetaSpending
+#' @template field_efficacyStops
+#' @template field_futilityStops
 #' @template field_power
 #' @template field_twoSidedPower
 #' @template field_constantBoundsHP
@@ -877,6 +879,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
 #' @template field_betaSpent
 #' @template field_typeBetaSpending
 #' @template field_userBetaSpending
+#' @template field_efficacyStops
+#' @template field_futilityStops
 #' @template field_power
 #' @template field_twoSidedPower
 #' @template field_constantBoundsHP

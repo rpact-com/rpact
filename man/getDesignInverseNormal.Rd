@@ -22,6 +22,8 @@ getDesignInverseNormal(
   typeBetaSpending = c("none", "bsP", "bsOF", "bsKD", "bsHSD", "bsUser"),
   userAlphaSpending = NA_real_,
   userBetaSpending = NA_real_,
+  efficacyStops = NA,
+  futilityStops = NA,
   gammaB = NA_real_,
   bindingFutility = NA,
   directionUpper = NA,
@@ -90,6 +92,10 @@ alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 
 
 \item{userBetaSpending}{The user defined beta spending. Vector of length \code{kMax} containing the cumulative
 beta-spending up to each interim stage.}
+
+\item{efficacyStops}{Logical vector of length \code{kMax - 1} indicating efficacy stops. Default is \code{NA}.}
+
+\item{futilityStops}{Logical vector of length \code{kMax - 1} indicating futility stops. Default is \code{NA}.}
 
 \item{gammaB}{Parameter for beta spending function.}
 

@@ -18,7 +18,44 @@
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-.getInformationCountData <- function(lambda1,
+
+#' 
+#' Calculate Information for Count Data
+#'
+#' @description
+#' This function calculates the Fisher information for count data based on the provided
+#' event rates, overdispersion, and recruitment times for two groups.
+#'
+#' @param lambda1 A numeric vector representing the event rates for group 1.
+#' @param lambda2 A numeric vector representing the event rates for group 2.
+#' @param overdispersion A numeric value representing the overdispersion parameter.
+#' @param recruit1 A numeric vector representing the recruitment times for group 1.
+#' @param recruit2 A numeric vector representing the recruitment times for group 2.
+#'
+#' @details
+#' The function computes the Fisher information for two groups by summing the contributions
+#' of each group's recruitment times and event rates, adjusted for overdispersion.
+#'
+#' @return
+#' A single numeric value representing the Fisher information for the count data.
+#'
+#' @examples
+#' \dontrun{
+#' lambda1 <- c(0.1, 0.2, 0.3)
+#' lambda2 <- c(0.15, 0.25, 0.35)
+#' overdispersion <- 0.1
+#' recruit1 <- c(1, 2, 3)
+#' recruit2 <- c(2, 3, 4)
+#' info <- .getInformationCountData(lambda1, lambda2, overdispersion, recruit1, recruit2)
+#' print(info)
+#' }
+#'
+#' @keywords internal
+#' 
+#' @noRd 
+#' 
+.getInformationCountData <- function(
+        lambda1,
         lambda2,
         overdispersion,
         recruit1,
@@ -30,8 +67,64 @@
     return(1 / (1 / sumLambda1 + 1 / sumLambda2))
 }
 
-.getGeneratedEventTimesCountData <- function(recruit1, recruit2, accrualTime, followUpTime,
-        lambda1, lambda2, overdispersion, fixedFollowUp = FALSE) {
+
+#' 
+#' Generate Event Times for Count Data
+#'
+#' @description
+#' This function generates event times for count data based on recruitment times, accrual time, follow-up time, 
+#' event rates, and overdispersion for two groups.
+#'
+#' @param recruit1 A numeric vector representing the recruitment times for group 1.
+#' @param recruit2 A numeric vector representing the recruitment times for group 2.
+#' @param accrualTime A numeric value representing the total accrual time.
+#' @param followUpTime A numeric value representing the follow-up time.
+#' @param lambda1 A numeric value or vector representing the event rates for group 1.
+#' @param lambda2 A numeric value or vector representing the event rates for group 2.
+#' @param overdispersion A numeric value representing the overdispersion parameter.
+#' @param fixedFollowUp A logical value indicating whether a fixed follow-up time is used. Default is \code{FALSE}.
+#'
+#' @details
+#' The function simulates the number of events for each subject using a negative binomial distribution. 
+#' Event times are generated through a homogeneous Poisson process. The output includes event times, 
+#' recruitment times, and other related information for each subject.
+#'
+#' @return
+#' A list containing:
+#' \itemize{
+#'   \item \code{output}: A matrix with columns for subject ID, recruitment time, event start and stop times, 
+#'   calendar times, status, and group.
+#'   \item \code{nEvents}: A numeric vector with the number of events for each subject.
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' recruit1 <- c(1, 2, 3)
+#' recruit2 <- c(2, 3, 4)
+#' accrualTime <- 10
+#' followUpTime <- 5
+#' lambda1 <- c(0.1, 0.2, 0.3)
+#' lambda2 <- c(0.15, 0.25, 0.35)
+#' overdispersion <- 0.1
+#' result <- .getGeneratedEventTimesCountData(
+#'     recruit1, recruit2, accrualTime, followUpTime, lambda1, lambda2, overdispersion
+#' )
+#' print(result)
+#' }
+#'
+#' @keywords internal
+#' 
+#' @noRd
+#' 
+.getGeneratedEventTimesCountData <- function(
+        recruit1, 
+        recruit2, 
+        accrualTime, 
+        followUpTime,
+        lambda1, 
+        lambda2, 
+        overdispersion, 
+        fixedFollowUp = FALSE) {
     n1 <- length(recruit1)
     n2 <- length(recruit2)
     totalRecruitment <- c(recruit1, recruit2)
