@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8671 $
-## |  Last changed: $Date: 2025-04-10 08:46:54 +0200 (Do, 10 Apr 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8679 $
+## |  Last changed: $Date: 2025-04-15 10:39:41 +0200 (Di, 15 Apr 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include class_simulation_results.R
@@ -632,7 +632,6 @@ getSimulationSurvival <- function(design = NULL, ...,
 
     # to force last value to be last accrualTime
     recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
-
 
     treatments <- c()
     while (length(treatments) < accrualSetup$maxNumberOfSubjects) {

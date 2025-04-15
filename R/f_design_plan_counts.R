@@ -475,9 +475,10 @@
             recruit1 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] * allocationRatio / (1 + allocationRatio))
             recruit2 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] / (1 + allocationRatio))
         } else {
-            # TODO @Gernot: init recruit1 and recruit2 with NA_real_?
+            recruit1 <- NA_real_
+            recruit2 <- NA_real_
         }
-
+        
         # calculate theta that solves (ln(theta) - ln(thetaH0) sqrt(FisherInformation_k) = boundary
         for (j in seq_len(length(criticalValues))) {
             if (all(is.na(numberOfSubjects[, iCase]))) {

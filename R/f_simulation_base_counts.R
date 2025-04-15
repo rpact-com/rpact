@@ -18,8 +18,7 @@
 ## |  Last changed by: $Author: pahlke $
 ## |
 
-
-#' 
+#'
 #' Calculate Information for Count Data
 #'
 #' @description
@@ -51,11 +50,10 @@
 #' }
 #'
 #' @keywords internal
-#' 
-#' @noRd 
-#' 
-.getInformationCountData <- function(
-        lambda1,
+#'
+#' @noRd
+#'
+.getInformationCountData <- function(lambda1,
         lambda2,
         overdispersion,
         recruit1,
@@ -68,11 +66,11 @@
 }
 
 
-#' 
+#'
 #' Generate Event Times for Count Data
 #'
 #' @description
-#' This function generates event times for count data based on recruitment times, accrual time, follow-up time, 
+#' This function generates event times for count data based on recruitment times, accrual time, follow-up time,
 #' event rates, and overdispersion for two groups.
 #'
 #' @param recruit1 A numeric vector representing the recruitment times for group 1.
@@ -85,14 +83,14 @@
 #' @param fixedFollowUp A logical value indicating whether a fixed follow-up time is used. Default is \code{FALSE}.
 #'
 #' @details
-#' The function simulates the number of events for each subject using a negative binomial distribution. 
-#' Event times are generated through a homogeneous Poisson process. The output includes event times, 
+#' The function simulates the number of events for each subject using a negative binomial distribution.
+#' Event times are generated through a homogeneous Poisson process. The output includes event times,
 #' recruitment times, and other related information for each subject.
 #'
 #' @return
 #' A list containing:
 #' \itemize{
-#'   \item \code{output}: A matrix with columns for subject ID, recruitment time, event start and stop times, 
+#'   \item \code{output}: A matrix with columns for subject ID, recruitment time, event start and stop times,
 #'   calendar times, status, and group.
 #'   \item \code{nEvents}: A numeric vector with the number of events for each subject.
 #' }
@@ -113,17 +111,16 @@
 #' }
 #'
 #' @keywords internal
-#' 
+#'
 #' @noRd
-#' 
-.getGeneratedEventTimesCountData <- function(
-        recruit1, 
-        recruit2, 
-        accrualTime, 
+#'
+.getGeneratedEventTimesCountData <- function(recruit1,
+        recruit2,
+        accrualTime,
         followUpTime,
-        lambda1, 
-        lambda2, 
-        overdispersion, 
+        lambda1,
+        lambda2,
+        overdispersion,
         fixedFollowUp = FALSE) {
     n1 <- length(recruit1)
     n2 <- length(recruit2)
@@ -591,18 +588,18 @@ getSimulationCounts <- function(design = NULL,
                 for (k in 1:kMax) {
                     if (is.na(fixedExposureTime)) {
                         timeUnderObservation1 <- (plannedCalendarTime[k] -
-                            recruit1)[plannedCalendarTime[k] - recruit1 >= 0]
+                            recruit1)[plannedCalendarTime[k] - recruit1 > 0]
                         timeUnderObservation2 <- (plannedCalendarTime[k] -
-                            recruit2)[plannedCalendarTime[k] - recruit2 >= 0]
+                            recruit2)[plannedCalendarTime[k] - recruit2 > 0]
                     } else {
                         timeUnderObservation1 <- pmin(
                             plannedCalendarTime[k] - recruit1,
                             fixedExposureTime
-                        )[plannedCalendarTime[k] - recruit1 >= 0]
+                        )[plannedCalendarTime[k] - recruit1 > 0]
                         timeUnderObservation2 <- pmin(
                             plannedCalendarTime[k] - recruit2,
                             fixedExposureTime
-                        )[plannedCalendarTime[k] - recruit2 >= 0]
+                        )[plannedCalendarTime[k] - recruit2 > 0]
                     }
                     if (k < kMax) {
                         kthStageWithEvents <- dfStartStop$output[
@@ -625,7 +622,16 @@ getSimulationCounts <- function(design = NULL,
                         counts1 <- dfStartStop$nEvents[1:n1]
                         counts2 <- dfStartStop$nEvents[(n1 + 1):(n1 + n2)]
                         sampleSizePerStage[k, iCase] <- sampleSizePerStage[k, iCase] + n1 + n2
+                        if ((length(counts1) > length(timeUnderObservation1)) ||
+                                (length(counts2) > length(timeUnderObservation2))) {
+                            counts1 <- counts[seq_len(length(timeUnderObservation1))]
+                            counts2 <- counts[(length(recruit1) + 1):(length(recruit1) +
+                                length(timeUnderObservation2))]
+                            sampleSizePerStage[k, iCase] <- sampleSizePerStage[k, iCase] +
+                                length(timeUnderObservation1) + length(timeUnderObservation2)
+                        }
                     }
+
                     nb <- .getNegativeBinomialEstimates(
                         counts1 = counts1,
                         counts2 = counts2,
@@ -634,7 +640,7 @@ getSimulationCounts <- function(design = NULL,
                     )
                     infoAnalysis <- .getInformationCountData(
                         lambda1 = nb[1], # negative binomial estimate 1
-                        lambda2 = nb[2], # negative binomial estimate 1
+                        lambda2 = nb[2], # negative binomial estimate 2
                         overdispersion = nb[3], # negative binomial overdispersion
                         recruit1 = timeUnderObservation1,
                         recruit2 = timeUnderObservation2

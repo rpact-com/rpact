@@ -2,11 +2,14 @@
 
 ## New features
 
-* TODO add
+* `efficacyStops` and `futilityStops` parameter added
+* parameter `varianceEstimation` added for calculation of final confidence intervals in two-sample situation for rates
 
 ## Improvements, issues, and changes
 
-* TODO add
+* Recruitment times for count and survival data situation improved (issue?)
+* Bug fix for getSimulationCounts() (issue?)
+* Minor improvements
 
 
 # rpact 4.2.0

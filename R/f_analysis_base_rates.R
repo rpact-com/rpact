@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8474 $
-## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
+## |  File version: $Revision: 8681 $
+## |  Last changed: $Date: 2025-04-15 13:26:20 +0200 (Di, 15 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -72,6 +72,7 @@ NULL
         pi2 = NA_real_,
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
+        stdErrorEstimate = C_RATES_STDERROR_ESTIMATE,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .assertIsTrialDesignInverseNormal(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -97,6 +98,7 @@ NULL
         pi2 = pi2,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
+        stdErrorEstimate = stdErrorEstimate,
         tolerance = tolerance
     )
 
@@ -113,6 +115,7 @@ NULL
         pi2 = NA_real_,
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
+        stdErrorEstimate = C_RATES_STDERROR_ESTIMATE,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .assertIsTrialDesignGroupSequential(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -138,6 +141,7 @@ NULL
         pi2 = pi2,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
+        stdErrorEstimate = stdErrorEstimate,
         tolerance = tolerance
     )
 
@@ -184,6 +188,7 @@ NULL
         pi2 = pi2,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
+        stdErrorEstimate = stdErrorEstimate,
         tolerance = tolerance,
         iterations = iterations,
         seed = seed
@@ -210,6 +215,7 @@ NULL
         pi2,
         nPlanned,
         allocationRatioPlanned,
+        stdErrorEstimate,
         tolerance,
         iterations,
         seed) {
@@ -354,9 +360,14 @@ NULL
         # final confidence interval & median unbiased estimate
         startTime <- Sys.time()
         finalConfidenceIntervals <- .getFinalConfidenceIntervalRates(
-            design = design, dataInput = dataInput,
-            thetaH0 = thetaH0, stage = stage, directionUpper = directionUpper,
-            normalApproximation = normalApproximation, tolerance = tolerance
+            design = design,
+            dataInput = dataInput,
+            thetaH0 = thetaH0,
+            stage = stage,
+            directionUpper = directionUpper,
+            normalApproximation = normalApproximation,
+            stdErrorEstimate = stdErrorEstimate,
+            tolerance = tolerance
         )
         if (!is.null(finalConfidenceIntervals)) {
             finalStage <- finalConfidenceIntervals$finalStage
@@ -417,9 +428,10 @@ NULL
 
     if (dataInput$getNumberOfGroups() == 1) {
         if (is.na(thetaH0)) {
-            stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, 
-                "'thetaH0' must be defined", 
-                call. = FALSE)
+            stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+                "'thetaH0' must be defined",
+                call. = FALSE
+            )
         }
 
         if (normalApproximation) {
@@ -427,17 +439,23 @@ NULL
                 dataInput$getOverallSampleSizesUpTo(stage) - thetaH0) /
                 sqrt(thetaH0 * (1 - thetaH0)) *
                 sqrt(dataInput$getOverallSampleSizesUpTo(stage)), rep(NA_real_, design$kMax - stage))
-            overallPValues <- .applyDirectionOfAlternative(stats::pnorm(overallTestStatistics), 
-                directionUpper, type = "oneMinusValue", phase = "analysis")
+            overallPValues <- .applyDirectionOfAlternative(stats::pnorm(overallTestStatistics),
+                directionUpper,
+                type = "oneMinusValue", phase = "analysis"
+            )
         } else {
             overallTestStatistics <- rep(NA_real_, design$kMax)
             overallPValues <- stats::pbinom(
-                .applyDirectionOfAlternative(dataInput$getOverallEventsUpTo(stage), 
-                    directionUpper, type = "valueMinusOne", phase = "analysis"),
+                .applyDirectionOfAlternative(dataInput$getOverallEventsUpTo(stage),
+                    directionUpper,
+                    type = "valueMinusOne", phase = "analysis"
+                ),
                 dataInput$getOverallSampleSizesUpTo(stage),
                 thetaH0,
-                lower.tail = .applyDirectionOfAlternative(FALSE, 
-                    directionUpper, type = "negateIfLower", phase = "analysis")
+                lower.tail = .applyDirectionOfAlternative(FALSE,
+                    directionUpper,
+                    type = "negateIfLower", phase = "analysis"
+                )
             )
             overallTestStatistics <- .getOneMinusQNorm(overallPValues)
         }
@@ -489,27 +507,30 @@ NULL
                 }
                 overallPValues[k] <- .applyDirectionOfAlternative(
                     stats::pnorm(overallTestStatistics[k]),
-                    directionUpper, type = "oneMinusValue", phase = "analysis"
+                    directionUpper,
+                    type = "oneMinusValue", phase = "analysis"
                 )
             } else {
                 if (thetaH0 != 0) {
                     stop(
                         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "thetaH0 must be equal 0 for performing Fisher's exact test", 
+                        "thetaH0 must be equal 0 for performing Fisher's exact test",
                         call. = FALSE
                     )
                 }
 
                 overallPValues[k] <- stats::phyper(
                     .applyDirectionOfAlternative(overallEvents1[k],
-                        directionUpper, type = "valueMinusOne", phase = "analysis"
+                        directionUpper,
+                        type = "valueMinusOne", phase = "analysis"
                     ),
                     overallEvents1[k] + overallEvents2[k],
                     sum(dataInput$getSampleSizesUpTo(k, 1)) + sum(dataInput$getSampleSizesUpTo(k, 2)) -
                         overallEvents1[k] - overallEvents2[k],
                     sum(dataInput$getSampleSizesUpTo(k, 1)),
                     lower.tail = .applyDirectionOfAlternative(FALSE,
-                        directionUpper, type = "negateIfLower", phase = "analysis"
+                        directionUpper,
+                        type = "negateIfLower", phase = "analysis"
                     )
                 )
                 overallTestStatistics <- .getOneMinusQNorm(overallPValues)
@@ -533,18 +554,21 @@ NULL
                 testStatistics[k] <- (dataInput$getEvent(k) / dataInput$getSampleSize(k) - thetaH0) /
                     sqrt(thetaH0 * (1 - thetaH0)) * sqrt(dataInput$getSampleSize(k))
                 pValues[k] <- .applyDirectionOfAlternative(stats::pnorm(testStatistics[k]),
-                    directionUpper, type = "oneMinusValue", phase = "analysis"
+                    directionUpper,
+                    type = "oneMinusValue", phase = "analysis"
                 )
             } else {
                 testStatistics[k] <- NA_real_
                 pValues[k] <- stats::pbinom(
                     .applyDirectionOfAlternative(dataInput$getEvent(k),
-                        directionUpper, type = "valueMinusOne", phase = "analysis"
+                        directionUpper,
+                        type = "valueMinusOne", phase = "analysis"
                     ),
                     dataInput$getSampleSize(k),
                     thetaH0,
                     lower.tail = .applyDirectionOfAlternative(FALSE,
-                        directionUpper, type = "negateIfLower", phase = "analysis"
+                        directionUpper,
+                        type = "negateIfLower", phase = "analysis"
                     )
                 )
             }
@@ -577,20 +601,26 @@ NULL
                         sqrt(y$ml1 * (1 - y$ml1) / dataInput$getSampleSize(k, 1) +
                             y$ml2 * (1 - y$ml2) / dataInput$getSampleSize(k, 2))
                 }
-                pValues[k] <- .applyDirectionOfAlternative(stats::pnorm(testStatistics[k]), 
-                    directionUpper, type = "oneMinusValue", phase = "analysis")
+                pValues[k] <- .applyDirectionOfAlternative(stats::pnorm(testStatistics[k]),
+                    directionUpper,
+                    type = "oneMinusValue", phase = "analysis"
+                )
             } else {
                 testStatistics[k] <- NA_real_
 
                 pValues[k] <- stats::phyper(
-                    .applyDirectionOfAlternative(dataInput$getEvent(k, 1), 
-                        directionUpper, type = "valueMinusOne", phase = "analysis"),
+                    .applyDirectionOfAlternative(dataInput$getEvent(k, 1),
+                        directionUpper,
+                        type = "valueMinusOne", phase = "analysis"
+                    ),
                     dataInput$getEvent(k, 1) + dataInput$getEvent(k, 2),
                     dataInput$getSampleSize(k, 1) + dataInput$getSampleSize(k, 2) -
                         dataInput$getEvent(k, 1) - dataInput$getEvent(k, 2),
                     dataInput$getSampleSize(k, 1),
-                    lower.tail = .applyDirectionOfAlternative(FALSE, 
-                        directionUpper, type = "negateIfLower", phase = "analysis")
+                    lower.tail = .applyDirectionOfAlternative(FALSE,
+                        directionUpper,
+                        type = "negateIfLower", phase = "analysis"
+                    )
                 )
             }
         }
@@ -1421,6 +1451,7 @@ NULL
         thetaH0 = C_THETA_H0_RATES_DEFAULT,
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+        stdErrorEstimate = C_RATES_STDERROR_ESTIMATE,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsRates(
         design = design,
@@ -1434,12 +1465,25 @@ NULL
     finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
     medianUnbiasedGeneral <- NA_real_
 
-    stageGroupSeq <- .getStageGroupSeq(design = design, stageResults = stageResults, stage = stage)
+    finalConfidenceInterval <- rep(NA_real_, 2)
+    medianUnbiased <- NA_real_
 
+    stageGroupSeq <- .getStageGroupSeq(design = design, stageResults = stageResults, stage = stage)
     finalStage <- min(stageGroupSeq, design$kMax)
 
+    # No early efficacy stopping design
+    if (stage == design$kMax && .isNoEarlyEfficacy(design)) {
+        finalConfidenceInterval <- .getRepeatedConfidenceIntervalsRatesGroupSequential(
+            design = design,
+            dataInput = dataInput,
+            normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+            directionUpper = directionUpper,
+            tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        )[, design$kMax]
+        medianUnbiased <- (finalConfidenceInterval[1] + finalConfidenceInterval[2]) / 2
+    }
     # early stopping or at end of study
-    if (stageGroupSeq < design$kMax || stage == design$kMax) {
+    else if (stageGroupSeq < design$kMax || stage == design$kMax) {
         if (stageGroupSeq == 1) {
             finalConfidenceIntervalGeneral[1] <- stageResults$overallTestStatistics[1] -
                 .getOneMinusQNorm(design$alpha / design$sided)
@@ -1480,94 +1524,92 @@ NULL
                 case = "medianUnbiasedGeneral"
             )
         }
-    }
 
-    if (is.na(finalConfidenceIntervalGeneral[1]) && (stageGroupSeq > 1)) {
-        finalStage <- NA_integer_
-    }
-
-    finalConfidenceInterval <- rep(NA_real_, 2)
-    medianUnbiased <- NA_real_
-
-    if (!is.na(finalStage)) {
-        #  Retransformation
-        if (dataInput$getNumberOfGroups() == 1) {
-            stErrRates <- sqrt(stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage] *
-                (1 - stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage])) /
-                sqrt(stageResults$overallSampleSizes[finalStage])
-        } else {
-            stErrRates <- sqrt(stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage] *
-                (1 - stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage]) /
-                stageResults$overallSampleSizes1[finalStage] +
-                stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage] *
-                    (1 - stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage]) /
-                    stageResults$overallSampleSizes2[finalStage])
+        if (any(is.na(finalConfidenceIntervalGeneral)) && (stageGroupSeq > 1)) {
+            finalStage <- NA_integer_
         }
 
-        directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
-        if (stageGroupSeq == 1) {
-            finalConfidenceInterval[1] <- .getRootThetaRates(
-                design = design,
-                dataInput = dataInput,
-                stage = 1,
-                directionUpper = TRUE,
-                normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
-                firstParameterName = "overallPValues",
-                secondValue = .getOneMinusQNorm(design$alpha / design$sided),
-                tolerance = tolerance,
-                acceptResultsOutOfTolerance = TRUE,
-                callingFunctionInformation = "Final confidence interval [1]"
-            )
 
-            finalConfidenceInterval[2] <- .getRootThetaRates(
-                design = design,
-                dataInput = dataInput,
-                stage = 1,
-                directionUpper = FALSE,
-                normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
-                firstParameterName = "overallPValues",
-                secondValue = .getOneMinusQNorm(design$alpha / design$sided),
-                tolerance = tolerance,
-                acceptResultsOutOfTolerance = TRUE,
-                callingFunctionInformation = "Final confidence interval [2]"
-            )
-
-            medianUnbiased <- stageResults$effectSizes[1]
-        } else {
+        if (!is.na(finalStage)) {
+            #  Retransformation
             if (dataInput$getNumberOfGroups() == 1) {
-                finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] *
-                    sqrt(stageResults$overallSampleSizes[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
-                finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] *
-                    sqrt(stageResults$overallSampleSizes[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
-                medianUnbiased <- medianUnbiasedGeneral * sqrt(stageResults$overallSampleSizes[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
+                stErrRates <- sqrt(stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage] *
+                    (1 - stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage])) /
+                    sqrt(stageResults$overallSampleSizes[finalStage])
             } else {
-                finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] /
-                    sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                        1 / stageResults$overallSampleSizes2[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
-                finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] /
-                    sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                        1 / stageResults$overallSampleSizes2[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
-                medianUnbiased <- medianUnbiasedGeneral /
-                    sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                        1 / stageResults$overallSampleSizes2[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
+                stErrRates <- sqrt(stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage] *
+                    (1 - stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage]) /
+                    stageResults$overallSampleSizes1[finalStage] +
+                    stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage] *
+                        (1 - stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage]) /
+                        stageResults$overallSampleSizes2[finalStage])
+            }
+
+            directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
+            if (stageGroupSeq == 1) {
+                finalConfidenceInterval[1] <- .getRootThetaRates(
+                    design = design,
+                    dataInput = dataInput,
+                    stage = 1,
+                    directionUpper = TRUE,
+                    normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+                    firstParameterName = "overallPValues",
+                    secondValue = .getOneMinusQNorm(design$alpha / design$sided),
+                    tolerance = tolerance,
+                    acceptResultsOutOfTolerance = TRUE,
+                    callingFunctionInformation = "Final confidence interval [1]"
+                )
+
+                finalConfidenceInterval[2] <- .getRootThetaRates(
+                    design = design,
+                    dataInput = dataInput,
+                    stage = 1,
+                    directionUpper = FALSE,
+                    normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+                    firstParameterName = "overallPValues",
+                    secondValue = .getOneMinusQNorm(design$alpha / design$sided),
+                    tolerance = tolerance,
+                    acceptResultsOutOfTolerance = TRUE,
+                    callingFunctionInformation = "Final confidence interval [2]"
+                )
+
+                medianUnbiased <- stageResults$effectSizes[1]
+            } else {
+                if (dataInput$getNumberOfGroups() == 1) {
+                    finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] *
+                        sqrt(stageResults$overallSampleSizes[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] *
+                        sqrt(stageResults$overallSampleSizes[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    medianUnbiased <- medianUnbiasedGeneral * sqrt(stageResults$overallSampleSizes[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                } else {
+                    finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] /
+                        sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
+                            1 / stageResults$overallSampleSizes2[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] /
+                        sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
+                            1 / stageResults$overallSampleSizes2[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    medianUnbiased <- medianUnbiasedGeneral /
+                        sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
+                            1 / stageResults$overallSampleSizes2[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                }
+            }
+        }
+        if (isFALSE(directionUpper)) {
+            medianUnbiasedGeneral <- -medianUnbiasedGeneral
+            finalConfidenceIntervalGeneral <- -finalConfidenceIntervalGeneral
+            if (stageGroupSeq > 1) {
+                medianUnbiased <- -medianUnbiased
+                finalConfidenceInterval <- -finalConfidenceInterval
             }
         }
     }
 
-    if (isFALSE(directionUpper)) {
-        medianUnbiasedGeneral <- -medianUnbiasedGeneral
-        finalConfidenceIntervalGeneral <- -finalConfidenceIntervalGeneral
-        if (stageGroupSeq > 1) {
-            medianUnbiased <- -medianUnbiased
-            finalConfidenceInterval <- -finalConfidenceInterval
-        }
-    }
 
     if (!any(is.na(finalConfidenceIntervalGeneral))) {
         finalConfidenceIntervalGeneral <- sort(finalConfidenceIntervalGeneral)
@@ -1611,6 +1653,7 @@ NULL
         thetaH0 = C_THETA_H0_RATES_DEFAULT,
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+        stdErrorEstimate = C_RATES_STDERROR_ESTIMATE,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsRates(
         design = design,
@@ -1624,11 +1667,25 @@ NULL
     finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
     medianUnbiasedGeneral <- NA_real_
 
+    finalConfidenceInterval <- rep(NA_real_, 2)
+    medianUnbiased <- NA_real_
+
     stageInverseNormal <- .getStageInverseNormal(design = design, stageResults = stageResults, stage = stage)
     finalStage <- min(stageInverseNormal, design$kMax)
 
+    # No early efficacy stopping design
+    if (stage == design$kMax && .isNoEarlyEfficacy(design)) {
+        finalConfidenceInterval <- .getRepeatedConfidenceIntervalsRatesInverseNormal(
+            design = design,
+            dataInput = dataInput,
+            normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+            directionUpper = directionUpper,
+            tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        )[, design$kMax]
+        medianUnbiased <- (finalConfidenceInterval[1] + finalConfidenceInterval[2]) / 2
+    }
     # Early stopping or at end of study
-    if (stageInverseNormal < design$kMax || stage == design$kMax) {
+    else if (stageInverseNormal < design$kMax || stage == design$kMax) {
         if (stageInverseNormal == 1) {
             finalConfidenceIntervalGeneral[1] <- stageResults$combInverseNormal[1] -
                 .getOneMinusQNorm(design$alpha / design$sided)
@@ -1679,90 +1736,87 @@ NULL
                 case = "medianUnbiasedGeneral"
             )
         }
-    }
 
-    if (is.na(finalConfidenceIntervalGeneral[1]) && (stageInverseNormal > 1)) {
-        finalStage <- NA_integer_
-    }
-
-    finalConfidenceInterval <- rep(NA_real_, 2)
-    medianUnbiased <- NA_real_
-
-    if (!is.na(finalStage)) {
-        # Retransformation
-        if (dataInput$getNumberOfGroups() == 1) {
-            stErrRates <- sqrt(stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage] *
-                (1 - stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage])) /
-                sqrt(stageResults$overallSampleSizes[finalStage])
-        } else {
-            stErrRates <- sqrt(stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage] *
-                (1 - stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage]) /
-                stageResults$overallSampleSizes1[finalStage] +
-                stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage] *
-                    (1 - stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage]) /
-                    stageResults$overallSampleSizes2[finalStage])
+        if (any(is.na(finalConfidenceIntervalGeneral)) && (stageInverseNormal > 1)) {
+            finalStage <- NA_integer_
         }
 
-        directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
-        if (stageInverseNormal == 1) {
-            finalConfidenceInterval[1] <- .getRootThetaRates(
-                design = design,
-                dataInput = dataInput,
-                stage = 1,
-                directionUpper = TRUE,
-                normalApproximation = TRUE,
-                firstParameterName = "combInverseNormal",
-                secondValue = .getOneMinusQNorm(design$alpha / design$sided), tolerance = tolerance,
-                acceptResultsOutOfTolerance = TRUE,
-                callingFunctionInformation = "Final confidence interval [1]"
-            )
-
-            finalConfidenceInterval[2] <- .getRootThetaRates(
-                design = design,
-                dataInput = dataInput,
-                stage = 1,
-                directionUpper = FALSE,
-                normalApproximation = TRUE,
-                firstParameterName = "combInverseNormal",
-                secondValue = .getOneMinusQNorm(design$alpha / design$sided), tolerance = tolerance,
-                acceptResultsOutOfTolerance = TRUE,
-                callingFunctionInformation = "Final confidence interval [1]"
-            )
-
-            medianUnbiased <- stageResults$effectSizes[1]
-        } else {
+        if (!is.na(finalStage)) {
+            # Retransformation
             if (dataInput$getNumberOfGroups() == 1) {
-                finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] *
-                    sqrt(stageResults$overallSampleSizes[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
-                finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] *
-                    sqrt(stageResults$overallSampleSizes[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
-                medianUnbiased <- medianUnbiasedGeneral * sqrt(stageResults$overallSampleSizes[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
+                stErrRates <- sqrt(stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage] *
+                    (1 - stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage])) /
+                    sqrt(stageResults$overallSampleSizes[finalStage])
             } else {
-                finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] /
-                    sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                        1 / stageResults$overallSampleSizes2[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
-                finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] /
-                    sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                        1 / stageResults$overallSampleSizes2[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
-                medianUnbiased <- medianUnbiasedGeneral /
-                    sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                        1 / stageResults$overallSampleSizes2[finalStage]) *
-                    stErrRates + directionUpperSign * thetaH0
+                stErrRates <- sqrt(stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage] *
+                    (1 - stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage]) /
+                    stageResults$overallSampleSizes1[finalStage] +
+                    stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage] *
+                        (1 - stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage]) /
+                        stageResults$overallSampleSizes2[finalStage])
+            }
+
+            directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
+            if (stageInverseNormal == 1) {
+                finalConfidenceInterval[1] <- .getRootThetaRates(
+                    design = design,
+                    dataInput = dataInput,
+                    stage = 1,
+                    directionUpper = TRUE,
+                    normalApproximation = TRUE,
+                    firstParameterName = "combInverseNormal",
+                    secondValue = .getOneMinusQNorm(design$alpha / design$sided), tolerance = tolerance,
+                    acceptResultsOutOfTolerance = TRUE,
+                    callingFunctionInformation = "Final confidence interval [1]"
+                )
+
+                finalConfidenceInterval[2] <- .getRootThetaRates(
+                    design = design,
+                    dataInput = dataInput,
+                    stage = 1,
+                    directionUpper = FALSE,
+                    normalApproximation = TRUE,
+                    firstParameterName = "combInverseNormal",
+                    secondValue = .getOneMinusQNorm(design$alpha / design$sided), tolerance = tolerance,
+                    acceptResultsOutOfTolerance = TRUE,
+                    callingFunctionInformation = "Final confidence interval [1]"
+                )
+
+                medianUnbiased <- stageResults$effectSizes[1]
+            } else {
+                if (dataInput$getNumberOfGroups() == 1) {
+                    finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] *
+                        sqrt(stageResults$overallSampleSizes[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] *
+                        sqrt(stageResults$overallSampleSizes[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    medianUnbiased <- medianUnbiasedGeneral * sqrt(stageResults$overallSampleSizes[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                } else {
+                    finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] /
+                        sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
+                            1 / stageResults$overallSampleSizes2[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] /
+                        sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
+                            1 / stageResults$overallSampleSizes2[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    medianUnbiased <- medianUnbiasedGeneral /
+                        sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
+                            1 / stageResults$overallSampleSizes2[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                }
             }
         }
-    }
 
-    if (isFALSE(directionUpper)) {
-        medianUnbiasedGeneral <- -medianUnbiasedGeneral
-        finalConfidenceIntervalGeneral <- -finalConfidenceIntervalGeneral
-        if (stageInverseNormal > 1) {
-            medianUnbiased <- -medianUnbiased
-            finalConfidenceInterval <- -finalConfidenceInterval
+        if (isFALSE(directionUpper)) {
+            medianUnbiasedGeneral <- -medianUnbiasedGeneral
+            finalConfidenceIntervalGeneral <- -finalConfidenceIntervalGeneral
+            if (stageInverseNormal > 1) {
+                medianUnbiased <- -medianUnbiased
+                finalConfidenceInterval <- -finalConfidenceInterval
+            }
         }
     }
 
@@ -1851,6 +1905,7 @@ NULL
         thetaH0 = NA_real_,
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+        stdErrorEstimate = C_RATES_STDERROR_ESTIMATE,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
@@ -1879,7 +1934,7 @@ NULL
         return(.getFinalConfidenceIntervalRatesGroupSequential(
             design = design, dataInput = dataInput, stage = stage, thetaH0 = thetaH0,
             directionUpper = directionUpper, normalApproximation = normalApproximation,
-            tolerance = tolerance
+            stdErrorEstimate = stdErrorEstimate, tolerance = tolerance
         ))
     }
 
@@ -1887,7 +1942,7 @@ NULL
         return(.getFinalConfidenceIntervalRatesInverseNormal(
             design = design, dataInput = dataInput, stage = stage, thetaH0 = thetaH0,
             directionUpper = directionUpper, normalApproximation = normalApproximation,
-            tolerance = tolerance
+            stdErrorEstimate = stdErrorEstimate, tolerance = tolerance
         ))
     }
 

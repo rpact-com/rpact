@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8454 $
-## |  Last changed: $Date: 2024-12-12 07:12:43 +0100 (Do, 12 Dez 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8677 $
+## |  Last changed: $Date: 2025-04-14 14:13:41 +0200 (Mo, 14 Apr 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -98,6 +98,8 @@ NULL
 #'   \item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
 #'       the t test assuming that the variances are equal or the t test without assuming this,
 #'       i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
+#'   \item{\code{stdErrorEstimate}}{Estimate of standard error for calculation of final confidence intervals for 
+#'       comparing rates in two treatment groups, default is \code{"H1"}.
 #'   \item{\code{intersectionTest}}{Defines the multiple test for the intersection
 #'       hypotheses in the closed system of hypotheses when testing multiple hypotheses.
 #'       Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"},
@@ -1603,6 +1605,7 @@ getFinalConfidenceInterval <- function(design, dataInput, ...,
     .warnInCaseOfUnknownArguments(functionName = ".getRepeatedPValuesGroupSequential", ...)
 
     design <- stageResults$.design
+    
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
 
     repeatedPValues <- rep(NA_real_, design$kMax)

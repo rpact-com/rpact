@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8674 $
-## |  Last changed: $Date: 2025-04-10 15:45:44 +0200 (Do, 10 Apr 2025) $
+## |  File version: $Revision: 8681 $
+## |  Last changed: $Date: 2025-04-15 13:26:20 +0200 (Di, 15 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1098,6 +1098,8 @@ getDesignInverseNormal <- function(...,
         tolerance = 1e-08 # C_DESIGN_TOLERANCE_DEFAULT
         ) {
     .warnInCaseOfUnknownArguments(functionName = "getDesignInverseNormal", ...)
+    
+    typeBetaSpending <- .matchArgument(typeBetaSpending, C_TYPE_OF_DESIGN_BS_NONE)
 
     .assertIsLogicalVector(efficacyStops, "efficacyStops", naAllowed = TRUE)
     .assertIsLogicalVector(futilityStops, "futilityStops", naAllowed = TRUE)
@@ -1377,15 +1379,15 @@ getDesignInverseNormal <- function(...,
     }
     
     newDesign <- do.call(.getDesignGroupSequential, args)
-    newDesign$criticalValues[!efficacyStops] <- Inf
-    newDesign$futilityBounds[!futilityStops] <- -Inf
+    newDesign$criticalValues[which(!efficacyStops)] <- Inf
+    newDesign$futilityBounds[which(!futilityStops)] <- -Inf
     
     newDesign$efficacyStops <- efficacyStops
     newDesign$.setParameterType("efficacyStops", C_PARAM_USER_DEFINED)
-    
+
     if (betaSpendingEnabled) {
         if (coreDesign$sided == 2) {
-            newDesign$futilityBounds[!futilityStops] <- 0
+            newDesign$futilityBounds[which(!futilityStops)] <- 0
         }
         newDesign$futilityStops <- futilityStops
         newDesign$.setParameterType("futilityStops", C_PARAM_USER_DEFINED)
@@ -1399,7 +1401,14 @@ getDesignInverseNormal <- function(...,
         newDesign$.setParameterType("userBetaSpending", C_PARAM_NOT_APPLICABLE)
     }
     
+    noEarlyEfficacyEnabled <- 
+        identical(newDesign$typeOfDesign, C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY) &&
+        !identical(typeOfDesign, C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY)
     for (paramName in coreDesign$.getUserDefinedParameters()) {
+        if (noEarlyEfficacyEnabled && identical(paramName, "typeOfDesign")) {
+            next
+        }
+        
         newDesign[[paramName]] <- coreDesign[[paramName]]
         newDesign$.setParameterType(paramName, C_PARAM_USER_DEFINED)
     }

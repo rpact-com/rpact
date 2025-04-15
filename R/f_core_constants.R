@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8670 $
-## |  Last changed: $Date: 2025-04-10 08:07:04 +0200 (Do, 10 Apr 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8676 $
+## |  Last changed: $Date: 2025-04-11 12:20:33 +0200 (Fr, 11 Apr 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include class_dictionary.R
@@ -78,6 +78,7 @@ C_NORMAL_APPROXIMATION_RATES_DEFAULT <- TRUE
 C_EQUAL_VARIANCES_DEFAULT <- TRUE
 C_ITERATIONS_DEFAULT <- 1000L
 C_ACCEPT_DEVIATION_INFORMATIONRATES <- 0.05
+C_RATES_STDERROR_ESTIMATE <- "H1"
 
 C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT <- 50
 C_VARIED_PARAMETER_SEQUENCE_LENGTH_DEFAULT <- 30
