@@ -14,8 +14,8 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7471 $
- * Last changed: $Date: 2023-12-05 15:19:36 +0100 (Di, 05 Dez 2023) $
+ * File version: $Revision: 8660 $
+ * Last changed: $Date: 2025-04-01 11:45:17 +0200 (Di, 01 Apr 2025) $
  * Last changed by: $Author: pahlke $
  *
  */
@@ -682,35 +682,110 @@ double getRandomTDistribution(double df, double ncp) {
 	return Rcpp::rnorm(1, ncp)[0] / sqrt(R::rchisq(df) / df);
 }
 
-// [[Rcpp::export]]
-IntegerVector getFraction(double x, double epsilon = 1.0e-6, int maxNumberOfSearchSteps = 30) {
-  int numerator = (int) floor(x);
-  int numerator0;
-  int numerator1 = 1;
-  int denominator = 1;
-  int denominator0;
-  int denominator1 = 0;
-  int factor0;
-  double factor1 = x - (double) numerator;
 
-  int i = 0;
-  while (++i < maxNumberOfSearchSteps) {
-    if (fabs(x - (double) numerator / (double) denominator) < epsilon) {
-    	break;
-    }
+/**
+ * @title Get Fraction
+ *
+ * @description
+ * Converts a decimal number to its fractional representation.
+ *
+ * @details
+ * This function uses a continued fraction algorithm to convert a decimal number
+ * to its fractional representation. The algorithm iterates up to a specified
+ * number of steps or until the remainder is less than the specified epsilon.
+ *
+ * @param x The decimal number to be converted.
+ * @param epsilon The tolerance for the continued fraction algorithm. Default is 1.0e-6.
+ * @param maxNumberOfSearchSteps The maximum number of steps for the continued fraction algorithm. Default is 30.
+ *
+ * @references See https://proofwiki.org/wiki/Continued_Fraction_Algorithm for more information on continued fractions.
+ *
+ * @return An IntegerVector containing the numerator and denominator of the fractional representation.
+ *
+ * @noRd
+ *
+ */
+// [[Rcpp::export(name = ".getFraction")]]
+IntegerVector getFraction(
+		double x,
+		double epsilon = 1.0e-6,
+		int maxNumberOfSearchSteps = 30) {
 
-    factor1 = 1 / factor1;
-    factor0 = (int) floor(factor1);
-    factor1 = factor1 - factor0;
-    numerator0 = numerator1;
-    numerator1 = numerator;
-    numerator = factor0 * numerator1 + numerator0;
-    denominator0 = denominator1;
-    denominator1 = denominator;
-    denominator = factor0 * denominator1 + denominator0;
-  }
+	int numerator = (int) floor(x);
+	int numerator0;
+	int numerator1 = 1;
+	int denominator = 1;
+	int denominator0;
+	int denominator1 = 0;
+	int factor0;
+	double factor1 = x - (double) numerator;
 
-  return IntegerVector::create(numerator, denominator);
+	int step = 0;
+	while (++step < maxNumberOfSearchSteps) {
+		if (fabs(x - (double) numerator / (double) denominator) < epsilon) {
+			break;
+		}
+
+		factor1 = 1 / factor1;
+		factor0 = (int) floor(factor1);
+		factor1 = factor1 - factor0;
+		numerator0 = numerator1;
+		numerator1 = numerator;
+		numerator = factor0 * numerator1 + numerator0;
+		denominator0 = denominator1;
+		denominator1 = denominator;
+		denominator = factor0 * denominator1 + denominator0;
+	}
+
+	return IntegerVector::create(numerator, denominator);
 }
+
+/**
+ * @title
+ * Get Fractions
+ *
+ * @description
+ * Converts a vector of decimal numbers to their fractional representations.
+ *
+ * @details
+ * This function uses a continued fraction algorithm to convert each decimal number
+ * in the input vector to its fractional representation. The algorithm iterates up to
+ * a specified number of steps or until the remainder is less than the specified epsilon.
+ *
+ * @param x A NumericVector of decimal numbers to be converted.
+ * @param epsilon The tolerance for the continued fraction algorithm. Default is 1.0e-6.
+ * @param maxNumberOfSearchSteps The maximum number of steps for the continued fraction algorithm. Default is 30.
+ *
+ * @references See https://proofwiki.org/wiki/Continued_Fraction_Algorithm for more information on continued fractions.
+ *
+ * @return A List containing the original decimal numbers, their numerators, and denominators.
+ *
+ * @noRd
+ *
+ */
+// [[Rcpp::export(name = ".getFractions")]]
+List getFractions(
+		NumericVector x,
+		double epsilon = 1.0e-6,
+		int maxNumberOfSearchSteps = 30) {
+
+	int n = x.size();
+	IntegerVector numerators(n);
+	IntegerVector denominators(n);
+	IntegerVector result;
+
+	for (int i = 0; i < n; ++i) {
+		result = getFraction(x[i], epsilon, maxNumberOfSearchSteps);
+		numerators[i] = result[0];
+		denominators[i] = result[1];
+	}
+
+	return List::create(
+		Named("x") = x,
+		Named("numerator") = numerators,
+		Named("denominator") = denominators
+	);
+}
+
 
 

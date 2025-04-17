@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8276 $
-## |  Last changed: $Date: 2024-09-26 13:37:54 +0200 (Do, 26 Sep 2024) $
+## |  File version: $Revision: 8691 $
+## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -205,7 +205,7 @@ NULL
     .assertIsDatasetMeans(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
-    .assertIsValidVarianceOptionEnrichment(design, varianceOption)
+    .assertIsValidVarianceOptionEnrichment(varianceOption)
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
     .warnInCaseOfUnknownArguments(
         functionName = ".getStageResultsMeansEnrichment",

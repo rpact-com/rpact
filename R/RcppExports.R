@@ -89,7 +89,11 @@ getCipheredValue <- function(x) {
     .Call(`_rpact_getCipheredValue`, x)
 }
 
-getFraction <- function(x, epsilon = 1.0e-6, maxNumberOfSearchSteps = 30L) {
+.getFraction <- function(x, epsilon = 1.0e-6, maxNumberOfSearchSteps = 30L) {
     .Call(`_rpact_getFraction`, x, epsilon, maxNumberOfSearchSteps)
+}
+
+.getFractions <- function(x, epsilon = 1.0e-6, maxNumberOfSearchSteps = 30L) {
+    .Call(`_rpact_getFractions`, x, epsilon, maxNumberOfSearchSteps)
 }
 

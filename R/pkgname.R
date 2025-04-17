@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8455 $
-## |  Last changed: $Date: 2024-12-12 09:33:14 +0100 (Do, 12 Dez 2024) $
+## |  File version: $Revision: 8670 $
+## |  Last changed: $Date: 2025-04-10 08:07:04 +0200 (Do, 10 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -86,7 +86,9 @@
     if (grepl("^\\d\\.\\d\\.\\d\\.\\d{4,4}$", .getPackageVersionString())) {
         packageStartupMessage(paste0("rpact developer version ", 
             .getPackageVersionString(), " loaded"))
-    } else if (!isTRUE(.installationQualificationDone())) {
+    } 
+    if (!isTRUE(.installationQualificationDone()) && 
+            .isStartupMessagingEnabled()) {
         packageStartupMessage(paste0("Installation qualification for rpact ", 
             .getPackageVersionString(), " has not yet been performed."))
         packageStartupMessage(paste0("Please run testPackage() before ",

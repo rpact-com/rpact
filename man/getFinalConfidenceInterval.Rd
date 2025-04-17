@@ -22,19 +22,6 @@ This is either an element of \code{DatasetMeans}, of \code{DatasetRates}, or of 
 and should be created with the function \code{\link[=getDataset]{getDataset()}}.
 For more information see \code{\link[=getDataset]{getDataset()}}.}
 
-\item{...}{Further (optional) arguments to be passed:
-\describe{
-\item{\code{normalApproximation}}{
-The type of computation of the p-values. Default is \code{FALSE} for
-testing means (i.e., the t test is used) and TRUE for testing rates and the hazard ratio.
-For testing rates, if \code{normalApproximation = FALSE} is specified, the binomial test
-(one sample) or the exact test of Fisher (two samples) is used for calculating the p-values.
-In the survival setting, \code{normalApproximation = FALSE} has no effect.}
-\item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
-the t test assuming that the variances are equal or the t test without assuming this,
-i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
-}}
-
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
 only applicable for one-sided testing; default is \code{TRUE}
 which means that larger values of the test statistics yield smaller p-values.}

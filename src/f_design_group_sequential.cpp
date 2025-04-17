@@ -14,9 +14,9 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7408 $
- * Last changed: $Date: 2023-11-09 10:36:19 +0100 (Do, 09 Nov 2023) $
- * Last changed by: $Author: pahlke $
+ * File version: $Revision: 8673 $
+ * Last changed: $Date: 2025-04-10 10:45:56 +0200 (Do, 10 Apr 2025) $
+ * Last changed by: $Author: wassmer $
  *
  */
 #include <Rcpp.h>
@@ -38,6 +38,7 @@ const int C_NUMBER_OF_GRID_POINTS_TWO_SIDED = C_CONST_NEWTON_COTES_4 * C_NEWTON_
 const NumericVector C_NEWTON_COTES_VEC_4 = NumericVector::create(14, 32, 12, 32);
 const NumericVector C_NEWTON_COTES_VEC_5 = NumericVector::create(38, 75, 50, 50, 75);
 const NumericVector C_NEWTON_COTES_VEC_6 = NumericVector::create(82, 216, 27, 272, 27, 216);
+const NumericVector C_NEWTON_COTES_VEC_7 = NumericVector::create(1502, 3577, 1323, 2989, 2989, 1323, 3577);
 const double C_FUTILITY_BOUNDS_DEFAULT = -6;
 const String C_TYPE_OF_DESIGN_AS_USER = "asUser";
 const String C_TYPE_OF_DESIGN_BS_USER = "bsUser";
@@ -122,6 +123,11 @@ NumericVector getW(double dx, int constNewtonCotes) {
 			vec = vectorMultiply(C_NEWTON_COTES_VEC_6, dx / 840.0);
 			vec = 6 * rep(vec, constNewtonCotes);
 			x = 246.0 * dx / 840.0;
+		}
+		else if (C_NEWTON_COTES_MULTIPLIER == 7) {
+		  vec = vectorMultiply(C_NEWTON_COTES_VEC_7, dx / 17280.0);
+		  vec = 7 * rep(vec, constNewtonCotes);
+		  x = 5257.0 * dx / 17280.0;
 		}
 		NumericVector result = NumericVector(vec.size() + 1, NA_REAL);
 		result[0] = x;

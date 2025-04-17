@@ -59,6 +59,10 @@ with suitable arguments to create a inverse normal design.
 
 \item{\code{userBetaSpending}}{The user defined beta spending. Contains the cumulative beta-spending up to each interim stage. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
+\item{\code{efficacyStops}}{Logical vector indicating efficacy stops Is a logical vector of length \code{kMax} minus 1.}
+
+\item{\code{futilityStops}}{Logical vector indicating futility stops Is a logical vector of length \code{kMax} minus 1.}
+
 \item{\code{power}}{The one-sided power at each stage of the trial. Is a numeric vector of length \code{kMax} containing values between 0 and 1.}
 
 \item{\code{twoSidedPower}}{Specifies if power is defined two-sided at each stage of the trial. Is a logical vector of length 1.}

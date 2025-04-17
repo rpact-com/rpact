@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8633 $
-## |  Last changed: $Date: 2025-03-25 14:14:39 +0100 (Di, 25 Mrz 2025) $
+## |  File version: $Revision: 8670 $
+## |  Last changed: $Date: 2025-04-10 08:07:04 +0200 (Do, 10 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -577,6 +577,170 @@ NULL
     saveOptions()
 }
 
+
+#' Check if Startup Messaging is Enabled
+#'
+#' @description
+#' This function checks whether the startup messages for the `rpact` package are enabled.
+#' It also ensures that the messages are displayed only once within a 72-hour period.
+#'
+#' @details
+#' The function retrieves the `rpact.startup.message.enabled` option to determine if startup
+#' messages are enabled. If enabled, it checks the last timestamp when the message was shown
+#' and ensures that the message is displayed again only if more than 72 hours have passed.
+#' The timestamp is updated after the message is shown.
+#'
+#' @return
+#' Returns \code{TRUE} if startup messaging is enabled and should be displayed, otherwise \code{FALSE}.
+#'
+#' @examples
+#' \dontrun{
+#' if (.isStartupMessagingEnabled()) {
+#'     message("Welcome to rpact!")
+#' }
+#' }
+#'
+#' @keywords internal
+#' 
+#' @noRd 
+#'
+.isStartupMessagingEnabled <- function() {
+    if (isFALSE(as.logical(base::getOption("rpact.startup.message.enabled")))) {
+        return(FALSE)
+    }
+    
+    lastShownTime <- base::getOption("rpact.startup.message.timestamp")
+    currentTime <- Sys.time()
+    if (is.null(lastShownTime) || !grepl("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", lastShownTime)) {
+        base::options("rpact.startup.message.timestamp" = currentTime)
+        return(TRUE)
+    }
+    
+    lastShownTime <- as.POSIXct(lastShownTime, tz = "UTC")
+    timeDiff <- as.numeric(difftime(currentTime, lastShownTime, units = "mins"))
+    
+    # If the time difference is greater than 72 hours, show the message again
+    if (timeDiff > 72 * 60) {
+        base::options("rpact.startup.message.timestamp" = currentTime)
+        saveOptions()
+        return(TRUE)
+    }
+    
+    return(FALSE)
+}
+
+#' Disable Startup Messages
+#'
+#' @description
+#' This function disables the startup messages for the `rpact` package by setting
+#' the `rpact.startup.message.enabled` option to `FALSE`.
+#'
+#' @details
+#' Once this function is called, the startup messages will remain disabled until
+#' explicitly re-enabled using the `enableStartupMessages()` function. The current
+#' state is saved using the `saveOptions()` function.
+#'
+#' @return
+#' This function does not return a value. It is called for its side effects.
+#'
+#' @examples
+#' \dontrun{
+#' disableStartupMessages()
+#' }
+#'
+#' @export
+#'
+#' @keywords internal
+#' 
+disableStartupMessages <- function() {
+    if (isFALSE(as.logical(base::getOption("rpact.startup.message.enabled")))) {
+        return(invisible())
+    }
+    
+    base::options("rpact.startup.message.enabled" = FALSE)
+    saveOptions()
+}
+
+#' Enable Startup Messages
+#'
+#' @description
+#' This function enables the startup messages for the `rpact` package by setting
+#' the `rpact.startup.message.enabled` option to `TRUE`.
+#'
+#' @details
+#' Once this function is called, the startup messages will remain enabled until
+#' explicitly disabled using the `disableStartupMessages()` function. The current
+#' state is saved using the `saveOptions()` function.
+#'
+#' @return
+#' This function does not return a value. It is called for its side effects.
+#'
+#' @examples
+#' \dontrun{
+#' enableStartupMessages()
+#' }
+#'
+#' @export
+#' 
+#' @keywords internal
+#' 
+enableStartupMessages <- function() {
+    if (isTRUE(as.logical(base::getOption("rpact.startup.message.enabled")))) {
+        return(invisible())
+    }
+    
+    base::options("rpact.startup.message.enabled" = TRUE)
+    saveOptions()
+}
+
+
+#' 
+#' @title 
+#' Check Installation Qualification Status
+#'
+#' @description
+#' This function checks whether the installation qualification for the `rpact` package
+#' has been completed. If not, it provides a message prompting the user to run the
+#' `testPackage()` function to perform the qualification.
+#'
+#' @param showMessage A logical value indicating whether to display a message if the
+#' installation qualification has not been completed. Default is \code{TRUE}.
+#' 
+#' @details
+#' The installation qualification is a critical step in ensuring that the `rpact` package
+#' is correctly installed and validated for use in GxP-relevant environments. This function
+#' verifies the qualification status and informs the user if further action is required.
+#'
+#' @return
+#' Invisibly returns \code{TRUE} if the installation qualification has been completed,
+#' otherwise returns \code{FALSE}.
+#'
+#' @examples
+#' \dontrun{
+#' checkInstallationQualificationStatus()
+#' }
+#'
+#' @export
+#' 
+#' @keywords internal
+#' 
+checkInstallationQualificationStatus <- function(showMessage = TRUE) {
+    if (isTRUE(.installationQualificationDone())) {
+        return(invisible(TRUE))
+    }
+    
+    if (!isTRUE(showMessage)) {
+        return(invisible(FALSE))
+    }
+    
+    message(
+        "Installation qualification for rpact ", .getPackageVersionString(),
+        " has not yet been performed. Please run testPackage() ",
+        "before using the package in GxP relevant environments."
+    )
+    return(invisible(FALSE))
+}
+
 #'
 #' @title
 #' Get System Identifier
@@ -926,7 +1090,8 @@ testPackage <- function(outDir = ".",
     }
 
     if (executionMode == "default") {
-        cat("Run a small subset of the available rpact unit tests. Please wait...\n") # TODO optimize wording
+        cat("Run a small subset of the available rpact unit tests. Please wait...\n")
+        cat("This is just a quick test for demonstration purposes.\n")
         cat("The test will take about a minute.\n")
     } else if (executionMode == "downloadOnly") {
         cat("The unit test files are only downloaded and not executed.\n")
@@ -939,7 +1104,7 @@ testPackage <- function(outDir = ".",
                 sep = ""
             )
         } else {
-            cat("Run a subset of all tests. Please wait...\n")
+            cat("Run a small subset of the available rpact unit tests. Please wait...\n")
             cat("This is just a quick test, i.e., all time consuming tests will be skipped.\n")
             cat("The test will take about a minute.\n")
         }

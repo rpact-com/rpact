@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8629 $
-## |  Last changed: $Date: 2025-03-24 09:50:39 +0100 (Mo, 24 Mrz 2025) $
+## |  File version: $Revision: 8670 $
+## |  Last changed: $Date: 2025-04-10 08:07:04 +0200 (Do, 10 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -539,6 +539,8 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
 #' @template field_betaSpent
 #' @template field_typeBetaSpending
 #' @template field_userBetaSpending
+#' @template field_efficacyStops
+#' @template field_futilityStops
 #' @template field_power
 #' @template field_twoSidedPower
 #' @template field_constantBoundsHP
@@ -577,6 +579,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
         betaSpent = NULL,
         typeBetaSpending = NULL,
         userBetaSpending = NULL,
+        efficacyStops = NULL,
+        futilityStops = NULL,
         power = NULL,
         twoSidedPower = NULL,
         constantBoundsHP = NULL,
@@ -598,6 +602,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 gammaB = NA_real_,
                 typeBetaSpending = C_TYPE_OF_DESIGN_BS_NONE,
                 userBetaSpending = NA_real_,
+                efficacyStops = NA,
+                futilityStops = NA,
                 power = NA_real_,
                 twoSidedPower = C_TWO_SIDED_POWER_DEFAULT,
                 constantBoundsHP = NA_real_,
@@ -616,6 +622,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             self$gammaB <- gammaB
             self$typeBetaSpending <- typeBetaSpending
             self$userBetaSpending <- userBetaSpending
+            self$efficacyStops <- efficacyStops
+            self$futilityStops <- futilityStops
             self$power <- power
             self$twoSidedPower <- twoSidedPower
             self$constantBoundsHP <- constantBoundsHP
@@ -630,6 +638,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             self$.setParameterType("delayedInformation", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("decisionCriticalValues", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("reversalProbabilities", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("efficacyStops", C_PARAM_NOT_APPLICABLE)
+            self$.setParameterType("futilityStops", C_PARAM_NOT_APPLICABLE)
         },
         .formatComparisonResult = function(x) {
             if (is.null(x) || length(x) == 0 || !is.numeric(x)) {
@@ -826,6 +836,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 "betaSpent",
                 "typeBetaSpending",
                 "userBetaSpending",
+                "efficacyStops",
+                "futilityStops",
                 "criticalValues",
                 "stageLevels",
                 "decisionCriticalValues",
@@ -867,6 +879,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
 #' @template field_betaSpent
 #' @template field_typeBetaSpending
 #' @template field_userBetaSpending
+#' @template field_efficacyStops
+#' @template field_futilityStops
 #' @template field_power
 #' @template field_twoSidedPower
 #' @template field_constantBoundsHP

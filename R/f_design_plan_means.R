@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8575 $
-## |  Last changed: $Date: 2025-02-28 14:45:47 +0100 (Fr, 28 Feb 2025) $
+## |  File version: $Revision: 8674 $
+## |  Last changed: $Date: 2025-04-10 15:45:44 +0200 (Do, 10 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -54,8 +54,8 @@ NULL
                 )
             }
         } else {
-            numberOfNAs <- sum(as.vector(criticalValues) > 50, na.rm = TRUE)
-            if (any(is.na(criticalValues))) {
+            numberOfNAs <- sum(is.na(criticalValues))
+            if (numberOfNAs > 0) {
                 warning("The computation of ", .integerToWrittenNumber(numberOfNAs), " ",
                     "efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " ",
                     "on treatment effect scale not performed presumably ",
@@ -853,7 +853,7 @@ getPowerMeans <- function(design = NULL, ...,
         allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
         ) {
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
-
+    
     if ((length(stDev) == 1) && (groups == 2)) {
         stDev <- rep(stDev, 2)
     }
