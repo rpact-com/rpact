@@ -2,13 +2,13 @@
 
 ## New features
 
-* `efficacyStops` and `futilityStops` parameter added
-* parameter `varianceEstimation` added for calculation of final confidence intervals in two-sample situation for rates
+* `efficacyStops` and `futilityStops` parameter added  (issue [#88](https://github.com/rpact-com/rpact/issues/88))
+* parameter `stdErrorEstimate` (`"pooled"` or `"unpooled"`) added for calculation of final confidence intervals in two-sample situation for rates
 
 ## Improvements, issues, and changes
 
-* Recruitment times for count and survival data situation improved (issue?)
-* Bug fix for getSimulationCounts() (issue?)
+* Recruitment times for count and survival data situation improved (issue [#86](https://github.com/rpact-com/rpact/issues/86))
+* Bug fix for `getSimulationCounts()` (issue [#84](https://github.com/rpact-com/rpact/issues/84))
 * Minor improvements
 
 

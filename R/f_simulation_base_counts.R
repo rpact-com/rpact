@@ -385,8 +385,7 @@ getSimulationCounts <- function(design = NULL,
         directionUpper, C_DIRECTION_UPPER_DEFAULT
     )
     .setValueAndParameterType(
-        simulationResults, "overdispersion",
-        overdispersion, 0
+        simulationResults, "overdispersion", overdispersion, 0
     )
     .setValueAndParameterType(simulationResults, "fixedExposureTime",
         fixedExposureTime, NA_real_,
@@ -444,7 +443,6 @@ getSimulationCounts <- function(design = NULL,
     iterations <- matrix(0, kMax, totalCases)
     sampleSizePerStage <- matrix(0, kMax, totalCases)
     expectedSampleSize <- rep(0, totalCases)
-    nTotal <- NA_integer_
 
     len <- totalCases * maxNumberOfIterations * kMax
 
@@ -468,38 +466,36 @@ getSimulationCounts <- function(design = NULL,
     dataReject <- rep(0, len)
     dataFutility <- rep(0, len)
 
+    if (!any(is.na(accrualIntensity))) {
+        # build up general recruitment times
+        recruitmentTimes <- .generateRecruitmentTimes(
+            allocationRatioPlanned,
+            accrualTime,
+            accrualIntensity
+        )
+        recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
+        recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
+        n1 <- length(recruit1)
+        n2 <- length(recruit2)
+        maxNumberOfSubjects <- n1 + n2
+    } else {
+        n2 <- maxNumberOfSubjects / (1 + allocationRatioPlanned)
+        n1 <- allocationRatioPlanned * n2
+        recruit1 <- seq(0, accrualTime, length.out = n1)
+        recruit2 <- seq(0, accrualTime, length.out = n2)
+    }
+    if (n1 + n2 > 1000 && maxNumberOfIterations > 10) {
+        message(
+            "The simulation of count data may take a very long time ",
+            "because the maximum number of subjects is very large (", n1 + n2, ")"
+        )
+    }
+
     index <- 1
-    messageShown <- FALSE
     for (iCase in 1:totalCases) {
         if (!is.na(lambda) && !any(is.na(theta))) {
             lambda2 <- (1 + allocationRatioPlanned) * lambda / (1 + allocationRatioPlanned * theta[iCase])
             lambda1[iCase] <- lambda2 * theta[iCase]
-        }
-        if (!any(is.na(accrualIntensity))) {
-            # build up general recruitment times
-            recruitmentTimes <- .generateRecruitmentTimes(
-                allocationRatioPlanned,
-                accrualTime,
-                accrualIntensity
-            )
-            recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
-            recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
-            n1 <- length(recruit1)
-            n2 <- length(recruit2)
-            nTotal <- n1 + n2
-        } else {
-            n2 <- maxNumberOfSubjects / (1 + allocationRatioPlanned)
-            n1 <- allocationRatioPlanned * n2
-            nTotal <- n1 + n2
-            recruit1 <- seq(0, accrualTime, length.out = n1)
-            recruit2 <- seq(0, accrualTime, length.out = n2)
-        }
-        if (nTotal > 1000 && maxNumberOfIterations > 10 && !messageShown) {
-            message(
-                "The simulation of count data may take a very long time ",
-                "because the maximum number of subjects is very large (", nTotal, ")"
-            )
-            messageShown <- TRUE
         }
 
         reject <- rep(0, kMax)
@@ -552,7 +548,6 @@ getSimulationCounts <- function(design = NULL,
                     dataReject[index] <- 1
                 }
                 iterations[1, iCase] <- iterations[1, iCase] + 1
-                nTotal <- nTotal + n1 + n2
 
                 dataCase[index] <- iCase
                 dataIterationNumber[index] <- iterationNumber
@@ -706,6 +701,12 @@ getSimulationCounts <- function(design = NULL,
         overallReject[iCase] <- cumsum(reject / iterationNumber)[kMax]
     }
 
+    simulationResults$maxNumberOfSubjects <- n1 + n2
+    simulationResults$.setParameterType(
+        "maxNumberOfSubjects",
+        ifelse(any(is.na(accrualIntensity)), C_PARAM_USER_DEFINED, C_PARAM_GENERATED)
+    )
+
     if (design$kMax > 1) {
         simulationResults$futilityPerStage <- futilityPerStage
         simulationResults$.setParameterType(
@@ -740,32 +741,32 @@ getSimulationCounts <- function(design = NULL,
     simulationResults$.setParameterType("iterations", C_PARAM_GENERATED)
 
     if (kMax == 1) {
-        sampleSizePerStage <- rep(maxNumberOfSubjects, totalCases)
+        sampleSizePerStage <- maxNumberOfSubjects
         expectedSampleSize <- sampleSizePerStage
     }
 
     sampleSizePerStage[is.nan(sampleSizePerStage)] <- NA_integer_
     simulationResults$numberOfSubjects <- sampleSizePerStage
     simulationResults$.setParameterType(
-        "numberOfSubjects",
-        ifelse(kMax == 1 || is.na(nTotal), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        "numberOfSubjects", C_PARAM_GENERATED
     )
 
     simulationResults$expectedNumberOfSubjects <- expectedSampleSize
     simulationResults$.setParameterType(
         "expectedNumberOfSubjects",
-        ifelse(kMax == 1 || all(is.na(expectedSampleSize)), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+        ifelse(kMax == 1, C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
     )
 
     simulationResults$numberOfSubjects1 <- n1
     simulationResults$.setParameterType(
         "numberOfSubjects1",
-        ifelse(kMax == 1 && allocationRatioPlanned != 1, C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
+        ifelse(allocationRatioPlanned != 1, C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
     )
+
     simulationResults$numberOfSubjects2 <- n2
     simulationResults$.setParameterType(
         "numberOfSubjects2",
-        ifelse(kMax == 1 && allocationRatioPlanned != 1, C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
+        ifelse(allocationRatioPlanned != 1, C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
     )
 
     simulationResults$overallReject <- overallReject

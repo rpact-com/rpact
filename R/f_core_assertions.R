@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8632 $
-## |  Last changed: $Date: 2025-03-24 15:41:19 +0100 (Mo, 24 Mrz 2025) $
+## |  File version: $Revision: 8691 $
+## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2824,13 +2824,9 @@ NULL
     }
 }
 
-.isValidVarianceOptionEnrichment <- function(varianceOption) {
-    return(!is.null(varianceOption) && length(varianceOption) == 1 && !is.na(varianceOption) &&
-        is.character(varianceOption) && varianceOption %in% C_VARIANCE_OPTIONS_ENRICHMENT)
-}
-
-.assertIsValidVarianceOptionEnrichment <- function(design, varianceOption) {
-    if (!.isValidVarianceOptionEnrichment(varianceOption)) {
+.assertIsValidVarianceOptionEnrichment <- function(varianceOption) {
+    .assertIsSingleCharacter(varianceOption, "varianceOption")
+    if (!varianceOption %in% C_VARIANCE_OPTIONS_ENRICHMENT) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'varianceOption' should be one of ",
             .arrayToString(C_VARIANCE_OPTIONS_ENRICHMENT, encapsulate = TRUE),
@@ -2839,6 +2835,34 @@ NULL
     }
 }
 
+.assertIsValidStdErrorEstimateRates <- function(stdErrorEstimate, dataInput) {
+    .assertIsSingleCharacter(stdErrorEstimate, "stdErrorEstimate", naAllowed = TRUE)
+    
+    if (dataInput$getNumberOfGroups() == 1) {
+        if (!is.na(stdErrorEstimate)) {
+            warning("'stdErrorEstimate' (", stdErrorEstimate, ") will be ignored because data input has only one group",
+                call. = FALSE
+            )
+        }
+        
+        return(invisible(stdErrorEstimate))
+    }
+    
+    if (is.na(stdErrorEstimate)) {
+        stdErrorEstimate <- C_RATES_STD_ERROR_ESTIMATE_DEFAULT
+    }
+    
+    if (!stdErrorEstimate %in% C_RATES_STD_ERROR_ESTIMATE) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            "'stdErrorEstimate' (", stdErrorEstimate, ") must be ",
+            .arrayToString(C_RATES_STD_ERROR_ESTIMATE, mode = "or", encapsulate = TRUE),
+            call. = FALSE
+        )
+    }
+    
+    return(invisible(stdErrorEstimate))
+}
 
 .assertIsValidSummaryIntervalFormat <- function(intervalFormat) {
     .assertIsSingleCharacter(intervalFormat, "intervalFormat") # "[%s; %s]"
@@ -2852,7 +2876,6 @@ NULL
         )
     }
 }
-
 
 #'
 #' @title

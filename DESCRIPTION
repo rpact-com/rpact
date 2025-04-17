@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
 Version: 4.2.1.9286
-Date: 2025-04-09
+Date: 2025-04-17
 Authors@R: c(
 	person(
 		given = "Gernot", 

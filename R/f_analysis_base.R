@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8677 $
-## |  Last changed: $Date: 2025-04-14 14:13:41 +0200 (Mo, 14 Apr 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8691 $
+## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_core_utilities.R
@@ -99,7 +99,7 @@ NULL
 #'       the t test assuming that the variances are equal or the t test without assuming this,
 #'       i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
 #'   \item{\code{stdErrorEstimate}}{Estimate of standard error for calculation of final confidence intervals for 
-#'       comparing rates in two treatment groups, default is \code{"H1"}.
+#'       comparing rates in two treatment groups, default is \code{"pooled"}.
 #'   \item{\code{intersectionTest}}{Defines the multiple test for the intersection
 #'       hypotheses in the closed system of hypotheses when testing multiple hypotheses.
 #'       Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"},
@@ -1508,6 +1508,8 @@ getFinalPValue <- function(stageResults, ...) {
 #'   \item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
 #'       the t test assuming that the variances are equal or the t test without assuming this,
 #'       i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
+#'   \item{\code{stdErrorEstimate}}{Estimate of standard error for calculation of final confidence intervals for 
+#'       comparing rates in two treatment groups, default is \code{"pooled"}.
 #' }
 #'
 #' @details
@@ -1536,7 +1538,10 @@ getFinalPValue <- function(stageResults, ...) {
 #'
 #' @export
 #'
-getFinalConfidenceInterval <- function(design, dataInput, ...,
+getFinalConfidenceInterval <- function(
+        design, 
+        dataInput, 
+        ...,
         directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
         thetaH0 = NA_real_,
         tolerance = 1e-06, # C_ANALYSIS_TOLERANCE_DEFAULT
@@ -1570,18 +1575,41 @@ getFinalConfidenceInterval <- function(design, dataInput, ...,
     finalConfidenceInterval <- NULL
     if (dataInput$isDatasetMeans()) {
         finalConfidenceInterval <- .getFinalConfidenceIntervalMeans(
-            design = design, dataInput = dataInput, directionUpper = directionUpper,
-            thetaH0 = thetaH0, tolerance = tolerance, stage = stage, ...
+            design = design, 
+            dataInput = dataInput, 
+            directionUpper = directionUpper,
+            thetaH0 = thetaH0, 
+            tolerance = tolerance, 
+            stage = stage, 
+            ...
         )
     } else if (dataInput$isDatasetRates()) {
+        stdErrorEstimate <- .getOptionalArgument("stdErrorEstimate", optionalArgumentDefaultValue = NA_character_, ...)
+        if (!.isTrialDesignFisher(design)) {
+            stdErrorEstimate <- .assertIsValidStdErrorEstimateRates(stdErrorEstimate, dataInput)
+        }
+        
+        normalApproximation <- .getOptionalArgument("normalApproximation", 
+            optionalArgumentDefaultValue = C_NORMAL_APPROXIMATION_RATES_DEFAULT, ...)
+        
         finalConfidenceInterval <- .getFinalConfidenceIntervalRates(
-            design = design, dataInput = dataInput, directionUpper = directionUpper,
-            thetaH0 = thetaH0, tolerance = tolerance, stage = stage, ...
+            design = design, 
+            dataInput = dataInput, 
+            directionUpper = directionUpper,
+            thetaH0 = thetaH0, 
+            tolerance = tolerance, 
+            stage = stage, 
+            stdErrorEstimate = stdErrorEstimate, 
+            normalApproximation = normalApproximation
         )
     } else if (dataInput$isDatasetSurvival()) {
         finalConfidenceInterval <- .getFinalConfidenceIntervalSurvival(
-            design = design, dataInput = dataInput, directionUpper = directionUpper,
-            thetaH0 = thetaH0, tolerance = tolerance, stage = stage
+            design = design, 
+            dataInput = dataInput, 
+            directionUpper = directionUpper,
+            thetaH0 = thetaH0, 
+            tolerance = tolerance, 
+            stage = stage
         )
     }
 

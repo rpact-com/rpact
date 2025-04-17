@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8676 $
-## |  Last changed: $Date: 2025-04-11 12:20:33 +0200 (Fr, 11 Apr 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8691 $
+## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include class_dictionary.R
@@ -78,7 +78,6 @@ C_NORMAL_APPROXIMATION_RATES_DEFAULT <- TRUE
 C_EQUAL_VARIANCES_DEFAULT <- TRUE
 C_ITERATIONS_DEFAULT <- 1000L
 C_ACCEPT_DEVIATION_INFORMATIONRATES <- 0.05
-C_RATES_STDERROR_ESTIMATE <- "H1"
 
 C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT <- 50
 C_VARIED_PARAMETER_SEQUENCE_LENGTH_DEFAULT <- 30
@@ -140,11 +139,13 @@ C_INTERSECTION_TESTS_ENRICHMENT <- c(
     "Sidak",
     "SpiessensDebois"
 )
+C_RATES_STD_ERROR_ESTIMATE <- c("pooled", "unpooled")
+C_RATES_STD_ERROR_ESTIMATE_DEFAULT <- "pooled"
 C_VARIANCE_OPTION_DUNNETT <- "overallPooled"
-C_VARIANCE_OPTION_MULTIARMED_DEFAULT <- "overallPooled"
 C_VARIANCE_OPTIONS_MULTIARMED <- c("overallPooled", "pairwisePooled", "notPooled")
-C_VARIANCE_OPTION_ENRICHMENT_DEFAULT <- "pooled"
+C_VARIANCE_OPTION_MULTIARMED_DEFAULT <- "overallPooled"
 C_VARIANCE_OPTIONS_ENRICHMENT <- c("pooled", "notPooled", "pooledFromFull")
+C_VARIANCE_OPTION_ENRICHMENT_DEFAULT <- "pooled"
 C_STRATIFIED_ANALYSIS_DEFAULT <- TRUE
 
 #
@@ -721,7 +722,8 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     expectedInformationH1 = "Expected information under H1",
     plannedCalendarTime = "Planned calendar time",
     efficacyStops = "Efficacy stops",
-    futilityStops = "Futility stops"
+    futilityStops = "Futility stops",
+    stdErrorEstimate = "Standard error estimate"
 ))
 
 C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
@@ -1031,7 +1033,8 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     expectedInformationH1 = "Expected information under H1",
     plannedCalendarTime = "Planned calendar time",
     efficacyStops = "Efficacy stops",
-    futilityStops = "Futility stops"
+    futilityStops = "Futility stops",
+    stdErrorEstimate = "Standard error estimate"
 ))
 
 C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETTINGS", list(

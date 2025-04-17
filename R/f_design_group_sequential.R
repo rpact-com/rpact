@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8681 $
-## |  Last changed: $Date: 2025-04-15 13:26:20 +0200 (Di, 15 Apr 2025) $
+## |  File version: $Revision: 8691 $
+## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1244,7 +1244,9 @@ getDesignInverseNormal <- function(...,
         constantBoundsHP = C_CONST_BOUND_HP_DEFAULT,
         twoSidedPower = NA,
         delayedInformation = NA_real_,
-        tolerance = C_DESIGN_TOLERANCE_DEFAULT
+        tolerance = C_DESIGN_TOLERANCE_DEFAULT,
+        efficacyStops = NA,
+        futilityStops = NA
     )
     if (is.null(designFun)) {
         return(defaultValues)
