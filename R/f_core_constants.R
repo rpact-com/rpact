@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8624 $
-## |  Last changed: $Date: 2025-03-21 13:24:59 +0100 (Fr, 21 Mrz 2025) $
+## |  File version: $Revision: 8691 $
+## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -139,11 +139,13 @@ C_INTERSECTION_TESTS_ENRICHMENT <- c(
     "Sidak",
     "SpiessensDebois"
 )
+C_RATES_STD_ERROR_ESTIMATE <- c("pooled", "unpooled")
+C_RATES_STD_ERROR_ESTIMATE_DEFAULT <- "pooled"
 C_VARIANCE_OPTION_DUNNETT <- "overallPooled"
-C_VARIANCE_OPTION_MULTIARMED_DEFAULT <- "overallPooled"
 C_VARIANCE_OPTIONS_MULTIARMED <- c("overallPooled", "pairwisePooled", "notPooled")
-C_VARIANCE_OPTION_ENRICHMENT_DEFAULT <- "pooled"
+C_VARIANCE_OPTION_MULTIARMED_DEFAULT <- "overallPooled"
 C_VARIANCE_OPTIONS_ENRICHMENT <- c("pooled", "notPooled", "pooledFromFull")
+C_VARIANCE_OPTION_ENRICHMENT_DEFAULT <- "pooled"
 C_STRATIFIED_ANALYSIS_DEFAULT <- TRUE
 
 #
@@ -718,7 +720,10 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
     expectedInformationH1 = "Expected information under H1",
-    plannedCalendarTime = "Planned calendar time"
+    plannedCalendarTime = "Planned calendar time",
+    efficacyStops = "Efficacy stops",
+    futilityStops = "Futility stops",
+    stdErrorEstimate = "Standard error estimate"
 ))
 
 C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
@@ -1026,7 +1031,10 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
     expectedInformationH1 = "Expected information under H1",
-    plannedCalendarTime = "Planned calendar time"
+    plannedCalendarTime = "Planned calendar time",
+    efficacyStops = "Efficacy stops",
+    futilityStops = "Futility stops",
+    stdErrorEstimate = "Standard error estimate"
 ))
 
 C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETTINGS", list(
@@ -1219,7 +1227,17 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
             obj$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED) {
         return(".formatHowItIs")
     }
-
+    
+    if (parameterName == "userAlphaSpending" && 
+            obj$.getParameterType("userAlphaSpending") == C_PARAM_GENERATED) {
+        return(".formatProbabilities")
+    }
+    
+    if (parameterName == "userBetaSpending" && 
+            obj$.getParameterType("userBetaSpending") == C_PARAM_GENERATED) {
+        return(".formatProbabilities")
+    }
+    
     return(C_PARAMETER_FORMAT_FUNCTIONS[[parameterName]])
 }
 

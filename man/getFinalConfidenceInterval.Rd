@@ -33,6 +33,8 @@ In the survival setting, \code{normalApproximation = FALSE} has no effect.}
 \item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
 the t test assuming that the variances are equal or the t test without assuming this,
 i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
+\item{\code{stdErrorEstimate}}{Estimate of standard error for calculation of final confidence intervals for
+comparing rates in two treatment groups, default is \code{"pooled"}.}
 }}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,

@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8474 $
-## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
+## |  File version: $Revision: 8691 $
+## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -973,7 +973,12 @@ AnalysisResultsBase <- R6::R6Class("AnalysisResultsBase",
         finalConfidenceIntervalLowerBounds = NULL,
         finalConfidenceIntervalUpperBounds = NULL,
         medianUnbiasedEstimates = NULL,
-        initialize = function(design, dataInput, ..., thetaH1 = NULL,
+        stdErrorEstimate = NULL,
+        initialize = function(
+                design, 
+                dataInput, 
+                ..., 
+                thetaH1 = NULL,
                 assumedStDev = NULL,
                 equalVariances = NULL,
                 testActions = NULL,
@@ -986,7 +991,8 @@ AnalysisResultsBase <- R6::R6Class("AnalysisResultsBase",
                 finalPValues = NULL,
                 finalConfidenceIntervalLowerBounds = NULL,
                 finalConfidenceIntervalUpperBounds = NULL,
-                medianUnbiasedEstimates = NULL) {
+                medianUnbiasedEstimates = NULL,
+                stdErrorEstimate = NA_character_) {
             self$thetaH1 <- thetaH1
             self$assumedStDev <- assumedStDev
             self$equalVariances <- equalVariances
@@ -1001,9 +1007,11 @@ AnalysisResultsBase <- R6::R6Class("AnalysisResultsBase",
             self$finalConfidenceIntervalLowerBounds <- finalConfidenceIntervalLowerBounds
             self$finalConfidenceIntervalUpperBounds <- finalConfidenceIntervalUpperBounds
             self$medianUnbiasedEstimates <- medianUnbiasedEstimates
+            self$stdErrorEstimate <- stdErrorEstimate
 
             super$initialize(design = design, dataInput = dataInput, ...)
             self$finalStage <- NA_integer_
+            self$.setParameterType("stdErrorEstimate", C_PARAM_NOT_APPLICABLE)
         }
     )
 )

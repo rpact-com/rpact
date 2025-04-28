@@ -18,6 +18,230 @@
 ## |  Last changed by: $Author: wassmer $
 ## |
 
+
+#'
+#' Warn in Case of Extreme Allocation Ratios
+#'
+#' @description
+#' This function generates a warning if the difference between two allocation ratios
+#' exceeds a predefined threshold, indicating that the allocation scheme might yield
+#' unreliable results.
+#'
+#' @param allocation1 A numeric value representing the allocation ratio for group 1.
+#' @param allocation2 A numeric value representing the allocation ratio for group 2.
+#'
+#' @details
+#' The function checks the absolute difference between `allocation1` and `allocation2`.
+#' If the difference is greater than 4, a warning is issued to inform the user that
+#' the chosen allocation scheme might lead to unreliable results.
+#'
+#' @return
+#' This function does not return a value. It is used for its side effect of generating a warning.
+#'
+#' @examples
+#' \dontrun{
+#' .warnInCaseOfExtremeAllocationRatios(6, 1) # Generates a warning
+#' .warnInCaseOfExtremeAllocationRatios(3, 2) # No warning
+#' }
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
+.warnInCaseOfExtremeAllocationRatios <- function(allocation1, allocation2) {
+    if (abs(allocation1 - allocation2) > 4) {
+        warning(
+            "Choice of allocation scheme ('allocation1' = ", allocation1,
+            ", 'allocation2' = ", allocation2, ") might yield unreliable results",
+            call. = FALSE
+        )
+    }
+}
+
+#'
+#' Generate Single Recruitment Time
+#'
+#' @description
+#' This function calculates the recruitment time for a single subject based on the given fraction,
+#' accrual time, and subject fractions.
+#'
+#' @param fraction A numeric value representing the fraction of subjects recruited.
+#' @param accrualTime A numeric vector representing the accrual time intervals.
+#' @param subjectFractions A numeric vector representing the cumulative fractions of subjects recruited
+#' at each accrual time interval.
+#'
+#' @details
+#' The function determines the recruitment time for a subject by comparing the given fraction to the
+#' cumulative subject fractions. If the fraction falls within a specific interval, the recruitment time
+#' is calculated proportionally within that interval.
+#'
+#' @return
+#' A numeric value representing the recruitment time for the subject. Returns \code{NA_real_} if the
+#' fraction does not fall within the defined intervals.
+#'
+#' @examples
+#' \dontrun{
+#' accrualTime <- c(0, 5, 10)
+#' subjectFractions <- c(0.2, 0.7, 1.0)
+#' .generateSingleRecruitmentTimes(0.5, accrualTime, subjectFractions)
+#' }
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
+.generateSingleRecruitmentTimes <- function(fraction, accrualTime, subjectFractions) {
+    if (fraction <= subjectFractions[1]) {
+        return(accrualTime[1] / subjectFractions[1] * fraction)
+    }
+
+    for (i in 2:length(accrualTime)) {
+        if (fraction <= subjectFractions[i]) {
+            return(accrualTime[i] + (accrualTime[i] - accrualTime[i - 1]) /
+                (subjectFractions[i] - subjectFractions[i - 1]) * (fraction - subjectFractions[i]))
+        }
+    }
+
+    return(NA_real_)
+}
+
+
+#'
+#' Generate Recruitment Times
+#'
+#' @description
+#' This function generates recruitment times for subjects based on the given allocation ratio,
+#' accrual time, and accrual intensity. It also assigns treatments to subjects based on the allocation ratio.
+#'
+#' @param allocationRatio A numeric value representing the planned allocation ratio between two groups.
+#' @param accrualTime A numeric vector representing the accrual time intervals.
+#' @param accrualIntensity A numeric vector representing the accrual intensity for each accrual time interval.
+#'
+#' @details
+#' The function calculates the recruitment times for subjects by dividing the accrual time into intervals
+#' and using the accrual intensity to determine the number of subjects recruited in each interval.
+#' It also assigns treatments to subjects based on the allocation ratio, ensuring that the allocation
+#' scheme is followed. A warning is generated if the allocation ratio is extreme.
+#'
+#' @return
+#' A data frame containing:
+#' \itemize{
+#'   \item \code{treatments}: A numeric vector indicating the treatment group for each subject.
+#'   \item \code{recruit}: A numeric vector representing the recruitment time for each subject.
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' allocationRatio <- 2
+#' accrualTime <- c(0, 5, 10)
+#' accrualIntensity <- c(10, 20, 30)
+#' recruitmentData <- .generateRecruitmentTimes(allocationRatio, accrualTime, accrualIntensity)
+#' print(recruitmentData)
+#' }
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
+.generateRecruitmentTimes <- function(allocationRatio,
+        accrualTime,
+        accrualIntensity) {
+    if (length(accrualTime) != length(accrualIntensity)) {
+        stop(
+            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+            "length of accrualTime (", length(accrualTime), ") and ",
+            "accrualIntensity (", length(accrualIntensity), ") must be identical"
+        )
+    }
+
+    densityIntervals <- accrualTime
+    if (length(densityIntervals) > 1) {
+        densityIntervals[2:length(densityIntervals)] <-
+            densityIntervals[2:length(densityIntervals)] -
+            densityIntervals[1:(length(densityIntervals) - 1)]
+        maxNumberOfSubjects <- ceiling(sum(densityIntervals * accrualIntensity))
+    } else {
+        maxNumberOfSubjects <- ceiling(accrualTime * accrualIntensity)
+    }
+    subjectFractions <- cumsum(densityIntervals * accrualIntensity) / maxNumberOfSubjects
+    subjectFractions[length(accrualTime)] <- 1
+
+    recruit <- numeric()
+    for (fraction in (1:maxNumberOfSubjects) / maxNumberOfSubjects) {
+        recruit <- c(recruit, .generateSingleRecruitmentTimes(fraction, accrualTime, subjectFractions))
+    }
+
+    # to force last value to be last accrualTime
+    recruit[length(recruit)] <- accrualTime[length(accrualTime)]
+
+    allocationFraction <- .getFraction(allocationRatio)
+    allocation1 <- allocationFraction[1]
+    allocation2 <- allocationFraction[2]
+    .warnInCaseOfExtremeAllocationRatios(allocation1, allocation2)
+
+    treatments <- c()
+    while (length(treatments) < maxNumberOfSubjects) {
+        if (allocation1 > allocation2) {
+            treatments <- c(treatments, rep(c(1, 2), allocation2), rep(1, allocation1 - allocation2))
+        } else {
+            treatments <- c(treatments, rep(c(1, 2), allocation1), rep(2, allocation2 - allocation1))
+        }
+    }
+    treatments <- treatments[1:maxNumberOfSubjects]
+
+    return(data.frame(
+        treatments = treatments,
+        recruit = recruit
+    ))
+}
+
+
+#'
+#' Calculate Variance Estimate
+#'
+#' @description
+#' This function calculates the variance estimate for count data based on the provided
+#' event rates, allocation ratio, overdispersion, and recruitment times for two groups.
+#'
+#' @param lambda1 A numeric vector representing the event rates for group 1.
+#' @param lambda2 A numeric vector representing the event rates for group 2.
+#' @param allocation A numeric value representing the allocation ratio between the two groups.
+#' @param overdispersion A numeric value representing the overdispersion parameter.
+#' @param accrualTime A numeric vector representing the accrual time intervals.
+#' @param followUpTime A numeric value representing the follow-up time.
+#' @param fixedExposureTime A numeric value representing the fixed exposure time. Default is \code{NA_real_}.
+#' @param recruit1 A numeric vector representing the recruitment times for group 1.
+#' @param recruit2 A numeric vector representing the recruitment times for group 2.
+#'
+#' @details
+#' The function calculates the variance estimate for two groups. If a fixed exposure time is provided,
+#' the variance is calculated using the fixed exposure time and overdispersion. Otherwise, it uses
+#' the follow-up time and recruitment times to compute the variance based on the observed event rates.
+#'
+#' @return
+#' A numeric value representing the variance estimate.
+#'
+#' @examples
+#' \dontrun{
+#' lambda1 <- c(0.1, 0.2, 0.3)
+#' lambda2 <- c(0.15, 0.25, 0.35)
+#' allocation <- 1
+#' overdispersion <- 0.1
+#' accrualTime <- c(0, 5, 10)
+#' followUpTime <- 5
+#' recruit1 <- c(1, 2, 3)
+#' recruit2 <- c(2, 3, 4)
+#' variance <- .getVarianceEstimate(
+#'     lambda1, lambda2, allocation, overdispersion,
+#'     accrualTime, followUpTime, NA_real_, recruit1, recruit2
+#' )
+#' print(variance)
+#' }
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
 .getVarianceEstimate <- function(lambda1,
         lambda2,
         allocation,
@@ -38,7 +262,6 @@
                 "Cannot calculated variance estimate because follow-up time is NA"
             )
         }
-
         timeUnderObservation1 <-
             pmax(accrualTime[length(accrualTime)] + followUpTime - recruit1, 0)
         timeUnderObservation2 <-
@@ -53,11 +276,45 @@
     return(varianceEstimate)
 }
 
+
+#' Find Theta Using Uniroot
+#'
+#' @description
+#' This function finds the value of \code{theta} that satisfies a given boundary condition
+#' using the \code{uniroot} method. It calculates the variance estimate and solves for
+#' \code{theta} based on the provided parameters.
+#'
+#' @param boundary A numeric value representing the boundary condition to be satisfied.
+#' @param lambda2 A numeric vector representing the event rates for group 2.
+#' @param thetaH0 A numeric value representing the null hypothesis value of \code{theta}.
+#' @param directionUpper A numeric value (1 or 0) indicating the direction of the test.
+#' @param allocationRatio A numeric value representing the allocation ratio between the two groups.
+#' @param overdispersion A numeric value representing the overdispersion parameter.
+#' @param accrualTime A numeric vector representing the accrual time intervals.
+#' @param followUpTime A numeric value representing the follow-up time.
+#' @param fixedExposureTime A numeric value representing the fixed exposure time. Default is \code{NA_real_}.
+#' @param numberOfSubjects A numeric value representing the total number of subjects.
+#' @param recruit1 A numeric vector representing the recruitment times for group 1.
+#' @param recruit2 A numeric vector representing the recruitment times for group 2.
+#'
+#' @details
+#' The function uses the \code{uniroot} method to find the root of the equation that satisfies
+#' the boundary condition. It calculates the variance estimate for the given parameters and
+#' uses it to determine the value of \code{theta}.
+#'
+#' @return
+#' A numeric value representing the value of \code{theta} that satisfies the boundary condition.
+#' Returns \code{NA_real_} if the root cannot be found.
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
 .findThetaUniRoot <- function(boundary,
         lambda2,
         thetaH0,
         directionUpper,
-        ar,
+        allocationRatio,
         overdispersion,
         accrualTime,
         followUpTime,
@@ -68,18 +325,18 @@
     tryCatch(
         {
             if ((2 * directionUpper - 1) * boundary < 0) {
-                lowerBound <- optimize(
+                lowerBound <- stats::optimize(
                     function(x) {
                         vHat <- .getVarianceEstimate(
                             lambda1 = x * lambda2,
                             lambda2 = lambda2,
-                            allocation = ar,
+                            allocation = allocationRatio,
                             overdispersion = overdispersion,
                             accrualTime = accrualTime,
                             followUpTime = followUpTime,
                             fixedExposureTime = fixedExposureTime,
-                            recruit1 = recruit1[1:(ar * numberOfSubjects / (1 + ar))],
-                            recruit2[1:(numberOfSubjects / (1 + ar))]
+                            recruit1 = recruit1[1:(allocationRatio * numberOfSubjects / (1 + allocationRatio))],
+                            recruit2[1:(numberOfSubjects / (1 + allocationRatio))]
                         )
 
                         if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
@@ -88,7 +345,6 @@
                                 "The calculated variance estimate is invalid: ", vHat
                             )
                         }
-
                         (log(x) - log(thetaH0)) / sqrt(vHat / numberOfSubjects)
                     },
                     lower = 1e-05,
@@ -107,18 +363,18 @@
                     vHat <- .getVarianceEstimate(
                         lambda1 = x * lambda2,
                         lambda2 = lambda2,
-                        allocation = ar,
+                        allocation = allocationRatio,
                         overdispersion = overdispersion,
                         accrualTime = accrualTime,
                         followUpTime = followUpTime,
                         fixedExposureTime = fixedExposureTime,
-                        recruit1 = recruit1[1:(ar * numberOfSubjects / (1 + ar))],
-                        recruit2 = recruit2[1:(numberOfSubjects / (1 + ar))]
+                        recruit1 = recruit1[1:(allocationRatio * numberOfSubjects / (1 + allocationRatio))],
+                        recruit2 = recruit2[1:(numberOfSubjects / (1 + allocationRatio))]
                     )
 
                     if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
                         stop(
-                            C_EXCEPTION_TYPE_RUNTIME_ISSUE, "Cannot find theta. ",
+                            C_EXCEPTION_TYPE_RUNTIME_ISSUE, "cannot find theta. ",
                             "The calculated variance estimate is invalid: ", vHat
                         )
                     }
@@ -152,6 +408,9 @@
     followUpTime <- designPlan$followUpTime
     studyTime <- designPlan$studyTime
     accrualTime <- designPlan$accrualTime
+    if (length(accrualTime) > 1) {
+        accrualTime <- accrualTime[-1]
+    }
     accrualIntensity <- designPlan$accrualIntensity
     maxNumberOfSubjects <- designPlan$maxNumberOfSubjects
     numberOfSubjects <- designPlan$numberOfSubjects
@@ -194,35 +453,23 @@
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
 
     for (iCase in 1:nParameters) {
-        ar <- allocationRatioPlanned[iCase]
+        allocationRatio <- allocationRatioPlanned[iCase]
 
-        #  Build up general recruitment times
         if (!any(is.na(accrualIntensity))) {
-            const <- ar / (1 + ar)
-            if (length(accrualIntensity) == 1) {
-                recruit1 <- seq(0, accrualTime[length(accrualIntensity)],
-                    length.out = accrualTime[length(accrualIntensity)] * accrualIntensity[1] * const
-                )
-                recruit2 <- seq(0, accrualTime[length(accrualIntensity)],
-                    length.out = accrualTime[length(accrualIntensity)] * accrualIntensity[1] * (1 - const)
-                )
-            } else {
-                recruit1 <- seq(0, accrualTime[1], length.out = accrualTime[1] * accrualIntensity[1] * const)
-                recruit2 <- seq(0, accrualTime[1], length.out = accrualTime[1] * accrualIntensity[1] * (1 - const))
-                for (i in 2:length(accrualIntensity)) {
-                    recruit1 <- c(recruit1, seq(accrualTime[i - 1] + 1 / accrualIntensity[i], accrualTime[i],
-                        length.out = (accrualTime[i] - accrualTime[i - 1]) * accrualIntensity[i] * const
-                    ))
-                    recruit2 <- c(recruit2, seq(accrualTime[i - 1] + 1 / accrualIntensity[i], accrualTime[i],
-                        length.out = (accrualTime[i] - accrualTime[i - 1]) * accrualIntensity[i] * (1 - const)
-                    ))
-                }
-            }
+            # build up general recruitment times
+            recruitmentTimes <- .generateRecruitmentTimes(
+                allocationRatio,
+                accrualTime,
+                accrualIntensity
+            )
+            recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
+            recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
+        } else if (!any(is.na(accrualTime))) {
+            recruit1 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] * allocationRatio / (1 + allocationRatio))
+            recruit2 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] / (1 + allocationRatio))
         } else {
-            if (!any(is.na(accrualTime))) {
-                recruit1 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] * ar / (1 + ar))
-                recruit2 <- seq(0, accrualTime, length.out = maxNumberOfSubjects[iCase] / (1 + ar))
-            }
+            recruit1 <- NA_real_
+            recruit2 <- NA_real_
         }
 
         # calculate theta that solves (ln(theta) - ln(thetaH0) sqrt(FisherInformation_k) = boundary
@@ -234,13 +481,15 @@
             }
             criticalValuesEffectScaleUpper[j, iCase] <- .findThetaUniRoot(
                 criticalValues[j],
-                lambda2, thetaH0,
+                lambda2,
+                thetaH0,
                 directionUpper[iCase],
-                ar, overdispersion, accrualTime,
+                allocationRatio,
+                overdispersion, accrualTime,
                 followUpTime[iCase], fixedExposureTime,
                 numberOfSubjectsPerStage,
-                recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
-                recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
+                recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
+                recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
             )
 
             if (design$sided == 2) {
@@ -248,11 +497,12 @@
                     -criticalValues[j],
                     lambda2, thetaH0,
                     directionUpper[iCase],
-                    ar, overdispersion, accrualTime,
+                    allocationRatio,
+                    overdispersion, accrualTime,
                     followUpTime[iCase], fixedExposureTime,
                     numberOfSubjectsPerStage,
-                    recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
-                    recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
+                    recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
+                    recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
                 )
             }
         }
@@ -268,27 +518,34 @@
                     futilityBounds[j],
                     lambda2, thetaH0,
                     directionUpper[iCase],
-                    ar, overdispersion, accrualTime,
-                    followUpTime[iCase], fixedExposureTime,
+                    allocationRatio,
+                    overdispersion,
+                    accrualTime,
+                    followUpTime[iCase],
+                    fixedExposureTime,
                     numberOfSubjectsPerStage,
-                    recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
-                    recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
+                    recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
+                    recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
                 )
                 if (design$sided == 2 && design$kMax > 1 &&
                         (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                             !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
                     futilityBoundsEffectScaleLower[j, iCase] <- .findThetaUniRoot(
                         -futilityBounds[j],
-                        lambda2, thetaH0,
+                        lambda2,
+                        thetaH0,
                         directionUpper[iCase],
-                        ar, overdispersion, accrualTime,
-                        followUpTime[iCase], fixedExposureTime,
+                        allocationRatio,
+                        overdispersion,
+                        accrualTime,
+                        followUpTime[iCase],
+                        fixedExposureTime,
                         numberOfSubjectsPerStage,
-                        recruit1[1:(ar * numberOfSubjectsPerStage / (1 + ar))],
-                        recruit2[1:(numberOfSubjectsPerStage / (1 + ar))]
+                        recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
+                        recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
                     )
                 }
-            }    
+            }
         }
     }
 
@@ -770,28 +1027,15 @@ getSampleSizeCounts <- function(design = NULL, ...,
             }
 
             if (!any(is.na(accrualIntensity))) {
-                const <- allocationRatioPlanned[iCase] / (1 + allocationRatioPlanned[iCase])
-                if (length(accrualIntensity) == 1) {
-                    recruit1 <- seq(0, accrualTime[length(accrualIntensity)],
-                        length.out = accrualTime[length(accrualIntensity)] * accrualIntensity[1] * const
-                    )
-                    recruit2 <- seq(0, accrualTime[length(accrualIntensity)],
-                        length.out = accrualTime[length(accrualIntensity)] * accrualIntensity[1] * (1 - const)
-                    )
-                } else {
-                    recruit1 <- seq(0, accrualTime[1], length.out = accrualTime[1] * accrualIntensity[1] * const)
-                    recruit2 <- seq(0, accrualTime[1], length.out = accrualTime[1] * accrualIntensity[1] * (1 - const))
-                    for (i in 2:length(accrualIntensity)) {
-                        recruit1 <- c(recruit1, seq(accrualTime[i - 1] + 1 / accrualIntensity[i],
-                            accrualTime[i],
-                            length.out = (accrualTime[i] - accrualTime[i - 1]) * accrualIntensity[i] * const
-                        ))
-                        recruit2 <- c(recruit2, seq(accrualTime[i - 1] + 1 / accrualIntensity[i],
-                            accrualTime[i],
-                            length.out = (accrualTime[i] - accrualTime[i - 1]) * accrualIntensity[i] * (1 - const)
-                        ))
-                    }
-                }
+                # build up general recruitment times
+                recruitmentTimes <- .generateRecruitmentTimes(
+                    allocationRatioPlanned[iCase],
+                    accrualTime,
+                    accrualIntensity
+                )
+                recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
+                recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
+
                 n1[iCase] <- length(recruit1)
                 n2[iCase] <- length(recruit2)
                 studyTime[iCase] <- .getCalendarTime(
@@ -1135,6 +1379,7 @@ getPowerCounts <- function(design = NULL, ...,
     if (length(accrualTime) > 1) {
         accrualTime <- accrualTime[-1]
     }
+
     directionUpper <- .assertIsValidDirectionUpper(directionUpper,
         design,
         objectType = "power", userFunctionCallEnabled = TRUE
@@ -1147,28 +1392,14 @@ getPowerCounts <- function(design = NULL, ...,
     overallReject <- rep(NA_real_, totalCases)
 
     if (!any(is.na(accrualIntensity))) {
-        const <- allocationRatioPlanned / (1 + allocationRatioPlanned)
-        if (length(accrualIntensity) == 1) {
-            recruit1 <- seq(0, accrualTime[length(accrualIntensity)],
-                length.out = accrualTime[length(accrualIntensity)] * accrualIntensity[1] * const
-            )
-            recruit2 <- seq(0, accrualTime[length(accrualIntensity)],
-                length.out = accrualTime[length(accrualIntensity)] * accrualIntensity[1] * (1 - const)
-            )
-        } else {
-            recruit1 <- seq(0, accrualTime[1], length.out = accrualTime[1] * accrualIntensity[1] * const)
-            recruit2 <- seq(0, accrualTime[1], length.out = accrualTime[1] * accrualIntensity[1] * (1 - const))
-            for (i in 2:length(accrualIntensity)) {
-                recruit1 <- c(recruit1, seq(accrualTime[i - 1] + 1 / accrualIntensity[i],
-                    accrualTime[i],
-                    length.out = (accrualTime[i] - accrualTime[i - 1]) * accrualIntensity[i] * const
-                ))
-                recruit2 <- c(recruit2, seq(accrualTime[i - 1] + 1 / accrualIntensity[i],
-                    accrualTime[i],
-                    length.out = (accrualTime[i] - accrualTime[i - 1]) * accrualIntensity[i] * (1 - const)
-                ))
-            }
-        }
+        # build up general recruitment times
+        recruitmentTimes <- .generateRecruitmentTimes(
+            allocationRatioPlanned,
+            accrualTime,
+            accrualIntensity
+        )
+        recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
+        recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
         n1 <- length(recruit1)
         n2 <- length(recruit2)
         nTotal <- n1 + n2
@@ -1222,6 +1453,7 @@ getPowerCounts <- function(design = NULL, ...,
         "maxNumberOfSubjects",
         ifelse(any(is.na(accrualIntensity)), C_PARAM_USER_DEFINED, C_PARAM_GENERATED)
     )
+
     designPlan$maxNumberOfSubjects1 <- n1
     designPlan$.setParameterType(
         "maxNumberOfSubjects1",
