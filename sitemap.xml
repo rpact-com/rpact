@@ -83,6 +83,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/as251Normal.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/as251StudentT.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/checkInstallationQualificationStatus.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/dataEnrichmentMeans.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/dataEnrichmentMeansStratified.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/dataEnrichmentRates.html</loc></url>
@@ -95,6 +96,8 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/dataMultiArmSurvival.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/dataRates.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/dataSurvival.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/disableStartupMessages.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/enableStartupMessages.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/fetch.ParameterSet.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getAccrualTime.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getAnalysisResults.html</loc></url>
@@ -232,7 +235,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/param_nPlanned.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_niceColumnNamesEnabled.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_normalApproximation.html</loc></url>
-<url><loc>https://rpact-com.github.io/rpact/reference/param_overDispersion_counts.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/param_overdispersion_counts.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_palette.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_pi1_rates.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/param_pi1_survival.html</loc></url>

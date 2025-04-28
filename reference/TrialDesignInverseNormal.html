@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.2.1.9286</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -140,6 +140,14 @@ with suitable arguments to create a inverse normal design.</p>
 
 <dt><code>userBetaSpending</code></dt>
 <dd><p>The user defined beta spending. Contains the cumulative beta-spending up to each interim stage. Is a numeric vector of length <code>kMax</code> containing values between 0 and 1.</p></dd>
+
+
+<dt><code>efficacyStops</code></dt>
+<dd><p>Logical vector indicating efficacy stops Is a logical vector of length <code>kMax</code> minus 1.</p></dd>
+
+
+<dt><code>futilityStops</code></dt>
+<dd><p>Logical vector indicating futility stops Is a logical vector of length <code>kMax</code> minus 1.</p></dd>
 
 
 <dt><code>power</code></dt>
