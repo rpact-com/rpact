@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8691 $
-## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8695 $
+## |  Last changed: $Date: 2025-04-24 14:37:00 +0200 (Do, 24 Apr 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_logger.R
@@ -389,7 +389,7 @@ NULL
             results$.setParameterType("finalConfidenceIntervalLowerBounds", C_PARAM_GENERATED)
             results$.setParameterType("finalConfidenceIntervalUpperBounds", C_PARAM_GENERATED)
             results$.setParameterType("medianUnbiasedEstimates", C_PARAM_GENERATED)
-            
+
             if (!.isTrialDesignFisher(design) && !is.na(stdErrorEstimate)) {
                 results$.setParameterType("stdErrorEstimate", ifelse(
                     stdErrorEstimate == C_RATES_STD_ERROR_ESTIMATE_DEFAULT,
@@ -397,7 +397,7 @@ NULL
                 ))
                 results$stdErrorEstimate <- stdErrorEstimate
             }
-            
+
             .logProgress("Final confidence interval calculated", startTime = startTime)
         }
     }
@@ -1450,48 +1450,53 @@ NULL
     ))
 }
 
-#'
-#' Calculation of final confidence interval
-#' based on group sequential test without SSR (general case).
-#'
-#' @noRd
-#'
-.getFinalConfidenceIntervalRatesGroupSequential <- function(...,
-        design,
-        dataInput,
-        stage,
-        thetaH0 = C_THETA_H0_RATES_DEFAULT,
-        directionUpper = NA,
-        normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
-        stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
-    stageResults <- .getStageResultsRates(
-        design = design,
-        dataInput = dataInput,
-        stage = stage,
-        thetaH0 = thetaH0,
-        directionUpper = directionUpper,
-        normalApproximation = normalApproximation
-    )
 
+.getFinalConfidenceIntervalRatesValues <- function(design,
+        dataInput,
+        stageResults,
+        directionUpper,
+        normalApproximation,
+        thetaH0,
+        stage,
+        stdErrorEstimate,
+        tolerance) {
     finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
     medianUnbiasedGeneral <- NA_real_
 
     finalConfidenceInterval <- rep(NA_real_, 2)
     medianUnbiased <- NA_real_
 
-    designStage <- .getStageGroupSeq(design = design, stageResults = stageResults, stage = stage)
+    if (.isTrialDesignGroupSequential(design)) {
+        designStage <- .getStageGroupSeq(design = design, stageResults = stageResults, stage = stage)
+    } else {
+        designStage <- .getStageInverseNormal(design = design, stageResults = stageResults, stage = stage)
+    }
+
     finalStage <- min(designStage, design$kMax)
+
+    firstParameterName <- ifelse(.isTrialDesignGroupSequential(design),
+        "overallPValues", "combInverseNormal"
+    )
 
     # No early efficacy stopping design
     if (stage == design$kMax && .isNoEarlyEfficacy(design)) {
-        finalConfidenceInterval <- .getRepeatedConfidenceIntervalsRatesGroupSequential(
-            design = design,
-            dataInput = dataInput,
-            normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
-            directionUpper = directionUpper,
-            tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        )[, design$kMax]
+        if (.isTrialDesignGroupSequential(design)) {
+            finalConfidenceInterval <- .getRepeatedConfidenceIntervalsRatesGroupSequential(
+                design = design,
+                dataInput = dataInput,
+                normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+                directionUpper = directionUpper,
+                tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+            )[, design$kMax]
+        } else {
+            finalConfidenceInterval <- .getRepeatedConfidenceIntervalsRatesInverseNormal(
+                design = design,
+                dataInput = dataInput,
+                normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+                directionUpper = directionUpper,
+                tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+            )[, design$kMax]
+        }
         medianUnbiased <- (finalConfidenceInterval[1] + finalConfidenceInterval[2]) / 2
     }
     # early stopping or at end of study
@@ -1517,12 +1522,20 @@ NULL
                         1 / stageResults$overallSampleSizes2[finalStage])
             }
         } else {
+            if (.isTrialDesignInverseNormal(design) && design$kMax > 2 && !.isNoEarlyEfficacy(design)) {
+                message(
+                    "Calculation of final confidence interval performed for kMax = ", design$kMax,
+                    " (for kMax > 2, it is theoretically shown that it is valid only ",
+                    "if no sample size change was performed)"
+                )
+            }
+
             finalConfidenceIntervalGeneral[1] <- .getDecisionMatrixRoot(
                 design = design,
                 stage = finalStage,
                 stageResults = stageResults,
                 tolerance = tolerance,
-                firstParameterName = "overallPValues",
+                firstParameterName = firstParameterName,
                 case = "finalConfidenceIntervalGeneralLower"
             )
 
@@ -1531,7 +1544,7 @@ NULL
                 stage = finalStage,
                 stageResults = stageResults,
                 tolerance = tolerance,
-                firstParameterName = "overallPValues",
+                firstParameterName = firstParameterName,
                 case = "finalConfidenceIntervalGeneralUpper"
             )
 
@@ -1540,7 +1553,7 @@ NULL
                 stage = finalStage,
                 stageResults = stageResults,
                 tolerance = tolerance,
-                firstParameterName = "overallPValues",
+                firstParameterName = firstParameterName,
                 case = "medianUnbiasedGeneral"
             )
         }
@@ -1550,24 +1563,74 @@ NULL
         }
 
         if (!is.na(finalStage)) {
-            result <- .getFinalConfidenceIntervalRatesFinalStage(
-                design = design,
-                dataInput = dataInput,
-                thetaH0 = thetaH0,
-                directionUpper = directionUpper,
-                stdErrorEstimate = stdErrorEstimate,
-                tolerance = tolerance,
-                stageResults = stageResults,
-                normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
-                firstParameterName = "overallPValues",
-                finalConfidenceIntervalGeneral = finalConfidenceIntervalGeneral,
-                medianUnbiasedGeneral = medianUnbiasedGeneral,
-                designStage = designStage,
-                finalStage = finalStage
-            )
-            finalConfidenceInterval <- result$finalConfidenceInterval
-            medianUnbiased <- result$medianUnbiased
+            if (dataInput$getNumberOfGroups() == 1) {
+                stErrRates <- sqrt(stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage] *
+                    (1 - stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage])) /
+                    sqrt(stageResults$overallSampleSizes[finalStage])
+            } else {
+                if (identical(stdErrorEstimate, "unpooled")) {
+                    stErrRates <- sqrt(stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage] *
+                        (1 - stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage]) /
+                        stageResults$overallSampleSizes1[finalStage] +
+                        stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage] *
+                            (1 - stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage]) /
+                            stageResults$overallSampleSizes2[finalStage])
+                } else {
+                    piPooled <- (stageResults$overallEvents1[finalStage] + stageResults$overallEvents2[finalStage]) /
+                        (stageResults$overallSampleSizes1[finalStage] + stageResults$overallSampleSizes2[finalStage])
+                    stErrRates <- sqrt(piPooled * (1 - piPooled) *
+                        (1 / stageResults$overallSampleSizes1[finalStage] + 1 / stageResults$overallSampleSizes2[finalStage]))
+                }
+            }
+
+            finalConfidenceInterval <- rep(NA_real_, 2)
+            medianUnbiased <- NA_real_
+            if (designStage == 1) {
+                args <- list(
+                    design = design,
+                    dataInput = dataInput,
+                    stage = 1,
+                    directionUpper = TRUE,
+                    normalApproximation = normalApproximation,
+                    firstParameterName = firstParameterName,
+                    secondValue = .getOneMinusQNorm(design$alpha / design$sided),
+                    tolerance = tolerance,
+                    acceptResultsOutOfTolerance = TRUE,
+                    callingFunctionInformation = "Final confidence interval [1]"
+                )
+                finalConfidenceInterval[1] <- do.call(.getRootThetaRates, args)
+                args$directionUpper <- FALSE
+                args$callingFunctionInformation <- "Final confidence interval [2]"
+                finalConfidenceInterval[2] <- do.call(.getRootThetaRates, args)
+                medianUnbiased <- stageResults$effectSizes[1]
+            } else {
+                directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
+                if (dataInput$getNumberOfGroups() == 1) {
+                    finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] *
+                        sqrt(stageResults$overallSampleSizes[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] *
+                        sqrt(stageResults$overallSampleSizes[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    medianUnbiased <- medianUnbiasedGeneral * sqrt(stageResults$overallSampleSizes[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                } else {
+                    finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] /
+                        sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
+                            1 / stageResults$overallSampleSizes2[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] /
+                        sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
+                            1 / stageResults$overallSampleSizes2[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                    medianUnbiased <- medianUnbiasedGeneral /
+                        sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
+                            1 / stageResults$overallSampleSizes2[finalStage]) *
+                        stErrRates + directionUpperSign * thetaH0
+                }
+            }
         }
+
         if (isFALSE(directionUpper)) {
             medianUnbiasedGeneral <- -medianUnbiasedGeneral
             finalConfidenceIntervalGeneral <- -finalConfidenceIntervalGeneral
@@ -1604,98 +1667,62 @@ NULL
         medianUnbiasedGeneral = medianUnbiasedGeneral,
         finalConfidenceIntervalGeneral = finalConfidenceIntervalGeneral,
         medianUnbiased = medianUnbiased,
-        finalConfidenceInterval = finalConfidenceInterval,
-        stdErrorEstimate = stdErrorEstimate
+        finalConfidenceInterval = finalConfidenceInterval
     ))
 }
 
-.getFinalConfidenceIntervalRatesFinalStage <- function(...,
+
+#'
+#' Calculation of final confidence interval
+#' based on group sequential test without SSR (general case).
+#'
+#' @noRd
+#'
+.getFinalConfidenceIntervalRatesGroupSequential <- function(...,
         design,
         dataInput,
-        thetaH0,
-        directionUpper,
-        stdErrorEstimate,
-        tolerance,
-        stageResults,
-        normalApproximation,
-        firstParameterName,
-        finalConfidenceIntervalGeneral,
-        medianUnbiasedGeneral,
-        designStage,
-        finalStage) {
-    # retransformation
-    if (dataInput$getNumberOfGroups() == 1) {
-        stErrRates <- sqrt(stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage] *
-            (1 - stageResults$overallEvents[finalStage] / stageResults$overallSampleSizes[finalStage])) /
-            sqrt(stageResults$overallSampleSizes[finalStage])
-    } else {
-        if (identical(stdErrorEstimate, "unpooled")) {
-            stErrRates <- sqrt(stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage] *
-                (1 - stageResults$overallEvents1[finalStage] / stageResults$overallSampleSizes1[finalStage]) /
-                stageResults$overallSampleSizes1[finalStage] +
-                stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage] *
-                    (1 - stageResults$overallEvents2[finalStage] / stageResults$overallSampleSizes2[finalStage]) /
-                    stageResults$overallSampleSizes2[finalStage])
-        } else {
-            piPooled <- (stageResults$overallEvents1[finalStage] + stageResults$overallEvents2[finalStage]) /
-                (stageResults$overallSampleSizes1[finalStage] + stageResults$overallSampleSizes2[finalStage])
-            stErrRates <- sqrt(piPooled * (1 - piPooled) *
-                (1 / stageResults$overallSampleSizes1[finalStage] + 1 / stageResults$overallSampleSizes2[finalStage]))
-        }
-    }
+        stage,
+        thetaH0 = C_THETA_H0_RATES_DEFAULT,
+        directionUpper = NA,
+        normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+        stdErrorEstimate = NA_character_,
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+    stageResults <- .getStageResultsRates(
+        design = design,
+        dataInput = dataInput,
+        stage = stage,
+        thetaH0 = thetaH0,
+        directionUpper = directionUpper,
+        normalApproximation = normalApproximation
+    )
 
-    finalConfidenceInterval <- rep(NA_real_, 2)
-    medianUnbiased <- NA_real_
-    if (designStage == 1) {
-        args <- list(
-            design = design,
-            dataInput = dataInput,
-            stage = 1,
-            directionUpper = TRUE,
-            normalApproximation = normalApproximation,
-            firstParameterName = firstParameterName,
-            secondValue = .getOneMinusQNorm(design$alpha / design$sided),
-            tolerance = tolerance,
-            acceptResultsOutOfTolerance = TRUE,
-            callingFunctionInformation = "Final confidence interval [1]"
-        )
-        finalConfidenceInterval[1] <- do.call(.getRootThetaRates, args)
-        args$directionUpper <- FALSE
-        args$callingFunctionInformation <- "Final confidence interval [2]"
-        finalConfidenceInterval[2] <- do.call(.getRootThetaRates, args)
-        medianUnbiased <- stageResults$effectSizes[1]
-    } else {
-        directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
-        if (dataInput$getNumberOfGroups() == 1) {
-            finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] *
-                sqrt(stageResults$overallSampleSizes[finalStage]) *
-                stErrRates + directionUpperSign * thetaH0
-            finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] *
-                sqrt(stageResults$overallSampleSizes[finalStage]) *
-                stErrRates + directionUpperSign * thetaH0
-            medianUnbiased <- medianUnbiasedGeneral * sqrt(stageResults$overallSampleSizes[finalStage]) *
-                stErrRates + directionUpperSign * thetaH0
-        } else {
-            finalConfidenceInterval[1] <- finalConfidenceIntervalGeneral[1] /
-                sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                    1 / stageResults$overallSampleSizes2[finalStage]) *
-                stErrRates + directionUpperSign * thetaH0
-            finalConfidenceInterval[2] <- finalConfidenceIntervalGeneral[2] /
-                sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                    1 / stageResults$overallSampleSizes2[finalStage]) *
-                stErrRates + directionUpperSign * thetaH0
-            medianUnbiased <- medianUnbiasedGeneral /
-                sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                    1 / stageResults$overallSampleSizes2[finalStage]) *
-                stErrRates + directionUpperSign * thetaH0
-        }
-    }
+    finalConfidenceIntervalRatesValues <- .getFinalConfidenceIntervalRatesValues(
+        design,
+        dataInput,
+        stageResults,
+        directionUpper,
+        normalApproximation,
+        thetaH0,
+        stage,
+        stdErrorEstimate,
+        tolerance
+    )
 
     return(list(
-        finalConfidenceInterval = finalConfidenceInterval,
-        medianUnbiased = medianUnbiased
+        stage = stage,
+        thetaH0 = thetaH0,
+        directionUpper = directionUpper,
+        normalApproximation = normalApproximation,
+        tolerance = tolerance,
+        stdErrorEstimate = stdErrorEstimate,
+        finalStage = finalConfidenceIntervalRatesValues$finalStage,
+        medianUnbiasedGeneral = finalConfidenceIntervalRatesValues$medianUnbiasedGeneral,
+        finalConfidenceIntervalGeneral = finalConfidenceIntervalRatesValues$finalConfidenceIntervalGeneral,
+        medianUnbiased = finalConfidenceIntervalRatesValues$medianUnbiased,
+        finalConfidenceInterval = finalConfidenceIntervalRatesValues$finalConfidenceInterval
     ))
 }
+
 
 #'
 #' Calculation of final confidence interval
@@ -1721,133 +1748,17 @@ NULL
         normalApproximation = normalApproximation
     )
 
-    finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
-    medianUnbiasedGeneral <- NA_real_
-
-    finalConfidenceInterval <- rep(NA_real_, 2)
-    medianUnbiased <- NA_real_
-
-    designStage <- .getStageInverseNormal(design = design, stageResults = stageResults, stage = stage)
-    finalStage <- min(designStage, design$kMax)
-
-    # No early efficacy stopping design
-    if (stage == design$kMax && .isNoEarlyEfficacy(design)) {
-        finalConfidenceInterval <- .getRepeatedConfidenceIntervalsRatesInverseNormal(
-            design = design,
-            dataInput = dataInput,
-            normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
-            directionUpper = directionUpper,
-            tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        )[, design$kMax]
-        medianUnbiased <- (finalConfidenceInterval[1] + finalConfidenceInterval[2]) / 2
-    }
-    # early stopping or at end of study
-    else if (designStage < design$kMax || stage == design$kMax) {
-        if (designStage == 1) {
-            finalConfidenceIntervalGeneral[1] <- stageResults$combInverseNormal[1] -
-                .getOneMinusQNorm(design$alpha / design$sided)
-            finalConfidenceIntervalGeneral[2] <- stageResults$combInverseNormal[1] +
-                .getOneMinusQNorm(design$alpha / design$sided)
-            medianUnbiasedGeneral <- stageResults$combInverseNormal[1]
-
-            if (dataInput$getNumberOfGroups() == 1) {
-                finalConfidenceIntervalGeneral <- finalConfidenceIntervalGeneral /
-                    sqrt(stageResults$overallSampleSizes[1])
-                medianUnbiasedGeneral <- medianUnbiasedGeneral /
-                    sqrt(stageResults$overallSampleSizes[1])
-            } else {
-                finalConfidenceIntervalGeneral <- finalConfidenceIntervalGeneral *
-                    sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                        1 / stageResults$overallSampleSizes2[finalStage])
-                medianUnbiasedGeneral <- medianUnbiasedGeneral *
-                    sqrt(1 / stageResults$overallSampleSizes1[finalStage] +
-                        1 / stageResults$overallSampleSizes2[finalStage])
-            }
-        } else {
-            if ((design$kMax > 2) && !.isNoEarlyEfficacy(design)) {
-                message(
-                    "Calculation of final confidence interval performed for kMax = ", design$kMax,
-                    " (for kMax > 2, it is theoretically shown that it is valid only ",
-                    "if no sample size change was performed)"
-                )
-            }
-
-            finalConfidenceIntervalGeneral[1] <- .getDecisionMatrixRoot(
-                design = design,
-                stage = finalStage,
-                stageResults = stageResults,
-                tolerance = tolerance,
-                firstParameterName = "combInverseNormal",
-                case = "finalConfidenceIntervalGeneralLower"
-            )
-
-            finalConfidenceIntervalGeneral[2] <- .getDecisionMatrixRoot(
-                design = design,
-                stage = finalStage,
-                stageResults = stageResults,
-                tolerance = tolerance,
-                firstParameterName = "combInverseNormal",
-                case = "finalConfidenceIntervalGeneralUpper"
-            )
-
-            medianUnbiasedGeneral <- .getDecisionMatrixRoot(
-                design = design,
-                stage = finalStage,
-                stageResults = stageResults,
-                tolerance = tolerance,
-                firstParameterName = "combInverseNormal",
-                case = "medianUnbiasedGeneral"
-            )
-        }
-
-        if (any(is.na(finalConfidenceIntervalGeneral)) && (designStage > 1)) {
-            finalStage <- NA_integer_
-        }
-
-        if (!is.na(finalStage)) {
-            result <- .getFinalConfidenceIntervalRatesFinalStage(
-                design = design,
-                dataInput = dataInput,
-                thetaH0 = thetaH0,
-                directionUpper = directionUpper,
-                stdErrorEstimate = stdErrorEstimate,
-                tolerance = tolerance,
-                stageResults = stageResults,
-                normalApproximation = TRUE,
-                firstParameterName = "combInverseNormal",
-                finalConfidenceIntervalGeneral = finalConfidenceIntervalGeneral,
-                medianUnbiasedGeneral = medianUnbiasedGeneral,
-                designStage = designStage,
-                finalStage = finalStage
-            )
-            finalConfidenceInterval <- result$finalConfidenceInterval
-            medianUnbiased <- result$medianUnbiased
-        }
-
-        if (isFALSE(directionUpper)) {
-            medianUnbiasedGeneral <- -medianUnbiasedGeneral
-            finalConfidenceIntervalGeneral <- -finalConfidenceIntervalGeneral
-            if (designStage > 1) {
-                medianUnbiased <- -medianUnbiased
-                finalConfidenceInterval <- -finalConfidenceInterval
-            }
-        }
-    }
-
-    if (!any(is.na(finalConfidenceIntervalGeneral))) {
-        finalConfidenceIntervalGeneral <- sort(finalConfidenceIntervalGeneral)
-    }
-    if (!any(is.na(finalConfidenceInterval))) {
-        finalConfidenceInterval <- sort(finalConfidenceInterval)
-    }
-
-    if (dataInput$getNumberOfGroups() == 1) {
-        finalConfidenceInterval[1] <- max(0, finalConfidenceInterval[1])
-        finalConfidenceInterval[2] <- min(1, finalConfidenceInterval[2])
-    } else {
-        finalConfidenceInterval[1] <- max(-1, finalConfidenceInterval[1])
-        finalConfidenceInterval[2] <- min(1, finalConfidenceInterval[2])
-    }
+    finalConfidenceIntervalRatesValues <- .getFinalConfidenceIntervalRatesValues(
+        design,
+        dataInput,
+        stageResults,
+        directionUpper,
+        normalApproximation,
+        thetaH0,
+        stage,
+        stdErrorEstimate,
+        tolerance
+    )
 
     return(list(
         stage = stage,
@@ -1856,14 +1767,14 @@ NULL
         normalApproximation = normalApproximation,
         tolerance = tolerance,
         stdErrorEstimate = stdErrorEstimate,
-        finalStage = finalStage,
-        medianUnbiasedGeneral = medianUnbiasedGeneral,
-        finalConfidenceIntervalGeneral = finalConfidenceIntervalGeneral,
-        medianUnbiased = medianUnbiased,
-        finalConfidenceInterval = finalConfidenceInterval,
-        stdErrorEstimate = stdErrorEstimate
+        finalStage = finalConfidenceIntervalRatesValues$finalStage,
+        medianUnbiasedGeneral = finalConfidenceIntervalRatesValues$medianUnbiasedGeneral,
+        finalConfidenceIntervalGeneral = finalConfidenceIntervalRatesValues$finalConfidenceIntervalGeneral,
+        medianUnbiased = finalConfidenceIntervalRatesValues$medianUnbiased,
+        finalConfidenceInterval = finalConfidenceIntervalRatesValues$finalConfidenceInterval
     ))
 }
+
 
 #'
 #' Calculation of final confidence interval
@@ -1878,6 +1789,7 @@ NULL
         thetaH0 = C_THETA_H0_RATES_DEFAULT,
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
+        stdErrorEstimate = NA_character_,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsRates(
         design = design,
@@ -1888,24 +1800,19 @@ NULL
         normalApproximation = normalApproximation
     )
 
-    finalConfidenceInterval <- rep(NA_real_, 2)
-    medianUnbiased <- NA_real_
 
-    stageFisher <- .getStageFisher(design = design, stageResults = stageResults, stage = stage)
+    stageFisher <- .getStageFisher(
+        design = design,
+        stageResults = stageResults,
+        stage = stage
+    )
 
     finalStage <- min(stageFisher, design$kMax)
 
-    # Early stopping or at end of study
-    if (stageFisher < design$kMax || stage == design$kMax) {
-        message(
-            "Calculation of final confidence interval for Fisher's ",
-            "design not implemented yet"
-        )
-        return(list(
-            finalStage = NA_integer_, medianUnbiased = NA_real_,
-            finalConfidenceInterval = rep(NA_real_, design$kMax)
-        ))
-    }
+    message(
+        "Calculation of final confidence interval for Fisher's ",
+        "design not implemented yet"
+    )
 
     return(list(
         stage = stage,
@@ -1914,13 +1821,15 @@ NULL
         normalApproximation = normalApproximation,
         tolerance = tolerance,
         finalStage = finalStage,
-        medianUnbiased = medianUnbiased,
-        finalConfidenceInterval = finalConfidenceInterval
+        medianUnbiasedGeneral = NA_real_,
+        finalConfidenceIntervalGeneral = rep(NA_real_, 2),
+        medianUnbiased = NA_real_,
+        finalConfidenceInterval = rep(NA_real_, 2),
+        stdErrorEstimate = NA_real_
     ))
 }
 
-.getFinalConfidenceIntervalRates <- function(
-        ...,
+.getFinalConfidenceIntervalRates <- function(...,
         design,
         dataInput,
         thetaH0 = NA_real_,
@@ -1929,6 +1838,7 @@ NULL
         stdErrorEstimate = NA_character_,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
+
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
     .warnInCaseOfUnknownArguments(
         functionName = "getFinalConfidenceIntervalRates",
@@ -1953,38 +1863,39 @@ NULL
 
     if (.isTrialDesignGroupSequential(design)) {
         return(.getFinalConfidenceIntervalRatesGroupSequential(
-            design = design, 
-            dataInput = dataInput, 
-            stage = stage, 
+            design = design,
+            dataInput = dataInput,
+            stage = stage,
             thetaH0 = thetaH0,
-            directionUpper = directionUpper, 
+            directionUpper = directionUpper,
             normalApproximation = normalApproximation,
-            stdErrorEstimate = stdErrorEstimate, 
+            stdErrorEstimate = stdErrorEstimate,
             tolerance = tolerance
         ))
     }
 
     if (.isTrialDesignInverseNormal(design)) {
         return(.getFinalConfidenceIntervalRatesInverseNormal(
-            design = design, 
-            dataInput = dataInput, 
-            stage = stage, 
+            design = design,
+            dataInput = dataInput,
+            stage = stage,
             thetaH0 = thetaH0,
-            directionUpper = directionUpper, 
+            directionUpper = directionUpper,
             normalApproximation = normalApproximation,
-            stdErrorEstimate = stdErrorEstimate, 
+            stdErrorEstimate = stdErrorEstimate,
             tolerance = tolerance
         ))
     }
 
     if (.isTrialDesignFisher(design)) {
         return(.getFinalConfidenceIntervalRatesFisher(
-            design = design, 
-            dataInput = dataInput, 
-            stage = stage, 
+            design = design,
+            dataInput = dataInput,
+            stage = stage,
             thetaH0 = thetaH0,
-            directionUpper = directionUpper, 
+            directionUpper = directionUpper,
             normalApproximation = normalApproximation,
+            stdErrorEstimate = stdErrorEstimate,
             tolerance = tolerance
         ))
     }
