@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8670 $
-## |  Last changed: $Date: 2025-04-10 08:07:04 +0200 (Do, 10 Apr 2025) $
+## |  File version: $Revision: 8705 $
+## |  Last changed: $Date: 2025-05-07 10:58:11 +0200 (Mi, 07 Mai 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1229,8 +1229,12 @@ testPackage <- function(outDir = ".",
     }
 
     minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
+    totalNumberOfTests <- NA_integer_
+    numberOfFailedTests <- 0
+    numberOfSkippedTests <- 0
     resultOuputFile <- "testthat.Rout"
     inputFileName <- file.path(resultDir, resultOuputFile)
+    resultMessage <- NA_character_
     if (file.exists(inputFileName)) {
         fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
         totalNumberOfTests <- .getTestthatResultNumberOfTests(fileContent)
@@ -1251,7 +1255,8 @@ testPackage <- function(outDir = ".",
         cat("\n")
 
         cat("Results:\n")
-        cat(.getTestthatResultLine(fileContent), "\n")
+        resultMessage <- .getTestthatResultLine(fileContent)
+        cat(resultMessage, "\n")
         cat("\n")
         cat("Test results were written to directory \n")
         if (!is.null(reportFileName)) {
@@ -1262,10 +1267,10 @@ testPackage <- function(outDir = ".",
         } else {
             cat("'", resultDir, "' (see file ", sQuote(resultOuputFile), ")\n", sep = "")
         }
-        skipped <- .getTestthatResultNumberOfSkippedTests(fileContent)
-        if (skipped > 0) {
+        numberOfSkippedTests <- .getTestthatResultNumberOfSkippedTests(fileContent)
+        if (numberOfSkippedTests > 0) {
             cat("-------------------------------------------------------------------------\n")
-            cat("Note that ", skipped, " tests were skipped; ",
+            cat("Note that ", numberOfSkippedTests, " tests were skipped; ",
                 "a possible reason may be that expected \n",
                 "error messages could not be tested ",
                 "because of local translation.\n",
@@ -1297,7 +1302,8 @@ testPackage <- function(outDir = ".",
                 cat(numberOfFailedTests, " unit tests failed :(\n", sep = "")
             }
             cat("Results:\n")
-            cat(.getTestthatResultLine(fileContent), "\n")
+            resultMessage <- .getTestthatResultLine(fileContent)
+            cat(resultMessage, "\n")
             cat("Test results were written to directory ")
             if (!is.null(reportFileName)) {
                 cat("'", testFileTargetDirectory, "' (see file(s) ",
@@ -1322,7 +1328,19 @@ testPackage <- function(outDir = ".",
         cat("Use testPackage(completeUnitTestSetEnabled = TRUE) to perform all unit tests.\n")
     }
 
-    invisible(.isCompleteUnitTestSetEnabled())
+    return(invisible(list(
+        completeUnitTestSetEnabled = completeUnitTestSetEnabled,
+        testFileDirectory = testFileDirectory,
+        testFileTargetDirectory = testFileTargetDirectory,
+        resultDir = resultDir,
+        resultOuputFile = resultOuputFile,
+        reportFileName = reportFileName,
+        minNumberOfExpectedTests = minNumberOfExpectedTests,
+        totalNumberOfTests = totalNumberOfTests,
+        numberOfFailedTests = numberOfFailedTests,
+        numberOfSkippedTests = numberOfSkippedTests,
+        resultMessage = resultMessage
+    )))
 }
 
 .testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", Ropts = character()) {
