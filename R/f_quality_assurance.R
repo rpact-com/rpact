@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8705 $
-## |  Last changed: $Date: 2025-05-07 10:58:11 +0200 (Mi, 07 Mai 2025) $
+## |  File version: $Revision: 8706 $
+## |  Last changed: $Date: 2025-05-07 16:03:42 +0200 (Mi, 07 Mai 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -950,7 +950,7 @@ setupPackageTests <- function(token, secret) {
 #' members of the rpact user group as part of the validation documentation.
 #' For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}{rpact_installation_qualification}.
 #'
-#' @return Invisibly returns the value of \code{completeUnitTestSetEnabled}.
+#' @return Invisibly returns an \code{\link[=InstallatinQualificationResult]{InstallatinQualificationResult}}) object.
 #'
 #' @references For more information, please visit: <https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/>
 #'
@@ -976,7 +976,8 @@ setupPackageTests <- function(token, secret) {
 #'
 #' @export
 #'
-testPackage <- function(outDir = ".",
+testPackage <- function(
+        outDir = ".",
         ...,
         completeUnitTestSetEnabled = TRUE,
         connection = list(token = NULL, secret = NULL),
@@ -1069,9 +1070,12 @@ testPackage <- function(outDir = ".",
         )
     }
     if (is.null(author) || length(author) != 1 || is.na(author)) {
+        author <- .getOptionalArgument("author", ...)
+    }
+    if (is.null(author) || length(author) != 1 || is.na(author) || nchar(trimws(author)) == 0) {
         author <- "RPACT"
     }
-
+    
     downloadOnlyModeEnabled <- is.na(testFileDirectory) &&
         isTRUE(downloadTestsOnly) && isTRUE(credentialsAvailable)
 
@@ -1180,6 +1184,7 @@ testPackage <- function(outDir = ".",
         }
 
         markdownReportFileName <- "rpact_test_result_report.md"
+        testFileTargetDirectory <- gsub("\\\\", "/", testFileTargetDirectory)
         testthatCommands <- paste0(
             "\n",
             "library(testthat)\n",
