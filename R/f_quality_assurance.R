@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8670 $
-## |  Last changed: $Date: 2025-04-10 08:07:04 +0200 (Do, 10 Apr 2025) $
+## |  File version: $Revision: 8706 $
+## |  Last changed: $Date: 2025-05-07 16:03:42 +0200 (Mi, 07 Mai 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -74,23 +74,30 @@ NULL
 }
 
 .getTestthatResultLine <- function(fileContent) {
-    if (grepl("\\[ OK:", fileContent)) {
-        indexStart <- regexpr("\\[ OK: \\d", fileContent)[[1]]
-        indexEnd <- regexpr("FAILED: \\d{1,5} \\]", fileContent)
-        indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
-        resultPart <- substr(fileContent, indexStart, indexEnd)
-        return(resultPart)
-    }
+    tryCatch(
+        {
+            if (grepl("\\[ OK:", fileContent)) {
+                indexStart <- regexpr("\\[ OK: \\d", fileContent)[[1]]
+                indexEnd <- regexpr("FAILED: \\d{1,5} \\]", fileContent)
+                indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
+                resultPart <- substr(fileContent, indexStart, indexEnd)
+                return(resultPart)
+            }
 
-    indexStart <- regexpr("\\[ FAIL \\d", fileContent)[[1]]
-    if (indexStart == -1) {
-        return("[ FAIL 0 | WARN 0 | SKIP 0 | PASS 0 ]")
-    }
+            indexStart <- regexpr("\\[ FAIL \\d", fileContent)[[1]]
+            if (indexStart == -1) {
+                return("[ FAIL 0 | WARN 0 | SKIP 0 | PASS 0 ]")
+            }
 
-    indexEnd <- regexpr("PASS \\d{1,5} \\]", fileContent)
-    indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
-    resultPart <- substr(fileContent, indexStart, indexEnd)
-    return(resultPart)
+            indexEnd <- regexpr("PASS \\d{1,5} \\]", fileContent)
+            indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
+            resultPart <- substr(fileContent, indexStart, indexEnd)
+            return(resultPart)
+        },
+        error = function(e) {
+            return(NA_character_)
+        }
+    )
 }
 
 .getTestthatResultNumberOfTests <- function(fileContent) {
@@ -109,35 +116,49 @@ NULL
 }
 
 .getTestthatResultNumberOfFailures <- function(fileContent) {
-    if (grepl("FAILED:", fileContent)) {
-        line <- .getTestthatResultLine(fileContent)
-        index <- regexpr("FAILED: \\d{1,5} \\]", line)
-        indexStart <- index[[1]] + 8
-        indexEnd <- index[[1]] + attr(index, "match.length") - 3
-        return(substr(line, indexStart, indexEnd))
-    }
+    tryCatch(
+        {
+            if (grepl("FAILED:", fileContent)) {
+                line <- .getTestthatResultLine(fileContent)
+                index <- regexpr("FAILED: \\d{1,5} \\]", line)
+                indexStart <- index[[1]] + 8
+                indexEnd <- index[[1]] + attr(index, "match.length") - 3
+                return(as.integer(substr(line, indexStart, indexEnd)))
+            }
 
-    line <- .getTestthatResultLine(fileContent)
-    index <- regexpr("FAIL \\d{1,5} ", line)
-    indexStart <- index[[1]] + 5
-    indexEnd <- index[[1]] + attr(index, "match.length") - 2
-    return(substr(line, indexStart, indexEnd))
+            line <- .getTestthatResultLine(fileContent)
+            index <- regexpr("FAIL \\d{1,5} ", line)
+            indexStart <- index[[1]] + 5
+            indexEnd <- index[[1]] + attr(index, "match.length") - 2
+            return(as.integer(substr(line, indexStart, indexEnd)))
+        },
+        error = function(e) {
+            return(NA_integer_)
+        }
+    )
 }
 
 .getTestthatResultNumberOfSkippedTests <- function(fileContent) {
-    if (grepl("SKIPPED:", fileContent)) {
-        line <- .getTestthatResultLine(fileContent)
-        index <- regexpr("SKIPPED: \\d{1,5} {1,1}", line)
-        indexStart <- index[[1]] + 9
-        indexEnd <- index[[1]] + attr(index, "match.length") - 2
-        return(substr(line, indexStart, indexEnd))
-    }
+    tryCatch(
+        {
+            if (grepl("SKIPPED:", fileContent)) {
+                line <- .getTestthatResultLine(fileContent)
+                index <- regexpr("SKIPPED: \\d{1,5} {1,1}", line)
+                indexStart <- index[[1]] + 9
+                indexEnd <- index[[1]] + attr(index, "match.length") - 2
+                return(as.integer(substr(line, indexStart, indexEnd)))
+            }
 
-    line <- .getTestthatResultLine(fileContent)
-    index <- regexpr("SKIP \\d{1,5} {1,1}", line)
-    indexStart <- index[[1]] + 5
-    indexEnd <- index[[1]] + attr(index, "match.length") - 2
-    return(substr(line, indexStart, indexEnd))
+            line <- .getTestthatResultLine(fileContent)
+            index <- regexpr("SKIP \\d{1,5} {1,1}", line)
+            indexStart <- index[[1]] + 5
+            indexEnd <- index[[1]] + attr(index, "match.length") - 2
+            return(as.integer(substr(line, indexStart, indexEnd)))
+        },
+        error = function(e) {
+            return(NA_integer_)
+        }
+    )
 }
 
 # testFileTargetDirectory <- "D:/R/_temp/test_debug"
@@ -601,31 +622,31 @@ NULL
 #' }
 #'
 #' @keywords internal
-#' 
-#' @noRd 
+#'
+#' @noRd
 #'
 .isStartupMessagingEnabled <- function() {
     if (isFALSE(as.logical(base::getOption("rpact.startup.message.enabled")))) {
         return(FALSE)
     }
-    
+
     lastShownTime <- base::getOption("rpact.startup.message.timestamp")
     currentTime <- Sys.time()
     if (is.null(lastShownTime) || !grepl("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", lastShownTime)) {
         base::options("rpact.startup.message.timestamp" = currentTime)
         return(TRUE)
     }
-    
+
     lastShownTime <- as.POSIXct(lastShownTime, tz = "UTC")
     timeDiff <- as.numeric(difftime(currentTime, lastShownTime, units = "mins"))
-    
+
     # If the time difference is greater than 72 hours, show the message again
     if (timeDiff > 72 * 60) {
         base::options("rpact.startup.message.timestamp" = currentTime)
         saveOptions()
         return(TRUE)
     }
-    
+
     return(FALSE)
 }
 
@@ -651,12 +672,12 @@ NULL
 #' @export
 #'
 #' @keywords internal
-#' 
+#'
 disableStartupMessages <- function() {
     if (isFALSE(as.logical(base::getOption("rpact.startup.message.enabled")))) {
         return(invisible())
     }
-    
+
     base::options("rpact.startup.message.enabled" = FALSE)
     saveOptions()
 }
@@ -681,21 +702,21 @@ disableStartupMessages <- function() {
 #' }
 #'
 #' @export
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 enableStartupMessages <- function() {
     if (isTRUE(as.logical(base::getOption("rpact.startup.message.enabled")))) {
         return(invisible())
     }
-    
+
     base::options("rpact.startup.message.enabled" = TRUE)
     saveOptions()
 }
 
 
-#' 
-#' @title 
+#'
+#' @title
 #' Check Installation Qualification Status
 #'
 #' @description
@@ -705,7 +726,7 @@ enableStartupMessages <- function() {
 #'
 #' @param showMessage A logical value indicating whether to display a message if the
 #' installation qualification has not been completed. Default is \code{TRUE}.
-#' 
+#'
 #' @details
 #' The installation qualification is a critical step in ensuring that the `rpact` package
 #' is correctly installed and validated for use in GxP-relevant environments. This function
@@ -721,18 +742,18 @@ enableStartupMessages <- function() {
 #' }
 #'
 #' @export
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 checkInstallationQualificationStatus <- function(showMessage = TRUE) {
     if (isTRUE(.installationQualificationDone())) {
         return(invisible(TRUE))
     }
-    
+
     if (!isTRUE(showMessage)) {
         return(invisible(FALSE))
     }
-    
+
     message(
         "Installation qualification for rpact ", .getPackageVersionString(),
         " has not yet been performed. Please run testPackage() ",
@@ -929,7 +950,7 @@ setupPackageTests <- function(token, secret) {
 #' members of the rpact user group as part of the validation documentation.
 #' For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}{rpact_installation_qualification}.
 #'
-#' @return Invisibly returns the value of \code{completeUnitTestSetEnabled}.
+#' @return Invisibly returns an \code{\link[=InstallatinQualificationResult]{InstallatinQualificationResult}}) object.
 #'
 #' @references For more information, please visit: <https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/>
 #'
@@ -955,7 +976,8 @@ setupPackageTests <- function(token, secret) {
 #'
 #' @export
 #'
-testPackage <- function(outDir = ".",
+testPackage <- function(
+        outDir = ".",
         ...,
         completeUnitTestSetEnabled = TRUE,
         connection = list(token = NULL, secret = NULL),
@@ -1048,9 +1070,12 @@ testPackage <- function(outDir = ".",
         )
     }
     if (is.null(author) || length(author) != 1 || is.na(author)) {
+        author <- .getOptionalArgument("author", ...)
+    }
+    if (is.null(author) || length(author) != 1 || is.na(author) || nchar(trimws(author)) == 0) {
         author <- "RPACT"
     }
-
+    
     downloadOnlyModeEnabled <- is.na(testFileDirectory) &&
         isTRUE(downloadTestsOnly) && isTRUE(credentialsAvailable)
 
@@ -1146,7 +1171,7 @@ testPackage <- function(outDir = ".",
             connectionType = .getConnectionArgument(connection, "connectionType")
         )
         if (downloadOnlyModeEnabled) {
-            return(invisible())
+            return(invisible(NULL))
         }
     }
 
@@ -1159,6 +1184,7 @@ testPackage <- function(outDir = ".",
         }
 
         markdownReportFileName <- "rpact_test_result_report.md"
+        testFileTargetDirectory <- gsub("\\\\", "/", testFileTargetDirectory)
         testthatCommands <- paste0(
             "\n",
             "library(testthat)\n",
@@ -1189,6 +1215,14 @@ testPackage <- function(outDir = ".",
         recursive = TRUE,
         full.names = TRUE
     )
+    if (length(newResultFiles) == 0) {
+        newResultFiles <- list.files(
+            path = testFileTargetDirectory,
+            pattern = "^testthat\\.Rout(\\.fail)?$",
+            recursive = TRUE,
+            full.names = TRUE
+        )
+    }
 
     resultDir <- file.path(outDir, paste0(pkgName, "-tests"))
     if (!dir.exists(resultDir)) {
@@ -1211,30 +1245,44 @@ testPackage <- function(outDir = ".",
         endTime = endTime, runtimeUnits = "auto"
     ), ".\n", sep = "")
 
-    reportFileName <- NULL
-    if (reportType != "Rout" && !is.null(markdownReportFileName) &&
-            file.exists(file.path(testFileTargetDirectory, markdownReportFileName))) {
-        reportFileName <- character()
+    reportFileNames <- NULL
+    if (reportType != "Rout" && !is.null(markdownReportFileName)) {
+        reportFileNames <- character()
+
+        if (keepSourceFiles && file.exists(file.path(testFileTargetDirectory, markdownReportFileName))) {
+            reportFileNames <- c(reportFileNames, markdownReportFileName)
+        }
+
         reportFileNameHtml <- sub("\\.md$", ".html", markdownReportFileName)
         if (file.exists(file.path(testFileTargetDirectory, reportFileNameHtml))) {
-            reportFileName <- c(reportFileName, reportFileNameHtml)
+            reportFileNames <- c(reportFileNames, reportFileNameHtml)
         }
+
         reportFileNamePdf <- sub("\\.md$", ".pdf", markdownReportFileName)
         if (file.exists(file.path(testFileTargetDirectory, reportFileNamePdf))) {
-            reportFileName <- c(reportFileName, reportFileNamePdf)
+            reportFileNames <- c(reportFileNames, reportFileNamePdf)
         }
-        if (length(reportFileName) == 0) {
-            reportFileName <- markdownReportFileName
+
+        if (length(reportFileNames) > 0) {
+            file.copy(file.path(testFileTargetDirectory, reportFileNames), resultDir)
         }
     }
 
     minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
+    totalNumberOfTests <- NA_integer_
+    numberOfFailedTests <- 0
+    numberOfSkippedTests <- 0
     resultOuputFile <- "testthat.Rout"
     inputFileName <- file.path(resultDir, resultOuputFile)
+    resultMessage <- NA_character_
+    statusMessage <- NA_character_
+    status <- "incomplete"
     if (file.exists(inputFileName)) {
         fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
         totalNumberOfTests <- .getTestthatResultNumberOfTests(fileContent)
         if (completeUnitTestSetEnabled && minNumberOfExpectedTests <= totalNumberOfTests) {
+            statusMessage <- "Installation qualification successfully completed"
+            status <- "success"
             .setSystemIdentifier()
             cat("All unit tests were completed successfully, i.e., the installation \n",
                 "qualification was successful.\n",
@@ -1243,29 +1291,25 @@ testPackage <- function(outDir = ".",
         } else {
             cat("Unit tests were completed successfully.\n")
             if (totalNumberOfTests < minNumberOfExpectedTests) {
-                cat("Only a subset of the ", minNumberOfExpectedTests, "
-					available rpact unit tests were executed.\n", sep = "")
+                cat("Only a subset of the ", minNumberOfExpectedTests,
+                    " available rpact unit tests were executed.\n",
+                    sep = ""
+                )
                 cat("This means the package is not yet validated for use in GxP-compliant settings.\n")
+                statusMessage <- "Installation qualification not completed (only a subset of tests executed)"
             }
         }
         cat("\n")
 
         cat("Results:\n")
-        cat(.getTestthatResultLine(fileContent), "\n")
+        resultMessage <- .getTestthatResultLine(fileContent)
+        cat(resultMessage, "\n")
         cat("\n")
-        cat("Test results were written to directory \n")
-        if (!is.null(reportFileName)) {
-            cat("'", testFileTargetDirectory, "' (see file(s) ",
-                .arrayToString(sQuote(reportFileName), mode = "and"), ")\n",
-                sep = ""
-            )
-        } else {
-            cat("'", resultDir, "' (see file ", sQuote(resultOuputFile), ")\n", sep = "")
-        }
-        skipped <- .getTestthatResultNumberOfSkippedTests(fileContent)
-        if (skipped > 0) {
+        .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
+        numberOfSkippedTests <- .getTestthatResultNumberOfSkippedTests(fileContent)
+        if (numberOfSkippedTests > 0) {
             cat("-------------------------------------------------------------------------\n")
-            cat("Note that ", skipped, " tests were skipped; ",
+            cat("Note that ", numberOfSkippedTests, " tests were skipped; ",
                 "a possible reason may be that expected \n",
                 "error messages could not be tested ",
                 "because of local translation.\n",
@@ -1275,40 +1319,42 @@ testPackage <- function(outDir = ".",
         cat("-------------------------------------------------------------------------\n")
         cat("Please visit www.rpact.com to learn how to use rpact on FDA/GxP-compliant \n",
             "validated corporate computer systems and how to get a copy of the formal \n",
-            "validation documentation that is customized and licensed for exclusive use \n", 
+            "validation documentation that is customized and licensed for exclusive use \n",
             "by your company/organization, e.g., to fulfill regulatory requirements.\n",
             sep = ""
         )
     } else {
         inputFileName <- file.path(resultDir, "testthat.Rout.fail")
+        status <- "failed"
         if (file.exists(inputFileName)) {
             fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
             numberOfFailedTests <- .getTestthatResultNumberOfFailures(fileContent)
             if (completeUnitTestSetEnabled) {
                 if (numberOfFailedTests > 0) {
                     cat(numberOfFailedTests,
-                        " unit tests failed, i.e., the installation qualification was not successful.\n",
+                        " unit test", ifelse(numberOfFailedTests == 1, "", "s"),
+                        " failed, i.e., the installation qualification was not successful.\n",
                         sep = ""
                     )
+                    statusMessage <- paste0("Installation qualification was not successful (", numberOfFailedTests, " failures)")
                 } else {
                     cat("Unexpected failures, i.e., the installation qualification was not successful.\n")
+                    statusMessage <- "Installation qualification was not successful (unexpected failures)"
                 }
             } else {
-                cat(numberOfFailedTests, " unit tests failed :(\n", sep = "")
-            }
-            cat("Results:\n")
-            cat(.getTestthatResultLine(fileContent), "\n")
-            cat("Test results were written to directory ")
-            if (!is.null(reportFileName)) {
-                cat("'", testFileTargetDirectory, "' (see file(s) ",
-                    .arrayToString(sQuote(reportFileName), mode = "and"), ")\n",
+                cat(numberOfFailedTests, " unit test",
+                    ifelse(numberOfFailedTests == 1, "", "s"), " failed :(\n",
                     sep = ""
                 )
-            } else {
-                cat("'", resultDir, "' (see file ", sQuote(resultOuputFile), ")\n", sep = "")
+                statusMessage <- paste0("Installation qualification was not successful (subset with ", numberOfFailedTests, " failures)")
             }
+            cat("Results:\n")
+            resultMessage <- .getTestthatResultLine(fileContent)
+            cat(resultMessage, "\n")
+            .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
         } else {
             cat("No test results found in directory '", resultDir, "'\n", sep = "")
+            statusMessage <- "Installation qualification was not successful (no test results found)"
         }
     }
     if (!credentialsAvailable) {
@@ -1322,7 +1368,89 @@ testPackage <- function(outDir = ".",
         cat("Use testPackage(completeUnitTestSetEnabled = TRUE) to perform all unit tests.\n")
     }
 
-    invisible(.isCompleteUnitTestSetEnabled())
+    result <- list(
+        completeUnitTestSetEnabled = completeUnitTestSetEnabled,
+        testFileDirectory = testFileDirectory,
+        testFileTargetDirectory = testFileTargetDirectory,
+        reportType = reportType,
+        executionMode = executionMode,
+        scope = scope,
+        resultDir = resultDir,
+        resultOuputFile = resultOuputFile,
+        reportFileNames = reportFileNames,
+        minNumberOfExpectedTests = minNumberOfExpectedTests,
+        totalNumberOfTests = totalNumberOfTests,
+        numberOfFailedTests = numberOfFailedTests,
+        numberOfSkippedTests = numberOfSkippedTests,
+        resultMessage = resultMessage,
+        statusMessage = statusMessage,
+        status = status
+    )
+
+    result <- structure(result, class = "InstallatinQualificationResult")
+
+    return(invisible(result))
+}
+
+
+#' 
+#' @title 
+#' Print Installation Qualification Result
+#'
+#' @description
+#' This function prints the details of an `InstallatinQualificationResult` object in a user-friendly format.
+#'
+#' @param x An object of class `InstallatinQualificationResult` containing the results of the installation qualification.
+#' @param ... Additional arguments passed to or from other methods.
+#'
+#' @details
+#' The function displays the result message, followed by the parameters and their values. It skips parameters with `NULL` or `NA` values.
+#'
+#' @return
+#' This function does not return a value. It is called for its side effects of printing the result.
+#'
+#' @examples
+#' \dontrun{
+#' result <- testPackage()
+#' print(result)
+#' }
+#' 
+#' @keywords internal
+#'
+#' @export
+#' 
+print.InstallatinQualificationResult <- function(x, ...) {
+    cat("Installation Qualification Result:\n")
+    cat(x$resultMessage, "\n\n")
+    cat("Parameters:\n")
+    paramNames <- names(x)
+    paramNames <- paramNames[!grepl("resultMessage", paramNames)]
+    for (paramName in paramNames) {
+        paramValue <- x[[paramName]]
+        if (is.null(paramValue) || all(is.na(paramValue))) {
+            next
+        }
+
+        if (is.character(paramValue)) {
+            if (grepl("Dir(ectory)?$", paramName)) {
+                paramValue <- gsub("\\\\", "/", paramValue)
+            }
+            paramValue <- sQuote(paramValue)
+        }
+        cat("  ", paramName, ": ", .arrayToString(paramValue), "\n", sep = "")
+    }
+}
+
+.showResultsWereWrittenToDirectoryMessage <- function(resultDir, reportFileName, resultOuputFile) {
+    cat("Test results were written to directory \n")
+    if (!is.null(reportFileName)) {
+        cat("'", resultDir, "' (see file", ifelse(length(reportFileName) == 1, "", "s"), " ",
+            .arrayToString(sQuote(reportFileName), mode = "and"), ")\n",
+            sep = ""
+        )
+    } else {
+        cat("'", resultDir, "' (see file ", sQuote(resultOuputFile), ")\n", sep = "")
+    }
 }
 
 .testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", Ropts = character()) {
@@ -1679,12 +1807,12 @@ MarkdownReporter <- R6::R6Class(
 
             resultStatusIcon <-
                 if (failureEnabled) {
-                        private$COLORS$FAILURE$unicode
-                    } else if (warningEnabled) {
-                        private$COLORS$WARNING$unicode
-                    } else {
-                        private$COLORS$SUCCESS$unicode
-                    }
+                    private$COLORS$FAILURE$unicode
+                } else if (warningEnabled) {
+                    private$COLORS$WARNING$unicode
+                } else {
+                    private$COLORS$SUCCESS$unicode
+                }
             if (self$outputSize == "detailed" || failureEnabled ||
                     (warningEnabled && self$addWarningDetailsToReport)) {
                 self$log(
