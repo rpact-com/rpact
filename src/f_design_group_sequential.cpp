@@ -40,6 +40,17 @@ const NumericVector C_NEWTON_COTES_VEC_5 = NumericVector::create(38, 75, 50, 50,
 const NumericVector C_NEWTON_COTES_VEC_6 = NumericVector::create(82, 216, 27, 272, 27, 216);
 const NumericVector C_NEWTON_COTES_VEC_7 = NumericVector::create(1502, 3577, 1323, 2989, 2989, 1323, 3577);
 const double C_FUTILITY_BOUNDS_DEFAULT = -6;
+const int C_GAUSS_LAGUERRE_N_POINTS = 10;
+const NumericVector C_GAUSS_LAGUERRE_POINTS_VEC_10 = NumericVector::create(
+	0.137793470540492, 0.729454549503169, 1.80834290174032, 3.4014336978549,
+	5.5524961400638, 8.33015274676449, 11.8437858379001, 16.2792578313781,
+	21.9965858119808, 29.9206970122739
+);
+const NumericVector C_GAUSS_LAGUERRE_WEIGHTS_VEC_10 = NumericVector::create(
+	0.354009738606996, 0.831902301043581, 1.33028856174932, 1.86306390311114,
+	2.45025555808301, 3.12276415513514, 3.93415269556146, 4.99241487219295,
+	6.57220248513068, 9.78469584037451
+);
 const String C_TYPE_OF_DESIGN_AS_USER = "asUser";
 const String C_TYPE_OF_DESIGN_BS_USER = "bsUser";
 const String C_TYPE_OF_DESIGN_AS_P = "asP";
@@ -184,6 +195,62 @@ NumericVector getXValues(NumericMatrix decisionMatrix, int k, int numberOfGridPo
 	}
 }
 
+NumericVector getGaussLaguerreXValues(NumericMatrix decisionMatrix, int k, int rowIndex) {
+	try {
+		NumericVector gridPoints;
+		if (C_GAUSS_LAGUERRE_N_POINTS == 10) {
+			gridPoints = C_GAUSS_LAGUERRE_POINTS_VEC_10;
+		}
+		else {
+			throw Exception("Gauss Laguerre points not available for %d points", C_GAUSS_LAGUERRE_N_POINTS);
+		}
+		// This assumes that the rowIndex is pointing to the lower bounds.
+		NumericVector x = rep(decisionMatrix(rowIndex, k - 2), gridPoints.size());
+		for (int i = 0; i < x.size(); i++) {
+			x[i] = x[i] - gridPoints[i];
+		}
+		return x;
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get Gauss Laguerre x values (k = %d, rowIndex = %d): %s",
+			k, rowIndex, e.what());
+	}
+}
+
+NumericVector getGaussLaguerreW() {
+	NumericVector w;
+	if (C_GAUSS_LAGUERRE_N_POINTS == 10) {
+		w = C_GAUSS_LAGUERRE_WEIGHTS_VEC_10;
+	}
+	else {
+		throw Exception("Gauss Laguerre weights not available for %d points", C_GAUSS_LAGUERRE_N_POINTS);
+	}
+	return w;
+}
+
+NumericVector getAllXValues(NumericMatrix decisionMatrix, int k, int numberOfGridPoints, int rowIndex) {
+	try {
+		NumericVector x1 = getXValues(decisionMatrix, k, numberOfGridPoints, rowIndex);
+		NumericVector x2 = getGaussLaguerreXValues(decisionMatrix, k, rowIndex);
+		NumericVector x = concat(x1, x2);
+		return x;
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get all x values (k = %d, numberOfGridPoints = %d, rowIndex = %d): %s",
+			k, numberOfGridPoints, rowIndex, e.what());
+	}
+}
+
+NumericVector getAllW(double dx, int constNewtonCotes) {
+	try {
+		NumericVector w1 = getW(dx, constNewtonCotes);
+		NumericVector w2 = getGaussLaguerreW();
+		NumericVector w = concat(w1, w2);
+		return w;
+	} catch (const std::exception& e) {
+		throw Exception("Failed to get all weights (dx = %f, constNewtonCotes = %d): %s", dx, constNewtonCotes,
+		e.what());
+	}
+}
+
 NumericVector getGroupSequentialProbabilitiesFast(
 		NumericMatrix decisionMatrix,
 		NumericVector informationRates) {
@@ -280,36 +347,80 @@ NumericMatrix getGroupSequentialProbabilitiesCpp(
 
 		if (decMatrix.nrow() == 2) {
 
-			for (int i = 0; i < decMatrix.nrow(); i++) {
-				for (int j = 0; j < decMatrix.ncol(); j++) {
-					if (decMatrix(i, j) <= C_FUTILITY_BOUNDS_DEFAULT) {
-						decMatrix(i, j) = C_FUTILITY_BOUNDS_DEFAULT;
-					}
+			int n_lower_bounds_below_thresh = 0;
+			for (int j = 0; j < decMatrix.ncol(); j++) {
+				if (decMatrix(0, j) < C_FUTILITY_BOUNDS_DEFAULT) {
+					n_lower_bounds_below_thresh++;
 				}
 			}
+			bool one_sided_test = (n_lower_bounds_below_thresh == decMatrix.ncol());
 
-			// density values in recursion
-			NumericVector dn2 = NumericVector(C_NUMBER_OF_GRID_POINTS_ONE_SIDED, NA_REAL);
+			if (one_sided_test) {
+				// One-sided test design.
 
-			// grid points in recursion
-			NumericVector x2  = NumericVector(C_NUMBER_OF_GRID_POINTS_ONE_SIDED, NA_REAL);
+				// Set lower bounds to negative of upper bounds.
+				// This is only used for the Newton-Cotes integration.
+				decMatrix(0, _) = - decMatrix(1, _);
 
-			for (int k = 2; k <= kMax; k++) {
-				double dx = getDxValue(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
+				const int n_grid_points_total = C_NUMBER_OF_GRID_POINTS_ONE_SIDED + C_GAUSS_LAGUERRE_N_POINTS;
 
-				NumericVector x = getXValues(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
-				NumericVector w = getW(dx, C_CONST_NEWTON_COTES_2);
-				NumericVector densityValues = getDensityValues(x, k, informationRates, epsilonVec, x2, dn2);
-				NumericVector dn = vectorMultiply(w, densityValues);
+				// density values in recursion
+				NumericVector dn2 = NumericVector(n_grid_points_total, NA_REAL);
 
-				double seq1 = getSeqValue(0, k, dn, x, decMatrix, informationRates, epsilonVec);
-				double seq2 = getSeqValue(1, k, dn, x, decMatrix, informationRates, epsilonVec);
+				// grid points in recursion
+				NumericVector x2  = NumericVector(n_grid_points_total, NA_REAL);
 
-				x2 = x;
-				dn2 = dn;
-				probs(0, k - 1) = seq1;
-				probs(1, k - 1) = seq2;
-				probs(2, k - 1) = probs(1, k - 2) - probs(0, k - 2);
+				for (int k = 2; k <= kMax; k++) {
+					double dx = getDxValue(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
+
+					NumericVector x = getXValues(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
+					NumericVector w = getAllW(dx, C_CONST_NEWTON_COTES_2);
+					NumericVector densityValues = getDensityValues(x, k, informationRates, epsilonVec, x2, dn2);
+					NumericVector dn = vectorMultiply(w, densityValues);
+
+					double seq1 = 0.0; // Because this is a one-sided test design.
+					double seq2 = getSeqValue(1, k, dn, x, decMatrix, informationRates, epsilonVec);
+
+					x2 = x;
+					dn2 = dn;
+					probs(0, k - 1) = seq1;
+					probs(1, k - 1) = seq2;
+					probs(2, k - 1) = probs(1, k - 2) - probs(0, k - 2);
+				}
+			} else {
+				// Two-sided test design.
+
+				for (int i = 0; i < decMatrix.nrow(); i++) {
+					for (int j = 0; j < decMatrix.ncol(); j++) {
+						if (decMatrix(i, j) <= C_FUTILITY_BOUNDS_DEFAULT) {
+							decMatrix(i, j) = C_FUTILITY_BOUNDS_DEFAULT;
+						}
+					}
+				}
+
+				// density values in recursion
+				NumericVector dn2 = NumericVector(C_NUMBER_OF_GRID_POINTS_ONE_SIDED, NA_REAL);
+
+				// grid points in recursion
+				NumericVector x2  = NumericVector(C_NUMBER_OF_GRID_POINTS_ONE_SIDED, NA_REAL);
+
+				for (int k = 2; k <= kMax; k++) {
+					double dx = getDxValue(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
+
+					NumericVector x = getXValues(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
+					NumericVector w = getW(dx, C_CONST_NEWTON_COTES_2);
+					NumericVector densityValues = getDensityValues(x, k, informationRates, epsilonVec, x2, dn2);
+					NumericVector dn = vectorMultiply(w, densityValues);
+
+					double seq1 = getSeqValue(0, k, dn, x, decMatrix, informationRates, epsilonVec);
+					double seq2 = getSeqValue(1, k, dn, x, decMatrix, informationRates, epsilonVec);
+
+					x2 = x;
+					dn2 = dn;
+					probs(0, k - 1) = seq1;
+					probs(1, k - 1) = seq2;
+					probs(2, k - 1) = probs(1, k - 2) - probs(0, k - 2);
+				}
 			}
 		}
 		else if (decMatrix.nrow() == 4) {
