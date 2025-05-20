@@ -43,3 +43,4 @@ testthat-problems.rds
 /rpact-Ex.pdf
 /tests/rpact_test_result_report.pdf
 /tests/testthat.Rout
+\.vscode
