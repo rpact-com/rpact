@@ -40,6 +40,7 @@ const NumericVector C_NEWTON_COTES_VEC_5 = NumericVector::create(38, 75, 50, 50,
 const NumericVector C_NEWTON_COTES_VEC_6 = NumericVector::create(82, 216, 27, 272, 27, 216);
 const NumericVector C_NEWTON_COTES_VEC_7 = NumericVector::create(1502, 3577, 1323, 2989, 2989, 1323, 3577);
 const double C_FUTILITY_BOUNDS_DEFAULT = -6;
+const double C_GAUSS_LAGUERRE_UPPER_BOUND = -3.0;
 const int C_GAUSS_LAGUERRE_N_POINTS = 10;
 const NumericVector C_GAUSS_LAGUERRE_POINTS_VEC_10 = NumericVector::create(
 	0.137793470540492, 0.729454549503169, 1.80834290174032, 3.4014336978549,
@@ -349,7 +350,9 @@ NumericMatrix getGroupSequentialProbabilitiesCpp(
 
 			int n_lower_bounds_below_thresh = 0;
 			for (int j = 0; j < decMatrix.ncol(); j++) {
-				if (decMatrix(0, j) < C_FUTILITY_BOUNDS_DEFAULT) {
+				// Check lower or equal to this bound, because R passes in with this lower
+				// bound in the one sided case.
+				if (decMatrix(0, j) <= C_FUTILITY_BOUNDS_DEFAULT) {
 					n_lower_bounds_below_thresh++;
 				}
 			}
@@ -358,9 +361,10 @@ NumericMatrix getGroupSequentialProbabilitiesCpp(
 			if (one_sided_test) {
 				// One-sided test design.
 
-				// Set lower bounds to negative of upper bounds.
-				// This is only used for the Newton-Cotes integration.
-				decMatrix(0, _) = - decMatrix(1, _);
+				// Set lower bounds to constant value.
+				// This is only used for the Newton-Cotes integration, and as upper bound for the 
+				// Gauss-Laguerre integration.
+				decMatrix(0, _) = rep(C_GAUSS_LAGUERRE_UPPER_BOUND, decMatrix.ncol());
 
 				const int n_grid_points_total = C_NUMBER_OF_GRID_POINTS_ONE_SIDED + C_GAUSS_LAGUERRE_N_POINTS;
 
