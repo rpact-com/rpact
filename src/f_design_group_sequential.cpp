@@ -373,7 +373,7 @@ NumericMatrix getGroupSequentialProbabilitiesCpp(
 				for (int k = 2; k <= kMax; k++) {
 					double dx = getDxValue(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
 
-					NumericVector x = getXValues(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
+					NumericVector x = getAllXValues(decMatrix, k, C_NUMBER_OF_GRID_POINTS_ONE_SIDED, 0);
 					NumericVector w = getAllW(dx, C_CONST_NEWTON_COTES_2);
 					NumericVector densityValues = getDensityValues(x, k, informationRates, epsilonVec, x2, dn2);
 					NumericVector dn = vectorMultiply(w, densityValues);
