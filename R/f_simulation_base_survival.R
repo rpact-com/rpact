@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8679 $
-## |  Last changed: $Date: 2025-04-15 10:39:41 +0200 (Di, 15 Apr 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8712 $
+## |  Last changed: $Date: 2025-05-15 09:57:14 +0200 (Do, 15 Mai 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include class_simulation_results.R
@@ -465,9 +465,17 @@ getSimulationSurvival <- function(design = NULL, ...,
 
     pwsTimeObject <- getPiecewiseSurvivalTime(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
-        lambda2 = lambda2, lambda1 = lambda1, median1 = median1, median2 = median2,
-        hazardRatio = hazardRatio, pi1 = pi1, pi2 = pi2, eventTime = eventTime, kappa = kappa,
-        delayedResponseAllowed = TRUE, .pi1Default = C_PI_1_DEFAULT
+        lambda2 = lambda2,
+        lambda1 = lambda1,
+        median1 = median1,
+        median2 = median2,
+        hazardRatio = hazardRatio,
+        pi1 = pi1,
+        pi2 = pi2,
+        eventTime = eventTime,
+        kappa = kappa,
+        delayedResponseAllowed = TRUE,
+        .pi1Default = C_PI_1_DEFAULT
     )
 
     simulationResults$.piecewiseSurvivalTime <- pwsTimeObject

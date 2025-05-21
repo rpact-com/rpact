@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Di, 10 Dez 2024) $
+## |  File version: $Revision: 8707 $
+## |  Last changed: $Date: 2025-05-09 14:43:55 +0200 (Fr, 09 Mai 2025) $
 ## |  Last changed by: $Author: wassmer $
 ## |
 
@@ -546,7 +546,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
 
     if (correlationComputation == "null") {
         # not accounting for alternative
-        corrMatrix <- matrix(rep(allocationRatioPlanned / (1 + allocationRatioPlanned), gMax^2), ncol = gMax, nrow = gMax)
+        corrMatrix <- matrix(rep(allocationRatioPlanned[1] / (1 + allocationRatioPlanned[1]), gMax^2), ncol = gMax, nrow = gMax)
         diag(corrMatrix) <- 1
         choleskyDecomposition <- chol(corrMatrix)
     }

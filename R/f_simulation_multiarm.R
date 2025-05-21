@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8361 $
-## |  Last changed: $Date: 2024-11-04 16:27:39 +0100 (Mo, 04 Nov 2024) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8719 $
+## |  Last changed: $Date: 2025-05-15 14:08:33 +0200 (Do, 15 Mai 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -377,9 +377,13 @@ NULL
         activeArms,
         effectMatrix,
         typeOfShape,
+        dropoutRate1 = NA_real_, # survival only
+        dropoutRate2 = NA_real_, # survival only
+        dropoutTime  = NA_real_, # survival only
+        eventTime = NA_real_, # survival only
         muMaxVector = NA_real_, # means only
         piMaxVector = NA_real_, # rates only
-        piControl = NA_real_, # rates only
+        piControl = NA_real_, # rates and survival only
         omegaMaxVector = NA_real_, # survival only
         gED50,
         slope,
@@ -394,7 +398,8 @@ NULL
         epsilonValue,
         rValue,
         threshold,
-        plannedSubjects = NA_real_, # means + rates only
+        plannedSubjects = NA_real_, 
+        maxNumberOfSubjects = NA_real_, # survival only
         plannedEvents = NA_real_, # survival only
         allocationRatioPlanned,
         minNumberOfSubjectsPerStage = NA_real_, # means + rates only
@@ -473,13 +478,15 @@ NULL
         simulationResults <- SimulationResultsMultiArmRates$new(design, showStatistics = showStatistics)
     } else if (endpoint == "survival") {
         simulationResults <- SimulationResultsMultiArmSurvival$new(design, showStatistics = showStatistics)
+        .setValueAndParameterType(simulationResults, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
     }
 
     gMax <- activeArms
     kMax <- design$kMax
 
     intersectionTest <- .getCorrectedIntersectionTestMultiArmIfNecessary(
-        design, intersectionTest,
+        design, 
+        intersectionTest,
         userFunctionCallEnabled = TRUE
     )
     .assertIsValidIntersectionTestMultiArm(design, intersectionTest)
@@ -586,6 +593,15 @@ NULL
         if (typeOfShape == "userDefined") {
             simulationResults$.setParameterType("omegaMaxVector", C_PARAM_DERIVED)
         }
+        
+        .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE) # , noDefaultAvailable = TRUE)
+        .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = TRUE)
+        .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
+        .setValueAndParameterType(simulationResults, "eventTime", eventTime, 12)
+        .setValueAndParameterType(simulationResults, "dropoutRate1", dropoutRate1, 0)
+        .setValueAndParameterType(simulationResults, "dropoutRate2", dropoutRate2, 0)
+        .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, 12)
+        .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
 
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {
@@ -603,9 +619,9 @@ NULL
     .assertIsValidThreshold(threshold, gMax)
 
     if (endpoint %in% c("means", "rates")) {
-        .assertIsValidPlannedSubjects(plannedSubjects, kMax) # means + rates only
+        .assertIsValidPlannedSubjects(plannedSubjects, kMax) 
     }
-
+    
     if (endpoint %in% c("means", "survival")) {
         thetaH1 <- .ignoreParameterIfNotUsed(
             "thetaH1", thetaH1, kMax > 1,

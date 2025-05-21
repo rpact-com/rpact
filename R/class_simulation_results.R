@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8474 $
-## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8719 $
+## |  Last changed: $Date: 2025-05-15 14:08:33 +0200 (Do, 15 Mai 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_utilities.R
@@ -236,7 +236,9 @@ SimulationResults <- R6::R6Class("SimulationResults",
                             inherits(self, "SimulationResultsEnrichmentSurvival")) {
                         params <- c(
                             "effectMeasure",
+                            "analysisTime",
                             "numberOfEvents",
+                            "numberOfSubjects",
                             "singleEventsPerArmAndStage",
                             "singleEventsPerSubsetAndStage",
                             "testStatistic",
@@ -548,6 +550,7 @@ SimulationResults <- R6::R6Class("SimulationResults",
             y <- c(
                 "singleEventsPerStage",
                 "cumulativeEventsPerStage",
+                "singleEventsPerArmAndStage",
                 "iterations",
                 "overallReject", # base
                 "rejectAtLeastOne",
@@ -573,7 +576,7 @@ SimulationResults <- R6::R6Class("SimulationResults",
                 "numberOfSubjects1",
                 "numberOfSubjects2",
                 "sampleSizes",
-                "singleEventsPerArmAndStage",
+               # "singleEventsPerArmAndStage",
                 "singleEventsPerSubsetAndStage",
                 "conditionalPowerAchieved" # base
             )
@@ -1311,6 +1314,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvi
         effectMatrix = NULL,
         typeOfShape = NULL,
         omegaMaxVector = NULL,
+        piControl = NULL, 
         gED50 = NULL,
         slope = NULL,
         doseLevels = NULL,
@@ -1327,9 +1331,19 @@ SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvi
         earlyStop = NULL,
         selectedArms = NULL,
         numberOfActiveArms = NULL,
+        analysisTime = NULL,
+        numberOfSubjects = NULL,
         rejectAtLeastOne = NULL,
         rejectedArmsPerStage = NULL,
         successPerStage = NULL,
+        maxNumberOfSubjects = NULL,
+        accrualTime = NULL,
+        accrualIntensity = NULL,
+        dropoutRate1 = NULL,
+        dropoutRate2 = NULL,
+        dropoutTime = NULL,
+        studyDuration = NULL, 
+        expectedNumberOfSubjects = NULL,
         eventsPerStage = NULL,
         singleEventsPerStage = NULL,
         cumulativeEventsPerStage = NULL,
@@ -1344,6 +1358,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvi
                 "selectedArms",
                 "numberOfActiveArms",
                 "rejectedArmsPerStage",
+                "studyDuration",
                 "successPerStage"
             )) {
                 self$.setParameterType(generatedParam, C_PARAM_GENERATED)
