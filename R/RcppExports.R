@@ -29,6 +29,10 @@
     .Call(`_rpact_getDesignFisherTryCpp`, kMax, alpha, tolerance, criticalValues, scale, alpha0Vec, userAlphaSpending, method)
 }
 
+.myPnorm <- function(x, mean = 0.0, sd = 1.0, use_gauss_laguerre = TRUE) {
+    .Call(`_rpact_myPnorm`, x, mean, sd, use_gauss_laguerre)
+}
+
 .getGroupSequentialProbabilitiesCpp <- function(decisionMatrix, informationRates) {
     .Call(`_rpact_getGroupSequentialProbabilitiesCpp`, decisionMatrix, informationRates)
 }

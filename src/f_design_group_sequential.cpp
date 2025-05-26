@@ -310,6 +310,47 @@ NumericVector getGroupSequentialProbabilitiesFast(
 	return probs;
 }
 
+// [[Rcpp::export(name = ".myPnorm")]]
+double myPnorm(
+		double x,
+		double mean = 0.0,
+		double sd = 1.0,
+		bool use_gauss_laguerre = true) {
+	// We try the combination of Gauss-Laguerre and Newton-Cotes integration here
+	// to prove that they are working correctly.
+	double lower_bound = -3.0;		
+
+	double dx = (x - lower_bound) / C_NEWTON_COTES_MULTIPLIER;
+	NumericVector x_newtoncotes = NumericVector(C_NEWTON_COTES_MULTIPLIER + 1, NA_REAL);
+	for (int i = 0; i < x_newtoncotes.size(); i++) {
+		x_newtoncotes[i] = lower_bound + i * dx;
+	}
+	NumericVector w_newtoncotes = getW(dx, 1);
+
+	NumericVector x_all;
+	NumericVector w_all;
+	if (use_gauss_laguerre) {
+		NumericVector x_gausslaguerre = C_GAUSS_LAGUERRE_POINTS_VEC_10;
+		x_gausslaguerre = lower_bound - x_gausslaguerre;
+		NumericVector w_gausslaguerre = C_GAUSS_LAGUERRE_WEIGHTS_VEC_10;
+
+		x_all = concat(x_newtoncotes, x_gausslaguerre);
+		w_all = concat(w_newtoncotes, w_gausslaguerre);
+	} else {
+		x_all = x_newtoncotes;
+		w_all = w_newtoncotes;
+	}
+	
+	NumericVector densityValues = NumericVector(x_all.size(), NA_REAL);
+	for (int i = 0; i < x_all.size(); i++) {
+		densityValues[i] = dnorm2(x_all[i], mean, sd);
+	}
+
+	NumericVector dn = vectorMultiply(w_all, densityValues);
+	double result = sum(dn);
+	return result;
+}
+
 // [[Rcpp::export(name = ".getGroupSequentialProbabilitiesCpp")]]
 NumericMatrix getGroupSequentialProbabilitiesCpp(
 		NumericMatrix decisionMatrix,

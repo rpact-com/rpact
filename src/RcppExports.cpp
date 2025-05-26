@@ -121,6 +121,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// myPnorm
+double myPnorm(double x, double mean, double sd, bool use_gauss_laguerre);
+RcppExport SEXP _rpact_myPnorm(SEXP xSEXP, SEXP meanSEXP, SEXP sdSEXP, SEXP use_gauss_laguerreSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type mean(meanSEXP);
+    Rcpp::traits::input_parameter< double >::type sd(sdSEXP);
+    Rcpp::traits::input_parameter< bool >::type use_gauss_laguerre(use_gauss_laguerreSEXP);
+    rcpp_result_gen = Rcpp::wrap(myPnorm(x, mean, sd, use_gauss_laguerre));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getGroupSequentialProbabilitiesCpp
 NumericMatrix getGroupSequentialProbabilitiesCpp(NumericMatrix decisionMatrix, NumericVector informationRates);
 RcppExport SEXP _rpact_getGroupSequentialProbabilitiesCpp(SEXP decisionMatrixSEXP, SEXP informationRatesSEXP) {
@@ -477,6 +491,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_getSimulatedAlphaCpp", (DL_FUNC) &_rpact_getSimulatedAlphaCpp, 5},
     {"_rpact_getFisherCombinationCasesCpp", (DL_FUNC) &_rpact_getFisherCombinationCasesCpp, 2},
     {"_rpact_getDesignFisherTryCpp", (DL_FUNC) &_rpact_getDesignFisherTryCpp, 8},
+    {"_rpact_myPnorm", (DL_FUNC) &_rpact_myPnorm, 4},
     {"_rpact_getGroupSequentialProbabilitiesCpp", (DL_FUNC) &_rpact_getGroupSequentialProbabilitiesCpp, 2},
     {"_rpact_getDesignGroupSequentialPampallonaTsiatisCpp", (DL_FUNC) &_rpact_getDesignGroupSequentialPampallonaTsiatisCpp, 9},
     {"_rpact_getDesignGroupSequentialUserDefinedAlphaSpendingCpp", (DL_FUNC) &_rpact_getDesignGroupSequentialUserDefinedAlphaSpendingCpp, 7},
