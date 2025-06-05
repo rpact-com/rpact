@@ -143,7 +143,8 @@ TrialDesignOptimalConditionalError <- setRefClass(
           .assertIsSingleNumber(x = delta1Min, xName = "delta1Min")
           .assertIsInOpenInterval(x = delta1Min, xName = "delta1Min", lower = 0, upper = Inf)
           .assertIsSingleNumber(x = delta1Max, xName = "delta1Max")
-          .assertIsInOpenInterval(x = delta1Max, xName = "delta1Max", lower = delta1Min, upper = Inf, naAllowed = TRUE) # TODO: this is likely never NA (but Inf)
+      
+          .assertIsInClosedInterval(x = delta1Max, xName = "delta1Max", lower = delta1Min, upper = Inf)
           .self$delta1Min <- delta1Min
           .self$delta1Max <- delta1Max
           
@@ -160,7 +161,7 @@ TrialDesignOptimalConditionalError <- setRefClass(
           .assertIsInOpenInterval(x = ncp1Min, xName = "ncp1Min", lower = 0, upper = Inf)
           
           .assertIsSingleNumber(x = ncp1Max, xName = "ncp1Max")
-          .assertIsInOpenInterval(x = ncp1Max, xName = "ncp1Max", lower = ncp1Min, upper = Inf, naAllowed = TRUE) # TODO: this is likely never NA (but Inf)
+          .assertIsInClosedInterval(x = ncp1Max, xName = "ncp1Max", lower = ncp1Min, upper = Inf)
           
           .self$ncp1Min <- ncp1Min
           .self$ncp1Max <- ncp1Max
