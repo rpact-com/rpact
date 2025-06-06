@@ -64,17 +64,17 @@ TrialDesignOptimalConditionalError <- setRefClass(
       
       # Range assertions for alpha, alpha1, alpha0
       # General range assertions
-      .assertIsSingleNumber(x = alpha, xName = "alpha")
-      .assertIsSingleNumber(x = alpha1, xName = "alpha1")
-      .assertIsSingleNumber(x = alpha0, xName = "alpha0")
+      .assertIsSingleNumber(x = alpha, argumentName = "alpha")
+      .assertIsSingleNumber(x = alpha1, argumentName = "alpha1")
+      .assertIsSingleNumber(x = alpha0, argumentName = "alpha0")
       
-      .assertIsInOpenInterval(x = alpha, xName = "alpha", lower = 0, upper = 1)
-      .assertIsInClosedInterval(x = alpha1, xName = "alpha1", lower = 0, upper = 1)
-      .assertIsInClosedInterval(x = alpha0, xName = "alpha0", lower = 0, upper = 1)
+      .assertIsInOpenInterval(x = alpha, argumentName = "alpha", lower = 0, upper = 1)
+      .assertIsInClosedInterval(x = alpha1, argumentName = "alpha1", lower = 0, upper = 1)
+      .assertIsInClosedInterval(x = alpha0, argumentName = "alpha0", lower = 0, upper = 1)
       
       # Context-related range assertions
-      .assertIsInClosedInterval(x = alpha1, xName = "alpha1", lower = 0, upper = alpha)
-      .assertIsInClosedInterval(x = alpha0, xName = "alpha0", lower = alpha1, upper = 1)
+      .assertIsInClosedInterval(x = alpha1, argumentName = "alpha1", lower = 0, upper = alpha)
+      .assertIsInClosedInterval(x = alpha0, argumentName = "alpha0", lower = alpha1, upper = 1)
       
       if(is.na(conditionalPower) && is.null(suppressWarnings(body(conditionalPowerFunction)))) {
         stop("Must specify either conditionalPower or a valid conditionalPowerFunction.")
@@ -82,14 +82,16 @@ TrialDesignOptimalConditionalError <- setRefClass(
       else {
         if(!is.na(conditionalPower)) {
           
-          .assertIsSingleNumber(x = conditionalPower, xName = "conditionalPower")
-          .assertIsInOpenInterval(x = conditionalPower, xName = "conditionalPower", lower = 0, upper = 1)
+          .assertIsSingleNumber(x = conditionalPower, argumentName = "conditionalPower")
+          .assertIsInOpenInterval(x = conditionalPower, argumentName = "conditionalPower", lower = 0, upper = 1)
           
           if(!is.null(suppressWarnings(body(conditionalPowerFunction)))) {
             warning("Both conditionalPower and conditionalPowerFunction are provided. Using conditionalPower and ignoring conditionalPowerFunction.")
           }
         }
         else if(!is.null(suppressWarnings(body(conditionalPowerFunction)))) {
+          
+          .assertIsFunction(x = conditionalPowerFunction, argumentName = "conditionalPowerFunction")
           
           # Check if function is increasing
           # Grid of values
@@ -109,8 +111,9 @@ TrialDesignOptimalConditionalError <- setRefClass(
         }
       }
       
-      .assertIsInOpenInterval(x = firstStageInformation, xName = "firstStageInformation", lower = 0, upper = Inf)
-      .assertIsSingleLogical(x = useInterimEstimate, xName = "useInterimEstimate")
+      .assertIsSingleNumber(x = firstStageInformation, argumentName = "firstStageInformation")
+      .assertIsInOpenInterval(x = firstStageInformation, argumentName = "firstStageInformation", lower = 0, upper = Inf)
+      .assertIsSingleLogical(x = useInterimEstimate, argumentName = "useInterimEstimate")
       
       # Set initial parameters
       .self$alpha <- alpha
@@ -121,8 +124,8 @@ TrialDesignOptimalConditionalError <- setRefClass(
       .self$likelihoodRatioDistribution <- likelihoodRatioDistribution
       .self$useInterimEstimate <- useInterimEstimate
       
-      .assertIsSingleNumber(x = levelConstantMinimum, xName = "levelConstantMinimum")
-      .assertIsSingleNumber(x = levelConstantMaximum, xName = "levelConstantMaximum")
+      .assertIsSingleNumber(x = levelConstantMinimum, argumentName = "levelConstantMinimum")
+      .assertIsSingleNumber(x = levelConstantMaximum, argumentName = "levelConstantMaximum")
       
       if(levelConstantMinimum >= levelConstantMaximum) {
         stop("levelConstantMinimum must be smaller than levelConstantMaximum.")
@@ -140,11 +143,12 @@ TrialDesignOptimalConditionalError <- setRefClass(
         }
         else if(!is.na(delta1Min)) {
           
-          .assertIsSingleNumber(x = delta1Min, xName = "delta1Min")
-          .assertIsInOpenInterval(x = delta1Min, xName = "delta1Min", lower = 0, upper = Inf)
-          .assertIsSingleNumber(x = delta1Max, xName = "delta1Max")
-      
-          .assertIsInClosedInterval(x = delta1Max, xName = "delta1Max", lower = delta1Min, upper = Inf)
+          .assertIsSingleNumber(x = delta1Min, argumentName = "delta1Min")
+          .assertIsInOpenInterval(x = delta1Min, argumentName = "delta1Min", lower = 0, upper = Inf)
+          
+          .assertIsSingleNumber(x = delta1Max, argumentName = "delta1Max")
+          .assertIsInClosedInterval(x = delta1Max, argumentName = "delta1Max", lower = delta1Min, upper = Inf)
+          
           .self$delta1Min <- delta1Min
           .self$delta1Max <- delta1Max
           
@@ -157,11 +161,11 @@ TrialDesignOptimalConditionalError <- setRefClass(
         }
         else if(!is.na(ncp1Min)) {
           
-          .assertIsSingleNumber(x = ncp1Min, xName = "ncp1Min")
-          .assertIsInOpenInterval(x = ncp1Min, xName = "ncp1Min", lower = 0, upper = Inf)
+          .assertIsSingleNumber(x = ncp1Min, argumentName = "ncp1Min")
+          .assertIsInOpenInterval(x = ncp1Min, argumentName = "ncp1Min", lower = 0, upper = Inf)
           
-          .assertIsSingleNumber(x = ncp1Max, xName = "ncp1Max")
-          .assertIsInClosedInterval(x = ncp1Max, xName = "ncp1Max", lower = ncp1Min, upper = Inf)
+          .assertIsSingleNumber(x = ncp1Max, argumentName = "ncp1Max")
+          .assertIsInClosedInterval(x = ncp1Max, argumentName = "ncp1Max", lower = ncp1Min, upper = Inf)
           
           .self$ncp1Min <- ncp1Min
           .self$ncp1Max <- ncp1Max
@@ -178,7 +182,8 @@ TrialDesignOptimalConditionalError <- setRefClass(
       else {
         # If non-centrality parameter was not specified, calculate it from delta1
         if(!is.na(delta1)) {
-          .assertIsInOpenInterval(x = delta1, xName = "delta1", lower = 0, upper = Inf)
+          .assertIsSingleNumber(x = delta1, argumentName = "delta1")
+          .assertIsInOpenInterval(x = delta1, argumentName = "delta1", lower = 0, upper = Inf)
           
           .self$delta1 <- delta1
           if(!is.na(ncp1)) {
@@ -188,7 +193,8 @@ TrialDesignOptimalConditionalError <- setRefClass(
         }
         # If delta1 was not specified, calculate it from ncp1
         else if(!is.na(ncp1)) {
-          .assertIsInOpenInterval(x = ncp1, xName = "ncp1", lower = 0, upper = Inf)
+          .assertIsSingleNumber(x = ncp1, argumentName = "ncp1")
+          .assertIsInOpenInterval(x = ncp1, argumentName = "ncp1", lower = 0, upper = Inf)
           
           .self$ncp1 <- ncp1
           .self$delta1 <- ncp1/sqrt(firstStageInformation)
@@ -201,20 +207,24 @@ TrialDesignOptimalConditionalError <- setRefClass(
       
       # Range assertions for constraints
       # General range assertions
-      .assertIsInClosedInterval(x = minimumConditionalError, xName = "minimumConditionalError", lower = 0, upper = 1)
-      .assertIsInClosedInterval(x = maximumConditionalError, xName = "maximumConditionalError", lower = 0, upper = 1)
+      .assertIsSingleNumber(x = minimumConditionalError, argumentName = "minimumConditionalError")
+      .assertIsInClosedInterval(x = minimumConditionalError, argumentName = "minimumConditionalError", lower = 0, upper = 1)
+      .assertIsSingleNumber(x = maximumConditionalError, argumentName = "maximumConditionalError")
+      .assertIsInClosedInterval(x = maximumConditionalError, argumentName = "maximumConditionalError", lower = 0, upper = 1)
       
-      .assertIsInClosedInterval(x = minimumSecondStageInformation, xName = "minimumSecondStageInformation", lower = 0, upper = Inf)
-      .assertIsInClosedInterval(x = maximumSecondStageInformation, xName = "maximumSecondStageInformation", lower = 0, upper = Inf)
+      .assertIsSingleNumber(x = minimumSecondStageInformation, argumentName = "minimumSecondStageInformation")
+      .assertIsInClosedInterval(x = minimumSecondStageInformation, argumentName = "minimumSecondStageInformation", lower = 0, upper = Inf)
+      .assertIsSingleNumber(x = maximumSecondStageInformation, argumentName = "maximumSecondStageInformation")
+      .assertIsInClosedInterval(x = maximumSecondStageInformation, argumentName = "maximumSecondStageInformation", lower = 0, upper = Inf)
       
       if(maximumSecondStageInformation == 0) {
         stop("Maximum second-stage information must be larger than 0.")
       }
       
       # Context-related range assertions
-      .assertIsInClosedInterval(x = minimumConditionalError, xName = "minimumConditionalError", lower = 0, upper = maximumConditionalError)
+      .assertIsInClosedInterval(x = minimumConditionalError, argumentName = "minimumConditionalError", lower = 0, upper = maximumConditionalError)
       
-      .assertIsInClosedInterval(x = minimumSecondStageInformation, xName = "minimumSecondStageInformation", lower = 0, upper = maximumSecondStageInformation)
+      .assertIsInClosedInterval(x = minimumSecondStageInformation, argumentName = "minimumSecondStageInformation", lower = 0, upper = maximumSecondStageInformation)
       
       # Identify constraints for minimum conditional error / maximum second-stage information
       .self$minimumConditionalError <- minimumConditionalError
@@ -225,8 +235,10 @@ TrialDesignOptimalConditionalError <- setRefClass(
       .self$minimumSecondStageInformation <- minimumSecondStageInformation
       
       
-      .assertIsSingleLogical(x = enforceMonotonicity, xName = "enforceMonotonicity")
+      .assertIsSingleLogical(x = enforceMonotonicity, argumentName = "enforceMonotonicity")
       .self$enforceMonotonicity <- enforceMonotonicity
+      
+      .assertIsSingleCharacter(x = likelihoodRatioDistribution, argumentName = "likelihoodRatioDistribution")
       
       # Identify specific distribution parameters
       if(likelihoodRatioDistribution == "fixed") {
@@ -234,6 +246,7 @@ TrialDesignOptimalConditionalError <- setRefClass(
           stop("Must provide deltaLR for fixed effect in likelihood ratio.")
         }
         else {
+          .assertIsNumericVector(x = deltaLR, argumentName = "deltaLR")
           .self$deltaLR <- deltaLR
           # If any of the weights are NA, use equal weights
           if(any(is.na(weightsDeltaLR))) {
@@ -244,7 +257,8 @@ TrialDesignOptimalConditionalError <- setRefClass(
             }
           }
           else {
-            .assertIsInClosedInterval(x = weightsDeltaLR, xName = "weightsDeltaLR", lower = 0, upper = 1)
+            .assertIsNumericVector(x = weightsDeltaLR, argumentName = "weightsDeltaLR")
+            .assertIsInClosedInterval(x = weightsDeltaLR, argumentName = "weightsDeltaLR", lower = 0, upper = 1)
             # Check if weightsDeltaLR and deltaLR are of equal length
             if(length(weightsDeltaLR) != length(deltaLR)) {
               stop("Must provide exactly one weight in weightsDeltaLR per entry of deltaLR.")
@@ -262,9 +276,12 @@ TrialDesignOptimalConditionalError <- setRefClass(
           stop("Must provide deltaLR and tauLR for normal prior in likelihood ratio.")
         }
         else {
-          .assertIsInOpenInterval(x = tauLR, xName = "tauLR", lower = 0, upper = Inf)
-          
+          .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
           .self$deltaLR <- deltaLR
+          
+          .assertIsSingleNumber(x = tauLR, argumentName = "tauLR")
+          .assertIsInOpenInterval(x = tauLR, argumentName = "tauLR", lower = 0, upper = Inf)
+          
           .self$tauLR <- tauLR
         }
       }
@@ -273,7 +290,8 @@ TrialDesignOptimalConditionalError <- setRefClass(
           stop("Must provide kappaLR for exponential prior in likelihood ratio.")
         }
         else {
-          .assertIsInOpenInterval(x = kappaLR, xName = "kappaLR", lower = 0, upper = Inf)
+          .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
+          .assertIsInOpenInterval(x = kappaLR, argumentName = "kappaLR", lower = 0, upper = Inf)
           .self$kappaLR <- kappaLR
         }
       }
@@ -282,7 +300,8 @@ TrialDesignOptimalConditionalError <- setRefClass(
           stop("Must provide deltaMaxLR for uniform prior in likelihood ratio.")
         }
         else {
-          .assertIsInOpenInterval(x = deltaMaxLR, xName = "deltaMaxLR", lower = 0, upper = Inf)
+          .assertIsSingleNumber(x = deltaMaxLR, argumentName = "deltaMaxLR")
+          .assertIsInOpenInterval(x = deltaMaxLR, argumentName = "deltaMaxLR", lower = 0, upper = Inf)
           .self$deltaMaxLR <- deltaMaxLR
         }
       }

@@ -318,7 +318,7 @@ getOptimalConditionalError <- Vectorize(FUN = getOptimalConditionalError, vector
 
 getOverallPower <- function(design, alternative) {
   
-  .assertIsNumericVector(x = alternative, xName = "alternative")
+  .assertIsNumericVector(x = alternative, argumentName = "alternative")
   
   alternativeNonCentralityParameterScale <- alternative * base::sqrt(design$firstStageInformation)
   
@@ -397,8 +397,8 @@ getOverallPower <- function(design, alternative) {
 #' @template reference_optimal
 getSecondStageInformation <- function(firstStagePValue, design) {
   
-  .assertIsNumericVector(x = firstStagePValue, xName = "firstStagePValue")
-  .assertIsInClosedInterval(x = firstStagePValue, xName = "firstStagePValue", lower = 0, upper = 1)
+  .assertIsNumericVector(x = firstStagePValue, argumentName = "firstStagePValue")
+  .assertIsInClosedInterval(x = firstStagePValue, argumentName = "firstStagePValue", lower = 0, upper = 1)
   
   secondStageInformation <- NULL
   # For p-values outside of the continuation region, return information 0
