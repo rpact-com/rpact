@@ -12,31 +12,36 @@
 #' @keywords internal
 
 getInnerPsi <- function(firstStagePValue, constant, design) {
-  
-  # If monotonisation constants provided, perform non-increasing transformation
-  if(design$enforceMonotonicity) {
-    likelihoodRatioOverEffect <- getMonotoneFunction(
-      x = firstStagePValue, fun = getQ, argument = "firstStagePValue",
-      design = design)
-  } else {
-    likelihoodRatioOverEffect <- getQ(firstStagePValue = firstStagePValue, design = design)
-  }
-  
-  # Calculate the value to be supplied to getPsi
-  inner <- -exp(constant)/likelihoodRatioOverEffect
-  
-  constraintList <- .getOptimalConditionalErrorConstraints(
-    design = design, firstStagePValue = firstStagePValue
-  )
-  
-  conditionalErrorConstraintUpper <- constraintList$conditionalErrorConstraintUpper
-  conditionalErrorConstraintLower <- constraintList$conditionalErrorConstraintLower
-  conditionalPower <- constraintList$conditionalPower
-  
-  conditionalErrorWithConstraints <- pmin(pmax(getPsi(nuPrime = inner, conditionalPower = conditionalPower),
-                                              conditionalErrorConstraintLower), conditionalErrorConstraintUpper)
-  
-  return(conditionalErrorWithConstraints)
+    # If monotonisation constants provided, perform non-increasing transformation
+    if (design$enforceMonotonicity) {
+        likelihoodRatioOverEffect <- getMonotoneFunction(
+            x = firstStagePValue,
+            fun = getQ,
+            argument = "firstStagePValue",
+            design = design
+        )
+    } else {
+        likelihoodRatioOverEffect <- getQ(firstStagePValue = firstStagePValue, design = design)
+    }
+
+    # Calculate the value to be supplied to getPsi
+    inner <- -exp(constant) / likelihoodRatioOverEffect
+
+    constraintList <- .getOptimalConditionalErrorConstraints(
+        design = design,
+        firstStagePValue = firstStagePValue
+    )
+
+    conditionalErrorConstraintUpper <- constraintList$conditionalErrorConstraintUpper
+    conditionalErrorConstraintLower <- constraintList$conditionalErrorConstraintLower
+    conditionalPower <- constraintList$conditionalPower
+
+    conditionalErrorWithConstraints <- pmin(
+        pmax(getPsi(nuPrime = inner, conditionalPower = conditionalPower), conditionalErrorConstraintLower),
+        conditionalErrorConstraintUpper
+    )
+
+    return(conditionalErrorWithConstraints)
 }
 
 #' Internal calculation of the integral over psi
@@ -53,22 +58,30 @@ getInnerPsi <- function(firstStagePValue, constant, design) {
 #' @keywords internal
 
 getIntegral <- function(constant, design) {
-  
-  # TODO: there are consistency issues with the alternative integration routine. For now, only standard is used. (MD, 02Jun2025)
-  
-  # If there are no monotonisation constants or they are not enforced, use standard integration
-  if(TRUE || !design$enforceMonotonicity || is.null(unlist(design$monotonisationConstants)) || !is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
-    integral <- stats::integrate(
-      f = getInnerPsi, lower = design$alpha1, upper = design$alpha0, constant = constant,
-      design = design)$value
-  }
-  # If monotonisation constants exist, use alternative integration routine better adapted to constant functions
-  else {
-    integral <- getIntegralWithConstants(
-      constant = constant, design = design
-    )
-  }
-  return(integral - (design$alpha-design$alpha1))
+    # TODO: there are consistency issues with the alternative integration routine. For now, only standard is used. (MD, 02Jun2025)
+
+    # If there are no monotonisation constants or they are not enforced, use standard integration
+    if (
+        TRUE ||
+            !design$enforceMonotonicity ||
+            is.null(unlist(design$monotonisationConstants)) ||
+            !is.null(suppressWarnings(body(design$conditionalPowerFunction)))
+    ) {
+        integral <- stats::integrate(
+            f = getInnerPsi,
+            lower = design$alpha1,
+            upper = design$alpha0,
+            constant = constant,
+            design = design
+        )$value
+    } else {
+        # If monotonisation constants exist, use alternative integration routine better adapted to constant functions
+        integral <- getIntegralWithConstants(
+            constant = constant,
+            design = design
+        )
+    }
+    return(integral - (design$alpha - design$alpha1))
 }
 
 #' Calculate the integral over a partially constant function
@@ -84,118 +97,156 @@ getIntegral <- function(constant, design) {
 #'
 
 getIntegralWithConstants <- function(constant, design) {
-  
-  # Routine is only used for constant conditional power
-  conditionalPower <- design$conditionalPower
-  
-  # Number of non-decreasing intervals of the optimal conditional error function
-  numberOfIntervals <- length(design$monotonisationConstants$qs)
-  
-  # Integrate over the first (non-constant) part of the function
-  firstPart <- stats::integrate(
-    f = getInnerPsi, lower = design$alpha1, upper = design$monotonisationConstants$dls[1],
-    constant = constant, design = design)$value
-  
-  # Integrate over the final (non-constant) part of the function
-  lastPart <- stats::integrate(
-    f = getInnerPsi, lower = design$monotonisationConstants$dus[numberOfIntervals], upper = design$alpha0,
-    constant = constant, design = design)$value
-  
-  # Calculate integral for all constant parts
-  constantParts <- 0
-  for (x in 1:numberOfIntervals){
-    newPart <- min(max(getPsi(nuPrime = -exp(constant)/design$monotonisationConstants$qs[x],
-                              conditionalPower = conditionalPower), design$minimumConditionalError),
-                   design$maximumConditionalError)*
-      (design$monotonisationConstants$dus[x] - design$monotonisationConstants$dls[x])
-    constantParts <- constantParts + newPart
-  }
-  
-  # Calculate integral for all remaining non-constant parts
-  nonConstantParts <- 0
-  if (numberOfIntervals>1){
-    for (x in 1:(numberOfIntervals-1)){
-      newPart <- stats::integrate(
-        f = getInnerPsi, lower = design$monotonisationConstants$dus[x], upper = design$monotonisationConstants$dls[x+1],
-        constant = constant, design = design)$value
-      nonConstantParts <- nonConstantParts + newPart
+    # Routine is only used for constant conditional power
+    conditionalPower <- design$conditionalPower
+
+    # Number of non-decreasing intervals of the optimal conditional error function
+    numberOfIntervals <- length(design$monotonisationConstants$qs)
+
+    # Integrate over the first (non-constant) part of the function
+    firstPart <- stats::integrate(
+        f = getInnerPsi,
+        lower = design$alpha1,
+        upper = design$monotonisationConstants$dls[1],
+        constant = constant,
+        design = design
+    )$value
+
+    # Integrate over the final (non-constant) part of the function
+    lastPart <- stats::integrate(
+        f = getInnerPsi,
+        lower = design$monotonisationConstants$dus[numberOfIntervals],
+        upper = design$alpha0,
+        constant = constant,
+        design = design
+    )$value
+
+    # Calculate integral for all constant parts
+    constantParts <- 0
+    for (x in 1:numberOfIntervals) {
+        newPart <- min(
+            max(
+                getPsi(
+                    nuPrime = -exp(constant) / design$monotonisationConstants$qs[x],
+                    conditionalPower = conditionalPower
+                ),
+                design$minimumConditionalError
+            ),
+            design$maximumConditionalError
+        ) *
+            (design$monotonisationConstants$dus[x] - design$monotonisationConstants$dls[x])
+        constantParts <- constantParts + newPart
     }
-  }
-  
-  # Return the sum of all parts
-  return(sum(c(firstPart, lastPart, constantParts, nonConstantParts)))
+
+    # Calculate integral for all remaining non-constant parts
+    nonConstantParts <- 0
+    if (numberOfIntervals > 1) {
+        for (x in 1:(numberOfIntervals - 1)) {
+            newPart <- stats::integrate(
+                f = getInnerPsi,
+                lower = design$monotonisationConstants$dus[x],
+                upper = design$monotonisationConstants$dls[x + 1],
+                constant = constant,
+                design = design
+            )$value
+            nonConstantParts <- nonConstantParts + newPart
+        }
+    }
+
+    # Return the sum of all parts
+    return(sum(c(firstPart, lastPart, constantParts, nonConstantParts)))
 }
 
 
 .getOptimalConditionalErrorConstraints <- function(design, firstStagePValue) {
-  
-  # Constraints on conditional error scale
-  conditionalErrorConstraintMaximumConditionalError <- design$maximumConditionalError
-  conditionalErrorConstraintMinimumConditionalError <- design$minimumConditionalError
-  
-  # Constraints on information scale
-  conditionalErrorConstraintMinimumInformation <- NULL
-  conditionalErrorConstraintMaximumInformation <- NULL
-  
-  conditionalPower <- NULL
-  
-  # Check if conditional power function should be used
-  if(!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
-    conditionalPower <- design$conditionalPowerFunction(firstStagePValue)
-    
-    # Check if interim estimate is used
-    if(design$useInterimEstimate) {
-      delta1 <- min(max(qnorm(1-firstStagePValue)/sqrt(design$firstStageInformation), design$delta1Min), design$delta1Max)
+    # Constraints on conditional error scale
+    conditionalErrorConstraintMaximumConditionalError <- design$maximumConditionalError
+    conditionalErrorConstraintMinimumConditionalError <- design$minimumConditionalError
+
+    # Constraints on information scale
+    conditionalErrorConstraintMinimumInformation <- NULL
+    conditionalErrorConstraintMaximumInformation <- NULL
+
+    conditionalPower <- NULL
+
+    # Check if conditional power function should be used
+    if (!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
+        conditionalPower <- design$conditionalPowerFunction(firstStagePValue)
+
+        # Check if interim estimate is used
+        if (design$useInterimEstimate) {
+            delta1 <- min(
+                max(qnorm(1 - firstStagePValue) / sqrt(design$firstStageInformation), design$delta1Min),
+                design$delta1Max
+            )
+        } else {
+            # Otherwise use fixed effect
+            delta1 <- design$delta1
+        }
+        # Calculate constraint based on minimumSecondStageInformation
+        if (design$minimumSecondStageInformation > 0) {
+            conditionalErrorConstraintMinimumInformation <- 1 -
+                stats::pnorm(delta1 * sqrt(design$minimumSecondStageInformation) - stats::qnorm(conditionalPower))
+        }
+
+        # Calculate constraint based on maximumSecondStageInformation
+        if (design$maximumSecondStageInformation < Inf) {
+            conditionalErrorConstraintMaximumInformation <- 1 -
+                stats::pnorm(delta1 * sqrt(design$maximumSecondStageInformation) - stats::qnorm(conditionalPower))
+        }
+    } else {
+        conditionalPower <- design$conditionalPower
+
+        #Check if interim estimate is used
+        if (design$useInterimEstimate) {
+            delta1MaximumAchieved <- min(
+                qnorm(1 - design$alpha1) / sqrt(design$firstStageInformation),
+                design$delta1Max
+            )
+            delta1MinimumAchieved <- max(
+                qnorm(1 - design$alpha0) / sqrt(design$firstStageInformation),
+                design$delta1Min
+            )
+        } else {
+            # Otherwise use fixed effect
+            delta1MaximumAchieved <- design$delta1
+            delta1MinimumAchieved <- design$delta1
+        }
+
+        # Calculate constraint based on minimumSecondStageInformation
+        if (design$minimumSecondStageInformation > 0) {
+            conditionalErrorConstraintMinimumInformation <- 1 -
+                pnorm(
+                    delta1MaximumAchieved * sqrt(design$minimumSecondStageInformation) - stats::qnorm(conditionalPower)
+                )
+        }
+
+        #Calculate constraint based on maximumSecondStageInformation
+        if (design$maximumSecondStageInformation < Inf) {
+            conditionalErrorConstraintMaximumInformation <- 1 -
+                pnorm(
+                    delta1MinimumAchieved * sqrt(design$maximumSecondStageInformation) - stats::qnorm(conditionalPower)
+                )
+        }
     }
-    # Otherwise use fixed effect
-    else {
-      delta1 <- design$delta1
-    }
-    # Calculate constraint based on minimumSecondStageInformation
-    if(design$minimumSecondStageInformation > 0){
-      conditionalErrorConstraintMinimumInformation <- 1 - stats::pnorm(delta1* sqrt(design$minimumSecondStageInformation)-stats::qnorm(conditionalPower))
-    }
-    
-    # Calculate constraint based on maximumSecondStageInformation
-    if(design$maximumSecondStageInformation < Inf){
-      conditionalErrorConstraintMaximumInformation <- 1 - stats::pnorm(delta1* sqrt(design$maximumSecondStageInformation)-stats::qnorm(conditionalPower))
-    }
-  } else {
-    conditionalPower <- design$conditionalPower
-    
-    #Check if interim estimate is used
-    if(design$useInterimEstimate) {
-      delta1MaximumAchieved <- min(qnorm(1-design$alpha1)/sqrt(design$firstStageInformation),design$delta1Max)
-      delta1MinimumAchieved <- max(qnorm(1-design$alpha0)/sqrt(design$firstStageInformation),design$delta1Min)
-    }
-    # Otherwise use fixed effect
-    else {
-      delta1MaximumAchieved <- design$delta1
-      delta1MinimumAchieved <- design$delta1
-    }
-    
-    # Calculate constraint based on minimumSecondStageInformation
-    if(design$minimumSecondStageInformation > 0){
-      conditionalErrorConstraintMinimumInformation <- 1 - pnorm(delta1MaximumAchieved* sqrt(design$minimumSecondStageInformation)-stats::qnorm(conditionalPower))
-    }
-    
-    #Calculate constraint based on maximumSecondStageInformation
-    if(design$maximumSecondStageInformation < Inf){
-      conditionalErrorConstraintMaximumInformation <- 1 - pnorm(delta1MinimumAchieved* sqrt(design$maximumSecondStageInformation)-stats::qnorm(conditionalPower))
-    }
-  }
-  
-  #Use the constraint that is the stronger restriction
-  conditionalErrorConstraintUpper <- min(conditionalErrorConstraintMinimumInformation, conditionalErrorConstraintMaximumConditionalError)
-  conditionalErrorConstraintLower <- max(conditionalErrorConstraintMaximumInformation, conditionalErrorConstraintMinimumConditionalError)
-  
-  constraintList <- list(
-    "conditionalErrorConstraintUpper" = conditionalErrorConstraintUpper,
-    "conditionalErrorConstraintLower" = conditionalErrorConstraintLower,
-    "conditionalPower" = conditionalPower
-  )
-  
-  return(constraintList)
+
+    #Use the constraint that is the stronger restriction
+    conditionalErrorConstraintUpper <- min(
+        conditionalErrorConstraintMinimumInformation,
+        conditionalErrorConstraintMaximumConditionalError
+    )
+    conditionalErrorConstraintLower <- max(
+        conditionalErrorConstraintMaximumInformation,
+        conditionalErrorConstraintMinimumConditionalError
+    )
+
+    constraintList <- list(
+        "conditionalErrorConstraintUpper" = conditionalErrorConstraintUpper,
+        "conditionalErrorConstraintLower" = conditionalErrorConstraintLower,
+        "conditionalPower" = conditionalPower
+    )
+
+    return(constraintList)
 }
 
 #' Get Level Constant for Optimal Conditional Error Function
@@ -224,47 +275,54 @@ getIntegralWithConstants <- function(constant, design) {
 #' @template reference_monotone
 
 getLevelConstant <- function(design) {
-  # Check basic condition for decision rules
-  # Fixed conditional power
-  if(!is.na(design$conditionalPower)) {
-    if (design$alpha1 + design$conditionalPower * (design$alpha0 - design$alpha1) <= design$alpha) {
-      stop("(alpha1 + conditionalPower*(alpha0-alpha1)) must exceed alpha, otherwise no level constant fully exhausting alpha can be found.")
+    # Check basic condition for decision rules
+    # Fixed conditional power
+    if (!is.na(design$conditionalPower)) {
+        if (design$alpha1 + design$conditionalPower * (design$alpha0 - design$alpha1) <= design$alpha) {
+            stop(
+                "(alpha1 + conditionalPower*(alpha0-alpha1)) must exceed alpha, otherwise no level constant fully exhausting alpha can be found."
+            )
+        }
+    } else if (!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
+        # Conditional power function
+        if (
+            stats::integrate(f = design$conditionalPowerFunction, lower = design$alpha1, upper = design$alpha0)$value <=
+                design$alpha - design$alpha1
+        ) {
+            stop(
+                "Integral over conditional power function from alpha1 to alpha0 must exceed (alpha-alpha1), otherwise no level constant fully exhausting alpha can be found."
+            )
+        }
+    } else {
+        # Unexpected issue
+        stop("Unexpected error: both conditionalPower and conditionalPowerFunction are specified inappropriately.")
     }
-  }
-  # Conditional power function
-  else if(!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
-    if(stats::integrate(f = design$conditionalPowerFunction, lower = design$alpha1, upper = design$alpha0)$value
-       <= design$alpha - design$alpha1) {
-      stop("Integral over conditional power function from alpha1 to alpha0 must exceed (alpha-alpha1), otherwise no level constant fully exhausting alpha can be found.")
-    }
-  }
-  # Unexpected issue
-  else {
-    stop("Unexpected error: both conditionalPower and conditionalPowerFunction are specified inappropriately.")
-  }
-  
-  # Find the level constant.
-  # Expects an error if specified non-centrality parameter is very large or very small
-  tryCatch(
-    expr = {
-      stats::uniroot(
-        f = getIntegral, lower = design$levelConstantMinimum,
-        upper = design$levelConstantMaximum, design = design,
-        tol = 1e-16
-      )
-    },
-    error = function(e) {
-      # This specific error may occur if the given non-centrality parameter is too small or too large or if the
-      # provided constraints are not suitable and is handled separately
-      if (e$message == "f() values at end points not of opposite sign") {
-        stop("Root finding for level constant failed. Try changing the search interval via arguments levelConstantMinimum and levelConstantMaximum. \n Alternatively, the constraints on the optimal conditional error function or second-stage information may not be appropriate.")
-      }
-      # Print all other errors directly
-      else {
-        stop(e)
-      }
-    }
-  )
+
+    # Find the level constant.
+    # Expects an error if specified non-centrality parameter is very large or very small
+    tryCatch(
+        expr = {
+            stats::uniroot(
+                f = getIntegral,
+                lower = design$levelConstantMinimum,
+                upper = design$levelConstantMaximum,
+                design = design,
+                tol = 1e-16
+            )
+        },
+        error = function(e) {
+            # This specific error may occur if the given non-centrality parameter is too small or too large or if the
+            # provided constraints are not suitable and is handled separately
+            if (e$message == "f() values at end points not of opposite sign") {
+                stop(
+                    "Root finding for level constant failed. Try changing the search interval via arguments levelConstantMinimum and levelConstantMaximum. \n Alternatively, the constraints on the optimal conditional error function or second-stage information may not be appropriate."
+                )
+            } else {
+                # Print all other errors directly
+                stop(e)
+            }
+        }
+    )
 }
 
 #' Calculate Likelihood Ratio
@@ -299,95 +357,101 @@ getLevelConstant <- function(design) {
 #' @references Hung, H. M. J., O’Neill, R. T., Bauer, P. & Kohne, K. (1997). The behavior of the p-value when the alternative hypothesis is true. Biometrics. http://www.jstor.org/stable/2533093
 
 getLikelihoodRatio <- function(firstStagePValue, design) {
-  # Initialise likelihood ratio
-  likelihoodRatio <- NA
-  # Fixed effect case
-  if(design$likelihoodRatioDistribution == "fixed"){
-    
-    # Get non-centrality parameter and weights
-    
-    # Ensure that ncp argument is provided
-    # This is a fallback protection, as the design function should already ensure this
-    if(is.null(design$deltaLR)) {
-      stop("Argument deltaLR required for fixed likelihood case, but not found in design object.")
+    # Initialise likelihood ratio
+    likelihoodRatio <- NA
+    # Fixed effect case
+    if (design$likelihoodRatioDistribution == "fixed") {
+        # Get non-centrality parameter and weights
+
+        # Ensure that ncp argument is provided
+        # This is a fallback protection, as the design function should already ensure this
+        if (is.null(design$deltaLR)) {
+            stop("Argument deltaLR required for fixed likelihood case, but not found in design object.")
+        }
+
+        nonCentralityParameter <- design$deltaLR * sqrt(design$firstStageInformation)
+        weights <- design$weightsDeltaLR
+
+        # If weights argument was not specified, automatically use equal weights
+        if (is.null(weights)) {
+            weights <- rep(1 / length(nonCentralityParameter), length(nonCentralityParameter))
+        }
+
+        # Ensure that weights are positive and sum up to 1
+        # This is a fallback protection, as the design function should already ensure this
+        if (sum(weights) != 1 || any(weights < 0)) {
+            stop("weightsDeltaLR must be positive and sum up to 1")
+        }
+
+        # Calculate likelihood ratio
+        likelihoodRatio <- exp(
+            stats::qnorm(1 - firstStagePValue) * nonCentralityParameter - nonCentralityParameter^2 / 2
+        ) %*%
+            weights
+    } else if (design$likelihoodRatioDistribution == "normal") {
+        # Normal prior
+        # Get ncp and tau
+
+        # Ensure that arguments were specified
+        # This is a fallback protection, as the design function should already ensure this
+        if (is.null(design$deltaLR) || is.null(design$tauLR)) {
+            stop("Arguments deltaLR and tauLR required for normal likelihood case, but not found in design object.")
+        }
+
+        nonCentralityParameter <- design$deltaLR * sqrt(design$firstStageInformation)
+        tau <- design$tauLR * sqrt(design$firstStageInformation)
+
+        # Calculate likelihood ratio
+        likelihoodRatio <- (1 / sqrt(1 + tau^2)) *
+            exp(
+                -(nonCentralityParameter / tau)^2 /
+                    2 +
+                    (tau * stats::qnorm(1 - firstStagePValue) + (nonCentralityParameter / tau))^2 / (2 * (1 + tau^2))
+            )
+    } else if (design$likelihoodRatioDistribution == "exp") {
+        # Exponential prior
+        # Get kap0
+
+        # Ensure that argument was specified
+        # This is a fallback protection, as the design function should already ensure this
+        if (is.null(design$kappaLR)) {
+            stop("Argument kappaLR required for exponential likelihood case, but not found in design object.")
+        }
+
+        nonCentralityParameter <- design$kappaLR * sqrt(design$firstStageInformation)
+
+        # Calculate likelihood ratio
+        likelihoodRatio <- sqrt(2 * pi) *
+            nonCentralityParameter *
+            exp((stats::qnorm(1 - firstStagePValue) - nonCentralityParameter)^2 / 2) *
+            stats::pnorm(stats::qnorm(1 - firstStagePValue) - nonCentralityParameter)
+    } else if (design$likelihoodRatioDistribution == "unif") {
+        # Uniform prior
+        # Get delMax
+
+        # Ensure that argument was specified
+        # This is a fallback protection, as the design function should already ensure this
+        if (is.null(design$deltaMaxLR)) {
+            stop("Argument deltaMaxLR required for uniform likelihood case, but not found in design object.")
+        }
+
+        nonCentralityParameter <- design$deltaMaxLR * sqrt(design$firstStageInformation)
+
+        # Calculate likelihood ratio
+        likelihoodRatio <- sqrt(2 * pi) *
+            exp(stats::qnorm(1 - firstStagePValue)^2 / 2) *
+            (stats::pnorm(nonCentralityParameter - stats::qnorm(1 - firstStagePValue)) - firstStagePValue) /
+            nonCentralityParameter
+    } else if (design$likelihoodRatioDistribution == "maxlr") {
+        # Maximum likelihood ratio case
+        # Calculate likelihood ratio
+        likelihoodRatio <- exp(max(0, stats::qnorm(1 - firstStagePValue))^2 / 2)
+    } else {
+        stop("Distribution not matched.")
     }
-    
-    nonCentralityParameter <- design$deltaLR * sqrt(design$firstStageInformation)
-    weights <- design$weightsDeltaLR
-    
-    # If weights argument was not specified, automatically use equal weights
-    if(is.null(weights)) {
-      weights <- rep(1/length(nonCentralityParameter), length(nonCentralityParameter))
-    }
-    
-    # Ensure that weights are positive and sum up to 1
-    # This is a fallback protection, as the design function should already ensure this
-    if(sum(weights) != 1 || any(weights < 0)) {
-      stop("weightsDeltaLR must be positive and sum up to 1")
-    }
-    
-    # Calculate likelihood ratio
-    likelihoodRatio <- exp(stats::qnorm(1-firstStagePValue)*nonCentralityParameter-nonCentralityParameter^2/2) %*% weights
-  }
-  # Normal prior
-  else if(design$likelihoodRatioDistribution == "normal") {
-    
-    # Get ncp and tau
-    
-    # Ensure that arguments were specified
-    # This is a fallback protection, as the design function should already ensure this
-    if(is.null(design$deltaLR) || is.null(design$tauLR)) {
-      stop("Arguments deltaLR and tauLR required for normal likelihood case, but not found in design object.")
-    }
-    
-    nonCentralityParameter <- design$deltaLR * sqrt(design$firstStageInformation)
-    tau <- design$tauLR * sqrt(design$firstStageInformation)
-    
-    # Calculate likelihood ratio
-    likelihoodRatio <- (1/sqrt(1+tau^2))*exp(-(nonCentralityParameter/tau)^2/2+(tau*stats::qnorm(1-firstStagePValue)+(nonCentralityParameter/tau))^2/(2*(1+tau^2)))
-  }
-  # Exponential prior
-  else if(design$likelihoodRatioDistribution == "exp"){
-    
-    # Get kap0
-    
-    # Ensure that argument was specified
-    # This is a fallback protection, as the design function should already ensure this
-    if(is.null(design$kappaLR)) {
-      stop("Argument kappaLR required for exponential likelihood case, but not found in design object.")
-    }
-    
-    nonCentralityParameter <- design$kappaLR * sqrt(design$firstStageInformation)
-    
-    # Calculate likelihood ratio
-    likelihoodRatio <- sqrt(2*pi)*nonCentralityParameter*exp((stats::qnorm(1-firstStagePValue)-nonCentralityParameter)^2/2)*stats::pnorm(stats::qnorm(1-firstStagePValue)-nonCentralityParameter)
-  }
-  # Uniform prior
-  else if(design$likelihoodRatioDistribution == "unif"){
-    # Get delMax
-    
-    # Ensure that argument was specified
-    # This is a fallback protection, as the design function should already ensure this
-    if(is.null(design$deltaMaxLR)) {
-      stop("Argument deltaMaxLR required for uniform likelihood case, but not found in design object.")
-    }
-    
-    nonCentralityParameter <- design$deltaMaxLR * sqrt(design$firstStageInformation)
-    
-    # Calculate likelihood ratio
-    likelihoodRatio <- sqrt(2*pi)*exp(stats::qnorm(1-firstStagePValue)^2/2)*(stats::pnorm(nonCentralityParameter-stats::qnorm(1-firstStagePValue))-firstStagePValue)/nonCentralityParameter
-  }
-  # Maximum likelihood ratio case
-  else if(design$likelihoodRatioDistribution == "maxlr") {
-    # Calculate likelihood ratio
-    likelihoodRatio <- exp(max(0, stats::qnorm(1-firstStagePValue))^2/2)
-  }
-  else {
-    stop("Distribution not matched.")
-  }
-  
-  # Return likelihood ratio
-  return(unname(likelihoodRatio))
+
+    # Return likelihood ratio
+    return(unname(likelihoodRatio))
 }
 
 getLikelihoodRatio <- Vectorize(getLikelihoodRatio, "firstStagePValue")
@@ -417,27 +481,38 @@ getLikelihoodRatio <- Vectorize(getLikelihoodRatio, "firstStagePValue")
 #'
 #' @template reference_monotone
 
-getMonotoneFunction <- function(x, fun, lower=NULL, upper=NULL, argument=NULL, nSteps = 10^4, epsilon = 10^(-5), numberOfIterationsQ = 10^4, design) {
-  
-  # If monotonisation is enforced, extract constants
-  if(design$enforceMonotonicity) {
-    out <- design$monotonisationConstants
-  }
-  else {
-    out <- list()
-  }
-  
-  # If the length of object out is 0, the function is already non-increasing
-  if(length(out)==0) {
-    modFunctionValues <- fun(x, design = design)
-  }
-  # If the length of out is larger than 0, a transformation is necessary
-  else {
-    positionLower <- apply(outer(x, out$dls, ">="), 1, sum)
-    positionUpper <- apply(outer(x, out$dus, ">"), 1, sum) + 1
-    modFunctionValues <- ifelse(positionLower == positionUpper, yes = out$qs[pmax(1, positionLower)], no = fun(x, design = design))
-  }
-  return(modFunctionValues)
+getMonotoneFunction <- function(
+    x,
+    fun,
+    lower = NULL,
+    upper = NULL,
+    argument = NULL,
+    nSteps = 10^4,
+    epsilon = 10^(-5),
+    numberOfIterationsQ = 10^4,
+    design
+) {
+    # If monotonisation is enforced, extract constants
+    if (design$enforceMonotonicity) {
+        out <- design$monotonisationConstants
+    } else {
+        out <- list()
+    }
+
+    # If the length of object out is 0, the function is already non-increasing
+    if (length(out) == 0) {
+        modFunctionValues <- fun(x, design = design)
+    } else {
+        # If the length of out is larger than 0, a transformation is necessary
+        positionLower <- apply(outer(x, out$dls, ">="), 1, sum)
+        positionUpper <- apply(outer(x, out$dus, ">"), 1, sum) + 1
+        modFunctionValues <- ifelse(
+            positionLower == positionUpper,
+            yes = out$qs[pmax(1, positionLower)],
+            no = fun(x, design = design)
+        )
+    }
+    return(modFunctionValues)
 }
 
 #' Calculate the Constants for Monotonisation
@@ -460,155 +535,161 @@ getMonotoneFunction <- function(x, fun, lower=NULL, upper=NULL, argument=NULL, n
 #'
 #' @template reference_monotone
 
-getMonotonisationConstants <- function(fun, lower = 0, upper = 1, argument, nSteps = 10^4, epsilon = 10^(-5), numberOfIterationsQ = 10^4, design) {
-  # Sequence of argument values
-  argumentValues <- max(0, lower - 1 / (nSteps + 1)) + (upper - lower) * (1:nSteps) / (nSteps + 1)
-  
-  # Create a list of arguments that fun requires
-  argumentList <- list(argumentValues, design)
-  names(argumentList) <- c(argument, "design")
-  
-  # Call fun with the specified arguments
-  functionValues <- do.call(what = fun, args = argumentList)
-  
-  # Get min and max function value
-  minFunctionValue <- min(functionValues)
-  maxFunctionValue <- max(functionValues)
-  
-  # Append max and min values
-  functionValues <- c(maxFunctionValue, functionValues, minFunctionValue)
-  
-  # Helper variable that saves the number of function values
-  m <- length(functionValues)
-  
-  # Calculate initial "integral"
-  initialIntegral <- (sum(functionValues) - 0.5 * (minFunctionValue + maxFunctionValue)) / m
-  
-  # Changes in function values
-  derivativeFunctionValues <- functionValues[-1] - functionValues[-m]
-  
-  output <- NULL
-  
-  # Check if function is increasing anywhere
-  if (max(derivativeFunctionValues) > 0) {
-    # Vector for the constants
-    qs <- NULL
-    
-    for (i in 1:m) {
-      # Recalculate min and max value
-      minFunctionValue <- min(functionValues)
-      maxFunctionValue <- max(functionValues)
-      
-      # Determine derivatives of function values
-      derivativeFunctionValues <- c(0, functionValues[-1] - functionValues[-m])
-      
-      # Additional check to potentially save runtime: function already non-increasing?
-      if(max(derivativeFunctionValues) <= 0) {
-        break
-      }
-      
-      # Index of lower boundary of first interval
-      dl1Position <- min(c(sum(cummin(derivativeFunctionValues <= 0)) + 1, m))
-      
-      # Index of upper boundary of first interval
-      if(dl1Position < length(functionValues)) {
-        duPosition <- dl1Position + sum(cummin(derivativeFunctionValues[dl1Position:(m - 2)] > 0))
-      }
-      else {
-        duPosition <- dl1Position
-      }
-      
-      # Index of lower boundary of second interval
-      if(duPosition < length(functionValues)) {
-        dl2Position <- duPosition + sum(cummin(derivativeFunctionValues[duPosition:(m - 1)] <= 0))
-      }
-      else {
-        dl2Position <- duPosition
-      }
-      
-      # Repeat until integrals are similar enough or maximum number of iterations reached
-      for (j in 1:numberOfIterationsQ) {
-        # Initial guess for q
-        q <- (minFunctionValue + maxFunctionValue) / 2
-        
-        # Temporal modification of functionValues with the current guess for q
-        modFunctionValues <- pmax(q, functionValues[1:dl1Position])
-        modFunctionValues <- c(modFunctionValues, rep(q, duPosition +1 - dl1Position))
-        
-        if (duPosition < (m - 1)) {
-          modFunctionValues <- c(modFunctionValues, pmin(q, functionValues[(duPosition + 2):dl2Position]))
+getMonotonisationConstants <- function(
+    fun,
+    lower = 0,
+    upper = 1,
+    argument,
+    nSteps = 10^4,
+    epsilon = 10^(-5),
+    numberOfIterationsQ = 10^4,
+    design
+) {
+    # Sequence of argument values
+    argumentValues <- max(0, lower - 1 / (nSteps + 1)) + (upper - lower) * (1:nSteps) / (nSteps + 1)
+
+    # Create a list of arguments that fun requires
+    argumentList <- list(argumentValues, design)
+    names(argumentList) <- c(argument, "design")
+
+    # Call fun with the specified arguments
+    functionValues <- do.call(what = fun, args = argumentList)
+
+    # Get min and max function value
+    minFunctionValue <- min(functionValues)
+    maxFunctionValue <- max(functionValues)
+
+    # Append max and min values
+    functionValues <- c(maxFunctionValue, functionValues, minFunctionValue)
+
+    # Helper variable that saves the number of function values
+    m <- length(functionValues)
+
+    # Calculate initial "integral"
+    initialIntegral <- (sum(functionValues) - 0.5 * (minFunctionValue + maxFunctionValue)) / m
+
+    # Changes in function values
+    derivativeFunctionValues <- functionValues[-1] - functionValues[-m]
+
+    output <- NULL
+
+    # Check if function is increasing anywhere
+    if (max(derivativeFunctionValues) > 0) {
+        # Vector for the constants
+        qs <- NULL
+
+        for (i in 1:m) {
+            # Recalculate min and max value
+            minFunctionValue <- min(functionValues)
+            maxFunctionValue <- max(functionValues)
+
+            # Determine derivatives of function values
+            derivativeFunctionValues <- c(0, functionValues[-1] - functionValues[-m])
+
+            # Additional check to potentially save runtime: function already non-increasing?
+            if (max(derivativeFunctionValues) <= 0) {
+                break
+            }
+
+            # Index of lower boundary of first interval
+            dl1Position <- min(c(sum(cummin(derivativeFunctionValues <= 0)) + 1, m))
+
+            # Index of upper boundary of first interval
+            if (dl1Position < length(functionValues)) {
+                duPosition <- dl1Position + sum(cummin(derivativeFunctionValues[dl1Position:(m - 2)] > 0))
+            } else {
+                duPosition <- dl1Position
+            }
+
+            # Index of lower boundary of second interval
+            if (duPosition < length(functionValues)) {
+                dl2Position <- duPosition + sum(cummin(derivativeFunctionValues[duPosition:(m - 1)] <= 0))
+            } else {
+                dl2Position <- duPosition
+            }
+
+            # Repeat until integrals are similar enough or maximum number of iterations reached
+            for (j in 1:numberOfIterationsQ) {
+                # Initial guess for q
+                q <- (minFunctionValue + maxFunctionValue) / 2
+
+                # Temporal modification of functionValues with the current guess for q
+                modFunctionValues <- pmax(q, functionValues[1:dl1Position])
+                modFunctionValues <- c(modFunctionValues, rep(q, duPosition + 1 - dl1Position))
+
+                if (duPosition < (m - 1)) {
+                    modFunctionValues <- c(modFunctionValues, pmin(q, functionValues[(duPosition + 2):dl2Position]))
+                }
+                if (dl2Position < m) {
+                    modFunctionValues <- c(modFunctionValues, functionValues[(dl2Position + 1):m])
+                }
+
+                newIntegral <- (sum(modFunctionValues) - 0.5 * (max(modFunctionValues) + min(modFunctionValues))) / m
+
+                # If difference between integrals is small enough, stop current iteration
+                if (abs(newIntegral - initialIntegral) < epsilon) {
+                    break
+                }
+
+                # If difference between integrals is not small enough yet, update the maximal or minimal values
+                if (newIntegral > initialIntegral) {
+                    maxFunctionValue <- q
+                } else {
+                    minFunctionValue <- q
+                }
+            }
+
+            # No constants q so far: add
+            if (is.null(qs)) {
+                qs <- c(qs, q)
+            } else {
+                # If some constants already exist: if the new constant is larger than the last constant, it must replace the last constant.
+                # This ensures that the constants are also non-increasing
+                if (q >= qs[length(qs)]) {
+                    qs[length(qs)] <- q
+                } else {
+                    qs <- c(qs, q)
+                }
+            }
+            # No more increasing interval -> Finished
+            if (dl2Position == m - 1) {
+                break
+            } else {
+                functionValues <- modFunctionValues
+            }
         }
-        if (dl2Position < m) {
-          modFunctionValues <- c(modFunctionValues, functionValues[(dl2Position + 1):m])
+        dls <- NULL
+        dus <- NULL
+        argumentValues <- c(lower, argumentValues, upper)
+
+        # Find min and max of the intervals for each q
+        for (q in qs) {
+            dls <- c(dls, argumentValues[sum(cummin(modFunctionValues[2:(m - 1)] > q)) + 1])
+            dus <- c(dus, argumentValues[sum(cummin(modFunctionValues[2:(m - 1)] >= q)) + 1])
         }
-        
-        newIntegral <- (sum(modFunctionValues) - 0.5 * (max(modFunctionValues) + min(modFunctionValues))) / m
-        
-        # If difference between integrals is small enough, stop current iteration
-        if (abs(newIntegral - initialIntegral) < epsilon) {
-          break
-        }
-        
-        # If difference between integrals is not small enough yet, update the maximal or minimal values
-        if (newIntegral > initialIntegral) {
-          maxFunctionValue <- q
-        } else {
-          minFunctionValue <- q
-        }
-      }
-      
-      # No constants q so far: add
-      if (is.null(qs)) {
-        qs <- c(qs, q)
-      }
-      # If some constants already exist: if the new constant is larger than the last constant, it must replace the last constant.
-      # This ensures that the constants are also non-increasing
-      else {
-        if (q >= qs[length(qs)]) {
-          qs[length(qs)] <- q
-        } else {
-          qs <- c(qs, q)
-        }
-      }
-      # No more increasing interval -> Finished
-      if (dl2Position == m - 1) {
-        break
-      } else {
-        functionValues <- modFunctionValues
-      }
+
+        output <- list(qs = qs, dls = dls, dus = dus, integral = newIntegral)
     }
-    dls <- NULL
-    dus <- NULL
-    argumentValues <- c(lower, argumentValues, upper)
-    
-    # Find min and max of the intervals for each q
-    for (q in qs) {
-      dls <- c(dls, argumentValues[sum(cummin(modFunctionValues[2:(m - 1)] > q)) + 1])
-      dus <- c(dus, argumentValues[sum(cummin(modFunctionValues[2:(m - 1)] >= q)) + 1])
+
+    # Special case: function is increasing at the last element -> set last du to upper
+    if (length(output$dus) > 0) {
+        if (output$dus[length(output$dus)] >= argumentValues[m - 1]) {
+            output$dus[length(output$dus)] <- upper
+        }
     }
-    
-    output <- list(qs = qs, dls = dls, dus = dus, integral = newIntegral)
-    
-  }
-  
-  # Special case: function is increasing at the last element -> set last du to upper
-  if(length(output$dus)>0) {
-    if(output$dus[length(output$dus)] >= argumentValues[m-1]) {
-      output$dus[length(output$dus)] <- upper
+
+    # If there are no entries, no monotonisation is required
+    if (is.null(unlist(output))) {
+        output <- list()
+    } else {
+        if (!design$enforceMonotonicity) {
+            warning(
+                "Monotonisation is required. Set enforceMonotonicity to TRUE in design object for strict type I error control."
+            )
+        }
     }
-  }
-  
-  # If there are no entries, no monotonisation is required
-  if(is.null(unlist(output))) {
-    output <- list()
-  }
-  else {
-    if(!design$enforceMonotonicity) {
-      warning("Monotonisation is required. Set enforceMonotonicity to TRUE in design object for strict type I error control.")
-    }
-  }
-  
-  return(output)
+
+    return(output)
 }
 
 #' Calculate Nu
@@ -634,14 +715,13 @@ getMonotonisationConstants <- function(fun, lower = 0, upper = 1, argument, nSte
 #' @template reference_optimal
 
 getNu <- function(alpha, conditionalPower) {
-  nu <- 0
-  if(any(alpha > conditionalPower)) {
-    warning("alpha/conditional error should not exceed conditionalPower. Information is otherwise 0")
-  }
-  else{
-    nu <- (stats::qnorm(1-alpha)+stats::qnorm(conditionalPower))^2
-  }
-  return(nu)
+    nu <- 0
+    if (any(alpha > conditionalPower)) {
+        warning("alpha/conditional error should not exceed conditionalPower. Information is otherwise 0")
+    } else {
+        nu <- (stats::qnorm(1 - alpha) + stats::qnorm(conditionalPower))^2
+    }
+    return(nu)
 }
 
 getNu <- Vectorize(FUN = getNu, vectorize.args = c("alpha", "conditionalPower"))
@@ -668,8 +748,8 @@ getNu <- Vectorize(FUN = getNu, vectorize.args = c("alpha", "conditionalPower"))
 #' @template reference_optimal
 #'
 getNuPrime <- function(alpha, conditionalPower) {
-  nuPrime <- -2*(stats::qnorm(1-alpha)+stats::qnorm(conditionalPower))/stats::dnorm(qnorm(1-alpha))
-  return(nuPrime)
+    nuPrime <- -2 * (stats::qnorm(1 - alpha) + stats::qnorm(conditionalPower)) / stats::dnorm(qnorm(1 - alpha))
+    return(nuPrime)
 }
 
 getNuPrime <- Vectorize(FUN = getNuPrime, vectorize.args = "alpha")
@@ -695,54 +775,80 @@ getNuPrime <- Vectorize(FUN = getNuPrime, vectorize.args = "alpha")
 #' # Returns 0.05
 #' getPsi(getNuPrime(alpha = 0.05, conditionalPower = 0.9), conditionalPower = 0.9)
 
+getPsi <- function(nuPrime, conditionalPower) {
+    # If the conditional power is between 1-pnorm(2) and pnorm(2) nu prime is monotone and we can build the inverse directly
+    if ((stats::pnorm(-2) <= conditionalPower && conditionalPower <= stats::pnorm(2))) {
+        rootlist <- uniroot(
+            f = function(alpha) {
+                getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+            },
+            lower = 0,
+            upper = conditionalPower,
+            tol = 1e-16
+        )
+        return(rootlist$root)
 
-getPsi <- function(nuPrime, conditionalPower){
-  
-  # If the conditional power is between 1-pnorm(2) and pnorm(2) nu prime is monotone and we can build the inverse directly
-  if((stats::pnorm(-2) <= conditionalPower && conditionalPower <= stats::pnorm(2))){
-    rootlist <- uniroot(f=function(alpha){getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime},
-                        lower = 0, upper = conditionalPower, tol = 1e-16)
-    return(rootlist$root)
-    
-    # If the conditional power is not between 1-pnorm(2) and pnorm(2) nu prime is not monotone and we need to build the inverse differently
-  } else {
-    # Calculate the minimum and the maximum of NuPrime(u)
-    maximumValue <- 1-stats::pnorm(-stats::qnorm(conditionalPower)/2+sqrt(stats::qnorm(conditionalPower)^2/4-1))
-    minimumValue <- 1-stats::pnorm(-stats::qnorm(conditionalPower)/2-sqrt(stats::qnorm(conditionalPower)^2/4-1))
-    nuPrimeAtMax <- getNuPrime(alpha = maximumValue, conditionalPower = conditionalPower)
-    nuPrimeAtMin <- getNuPrime(alpha = minimumValue, conditionalPower = conditionalPower)
-    
-    if(nuPrime > nuPrimeAtMax){
-      
-      rootlist <- uniroot(f=function(alpha){getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime},
-                          lower = minimumValue, upper = conditionalPower, tol = 1e-16)
-      return(rootlist$root)
-      
-    } else if (nuPrime < nuPrimeAtMin){
-      
-      rootlist <- uniroot(f=function(alpha){getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime},
-                          lower = 0, upper = maximumValue, tol = 1e-16)
-      return(rootlist$root)
-      
+        # If the conditional power is not between 1-pnorm(2) and pnorm(2) nu prime is not monotone and we need to build the inverse differently
     } else {
-      
-      # Calculate psiLower and psiUpper
-      rootlistLower <- uniroot(f=function(alpha){getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime},
-                           lower = 0, upper = maximumValue, tol = 1e-16)
-      psiLower <- rootlistLower$root
-      rootlistUpper <- uniroot(f=function(alpha){getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime},
-                           lower = minimumValue, upper = conditionalPower, tol = 1e-16)
-      psiUpper <- rootlistUpper$root
-      # Calculate the quotient that is needed to decide if psiLower or psiUpper is used
-      quotient <- getNu(alpha = min(conditionalPower, psiUpper), conditionalPower = conditionalPower) -
-        getNu(alpha = psiLower, conditionalPower = conditionalPower)/(min(psiUpper, conditionalPower)- psiLower)
-      if (quotient <= nuPrime){
-        return(psiUpper)
-      } else {
-        return(psiLower)
-      }
+        # Calculate the minimum and the maximum of NuPrime(u)
+        maximumValue <- 1 -
+            stats::pnorm(-stats::qnorm(conditionalPower) / 2 + sqrt(stats::qnorm(conditionalPower)^2 / 4 - 1))
+        minimumValue <- 1 -
+            stats::pnorm(-stats::qnorm(conditionalPower) / 2 - sqrt(stats::qnorm(conditionalPower)^2 / 4 - 1))
+        nuPrimeAtMax <- getNuPrime(alpha = maximumValue, conditionalPower = conditionalPower)
+        nuPrimeAtMin <- getNuPrime(alpha = minimumValue, conditionalPower = conditionalPower)
+
+        if (nuPrime > nuPrimeAtMax) {
+            rootlist <- uniroot(
+                f = function(alpha) {
+                    getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+                },
+                lower = minimumValue,
+                upper = conditionalPower,
+                tol = 1e-16
+            )
+            return(rootlist$root)
+        } else if (nuPrime < nuPrimeAtMin) {
+            rootlist <- uniroot(
+                f = function(alpha) {
+                    getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+                },
+                lower = 0,
+                upper = maximumValue,
+                tol = 1e-16
+            )
+            return(rootlist$root)
+        } else {
+            # Calculate psiLower and psiUpper
+            rootlistLower <- uniroot(
+                f = function(alpha) {
+                    getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+                },
+                lower = 0,
+                upper = maximumValue,
+                tol = 1e-16
+            )
+            psiLower <- rootlistLower$root
+            rootlistUpper <- uniroot(
+                f = function(alpha) {
+                    getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+                },
+                lower = minimumValue,
+                upper = conditionalPower,
+                tol = 1e-16
+            )
+            psiUpper <- rootlistUpper$root
+            # Calculate the quotient that is needed to decide if psiLower or psiUpper is used
+            quotient <- getNu(alpha = min(conditionalPower, psiUpper), conditionalPower = conditionalPower) -
+                getNu(alpha = psiLower, conditionalPower = conditionalPower) /
+                    (min(psiUpper, conditionalPower) - psiLower)
+            if (quotient <= nuPrime) {
+                return(psiUpper)
+            } else {
+                return(psiLower)
+            }
+        }
     }
-  }
 }
 
 getPsi <- Vectorize(FUN = getPsi, vectorize.args = c("nuPrime", "conditionalPower"))
@@ -770,25 +876,24 @@ getPsi <- Vectorize(FUN = getPsi, vectorize.args = c("nuPrime", "conditionalPowe
 #' @template reference_monotone
 
 getQ <- function(firstStagePValue, design) {
-  
-  # Initialise effect and likelihood ratio
-  effect <- NA
-  likelihoodRatio <- NA
-  
-  # When using interim estimate, apply the restrictions given in the design
-  if(design$useInterimEstimate) {
-    effect <- min(max(design$ncp1Min, stats::qnorm(1-firstStagePValue)), design$ncp1Max)/sqrt(design$firstStageInformation)
-  }
-  # Fixed effect case
-  else {
-    effect <- design$delta1
-  }
-  
-  likelihoodRatio <- getLikelihoodRatio(firstStagePValue = firstStagePValue, design = design)
-  
-  Q <- likelihoodRatio/(effect^2)
-  
-  return(Q)
+    # Initialise effect and likelihood ratio
+    effect <- NA
+    likelihoodRatio <- NA
+
+    # When using interim estimate, apply the restrictions given in the design
+    if (design$useInterimEstimate) {
+        effect <- min(max(design$ncp1Min, stats::qnorm(1 - firstStagePValue)), design$ncp1Max) /
+            sqrt(design$firstStageInformation)
+    } else {
+        # Fixed effect case
+        effect <- design$delta1
+    }
+
+    likelihoodRatio <- getLikelihoodRatio(firstStagePValue = firstStagePValue, design = design)
+
+    Q <- likelihoodRatio / (effect^2)
+
+    return(Q)
 }
 
 getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
@@ -807,153 +912,159 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
 #' @keywords internal
 
 .integrateExpectedInformation <- function(firstStagePValue, design, likelihoodRatioDistribution, ...) {
-  
-  # Calculate optimal conditional error function
-  conditionalError <- getOptimalConditionalError(
-    firstStagePValue = firstStagePValue, design = design)
-  
-  # Identify how the likelihood ratio should be calculated
-  likelihoodRatio <- NA
-  args <- list(...)
-  
-  # Fixed effect
-  # If NULL, use specification in design object
-  if(is.null(likelihoodRatioDistribution)) {
-    ghostDesign <- design
-    likelihoodRatio <- getLikelihoodRatio(
-      firstStagePValue = firstStagePValue, design = ghostDesign
+    # Calculate optimal conditional error function
+    conditionalError <- getOptimalConditionalError(
+        firstStagePValue = firstStagePValue,
+        design = design
     )
-  }
-  else if(likelihoodRatioDistribution == "fixed") {
-    deltaLR <- unlist(args["deltaLR"])
-    weights <- unlist(args["weightsDeltaLR"])
-    
-    # Ensure argument specified
-    if(is.null(deltaLR)) {
-      stop("Argument deltaLR must be provided for fixed likelihood ratio case.")
-    }
-    .assertIsNumericVector(x = deltaLR, argumentName = "deltaLR")
-    if(is.null(weights)) {
-      weights <- rep(1/length(deltaLR), length(deltaLR))
-    }
-    
-    # Create a list that acts as a design object to calculate true likelihood ratio
-    ghostDesign <- list("likelihoodRatioDistribution" = likelihoodRatioDistribution,
-                        "deltaLR" = deltaLR, "weightsDeltaLR" = weights,
-                        "firstStageInformation" = design$firstStageInformation)
-    
-    # Calculate likelihood ratio
-    likelihoodRatio <- getLikelihoodRatio(
-      firstStagePValue = firstStagePValue, design = ghostDesign
-    )
-  }
-  # Normal prior for effect
-  else if(likelihoodRatioDistribution == "normal") {
-    deltaLR <- unlist(args["deltaLR"])
-    tauLR <- unlist(args["tauLR"])
-    
-    # Ensure arguments specified
-    if(is.null(deltaLR) || is.null(tauLR)) {
-      stop("Arguments deltaLR and tauLR must be provided for normally distributed likelihood ratio case.")
-    }
-    .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
-    .assertIsSingleNumber(x = tauLR, argumentName = "tauLR")
-    
-    .assertIsInOpenInterval(x = tauLR, argumentName = "tauLR", lower = 0, upper = Inf)
-    
-    # Create a list that acts as a design object to calculate true likelihood ratio
-    ghostDesign <- list("likelihoodRatioDistribution" = likelihoodRatioDistribution,
-                        "deltaLR" = deltaLR, "tauLR" = tauLR,
-                        "firstStageInformation" = design$firstStageInformation)
-    
-    # Calculate likelihood ratio
-    likelihoodRatio <- getLikelihoodRatio(
-      firstStagePValue = firstStagePValue, design = ghostDesign
-    )
-  }
-  # Exponential prior for effect
-  else if(likelihoodRatioDistribution == "exp") {
-    
-    kappaLR <- unlist(args["kappaLR"])
-    
-    # Ensure argument specified
-    if(is.null(kappaLR)) {
-      stop("Argument kappaLR must be specified for exponential likelihood case.")
-    }
-    .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
-    .assertIsInOpenInterval(x = kappaLR, argumentName = "kappaLR", lower = 0, upper = Inf)
-    
-    # Create a list that acts as a design object to calculate true likelihood ratio
-    ghostDesign <- list("likelihoodRatioDistribution" = likelihoodRatioDistribution,
-                        "kappaLR" = kappaLR,
-                        "firstStageInformation" = design$firstStageInformation)
-    
-    # Calculate likelihood ratio
-    likelihoodRatio <- getLikelihoodRatio(
-      firstStagePValue = firstStagePValue, design = ghostDesign
-    )
-  }
-  # Uniform prior for effect
-  else if(likelihoodRatioDistribution == "unif") {
-    
-    deltaMaxLR <- unlist(args["deltaMaxLR"])
-    
-    # Ensure argument specified
-    if(is.null(deltaMaxLR)) {
-      stop("Argument deltaMaxLR must be specified for uniform likelihood case.")
-    }
-    
-    .assertIsSingleNumber(x = deltaMaxLR, argumentName = "deltaMaxLR")
-    .assertIsInOpenInterval(x = deltaMaxLR, argumentName = "deltaMaxLR", lower = 0, upper = Inf)
-    
-    # Create a list that acts as a design object to calculate true likelihood ratio
-    ghostDesign <- list("likelihoodRatioDistribution" = likelihoodRatioDistribution,
-                        "deltaMaxLR" = deltaMaxLR,
-                        "firstStageInformation" = design$firstStageInformation)
-    
-    # Calculate likelihood ratio
-    likelihoodRatio <- getLikelihoodRatio(
-      firstStagePValue = firstStagePValue, design = ghostDesign
-    )
-  }
-  # Maximum likelihood ratio
-  else if(likelihoodRatioDistribution == "maxlr") {
-    # Create a list that acts as a design object to calculate true likelihood ratio
-    ghostDesign <- list("likelihoodRatioDistribution" = likelihoodRatioDistribution)
-    
-    # Calculate likelihood ratio
-    likelihoodRatio <- getLikelihoodRatio(
-      firstStagePValue = firstStagePValue, design = ghostDesign
-    )
-  }
-  # Unknown distribution specified
-  else {
-    stop("Distribution not matched.")
-  }
-  
-  # Identify effect size to calculate second-stage information
-  # The effect is the same as the one specified in the design object.
-  
-  # Fixed effect case
-  if(!design$useInterimEstimate) {
-    delta1 <- design$delta1
-  }
-  # Interim estimate
-  else {
-    # Apply restrictions that are given in the design object
-    delta1 <- pmin(pmax(design$delta1Min, stats::qnorm(1-firstStagePValue)), design$delta1Max)
-  }
-  
-  # Check if conditional power function should be used
-  if(!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
-    conditionalPower <- design$conditionalPowerFunction(firstStagePValue)
-  }
-  else {
-    conditionalPower <- design$conditionalPower
-  }
-  
-  secondStageInformation <- (getNu(alpha=conditionalError,  conditionalPower = conditionalPower)*likelihoodRatio) / (delta1^2)
-  return(secondStageInformation)
-  
-}
 
+    # Identify how the likelihood ratio should be calculated
+    likelihoodRatio <- NA
+    args <- list(...)
+
+    # Fixed effect
+    # If NULL, use specification in design object
+    if (is.null(likelihoodRatioDistribution)) {
+        ghostDesign <- design
+        likelihoodRatio <- getLikelihoodRatio(
+            firstStagePValue = firstStagePValue,
+            design = ghostDesign
+        )
+    } else if (likelihoodRatioDistribution == "fixed") {
+        deltaLR <- unlist(args["deltaLR"])
+        weights <- unlist(args["weightsDeltaLR"])
+
+        # Ensure argument specified
+        if (is.null(deltaLR)) {
+            stop("Argument deltaLR must be provided for fixed likelihood ratio case.")
+        }
+        .assertIsNumericVector(x = deltaLR, argumentName = "deltaLR")
+        if (is.null(weights)) {
+            weights <- rep(1 / length(deltaLR), length(deltaLR))
+        }
+
+        # Create a list that acts as a design object to calculate true likelihood ratio
+        ghostDesign <- list(
+            "likelihoodRatioDistribution" = likelihoodRatioDistribution,
+            "deltaLR" = deltaLR,
+            "weightsDeltaLR" = weights,
+            "firstStageInformation" = design$firstStageInformation
+        )
+
+        # Calculate likelihood ratio
+        likelihoodRatio <- getLikelihoodRatio(
+            firstStagePValue = firstStagePValue,
+            design = ghostDesign
+        )
+    } else if (likelihoodRatioDistribution == "normal") {
+        # Normal prior for effect
+        deltaLR <- unlist(args["deltaLR"])
+        tauLR <- unlist(args["tauLR"])
+
+        # Ensure arguments specified
+        if (is.null(deltaLR) || is.null(tauLR)) {
+            stop("Arguments deltaLR and tauLR must be provided for normally distributed likelihood ratio case.")
+        }
+        .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
+        .assertIsSingleNumber(x = tauLR, argumentName = "tauLR")
+
+        .assertIsInOpenInterval(x = tauLR, argumentName = "tauLR", lower = 0, upper = Inf)
+
+        # Create a list that acts as a design object to calculate true likelihood ratio
+        ghostDesign <- list(
+            "likelihoodRatioDistribution" = likelihoodRatioDistribution,
+            "deltaLR" = deltaLR,
+            "tauLR" = tauLR,
+            "firstStageInformation" = design$firstStageInformation
+        )
+
+        # Calculate likelihood ratio
+        likelihoodRatio <- getLikelihoodRatio(
+            firstStagePValue = firstStagePValue,
+            design = ghostDesign
+        )
+    } else if (likelihoodRatioDistribution == "exp") {
+        # Exponential prior for effect
+        kappaLR <- unlist(args["kappaLR"])
+
+        # Ensure argument specified
+        if (is.null(kappaLR)) {
+            stop("Argument kappaLR must be specified for exponential likelihood case.")
+        }
+        .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
+        .assertIsInOpenInterval(x = kappaLR, argumentName = "kappaLR", lower = 0, upper = Inf)
+
+        # Create a list that acts as a design object to calculate true likelihood ratio
+        ghostDesign <- list(
+            "likelihoodRatioDistribution" = likelihoodRatioDistribution,
+            "kappaLR" = kappaLR,
+            "firstStageInformation" = design$firstStageInformation
+        )
+
+        # Calculate likelihood ratio
+        likelihoodRatio <- getLikelihoodRatio(
+            firstStagePValue = firstStagePValue,
+            design = ghostDesign
+        )
+    } else if (likelihoodRatioDistribution == "unif") {
+        # Uniform prior for effect
+        deltaMaxLR <- unlist(args["deltaMaxLR"])
+
+        # Ensure argument specified
+        if (is.null(deltaMaxLR)) {
+            stop("Argument deltaMaxLR must be specified for uniform likelihood case.")
+        }
+
+        .assertIsSingleNumber(x = deltaMaxLR, argumentName = "deltaMaxLR")
+        .assertIsInOpenInterval(x = deltaMaxLR, argumentName = "deltaMaxLR", lower = 0, upper = Inf)
+
+        # Create a list that acts as a design object to calculate true likelihood ratio
+        ghostDesign <- list(
+            "likelihoodRatioDistribution" = likelihoodRatioDistribution,
+            "deltaMaxLR" = deltaMaxLR,
+            "firstStageInformation" = design$firstStageInformation
+        )
+
+        # Calculate likelihood ratio
+        likelihoodRatio <- getLikelihoodRatio(
+            firstStagePValue = firstStagePValue,
+            design = ghostDesign
+        )
+    } else if (likelihoodRatioDistribution == "maxlr") {
+        # Maximum likelihood ratio
+        # Create a list that acts as a design object to calculate true likelihood ratio
+        ghostDesign <- list("likelihoodRatioDistribution" = likelihoodRatioDistribution)
+
+        # Calculate likelihood ratio
+        likelihoodRatio <- getLikelihoodRatio(
+            firstStagePValue = firstStagePValue,
+            design = ghostDesign
+        )
+    } else {
+        # Unknown distribution specified
+        stop("Distribution not matched.")
+    }
+
+    # Identify effect size to calculate second-stage information
+    # The effect is the same as the one specified in the design object.
+
+    # Fixed effect case
+    if (!design$useInterimEstimate) {
+        delta1 <- design$delta1
+    } else {
+        # Interim estimate
+        # Apply restrictions that are given in the design object
+        delta1 <- pmin(pmax(design$delta1Min, stats::qnorm(1 - firstStagePValue)), design$delta1Max)
+    }
+
+    # Check if conditional power function should be used
+    if (!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
+        conditionalPower <- design$conditionalPowerFunction(firstStagePValue)
+    } else {
+        conditionalPower <- design$conditionalPower
+    }
+
+    secondStageInformation <- (getNu(alpha = conditionalError, conditionalPower = conditionalPower) * likelihoodRatio) /
+        (delta1^2)
+    return(secondStageInformation)
+}

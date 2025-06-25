@@ -94,7 +94,6 @@
 #'
 #' @return An object of class \code{TrialDesignOptimalConditionalError}, which can be passed to other package functions.
 #'
-#'
 #' @examples
 #' \dontrun{
 #' # Create a single-arm design with fixed parameter for the likelihood ratio
@@ -125,42 +124,56 @@
 #' @template reference_monotone
 #'
 getDesignOptimalConditionalErrorFunction <- function(
-    alpha, alpha1, alpha0, conditionalPower = NA_real_, delta1 = NA_real_,
-    delta1Min = NA_real_, delta1Max = Inf, ncp1 = NA_real_,
-    ncp1Min = NA_real_, ncp1Max = Inf, useInterimEstimate = TRUE,
-    firstStageInformation, likelihoodRatioDistribution,
-    minimumSecondStageInformation = 0, maximumSecondStageInformation = Inf,
-    minimumConditionalError = 0, maximumConditionalError = 1,
+    alpha,
+    alpha1,
+    alpha0,
+    conditionalPower = NA_real_,
+    delta1 = NA_real_,
+    delta1Min = NA_real_,
+    delta1Max = Inf,
+    ncp1 = NA_real_,
+    ncp1Min = NA_real_,
+    ncp1Max = Inf,
+    useInterimEstimate = TRUE,
+    firstStageInformation,
+    likelihoodRatioDistribution,
+    minimumSecondStageInformation = 0,
+    maximumSecondStageInformation = Inf,
+    minimumConditionalError = 0,
+    maximumConditionalError = 1,
     conditionalPowerFunction = NA,
-    levelConstantMinimum = 0, levelConstantMaximum = 10,
-    enforceMonotonicity = TRUE, ...) {
-  design <- new(
-    "TrialDesignOptimalConditionalError",
-    alpha = alpha,
-    alpha1 = alpha1,
-    alpha0 = alpha0,
-    conditionalPower = conditionalPower,
-    delta1 = delta1,
-    delta1Min = delta1Min,
-    delta1Max = delta1Max,
-    ncp1 = ncp1,
-    ncp1Min = ncp1Min,
-    ncp1Max = ncp1Max,
-    firstStageInformation = firstStageInformation,
-    useInterimEstimate = useInterimEstimate,
-    likelihoodRatioDistribution = likelihoodRatioDistribution,
-    minimumSecondStageInformation = minimumSecondStageInformation,
-    maximumSecondStageInformation = maximumSecondStageInformation,
-    minimumConditionalError = minimumConditionalError,
-    maximumConditionalError = maximumConditionalError,
-    conditionalPowerFunction = conditionalPowerFunction,
-    levelConstantMinimum = levelConstantMinimum,
-    levelConstantMaximum = levelConstantMaximum,
-    enforceMonotonicity = enforceMonotonicity,
-    ... = ...
-  )
-  
-  return(design)
+    levelConstantMinimum = 0,
+    levelConstantMaximum = 10,
+    enforceMonotonicity = TRUE,
+    ...
+) {
+    design <- new(
+        "TrialDesignOptimalConditionalError",
+        alpha = alpha,
+        alpha1 = alpha1,
+        alpha0 = alpha0,
+        conditionalPower = conditionalPower,
+        delta1 = delta1,
+        delta1Min = delta1Min,
+        delta1Max = delta1Max,
+        ncp1 = ncp1,
+        ncp1Min = ncp1Min,
+        ncp1Max = ncp1Max,
+        firstStageInformation = firstStageInformation,
+        useInterimEstimate = useInterimEstimate,
+        likelihoodRatioDistribution = likelihoodRatioDistribution,
+        minimumSecondStageInformation = minimumSecondStageInformation,
+        maximumSecondStageInformation = maximumSecondStageInformation,
+        minimumConditionalError = minimumConditionalError,
+        maximumConditionalError = maximumConditionalError,
+        conditionalPowerFunction = conditionalPowerFunction,
+        levelConstantMinimum = levelConstantMinimum,
+        levelConstantMaximum = levelConstantMaximum,
+        enforceMonotonicity = enforceMonotonicity,
+        ... = ...
+    )
+
+    return(design)
 }
 
 
@@ -208,11 +221,17 @@ getDesignOptimalConditionalErrorFunction <- function(
 #' @template reference_optimal
 
 getExpectedSecondStageInformation <- function(design, likelihoodRatioDistribution = NULL, ...) {
-  
-  # Integrate over a helper function from alpha1 to alpha0
-  return(stats::integrate(f = .integrateExpectedInformation, lower = design$alpha1,
-                          upper = design$alpha0, design = design,
-                          likelihoodRatioDistribution = likelihoodRatioDistribution, ... = ...)$value)
+    # Integrate over a helper function from alpha1 to alpha0
+    return(
+        stats::integrate(
+            f = .integrateExpectedInformation,
+            lower = design$alpha1,
+            upper = design$alpha0,
+            design = design,
+            likelihoodRatioDistribution = likelihoodRatioDistribution,
+            ... = ...
+        )$value
+    )
 }
 
 #' Calculate the Optimal Conditional Error
@@ -251,50 +270,60 @@ getExpectedSecondStageInformation <- function(design, likelihoodRatioDistributio
 #' }
 
 getOptimalConditionalError <- function(firstStagePValue, design) {
-  
-  conditionalErrorWithConstraints <- NULL
-  
-  # Check if firstStagePValue lies outside early decision boundaries
-  if(firstStagePValue <= design$alpha1 && design$alpha1!=0) {
-    conditionalErrorWithConstraints <- 1
-  } else if(firstStagePValue > design$alpha0) {
-    conditionalErrorWithConstraints <- 0
-  }
-  else {
-  # If monotonisation constants specified and monotonisation enforced, perform non-increasing transformation
-  if(design$enforceMonotonicity && !is.null(unlist(design$monotonisationConstants))) {
-    likelihoodRatioOverEffect <- getMonotoneFunction(
-      x = firstStagePValue, fun = getQ, design = design)
-  }
-  else {
-    likelihoodRatioOverEffect <- getQ(firstStagePValue = firstStagePValue, design = design)
-  }
-  
-  # Take constraints into account (minimumConditionalError, maximumConditionalError,
-  # minimumSecondStageInformation, maximumSecondStageInformation)
-  constraintList <- .getOptimalConditionalErrorConstraints(
-    design = design, firstStagePValue = firstStagePValue
-  )
-  
-  conditionalErrorConstraintUpper <- constraintList$conditionalErrorConstraintUpper
-  conditionalErrorConstraintLower <- constraintList$conditionalErrorConstraintLower
-  conditionalPower <- constraintList$conditionalPower
-  
-  #Handling of the special case firstStagePValue=0 and no early stopping
-  if (firstStagePValue == 0 && design$alpha1==0){
-    # Calculate the specified conditional power for a firstStagePValue of 0
-    if(!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
-      conditionalPower0 <- design$conditionalPowerFunction(0)
-    }else{
-      conditionalPower0 <- design$conditionalPower
+    conditionalErrorWithConstraints <- NULL
+
+    # Check if firstStagePValue lies outside early decision boundaries
+    if (firstStagePValue <= design$alpha1 && design$alpha1 != 0) {
+        conditionalErrorWithConstraints <- 1
+    } else if (firstStagePValue > design$alpha0) {
+        conditionalErrorWithConstraints <- 0
+    } else {
+        # If monotonisation constants specified and monotonisation enforced, perform non-increasing transformation
+        if (design$enforceMonotonicity && !is.null(unlist(design$monotonisationConstants))) {
+            likelihoodRatioOverEffect <- getMonotoneFunction(
+                x = firstStagePValue,
+                fun = getQ,
+                design = design
+            )
+        } else {
+            likelihoodRatioOverEffect <- getQ(firstStagePValue = firstStagePValue, design = design)
+        }
+
+        # Take constraints into account (minimumConditionalError, maximumConditionalError,
+        # minimumSecondStageInformation, maximumSecondStageInformation)
+        constraintList <- .getOptimalConditionalErrorConstraints(
+            design = design,
+            firstStagePValue = firstStagePValue
+        )
+
+        conditionalErrorConstraintUpper <- constraintList$conditionalErrorConstraintUpper
+        conditionalErrorConstraintLower <- constraintList$conditionalErrorConstraintLower
+        conditionalPower <- constraintList$conditionalPower
+
+        #Handling of the special case firstStagePValue=0 and no early stopping
+        if (firstStagePValue == 0 && design$alpha1 == 0) {
+            # Calculate the specified conditional power for a firstStagePValue of 0
+            if (!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
+                conditionalPower0 <- design$conditionalPowerFunction(0)
+            } else {
+                conditionalPower0 <- design$conditionalPower
+            }
+            return(min(conditionalErrorConstraintUpper, conditionalPower0))
+        }
+
+        conditionalErrorWithConstraints <- max(
+            conditionalErrorConstraintLower,
+            min(
+                conditionalErrorConstraintUpper,
+                getPsi(
+                    nuPrime = (-exp(design$levelConstant) / likelihoodRatioOverEffect),
+                    conditionalPower = conditionalPower
+                )
+            )
+        )
     }
-    return(min(conditionalErrorConstraintUpper, conditionalPower0))
-  }
-  
-  conditionalErrorWithConstraints <- max(conditionalErrorConstraintLower, min(conditionalErrorConstraintUpper, getPsi(nuPrime = (-exp(design$levelConstant)/likelihoodRatioOverEffect), conditionalPower = conditionalPower)))
-  }
-  
-  return(conditionalErrorWithConstraints)
+
+    return(conditionalErrorWithConstraints)
 }
 
 getOptimalConditionalError <- Vectorize(FUN = getOptimalConditionalError, vectorize.args = c("firstStagePValue"))
@@ -317,43 +346,51 @@ getOptimalConditionalError <- Vectorize(FUN = getOptimalConditionalError, vector
 #' @export
 
 getOverallPower <- function(design, alternative) {
-  
-  .assertIsNumericVector(x = alternative, argumentName = "alternative")
-  
-  alternativeNonCentralityParameterScale <- alternative * base::sqrt(design$firstStageInformation)
-  
-  # One value per entry in alternative
-  firstStageFutility <- numeric(length(alternative))
-  firstStageEfficacy <- numeric(length(alternative))
-  overallPower <- numeric(length(alternative))
-  
-  for(i in 1:length(alternative)) {
-    
-    # Early decision probabilities
-    firstStageFutility[i] <- stats::pnorm(stats::qnorm(1 - design$alpha0) - alternativeNonCentralityParameterScale[i])
-    firstStageEfficacy[i] <- 1 - stats::pnorm(stats::qnorm(1 - design$alpha1) - alternativeNonCentralityParameterScale[i])
-    
-    # Calculate probability to reject at the second stage for given delta
-    secondStageRejection <- function(firstStagePValue) {
-      (1-stats::pnorm(stats::qnorm(1 - getOptimalConditionalError(firstStagePValue, design = design)) -
-                        sqrt(getSecondStageInformation(firstStagePValue, design = design)) * alternative[i])) * exp(qnorm(1 - firstStagePValue) * alternativeNonCentralityParameterScale[i] - alternativeNonCentralityParameterScale[i]^2 / 2)
+    .assertIsNumericVector(x = alternative, argumentName = "alternative")
+
+    alternativeNonCentralityParameterScale <- alternative * base::sqrt(design$firstStageInformation)
+
+    # One value per entry in alternative
+    firstStageFutility <- numeric(length(alternative))
+    firstStageEfficacy <- numeric(length(alternative))
+    overallPower <- numeric(length(alternative))
+
+    for (i in 1:length(alternative)) {
+        # Early decision probabilities
+        firstStageFutility[i] <- stats::pnorm(
+            stats::qnorm(1 - design$alpha0) - alternativeNonCentralityParameterScale[i]
+        )
+        firstStageEfficacy[i] <- 1 -
+            stats::pnorm(stats::qnorm(1 - design$alpha1) - alternativeNonCentralityParameterScale[i])
+
+        # Calculate probability to reject at the second stage for given delta
+        secondStageRejection <- function(firstStagePValue) {
+            (1 -
+                stats::pnorm(
+                    stats::qnorm(1 - getOptimalConditionalError(firstStagePValue, design = design)) -
+                        sqrt(getSecondStageInformation(firstStagePValue, design = design)) * alternative[i]
+                )) *
+                exp(
+                    qnorm(1 - firstStagePValue) *
+                        alternativeNonCentralityParameterScale[i] -
+                        alternativeNonCentralityParameterScale[i]^2 / 2
+                )
+        }
+
+        integral <- stats::integrate(f = secondStageRejection, lower = design$alpha1, upper = design$alpha0)$value
+
+        overallPower[i] <- firstStageEfficacy[i] + integral
     }
-    
-    integral <- stats::integrate(f = secondStageRejection, lower = design$alpha1, upper = design$alpha0)$value
-    
-    overallPower[i] <- firstStageEfficacy[i] + integral
-    
-  }
-  
-  powerResults <- new(
-    "PowerResultsOptimalConditionalError",
-    alternative = alternative,
-    firstStageFutility = firstStageFutility,
-    firstStageEfficacy = firstStageEfficacy,
-    overallPower = overallPower
-  )
-  
-  return(powerResults)
+
+    powerResults <- new(
+        "PowerResultsOptimalConditionalError",
+        alternative = alternative,
+        firstStageFutility = firstStageFutility,
+        firstStageEfficacy = firstStageEfficacy,
+        overallPower = overallPower
+    )
+
+    return(powerResults)
 }
 
 #' Calculate the Second-stage Information
@@ -396,47 +433,44 @@ getOverallPower <- function(design, alternative) {
 #'
 #' @template reference_optimal
 getSecondStageInformation <- function(firstStagePValue, design) {
-  
-  .assertIsNumericVector(x = firstStagePValue, argumentName = "firstStagePValue")
-  .assertIsInClosedInterval(x = firstStagePValue, argumentName = "firstStagePValue", lower = 0, upper = 1)
-  
-  secondStageInformation <- NULL
-  # For p-values outside of the continuation region, return information 0
-  if ((firstStagePValue <= design$alpha1 && design$alpha1 > 0) || firstStagePValue > design$alpha0) {
-    secondStageInformation <- 0
-  } else {
-    # For design with interim estimate, apply effect restrictions
-    if (design$useInterimEstimate) {
-      effect <- min(
-        max(qnorm(1 - firstStagePValue) / design$firstStageInformation, design$delta1Min),
-        design$delta1Max
-      )
+    .assertIsNumericVector(x = firstStagePValue, argumentName = "firstStagePValue")
+    .assertIsInClosedInterval(x = firstStagePValue, argumentName = "firstStagePValue", lower = 0, upper = 1)
+
+    secondStageInformation <- NULL
+    # For p-values outside of the continuation region, return information 0
+    if ((firstStagePValue <= design$alpha1 && design$alpha1 > 0) || firstStagePValue > design$alpha0) {
+        secondStageInformation <- 0
+    } else {
+        # For design with interim estimate, apply effect restrictions
+        if (design$useInterimEstimate) {
+            effect <- min(
+                max(qnorm(1 - firstStagePValue) / design$firstStageInformation, design$delta1Min),
+                design$delta1Max
+            )
+        } else {
+            # For design without interim estimate, use fixed effect
+            effect <- design$delta1
+        }
+
+        # Calculate conditional error
+        conditionalError <- getOptimalConditionalError(
+            firstStagePValue = firstStagePValue,
+            design = design
+        )
+
+        # Check if conditional power function should be used
+        if (!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
+            conditionalPower <- design$conditionalPowerFunction(firstStagePValue)
+        } else {
+            conditionalPower <- design$conditionalPower
+        }
+
+        secondStageInformation <- (getNu(alpha = conditionalError, conditionalPower = conditionalPower)) / (effect^2)
     }
-    # For design without interim estimate, use fixed effect
-    else {
-      effect <- design$delta1
-    }
-    
-    # Calculate conditional error
-    conditionalError <- getOptimalConditionalError(
-      firstStagePValue = firstStagePValue, design = design
-    )
-    
-    # Check if conditional power function should be used
-    if(!is.null(suppressWarnings(body(design$conditionalPowerFunction)))) {
-      conditionalPower <- design$conditionalPowerFunction(firstStagePValue)
-    }
-    else {
-      conditionalPower <- design$conditionalPower
-    }
-    
-    secondStageInformation <- (getNu(alpha = conditionalError, conditionalPower = conditionalPower)) / (effect^2)
-  }
-  return(secondStageInformation)
+    return(secondStageInformation)
 }
 
 getSecondStageInformation <- Vectorize(
-  FUN = getSecondStageInformation,
-  vectorize.args = c("firstStagePValue")
+    FUN = getSecondStageInformation,
+    vectorize.args = c("firstStagePValue")
 )
-
