@@ -434,7 +434,7 @@ getOverallPower <- function(design, alternative) {
 #' @template reference_optimal
 getSecondStageInformation <- function(firstStagePValue, design) {
     .assertIsNumericVector(x = firstStagePValue, argumentName = "firstStagePValue")
-    .assertIsInClosedInterval(x = firstStagePValue, argumentName = "firstStagePValue", lower = 0, upper = 1)
+    .assertIsInClosedInterval(x = firstStagePValue, xName = "firstStagePValue", lower = 0, upper = 1)
 
     secondStageInformation <- NULL
     # For p-values outside of the continuation region, return information 0

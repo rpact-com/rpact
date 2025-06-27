@@ -965,10 +965,10 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
         if (is.null(deltaLR) || is.null(tauLR)) {
             stop("Arguments deltaLR and tauLR must be provided for normally distributed likelihood ratio case.")
         }
-        .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
-        .assertIsSingleNumber(x = tauLR, argumentName = "tauLR")
+        .assertIsSingleNumber(x = deltaLR, xName = "deltaLR")
+        .assertIsSingleNumber(x = tauLR, xName = "tauLR")
 
-        .assertIsInOpenInterval(x = tauLR, argumentName = "tauLR", lower = 0, upper = Inf)
+        .assertIsInOpenInterval(x = tauLR, xName = "tauLR", lower = 0, upper = Inf)
 
         # Create a list that acts as a design object to calculate true likelihood ratio
         ghostDesign <- list(
@@ -992,7 +992,7 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
             stop("Argument kappaLR must be specified for exponential likelihood case.")
         }
         .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
-        .assertIsInOpenInterval(x = kappaLR, argumentName = "kappaLR", lower = 0, upper = Inf)
+        .assertIsInOpenInterval(x = kappaLR, xName = "kappaLR", lower = 0, upper = Inf)
 
         # Create a list that acts as a design object to calculate true likelihood ratio
         ghostDesign <- list(
@@ -1016,7 +1016,7 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
         }
 
         .assertIsSingleNumber(x = deltaMaxLR, argumentName = "deltaMaxLR")
-        .assertIsInOpenInterval(x = deltaMaxLR, argumentName = "deltaMaxLR", lower = 0, upper = Inf)
+        .assertIsInOpenInterval(x = deltaMaxLR, xName = "deltaMaxLR", lower = 0, upper = Inf)
 
         # Create a list that acts as a design object to calculate true likelihood ratio
         ghostDesign <- list(
