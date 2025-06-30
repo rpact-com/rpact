@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8707 $
-## |  Last changed: $Date: 2025-05-09 14:43:55 +0200 (Fr, 09 Mai 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8730 $
+## |  Last changed: $Date: 2025-05-23 12:07:33 +0200 (Fr, 23 Mai 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_multiarm.R
@@ -390,7 +390,7 @@ NULL
 #' @export
 #'
 getSimulationMultiArmSurvival <- function(design = NULL, ...,
-        activeArms = 3L, # C_ACTIVE_ARMS_DEFAULT
+        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
         omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
@@ -438,9 +438,11 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
-    
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
+
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,
@@ -472,12 +474,12 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
         showStatistics              = showStatistics,
         endpoint                    = "survival"
     )
-
+    
     design <- simulationResults$.design
     successCriterion <- simulationResults$successCriterion
     effectMeasure <- simulationResults$effectMeasure
     adaptations <- simulationResults$adaptations
-    gMax <- activeArms
+    gMax <- simulationResults$activeArms
     kMax <- simulationResults$.design$kMax
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection

@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8691 $
-## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8738 $
+## |  Last changed: $Date: 2025-06-04 13:12:30 +0200 (Mi, 04 Jun 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include class_dictionary.R
@@ -628,6 +628,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     singleEventsPerStage = "Single number of events",
     singleEventsPerArmAndStage = "Single number of events",
     singleEventsPerSubsetAndStage = "Single number of events",
+	populationEventsPerStage = "Number of events per population",
     endOfAccrualIsUserDefined = "End of accrual is user defined",
     followUpTimeMustBeUserDefined = "Follow-up time must be user defined",
     maxNumberOfSubjectsIsUserDefined = "Max number of subjects is user defined",

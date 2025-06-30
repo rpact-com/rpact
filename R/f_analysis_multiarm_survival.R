@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8545 $
-## |  Last changed: $Date: 2025-02-10 12:37:59 +0100 (Mo, 10 Feb 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8730 $
+## |  Last changed: $Date: 2025-05-23 12:07:33 +0200 (Fr, 23 Mai 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_logger.R
@@ -383,7 +383,7 @@ NULL
 
     .setWeightsToStageResults(design, stageResults)
 
-    
+
     # Calculation of single stage adjusted p-Values and overall test statistics
     # for determination of RCIs for combination tests
     if (calculateSingleStepAdjusted) {
@@ -423,9 +423,10 @@ NULL
                         df <- NA_real_
                         singleStepAdjustedPValues[treatmentArm, k] <- 1 - .getMultivariateDistribution(
                             type = "normal",
-                            upper = ifelse(!isFALSE(directionUpper), 
-                                testStatistics[treatmentArm, k], 
-                                -testStatistics[treatmentArm, k]),
+                            upper = ifelse(!isFALSE(directionUpper),
+                                testStatistics[treatmentArm, k],
+                                -testStatistics[treatmentArm, k]
+                            ),
                             sigma = sigma, df = df
                         )
                     }

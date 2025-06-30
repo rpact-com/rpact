@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Di, 10 Dez 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8731 $
+## |  Last changed: $Date: 2025-05-23 12:09:53 +0200 (Fr, 23 Mai 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_multiarm.R
@@ -394,7 +394,7 @@ NULL
 #' @export
 #'
 getSimulationMultiArmRates <- function(design = NULL, ...,
-        activeArms = 3L, # C_ACTIVE_ARMS_DEFAULT
+        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
         piMaxVector = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
@@ -486,7 +486,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     successCriterion <- simulationResults$successCriterion
     effectMeasure <- simulationResults$effectMeasure
     adaptations <- simulationResults$adaptations
-    gMax <- activeArms
+    gMax <- simulationResults$activeArms
     kMax <- simulationResults$.design$kMax
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection

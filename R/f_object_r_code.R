@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8625 $
-## |  Last changed: $Date: 2025-03-21 14:46:59 +0100 (Fr, 21 Mrz 2025) $
-## |  Last changed by: $Author: pahlke $
+## |  File version: $Revision: 8738 $
+## |  Last changed: $Date: 2025-06-04 13:12:30 +0200 (Mi, 04 Jun 2025) $
+## |  Last changed by: $Author: wassmer $
 ## |
 
 #' @include f_core_constants.R
@@ -98,8 +98,7 @@ NULL
         x <- floor(x * 100) / 100
     } else if (is.numeric(x) && !is.matrix(x)) {
         seqTest <- .reconstructSequenceCommand(x)
-        if (!is.null(seqTest) && length(seqTest) == 1 &&
-                !is.na(seqTest) && grepl("^seq", seqTest)) {
+        if (!is.null(seqTest) && length(seqTest) == 1 && !is.na(seqTest) && grepl("^seq", seqTest)) {
             return(seqTest)
         }
     }
@@ -255,27 +254,29 @@ NULL
 
     stop(
         C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-        "function '.getGeneratorFunctionName' is not implemented for class ", .getClassName(obj)
+        "function '.getGeneratorFunctionName' is not implemented for class ",
+        .getClassName(obj)
     )
 }
 
 #' @rdname getObjectRCode
 #' @export
 rcmd <- function(
-        obj, 
-        ...,
-        leadingArguments = NULL,
-        includeDefaultParameters = FALSE,
-        stringWrapParagraphWidth = 90,
-        prefix = "",
-        postfix = "",
-        stringWrapPrefix = "",
-        newArgumentValues = list(),
-        
-        tolerance = 1e-07,
-        pipeOperator = c("auto", "none", "magrittr", "R"),
-        output = c("vector", "cat", "test", "markdown", "internal"),
-        explicitPrint = FALSE) {
+    obj,
+    ...,
+    leadingArguments = NULL,
+    includeDefaultParameters = FALSE,
+    stringWrapParagraphWidth = 90,
+    prefix = "",
+    postfix = "",
+    stringWrapPrefix = "",
+    newArgumentValues = list(),
+
+    tolerance = 1e-07,
+    pipeOperator = c("auto", "none", "magrittr", "R"),
+    output = c("vector", "cat", "test", "markdown", "internal"),
+    explicitPrint = FALSE
+) {
     getObjectRCode(
         obj = obj,
         leadingArguments = leadingArguments,
@@ -327,19 +328,20 @@ rcmd <- function(
 #' @export
 #'
 getObjectRCode <- function(
-        obj, 
-        ...,
-        leadingArguments = NULL,
-        includeDefaultParameters = FALSE,
-        stringWrapParagraphWidth = 90,
-        prefix = "",
-        postfix = "",
-        stringWrapPrefix = "",
-        newArgumentValues = list(),
-        tolerance = 1e-07,
-        pipeOperator = c("auto", "none", "magrittr", "R"),
-        output = c("vector", "cat", "test", "markdown", "internal"),
-        explicitPrint = FALSE) {
+    obj,
+    ...,
+    leadingArguments = NULL,
+    includeDefaultParameters = FALSE,
+    stringWrapParagraphWidth = 90,
+    prefix = "",
+    postfix = "",
+    stringWrapPrefix = "",
+    newArgumentValues = list(),
+    tolerance = 1e-07,
+    pipeOperator = c("auto", "none", "magrittr", "R"),
+    output = c("vector", "cat", "test", "markdown", "internal"),
+    explicitPrint = FALSE
+) {
     functionName <- deparse(substitute(obj))
     functionName <- sub("\\(.*\\)$", "", functionName)
 
@@ -407,8 +409,11 @@ getObjectRCode <- function(
 
     if (!is.list(newArgumentValues)) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'newArgumentValues' must be a named list ",
-            "(is ", .getClassName(newArgumentValues), ")"
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'newArgumentValues' must be a named list ",
+            "(is ",
+            .getClassName(newArgumentValues),
+            ")"
         )
     }
 
@@ -416,10 +421,13 @@ getObjectRCode <- function(
     if (is.null(leadingArguments)) {
         leadingArguments <- character()
     }
-    if (!inherits(obj, "ConditionalPowerResults") &&
+    if (
+        !inherits(obj, "ConditionalPowerResults") &&
             !is.null(obj[[".design"]]) &&
-            (is.null(leadingArguments) || !any(grepl("design", leadingArguments)))) {
-        preconditionDesign <- getObjectRCode(obj$.design,
+            (is.null(leadingArguments) || !any(grepl("design", leadingArguments)))
+    ) {
+        preconditionDesign <- getObjectRCode(
+            obj$.design,
             prefix = ifelse(pipeOperator == "none", "design <- ", ""),
             postfix = pipeOperatorPostfix,
             includeDefaultParameters = includeDefaultParameters,
@@ -429,7 +437,9 @@ getObjectRCode <- function(
             pipeOperator = pipeOperator,
             output = "internal"
         )
-        if (!grepl("getDesign(GroupSequential|InverseNormal)\\(kMax = 1\\)", paste0(preconditionDesign, collapse = " "))) {
+        if (
+            !grepl("getDesign(GroupSequential|InverseNormal)\\(kMax = 1\\)", paste0(preconditionDesign, collapse = " "))
+        ) {
             precondition <- c(precondition, preconditionDesign)
             if (pipeOperator == "none") {
                 leadingArguments <- c(leadingArguments, "design = design")
@@ -437,7 +447,8 @@ getObjectRCode <- function(
         }
     }
     if (inherits(obj, "PerformanceScore")) {
-        preconditionSimulationResults <- getObjectRCode(obj$.simulationResults,
+        preconditionSimulationResults <- getObjectRCode(
+            obj$.simulationResults,
             prefix = ifelse(pipeOperator == "none", "simulationResults <- ", ""),
             postfix = pipeOperatorPostfix,
             includeDefaultParameters = includeDefaultParameters,
@@ -453,24 +464,31 @@ getObjectRCode <- function(
         }
     }
     if (!is.null(obj[[".dataInput"]]) && (is.null(leadingArguments) || !any(grepl("data", leadingArguments)))) {
-        precondition <- c(precondition, getObjectRCode(obj$.dataInput,
-            prefix = ifelse(pipeOperator == "none", "data <- ", ""),
-            postfix = pipeOperatorPostfix,
-            includeDefaultParameters = includeDefaultParameters,
-            stringWrapParagraphWidth = stringWrapParagraphWidth,
-            stringWrapPrefix = stringWrapPrefix,
-            newArgumentValues = newArgumentValues,
-            pipeOperator = pipeOperator,
-            output = "internal"
-        ))
+        precondition <- c(
+            precondition,
+            getObjectRCode(
+                obj$.dataInput,
+                prefix = ifelse(pipeOperator == "none", "data <- ", ""),
+                postfix = pipeOperatorPostfix,
+                includeDefaultParameters = includeDefaultParameters,
+                stringWrapParagraphWidth = stringWrapParagraphWidth,
+                stringWrapPrefix = stringWrapPrefix,
+                newArgumentValues = newArgumentValues,
+                pipeOperator = pipeOperator,
+                output = "internal"
+            )
+        )
         if (pipeOperator == "none") {
             leadingArguments <- c(leadingArguments, "dataInput = data")
         }
     }
-    if (!is.null(obj[["calcSubjectsFunction"]]) &&
+    if (
+        !is.null(obj[["calcSubjectsFunction"]]) &&
             (is.null(leadingArguments) || !any(grepl("calcSubjectsFunction", leadingArguments))) &&
-            obj$.getParameterType("calcSubjectsFunction") == C_PARAM_USER_DEFINED) {
-        precond <- getObjectRCode(obj$calcSubjectsFunction,
+            obj$.getParameterType("calcSubjectsFunction") == C_PARAM_USER_DEFINED
+    ) {
+        precond <- getObjectRCode(
+            obj$calcSubjectsFunction,
             prefix = "calcSubjectsFunction <- ",
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
@@ -485,10 +503,13 @@ getObjectRCode <- function(
             precondition <- c(precond, precondition)
         }
     }
-    if (!is.null(obj[["calcEventsFunction"]]) &&
+    if (
+        !is.null(obj[["calcEventsFunction"]]) &&
             (is.null(leadingArguments) || !any(grepl("calcEventsFunction", leadingArguments))) &&
-            obj$.getParameterType("calcEventsFunction") == C_PARAM_USER_DEFINED) {
-        precond <- getObjectRCode(obj$calcEventsFunction,
+            obj$.getParameterType("calcEventsFunction") == C_PARAM_USER_DEFINED
+    ) {
+        precond <- getObjectRCode(
+            obj$calcEventsFunction,
             prefix = "calcEventsFunction <- ",
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
@@ -503,10 +524,14 @@ getObjectRCode <- function(
             precondition <- c(precond, precondition)
         }
     }
-    if (!is.null(obj[["selectArmsFunction"]]) &&
+    if (
+        !is.null(obj[["selectArmsFunction"]]) &&
             (is.null(leadingArguments) || !any(grepl("selectArmsFunction", leadingArguments))) &&
-            !is.null(obj[["typeOfSelection"]]) && obj$typeOfSelection == "userDefined") {
-        precond <- getObjectRCode(obj$selectArmsFunction,
+            !is.null(obj[["typeOfSelection"]]) &&
+            obj$typeOfSelection == "userDefined"
+    ) {
+        precond <- getObjectRCode(
+            obj$selectArmsFunction,
             prefix = "selectArmsFunction <- ",
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
@@ -522,10 +547,13 @@ getObjectRCode <- function(
         }
         leadingArguments <- c(leadingArguments, "selectArmsFunction = selectArmsFunction")
     }
-    if (inherits(obj, "ConditionalPowerResults") &&
+    if (
+        inherits(obj, "ConditionalPowerResults") &&
             !is.null(obj[[".stageResults"]]) &&
-            (is.null(leadingArguments) || !any(grepl("stageResults", leadingArguments)))) {
-        precond <- getObjectRCode(obj$.stageResults,
+            (is.null(leadingArguments) || !any(grepl("stageResults", leadingArguments)))
+    ) {
+        precond <- getObjectRCode(
+            obj$.stageResults,
             prefix = ifelse(pipeOperator == "none", "stageResults <- ", ""),
             postfix = pipeOperatorPostfix,
             includeDefaultParameters = includeDefaultParameters,
@@ -558,7 +586,8 @@ getObjectRCode <- function(
     precondition <- unique(precondition)
 
     if (inherits(obj, "SummaryFactory") || "SummaryFactory" == .getClassName(obj)) {
-        return(getObjectRCode(obj$object,
+        return(getObjectRCode(
+            obj$object,
             prefix = ifelse(pipeOperator == "none", "summary(", ""),
             postfix = {
                 if (pipeOperator == "none") ")" else c(pipeOperatorPostfix, "summary()")
@@ -588,14 +617,21 @@ getObjectRCode <- function(
         objNames <- objNames[objNames != "stages"]
     }
 
-    if (inherits(obj, "TrialDesign") && !inherits(obj, "TrialDesignConditionalDunnett") &&
-            !("informationRates" %in% objNames) && !("kMax" %in% objNames) && obj$kMax != 3) {
+    if (
+        inherits(obj, "TrialDesign") &&
+            !inherits(obj, "TrialDesignConditionalDunnett") &&
+            !("informationRates" %in% objNames) &&
+            !("kMax" %in% objNames) &&
+            obj$kMax != 3
+    ) {
         objNames <- c("kMax", objNames)
     }
 
     thetaH0 <- NA_real_
-    if (inherits(obj, "SimulationResultsSurvival") &&
-            obj$.getParameterType("thetaH1") == C_PARAM_GENERATED) {
+    if (
+        inherits(obj, "SimulationResultsSurvival") &&
+            obj$.getParameterType("thetaH1") == C_PARAM_GENERATED
+    ) {
         objNames <- c(objNames, "thetaH1")
         thetaH0 <- obj[["thetaH0"]]
     }
@@ -612,10 +648,12 @@ getObjectRCode <- function(
             if (!("seed" %in% objNames)) {
                 objNames <- c(objNames, "seed")
             }
-        } else if (!is.null(obj[[".conditionalPowerResults"]]) &&
+        } else if (
+            !is.null(obj[[".conditionalPowerResults"]]) &&
                 !is.null(obj$.conditionalPowerResults[["seed"]]) &&
                 length(obj$.conditionalPowerResults$seed) == 1 &&
-                !is.na(obj$.conditionalPowerResults$seed)) {
+                !is.na(obj$.conditionalPowerResults$seed)
+        ) {
             if (!("iterations" %in% objNames)) {
                 objNames <- c(
                     objNames,
@@ -630,16 +668,22 @@ getObjectRCode <- function(
             }
         }
     }
-    
-    if (!("accrualTime" %in% objNames) && !is.null(obj[[".accrualTime"]]) &&
+
+    if (
+        !("accrualTime" %in% objNames) &&
+            !is.null(obj[[".accrualTime"]]) &&
             obj$.getParameterType("accrualTime") == C_PARAM_GENERATED &&
-            obj$.accrualTime$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED) {
+            obj$.accrualTime$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED
+    ) {
         objNames <- c(objNames, "accrualTime")
     }
 
-    if (!("accrualIntensity" %in% objNames) && !is.null(obj[[".accrualTime"]]) &&
-            !obj$.accrualTime$absoluteAccrualIntensityEnabled && 
-            obj$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED) {
+    if (
+        !("accrualIntensity" %in% objNames) &&
+            !is.null(obj[[".accrualTime"]]) &&
+            !obj$.accrualTime$absoluteAccrualIntensityEnabled &&
+            obj$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED
+    ) {
         objNames <- c(objNames, "accrualIntensity")
         objNames <- objNames[objNames != "accrualIntensityRelative"]
     }
@@ -650,8 +694,12 @@ getObjectRCode <- function(
         illegalArgumentValueNames <- newArgumentValueNames[which(!(newArgumentValueNames %in% names(obj)))]
         if (length(illegalArgumentValueNames) > 0) {
             stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'",
-                illegalArgumentValueNames, "' is not a valid ", functionName, "() argument"
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'",
+                illegalArgumentValueNames,
+                "' is not a valid ",
+                functionName,
+                "() argument"
             )
         }
 
@@ -659,15 +707,21 @@ getObjectRCode <- function(
         objNames <- c(objNames, defaultParams)
     }
 
-    if (inherits(obj, "TrialDesign") && "informationRates" %in% objNames &&
-            !("informationRates" %in% newArgumentValueNames)) {
+    if (
+        inherits(obj, "TrialDesign") &&
+            "informationRates" %in% objNames &&
+            !("informationRates" %in% newArgumentValueNames)
+    ) {
         informationRates <- obj[["informationRates"]]
         if (!is.null(informationRates) && length(informationRates) > 0) {
             kMax <- obj[["kMax"]]
-            if (isTRUE(all.equal(
+            if (
+                isTRUE(all.equal(
                     target = .getInformationRatesDefault(kMax),
-                    current = informationRates, tolerance = tolerance
-                ))) {
+                    current = informationRates,
+                    tolerance = tolerance
+                ))
+            ) {
                 objNames <- objNames[objNames != "informationRates"]
                 if (!("kMax" %in% objNames) && kMax != 3) {
                     objNames <- c("kMax", objNames)
@@ -691,25 +745,34 @@ getObjectRCode <- function(
                     value <- obj[[objName]]
                 }
 
-                if (objName == "accrualTime" && inherits(obj, "AccrualTime") &&
+                if (
+                    objName == "accrualTime" &&
+                        inherits(obj, "AccrualTime") &&
                         !isTRUE(obj$endOfAccrualIsUserDefined) &&
-                        isTRUE(length(obj$accrualIntensity) < length(value))) {
+                        isTRUE(length(obj$accrualIntensity) < length(value))
+                ) {
                     value <- value[1:(length(value) - 1)]
                 }
-                if (objName == "accrualTime" && !is.null(obj[[".accrualTime"]]) &&
+                if (
+                    objName == "accrualTime" &&
+                        !is.null(obj[[".accrualTime"]]) &&
                         obj$.getParameterType("accrualTime") == C_PARAM_GENERATED &&
-                        obj$.accrualTime$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED) {
+                        obj$.accrualTime$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED
+                ) {
                     value <- obj$.accrualTime$accrualTimeOriginal
                 }
                 if (objName == "accrualTimeOriginal") {
                     objName <- "accrualTime"
                 }
-                
+
                 if (objName == "accrualIntensityRelative") {
                     objName <- "accrualIntensity"
                 }
-                if (objName == "accrualIntensity" && !is.null(obj[[".accrualTime"]]) &&
-                        !obj$.accrualTime$absoluteAccrualIntensityEnabled) {
+                if (
+                    objName == "accrualIntensity" &&
+                        !is.null(obj[[".accrualTime"]]) &&
+                        !obj$.accrualTime$absoluteAccrualIntensityEnabled
+                ) {
                     value <- obj$.accrualTime$accrualIntensityRelative
                 }
 
@@ -743,13 +806,17 @@ getObjectRCode <- function(
                     }
                 }
 
-                if (objName == "calcSubjectsFunction" &&
+                if (
+                    objName == "calcSubjectsFunction" &&
                         obj$.getParameterType("calcSubjectsFunction") == C_PARAM_USER_DEFINED &&
-                        !is.null(obj[["calcSubjectsFunction"]])) {
+                        !is.null(obj[["calcSubjectsFunction"]])
+                ) {
                     value <- "calcSubjectsFunction"
-                } else if (objName == "calcEventsFunction" &&
+                } else if (
+                    objName == "calcEventsFunction" &&
                         obj$.getParameterType("calcEventsFunction") == C_PARAM_USER_DEFINED &&
-                        !is.null(obj[["calcEventsFunction"]])) {
+                        !is.null(obj[["calcEventsFunction"]])
+                ) {
                     value <- "calcEventsFunction"
                 }
 
@@ -770,26 +837,39 @@ getObjectRCode <- function(
         }
 
         if (inherits(obj, "TrialDesignPlanSurvival") || inherits(obj, "SimulationResultsSurvival")) {
-            if (!("accrualTime" %in% objNames) &&
-                    obj$.getParameterType("accrualTime") == C_PARAM_GENERATED && !all(is.na(obj$accrualTime))) {
+            if (
+                !("accrualTime" %in% objNames) &&
+                    obj$.getParameterType("accrualTime") == C_PARAM_GENERATED &&
+                    !all(is.na(obj$accrualTime))
+            ) {
                 # case 2: follow-up time and absolute intensity given
-                accrualType2 <- (length(obj$accrualIntensity) == 1 && obj$accrualIntensity >= 1 &&
+                accrualType2 <- (length(obj$accrualIntensity) == 1 &&
+                    obj$accrualIntensity >= 1 &&
                     obj$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED &&
                     obj$.getParameterType("followUpTime") == C_PARAM_USER_DEFINED &&
                     obj$.getParameterType("maxNumberOfSubjects") == C_PARAM_GENERATED)
 
                 if (!accrualType2) {
                     accrualTime <- .getArgumentValueRCode(obj$accrualTime, "accrualTime")
-                    if (length(obj$accrualTime) > 1 && length(obj$accrualTime) == length(obj$accrualIntensity) &&
-                        (obj$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED ||
-                            obj$.getParameterType("followUpTime") == C_PARAM_USER_DEFINED)) {
-                        accrualTime <- .getArgumentValueRCode(obj$accrualTime[1:(length(obj$accrualTime) - 1)], "accrualTime")
+                    if (
+                        length(obj$accrualTime) > 1 &&
+                            length(obj$accrualTime) == length(obj$accrualIntensity) &&
+                            (obj$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED ||
+                                obj$.getParameterType("followUpTime") == C_PARAM_USER_DEFINED)
+                    ) {
+                        accrualTime <- .getArgumentValueRCode(
+                            obj$accrualTime[1:(length(obj$accrualTime) - 1)],
+                            "accrualTime"
+                        )
                     }
-                    
-                    if (!identical(accrualTime, c(0, 12)) && !identical(accrualTime, c(0L, 12L)) &&
-                            getParameterType(obj$.accrualTime, "accrualTime") != C_PARAM_GENERATED) {
+
+                    if (
+                        !identical(accrualTime, c(0, 12)) &&
+                            !identical(accrualTime, c(0L, 12L)) &&
+                            getParameterType(obj$.accrualTime, "accrualTime") != C_PARAM_GENERATED
+                    ) {
                         accrualTimeArg <- paste0("accrualTime = ", accrualTime)
-                        
+
                         index <- which(grepl("^accrualIntensity", arguments))
                         if (length(index) == 1 && index > 1) {
                             arguments <- c(arguments[1:(index - 1)], accrualTimeArg, arguments[index:length(arguments)])
@@ -803,21 +883,32 @@ getObjectRCode <- function(
             }
 
             accrualIntensityRelative <- obj$.accrualTime$accrualIntensityRelative
-            if (!("accrualIntensity" %in% objNames) && !all(is.na(accrualIntensityRelative)) && 
-                    obj$.accrualTime$.getParameterType("accrualIntensityRelative") == C_PARAM_USER_DEFINED) {
-                arguments <- c(arguments, paste0(
-                    "accrualIntensity = ",
-                    .getArgumentValueRCode(accrualIntensityRelative, "accrualIntensity")
-                ))
+            if (
+                !("accrualIntensity" %in% objNames) &&
+                    !all(is.na(accrualIntensityRelative)) &&
+                    obj$.accrualTime$.getParameterType("accrualIntensityRelative") == C_PARAM_USER_DEFINED
+            ) {
+                arguments <- c(
+                    arguments,
+                    paste0(
+                        "accrualIntensity = ",
+                        .getArgumentValueRCode(accrualIntensityRelative, "accrualIntensity")
+                    )
+                )
             }
 
-            if (!("maxNumberOfSubjects" %in% objNames) && 
-                obj$.accrualTime$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED &&
-                    !(obj$.getParameterType("followUpTime") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))) {
-                arguments <- c(arguments, paste0(
-                    "maxNumberOfSubjects = ",
-                    .getArgumentValueRCode(obj$maxNumberOfSubjects[1], "maxNumberOfSubjects")
-                ))
+            if (
+                !("maxNumberOfSubjects" %in% objNames) &&
+                    obj$.accrualTime$.getParameterType("maxNumberOfSubjects") == C_PARAM_USER_DEFINED &&
+                    !(obj$.getParameterType("followUpTime") %in% c(C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE))
+            ) {
+                arguments <- c(
+                    arguments,
+                    paste0(
+                        "maxNumberOfSubjects = ",
+                        .getArgumentValueRCode(obj$maxNumberOfSubjects[1], "maxNumberOfSubjects")
+                    )
+                )
             }
         } else if (inherits(obj, "AnalysisResults")) {
             arguments <- c(arguments, paste0("stage = ", obj$.stageResults$stage))
@@ -865,7 +956,8 @@ getObjectRCode <- function(
 
     rCode <- c(precondition, rCode)
 
-    if (!is.null(stringWrapParagraphWidth) &&
+    if (
+        !is.null(stringWrapParagraphWidth) &&
             length(stringWrapParagraphWidth) == 1 &&
             !is.na(stringWrapParagraphWidth) &&
             is.numeric(stringWrapParagraphWidth) &&
@@ -873,14 +965,16 @@ getObjectRCode <- function(
             !is.null(stringWrapPrefix) &&
             length(stringWrapPrefix) == 1 &&
             !is.na(stringWrapPrefix) &&
-            is.character(stringWrapPrefix)) {
+            is.character(stringWrapPrefix)
+    ) {
         rCodeNew <- character()
         for (rCodeLine in rCode) {
             for (i in 12:2) {
                 rCodeLine <- gsub(
-                    pattern = paste(rep(" ", i), collapse = ""), 
-                    replacement = paste(rep("_", i), collapse = ""), 
-                    x = rCodeLine)
+                    pattern = paste(rep(" ", i), collapse = ""),
+                    replacement = paste(rep("_", i), collapse = ""),
+                    x = rCodeLine
+                )
             }
             if (!grepl("^__", rCodeLine)) {
                 rCodeLine <- gsub(" = ", "_=_", rCodeLine)
@@ -894,17 +988,17 @@ getObjectRCode <- function(
                     if (grepl("^ *(\\|>|%>%) *", rCodeLines[i])) {
                         rCodeLines[i - 1] <- paste0(rCodeLines[i - 1], pipeOperatorPostfix)
                         rCodeLines[i] <- sub("^ *(\\|>|%>%) *", "", rCodeLines[i])
-                    } else if (!grepl("^ *([a-zA-Z0-9]+ *<-)|(^ *get[a-zA-Z]+\\()|summary\\(", 
-                            rCodeLines[i])) {
+                    } else if (!grepl("^ *([a-zA-Z0-9]+ *<-)|(^ *get[a-zA-Z]+\\()|summary\\(", rCodeLines[i])) {
                         rCodeLines[i] <- paste0(stringWrapPrefix, rCodeLines[i])
                     }
                 }
             }
             for (i in 12:2) {
                 rCodeLines <- gsub(
-                    pattern = paste(rep("_", i), collapse = ""), 
-                    replacement = paste(rep(" ", i), collapse = ""), 
-                    x = rCodeLines)
+                    pattern = paste(rep("_", i), collapse = ""),
+                    replacement = paste(rep(" ", i), collapse = ""),
+                    x = rCodeLines
+                )
             }
             rCodeLines <- rCodeLines[nchar(trimws(rCodeLines)) > 0]
             rCodeNew <- c(rCodeNew, rCodeLines)
