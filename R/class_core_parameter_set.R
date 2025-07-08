@@ -986,7 +986,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
     if (parameterName %in% c("adjustedStageWisePValues", "overallAdjustedTestStatistics")) {
         return(NULL)
     }
-
+    
     if (!is.matrix(parameterValues)) {
         if (length(parameterValues) == 1) {
             return(rep(parameterValues, numberOfVariants * numberOfStages))
@@ -1161,7 +1161,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
     for (parameterName in parameterNames) {
         tryCatch(
             {
-                if (!(parameterName %in% c("stages", "adaptations", "effectList", "doseLevels", "plannedCalendarTime", "stDev")) &&
+                if (!(parameterName %in% c("stages", "adaptations", "effectList", 
+                            "doseLevels", "plannedCalendarTime")) && 
                         !grepl("Function$", parameterName) &&
                         (is.null(variedParameter) || parameterName != variedParameter)) {
                     columnValues <- .getDataFrameColumnValues(
@@ -1169,10 +1170,16 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         numberOfVariants, numberOfStages,
                         includeAllParameters, mandatoryParameterNames
                     )
+                    
                     if (!is.null(columnValues)) {
                         columnCaption <- parameterSet$.getDataFrameColumnCaption(
                             parameterName, niceColumnNamesEnabled
                         )
+                        
+                        if (parameterName == "stDev" && length(columnValues) == 2) {
+                            columnValues <- paste(columnValues, collapse = ", ")
+                        }
+                        
                         dataFrame[[columnCaption]] <- columnValues
                         if (returnParametersAsCharacter) {
                             parameterSet$.formatDataFrameParametersAsCharacter(

@@ -740,8 +740,13 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     tryCatch(
         {
             modelCall <- emmeansResults[[1]]@model.info$call
+            
+            print("modelCall:")
+            print(modelCall)
+            
             modelFunction <- as.character(modelCall)[1]
-            lmEnabled <- modelFunction == "lm"
+            print(modelFunction)
+            lmEnabled <- grepl("^(stats::)?lm$", modelFunction)
             if (!grepl(paste0("::", modelFunction), modelFunction)) {
                 packageName <- .getPackageName(modelFunction)
                 if (!is.na(packageName)) {
