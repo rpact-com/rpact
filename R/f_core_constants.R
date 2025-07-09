@@ -730,7 +730,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
 C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     iterations = "Iterations",
     seed = "Seed",
-    groups = "Treatment group",
+    groups = "Treatment groups",
     stages = "Stage",
     sampleSizes = "Sample size",
     means = "Mean",

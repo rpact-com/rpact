@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
+## |  File version: $Revision: 8751 $
+## |  Last changed: $Date: 2025-07-08 15:42:23 +0200 (Di, 08 Jul 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -693,10 +693,55 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     return(emmeansResults)
 }
 
-.getStandardDeviationFromStandardError <- function(sampleSize, standardError, ...,
-        dfValue = NA_real_, alpha = 0.05, lmEnabled = TRUE, stDevCalcMode = "auto") {
-    qtCalcEnablbled <- length(stDevCalcMode) == 1 && !is.na(stDevCalcMode) && stDevCalcMode == "t"
-    if ((qtCalcEnablbled || !lmEnabled) && !is.na(dfValue) && !is.infinite(dfValue) && dfValue > 0) {
+
+#' 
+#' Calculate Standard Deviation from Standard Error
+#'
+#' @description
+#' This function calculates the standard deviation from the standard error, given the sample size.
+#' It supports calculations using either the normal distribution or the t-distribution, depending on the input parameters.
+#'
+#' @param sampleSize Numeric. The sample size used in the calculation.
+#' @param standardError Numeric. The standard error of the sample.
+#' @param ... Additional arguments for advanced calculations.
+#' @param dfValue Numeric. Degrees of freedom for the t-distribution. Default is \code{NA_real_}.
+#' @param alpha Numeric. Significance level for the t-distribution. Default is \code{0.05}.
+#' @param lmEnabled Logical. If \code{TRUE}, linear model-based calculations are enabled. Default is \code{TRUE}.
+#' @param stDevCalcMode Character. Specifies the calculation mode for standard deviation. Options are \code{"auto"} or \code{"t"}.
+#'
+#' @details
+#' The function performs the following tasks:
+#' \itemize{
+#'   \item If \code{stDevCalcMode} is set to \code{"t"} and \code{dfValue} is valid, it uses the t-distribution to calculate the standard deviation.
+#'   \item Otherwise, it defaults to using the normal distribution for the calculation.
+#' }
+#'
+#' @return
+#' Returns the calculated standard deviation as a numeric value.
+#'
+#' @examples
+#' \dontrun{
+#' # Example using normal distribution
+#' .getStandardDeviationFromStandardError(sampleSize = 100, standardError = 2)
+#'
+#' # Example using t-distribution
+#' .getStandardDeviationFromStandardError(
+#'     sampleSize = 100, standardError = 2, dfValue = 98, alpha = 0.05, stDevCalcMode = "t"
+#' )
+#' }
+#'
+#' @noRd
+#' 
+.getStandardDeviationFromStandardError <- function(
+        sampleSize, 
+        standardError, 
+        ...,
+        dfValue = NA_real_, 
+        alpha = 0.05, 
+        lmEnabled = TRUE, 
+        stDevCalcMode = "auto") {
+    qtCalcEnabled <- length(stDevCalcMode) == 1 && !is.na(stDevCalcMode) && stDevCalcMode == "t"
+    if ((qtCalcEnabled || !lmEnabled) && !is.na(dfValue) && !is.infinite(dfValue) && dfValue > 0) {
         qValue <- stats::qt(1 - alpha / 2, df = dfValue)
         stDev <- standardError * 2 / qValue * sqrt(sampleSize)
     } else {
@@ -741,6 +786,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         {
             modelCall <- emmeansResults[[1]]@model.info$call
             modelFunction <- as.character(modelCall)[1]
+            
             lmEnabled <- grepl("^(stats::)?lm$", modelFunction)
             if (!grepl(paste0("::", modelFunction), modelFunction)) {
                 packageName <- .getPackageName(modelFunction)
