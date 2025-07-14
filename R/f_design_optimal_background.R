@@ -4,9 +4,9 @@
 #' @description Calculate psi for the given scenario, incl. constant
 #' @details Internal function called by \code{getIntegral()} that calculates a point value of \code{getPsi()}.
 #'
-#' @template param_firstStagePValue_integrate
-#' @template param_constant_integrate
-#' @template param_design
+#' @template param_firstStagePValueIntegralOCEF
+#' @template param_constantOCEF
+#' @template param_designOCEF
 #'
 #' @return Point value of \code{getPsi()}.
 #' @keywords internal
@@ -51,8 +51,8 @@ getInnerPsi <- function(firstStagePValue, constant, design) {
 #'
 #' @details Internal function called by \code{findLevelConstant()} that should be solved (i.e., root should be found).
 #'
-#' @template param_constant_integrate
-#' @template param_design
+#' @template param_constantOCEF
+#' @template param_designOCEF
 #'
 #' @return Distance of integral over psi to (alpha-alpha1).
 #' @keywords internal
@@ -89,8 +89,8 @@ getIntegral <- function(constant, design) {
 #' @description This function aims to provide a more accurate integration routine than the \code{integrate()} function
 #' for a partially constant function.
 #'
-#' @template param_constant_integrate
-#' @template param_design
+#' @template param_constantOCEF
+#' @template param_designOCEF
 #'
 #' @return Integral over the partially constant function.
 #' @keywords internal
@@ -263,7 +263,7 @@ getIntegralWithConstants <- function(constant, design) {
 #' In case a conditional power function is used, the condition is instead:
 #' \deqn{\alpha_1 + \int_{\alpha_1}^{\alpha_0} CP(p_1)dp_1>\alpha.}
 #'
-#' @template param_design
+#' @template param_designOCEF
 #'
 #' @return A list that contains the constant (element \code{$root}) and other components provided by \code{uniroot()}.
 #' The level constant is calculated corresponding to the mean difference scale.
@@ -347,8 +347,8 @@ getLevelConstant <- function(design) {
 #'          The maximum likelihood ratio is always restricted to effect sizes \eqn{\vartheta \geq 0} (corresponding to \eqn{p_1 \leq 0.5}).
 #' }
 #'
-#' @template param_firstStagePValue
-#' @template param_design
+#' @template param_firstStagePValueOCEF
+#' @template param_designOCEF
 #'
 #' @return The value of the likelihood ratio for the given specification.
 #' @export
@@ -466,14 +466,14 @@ getLikelihoodRatio <- Vectorize(getLikelihoodRatio, "firstStagePValue")
 #' The algorithm can easily be translated to the use of p-values by switching the maximum and minimum functions, i.e., replacing \eqn{\min\{q, Q(z_1)\}} by \eqn{\max\{q, Q(p_1)\}} and \eqn{\min\{q, Q(z_1)\}} by \eqn{\max\{q, Q(p_1\}}.
 #'
 #' @param x Argument values.
-#' @template param_fun_mono
-#' @template param_lower_mono
-#' @template param_upper_mono
-#' @template param_argument_mono
-#' @template param_nSteps_mono
-#' @template param_epsilon_mono
-#' @template param_numberOfIterationsQ
-#' @template param_design
+#' @template param_funOCEF
+#' @template param_lowerOCEF
+#' @template param_upperOCEF
+#' @template param_argumentOCEF
+#' @template param_nStepsOCEF
+#' @template param_epsilonOCEF
+#' @template param_numberOfIterationsQOCEF
+#' @template param_designOCEF
 #'
 #' @return Monotone function values.
 #' @export
@@ -521,14 +521,14 @@ getMonotoneFunction <- function(
 #' @description Computes the constants required to make a function non-increasing on the specified interval. The output of this function is necessary to calculate the monotone optimal conditional error function.
 #' The output object is a list that contains the intervals on which constant values are required, specified by the minimum \code{dls} and maximum \code{dus} of the interval and the respective constants, \code{qs}.
 #'
-#' @template param_fun_mono
-#' @template param_lower_mono
-#' @template param_upper_mono
-#' @template param_argument_mono
-#' @template param_nSteps_mono
-#' @template param_epsilon_mono
-#' @template param_numberOfIterationsQ
-#' @template param_design
+#' @template param_funOCEF
+#' @template param_lowerOCEF
+#' @template param_upperOCEF
+#' @template param_argumentOCEF
+#' @template param_nStepsOCEF
+#' @template param_epsilonOCEF
+#' @template param_numberOfIterationsQOCEF
+#' @template param_designOCEF
 #'
 #' @return A list containing the monotonisation constants (element \code{$qs}) and the intervals on which they must be applied, specified via minimum (element \code{qls}) and maximum (element \code{qus}).
 #' @export
@@ -700,8 +700,8 @@ getMonotonisationConstants <- function(
 #' @details Note that this function uses factor 1 instead of factor 2 (Brannath & Bauer 2004). This has no impact on the optimal conditional error function, as constant factors are absorbed by the level constant \eqn{c_0}. \cr
 #' The calculation is:
 #' \deqn{\nu(\alpha_2(p_1)) = (\Phi^{-1}(1-\alpha_2(p_1)) + \Phi^{-1}(CP))^2.}
-#' @template param_alpha_cerr
-#' @template param_conditionalPower
+#' @template param_alphaGenericOCEF
+#' @template param_conditionalPowerOCEF
 #'
 #' @return Factor linking information and \eqn{\alpha_2}.
 #' @export
@@ -736,8 +736,8 @@ getNu <- Vectorize(FUN = getNu, vectorize.args = c("alpha", "conditionalPower"))
 #' Note that in this implementation, the the factor -2 is used instead of -4, which is used in by Brannath & Bauer (2004), who explicitly investigate the setting of a balanced two-group trial.
 #' The argument \code{conditionalPower} is either the fixed target conditional power or the value of the conditional power function at the corresponding first-stage p-value.
 #'
-#' @template param_alpha_cerr
-#' @template param_conditionalPower
+#' @template param_alphaGenericOCEF
+#' @template param_conditionalPowerOCEF
 #'
 #' @return Value for nu prime.
 #' @export
@@ -760,7 +760,7 @@ getNuPrime <- Vectorize(FUN = getNuPrime, vectorize.args = "alpha")
 #' @description Get point-wise values of psi (inverse of nu prime)
 #'
 #' @param nuPrime The function value to be inverted.
-#' @template param_conditionalPower
+#' @template param_conditionalPowerOCEF
 #'
 #' @return The value of alpha which corresponds to nuPrime and lies between 0 and \code{conditionalPower}.
 #' @export
@@ -857,8 +857,8 @@ getPsi <- Vectorize(FUN = getPsi, vectorize.args = c("nuPrime", "conditionalPowe
 #' @name getQ
 #' @description Calculate the ratio of likelihood ratio and squared effect size.
 #'
-#' @template param_firstStagePValue
-#' @template param_design
+#' @template param_firstStagePValueOCEF
+#' @template param_designOCEF
 #'
 #' @details For more information on how to specify the likelihood ratio, see \code{?getLikelihoodRatio()}.
 #' In case the optimal conditional error function is ever increasing in the first-stage p-value \eqn{p_1}, a monotone transformation of \code{getQ()}
@@ -902,9 +902,9 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
 #'
 #' @description Internal function used by \code{getExpectedSecondStageInformation()} to calculate the integral over the information.
 #'
-#' @template param_firstStagePValue
-#' @template param_likelihoodRatioDistribution
-#' @template param_design
+#' @template param_firstStagePValueOCEF
+#' @template param_likelihoodRatioDistributionOCEF
+#' @template param_designOCEF
 #' @param ... Additional arguments needed for \code{getOptimalConditionalError()} and \code{getLikelihoodRatio()}.
 #'
 #' @return Integral over the information of the second stage

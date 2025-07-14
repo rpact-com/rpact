@@ -28,9 +28,10 @@
 #'
 #' @section Effect for conditional power:
 #' For the treatment effect at which the target conditional power should be achieved, either a fixed effect or an interim estimate can be used.
-#' The usage of a fixed effect is indicated by setting \code{useInterimEstimate=FALSE}, in which case the fixed effect is provided by \code{delta1} on the mean difference scale or by \code{ncp1} on the non-centrality parameter scale (i.e., \code{delta1*sqrt(firstStageInformation)}).
-#' For an interim estimate, specified by \code{useInterimEstimate=TRUE}, a lower cut-off for the interim estimate must be provided, either by \code{delta1Min} on the mean difference scale, or \code{ncp1Min} on the non-centrality parameter scale.
-#' In addition, an upper limit of the estimate may be analogously provided by \code{delta1Max} or \code{ncp1Max}.
+#' The usage of a fixed effect is indicated by setting \code{useInterimEstimate=FALSE}, in which case the fixed effect is provided by \code{delta1} on the mean difference scale.
+#' For an interim estimate, specified by \code{useInterimEstimate=TRUE}, a lower cut-off for the interim estimate must be provided, either by \code{delta1Min} on the mean difference scale.
+#' In addition, an upper limit of the estimate may be analogously provided by \code{delta1Max}. These effects may alternatively be specified on the non-centrality parameter scale as
+#' \code{ncp1}, \code{ncp1Min} and \code{ncp1Max}.
 #'
 #' @section Sample size and information:
 #' The first-stage information of the trial design must be specified to allow for calculations between the mean difference and non-centrality parameter scale.
@@ -67,27 +68,24 @@
 #' The \code{print()} and \code{plot()} functions are available for objects of class \code{TrialDesignOptimalConditionalError}.
 #' For details, see \code{?print.TrialDesignOptimalConditionalError} and \code{?plot.TrialDesignOptimalConditionalError}.
 #'
-#' @template param_alpha
-#' @template param_alpha1
-#' @template param_alpha0
-#' @template param_conditionalPower
-#' @template param_conditionalPowerFunction
-#' @template param_ncp1
-#' @template param_ncp1Min
-#' @template param_ncp1Max
-#' @template param_delta1
-#' @template param_delta1Min
-#' @template param_delta1Max
-#' @template param_likelihoodRatioDistribution
-#' @template param_firstStageInformation
-#' @template param_useInterimEstimate
-#' @template param_minimumSecondStageInformation
-#' @template param_maximumSecondStageInformation
-#' @template param_minimumConditionalError
-#' @template param_maximumConditionalError
-#' @template param_levelConstantMinimum
-#' @template param_levelConstantMaximum
-#' @template param_enforceMonotonicity
+#' @template param_alphaOCEF
+#' @template param_alpha1OCEF
+#' @template param_alpha0OCEF
+#' @template param_conditionalPowerOCEF
+#' @template param_conditionalPowerFunctionOCEF
+#' @template param_delta1OCEF
+#' @template param_delta1MinOCEF
+#' @template param_delta1MaxOCEF
+#' @template param_likelihoodRatioDistributionOCEF
+#' @template param_firstStageInformationOCEF
+#' @template param_useInterimEstimateOCEF
+#' @template param_minimumSecondStageInformationOCEF
+#' @template param_maximumSecondStageInformationOCEF
+#' @template param_minimumConditionalErrorOCEF
+#' @template param_maximumConditionalErrorOCEF
+#' @template param_levelConstantMinimumOCEF
+#' @template param_levelConstantMaximumOCEF
+#' @template param_enforceMonotonicityOCEF
 #' @param ... Additional arguments required for the specification of the likelihood ratio.
 #'
 #' @importFrom methods new
@@ -193,8 +191,8 @@ getDesignOptimalConditionalErrorFunction <- function(
 #'        \item \eqn{\nu(\alpha_2(p_1)) = (\Phi^{-1}(1-\alpha_2(p_1))+\Phi^{-1}(CP))^2} is a factor calculated for the specific assumptions about the optimal conditional error function and the target conditional power \eqn{CP}.
 #' }}
 #'
-#' @template param_design
-#' @template param_likelihoodRatioDistribution_expected
+#' @template param_designOCEF
+#' @template param_likelihoodRatioDistributionExpectedOCEF
 #' @param ... {Additional parameters required for the specification of \code{likelihoodRatioDistribution}}.
 #'
 #' @return Expected second-stage information.
@@ -245,8 +243,8 @@ getExpectedSecondStageInformation <- function(design, likelihoodRatioDistributio
 #' Early stopping rules are supported, i.e., for \eqn{p_1 \leq \alpha_1}, the returned conditional error is 1 and for \eqn{p_1 > \alpha_0}, the returned conditional error is 0.
 #'
 #'
-#' @template param_firstStagePValue
-#' @template param_design
+#' @template param_firstStagePValueOCEF
+#' @template param_designOCEF
 #'
 #' @return Value of the optimal conditional error function.
 #' @export
@@ -337,8 +335,8 @@ getOptimalConditionalError <- Vectorize(FUN = getOptimalConditionalError, vector
 #' This function is used to evaluate the overall performance of a design.
 #' The probabilities for first-stage futility, first-stage efficacy and overall efficacy (i.e., overall power) are saved in an object of class \code{PowerResultsOptimalConditionalError}.
 #'
-#' @template param_design
-#' @template param_alternative
+#' @template param_designOCEF
+#' @template param_alternativeOCEF
 #'
 #' @seealso [getDesignOptimalConditionalErrorFunction()], [getSimulationResults()]
 #'
@@ -410,8 +408,8 @@ getOverallPower <- function(design, alternative) {
 #' For p-values smaller or equal to the first-stage efficacy boundary as well as p-values greater than the first-stage futility boundary,
 #' the returned information is 0 (since the trial is ended early in both cases).
 #'
-#' @template param_firstStagePValue
-#' @template param_design
+#' @template param_firstStagePValueOCEF
+#' @template param_designOCEF
 #'
 #' @return The second-stage information.
 #' @export
