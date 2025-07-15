@@ -979,7 +979,7 @@ NULL
 NULL
 
 #' Parameter Description: Futility boundary (optimal conditional error design)
-#' @param alpha0OCEF
+#' @param alpha0
 #' Binding stage 1 futility boundary \eqn{\alpha_0} (p-value scale). Must be a numeric value between 0 and 1. Should be greater than \code{alpha1}. For use of a non-binding futility boundary, specify \code{alpha0=1}.
 #' @name param_alpha0OCEF
 #' @keywords internal
