@@ -1,42 +1,41 @@
-TrialDesignOptimalConditionalError <- setRefClass(
-    Class = "TrialDesignOptimalConditionalError",
-    fields = list(
-        alpha = "numeric",
-        alpha1 = "numeric",
-        alpha0 = "numeric",
-        conditionalPower = "numeric",
-        conditionalPowerFunction = "function",
-        delta1 = "numeric",
-        delta1Min = "numeric",
-        delta1Max = "numeric",
-        firstStageInformation = "numeric",
-        useInterimEstimate = "logical",
-        likelihoodRatioDistribution = "character",
-        deltaLR = "numeric",
-        weightsDeltaLR = "numeric",
-        tauLR = "numeric",
-        kappaLR = "numeric",
-        deltaMaxLR = "numeric",
-        levelConstant = "numeric",
-        monotonisationConstants = "list",
-        minimumSecondStageInformation = "numeric",
-        maximumSecondStageInformation = "numeric",
-        minimumConditionalError = "numeric",
-        maximumConditionalError = "numeric",
-        levelConstantMinimum = "numeric",
-        levelConstantMaximum = "numeric",
-        ncp1 = "numeric",
-        ncp1Min = "numeric",
-        ncp1Max = "numeric",
-        enforceMonotonicity = "logical"
-    ),
-    methods = list(
+TrialDesignOptimalConditionalError <- R6::R6Class(
+    "TrialDesignOptimalConditionalError",
+    inherit = ParameterSet,
+    public = list(
+        alpha = NULL,
+        alpha1 = NULL,
+        alpha0 = NULL,
+        conditionalPower = NULL,
+        conditionalPowerFunction = NULL,
+        delta1 = NULL,
+        delta1Min = NULL,
+        delta1Max = NULL,
+        firstStageInformation = NULL,
+        useInterimEstimate = NULL,
+        likelihoodRatioDistribution = NULL,
+        deltaLR = NULL,
+        weightsDeltaLR = NULL,
+        tauLR = NULL,
+        kappaLR = NULL,
+        deltaMaxLR = NULL,
+        levelConstant = NULL,
+        monotonisationConstants = NULL,
+        minimumSecondStageInformation = NULL,
+        maximumSecondStageInformation = NULL,
+        minimumConditionalError = NULL,
+        maximumConditionalError = NULL,
+        levelConstantMinimum = NULL,
+        levelConstantMaximum = NULL,
+        ncp1 = NULL,
+        ncp1Min = NULL,
+        ncp1Max = NULL,
+        enforceMonotonicity = NULL,
         initialize = function(
             alpha = NA_real_,
             alpha1 = NA_real_,
             alpha0 = NA_real_,
             conditionalPower = NA_real_,
-            conditionalPowerFunction = NA,
+            conditionalPowerFunction = NULL,
             delta1 = NA_real_,
             delta1Min = NA_real_,
             delta1Max = NA_real_,
@@ -49,7 +48,7 @@ TrialDesignOptimalConditionalError <- setRefClass(
             kappaLR = NA_real_,
             deltaMaxLR = NA_real_,
             levelConstant = NA_real_,
-            monotonisationConstants,
+            monotonisationConstants = NULL,
             minimumSecondStageInformation = 0,
             maximumSecondStageInformation = Inf,
             minimumConditionalError = 0,
@@ -116,7 +115,7 @@ TrialDesignOptimalConditionalError <- setRefClass(
                         )
                     }
 
-                    .self$conditionalPowerFunction <- conditionalPowerFunction
+                    self$conditionalPowerFunction <- conditionalPowerFunction
                 }
             }
 
@@ -125,13 +124,13 @@ TrialDesignOptimalConditionalError <- setRefClass(
             .assertIsSingleLogical(x = useInterimEstimate, argumentName = "useInterimEstimate")
 
             # Set initial parameters
-            .self$alpha <- alpha
-            .self$alpha1 <- alpha1
-            .self$alpha0 <- alpha0
-            .self$conditionalPower <- conditionalPower
-            .self$firstStageInformation <- firstStageInformation
-            .self$likelihoodRatioDistribution <- likelihoodRatioDistribution
-            .self$useInterimEstimate <- useInterimEstimate
+            self$alpha <- alpha
+            self$alpha1 <- alpha1
+            self$alpha0 <- alpha0
+            self$conditionalPower <- conditionalPower
+            self$firstStageInformation <- firstStageInformation
+            self$likelihoodRatioDistribution <- likelihoodRatioDistribution
+            self$useInterimEstimate <- useInterimEstimate
 
             .assertIsSingleNumber(x = levelConstantMinimum, argumentName = "levelConstantMinimum")
             .assertIsSingleNumber(x = levelConstantMaximum, argumentName = "levelConstantMaximum")
@@ -143,8 +142,8 @@ TrialDesignOptimalConditionalError <- setRefClass(
                 ))
             }
 
-            .self$levelConstantMinimum <- levelConstantMinimum
-            .self$levelConstantMaximum <- levelConstantMaximum
+            self$levelConstantMinimum <- levelConstantMinimum
+            self$levelConstantMaximum <- levelConstantMaximum
 
             # Derive effect sizes for conditional power
             # When using an interim estimate, derive minimal or maximal effects
@@ -162,15 +161,15 @@ TrialDesignOptimalConditionalError <- setRefClass(
                     .assertIsSingleNumber(x = delta1Max, argumentName = "delta1Max")
                     .assertIsInClosedInterval(x = delta1Max, xName = "delta1Max", lower = delta1Min, upper = Inf)
 
-                    .self$delta1Min <- delta1Min
-                    .self$delta1Max <- delta1Max
+                    self$delta1Min <- delta1Min
+                    self$delta1Max <- delta1Max
 
                     if (!is.na(ncp1Min)) {
                         warning("Both ncp1Min and delta1Min are provided. Using delta1Min and ignoring ncp1Min.")
                     }
 
-                    .self$ncp1Min <- delta1Min * sqrt(firstStageInformation)
-                    .self$ncp1Max <- delta1Max * sqrt(firstStageInformation)
+                    self$ncp1Min <- delta1Min * sqrt(firstStageInformation)
+                    self$ncp1Max <- delta1Max * sqrt(firstStageInformation)
                 } else if (!is.na(ncp1Min)) {
                     .assertIsSingleNumber(x = ncp1Min, argumentName = "ncp1Min")
                     .assertIsInOpenInterval(x = ncp1Min, xName = "ncp1Min", lower = 0, upper = Inf)
@@ -178,11 +177,11 @@ TrialDesignOptimalConditionalError <- setRefClass(
                     .assertIsSingleNumber(x = ncp1Max, argumentName = "ncp1Max")
                     .assertIsInClosedInterval(x = ncp1Max, xName = "ncp1Max", lower = ncp1Min, upper = Inf)
 
-                    .self$ncp1Min <- ncp1Min
-                    .self$ncp1Max <- ncp1Max
+                    self$ncp1Min <- ncp1Min
+                    self$ncp1Max <- ncp1Max
 
-                    .self$delta1Min <- ncp1Min / sqrt(firstStageInformation)
-                    .self$delta1Max <- ifelse(ncp1Max == Inf, Inf, ncp1Max / sqrt(firstStageInformation))
+                    self$delta1Min <- ncp1Min / sqrt(firstStageInformation)
+                    self$delta1Max <- ifelse(ncp1Max == Inf, Inf, ncp1Max / sqrt(firstStageInformation))
                 } else {
                     stop(paste0(
                         C_EXCEPTION_TYPE_RUNTIME_ISSUE,
@@ -196,18 +195,18 @@ TrialDesignOptimalConditionalError <- setRefClass(
                     .assertIsSingleNumber(x = delta1, argumentName = "delta1")
                     .assertIsInOpenInterval(x = delta1, xName = "delta1", lower = 0, upper = Inf)
 
-                    .self$delta1 <- delta1
+                    self$delta1 <- delta1
                     if (!is.na(ncp1)) {
                         warning("Both delta1 and ncp1 are provided. Using delta1 and ignoring ncp1.")
                     }
-                    .self$ncp1 <- delta1 * sqrt(firstStageInformation)
+                    self$ncp1 <- delta1 * sqrt(firstStageInformation)
                 } else if (!is.na(ncp1)) {
                     # If delta1 was not specified, calculate it from ncp1
                     .assertIsSingleNumber(x = ncp1, argumentName = "ncp1")
                     .assertIsInOpenInterval(x = ncp1, xName = "ncp1", lower = 0, upper = Inf)
 
-                    .self$ncp1 <- ncp1
-                    .self$delta1 <- ncp1 / sqrt(firstStageInformation)
+                    self$ncp1 <- ncp1
+                    self$delta1 <- ncp1 / sqrt(firstStageInformation)
                 } else {
                     # Else, none of ncp1 and delta1 were specified
                     stop(paste0(
@@ -272,15 +271,15 @@ TrialDesignOptimalConditionalError <- setRefClass(
             )
 
             # Identify constraints for minimum conditional error / maximum second-stage information
-            .self$minimumConditionalError <- minimumConditionalError
-            .self$maximumSecondStageInformation <- maximumSecondStageInformation
+            self$minimumConditionalError <- minimumConditionalError
+            self$maximumSecondStageInformation <- maximumSecondStageInformation
 
             # Identify constraints for maximum conditional error / minimum second-stage information
-            .self$maximumConditionalError <- maximumConditionalError
-            .self$minimumSecondStageInformation <- minimumSecondStageInformation
+            self$maximumConditionalError <- maximumConditionalError
+            self$minimumSecondStageInformation <- minimumSecondStageInformation
 
             .assertIsSingleLogical(x = enforceMonotonicity, argumentName = "enforceMonotonicity")
-            .self$enforceMonotonicity <- enforceMonotonicity
+            self$enforceMonotonicity <- enforceMonotonicity
 
             .assertIsSingleCharacter(x = likelihoodRatioDistribution, argumentName = "likelihoodRatioDistribution")
 
@@ -293,10 +292,10 @@ TrialDesignOptimalConditionalError <- setRefClass(
                     ))
                 } else {
                     .assertIsNumericVector(x = deltaLR, argumentName = "deltaLR")
-                    .self$deltaLR <- deltaLR
+                    self$deltaLR <- deltaLR
                     # If any of the weights are NA, use equal weights
                     if (any(is.na(weightsDeltaLR))) {
-                        .self$weightsDeltaLR <- rep(1 / length(deltaLR), length(deltaLR))
+                        self$weightsDeltaLR <- rep(1 / length(deltaLR), length(deltaLR))
                         # For multiple effects, tell the user that equal weights are used.
                         if (length(deltaLR) > 1) {
                             message(
@@ -317,7 +316,7 @@ TrialDesignOptimalConditionalError <- setRefClass(
                         if (sum(weightsDeltaLR) != 1) {
                             stop(paste0(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "Weights in weightsDeltaLR must sum to 1."))
                         }
-                        .self$weightsDeltaLR <- weightsDeltaLR
+                        self$weightsDeltaLR <- weightsDeltaLR
                     }
                 }
             } else if (likelihoodRatioDistribution == "normal") {
@@ -328,12 +327,12 @@ TrialDesignOptimalConditionalError <- setRefClass(
                     ))
                 } else {
                     .assertIsSingleNumber(x = deltaLR, argumentName = "deltaLR")
-                    .self$deltaLR <- deltaLR
+                    self$deltaLR <- deltaLR
 
                     .assertIsSingleNumber(x = tauLR, argumentName = "tauLR")
                     .assertIsInOpenInterval(x = tauLR, xName = "tauLR", lower = 0, upper = Inf)
 
-                    .self$tauLR <- tauLR
+                    self$tauLR <- tauLR
                 }
             } else if (likelihoodRatioDistribution == "exp") {
                 if (is.na(kappaLR)) {
@@ -344,7 +343,7 @@ TrialDesignOptimalConditionalError <- setRefClass(
                 } else {
                     .assertIsSingleNumber(x = kappaLR, argumentName = "kappaLR")
                     .assertIsInOpenInterval(x = kappaLR, xName = "kappaLR", lower = 0, upper = Inf)
-                    .self$kappaLR <- kappaLR
+                    self$kappaLR <- kappaLR
                 }
             } else if (likelihoodRatioDistribution == "unif") {
                 if (is.na(deltaMaxLR)) {
@@ -355,7 +354,7 @@ TrialDesignOptimalConditionalError <- setRefClass(
                 } else {
                     .assertIsSingleNumber(x = deltaMaxLR, argumentName = "deltaMaxLR")
                     .assertIsInOpenInterval(x = deltaMaxLR, xName = "deltaMaxLR", lower = 0, upper = Inf)
-                    .self$deltaMaxLR <- deltaMaxLR
+                    self$deltaMaxLR <- deltaMaxLR
                 }
             } else if (likelihoodRatioDistribution == "maxlr") {} else {
                 stop(paste0(
@@ -365,21 +364,21 @@ TrialDesignOptimalConditionalError <- setRefClass(
             }
 
             # Calculate monotonisation constants
-            .self$monotonisationConstants <- getMonotonisationConstants(
+            self$monotonisationConstants <- getMonotonisationConstants(
                 fun = "getQ",
                 lower = alpha1,
                 upper = alpha0,
                 argument = "firstStagePValue",
-                design = .self
+                design = self
             )
 
             # Calculate level constant
-            .self$levelConstant <- getLevelConstant(
-                design = .self
+            self$levelConstant <- getLevelConstant(
+                design = self
             )$root
         },
         show = function() {
-            print.TrialDesignOptimalConditionalError(.self)
+            print.TrialDesignOptimalConditionalError(self)
         }
     )
 )
