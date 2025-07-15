@@ -380,8 +380,7 @@ getOverallPower <- function(design, alternative) {
         overallPower[i] <- firstStageEfficacy[i] + integral
     }
 
-    powerResults <- new(
-        "PowerResultsOptimalConditionalError",
+    powerResults <- list(
         alternative = alternative,
         firstStageFutility = firstStageFutility,
         firstStageEfficacy = firstStageEfficacy,
