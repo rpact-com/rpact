@@ -77,6 +77,30 @@
     .Call(`_rpact_getSimulationSurvivalCpp`, designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocationRatioPlanned, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa, calcEventsFunctionType, calcEventsFunctionR, calcEventsFunctionCpp)
 }
 
+.getSimulatedStageMeansMultiArmCpp <- function(design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
+    .Call(`_rpact_getSimulatedStageMeansMultiArmCpp`, design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction)
+}
+
+.getSimulationMultiArmMeansInnerLoopCpp <- function(iterations, simulatedFutilityStopping, simulatedConditionalPower, i, j, gMax, kMax, cols, index, simulatedSubjectsPerStage, simulatedRejections, simulatedSelections, simulatedNumberOfActiveArms, simulatedSuccessStopping, muMaxVector, effectMatrix, dataIterationNumber, dataStageNumber, dataArmNumber, dataAlternative, dataEffect, dataSubjectsControlArm, dataSubjectsActiveArm, dataNumberOfSubjects, dataNumberOfCumulatedSubjects, dataRejectPerStage, dataTestStatistics, dataSuccessStop, dataFutilityStop, dataConditionalCriticalValue, dataConditionalPowerAchieved, dataEffectEstimate, dataPValuesSeparate, simulatedRejectAtLeastOne, design, indices, criticalValuesDunnett, intersectionTest, successCriterion, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction, stageResults) {
+    .Call(`_rpact_simulationMultiArmMeansInnerLoopCpp`, iterations, simulatedFutilityStopping, simulatedConditionalPower, i, j, gMax, kMax, cols, index, simulatedSubjectsPerStage, simulatedRejections, simulatedSelections, simulatedNumberOfActiveArms, simulatedSuccessStopping, muMaxVector, effectMatrix, dataIterationNumber, dataStageNumber, dataArmNumber, dataAlternative, dataEffect, dataSubjectsControlArm, dataSubjectsActiveArm, dataNumberOfSubjects, dataNumberOfCumulatedSubjects, dataRejectPerStage, dataTestStatistics, dataSuccessStop, dataFutilityStop, dataConditionalCriticalValue, dataConditionalPowerAchieved, dataEffectEstimate, dataPValuesSeparate, simulatedRejectAtLeastOne, design, indices, criticalValuesDunnett, intersectionTest, successCriterion, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction, stageResults)
+}
+
+.hmmCpp <- function(gMax, k, i, cols, kMax, simulatedRejections, closedTest, rejectedArmsBefore, cheat) {
+    .Call(`_rpact_hmm`, gMax, k, i, cols, kMax, simulatedRejections, closedTest, rejectedArmsBefore, cheat)
+}
+
+.firstCpp <- function(gMax, k, i, cols, kMax, simulatedSelections, closedTest) {
+    .Call(`_rpact_first`, gMax, k, i, cols, kMax, simulatedSelections, closedTest)
+}
+
+.funnyBoolCpp <- function(k, kMax, closedTest) {
+    .Call(`_rpact_funnyBool`, k, kMax, closedTest)
+}
+
+.lastSectionCpp <- function(simulatedSubjectsPerStage, iterations, i, gMax, kMax, cols, simulatedRejections, simulatedSuccessStopping, simulatedFutilityStopping, maxNumberOfIterations, expectedNumberOfSubjects) {
+    .Call(`_rpact_lastSection`, simulatedSubjectsPerStage, iterations, i, gMax, kMax, cols, simulatedRejections, simulatedSuccessStopping, simulatedFutilityStopping, maxNumberOfIterations, expectedNumberOfSubjects)
+}
+
 getOneMinusQNorm <- function(p, mean = 0, sd = 1, lowerTail = 1, logP = 0, epsilon = 1.0e-100) {
     .Call(`_rpact_getOneMinusQNorm`, p, mean, sd, lowerTail, logP, epsilon)
 }
