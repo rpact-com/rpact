@@ -920,7 +920,7 @@ getSimulationMultiArmSurvivalNew <- function(
         maxNumberOfSubjects = maxNumberOfSubjects
     )
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
-        if (identical(accrualIntensity, 1L)) {
+        if (accrualIntensity < 1L) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'"
