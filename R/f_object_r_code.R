@@ -825,6 +825,7 @@ getObjectRCode <- function(
                     # do not add
                     # arguments <- c(arguments, paste0(name, "_DoNotAdd"))
                 } else {
+                    argument <- NULL
                     if (length(value) > 0 && nchar(as.character(value)) > 0) {
                         if (!all(is.na(value)) && !all(grepl("^NA(_(real|integer|character)_)?$", as.character(value)))) {
                             argument <- paste0(objName, " = ", value)
@@ -832,7 +833,7 @@ getObjectRCode <- function(
                     } else {
                         argument <- objName
                     }
-                    if (!(argument %in% leadingArguments)) {
+                    if (!is.null(argument) && !(argument %in% leadingArguments)) {
                         arguments <- c(arguments, argument)
                     }
                 }
