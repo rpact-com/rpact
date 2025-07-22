@@ -893,7 +893,7 @@ getSimulationEnrichmentSurvival <- function(
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
 
-    #simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
+    simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
     simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
     .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", simulatedSingleEventsPerStage)
 

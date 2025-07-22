@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8751 $
-## |  Last changed: $Date: 2025-07-08 15:42:23 +0200 (Di, 08 Jul 2025) $
+## |  File version: $Revision: 8752 $
+## |  Last changed: $Date: 2025-07-10 14:29:45 +0200 (Do, 10 Jul 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -773,8 +773,16 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 .getClassName(emmeansResults[[stage]]), stage
             ))
         }
+        
+        varianceCovarianceMatrix <- stats::vcov(emmeansResults[[stage]])
+        if (any(dim(varianceCovarianceMatrix) > 2)) {
+            stop(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "models with covariates are not yet supported by getDataset()"
+            )
+        }
     }
-
+    
     stages <- integer(0)
     groups <- integer(0)
     means <- numeric(0)

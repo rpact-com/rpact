@@ -8,6 +8,7 @@
 
 ## Improvements, issues, and changes
 
+* Issue for conditional power calculation for group sequential designs in analysis tool fixed
 * Recruitment times for count and survival data situation improved (issue [#86](https://github.com/rpact-com/rpact/issues/86))
 * Bug fix for `getSimulationCounts()` (issue [#84](https://github.com/rpact-com/rpact/issues/84))
 * Minor improvements

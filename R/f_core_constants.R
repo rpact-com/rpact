@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8738 $
-## |  Last changed: $Date: 2025-06-04 13:12:30 +0200 (Mi, 04 Jun 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8752 $
+## |  Last changed: $Date: 2025-07-10 14:29:45 +0200 (Do, 10 Jul 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include class_dictionary.R

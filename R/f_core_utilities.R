@@ -1597,6 +1597,13 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 .addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues) {
+    if (!fieldName %in% names(parameterSet)) {
+        stop(
+            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+            "'", .getClassName(parameterSet), "' does not contain a field with name '", fieldName, "'"
+        )
+    }
+    
     parameterSet[[fieldName]] <- fieldValues
     parameterSet$.setParameterType(fieldName, C_PARAM_NOT_APPLICABLE)
     parameterSet$.deprecatedFieldNames <- unique(c(parameterSet$.deprecatedFieldNames, fieldName))

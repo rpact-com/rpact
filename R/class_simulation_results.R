@@ -1774,6 +1774,8 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class(
         numberOfSubjects = NULL,
         populations = NULL,
         populationEventsPerStage = NULL,
+        singleEventsPerSubsetAndStage = NULL, # deprecated
+        singleNumberOfEventsPerStage = NULL, # deprecated
         rejectAtLeastOne = NULL,
         rejectedPopulationsPerStage = NULL,
         rValue = NULL,

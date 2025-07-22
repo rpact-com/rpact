@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8705 $
-## |  Last changed: $Date: 2025-05-07 10:58:11 +0200 (Mi, 07 Mai 2025) $
+## |  File version: $Revision: 8757 $
+## |  Last changed: $Date: 2025-07-18 08:22:24 +0200 (Fr, 18 Jul 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -25,28 +25,32 @@ NULL
     if (.isTrialDesignGroupSequential(design)) {
         return(.getAnalysisResultsSurvivalGroupSequential(
             design = design,
-            dataInput = dataInput, ...
+            dataInput = dataInput,
+            ...
         ))
     }
 
     if (.isTrialDesignInverseNormal(design)) {
         return(.getAnalysisResultsSurvivalInverseNormal(
             design = design,
-            dataInput = dataInput, ...
+            dataInput = dataInput,
+            ...
         ))
     }
 
     if (.isTrialDesignFisher(design)) {
         return(.getAnalysisResultsSurvivalFisher(
             design = design,
-            dataInput = dataInput, ...
+            dataInput = dataInput,
+            ...
         ))
     }
 
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getAnalysisResultsSurvivalInverseNormal <- function(...,
+.getAnalysisResultsSurvivalInverseNormal <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -59,10 +63,14 @@ NULL
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
         functionName = ".getAnalysisResultsSurvivalInverseNormal",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
-            design,
-            powerCalculationEnabled = TRUE
-        ), "stage"), ...
+        ignore = c(
+            .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+                design,
+                powerCalculationEnabled = TRUE
+            ),
+            "stage"
+        ),
+        ...
     )
 
     results <- AnalysisResultsInverseNormal$new(design = design, dataInput = dataInput)
@@ -83,7 +91,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsSurvivalGroupSequential <- function(...,
+.getAnalysisResultsSurvivalGroupSequential <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -96,10 +105,14 @@ NULL
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
         functionName = ".getAnalysisResultsSurvivalGroupSequential",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
-            design,
-            powerCalculationEnabled = TRUE
-        ), "stage"), ...
+        ignore = c(
+            .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+                design,
+                powerCalculationEnabled = TRUE
+            ),
+            "stage"
+        ),
+        ...
     )
 
     results <- AnalysisResultsGroupSequential$new(design = design, dataInput = dataInput)
@@ -120,7 +133,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsSurvivalFisher <- function(...,
+.getAnalysisResultsSurvivalFisher <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -136,10 +150,14 @@ NULL
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
         functionName = ".getAnalysisResultsSurvivalFisher",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
-            design,
-            powerCalculationEnabled = TRUE
-        ), "stage"), ...
+        ignore = c(
+            .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+                design,
+                powerCalculationEnabled = TRUE
+            ),
+            "stage"
+        ),
+        ...
     )
 
     results <- AnalysisResultsFisher$new(design = design, dataInput = dataInput)
@@ -170,7 +188,8 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsSurvivalAll <- function(...,
+.getAnalysisResultsSurvivalAll <- function(
+        ...,
         results,
         design,
         dataInput,
@@ -220,14 +239,18 @@ NULL
         if (.isTrialDesignFisher(design)) {
             results$.conditionalPowerResults <- .getConditionalPowerSurvival(
                 stageResults = stageResults,
-                nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
-                thetaH1 = thetaH1, iterations = iterations, seed = seed
+                nPlanned = nPlanned,
+                allocationRatioPlanned = allocationRatioPlanned,
+                thetaH1 = thetaH1,
+                iterations = iterations,
+                seed = seed
             )
             .synchronizeIterationsAndSeed(results)
         } else {
             results$.conditionalPowerResults <- .getConditionalPowerSurvival(
                 stageResults = stageResults,
-                nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned,
+                nPlanned = nPlanned,
+                allocationRatioPlanned = allocationRatioPlanned,
                 thetaH1 = thetaH1
             )
             results$conditionalPower <- results$.conditionalPowerResults$conditionalPower
@@ -241,7 +264,9 @@ NULL
             results$.setParameterType("seed", ifelse(is.na(seed), C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED))
             seed <- results$.conditionalPowerResults$seed
             crp <- getConditionalRejectionProbabilities(
-                stageResults = stageResults, iterations = iterations, seed = seed
+                stageResults = stageResults,
+                iterations = iterations,
+                seed = seed
             )
             results$conditionalRejectionProbabilities <- crp$crpFisherSimulated
             paramTypeSeed <- results$.conditionalPowerResults$.getParameterType("seed")
@@ -287,7 +312,8 @@ NULL
         finalPValue <- getFinalPValue(stageResults, showWarnings = FALSE)
         results$finalPValues <- .getVectorWithFinalValueAtFinalStage(
             kMax = design$kMax,
-            finalValue = finalPValue$pFinal, finalStage = finalPValue$finalStage
+            finalValue = finalPValue$pFinal,
+            finalStage = finalPValue$finalStage
         )
         results$finalStage <- finalPValue$finalStage
         results$.setParameterType("finalPValues", C_PARAM_GENERATED)
@@ -297,23 +323,30 @@ NULL
         # final confidence interval & median unbiased estimate
         startTime <- Sys.time()
         finalConfidenceIntervals <- .getFinalConfidenceIntervalSurvival(
-            design = design, dataInput = dataInput, thetaH0 = thetaH0, stage = stage,
-            directionUpper = directionUpper, tolerance = tolerance
+            design = design,
+            dataInput = dataInput,
+            thetaH0 = thetaH0,
+            stage = stage,
+            directionUpper = directionUpper,
+            tolerance = tolerance
         )
 
         if (!is.null(finalConfidenceIntervals)) {
             finalStage <- finalConfidenceIntervals$finalStage
             results$finalConfidenceIntervalLowerBounds <- .getVectorWithFinalValueAtFinalStage(
                 kMax = design$kMax,
-                finalValue = finalConfidenceIntervals$finalConfidenceInterval[1], finalStage = finalStage
+                finalValue = finalConfidenceIntervals$finalConfidenceInterval[1],
+                finalStage = finalStage
             )
             results$finalConfidenceIntervalUpperBounds <- .getVectorWithFinalValueAtFinalStage(
                 kMax = design$kMax,
-                finalValue = finalConfidenceIntervals$finalConfidenceInterval[2], finalStage = finalStage
+                finalValue = finalConfidenceIntervals$finalConfidenceInterval[2],
+                finalStage = finalStage
             )
             results$medianUnbiasedEstimates <- .getVectorWithFinalValueAtFinalStage(
                 kMax = design$kMax,
-                finalValue = finalConfidenceIntervals$medianUnbiased, finalStage = finalStage
+                finalValue = finalConfidenceIntervals$medianUnbiased,
+                finalStage = finalStage
             )
             results$.setParameterType("finalConfidenceIntervalLowerBounds", C_PARAM_GENERATED)
             results$.setParameterType("finalConfidenceIntervalUpperBounds", C_PARAM_GENERATED)
@@ -339,7 +372,8 @@ NULL
 #'
 #' @noRd
 #'
-.getStageResultsSurvival <- function(...,
+.getStageResultsSurvival <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT,
@@ -350,7 +384,8 @@ NULL
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
     .warnInCaseOfUnknownArguments(
         functionName = "getStageResultsSurvival",
-        ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), ...
+        ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE),
+        ...
     )
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design, stage = stage)
 
@@ -361,8 +396,11 @@ NULL
     overallLogRankTestStatistics <- dataInput$getOverallLogRanksUpTo(stage, group = 1) -
         sqrt(overallEvents) * sqrt(overallAllocationRatios) / (1 + overallAllocationRatios) * log(thetaH0)
 
-    effectSizes <- exp(dataInput$getOverallLogRanksUpTo(stage, group = 1) * (1 + overallAllocationRatios[1:stage]) /
-        sqrt(overallAllocationRatios[1:stage] * overallEvents[1:stage]))
+    effectSizes <- exp(
+        dataInput$getOverallLogRanksUpTo(stage, group = 1) *
+            (1 + overallAllocationRatios[1:stage]) /
+            sqrt(overallAllocationRatios[1:stage] * overallEvents[1:stage])
+    )
 
     events <- dataInput$getEventsUpTo(stage, group = 1)
     allocationRatios <- dataInput$getAllocationRatiosUpTo(stage, group = 1)
@@ -377,13 +415,17 @@ NULL
     combFisher <- rep(NA_real_, design$kMax)
     weightsInverseNormal <- .getWeightsInverseNormal(design)
     weightsFisher <- .getWeightsFisher(design)
-    pValues <- .applyDirectionOfAlternative(stats::pnorm(logRankTestStatistics),
+    pValues <- .applyDirectionOfAlternative(
+        stats::pnorm(logRankTestStatistics),
         directionUpper,
-        type = "oneMinusValue", phase = "analysis"
+        type = "oneMinusValue",
+        phase = "analysis"
     )
-    overallPValues <- .applyDirectionOfAlternative(stats::pnorm(overallLogRankTestStatistics),
+    overallPValues <- .applyDirectionOfAlternative(
+        stats::pnorm(overallLogRankTestStatistics),
         directionUpper,
-        type = "oneMinusValue", phase = "analysis"
+        type = "oneMinusValue",
+        phase = "analysis"
     )
 
     for (k in 1:stage) {
@@ -448,7 +490,8 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getRootThetaSurvival <- function(...,
+.getRootThetaSurvival <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -462,8 +505,11 @@ NULL
     result <- .getOneDimensionalRoot(
         function(theta) {
             stageResults <- .getStageResultsSurvival(
-                design = design, dataInput = dataInput,
-                stage = stage, thetaH0 = theta, directionUpper = directionUpper
+                design = design,
+                dataInput = dataInput,
+                stage = stage,
+                thetaH0 = theta,
+                directionUpper = directionUpper
             )
 
             firstValue <- stageResults[[firstParameterName]][stage]
@@ -473,14 +519,17 @@ NULL
 
             return(firstValue - secondValue)
         },
-        lower = thetaLow, upper = thetaUp, tolerance = tolerance,
+        lower = thetaLow,
+        upper = thetaUp,
+        tolerance = tolerance,
         callingFunctionInformation = callingFunctionInformation
     )
 
     return(result)
 }
 
-.getUpperLowerThetaSurvival <- function(...,
+.getUpperLowerThetaSurvival <- function(
+        ...,
         design,
         dataInput,
         theta,
@@ -490,8 +539,11 @@ NULL
         firstParameterName,
         secondValue) {
     stageResults <- .getStageResultsSurvival(
-        design = design, dataInput = dataInput,
-        stage = stage, thetaH0 = exp(theta), directionUpper = directionUpper
+        design = design,
+        dataInput = dataInput,
+        stage = stage,
+        thetaH0 = exp(theta),
+        directionUpper = directionUpper
     )
 
     firstValue <- stageResults[[firstParameterName]][stage]
@@ -505,8 +557,11 @@ NULL
         theta <- 2 * theta
 
         stageResults <- .getStageResultsSurvival(
-            design = design, dataInput = dataInput,
-            stage = stage, thetaH0 = exp(theta), directionUpper = directionUpper
+            design = design,
+            dataInput = dataInput,
+            stage = stage,
+            thetaH0 = exp(theta),
+            directionUpper = directionUpper
         )
 
         firstValue <- stageResults[[firstParameterName]][stage]
@@ -516,14 +571,18 @@ NULL
 
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+            stop(
+                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
                 sprintf(
                     paste0(
                         "failed to find theta (k = %s, firstValue = %s, ",
                         "secondValue = %s, levels(firstValue) = %s, theta = %s)"
                     ),
-                    stage, stageResults[[firstParameterName]][stage], secondValue,
-                    firstValue, theta
+                    stage,
+                    stageResults[[firstParameterName]][stage],
+                    secondValue,
+                    firstValue,
+                    theta
                 ),
                 call. = FALSE
             )
@@ -533,7 +592,8 @@ NULL
     return(theta)
 }
 
-.getRepeatedConfidenceIntervalsSurvivalAll <- function(...,
+.getRepeatedConfidenceIntervalsSurvivalAll <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -564,16 +624,24 @@ NULL
         if (criticalValues[k] < C_QNORM_MAXIMUM) {
             # Finding maximum upper and minimum lower bounds for RCIs
             thetaLow <- exp(.getUpperLowerThetaSurvival(
-                design = design, dataInput = dataInput,
-                theta = -1, stage = k, directionUpper = TRUE,
-                conditionFunction = conditionFunction, firstParameterName = firstParameterName,
+                design = design,
+                dataInput = dataInput,
+                theta = -1,
+                stage = k,
+                directionUpper = TRUE,
+                conditionFunction = conditionFunction,
+                firstParameterName = firstParameterName,
                 secondValue = criticalValues[k]
             ))
 
             thetaUp <- exp(.getUpperLowerThetaSurvival(
-                design = design, dataInput = dataInput,
-                theta = 1, stage = k, directionUpper = FALSE,
-                conditionFunction = conditionFunction, firstParameterName = firstParameterName,
+                design = design,
+                dataInput = dataInput,
+                theta = 1,
+                stage = k,
+                directionUpper = FALSE,
+                conditionFunction = conditionFunction,
+                firstParameterName = firstParameterName,
                 secondValue = criticalValues[k]
             ))
 
@@ -609,9 +677,15 @@ NULL
                 parameterName <- ifelse(.isTrialDesignFisher(design), "pValues", firstParameterName)
 
                 futilityCorr[k] <- .getRootThetaSurvival(
-                    design = design, dataInput = dataInput, stage = k - 1, directionUpper = directionUpper,
-                    thetaLow = thetaLow, thetaUp = thetaUp,
-                    firstParameterName = parameterName, secondValue = bounds[k - 1], tolerance = tolerance,
+                    design = design,
+                    dataInput = dataInput,
+                    stage = k - 1,
+                    directionUpper = directionUpper,
+                    thetaLow = thetaLow,
+                    thetaUp = thetaUp,
+                    firstParameterName = parameterName,
+                    secondValue = bounds[k - 1],
+                    tolerance = tolerance,
                     callingFunctionInformation = paste0("Repeated confidence interval, futility correction [", k, "]")
                 )
 
@@ -623,8 +697,11 @@ NULL
             }
             .logProgress("Repeated confidence interval of stage %s calculated", startTime = startTime, k)
 
-            if (!is.na(repeatedConfidenceIntervals[1, k]) && !is.na(repeatedConfidenceIntervals[2, k]) &&
-                    repeatedConfidenceIntervals[1, k] > repeatedConfidenceIntervals[2, k]) {
+            if (
+                !is.na(repeatedConfidenceIntervals[1, k]) &&
+                    !is.na(repeatedConfidenceIntervals[2, k]) &&
+                    repeatedConfidenceIntervals[1, k] > repeatedConfidenceIntervals[2, k]
+                ) {
                 repeatedConfidenceIntervals[, k] <- rep(NA_real_, 2)
             }
         }
@@ -638,15 +715,16 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsSurvivalGroupSequential <- function(...,
+.getRepeatedConfidenceIntervalsSurvivalGroupSequential <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
-        functionName =
-            ".getRepeatedConfidenceIntervalsSurvivalGroupSequential",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"), ...
+        functionName = ".getRepeatedConfidenceIntervalsSurvivalGroupSequential",
+        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"),
+        ...
     )
 
     return(.getRepeatedConfidenceIntervalsSurvivalAll(
@@ -664,15 +742,16 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsSurvivalInverseNormal <- function(...,
+.getRepeatedConfidenceIntervalsSurvivalInverseNormal <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
-        functionName =
-            ".getRepeatedConfidenceIntervalsSurvivalInverseNormal",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"), ...
+        functionName = ".getRepeatedConfidenceIntervalsSurvivalInverseNormal",
+        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"),
+        ...
     )
 
     return(.getRepeatedConfidenceIntervalsSurvivalAll(
@@ -690,15 +769,16 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsSurvivalFisher <- function(...,
+.getRepeatedConfidenceIntervalsSurvivalFisher <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
-        functionName =
-            ".getRepeatedConfidenceIntervalsSurvivalFisher",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"), ...
+        functionName = ".getRepeatedConfidenceIntervalsSurvivalFisher",
+        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), "stage"),
+        ...
     )
 
     return(.getRepeatedConfidenceIntervalsSurvivalAll(
@@ -716,7 +796,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalGroupSequential <- function(...,
+.getConditionalPowerSurvivalGroupSequential <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -727,7 +808,8 @@ NULL
     .assertIsValidStage(stage, design$kMax)
     .warnInCaseOfUnknownArguments(
         functionName = ".getConditionalPowerSurvivalGroupSequential",
-        ignore = c("design", "stageResultsName"), ...
+        ignore = c("design", "stageResultsName"),
+        ...
     )
 
     kMax <- design$kMax
@@ -740,7 +822,11 @@ NULL
     if (stageResults$stage == kMax) {
         .logDebug(
             "Conditional power will be calculated only for subsequent stages ",
-            "(stage = ", stageResults$stage, ", kMax = ", design$kMax, ")"
+            "(stage = ",
+            stageResults$stage,
+            ", kMax = ",
+            design$kMax,
+            ")"
         )
         return(list(
             nPlanned = nPlanned,
@@ -748,12 +834,14 @@ NULL
         ))
     }
 
-    criticalValuesInverseNormal <- .getCriticalValues(design)
+    criticalValuesGroupSequential <- .getCriticalValues(design)
 
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(
         allocationRatioPlanned,
-        "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM
+        "allocationRatioPlanned",
+        0,
+        C_ALLOCATION_RATIO_MAXIMUM
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
@@ -765,21 +853,25 @@ NULL
 
     # Shifted decision region for use in getGroupSeqProbs
     # Group sequential method
-    shiftedDecisionRegionUpper <- criticalValuesInverseNormal[(stage + 1):kMax] *
+    shiftedDecisionRegionUpper <- criticalValuesGroupSequential[(stage + 1):kMax] *
         sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):kMax]^2)) /
         sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
-        c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
+        .getOneMinusQNorm(stageResults$overallPValues[stage]) *
+            sqrt(sum(weights[1:stage]^2)) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
-        thetaH1 * cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
+        thetaH1 *
+            cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2))
 
     if (design$sided == 2) {
-        shiftedDecisionRegionLower <- -criticalValuesInverseNormal[(stage + 1):kMax] *
+        shiftedDecisionRegionLower <- -criticalValuesGroupSequential[(stage + 1):kMax] *
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):kMax]^2)) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
-            .getOneMinusQNorm(stageResults$overallPValues[stage]) * sqrt(sum(weights[1:stage]^2)) /
+            .getOneMinusQNorm(stageResults$overallPValues[stage]) *
+                sqrt(sum(weights[1:stage]^2)) /
                 sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
-            thetaH1 * cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
+            thetaH1 *
+                cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
                 sqrt(cumsum(weights[(stage + 1):kMax]^2))
     }
 
@@ -789,9 +881,11 @@ NULL
         shiftedFutilityBounds <- design$futilityBounds[(stage + 1):(kMax - 1)] *
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):(kMax - 1)]^2)) /
             sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
-            c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
+            .getOneMinusQNorm(stageResults$overallPValues[stage]) *
+                sqrt(sum(weights[1:stage]^2)) /
                 sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
-            thetaH1 * cumsum(sqrt(nPlanned[(stage + 1):(kMax - 1)]) * weights[(stage + 1):(kMax - 1)]) /
+            thetaH1 *
+                cumsum(sqrt(nPlanned[(stage + 1):(kMax - 1)]) * weights[(stage + 1):(kMax - 1)]) /
                 sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2))
     }
 
@@ -800,15 +894,24 @@ NULL
         (1 - informationRates[stage])
 
     if (design$sided == 2) {
-        decisionMatrix <- matrix(c(
-            shiftedDecisionRegionLower,
-            shiftedDecisionRegionUpper
-        ), nrow = 2, byrow = TRUE)
+        decisionMatrix <- matrix(
+            c(
+                shiftedDecisionRegionLower,
+                shiftedDecisionRegionUpper
+            ),
+            nrow = 2,
+            byrow = TRUE
+        )
     } else {
-        decisionMatrix <- matrix(c(
-            shiftedFutilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
-            shiftedDecisionRegionUpper
-        ), nrow = 2, byrow = TRUE)
+        decisionMatrix <- matrix(
+            c(
+                shiftedFutilityBounds,
+                C_FUTILITY_BOUNDS_DEFAULT,
+                shiftedDecisionRegionUpper
+            ),
+            nrow = 2,
+            byrow = TRUE
+        )
     }
     probs <- .getGroupSequentialProbabilities(
         decisionMatrix = decisionMatrix,
@@ -834,7 +937,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalInverseNormal <- function(...,
+.getConditionalPowerSurvivalInverseNormal <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -845,7 +949,8 @@ NULL
     .assertIsValidStage(stage, design$kMax)
     .warnInCaseOfUnknownArguments(
         functionName = ".getConditionalPowerSurvivalInverseNormal",
-        ignore = c("design", "stageResultsName"), ...
+        ignore = c("design", "stageResultsName"),
+        ...
     )
 
     kMax <- design$kMax
@@ -858,7 +963,11 @@ NULL
     if (stageResults$stage == kMax) {
         .logDebug(
             "Conditional power will be calculated only for subsequent stages ",
-            "(stage = ", stageResults$stage, ", kMax = ", design$kMax, ")"
+            "(stage = ",
+            stageResults$stage,
+            ", kMax = ",
+            design$kMax,
+            ")"
         )
         return(list(
             nPlanned = nPlanned,
@@ -871,7 +980,9 @@ NULL
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(
         allocationRatioPlanned,
-        "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM
+        "allocationRatioPlanned",
+        0,
+        C_ALLOCATION_RATIO_MAXIMUM
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
@@ -888,16 +999,18 @@ NULL
         sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
         c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
-        thetaH1 * cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
+        thetaH1 *
+            cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2))
 
     if (design$sided == 2) {
         shiftedDecisionRegionLower <- -criticalValuesInverseNormal[(stage + 1):kMax] *
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):kMax]^2)) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
-            .getOneMinusQNorm(stageResults$overallPValues[stage]) * sqrt(sum(weights[1:stage]^2)) /
+            c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
                 sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
-            thetaH1 * cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
+            thetaH1 *
+                cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
                 sqrt(cumsum(weights[(stage + 1):kMax]^2))
     }
 
@@ -909,7 +1022,8 @@ NULL
             sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
             c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
                 sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
-            thetaH1 * cumsum(sqrt(nPlanned[(stage + 1):(kMax - 1)]) * weights[(stage + 1):(kMax - 1)]) /
+            thetaH1 *
+                cumsum(sqrt(nPlanned[(stage + 1):(kMax - 1)]) * weights[(stage + 1):(kMax - 1)]) /
                 sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2))
     }
 
@@ -918,15 +1032,24 @@ NULL
         (1 - informationRates[stage])
 
     if (design$sided == 2) {
-        decisionMatrix <- matrix(c(
-            shiftedDecisionRegionLower,
-            shiftedDecisionRegionUpper
-        ), nrow = 2, byrow = TRUE)
+        decisionMatrix <- matrix(
+            c(
+                shiftedDecisionRegionLower,
+                shiftedDecisionRegionUpper
+            ),
+            nrow = 2,
+            byrow = TRUE
+        )
     } else {
-        decisionMatrix <- matrix(c(
-            shiftedFutilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
-            shiftedDecisionRegionUpper
-        ), nrow = 2, byrow = TRUE)
+        decisionMatrix <- matrix(
+            c(
+                shiftedFutilityBounds,
+                C_FUTILITY_BOUNDS_DEFAULT,
+                shiftedDecisionRegionUpper
+            ),
+            nrow = 2,
+            byrow = TRUE
+        )
     }
     probs <- .getGroupSequentialProbabilities(
         decisionMatrix = decisionMatrix,
@@ -952,7 +1075,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalFisher <- function(...,
+.getConditionalPowerSurvivalFisher <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -966,7 +1090,8 @@ NULL
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     .warnInCaseOfUnknownArguments(
         functionName = ".getConditionalPowerSurvivalFisher",
-        ignore = c("design", "piTreatmentRange", "stageResultsName"), ...
+        ignore = c("design", "piTreatmentRange", "stageResultsName"),
+        ...
     )
 
     kMax <- design$kMax
@@ -994,12 +1119,18 @@ NULL
         for (k in (stageResults$stage + 1):kMax) {
             reject <- 0
             for (i in 1:iterations) {
-                reject <- reject + .getRejectValueConditionalPowerFisher(
-                    kMax = kMax, alpha0Vec = design$alpha0Vec,
-                    criticalValues = criticalValues, weightsFisher = weightsFisher,
-                    pValues = pValues, currentKMax = k, thetaH1 = thetaH1,
-                    stage = stageResults$stage, nPlanned = nPlanned
-                )
+                reject <- reject +
+                    .getRejectValueConditionalPowerFisher(
+                        kMax = kMax,
+                        alpha0Vec = design$alpha0Vec,
+                        criticalValues = criticalValues,
+                        weightsFisher = weightsFisher,
+                        pValues = pValues,
+                        currentKMax = k,
+                        thetaH1 = thetaH1,
+                        stage = stageResults$stage,
+                        nPlanned = nPlanned
+                    )
             }
             conditionalPower[k] <- reject / iterations
         }
@@ -1028,14 +1159,18 @@ NULL
     ))
 }
 
-.getConditionalPowerSurvival <- function(...,
-        stageResults, nPlanned = NA_real_,
+.getConditionalPowerSurvival <- function(
+        ...,
+        stageResults,
+        nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaH1 = NA_real_) {
     results <- ConditionalPowerResultsSurvival$new(
         .stageResults = stageResults,
-        .design = stageResults$.design, nPlanned = nPlanned,
-        allocationRatioPlanned = allocationRatioPlanned, thetaH1 = thetaH1
+        .design = stageResults$.design,
+        nPlanned = nPlanned,
+        allocationRatioPlanned = allocationRatioPlanned,
+        thetaH1 = thetaH1
     )
 
     if (any(is.na(nPlanned))) {
@@ -1052,18 +1187,27 @@ NULL
 
     if (.isTrialDesignGroupSequential(stageResults$.design)) {
         cp <- .getConditionalPowerSurvivalGroupSequential(
-            stageResults = stageResults, nPlanned = nPlanned,
-            allocationRatioPlanned = allocationRatioPlanned, thetaH1 = thetaH1, ...
+            stageResults = stageResults,
+            nPlanned = nPlanned,
+            allocationRatioPlanned = allocationRatioPlanned,
+            thetaH1 = thetaH1,
+            ...
         )
     } else if (.isTrialDesignInverseNormal(stageResults$.design)) {
         cp <- .getConditionalPowerSurvivalInverseNormal(
-            stageResults = stageResults, nPlanned = nPlanned,
-            allocationRatioPlanned = allocationRatioPlanned, thetaH1 = thetaH1, ...
+            stageResults = stageResults,
+            nPlanned = nPlanned,
+            allocationRatioPlanned = allocationRatioPlanned,
+            thetaH1 = thetaH1,
+            ...
         )
     } else if (.isTrialDesignFisher(stageResults$.design)) {
         cp <- .getConditionalPowerSurvivalFisher(
-            stageResults = stageResults, nPlanned = nPlanned,
-            allocationRatioPlanned = allocationRatioPlanned, thetaH1 = thetaH1, ...
+            stageResults = stageResults,
+            nPlanned = nPlanned,
+            allocationRatioPlanned = allocationRatioPlanned,
+            thetaH1 = thetaH1,
+            ...
         )
         results$iterations <- cp$iterations
         results$seed <- cp$seed
@@ -1086,7 +1230,8 @@ NULL
     return(results)
 }
 
-.getConditionalPowerPlotSurvival <- function(...,
+.getConditionalPowerPlotSurvival <- function(
+        ...,
         stageResults,
         stage,
         nPlanned,
@@ -1096,7 +1241,8 @@ NULL
     .associatedArgumentsAreDefined(nPlanned = nPlanned, thetaRange = thetaRange)
     .warnInCaseOfUnknownArguments(
         functionName = ".getConditionalPowerPlotSurvival",
-        ignore = c("iterations", "seed", "stageResultsName", "grid"), ...
+        ignore = c("iterations", "seed", "stageResultsName", "grid"),
+        ...
     )
 
     design <- stageResults$.design
@@ -1122,7 +1268,8 @@ NULL
         for (i in seq(along = thetaRange)) {
             if (.isTrialDesignGroupSequential(design)) {
                 condPowerValues[i] <- .getConditionalPowerSurvivalGroupSequential(
-                    stageResults = stageResults, nPlanned = nPlanned,
+                    stageResults = stageResults,
+                    nPlanned = nPlanned,
                     allocationRatioPlanned = allocationRatioPlanned,
                     thetaH1 = thetaRange[i]
                 )$conditionalPower[design$kMax]
@@ -1130,7 +1277,8 @@ NULL
 
             if (.isTrialDesignInverseNormal(design)) {
                 condPowerValues[i] <- .getConditionalPowerSurvivalInverseNormal(
-                    stageResults = stageResults, nPlanned = nPlanned,
+                    stageResults = stageResults,
+                    nPlanned = nPlanned,
                     allocationRatioPlanned = allocationRatioPlanned,
                     thetaH1 = thetaRange[i]
                 )$conditionalPower[design$kMax]
@@ -1138,14 +1286,16 @@ NULL
 
             if (.isTrialDesignFisher(design)) {
                 condPowerValues[i] <- .getConditionalPowerSurvivalFisher(
-                    stageResults = stageResults, nPlanned = nPlanned,
+                    stageResults = stageResults,
+                    nPlanned = nPlanned,
                     allocationRatioPlanned = allocationRatioPlanned,
                     thetaH1 = thetaRange[i]
                 )$conditionalPower[design$kMax]
             }
 
             likelihoodValues[i] <- stats::dnorm(
-                log(thetaRange[i]), log(stageResults$effectSizes[stage]),
+                log(thetaRange[i]),
+                log(stageResults$effectSizes[stage]),
                 2 / sqrt(stageResults$overallEvents[stage])
             ) /
                 stats::dnorm(0, 0, 2 / sqrt(stageResults$overallEvents[stage]))
@@ -1168,8 +1318,12 @@ NULL
     }
 
     subtitle <- paste0(
-        "Stage = ", stage, ", maximum number of remaining events = ",
-        sum(nPlanned), ", allocation ratio = ", .formatSubTitleValue(allocationRatioPlanned, "allocationRatioPlanned")
+        "Stage = ",
+        stage,
+        ", maximum number of remaining events = ",
+        sum(nPlanned),
+        ", allocation ratio = ",
+        .formatSubTitleValue(allocationRatioPlanned, "allocationRatioPlanned")
     )
 
     return(list(
@@ -1223,9 +1377,8 @@ NULL
             )[, design$kMax]
         }
         medianUnbiased <- (finalConfidenceInterval[1] + finalConfidenceInterval[2]) / 2
-    }
-    # Early stopping or at end of study
-    else if (designStage < design$kMax || stage == design$kMax) {
+    } else if (designStage < design$kMax || stage == design$kMax) {
+        # Early stopping or at end of study
         if (designStage == 1) {
             finalConfidenceIntervalGeneral[1] <- stageResults$testStatistics[1] -
                 .getOneMinusQNorm(design$alpha / design$sided)
@@ -1235,15 +1388,14 @@ NULL
         } else {
             if (.isTrialDesignInverseNormal(design) && design$kMax > 2 && !.isNoEarlyEfficacy(design)) {
                 message(
-                    "Calculation of final confidence interval performed for kMax = ", design$kMax,
+                    "Calculation of final confidence interval performed for kMax = ",
+                    design$kMax,
                     " (for kMax > 2, it is theoretically shown that it is valid only ",
                     "if no sample size change was performed)"
                 )
             }
 
-            firstParameterName <- ifelse(.isTrialDesignGroupSequential(design),
-                "overallPValues", "combInverseNormal"
-            )
+            firstParameterName <- ifelse(.isTrialDesignGroupSequential(design), "overallPValues", "combInverseNormal")
 
             finalConfidenceIntervalGeneral[1] <- .getDecisionMatrixRoot(
                 design = design,
@@ -1287,7 +1439,8 @@ NULL
                 directionUpper = directionUpper
             )
 
-            stderr <- (1 + y$overallAllocationRatios[finalStage]) / sqrt(y$overallAllocationRatios[finalStage]) /
+            stderr <- (1 + y$overallAllocationRatios[finalStage]) /
+                sqrt(y$overallAllocationRatios[finalStage]) /
                 sqrt(stageResults$overallEvents[finalStage])
 
             directionUpperSign <- ifelse(!isFALSE(directionUpper), 1, -1)
@@ -1295,18 +1448,24 @@ NULL
                 finalConfidenceInterval <- exp(stderr * finalConfidenceIntervalGeneral + log(thetaH0))
                 medianUnbiased <- exp(stderr * medianUnbiasedGeneral + log(thetaH0))
             } else {
-                finalConfidenceInterval[1] <- exp(finalConfidenceIntervalGeneral[1] *
-                    (1 + y$overallAllocationRatios[finalStage]) /
-                    sqrt(y$overallAllocationRatios[finalStage]) +
-                    directionUpperSign * log(thetaH0))
-                finalConfidenceInterval[2] <- exp(finalConfidenceIntervalGeneral[2] *
-                    (1 + y$overallAllocationRatios[finalStage]) /
-                    sqrt(y$overallAllocationRatios[finalStage]) +
-                    directionUpperSign * log(thetaH0))
-                medianUnbiased <- exp(medianUnbiasedGeneral *
-                    (1 + y$overallAllocationRatios[finalStage]) /
-                    sqrt(y$overallAllocationRatios[finalStage]) +
-                    directionUpperSign * log(thetaH0))
+                finalConfidenceInterval[1] <- exp(
+                    finalConfidenceIntervalGeneral[1] *
+                        (1 + y$overallAllocationRatios[finalStage]) /
+                        sqrt(y$overallAllocationRatios[finalStage]) +
+                        directionUpperSign * log(thetaH0)
+                )
+                finalConfidenceInterval[2] <- exp(
+                    finalConfidenceIntervalGeneral[2] *
+                        (1 + y$overallAllocationRatios[finalStage]) /
+                        sqrt(y$overallAllocationRatios[finalStage]) +
+                        directionUpperSign * log(thetaH0)
+                )
+                medianUnbiased <- exp(
+                    medianUnbiasedGeneral *
+                        (1 + y$overallAllocationRatios[finalStage]) /
+                        sqrt(y$overallAllocationRatios[finalStage]) +
+                        directionUpperSign * log(thetaH0)
+                )
             }
         }
 
@@ -1342,7 +1501,8 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalSurvivalGroupSequential <- function(...,
+.getFinalConfidenceIntervalSurvivalGroupSequential <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -1350,8 +1510,11 @@ NULL
         directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsSurvival(
-        design = design, dataInput = dataInput, stage = stage,
-        thetaH0 = thetaH0, directionUpper = directionUpper
+        design = design,
+        dataInput = dataInput,
+        stage = stage,
+        thetaH0 = thetaH0,
+        directionUpper = directionUpper
     )
 
     finalConfidenceIntervalSurvivalValues <- .getFinalConfidenceIntervalSurvivalValues(
@@ -1383,7 +1546,8 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalSurvivalInverseNormal <- function(...,
+.getFinalConfidenceIntervalSurvivalInverseNormal <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -1427,7 +1591,8 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalSurvivalFisher <- function(...,
+.getFinalConfidenceIntervalSurvivalFisher <- function(
+        ...,
         design,
         dataInput,
         stage,
@@ -1468,7 +1633,8 @@ NULL
     ))
 }
 
-.getFinalConfidenceIntervalSurvival <- function(...,
+.getFinalConfidenceIntervalSurvival <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = NA_real_,
@@ -1479,10 +1645,14 @@ NULL
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
     .warnInCaseOfUnknownArguments(
         functionName = "getFinalConfidenceIntervalSurvival",
-        ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
-            design,
-            powerCalculationEnabled = TRUE
-        ), "stage"), ...
+        ignore = c(
+            .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+                design,
+                powerCalculationEnabled = TRUE
+            ),
+            "stage"
+        ),
+        ...
     )
 
     if (design$kMax == 1) {

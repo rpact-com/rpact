@@ -7,7 +7,7 @@
 getSimulationMultiArmMeans(
   design = NULL,
   ...,
-  activeArms = 3L,
+  activeArms = NA_integer_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
   muMaxVector = seq(0, 1, 0.2),
