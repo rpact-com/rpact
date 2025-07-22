@@ -1029,9 +1029,15 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 "minNumberOfSubjectsPerStage", 
                 "maxNumberOfSubjectsPerStage",
                 "piecewiseSurvivalTime", 
-                "lambda2"
-            )) {
-            return(NULL)
+                "lambda2",
+                "stDev"
+                )) {
+
+            if (parameterName == "stDev" && length(unique(parameterValues)) == 1) {
+                return(parameterValues[1])
+            }
+            
+            return(paste(parameterValues, collapse = ", "))
         }
 
         stop(
