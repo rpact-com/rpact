@@ -682,7 +682,8 @@ getObjectRCode <- function(
         !("accrualIntensity" %in% objNames) &&
             !is.null(obj[[".accrualTime"]]) &&
             !obj$.accrualTime$absoluteAccrualIntensityEnabled &&
-            obj$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED
+            obj$.getParameterType("accrualIntensity") == C_PARAM_USER_DEFINED &&
+            !all(is.na(obj$accrualIntensity))
     ) {
         objNames <- c(objNames, "accrualIntensity")
         objNames <- objNames[objNames != "accrualIntensityRelative"]
@@ -825,7 +826,9 @@ getObjectRCode <- function(
                     # arguments <- c(arguments, paste0(name, "_DoNotAdd"))
                 } else {
                     if (length(value) > 0 && nchar(as.character(value)) > 0) {
-                        argument <- paste0(objName, " = ", value)
+                        if (!all(is.na(value)) && !all(grepl("^NA(_(real|integer|character)_)?$", as.character(value)))) {
+                            argument <- paste0(objName, " = ", value)
+                        }
                     } else {
                         argument <- objName
                     }

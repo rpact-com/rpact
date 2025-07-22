@@ -1316,12 +1316,16 @@ SimulationResultsSurvival <- R6::R6Class(
                     C_PARAM_GENERATED
                 )
             }
-            self$.setParameterType("numberOfSubjects1", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("median1", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("median2", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("eventsPerStage", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("overallEventsPerStage", C_PARAM_NOT_APPLICABLE)
+            for (notApplicableParam in c(
+                    "numberOfSubjects1",
+                    "numberOfSubjects2",
+                    "median1",
+                    "median2",
+                    "eventsPerStage",
+                    "overallEventsPerStage"
+                )) {
+                    self$.setParameterType(notApplicableParam, C_PARAM_NOT_APPLICABLE)
+            }
         }
     )
 )

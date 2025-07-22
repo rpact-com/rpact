@@ -389,7 +389,8 @@ NULL
 #'
 #' @export
 #'
-getSimulationMultiArmSurvival <- function(design = NULL, ...,
+getSimulationMultiArmSurvival <- function(design = NULL,
+        ...,
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
@@ -474,7 +475,19 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
         showStatistics              = showStatistics,
         endpoint                    = "survival"
     )
-    
+    for (notApplicableParam in c(
+            "accrualIntensity",
+            "accrualTime",
+            "dropoutRate1",
+            "dropoutRate2",
+            "dropoutTime",
+            "eventTime",
+            "kappa",
+            "piControl")
+            ) {
+        simulationResults$.setParameterType(notApplicableParam, C_PARAM_NOT_APPLICABLE)
+    }
+
     design <- simulationResults$.design
     successCriterion <- simulationResults$successCriterion
     effectMeasure <- simulationResults$effectMeasure
