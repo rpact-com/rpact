@@ -2492,8 +2492,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 )
             ))
         }
-        if (settings$survivalEnabled && !is.null(designPlan[["dropoutTime"]])) {
-            if (designPlan$dropoutRate1 > 0 || designPlan$dropoutRate2 > 0) {
+        if (settings$survivalEnabled && 
+                !is.null(designPlan[["dropoutTime"]]) && 
+                !is.na(designPlan$dropoutTime)) {
+            if ((!is.na(designPlan$dropoutRate1) && designPlan$dropoutRate1 > 0) || 
+                    (!is.na(designPlan$dropoutRate2) && designPlan$dropoutRate2 > 0)) {
                 header <- .concatenateSummaryText(header, paste0(
                     "dropout rate(1) = ",
                     .arrayToString(designPlan$dropoutRate1,
