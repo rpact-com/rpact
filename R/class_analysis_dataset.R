@@ -763,19 +763,20 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     }
 
     for (stage in seq_len(length(emmeansResults))) {
-        if (!inherits(emmeansResults[[stage]], "emmGrid")) {
+        emmeansResultPerStage <- emmeansResults[[stage]]
+        if (!inherits(emmeansResultPerStage, "emmGrid")) {
             stop(sprintf(
                 paste0(
                     "%s%s must contain %s objects created by emmeans(x), ",
                     "where x is a linear model result (one object per stage; class is %s at stage %s)"
                 ),
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote("emmeansResults"), sQuote("emmGrid"),
-                .getClassName(emmeansResults[[stage]]), stage
+                .getClassName(emmeansResultPerStage), stage
             ))
         }
         
-        varianceCovarianceMatrix <- stats::vcov(emmeansResults[[stage]])
-        if (any(dim(varianceCovarianceMatrix) > 2)) {
+        levelsList <- methods::slot(emmeansResultPerStage, "levels")
+        if (!is.null(levelsList) && length(levelsList) > 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "models with covariates are not yet supported by getDataset()"

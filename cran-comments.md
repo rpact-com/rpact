@@ -1,7 +1,7 @@
 
 ## Test environments
 
-* local OS X install, R 4.4.3
+* local OS X install, R 4.5.1
 * win-builder (old release, devel, and release)
 
 ## R CMD check results
@@ -10,7 +10,7 @@ There were no ERRORs or WARNINGs.
 
 ## Unit tests: testthat results (complete test)
 
-OK:       37912
+OK:       38913
 Failed:   0
 Warnings: 0
 Skipped:  0
