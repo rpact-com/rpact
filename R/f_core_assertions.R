@@ -1772,9 +1772,13 @@ NULL
         ..., 
         endpoint = c("means", "rates", "survival", "counts"),
         groups, 
-        ratioEnabled = FALSE) {
+        ratioEnabled = FALSE,
+        naAllowed = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsValidThetaH0", ...)
-    .assertIsSingleNumber(thetaH0, "thetaH0")
+    .assertIsSingleNumber(thetaH0, "thetaH0", naAllowed = naAllowed)
+    if (naAllowed && is.na(thetaH0)) {
+        return(invisible())
+    }
 
     endpoint <- match.arg(endpoint)
     if (endpoint == "means" || endpoint == "rates") {
@@ -1795,7 +1799,7 @@ NULL
     }
 }
 
-.assertIsValidThetaH0DataInput <- function(thetaH0, dataInput) {
+.assertIsValidThetaH0DataInput <- function(thetaH0, dataInput, ..., naAllowed = TRUE) {
     if (.isDatasetRates(dataInput)) {
         endpoint <- "rates"
     } else if (.isDatasetSurvival(dataInput)) {
@@ -1803,8 +1807,10 @@ NULL
     } else {
         endpoint <- "means"
     }
-    .assertIsValidThetaH0(thetaH0, endpoint = endpoint, 
-        groups = dataInput$getNumberOfGroups())
+    .assertIsValidThetaH0(thetaH0, 
+        endpoint = endpoint, 
+        groups = dataInput$getNumberOfGroups(),
+        naAllowed = naAllowed)
 }
 
 .assertIsValidThetaRange <- function(..., thetaRange, thetaAutoSeqEnabled = TRUE, survivalDataEnabled = FALSE) {
