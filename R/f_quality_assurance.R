@@ -1392,6 +1392,48 @@ testPackage <- function(
     return(invisible(result))
 }
 
+#' 
+#' @title 
+#' Installation Qualification Result Object
+#'
+#' @description 
+#' This object represents the structured result of a full or partial
+#' installation qualification test execution. It includes metadata about
+#' the executed test suite, paths used, summary statistics, and status
+#' messages.
+#'
+#' @details 
+#' The object is returned by the function \code{\link{testPackage}} and
+#' is of class \code{InstallatinQualificationResult}.
+#'
+#' @format An S3 object of class \code{InstallatinQualificationResult} with the following elements:
+#' \describe{
+#'   \item{completeUnitTestSetEnabled}{Logical indicating whether the full test set was enabled}
+#'   \item{testFileDirectory}{Directory containing test scripts}
+#'   \item{testFileTargetDirectory}{Directory to which tests are copied or linked}
+#'   \item{reportType}{Report type selected (\code{"compact"}, \code{"detailed"}, or \code{"Rout"})}
+#'   \item{executionMode}{Execution mode (\code{"default"}, \code{"downloadOnly"}, 
+#'        \code{"downloadAndRunTests"}, or \code{"runTestsInTestFileDirectory"})}
+#'   \item{scope}{Scope of the qualification (`"basic"`, `"devel"`, `"both"`, `"internet"`, or `"all"`)}
+#'   \item{resultDir}{Directory where the result reports are stored}
+#'   \item{resultOuputFile}{Main output report filename}
+#'   \item{reportFileNames}{Vector of report files generated}
+#'   \item{minNumberOfExpectedTests}{Minimum number of expected tests}
+#'   \item{totalNumberOfTests}{Number of tests actually run}
+#'   \item{numberOfFailedTests}{Number of failed tests}
+#'   \item{numberOfSkippedTests}{Number of skipped tests}
+#'   \item{resultMessage}{Message summarizing the result}
+#'   \item{statusMessage}{Detailed status message}
+#'   \item{status}{Overall result status (\code{"success"}, \code{"incomplete"}, or \code{"failed"})}
+#' }
+#'
+#' @name InstallatinQualificationResult
+#' @keywords internal
+#' @seealso \code{\link{testPackage}}
+#' @docType class
+#' @aliases InstallatinQualificationResult-class
+#' 
+NULL
 
 #' 
 #' @title 
