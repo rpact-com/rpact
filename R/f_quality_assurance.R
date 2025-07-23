@@ -950,7 +950,7 @@ setupPackageTests <- function(token, secret) {
 #' members of the rpact user group as part of the validation documentation.
 #' For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}{rpact_installation_qualification}.
 #'
-#' @return Invisibly returns an \code{\link[=InstallatinQualificationResult]{InstallatinQualificationResult}}) object.
+#' @return Invisibly returns an \code{\link[=InstallationQualificationResult]{InstallationQualificationResult}}) object.
 #'
 #' @references For more information, please visit: <https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/>
 #'
@@ -1387,7 +1387,7 @@ testPackage <- function(
         status = status
     )
 
-    result <- structure(result, class = "InstallatinQualificationResult")
+    result <- structure(result, class = "InstallationQualificationResult")
 
     return(invisible(result))
 }
@@ -1404,9 +1404,9 @@ testPackage <- function(
 #'
 #' @details 
 #' The object is returned by the function \code{\link{testPackage}} and
-#' is of class \code{InstallatinQualificationResult}.
+#' is of class \code{InstallationQualificationResult}.
 #'
-#' @format An S3 object of class \code{InstallatinQualificationResult} with the following elements:
+#' @format An S3 object of class \code{InstallationQualificationResult} with the following elements:
 #' \describe{
 #'   \item{completeUnitTestSetEnabled}{Logical indicating whether the full test set was enabled}
 #'   \item{testFileDirectory}{Directory containing test scripts}
@@ -1427,11 +1427,11 @@ testPackage <- function(
 #'   \item{status}{Overall result status (\code{"success"}, \code{"incomplete"}, or \code{"failed"})}
 #' }
 #'
-#' @name InstallatinQualificationResult
+#' @name InstallationQualificationResult
 #' @keywords internal
 #' @seealso \code{\link{testPackage}}
 #' @docType class
-#' @aliases InstallatinQualificationResult-class
+#' @aliases InstallationQualificationResult-class
 #' 
 NULL
 
@@ -1440,9 +1440,9 @@ NULL
 #' Print Installation Qualification Result
 #'
 #' @description
-#' This function prints the details of an `InstallatinQualificationResult` object in a user-friendly format.
+#' This function prints the details of an `InstallationQualificationResult` object in a user-friendly format.
 #'
-#' @param x An object of class `InstallatinQualificationResult` containing the results of the installation qualification.
+#' @param x An object of class `InstallationQualificationResult` containing the results of the installation qualification.
 #' @param ... Additional arguments passed to or from other methods.
 #'
 #' @details
@@ -1461,7 +1461,7 @@ NULL
 #'
 #' @export
 #' 
-print.InstallatinQualificationResult <- function(x, ...) {
+print.InstallationQualificationResult <- function(x, ...) {
     cat("Installation Qualification Result:\n")
     cat(x$resultMessage, "\n\n")
     cat("Parameters:\n")

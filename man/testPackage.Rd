@@ -59,7 +59,7 @@ Only available if \code{testInstalledBasicPackages = TRUE}.}
 A copy of them can be found in the subdirectory \code{src}.}
 }
 \value{
-Invisibly returns an \code{\link[=InstallatinQualificationResult]{InstallatinQualificationResult}}) object.
+Invisibly returns an \code{\link[=InstallationQualificationResult]{InstallationQualificationResult}}) object.
 }
 \description{
 This function ensures the correct installation of the \code{rpact} package by performing

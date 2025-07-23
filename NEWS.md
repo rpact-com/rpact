@@ -4,7 +4,7 @@
 
 * `efficacyStops` and `futilityStops` parameter added  (issue [#88](https://github.com/rpact-com/rpact/issues/88))
 * parameter `stdErrorEstimate` (`"pooled"` or `"unpooled"`) added for calculation of final confidence intervals in two-sample situation for rates
-* `testPackage()` returns an `InstallatinQualificationResult` object
+* `testPackage()` returns an `InstallationQualificationResult` object
 
 ## Improvements, issues, and changes
 
