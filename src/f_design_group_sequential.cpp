@@ -698,7 +698,8 @@ double getFutilityBoundOneSided(int k, NumericVector betaSpendingValues, Numeric
 	bisection2([&](double scale) {
 		futilityBound = scale;
 		futilityBoundsTemp[k - 1] = futilityBound;
-		decisionMatrix = getDecisionMatrixForFutilityBounds(informationRates, criticalValues, futilityBoundsTemp, shift,1 );
+		decisionMatrix = getDecisionMatrixForFutilityBounds(
+			informationRates, criticalValues, futilityBoundsTemp, shift, 1);
 		probs = getGroupSequentialProbabilitiesFast(getDecisionMatrixSubset(decisionMatrix, k),
 			rangeVector(informationRates, 0, k - 1));
 		return (double) betaSpendingValues[k - 1] - sum(probs);
@@ -719,8 +720,8 @@ NumericVector getFutilityBoundsOneSided(int kMax, NumericVector betaSpendingValu
 NumericMatrix getProbabilitiesForFutilityBounds(NumericVector informationRates, NumericVector criticalValues,
 	NumericVector futilityBounds, double shift, int k, double sided) {
 
-	NumericMatrix decisionMatrix = getDecisionMatrixForFutilityBounds(informationRates, criticalValues, futilityBounds,
-		shift, sided);
+	NumericMatrix decisionMatrix = getDecisionMatrixForFutilityBounds(
+		informationRates, criticalValues, futilityBounds, shift, sided);
 	return getGroupSequentialProbabilitiesCpp(getDecisionMatrixSubset(decisionMatrix, k),
 		rangeVector(informationRates, 0, k - 1));
 }
@@ -854,7 +855,8 @@ double getFutilityBoundTwoSided(int k, NumericVector betaSpendingValues, Numeric
 		}
 		futilityBoundsTemp[k - 1] = futilityBound;
 
-		decisionMatrix = getDecisionMatrixForFutilityBounds(informationRates, criticalValues, futilityBoundsTemp, shift,2 );
+		decisionMatrix = getDecisionMatrixForFutilityBounds(
+			informationRates, criticalValues, futilityBoundsTemp, shift, 2);
 		NumericMatrix probs = getGroupSequentialProbabilitiesCpp(decisionMatrix(_, Range(0, k - 1)),
 			informationRates[Range(0, k - 1)]);
 		double probsSum = sum(probs.row(2) - probs.row(1));
