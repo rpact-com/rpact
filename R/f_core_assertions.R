@@ -1767,59 +1767,31 @@ NULL
     .assertPackageIsInstalled("testthat")
 }
 
-.assertIsValidThetaH0 <- function(thetaH0, ..., endpoint = c("means", "rates", "survival", "counts"),
-        groups, ratioEnabled = FALSE) {
+.assertIsValidThetaH0 <- function(
+        thetaH0, 
+        ..., 
+        endpoint = c("means", "rates", "survival", "counts"),
+        groups, 
+        ratioEnabled = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsValidThetaH0", ...)
-
-    if (is.na(thetaH0)) {
-        return(invisible())
-    }
-
-    if (!is.numeric(thetaH0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'thetaH0' must be a valid numeric value",
-            call. = FALSE
-        )
-    }
+    .assertIsSingleNumber(thetaH0, "thetaH0")
 
     endpoint <- match.arg(endpoint)
     if (endpoint == "means" || endpoint == "rates") {
         if (groups == 2 && ratioEnabled) {
-            if (thetaH0 <= 0) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'thetaH0' (", thetaH0, ") must be > 0",
-                    call. = FALSE
-                )
-            }
+            .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL)
             return(invisible())
         }
     }
 
     if (endpoint == "rates") {
         if (groups == 1) {
-            if (thetaH0 <= 0 || thetaH0 >= 1) {
-                stop(
-                    C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                    "'thetaH0' (", thetaH0, ") is out of bounds (0; 1) or not specified",
-                    call. = FALSE
-                )
-            }
+            .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = 1)
         } else {
-            if (thetaH0 <= -1 || thetaH0 >= 1) {
-                stop(
-                    C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                    "'thetaH0' (", thetaH0, ") is out of bounds (-1; 1)",
-                    call. = FALSE
-                )
-            }
+            .assertIsInOpenInterval(thetaH0, "thetaH0", lower = -1, upper = 1)
         }
     } else if (endpoint %in% c("survival", "counts")) {
-        if (thetaH0 <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'thetaH0' (", thetaH0, ") must be > 0",
-                call. = FALSE
-            )
-        }
+        .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL)
     }
 }
 
@@ -1831,7 +1803,8 @@ NULL
     } else {
         endpoint <- "means"
     }
-    .assertIsValidThetaH0(thetaH0, endpoint = endpoint, groups = dataInput$getNumberOfGroups())
+    .assertIsValidThetaH0(thetaH0, endpoint = endpoint, 
+        groups = dataInput$getNumberOfGroups())
 }
 
 .assertIsValidThetaRange <- function(..., thetaRange, thetaAutoSeqEnabled = TRUE, survivalDataEnabled = FALSE) {
