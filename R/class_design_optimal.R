@@ -10,6 +10,9 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
         delta1 = NULL,
         delta1Min = NULL,
         delta1Max = NULL,
+        ncp1 = NULL,
+        ncp1Min = NULL,
+        ncp1Max = NULL,
         firstStageInformation = NULL,
         useInterimEstimate = NULL,
         likelihoodRatioDistribution = NULL,
@@ -26,9 +29,6 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
         maximumConditionalError = NULL,
         levelConstantMinimum = NULL,
         levelConstantMaximum = NULL,
-        ncp1 = NULL,
-        ncp1Min = NULL,
-        ncp1Max = NULL,
         enforceMonotonicity = NULL,
         initialize = function(
             alpha = NA_real_,
@@ -55,10 +55,8 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             maximumConditionalError = 1,
             levelConstantMinimum = 0,
             levelConstantMaximum = 10,
-            ncp1 = NA_real_,
-            ncp1Min = NA_real_,
-            ncp1Max = NA_real_,
-            enforceMonotonicity = TRUE
+            enforceMonotonicity = TRUE,
+            ...
         ) {
             # Range assertions for alpha, alpha1, alpha0
             # General range assertions
@@ -90,7 +88,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                         )
                     }
                 } else if (!is.null(suppressWarnings(body(conditionalPowerFunction)))) {
-                    .assertIsFunction(x = conditionalPowerFunction, argumentName = "conditionalPowerFunction")
+                    .assertIsFunction(fun = conditionalPowerFunction)
 
                     # Check if function is increasing
                     # Grid of values
@@ -149,10 +147,14 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             # When using an interim estimate, derive minimal or maximal effects
             if (useInterimEstimate) {
                 # Neither lower limit provided -> error
-                if ((is.na(ncp1Min) && (is.na(delta1Min)))) {
+                # Extract hidden arguments from ...
+                ncp1Min <- list(...)$ncp1Min
+                ncp1Max <- list(...)$ncp1Max
+
+                if (is.na(delta1Min) && is.null(ncp1Min)) {
                     stop(paste0(
                         C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                        "Must provide a lower limit for the interim estimate by using ncp1Min or delta1Min."
+                        "Must provide a lower limit for the interim estimate by using delta1Min."
                     ))
                 } else if (!is.na(delta1Min)) {
                     .assertIsSingleNumber(x = delta1Min, argumentName = "delta1Min")
@@ -164,13 +166,13 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     self$delta1Min <- delta1Min
                     self$delta1Max <- delta1Max
 
-                    if (!is.na(ncp1Min)) {
+                    if (!is.null(ncp1Min)) {
                         warning("Both ncp1Min and delta1Min are provided. Using delta1Min and ignoring ncp1Min.")
                     }
 
                     self$ncp1Min <- delta1Min * sqrt(firstStageInformation)
                     self$ncp1Max <- delta1Max * sqrt(firstStageInformation)
-                } else if (!is.na(ncp1Min)) {
+                } else if (!is.null(ncp1Min)) {
                     .assertIsSingleNumber(x = ncp1Min, argumentName = "ncp1Min")
                     .assertIsInOpenInterval(x = ncp1Min, xName = "ncp1Min", lower = 0, upper = Inf)
 
@@ -178,7 +180,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     .assertIsInClosedInterval(x = ncp1Max, xName = "ncp1Max", lower = ncp1Min, upper = Inf)
 
                     self$ncp1Min <- ncp1Min
-                    self$ncp1Max <- ncp1Max
+                    self$ncp1Max <- ifelse(is.null(ncp1Max), Inf, ncp1Max)
 
                     self$delta1Min <- ncp1Min / sqrt(firstStageInformation)
                     self$delta1Max <- ifelse(ncp1Max == Inf, Inf, ncp1Max / sqrt(firstStageInformation))
@@ -191,16 +193,20 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             } else {
                 # When not using an interim estimate, derive fixed effects
                 # If non-centrality parameter was not specified, calculate it from delta1
+
+                # Extract hidden argument from ...
+                ncp1 <- list(...)$ncp1
+
                 if (!is.na(delta1)) {
                     .assertIsSingleNumber(x = delta1, argumentName = "delta1")
                     .assertIsInOpenInterval(x = delta1, xName = "delta1", lower = 0, upper = Inf)
 
                     self$delta1 <- delta1
-                    if (!is.na(ncp1)) {
+                    if (!is.null(ncp1)) {
                         warning("Both delta1 and ncp1 are provided. Using delta1 and ignoring ncp1.")
                     }
                     self$ncp1 <- delta1 * sqrt(firstStageInformation)
-                } else if (!is.na(ncp1)) {
+                } else if (!is.null(ncp1)) {
                     # If delta1 was not specified, calculate it from ncp1
                     .assertIsSingleNumber(x = ncp1, argumentName = "ncp1")
                     .assertIsInOpenInterval(x = ncp1, xName = "ncp1", lower = 0, upper = Inf)
@@ -211,7 +217,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
                     # Else, none of ncp1 and delta1 were specified
                     stop(paste0(
                         C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                        "Must specify delta1 or ncp1 when using a fixed effect for conditional power."
+                        "Must specify delta1 when using a fixed effect for conditional power."
                     ))
                 }
             }
