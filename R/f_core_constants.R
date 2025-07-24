@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8691 $
-## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
+## |  File version: $Revision: 8752 $
+## |  Last changed: $Date: 2025-07-10 14:29:45 +0200 (Do, 10 Jul 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -628,6 +628,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     singleEventsPerStage = "Single number of events",
     singleEventsPerArmAndStage = "Single number of events",
     singleEventsPerSubsetAndStage = "Single number of events",
+	populationEventsPerStage = "Number of events per population",
     endOfAccrualIsUserDefined = "End of accrual is user defined",
     followUpTimeMustBeUserDefined = "Follow-up time must be user defined",
     maxNumberOfSubjectsIsUserDefined = "Max number of subjects is user defined",
@@ -729,7 +730,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
 C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     iterations = "Iterations",
     seed = "Seed",
-    groups = "Treatment group",
+    groups = "Treatment groups",
     stages = "Stage",
     sampleSizes = "Sample size",
     means = "Mean",

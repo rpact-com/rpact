@@ -59,7 +59,7 @@ Only available if \code{testInstalledBasicPackages = TRUE}.}
 A copy of them can be found in the subdirectory \code{src}.}
 }
 \value{
-Invisibly returns the value of \code{completeUnitTestSetEnabled}.
+Invisibly returns an \code{\link[=InstallationQualificationResult]{InstallationQualificationResult}}) object.
 }
 \description{
 This function ensures the correct installation of the \code{rpact} package by performing

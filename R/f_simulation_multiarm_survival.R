@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Di, 10 Dez 2024) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8730 $
+## |  Last changed: $Date: 2025-05-23 12:07:33 +0200 (Fr, 23 Mai 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_multiarm.R
@@ -389,8 +389,9 @@ NULL
 #'
 #' @export
 #'
-getSimulationMultiArmSurvival <- function(design = NULL, ...,
-        activeArms = 3L, # C_ACTIVE_ARMS_DEFAULT
+getSimulationMultiArmSurvival <- function(design = NULL,
+        ...,
+        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
         omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
@@ -438,9 +439,11 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
-    
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
+
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,
@@ -472,12 +475,24 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
         showStatistics              = showStatistics,
         endpoint                    = "survival"
     )
+    for (notApplicableParam in c(
+            "accrualIntensity",
+            "accrualTime",
+            "dropoutRate1",
+            "dropoutRate2",
+            "dropoutTime",
+            "eventTime",
+            "kappa",
+            "piControl")
+            ) {
+        simulationResults$.setParameterType(notApplicableParam, C_PARAM_NOT_APPLICABLE)
+    }
 
     design <- simulationResults$.design
     successCriterion <- simulationResults$successCriterion
     effectMeasure <- simulationResults$effectMeasure
     adaptations <- simulationResults$adaptations
-    gMax <- activeArms
+    gMax <- simulationResults$activeArms
     kMax <- simulationResults$.design$kMax
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection
@@ -546,7 +561,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
 
     if (correlationComputation == "null") {
         # not accounting for alternative
-        corrMatrix <- matrix(rep(allocationRatioPlanned / (1 + allocationRatioPlanned), gMax^2), ncol = gMax, nrow = gMax)
+        corrMatrix <- matrix(rep(allocationRatioPlanned[1] / (1 + allocationRatioPlanned[1]), gMax^2), ncol = gMax, nrow = gMax)
         diag(corrMatrix) <- 1
         choleskyDecomposition <- chol(corrMatrix)
     }

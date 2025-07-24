@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8670 $
-## |  Last changed: $Date: 2025-04-10 08:07:04 +0200 (Do, 10 Apr 2025) $
+## |  File version: $Revision: 8765 $
+## |  Last changed: $Date: 2025-07-22 08:09:47 +0200 (Di, 22 Jul 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -2492,8 +2492,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 )
             ))
         }
-        if (settings$survivalEnabled && !is.null(designPlan[["dropoutTime"]])) {
-            if (designPlan$dropoutRate1 > 0 || designPlan$dropoutRate2 > 0) {
+        if (settings$survivalEnabled && 
+                !is.null(designPlan[["dropoutTime"]]) && 
+                !is.na(designPlan$dropoutTime)) {
+            if ((!is.na(designPlan$dropoutRate1) && designPlan$dropoutRate1 > 0) || 
+                    (!is.na(designPlan$dropoutRate2) && designPlan$dropoutRate2 > 0)) {
                 header <- .concatenateSummaryText(header, paste0(
                     "dropout rate(1) = ",
                     .arrayToString(designPlan$dropoutRate1,

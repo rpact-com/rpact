@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8660 $
-## |  Last changed: $Date: 2025-04-01 11:45:17 +0200 (Di, 01 Apr 2025) $
+## |  File version: $Revision: 8765 $
+## |  Last changed: $Date: 2025-07-22 08:09:47 +0200 (Di, 22 Jul 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -1597,6 +1597,13 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 .addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues) {
+    if (!fieldName %in% names(parameterSet)) {
+        stop(
+            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+            "'", .getClassName(parameterSet), "' does not contain a field with name '", fieldName, "'"
+        )
+    }
+    
     parameterSet[[fieldName]] <- fieldValues
     parameterSet$.setParameterType(fieldName, C_PARAM_NOT_APPLICABLE)
     parameterSet$.deprecatedFieldNames <- unique(c(parameterSet$.deprecatedFieldNames, fieldName))

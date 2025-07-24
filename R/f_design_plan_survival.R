@@ -646,7 +646,6 @@ NULL
         .assertIsValidAlphaAndBeta(design$alpha, design$beta)
         .assertIsValidSidedParameter(design$sided)
         .assertIsSingleLogical(accountForObservationTimes, "accountForObservationTimes", naAllowed = TRUE)
-        .assertIsSingleNumber(thetaH0, "thetaH0")
         .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
         .assertIsValidKappa(kappa)
         directionUpper <- .assertIsValidDirectionUpper(directionUpper,

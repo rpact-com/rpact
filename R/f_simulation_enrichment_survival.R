@@ -13,26 +13,28 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8349 $
-## |  Last changed: $Date: 2024-11-01 14:50:21 +0100 (Fr, 01 Nov 2024) $
+## |  File version: $Revision: 8765 $
+## |  Last changed: $Date: 2025-07-22 08:09:47 +0200 (Di, 22 Jul 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_simulation_enrichment.R
 NULL
 
-.getSimulationSurvivalEnrichmentStageEvents <- function(...,
-        stage,
-        directionUpper,
-        conditionalPower,
-        conditionalCriticalValue,
-        plannedEvents,
-        allocationRatioPlanned,
-        selectedPopulations,
-        thetaH1,
-        overallEffects,
-        minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage) {
+.getSimulationSurvivalEnrichmentStageEvents <- function(
+    ...,
+    stage,
+    directionUpper,
+    conditionalPower,
+    conditionalCriticalValue,
+    plannedEvents,
+    allocationRatioPlanned,
+    selectedPopulations,
+    thetaH1,
+    overallEffects,
+    minNumberOfEventsPerStage,
+    maxNumberOfEventsPerStage
+) {
     stage <- stage - 1 # to be consistent with non-enrichment situation
     gMax <- nrow(overallEffects)
 
@@ -40,27 +42,47 @@ NULL
         if (any(selectedPopulations[1:gMax, stage + 1], na.rm = TRUE)) {
             if (is.na(thetaH1)) {
                 if (is.na(directionUpper) || isTRUE(directionUpper)) {
-                    thetaStandardized <- log(max(min(
-                        overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
-                        na.rm = TRUE
-                    ), 1 + 1e-07))
+                    thetaStandardized <- log(max(
+                        min(
+                            overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
+                            na.rm = TRUE
+                        ),
+                        1 + 1e-07
+                    ))
                 } else {
-                    thetaStandardized <- log(min(max(
-                        overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
-                        na.rm = TRUE
-                    ), 1 - 1e-07))
+                    thetaStandardized <- log(min(
+                        max(
+                            overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
+                            na.rm = TRUE
+                        ),
+                        1 - 1e-07
+                    ))
                 }
             } else {
-                thetaStandardized <- log(min(thetaH1, 1 + ifelse(is.na(directionUpper) ||
-                    isTRUE(directionUpper), 1e-07, -1e-07)))
+                thetaStandardized <- log(min(
+                    thetaH1,
+                    1 +
+                        ifelse(
+                            is.na(directionUpper) ||
+                                isTRUE(directionUpper),
+                            1e-07,
+                            -1e-07
+                        )
+                ))
             }
 
             if (conditionalCriticalValue[stage] > 8) {
                 newEvents <- maxNumberOfEventsPerStage[stage + 1]
             } else {
-                newEvents <- (1 + allocationRatioPlanned[stage])^2 / allocationRatioPlanned[stage] *
-                    (max(0, conditionalCriticalValue[stage] +
-                        .getQNorm(conditionalPower), na.rm = TRUE))^2 / thetaStandardized^2
+                newEvents <- (1 + allocationRatioPlanned[stage])^2 /
+                    allocationRatioPlanned[stage] *
+                    (max(
+                        0,
+                        conditionalCriticalValue[stage] +
+                            .getQNorm(conditionalPower),
+                        na.rm = TRUE
+                    ))^2 /
+                    thetaStandardized^2
                 newEvents <- min(
                     max(minNumberOfEventsPerStage[stage + 1], newEvents),
                     maxNumberOfEventsPerStage[stage + 1]
@@ -75,29 +97,31 @@ NULL
     return(newEvents)
 }
 
-.getSimulatedStageSurvivalEnrichment <- function(...,
-        design,
-        subsets,
-        prevalences,
-        piControls,
-        hazardRatios,
-        directionUpper,
-        stratifiedAnalysis,
-        plannedEvents,
-        typeOfSelection,
-        effectMeasure,
-        adaptations,
-        epsilonValue,
-        rValue,
-        threshold,
-        allocationRatioPlanned,
-        minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage,
-        conditionalPower,
-        thetaH1,
-        calcEventsFunction,
-        calcEventsFunctionIsUserDefined,
-        selectPopulationsFunction) {
+.getSimulatedStageSurvivalEnrichment <- function(
+    ...,
+    design,
+    subsets,
+    prevalences,
+    piControls,
+    hazardRatios,
+    directionUpper,
+    stratifiedAnalysis,
+    plannedEvents,
+    typeOfSelection,
+    effectMeasure,
+    adaptations,
+    epsilonValue,
+    rValue,
+    threshold,
+    allocationRatioPlanned,
+    minNumberOfEventsPerStage,
+    maxNumberOfEventsPerStage,
+    conditionalPower,
+    thetaH1,
+    calcEventsFunction,
+    calcEventsFunctionIsUserDefined,
+    selectPopulationsFunction
+) {
     kMax <- length(plannedEvents)
     pMax <- length(hazardRatios)
     gMax <- log(length(hazardRatios), 2) + 1
@@ -129,17 +153,19 @@ NULL
     for (k in seq_len(kMax)) {
         const <- allocationRatioPlanned[k] / (1 + allocationRatioPlanned[k])^2
 
-        selectedSubsets[, k] <- .createSelectedSubsets(k, selectedPopulations)
+        selectedSubsets[, k] <- .createSelectedSubsets(selectedPopulations[, k])
         if (is.null(piControls) || length(piControls) == 0) {
             if (k == 1) {
-                cumulativeEventsPerStage[, k] <- prevalences * (1 + allocationRatioPlanned[k] * hazardRatios) /
+                cumulativeEventsPerStage[, k] <- prevalences *
+                    (1 + allocationRatioPlanned[k] * hazardRatios) /
                     sum(prevalences * (1 + allocationRatioPlanned[k] * hazardRatios), na.rm = TRUE) *
                     plannedEvents[k]
             } else {
                 prevSelected <- prevalences / sum(prevalences[selectedSubsets[, k]])
                 prevSelected[!selectedSubsets[, k]] <- 0
                 if (sum(prevSelected, na.rm = TRUE) > 0) {
-                    cumulativeEventsPerStage[, k] <- prevSelected * (1 + allocationRatioPlanned[k] * hazardRatios) /
+                    cumulativeEventsPerStage[, k] <- prevSelected *
+                        (1 + allocationRatioPlanned[k] * hazardRatios) /
                         sum(prevSelected * (1 + allocationRatioPlanned[k] * hazardRatios), na.rm = TRUE) *
                         (plannedEvents[k] - plannedEvents[k - 1])
                 } else {
@@ -150,13 +176,17 @@ NULL
             rho <- (allocationRatioPlanned[k] * (1 - (1 - piControls)^hazardRatios) + piControls) /
                 (1 + allocationRatioPlanned[k])
             if (k == 1) {
-                cumulativeEventsPerStage[, k] <- prevalences * rho / sum(prevalences * rho, na.rm = TRUE) *
+                cumulativeEventsPerStage[, k] <- prevalences *
+                    rho /
+                    sum(prevalences * rho, na.rm = TRUE) *
                     plannedEvents[k]
             } else {
                 prevSelected <- prevalences / sum(prevalences[selectedSubsets[, k]])
                 prevSelected[!selectedSubsets[, k]] <- 0
                 if (sum(prevSelected, na.rm = TRUE) > 0) {
-                    cumulativeEventsPerStage[, k] <- prevSelected * rho / sum(prevSelected * rho, na.rm = TRUE) *
+                    cumulativeEventsPerStage[, k] <- prevSelected *
+                        rho /
+                        sum(prevSelected * rho, na.rm = TRUE) *
                         (plannedEvents[k] - plannedEvents[k - 1])
                 } else {
                     break
@@ -164,90 +194,189 @@ NULL
             }
         }
 
-        logRankStatistics[, k] <- (2 * directionUpper - 1) * stats::rnorm(pMax, log(hazardRatios) *
-            sqrt(const * cumulativeEventsPerStage[, k]), 1)
+        logRankStatistics[, k] <- (2 * directionUpper - 1) *
+            stats::rnorm(
+                pMax,
+                log(hazardRatios) *
+                    sqrt(const * cumulativeEventsPerStage[, k]),
+                1
+            )
         if (gMax == 1) {
             testStatistics[1, k] <- logRankStatistics[1, k]
             populationEventsPerStage[1, k] <- cumulativeEventsPerStage[1, k]
-            overallTestStatistics[1, k] <- sum(sqrt(cumulativeEventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
+            overallTestStatistics[1, k] <- sum(
+                sqrt(cumulativeEventsPerStage[1, 1:k]) * testStatistics[1, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE))
-            overallEffects[1, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[1, k] /
-                sqrt(const) / sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE)))
+            overallEffects[1, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[1, k] /
+                    sqrt(const) /
+                    sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE))
+            )
         } else if (gMax == 2) {
             # Population S1
             testStatistics[1, k] <- logRankStatistics[1, k]
             populationEventsPerStage[1, k] <- cumulativeEventsPerStage[1, k]
-            overallTestStatistics[1, k] <- sum(sqrt(cumulativeEventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
+            overallTestStatistics[1, k] <- sum(
+                sqrt(cumulativeEventsPerStage[1, 1:k]) * testStatistics[1, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE))
-            overallEffects[1, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[1, k] /
-                sqrt(const) / sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE)))
+            overallEffects[1, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[1, k] /
+                    sqrt(const) /
+                    sqrt(sum(cumulativeEventsPerStage[1, 1:k], na.rm = TRUE))
+            )
             # Full population
-            testStatistics[2, k] <- sum(sqrt(cumulativeEventsPerStage[1:2, k]) * logRankStatistics[1:2, k], na.rm = TRUE) /
+            testStatistics[2, k] <- sum(
+                sqrt(cumulativeEventsPerStage[1:2, k]) * logRankStatistics[1:2, k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[1:2, k], na.rm = TRUE))
 
             populationEventsPerStage[2, k] <- sum(cumulativeEventsPerStage[1:2, k], na.rm = TRUE)
-            overallTestStatistics[2, k] <- sum(sqrt(populationEventsPerStage[2, 1:k]) * testStatistics[2, 1:k], na.rm = TRUE) /
+            overallTestStatistics[2, k] <- sum(
+                sqrt(populationEventsPerStage[2, 1:k]) * testStatistics[2, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
-            overallEffects[2, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[2, k] /
-                sqrt(const) / sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE)))
+            overallEffects[2, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[2, k] /
+                    sqrt(const) /
+                    sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
+            )
         } else if (gMax == 3) {
             # Population S1
-            testStatistics[1, k] <- sum(sqrt(cumulativeEventsPerStage[c(1, 3), k]) * logRankStatistics[c(1, 3), k], na.rm = TRUE) /
+            testStatistics[1, k] <- sum(
+                sqrt(cumulativeEventsPerStage[c(1, 3), k]) * logRankStatistics[c(1, 3), k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[c(1, 3), k], na.rm = TRUE))
             populationEventsPerStage[1, k] <- sum(cumulativeEventsPerStage[c(1, 3), k], na.rm = TRUE)
-            overallTestStatistics[1, k] <- sum(sqrt(populationEventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
+            overallTestStatistics[1, k] <- sum(
+                sqrt(populationEventsPerStage[1, 1:k]) * testStatistics[1, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE))
-            overallEffects[1, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[1, k] /
-                sqrt(const) / sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE)))
+            overallEffects[1, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[1, k] /
+                    sqrt(const) /
+                    sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE))
+            )
             # Population S2
-            testStatistics[2, k] <- sum(sqrt(cumulativeEventsPerStage[c(2, 3), k]) * logRankStatistics[c(2, 3), k], na.rm = TRUE) /
+            testStatistics[2, k] <- sum(
+                sqrt(cumulativeEventsPerStage[c(2, 3), k]) * logRankStatistics[c(2, 3), k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[c(2, 3), k], na.rm = TRUE))
             populationEventsPerStage[2, k] <- sum(cumulativeEventsPerStage[c(2, 3), k], na.rm = TRUE)
-            overallTestStatistics[2, k] <- sum(sqrt(populationEventsPerStage[2, 1:k]) * testStatistics[2, 1:k], na.rm = TRUE) /
+            overallTestStatistics[2, k] <- sum(
+                sqrt(populationEventsPerStage[2, 1:k]) * testStatistics[2, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
-            overallEffects[2, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[2, k] /
-                sqrt(const) / sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE)))
+            overallEffects[2, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[2, k] /
+                    sqrt(const) /
+                    sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
+            )
             # Full population
-            testStatistics[3, k] <- sum(sqrt(cumulativeEventsPerStage[1:4, k]) * logRankStatistics[1:4, k], na.rm = TRUE) /
+            testStatistics[3, k] <- sum(
+                sqrt(cumulativeEventsPerStage[1:4, k]) * logRankStatistics[1:4, k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[1:4, k], na.rm = TRUE))
             populationEventsPerStage[3, k] <- sum(cumulativeEventsPerStage[1:4, k], na.rm = TRUE)
-            overallTestStatistics[3, k] <- sum(sqrt(populationEventsPerStage[3, 1:k]) * testStatistics[3, 1:k], na.rm = TRUE) /
+            overallTestStatistics[3, k] <- sum(
+                sqrt(populationEventsPerStage[3, 1:k]) * testStatistics[3, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE))
-            overallEffects[3, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[3, k] /
-                sqrt(const) / sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE)))
+            overallEffects[3, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[3, k] /
+                    sqrt(const) /
+                    sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE))
+            )
         } else if (gMax == 4) {
             # Population S1
-            testStatistics[1, k] <- sum(sqrt(cumulativeEventsPerStage[c(1, 4, 5, 7), k]) * logRankStatistics[c(1, 4, 5, 7), k], na.rm = TRUE) /
+            testStatistics[1, k] <- sum(
+                sqrt(cumulativeEventsPerStage[c(1, 4, 5, 7), k]) * logRankStatistics[c(1, 4, 5, 7), k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[c(1, 4, 5, 7), k], na.rm = TRUE))
             populationEventsPerStage[1, k] <- sum(cumulativeEventsPerStage[c(1, 4, 5, 7), k], na.rm = TRUE)
-            overallTestStatistics[1, k] <- sum(sqrt(populationEventsPerStage[1, 1:k]) * testStatistics[1, 1:k], na.rm = TRUE) /
+            overallTestStatistics[1, k] <- sum(
+                sqrt(populationEventsPerStage[1, 1:k]) * testStatistics[1, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE))
-            overallEffects[1, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[1, k] /
-                sqrt(const) / sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE)))
+            overallEffects[1, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[1, k] /
+                    sqrt(const) /
+                    sqrt(sum(populationEventsPerStage[1, 1:k], na.rm = TRUE))
+            )
             # Population S2
-            testStatistics[2, k] <- sum(sqrt(cumulativeEventsPerStage[c(2, 4, 6, 7), k]) * logRankStatistics[c(2, 4, 6, 7), k], na.rm = TRUE) /
+            testStatistics[2, k] <- sum(
+                sqrt(cumulativeEventsPerStage[c(2, 4, 6, 7), k]) * logRankStatistics[c(2, 4, 6, 7), k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE))
             populationEventsPerStage[2, k] <- sum(cumulativeEventsPerStage[c(2, 4, 6, 7), k], na.rm = TRUE)
-            overallTestStatistics[2, k] <- sum(sqrt(populationEventsPerStage[2, 1:k]) * testStatistics[2, 1:k], na.rm = TRUE) /
+            overallTestStatistics[2, k] <- sum(
+                sqrt(populationEventsPerStage[2, 1:k]) * testStatistics[2, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
-            overallEffects[2, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[2, k] /
-                sqrt(const) / sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE)))
+            overallEffects[2, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[2, k] /
+                    sqrt(const) /
+                    sqrt(sum(populationEventsPerStage[2, 1:k], na.rm = TRUE))
+            )
             # Population S3
-            testStatistics[3, k] <- sum(sqrt(cumulativeEventsPerStage[c(3, 5, 6, 7), k]) * logRankStatistics[c(3, 5, 6, 7), k], na.rm = TRUE) /
+            testStatistics[3, k] <- sum(
+                sqrt(cumulativeEventsPerStage[c(3, 5, 6, 7), k]) * logRankStatistics[c(3, 5, 6, 7), k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[c(3, 5, 6, 7), k], na.rm = TRUE))
             populationEventsPerStage[3, k] <- sum(cumulativeEventsPerStage[c(3, 5, 6, 7), k], na.rm = TRUE)
-            overallTestStatistics[3, k] <- sum(sqrt(populationEventsPerStage[3, 1:k]) * testStatistics[3, 1:k], na.rm = TRUE) /
+            overallTestStatistics[3, k] <- sum(
+                sqrt(populationEventsPerStage[3, 1:k]) * testStatistics[3, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE))
-            overallEffects[3, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[3, k] /
-                sqrt(const) / sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE)))
+            overallEffects[3, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[3, k] /
+                    sqrt(const) /
+                    sqrt(sum(populationEventsPerStage[3, 1:k], na.rm = TRUE))
+            )
             # Full population
-            testStatistics[4, k] <- sum(sqrt(cumulativeEventsPerStage[1:8, k]) * logRankStatistics[1:8, k], na.rm = TRUE) /
+            testStatistics[4, k] <- sum(
+                sqrt(cumulativeEventsPerStage[1:8, k]) * logRankStatistics[1:8, k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(cumulativeEventsPerStage[1:8, k], na.rm = TRUE))
             populationEventsPerStage[4, k] <- sum(cumulativeEventsPerStage[1:8, k], na.rm = TRUE)
-            overallTestStatistics[4, k] <- sum(sqrt(populationEventsPerStage[4, 1:k]) * testStatistics[4, 1:k], na.rm = TRUE) /
+            overallTestStatistics[4, k] <- sum(
+                sqrt(populationEventsPerStage[4, 1:k]) * testStatistics[4, 1:k],
+                na.rm = TRUE
+            ) /
                 sqrt(sum(populationEventsPerStage[4, 1:k], na.rm = TRUE))
-            overallEffects[4, k] <- exp((2 * directionUpper - 1) * overallTestStatistics[4, k] /
-                sqrt(const) / sqrt(sum(populationEventsPerStage[4, 1:k], na.rm = TRUE)))
+            overallEffects[4, k] <- exp(
+                (2 * directionUpper - 1) *
+                    overallTestStatistics[4, k] /
+                    sqrt(const) /
+                    sqrt(sum(populationEventsPerStage[4, 1:k], na.rm = TRUE))
+            )
         }
 
         testStatistics[!selectedPopulations[, k], k] <- NA_real_
@@ -262,15 +391,22 @@ NULL
             }
 
             # Bonferroni adjustment
-            adjustedPValues[k] <- min(min(separatePValues[, k], na.rm = TRUE) * (colSums(selectedPopulations)[k]), 1 - 1e-07)
+            adjustedPValues[k] <- min(
+                min(separatePValues[, k], na.rm = TRUE) * (colSums(selectedPopulations)[k]),
+                1 - 1e-07
+            )
 
             # conditional critical value to reject the null hypotheses at the next stage of the trial
             criticalValues <- .getCriticalValues(design)
             if (.isTrialDesignFisher(design)) {
-                conditionalCriticalValue[k] <- .getOneMinusQNorm(min((criticalValues[k + 1] /
-                    prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]), 1 - 1e-07))
+                conditionalCriticalValue[k] <- .getOneMinusQNorm(min(
+                    (criticalValues[k + 1] /
+                        prod(adjustedPValues[1:k]^weights[1:k]))^(1 / weights[k + 1]),
+                    1 - 1e-07
+                ))
             } else {
-                conditionalCriticalValue[k] <- (criticalValues[k + 1] * sqrt(design$informationRates[k + 1]) -
+                conditionalCriticalValue[k] <- (criticalValues[k + 1] *
+                    sqrt(design$informationRates[k + 1]) -
                     .getOneMinusQNorm(adjustedPValues[1:k]) %*% weights[1:k]) /
                     sqrt(design$informationRates[k + 1] - design$informationRates[k])
             }
@@ -329,7 +465,9 @@ NULL
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
+                        "'calcEventsFunction' returned an illegal or undefined result (",
+                        newEvents,
+                        "); ",
                         "the output must be a single numeric value"
                     )
                 }
@@ -345,15 +483,19 @@ NULL
                 thetaStandardized <- log(.applyDirectionOfAlternative(
                     overallEffects[selectedPopulations[1:gMax, k], k],
                     directionUpper,
-                    type = "minMax", phase = "planning"
+                    type = "minMax",
+                    phase = "planning"
                 ))
             } else {
                 thetaStandardized <- log(thetaH1)
             }
             thetaStandardized <- (2 * directionUpper - 1) * thetaStandardized
 
-            conditionalPowerPerStage[k] <- 1 - stats::pnorm(conditionalCriticalValue[k] -
-                thetaStandardized * sqrt(plannedEvents[k + 1] - plannedEvents[k]) * sqrt(const))
+            conditionalPowerPerStage[k] <- 1 -
+                stats::pnorm(
+                    conditionalCriticalValue[k] -
+                        thetaStandardized * sqrt(plannedEvents[k + 1] - plannedEvents[k]) * sqrt(const)
+                )
         }
     }
 
@@ -441,43 +583,52 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentSurvival <- function(design = NULL, ...,
-        effectList = NULL,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
-        adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
-        epsilonValue = NA_real_,
-        rValue = NA_real_,
-        threshold = -Inf,
-        plannedEvents = NA_real_,
-        allocationRatioPlanned = NA_real_,
-        minNumberOfEventsPerStage = NA_real_,
-        maxNumberOfEventsPerStage = NA_real_,
-        conditionalPower = NA_real_,
-        thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
-        seed = NA_real_,
-        calcEventsFunction = NULL,
-        selectPopulationsFunction = NULL,
-        showStatistics = FALSE) {
+getSimulationEnrichmentSurvival <- function(
+    design = NULL,
+    ...,
+    effectList = NULL,
+    intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+    stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
+    directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+    adaptations = NA,
+    typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
+    effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
+    successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+    epsilonValue = NA_real_,
+    rValue = NA_real_,
+    threshold = -Inf,
+    plannedEvents = NA_real_,
+    allocationRatioPlanned = NA_real_,
+    minNumberOfEventsPerStage = NA_real_,
+    maxNumberOfEventsPerStage = NA_real_,
+    conditionalPower = NA_real_,
+    thetaH1 = NA_real_,
+    maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+    seed = NA_real_,
+    calcEventsFunction = NULL,
+    selectPopulationsFunction = NULL,
+    showStatistics = FALSE
+) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "simulation")
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationEnrichmentSurvival",
-            ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
-                design,
-                powerCalculationEnabled = TRUE
-            ), "showStatistics"), ...
+            ignore = c(
+                .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
+                    design,
+                    powerCalculationEnabled = TRUE
+                ),
+                "showStatistics"
+            ),
+            ...
         )
     } else {
         .assertIsTrialDesignInverseNormalOrFisher(design)
         .warnInCaseOfUnknownArguments(
-            functionName = "getSimulationEnrichmentSurvival", 
-            ignore = "showStatistics", ...)
+            functionName = "getSimulationEnrichmentSurvival",
+            ignore = "showStatistics",
+            ...
+        )
         .warnInCaseOfTwoSidedPowerArgument(...)
     }
 
@@ -485,36 +636,38 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+    directionUpper <- .assertIsValidDirectionUpper(
+        directionUpper,
         design,
-        objectType = "power", userFunctionCallEnabled = TRUE
+        objectType = "power",
+        userFunctionCallEnabled = TRUE
     )
 
     simulationResults <- .createSimulationResultsEnrichmentObject(
-        design                      = design,
-        effectList                  = effectList,
-        intersectionTest            = intersectionTest,
-        stratifiedAnalysis          = stratifiedAnalysis,
-        directionUpper              = directionUpper, # rates + survival only
-        adaptations                 = adaptations,
-        typeOfSelection             = typeOfSelection,
-        effectMeasure               = effectMeasure,
-        successCriterion            = successCriterion,
-        epsilonValue                = epsilonValue,
-        rValue                      = rValue,
-        threshold                   = threshold,
-        plannedEvents               = plannedEvents, # survival only
-        allocationRatioPlanned      = allocationRatioPlanned,
-        minNumberOfEventsPerStage   = minNumberOfEventsPerStage, # survival only
-        maxNumberOfEventsPerStage   = maxNumberOfEventsPerStage, # survival only
-        conditionalPower            = conditionalPower,
-        thetaH1                     = thetaH1, # means + survival only
-        maxNumberOfIterations       = maxNumberOfIterations,
-        seed                        = seed,
-        calcEventsFunction          = calcEventsFunction, # survival only
-        selectPopulationsFunction   = selectPopulationsFunction,
-        showStatistics              = showStatistics,
-        endpoint                    = "survival"
+        design = design,
+        effectList = effectList,
+        intersectionTest = intersectionTest,
+        stratifiedAnalysis = stratifiedAnalysis,
+        directionUpper = directionUpper, # rates + survival only
+        adaptations = adaptations,
+        typeOfSelection = typeOfSelection,
+        effectMeasure = effectMeasure,
+        successCriterion = successCriterion,
+        epsilonValue = epsilonValue,
+        rValue = rValue,
+        threshold = threshold,
+        plannedEvents = plannedEvents, # survival only
+        allocationRatioPlanned = allocationRatioPlanned,
+        minNumberOfEventsPerStage = minNumberOfEventsPerStage, # survival only
+        maxNumberOfEventsPerStage = maxNumberOfEventsPerStage, # survival only
+        conditionalPower = conditionalPower,
+        thetaH1 = thetaH1, # means + survival only
+        maxNumberOfIterations = maxNumberOfIterations,
+        seed = seed,
+        calcEventsFunction = calcEventsFunction, # survival only
+        selectPopulationsFunction = selectPopulationsFunction,
+        showStatistics = showStatistics,
+        endpoint = "survival"
     )
 
     design <- simulationResults$.design
@@ -602,7 +755,8 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
 
             closedTest <- .performClosedCombinationTestForSimulationEnrichment(
                 stageResults = stageResults,
-                design = design, indices = indices,
+                design = design,
+                indices = indices,
                 intersectionTest = intersectionTest,
                 successCriterion = successCriterion
             )
@@ -615,9 +769,11 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
                     (closedTest$rejected[, k] & closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore)
                 simulatedSelections[k, i, ] <- simulatedSelections[k, i, ] + closedTest$selectedPopulations[, k]
 
-                simulatedSingleEventsPerStage[k, i, ] <- simulatedSingleEventsPerStage[k, i, ] + stageResults$cumulativeEventsPerStage[, k]
+                simulatedSingleEventsPerStage[k, i, ] <- simulatedSingleEventsPerStage[k, i, ] +
+                    stageResults$cumulativeEventsPerStage[, k]
 
-                simulatedNumberOfPopulations[k, i] <- simulatedNumberOfPopulations[k, i] + sum(closedTest$selectedPopulations[, k])
+                simulatedNumberOfPopulations[k, i] <- simulatedNumberOfPopulations[k, i] +
+                    sum(closedTest$selectedPopulations[, k])
 
                 if (!any(is.na(closedTest$successStop))) {
                     simulatedSuccessStopping[k, i] <- simulatedSuccessStopping[k, i] + closedTest$successStop[k]
@@ -641,7 +797,8 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
                         stageResults$plannedEvents[k]
                 } else {
                     simulatedOverallEventsPerStage[k, i] <- simulatedOverallEventsPerStage[k, i] +
-                        stageResults$plannedEvents[k] - stageResults$plannedEvents[k - 1]
+                        stageResults$plannedEvents[k] -
+                        stageResults$plannedEvents[k - 1]
                 }
 
                 for (g in seq_len(gMax)) {
@@ -664,8 +821,14 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
                     index <- index + 1
                 }
 
-                if (!rejectAtSomeStage && any(closedTest$rejected[, k] &
-                        closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore)) {
+                if (
+                    !rejectAtSomeStage &&
+                        any(
+                            closedTest$rejected[, k] &
+                                closedTest$selectedPopulations[1:gMax, k] |
+                                rejectedPopulationsBefore
+                        )
+                ) {
                     simulatedRejectAtLeastOne[i] <- simulatedRejectAtLeastOne[i] + 1
                     rejectAtSomeStage <- TRUE
                 }
@@ -673,15 +836,20 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
                 if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
                     # rejected hypotheses remain rejected also in case of early stopping
                     simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
-                        matrix((closedTest$rejected[, k] & closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore),
-                            kMax - k, gMax,
+                        matrix(
+                            (closedTest$rejected[, k] &
+                                closedTest$selectedPopulations[1:gMax, k] |
+                                rejectedPopulationsBefore),
+                            kMax - k,
+                            gMax,
                             byrow = TRUE
                         )
                     break
                 }
 
                 rejectedPopulationsBefore <- closedTest$rejected[, k] &
-                    closedTest$selectedPopulations[1:gMax, k] | rejectedPopulationsBefore
+                    closedTest$selectedPopulations[1:gMax, k] |
+                    rejectedPopulationsBefore
             }
         }
 
@@ -690,13 +858,18 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
         simulatedOverallEventsPerStage[, i] <- simulatedOverallEventsPerStage[, i] / iterations[, i]
 
         if (kMax > 1) {
-            simulatedRejections[2:kMax, i, ] <- simulatedRejections[2:kMax, i, ] - simulatedRejections[1:(kMax - 1), i, ]
+            simulatedRejections[2:kMax, i, ] <- simulatedRejections[2:kMax, i, ] -
+                simulatedRejections[1:(kMax - 1), i, ]
 
-            stopping <- cumsum(simulatedSuccessStopping[1:(kMax - 1), i] +
-                simulatedFutilityStopping[, i]) / maxNumberOfIterations
+            stopping <- cumsum(
+                simulatedSuccessStopping[1:(kMax - 1), i] +
+                    simulatedFutilityStopping[, i]
+            ) /
+                maxNumberOfIterations
 
-            expectedNumberOfEvents[i] <- simulatedOverallEventsPerStage[1, i] + t(1 - stopping) %*%
-                simulatedOverallEventsPerStage[2:kMax, i]
+            expectedNumberOfEvents[i] <- simulatedOverallEventsPerStage[1, i] +
+                t(1 - stopping) %*%
+                    simulatedOverallEventsPerStage[2:kMax, i]
         } else {
             expectedNumberOfEvents[i] <- simulatedOverallEventsPerStage[1, i]
         }
@@ -733,8 +906,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL, ...,
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
-            "internal error, simulation not possible due to numerical overflow")
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
     }
 
     data <- data.frame(

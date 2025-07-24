@@ -13,8 +13,8 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8474 $
-## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
+## |  File version: $Revision: 8765 $
+## |  Last changed: $Date: 2025-07-22 08:09:47 +0200 (Di, 22 Jul 2025) $
 ## |  Last changed by: $Author: pahlke $
 ## |
 
@@ -88,7 +88,8 @@ names.SimulationResults <- function(x) {
 #'
 #' @importFrom methods new
 #'
-SimulationResults <- R6::R6Class("SimulationResults",
+SimulationResults <- R6::R6Class(
+    "SimulationResults",
     inherit = ParameterSet,
     public = list(
         .plotSettings = NULL,
@@ -119,19 +120,28 @@ SimulationResults <- R6::R6Class("SimulationResults",
         },
         show = function(showType = 1, digits = NA_integer_, showStatistics = FALSE) {
             self$.show(
-                showType = showType, digits = digits, showStatistics = showStatistics,
+                showType = showType,
+                digits = digits,
+                showStatistics = showStatistics,
                 consoleOutputEnabled = TRUE
             )
         },
-        .show = function(..., showType = 1, digits = NA_integer_,
-                showStatistics = FALSE, consoleOutputEnabled = TRUE, performanceScore = NULL) {
+        .show = function(
+            ...,
+            showType = 1,
+            digits = NA_integer_,
+            showStatistics = FALSE,
+            consoleOutputEnabled = TRUE,
+            performanceScore = NULL
+        ) {
             "Method for automatically printing simulation result objects"
 
             self$.resetCat()
             if (showType == 3) {
                 .createSummary(self, digits = digits)$.show(
                     showType = 1,
-                    digits = digits, consoleOutputEnabled = consoleOutputEnabled
+                    digits = digits,
+                    consoleOutputEnabled = consoleOutputEnabled
                 )
             } else if (showType == 2) {
                 super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
@@ -139,51 +149,74 @@ SimulationResults <- R6::R6Class("SimulationResults",
                 if (is.null(showStatistics) || length(showStatistics) != 1) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'showStatistics' (", .arrayToString(showStatistics),
-                        ") must be a single logical or character", 
+                        "'showStatistics' (",
+                        .arrayToString(showStatistics),
+                        ") must be a single logical or character",
                         call. = FALSE
                     )
                 }
 
                 if (!is.character(showStatistics) || showStatistics != "exclusive") {
-                    self$.cat(self$.toString(startWithUpperCase = TRUE), ":\n\n",
+                    self$.cat(
+                        self$.toString(startWithUpperCase = TRUE),
+                        ":\n\n",
                         heading = 1,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
 
-                    self$.showParametersOfOneGroup(.getDesignParametersToShow(self), "Design parameters",
-                        orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                    self$.showParametersOfOneGroup(
+                        .getDesignParametersToShow(self),
+                        "Design parameters",
+                        orderByParameterName = FALSE,
+                        consoleOutputEnabled = consoleOutputEnabled
                     )
 
                     userDefinedParameters <- self$.getUserDefinedParameters()
-                    if (inherits(self, "SimulationResultsSurvival") &&
-                            self$.piecewiseSurvivalTime$delayedResponseEnabled) {
+                    if (
+                        inherits(self, "SimulationResultsSurvival") &&
+                            self$.piecewiseSurvivalTime$delayedResponseEnabled
+                    ) {
                         userDefinedParameters <- c(
                             userDefinedParameters,
                             ".piecewiseSurvivalTime$delayedResponseEnabled"
                         )
                     }
-                    self$.showParametersOfOneGroup(userDefinedParameters, "User defined parameters",
-                        orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                    self$.showParametersOfOneGroup(
+                        userDefinedParameters,
+                        "User defined parameters",
+                        orderByParameterName = FALSE,
+                        consoleOutputEnabled = consoleOutputEnabled
                     )
                     derivedParameters <- self$.getDerivedParameters()
                     if (length(derivedParameters) > 0) {
-                        self$.showParametersOfOneGroup(derivedParameters, "Derived from user defined parameters",
-                            orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                        self$.showParametersOfOneGroup(
+                            derivedParameters,
+                            "Derived from user defined parameters",
+                            orderByParameterName = FALSE,
+                            consoleOutputEnabled = consoleOutputEnabled
                         )
                     }
-                    self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
-                        orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                    self$.showParametersOfOneGroup(
+                        self$.getDefaultParameters(),
+                        "Default parameters",
+                        orderByParameterName = FALSE,
+                        consoleOutputEnabled = consoleOutputEnabled
                     )
-                    self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Results",
-                        orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                    self$.showParametersOfOneGroup(
+                        self$.getGeneratedParameters(),
+                        "Results",
+                        orderByParameterName = FALSE,
+                        consoleOutputEnabled = consoleOutputEnabled
                     )
                     self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
                 }
 
                 ## statistics of simulated data
-                if (isTRUE(showStatistics) || self$.showStatistics ||
-                        (is.character(showStatistics) && showStatistics == "exclusive")) {
+                if (
+                    isTRUE(showStatistics) ||
+                    isTRUE(self$.showStatistics) ||
+                    (is.character(showStatistics) && showStatistics == "exclusive")
+                ) {
                     self$.cat("Simulated data:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                     params <- c()
                     if (inherits(self, "SimulationResultsMeans")) {
@@ -210,8 +243,10 @@ SimulationResults <- R6::R6Class("SimulationResults",
                             "logRankStatistic",
                             "hazardRatioEstimateLR"
                         )
-                    } else if (inherits(self, "SimulationResultsMultiArmMeans") ||
-                            inherits(self, "SimulationResultsMultiArmRates")) {
+                    } else if (
+                        inherits(self, "SimulationResultsMultiArmMeans") ||
+                            inherits(self, "SimulationResultsMultiArmRates")
+                    ) {
                         params <- c(
                             "effectMeasure",
                             "subjectsActiveArm",
@@ -221,8 +256,10 @@ SimulationResults <- R6::R6Class("SimulationResults",
                             "successStop",
                             "futilityPerStage"
                         )
-                    } else if (inherits(self, "SimulationResultsEnrichmentMeans") ||
-                            inherits(self, "SimulationResultsEnrichmentRates")) {
+                    } else if (
+                        inherits(self, "SimulationResultsEnrichmentMeans") ||
+                            inherits(self, "SimulationResultsEnrichmentRates")
+                    ) {
                         params <- c(
                             "effectMeasure",
                             "subjectsPopulation",
@@ -232,11 +269,15 @@ SimulationResults <- R6::R6Class("SimulationResults",
                             "successStop",
                             "futilityPerStage"
                         )
-                    } else if (inherits(self, "SimulationResultsMultiArmSurvival") ||
-                            inherits(self, "SimulationResultsEnrichmentSurvival")) {
+                    } else if (
+                        inherits(self, "SimulationResultsMultiArmSurvival") ||
+                            inherits(self, "SimulationResultsEnrichmentSurvival")
+                    ) {
                         params <- c(
                             "effectMeasure",
+                            "analysisTime",
                             "numberOfEvents",
+                            "numberOfSubjects",
                             "singleEventsPerArmAndStage",
                             "singleEventsPerSubsetAndStage",
                             "testStatistic",
@@ -247,10 +288,12 @@ SimulationResults <- R6::R6Class("SimulationResults",
                         )
                     }
 
-                    if (!is.null(self[["conditionalPowerAchieved"]]) &&
+                    if (
+                        !is.null(self[["conditionalPowerAchieved"]]) &&
                             !all(is.na(self$conditionalPowerAchieved)) &&
                             any(!is.na(self$conditionalPowerAchieved)) &&
-                            any(na.omit(self$conditionalPowerAchieved) != 0)) {
+                            any(na.omit(self$conditionalPowerAchieved) != 0)
+                    ) {
                         params <- c(params, "conditionalPowerAchieved")
                     }
 
@@ -323,7 +366,8 @@ SimulationResults <- R6::R6Class("SimulationResults",
 
                 if (!is.null(performanceScore)) {
                     performanceScore$.showParametersOfOneGroup(
-                        performanceScore$.getGeneratedParameters(), "Performance",
+                        performanceScore$.getGeneratedParameters(),
+                        "Performance",
                         orderByParameterName = FALSE,
                         consoleOutputEnabled = consoleOutputEnabled
                     )
@@ -333,47 +377,34 @@ SimulationResults <- R6::R6Class("SimulationResults",
                 }
 
                 if (self$.design$kMax > 1 || twoGroupsEnabled || multiArmSurvivalEnabled) {
-                    self$.cat("Legend:\n",
-                        heading = 2,
-                        consoleOutputEnabled = consoleOutputEnabled
-                    )
+                    self$.cat("Legend:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
 
                     if (multiArmSurvivalEnabled) {
-                        self$.cat("  (i): values of treatment arm i compared to control\n",
+                        self$.cat(
+                            "  (i): values of treatment arm i compared to control\n",
                             consoleOutputEnabled = consoleOutputEnabled
                         )
-                        self$.cat("  {j}: values of treatment arm j\n",
-                            consoleOutputEnabled = consoleOutputEnabled
-                        )
+                        self$.cat("  {j}: values of treatment arm j\n", consoleOutputEnabled = consoleOutputEnabled)
                     } else if (enrichmentEnabled) {
                         matrixName <- .getSimulationEnrichmentEffectMatrixName(self)
                         if (nrow(self$effectList[[matrixName]]) > 1) {
-                            self$.cat("  (i): results of situation i\n",
-                                consoleOutputEnabled = consoleOutputEnabled
-                            )
+                            self$.cat("  (i): results of situation i\n", consoleOutputEnabled = consoleOutputEnabled)
                         }
                     } else if (twoGroupsEnabled) {
-                        self$.cat("  (i): values of treatment arm i\n",
-                            consoleOutputEnabled = consoleOutputEnabled
-                        )
+                        self$.cat("  (i): values of treatment arm i\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
                     if (self$.design$kMax > 1) {
-                        self$.cat("  [k]: values at stage k\n",
-                            consoleOutputEnabled = consoleOutputEnabled
-                        )
+                        self$.cat("  [k]: values at stage k\n", consoleOutputEnabled = consoleOutputEnabled)
                     }
 
                     if (enrichmentEnabled) {
                         if (length(self$effectList$subGroups) > 1) {
-                            self$.cat(paste0("  S[i]: population i\n"),
-                                consoleOutputEnabled = consoleOutputEnabled
-                            )
+                            self$.cat(paste0("  S[i]: population i\n"), consoleOutputEnabled = consoleOutputEnabled)
                         }
-                        self$.cat(paste0("  F: full population\n"),
-                            consoleOutputEnabled = consoleOutputEnabled
-                        )
+                        self$.cat(paste0("  F: full population\n"), consoleOutputEnabled = consoleOutputEnabled)
                         if (length(self$effectList$subGroups) > 1) {
-                            self$.cat(paste0("  R: remaining population\n"),
+                            self$.cat(
+                                paste0("  R: remaining population\n"),
                                 consoleOutputEnabled = consoleOutputEnabled
                             )
                         }
@@ -385,10 +416,12 @@ SimulationResults <- R6::R6Class("SimulationResults",
         },
         .getVariedParameterName = function(number = 1) {
             if (number == 2) {
-                if (!inherits(self, "SimulationResultsMeans") &&
+                if (
+                    !inherits(self, "SimulationResultsMeans") &&
                         !inherits(self, "SimulationResultsRates") &&
                         !inherits(self, "SimulationResultsSurvival") &&
-                        grepl("MultiArm", .getClassName(self))) {
+                        grepl("MultiArm", .getClassName(self))
+                ) {
                     return("armNumber")
                 }
                 return(NA_character_)
@@ -397,8 +430,10 @@ SimulationResults <- R6::R6Class("SimulationResults",
             variedParameterName1 <- NA_character_
             if (inherits(self, "SimulationResultsMeans")) {
                 variedParameterName1 <- "alternative"
-            } else if (inherits(self, "SimulationResultsRates") ||
-                    inherits(self, "SimulationResultsSurvival")) {
+            } else if (
+                inherits(self, "SimulationResultsRates") ||
+                    inherits(self, "SimulationResultsSurvival")
+            ) {
                 variedParameterName1 <- "pi1"
             } else if (grepl("MultiArm", .getClassName(self))) {
                 if (inherits(self, "SimulationResultsMultiArmMeans")) {
@@ -434,9 +469,17 @@ SimulationResults <- R6::R6Class("SimulationResults",
             variedParameterName <- sub("Max$", "_max", variedParameterName)
             return(paste0(", ", variedParameterName, " = ", round(parameterValue[1], 4)))
         },
-        .catStatisticsLine = function(..., stage, parameterName, paramCaption,
-                parameterValue1, variedParameterName1, parameterValue2 = NA_real_,
-                variedParameterName2 = NA_character_, consoleOutputEnabled = TRUE) {
+        .catStatisticsLine = function(
+            ...,
+            stage,
+            parameterName,
+            paramCaption,
+            parameterValue1,
+            variedParameterName1,
+            parameterValue2 = NA_real_,
+            variedParameterName2 = NA_character_,
+            consoleOutputEnabled = TRUE
+        ) {
             if (stage == 1 && parameterName == "conditionalPowerAchieved") {
                 return(invisible())
             }
@@ -444,13 +487,21 @@ SimulationResults <- R6::R6Class("SimulationResults",
             postfix <- ""
             if (!is.na(parameterValue1)) {
                 if (!all(is.na(parameterValue2))) {
-                    postfix <- paste0(postfix, self$.getVariedParameterValueString(
-                        variedParameterName1, parameterValue1
-                    ))
+                    postfix <- paste0(
+                        postfix,
+                        self$.getVariedParameterValueString(
+                            variedParameterName1,
+                            parameterValue1
+                        )
+                    )
                     if (parameterName != "subjectsControlArm") {
-                        postfix <- paste0(postfix, self$.getVariedParameterValueString(
-                            variedParameterName2, parameterValue2
-                        ))
+                        postfix <- paste0(
+                            postfix,
+                            self$.getVariedParameterValueString(
+                                variedParameterName2,
+                                parameterValue2
+                            )
+                        )
                     }
                     paramValue <- self$.data[[parameterName]][
                         self$.data$stageNumber == stage &
@@ -458,9 +509,13 @@ SimulationResults <- R6::R6Class("SimulationResults",
                             self$.data[[variedParameterName2]] %in% parameterValue2
                     ]
                 } else {
-                    postfix <- paste0(postfix, self$.getVariedParameterValueString(
-                        variedParameterName1, parameterValue1
-                    ))
+                    postfix <- paste0(
+                        postfix,
+                        self$.getVariedParameterValueString(
+                            variedParameterName1,
+                            parameterValue1
+                        )
+                    )
                     paramValue <- self$.data[[parameterName]][
                         self$.data$stageNumber == stage &
                             self$.data[[variedParameterName1]] == parameterValue1
@@ -481,18 +536,27 @@ SimulationResults <- R6::R6Class("SimulationResults",
 
             variableNameFormatted <- .getFormattedVariableName(
                 name = paramCaption,
-                n = self$.getNChar(), prefix = "", postfix = postfix
+                n = self$.getNChar(),
+                prefix = "",
+                postfix = postfix
             )
 
             if (!is.null(paramValue)) {
                 paramValue <- stats::na.omit(paramValue)
                 if (length(paramValue) > 0 && is.numeric(paramValue)) {
                     paramValueFormatted <- paste0(
-                        "median [range]: ", round(stats::median(paramValue), 3),
-                        " [", paste(round(base::range(paramValue), 3), collapse = " - "), "]; ",
-                        "mean +/-sd: ", round(base::mean(paramValue), 3),
-                        " +/-", round(stats::sd(paramValue), 3), "; ",
-                        "n = ", length(paramValue)
+                        "median [range]: ",
+                        round(stats::median(paramValue), 3),
+                        " [",
+                        paste(round(base::range(paramValue), 3), collapse = " - "),
+                        "]; ",
+                        "mean +/-sd: ",
+                        round(base::mean(paramValue), 3),
+                        " +/-",
+                        round(stats::sd(paramValue), 3),
+                        "; ",
+                        "n = ",
+                        length(paramValue)
                     )
                 } else {
                     paramValueFormatted <- "median [range]: NA [NA - NA]; mean +/sd: NA +/-NA"
@@ -506,13 +570,19 @@ SimulationResults <- R6::R6Class("SimulationResults",
         .toString = function(startWithUpperCase = FALSE) {
             s <- "simulation of"
 
-            if (grepl("MultiArm", .getClassName(self)) &&
-                    !is.null(self[["activeArms"]]) && self$activeArms > 1) {
+            if (
+                grepl("MultiArm", .getClassName(self)) &&
+                    !is.null(self[["activeArms"]]) &&
+                    self$activeArms > 1
+            ) {
                 s <- paste(s, "multi-arm")
             }
 
-            if (grepl("Enrichment", .getClassName(self)) &&
-                    !is.null(self[["populations"]]) && self$populations > 1) {
+            if (
+                grepl("Enrichment", .getClassName(self)) &&
+                    !is.null(self[["populations"]]) &&
+                    self$populations > 1
+            ) {
                 s <- paste(s, "enrichment")
             }
 
@@ -548,6 +618,7 @@ SimulationResults <- R6::R6Class("SimulationResults",
             y <- c(
                 "singleEventsPerStage",
                 "cumulativeEventsPerStage",
+                "singleEventsPerArmAndStage",
                 "iterations",
                 "overallReject", # base
                 "rejectAtLeastOne",
@@ -573,7 +644,6 @@ SimulationResults <- R6::R6Class("SimulationResults",
                 "numberOfSubjects1",
                 "numberOfSubjects2",
                 "sampleSizes",
-                "singleEventsPerArmAndStage",
                 "singleEventsPerSubsetAndStage",
                 "conditionalPowerAchieved" # base
             )
@@ -593,17 +663,18 @@ SimulationResults <- R6::R6Class("SimulationResults",
     )
 )
 
-SimulationResultsBaseMeans <- R6::R6Class("SimulationResultsBaseMeans",
+SimulationResultsBaseMeans <- R6::R6Class(
+    "SimulationResultsBaseMeans",
     inherit = SimulationResults,
     public = list(
-        stDev = NULL,
-        plannedSubjects = NULL,
-        minNumberOfSubjectsPerStage = NULL,
-        maxNumberOfSubjectsPerStage = NULL,
-        thetaH1 = NULL,
-        stDevH1 = NULL,
         calcSubjectsFunction = NULL,
         expectedNumberOfSubjects = NULL,
+        maxNumberOfSubjectsPerStage = NULL,
+        minNumberOfSubjectsPerStage = NULL,
+        plannedSubjects = NULL,
+        stDev = NULL,
+        stDevH1 = NULL,
+        thetaH1 = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             generatedParams <- c(
@@ -634,33 +705,33 @@ SimulationResultsBaseMeans <- R6::R6Class("SimulationResultsBaseMeans",
 #' @description
 #' A class for simulation results means.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
 #' @template field_allocationRatioPlanned
+#' @template field_alternative
+#' @template field_calcSubjectsFunction
 #' @template field_conditionalPower
-#' @template field_iterations
+#' @template field_conditionalPowerAchieved
+#' @template field_directionUpper
+#' @template field_earlyStop
+#' @template field_effect
+#' @template field_expectedNumberOfSubjects
 #' @template field_futilityPerStage
 #' @template field_futilityStop
-#' @template field_stDev
-#' @template field_plannedSubjects
-#' @template field_minNumberOfSubjectsPerStage
-#' @template field_maxNumberOfSubjectsPerStage
-#' @template field_thetaH1
-#' @template field_stDevH1
-#' @template field_calcSubjectsFunction
-#' @template field_expectedNumberOfSubjects
-#' @template field_meanRatio
-#' @template field_thetaH0
-#' @template field_normalApproximation
-#' @template field_alternative
 #' @template field_groups
-#' @template field_directionUpper
-#' @template field_effect
-#' @template field_earlyStop
-#' @template field_sampleSizes
+#' @template field_iterations
+#' @template field_maxNumberOfIterations
+#' @template field_maxNumberOfSubjectsPerStage
+#' @template field_meanRatio
+#' @template field_minNumberOfSubjectsPerStage
+#' @template field_normalApproximation
 #' @template field_overallReject
+#' @template field_plannedSubjects
 #' @template field_rejectPerStage
-#' @template field_conditionalPowerAchieved
+#' @template field_sampleSizes
+#' @template field_seed
+#' @template field_stDev
+#' @template field_stDevH1
+#' @template field_thetaH0
+#' @template field_thetaH1
 #'
 #' @details
 #' Use \code{\link[=getSimulationMeans]{getSimulationMeans()}} to create an object of this type.
@@ -683,21 +754,22 @@ SimulationResultsBaseMeans <- R6::R6Class("SimulationResultsBaseMeans",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMeans <- R6::R6Class("SimulationResultsMeans",
+SimulationResultsMeans <- R6::R6Class(
+    "SimulationResultsMeans",
     inherit = SimulationResultsBaseMeans,
     public = list(
-        meanRatio = NULL,
-        thetaH0 = NULL,
-        normalApproximation = NULL,
         alternative = NULL,
-        groups = NULL,
+        conditionalPowerAchieved = NULL,
         directionUpper = NULL,
-        effect = NULL,
         earlyStop = NULL,
-        sampleSizes = NULL,
+        effect = NULL,
+        groups = NULL,
+        meanRatio = NULL,
+        normalApproximation = NULL,
         overallReject = NULL, # = rejectedArmsPerStage in multi-arm
         rejectPerStage = NULL,
-        conditionalPowerAchieved = NULL,
+        sampleSizes = NULL,
+        thetaH0 = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
         }
@@ -713,44 +785,44 @@ SimulationResultsMeans <- R6::R6Class("SimulationResultsMeans",
 #' @description
 #' A class for simulation results means in multi-arm designs.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
+#' @template field_activeArms
+#' @template field_adaptations
 #' @template field_allocationRatioPlanned
+#' @template field_calcSubjectsFunction
 #' @template field_conditionalPower
-#' @template field_iterations
+#' @template field_conditionalPowerAchieved
+#' @template field_earlyStop
+#' @template field_effectMatrix
+#' @template field_effectMeasure
+#' @template field_epsilonValue
+#' @template field_expectedNumberOfSubjects
 #' @template field_futilityPerStage
 #' @template field_futilityStop
-#' @template field_stDev
-#' @template field_plannedSubjects
-#' @template field_minNumberOfSubjectsPerStage
-#' @template field_maxNumberOfSubjectsPerStage
-#' @template field_thetaH1
-#' @template field_stDevH1
-#' @template field_calcSubjectsFunction
-#' @template field_expectedNumberOfSubjects
-#' @template field_activeArms
-#' @template field_effectMatrix
-#' @template field_typeOfShape
-#' @template field_muMaxVector
 #' @template field_gED50
-#' @template field_slope
 #' @template field_intersectionTest
-#' @template field_adaptations
-#' @template field_typeOfSelection
-#' @template field_effectMeasure
-#' @template field_successCriterion
-#' @template field_epsilonValue
-#' @template field_rValue
-#' @template field_threshold
-#' @template field_selectArmsFunction
-#' @template field_earlyStop
-#' @template field_selectedArms
+#' @template field_iterations
+#' @template field_maxNumberOfIterations
+#' @template field_maxNumberOfSubjectsPerStage
+#' @template field_minNumberOfSubjectsPerStage
+#' @template field_muMaxVector
 #' @template field_numberOfActiveArms
+#' @template field_plannedSubjects
 #' @template field_rejectAtLeastOne
 #' @template field_rejectedArmsPerStage
-#' @template field_successPerStage
+#' @template field_rValue
 #' @template field_sampleSizes
-#' @template field_conditionalPowerAchieved
+#' @template field_seed
+#' @template field_selectArmsFunction
+#' @template field_selectedArms
+#' @template field_slope
+#' @template field_stDev
+#' @template field_stDevH1
+#' @template field_successCriterion
+#' @template field_successPerStage
+#' @template field_thetaH1
+#' @template field_threshold
+#' @template field_typeOfSelection
+#' @template field_typeOfShape
 #'
 #' @details
 #' Use \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}} to create an object of this type.
@@ -766,33 +838,34 @@ SimulationResultsMeans <- R6::R6Class("SimulationResultsMeans",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmMeans <- R6::R6Class("SimulationResultsMultiArmMeans",
+SimulationResultsMultiArmMeans <- R6::R6Class(
+    "SimulationResultsMultiArmMeans",
     inherit = SimulationResultsBaseMeans,
     public = list(
         activeArms = NULL,
-        effectMatrix = NULL,
-        typeOfShape = NULL,
-        muMaxVector = NULL,
-        gED50 = NULL,
-        slope = NULL,
-        doseLevels = NULL,
-        intersectionTest = NULL,
         adaptations = NULL,
-        typeOfSelection = NULL,
-        effectMeasure = NULL,
-        successCriterion = NULL,
-        epsilonValue = NULL,
-        rValue = NULL,
-        threshold = NULL,
-        selectArmsFunction = NULL,
+        conditionalPowerAchieved = matrix(),
+        doseLevels = NULL,
         earlyStop = NULL,
-        selectedArms = NULL,
+        effectMatrix = NULL,
+        effectMeasure = NULL,
+        epsilonValue = NULL,
+        gED50 = NULL,
+        intersectionTest = NULL,
+        muMaxVector = NULL,
         numberOfActiveArms = NULL,
         rejectAtLeastOne = NULL,
         rejectedArmsPerStage = NULL,
-        successPerStage = NULL,
+        rValue = NULL,
         sampleSizes = NULL,
-        conditionalPowerAchieved = matrix(),
+        selectArmsFunction = NULL,
+        selectedArms = NULL,
+        slope = NULL,
+        successCriterion = NULL,
+        successPerStage = NULL,
+        threshold = NULL,
+        typeOfSelection = NULL,
+        typeOfShape = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
 
@@ -809,7 +882,8 @@ SimulationResultsMultiArmMeans <- R6::R6Class("SimulationResultsMultiArmMeans",
     )
 )
 
-SimulationResultsBaseRates <- R6::R6Class("SimulationResultsBaseRates",
+SimulationResultsBaseRates <- R6::R6Class(
+    "SimulationResultsBaseRates",
     inherit = SimulationResults,
     public = list(
         directionUpper = NULL,
@@ -849,33 +923,32 @@ SimulationResultsBaseRates <- R6::R6Class("SimulationResultsBaseRates",
 #' @description
 #' A class for simulation results rates.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
 #' @template field_allocationRatioPlanned
+#' @template field_calcSubjectsFunction
 #' @template field_conditionalPower
-#' @template field_iterations
+#' @template field_conditionalPowerAchieved
+#' @template field_directionUpper
+#' @template field_earlyStop
+#' @template field_effect
+#' @template field_expectedNumberOfSubjects
 #' @template field_futilityPerStage
 #' @template field_futilityStop
-#' @template field_directionUpper
-#' @template field_plannedSubjects
-#' @template field_maxNumberOfSubjects
-#' @template field_calcSubjectsFunction
-#' @template field_expectedNumberOfSubjects
-#' @template field_riskRatio
-#' @template field_thetaH0
-#' @template field_normalApproximation
-#' @template field_pi1
-#' @template field_pi2
 #' @template field_groups
-#' @template field_pi1H1
-#' @template field_pi2H1
-#' @template field_effect
-#' @template field_earlyStop
-#' @template field_sampleSizes
+#' @template field_iterations
+#' @template field_maxNumberOfIterations
+#' @template field_maxNumberOfSubjects
+#' @template field_normalApproximation
 #' @template field_overallReject
+#' @template field_pi1
+#' @template field_pi1H1
+#' @template field_pi2
+#' @template field_pi2H1
+#' @template field_plannedSubjects
 #' @template field_rejectPerStage
-#' @template field_conditionalPowerAchieved
-#'
+#' @template field_riskRatio
+#' @template field_sampleSizes
+#' @template field_seed
+#' @template field_thetaH0
 #'
 #' @details
 #' Use \code{\link[=getSimulationRates]{getSimulationRates()}}
@@ -899,39 +972,37 @@ SimulationResultsBaseRates <- R6::R6Class("SimulationResultsBaseRates",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsRates <- R6::R6Class("SimulationResultsRates",
+SimulationResultsRates <- R6::R6Class(
+    "SimulationResultsRates",
     inherit = SimulationResultsBaseRates,
     public = list(
-        riskRatio = NULL,
-        thetaH0 = NULL,
-        normalApproximation = NULL,
-        pi1 = NULL,
-        pi2 = NULL,
-        groups = NULL,
         # directionUpper = NULL,
-        pi1H1 = NULL,
-        pi2H1 = NULL,
-        effect = NULL,
-        earlyStop = NULL,
-        sampleSizes = NULL,
-        expectedNumberOfSubjects = NULL,
-        overallReject = NULL,
-        rejectPerStage = NULL,
         conditionalPowerAchieved = matrix(),
+        earlyStop = NULL,
+        effect = NULL,
+        expectedNumberOfSubjects = NULL,
+        groups = NULL,
+        normalApproximation = NULL,
+        overallReject = NULL,
+        pi1 = NULL,
+        pi1H1 = NULL,
+        pi2 = NULL,
+        pi2H1 = NULL,
+        rejectPerStage = NULL,
+        riskRatio = NULL,
+        sampleSizes = NULL,
+        thetaH0 = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             generatedParams <- c(
                 "effect",
                 "iterations",
                 "sampleSizes",
-                "eventsNotAchieved",
                 "expectedNumberOfSubjects",
                 "overallReject",
                 "rejectPerStage",
                 "futilityPerStage",
-                "earlyStop",
-                "analysisTime",
-                "studyDuration"
+                "earlyStop"
             )
             if (design$kMax > 2) {
                 generatedParams <- c(generatedParams, "futilityStop")
@@ -953,45 +1024,44 @@ SimulationResultsRates <- R6::R6Class("SimulationResultsRates",
 #' @description
 #' A class for simulation results rates in multi-arm designs.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
+#' @template field_activeArms
+#' @template field_adaptations
 #' @template field_allocationRatioPlanned
+#' @template field_calcSubjectsFunction
 #' @template field_conditionalPower
-#' @template field_iterations
+#' @template field_conditionalPowerAchieved
+#' @template field_directionUpper
+#' @template field_earlyStop
+#' @template field_effectMatrix
+#' @template field_effectMeasure
+#' @template field_epsilonValue
+#' @template field_expectedNumberOfSubjects
 #' @template field_futilityPerStage
 #' @template field_futilityStop
-#' @template field_directionUpper
-#' @template field_plannedSubjects
-#' @template field_maxNumberOfSubjects
-#' @template field_calcSubjectsFunction
-#' @template field_expectedNumberOfSubjects
-#' @template field_activeArms
-#' @template field_effectMatrix
-#' @template field_typeOfShape
-#' @template field_piMaxVector
-#' @template field_piControl
-#' @template field_piH1
-#' @template field_piControlH1
 #' @template field_gED50
-#' @template field_slope
 #' @template field_intersectionTest
-#' @template field_adaptations
-#' @template field_typeOfSelection
-#' @template field_effectMeasure
-#' @template field_successCriterion
-#' @template field_epsilonValue
-#' @template field_rValue
-#' @template field_threshold
-#' @template field_selectArmsFunction
-#' @template field_earlyStop
-#' @template field_selectedArms
+#' @template field_iterations
+#' @template field_maxNumberOfIterations
+#' @template field_maxNumberOfSubjects
 #' @template field_numberOfActiveArms
+#' @template field_piControl
+#' @template field_piControlH1
+#' @template field_piH1
+#' @template field_piMaxVector
+#' @template field_plannedSubjects
 #' @template field_rejectAtLeastOne
 #' @template field_rejectedArmsPerStage
-#' @template field_successPerStage
+#' @template field_rValue
 #' @template field_sampleSizes
-#' @template field_conditionalPowerAchieved
-#'
+#' @template field_seed
+#' @template field_selectArmsFunction
+#' @template field_selectedArms
+#' @template field_slope
+#' @template field_successCriterion
+#' @template field_successPerStage
+#' @template field_threshold
+#' @template field_typeOfSelection
+#' @template field_typeOfShape
 #'
 #' @details
 #' Use \code{\link[=getSimulationMultiArmRates]{getSimulationMultiArmRates()}}
@@ -1008,36 +1078,37 @@ SimulationResultsRates <- R6::R6Class("SimulationResultsRates",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmRates <- R6::R6Class("SimulationResultsMultiArmRates",
+SimulationResultsMultiArmRates <- R6::R6Class(
+    "SimulationResultsMultiArmRates",
     inherit = SimulationResultsBaseRates,
     public = list(
         activeArms = NULL,
-        effectMatrix = NULL,
-        typeOfShape = NULL,
-        piMaxVector = NULL,
-        piControl = NULL,
-        piTreatmentsH1 = NULL,
-        piControlH1 = NULL,
-        gED50 = NULL,
-        slope = NULL,
-        doseLevels = NULL,
-        intersectionTest = NULL,
         adaptations = NULL,
-        typeOfSelection = NULL,
-        effectMeasure = NULL,
-        successCriterion = NULL,
-        epsilonValue = NULL,
-        rValue = NULL,
-        threshold = NULL,
-        selectArmsFunction = NULL,
+        conditionalPowerAchieved = matrix(),
+        doseLevels = NULL,
         earlyStop = NULL,
-        selectedArms = NULL,
+        effectMatrix = NULL,
+        effectMeasure = NULL,
+        epsilonValue = NULL,
+        gED50 = NULL,
+        intersectionTest = NULL,
         numberOfActiveArms = NULL,
+        piControl = NULL,
+        piControlH1 = NULL,
+        piMaxVector = NULL,
+        piTreatmentsH1 = NULL,
         rejectAtLeastOne = NULL,
         rejectedArmsPerStage = NULL,
-        successPerStage = NULL,
+        rValue = NULL,
         sampleSizes = NULL,
-        conditionalPowerAchieved = matrix(),
+        selectArmsFunction = NULL,
+        selectedArms = NULL,
+        slope = NULL,
+        successCriterion = NULL,
+        successPerStage = NULL,
+        threshold = NULL,
+        typeOfSelection = NULL,
+        typeOfShape = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
 
@@ -1054,16 +1125,17 @@ SimulationResultsMultiArmRates <- R6::R6Class("SimulationResultsMultiArmRates",
     )
 )
 
-SimulationResultsBaseSurvival <- R6::R6Class("SimulationResultsBaseSurvival",
+SimulationResultsBaseSurvival <- R6::R6Class(
+    "SimulationResultsBaseSurvival",
     inherit = SimulationResults,
     public = list(
-        directionUpper = NULL,
-        plannedEvents = NULL,
-        minNumberOfEventsPerStage = NULL,
-        maxNumberOfEventsPerStage = NULL,
-        thetaH1 = NULL,
         calcEventsFunction = NULL,
+        directionUpper = NULL,
         expectedNumberOfEvents = NULL,
+        maxNumberOfEventsPerStage = NULL,
+        minNumberOfEventsPerStage = NULL,
+        plannedEvents = NULL,
+        thetaH1 = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             generatedParams <- c(
@@ -1094,51 +1166,51 @@ SimulationResultsBaseSurvival <- R6::R6Class("SimulationResultsBaseSurvival",
 #' @description
 #' A class for simulation results survival.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
-#' @template field_allocationRatioPlanned
-#' @template field_conditionalPower
-#' @template field_iterations
-#' @template field_futilityPerStage
-#' @template field_futilityStop
-#' @template field_directionUpper
-#' @template field_plannedEvents
-#' @template field_minNumberOfEventsPerStage
-#' @template field_maxNumberOfEventsPerStage
-#' @template field_thetaH1
-#' @template field_calcEventsFunction
-#' @template field_expectedNumberOfEvents
-#' @template field_pi1_survival
-#' @template field_pi2_survival
-#' @template field_median1
-#' @template field_median2
-#' @template field_maxNumberOfSubjects
-#' @template field_accrualTime
 #' @template field_accrualIntensity
+#' @template field_accrualTime
+#' @template field_allocation1
+#' @template field_allocation2
+#' @template field_allocationRatioPlanned
+#' @template field_calcEventsFunction
+#' @template field_conditionalPower
+#' @template field_conditionalPowerAchieved
+#' @template field_cumulativeEventsPerStage
+#' @template field_directionUpper
 #' @template field_dropoutRate1
 #' @template field_dropoutRate2
 #' @template field_dropoutTime
+#' @template field_earlyStop
+#' @template field_eventsNotAchieved
 #' @template field_eventTime
-#' @template field_thetaH0
-#' @template field_allocation1
-#' @template field_allocation2
+#' @template field_expectedNumberOfEvents
+#' @template field_expectedNumberOfSubjects
+#' @template field_futilityPerStage
+#' @template field_futilityStop
+#' @template field_hazardRatio
+#' @template field_iterations
 #' @template field_kappa
-#' @template field_piecewiseSurvivalTime
 #' @template field_lambda1
 #' @template field_lambda2
-#' @template field_earlyStop
-#' @template field_hazardRatio
-#' @template field_studyDuration
-#' @template field_eventsNotAchieved
+#' @template field_maxNumberOfEventsPerStage
+#' @template field_maxNumberOfIterations
+#' @template field_maxNumberOfSubjects
+#' @template field_median1
+#' @template field_median2
+#' @template field_minNumberOfEventsPerStage
 #' @template field_numberOfSubjects
 #' @template field_numberOfSubjects1
 #' @template field_numberOfSubjects2
-#' @template field_singleEventsPerStage
-#' @template field_cumulativeEventsPerStage
-#' @template field_expectedNumberOfSubjects
-#' @template field_rejectPerStage
 #' @template field_overallReject
-#' @template field_conditionalPowerAchieved
+#' @template field_pi1_survival
+#' @template field_pi2_survival
+#' @template field_piecewiseSurvivalTime
+#' @template field_plannedEvents
+#' @template field_rejectPerStage
+#' @template field_seed
+#' @template field_singleEventsPerStage
+#' @template field_studyDuration
+#' @template field_thetaH0
+#' @template field_thetaH1
 #'
 #' @details
 #' Use \code{\link[=getSimulationSurvival]{getSimulationSurvival()}}
@@ -1162,45 +1234,46 @@ SimulationResultsBaseSurvival <- R6::R6Class("SimulationResultsBaseSurvival",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsSurvival <- R6::R6Class("SimulationResultsSurvival",
+SimulationResultsSurvival <- R6::R6Class(
+    "SimulationResultsSurvival",
     inherit = SimulationResultsBaseSurvival,
     public = list(
         .piecewiseSurvivalTime = NULL,
         .accrualTime = NULL,
-        pi1 = NULL,
-        pi2 = NULL,
-        median1 = NULL,
-        median2 = NULL,
-        maxNumberOfSubjects = NULL,
-        accrualTime = NULL,
         accrualIntensity = NULL,
+        accrualTime = NULL,
+        allocation1 = NULL,
+        allocation2 = NULL,
+        analysisTime = NULL,
+        conditionalPowerAchieved = matrix(),
+        cumulativeEventsPerStage = NULL,
         dropoutRate1 = NULL,
         dropoutRate2 = NULL,
         dropoutTime = NULL,
+        earlyStop = NULL,
+        eventsNotAchieved = NULL,
+        eventsPerStage = NULL,
         eventTime = NULL,
-        thetaH0 = NULL,
-        allocation1 = NULL,
-        allocation2 = NULL,
+        expectedNumberOfSubjects = NULL,
+        hazardRatio = NULL,
         kappa = NULL,
-        piecewiseSurvivalTime = NULL,
         lambda1 = NULL,
         lambda2 = NULL,
-        earlyStop = NULL,
-        hazardRatio = NULL,
-        analysisTime = NULL,
-        studyDuration = NULL,
-        eventsNotAchieved = NULL,
+        maxNumberOfSubjects = NULL,
+        median1 = NULL,
+        median2 = NULL,
         numberOfSubjects = NULL,
         numberOfSubjects1 = NULL,
         numberOfSubjects2 = NULL,
-        eventsPerStage = NULL,
         overallEventsPerStage = NULL,
-        singleEventsPerStage = NULL,
-        cumulativeEventsPerStage = NULL,
-        expectedNumberOfSubjects = NULL,
-        rejectPerStage = NULL,
         overallReject = NULL,
-        conditionalPowerAchieved = matrix(),
+        pi1 = NULL,
+        pi2 = NULL,
+        piecewiseSurvivalTime = NULL,
+        rejectPerStage = NULL,
+        singleEventsPerStage = NULL,
+        studyDuration = NULL,
+        thetaH0 = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             generatedParams <- c(
@@ -1221,23 +1294,38 @@ SimulationResultsSurvival <- R6::R6Class("SimulationResultsSurvival",
             if (inherits(self, "SimulationResultsMultiArmSurvival")) {
                 generatedParams <- c(
                     generatedParams,
-                    "cumulativeEventsPerStage", "singleEventsPerArmAndStage"
+                    "cumulativeEventsPerStage",
+                    "singleEventsPerArmAndStage"
                 )
             } else {
-                generatedParams <- c(generatedParams, "singleEventsPerSubsetAndStage")
+                generatedParams <- c(
+                    generatedParams,
+                    "cumulativeEventsPerStage",
+                    "populationEventsPerStage"
+                )
             }
             if (design$kMax > 2) {
-                generatedParams <- c(generatedParams, "futilityStop")
+                generatedParams <- c(
+                    generatedParams,
+                    "futilityStop"
+                )
             }
             for (generatedParam in generatedParams) {
-                self$.setParameterType(generatedParam, C_PARAM_GENERATED)
+                self$.setParameterType(
+                    generatedParam,
+                    C_PARAM_GENERATED
+                )
             }
-            self$.setParameterType("numberOfSubjects1", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("numberOfSubjects2", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("median1", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("median2", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("eventsPerStage", C_PARAM_NOT_APPLICABLE)
-            self$.setParameterType("overallEventsPerStage", C_PARAM_NOT_APPLICABLE)
+            for (notApplicableParam in c(
+                    "numberOfSubjects1",
+                    "numberOfSubjects2",
+                    "median1",
+                    "median2",
+                    "eventsPerStage",
+                    "overallEventsPerStage"
+                )) {
+                    self$.setParameterType(notApplicableParam, C_PARAM_NOT_APPLICABLE)
+            }
         }
     )
 )
@@ -1251,43 +1339,53 @@ SimulationResultsSurvival <- R6::R6Class("SimulationResultsSurvival",
 #' @description
 #' A class for simulation results survival in multi-arm designs.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
+#' @template field_accrualIntensity
+#' @template field_accrualTime
+#' @template field_activeArms
+#' @template field_adaptations
 #' @template field_allocationRatioPlanned
 #' @template field_conditionalPower
-#' @template field_iterations
+#' @template field_conditionalPowerAchieved
+#' @template field_correlationComputation
+#' @template field_cumulativeEventsPerStage
+#' @template field_directionUpper
+#' @template field_dropoutRate1
+#' @template field_dropoutRate2
+#' @template field_dropoutTime
+#' @template field_earlyStop
+#' @template field_effectMatrix
+#' @template field_epsilonValue
+#' @template field_eventsPerStage
+#' @template field_eventTime
+#' @template field_expectedNumberOfEvents
+#' @template field_expectedNumberOfSubjects
 #' @template field_futilityPerStage
 #' @template field_futilityStop
-#' @template field_directionUpper
-#' @template field_plannedEvents
-#' @template field_minNumberOfEventsPerStage
-#' @template field_maxNumberOfEventsPerStage
-#' @template field_expectedNumberOfEvents
-#' @template field_activeArms
-#' @template field_effectMatrix
-#' @template field_typeOfShape
-#' @template field_omegaMaxVector
 #' @template field_gED50
-#' @template field_slope
 #' @template field_intersectionTest
-#' @template field_adaptations
-#' @template field_epsilonValue
-#' @template field_rValue
-#' @template field_threshold
-#' @template field_selectArmsFunction
-#' @template field_correlationComputation
-#' @template field_earlyStop
-#' @template field_selectedArms
+#' @template field_iterations
+#' @template field_kappa
+#' @template field_maxNumberOfEventsPerStage
+#' @template field_maxNumberOfIterations
+#' @template field_maxNumberOfSubjects
+#' @template field_minNumberOfEventsPerStage
 #' @template field_numberOfActiveArms
+#' @template field_omegaMaxVector
+#' @template field_plannedEvents
 #' @template field_rejectAtLeastOne
 #' @template field_rejectedArmsPerStage
-#' @template field_successPerStage
-#' @template field_eventsPerStage
-#' @template field_singleNumberOfEventsPerStage
+#' @template field_rValue
+#' @template field_seed
+#' @template field_selectArmsFunction
+#' @template field_selectedArms
 #' @template field_singleEventsPerArmAndStage
 #' @template field_singleEventsPerStage
-#' @template field_cumulativeEventsPerStage
-#' @template field_conditionalPowerAchieved
+#' @template field_singleNumberOfEventsPerStage
+#' @template field_slope
+#' @template field_studyDuration
+#' @template field_successPerStage
+#' @template field_threshold
+#' @template field_typeOfShape
 #'
 #' @details
 #' Use \code{\link[=getSimulationMultiArmSurvival]{getSimulationMultiArmSurvival()}}
@@ -1304,46 +1402,63 @@ SimulationResultsSurvival <- R6::R6Class("SimulationResultsSurvival",
 #'
 #' @importFrom methods new
 #'
-SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvival",
+SimulationResultsMultiArmSurvival <- R6::R6Class(
+    "SimulationResultsMultiArmSurvival",
     inherit = SimulationResultsBaseSurvival,
     public = list(
+        accrualIntensity = NULL,
+        accrualTime = NULL,
         activeArms = NULL,
-        effectMatrix = NULL,
-        typeOfShape = NULL,
-        omegaMaxVector = NULL,
-        gED50 = NULL,
-        slope = NULL,
-        doseLevels = NULL,
-        intersectionTest = NULL,
         adaptations = NULL,
-        typeOfSelection = NULL,
-        effectMeasure = NULL,
-        successCriterion = NULL,
-        epsilonValue = NULL,
-        rValue = NULL,
-        threshold = NULL,
-        selectArmsFunction = NULL,
+        analysisTime = NULL,
+        conditionalPowerAchieved = matrix(),
         correlationComputation = NULL,
+        cumulativeEventsPerStage = NULL,
+        doseLevels = NULL,
+        dropoutRate1 = NULL,
+        dropoutRate2 = NULL,
+        dropoutTime = NULL,
         earlyStop = NULL,
-        selectedArms = NULL,
+        effectMatrix = NULL,
+        effectMeasure = NULL,
+        epsilonValue = NULL,
+        eventsNotAchieved = NULL,
+        eventsPerStage = NULL,
+        eventTime = NULL,
+        expectedNumberOfSubjects = NULL,
+        gED50 = NULL,
+        intersectionTest = NULL,
+        kappa = NULL,
+        maxNumberOfSubjects = NULL,
         numberOfActiveArms = NULL,
+        numberOfSubjects = NULL,
+        omegaMaxVector = NULL,
+        piControl = NULL,
         rejectAtLeastOne = NULL,
         rejectedArmsPerStage = NULL,
-        successPerStage = NULL,
-        eventsPerStage = NULL,
-        singleEventsPerStage = NULL,
-        cumulativeEventsPerStage = NULL,
+        rValue = NULL,
+        selectArmsFunction = NULL,
+        selectedArms = NULL,
         singleEventsPerArmAndStage = NULL,
-        singleNumberOfEventsPerStage = NULL,
-        conditionalPowerAchieved = matrix(),
+        singleEventsPerStage = NULL, # only necessary for old simulation routine
+        singleNumberOfEventsPerStage = NULL, # only necessary for old simulation routine
+        slope = NULL,
+        studyDuration = NULL,
+        successCriterion = NULL,
+        successPerStage = NULL,
+        threshold = NULL,
+        typeOfSelection = NULL,
+        typeOfShape = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
 
             for (generatedParam in c(
+                "eventsNotAchieved",
                 "rejectAtLeastOne",
                 "selectedArms",
                 "numberOfActiveArms",
                 "rejectedArmsPerStage",
+                "studyDuration",
                 "successPerStage"
             )) {
                 self$.setParameterType(generatedParam, C_PARAM_GENERATED)
@@ -1361,41 +1476,41 @@ SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvi
 #' @description
 #' A class for simulation results means in enrichment designs.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
+#' @template field_adaptations
 #' @template field_allocationRatioPlanned
+#' @template field_calcSubjectsFunction
 #' @template field_conditionalPower
-#' @template field_iterations
+#' @template field_conditionalPowerAchieved
+#' @template field_earlyStop
+#' @template field_effectList
+#' @template field_effectMeasure
+#' @template field_epsilonValue
+#' @template field_expectedNumberOfSubjects
 #' @template field_futilityPerStage
 #' @template field_futilityStop
-#' @template field_stDev
-#' @template field_plannedSubjects
-#' @template field_minNumberOfSubjectsPerStage
-#' @template field_maxNumberOfSubjectsPerStage
-#' @template field_thetaH1
-#' @template field_stDevH1
-#' @template field_calcSubjectsFunction
-#' @template field_expectedNumberOfSubjects
-#' @template field_populations
-#' @template field_effectList
 #' @template field_intersectionTest
-#' @template field_stratifiedAnalysis
-#' @template field_adaptations
-#' @template field_typeOfSelection
-#' @template field_effectMeasure
-#' @template field_successCriterion
-#' @template field_epsilonValue
-#' @template field_rValue
-#' @template field_threshold
-#' @template field_selectPopulationsFunction
-#' @template field_earlyStop
-#' @template field_selectedPopulations
+#' @template field_iterations
+#' @template field_maxNumberOfIterations
+#' @template field_maxNumberOfSubjectsPerStage
+#' @template field_minNumberOfSubjectsPerStage
 #' @template field_numberOfPopulations
+#' @template field_plannedSubjects
+#' @template field_populations
 #' @template field_rejectAtLeastOne
 #' @template field_rejectedPopulationsPerStage
-#' @template field_successPerStage
+#' @template field_rValue
 #' @template field_sampleSizes
-#' @template field_conditionalPowerAchieved
+#' @template field_seed
+#' @template field_selectedPopulations
+#' @template field_selectPopulationsFunction
+#' @template field_stDev
+#' @template field_stDevH1
+#' @template field_stratifiedAnalysis
+#' @template field_successCriterion
+#' @template field_successPerStage
+#' @template field_thetaH1
+#' @template field_threshold
+#' @template field_typeOfSelection
 #'
 #' @details
 #' Use \code{\link[=getSimulationEnrichmentMeans]{getSimulationEnrichmentMeans()}}
@@ -1413,29 +1528,33 @@ SimulationResultsMultiArmSurvival <- R6::R6Class("SimulationResultsMultiArmSurvi
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentMeans <- R6::R6Class("SimulationResultsEnrichmentMeans",
+SimulationResultsEnrichmentMeans <- R6::R6Class(
+    "SimulationResultsEnrichmentMeans",
     inherit = SimulationResultsBaseMeans,
     public = list(
-        populations = NULL,
-        effectList = NULL,
-        intersectionTest = NULL,
-        stratifiedAnalysis = NULL,
         adaptations = NULL,
-        typeOfSelection = NULL,
-        effectMeasure = NULL,
-        successCriterion = NULL,
-        epsilonValue = NULL,
-        rValue = NULL,
-        threshold = NULL,
-        selectPopulationsFunction = NULL,
+        conditionalPowerAchieved = matrix(),
+        cumulativeEventsPerStage = NULL,
         earlyStop = NULL,
-        selectedPopulations = NULL,
+        effectList = NULL,
+        effectMeasure = NULL,
+        epsilonValue = NULL,
+        expectedNumberOfSubjects = NULL,
+        intersectionTest = NULL,
+        maxNumberOfSubjects = NULL,
         numberOfPopulations = NULL,
+        populations = NULL,
         rejectAtLeastOne = NULL,
         rejectedPopulationsPerStage = NULL,
-        successPerStage = NULL,
+        rValue = NULL,
         sampleSizes = NULL,
-        conditionalPowerAchieved = matrix(),
+        selectedPopulations = NULL,
+        selectPopulationsFunction = NULL,
+        stratifiedAnalysis = NULL,
+        successCriterion = NULL,
+        successPerStage = NULL,
+        threshold = NULL,
+        typeOfSelection = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
 
@@ -1461,41 +1580,41 @@ SimulationResultsEnrichmentMeans <- R6::R6Class("SimulationResultsEnrichmentMean
 #' @description
 #' A class for simulation results rates in enrichment designs.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
+#' @template field_adaptations
 #' @template field_allocationRatioPlanned
+#' @template field_calcSubjectsFunction
 #' @template field_conditionalPower
-#' @template field_iterations
+#' @template field_conditionalPowerAchieved
+#' @template field_directionUpper
+#' @template field_earlyStop
+#' @template field_effectList
+#' @template field_effectMeasure
+#' @template field_epsilonValue
+#' @template field_expectedNumberOfSubjects
 #' @template field_futilityPerStage
 #' @template field_futilityStop
-#' @template field_directionUpper
-#' @template field_plannedSubjects
-#' @template field_minNumberOfSubjectsPerStage
-#' @template field_maxNumberOfSubjectsPerStage
-#' @template field_calcSubjectsFunction
-#' @template field_expectedNumberOfSubjects
-#' @template field_populations
-#' @template field_effectList
 #' @template field_intersectionTest
-#' @template field_stratifiedAnalysis
-#' @template field_adaptations
-#' @template field_piTreatmentH1
-#' @template field_piControlH1
-#' @template field_typeOfSelection
-#' @template field_effectMeasure
-#' @template field_successCriterion
-#' @template field_epsilonValue
-#' @template field_rValue
-#' @template field_threshold
-#' @template field_selectPopulationsFunction
-#' @template field_earlyStop
-#' @template field_selectedPopulations
+#' @template field_iterations
+#' @template field_maxNumberOfIterations
+#' @template field_maxNumberOfSubjectsPerStage
+#' @template field_minNumberOfSubjectsPerStage
 #' @template field_numberOfPopulations
+#' @template field_piControlH1
+#' @template field_piTreatmentH1
+#' @template field_plannedSubjects
+#' @template field_populations
 #' @template field_rejectAtLeastOne
 #' @template field_rejectedPopulationsPerStage
-#' @template field_successPerStage
+#' @template field_rValue
 #' @template field_sampleSizes
-#' @template field_conditionalPowerAchieved
+#' @template field_seed
+#' @template field_selectedPopulations
+#' @template field_selectPopulationsFunction
+#' @template field_stratifiedAnalysis
+#' @template field_successCriterion
+#' @template field_successPerStage
+#' @template field_threshold
+#' @template field_typeOfSelection
 #'
 #' @details
 #' Use \code{\link[=getSimulationEnrichmentRates]{getSimulationEnrichmentRates()}}
@@ -1513,31 +1632,33 @@ SimulationResultsEnrichmentMeans <- R6::R6Class("SimulationResultsEnrichmentMean
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentRates <- R6::R6Class("SimulationResultsEnrichmentRates",
+SimulationResultsEnrichmentRates <- R6::R6Class(
+    "SimulationResultsEnrichmentRates",
     inherit = SimulationResultsBaseRates,
     public = list(
-        populations = NULL,
-        effectList = NULL,
-        intersectionTest = NULL,
-        stratifiedAnalysis = NULL,
         adaptations = NULL,
-        piTreatmentH1 = NULL,
-        piControlH1 = NULL,
-        typeOfSelection = NULL,
-        effectMeasure = NULL,
-        successCriterion = NULL,
-        epsilonValue = NULL,
-        rValue = NULL,
-        threshold = NULL,
-        selectPopulationsFunction = NULL,
+        conditionalPowerAchieved = matrix(),
         earlyStop = NULL,
-        selectedPopulations = NULL,
+        effectList = NULL,
+        effectMeasure = NULL,
+        epsilonValue = NULL,
+        intersectionTest = NULL,
+        maxNumberOfSubjects = NULL,
         numberOfPopulations = NULL,
+        piControlH1 = NULL,
+        piTreatmentH1 = NULL,
+        populations = NULL,
         rejectAtLeastOne = NULL,
         rejectedPopulationsPerStage = NULL,
-        successPerStage = NULL,
+        rValue = NULL,
         sampleSizes = NULL,
-        conditionalPowerAchieved = matrix(),
+        selectedPopulations = NULL,
+        selectPopulationsFunction = NULL,
+        stratifiedAnalysis = NULL,
+        successCriterion = NULL,
+        successPerStage = NULL,
+        threshold = NULL,
+        typeOfSelection = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
 
@@ -1563,43 +1684,53 @@ SimulationResultsEnrichmentRates <- R6::R6Class("SimulationResultsEnrichmentRate
 #' @description
 #' A class for simulation results survival in enrichment designs.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
+#' @template field_accrualIntensity
+#' @template field_accrualTime
+#' @template field_adaptations
 #' @template field_allocationRatioPlanned
+#' @template field_calcEventsFunction
 #' @template field_conditionalPower
-#' @template field_iterations
+#' @template field_conditionalPowerAchieved
+#' @template field_cumulativeEventsPerStage
+#' @template field_directionUpper
+#' @template field_dropoutRate1
+#' @template field_dropoutRate2
+#' @template field_dropoutTime
+#' @template field_earlyStop
+#' @template field_effectList
+#' @template field_effectMeasure
+#' @template field_epsilonValue
+#' @template field_eventsPerStage
+#' @template field_eventTime
+#' @template field_expectedNumberOfEvents
+#' @template field_expectedNumberOfSubjects
 #' @template field_futilityPerStage
 #' @template field_futilityStop
-#' @template field_directionUpper
-#' @template field_plannedSubjects
-#' @template field_minNumberOfSubjectsPerStage
-#' @template field_maxNumberOfSubjectsPerStage
-#' @template field_thetaH1_survival
-#' @template field_calcEventsFunction
-#' @template field_expectedNumberOfEvents
-#' @template field_populations
-#' @template field_effectList
 #' @template field_intersectionTest
-#' @template field_stratifiedAnalysis
-#' @template field_adaptations
-#' @template field_typeOfSelection
-#' @template field_effectMeasure
-#' @template field_successCriterion
-#' @template field_epsilonValue
-#' @template field_rValue
-#' @template field_threshold
-#' @template field_selectPopulationsFunction
-#' @template field_correlationComputation
-#' @template field_earlyStop
-#' @template field_selectedPopulations
+#' @template field_iterations
+#' @template field_kappa
+#' @template field_maxNumberOfIterations
+#' @template field_maxNumberOfSubjects
+#' @template field_maxNumberOfSubjectsPerStage
+#' @template field_minNumberOfSubjectsPerStage
 #' @template field_numberOfPopulations
+#' @template field_plannedSubjects
+#' @template field_populations
+#' @template field_populationEventsPerStage
 #' @template field_rejectAtLeastOne
 #' @template field_rejectedPopulationsPerStage
-#' @template field_successPerStage
-#' @template field_eventsPerStage
+#' @template field_rValue
+#' @template field_seed
+#' @template field_selectedPopulations
+#' @template field_selectPopulationsFunction
 #' @template field_singleNumberOfEventsPerStage
-#' @template field_singleEventsPerSubsetAndStage
-#' @template field_conditionalPowerAchieved
+#' @template field_stratifiedAnalysis
+#' @template field_studyDuration
+#' @template field_successCriterion
+#' @template field_successPerStage
+#' @template field_thetaH1_survival
+#' @template field_threshold
+#' @template field_typeOfSelection
 #'
 #' @details
 #' Use \code{\link[=getSimulationEnrichmentSurvival]{getSimulationEnrichmentSurvival()}}
@@ -1617,40 +1748,60 @@ SimulationResultsEnrichmentRates <- R6::R6Class("SimulationResultsEnrichmentRate
 #'
 #' @importFrom methods new
 #'
-SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentSurvival",
+#'
+
+SimulationResultsEnrichmentSurvival <- R6::R6Class(
+    "SimulationResultsEnrichmentSurvival",
     inherit = SimulationResultsBaseSurvival,
     public = list(
-        populations = NULL,
-        effectList = NULL,
-        intersectionTest = NULL,
-        stratifiedAnalysis = NULL,
+        accrualIntensity = NULL,
+        accrualTime = NULL,
         adaptations = NULL,
-        typeOfSelection = NULL,
-        effectMeasure = NULL,
-        successCriterion = NULL,
-        epsilonValue = NULL,
-        rValue = NULL,
-        threshold = NULL,
-        selectPopulationsFunction = NULL,
-        correlationComputation = NULL,
+        analysisTime = NULL,
+        conditionalPowerAchieved = matrix(),
+        cumulativeEventsPerStage = NULL,
+        dropoutRate1 = NULL,
+        dropoutRate2 = NULL,
+        dropoutTime = NULL,
         earlyStop = NULL,
-        selectedPopulations = NULL,
+        effectList = NULL,
+        effectMeasure = NULL,
+        epsilonValue = NULL,
+        eventsNotAchieved = NULL,
+        eventsPerStage = NULL,
+        eventTime = NULL,
+        expectedNumberOfSubjects = NULL,
+        intersectionTest = NULL,
+        kappa = NULL,
+        maxNumberOfSubjects = NULL,
         numberOfPopulations = NULL,
+        numberOfSubjects = NULL,
+        populations = NULL,
+        populationEventsPerStage = NULL,
+        singleEventsPerSubsetAndStage = NULL, # deprecated
+        singleNumberOfEventsPerStage = NULL, # deprecated
         rejectAtLeastOne = NULL,
         rejectedPopulationsPerStage = NULL,
+        rValue = NULL,
+        selectedPopulations = NULL,
+        selectPopulationsFunction = NULL,
+        stratifiedAnalysis = NULL,
+        studyDuration = NULL,
+        successCriterion = NULL,
         successPerStage = NULL,
-        eventsPerStage = NULL,
-        singleEventsPerSubsetAndStage = NULL,
-        singleNumberOfEventsPerStage = NULL,
-        conditionalPowerAchieved = matrix(),
+        threshold = NULL,
+        typeOfSelection = NULL,
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
 
             for (generatedParam in c(
+                "eventsNotAchieved",
+                "populationEventsPerStage",
                 "rejectAtLeastOne",
                 "selectedPopulations",
                 "numberOfPopulations",
                 "rejectedPopulationsPerStage",
+                "studyDuration",
                 "successPerStage"
             )) {
                 self$.setParameterType(generatedParam, C_PARAM_GENERATED)
@@ -1668,22 +1819,22 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentS
 #' @description
 #' A class for simulation results count data.
 #'
-#' @template field_maxNumberOfIterations
-#' @template field_seed
+#' @template field_accrualIntensity
+#' @template field_accrualTime
 #' @template field_allocationRatioPlanned
 #' @template field_conditionalPower
-#' @template field_iterations
-#' @template field_futilityPerStage
-#' @template field_thetaH0
-#' @template field_accrualTime
-#' @template field_accrualIntensity
-#' @template field_groups
 #' @template field_directionUpper
 #' @template field_earlyStop
-#' @template field_sampleSizes
 #' @template field_expectedNumberOfSubjects
+#' @template field_futilityPerStage
+#' @template field_groups
+#' @template field_iterations
+#' @template field_maxNumberOfIterations
 #' @template field_overallReject
 #' @template field_rejectPerStage
+#' @template field_sampleSizes
+#' @template field_seed
+#' @template field_thetaH0
 #'
 #' @details
 #' Use \code{\link[=getSimulationCounts]{getSimulationCounts()}}
@@ -1699,7 +1850,8 @@ SimulationResultsEnrichmentSurvival <- R6::R6Class("SimulationResultsEnrichmentS
 #'
 #' @importFrom methods new
 #'
-SimulationResultsCountData <- R6::R6Class("SimulationResultsCountData",
+SimulationResultsCountData <- R6::R6Class(
+    "SimulationResultsCountData",
     inherit = SimulationResults,
     public = list(
         maxNumberOfSubjects = NULL,
@@ -1737,4 +1889,3 @@ SimulationResultsCountData <- R6::R6Class("SimulationResultsCountData",
         }
     )
 )
-

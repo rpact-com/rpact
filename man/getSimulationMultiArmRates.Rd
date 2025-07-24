@@ -7,7 +7,7 @@
 getSimulationMultiArmRates(
   design = NULL,
   ...,
-  activeArms = 3L,
+  activeArms = NA_integer_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
   piMaxVector = seq(0.2, 0.5, 0.1),
