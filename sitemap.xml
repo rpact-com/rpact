@@ -31,6 +31,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/DatasetSurvival.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/EventProbabilities.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/FieldSet.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/InstallationQualificationResult.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/MarkdownReporter.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/NumberOfSubjects.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/ParameterSet.html</loc></url>
@@ -293,6 +294,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/plot.TrialDesignSummaries.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.Dataset.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.FieldSet.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/print.InstallationQualificationResult.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.ParameterSet.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.SummaryFactory.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.TrialDesignCharacteristics.html</loc></url>
