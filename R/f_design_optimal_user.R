@@ -68,24 +68,24 @@
 #' The \code{print()} and \code{plot()} functions are available for objects of class \code{TrialDesignOptimalConditionalError}.
 #' For details, see \code{?print.TrialDesignOptimalConditionalError} and \code{?plot.TrialDesignOptimalConditionalError}.
 #'
-#' @template param_alphaOCEF
-#' @template param_alpha1OCEF
-#' @template param_alpha0OCEF
-#' @template param_conditionalPowerOCEF
-#' @template param_conditionalPowerFunctionOCEF
-#' @template param_delta1OCEF
-#' @template param_delta1MinOCEF
-#' @template param_delta1MaxOCEF
-#' @template param_likelihoodRatioDistributionOCEF
-#' @template param_firstStageInformationOCEF
-#' @template param_useInterimEstimateOCEF
-#' @template param_minimumSecondStageInformationOCEF
-#' @template param_maximumSecondStageInformationOCEF
-#' @template param_minimumConditionalErrorOCEF
-#' @template param_maximumConditionalErrorOCEF
-#' @template param_levelConstantMinimumOCEF
-#' @template param_levelConstantMaximumOCEF
-#' @template param_enforceMonotonicityOCEF
+#' @inheritParams param_alphaOCEF
+#' @inheritParams param_alpha1OCEF
+#' @inheritParams param_alpha0OCEF
+#' @inheritParams param_conditionalPowerOCEF
+#' @inheritParams param_conditionalPowerFunctionOCEF
+#' @inheritParams param_delta1OCEF
+#' @inheritParams param_delta1MinOCEF
+#' @inheritParams param_delta1MaxOCEF
+#' @inheritParams param_likelihoodRatioDistributionOCEF
+#' @inheritParams param_firstStageInformationOCEF
+#' @inheritParams param_useInterimEstimateOCEF
+#' @inheritParams param_minimumSecondStageInformationOCEF
+#' @inheritParams param_maximumSecondStageInformationOCEF
+#' @inheritParams param_minimumConditionalErrorOCEF
+#' @inheritParams param_maximumConditionalErrorOCEF
+#' @inheritParams param_levelConstantMinimumOCEF
+#' @inheritParams param_levelConstantMaximumOCEF
+#' @inheritParams param_enforceMonotonicityOCEF
 #' @param ... Additional arguments required for the specification of the likelihood ratio.
 #'
 #' @importFrom methods new
@@ -129,9 +129,6 @@ getDesignOptimalConditionalErrorFunction <- function(
     delta1 = NA_real_,
     delta1Min = NA_real_,
     delta1Max = Inf,
-    ncp1 = NA_real_,
-    ncp1Min = NA_real_,
-    ncp1Max = Inf,
     useInterimEstimate = TRUE,
     firstStageInformation,
     likelihoodRatioDistribution,
@@ -145,8 +142,7 @@ getDesignOptimalConditionalErrorFunction <- function(
     enforceMonotonicity = TRUE,
     ...
 ) {
-    design <- new(
-        "TrialDesignOptimalConditionalError",
+    design <- TrialDesignOptimalConditionalError$new(
         alpha = alpha,
         alpha1 = alpha1,
         alpha0 = alpha0,
@@ -154,9 +150,6 @@ getDesignOptimalConditionalErrorFunction <- function(
         delta1 = delta1,
         delta1Min = delta1Min,
         delta1Max = delta1Max,
-        ncp1 = ncp1,
-        ncp1Min = ncp1Min,
-        ncp1Max = ncp1Max,
         firstStageInformation = firstStageInformation,
         useInterimEstimate = useInterimEstimate,
         likelihoodRatioDistribution = likelihoodRatioDistribution,
@@ -191,8 +184,8 @@ getDesignOptimalConditionalErrorFunction <- function(
 #'        \item \eqn{\nu(\alpha_2(p_1)) = (\Phi^{-1}(1-\alpha_2(p_1))+\Phi^{-1}(CP))^2} is a factor calculated for the specific assumptions about the optimal conditional error function and the target conditional power \eqn{CP}.
 #' }}
 #'
-#' @template param_designOCEF
-#' @template param_likelihoodRatioDistributionExpectedOCEF
+#' @inheritParams param_designOCEF
+#' @inheritParams param_likelihoodRatioDistributionExpectedOCEF
 #' @param ... {Additional parameters required for the specification of \code{likelihoodRatioDistribution}}.
 #'
 #' @return Expected second-stage information.
@@ -243,8 +236,8 @@ getExpectedSecondStageInformation <- function(design, likelihoodRatioDistributio
 #' Early stopping rules are supported, i.e., for \eqn{p_1 \leq \alpha_1}, the returned conditional error is 1 and for \eqn{p_1 > \alpha_0}, the returned conditional error is 0.
 #'
 #'
-#' @template param_firstStagePValueOCEF
-#' @template param_designOCEF
+#' @inheritParams param_firstStagePValueOCEF
+#' @inheritParams param_designOCEF
 #'
 #' @return Value of the optimal conditional error function.
 #' @export
@@ -335,10 +328,10 @@ getOptimalConditionalError <- Vectorize(FUN = getOptimalConditionalError, vector
 #' This function is used to evaluate the overall performance of a design.
 #' The probabilities for first-stage futility, first-stage efficacy and overall efficacy (i.e., overall power) are saved in an object of class \code{PowerResultsOptimalConditionalError}.
 #'
-#' @template param_designOCEF
-#' @template param_alternativeOCEF
+#' @inheritParams param_designOCEF
+#' @inheritParams param_alternativeOCEF
 #'
-#' @seealso [getDesignOptimalConditionalErrorFunction()], [getSimulationResults()]
+#' @seealso [getDesignOptimalConditionalErrorFunction()]
 #'
 #' @return The overall power of the design at the provided effect size.
 #' @export
@@ -407,8 +400,8 @@ getOverallPower <- function(design, alternative) {
 #' For p-values smaller or equal to the first-stage efficacy boundary as well as p-values greater than the first-stage futility boundary,
 #' the returned information is 0 (since the trial is ended early in both cases).
 #'
-#' @template param_firstStagePValueOCEF
-#' @template param_designOCEF
+#' @inheritParams param_firstStagePValueOCEF
+#' @inheritParams param_designOCEF
 #'
 #' @return The second-stage information.
 #' @export
