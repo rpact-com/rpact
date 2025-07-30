@@ -14,17 +14,17 @@ NULL
 #' @return Point value of \code{getPsi()}.
 #' @keywords internal
 
-getInnerPsi <- function(firstStagePValue, constant, design) {
+.getInnerPsi <- function(firstStagePValue, constant, design) {
     # If monotonisation constants provided, perform non-increasing transformation
     if (design$enforceMonotonicity) {
-        likelihoodRatioOverEffect <- getMonotoneFunction(
+        likelihoodRatioOverEffect <- .getMonotoneFunction(
             x = firstStagePValue,
-            fun = getQ,
+            fun = .getQ,
             argument = "firstStagePValue",
             design = design
         )
     } else {
-        likelihoodRatioOverEffect <- getQ(firstStagePValue = firstStagePValue, design = design)
+        likelihoodRatioOverEffect <- .getQ(firstStagePValue = firstStagePValue, design = design)
     }
 
     # Calculate the value to be supplied to getPsi
@@ -40,7 +40,7 @@ getInnerPsi <- function(firstStagePValue, constant, design) {
     conditionalPower <- constraintList$conditionalPower
 
     conditionalErrorWithConstraints <- pmin(
-        pmax(getPsi(nuPrime = inner, conditionalPower = conditionalPower), conditionalErrorConstraintLower),
+        pmax(.getPsi(nuPrime = inner, conditionalPower = conditionalPower), conditionalErrorConstraintLower),
         conditionalErrorConstraintUpper
     )
 
@@ -60,7 +60,7 @@ getInnerPsi <- function(firstStagePValue, constant, design) {
 #' @return Distance of integral over psi to (alpha-alpha1).
 #' @keywords internal
 
-getIntegral <- function(constant, design) {
+.getIntegral <- function(constant, design) {
     # TODO: there are consistency issues with the alternative integration routine. For now, only standard is used. (MD, 02Jun2025)
 
     # If there are no monotonisation constants or they are not enforced, use standard integration
@@ -71,7 +71,7 @@ getIntegral <- function(constant, design) {
             !is.null(suppressWarnings(body(design$conditionalPowerFunction)))
     ) {
         integral <- stats::integrate(
-            f = getInnerPsi,
+            f = .getInnerPsi,
             lower = design$alpha1,
             upper = design$alpha0,
             constant = constant,
@@ -79,7 +79,7 @@ getIntegral <- function(constant, design) {
         )$value
     } else {
         # If monotonisation constants exist, use alternative integration routine better adapted to constant functions
-        integral <- getIntegralWithConstants(
+        integral <- .getIntegralWithConstants(
             constant = constant,
             design = design
         )
@@ -99,7 +99,7 @@ getIntegral <- function(constant, design) {
 #' @keywords internal
 #'
 
-getIntegralWithConstants <- function(constant, design) {
+.getIntegralWithConstants <- function(constant, design) {
     # Routine is only used for constant conditional power
     conditionalPower <- design$conditionalPower
 
@@ -108,7 +108,7 @@ getIntegralWithConstants <- function(constant, design) {
 
     # Integrate over the first (non-constant) part of the function
     firstPart <- stats::integrate(
-        f = getInnerPsi,
+        f = .getInnerPsi,
         lower = design$alpha1,
         upper = design$monotonisationConstants$dls[1],
         constant = constant,
@@ -117,7 +117,7 @@ getIntegralWithConstants <- function(constant, design) {
 
     # Integrate over the final (non-constant) part of the function
     lastPart <- stats::integrate(
-        f = getInnerPsi,
+        f = .getInnerPsi,
         lower = design$monotonisationConstants$dus[numberOfIntervals],
         upper = design$alpha0,
         constant = constant,
@@ -129,7 +129,7 @@ getIntegralWithConstants <- function(constant, design) {
     for (x in 1:numberOfIntervals) {
         newPart <- min(
             max(
-                getPsi(
+                .getPsi(
                     nuPrime = -exp(constant) / design$monotonisationConstants$qs[x],
                     conditionalPower = conditionalPower
                 ),
@@ -146,7 +146,7 @@ getIntegralWithConstants <- function(constant, design) {
     if (numberOfIntervals > 1) {
         for (x in 1:(numberOfIntervals - 1)) {
             newPart <- stats::integrate(
-                f = getInnerPsi,
+                f = .getInnerPsi,
                 lower = design$monotonisationConstants$dus[x],
                 upper = design$monotonisationConstants$dls[x + 1],
                 constant = constant,
@@ -277,7 +277,7 @@ getIntegralWithConstants <- function(constant, design) {
 #' @template reference_optimal
 #' @template reference_monotone
 
-getLevelConstant <- function(design) {
+.getLevelConstant <- function(design) {
     # Check basic condition for decision rules
     # Fixed conditional power
     if (!is.na(design$conditionalPower)) {
@@ -306,7 +306,7 @@ getLevelConstant <- function(design) {
     tryCatch(
         expr = {
             stats::uniroot(
-                f = getIntegral,
+                f = .getIntegral,
                 lower = design$levelConstantMinimum,
                 upper = design$levelConstantMaximum,
                 design = design,
@@ -359,7 +359,7 @@ getLevelConstant <- function(design) {
 #' @template reference_optimal
 #' @references Hung, H. M. J., O’Neill, R. T., Bauer, P. & Kohne, K. (1997). The behavior of the p-value when the alternative hypothesis is true. Biometrics. http://www.jstor.org/stable/2533093
 
-getLikelihoodRatio <- function(firstStagePValue, design) {
+.getLikelihoodRatio <- function(firstStagePValue, design) {
     # Initialise likelihood ratio
     likelihoodRatio <- NA
     # Fixed effect case
@@ -457,7 +457,7 @@ getLikelihoodRatio <- function(firstStagePValue, design) {
     return(unname(likelihoodRatio))
 }
 
-getLikelihoodRatio <- Vectorize(getLikelihoodRatio, "firstStagePValue")
+.getLikelihoodRatio <- Vectorize(.getLikelihoodRatio, "firstStagePValue")
 
 #' Return Monotone Function Values
 #'
@@ -484,7 +484,7 @@ getLikelihoodRatio <- Vectorize(getLikelihoodRatio, "firstStagePValue")
 #'
 #' @template reference_monotone
 
-getMonotoneFunction <- function(
+.getMonotoneFunction <- function(
     x,
     fun,
     lower = NULL,
@@ -538,7 +538,7 @@ getMonotoneFunction <- function(
 #'
 #' @template reference_monotone
 
-getMonotonisationConstants <- function(
+.getMonotonisationConstants <- function(
     fun,
     lower = 0,
     upper = 1,
@@ -710,14 +710,14 @@ getMonotonisationConstants <- function(
 #' @export
 #'
 #' @examples
-#' getNu(alpha = 0.05, conditionalPower = 0.9)
+#' .getNu(alpha = 0.05, conditionalPower = 0.9)
 #'
 #' # Returns 0 if alpha exceeds conditionalPower
-#' getNu(alpha = 0.8, conditionalPower = 0.7)
+#' .getNu(alpha = 0.8, conditionalPower = 0.7)
 #'
 #' @template reference_optimal
 
-getNu <- function(alpha, conditionalPower) {
+.getNu <- function(alpha, conditionalPower) {
     nu <- 0
     if (any(alpha > conditionalPower)) {
         warning("alpha/conditional error should not exceed conditionalPower. Information is otherwise 0")
@@ -727,7 +727,7 @@ getNu <- function(alpha, conditionalPower) {
     return(nu)
 }
 
-getNu <- Vectorize(FUN = getNu, vectorize.args = c("alpha", "conditionalPower"))
+.getNu <- Vectorize(FUN = .getNu, vectorize.args = c("alpha", "conditionalPower"))
 
 #' Calculate the Derivate of Nu
 #' @name getNuPrime
@@ -746,16 +746,16 @@ getNu <- Vectorize(FUN = getNu, vectorize.args = c("alpha", "conditionalPower"))
 #' @export
 #'
 #' @examples
-#' getNuPrime(alpha = 0.05, conditionalPower = 0.9)
+#' .getNuPrime(alpha = 0.05, conditionalPower = 0.9)
 #'
 #' @template reference_optimal
 #'
-getNuPrime <- function(alpha, conditionalPower) {
+.getNuPrime <- function(alpha, conditionalPower) {
     nuPrime <- -2 * (stats::qnorm(1 - alpha) + stats::qnorm(conditionalPower)) / stats::dnorm(qnorm(1 - alpha))
     return(nuPrime)
 }
 
-getNuPrime <- Vectorize(FUN = getNuPrime, vectorize.args = "alpha")
+.getNuPrime <- Vectorize(FUN = .getNuPrime, vectorize.args = "alpha")
 
 #' Calculate Psi, the Inverse of Nu Prime
 #' @name getPsi
@@ -776,14 +776,14 @@ getNuPrime <- Vectorize(FUN = getNuPrime, vectorize.args = "alpha")
 #'
 #' @examples
 #' # Returns 0.05
-#' getPsi(getNuPrime(alpha = 0.05, conditionalPower = 0.9), conditionalPower = 0.9)
+#' .getPsi(.getNuPrime(alpha = 0.05, conditionalPower = 0.9), conditionalPower = 0.9)
 
-getPsi <- function(nuPrime, conditionalPower) {
+.getPsi <- function(nuPrime, conditionalPower) {
     # If the conditional power is between 1-pnorm(2) and pnorm(2) nu prime is monotone and we can build the inverse directly
     if ((stats::pnorm(-2) <= conditionalPower && conditionalPower <= stats::pnorm(2))) {
         rootlist <- uniroot(
             f = function(alpha) {
-                getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+                .getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
             },
             lower = 0,
             upper = conditionalPower,
@@ -798,13 +798,13 @@ getPsi <- function(nuPrime, conditionalPower) {
             stats::pnorm(-stats::qnorm(conditionalPower) / 2 + sqrt(stats::qnorm(conditionalPower)^2 / 4 - 1))
         minimumValue <- 1 -
             stats::pnorm(-stats::qnorm(conditionalPower) / 2 - sqrt(stats::qnorm(conditionalPower)^2 / 4 - 1))
-        nuPrimeAtMax <- getNuPrime(alpha = maximumValue, conditionalPower = conditionalPower)
-        nuPrimeAtMin <- getNuPrime(alpha = minimumValue, conditionalPower = conditionalPower)
+        nuPrimeAtMax <- .getNuPrime(alpha = maximumValue, conditionalPower = conditionalPower)
+        nuPrimeAtMin <- .getNuPrime(alpha = minimumValue, conditionalPower = conditionalPower)
 
         if (nuPrime > nuPrimeAtMax) {
             rootlist <- uniroot(
                 f = function(alpha) {
-                    getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+                    .getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
                 },
                 lower = minimumValue,
                 upper = conditionalPower,
@@ -814,7 +814,7 @@ getPsi <- function(nuPrime, conditionalPower) {
         } else if (nuPrime < nuPrimeAtMin) {
             rootlist <- uniroot(
                 f = function(alpha) {
-                    getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+                    .getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
                 },
                 lower = 0,
                 upper = maximumValue,
@@ -825,7 +825,7 @@ getPsi <- function(nuPrime, conditionalPower) {
             # Calculate psiLower and psiUpper
             rootlistLower <- uniroot(
                 f = function(alpha) {
-                    getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+                    .getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
                 },
                 lower = 0,
                 upper = maximumValue,
@@ -834,7 +834,7 @@ getPsi <- function(nuPrime, conditionalPower) {
             psiLower <- rootlistLower$root
             rootlistUpper <- uniroot(
                 f = function(alpha) {
-                    getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
+                    .getNuPrime(alpha = alpha, conditionalPower = conditionalPower) - nuPrime
                 },
                 lower = minimumValue,
                 upper = conditionalPower,
@@ -842,8 +842,8 @@ getPsi <- function(nuPrime, conditionalPower) {
             )
             psiUpper <- rootlistUpper$root
             # Calculate the quotient that is needed to decide if psiLower or psiUpper is used
-            quotient <- getNu(alpha = min(conditionalPower, psiUpper), conditionalPower = conditionalPower) -
-                getNu(alpha = psiLower, conditionalPower = conditionalPower) /
+            quotient <- .getNu(alpha = min(conditionalPower, psiUpper), conditionalPower = conditionalPower) -
+                .getNu(alpha = psiLower, conditionalPower = conditionalPower) /
                     (min(psiUpper, conditionalPower) - psiLower)
             if (quotient <= nuPrime) {
                 return(psiUpper)
@@ -854,7 +854,7 @@ getPsi <- function(nuPrime, conditionalPower) {
     }
 }
 
-getPsi <- Vectorize(FUN = getPsi, vectorize.args = c("nuPrime", "conditionalPower"))
+.getPsi <- Vectorize(FUN = .getPsi, vectorize.args = c("nuPrime", "conditionalPower"))
 
 #' Calculate Q
 #' @name getQ
@@ -878,7 +878,7 @@ getPsi <- Vectorize(FUN = getPsi, vectorize.args = c("nuPrime", "conditionalPowe
 #'
 #' @template reference_monotone
 
-getQ <- function(firstStagePValue, design) {
+.getQ <- function(firstStagePValue, design) {
     # Initialise effect and likelihood ratio
     effect <- NA
     likelihoodRatio <- NA
@@ -892,14 +892,14 @@ getQ <- function(firstStagePValue, design) {
         effect <- design$delta1
     }
 
-    likelihoodRatio <- getLikelihoodRatio(firstStagePValue = firstStagePValue, design = design)
+    likelihoodRatio <- .getLikelihoodRatio(firstStagePValue = firstStagePValue, design = design)
 
     Q <- likelihoodRatio / (effect^2)
 
     return(Q)
 }
 
-getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
+.getQ <- Vectorize(.getQ, vectorize.args = "firstStagePValue")
 
 #' Integrate over information
 #'
@@ -929,7 +929,7 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
     # If NULL, use specification in design object
     if (is.null(likelihoodRatioDistribution)) {
         ghostDesign <- design
-        likelihoodRatio <- getLikelihoodRatio(
+        likelihoodRatio <- .getLikelihoodRatio(
             firstStagePValue = firstStagePValue,
             design = ghostDesign
         )
@@ -955,7 +955,7 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
         )
 
         # Calculate likelihood ratio
-        likelihoodRatio <- getLikelihoodRatio(
+        likelihoodRatio <- .getLikelihoodRatio(
             firstStagePValue = firstStagePValue,
             design = ghostDesign
         )
@@ -982,7 +982,7 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
         )
 
         # Calculate likelihood ratio
-        likelihoodRatio <- getLikelihoodRatio(
+        likelihoodRatio <- .getLikelihoodRatio(
             firstStagePValue = firstStagePValue,
             design = ghostDesign
         )
@@ -1005,7 +1005,7 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
         )
 
         # Calculate likelihood ratio
-        likelihoodRatio <- getLikelihoodRatio(
+        likelihoodRatio <- .getLikelihoodRatio(
             firstStagePValue = firstStagePValue,
             design = ghostDesign
         )
@@ -1029,7 +1029,7 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
         )
 
         # Calculate likelihood ratio
-        likelihoodRatio <- getLikelihoodRatio(
+        likelihoodRatio <- .getLikelihoodRatio(
             firstStagePValue = firstStagePValue,
             design = ghostDesign
         )
@@ -1039,7 +1039,7 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
         ghostDesign <- list("likelihoodRatioDistribution" = likelihoodRatioDistribution)
 
         # Calculate likelihood ratio
-        likelihoodRatio <- getLikelihoodRatio(
+        likelihoodRatio <- .getLikelihoodRatio(
             firstStagePValue = firstStagePValue,
             design = ghostDesign
         )
@@ -1067,7 +1067,8 @@ getQ <- Vectorize(getQ, vectorize.args = "firstStagePValue")
         conditionalPower <- design$conditionalPower
     }
 
-    secondStageInformation <- (getNu(alpha = conditionalError, conditionalPower = conditionalPower) * likelihoodRatio) /
+    secondStageInformation <- (.getNu(alpha = conditionalError, conditionalPower = conditionalPower) *
+        likelihoodRatio) /
         (delta1^2)
     return(secondStageInformation)
 }

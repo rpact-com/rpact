@@ -370,8 +370,8 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             }
 
             # Calculate monotonisation constants
-            self$monotonisationConstants <- getMonotonisationConstants(
-                fun = "getQ",
+            self$monotonisationConstants <- .getMonotonisationConstants(
+                fun = ".getQ",
                 lower = alpha1,
                 upper = alpha0,
                 argument = "firstStagePValue",
@@ -379,7 +379,7 @@ TrialDesignOptimalConditionalError <- R6::R6Class(
             )
 
             # Calculate level constant
-            self$levelConstant <- getLevelConstant(
+            self$levelConstant <- .getLevelConstant(
                 design = self
             )$root
         },

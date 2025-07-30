@@ -271,13 +271,13 @@ getOptimalConditionalError <- function(firstStagePValue, design) {
     } else {
         # If monotonisation constants specified and monotonisation enforced, perform non-increasing transformation
         if (design$enforceMonotonicity && !is.null(unlist(design$monotonisationConstants))) {
-            likelihoodRatioOverEffect <- getMonotoneFunction(
+            likelihoodRatioOverEffect <- .getMonotoneFunction(
                 x = firstStagePValue,
-                fun = getQ,
+                fun = .getQ,
                 design = design
             )
         } else {
-            likelihoodRatioOverEffect <- getQ(firstStagePValue = firstStagePValue, design = design)
+            likelihoodRatioOverEffect <- .getQ(firstStagePValue = firstStagePValue, design = design)
         }
 
         # Take constraints into account (minimumConditionalError, maximumConditionalError,
@@ -306,7 +306,7 @@ getOptimalConditionalError <- function(firstStagePValue, design) {
             conditionalErrorConstraintLower,
             min(
                 conditionalErrorConstraintUpper,
-                getPsi(
+                .getPsi(
                     nuPrime = (-exp(design$levelConstant) / likelihoodRatioOverEffect),
                     conditionalPower = conditionalPower
                 )
@@ -355,7 +355,7 @@ getOverallPower <- function(design, alternative) {
             stats::pnorm(stats::qnorm(1 - design$alpha1) - alternativeNonCentralityParameterScale[i])
 
         # Calculate probability to reject at the second stage for given delta
-        secondStageRejection <- function(firstStagePValue) {
+        .secondStageRejection <- function(firstStagePValue) {
             (1 -
                 stats::pnorm(
                     stats::qnorm(1 - getOptimalConditionalError(firstStagePValue, design = design)) -
@@ -368,7 +368,7 @@ getOverallPower <- function(design, alternative) {
                 )
         }
 
-        integral <- stats::integrate(f = secondStageRejection, lower = design$alpha1, upper = design$alpha0)$value
+        integral <- stats::integrate(f = .secondStageRejection, lower = design$alpha1, upper = design$alpha0)$value
 
         overallPower[i] <- firstStageEfficacy[i] + integral
     }
@@ -455,7 +455,7 @@ getSecondStageInformation <- function(firstStagePValue, design) {
             conditionalPower <- design$conditionalPower
         }
 
-        secondStageInformation <- (getNu(alpha = conditionalError, conditionalPower = conditionalPower)) / (effect^2)
+        secondStageInformation <- (.getNu(alpha = conditionalError, conditionalPower = conditionalPower)) / (effect^2)
     }
     return(secondStageInformation)
 }

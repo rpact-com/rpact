@@ -320,7 +320,7 @@ plot.TrialDesignOptimalConditionalError <- function(
     } else if (type == 3) {
         # Plot type 3: likelihood ratio
         # Calculate likelihood ratio values
-        likelihoodRatios <- getLikelihoodRatio(
+        likelihoodRatios <- .getLikelihoodRatio(
             firstStagePValue = firstStagePValues,
             design = x
         )
@@ -343,9 +343,9 @@ plot.TrialDesignOptimalConditionalError <- function(
         # Plot type 4: Q
         firstStagePValues <- seq(from = max(range[1], x$alpha1), to = min(range[2], x$alpha0), length.out = 1e3)
         # Calculate Q values
-        Q <- getMonotoneFunction(
+        Q <- .getMonotoneFunction(
             x = firstStagePValues,
-            fun = getQ,
+            fun = .getQ,
             design = x
         )
         QPlot <- ggplot2::ggplot() +
@@ -362,7 +362,7 @@ plot.TrialDesignOptimalConditionalError <- function(
             ggplot2::xlim(c(max(range[1], x$alpha1), min(x$alpha0, range[2])))
 
         if (plotNonMonotoneFunction && x$enforceMonotonicity && !is.null(unlist(x$monotonisationConstants))) {
-            nonMonoQ <- getQ(
+            nonMonoQ <- .getQ(
                 firstStagePValue = firstStagePValues,
                 design = x
             )
