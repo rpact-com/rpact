@@ -2,7 +2,6 @@
 NULL
 
 #' Internal variation of \code{getPsi()} used by \code{findLevelConstant()}
-#' @name getInnerPsi
 #'
 #' @description Calculate psi for the given scenario, incl. constant
 #' @details Internal function called by \code{getIntegral()} that calculates a point value of \code{getPsi()}.
@@ -48,7 +47,6 @@ NULL
 }
 
 #' Internal calculation of the integral over psi
-#' @name getIntegral
 #'
 #' @description Helper function that integrates over the optimal conditional error function. Used to find appropriate level constant.
 #'
@@ -61,11 +59,23 @@ NULL
 #' @keywords internal
 
 .getIntegral <- function(constant, design) {
-    # TODO: there are consistency issues with the alternative integration routine. For now, only standard is used. (MD, 02Jun2025)
+    # Introduce an option which allows consistent use of standard integration
+    enforceBasicIntegration <- isTRUE(as.logical(getOption("rpact.design.optimal.enforce.basic.integration", FALSE)))
 
-    # If there are no monotonisation constants or they are not enforced, use standard integration
+    designHasConstraints <- (design$maximumConditionalError < 1) ||
+        (design$minimumConditionalError > 0) ||
+        (design$minimumSecondStageInformation > 0) ||
+        (design$maximumSecondStageInformation < Inf)
+
+    # In the following cases, use basic integration:
+    # - enforced through option (see above)
+    # - design has constraints
+    # - monotonicity of design is not enforced
+    # - design has no monotonisation constants
+    # - design uses a conditional power function
     if (
-        TRUE ||
+        enforceBasicIntegration ||
+            designHasConstraints ||
             !design$enforceMonotonicity ||
             is.null(unlist(design$monotonisationConstants)) ||
             !is.null(suppressWarnings(body(design$conditionalPowerFunction)))
@@ -253,7 +263,6 @@ NULL
 }
 
 #' Get Level Constant for Optimal Conditional Error Function
-#' @name getLevelConstant
 #'
 #' @description Find the constant required such that the conditional error function meets the overall level condition.
 #'
@@ -330,7 +339,6 @@ NULL
 
 #' Calculate Likelihood Ratio
 #'
-#' @name getLikelihoodRatio
 #'
 #' @description Calculate the likelihood ratio of a p-value for a given distribution.
 #'
@@ -461,8 +469,6 @@ NULL
 
 #' Return Monotone Function Values
 #'
-#' @name getMonotoneFunction
-#'
 #' @description Applies the provided monotonisation constants to a specified, possibly non-monotone function. The returned function values are non-increasing.
 #'
 #' @details The exact monotonisation process is outlined in Brannath et al. (2024), but specified in terms of the first-stage test statistic \eqn{z_1} rather than the first-stage p-value \eqn{p_1}. \cr
@@ -519,7 +525,6 @@ NULL
 }
 
 #' Calculate the Constants for Monotonisation
-#' @name getMonotonisationConstants
 #'
 #' @description Computes the constants required to make a function non-increasing on the specified interval. The output of this function is necessary to calculate the monotone optimal conditional error function.
 #' The output object is a list that contains the intervals on which constant values are required, specified by the minimum \code{dls} and maximum \code{dus} of the interval and the respective constants, \code{qs}.
@@ -696,7 +701,6 @@ NULL
 }
 
 #' Calculate Nu
-#' @name getNu
 #'
 #' @description Calculate the factor which relates \eqn{\alpha_2} to the second-stage information for given conditional power.
 #'
@@ -730,7 +734,6 @@ NULL
 .getNu <- Vectorize(FUN = .getNu, vectorize.args = c("alpha", "conditionalPower"))
 
 #' Calculate the Derivate of Nu
-#' @name getNuPrime
 #'
 #' @description Calculates the derivative of nu for a given conditional error and conditional power.
 #'
@@ -758,7 +761,6 @@ NULL
 .getNuPrime <- Vectorize(FUN = .getNuPrime, vectorize.args = "alpha")
 
 #' Calculate Psi, the Inverse of Nu Prime
-#' @name getPsi
 #'
 #' @description Get point-wise values of psi (inverse of nu prime)
 #'
@@ -857,7 +859,7 @@ NULL
 .getPsi <- Vectorize(FUN = .getPsi, vectorize.args = c("nuPrime", "conditionalPower"))
 
 #' Calculate Q
-#' @name getQ
+#'
 #' @description Calculate the ratio of likelihood ratio and squared effect size.
 #'
 #' @inheritParams param_firstStagePValueOCEF
