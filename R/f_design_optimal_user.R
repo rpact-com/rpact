@@ -1,5 +1,4 @@
 #' Create a design object for the optimal conditional error function.
-#' @name getDesignOptimalConditionalErrorFunction
 #'
 #' @description This function returns a design object which contains all important parameters for the specification of the optimal conditional error function.
 #' The returned object is of class \code{TrialDesignOptimalConditionalError} and can be passed to other package functions.
@@ -169,7 +168,6 @@ getDesignOptimalConditionalErrorFunction <- function(
 
 
 #' Calculate Expected Second-stage Information
-#' @name getExpectedSecondStageInformation
 #'
 #' @description Calculate the expected second-stage information using the optimal conditional error function with specific assumptions.
 #'
@@ -226,7 +224,6 @@ getExpectedSecondStageInformation <- function(design, likelihoodRatioDistributio
 }
 
 #' Calculate the Optimal Conditional Error
-#' @name getOptimalConditionalError
 #'
 #' @details The optimal conditional error \eqn{\alpha_2} given a first-stage p-value \eqn{p_1} is calculated as:
 #' \deqn{\alpha_2(p_1)=\psi(-e^{c_0} \cdot \frac{\Delta_1^2}{l(p_1)}).}
@@ -320,7 +317,6 @@ getOptimalConditionalError <- function(firstStagePValue, design) {
 getOptimalConditionalError <- Vectorize(FUN = getOptimalConditionalError, vectorize.args = c("firstStagePValue"))
 
 #' Calculate the overall power
-#' @name getOverallPower
 #'
 #' @description Calculate the overall power and other operating characteristics of a design.
 #'
@@ -384,7 +380,6 @@ getOverallPower <- function(design, alternative) {
 }
 
 #' Calculate the Second-stage Information
-#' @name getSecondStageInformation
 #'
 #' @description Calculate second-stage information for given first-stage p-value and design.
 #'

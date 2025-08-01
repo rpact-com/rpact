@@ -123,7 +123,6 @@ print.TrialDesignOptimalConditionalError <- function(x, ...) {
 
 
 #' Plot the optimal conditional error function
-#' @name plot.TrialDesignOptimalConditionalError
 #'
 #' @description
 #' The returned plot is a \code{ggplot2} object and can be supplemented with additional layers using \code{ggplot2} commands.
