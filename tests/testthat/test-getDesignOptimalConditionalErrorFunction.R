@@ -13,8 +13,8 @@ test_that("Class objects correctly created", {
         enforceMonotonicity = TRUE
     )
     # Class correct?
-    expect_s4_class(designInterim, "TrialDesignOptimalConditionalError")
-    # TODO will later have to be adapted to r6 class
+    expect_true(is(designInterim, "R6"))
+    expect_true(is(designInterim, "TrialDesignOptimalConditionalError"))
 
     # Fields correct?
     expect_equal(designInterim$alpha, 0.025)
@@ -47,8 +47,8 @@ test_that("Class objects correctly created", {
         enforceMonotonicity = FALSE
     )
     # Class correct?
-    expect_s4_class(designFixed, "TrialDesignOptimalConditionalError")
-    # TODO will later have to be adapted to r6 class
+    expect_true(is(designFixed, "R6"))
+    expect_true(is(designFixed, "TrialDesignOptimalConditionalError"))
 
     # Fields correct?
     expect_equal(designFixed$alpha, 0.025)
