@@ -367,13 +367,14 @@ NULL
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned",
-        0,
-        C_ALLOCATION_RATIO_MAXIMUM,
+        lower = 0,
+        upper = C_ALLOCATION_RATIO_MAXIMUM,
         naAllowed = TRUE
     )
 
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
-    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 
+        lower = 0, upper = 1, naAllowed = TRUE)
 
     .assertIsLogicalVector(adaptations, "adaptations", naAllowed = TRUE)
 
@@ -399,7 +400,8 @@ NULL
 
     if (endpoint == "means") {
         .assertIsSingleNumber(stDevH1, "stDevH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(stDevH1, "stDevH1", 0, NULL, naAllowed = TRUE)
+        .assertIsInOpenInterval(stDevH1, "stDevH1", 
+            lower = 0, upper = NULL, naAllowed = TRUE)
     }
 
     successCriterion <- .assertIsValidSuccessCriterion(successCriterion)
@@ -481,7 +483,8 @@ NULL
         )
     } else if (endpoint == "rates") {
         .assertIsSingleNumber(piTreatmentH1, "piTreatmentH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(piTreatmentH1, "piTreatmentH1", 0, 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(piTreatmentH1, "piTreatmentH1", 
+            lower = 0, upper = 1, naAllowed = TRUE)
         piTreatmentH1 <- .ignoreParameterIfNotUsed(
             "piTreatmentH1",
             piTreatmentH1,
@@ -492,7 +495,8 @@ NULL
         .setValueAndParameterType(simulationResults, "piTreatmentH1", piTreatmentH1, NA_real_)
 
         .assertIsSingleNumber(piControlH1, "piControlH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(piControlH1, "piControlH1", 0, 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(piControlH1, "piControlH1", 
+            lower = 0, upper = 1, naAllowed = TRUE)
         piControlH1 <- .ignoreParameterIfNotUsed(
             "piControlH1",
             piControlH1,

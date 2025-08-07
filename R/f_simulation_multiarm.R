@@ -539,10 +539,12 @@ NULL
 
     .assertIsSingleNumber(threshold, "threshold", naAllowed = FALSE)
     .assertIsSingleNumber(gED50, "gED50", naAllowed = TRUE)
-    .assertIsInOpenInterval(gED50, "gED50", 0, NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(gED50, "gED50", 
+        lower = 0, upper = NULL, naAllowed = TRUE)
 
     .assertIsSingleNumber(slope, "slope", naAllowed = TRUE)
-    .assertIsInOpenInterval(slope, "slope", 0, NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(slope, "slope", 
+        lower = 0, upper = NULL, naAllowed = TRUE)
 
     .assertIsSinglePositiveInteger(rValue, "rValue", naAllowed = TRUE, validateType = FALSE)
 
@@ -550,13 +552,14 @@ NULL
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned",
-        0,
-        C_ALLOCATION_RATIO_MAXIMUM,
+        lower = 0,
+        upper = C_ALLOCATION_RATIO_MAXIMUM,
         naAllowed = TRUE
     )
 
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
-    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 
+        lower = 0, upper = 1, naAllowed = TRUE)
 
     .assertIsLogicalVector(adaptations, "adaptations", naAllowed = TRUE)
 
@@ -583,7 +586,8 @@ NULL
     if (endpoint == "means") {
         .assertIsValidStandardDeviation(stDev) # means only
         .assertIsSingleNumber(stDevH1, "stDevH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(stDevH1, "stDevH1", 0, NULL, naAllowed = TRUE)
+        .assertIsInOpenInterval(stDevH1, "stDevH1", 
+            lower = 0, upper = NULL, naAllowed = TRUE)
     }
 
     successCriterion <- .assertIsValidSuccessCriterion(successCriterion)
@@ -653,7 +657,8 @@ NULL
         }
     } else if (endpoint == "rates") {
         .assertIsSingleNumber(piTreatmentsH1, "piTreatmentsH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(piTreatmentsH1, "piTreatmentsH1", 0, 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(piTreatmentsH1, "piTreatmentsH1", 
+            lower = 0, upper = 1, naAllowed = TRUE)
         piTreatmentsH1 <- .ignoreParameterIfNotUsed(
             "piTreatmentsH1",
             piTreatmentsH1,
@@ -665,7 +670,8 @@ NULL
         .setValueAndParameterType(simulationResults, "piTreatmentsH1", piTreatmentsH1, NA_real_)
 
         .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE) # , noDefaultAvailable = TRUE)
-        .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = FALSE)
+        .assertIsInOpenInterval(piControl, "piControl", 
+            lower = 0, upper = 1, naAllowed = FALSE)
         .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
 
         piControlH1 <- .ignoreParameterIfNotUsed(
@@ -677,7 +683,8 @@ NULL
         )
 
         .assertIsSingleNumber(piControlH1, "piControlH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(piControlH1, "piControlH1", 0, 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(piControlH1, "piControlH1", 
+            lower = 0, upper = 1, naAllowed = TRUE)
         .setValueAndParameterType(simulationResults, "piControlH1", piControlH1, NA_real_)
 
         effectMatrix <- .assertIsValidEffectMatrixRates(
@@ -719,7 +726,8 @@ NULL
         }
 
         .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE) # , noDefaultAvailable = TRUE)
-        .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(piControl, "piControl", 
+            lower = 0, upper = 1, naAllowed = TRUE)
         .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
         .setValueAndParameterType(simulationResults, "eventTime", eventTime, 12)
 

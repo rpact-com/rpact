@@ -1132,7 +1132,7 @@ NULL
     .assertIsValidNPlanned(nPlanned, kMax, stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-        0, C_ALLOCATION_RATIO_MAXIMUM)
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
     .setValueAndParameterType(results, "allocationRatioPlanned", 
         allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
     assumedStDevs <- .assertIsValidAssumedStDevForMultiHypotheses(
@@ -1425,7 +1425,7 @@ NULL
     .associatedArgumentsAreDefined(nPlanned = nPlanned, thetaRange = thetaRange)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-        0, C_ALLOCATION_RATIO_MAXIMUM)
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
 
     design <- stageResults$.design
     kMax <- design$kMax

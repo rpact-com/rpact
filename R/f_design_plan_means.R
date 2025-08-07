@@ -595,7 +595,8 @@ NULL
         if (identical(alternative, C_ALTERNATIVE_POWER_SIMULATION_DEFAULT)) {
             alternative <- C_ALTERNATIVE_POWER_SIMULATION_MEAN_RATIO_DEFAULT
         }
-        .assertIsInOpenInterval(alternative, "alternative", 0, NULL, naAllowed = TRUE)
+        .assertIsInOpenInterval(alternative, "alternative", 
+            lower = 0, upper = NULL, naAllowed = TRUE)
     }
 
     directionUpper <- .assertIsValidDirectionUpper(directionUpper,

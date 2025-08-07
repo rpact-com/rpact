@@ -931,7 +931,8 @@ NULL
 
     .assertIsValidNPlanned(nPlanned, kMax, stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
     results$.setParameterType(
         "allocationRatioPlanned",
@@ -1189,7 +1190,8 @@ NULL
         iterations = C_ITERATIONS_DEFAULT, 
         seed = NA_real_) {
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
     .associatedArgumentsAreDefined(nPlanned = nPlanned, thetaRange = thetaRange)
 
     design <- stageResults$.design

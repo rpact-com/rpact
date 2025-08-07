@@ -1137,8 +1137,8 @@ NULL
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned",
-        0,
-        C_ALLOCATION_RATIO_MAXIMUM
+        lower = 0,
+        upper = C_ALLOCATION_RATIO_MAXIMUM
     )
 
     x <- .getFarringtonManningValues(

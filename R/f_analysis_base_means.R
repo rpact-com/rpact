@@ -1155,7 +1155,8 @@ NULL
 
     if (stageResults$isTwoSampleDataset()) {
         .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-        .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+        .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
+            lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
 
@@ -1294,7 +1295,8 @@ NULL
 
     if (stageResults$isTwoSampleDataset()) {
         .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-        .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+        .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
+            lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
 
@@ -1419,8 +1421,8 @@ NULL
         .assertIsInOpenInterval(
             allocationRatioPlanned,
             "allocationRatioPlanned",
-            0,
-            C_ALLOCATION_RATIO_MAXIMUM
+            lower = 0,
+            upper = C_ALLOCATION_RATIO_MAXIMUM
         )
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }

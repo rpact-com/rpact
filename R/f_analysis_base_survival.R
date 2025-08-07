@@ -215,7 +215,7 @@ NULL
 
     thetaH1User <- thetaH1
     thetaH1 <- .assertIsValidThetaH1(thetaH1, stageResults, stage)
-    .assertIsInOpenInterval(thetaH1, "thetaH1", 0, Inf)
+    .assertIsInOpenInterval(thetaH1, "thetaH1", lower = 0, upper = Inf)
     if (identical(thetaH1, thetaH1User)) {
         .setValueAndParameterType(results, "thetaH1", thetaH1, NA_real_)
     } else {
@@ -840,8 +840,8 @@ NULL
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned",
-        0,
-        C_ALLOCATION_RATIO_MAXIMUM
+        lower = 0,
+        upper = C_ALLOCATION_RATIO_MAXIMUM
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
@@ -981,8 +981,8 @@ NULL
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned",
-        0,
-        C_ALLOCATION_RATIO_MAXIMUM
+        lower = 0,
+        upper = C_ALLOCATION_RATIO_MAXIMUM
     )
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
@@ -1102,7 +1102,8 @@ NULL
     nPlanned <- c(rep(NA, stageResults$stage), nPlanned)
 
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
     if (stageResults$direction == "upper") {
@@ -1179,7 +1180,7 @@ NULL
 
     stage <- stageResults$stage
     thetaH1 <- .assertIsValidThetaH1(thetaH1, stageResults, stage)
-    .assertIsInOpenInterval(thetaH1, "thetaH1", 0, Inf)
+    .assertIsInOpenInterval(thetaH1, "thetaH1", lower = 0, upper = Inf)
 
     if (!.isValidNPlanned(nPlanned = nPlanned, kMax = stageResults$.design$kMax, stage = stage)) {
         return(results)

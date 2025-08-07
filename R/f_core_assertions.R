@@ -273,6 +273,31 @@ NULL
     }
 }
 
+#' 
+#' Assert Values Are in a Closed Interval
+#'
+#' @description
+#' Checks if every element of \code{x} is within the closed interval defined by \code{lower} and \code{upper}.
+#' If any element is outside the interval, an error is thrown.
+#'
+#' @param x Numeric vector. The values to be checked.
+#' @param xName Character. Used to label \code{x} in error messages.
+#' @param ... Additional arguments (unused).
+#' @param lower Numeric. The inclusive lower bound of the interval.
+#' @param upper Numeric. The inclusive upper bound of the interval. If \code{NULL} or \code{NA}, only the lower bound is enforced.
+#' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
+#' @param call. Logical. If \code{TRUE} the error message will include the call. Default is \code{FALSE}.
+#'
+#' @return Invisibly returns \code{x} if all elements are within the specified interval.
+#'
+#' @examples
+#' \dontrun{
+#'   .assertIsInClosedInterval(1:10, "x", lower = 1, upper = 10)
+#'   .assertIsInClosedInterval(c(1, NA, 5), "x", lower = 1, upper = 10, naAllowed = TRUE)
+#' }
+#'
+#' @noRd
+#' 
 .assertIsInClosedInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
     if (naAllowed && all(is.na(x))) {
@@ -305,7 +330,31 @@ NULL
     }
 }
 
-.assertIsInOpenInterval <- function(x, xName, lower, upper, naAllowed = FALSE, call. = FALSE) {
+#' 
+#' Assert Values Are in an Open Interval
+#'
+#' @description
+#' Checks if every element of \code{x} is within the open interval defined by \code{lower} and \code{upper}.
+#' If any element is outside the interval (i.e., less than or equal to \code{lower} or greater than or equal to \code{upper}),
+#' an error is thrown.
+#'
+#' @param x Numeric vector. The values to be checked.
+#' @param xName Character. Label used for \code{x} in error messages.
+#' @param lower Numeric. The exclusive lower bound of the interval.
+#' @param upper Numeric. The exclusive upper bound of the interval.
+#' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
+#' @param call. Logical. If \code{TRUE}, the error message will include the original function call. Default is \code{FALSE}.
+#'
+#' @return Invisibly returns \code{x} if all elements are within the specified open interval.
+#'
+#' @examples
+#' \dontrun{
+#'   .assertIsInOpenInterval(1:10, "x", lower = 0, upper = 11)
+#' }
+#'
+#' @noRd
+#' 
+.assertIsInOpenInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
     if (naAllowed && all(is.na(x))) {
         return(invisible())
     }
@@ -1948,7 +1997,8 @@ NULL
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(
         allocationRatioPlanned,
-        "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM
+        "allocationRatioPlanned", 
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
     )
 }
 
@@ -3090,7 +3140,8 @@ NULL
         .assertIsNumericVector(valueMaxVector, valueMaxVectorName, naAllowed = TRUE)
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         if (valueMaxVectorName == "piMaxVector") {
-            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, 1, naAllowed = FALSE)
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 
+                lower = 0, upper = 1, naAllowed = FALSE)
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, NULL, naAllowed = FALSE)

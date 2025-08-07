@@ -2557,7 +2557,8 @@ getPowerSurvival <- function(design = NULL, ...,
     )
 
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
 
     if (designPlan$typeOfComputation == "Schoenfeld") {
         theta <- sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned) *

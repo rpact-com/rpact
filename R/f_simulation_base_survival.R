@@ -291,13 +291,14 @@ getSimulationSurvival <- function(design = NULL, ...,
         objectType = "power", userFunctionCallEnabled = TRUE
     )
     .assertIsSingleNumber(thetaH0, "thetaH0")
-    .assertIsInOpenInterval(thetaH0, "thetaH0", 0, NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsNumericVector(minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
     .assertIsNumericVector(maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage", naAllowed = TRUE)
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
-    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 
+        lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE)
-    .assertIsInOpenInterval(thetaH1, "thetaH1", 0, NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(thetaH1, "thetaH1", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)

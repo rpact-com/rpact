@@ -218,28 +218,34 @@ getSimulationRates <- function(design = NULL, ...,
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsSingleLogical(riskRatio, "riskRatio")
     if (groups == 1L) {
-        .assertIsInOpenInterval(thetaH0, "thetaH0", 0, 1, naAllowed = FALSE)
+        .assertIsInOpenInterval(thetaH0, "thetaH0", 
+            lower = 0, upper = 1, naAllowed = FALSE)
     } else {
         if (riskRatio) {
-            .assertIsInOpenInterval(thetaH0, "thetaH0", 0, NULL, naAllowed = TRUE)
+            .assertIsInOpenInterval(thetaH0, "thetaH0", 
+                lower = 0, upper = NULL, naAllowed = TRUE)
         } else {
-            .assertIsInOpenInterval(thetaH0, "thetaH0", -1, 1, naAllowed = TRUE)
+            .assertIsInOpenInterval(thetaH0, "thetaH0", 
+                lower = -1, upper = 1, naAllowed = TRUE)
         }
     }
     .assertIsNumericVector(pi1, "pi1", naAllowed = FALSE)
-    .assertIsInOpenInterval(pi1, "pi1", 0, 1, naAllowed = FALSE)
+    .assertIsInOpenInterval(pi1, "pi1", 
+        lower = 0, upper = 1, naAllowed = FALSE)
     .assertIsNumericVector(pi2, "pi2", naAllowed = TRUE)
-    .assertIsInOpenInterval(pi2, "pi2", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsNumericVector(minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
     .assertIsNumericVector(maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
-    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 
+        lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsSingleNumber(pi1H1, "pi1H1", naAllowed = TRUE)
-    .assertIsInOpenInterval(pi1H1, "pi1H1", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(pi1H1, "pi1H1", lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsSingleNumber(pi2H1, "pi2H1", naAllowed = TRUE)
-    .assertIsInOpenInterval(pi2H1, "pi2H1", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(pi2H1, "pi2H1", lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE)
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)

@@ -940,7 +940,8 @@ getRawData <- function(x, aggregate = FALSE) {
                 matrix(doseLevels / max(doseLevels), nrow = 1, ncol = gMax)
         } else if (valueMaxVectorName == "piMaxVector") {
             .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE, noDefaultAvailable = TRUE)
-            .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = FALSE)
+            .assertIsInOpenInterval(piControl, "piControl", 
+                lower = 0, upper = 1, naAllowed = FALSE)
             effectMatrix <- piControl +
                 matrix(valueMaxVector - piControl, nrow = length(valueMaxVector), ncol = 1) %*%
                 matrix(doseLevels / max(doseLevels), nrow = 1, ncol = gMax)

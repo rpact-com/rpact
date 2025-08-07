@@ -118,7 +118,8 @@ getObservedInformationRates <- function(dataInput,
     .assertIsSingleNumber(maxInformation, "maxInformation")
     .assertIsInOpenInterval(
         maxInformation,
-        "maxInformation", 0, NULL
+        "maxInformation", 
+        lower = 0, upper = NULL
     )
 
     information <- .getRecalculatedInformationRates(dataInput, maxInformation, stage = stage)
