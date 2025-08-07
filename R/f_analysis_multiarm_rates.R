@@ -13,9 +13,9 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8545 $
-## |  Last changed: $Date: 2025-02-10 12:37:59 +0100 (Mo, 10 Feb 2025) $
-## |  Last changed by: $Author: wassmer $
+## |  File version: $Revision: 8781 $
+## |  Last changed: $Date: 2025-08-07 13:34:35 +0200 (Do, 07 Aug 2025) $
+## |  Last changed by: $Author: pahlke $
 ## |
 
 #' @include f_logger.R
