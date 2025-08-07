@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7920 $
-## |  Last changed: $Date: 2024-05-23 13:56:24 +0200 (Do, 23 Mai 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 C_SIMULATION_CALC_SUBJECTS_FUNCTION_BASE_MEANS_ARGUMENTS <- list(
     stage = "int",

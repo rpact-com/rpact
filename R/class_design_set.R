@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8620 $
-## |  Last changed: $Date: 2025-03-20 09:03:31 +0100 (Do, 20 Mrz 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_plot.R
 #' @include f_core_utilities.R

@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8579 $
-## |  Last changed: $Date: 2025-03-04 16:57:07 +0100 (Di, 04 Mrz 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 PlotSubTitleItem <- R6::R6Class("PlotSubTitleItem",
     public = list(

@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8246 $
-## |  Last changed: $Date: 2024-09-20 12:10:36 +0200 (Fr, 20 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_utilities.R
 NULL

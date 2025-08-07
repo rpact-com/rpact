@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8752 $
-## |  Last changed: $Date: 2025-07-10 14:29:45 +0200 (Do, 10 Jul 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include class_dictionary.R
 #' @include f_core_utilities.R

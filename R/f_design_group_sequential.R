@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8691 $
-## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_constants.R
 NULL
