@@ -220,6 +220,26 @@ NULL
 #' \code{\link[=getRawData]{getRawData()}} can be used to get the simulated raw data from the
 #' object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival()}
 #' must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
+#' 
+#' **What `maxNumberOfRawDatasetsPerStage` does**
+#' 
+#' When `maxNumberOfRawDatasetsPerStage = 0` (the default), simulations run as usual but *no* 
+#' patient-level ("raw") data are kept - only summary results.
+#' 
+#' If you set `maxNumberOfRawDatasetsPerStage > 0`, rpact will **save up to that many 
+#' full patient-level datasets *per stage*** (i.e., per interim/final look). 
+#' Each saved dataset corresponds to one simulated iteration and contains all 
+#' subject-wise records accrued up to the stage at which that iteration stopped. 
+#' You can later retrieve these datasets with \code{\link[=getRawData]{getRawData()}}.
+#' 
+#' **Why "max" and not `numberOfRawDatasetsPerStage`?**
+#' 
+#' The value is an *upper bound per stage*, not a fixed count. The actual number of datasets stored can be smaller because:
+#' 
+#' - Some iterations stop early (e.g., at stage 1), so later stages receive fewer datasets.
+#' - The simulation might finish before reaching the cap due to other stopping or iteration limits.
+#' 
+#' As a result, the number specified is the **maximum possible** datasets saved *per stage*, not the exact number.
 #'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
