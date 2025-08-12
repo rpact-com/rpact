@@ -538,7 +538,7 @@ NULL
 #' @inheritParams param_numberOfIterationsQOCEF
 #' @inheritParams param_designOCEF
 #'
-#' @return A list containing the monotonisation constants (element \code{$qs}) and the intervals on which they must be applied, specified via minimum (element \code{qls}) and maximum (element \code{qus}).
+#' @return A list containing the monotonisation constants (element \code{qs}) and the intervals on which they must be applied, specified via minimum (element \code{qls}) and maximum (element \code{qus}).
 #' @export
 #'
 #' @template reference_monotone
