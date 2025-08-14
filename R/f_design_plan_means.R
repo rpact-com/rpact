@@ -754,7 +754,9 @@ NULL
 #'
 #' @export
 #'
-getSampleSizeMeans <- function(design = NULL, ...,
+getSampleSizeMeans <- function(
+        design = NULL, 
+        ...,
         groups = 2L,
         normalApproximation = FALSE,
         meanRatio = FALSE,

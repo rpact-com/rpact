@@ -269,7 +269,7 @@ NULL
     }
 }
 
-#' 
+#'
 #' Assert Values Are in a Closed Interval
 #'
 #' @description
@@ -288,12 +288,12 @@ NULL
 #'
 #' @examples
 #' \dontrun{
-#'   .assertIsInClosedInterval(1:10, "x", lower = 1, upper = 10)
-#'   .assertIsInClosedInterval(c(1, NA, 5), "x", lower = 1, upper = 10, naAllowed = TRUE)
+#' .assertIsInClosedInterval(1:10, "x", lower = 1, upper = 10)
+#' .assertIsInClosedInterval(c(1, NA, 5), "x", lower = 1, upper = 10, naAllowed = TRUE)
 #' }
 #'
 #' @noRd
-#' 
+#'
 .assertIsInClosedInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
     if (naAllowed && all(is.na(x))) {
@@ -326,7 +326,7 @@ NULL
     }
 }
 
-#' 
+#'
 #' Assert Values Are in an Open Interval
 #'
 #' @description
@@ -345,11 +345,11 @@ NULL
 #'
 #' @examples
 #' \dontrun{
-#'   .assertIsInOpenInterval(1:10, "x", lower = 0, upper = 11)
+#' .assertIsInOpenInterval(1:10, "x", lower = 0, upper = 11)
 #' }
 #'
 #' @noRd
-#' 
+#'
 .assertIsInOpenInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
     if (naAllowed && all(is.na(x))) {
         return(invisible())
@@ -1812,11 +1812,10 @@ NULL
     .assertPackageIsInstalled("testthat")
 }
 
-.assertIsValidThetaH0 <- function(
-        thetaH0, 
-        ..., 
+.assertIsValidThetaH0 <- function(thetaH0,
+        ...,
         endpoint = c("means", "rates", "survival", "counts"),
-        groups, 
+        groups,
         ratioEnabled = FALSE,
         naAllowed = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsValidThetaH0", ...)
@@ -1852,10 +1851,11 @@ NULL
     } else {
         endpoint <- "means"
     }
-    .assertIsValidThetaH0(thetaH0, 
-        endpoint = endpoint, 
+    .assertIsValidThetaH0(thetaH0,
+        endpoint = endpoint,
         groups = dataInput$getNumberOfGroups(),
-        naAllowed = naAllowed)
+        naAllowed = naAllowed
+    )
 }
 
 .assertIsValidThetaRange <- function(..., thetaRange, thetaAutoSeqEnabled = TRUE, survivalDataEnabled = FALSE) {
@@ -1993,7 +1993,7 @@ NULL
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(
         allocationRatioPlanned,
-        "allocationRatioPlanned", 
+        "allocationRatioPlanned",
         lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
     )
 }
@@ -2862,30 +2862,30 @@ NULL
 
 .assertIsValidStdErrorEstimateRates <- function(stdErrorEstimate, dataInput) {
     .assertIsSingleCharacter(stdErrorEstimate, "stdErrorEstimate", naAllowed = TRUE)
-    
+
     if (dataInput$getNumberOfGroups() == 1) {
         if (!is.na(stdErrorEstimate)) {
             warning("'stdErrorEstimate' (", stdErrorEstimate, ") will be ignored because data input has only one group",
                 call. = FALSE
             )
         }
-        
+
         return(invisible(stdErrorEstimate))
     }
-    
+
     if (is.na(stdErrorEstimate)) {
         stdErrorEstimate <- C_RATES_STD_ERROR_ESTIMATE_DEFAULT
     }
-    
+
     if (!stdErrorEstimate %in% C_RATES_STD_ERROR_ESTIMATE) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stdErrorEstimate' (", stdErrorEstimate, ") must be ",
             .arrayToString(C_RATES_STD_ERROR_ESTIMATE, mode = "or", encapsulate = TRUE),
             call. = FALSE
         )
     }
-    
+
     return(invisible(stdErrorEstimate))
 }
 
@@ -3136,8 +3136,9 @@ NULL
         .assertIsNumericVector(valueMaxVector, valueMaxVectorName, naAllowed = TRUE)
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         if (valueMaxVectorName == "piMaxVector") {
-            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 
-                lower = 0, upper = 1, naAllowed = FALSE)
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix",
+                lower = 0, upper = 1, naAllowed = FALSE
+            )
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
             .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, NULL, naAllowed = FALSE)
@@ -3637,3 +3638,113 @@ NULL
             any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
     )
 }
+
+.showFutilityBoundsUnnecessaryArgumentWarning <- function(
+        argumentName, sourceScale, targetScale) {
+    warning(
+        sQuote(argumentName), " need not to be specified ",
+        "for 'sourceScale' = ", dQuote(sourceScale),
+        " and 'targetScale' = ", dQuote(targetScale),
+        call. = FALSE
+    )
+}
+
+.showFutilityBoundsMissingArgumentError <- function(
+        argumentName, scaleName, scaleValue) {
+    stop(
+        C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+        sQuote(argumentName), " needs to be specified for ",
+        sQuote(scaleName), " = ", dQuote(scaleValue),
+        call. = FALSE
+    )
+}
+
+C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
+    effectEstimate = c("information1"),
+    conditionalPower = c("design", "theta", "information2"),
+    condPowerAtObserved = c("design", "information1", "information2"),
+    predictivePower = c("design", "information1", "information2")
+)
+
+.isFutilityBoundsArgumentMissing <- function(name, value) {
+    if (identical(name, "design")) {
+        return(is.null(value))
+    }
+    is.na(value)
+}
+
+.checkFutilityBoundsScaleArgs <- function(scaleValue, scaleLabel, args) {
+    reqs <- C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE[[scaleValue]]
+    if (length(reqs) == 0L) {
+        return(invisible())
+    }
+    for (arg in reqs) {
+        if (.isFutilityBoundsArgumentMissing(arg, args[[arg]])) {
+            .showFutilityBoundsMissingArgumentError(arg, scaleLabel, scaleValue)
+        }
+    }
+}
+
+.checkForUnnecessaryFutilityBoundsScaleArgs <- function(argName, argValue, sourceScale, targetScale, allowedScales) {
+    if (!(sourceScale %in% allowedScales || targetScale %in% allowedScales) &&
+            !.isFutilityBoundsArgumentMissing(argName, argValue)) {
+        .showFutilityBoundsUnnecessaryArgumentWarning(argName, sourceScale, targetScale)
+    }
+}
+
+#' Assert Valid Futility Bounds Scale Arguments
+#'
+#' @description
+#' Verifies that futility bounds scale arguments are specified correctly. It checks for
+#' unnecessary or missing arguments based on the provided source and target scales.
+#'
+#' @param design Object. The trial design.
+#' @param sourceScale Character. The scale on which the futility bounds are currently specified.
+#' @param targetScale Character. The scale to which the futility bounds are to be converted.
+#' @param theta Numeric. The theta value for conditional power calculations.
+#' @param information1 Numeric. The first information rate.
+#' @param information2 Numeric. The second information rate.
+#'
+#' @return Invisibly returns \code{NULL} if the futility bounds scale arguments are valid.
+#'
+#' @examples
+#' \dontrun{
+#'   .assertAreValidFutilityBoundsScaleArguments(design,
+#'       sourceScale = "conditionalPower",
+#'       targetScale = "effectEstimate",
+#'       theta = 0.5,
+#'       information1 = 0.2,
+#'       information2 = 0.8)
+#' }
+#'
+#' @noRd
+#' 
+.assertAreValidFutilityBoundsScaleArguments <- function(design,
+        sourceScale,
+        targetScale,
+        theta,
+        information1,
+        information2) {
+        
+    baseScales <- c(
+        "conditionalPower",
+        "condPowerAtObserved",
+        "predictivePower"
+    )
+    scalesWithReverse <- c(baseScales, "reverseCondPower")
+    scalesWithEffect  <- c(baseScales, "effectEstimate")
+    .checkForUnnecessaryFutilityBoundsScaleArgs("design", design, sourceScale, targetScale, scalesWithReverse)
+    .checkForUnnecessaryFutilityBoundsScaleArgs("information1", information1, sourceScale, targetScale, scalesWithEffect)
+    .checkForUnnecessaryFutilityBoundsScaleArgs("information2", information2, sourceScale, targetScale, baseScales)
+    .checkForUnnecessaryFutilityBoundsScaleArgs("theta", theta, sourceScale, targetScale, "conditionalPower")
+        
+    args <- list(
+        design       = design,
+        information1 = information1,
+        information2 = information2,
+        theta        = theta
+    )
+    .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args)
+    .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args)
+}
+
