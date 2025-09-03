@@ -879,7 +879,7 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentSurvivalNew <- function(
+getSimulationEnrichmentSurvival <- function(
         design = NULL,
         ...,
         effectList = NULL,
