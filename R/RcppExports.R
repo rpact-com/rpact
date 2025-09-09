@@ -101,6 +101,10 @@
     .Call(`_rpact_lastSection`, simulatedSubjectsPerStage, iterations, i, gMax, kMax, cols, simulatedRejections, simulatedSuccessStopping, simulatedFutilityStopping, maxNumberOfIterations, expectedNumberOfSubjects)
 }
 
+.findObservationTimeCpp <- function(accrualTime, survivalTime, dropoutTime, requiredStageEvents) {
+    .Call(`_rpact_findObservationTime`, accrualTime, survivalTime, dropoutTime, requiredStageEvents)
+}
+
 getOneMinusQNorm <- function(p, mean = 0, sd = 1, lowerTail = 1, logP = 0, epsilon = 1.0e-100) {
     .Call(`_rpact_getOneMinusQNorm`, p, mean, sd, lowerTail, logP, epsilon)
 }

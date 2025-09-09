@@ -28,6 +28,7 @@
 
 using namespace Rcpp;
 
+// [[Rcpp::export(name = ".findObservationTimeCpp")]]
 double findObservationTime(
 		NumericVector accrualTime,
 		NumericVector survivalTime,

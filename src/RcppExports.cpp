@@ -566,6 +566,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// findObservationTime
+double findObservationTime(NumericVector accrualTime, NumericVector survivalTime, NumericVector dropoutTime, double requiredStageEvents);
+RcppExport SEXP _rpact_findObservationTime(SEXP accrualTimeSEXP, SEXP survivalTimeSEXP, SEXP dropoutTimeSEXP, SEXP requiredStageEventsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type accrualTime(accrualTimeSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type survivalTime(survivalTimeSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dropoutTime(dropoutTimeSEXP);
+    Rcpp::traits::input_parameter< double >::type requiredStageEvents(requiredStageEventsSEXP);
+    rcpp_result_gen = Rcpp::wrap(findObservationTime(accrualTime, survivalTime, dropoutTime, requiredStageEvents));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getOneMinusQNorm
 double getOneMinusQNorm(double p, double mean, double sd, double lowerTail, double logP, double epsilon);
 RcppExport SEXP _rpact_getOneMinusQNorm(SEXP pSEXP, SEXP meanSEXP, SEXP sdSEXP, SEXP lowerTailSEXP, SEXP logPSEXP, SEXP epsilonSEXP) {
@@ -661,6 +675,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_first", (DL_FUNC) &_rpact_first, 7},
     {"_rpact_funnyBool", (DL_FUNC) &_rpact_funnyBool, 3},
     {"_rpact_lastSection", (DL_FUNC) &_rpact_lastSection, 11},
+    {"_rpact_findObservationTime", (DL_FUNC) &_rpact_findObservationTime, 4},
     {"_rpact_getOneMinusQNorm", (DL_FUNC) &_rpact_getOneMinusQNorm, 6},
     {"_rpact_zeroin", (DL_FUNC) &_rpact_zeroin, 5},
     {"_rpact_getCipheredValue", (DL_FUNC) &_rpact_getCipheredValue, 1},
