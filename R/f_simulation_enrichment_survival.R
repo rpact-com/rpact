@@ -21,36 +21,6 @@
 #' @include f_simulation_enrichment.R
 NULL
 
-.createSubGroupsFromPopulation <- function(gMax, subPopulation) {
-    if (gMax == 2) {
-        if (subPopulation == 1) {
-            return(c("S"))
-        } else if (subPopulation == 2) {
-            return(c("S", "R"))
-        }
-    } else if (gMax == 3) {
-        if (subPopulation == 1) {
-            return(c("S1", "S12"))
-        } else if (subPopulation == 2) {
-            return(c("S2", "S12"))
-        } else if (subPopulation == 3) {
-            return(c("S1", "S2", "S12", "R"))
-        }
-    } else if (gMax == 4) {
-        if (subPopulation == 1) {
-            return(c("S1", "S12", "S13", "S123"))
-        } else if (subPopulation == 2) {
-            return(c("S2", "S12", "S23", "S123"))
-        } else if (subPopulation == 3) {
-            return(c("S3", "S13", "S23", "S123"))
-        } else if (subPopulation == 4) {
-            return(c("S1", "S2", "S3", "S12", "S13", "S23", "S123", "R"))
-        }
-    }
-    return(NA)
-}
-
-
 #   Calculates the stratified logrank test statistic for the enrichment survival
 #   data set and a specified population at given time.
 #' @noRd
@@ -62,7 +32,7 @@ NULL
                                    stratifiedAnalysis,
                                    directionUpper = TRUE,
                                    thetaH0 = 1) {
-    subGroups <- .createSubGroupsFromPopulation(gMax, subPopulation)
+    subGroups <- .createSubGroupsFromPopulationCpp(gMax, subPopulation)
 
     if (stratifiedAnalysis) {
         stratifiedNumerator <- 0

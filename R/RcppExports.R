@@ -81,6 +81,10 @@
     .Call(`_rpact_createSubGroups`, gMax)
 }
 
+.createSubGroupsFromPopulationCpp <- function(gMax, subPopulation) {
+    .Call(`_rpact_createSubGroupsFromPopulation`, gMax, subPopulation)
+}
+
 .getSimulatedStageMeansMultiArmCpp <- function(design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
     .Call(`_rpact_getSimulatedStageMeansMultiArmCpp`, design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction)
 }
