@@ -21,59 +21,6 @@
 #' @include f_simulation_enrichment.R
 NULL
 
-#'
-#' Calculates the time until required events were observed.
-#' If number of subjects (taking into account drop outs) are too small, eventsAchieved = FALSE
-#' is returned (same function as in f_simulation_multiarm_survival_new.R)
-#'
-#' @noRd
-#'
-.findObservationTime <- function(
-        survivalDataSet,
-        requiredStageEvents) {
-    numberOfSubjects <- length(survivalDataSet$accrualTime)
-    upperBound <- 1
-    repeat {
-        numberOfEvents <- 0
-        for (i in (1:numberOfSubjects)) {
-            if (
-                (survivalDataSet$accrualTime[i] + survivalDataSet$survivalTime[i] < upperBound) &&
-                    ((survivalDataSet$dropoutTime[i] > survivalDataSet$survivalTime[i]) ||
-                        is.na(survivalDataSet$dropoutTime[i]))
-                ) {
-                numberOfEvents <- numberOfEvents + 1
-            }
-        }
-        upperBound <- 2 * upperBound
-        if ((numberOfEvents >= requiredStageEvents) || (upperBound > 1E20)) break
-    }
-
-    if (upperBound > 1E20) {
-        return(list(time = NA, eventsAchieved = FALSE))
-    } else {
-        lower <- 0
-        upper <- upperBound
-        repeat {
-            time <- (lower + upper) / 2
-            numberOfEvents <- 0
-            for (i in (1:numberOfSubjects)) {
-                if (
-                    (survivalDataSet$accrualTime[i] + survivalDataSet$survivalTime[i] <= time) &&
-                        ((survivalDataSet$dropoutTime[i] > survivalDataSet$survivalTime[i]) ||
-                            is.na(survivalDataSet$dropoutTime[i]))
-                    ) {
-                    numberOfEvents <- numberOfEvents + 1
-                }
-            }
-            ifelse(numberOfEvents >= requiredStageEvents, upper <- time, lower <- time)
-            if (upper - lower < 1E-5) break
-        }
-        if (numberOfEvents > requiredStageEvents) time <- time - 1E-5
-        if (numberOfEvents < requiredStageEvents) time <- time + 1E-5
-        return(list(time = time, eventsAchieved = TRUE))
-    }
-}
-
 .createSubGroups <- function(gMax) {
     if (gMax == 2) {
         return(c("S", "R"))
@@ -119,14 +66,13 @@ NULL
 #   data set and a specified population at given time.
 #' @noRd
 #'
-.logRankTestEnrichment <- function(
-        gMax,
-        survivalDataSet,
-        time,
-        subPopulation,
-        stratifiedAnalysis,
-        directionUpper = TRUE,
-        thetaH0 = 1) {
+.logRankTestEnrichment <- function(gMax,
+                                   survivalDataSet,
+                                   time,
+                                   subPopulation,
+                                   stratifiedAnalysis,
+                                   directionUpper = TRUE,
+                                   thetaH0 = 1) {
     subGroups <- .createSubGroupsFromPopulation(gMax, subPopulation)
 
     if (stratifiedAnalysis) {
@@ -155,13 +101,13 @@ NULL
                     if (
                         (survivalDataSetSelected$treatmentArm[i] == 1) &&
                             (survivalDataSetSelected$accrualTime[i] <= time)
-                        ) {
+                    ) {
                         subjectsT1 <- subjectsT1 + 1
                     }
                     if (
                         (survivalDataSetSelected$treatmentArm[i] == 2) &&
                             (survivalDataSetSelected$accrualTime[i] <= time)
-                        ) {
+                    ) {
                         subjectsT2 <- subjectsT2 + 1
                     }
                     if (
@@ -169,7 +115,7 @@ NULL
                             (survivalDataSetSelected$treatmentArm[i] > 0) &&
                             ((survivalDataSetSelected$dropoutTime[i] > survivalDataSetSelected$survivalTime[i]) ||
                                 is.na(survivalDataSetSelected$dropoutTime[i]))
-                        ) {
+                    ) {
                         survivalDataSetSelected$event[i] <- TRUE
                     } else {
                         survivalDataSetSelected$event[i] <- FALSE
@@ -179,7 +125,7 @@ NULL
                             (survivalDataSetSelected$treatmentArm[i] > 0) &&
                             (survivalDataSetSelected$dropoutTime[i] < survivalDataSetSelected$survivalTime[i]) &&
                             !is.na(survivalDataSetSelected$dropoutTime[i])
-                        ) {
+                    ) {
                         survivalDataSetSelected$dropoutEvent[i] <- TRUE
                     } else {
                         survivalDataSetSelected$dropoutEvent[i] <- FALSE
@@ -257,13 +203,13 @@ NULL
                 if (
                     (survivalDataSetSelected$treatmentArm[i] == 1) &&
                         (survivalDataSetSelected$accrualTime[i] <= time)
-                    ) {
+                ) {
                     subjectsT1 <- subjectsT1 + 1
                 }
                 if (
                     (survivalDataSetSelected$treatmentArm[i] == 2) &&
                         (survivalDataSetSelected$accrualTime[i] <= time)
-                    ) {
+                ) {
                     subjectsT2 <- subjectsT2 + 1
                 }
                 if (
@@ -271,7 +217,7 @@ NULL
                         (survivalDataSetSelected$treatmentArm[i] > 0) &&
                         ((survivalDataSetSelected$dropoutTime[i] > survivalDataSetSelected$survivalTime[i]) ||
                             is.na(survivalDataSetSelected$dropoutTime[i]))
-                    ) {
+                ) {
                     survivalDataSetSelected$event[i] <- TRUE
                 } else {
                     survivalDataSetSelected$event[i] <- FALSE
@@ -281,7 +227,7 @@ NULL
                         (survivalDataSetSelected$treatmentArm[i] > 0) &&
                         (survivalDataSetSelected$dropoutTime[i] < survivalDataSetSelected$survivalTime[i]) &&
                         !is.na(survivalDataSetSelected$dropoutTime[i])
-                    ) {
+                ) {
                     survivalDataSetSelected$dropoutEvent[i] <- TRUE
                 } else {
                     survivalDataSetSelected$dropoutEvent[i] <- FALSE
@@ -346,19 +292,18 @@ NULL
 #'
 #' @noRd
 #'
-.getSimulationSurvivalEnrichmentStageEvents <- function(
-        ...,
-        stage,
-        directionUpper,
-        conditionalPower,
-        conditionalCriticalValue,
-        plannedEvents,
-        allocationRatioPlanned,
-        selectedPopulations,
-        thetaH1,
-        overallEffects,
-        minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage) {
+.getSimulationSurvivalEnrichmentStageEvents <- function(...,
+                                                        stage,
+                                                        directionUpper,
+                                                        conditionalPower,
+                                                        conditionalCriticalValue,
+                                                        plannedEvents,
+                                                        allocationRatioPlanned,
+                                                        selectedPopulations,
+                                                        thetaH1,
+                                                        overallEffects,
+                                                        minNumberOfEventsPerStage,
+                                                        maxNumberOfEventsPerStage) {
     stage <- stage - 1 # to be consistent with non-enrichment situation
     gMax <- nrow(overallEffects)
 
@@ -426,34 +371,33 @@ NULL
 #'
 #' @noRd
 #'
-.getSimulatedStageResultsSurvivalEnrichmentSubjectsBased <- function(
-        ...,
-        design,
-        subGroups,
-        prevalences,
-        piControls,
-        kappa,
-        phi,
-        eventTime,
-        hazardRatios,
-        directionUpper,
-        stratifiedAnalysis,
-        plannedEvents,
-        recruitmentTimes,
-        allocationFraction,
-        typeOfSelection,
-        effectMeasure,
-        adaptations,
-        epsilonValue,
-        rValue,
-        threshold,
-        minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage,
-        conditionalPower,
-        thetaH1,
-        calcEventsFunction,
-        calcEventsFunctionIsUserDefined,
-        selectPopulationsFunction) {
+.getSimulatedStageResultsSurvivalEnrichmentSubjectsBased <- function(...,
+                                                                     design,
+                                                                     subGroups,
+                                                                     prevalences,
+                                                                     piControls,
+                                                                     kappa,
+                                                                     phi,
+                                                                     eventTime,
+                                                                     hazardRatios,
+                                                                     directionUpper,
+                                                                     stratifiedAnalysis,
+                                                                     plannedEvents,
+                                                                     recruitmentTimes,
+                                                                     allocationFraction,
+                                                                     typeOfSelection,
+                                                                     effectMeasure,
+                                                                     adaptations,
+                                                                     epsilonValue,
+                                                                     rValue,
+                                                                     threshold,
+                                                                     minNumberOfEventsPerStage,
+                                                                     maxNumberOfEventsPerStage,
+                                                                     conditionalPower,
+                                                                     thetaH1,
+                                                                     calcEventsFunction,
+                                                                     calcEventsFunctionIsUserDefined,
+                                                                     selectPopulationsFunction) {
     kMax <- length(plannedEvents)
     pMax <- length(hazardRatios)
     gMax <- log(length(hazardRatios), 2) + 1
@@ -543,7 +487,12 @@ NULL
 
     for (k in 1:kMax) {
         if (k == 1) {
-            analysisTime[k] <- .findObservationTime(survivalDataSet, plannedEvents[k])$time
+            analysisTime[k] <- .findObservationTimeCpp(
+                accrualTime = survivalDataSet$accrualTime,
+                survivalTime = survivalDataSet$survivalTime,
+                dropoutTime = survivalDataSet$dropoutTime,
+                requiredStageEvents = plannedEvents[k]
+            )
             if (is.na(analysisTime[k])) {
                 eventsNotAchieved[k] <- TRUE
                 break
@@ -616,11 +565,12 @@ NULL
 
             survivalDatasetSelected <- survivalDataSet[survivalDataSet$subGroup %in% selectedsubGroups, ]
 
-            analysisTime[k] <- .findObservationTime(
-                survivalDatasetSelected,
-                plannedEvents[k]
-            )$time
-
+            analysisTime[k] <- .findObservationTimeCpp(
+                accrualTime = survivalDatasetSelected$accrualTime,
+                survivalTime = survivalDatasetSelected$survivalTime,
+                dropoutTime = survivalDatasetSelected$dropoutTime,
+                requiredStageEvents = plannedEvents[k]
+            )
             if (is.na(analysisTime[k])) {
                 eventsNotAchieved[k] <- TRUE
                 break
@@ -879,40 +829,39 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentSurvival <- function(
-        design = NULL,
-        ...,
-        effectList = NULL,
-        kappa = 1,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
-        accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
-        accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
-        accrualIntensityType = c("auto", "absolute", "relative"),
-        dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
-        maxNumberOfSubjects = NA_real_,
-        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
-        adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
-        epsilonValue = NA_real_,
-        rValue = NA_real_,
-        threshold = -Inf,
-        plannedEvents = NA_real_,
-        allocationRatioPlanned = NA_real_,
-        minNumberOfEventsPerStage = NA_real_,
-        maxNumberOfEventsPerStage = NA_real_,
-        conditionalPower = NA_real_,
-        thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
-        seed = NA_real_,
-        calcEventsFunction = NULL,
-        selectPopulationsFunction = NULL,
-        showStatistics = FALSE) {
+getSimulationEnrichmentSurvival <- function(design = NULL,
+                                            ...,
+                                            effectList = NULL,
+                                            kappa = 1,
+                                            eventTime = 12, # C_EVENT_TIME_DEFAULT
+                                            accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
+                                            accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
+                                            accrualIntensityType = c("auto", "absolute", "relative"),
+                                            dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
+                                            dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
+                                            dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
+                                            maxNumberOfSubjects = NA_real_,
+                                            intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+                                            stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT
+                                            directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+                                            adaptations = NA,
+                                            typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
+                                            effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
+                                            successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+                                            epsilonValue = NA_real_,
+                                            rValue = NA_real_,
+                                            threshold = -Inf,
+                                            plannedEvents = NA_real_,
+                                            allocationRatioPlanned = NA_real_,
+                                            minNumberOfEventsPerStage = NA_real_,
+                                            maxNumberOfEventsPerStage = NA_real_,
+                                            conditionalPower = NA_real_,
+                                            thetaH1 = NA_real_,
+                                            maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+                                            seed = NA_real_,
+                                            calcEventsFunction = NULL,
+                                            selectPopulationsFunction = NULL,
+                                            showStatistics = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "simulation")
         .warnInCaseOfUnknownArguments(
@@ -1219,7 +1168,7 @@ getSimulationEnrichmentSurvival <- function(
                                     closedTest$selectedPopulations[1:gMax, k] |
                                     rejectedPopulationsBefore
                             )
-                        ) {
+                    ) {
                         simulatedRejectAtLeastOne[i] <- simulatedRejectAtLeastOne[i] + 1
                         rejectAtSomeStage <- TRUE
                     }
