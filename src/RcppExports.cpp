@@ -400,6 +400,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// createSubGroups
+CharacterVector createSubGroups(int gMax);
+RcppExport SEXP _rpact_createSubGroups(SEXP gMaxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type gMax(gMaxSEXP);
+    rcpp_result_gen = Rcpp::wrap(createSubGroups(gMax));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getSimulatedStageMeansMultiArmCpp
 List getSimulatedStageMeansMultiArmCpp(Environment design, NumericVector muVector, double stDev, NumericVector plannedSubjects, std::string typeOfSelection, std::string effectMeasure, LogicalVector adaptations, double epsilonValue, double rValue, double threshold, NumericVector allocationRatioPlanned, NumericVector minNumberOfSubjectsPerStage, NumericVector maxNumberOfSubjectsPerStage, double conditionalPower, double thetaH1, double stDevH1, Function calcSubjectsFunction, bool calcSubjectsFunctionIsUserDefined, Nullable<Function> selectArmsFunction);
 RcppExport SEXP _rpact_getSimulatedStageMeansMultiArmCpp(SEXP designSEXP, SEXP muVectorSEXP, SEXP stDevSEXP, SEXP plannedSubjectsSEXP, SEXP typeOfSelectionSEXP, SEXP effectMeasureSEXP, SEXP adaptationsSEXP, SEXP epsilonValueSEXP, SEXP rValueSEXP, SEXP thresholdSEXP, SEXP allocationRatioPlannedSEXP, SEXP minNumberOfSubjectsPerStageSEXP, SEXP maxNumberOfSubjectsPerStageSEXP, SEXP conditionalPowerSEXP, SEXP thetaH1SEXP, SEXP stDevH1SEXP, SEXP calcSubjectsFunctionSEXP, SEXP calcSubjectsFunctionIsUserDefinedSEXP, SEXP selectArmsFunctionSEXP) {
@@ -669,6 +680,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_getSimulationMeansLoopCpp", (DL_FUNC) &_rpact_getSimulationMeansLoopCpp, 24},
     {"_rpact_getSimulationRatesCpp", (DL_FUNC) &_rpact_getSimulationRatesCpp, 24},
     {"_rpact_getSimulationSurvivalCpp", (DL_FUNC) &_rpact_getSimulationSurvivalCpp, 33},
+    {"_rpact_createSubGroups", (DL_FUNC) &_rpact_createSubGroups, 1},
     {"_rpact_getSimulatedStageMeansMultiArmCpp", (DL_FUNC) &_rpact_getSimulatedStageMeansMultiArmCpp, 19},
     {"_rpact_simulationMultiArmMeansInnerLoopCpp", (DL_FUNC) &_rpact_simulationMultiArmMeansInnerLoopCpp, 57},
     {"_rpact_hmm", (DL_FUNC) &_rpact_hmm, 9},

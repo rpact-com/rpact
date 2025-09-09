@@ -21,17 +21,6 @@
 #' @include f_simulation_enrichment.R
 NULL
 
-.createSubGroups <- function(gMax) {
-    if (gMax == 2) {
-        return(c("S", "R"))
-    } else if (gMax == 3) {
-        return(c("S1", "S2", "S12", "R"))
-    } else if (gMax == 4) {
-        return(c("S1", "S2", "S3", "S12", "S13", "S23", "S123", "R"))
-    }
-    return(NA)
-}
-
 .createSubGroupsFromPopulation <- function(gMax, subPopulation) {
     if (gMax == 2) {
         if (subPopulation == 1) {
@@ -561,7 +550,7 @@ NULL
                 }
             }
 
-            selectedsubGroups <- .createSubGroups(gMax)[selectedsubGroupsIndices[, k]]
+            selectedsubGroups <- .createSubGroupsCpp(gMax)[selectedsubGroupsIndices[, k]]
 
             survivalDatasetSelected <- survivalDataSet[survivalDataSet$subGroup %in% selectedsubGroups, ]
 
