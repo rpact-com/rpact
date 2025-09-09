@@ -48,3 +48,7 @@ testthat-problems.rds
 .vscode/debug.R
 .vscode/launch.json
 .vscode/rcpp_printers.py
+src/rpact.so
+src/tests/testthat/index.txt
+src/tests/testthat.R
+src/tests/testthat/.gitignore
