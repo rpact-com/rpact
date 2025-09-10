@@ -318,7 +318,7 @@ NULL
 
                 for (g in 1:gMax) {
                     if (selectedPopulations[g, k]) {
-                        logRank <- .logRankTestEnrichmentCpp(
+                        logRank <- .logRankTestEnrichment(
                             gMax = gMax,
                             survivalDataSet = survivalDataSet,
                             time = analysisTime[1],
@@ -326,6 +326,15 @@ NULL
                             stratifiedAnalysis = stratifiedAnalysis,
                             directionUpper = directionUpper
                         )
+                        logRank2 <- .logRankTestEnrichmentCpp(
+                            gMax = gMax,
+                            survivalDataSet = survivalDataSet,
+                            time = analysisTime[1],
+                            subPopulation = g,
+                            stratifiedAnalysis = stratifiedAnalysis,
+                            directionUpper = directionUpper
+                        )
+                        stopifnot(isTRUE(all.equal(logRank, logRank2)))
                     }
                     testStatistics[g, k] <- logRank$logRank
                     overallTestStatistics[g, k] <- logRank$logRank
@@ -395,7 +404,7 @@ NULL
                 numberOfSubjects[k] <- sum(survivalDataSet$accrualTime <= analysisTime[k])
                 for (g in 1:gMax) {
                     if (selectedPopulations[g, k]) {
-                        logRank <- .logRankTestEnrichmentCpp(
+                        logRank <- .logRankTestEnrichment(
                             gMax = gMax,
                             survivalDataSet = survivalDatasetSelected,
                             time = analysisTime[k],
@@ -403,6 +412,16 @@ NULL
                             stratifiedAnalysis = stratifiedAnalysis,
                             directionUpper = directionUpper
                         )
+                        logRank2 <- .logRankTestEnrichmentCpp(
+                            gMax = gMax,
+                            survivalDataSet = survivalDataSet,
+                            time = analysisTime[k],
+                            subPopulation = g,
+                            stratifiedAnalysis = stratifiedAnalysis,
+                            directionUpper = directionUpper
+                        )
+                        stopifnot(isTRUE(all.equal(logRank, logRank2)))
+
                         overallTestStatistics[g, k] <- logRank$logRank
                         populationEventsPerStage[g, k] <- sum(logRank$events)
                         if (populationEventsPerStage[g, k] - populationEventsPerStage[g, k - 1] > 0) {
