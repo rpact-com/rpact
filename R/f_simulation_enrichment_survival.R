@@ -318,7 +318,7 @@ NULL
 
                 for (g in 1:gMax) {
                     if (selectedPopulations[g, k]) {
-                        logRank <- .logRankTestEnrichment(
+                        logRank <- .logRankTestEnrichmentCpp(
                             gMax = gMax,
                             survivalDataSet = survivalDataSet,
                             time = analysisTime[1],
@@ -395,7 +395,7 @@ NULL
                 numberOfSubjects[k] <- sum(survivalDataSet$accrualTime <= analysisTime[k])
                 for (g in 1:gMax) {
                     if (selectedPopulations[g, k]) {
-                        logRank <- .logRankTestEnrichment(
+                        logRank <- .logRankTestEnrichmentCpp(
                             gMax = gMax,
                             survivalDataSet = survivalDatasetSelected,
                             time = analysisTime[k],
