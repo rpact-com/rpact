@@ -88,7 +88,7 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		}
 	}
 
-	int numberOfSubjets = subjectsT1 + subjectsT2;
+	int numberOfSubjects = subjectsT1 + subjectsT2;
 
 	NumericVector timeUnderObservationSorted = clone(timeUnderObservation).sort();
 	IntegerVector sortedIndex = match(timeUnderObservationSorted, timeUnderObservation);
@@ -143,7 +143,7 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 
 	NumericVector out(4);
 	out[0] = logRank;
-	out[1] = numberOfSubjets;
+	out[1] = numberOfSubjects;
 	out[2] = events1;
 	out[3] = events2;
 

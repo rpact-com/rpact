@@ -21,6 +21,101 @@
 #' @include f_simulation_enrichment.R
 NULL
 
+.logRankHelper <- function(survivalDataSetSelected, time, thetaH0) {
+    numberOfSubjects <- length(survivalDataSetSelected$accrualTime)
+    events1 <- 0
+    events2 <- 0
+    subjectsT1 <- 0
+    subjectsT2 <- 0
+    subjectNumber <- 0
+    numerator <- 0
+    denominator <- 0
+    if (numberOfSubjects > 0) {
+        for (i in (1:numberOfSubjects)) {
+            if (survivalDataSetSelected$accrualTime[i] > time) {
+                survivalDataSetSelected$treatmentArm[i] <- 0
+                survivalDataSetSelected$event[i] <- FALSE
+                survivalDataSetSelected$dropoutEvent[i] <- FALSE
+            }
+            if (
+                (survivalDataSetSelected$treatmentArm[i] == 1) &&
+                    (survivalDataSetSelected$accrualTime[i] <= time)
+            ) {
+                subjectsT1 <- subjectsT1 + 1
+            }
+            if (
+                (survivalDataSetSelected$treatmentArm[i] == 2) &&
+                    (survivalDataSetSelected$accrualTime[i] <= time)
+            ) {
+                subjectsT2 <- subjectsT2 + 1
+            }
+            if (
+                (survivalDataSetSelected$accrualTime[i] + survivalDataSetSelected$survivalTime[i] < time) &&
+                    (survivalDataSetSelected$treatmentArm[i] > 0) &&
+                    ((survivalDataSetSelected$dropoutTime[i] > survivalDataSetSelected$survivalTime[i]) ||
+                        is.na(survivalDataSetSelected$dropoutTime[i]))
+            ) {
+                survivalDataSetSelected$event[i] <- TRUE
+            } else {
+                survivalDataSetSelected$event[i] <- FALSE
+            }
+            if (
+                (survivalDataSetSelected$accrualTime[i] + survivalDataSetSelected$dropoutTime[i] < time) &&
+                    (survivalDataSetSelected$treatmentArm[i] > 0) &&
+                    (survivalDataSetSelected$dropoutTime[i] < survivalDataSetSelected$survivalTime[i]) &&
+                    !is.na(survivalDataSetSelected$dropoutTime[i])
+            ) {
+                survivalDataSetSelected$dropoutEvent[i] <- TRUE
+            } else {
+                survivalDataSetSelected$dropoutEvent[i] <- FALSE
+            }
+            if (survivalDataSetSelected$event[i]) {
+                survivalDataSetSelected$timeUnderObservation[i] <- survivalDataSetSelected$survivalTime[i]
+            } else if (survivalDataSetSelected$dropoutEvent[i]) {
+                survivalDataSetSelected$timeUnderObservation[i] <- survivalDataSetSelected$dropoutTime[i]
+            } else {
+                survivalDataSetSelected$timeUnderObservation[i] <- time - survivalDataSetSelected$accrualTime[i]
+            }
+        }
+        subjectNumber <- subjectsT1 + subjectsT2
+        sortedIndex <- order(survivalDataSetSelected$timeUnderObservation, decreasing = FALSE)
+        survivalDataSetSelectedSorted <- survivalDataSetSelected[sortedIndex, ]
+        for (i in (1:numberOfSubjects)) {
+            if (survivalDataSetSelectedSorted$event[i]) {
+                if (survivalDataSetSelectedSorted$treatmentArm[i] == 1) {
+                    if (subjectsT1 + subjectsT2 > 0) {
+                        numerator <- numerator - thetaH0 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)
+                    }
+                    events1 <- events1 + 1
+                } else if (survivalDataSetSelectedSorted$treatmentArm[i] == 2) {
+                    if (subjectsT1 + subjectsT2 > 0) {
+                        numerator <- numerator + 1 - thetaH0 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)
+                    }
+                    events2 <- events2 + 1
+                }
+                if (subjectsT1 + subjectsT2 > 0) {
+                    denominator <- denominator +
+                        thetaH0 * subjectsT1 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)^2
+                }
+            }
+            if (survivalDataSetSelectedSorted$treatmentArm[i] == 1) {
+                subjectsT1 <- subjectsT1 - 1
+            }
+            if (survivalDataSetSelectedSorted$treatmentArm[i] == 2) {
+                subjectsT2 <- subjectsT2 - 1
+            }
+        }
+    }
+
+    list(
+        numerator = numerator,
+        denominator = denominator,
+        subjectNumber = subjectNumber,
+        events1 = events1,
+        events2 = events2
+    )
+}
+
 #   Calculates the stratified logrank test statistic for the enrichment survival
 #   data set and a specified population at given time.
 #' @noRd
@@ -42,95 +137,12 @@ NULL
         stratifiedSubjectNumber <- 0
         for (subGroup in subGroups) {
             survivalDataSetSelected <- survivalDataSet[survivalDataSet$subGroup == subGroup, ]
-            numberOfSubjects <- length(survivalDataSetSelected$accrualTime)
-            events1 <- 0
-            events2 <- 0
-            subjectsT1 <- 0
-            subjectsT2 <- 0
-            subjectNumber <- 0
-            numerator <- 0
-            denominator <- 0
-            if (numberOfSubjects > 0) {
-                for (i in (1:numberOfSubjects)) {
-                    if (survivalDataSetSelected$accrualTime[i] > time) {
-                        survivalDataSetSelected$treatmentArm[i] <- 0
-                        survivalDataSetSelected$event[i] <- FALSE
-                        survivalDataSetSelected$dropoutEvent[i] <- FALSE
-                    }
-                    if (
-                        (survivalDataSetSelected$treatmentArm[i] == 1) &&
-                            (survivalDataSetSelected$accrualTime[i] <= time)
-                    ) {
-                        subjectsT1 <- subjectsT1 + 1
-                    }
-                    if (
-                        (survivalDataSetSelected$treatmentArm[i] == 2) &&
-                            (survivalDataSetSelected$accrualTime[i] <= time)
-                    ) {
-                        subjectsT2 <- subjectsT2 + 1
-                    }
-                    if (
-                        (survivalDataSetSelected$accrualTime[i] + survivalDataSetSelected$survivalTime[i] < time) &&
-                            (survivalDataSetSelected$treatmentArm[i] > 0) &&
-                            ((survivalDataSetSelected$dropoutTime[i] > survivalDataSetSelected$survivalTime[i]) ||
-                                is.na(survivalDataSetSelected$dropoutTime[i]))
-                    ) {
-                        survivalDataSetSelected$event[i] <- TRUE
-                    } else {
-                        survivalDataSetSelected$event[i] <- FALSE
-                    }
-                    if (
-                        (survivalDataSetSelected$accrualTime[i] + survivalDataSetSelected$dropoutTime[i] < time) &&
-                            (survivalDataSetSelected$treatmentArm[i] > 0) &&
-                            (survivalDataSetSelected$dropoutTime[i] < survivalDataSetSelected$survivalTime[i]) &&
-                            !is.na(survivalDataSetSelected$dropoutTime[i])
-                    ) {
-                        survivalDataSetSelected$dropoutEvent[i] <- TRUE
-                    } else {
-                        survivalDataSetSelected$dropoutEvent[i] <- FALSE
-                    }
-                    if (survivalDataSetSelected$event[i]) {
-                        survivalDataSetSelected$timeUnderObservation[i] <- survivalDataSetSelected$survivalTime[i]
-                    } else if (survivalDataSetSelected$dropoutEvent[i]) {
-                        survivalDataSetSelected$timeUnderObservation[i] <- survivalDataSetSelected$dropoutTime[i]
-                    } else {
-                        survivalDataSetSelected$timeUnderObservation[i] <- time - survivalDataSetSelected$accrualTime[i]
-                    }
-                }
-                subjectNumber <- subjectsT1 + subjectsT2
-                sortedIndex <- order(survivalDataSetSelected$timeUnderObservation, decreasing = FALSE)
-                survivalDataSetSelectedSorted <- survivalDataSetSelected[sortedIndex, ]
-                for (i in (1:numberOfSubjects)) {
-                    if (survivalDataSetSelectedSorted$event[i]) {
-                        if (survivalDataSetSelectedSorted$treatmentArm[i] == 1) {
-                            if (subjectsT1 + subjectsT2 > 0) {
-                                numerator <- numerator - thetaH0 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)
-                            }
-                            events1 <- events1 + 1
-                        } else if (survivalDataSetSelectedSorted$treatmentArm[i] == 2) {
-                            if (subjectsT1 + subjectsT2 > 0) {
-                                numerator <- numerator + 1 - thetaH0 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)
-                            }
-                            events2 <- events2 + 1
-                        }
-                        if (subjectsT1 + subjectsT2 > 0) {
-                            denominator <- denominator +
-                                thetaH0 * subjectsT1 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)^2
-                        }
-                    }
-                    if (survivalDataSetSelectedSorted$treatmentArm[i] == 1) {
-                        subjectsT1 <- subjectsT1 - 1
-                    }
-                    if (survivalDataSetSelectedSorted$treatmentArm[i] == 2) {
-                        subjectsT2 <- subjectsT2 - 1
-                    }
-                }
-            }
-            stratifiedNumerator <- stratifiedNumerator + numerator
-            stratifiedDenominator <- stratifiedDenominator + denominator
-            stratifiedEvents1 <- stratifiedEvents1 + events1
-            stratifiedEvents2 <- stratifiedEvents2 + events2
-            stratifiedSubjectNumber <- stratifiedSubjectNumber + subjectNumber
+            logRankHelperResult <- .logRankHelper(survivalDataSetSelected, time, thetaH0)
+            stratifiedNumerator <- stratifiedNumerator + logRankHelperResult$numerator
+            stratifiedDenominator <- stratifiedDenominator + logRankHelperResult$denominator
+            stratifiedEvents1 <- stratifiedEvents1 + logRankHelperResult$events1
+            stratifiedEvents2 <- stratifiedEvents2 + logRankHelperResult$events2
+            stratifiedSubjectNumber <- stratifiedSubjectNumber + logRankHelperResult$subjectNumber
         }
         if (directionUpper && stratifiedDenominator > 0) {
             logRank <- -stratifiedNumerator / sqrt(stratifiedDenominator)
@@ -144,106 +156,26 @@ NULL
         subjectNumber <- stratifiedSubjectNumber
     } else {
         survivalDataSetSelected <- survivalDataSet[survivalDataSet$subGroup %in% subGroups, ]
-        numberOfSubjects <- length(survivalDataSetSelected$accrualTime)
-        events1 <- 0
-        events2 <- 0
-        subjectsT1 <- 0
-        subjectsT2 <- 0
-        subjectNumber <- 0
-        numerator <- 0
-        denominator <- 0
-        if (numberOfSubjects > 0) {
-            for (i in (1:numberOfSubjects)) {
-                if (survivalDataSetSelected$accrualTime[i] > time) {
-                    survivalDataSetSelected$treatmentArm[i] <- 0
-                    survivalDataSetSelected$event[i] <- FALSE
-                    survivalDataSetSelected$dropoutEvent[i] <- FALSE
-                }
-                if (
-                    (survivalDataSetSelected$treatmentArm[i] == 1) &&
-                        (survivalDataSetSelected$accrualTime[i] <= time)
-                ) {
-                    subjectsT1 <- subjectsT1 + 1
-                }
-                if (
-                    (survivalDataSetSelected$treatmentArm[i] == 2) &&
-                        (survivalDataSetSelected$accrualTime[i] <= time)
-                ) {
-                    subjectsT2 <- subjectsT2 + 1
-                }
-                if (
-                    (survivalDataSetSelected$accrualTime[i] + survivalDataSetSelected$survivalTime[i] < time) &&
-                        (survivalDataSetSelected$treatmentArm[i] > 0) &&
-                        ((survivalDataSetSelected$dropoutTime[i] > survivalDataSetSelected$survivalTime[i]) ||
-                            is.na(survivalDataSetSelected$dropoutTime[i]))
-                ) {
-                    survivalDataSetSelected$event[i] <- TRUE
-                } else {
-                    survivalDataSetSelected$event[i] <- FALSE
-                }
-                if (
-                    (survivalDataSetSelected$accrualTime[i] + survivalDataSetSelected$dropoutTime[i] < time) &&
-                        (survivalDataSetSelected$treatmentArm[i] > 0) &&
-                        (survivalDataSetSelected$dropoutTime[i] < survivalDataSetSelected$survivalTime[i]) &&
-                        !is.na(survivalDataSetSelected$dropoutTime[i])
-                ) {
-                    survivalDataSetSelected$dropoutEvent[i] <- TRUE
-                } else {
-                    survivalDataSetSelected$dropoutEvent[i] <- FALSE
-                }
-                if (survivalDataSetSelected$event[i]) {
-                    survivalDataSetSelected$timeUnderObservation[i] <- survivalDataSetSelected$survivalTime[i]
-                } else if (survivalDataSetSelected$dropoutEvent[i]) {
-                    survivalDataSetSelected$timeUnderObservation[i] <- survivalDataSetSelected$dropoutTime[i]
-                } else {
-                    survivalDataSetSelected$timeUnderObservation[i] <- time - survivalDataSetSelected$accrualTime[i]
-                }
-            }
-            subjectNumber <- subjectsT1 + subjectsT2
-            sortedIndex <- order(survivalDataSetSelected$timeUnderObservation, decreasing = FALSE)
-            survivalDataSetSelectedSorted <- survivalDataSetSelected[sortedIndex, ]
-            for (i in (1:numberOfSubjects)) {
-                if (survivalDataSetSelectedSorted$event[i]) {
-                    if (survivalDataSetSelectedSorted$treatmentArm[i] == 1) {
-                        if (subjectsT1 + subjectsT2 > 0) {
-                            numerator <- numerator - thetaH0 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)
-                        }
-                        events1 <- events1 + 1
-                    } else if (survivalDataSetSelectedSorted$treatmentArm[i] == 2) {
-                        if (subjectsT1 + subjectsT2 > 0) {
-                            numerator <- numerator + 1 - thetaH0 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)
-                        }
-                        events2 <- events2 + 1
-                    }
-                    if (subjectsT1 + subjectsT2 > 0) {
-                        denominator <- denominator +
-                            thetaH0 * subjectsT1 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)^2
-                    }
-                }
-                if (survivalDataSetSelectedSorted$treatmentArm[i] == 1) {
-                    subjectsT1 <- subjectsT1 - 1
-                }
-                if (survivalDataSetSelectedSorted$treatmentArm[i] == 2) {
-                    subjectsT2 <- subjectsT2 - 1
-                }
-            }
-        }
-        if (directionUpper && denominator > 0) {
-            logRank <- -numerator / sqrt(denominator)
-        } else if (!directionUpper && denominator > 0) {
-            logRank <- numerator / sqrt(denominator)
+        logRankHelperResult <- .logRankHelper(survivalDataSetSelected, time, thetaH0)
+        if (directionUpper && logRankHelperResult$denominator > 0) {
+            logRank <- -logRankHelperResult$numerator / sqrt(logRankHelperResult$denominator)
+        } else if (!directionUpper && logRankHelperResult$denominator > 0) {
+            logRank <- logRankHelperResult$numerator / sqrt(logRankHelperResult$denominator)
         } else {
             logRank <- -Inf
         }
+        events1 <- logRankHelperResult$events1
+        events2 <- logRankHelperResult$events2
+        subjectNumber <- logRankHelperResult$subjectNumber
     }
 
-    return(list(
+    list(
         logRank = logRank,
         thetaH0 = thetaH0,
         directionUpper = directionUpper,
         subjectNumber = subjectNumber,
         events = c(events1, events2)
-    ))
+    )
 }
 
 #'
