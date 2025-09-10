@@ -36,8 +36,16 @@ using namespace Rcpp;
 // i.e., it determines whether an event or a dropout
 // was observed, calculates the time under risk, and the logrank statistic.
 //
-// @param accrualTime An double vector
+// @param accrualTime double vector of accrual times
+// @param survivalTime double vector of survival times
+// @param dropoutTime double vector of dropout times
+// @param treatmentGroup integer vector of treatment group (1 or 2)
+// @param time double time point of the analysis
+// @param directionUpper bool if true, the upper tail is considered
+// @param thetaH0 double the hazard ratio under the null hypothesis
+// @param returnRawData bool if true, the raw data are returned in a list
 //
+// [[Rcpp::export(name = ".logRankTestCpp")]]
 List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		NumericVector dropoutTime, IntegerVector treatmentGroup,
 		double time, bool directionUpper, double thetaH0, bool returnRawData) {
@@ -88,11 +96,10 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		}
 	}
 
-	int numberOfSubjects = subjectsT1 + subjectsT2;
+	int numberOfSubjectsIncluded = subjectsT1 + subjectsT2;
 
-	NumericVector timeUnderObservationSorted = clone(timeUnderObservation).sort();
-	IntegerVector sortedIndex = match(timeUnderObservationSorted, timeUnderObservation);
-	sortedIndex = sortedIndex - 1;
+	IntegerVector sortedIndex = order(timeUnderObservation) - 1;
+	NumericVector timeUnderObservationSorted = timeUnderObservation[sortedIndex];
 	LogicalVector eventSorted = event[sortedIndex];
 	IntegerVector treatmentGroupSorted = treatmentGroup[sortedIndex];
 	eventSorted = eventSorted[treatmentGroupSorted > 0];
@@ -141,11 +148,13 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		logRank = -logRank;
 	}
 
-	NumericVector out(4);
+	NumericVector out(6);
 	out[0] = logRank;
-	out[1] = numberOfSubjects;
+	out[1] = numberOfSubjectsIncluded;
 	out[2] = events1;
 	out[3] = events2;
+	out[4] = numerator;
+	out[5] = denominator;
 
 	if (returnRawData) {
 		return List::create(
@@ -154,11 +163,11 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 			_["event"] = event,
 			_["dropoutEvent"] = dropoutEvent
 		);
+	} else {
+		return List::create(
+			_["result"] = out
+		);
 	}
-
-	return List::create(
-		_["result"] = out
-	);
 }
 
 NumericVector getIndependentIncrements(int stage, NumericVector eventsOverStages, NumericVector logRankOverStages) {

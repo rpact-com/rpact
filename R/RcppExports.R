@@ -73,6 +73,10 @@
     .Call(`_rpact_getSimulationRatesCpp`, kMax, informationRates, criticalValues, pi1, pi2, maxNumberOfIterations, designNumber, groups, futilityBounds, alpha0Vec, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, pi1H1, pi2H1, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, riskRatio, thetaH0, calcSubjectsFunctionType, calcSubjectsFunctionR, calcSubjectsFunctionCpp)
 }
 
+.logRankTestCpp <- function(accrualTime, survivalTime, dropoutTime, treatmentGroup, time, directionUpper, thetaH0, returnRawData) {
+    .Call(`_rpact_logRankTest`, accrualTime, survivalTime, dropoutTime, treatmentGroup, time, directionUpper, thetaH0, returnRawData)
+}
+
 .getSimulationSurvivalCpp <- function(designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocationRatioPlanned, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa, calcEventsFunctionType, calcEventsFunctionR, calcEventsFunctionCpp) {
     .Call(`_rpact_getSimulationSurvivalCpp`, designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocationRatioPlanned, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa, calcEventsFunctionType, calcEventsFunctionR, calcEventsFunctionCpp)
 }
@@ -83,6 +87,10 @@
 
 .createSubGroupsFromPopulationCpp <- function(gMax, subPopulation) {
     .Call(`_rpact_createSubGroupsFromPopulation`, gMax, subPopulation)
+}
+
+.logRankTestEnrichmentCpp <- function(gMax, survivalDataSet, time, subPopulation, stratifiedAnalysis, directionUpper = TRUE, thetaH0 = 1.0) {
+    .Call(`_rpact_logRankTestEnrichment`, gMax, survivalDataSet, time, subPopulation, stratifiedAnalysis, directionUpper, thetaH0)
 }
 
 .getSimulatedStageMeansMultiArmCpp <- function(design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
@@ -115,6 +123,10 @@
 
 getOneMinusQNorm <- function(p, mean = 0, sd = 1, lowerTail = 1, logP = 0, epsilon = 1.0e-100) {
     .Call(`_rpact_getOneMinusQNorm`, p, mean, sd, lowerTail, logP, epsilon)
+}
+
+.orderCpp <- function(x) {
+    .Call(`_rpact_order`, x)
 }
 
 zeroin <- function(f, lower, upper, tolerance, maxIter) {

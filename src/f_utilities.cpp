@@ -173,6 +173,28 @@ IntegerVector getOrder(SEXP x, bool desc = false) {
     return IntegerVector::create();
 }
 
+// Custom order function that returns ascending permutation indices
+// @param x NumericVector to be ordered
+// @return IntegerVector of 1-based indices in ascending order
+//
+// [[Rcpp::export(name = ".orderCpp")]]
+IntegerVector order(NumericVector x) {
+	int n = x.size();
+	IntegerVector indices(n);
+	
+	// Initialize indices vector with 1-based indexing
+	for (int i = 0; i < n; i++) {
+		indices[i] = i + 1;
+	}
+	
+	// Sort indices based on corresponding values in x
+	std::sort(indices.begin(), indices.end(), [&](int a, int b) {
+		return x[a-1] < x[b-1];  // Convert back to 0-based for comparison
+	});
+	
+	return indices;
+}
+
 NumericVector vectorSum(NumericVector x, NumericVector y) {
     int n = x.size();
     NumericVector result = NumericVector(n, NA_REAL);
@@ -787,5 +809,27 @@ List getFractions(
 	);
 }
 
+IntegerVector which(const LogicalVector& x) {
+	std::vector<int> indices;
+	for (int i = 0; i < x.size(); i++) {
+		if (x[i]) {
+			indices.push_back(i);
+		}
+	}
+	return Rcpp::wrap(indices);
+}
 
-
+LogicalVector charInSet(const CharacterVector& x, CharacterVector set) {
+    int n = x.size();
+    LogicalVector result(n);
+    for (int i = 0; i < n; i++) {
+        result[i] = false;
+        for (int j = 0; j < set.size(); j++) {
+            if (Rcpp::as<std::string>(x[i]) == Rcpp::as<std::string>(set[j])) {
+                result[i] = true;
+                break;
+            }
+        }
+    }
+    return result;
+}

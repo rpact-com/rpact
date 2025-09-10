@@ -357,6 +357,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// logRankTest
+List logRankTest(NumericVector accrualTime, NumericVector survivalTime, NumericVector dropoutTime, IntegerVector treatmentGroup, double time, bool directionUpper, double thetaH0, bool returnRawData);
+RcppExport SEXP _rpact_logRankTest(SEXP accrualTimeSEXP, SEXP survivalTimeSEXP, SEXP dropoutTimeSEXP, SEXP treatmentGroupSEXP, SEXP timeSEXP, SEXP directionUpperSEXP, SEXP thetaH0SEXP, SEXP returnRawDataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type accrualTime(accrualTimeSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type survivalTime(survivalTimeSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dropoutTime(dropoutTimeSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type treatmentGroup(treatmentGroupSEXP);
+    Rcpp::traits::input_parameter< double >::type time(timeSEXP);
+    Rcpp::traits::input_parameter< bool >::type directionUpper(directionUpperSEXP);
+    Rcpp::traits::input_parameter< double >::type thetaH0(thetaH0SEXP);
+    Rcpp::traits::input_parameter< bool >::type returnRawData(returnRawDataSEXP);
+    rcpp_result_gen = Rcpp::wrap(logRankTest(accrualTime, survivalTime, dropoutTime, treatmentGroup, time, directionUpper, thetaH0, returnRawData));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getSimulationSurvivalCpp
 List getSimulationSurvivalCpp(int designNumber, int kMax, int sided, NumericVector criticalValues, NumericVector informationRates, double conditionalPower, NumericVector plannedEvents, double thetaH1, NumericVector minNumberOfEventsPerStage, NumericVector maxNumberOfEventsPerStage, bool directionUpper, double allocationRatioPlanned, NumericVector accrualTime, IntegerVector treatmentGroup, double thetaH0, NumericVector futilityBounds, NumericVector alpha0Vec, NumericVector pi1Vec, double pi2, double eventTime, NumericVector piecewiseSurvivalTime, NumericVector cdfValues1, NumericVector cdfValues2, NumericVector lambdaVec1, NumericVector lambdaVec2, NumericVector phi, int maxNumberOfSubjects, int maxNumberOfIterations, int maxNumberOfRawDatasetsPerStage, double kappa, int calcEventsFunctionType, Nullable<Function> calcEventsFunctionR, SEXP calcEventsFunctionCpp);
 RcppExport SEXP _rpact_getSimulationSurvivalCpp(SEXP designNumberSEXP, SEXP kMaxSEXP, SEXP sidedSEXP, SEXP criticalValuesSEXP, SEXP informationRatesSEXP, SEXP conditionalPowerSEXP, SEXP plannedEventsSEXP, SEXP thetaH1SEXP, SEXP minNumberOfEventsPerStageSEXP, SEXP maxNumberOfEventsPerStageSEXP, SEXP directionUpperSEXP, SEXP allocationRatioPlannedSEXP, SEXP accrualTimeSEXP, SEXP treatmentGroupSEXP, SEXP thetaH0SEXP, SEXP futilityBoundsSEXP, SEXP alpha0VecSEXP, SEXP pi1VecSEXP, SEXP pi2SEXP, SEXP eventTimeSEXP, SEXP piecewiseSurvivalTimeSEXP, SEXP cdfValues1SEXP, SEXP cdfValues2SEXP, SEXP lambdaVec1SEXP, SEXP lambdaVec2SEXP, SEXP phiSEXP, SEXP maxNumberOfSubjectsSEXP, SEXP maxNumberOfIterationsSEXP, SEXP maxNumberOfRawDatasetsPerStageSEXP, SEXP kappaSEXP, SEXP calcEventsFunctionTypeSEXP, SEXP calcEventsFunctionRSEXP, SEXP calcEventsFunctionCppSEXP) {
@@ -420,6 +438,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type gMax(gMaxSEXP);
     Rcpp::traits::input_parameter< int >::type subPopulation(subPopulationSEXP);
     rcpp_result_gen = Rcpp::wrap(createSubGroupsFromPopulation(gMax, subPopulation));
+    return rcpp_result_gen;
+END_RCPP
+}
+// logRankTestEnrichment
+List logRankTestEnrichment(int gMax, DataFrame survivalDataSet, double time, int subPopulation, bool stratifiedAnalysis, bool directionUpper, double thetaH0);
+RcppExport SEXP _rpact_logRankTestEnrichment(SEXP gMaxSEXP, SEXP survivalDataSetSEXP, SEXP timeSEXP, SEXP subPopulationSEXP, SEXP stratifiedAnalysisSEXP, SEXP directionUpperSEXP, SEXP thetaH0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type gMax(gMaxSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type survivalDataSet(survivalDataSetSEXP);
+    Rcpp::traits::input_parameter< double >::type time(timeSEXP);
+    Rcpp::traits::input_parameter< int >::type subPopulation(subPopulationSEXP);
+    Rcpp::traits::input_parameter< bool >::type stratifiedAnalysis(stratifiedAnalysisSEXP);
+    Rcpp::traits::input_parameter< bool >::type directionUpper(directionUpperSEXP);
+    Rcpp::traits::input_parameter< double >::type thetaH0(thetaH0SEXP);
+    rcpp_result_gen = Rcpp::wrap(logRankTestEnrichment(gMax, survivalDataSet, time, subPopulation, stratifiedAnalysis, directionUpper, thetaH0));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -619,6 +654,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// order
+IntegerVector order(NumericVector x);
+RcppExport SEXP _rpact_order(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(order(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // zeroin
 double zeroin(Function f, double lower, double upper, double tolerance, int maxIter);
 RcppExport SEXP _rpact_zeroin(SEXP fSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP toleranceSEXP, SEXP maxIterSEXP) {
@@ -691,9 +737,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_getDesignGroupSequentialUserDefinedBetaSpendingCpp", (DL_FUNC) &_rpact_getDesignGroupSequentialUserDefinedBetaSpendingCpp, 13},
     {"_rpact_getSimulationMeansLoopCpp", (DL_FUNC) &_rpact_getSimulationMeansLoopCpp, 24},
     {"_rpact_getSimulationRatesCpp", (DL_FUNC) &_rpact_getSimulationRatesCpp, 24},
+    {"_rpact_logRankTest", (DL_FUNC) &_rpact_logRankTest, 8},
     {"_rpact_getSimulationSurvivalCpp", (DL_FUNC) &_rpact_getSimulationSurvivalCpp, 33},
     {"_rpact_createSubGroups", (DL_FUNC) &_rpact_createSubGroups, 1},
     {"_rpact_createSubGroupsFromPopulation", (DL_FUNC) &_rpact_createSubGroupsFromPopulation, 2},
+    {"_rpact_logRankTestEnrichment", (DL_FUNC) &_rpact_logRankTestEnrichment, 7},
     {"_rpact_getSimulatedStageMeansMultiArmCpp", (DL_FUNC) &_rpact_getSimulatedStageMeansMultiArmCpp, 19},
     {"_rpact_simulationMultiArmMeansInnerLoopCpp", (DL_FUNC) &_rpact_simulationMultiArmMeansInnerLoopCpp, 57},
     {"_rpact_hmm", (DL_FUNC) &_rpact_hmm, 9},
@@ -702,6 +750,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_lastSection", (DL_FUNC) &_rpact_lastSection, 11},
     {"_rpact_findObservationTime", (DL_FUNC) &_rpact_findObservationTime, 4},
     {"_rpact_getOneMinusQNorm", (DL_FUNC) &_rpact_getOneMinusQNorm, 6},
+    {"_rpact_order", (DL_FUNC) &_rpact_order, 1},
     {"_rpact_zeroin", (DL_FUNC) &_rpact_zeroin, 5},
     {"_rpact_getCipheredValue", (DL_FUNC) &_rpact_getCipheredValue, 1},
     {"_rpact_getFraction", (DL_FUNC) &_rpact_getFraction, 3},
