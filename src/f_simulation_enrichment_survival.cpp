@@ -133,10 +133,10 @@ List logRankTestEnrichment(int gMax,
 		}
 		if (stratifiedDenominator > 0) {
 			logRank = -stratifiedNumerator / sqrt(stratifiedDenominator);
-			if (!directionUpper) logRank = -logRank;
 		} else {
 			logRank = R_NegInf;
 		}
+		if (!directionUpper) logRank = -logRank;
 		subjectNumber = stratifiedSubjectNumber;
 		events1 = stratifiedEvents1;
 		events2 = stratifiedEvents2;		

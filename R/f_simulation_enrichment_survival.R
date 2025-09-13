@@ -21,14 +21,14 @@
 #' @include f_simulation_enrichment.R
 NULL
 
-.logRankHelper <- function(survivalDataSetSelected, time, thetaH0) {
+.logRankHelper <- function(survivalDataSetSelected, time, thetaH0, directionUpper) {
     res <- .logRankTestCpp(
         accrualTime = survivalDataSetSelected$accrualTime,
         survivalTime = survivalDataSetSelected$survivalTime,
         dropoutTime = survivalDataSetSelected$dropoutTime,
         treatmentGroup = as.integer(survivalDataSetSelected$treatmentArm),
         time = time,
-        directionUpper = TRUE,
+        directionUpper = directionUpper,
         thetaH0 = thetaH0,
         returnRawData = FALSE
     )
@@ -63,7 +63,7 @@ NULL
         stratifiedSubjectNumber <- 0
         for (subGroup in subGroups) {
             survivalDataSetSelected <- survivalDataSet[survivalDataSet$subGroup == subGroup, ]
-            logRankHelperResult <- .logRankHelper(survivalDataSetSelected, time, thetaH0)
+            logRankHelperResult <- .logRankHelper(survivalDataSetSelected, time, thetaH0, directionUpper)
             stratifiedNumerator <- stratifiedNumerator + logRankHelperResult$numerator
             stratifiedDenominator <- stratifiedDenominator + logRankHelperResult$denominator
             stratifiedEvents1 <- stratifiedEvents1 + logRankHelperResult$events1
@@ -82,7 +82,7 @@ NULL
         subjectNumber <- stratifiedSubjectNumber
     } else {
         survivalDataSetSelected <- survivalDataSet[survivalDataSet$subGroup %in% subGroups, ]
-        logRankHelperResult <- .logRankHelper(survivalDataSetSelected, time, thetaH0)
+        logRankHelperResult <- .logRankHelper(survivalDataSetSelected, time, thetaH0, directionUpper)
         if (directionUpper && logRankHelperResult$denominator > 0) {
             logRank <- -logRankHelperResult$numerator / sqrt(logRankHelperResult$denominator)
         } else if (!directionUpper && logRankHelperResult$denominator > 0) {
