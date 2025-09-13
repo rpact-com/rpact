@@ -28,9 +28,8 @@ NULL
 #'
 #' @noRd
 #'
-.findObservationTime <- function(
-        survivalDataSet,
-        requiredStageEvents) {
+.findObservationTime <- function(survivalDataSet,
+                                 requiredStageEvents) {
     numberOfSubjects <- length(survivalDataSet$accrualTime)
     upperBound <- 1
     repeat {
@@ -40,7 +39,7 @@ NULL
                 (survivalDataSet$accrualTime[i] + survivalDataSet$survivalTime[i] < upperBound) &&
                     ((survivalDataSet$dropoutTime[i] > survivalDataSet$survivalTime[i]) ||
                         is.na(survivalDataSet$dropoutTime[i]))
-                ) {
+            ) {
                 numberOfEvents <- numberOfEvents + 1
             }
         }
@@ -64,7 +63,7 @@ NULL
                     (survivalDataSet$accrualTime[i] + survivalDataSet$survivalTime[i] <= time) &&
                         ((survivalDataSet$dropoutTime[i] > survivalDataSet$survivalTime[i]) ||
                             is.na(survivalDataSet$dropoutTime[i]))
-                    ) {
+                ) {
                     numberOfEvents <- numberOfEvents + 1
                 }
             }
@@ -104,13 +103,13 @@ NULL
         if (
             (survivalDataSetSelectedArms$treatmentArm[i] == treatmentArms[1]) &&
                 (survivalDataSetSelectedArms$accrualTime[i] <= time)
-            ) {
+        ) {
             subjectsT1 <- subjectsT1 + 1
         }
         if (
             (survivalDataSetSelectedArms$treatmentArm[i] == treatmentArms[2]) &&
                 (survivalDataSetSelectedArms$accrualTime[i] <= time)
-            ) {
+        ) {
             subjectsT2 <- subjectsT2 + 1
         }
 
@@ -119,7 +118,7 @@ NULL
                 (survivalDataSetSelectedArms$treatmentArm[i] > 0) &&
                 ((survivalDataSetSelectedArms$dropoutTime[i] > survivalDataSetSelectedArms$survivalTime[i]) ||
                     is.na(survivalDataSetSelectedArms$dropoutTime[i]))
-            ) {
+        ) {
             survivalDataSetSelectedArms$event[i] <- TRUE
         } else {
             survivalDataSetSelectedArms$event[i] <- FALSE
@@ -130,7 +129,7 @@ NULL
                 (survivalDataSetSelectedArms$treatmentArm[i] > 0) &&
                 (survivalDataSetSelectedArms$dropoutTime[i] < survivalDataSetSelectedArms$survivalTime[i]) &&
                 !is.na(survivalDataSetSelectedArms$dropoutTime[i])
-            ) {
+        ) {
             survivalDataSetSelectedArms$dropoutEvent[i] <- TRUE
         } else {
             survivalDataSetSelectedArms$dropoutEvent[i] <- FALSE
@@ -203,19 +202,18 @@ NULL
 #'
 #' @noRd
 #'
-.getSimulationSurvivalMultiArmStageEvents <- function(
-        ...,
-        stage,
-        directionUpper,
-        conditionalPower,
-        conditionalCriticalValue,
-        plannedEvents,
-        allocationRatioPlanned,
-        selectedArms,
-        thetaH1,
-        overallEffects,
-        minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage) {
+.getSimulationSurvivalMultiArmStageEvents <- function(...,
+                                                      stage,
+                                                      directionUpper,
+                                                      conditionalPower,
+                                                      conditionalCriticalValue,
+                                                      plannedEvents,
+                                                      allocationRatioPlanned,
+                                                      selectedArms,
+                                                      thetaH1,
+                                                      overallEffects,
+                                                      minNumberOfEventsPerStage,
+                                                      maxNumberOfEventsPerStage) {
     stage <- stage - 1 # to be consistent with non-multiarm situation
     gMax <- nrow(overallEffects)
 
@@ -277,31 +275,30 @@ NULL
 #'
 #' @noRd
 #'
-.getSimulatedStageResultsSurvivalMultiArmSubjectsBased <- function(
-        ...,
-        design,
-        directionUpper,
-        omegaVector,
-        piControl,
-        kappa,
-        phi,
-        eventTime,
-        plannedEvents,
-        recruitmentTimes,
-        allocationFraction,
-        typeOfSelection,
-        effectMeasure,
-        adaptations,
-        epsilonValue,
-        rValue,
-        threshold,
-        minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage,
-        conditionalPower,
-        thetaH1,
-        calcEventsFunction,
-        calcEventsFunctionIsUserDefined,
-        selectArmsFunction) {
+.getSimulatedStageResultsSurvivalMultiArmSubjectsBased <- function(...,
+                                                                   design,
+                                                                   directionUpper,
+                                                                   omegaVector,
+                                                                   piControl,
+                                                                   kappa,
+                                                                   phi,
+                                                                   eventTime,
+                                                                   plannedEvents,
+                                                                   recruitmentTimes,
+                                                                   allocationFraction,
+                                                                   typeOfSelection,
+                                                                   effectMeasure,
+                                                                   adaptations,
+                                                                   epsilonValue,
+                                                                   rValue,
+                                                                   threshold,
+                                                                   minNumberOfEventsPerStage,
+                                                                   maxNumberOfEventsPerStage,
+                                                                   conditionalPower,
+                                                                   thetaH1,
+                                                                   calcEventsFunction,
+                                                                   calcEventsFunctionIsUserDefined,
+                                                                   selectArmsFunction) {
     kMax <- length(plannedEvents)
     gMax <- length(omegaVector)
     maxNumberOfSubjects <- length(recruitmentTimes)
@@ -712,46 +709,45 @@ NULL
 #'
 #' @export
 #'
-getSimulationMultiArmSurvivalNew <- function(
-        design = NULL,
-        ...,
-        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
-        piControl = NA_real_,
-        effectMatrix = NULL,
-        typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
-        omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
-        kappa = 1,
-        gED50 = NA_real_,
-        slope = 1,
-        doseLevels = NA_real_,
-        eventTime = 12, # C_EVENT_TIME_DEFAULT
-        accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
-        accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
-        accrualIntensityType = c("auto", "absolute", "relative"),
-        dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
-        dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
-        maxNumberOfSubjects = NA_real_,
-        intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
-        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
-        adaptations = NA,
-        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
-        epsilonValue = NA_real_,
-        rValue = NA_real_,
-        threshold = -Inf,
-        plannedEvents = NA_real_,
-        allocationRatioPlanned = NA_real_,
-        minNumberOfEventsPerStage = NA_real_,
-        maxNumberOfEventsPerStage = NA_real_,
-        conditionalPower = NA_real_,
-        thetaH1 = NA_real_,
-        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
-        seed = NA_real_,
-        calcEventsFunction = NULL,
-        selectArmsFunction = NULL,
-        showStatistics = FALSE) {
+getSimulationMultiArmSurvival <- function(design = NULL,
+                                          ...,
+                                          activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
+                                          piControl = NA_real_,
+                                          effectMatrix = NULL,
+                                          typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
+                                          omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
+                                          kappa = 1,
+                                          gED50 = NA_real_,
+                                          slope = 1,
+                                          doseLevels = NA_real_,
+                                          eventTime = 12, # C_EVENT_TIME_DEFAULT
+                                          accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
+                                          accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
+                                          accrualIntensityType = c("auto", "absolute", "relative"),
+                                          dropoutRate1 = 0, # C_DROP_OUT_RATE_DEFAULT
+                                          dropoutRate2 = 0, # C_DROP_OUT_RATE_DEFAULT
+                                          dropoutTime = 12, # C_DROP_OUT_TIME_DEFAULT
+                                          maxNumberOfSubjects = NA_real_,
+                                          intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"), # C_INTERSECTION_TEST_MULTIARMED_DEFAULT
+                                          directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+                                          adaptations = NA,
+                                          typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
+                                          effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
+                                          successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+                                          epsilonValue = NA_real_,
+                                          rValue = NA_real_,
+                                          threshold = -Inf,
+                                          plannedEvents = NA_real_,
+                                          allocationRatioPlanned = NA_real_,
+                                          minNumberOfEventsPerStage = NA_real_,
+                                          maxNumberOfEventsPerStage = NA_real_,
+                                          conditionalPower = NA_real_,
+                                          thetaH1 = NA_real_,
+                                          maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+                                          seed = NA_real_,
+                                          calcEventsFunction = NULL,
+                                          selectArmsFunction = NULL,
+                                          showStatistics = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "simulation")
         .warnInCaseOfUnknownArguments(
@@ -1062,7 +1058,7 @@ getSimulationMultiArmSurvivalNew <- function(
                     if (
                         !rejectAtSomeStage &&
                             any(closedTest$rejected[, k] & closedTest$selectedArms[1:gMax, k] | rejectedArmsBefore)
-                        ) {
+                    ) {
                         simulatedRejectAtLeastOne[i] <- simulatedRejectAtLeastOne[i] + 1
                         rejectAtSomeStage <- TRUE
                     }
