@@ -74,7 +74,7 @@ Suggests:
 	rmarkdown (>= 1.10),
     rappdirs (>= 0.3.3)
 VignetteBuilder: knitr, rmarkdown
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true

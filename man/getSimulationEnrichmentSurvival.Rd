@@ -8,6 +8,15 @@ getSimulationEnrichmentSurvival(
   design = NULL,
   ...,
   effectList = NULL,
+  kappa = 1,
+  eventTime = 12,
+  accrualTime = c(0, 12),
+  accrualIntensity = 0.1,
+  accrualIntensityType = c("auto", "absolute", "relative"),
+  dropoutRate1 = 0,
+  dropoutRate2 = 0,
+  dropoutTime = 12,
+  maxNumberOfSubjects = NA_real_,
   intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
   stratifiedAnalysis = TRUE,
   directionUpper = NA,
@@ -41,6 +50,40 @@ that a warning will be displayed if unknown arguments are passed.}
 
 \item{effectList}{List of subsets, prevalences, and effect sizes with columns and number of rows
 reflecting the different situations to consider (see examples).}
+
+\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
+of the shape of the Weibull distribution.
+Default is \code{1}, i.e., the exponential survival distribution is used instead of the Weibull distribution.
+Note that the Weibull distribution cannot be used for the piecewise definition of
+the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa}
+can be specified.
+This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)}
+of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
+For example,
+\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
+and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the same result.}
+
+\item{eventTime}{The assumed time under which the event rates are calculated, default is \code{12}.}
+
+\item{accrualTime}{The assumed accrual time intervals for the study, default is
+\code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
+
+\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative
+intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
+
+\item{accrualIntensityType}{A character value specifying the accrual intensity input type.
+Must be one of \code{"auto"}, \code{"absolute"}, or \code{"relative"}; default is \code{"auto"},
+i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code{"absolute"}.}
+
+\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
+
+\item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
+
+\item{dropoutTime}{The assumed time for drop-out rates in the control and the
+treatment group, default is \code{12}.}
+
+\item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified.
+If accrual time and accrual intensity are specified, this will be calculated. Must be a positive integer of length 1.}
 
 \item{intersectionTest}{Defines the multiple test for the intersection
 hypotheses in the closed system of hypotheses.

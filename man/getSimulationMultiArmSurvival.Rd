@@ -7,20 +7,29 @@
 getSimulationMultiArmSurvival(
   design = NULL,
   ...,
-  activeArms = 3L,
+  activeArms = NA_integer_,
+  piControl = NA_real_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
   omegaMaxVector = seq(1, 2.6, 0.4),
+  kappa = 1,
   gED50 = NA_real_,
   slope = 1,
   doseLevels = NA_real_,
+  eventTime = 12,
+  accrualTime = c(0, 12),
+  accrualIntensity = 0.1,
+  accrualIntensityType = c("auto", "absolute", "relative"),
+  dropoutRate1 = 0,
+  dropoutRate2 = 0,
+  dropoutTime = 12,
+  maxNumberOfSubjects = NA_real_,
   intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
   directionUpper = NA,
   adaptations = NA,
   typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
   effectMeasure = c("effectEstimate", "testStatistic"),
   successCriterion = c("all", "atLeastOne"),
-  correlationComputation = c("alternative", "null"),
   epsilonValue = NA_real_,
   rValue = NA_real_,
   threshold = -Inf,
@@ -64,6 +73,18 @@ If \code{"userDefined"} is selected, \code{effectMatrix} has to be entered.}
 \item{omegaMaxVector}{Range of hazard ratios with highest response for \code{"linear"} and
 \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.}
 
+\item{kappa}{A numeric value > 0. A \code{kappa != 1} will be used for the specification
+of the shape of the Weibull distribution.
+Default is \code{1}, i.e., the exponential survival distribution is used instead of the Weibull distribution.
+Note that the Weibull distribution cannot be used for the piecewise definition of
+the survival time distribution, i.e., only \code{piecewiselambda} (as a single value) and \code{kappa}
+can be specified.
+This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lambda)}
+of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
+For example,
+\code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
+and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the same result.}
+
 \item{gED50}{If \code{typeOfShape = "sigmoidEmax"} is selected, \code{gED50} has to be entered
 to specify the ED50 of the sigmoid Emax model.}
 
@@ -72,6 +93,28 @@ to specify the slope of the sigmoid Emax model, default is 1.}
 
 \item{doseLevels}{The dose levels for the dose response relationship.
 If not specified, these dose levels are \code{1,...,activeArms}.}
+
+\item{eventTime}{The assumed time under which the event rates are calculated, default is \code{12}.}
+
+\item{accrualTime}{The assumed accrual time intervals for the study, default is
+\code{c(0, 12)} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
+
+\item{accrualIntensity}{A numeric vector of accrual intensities, default is the relative
+intensity \code{0.1} (for details see \code{\link[=getAccrualTime]{getAccrualTime()}}).}
+
+\item{accrualIntensityType}{A character value specifying the accrual intensity input type.
+Must be one of \code{"auto"}, \code{"absolute"}, or \code{"relative"}; default is \code{"auto"},
+i.e., if all values are < 1 the type is \code{"relative"}, otherwise it is \code{"absolute"}.}
+
+\item{dropoutRate1}{The assumed drop-out rate in the treatment group, default is \code{0}.}
+
+\item{dropoutRate2}{The assumed drop-out rate in the control group, default is \code{0}.}
+
+\item{dropoutTime}{The assumed time for drop-out rates in the control and the
+treatment group, default is \code{12}.}
+
+\item{maxNumberOfSubjects}{\code{maxNumberOfSubjects > 0} needs to be specified.
+If accrual time and accrual intensity are specified, this will be calculated. Must be a positive integer of length 1.}
 
 \item{intersectionTest}{Defines the multiple test for the intersection
 hypotheses in the closed system of hypotheses.
@@ -102,14 +145,6 @@ Two options are available: \code{"all"} stops the trial
 if the efficacy criterion is fulfilled for all selected treatment arms/populations,
 \code{"atLeastOne"} stops if at least one of the selected treatment arms/populations is shown to be
 superior to control at interim, default is \code{"all"}.}
-
-\item{correlationComputation}{If \code{correlationComputation = "alternative"},
-for simulating log-rank statistics in the many-to-one design, a correlation
-matrix according to Deng et al. (Biometrics, 2019) accounting for the
-respective alternative is used;
-if \code{correlationComputation = "null"}, a constant correlation matrix valid
-under the null, i.e., not accounting for the alternative is used,
-default is \code{"alternative"}.}
 
 \item{epsilonValue}{For \code{typeOfSelection = "epsilon"} (select treatment arm / population not worse than
 epsilon compared to the best), the parameter \code{epsilonValue} has to be specified. Must be a numeric of length 1.}
@@ -188,15 +223,14 @@ The following generics (R generic functions) are available for this object:
 \description{
 Returns the simulated power, stopping and selection probabilities, conditional power, and
 expected sample size for testing hazard ratios in a multi-arm treatment groups testing situation.
-In contrast to \code{getSimulationSurvival()} (where survival times are simulated), normally
-distributed logrank test statistics are simulated.
 }
 \details{
-At given design the function simulates the power, stopping probabilities,
-selection probabilities, and expected sample size at given number of subjects,
-parameter configuration, and treatment arm selection rule in the multi-arm situation.
-An allocation ratio can be specified referring to the ratio of number of subjects
-in the active treatment groups as compared to the control group.
+At given design the function simulates the analysis times, power, stopping
+probabilities, expected sample size and events, and selection probabilities,
+at given number of subjects, events, parameter configuration, and treatment
+arm selection rule in the multi-arm survival design situation. An allocation
+ratio can be specified referring to the ratio of number of subjects in the
+active treatment groups as compared to the control group.
 
 The definition of \code{thetaH1} makes only sense if \code{kMax} > 1
 and if \code{conditionalPower}, \code{minNumberOfEventsPerStage}, and

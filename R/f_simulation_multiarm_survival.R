@@ -712,7 +712,7 @@ NULL
 #'
 #' @export
 #'
-getSimulationMultiArmSurvivalNew <- function(
+getSimulationMultiArmSurvival <- function(
         design = NULL,
         ...,
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
