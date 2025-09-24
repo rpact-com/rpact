@@ -87,8 +87,7 @@ NULL
     rValue,
     threshold,
     selectPopulationsFunction,
-    selectPopulationsFunctionArgs
-) {
+    selectPopulationsFunctionArgs) {
     effectVector <- selectPopulationsFunctionArgs$effectVector
     gMax <- length(effectVector)
 
@@ -145,8 +144,7 @@ NULL
     design,
     indices,
     intersectionTest,
-    successCriterion
-) {
+    successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -253,7 +251,7 @@ NULL
                 } else {
                     overallAdjustedTestStatistics[i, k] <-
                         (weightsInverseNormal[1:k] %*% .getOneMinusQNorm(adjustedStageWisePValues[i, 1:k])) /
-                        sqrt(sum(weightsInverseNormal[1:k]^2))
+                            sqrt(sum(weightsInverseNormal[1:k]^2))
                 }
             }
 
@@ -273,7 +271,7 @@ NULL
             rejectedIntersections[is.na(rejectedIntersections[, k]), k] <- FALSE
 
             if (k == kMax && !rejectedIntersections[1, k]) {
-                #break
+                # break
             }
         }
 
@@ -353,8 +351,7 @@ NULL
     calcEventsFunction = NULL, # survival only
     selectPopulationsFunction,
     showStatistics,
-    endpoint = c("means", "rates", "survival")
-) {
+    endpoint = c("means", "rates", "survival")) {
     endpoint <- match.arg(endpoint)
 
     .assertIsSingleNumber(threshold, "threshold", naAllowed = FALSE)
@@ -797,12 +794,12 @@ NULL
         simulationResults$calcSubjectsFunction <- calcSubjectsFunction
     } else if (endpoint == "survival") {
         if (is.null(calcEventsFunction)) {
-            calcEventsFunction <- .getSimulationSurvivalEnrichmentStageEvents
+            calcEventsFunction <- .getSimulationSurvivalEnrichmentStageEventsCpp
         } else {
             .assertIsValidFunction(
                 fun = calcEventsFunction,
                 funArgName = "calcEventsFunction",
-                expectedFunction = .getSimulationSurvivalEnrichmentStageEvents
+                expectedFunction = .getSimulationSurvivalEnrichmentStageEventsCpp
             )
         }
         simulationResults$calcEventsFunction <- calcEventsFunction

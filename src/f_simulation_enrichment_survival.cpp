@@ -170,3 +170,100 @@ List logRankTestEnrichment(int gMax,
 		_["events"] = IntegerVector::create(events1, events2)
 	);
 }
+
+// Get Simulation Survival Enrichment Stage Events
+//
+// Calculates stage events for specified conditional power
+//
+// @param stage Stage number
+// @param directionUpper Direction of test
+// @param conditionalPower Conditional power
+// @param conditionalCriticalValue Conditional critical values per stage
+// @param plannedEvents Planned events per stage
+// @param allocationRatioPlanned Allocation ratio planned per stage
+// @param selectedPopulations Whether populations are selected (rows: populations, columns: stages)
+// @param thetaH1 Alternative hypothesis hazard ratio
+// @param overallEffects Matrix of overall effects (rows: populations, columns: stages)
+// @param minNumberOfEventsPerStage Minimum number of events per stage
+// @param maxNumberOfEventsPerStage Maximum number of events per stage
+//
+// [[Rcpp::export(name = ".getSimulationSurvivalEnrichmentStageEventsCpp")]]
+double getSimulationSurvivalEnrichmentStageEvents(int stage,
+												  bool directionUpper,
+												  double conditionalPower,
+												  NumericVector conditionalCriticalValue,
+												  NumericVector plannedEvents,
+												  NumericVector allocationRatioPlanned,
+												  LogicalMatrix selectedPopulations,
+												  double thetaH1,
+												  NumericMatrix overallEffects,
+												  NumericVector minNumberOfEventsPerStage,
+												  NumericVector maxNumberOfEventsPerStage) {
+	stage = stage - 1; // to be consistent with non-enrichment situation
+	int gMax = overallEffects.nrow();
+
+	double newEvents;
+
+	if (!R_IsNA(conditionalPower)) {
+		// Check if any populations are selected for the next stage
+		bool anySelected = false;
+		for (int g = 0; g < gMax; g++) {
+			if (selectedPopulations(g, stage)) {
+				anySelected = true;
+				break;
+			}
+		}
+
+		if (anySelected) {
+			double thetaStandardized;
+			
+			if (R_IsNA(thetaH1)) {
+				if (R_IsNA(directionUpper) || directionUpper) {
+					// Find minimum of selected effects
+					double minEffect = R_PosInf;
+					for (int g = 0; g < gMax; g++) {
+						if (selectedPopulations(g, stage)) {
+							if (overallEffects(g, stage - 1) < minEffect) {
+								minEffect = overallEffects(g, stage - 1);
+							}
+						}
+					}
+					thetaStandardized = log(std::max(minEffect, 1.0 + 1e-07));
+				} else {
+					// Find maximum of selected effects
+					double maxEffect = R_NegInf;
+					for (int g = 0; g < gMax; g++) {
+						if (selectedPopulations(g, stage)) {
+							if (overallEffects(g, stage - 1) > maxEffect) {
+								maxEffect = overallEffects(g, stage - 1);
+							}
+						}
+					}
+					thetaStandardized = log(std::min(maxEffect, 1.0 - 1e-07));
+				}
+			} else {
+				double adjustment = (R_IsNA(directionUpper) || directionUpper) ? 1e-07 : -1e-07;
+				thetaStandardized = log(std::min(thetaH1, 1.0 + adjustment));
+			}
+
+			if (conditionalCriticalValue[stage - 1] > 8.0) {
+				newEvents = maxNumberOfEventsPerStage[stage];
+			} else {
+				double allocRatioSquared = pow(1.0 + allocationRatioPlanned[stage - 1], 2.0);
+				double criticalPart = std::max(0.0, conditionalCriticalValue[stage - 1] + R::qnorm(conditionalPower, 0.0, 1.0, 1, 0));
+				double numerator = allocRatioSquared * pow(criticalPart, 2.0);
+				double allocRatio = allocationRatioPlanned[stage - 1];
+				double denominator = pow(allocRatio, 2.0) * pow(thetaStandardized, 2.0);
+				newEvents = numerator / denominator;
+				newEvents = std::min(std::max(minNumberOfEventsPerStage[stage], newEvents), maxNumberOfEventsPerStage[stage]);
+			}
+		} else {
+			newEvents = 0.0;
+		}
+	} else {
+		newEvents = plannedEvents[stage] - plannedEvents[stage - 1];
+	}
+
+	return newEvents;
+}
+

@@ -458,6 +458,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getSimulationSurvivalEnrichmentStageEvents
+double getSimulationSurvivalEnrichmentStageEvents(int stage, bool directionUpper, double conditionalPower, NumericVector conditionalCriticalValue, NumericVector plannedEvents, NumericVector allocationRatioPlanned, LogicalMatrix selectedPopulations, double thetaH1, NumericMatrix overallEffects, NumericVector minNumberOfEventsPerStage, NumericVector maxNumberOfEventsPerStage);
+RcppExport SEXP _rpact_getSimulationSurvivalEnrichmentStageEvents(SEXP stageSEXP, SEXP directionUpperSEXP, SEXP conditionalPowerSEXP, SEXP conditionalCriticalValueSEXP, SEXP plannedEventsSEXP, SEXP allocationRatioPlannedSEXP, SEXP selectedPopulationsSEXP, SEXP thetaH1SEXP, SEXP overallEffectsSEXP, SEXP minNumberOfEventsPerStageSEXP, SEXP maxNumberOfEventsPerStageSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type stage(stageSEXP);
+    Rcpp::traits::input_parameter< bool >::type directionUpper(directionUpperSEXP);
+    Rcpp::traits::input_parameter< double >::type conditionalPower(conditionalPowerSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type conditionalCriticalValue(conditionalCriticalValueSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type plannedEvents(plannedEventsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type allocationRatioPlanned(allocationRatioPlannedSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type selectedPopulations(selectedPopulationsSEXP);
+    Rcpp::traits::input_parameter< double >::type thetaH1(thetaH1SEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type overallEffects(overallEffectsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type minNumberOfEventsPerStage(minNumberOfEventsPerStageSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type maxNumberOfEventsPerStage(maxNumberOfEventsPerStageSEXP);
+    rcpp_result_gen = Rcpp::wrap(getSimulationSurvivalEnrichmentStageEvents(stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedPopulations, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getSimulatedStageMeansMultiArmCpp
 List getSimulatedStageMeansMultiArmCpp(Environment design, NumericVector muVector, double stDev, NumericVector plannedSubjects, std::string typeOfSelection, std::string effectMeasure, LogicalVector adaptations, double epsilonValue, double rValue, double threshold, NumericVector allocationRatioPlanned, NumericVector minNumberOfSubjectsPerStage, NumericVector maxNumberOfSubjectsPerStage, double conditionalPower, double thetaH1, double stDevH1, Function calcSubjectsFunction, bool calcSubjectsFunctionIsUserDefined, Nullable<Function> selectArmsFunction);
 RcppExport SEXP _rpact_getSimulatedStageMeansMultiArmCpp(SEXP designSEXP, SEXP muVectorSEXP, SEXP stDevSEXP, SEXP plannedSubjectsSEXP, SEXP typeOfSelectionSEXP, SEXP effectMeasureSEXP, SEXP adaptationsSEXP, SEXP epsilonValueSEXP, SEXP rValueSEXP, SEXP thresholdSEXP, SEXP allocationRatioPlannedSEXP, SEXP minNumberOfSubjectsPerStageSEXP, SEXP maxNumberOfSubjectsPerStageSEXP, SEXP conditionalPowerSEXP, SEXP thetaH1SEXP, SEXP stDevH1SEXP, SEXP calcSubjectsFunctionSEXP, SEXP calcSubjectsFunctionIsUserDefinedSEXP, SEXP selectArmsFunctionSEXP) {
@@ -742,6 +763,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_createSubGroups", (DL_FUNC) &_rpact_createSubGroups, 1},
     {"_rpact_createSubGroupsFromPopulation", (DL_FUNC) &_rpact_createSubGroupsFromPopulation, 2},
     {"_rpact_logRankTestEnrichment", (DL_FUNC) &_rpact_logRankTestEnrichment, 7},
+    {"_rpact_getSimulationSurvivalEnrichmentStageEvents", (DL_FUNC) &_rpact_getSimulationSurvivalEnrichmentStageEvents, 11},
     {"_rpact_getSimulatedStageMeansMultiArmCpp", (DL_FUNC) &_rpact_getSimulatedStageMeansMultiArmCpp, 19},
     {"_rpact_simulationMultiArmMeansInnerLoopCpp", (DL_FUNC) &_rpact_simulationMultiArmMeansInnerLoopCpp, 57},
     {"_rpact_hmm", (DL_FUNC) &_rpact_hmm, 9},

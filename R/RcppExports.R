@@ -93,6 +93,10 @@
     .Call(`_rpact_logRankTestEnrichment`, gMax, survivalDataSet, time, subPopulation, stratifiedAnalysis, directionUpper, thetaH0)
 }
 
+.getSimulationSurvivalEnrichmentStageEventsCpp <- function(stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedPopulations, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage) {
+    .Call(`_rpact_getSimulationSurvivalEnrichmentStageEvents`, stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedPopulations, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage)
+}
+
 .getSimulatedStageMeansMultiArmCpp <- function(design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
     .Call(`_rpact_getSimulatedStageMeansMultiArmCpp`, design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction)
 }
