@@ -24,7 +24,7 @@ NULL
 # See testthat::skip_on_cran()
 .skipTestIfDisabled <- function(msg = "Test is disabled", ..., ignoreInTestPlan = FALSE) {
     if (!isTRUE(.isCompleteUnitTestSetEnabled()) &&
-            .isPackageNamespaceLoaded("testthat", quietly = TRUE)) {
+        .isPackageNamespaceLoaded("testthat", quietly = TRUE)) {
         if (isTRUE(ignoreInTestPlan)) {
             msg <- paste(msg, "and ignored in test plan")
         }
@@ -38,7 +38,7 @@ NULL
     }
 
     if (.isPackageInstalled("pkgbuild") &&
-            isTRUE(eval(parse(text = "pkgbuild::has_build_tools(debug = FALSE)")))) {
+        isTRUE(eval(parse(text = "pkgbuild::has_build_tools(debug = FALSE)")))) {
         return(invisible())
     }
 
@@ -163,8 +163,8 @@ NULL
 
 # testFileTargetDirectory <- "D:/R/_temp/test_debug"
 .downloadUnitTests <- function(testFileTargetDirectory, ..., token, secret,
-        method = "auto", mode = "wb", cacheOK = TRUE, extra = getOption("download.file.extra"),
-        cleanOldFiles = TRUE, connectionType = c("http", "ftp", "pkg")) {
+                               method = "auto", mode = "wb", cacheOK = TRUE, extra = getOption("download.file.extra"),
+                               cleanOldFiles = TRUE, connectionType = c("http", "ftp", "pkg")) {
     .assertIsSingleCharacter(testFileTargetDirectory, "testFileTargetDirectory")
     .assertIsSingleCharacter(token, "token")
     .assertIsSingleCharacter(secret, "secret")
@@ -373,7 +373,7 @@ NULL
 }
 
 .downloadUnitTestsViaFtp <- function(testFileTargetDirectory, ..., testthatSubDirectory, token, secret,
-        method = "auto", mode = "wb", cacheOK = TRUE, extra = getOption("download.file.extra")) {
+                                     method = "auto", mode = "wb", cacheOK = TRUE, extra = getOption("download.file.extra")) {
     indexFile <- file.path(testFileTargetDirectory, "index.html")
     tryCatch(
         {
@@ -458,9 +458,9 @@ NULL
 }
 
 .getConnectionArgument <- function(connection, name = c(
-            "token", "secret", "method",
-            "mode", "cacheEnabled", "extra", "cleanOldFiles", "connectionType"
-        )) {
+                                       "token", "secret", "method",
+                                       "mode", "cacheEnabled", "extra", "cleanOldFiles", "connectionType"
+                                   )) {
     if (is.null(connection) || !is.list(connection)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -517,7 +517,7 @@ NULL
 #' @noRd
 #'
 .getSessionInfoMarkdown <- function(title = NA_character_,
-        headingLevel = 3) {
+                                    headingLevel = 3) {
     si <- sessionInfo()
     output <- character()
 
@@ -976,19 +976,18 @@ setupPackageTests <- function(token, secret) {
 #'
 #' @export
 #'
-testPackage <- function(
-        outDir = ".",
-        ...,
-        completeUnitTestSetEnabled = TRUE,
-        connection = list(token = NULL, secret = NULL),
-        testFileDirectory = NA_character_,
-        downloadTestsOnly = FALSE,
-        addWarningDetailsToReport = TRUE,
-        reportType = c("compact", "detailed", "Rout"),
-        testInstalledBasicPackages = TRUE,
-        scope = c("basic", "devel", "both", "internet", "all"),
-        openHtmlReport = TRUE,
-        keepSourceFiles = FALSE) {
+testPackage <- function(outDir = ".",
+                        ...,
+                        completeUnitTestSetEnabled = TRUE,
+                        connection = list(token = NULL, secret = NULL),
+                        testFileDirectory = NA_character_,
+                        downloadTestsOnly = FALSE,
+                        addWarningDetailsToReport = TRUE,
+                        reportType = c("compact", "detailed", "Rout"),
+                        testInstalledBasicPackages = TRUE,
+                        scope = c("basic", "devel", "both", "internet", "all"),
+                        openHtmlReport = TRUE,
+                        keepSourceFiles = FALSE) {
     .assertTestthatIsInstalled()
     .assertIsSingleCharacter(outDir, "outDir", naAllowed = FALSE)
     .assertIsSingleLogical(completeUnitTestSetEnabled, "completeUnitTestSetEnabled", naAllowed = FALSE)
@@ -1075,7 +1074,7 @@ testPackage <- function(
     if (is.null(author) || length(author) != 1 || is.na(author) || nchar(trimws(author)) == 0) {
         author <- "RPACT"
     }
-    
+
     downloadOnlyModeEnabled <- is.na(testFileDirectory) &&
         isTRUE(downloadTestsOnly) && isTRUE(credentialsAvailable)
 
@@ -1393,8 +1392,8 @@ testPackage <- function(
 }
 
 
-#' 
-#' @title 
+#'
+#' @title
 #' Print Installation Qualification Result
 #'
 #' @description
@@ -1414,11 +1413,11 @@ testPackage <- function(
 #' result <- testPackage()
 #' print(result)
 #' }
-#' 
+#'
 #' @keywords internal
 #'
 #' @export
-#' 
+#'
 print.InstallatinQualificationResult <- function(x, ...) {
     cat("Installation Qualification Result:\n")
     cat(x$resultMessage, "\n\n")
@@ -1510,6 +1509,10 @@ print.InstallatinQualificationResult <- function(x, ...) {
     return(isTRUE(completeUnitTestSetEnabled))
 }
 
+.enableCompleteUnitTestSet <- function() {
+    Sys.setenv("RPACT_COMPLETE_UNIT_TEST_SET_ENABLED" = TRUE)
+}
+
 #'
 #' @title
 #' Test Plan Section
@@ -1567,8 +1570,8 @@ test_plan_section <- function(section) {
                 if (length(metaLines) > 0) {
                     minNumberOfExpectedTests <- as.integer(metaLines[1])
                     if (length(minNumberOfExpectedTests) == 1 &&
-                            !is.na(minNumberOfExpectedTests) &&
-                            minNumberOfExpectedTests > minNumberOfExpectedTestsDefault) {
+                        !is.na(minNumberOfExpectedTests) &&
+                        minNumberOfExpectedTests > minNumberOfExpectedTestsDefault) {
                         return(minNumberOfExpectedTests)
                     }
                 }
@@ -1659,14 +1662,14 @@ MarkdownReporter <- R6::R6Class(
         scope = "basic",
         rpactCranReference = "[rpact](https://cran.r-project.org/package=rpact)",
         initialize = function(...,
-                outputSize = c("compact", "detailed"),
-                outputFile = "test_results.md",
-                addWarningDetailsToReport = TRUE,
-                openHtmlReport = TRUE,
-                keepSourceFiles = FALSE,
-                testInstalledBasicPackages = TRUE,
-                author = "RPACT",
-                scope = "basic") {
+                              outputSize = c("compact", "detailed"),
+                              outputFile = "test_results.md",
+                              addWarningDetailsToReport = TRUE,
+                              openHtmlReport = TRUE,
+                              keepSourceFiles = FALSE,
+                              testInstalledBasicPackages = TRUE,
+                              author = "RPACT",
+                              scope = "basic") {
             # self$capabilities$parallel_support <- TRUE
             super$initialize(...)
             self$outputSize <- match.arg(outputSize)
@@ -1814,7 +1817,7 @@ MarkdownReporter <- R6::R6Class(
                     private$COLORS$SUCCESS$unicode
                 }
             if (self$outputSize == "detailed" || failureEnabled ||
-                    (warningEnabled && self$addWarningDetailsToReport)) {
+                (warningEnabled && self$addWarningDetailsToReport)) {
                 self$log(
                     self$testNumber, ": ", resultStatusIcon, " ",
                     ifelse(failureEnabled,

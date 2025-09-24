@@ -21,89 +21,6 @@
 #' @include f_simulation_enrichment.R
 NULL
 
-.logRankHelper <- function(survivalDataSetSelected, time, thetaH0, directionUpper) {
-    res <- .logRankTestCpp(
-        accrualTime = survivalDataSetSelected$accrualTime,
-        survivalTime = survivalDataSetSelected$survivalTime,
-        dropoutTime = survivalDataSetSelected$dropoutTime,
-        treatmentGroup = as.integer(survivalDataSetSelected$treatmentArm),
-        time = time,
-        directionUpper = directionUpper,
-        thetaH0 = thetaH0,
-        returnRawData = FALSE
-    )
-    res <- res$result
-    list(
-        numerator = res[5],
-        denominator = res[6],
-        subjectNumber = res[2],
-        events1 = res[3],
-        events2 = res[4]
-    )
-}
-
-#   Calculates the stratified logrank test statistic for the enrichment survival
-#   data set and a specified population at given time.
-#' @noRd
-#'
-.logRankTestEnrichment <- function(gMax,
-                                   survivalDataSet,
-                                   time,
-                                   subPopulation,
-                                   stratifiedAnalysis,
-                                   directionUpper = TRUE,
-                                   thetaH0 = 1) {
-    subGroups <- .createSubGroupsFromPopulationCpp(gMax, subPopulation)
-
-    if (stratifiedAnalysis) {
-        stratifiedNumerator <- 0
-        stratifiedDenominator <- 0
-        stratifiedEvents1 <- 0
-        stratifiedEvents2 <- 0
-        stratifiedSubjectNumber <- 0
-        for (subGroup in subGroups) {
-            survivalDataSetSelected <- survivalDataSet[survivalDataSet$subGroup == subGroup, ]
-            logRankHelperResult <- .logRankHelper(survivalDataSetSelected, time, thetaH0, directionUpper)
-            stratifiedNumerator <- stratifiedNumerator + logRankHelperResult$numerator
-            stratifiedDenominator <- stratifiedDenominator + logRankHelperResult$denominator
-            stratifiedEvents1 <- stratifiedEvents1 + logRankHelperResult$events1
-            stratifiedEvents2 <- stratifiedEvents2 + logRankHelperResult$events2
-            stratifiedSubjectNumber <- stratifiedSubjectNumber + logRankHelperResult$subjectNumber
-        }
-        if (directionUpper && stratifiedDenominator > 0) {
-            logRank <- -stratifiedNumerator / sqrt(stratifiedDenominator)
-        } else if (!directionUpper && stratifiedDenominator > 0) {
-            logRank <- stratifiedNumerator / sqrt(stratifiedDenominator)
-        } else {
-            logRank <- -Inf
-        }
-        events1 <- stratifiedEvents1
-        events2 <- stratifiedEvents2
-        subjectNumber <- stratifiedSubjectNumber
-    } else {
-        survivalDataSetSelected <- survivalDataSet[survivalDataSet$subGroup %in% subGroups, ]
-        logRankHelperResult <- .logRankHelper(survivalDataSetSelected, time, thetaH0, directionUpper)
-        if (directionUpper && logRankHelperResult$denominator > 0) {
-            logRank <- -logRankHelperResult$numerator / sqrt(logRankHelperResult$denominator)
-        } else if (!directionUpper && logRankHelperResult$denominator > 0) {
-            logRank <- logRankHelperResult$numerator / sqrt(logRankHelperResult$denominator)
-        } else {
-            logRank <- -Inf
-        }
-        events1 <- logRankHelperResult$events1
-        events2 <- logRankHelperResult$events2
-        subjectNumber <- logRankHelperResult$subjectNumber
-    }
-
-    list(
-        logRank = logRank,
-        thetaH0 = thetaH0,
-        directionUpper = directionUpper,
-        subjectNumber = subjectNumber,
-        events = c(events1, events2)
-    )
-}
-
 #'
 #' Calculates stage events for specified conditional power
 #'
@@ -318,7 +235,7 @@ NULL
 
                 for (g in 1:gMax) {
                     if (selectedPopulations[g, k]) {
-                        logRank <- .logRankTestEnrichment(
+                        logRank <- .logRankTestEnrichmentCpp(
                             gMax = gMax,
                             survivalDataSet = survivalDataSet,
                             time = analysisTime[1],
@@ -326,19 +243,10 @@ NULL
                             stratifiedAnalysis = stratifiedAnalysis,
                             directionUpper = directionUpper
                         )
-                        logRank2 <- .logRankTestEnrichmentCpp(
-                            gMax = gMax,
-                            survivalDataSet = survivalDataSet,
-                            time = analysisTime[1],
-                            subPopulation = g,
-                            stratifiedAnalysis = stratifiedAnalysis,
-                            directionUpper = directionUpper
-                        )
-                        stopifnot(isTRUE(all.equal(logRank, logRank2)))
+                        testStatistics[g, k] <- logRank$logRank
+                        overallTestStatistics[g, k] <- logRank$logRank
+                        populationEventsPerStage[g, k] <- sum(logRank$events)
                     }
-                    testStatistics[g, k] <- logRank$logRank
-                    overallTestStatistics[g, k] <- logRank$logRank
-                    populationEventsPerStage[g, k] <- sum(logRank$events)
                 }
             }
         } else {
@@ -404,15 +312,7 @@ NULL
                 numberOfSubjects[k] <- sum(survivalDataSet$accrualTime <= analysisTime[k])
                 for (g in 1:gMax) {
                     if (selectedPopulations[g, k]) {
-                        logRank <- .logRankTestEnrichment(
-                            gMax = gMax,
-                            survivalDataSet = survivalDatasetSelected,
-                            time = analysisTime[k],
-                            subPopulation = g,
-                            stratifiedAnalysis = stratifiedAnalysis,
-                            directionUpper = directionUpper
-                        )
-                        logRank2 <- .logRankTestEnrichmentCpp(
+                        logRank <- .logRankTestEnrichmentCpp(
                             gMax = gMax,
                             survivalDataSet = survivalDataSet,
                             time = analysisTime[k],
@@ -420,8 +320,6 @@ NULL
                             stratifiedAnalysis = stratifiedAnalysis,
                             directionUpper = directionUpper
                         )
-                        stopifnot(isTRUE(all.equal(logRank, logRank2)))
-
                         overallTestStatistics[g, k] <- logRank$logRank
                         populationEventsPerStage[g, k] <- sum(logRank$events)
                         if (populationEventsPerStage[g, k] - populationEventsPerStage[g, k - 1] > 0) {
@@ -568,7 +466,7 @@ NULL
         }
     }
 
-    return(list(
+    list(
         eventsNotAchieved = eventsNotAchieved,
         populationEventsPerStage = populationEventsPerStage,
         plannedEvents = plannedEvents,
@@ -581,7 +479,7 @@ NULL
         conditionalCriticalValue = conditionalCriticalValue,
         conditionalPowerPerStage = conditionalPowerPerStage,
         selectedPopulations = selectedPopulations
-    ))
+    )
 }
 
 

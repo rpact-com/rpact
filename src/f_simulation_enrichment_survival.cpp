@@ -132,9 +132,9 @@ List logRankTestEnrichment(int gMax,
 			stratifiedDenominator += result[5];			
 		}
 		if (stratifiedDenominator > 0) {
-			logRank = -stratifiedNumerator / sqrt(stratifiedDenominator);
+			logRank = stratifiedNumerator / sqrt(stratifiedDenominator);
 		} else {
-			logRank = R_NegInf;
+			logRank = 0.0;
 		}
 		if (!directionUpper) logRank = -logRank;
 		subjectNumber = stratifiedSubjectNumber;
