@@ -132,4 +132,15 @@ IntegerVector which(const LogicalVector& x);
 
 LogicalVector charInSet(const CharacterVector& x, CharacterVector set);
 
+IntegerVector repInt(const IntegerVector& values, const IntegerVector& times);
+
+int firstMatch(const CharacterVector& x, std::string value);
+
+DataFrame getRows(const DataFrame& x, const IntegerVector& inds);
+
+NumericVector applyDirectionOfAlternative(const NumericVector& values, 
+                                          bool directionUpper, 
+                                          String type,
+                                          String phase);
+
 #endif

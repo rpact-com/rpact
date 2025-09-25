@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <cmath>
 
 // [[Rcpp::plugins(cpp11)]]
 
@@ -8,6 +9,41 @@
 #include "rpact_types.h"
 
 using namespace Rcpp;
+
+// Create Selected Subsets
+//
+// Creates selected subsets based on selected populations at a stage
+//
+// @param selectedPopulationsAtStagek Logical vector of selected populations
+//
+// [[Rcpp::export(name = ".createSelectedSubsetsCpp")]]
+LogicalVector createSelectedSubsets(LogicalVector selectedPopulationsAtStagek) {
+    int gMax = selectedPopulationsAtStagek.size();
+    int vectorSize = static_cast<int>(pow(2, gMax - 1));
+    LogicalVector selectedVector(vectorSize, false);
+
+    if (gMax == 1) {
+        selectedVector[0] = selectedPopulationsAtStagek[0];
+    } else if (gMax == 2) {
+        selectedVector[0] = selectedPopulationsAtStagek[0] || selectedPopulationsAtStagek[1];
+        selectedVector[1] = selectedPopulationsAtStagek[1];
+    } else if (gMax == 3) {
+        selectedVector[0] = selectedPopulationsAtStagek[0] || selectedPopulationsAtStagek[2];
+        selectedVector[1] = selectedPopulationsAtStagek[1] || selectedPopulationsAtStagek[2];
+        selectedVector[2] = selectedPopulationsAtStagek[0] || selectedPopulationsAtStagek[1] || selectedPopulationsAtStagek[2];
+        selectedVector[3] = selectedPopulationsAtStagek[2];
+    } else if (gMax == 4) {
+        selectedVector[0] = selectedPopulationsAtStagek[0] || selectedPopulationsAtStagek[3];
+        selectedVector[1] = selectedPopulationsAtStagek[1] || selectedPopulationsAtStagek[3];
+        selectedVector[2] = selectedPopulationsAtStagek[2] || selectedPopulationsAtStagek[3];
+        selectedVector[3] = selectedPopulationsAtStagek[0] || selectedPopulationsAtStagek[1] || selectedPopulationsAtStagek[3];
+        selectedVector[4] = selectedPopulationsAtStagek[0] || selectedPopulationsAtStagek[2] || selectedPopulationsAtStagek[3];
+        selectedVector[5] = selectedPopulationsAtStagek[1] || selectedPopulationsAtStagek[2] || selectedPopulationsAtStagek[3];
+        selectedVector[6] = selectedPopulationsAtStagek[0] || selectedPopulationsAtStagek[1] || selectedPopulationsAtStagek[2] || selectedPopulationsAtStagek[3];
+        selectedVector[7] = selectedPopulationsAtStagek[3];
+    }
+    return selectedVector;
+}
 
 // Create SubGroups
 //
@@ -73,7 +109,7 @@ CharacterVector createSubGroupsFromPopulation(int gMax, int subPopulation) {
 // @param survivalDataSet DataFrame with columns: 
 //   accrualTime, survivalTime, dropoutTime, treatmentArm, subGroup
 // @param time Time point for analysis
-// @param subPopulation Subpopulation index
+// @param subPopulation Subpopulation index (1-based!)
 // @param stratifiedAnalysis Whether to use stratified analysis
 // @param directionUpper Direction of test
 // @param thetaH0 Null hypothesis hazard ratio
@@ -267,3 +303,506 @@ double getSimulationSurvivalEnrichmentStageEvents(int stage,
 	return newEvents;
 }
 
+// Get Treatments and Subgroups
+// [[Rcpp::export(name = ".getTreatmentsSubgroupsCpp")]]
+List getTreatmentsSubgroups(int maxNumberOfSubjects,
+							IntegerVector allocationFraction,
+							CharacterVector subGroups,
+							NumericVector prevalences) {
+	IntegerVector twoGroups = IntegerVector::create(1, 2);
+	IntegerVector allocatedTreatments = repInt(twoGroups, allocationFraction);
+	IntegerVector treatments = rep_len(allocatedTreatments, maxNumberOfSubjects);
+
+	CharacterVector subGroupsVector = sample(subGroups, maxNumberOfSubjects, true, prevalences);
+	return List::create(
+		_["treatments"] = treatments,
+		_["subGroups"] = subGroupsVector
+	);
+}
+
+// Generate survival and dropout times
+List getSurvDropoutTimes(int numberOfSubjects, 
+						IntegerVector treatments,
+						CharacterVector subGroupVector,
+						CharacterVector subGroups,
+						NumericVector lambdaControl,
+						NumericVector lambdaActive,
+						double kappa,
+						NumericVector phi) {
+	NumericVector survivalTime(numberOfSubjects);
+	NumericVector dropoutTime(numberOfSubjects);
+	
+	for (int i = 0; i < numberOfSubjects; i++) {
+		// Find which subgroup this subject belongs to
+		int subGroupIndex = firstMatch(subGroups, Rcpp::as<std::string>(subGroupVector[i]));
+
+		// Generate survival time
+		double thisLambda = treatments[i] == 1 ? lambdaActive[subGroupIndex] : lambdaControl[subGroupIndex];
+		survivalTime[i] = pow(-log(1 - R::runif(0.0, 1.0)), 1.0 / kappa) / thisLambda;
+		
+		// Generate dropout time
+		bool anyPhiPositive = any(phi > 0);		
+		if (anyPhiPositive) {
+			if (phi[0] > 0) {
+				if (treatments[i] == 1) {
+					dropoutTime[i] = -log(1 - R::runif(0.0, 1.0)) / phi[0];
+				}
+			}
+			if (phi[1] > 0) {
+				if (treatments[i] == 2) {
+					dropoutTime[i] = -log(1 - R::runif(0.0, 1.0)) / phi[1];
+				}
+			}
+		} else {
+			dropoutTime[i] = NA_REAL;
+		}
+	}
+	return List::create(
+		_["survivalTime"] = survivalTime,
+		_["dropoutTime"] = dropoutTime
+	);
+}
+
+
+ 
+// Get Simulated Stage Results Survival Enrichment Subjects Based
+//
+// Calculates stage results for each simulation iteration step
+//
+// @param design Trial design object
+// @param weights Numeric vector of weights per stage, defined by the design
+// @param subGroups Character vector of subgroup names
+// @param prevalences Numeric vector of prevalences for each subgroup
+// @param piControls Numeric vector of control group event rates
+// @param kappa Shape parameter for Weibull distribution
+// @param phi Dropout rates for treatment groups
+// @param eventTime Event time
+// @param hazardRatios Numeric vector of hazard ratios
+// @param directionUpper Direction of test
+// @param stratifiedAnalysis Whether to use stratified analysis
+// @param plannedEvents Planned events per stage
+// @param recruitmentTimes Recruitment times
+// @param allocationFraction Allocation fractions
+// @param typeOfSelection Type of population selection
+// @param effectMeasure Effect measure type
+// @param adaptations Adaptation indicators per stage
+// @param epsilonValue Epsilon value for selection
+// @param rValue R value for selection
+// @param threshold Threshold for selection
+// @param minNumberOfEventsPerStage Minimum events per stage
+// @param maxNumberOfEventsPerStage Maximum events per stage
+// @param conditionalPower Conditional power
+// @param thetaH1 Alternative hypothesis hazard ratio
+// @param calcEventsFunction Events calculation function
+// @param calcEventsFunctionIsUserDefined Whether calc function is user defined
+// @param selectPopulationsFunction Population selection function
+//
+// [[Rcpp::export(name = ".getSimulatedStageResultsSurvivalEnrichmentSubjectsBasedCpp")]]
+List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
+		List design,
+		NumericVector weights,
+		CharacterVector subGroups,
+		NumericVector prevalences,
+		NumericVector piControls,
+		double kappa,
+		NumericVector phi,
+		double eventTime,
+		NumericVector hazardRatios,
+		bool directionUpper,
+		bool stratifiedAnalysis,
+		NumericVector plannedEvents,
+		NumericVector recruitmentTimes,
+		IntegerVector allocationFraction,
+		std::string typeOfSelection,
+		std::string effectMeasure,
+		LogicalVector adaptations,
+		double epsilonValue,
+		double rValue,
+		double threshold,
+		NumericVector minNumberOfEventsPerStage,
+		NumericVector maxNumberOfEventsPerStage,
+		double conditionalPower,
+		double thetaH1,
+		Nullable<Function> calcEventsFunction = R_NilValue,
+		bool calcEventsFunctionIsUserDefined = false,
+		Nullable<Function> selectPopulationsFunction = R_NilValue) {
+	
+	int kMax = plannedEvents.size();
+	int pMax = hazardRatios.size();
+	int gMax = static_cast<int>(log2(hazardRatios.size())) + 1;
+
+	int maxNumberOfSubjects = recruitmentTimes.size();
+
+	// Initialize matrices and vectors
+	NumericMatrix populationEventsPerStage(gMax, kMax);
+	std::fill(populationEventsPerStage.begin(), populationEventsPerStage.end(), NA_REAL);
+	NumericMatrix populationEventsPerStageCumulated(gMax, kMax);
+	std::fill(populationEventsPerStageCumulated.begin(), populationEventsPerStageCumulated.end(), NA_REAL);
+	NumericMatrix overallEffects(gMax, kMax);
+	std::fill(overallEffects.begin(), overallEffects.end(), NA_REAL);
+	NumericMatrix testStatistics(gMax, kMax);
+	std::fill(testStatistics.begin(), testStatistics.end(), NA_REAL);
+	NumericMatrix overallTestStatistics(gMax, kMax);
+	std::fill(overallTestStatistics.begin(), overallTestStatistics.end(), NA_REAL);
+	NumericMatrix separatePValues(gMax, kMax);
+	std::fill(separatePValues.begin(), separatePValues.end(), NA_REAL);
+	NumericVector conditionalCriticalValue(kMax - 1);
+	std::fill(conditionalCriticalValue.begin(), conditionalCriticalValue.end(), NA_REAL);
+	NumericVector conditionalPowerPerStage(kMax);
+	std::fill(conditionalPowerPerStage.begin(), conditionalPowerPerStage.end(), NA_REAL);
+	LogicalMatrix selectedPopulations(gMax, kMax);
+	selectedPopulations(_, 0) = rep(TRUE, gMax); // First stage all populations selected
+	LogicalMatrix selectedsubGroupsIndices(pMax, kMax);
+	selectedsubGroupsIndices(_, 0) = rep(TRUE, pMax); // First stage all subgroups selected
+	NumericVector adjustedPValues(kMax);
+	std::fill(adjustedPValues.begin(), adjustedPValues.end(), NA_REAL);
+	NumericVector analysisTime(kMax);
+	std::fill(analysisTime.begin(), analysisTime.end(), NA_REAL);
+	NumericVector numberOfSubjects(kMax);
+	std::fill(numberOfSubjects.begin(), numberOfSubjects.end(), NA_REAL);
+	LogicalVector eventsNotAchieved(kMax);
+
+	// Generate treatments and random subgroups according to allocation numbers and prevalences
+	List tmp = getTreatmentsSubgroups(
+		maxNumberOfSubjects,
+		allocationFraction,
+		subGroups,
+		prevalences
+	);
+	IntegerVector treatments = tmp["treatments"];
+	CharacterVector subGroupVector = tmp["subGroups"];
+
+	// Calculate hazards for control and active treatment
+	NumericVector lambdaControl = getLambdasByPis(piControls, eventTime, kappa);
+	NumericVector lambdaActive = hazardRatios * lambdaControl;
+
+	// Generate random survival and dropout times
+	tmp = getSurvDropoutTimes(
+		maxNumberOfSubjects,
+		treatments,
+		subGroupVector,
+		subGroups,
+		lambdaControl,
+		lambdaActive,
+		kappa,
+		phi
+	);
+	NumericVector survivalTime = tmp["survivalTime"];
+	NumericVector dropoutTime = tmp["dropoutTime"];
+
+	// Combine into a DataFrame
+	DataFrame survivalDataSet = DataFrame::create(
+		_["accrualTime"] = recruitmentTimes,
+		_["subGroup"] = subGroupVector,
+		_["treatmentArm"] = treatments,
+		_["survivalTime"] = survivalTime,
+		_["dropoutTime"] = dropoutTime
+	);
+
+	// Main simulation loop for stages
+	for (int k = 0; k < kMax; k++) {
+		if (k == 0) {
+			// First stage
+			analysisTime[k] = findObservationTime(recruitmentTimes, survivalTime, dropoutTime, plannedEvents[k]);
+						
+			if (R_IsNA(analysisTime[k])) {
+				eventsNotAchieved[k] = true;
+				break;
+			} else {
+				numberOfSubjects[k] = sum(recruitmentTimes <= analysisTime[k]);
+				
+				for (int g = 0; g < gMax; g++) {
+					if (selectedPopulations(g, k)) {
+						List logRank = logRankTestEnrichment(
+							gMax, 
+							survivalDataSet, 
+							analysisTime[k], 
+							g + 1, // need 1-based index here!
+							stratifiedAnalysis, 
+							directionUpper
+						);
+						testStatistics(g, k) = logRank["logRank"];
+						overallTestStatistics(g, k) = testStatistics(g, k);
+						IntegerVector events = logRank["events"];
+						populationEventsPerStage(g, k) = sum(events);
+					}
+				}
+			}
+		} else {
+			// Subsequent stages
+			LogicalVector selectedAtK = selectedPopulations(_, k);
+			selectedsubGroupsIndices(_, k) = createSelectedSubsets(selectedAtK);
+			
+			bool analysisTimeOK = analysisTime[k - 1] < max(survivalDataSet["accrualTime"]);
+			LogicalVector selInBoth = selectedPopulations(_, k) & selectedPopulations(_, k - 1);
+			bool allInBoth = all(selInBoth);
+			bool diffInSelectedPopulations = !allInBoth;
+
+			if (analysisTimeOK && diffInSelectedPopulations) {
+				// Create new survival and dropout times for selected populations
+				
+				// Calculate adjusted prevalences for selected subgroups
+				NumericVector prevInSelected = prevalences[selectedsubGroupsIndices(_, k)];
+				NumericVector prevSelected = prevalences / sum(prevInSelected);
+				prevSelected[!selectedsubGroupsIndices(_, k)] = 0.0;
+						
+				// Sample new subgroups for new subjects
+				int numberNewSubjects = maxNumberOfSubjects - numberOfSubjects[k - 1];
+				CharacterVector newSubGroupVector = sample(
+					subGroups,
+					numberNewSubjects,
+					true,
+					prevSelected
+				);
+				// We keep subGroupVector[seq(0, numberOfSubjects[k - 1] - 1)]
+				// and just update the rest
+				IntegerVector newSubjectsInds = seq(numberOfSubjects[k - 1], maxNumberOfSubjects - 1);
+				subGroupVector[newSubjectsInds] = newSubGroupVector;
+				
+				tmp = getSurvDropoutTimes(
+					numberNewSubjects,
+					treatments[newSubjectsInds],
+					subGroupVector[newSubjectsInds],
+					subGroups,
+					lambdaControl,
+					lambdaActive,
+					kappa,
+					phi
+				);
+				NumericVector newSurvivalTime = tmp["survivalTime"];
+				NumericVector newDropoutTime = tmp["dropoutTime"];
+
+				survivalTime[newSubjectsInds] = newSurvivalTime;
+				dropoutTime[newSubjectsInds] = newDropoutTime;
+
+				// Update the DataFrame with new values
+				survivalDataSet["subGroup"] = subGroupVector;
+				survivalDataSet["survivalTime"] = survivalTime;
+				survivalDataSet["dropoutTime"] = dropoutTime;
+			}
+
+			LogicalVector subGroupNowSelected = selectedsubGroupsIndices(_, k);
+			CharacterVector allSubGroups = createSubGroups(gMax);
+			CharacterVector selectedsubGroups = allSubGroups[subGroupNowSelected];
+			IntegerVector selectedSubjects = which(charInSet(survivalDataSet["subGroup"], selectedsubGroups));
+			DataFrame survivalDatasetSelected = getRows(survivalDataSet, selectedSubjects);
+
+			List timeResult = findObservationTime(
+				survivalDatasetSelected["recruitmentTimes"], 
+				survivalDatasetSelected["survivalTime"], 
+				survivalDatasetSelected["dropoutTime"], 
+				plannedEvents[k]
+			);
+			analysisTime[k] = timeResult["time"];
+			bool achieved = timeResult["eventsAchieved"];
+			
+			if (!achieved) {
+				eventsNotAchieved[k] = true;
+				break;
+			} else {
+				numberOfSubjects[k] = sum(recruitmentTimes <= analysisTime[k]);
+				
+				for (int g = 0; g < gMax; g++) {
+					if (selectedPopulations(g, k)) {
+						List logRank = logRankTestEnrichment(
+							gMax, 
+							survivalDataSet, 
+							analysisTime[k], 
+							g + 1, // need 1-based index here!
+							stratifiedAnalysis, 
+							directionUpper
+						);
+						overallTestStatistics(g, k) = logRank["logRank"];
+						IntegerVector events = logRank["events"];
+						populationEventsPerStage(g, k) = events[0] + events[1];
+						
+						if (populationEventsPerStage(g, k) - populationEventsPerStage(g, k - 1) > 0) {
+							double denom = sqrt(populationEventsPerStage(g, k) - populationEventsPerStage(g, k - 1));
+							double numerator = sqrt(populationEventsPerStage(g, k)) * overallTestStatistics(g, k) - 
+								sqrt(populationEventsPerStage(g, k - 1)) * overallTestStatistics(g, k - 1);
+							testStatistics(g, k) = (sqrt(populationEventsPerStage(g, k)) * overallTestStatistics(g, k) - 
+													sqrt(populationEventsPerStage(g, k - 1)) * overallTestStatistics(g, k - 1)) / denom;
+						}
+					}
+				}
+			}
+
+			IntegerVector notSelectedPopulations = which(!selectedPopulations(_, k));
+			for (int i = 0; i < notSelectedPopulations.size(); i++) {
+				int g = notSelectedPopulations[i];
+				testStatistics(g, k) = NA_REAL;
+				overallEffects(g, k) = NA_REAL;
+				overallTestStatistics(g, k) = NA_REAL;
+			}
+		}
+
+		// Calculate separate p-values
+		for (int g = 0; g < gMax; g++) {
+			if (!R_IsNA(testStatistics(g, k))) {
+				separatePValues(g, k) = 1.0 - R::pnorm(testStatistics(g, k), 0.0, 1.0, 1, 0);
+			} else {
+				separatePValues(g, k) = NA_REAL;
+			}
+		}
+
+		// Calculate overall effects
+		for (int g = 0; g < gMax; g++) {
+			if (!R_IsNA(overallTestStatistics(g, k)) && populationEventsPerStage(g, k) > 0) {
+				double direction = (2.0 * directionUpper - 1.0);
+				double numerator = direction * overallTestStatistics(g, k) * (1.0 + allocationFraction[0] / allocationFraction[1]);
+				double denominator = sqrt(allocationFraction[0] / (1.0 * allocationFraction[1])) * sqrt(populationEventsPerStage(g, k));
+				overallEffects(g, k) = exp(numerator / denominator);
+			}
+		}
+
+		double allocationRatioPlanned = (1.0 * allocationFraction[1]) / allocationFraction[2];
+
+		// Stage-specific calculations for intermediate stages
+		if (k < kMax - 1) {
+			// Check if any populations selected
+			int selectedCount = sum(selectedPopulations(_, k));
+			if (selectedCount == 0) {
+				break;
+			}
+
+			// Bonferroni adjustment
+			double minPValue = min(na_omit(separatePValues(_, k)));
+			adjustedPValues[k] = std::min(minPValue * selectedCount, 1.0 - 1e-07);
+
+			// Conditional critical value to reject the null hypotheses at the next stage of the trial
+			NumericVector criticalValues = design["criticalValues"];
+			CharacterVector designClass = design.attr("class");
+			bool isDesignFisher = designClass[0] == "TrialDesignFisher";
+
+			if (isDesignFisher) {
+				double numerator = criticalValues[k + 1];
+				NumericVector expPvals(k + 1);
+				for (int i = 0; i <= k; i++) {
+					expPvals[i] = pow(adjustedPValues[i], weights[i]);
+				}				
+				double denominator = pow(
+					// prod(expPvals):
+					std::accumulate(expPvals.begin(), expPvals.end(), 1, std::multiplies<double>()), 
+					1.0 / weights[k + 1]
+				);
+				conditionalCriticalValue[k] = getOneMinusQNorm(std::min(numerator / denominator, 1.0 - 1e-07));
+			} else {
+				NumericVector informationRates = design["informationRates"];
+				double minuend = criticalValues[k + 1] * sqrt(informationRates[k + 1]);
+				double subtrahend = 0.0;
+				for (int j = 0; j < k; j++) {
+					subtrahend += weights[j] * getOneMinusQNorm(adjustedPValues[j]);
+				}
+				double numerator = minuend - subtrahend;
+				double denominator = sqrt(informationRates[k + 1] - informationRates[k]);
+				conditionalCriticalValue[k] = numerator / denominator;
+			}
+
+			if (adaptations[k]) {
+				List selectPopulationsFunctionArgs = List::create(
+					_["effectVector"] = R_NilValue,
+					_["stage"] = k,
+					_["directionUpper"] = directionUpper,
+					_["conditionalPower"] = conditionalPower,
+					_["conditionalCriticalValue"] = conditionalCriticalValue,
+					_["plannedEvents"] = plannedEvents,
+					_["allocationRatioPlanned"] = allocationRatioPlanned,
+					_["selectedPopulations"] = selectedPopulations,
+					_["thetaH1"] = thetaH1,
+					_["overallEffects"] = overallEffects
+				);
+
+				List args = List::create(
+					_["typeOfSelection"] = typeOfSelection,
+					_["epsilonValue"] = epsilonValue,
+					_["rValue"] = rValue,
+					_["threshold"] = threshold,
+					_["selectPopulationsFunction"] = selectPopulationsFunction
+				);
+
+				if (effectMeasure == "testStatistic") {
+					selectPopulationsFunctionArgs["effectVector"] = overallTestStatistics(_, k);
+				} else if (effectMeasure == "effectEstimate") {
+					if (R_IsNA(directionUpper) || directionUpper) {
+						selectPopulationsFunctionArgs["effectVector"] = overallEffects(_, k);
+					} else {
+						selectPopulationsFunctionArgs["effectVector"] = 1.0 / overallEffects(_, k);
+						args["threshold"] = 1.0 / threshold;
+					}
+				}
+
+				args["selectPopulationsFunctionArgs"] = selectPopulationsFunctionArgs;
+
+				Function selectPopulations(".selectPopulations");
+				LogicalVector selectedNow = selectPopulations(args);
+				selectedPopulations(_, k + 1) = selectedPopulations(_, k) & selectedNow;
+
+				Function calcEventsFunc = calcEventsFunction.get();
+				RObject newEvents = calcEventsFunc(
+					Named("stage") = k + 2, // need 1-based index here!
+					Named("directionUpper") = directionUpper,
+					Named("conditionalPower") = conditionalPower,
+					Named("conditionalCriticalValue") = conditionalCriticalValue,
+					Named("plannedEvents") = plannedEvents,
+					Named("allocationRatioPlanned") = allocationRatioPlanned,
+					Named("selectedPopulations") = selectedPopulations,
+					Named("thetaH1") = thetaH1,
+					Named("overallEffects") = overallEffects,
+					Named("minNumberOfEventsPerStage") = minNumberOfEventsPerStage,
+					Named("maxNumberOfEventsPerStage") = maxNumberOfEventsPerStage
+				);
+
+				if (Rf_isNull(newEvents) || Rf_length(newEvents) != 1 || !Rf_isReal(newEvents) || R_IsNA(REAL(newEvents)[0])) {
+					stop(
+						"'calcEventsFunction' returned an illegal or undefined result; ",
+						"the output must be a single numeric value"
+					);
+				}
+
+				double newEventsValue = REAL(newEvents)[0];
+                if (!R_IsNA(conditionalPower) || calcEventsFunctionIsUserDefined) {
+					NumericVector newEventsIncrements = cumsum(rep(newEventsValue, kMax - 1 - k));
+					plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;
+				}
+			} else {
+				selectedPopulations(_, k + 1) = selectedPopulations(_, k);
+			}
+
+			double thetaStandardized;
+			if (R_IsNA(thetaH1)) {
+				thetaStandardized = log(
+					applyDirectionOfAlternative(
+						overallEffects[selectedPopulations(_, k), k],
+						directionUpper,
+						"minMax",
+						"planning"
+					)[0]
+				);
+			} else {
+				thetaStandardized = log(thetaH1);
+			}
+			thetaStandardized = (2.0 * directionUpper - 1.0) * thetaStandardized;					
+			double numerator = thetaStandardized * sqrt(plannedEvents[k + 1] - plannedEvents[k]) *
+				sqrt(allocationFraction[0] / (1.0 * allocationFraction[1]));
+			double denominator = (1.0 + allocationFraction[0] / allocationFraction[1]);
+			double quantile = conditionalCriticalValue[k] - numerator / denominator;
+			// pnorm(quantile, lower.tail = FALSE):
+			conditionalPowerPerStage[k] = R::pnorm(quantile, 0.0, 1.0, 0, 0);
+		}
+	}
+
+	return List::create(
+		_["eventsNotAchieved"] = eventsNotAchieved,
+		_["populationEventsPerStage"] = populationEventsPerStage,
+		_["plannedEvents"] = plannedEvents,
+		_["analysisTime"] = analysisTime,
+		_["numberOfSubjects"] = numberOfSubjects,
+		_["testStatistics"] = testStatistics,
+		_["overallEffects"] = overallEffects,
+		_["overallTestStatistics"] = overallTestStatistics,
+		_["separatePValues"] = separatePValues,
+		_["conditionalCriticalValue"] = conditionalCriticalValue,
+		_["conditionalPowerPerStage"] = conditionalPowerPerStage,
+		_["selectedPopulations"] = selectedPopulations
+	);
+}

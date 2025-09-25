@@ -21,6 +21,44 @@
 #' @include f_simulation_enrichment.R
 NULL
 
+.getTreatmentsSubgroups <- function(maxNumberOfSubjects, allocationFraction, subGroups, prevalences) {
+    treatments <- c()
+    subGroupVector <- c()
+
+    while (length(treatments) < maxNumberOfSubjects) {
+        if (allocationFraction[1] > allocationFraction[2]) {
+            treatments <- c(
+                treatments,
+                rep(c(1, 2), allocationFraction[2]),
+                rep(1, allocationFraction[1] - allocationFraction[2])
+            )
+        } else {
+            treatments <- c(
+                treatments,
+                rep(c(1, 2), allocationFraction[1]),
+                rep(2, allocationFraction[2] - allocationFraction[1])
+            )
+        }
+        subGroup <- subGroups[which(rmultinom(1, 1, prevalences) == 1)]
+        subGroupVector <- c(
+            subGroupVector,
+            rep(subGroup, allocationFraction[1] + allocationFraction[2])
+        )
+    }
+    treatments <- treatments[1:maxNumberOfSubjects]
+    subGroupVector <- subGroupVector[1:maxNumberOfSubjects]
+
+    list(treatments = treatments, subGroupVector = subGroupVector)
+}
+
+.getTreatmentsSubgroups2 <- function(maxNumberOfSubjects, allocationFraction, subGroups, prevalences) {
+    allocatedTreatments <- rep(c(1, 2), allocationFraction)
+    treatments <- rep(allocatedTreatments, length.out = maxNumberOfSubjects)
+    subGroupVector <- sample(subGroups, size = maxNumberOfSubjects, replace = TRUE, prob = prevalences)
+    list(treatments = treatments, subGroupVector = subGroupVector)
+}
+
+
 #'
 #' Calculates stage results for each simulation iteration step
 #'
@@ -28,6 +66,7 @@ NULL
 #'
 .getSimulatedStageResultsSurvivalEnrichmentSubjectsBased <- function(...,
                                                                      design,
+                                                                     weights,
                                                                      subGroups,
                                                                      prevalences,
                                                                      piControls,
@@ -78,34 +117,10 @@ NULL
     numberOfSubjects <- rep(NA_real_, kMax)
     eventsNotAchieved <- rep(FALSE, kMax)
 
-    if (.isTrialDesignFisher(design)) {
-        weights <- .getWeightsFisher(design)
-    } else if (.isTrialDesignInverseNormal(design)) {
-        weights <- .getWeightsInverseNormal(design)
-    }
-
     ##  Create data set for first stage  ##
-    treatments <- c()
-    subGroupVector <- c()
-    while (length(treatments) < maxNumberOfSubjects) {
-        if (allocationFraction[1] > allocationFraction[2]) {
-            treatments <- c(
-                treatments,
-                rep(c(1, 2), allocationFraction[2]),
-                rep(1, allocationFraction[1] - allocationFraction[2])
-            )
-        } else {
-            treatments <- c(
-                treatments,
-                rep(c(1, 2), allocationFraction[1]),
-                rep(2, allocationFraction[2] - allocationFraction[1])
-            )
-        }
-        subGroup <- subGroups[which(rmultinom(1, 1, prevalences) == 1)]
-        subGroupVector <- c(subGroupVector, rep(subGroup, allocationFraction[1] + allocationFraction[2]))
-    }
-    treatments <- treatments[1:maxNumberOfSubjects]
-    subGroupVector <- subGroupVector[1:maxNumberOfSubjects]
+    treatmentsAndSubGroups <- .getTreatmentsSubgroups(maxNumberOfSubjects, allocationFraction, subGroups, prevalences)
+    treatments <- treatmentsAndSubGroups$treatments
+    subGroupVector <- treatmentsAndSubGroups$subGroupVector
 
     survivalDataSet <- data.frame(
         accrualTime = recruitmentTimes,
@@ -702,11 +717,18 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
     # to force last value to be last accrualTime
     recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
 
+    if (.isTrialDesignFisher(design)) {
+        weights <- .getWeightsFisher(design)
+    } else if (.isTrialDesignInverseNormal(design)) {
+        weights <- .getWeightsInverseNormal(design)
+    }
+
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
             stageResults <- .getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
                 design = design,
+                weights = weights,
                 subGroups = effectList$subGroups,
                 prevalences = effectList$prevalences,
                 piControls = effectList$piControls,

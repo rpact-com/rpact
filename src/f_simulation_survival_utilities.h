@@ -51,6 +51,11 @@ bool isPiecewiseExponentialSurvivalEnabled(NumericVector lambdaVec2);
 
 double getLambdaByPi(double pi, double eventTime, double kappa);
 
+NumericVector getLambdasByPis(
+		NumericVector pis,
+		double eventTime,
+		double kappa);
+
 double getPiByLambda(double lambda, double eventTime, double kappa);
 
 double getHazardRatio(double pi1, double pi2, double eventTime, double kappa);

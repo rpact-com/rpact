@@ -809,6 +809,7 @@ List getFractions(
 	);
 }
 
+// Returns the indices of TRUE values in a logical vector
 IntegerVector which(const LogicalVector& x) {
 	std::vector<int> indices;
 	for (int i = 0; i < x.size(); i++) {
@@ -819,6 +820,7 @@ IntegerVector which(const LogicalVector& x) {
 	return Rcpp::wrap(indices);
 }
 
+// Returns a logical vector indicating if elements of x are in the set
 LogicalVector charInSet(const CharacterVector& x, CharacterVector set) {
     int n = x.size();
     LogicalVector result(n);
@@ -832,4 +834,116 @@ LogicalVector charInSet(const CharacterVector& x, CharacterVector set) {
         }
     }
     return result;
+}
+
+// Replicates each element in 'values' according to the corresponding count in 'times'
+IntegerVector repInt(const IntegerVector& values, const IntegerVector& times) {
+    int n = values.size();
+    int n_times = times.size();
+    if (n != n_times) {
+        throw std::invalid_argument("Length of values and times must be the same.");
+    }
+    
+    int length_out = sum(times);
+    IntegerVector result(length_out);
+    int index = 0;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < times[i]; j++) {
+            result[index++] = values[i];
+        }
+    }
+    return result;
+}
+
+// Returns the index of the first match of 'value' in 'x', or -1 if not found
+int firstMatch(const CharacterVector& x, std::string value) {
+    int n = x.size();
+    for (int i = 0; i < n; i++) {
+        if (Rcpp::as<std::string>(x[i]) == value) {
+            return i;
+        }
+    }
+    return -1; // Return -1 if no match is found
+}
+
+// Return the rows of a DataFrame corresponding to the given indices
+DataFrame getRows(const DataFrame& x, IntegerVector inds) {
+    List x_list = x;
+    int n_cols = x_list.size();
+    for (int j = 0; j < n_cols; j++) {
+        SEXP col = x_list[j];
+        switch (TYPEOF(col)) {
+            case INTSXP: {
+                IntegerVector int_col = as<IntegerVector>(col);
+                x_list[j] = int_col[inds];
+                break;
+            }
+            case REALSXP: {
+                NumericVector num_col = as<NumericVector>(col);
+                x_list[j] = num_col[inds];
+                break;
+            }
+            case STRSXP: {
+                CharacterVector char_col = as<CharacterVector>(col);
+                x_list[j] = char_col[inds];
+                break;
+            }
+            case LGLSXP: {
+                LogicalVector lgl_col = as<LogicalVector>(col);
+                x_list[j] = lgl_col[inds];
+                break;
+            }
+            default:
+                stop("Unsupported column type in DataFrame");
+        }
+    }
+    return DataFrame(x_list);
+}
+
+// Simplified equivalent of R function .applyDirectionOfAlternative.
+// Note that directionUpper cannot be a vector here, and values cannot be a logical vector.
+NumericVector applyDirectionOfAlternative(const NumericVector& values, 
+                                          bool directionUpper, 
+                                          String type,
+                                          String phase) {
+    
+    if (phase == "design") {
+        return values;
+    }
+    if (Rf_isNull(values) || values.size() == 0 || all(is_na(values))) {
+        return values;
+    }
+    if (R_IsNA(directionUpper) || directionUpper) {
+        if (type == "oneMinusValue") {
+            return(1 - values);
+        }
+        if (type == "valueMinusOne") {
+            return(values - 1);
+        }
+        if (type == "negateIfLower") {
+            return(values);
+        }
+        if (type == "negateIfUpper") {
+            return(-values);
+        }
+        if (type == "minMax") {
+            return(min(na_omit(values)));
+        }
+        if (type == "maxMin") {
+            return(max(na_omit(values)));
+        }
+    }
+    if (type == "negateIfLower") {
+        return(-values);
+    }
+    if (type == "negateIfUpper") {
+        return(values);
+    }
+    if (type == "minMax") {
+        return(max(na_omit(values)));
+    }
+    if (type == "maxMin") {
+        return(min(na_omit(values)));
+    }   
 }

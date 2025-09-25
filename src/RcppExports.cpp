@@ -418,6 +418,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// createSelectedSubsets
+LogicalVector createSelectedSubsets(LogicalVector selectedPopulationsAtStagek);
+RcppExport SEXP _rpact_createSelectedSubsets(SEXP selectedPopulationsAtStagekSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< LogicalVector >::type selectedPopulationsAtStagek(selectedPopulationsAtStagekSEXP);
+    rcpp_result_gen = Rcpp::wrap(createSelectedSubsets(selectedPopulationsAtStagek));
+    return rcpp_result_gen;
+END_RCPP
+}
 // createSubGroups
 CharacterVector createSubGroups(int gMax);
 RcppExport SEXP _rpact_createSubGroups(SEXP gMaxSEXP) {
@@ -476,6 +487,57 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type minNumberOfEventsPerStage(minNumberOfEventsPerStageSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type maxNumberOfEventsPerStage(maxNumberOfEventsPerStageSEXP);
     rcpp_result_gen = Rcpp::wrap(getSimulationSurvivalEnrichmentStageEvents(stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedPopulations, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getTreatmentsSubgroups
+List getTreatmentsSubgroups(int maxNumberOfSubjects, IntegerVector allocationFraction, CharacterVector subGroups, NumericVector prevalences);
+RcppExport SEXP _rpact_getTreatmentsSubgroups(SEXP maxNumberOfSubjectsSEXP, SEXP allocationFractionSEXP, SEXP subGroupsSEXP, SEXP prevalencesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type maxNumberOfSubjects(maxNumberOfSubjectsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type allocationFraction(allocationFractionSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type subGroups(subGroupsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type prevalences(prevalencesSEXP);
+    rcpp_result_gen = Rcpp::wrap(getTreatmentsSubgroups(maxNumberOfSubjects, allocationFraction, subGroups, prevalences));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getSimulatedStageResultsSurvivalEnrichmentSubjectsBased
+List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(List design, NumericVector weights, CharacterVector subGroups, NumericVector prevalences, NumericVector piControls, double kappa, NumericVector phi, double eventTime, NumericVector hazardRatios, bool directionUpper, bool stratifiedAnalysis, NumericVector plannedEvents, NumericVector recruitmentTimes, IntegerVector allocationFraction, std::string typeOfSelection, std::string effectMeasure, LogicalVector adaptations, double epsilonValue, double rValue, double threshold, NumericVector minNumberOfEventsPerStage, NumericVector maxNumberOfEventsPerStage, double conditionalPower, double thetaH1, Nullable<Function> calcEventsFunction, bool calcEventsFunctionIsUserDefined, Nullable<Function> selectPopulationsFunction);
+RcppExport SEXP _rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(SEXP designSEXP, SEXP weightsSEXP, SEXP subGroupsSEXP, SEXP prevalencesSEXP, SEXP piControlsSEXP, SEXP kappaSEXP, SEXP phiSEXP, SEXP eventTimeSEXP, SEXP hazardRatiosSEXP, SEXP directionUpperSEXP, SEXP stratifiedAnalysisSEXP, SEXP plannedEventsSEXP, SEXP recruitmentTimesSEXP, SEXP allocationFractionSEXP, SEXP typeOfSelectionSEXP, SEXP effectMeasureSEXP, SEXP adaptationsSEXP, SEXP epsilonValueSEXP, SEXP rValueSEXP, SEXP thresholdSEXP, SEXP minNumberOfEventsPerStageSEXP, SEXP maxNumberOfEventsPerStageSEXP, SEXP conditionalPowerSEXP, SEXP thetaH1SEXP, SEXP calcEventsFunctionSEXP, SEXP calcEventsFunctionIsUserDefinedSEXP, SEXP selectPopulationsFunctionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type design(designSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type weights(weightsSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type subGroups(subGroupsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type prevalences(prevalencesSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type piControls(piControlsSEXP);
+    Rcpp::traits::input_parameter< double >::type kappa(kappaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type phi(phiSEXP);
+    Rcpp::traits::input_parameter< double >::type eventTime(eventTimeSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type hazardRatios(hazardRatiosSEXP);
+    Rcpp::traits::input_parameter< bool >::type directionUpper(directionUpperSEXP);
+    Rcpp::traits::input_parameter< bool >::type stratifiedAnalysis(stratifiedAnalysisSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type plannedEvents(plannedEventsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type recruitmentTimes(recruitmentTimesSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type allocationFraction(allocationFractionSEXP);
+    Rcpp::traits::input_parameter< std::string >::type typeOfSelection(typeOfSelectionSEXP);
+    Rcpp::traits::input_parameter< std::string >::type effectMeasure(effectMeasureSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type adaptations(adaptationsSEXP);
+    Rcpp::traits::input_parameter< double >::type epsilonValue(epsilonValueSEXP);
+    Rcpp::traits::input_parameter< double >::type rValue(rValueSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type minNumberOfEventsPerStage(minNumberOfEventsPerStageSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type maxNumberOfEventsPerStage(maxNumberOfEventsPerStageSEXP);
+    Rcpp::traits::input_parameter< double >::type conditionalPower(conditionalPowerSEXP);
+    Rcpp::traits::input_parameter< double >::type thetaH1(thetaH1SEXP);
+    Rcpp::traits::input_parameter< Nullable<Function> >::type calcEventsFunction(calcEventsFunctionSEXP);
+    Rcpp::traits::input_parameter< bool >::type calcEventsFunctionIsUserDefined(calcEventsFunctionIsUserDefinedSEXP);
+    Rcpp::traits::input_parameter< Nullable<Function> >::type selectPopulationsFunction(selectPopulationsFunctionSEXP);
+    rcpp_result_gen = Rcpp::wrap(getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(design, weights, subGroups, prevalences, piControls, kappa, phi, eventTime, hazardRatios, directionUpper, stratifiedAnalysis, plannedEvents, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectPopulationsFunction));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -760,10 +822,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_getSimulationRatesCpp", (DL_FUNC) &_rpact_getSimulationRatesCpp, 24},
     {"_rpact_logRankTest", (DL_FUNC) &_rpact_logRankTest, 8},
     {"_rpact_getSimulationSurvivalCpp", (DL_FUNC) &_rpact_getSimulationSurvivalCpp, 33},
+    {"_rpact_createSelectedSubsets", (DL_FUNC) &_rpact_createSelectedSubsets, 1},
     {"_rpact_createSubGroups", (DL_FUNC) &_rpact_createSubGroups, 1},
     {"_rpact_createSubGroupsFromPopulation", (DL_FUNC) &_rpact_createSubGroupsFromPopulation, 2},
     {"_rpact_logRankTestEnrichment", (DL_FUNC) &_rpact_logRankTestEnrichment, 7},
     {"_rpact_getSimulationSurvivalEnrichmentStageEvents", (DL_FUNC) &_rpact_getSimulationSurvivalEnrichmentStageEvents, 11},
+    {"_rpact_getTreatmentsSubgroups", (DL_FUNC) &_rpact_getTreatmentsSubgroups, 4},
+    {"_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased", (DL_FUNC) &_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased, 27},
     {"_rpact_getSimulatedStageMeansMultiArmCpp", (DL_FUNC) &_rpact_getSimulatedStageMeansMultiArmCpp, 19},
     {"_rpact_simulationMultiArmMeansInnerLoopCpp", (DL_FUNC) &_rpact_simulationMultiArmMeansInnerLoopCpp, 57},
     {"_rpact_hmm", (DL_FUNC) &_rpact_hmm, 9},

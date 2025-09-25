@@ -176,6 +176,19 @@ double getLambdaByPi(double pi, double eventTime, double kappa) {
 	return pow(-log(1 - pi), 1 / kappa) / eventTime;
 }
 
+NumericVector getLambdasByPis(
+		NumericVector pis,
+		double eventTime,
+		double kappa) {
+
+	int n = pis.size();
+	NumericVector lambdas(n);
+	for (int i = 0; i < n; i++) {
+		lambdas[i] = getLambdaByPi(pis[i], eventTime, kappa);
+	}
+	return lambdas;
+}
+
 double getPiByLambda(double lambda, double eventTime, double kappa) {
 	return 1 - exp(-pow(lambda * eventTime, kappa));
 }
