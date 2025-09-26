@@ -341,7 +341,7 @@ List getSurvDropoutTimes(int numberOfSubjects,
 		survivalTime[i] = pow(-log(1 - R::runif(0.0, 1.0)), 1.0 / kappa) / thisLambda;
 		
 		// Generate dropout time
-		bool anyPhiPositive = any(phi > 0);		
+		bool anyPhiPositive = Rcpp::as<bool>(any(phi > 0));		
 		if (anyPhiPositive) {
 			if (phi[0] > 0) {
 				if (treatments[i] == 1) {
@@ -399,7 +399,7 @@ List getSurvDropoutTimes(int numberOfSubjects,
 //
 // [[Rcpp::export(name = ".getSimulatedStageResultsSurvivalEnrichmentSubjectsBasedCpp")]]
 List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
-		List design,
+		Environment design,
 		NumericVector weights,
 		CharacterVector subGroups,
 		NumericVector prevalences,
@@ -427,6 +427,12 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		bool calcEventsFunctionIsUserDefined = false,
 		Nullable<Function> selectPopulationsFunction = R_NilValue) {
 	
+	if (!design.hasAttribute("class")) {
+		stop("Design has no class attribute.");
+	}
+	std::vector<std::string> designClass = design.attr("class");
+	bool isDesignFisher = designClass[0] == "TrialDesignFisher";
+
 	int kMax = plannedEvents.size();
 	int pMax = hazardRatios.size();
 	int gMax = static_cast<int>(log2(hazardRatios.size())) + 1;
@@ -503,8 +509,12 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	for (int k = 0; k < kMax; k++) {
 		if (k == 0) {
 			// First stage
-			analysisTime[k] = findObservationTime(recruitmentTimes, survivalTime, dropoutTime, plannedEvents[k]);
-						
+			analysisTime[k] = findObservationTime(
+				recruitmentTimes, 
+				survivalTime, 
+				dropoutTime, 
+				plannedEvents[k]
+			);						
 			if (R_IsNA(analysisTime[k])) {
 				eventsNotAchieved[k] = true;
 				break;
@@ -535,7 +545,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			
 			bool analysisTimeOK = analysisTime[k - 1] < max(survivalDataSet["accrualTime"]);
 			LogicalVector selInBoth = selectedPopulations(_, k) & selectedPopulations(_, k - 1);
-			bool allInBoth = all(selInBoth);
+			bool allInBoth = Rcpp::as<bool>(all(selInBoth));
 			bool diffInSelectedPopulations = !allInBoth;
 
 			if (analysisTimeOK && diffInSelectedPopulations) {
@@ -587,16 +597,14 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			IntegerVector selectedSubjects = which(charInSet(survivalDataSet["subGroup"], selectedsubGroups));
 			DataFrame survivalDatasetSelected = getRows(survivalDataSet, selectedSubjects);
 
-			List timeResult = findObservationTime(
-				survivalDatasetSelected["recruitmentTimes"], 
+			analysisTime[k] = findObservationTime(
+				survivalDatasetSelected["accrualTime"], 
 				survivalDatasetSelected["survivalTime"], 
 				survivalDatasetSelected["dropoutTime"], 
 				plannedEvents[k]
 			);
-			analysisTime[k] = timeResult["time"];
-			bool achieved = timeResult["eventsAchieved"];
 			
-			if (!achieved) {
+			if (R_IsNA(analysisTime[k])) {
 				eventsNotAchieved[k] = true;
 				break;
 			} else {
@@ -620,8 +628,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 							double denom = sqrt(populationEventsPerStage(g, k) - populationEventsPerStage(g, k - 1));
 							double numerator = sqrt(populationEventsPerStage(g, k)) * overallTestStatistics(g, k) - 
 								sqrt(populationEventsPerStage(g, k - 1)) * overallTestStatistics(g, k - 1);
-							testStatistics(g, k) = (sqrt(populationEventsPerStage(g, k)) * overallTestStatistics(g, k) - 
-													sqrt(populationEventsPerStage(g, k - 1)) * overallTestStatistics(g, k - 1)) / denom;
+							testStatistics(g, k) = numerator / denom;
 						}
 					}
 				}
@@ -654,8 +661,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				overallEffects(g, k) = exp(numerator / denominator);
 			}
 		}
-
-		double allocationRatioPlanned = (1.0 * allocationFraction[1]) / allocationFraction[2];
+		double allocationRatioPlanned = (1.0 * allocationFraction[0]) / allocationFraction[1];
 
 		// Stage-specific calculations for intermediate stages
 		if (k < kMax - 1) {
@@ -670,9 +676,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			adjustedPValues[k] = std::min(minPValue * selectedCount, 1.0 - 1e-07);
 
 			// Conditional critical value to reject the null hypotheses at the next stage of the trial
-			NumericVector criticalValues = design["criticalValues"];
-			CharacterVector designClass = design.attr("class");
-			bool isDesignFisher = designClass[0] == "TrialDesignFisher";
+			NumericVector criticalValues = design.get("criticalValues");			
 
 			if (isDesignFisher) {
 				double numerator = criticalValues[k + 1];
@@ -687,7 +691,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				);
 				conditionalCriticalValue[k] = getOneMinusQNorm(std::min(numerator / denominator, 1.0 - 1e-07));
 			} else {
-				NumericVector informationRates = design["informationRates"];
+				NumericVector informationRates = design.get("informationRates");
 				double minuend = criticalValues[k + 1] * sqrt(informationRates[k + 1]);
 				double subtrahend = 0.0;
 				for (int j = 0; j < k; j++) {
@@ -712,14 +716,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					_["overallEffects"] = overallEffects
 				);
 
-				List args = List::create(
-					_["typeOfSelection"] = typeOfSelection,
-					_["epsilonValue"] = epsilonValue,
-					_["rValue"] = rValue,
-					_["threshold"] = threshold,
-					_["selectPopulationsFunction"] = selectPopulationsFunction
-				);
-
+				double thresholdArg = threshold;
 				if (effectMeasure == "testStatistic") {
 					selectPopulationsFunctionArgs["effectVector"] = overallTestStatistics(_, k);
 				} else if (effectMeasure == "effectEstimate") {
@@ -727,14 +724,19 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						selectPopulationsFunctionArgs["effectVector"] = overallEffects(_, k);
 					} else {
 						selectPopulationsFunctionArgs["effectVector"] = 1.0 / overallEffects(_, k);
-						args["threshold"] = 1.0 / threshold;
+						thresholdArg = 1.0 / thresholdArg;
 					}
 				}
 
-				args["selectPopulationsFunctionArgs"] = selectPopulationsFunctionArgs;
-
 				Function selectPopulations(".selectPopulations");
-				LogicalVector selectedNow = selectPopulations(args);
+				LogicalVector selectedNow = selectPopulations(
+					Named("typeOfSelection") = typeOfSelection,
+					Named("epsilonValue") = epsilonValue,
+					Named("rValue") = rValue,
+					Named("threshold") = thresholdArg,
+					Named("selectPopulationsFunction") = selectPopulationsFunction,
+					Named("selectPopulationsFunctionArgs") = selectPopulationsFunctionArgs
+				);
 				selectedPopulations(_, k + 1) = selectedPopulations(_, k) & selectedNow;
 
 				Function calcEventsFunc = calcEventsFunction.get();
@@ -770,14 +772,16 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 
 			double thetaStandardized;
 			if (R_IsNA(thetaH1)) {
-				thetaStandardized = log(
-					applyDirectionOfAlternative(
-						overallEffects[selectedPopulations(_, k), k],
-						directionUpper,
-						"minMax",
-						"planning"
-					)[0]
+				LogicalVector nowSelected = selectedPopulations(_, k);
+				NumericVector effectsThisStage = overallEffects(_, k);
+				NumericVector nowEffects = effectsThisStage[nowSelected];
+				NumericVector minMaxEffect = applyDirectionOfAlternative(
+					nowEffects,
+					directionUpper,
+					"minMax",
+					"planning"
 				);
+				thetaStandardized = log(minMaxEffect[0]);
 			} else {
 				thetaStandardized = log(thetaH1);
 			}

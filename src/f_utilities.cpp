@@ -868,7 +868,7 @@ int firstMatch(const CharacterVector& x, std::string value) {
 }
 
 // Return the rows of a DataFrame corresponding to the given indices
-DataFrame getRows(const DataFrame& x, IntegerVector inds) {
+DataFrame getRows(const DataFrame& x, const IntegerVector& inds) {
     List x_list = x;
     int n_cols = x_list.size();
     for (int j = 0; j < n_cols; j++) {
@@ -907,11 +907,10 @@ NumericVector applyDirectionOfAlternative(const NumericVector& values,
                                           bool directionUpper, 
                                           String type,
                                           String phase) {
-    
     if (phase == "design") {
         return values;
     }
-    if (Rf_isNull(values) || values.size() == 0 || all(is_na(values))) {
+    if (Rf_isNull(values) || values.size() == 0 || Rcpp::as<bool>(all(is_na(values)))) {
         return values;
     }
     if (R_IsNA(directionUpper) || directionUpper) {
@@ -928,10 +927,10 @@ NumericVector applyDirectionOfAlternative(const NumericVector& values,
             return(-values);
         }
         if (type == "minMax") {
-            return(min(na_omit(values)));
+            return(wrap(min(na_omit(values))));
         }
         if (type == "maxMin") {
-            return(max(na_omit(values)));
+            return(wrap(max(na_omit(values))));
         }
     }
     if (type == "negateIfLower") {
@@ -946,4 +945,6 @@ NumericVector applyDirectionOfAlternative(const NumericVector& values,
     if (type == "maxMin") {
         return(min(na_omit(values)));
     }   
+    stop("Unknown type of direction of alternative.");
+    return R_NaReal;
 }

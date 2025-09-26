@@ -505,12 +505,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // getSimulatedStageResultsSurvivalEnrichmentSubjectsBased
-List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(List design, NumericVector weights, CharacterVector subGroups, NumericVector prevalences, NumericVector piControls, double kappa, NumericVector phi, double eventTime, NumericVector hazardRatios, bool directionUpper, bool stratifiedAnalysis, NumericVector plannedEvents, NumericVector recruitmentTimes, IntegerVector allocationFraction, std::string typeOfSelection, std::string effectMeasure, LogicalVector adaptations, double epsilonValue, double rValue, double threshold, NumericVector minNumberOfEventsPerStage, NumericVector maxNumberOfEventsPerStage, double conditionalPower, double thetaH1, Nullable<Function> calcEventsFunction, bool calcEventsFunctionIsUserDefined, Nullable<Function> selectPopulationsFunction);
+List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(Environment design, NumericVector weights, CharacterVector subGroups, NumericVector prevalences, NumericVector piControls, double kappa, NumericVector phi, double eventTime, NumericVector hazardRatios, bool directionUpper, bool stratifiedAnalysis, NumericVector plannedEvents, NumericVector recruitmentTimes, IntegerVector allocationFraction, std::string typeOfSelection, std::string effectMeasure, LogicalVector adaptations, double epsilonValue, double rValue, double threshold, NumericVector minNumberOfEventsPerStage, NumericVector maxNumberOfEventsPerStage, double conditionalPower, double thetaH1, Nullable<Function> calcEventsFunction, bool calcEventsFunctionIsUserDefined, Nullable<Function> selectPopulationsFunction);
 RcppExport SEXP _rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(SEXP designSEXP, SEXP weightsSEXP, SEXP subGroupsSEXP, SEXP prevalencesSEXP, SEXP piControlsSEXP, SEXP kappaSEXP, SEXP phiSEXP, SEXP eventTimeSEXP, SEXP hazardRatiosSEXP, SEXP directionUpperSEXP, SEXP stratifiedAnalysisSEXP, SEXP plannedEventsSEXP, SEXP recruitmentTimesSEXP, SEXP allocationFractionSEXP, SEXP typeOfSelectionSEXP, SEXP effectMeasureSEXP, SEXP adaptationsSEXP, SEXP epsilonValueSEXP, SEXP rValueSEXP, SEXP thresholdSEXP, SEXP minNumberOfEventsPerStageSEXP, SEXP maxNumberOfEventsPerStageSEXP, SEXP conditionalPowerSEXP, SEXP thetaH1SEXP, SEXP calcEventsFunctionSEXP, SEXP calcEventsFunctionIsUserDefinedSEXP, SEXP selectPopulationsFunctionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type design(designSEXP);
+    Rcpp::traits::input_parameter< Environment >::type design(designSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type weights(weightsSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type subGroups(subGroupsSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type prevalences(prevalencesSEXP);
