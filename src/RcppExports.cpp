@@ -47,6 +47,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// as251Normal
+double as251Normal(NumericVector lower, NumericVector upper, NumericMatrix sigma, double eps, String errorControl, double intervalSimpsonsRule);
+RcppExport SEXP _rpact_as251Normal(SEXP lowerSEXP, SEXP upperSEXP, SEXP sigmaSEXP, SEXP epsSEXP, SEXP errorControlSEXP, SEXP intervalSimpsonsRuleSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type lower(lowerSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type upper(upperSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< String >::type errorControl(errorControlSEXP);
+    Rcpp::traits::input_parameter< double >::type intervalSimpsonsRule(intervalSimpsonsRuleSEXP);
+    rcpp_result_gen = Rcpp::wrap(as251Normal(lower, upper, sigma, eps, errorControl, intervalSimpsonsRule));
+    return rcpp_result_gen;
+END_RCPP
+}
 // estimate_nb
 SEXP estimate_nb(NumericVector counts1, NumericVector counts2, NumericVector t1, NumericVector t2);
 RcppExport SEXP _rpact_estimate_nb(SEXP counts1SEXP, SEXP counts2SEXP, SEXP t1SEXP, SEXP t2SEXP) {
@@ -804,6 +820,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_rpact_mvnprd", (DL_FUNC) &_rpact_mvnprd, 7},
     {"_rpact_mvstud", (DL_FUNC) &_rpact_mvstud, 9},
+    {"_rpact_as251Normal", (DL_FUNC) &_rpact_as251Normal, 6},
     {"_rpact_estimate_nb", (DL_FUNC) &_rpact_estimate_nb, 4},
     {"_rpact_getFisherCombinationSizeCpp", (DL_FUNC) &_rpact_getFisherCombinationSizeCpp, 5},
     {"_rpact_getSimulatedAlphaCpp", (DL_FUNC) &_rpact_getSimulatedAlphaCpp, 5},

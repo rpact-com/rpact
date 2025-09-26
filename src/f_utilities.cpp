@@ -948,3 +948,11 @@ NumericVector applyDirectionOfAlternative(const NumericVector& values,
     stop("Unknown type of direction of alternative.");
     return R_NaReal;
 }
+
+std::string getClassName(const Environment& x) {
+    if (!x.hasAttribute("class")) {
+		stop("x has no class attribute");
+	}
+	std::vector<std::string> xClass = x.attr("class");
+    return xClass[0];
+}

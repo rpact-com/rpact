@@ -427,11 +427,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		bool calcEventsFunctionIsUserDefined = false,
 		Nullable<Function> selectPopulationsFunction = R_NilValue) {
 	
-	if (!design.hasAttribute("class")) {
-		stop("Design has no class attribute.");
-	}
-	std::vector<std::string> designClass = design.attr("class");
-	bool isDesignFisher = designClass[0] == "TrialDesignFisher";
+	bool isDesignFisher = getClassName(design) == "TrialDesignFisher";
 
 	int kMax = plannedEvents.size();
 	int pMax = hazardRatios.size();

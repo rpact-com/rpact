@@ -143,4 +143,6 @@ NumericVector applyDirectionOfAlternative(const NumericVector& values,
                                           String type,
                                           String phase);
 
+std::string getClassName(const Environment& x);
+
 #endif

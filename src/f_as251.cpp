@@ -141,3 +141,67 @@ NumericVector mvstud(
 
   return NumericVector::create(prob, bnd, iflt);
 }
+
+NumericVector sigmaToBPD(const NumericMatrix& sigma) {
+    int ncol = sigma.ncol();
+    NumericVector bpd(ncol);
+        
+    if (ncol == 2) {
+        double sqrtSigma12 = sqrt(sigma(0, 1));
+        std::fill(bpd.begin(), bpd.end(), sqrtSigma12);
+        return bpd;
+    }
+    
+    bpd[0] = sqrt(sigma(0, 1) * sigma(0, 2) / sigma(1, 2));
+    for (int i = 1; i < ncol; i++) {
+        bpd[i] = sigma(0, i) / bpd[0];
+    }
+    
+    return bpd;
+}
+
+// [[Rcpp::export(name = ".as251NormalCpp")]]
+double as251Normal(NumericVector lower, 
+                   NumericVector upper, 
+                   NumericMatrix sigma,
+                   double eps = 1e-06,
+                   String errorControl = "strict",
+                   double intervalSimpsonsRule = 0.0) {
+    
+    int errorControlInt;
+    if (errorControl == "strict") {
+        errorControlInt = 1;
+    } else {
+        errorControlInt = 0;
+    }
+    
+    NumericVector bpd = sigmaToBPD(sigma);
+    int n = bpd.size();
+    
+    NumericVector lowerExt = rep_len(lower, n);
+    NumericVector upperExt = rep_len(upper, n);
+    
+    IntegerVector inf(n, 2);
+    
+    for (int i = 0; i < n; i++) {
+        if (std::isinf(upperExt[i]) && upperExt[i] > 0) {
+            inf[i] = 0;
+        }
+        if (std::isinf(lowerExt[i]) && lowerExt[i] < 0) {
+            inf[i] = 1;
+        }
+    }
+    
+    NumericVector result = mvnprd(
+      upperExt, 
+      lowerExt, 
+      bpd, 
+      (float)eps, 
+      inf, 
+      errorControlInt, 
+      (float)intervalSimpsonsRule
+    );
+    
+    return result[0];
+}
+

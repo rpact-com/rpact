@@ -9,6 +9,10 @@
     .Call(`_rpact_mvstud`, ndf, a, b, bpd, d, eps, inf, ierc, hnc)
 }
 
+.as251NormalCpp <- function(lower, upper, sigma, eps = 1e-06, errorControl = "strict", intervalSimpsonsRule = 0.0) {
+    .Call(`_rpact_as251Normal`, lower, upper, sigma, eps, errorControl, intervalSimpsonsRule)
+}
+
 .getNegativeBinomialEstimates <- function(counts1, counts2, t1, t2) {
     .Call(`_rpact_estimate_nb`, counts1, counts2, t1, t2)
 }
