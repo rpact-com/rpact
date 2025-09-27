@@ -199,7 +199,7 @@ NULL
 .isDefinedArgument <- function(arg, argumentExistsValidationEnabled = TRUE) {
     paramName <- deparse(substitute(arg))
     if (argumentExistsValidationEnabled &&
-            length(grep("\\$|\\[|\\]", paramName)) == 0 && !exists(paramName)) {
+        length(grep("\\$|\\[|\\]", paramName)) == 0 && !exists(paramName)) {
         tryCatch(
             {
                 if (missing(arg) || is.null(arg)) {
@@ -291,12 +291,12 @@ NULL
 #' @noRd
 #'
 .arrayToString <- function(x, ..., separator = ", ",
-        vectorLookAndFeelEnabled = FALSE,
-        encapsulate = FALSE,
-        digits = 3,
-        maxLength = 80L,
-        maxCharacters = 160L,
-        mode = c("csv", "vector", "and", "or")) {
+                           vectorLookAndFeelEnabled = FALSE,
+                           encapsulate = FALSE,
+                           digits = 3,
+                           maxLength = 80L,
+                           maxCharacters = 160L,
+                           mode = c("csv", "vector", "and", "or")) {
     .assertIsSingleInteger(digits, "digits", naAllowed = TRUE, validateType = FALSE)
     .assertIsInClosedInterval(digits, "digits", lower = 0, upper = NULL)
     .assertIsSingleInteger(maxLength, "maxLength", naAllowed = FALSE, validateType = FALSE)
@@ -442,9 +442,9 @@ NULL
 }
 
 .getInputProducingZeroOutput <- function(input1, output1, input2, output2,
-        tolerance = .Machine$double.eps^0.25) {
+                                         tolerance = .Machine$double.eps^0.25) {
     if ((is.na(output1) || is.null(output1)) &&
-            (is.na(output2) || is.null(output2))) {
+        (is.na(output2) || is.null(output2))) {
         return(NA_real_)
     }
 
@@ -483,14 +483,14 @@ NULL
 #' @noRd
 #'
 .getOneDimensionalRoot <- function(fun,
-        ...,
-        lower,
-        upper,
-        tolerance = .Machine$double.eps^0.25,
-        acceptResultsOutOfTolerance = FALSE,
-        suppressWarnings = TRUE,
-        callingFunctionInformation = NA_character_,
-        cppEnabled = FALSE) {
+                                   ...,
+                                   lower,
+                                   upper,
+                                   tolerance = .Machine$double.eps^0.25,
+                                   acceptResultsOutOfTolerance = FALSE,
+                                   suppressWarnings = TRUE,
+                                   callingFunctionInformation = NA_character_,
+                                   cppEnabled = FALSE) {
     .assertIsSingleNumber(lower, "lower")
     .assertIsSingleNumber(upper, "upper")
     .assertIsSingleNumber(tolerance, "tolerance")
@@ -621,12 +621,12 @@ NULL
 #' @noRd
 #'
 .getOneDimensionalRootBisectionMethod <- function(fun, ..., lower, upper,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        acceptResultsOutOfTolerance = FALSE,
-        maxSearchIterations = 50,
-        direction = 0,
-        suppressWarnings = TRUE,
-        callingFunctionInformation = NA_character_) {
+                                                  tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
+                                                  acceptResultsOutOfTolerance = FALSE,
+                                                  maxSearchIterations = 50,
+                                                  direction = 0,
+                                                  suppressWarnings = TRUE,
+                                                  callingFunctionInformation = NA_character_) {
     lowerStart <- lower
     upperStart <- upper
 
@@ -778,7 +778,7 @@ NULL
 }
 
 .setValueAndParameterType <- function(parameterSet, parameterName, value, defaultValue,
-        notApplicableIfNA = FALSE) {
+                                      notApplicableIfNA = FALSE) {
     .assertIsParameterSetClass(parameterSet, "parameterSet")
 
     if (is.null(parameterSet)) {
@@ -797,9 +797,9 @@ NULL
     if (notApplicableIfNA && all(is.na(value))) {
         parameterSet$.setParameterType(parameterName, C_PARAM_NOT_APPLICABLE)
     } else if (!is.null(value) && length(value) == length(defaultValue) && (
-            (all(is.na(value)) && all(is.na(value) == is.na(defaultValue))) ||
-                (!is.na(all(value == defaultValue)) && all(value == defaultValue))
-        )) {
+        (all(is.na(value)) && all(is.na(value) == is.na(defaultValue))) ||
+            (!is.na(all(value == defaultValue)) && all(value == defaultValue))
+    )) {
         parameterSet$.setParameterType(parameterName, C_PARAM_DEFAULT_VALUE)
     } else {
         parameterSet$.setParameterType(parameterName, C_PARAM_USER_DEFINED)
@@ -1236,7 +1236,7 @@ getParameterName <- function(obj, parameterCaption) {
         stop("Illegal argument: 'data' (", .getClassName(data), ") must be a data.frame")
     }
     if (is.null(insertPositionColumnName) || length(insertPositionColumnName) != 1 ||
-            is.na(insertPositionColumnName) || !is.character(insertPositionColumnName)) {
+        is.na(insertPositionColumnName) || !is.character(insertPositionColumnName)) {
         stop(
             "Illegal argument: 'insertPositionColumnName' (", .getClassName(insertPositionColumnName),
             ") must be a valid character value"
@@ -1301,7 +1301,7 @@ getParameterName <- function(obj, parameterCaption) {
 #' @noRd
 #'
 .isConditionTrue <- function(x, condType = c("and", "or"), xName = NA_character_,
-        level = 0, showDebugMessages = FALSE) {
+                             level = 0, showDebugMessages = FALSE) {
     if (is.logical(x)) {
         if (showDebugMessages) {
             message(rep("\t", level), x, "")
@@ -1519,11 +1519,11 @@ getParameterName <- function(obj, parameterCaption) {
 #'
 #' @noRd
 .getMultivariateDistribution <- function(...,
-        type = c("normal", "t", "quantile", "tQuantile"),
-        upper,
-        sigma,
-        eps = NA_real_,
-        df = NA_real_, alpha = NA_real_) {
+                                         type = c("normal", "t", "quantile", "tQuantile"),
+                                         upper,
+                                         sigma,
+                                         eps = NA_real_,
+                                         df = NA_real_, alpha = NA_real_) {
     type <- match.arg(type)
 
     if (is.null(eps) || length(eps) != 1 || is.na(eps)) {
@@ -1659,18 +1659,18 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 .applyDirectionOfAlternative <- function(value,
-        directionUpper,
-        ...,
-        type = c(
-            "oneMinusValue",
-            "valueMinusOne",
-            "negateIfUpper",
-            "negateIfLower",
-            "minMax",
-            "maxMin"
-        ),
-        phase = c("unknown", "design", "planning", "analysis"),
-        syncLength = FALSE) {
+                                         directionUpper,
+                                         ...,
+                                         type = c(
+                                             "oneMinusValue",
+                                             "valueMinusOne",
+                                             "negateIfUpper",
+                                             "negateIfLower",
+                                             "minMax",
+                                             "maxMin"
+                                         ),
+                                         phase = c("unknown", "design", "planning", "analysis"),
+                                         syncLength = FALSE) {
     type <- match.arg(type)
     phase <- match.arg(phase)
 
@@ -1716,16 +1716,16 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 .applyDirectionOfAlternativeSingle <- function(...,
-        value,
-        directionUpper,
-        type = c(
-            "oneMinusValue",
-            "valueMinusOne",
-            "negateIfUpper",
-            "negateIfLower",
-            "minMax",
-            "maxMin"
-        )) {
+                                               value,
+                                               directionUpper,
+                                               type = c(
+                                                   "oneMinusValue",
+                                                   "valueMinusOne",
+                                                   "negateIfUpper",
+                                                   "negateIfLower",
+                                                   "minMax",
+                                                   "maxMin"
+                                               )) {
     type <- match.arg(type)
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
         return(value)
@@ -1952,5 +1952,3 @@ resetOptions <- function(persist = TRUE) {
         }
     )
 }
-
-

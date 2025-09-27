@@ -24,6 +24,7 @@
 #include <cmath>
 #include <iostream>
 #include <Rcpp.h>
+#include "f_as251.h"
 
 // [[Rcpp::plugins(cpp11)]]
 
@@ -955,4 +956,17 @@ std::string getClassName(const Environment& x) {
 	}
 	std::vector<std::string> xClass = x.attr("class");
     return xClass[0];
+}
+
+// [[Rcpp::export(name = ".getMultivarNormalDistributionCpp")]]
+double getMultivarNormalDistribution(NumericVector upper, NumericMatrix sigma) {
+    
+    int dimensionSigma = sigma.ncol();
+    
+    if (dimensionSigma == 1) {
+        return R::pnorm(upper[0], 0.0, 1.0, 1, 0);
+    }
+    
+    NumericVector lower = NumericVector::create(R_NegInf);
+    return as251Normal(lower, upper, sigma);
 }

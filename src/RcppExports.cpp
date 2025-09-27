@@ -816,6 +816,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getMultivarNormalDistribution
+double getMultivarNormalDistribution(NumericVector upper, NumericMatrix sigma);
+RcppExport SEXP _rpact_getMultivarNormalDistribution(SEXP upperSEXP, SEXP sigmaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type upper(upperSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type sigma(sigmaSEXP);
+    rcpp_result_gen = Rcpp::wrap(getMultivarNormalDistribution(upper, sigma));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rpact_mvnprd", (DL_FUNC) &_rpact_mvnprd, 7},
@@ -859,6 +871,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_getCipheredValue", (DL_FUNC) &_rpact_getCipheredValue, 1},
     {"_rpact_getFraction", (DL_FUNC) &_rpact_getFraction, 3},
     {"_rpact_getFractions", (DL_FUNC) &_rpact_getFractions, 3},
+    {"_rpact_getMultivarNormalDistribution", (DL_FUNC) &_rpact_getMultivarNormalDistribution, 2},
     {NULL, NULL, 0}
 };
 

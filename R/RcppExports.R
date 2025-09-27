@@ -165,3 +165,7 @@ getCipheredValue <- function(x) {
     .Call(`_rpact_getFractions`, x, epsilon, maxNumberOfSearchSteps)
 }
 
+.getMultivarNormalDistributionCpp <- function(upper, sigma) {
+    .Call(`_rpact_getMultivarNormalDistribution`, upper, sigma)
+}
+

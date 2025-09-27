@@ -145,4 +145,6 @@ NumericVector applyDirectionOfAlternative(const NumericVector& values,
 
 std::string getClassName(const Environment& x);
 
+double getMultivarNormalDistribution(NumericVector upper, NumericMatrix sigma);
+
 #endif

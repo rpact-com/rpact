@@ -65,7 +65,7 @@ mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
     if (length(A) != length(B) || length(B) != length(BPD) || length(BPD) != length(INF)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "input vectors must have the same length (",
-            paste0(sort(unique(c(length(A), length(B), length(BPD), length(INF)))), collapse = " != "), ")", 
+            paste0(sort(unique(c(length(A), length(B), length(BPD), length(INF)))), collapse = " != "), ")",
             call. = FALSE
         )
     }
@@ -105,9 +105,9 @@ mvnprd <- function(..., A, B, BPD, EPS = 1e-06, INF, IERC = 1, HINC = 0) {
 #' @export
 #'
 as251Normal <- function(lower, upper, sigma, ...,
-        eps = 1e-06,
-        errorControl = c("strict", "halvingIntervals"),
-        intervalSimpsonsRule = 0) {
+                        eps = 1e-06,
+                        errorControl = c("strict", "halvingIntervals"),
+                        intervalSimpsonsRule = 0) {
     errorControl <- match.arg(errorControl)
     if (errorControl == "strict") {
         errorControl <- 1
@@ -117,8 +117,8 @@ as251Normal <- function(lower, upper, sigma, ...,
 
     bpd <- .sigmaToBPD(sigma)
     n <- length(bpd)
-    lower <- rep(lower, n)
-    upper <- rep(upper, n)
+    lower <- rep_len(lower, n)
+    upper <- rep_len(upper, n)
 
     inf <- rep(2, n)
     inf[is.infinite(upper) & upper > 0] <- 0
@@ -133,7 +133,6 @@ as251Normal <- function(lower, upper, sigma, ...,
         IERC = errorControl,
         HINC = intervalSimpsonsRule
     )
-    iFault <- attr(result, "iFault")
     return(result)
 }
 
@@ -187,7 +186,7 @@ mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0)
     if (length(A) != length(B) || length(B) != length(BPD) || length(BPD) != length(INF) || length(INF) != length(D)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "input vectors must have the same length (",
-            paste0(sort(unique(c(length(A), length(B), length(BPD), length(INF), length(D)))), collapse = " != "), ")", 
+            paste0(sort(unique(c(length(A), length(B), length(BPD), length(INF), length(D)))), collapse = " != "), ")",
             call. = FALSE
         )
     }
@@ -228,10 +227,10 @@ mvstud <- function(..., NDF, A, B, BPD, D, EPS = 1e-06, INF, IERC = 1, HINC = 0)
 #' @export
 #'
 as251StudentT <- function(lower, upper, sigma, ...,
-        df,
-        eps = 1e-06,
-        errorControl = c("strict", "halvingIntervals"),
-        intervalSimpsonsRule = 0) {
+                          df,
+                          eps = 1e-06,
+                          errorControl = c("strict", "halvingIntervals"),
+                          intervalSimpsonsRule = 0) {
     errorControl <- match.arg(errorControl)
     if (errorControl == "strict") {
         errorControl <- 1
