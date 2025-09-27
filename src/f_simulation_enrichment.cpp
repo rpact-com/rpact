@@ -16,7 +16,7 @@ using namespace Rcpp;
 // @param stageResults List containing stage results with matrices:
 //   testStatistics, separatePValues, selectedPopulations, 
 //   populationEventsPerStage (optional), subjectsPerStage (optional)
-// @param design Trial design environment object
+// @param design Trial design object
 // @param indices Matrix of indices for intersection hypotheses
 // @param intersectionTest String specifying intersection test method:
 //   "SpiessensDebois", "Bonferroni", "Simes", "Sidak"
@@ -46,7 +46,13 @@ List performClosedCombinationTestForSimulationEnrichment(
     
     int gMax = testStatistics.nrow();
     int nIntersections = indices.nrow();
-    
+
+    // Verify that nIntersections equals 2^gMax - 1
+    int expectedIntersections = static_cast<int>(pow(2, gMax)) - 1; // 2^gMax - 1
+    if (nIntersections != expectedIntersections) {
+        stop("Number of intersections must equal 2^gMax - 1");
+    }
+
     // Initialize result matrices
     NumericMatrix adjustedStageWisePValues(nIntersections, kMax);
     std::fill(adjustedStageWisePValues.begin(), adjustedStageWisePValues.end(), NA_REAL);
@@ -78,8 +84,7 @@ List performClosedCombinationTestForSimulationEnrichment(
     // Get weights based on design type
     bool isDesignFisher = designClass == "TrialDesignFisher";
     bool isDesignInverseNormal = designClass == "TrialDesignInverseNormal";
-    NumericVector weights;
-    
+    NumericVector weights;    
     if (isDesignFisher) {
         weights = getWeightsFisher(design);
     } else {
@@ -94,18 +99,17 @@ List performClosedCombinationTestForSimulationEnrichment(
     // Main loop over stages
     for (int k = 0; k < kMax; k++) {
         
+        NumericVector stageSeparatePValues = separatePValues(_, k);
+
         // Loop over intersection hypotheses
         for (int i = 0; i < nIntersections; i++) {
-            
-            // Check if any p-values available for this intersection
-            bool hasValidPValues = false;
-            for (int g = 0; g < gMax; g++) {
-                if (indices(i, g) == 1 && !R_IsNA(separatePValues(g, k))) {
-                    hasValidPValues = true;
-                    break;
-                }
-            }
-            
+                     
+            // Get p-values available for this intersection, if there are none continue to next intersection
+            LogicalVector isInIntersection = indices(i, _) > 0;
+            NumericVector intersectStageSeparatePValues = stageSeparatePValues[isInIntersection];
+            intersectStageSeparatePValues = na_omit(intersectStageSeparatePValues);
+            int nAvailablePVals = intersectStageSeparatePValues.size();
+            bool hasValidPValues = nAvailablePVals > 0;
             if (!hasValidPValues) continue;
             
             // Calculate adjusted stage-wise p-value based on intersection test
@@ -118,164 +122,106 @@ List performClosedCombinationTestForSimulationEnrichment(
                 bool hasSubjects = stageResults.containsElementNamed("subjectsPerStage");
                 if (hasSubjects) {
                     NumericMatrix subjectsPerStage = stageResults["subjectsPerStage"];
-                    NumericVector subjectsSelected;
-                    
-                    for (int g = 0; g < gMax; g++) {
-                        if (indices(i, g) == 1 && selectedPopulations(g, k) && 
-                            !R_IsNA(subjectsPerStage(g, k))) {
-                            subjectsSelected.push_back(subjectsPerStage(g, k));
-                        }
-                    }
-                    
+                    NumericVector subjectsThisStage = subjectsPerStage(_, k);
+                    LogicalVector isSubjectsSelected = isInIntersection & selectedPopulations(_, k);
+                    NumericVector subjectsSelected = subjectsThisStage[isSubjectsSelected];
+                    subjectsSelected = na_omit(subjectsSelected);
+
                     if (subjectsSelected.size() == 1) {
                         sigma = NumericMatrix(1, 1);
                         sigma(0, 0) = 1.0;
-                    } else if (subjectsSelected.size() == 2) {
+                    } else {
                         sigma = NumericMatrix(2, 2);
-                        double corr = sqrt(subjectsSelected[0] / (subjectsSelected[0] + subjectsSelected[1]));
+                        double corr = sqrt(subjectsSelected[0] / sum(subjectsSelected));
                         sigma(0, 0) = 1.0;
                         sigma(0, 1) = corr;
                         sigma(1, 0) = corr;
                         sigma(1, 1) = 1.0;
                     }
                 } else {
-                    // Use populationEventsPerStage if available
-                    bool hasEvents = stageResults.containsElementNamed("populationEventsPerStage");
-                    if (hasEvents) {
-                        NumericMatrix populationEventsPerStage = stageResults["populationEventsPerStage"];
-                        NumericVector eventsSelected;
-                        
-                        for (int g = 0; g < gMax; g++) {
-                            if (indices(i, g) == 1 && selectedPopulations(g, k) && 
-                                !R_IsNA(populationEventsPerStage(g, k))) {
-                                eventsSelected.push_back(populationEventsPerStage(g, k));
-                            }
-                        }
-                        
-                        if (eventsSelected.size() <= 1) {
-                            sigma = NumericMatrix(1, 1);
-                            sigma(0, 0) = 1.0;
-                        } else {
-                            sigma = NumericMatrix(2, 2);
-                            double corr = sqrt(eventsSelected[0] / eventsSelected[1]);
-                            sigma(0, 0) = 1.0;
-                            sigma(0, 1) = corr;
-                            sigma(1, 0) = corr;
-                            sigma(1, 1) = 1.0;
-                        }
+                    // Use populationEventsPerStage
+                    NumericMatrix populationEventsPerStage = stageResults["populationEventsPerStage"];
+                    NumericVector populationEventsThisStage = populationEventsPerStage(_, k);  
+                    LogicalVector isEventsSelected = isInIntersection & selectedPopulations(_, k);                  
+                    NumericVector eventsSelected = populationEventsThisStage[isEventsSelected];
+                    eventsSelected = na_omit(eventsSelected);     
+                    
+                    if (eventsSelected.size() <= 1) {
+                        sigma = NumericMatrix(1, 1);
+                        sigma(0, 0) = 1.0;
+                    } else {
+                        sigma = NumericMatrix(2, 2);
+                        double corr = sqrt(eventsSelected[0] / eventsSelected[1]);
+                        sigma(0, 0) = 1.0;
+                        sigma(0, 1) = corr;
+                        sigma(1, 0) = corr;
+                        sigma(1, 1) = 1.0;
                     }
                 }
                 
                 // Find maximum test statistic for this intersection
-                double maxTestStatistic = R_NegInf;
-                for (int g = 0; g < gMax; g++) {
-                    if (indices(i, g) == 1 && !R_IsNA(testStatistics(g, k))) {
-                        maxTestStatistic = std::max(maxTestStatistic, testStatistics(g, k));
-                    }
-                }
-                
-                if (!std::isinf(maxTestStatistic)) {
-                    NumericVector upper(1);
-                    upper[0] = maxTestStatistic;
-                    adjustedStageWisePValues(i, k) = 1.0 - getMultivarNormalDistribution(upper, sigma);
-                }
-                
+                NumericVector testStatsThisStage = testStatistics(_, k);
+                NumericVector testStats = testStatsThisStage[isInIntersection];
+                testStats = na_omit(testStats);
+                double maxTestStatistic = max(testStats);
+
+                adjustedStageWisePValues(i, k) = 1.0 - getMultivarNormalDistribution(maxTestStatistic, sigma);
+
             } else if (intersectionTest == "Bonferroni") {
-                // Bonferroni adjusted p-values
-                double minPValue = R_PosInf;
-                int numValidPValues = 0;
-                
-                for (int g = 0; g < gMax; g++) {
-                    if (indices(i, g) == 1 && !R_IsNA(separatePValues(g, k))) {
-                        minPValue = std::min(minPValue, separatePValues(g, k));
-                        numValidPValues++;
-                    }
-                }
-                
-                if (numValidPValues > 0) {
-                    adjustedStageWisePValues(i, k) = std::min(1.0, numValidPValues * minPValue);
-                }
-                
+                // Bonferroni adjusted p-values            
+                double minAvailablePvals = min(intersectStageSeparatePValues);
+                double bonferroniAdjustedPval = nAvailablePVals * minAvailablePvals;
+                adjustedStageWisePValues(i, k) = std::min(1.0, bonferroniAdjustedPval);
+
             } else if (intersectionTest == "Simes") {
                 // Simes adjusted p-values
-                NumericVector selectedPValues;
-                for (int g = 0; g < gMax; g++) {
-                    if (indices(i, g) == 1 && !R_IsNA(separatePValues(g, k))) {
-                        selectedPValues.push_back(separatePValues(g, k));
-                    }
-                }
-                
-                if (selectedPValues.size() > 0) {
-                    std::sort(selectedPValues.begin(), selectedPValues.end());
-                    double minSimes = R_PosInf;
-                    
-                    for (int j = 0; j < selectedPValues.size(); j++) {
-                        double simesValue = (selectedPValues.size() / (j + 1.0)) * selectedPValues[j];
-                        minSimes = std::min(minSimes, simesValue);
-                    }
-                    adjustedStageWisePValues(i, k) = minSimes;
-                }
-                
+                NumericVector sortedPValues = clone(intersectStageSeparatePValues);
+                std::sort(sortedPValues.begin(), sortedPValues.end());
+                IntegerVector seqAlongPvals = seq_len(nAvailablePVals);
+                NumericVector seqAlongPvalsDouble = Rcpp::as<NumericVector>(seqAlongPvals);
+                NumericVector simesAdjustedPValues = rep(1.0, nAvailablePVals) / seqAlongPvalsDouble * sortedPValues;
+                adjustedStageWisePValues(i, k) = std::min(1.0, min(simesAdjustedPValues));
+
             } else if (intersectionTest == "Sidak") {
                 // Sidak adjusted p-values
-                double minPValue = R_PosInf;
-                int numValidPValues = 0;
-                
-                for (int g = 0; g < gMax; g++) {
-                    if (indices(i, g) == 1 && !R_IsNA(separatePValues(g, k))) {
-                        minPValue = std::min(minPValue, separatePValues(g, k));
-                        numValidPValues++;
-                    }
-                }
-                
-                if (numValidPValues > 0) {
-                    adjustedStageWisePValues(i, k) = 1.0 - pow(1.0 - minPValue, numValidPValues);
-                }
+                double minAvailablePvals = min(intersectStageSeparatePValues);
+                double minToPower = pow(minAvailablePvals, nAvailablePVals);
+                // 1 - (1 - minToPower) == minToPower
+                adjustedStageWisePValues(i, k) = minToPower;
             }
             
-            // Calculate overall adjusted test statistic
-            if (!R_IsNA(adjustedStageWisePValues(i, k))) {
-                if (isDesignFisher) {
-                    double product = 1.0;
-                    for (int j = 0; j <= k; j++) {
-                        if (!R_IsNA(adjustedStageWisePValues(i, j))) {
-                            product *= pow(adjustedStageWisePValues(i, j), weights[j]);
-                        }
-                    }
-                    overallAdjustedTestStatistics(i, k) = product;
-                } else {
-                    double numerator = 0.0;
-                    double denominator = 0.0;
-                    
-                    for (int j = 0; j <= k; j++) {
-                        if (!R_IsNA(adjustedStageWisePValues(i, j))) {
-                            numerator += weights[j] * getOneMinusQNorm(adjustedStageWisePValues(i, j));
-                            denominator += weights[j] * weights[j];
-                        }
-                    }
-                    
-                    if (denominator > 0) {
-                        overallAdjustedTestStatistics(i, k) = numerator / sqrt(denominator);
-                    }
+            // Calculate overall adjusted test statistic            
+            if (isDesignFisher) {
+                double product = 1.0;
+                for (int j = 0; j <= k; j++) {
+                    product *= pow(adjustedStageWisePValues(i, j), weights[j]);
                 }
+                overallAdjustedTestStatistics(i, k) = product;
+            } else {
+                double numerator = 0.0;
+                double denominator = 0.0;
+                for (int j = 0; j <= k; j++) {                    
+                    numerator += weights[j] * getOneMinusQNorm(adjustedStageWisePValues(i, j));
+                    denominator += pow(weights[j], 2.0);                    
+                }
+                overallAdjustedTestStatistics(i, k) = numerator / sqrt(denominator);
             }
+            
             
             // Determine rejection and futility
-            if (!R_IsNA(overallAdjustedTestStatistics(i, k))) {
-                NumericVector criticalValues = Rcpp::as<NumericVector>(design.get("criticalValues"));
-                
-                if (isDesignFisher) {
-                    rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= criticalValues[k];
-                    if (k < kMax - 1) {
-                        NumericVector alpha0Vec = design.get("alpha0Vec");
-                        futilityIntersections(i, k) = adjustedStageWisePValues(i, k) >= alpha0Vec[k];
-                    }
-                } else if (isDesignInverseNormal) {
-                    rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) >= criticalValues[k];
-                    if (k < kMax - 1) {
-                        NumericVector futilityBounds = design.get("futilityBounds");
-                        futilityIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= futilityBounds[k];
-                    }
+            NumericVector criticalValues = design.get("criticalValues");
+            
+            if (isDesignFisher) {
+                rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= criticalValues[k];
+                if (k < kMax - 1) {
+                    NumericVector alpha0Vec = design.get("alpha0Vec");
+                    futilityIntersections(i, k) = adjustedStageWisePValues(i, k) >= alpha0Vec[k];
+                }
+            } else if (isDesignInverseNormal) {
+                rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) >= criticalValues[k];
+                if (k < kMax - 1) {
+                    NumericVector futilityBounds = design.get("futilityBounds");
+                    futilityIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= futilityBounds[k];
                 }
             }
             
@@ -290,82 +236,41 @@ List performClosedCombinationTestForSimulationEnrichment(
             }
         }
         
-        // Update rejectedIntersections with previous results
-        for (int i = 0; i < nIntersections; i++) {
-            rejectedIntersections(i, k) = rejectedIntersections(i, k) || rejectedIntersectionsBefore[i];
-        }
-        
-        // Update rejectedIntersectionsBefore for next iteration
-        for (int i = 0; i < nIntersections; i++) {
-            rejectedIntersectionsBefore[i] = rejectedIntersections(i, k);
-        }
-        
+        rejectedIntersections(_, k) = rejectedIntersections(_, k) | rejectedIntersectionsBefore;
+        rejectedIntersectionsBefore = rejectedIntersections(_, k);
+        LogicalVector futilityThisStage = futilityIntersections(_, k);
+
         // Determine population-level rejections and futility
         for (int j = 0; j < gMax; j++) {
-            bool allIntersectionsRejected = true;
-            for (int i = 0; i < nIntersections; i++) {
-                if (indices(i, j) == 1 && !rejectedIntersections(i, k)) {
-                    allIntersectionsRejected = false;
-                    break;
-                }
-            }
-            rejected(j, k) = allIntersectionsRejected;
+            LogicalVector isInStage = indices(_, j) == rep(1, nIntersections);      
+
+            LogicalVector rejectedIntersectionInStage = rejectedIntersectionsBefore[isInStage];
+            rejected(j, k) = Rcpp::as<bool>(all(na_omit(rejectedIntersectionInStage)));           
             
-            if (k < kMax - 1) {
-                bool anyIntersectionFutile = false;
-                for (int i = 0; i < nIntersections; i++) {
-                    if (indices(i, j) == 1 && futilityIntersections(i, k)) {
-                        anyIntersectionFutile = true;
-                        break;
-                    }
-                }
-                futility(j, k) = anyIntersectionFutile;
+            if (k < kMax - 1) {                
+                LogicalVector futilityIntersectionInStage = futilityThisStage[isInStage];
+                futility(j, k) = Rcpp::as<bool>(any(na_omit(futilityIntersectionInStage)));
             }
         }
         
-        // Determine success stopping
+        LogicalVector selectedPopulationsThisStage = selectedPopulations(_, k);
+
+        // Determine success stopping        
         if (successCriterion == "all") {
-            bool allSelectedRejected = true;
-            for (int j = 0; j < gMax; j++) {
-                if (selectedPopulations(j, k) && !rejected(j, k)) {
-                    allSelectedRejected = false;
-                    break;
-                }
-            }
-            successStop[k] = allSelectedRejected;
+            LogicalVector rejectedIntersectionsThisPop = rejectedIntersectionsBefore[selectedPopulationsThisStage];
+            successStop[k] = Rcpp::as<bool>(all(rejectedIntersectionsThisPop));
         } else {
-            bool anyRejected = false;
-            for (int j = 0; j < gMax; j++) {
-                if (rejected(j, k)) {
-                    anyRejected = true;
-                    break;
-                }
-            }
-            successStop[k] = anyRejected;
+            successStop[k] = Rcpp::as<bool>(any(rejectedIntersectionsBefore));
         }
         
         // Determine futility stopping for intermediate stages
         if (k < kMax - 1) {
-            bool allSelectedFutile = true;
-            for (int j = 0; j < gMax; j++) {
-                if (selectedPopulations(j, k) && !futility(j, k)) {
-                    allSelectedFutile = false;
-                    break;
-                }
-            }
-            futilityStop[k] = allSelectedFutile;
-            
-            // Check if no populations selected for next stage
-            bool anySelectedNext = false;
-            if (k + 1 < selectedPopulations.ncol()) {
-                for (int j = 0; j < gMax; j++) {
-                    if (selectedPopulations(j, k + 1)) {
-                        anySelectedNext = true;
-                        break;
-                    }
-                }
-            }
-            if (!anySelectedNext) {
+            LogicalVector futilityIntersectionsThisPop = futilityThisStage[selectedPopulationsThisStage];
+            futilityStop[k] = Rcpp::as<bool>(all(futilityIntersectionsThisPop));
+
+            LogicalVector selectedPopulationsNextStage = selectedPopulations(_, k + 1);
+            bool noPopInNextStage = Rcpp::as<bool>(all(na_omit(!selectedPopulationsNextStage)));
+            if (noPopInNextStage) {
                 futilityStop[k] = true;
             }
         }
