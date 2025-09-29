@@ -232,7 +232,7 @@ List performClosedCombinationTestForSimulationEnrichment(
             
             // Early termination check for final stage
             if (k == kMax - 1 && !rejectedIntersections(0, k)) {
-                // break; // Could implement early break if needed
+                break;
             }
         }
         

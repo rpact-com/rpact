@@ -434,6 +434,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// performClosedCombinationTestForSimulationEnrichment
+List performClosedCombinationTestForSimulationEnrichment(List stageResults, Environment design, IntegerMatrix indices, std::string intersectionTest, std::string successCriterion);
+RcppExport SEXP _rpact_performClosedCombinationTestForSimulationEnrichment(SEXP stageResultsSEXP, SEXP designSEXP, SEXP indicesSEXP, SEXP intersectionTestSEXP, SEXP successCriterionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type stageResults(stageResultsSEXP);
+    Rcpp::traits::input_parameter< Environment >::type design(designSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< std::string >::type intersectionTest(intersectionTestSEXP);
+    Rcpp::traits::input_parameter< std::string >::type successCriterion(successCriterionSEXP);
+    rcpp_result_gen = Rcpp::wrap(performClosedCombinationTestForSimulationEnrichment(stageResults, design, indices, intersectionTest, successCriterion));
+    return rcpp_result_gen;
+END_RCPP
+}
 // createSelectedSubsets
 LogicalVector createSelectedSubsets(LogicalVector selectedPopulationsAtStagek);
 RcppExport SEXP _rpact_createSelectedSubsets(SEXP selectedPopulationsAtStagekSEXP) {
@@ -851,6 +866,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_getSimulationRatesCpp", (DL_FUNC) &_rpact_getSimulationRatesCpp, 24},
     {"_rpact_logRankTest", (DL_FUNC) &_rpact_logRankTest, 8},
     {"_rpact_getSimulationSurvivalCpp", (DL_FUNC) &_rpact_getSimulationSurvivalCpp, 33},
+    {"_rpact_performClosedCombinationTestForSimulationEnrichment", (DL_FUNC) &_rpact_performClosedCombinationTestForSimulationEnrichment, 5},
     {"_rpact_createSelectedSubsets", (DL_FUNC) &_rpact_createSelectedSubsets, 1},
     {"_rpact_createSubGroups", (DL_FUNC) &_rpact_createSubGroups, 1},
     {"_rpact_createSubGroupsFromPopulation", (DL_FUNC) &_rpact_createSubGroupsFromPopulation, 2},
