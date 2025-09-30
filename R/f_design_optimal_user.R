@@ -429,7 +429,7 @@ getSecondStageInformation <- function(firstStagePValue, design) {
         # For design with interim estimate, apply effect restrictions
         if (design$useInterimEstimate) {
             effect <- min(
-                max(qnorm(1 - firstStagePValue) / design$firstStageInformation, design$delta1Min),
+                max(qnorm(1 - firstStagePValue) / sqrt(design$firstStageInformation), design$delta1Min),
                 design$delta1Max
             )
         } else {
