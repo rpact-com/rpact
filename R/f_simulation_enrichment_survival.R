@@ -981,7 +981,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
     }
 
     # Perform the main simulation
-    simulationResult <- .performSimulationEnrichmentSurvivalLoop(
+    loopResult <- .performSimulationEnrichmentSurvivalLoopCpp(
         cols = cols,
         maxNumberOfIterations = maxNumberOfIterations,
         design = design,
@@ -1016,22 +1016,22 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
     )
 
     # Extract results from the simulation
-    simulatedNumberEventsNotAchieved <- simulationResult$simulatedNumberEventsNotAchieved
-    simulatedAnalysisTime <- simulationResult$simulatedAnalysisTime
-    simulatedNumberOfSubjects <- simulationResult$simulatedNumberOfSubjects
-    simulatedSelections <- simulationResult$simulatedSelections
-    simulatedRejections <- simulationResult$simulatedRejections
-    simulatedNumberOfPopulations <- simulationResult$simulatedNumberOfPopulations
-    simulatedPopulationEventsPerStage <- simulationResult$simulatedPopulationEventsPerStage
-    simulatedNumberOfEvents <- simulationResult$simulatedNumberOfEvents
-    simulatedSuccessStopping <- simulationResult$simulatedSuccessStopping
-    simulatedFutilityStopping <- simulationResult$simulatedFutilityStopping
-    simulatedConditionalPower <- simulationResult$simulatedConditionalPower
-    simulatedRejectAtLeastOne <- simulationResult$simulatedRejectAtLeastOne
-    expectedNumberOfEvents <- simulationResult$expectedNumberOfEvents
-    expectedNumberOfSubjects <- simulationResult$expectedNumberOfSubjects
-    expectedStudyDuration <- simulationResult$expectedStudyDuration
-    iterations <- simulationResult$iterations
+    simulatedNumberEventsNotAchieved <- loopResult$simulatedNumberEventsNotAchieved
+    simulatedAnalysisTime <- loopResult$simulatedAnalysisTime
+    simulatedNumberOfSubjects <- loopResult$simulatedNumberOfSubjects
+    simulatedSelections <- loopResult$simulatedSelections
+    simulatedRejections <- loopResult$simulatedRejections
+    simulatedNumberOfPopulations <- loopResult$simulatedNumberOfPopulations
+    simulatedPopulationEventsPerStage <- loopResult$simulatedPopulationEventsPerStage
+    simulatedNumberOfEvents <- loopResult$simulatedNumberOfEvents
+    simulatedSuccessStopping <- loopResult$simulatedSuccessStopping
+    simulatedFutilityStopping <- loopResult$simulatedFutilityStopping
+    simulatedConditionalPower <- loopResult$simulatedConditionalPower
+    simulatedRejectAtLeastOne <- loopResult$simulatedRejectAtLeastOne
+    expectedNumberOfEvents <- loopResult$expectedNumberOfEvents
+    expectedNumberOfSubjects <- loopResult$expectedNumberOfSubjects
+    expectedStudyDuration <- loopResult$expectedStudyDuration
+    iterations <- loopResult$iterations
 
     simulatedConditionalPower[1, ] <- NA_real_
     if (kMax > 1) {
@@ -1097,7 +1097,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
     }
 
-    simulationResults$.data <- simulationResult$data
+    simulationResults$.data <- loopResult$data
 
     return(simulationResults)
 }

@@ -868,40 +868,6 @@ int firstMatch(const CharacterVector& x, std::string value) {
     return -1; // Return -1 if no match is found
 }
 
-// Return the rows of a DataFrame corresponding to the given indices
-DataFrame getRows(const DataFrame& x, const IntegerVector& inds) {
-    List x_list = x;
-    int n_cols = x_list.size();
-    for (int j = 0; j < n_cols; j++) {
-        SEXP col = x_list[j];
-        switch (TYPEOF(col)) {
-            case INTSXP: {
-                IntegerVector int_col = as<IntegerVector>(col);
-                x_list[j] = int_col[inds];
-                break;
-            }
-            case REALSXP: {
-                NumericVector num_col = as<NumericVector>(col);
-                x_list[j] = num_col[inds];
-                break;
-            }
-            case STRSXP: {
-                CharacterVector char_col = as<CharacterVector>(col);
-                x_list[j] = char_col[inds];
-                break;
-            }
-            case LGLSXP: {
-                LogicalVector lgl_col = as<LogicalVector>(col);
-                x_list[j] = lgl_col[inds];
-                break;
-            }
-            default:
-                stop("Unsupported column type in DataFrame");
-        }
-    }
-    return DataFrame(x_list);
-}
-
 // Simplified equivalent of R function .applyDirectionOfAlternative.
 // Note that directionUpper cannot be a vector here, and values cannot be a logical vector.
 NumericVector applyDirectionOfAlternative(const NumericVector& values, 
@@ -941,10 +907,10 @@ NumericVector applyDirectionOfAlternative(const NumericVector& values,
         return(values);
     }
     if (type == "minMax") {
-        return(max(na_omit(values)));
+        return(wrap(max(na_omit(values))));
     }
     if (type == "maxMin") {
-        return(min(na_omit(values)));
+        return(wrap(min(na_omit(values))));
     }   
     stop("Unknown type of direction of alternative.");
     return R_NaReal;
