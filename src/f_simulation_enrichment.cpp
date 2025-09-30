@@ -47,6 +47,10 @@ List performClosedCombinationTestForSimulationEnrichment(
     int gMax = testStatistics.nrow();
     int nIntersections = indices.nrow();
 
+    if (kMax != testStatistics.ncol() || kMax != separatePValues.ncol() || kMax != selectedPopulations.ncol()) {
+        stop("Number of columns in stage results matrices must equal kMax");
+    }
+
     // Verify that nIntersections equals 2^gMax - 1
     int expectedIntersections = static_cast<int>(pow(2, gMax)) - 1; // 2^gMax - 1
     if (nIntersections != expectedIntersections) {
@@ -103,7 +107,7 @@ List performClosedCombinationTestForSimulationEnrichment(
 
         // Loop over intersection hypotheses
         for (int i = 0; i < nIntersections; i++) {
-                     
+            
             // Get p-values available for this intersection, if there are none continue to next intersection
             LogicalVector isInIntersection = indices(i, _) > 0;
             NumericVector intersectStageSeparatePValues = stageSeparatePValues[isInIntersection];
@@ -165,7 +169,7 @@ List performClosedCombinationTestForSimulationEnrichment(
                 testStats = na_omit(testStats);
                 double maxTestStatistic = max(testStats);
 
-                adjustedStageWisePValues(i, k) = 1.0 - getMultivarNormalDistribution(maxTestStatistic, sigma);
+                adjustedStageWisePValues(i, k) = 1.0 - getMultivarNormalDistribution(wrap(maxTestStatistic), sigma);
 
             } else if (intersectionTest == "Bonferroni") {
                 // Bonferroni adjusted p-values            
@@ -179,15 +183,15 @@ List performClosedCombinationTestForSimulationEnrichment(
                 std::sort(sortedPValues.begin(), sortedPValues.end());
                 IntegerVector seqAlongPvals = seq_len(nAvailablePVals);
                 NumericVector seqAlongPvalsDouble = Rcpp::as<NumericVector>(seqAlongPvals);
-                NumericVector simesAdjustedPValues = rep(1.0, nAvailablePVals) / seqAlongPvalsDouble * sortedPValues;
+                NumericVector simesAdjustedPValues = rep(nAvailablePVals * 1.0, nAvailablePVals) / 
+                    seqAlongPvalsDouble * sortedPValues;
                 adjustedStageWisePValues(i, k) = std::min(1.0, min(simesAdjustedPValues));
 
             } else if (intersectionTest == "Sidak") {
                 // Sidak adjusted p-values
                 double minAvailablePvals = min(intersectStageSeparatePValues);
-                double minToPower = pow(minAvailablePvals, nAvailablePVals);
-                // 1 - (1 - minToPower) == minToPower
-                adjustedStageWisePValues(i, k) = minToPower;
+                double OneMinusMinPvalsToPower = pow(1.0 - minAvailablePvals, nAvailablePVals);
+                adjustedStageWisePValues(i, k) = 1.0 - OneMinusMinPvalsToPower;
             }
             
             // Calculate overall adjusted test statistic            
@@ -232,41 +236,49 @@ List performClosedCombinationTestForSimulationEnrichment(
             
             // Early termination check for final stage
             if (k == kMax - 1 && !rejectedIntersections(0, k)) {
-                break;
+                // We currently don't do that early break because then we don't get the adjusted p-values
+                // for the other intersection hypotheses.
+
+                // break;
             }
         }
         
         rejectedIntersections(_, k) = rejectedIntersections(_, k) | rejectedIntersectionsBefore;
         rejectedIntersectionsBefore = rejectedIntersections(_, k);
-        LogicalVector futilityThisStage = futilityIntersections(_, k);
+
+        LogicalVector futilityIntersectionsBefore;
+        if (k < kMax - 1) {
+            futilityIntersectionsBefore = futilityIntersections(_, k);
+        }
 
         // Determine population-level rejections and futility
         for (int j = 0; j < gMax; j++) {
             LogicalVector isInStage = indices(_, j) == rep(1, nIntersections);      
-
             LogicalVector rejectedIntersectionInStage = rejectedIntersectionsBefore[isInStage];
             rejected(j, k) = Rcpp::as<bool>(all(na_omit(rejectedIntersectionInStage)));           
             
             if (k < kMax - 1) {                
-                LogicalVector futilityIntersectionInStage = futilityThisStage[isInStage];
+                LogicalVector futilityIntersectionInStage = futilityIntersectionsBefore[isInStage];
                 futility(j, k) = Rcpp::as<bool>(any(na_omit(futilityIntersectionInStage)));
             }
         }
-        
-        LogicalVector selectedPopulationsThisStage = selectedPopulations(_, k);
 
         // Determine success stopping        
+        LogicalVector selectedPopulationsThisStage = selectedPopulations(_, k);
+        LogicalVector rejectedThisStage = rejected(_, k);
+
         if (successCriterion == "all") {
-            LogicalVector rejectedIntersectionsThisPop = rejectedIntersectionsBefore[selectedPopulationsThisStage];
-            successStop[k] = Rcpp::as<bool>(all(rejectedIntersectionsThisPop));
+            LogicalVector rejectedThisStageThisPop = rejectedThisStage[selectedPopulationsThisStage];
+            successStop[k] = Rcpp::as<bool>(all(rejectedThisStageThisPop));
         } else {
-            successStop[k] = Rcpp::as<bool>(any(rejectedIntersectionsBefore));
+            successStop[k] = Rcpp::as<bool>(any(rejectedThisStage));
         }
         
         // Determine futility stopping for intermediate stages
         if (k < kMax - 1) {
-            LogicalVector futilityIntersectionsThisPop = futilityThisStage[selectedPopulationsThisStage];
-            futilityStop[k] = Rcpp::as<bool>(all(futilityIntersectionsThisPop));
+            LogicalVector futilityThisStage = futility(_, k);
+            LogicalVector futilityThisStageThisPop = futilityThisStage[selectedPopulationsThisStage];
+            futilityStop[k] = Rcpp::as<bool>(all(futilityThisStageThisPop));
 
             LogicalVector selectedPopulationsNextStage = selectedPopulations(_, k + 1);
             bool noPopInNextStage = Rcpp::as<bool>(all(na_omit(!selectedPopulationsNextStage)));
