@@ -756,7 +756,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
                 selectPopulationsFunction = selectPopulationsFunction
             )
 
-            closedTest <- .performClosedCombinationTestForSimulationEnrichment(
+            closedTest <- .performClosedCombinationTestForSimulationEnrichmentCpp(
                 stageResults = stageResults,
                 design = design,
                 indices = indices,
