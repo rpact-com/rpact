@@ -50,8 +50,8 @@ Encoding: UTF-8
 LazyData: true
 URL: https://www.rpact.org,
     https://www.rpact.com,
+    https://docs.rpact.org,
     https://github.com/rpact-com/rpact,
-    https://rpact-com.github.io/rpact/,
     https://rpact.shinyapps.io/connect
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US

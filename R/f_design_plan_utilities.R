@@ -17,459 +17,6 @@
 #' @include f_core_utilities.R
 NULL
 
-#'
-#' Get Futility Bounds
-#'
-#' @description
-#' This function converts futility bounds between different scales such as
-#' z-value, p-value, conditional power, predictive power, reverse conditional
-#' power, and effect estimate.
-#'
-#' @param sourceValue A numeric vector representing the
-#' futility bounds in the source scale.
-#' @param sourceScale Character. The scale of the input futility bounds.
-#' Must be one of \code{"zValue"}, \code{"pValue"},
-#' \code{"conditionalPower"}, "condPowerAtObserved", \code{"predictivePower"},
-#' \code{"reverseCondPower"}, or \code{"effectEstimate"}.
-#' @param targetScale Character. The scale to which the futility bounds should
-#' be converted. Must be one of \code{"zValue"}, \code{"pValue"},
-#' \code{"conditionalPower"}, "condPowerAtObserved", \code{"predictivePower"},
-#' \code{"reverseCondPower"}, or \code{"effectEstimate"}.
-#' @param design
-#' @param theta
-#' @param information1
-#' @param information2
-#' @inheritParams param_three_dots
-#'
-#' @details
-#' If the \code{sourceScale} and \code{targetScale} are the same, the function
-#' returns the input \code{sourceValue} without modification.
-#' Otherwise, the function is designed to convert between the specified scales.
-#'
-#' @return
-#' A numeric vector representing the futility bounds in the target scale, or
-#' \code{NULL} if the conversion is not implemented or yields no result.
-#'
-#' @examples
-#' \dontrun{
-#' # Example with identical source and target scales
-#' getFutilityBounds(
-#'     sourceValue = c(0, 0.5),
-#'     sourceScale = "zValue",
-#'     targetScale = "zValue"
-#' )
-#'
-#' # Example with different scales
-#' getFutilityBounds(
-#'     design = getDesignGroupSequential(kMax = 2, typeOfDesign = "noEarlyEfficacy", alpha = 0.05),
-#'     information1 = 10,
-#'     information2 = 10,
-#'     sourceValue = 0.5,
-#'     sourceScale = "condPowerAtObserved",
-#'     targetScale = "pValue"
-#' )
-#' }
-#' @export
-getFutilityBounds <- function(
-        sourceValue,
-        ...,
-        design = NULL,
-        sourceScale = c(
-            "zValue",
-            "pValue",
-            "conditionalPower",
-            "condPowerAtObserved",
-            "predictivePower",
-            "reverseCondPower",
-            "effectEstimate"
-        ),
-        targetScale = c(
-            "zValue",
-            "pValue",
-            "conditionalPower",
-            "condPowerAtObserved",
-            "predictivePower",
-            "reverseCondPower",
-            "effectEstimate"
-        ),
-        theta = NA_real_,
-        information1 = NA_real_,
-        information2 = NA_real_) {
-    sourceScale <- match.arg(sourceScale)
-    targetScale <- match.arg(targetScale)
-    if (sourceScale == targetScale) {
-        return(sourceValue)
-    }
-    
-    # TODO test and activate the following line instead of lines 107 - 223 because messages are more precise
-    #.assertAreValidFutilityBoundsScaleArguments(design, sourceScale, targetScale, theta, information1, information2)
-    
-    if (!((sourceScale == "conditionalPower") ||
-            (targetScale == "conditionalPower") ||
-            (sourceScale == "condPowerAtObserved") ||
-            (targetScale == "condPowerAtObserved") ||
-            (sourceScale == "predictivePower") ||
-            (targetScale == "predictivePower") ||
-            (sourceScale == "reverseCondPower") ||
-            (targetScale == "reverseCondPower")) &&
-            !is.null(design)
-        ) {
-        warning(
-            "'design' need not to be specified for 'sourceScale' = ",
-            sQuote(sourceScale),
-            " and 'targetScale' = ",
-            sQuote(targetScale),
-            call. = FALSE
-        )
-    }
-    if (
-        !((sourceScale == "conditionalPower") ||
-            (targetScale == "conditionalPower") ||
-            (sourceScale == "condPowerAtObserved") ||
-            (targetScale == "condPowerAtObserved") ||
-            (sourceScale == "predictivePower") ||
-            (targetScale == "predictivePower") ||
-            (sourceScale == "effectEstimate") ||
-            (targetScale == "effectEstimate")) &&
-            !is.na(information1)
-        ) {
-        warning(
-            "'information1' need not to be specified for 'sourceScale' = ",
-            sourceScale,
-            " and 'targetScale' = ",
-            targetScale,
-            call. = FALSE
-        )
-    }
-    if (
-        !((sourceScale == "conditionalPower") ||
-            (targetScale == "conditionalPower") ||
-            (sourceScale == "condPowerAtObserved") ||
-            (targetScale == "condPowerAtObserved") ||
-            (sourceScale == "predictivePower") ||
-            (targetScale == "predictivePower")) &&
-            !is.na(information2)
-        ) {
-        warning(
-            "'information2' need not to be specified for 'sourceScale' = ",
-            sourceScale,
-            " and 'targetScale' = ",
-            targetScale,
-            call. = FALSE
-        )
-    }
-
-    if (
-        !((sourceScale == "conditionalPower") ||
-            (targetScale == "conditionalPower")) &&
-            !is.na(theta)
-        ) {
-        warning(
-            "'theta' need not to be specified for 'sourceScale' = ",
-            sourceScale,
-            " and 'targetScale' = ",
-            targetScale,
-            call. = FALSE
-        )
-    }
-
-    if ((sourceScale == "effectEstimate") || (targetScale == "effectEstimate")) {
-        if (is.na(information1)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'information1' needs to be specified for 'sourceScale' or 'targetScale'  = 'effectEstimate'",
-                call. = FALSE
-            )
-        }
-    }
-    if (
-        (sourceScale == "conditionalPower") ||
-            (targetScale == "conditionalPower")
-        ) {
-        if (is.null(design) || is.na(theta) || is.na(information2)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'design', 'theta' and 'information2' need to be specified for
-                        'sourceScale' or 'targetScale' = 'conditionalPower'",
-                call. = FALSE
-            )
-        }
-    }
-    if (
-        (sourceScale == "condPowerAtObserved") ||
-            (targetScale == "condPowerAtObserved")
-        ) {
-        if (is.null(design) || is.na(information1) || is.na(information2)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'design', 'information1', and 'information2' need to be specified for
-                        'sourceScale' or 'targetScale' = 'condPowerAtObserved'",
-                call. = FALSE
-            )
-        }
-    }
-    if (
-        (sourceScale == "predictivePower") ||
-            (targetScale == "predictivePower")
-        ) {
-        if (is.null(design) || is.na(information1) || is.na(information2)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'design', 'information1', and 'information2' need to be specified for
-                        'sourceScale' or 'targetScale' = 'predictivePower'",
-                call. = FALSE
-            )
-        }
-    }
-    if (
-        (sourceScale == "reverseCondPower") ||
-            (targetScale == "reverseCondPower")
-        ) {
-        if (is.null(design)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'design' need to be specified for
-                        'sourceScale' or 'targetScale' = 'predictivePower'",
-                call. = FALSE
-            )
-        } else {
-            if (!.isTrialDesignGroupSequential(design)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "design not correctly specified, needs to be one-sided two-stage group sequential",
-                    call. = FALSE
-                )
-            }
-        }
-    }
-
-    if (!is.null(design)) {
-        if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
-            gsWeights <- c(sqrt(design$informationRates[1]), sqrt(1 - design$informationRates[1]))
-        } else if (.isTrialDesignFisher(design)) {
-            gsWeights <- c(1, sqrt((1 - design$informationRates[1]) / design$informationRates[1]))
-        } else {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "design not correctly specified",
-                call. = FALSE
-            )
-        }
-        criticalValue <- design$criticalValues[2]
-        if ((design$kMax != 2) || (design$sided != 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Futility bounds conversion is available only for one-sided two-stage designs",
-                call. = FALSE
-            )
-        }
-    }
-    if (!is.na(information1)) {
-        .assertIsSingleNumber(information1, "information1")
-        .assertIsInOpenInterval(
-            information1,
-            "information1",
-            lower = 0,
-            upper = Inf
-        )
-    }
-    if (!is.na(information2)) {
-        .assertIsSingleNumber(information2, "information2")
-        .assertIsInOpenInterval(
-            information2,
-            "information2",
-            lower = 0,
-            upper = Inf
-        )
-    }
-
-    if (!is.na(theta)) {
-        .assertIsSingleNumber(theta, "theta")
-    }
-
-    if (
-        sourceScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower", "reverseCondPower", "pValue")
-        ) {
-        .assertIsInClosedInterval(
-            sourceValue,
-            "sourceValue",
-            lower = 0,
-            upper = 1,
-            naAllowed = TRUE
-        )
-    }
-
-    if (sourceScale == "zValue") {
-        usedSource <- sourceValue
-    } else if (sourceScale == "pValue") {
-        usedSource <- qnorm(1 - sourceValue)
-    } else if (sourceScale == "effectEstimate") {
-        usedSource <- sourceValue * sqrt(information1)
-    } else if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
-        if (sourceScale == "conditionalPower") {
-            usedSource <- (criticalValue - gsWeights[2] * (qnorm(1 - sourceValue) + theta * sqrt(information2))) /
-                gsWeights[1]
-        } else if (sourceScale == "condPowerAtObserved") {
-            usedSource <- (criticalValue /
-                gsWeights[2] -
-                qnorm(1 - sourceValue)) /
-                (gsWeights[1] / gsWeights[2] + sqrt(information2 / information1))
-        } else if (sourceScale == "predictivePower") {
-            usedSource <- (criticalValue /
-                gsWeights[2] -
-                sqrt((information1 + information2) / information1) * qnorm(1 - sourceValue)) /
-                (gsWeights[1] / gsWeights[2] + sqrt(information2 / information1))
-        } else if (sourceScale == "reverseCondPower") {
-            usedSource <- sqrt(1 - design$informationRates[1]) *
-                qnorm(sourceValue) +
-                sqrt(design$informationRates[1]) * criticalValue
-        }
-    } else if (.isTrialDesignFisher(design)) {
-        if (sourceScale == "conditionalPower") {
-            usedSource <- qnorm(
-                1 - criticalValue /
-                    pnorm((qnorm(sourceValue) - theta * sqrt(information2)))^gsWeights[2]
-            )
-        } else if (sourceScale == "condPowerAtObserved") {
-            usedSource <- c()
-            for (y in sourceValue) {
-                result <- NA
-                tryCatch(
-                    {
-                        result <- stats::uniroot(
-                            function(x) {
-                                pmin(
-                                    1,
-                                    pnorm(
-                                        qnorm((criticalValue / (1 - pnorm(x)))^(1 / gsWeights[2])) +
-                                            x * sqrt(information2 / information1)
-                                    )
-                                ) - y
-                            },
-                            lower = -2,
-                            upper = qnorm(1 - criticalValue),
-                            tol = .Machine$double.eps^0.5
-                        )$root
-                    },
-                    error = function(e) {
-                        warning("Failed to calculate sourceValue", e$message)
-                    }
-                )
-                usedSource <- c(
-                    usedSource,
-                    result
-                )
-            }
-        } else if (sourceScale == "predictivePower") {
-            usedSource <- c()
-            for (y in sourceValue) {
-                result <- NA
-                tryCatch(
-                    {
-                        result <- stats::uniroot(
-                            function(x) {
-                                pmin(
-                                    1,
-                                    pnorm(
-                                        sqrt(information1 / (information1 + information2)) *
-                                            (qnorm((criticalValue / (1 - pnorm(x)))^(1 / gsWeights[2])) +
-                                                x * sqrt(information2 / information1))
-                                    )
-                                ) - y
-                            },
-                            lower = -2,
-                            upper = qnorm(1 - criticalValue),
-                            tol = .Machine$double.eps^0.5
-                        )$root
-                    },
-                    error = function(e) {
-                        warning("Failed to calculate sourceValue", e$message)
-                        result <- NA
-                    }
-                )
-                usedSource <- c(
-                    usedSource,
-                    result
-                )
-            }
-        }
-    }
-
-    if (targetScale == "zValue") {
-        return(usedSource)
-    } else if (targetScale == "pValue") {
-        return(1 - pnorm(usedSource))
-    } else if (targetScale == "effectEstimate") {
-        return(usedSource / sqrt(information1))
-    } else if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
-        if (targetScale == "conditionalPower") {
-            return(pmax(
-                1e-20,
-                1 - pnorm(
-                    (criticalValue - gsWeights[1] * usedSource) /
-                        gsWeights[2] -
-                        theta * sqrt(information2)
-                )
-            ))
-        } else if (targetScale == "condPowerAtObserved") {
-            return(pmax(
-                1e-20,
-                1 - pnorm(
-                    (criticalValue - gsWeights[1] * usedSource) /
-                        gsWeights[2] -
-                        usedSource * sqrt(information2 / information1)
-                )
-            ))
-        } else if (targetScale == "predictivePower") {
-            return(pmax(
-                1e-20,
-                1 - pnorm(
-                    sqrt(information1 / (information1 + information2)) *
-                        ((criticalValue - gsWeights[1] * usedSource) /
-                            gsWeights[2] -
-                            usedSource * sqrt(information2 / information1))
-                )
-            ))
-        } else if (targetScale == "reverseCondPower") {
-            return(pmax(
-                1e-20,
-                pnorm(
-                    (usedSource - sqrt(design$informationRates[1]) * criticalValue) /
-                        sqrt(1 - design$informationRates[1])
-                )
-            ))
-        }
-    } else if (.isTrialDesignFisher(design)) {
-        if (targetScale == "conditionalPower") {
-            return(pmax(
-                1e-20,
-                pnorm(
-                    qnorm((criticalValue / (1 - pnorm(usedSource)))^(1 / gsWeights[2])) +
-                        theta * sqrt(information2)
-                )
-            ))
-        } else if (targetScale == "condPowerAtObserved") {
-            return(pmax(
-                1e-20,
-                pnorm(
-                    qnorm((criticalValue / (1 - pnorm(usedSource)))^(1 / gsWeights[2])) +
-                        usedSource * sqrt(information2 / information1)
-                )
-            ))
-        } else if (targetScale == "predictivePower") {
-            return(pmax(
-                1e-20,
-                pnorm(
-                    sqrt(information1 / (information1 + information2)) *
-                        (qnorm((criticalValue / (1 - pnorm(usedSource)))^(1 / gsWeights[2])) +
-                            usedSource * sqrt(information2 / information1))
-                )
-            ))
-        }
-    }
-    return(NULL)
-}
-
 .hideFutilityStopsIfNotApplicable <- function(designPlan) {
     if (all(designPlan$.design$futilityBounds == C_FUTILITY_BOUNDS_DEFAULT)) {
         designPlan$.setParameterType("futilityStop", C_PARAM_NOT_APPLICABLE)
@@ -478,14 +25,10 @@ getFutilityBounds <- function(
 }
 
 .getSingleEventsPerStage <- function(cumulativeEventsPerStage) {
-    singleEventsPerStage <- matrix(
-        nrow = nrow(cumulativeEventsPerStage),
-        ncol = ncol(cumulativeEventsPerStage)
-    )
+    singleEventsPerStage <- matrix(nrow = nrow(cumulativeEventsPerStage), ncol = ncol(cumulativeEventsPerStage))
     if (nrow(cumulativeEventsPerStage) > 1) {
         for (i in nrow(cumulativeEventsPerStage):2) {
-            singleEventsPerStage[i, ] <- cumulativeEventsPerStage[i, ] -
-                cumulativeEventsPerStage[i - 1, ]
+            singleEventsPerStage[i, ] <- cumulativeEventsPerStage[i, ] - cumulativeEventsPerStage[i - 1, ]
         }
     }
     if (nrow(cumulativeEventsPerStage) > 0) {
@@ -511,11 +54,9 @@ getFutilityBounds <- function(
                 designPlan$directionUpper <- (designPlan$pi1 > designPlan$thetaH0)
             } else {
                 if (designPlan$riskRatio) {
-                    designPlan$directionUpper <-
-                        (designPlan$pi1 / designPlan$pi2 > designPlan$thetaH0)
+                    designPlan$directionUpper <- (designPlan$pi1 / designPlan$pi2 > designPlan$thetaH0)
                 } else {
-                    designPlan$directionUpper <-
-                        (designPlan$pi1 - designPlan$pi2 > designPlan$thetaH0)
+                    designPlan$directionUpper <- (designPlan$pi1 - designPlan$pi2 > designPlan$thetaH0)
                 }
             }
             designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
@@ -543,8 +84,7 @@ getFutilityBounds <- function(
         designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleUpper
         designPlan$.setParameterType("criticalValuesEffectScale", C_PARAM_GENERATED)
     } else {
-        if (all(boundaries$criticalValuesEffectScaleLower <
-                boundaries$criticalValuesEffectScaleUpper, na.rm = TRUE)) {
+        if (all(boundaries$criticalValuesEffectScaleLower < boundaries$criticalValuesEffectScaleUpper, na.rm = TRUE)) {
             designPlan$criticalValuesEffectScaleLower <- boundaries$criticalValuesEffectScaleLower
             designPlan$criticalValuesEffectScaleUpper <- boundaries$criticalValuesEffectScaleUpper
         } else {
@@ -557,21 +97,17 @@ getFutilityBounds <- function(
 
     if (.hasApplicableFutilityBounds(design)) {
         if (design$sided == 1) {
-            designPlan$futilityBoundsEffectScale <- 
-                round(boundaries$futilityBoundsEffectScaleUpper, 8)
+            designPlan$futilityBoundsEffectScale <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
             designPlan$.setParameterType("futilityBoundsEffectScale", C_PARAM_GENERATED)
         } else {
-            if (all(designPlan$futilityBoundsEffectScaleLower <
-                    designPlan$futilityBoundsEffectScaleUpper, na.rm = TRUE)) {
-                designPlan$futilityBoundsEffectScaleLower <- 
-                    round(boundaries$futilityBoundsEffectScaleLower, 8)
-                designPlan$futilityBoundsEffectScaleUpper <- 
-                    round(boundaries$futilityBoundsEffectScaleUpper, 8)
+            if (
+                all(designPlan$futilityBoundsEffectScaleLower < designPlan$futilityBoundsEffectScaleUpper, na.rm = TRUE)
+                ) {
+                designPlan$futilityBoundsEffectScaleLower <- round(boundaries$futilityBoundsEffectScaleLower, 8)
+                designPlan$futilityBoundsEffectScaleUpper <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
             } else {
-                designPlan$futilityBoundsEffectScaleLower <- 
-                    round(boundaries$futilityBoundsEffectScaleUpper, 8)
-                designPlan$futilityBoundsEffectScaleUpper <- 
-                    round(boundaries$futilityBoundsEffectScaleLower, 8)
+                designPlan$futilityBoundsEffectScaleLower <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
+                designPlan$futilityBoundsEffectScaleUpper <- round(boundaries$futilityBoundsEffectScaleLower, 8)
             }
             designPlan$.setParameterType("futilityBoundsEffectScaleLower", C_PARAM_GENERATED)
             designPlan$.setParameterType("futilityBoundsEffectScaleUpper", C_PARAM_GENERATED)
@@ -706,8 +242,7 @@ getFutilityBounds <- function(
         }
 
         if (!is.null(sampleSizeSequential$rejectPerStage)) {
-            designPlan$rejectPerStage <- matrix(sampleSizeSequential$rejectPerStage, 
-                nrow = designPlan$.design$kMax)
+            designPlan$rejectPerStage <- matrix(sampleSizeSequential$rejectPerStage, nrow = designPlan$.design$kMax)
             designPlan$.setParameterType("rejectPerStage", C_PARAM_GENERATED)
 
             designPlan$earlyStop <- sum(designPlan$rejectPerStage[1:(designPlan$.design$kMax - 1), ])
@@ -811,11 +346,9 @@ getFutilityBounds <- function(
 .getFarringtonManningValues <- function(rate1, rate2, theta, allocation, method = c("diff", "ratio")) {
     method <- match.arg(method)
     if (method == "diff") {
-        ml <- .getFarringtonManningValuesDiff(
-            rate1 = rate1, rate2 = rate2, theta = theta, allocation = allocation)
+        ml <- .getFarringtonManningValuesDiff(rate1 = rate1, rate2 = rate2, theta = theta, allocation = allocation)
     } else {
-        ml <- .getFarringtonManningValuesRatio(
-            rate1 = rate1, rate2 = rate2, theta = theta, allocation = allocation)
+        ml <- .getFarringtonManningValuesRatio(rate1 = rate1, rate2 = rate2, theta = theta, allocation = allocation)
     }
     return(list(theta = theta, method = method, ml1 = ml[1], ml2 = ml[2]))
 }
@@ -851,8 +384,7 @@ getFutilityBounds <- function(
     return(piecewiseSurvivalTime[2:length(piecewiseSurvivalTime)])
 }
 
-.getNumberOfSubjectsInner <- function(..., 
-        timeValue, accrualTime, accrualIntensity, maxNumberOfSubjects) {
+.getNumberOfSubjectsInner <- function(..., timeValue, accrualTime, accrualIntensity, maxNumberOfSubjects) {
     .assertIsSingleNumber(timeValue, "timeValue")
     if (length(accrualTime) != length(accrualIntensity)) {
         stop(

@@ -3141,7 +3141,7 @@ NULL
             )
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
-            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, NULL, naAllowed = FALSE)
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix", lower = 0, upper = NULL, naAllowed = FALSE)
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {
@@ -3748,3 +3748,29 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args)
 }
 
+.showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(
+        futilityBounds,
+        ..., 
+        lowerBound = 1e-12, 
+        upperBound = 1 - 1e-12) {
+        
+    if (all(is.na(futilityBounds))) {
+        return(invisible())
+    }
+        
+    if (!is.null(lowerBound) && length(lowerBound) > 0 && !any(is.na(lowerBound)) && 
+            any(futilityBounds < lowerBound, na.rm = TRUE)) {
+        warning(
+            "At least one calculated futility bound outside acceptable range",
+            call. = FALSE
+        )
+    }
+    
+    if (!is.null(upperBound) && length(upperBound) > 0 && !any(is.na(upperBound)) && 
+            any(futilityBounds > upperBound, na.rm = TRUE)) {
+        warning(
+            "At least one calculated futility bound outside acceptable range",
+            call. = FALSE
+        )
+    }
+}
