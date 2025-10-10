@@ -77,7 +77,9 @@ NULL
 #' 
 #' @export
 #' 
-getFutilityBounds <- function(design = NULL,
+getFutilityBounds <- function(
+        design = NULL,
+        ...,
         sourceValue,
         sourceScale = c(
             "zValue",
@@ -101,12 +103,12 @@ getFutilityBounds <- function(design = NULL,
         information1 = NA_real_,
         information2 = NA_real_) {
     .assertAreValidFutilityBoundsScaleArguments(
-        design,
-        sourceScale,
-        targetScale,
-        theta,
-        information1,
-        information2
+        design = design,
+        sourceScale = sourceScale,
+        targetScale = targetScale,
+        theta = theta,
+        information1 = information1,
+        information2 = information2
     )
 
     sourceScale <- match.arg(sourceScale)

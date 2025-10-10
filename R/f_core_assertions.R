@@ -3678,6 +3678,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     if (length(reqs) == 0L) {
         return(invisible())
     }
+    
     for (arg in reqs) {
         if (.isFutilityBoundsArgumentMissing(arg, args[[arg]])) {
             .showFutilityBoundsMissingArgumentError(arg, scaleLabel, scaleValue)
@@ -3704,6 +3705,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
 #' @param theta Numeric. The theta value for conditional power calculations.
 #' @param information1 Numeric. The first information rate.
 #' @param information2 Numeric. The second information rate.
+#' @param ... Additional arguments (not used).
 #'
 #' @return Invisibly returns \code{NULL} if the futility bounds scale arguments are valid.
 #'
@@ -3719,7 +3721,9 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
 #'
 #' @noRd
 #' 
-.assertAreValidFutilityBoundsScaleArguments <- function(design,
+.assertAreValidFutilityBoundsScaleArguments <- function(
+        ...,
+        design,
         sourceScale,
         targetScale,
         theta,
@@ -3744,6 +3748,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         information2 = information2,
         theta        = theta
     )
+    
     .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args)
     .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args)
 }
