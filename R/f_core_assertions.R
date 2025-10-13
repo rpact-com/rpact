@@ -3640,9 +3640,15 @@ NULL
 }
 
 .showFutilityBoundsUnnecessaryArgumentWarning <- function(
-        argumentName, sourceScale, targetScale) {
+        argumentName, argValue, sourceScale, targetScale) {
+   
+   valueStr <- ""
+   if (!is.null(argValue) && is.numeric(argValue) && length(argValue) > 0) {
+       valueStr <- paste0(" (", .arrayToString(argValue), ")")
+   }
+        
     warning(
-        sQuote(argumentName), " need not to be specified ",
+        sQuote(argumentName), valueStr, " need not to be specified ",
         "for 'sourceScale' = ", dQuote(sourceScale),
         " and 'targetScale' = ", dQuote(targetScale),
         call. = FALSE
@@ -3660,27 +3666,57 @@ NULL
 }
 
 C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
-    effectEstimate = c("information1"),
-    conditionalPower = c("design", "theta", "information2"),
-    condPowerAtObserved = c("design", "information1", "information2"),
-    predictivePower = c("design", "information1", "information2")
+    "vector" = list(
+        effectEstimate = c("information[1]"),
+        conditionalPower = c("design", "theta", "information[2]"),
+        condPowerAtObserved = c("design", "information"),
+        predictivePower = c("design", "information")
+    ),
+    "separate" = list(
+        effectEstimate = c("information1"),
+        conditionalPower = c("design", "theta", "information2"),
+        condPowerAtObserved = c("design", "information1", "information2"),
+        predictivePower = c("design", "information1", "information2")
+    )
 )
+
+.getFutilityBoundVectorLength = function(sourceScale, targetScale) {
+    if (sourceScale == "effectEstimate" && !targetScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
+        return(1L)
+    }
+    
+    if (targetScale == "effectEstimate" && !sourceScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
+        return(1L)
+    }
+    
+    return(2L)
+}
 
 .isFutilityBoundsArgumentMissing <- function(name, value) {
     if (identical(name, "design")) {
         return(is.null(value))
     }
-    is.na(value)
+    
+    return(all(is.na(value)))
 }
 
-.checkFutilityBoundsScaleArgs <- function(scaleValue, scaleLabel, args) {
-    reqs <- C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE[[scaleValue]]
+.checkFutilityBoundsScaleArgs <- function(scaleValue, scaleLabel, args, informationVectorInput) {
+    type <- ifelse(informationVectorInput, "vector", "separate")
+    reqs <- C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE[[type]][[scaleValue]]
     if (length(reqs) == 0L) {
         return(invisible())
     }
     
     for (arg in reqs) {
-        if (.isFutilityBoundsArgumentMissing(arg, args[[arg]])) {
+        argName <- gsub("\\[.*\\]$", "", arg)
+        
+        if (grepl("\\[\\d+\\]$", arg)) {
+            number <- sub("^.*\\[(\\d+)\\]$", "\\1", arg)
+            argName <- paste0(argName, number)
+        }
+        
+        argValue <- args[[argName]]
+        if (.isFutilityBoundsArgumentMissing(arg, argValue)) {
             .showFutilityBoundsMissingArgumentError(arg, scaleLabel, scaleValue)
         }
     }
@@ -3689,7 +3725,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
 .checkForUnnecessaryFutilityBoundsScaleArgs <- function(argName, argValue, sourceScale, targetScale, allowedScales) {
     if (!(sourceScale %in% allowedScales || targetScale %in% allowedScales) &&
             !.isFutilityBoundsArgumentMissing(argName, argValue)) {
-        .showFutilityBoundsUnnecessaryArgumentWarning(argName, sourceScale, targetScale)
+        .showFutilityBoundsUnnecessaryArgumentWarning(argName, argValue, sourceScale, targetScale)
     }
 }
 
@@ -3727,8 +3763,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         sourceScale,
         targetScale,
         theta,
-        information1,
-        information2) {
+        information) {
         
     baseScales <- c(
         "conditionalPower",
@@ -3737,9 +3772,23 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     )
     scalesWithReverse <- c(baseScales, "reverseCondPower")
     scalesWithEffect  <- c(baseScales, "effectEstimate")
+    
+    infos <- .getFutilityBoundInformations(
+        information = information, 
+        sourceScale = sourceScale,
+        targetScale = targetScale,
+        ...
+    )
+    information1 <- infos$information1
+    information2 <- infos$information2
+    
     .checkForUnnecessaryFutilityBoundsScaleArgs("design", design, sourceScale, targetScale, scalesWithReverse)
-    .checkForUnnecessaryFutilityBoundsScaleArgs("information1", information1, sourceScale, targetScale, scalesWithEffect)
-    .checkForUnnecessaryFutilityBoundsScaleArgs("information2", information2, sourceScale, targetScale, baseScales)
+    if (infos$vectorInput) {
+        .checkForUnnecessaryFutilityBoundsScaleArgs("information", information, sourceScale, targetScale, scalesWithEffect)
+    } else {
+        .checkForUnnecessaryFutilityBoundsScaleArgs(infos$paramNames[1], information1, sourceScale, targetScale, scalesWithEffect)
+        .checkForUnnecessaryFutilityBoundsScaleArgs(infos$paramNames[2], information2, sourceScale, targetScale, baseScales)
+    }
     .checkForUnnecessaryFutilityBoundsScaleArgs("theta", theta, sourceScale, targetScale, "conditionalPower")
         
     args <- list(
@@ -3749,8 +3798,8 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         theta        = theta
     )
     
-    .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args)
-    .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args)
+    .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args, informationVectorInput = infos$vectorInput)
+    .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args, informationVectorInput = infos$vectorInput)
 }
 
 .showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(
