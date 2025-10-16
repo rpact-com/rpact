@@ -113,6 +113,10 @@
     .Call(`_rpact_getTreatmentsSubgroups`, maxNumberOfSubjects, allocationFraction, subGroups, prevalences)
 }
 
+.updateSubGroupVectorCpp <- function(k, maxNumberOfSubjects, numberOfSubjects, subGroupVector, subGroups, prevSelected) {
+    .Call(`_rpact_updateSubGroupVector`, k, maxNumberOfSubjects, numberOfSubjects, subGroupVector, subGroups, prevSelected)
+}
+
 .getSimulatedStageResultsSurvivalEnrichmentSubjectsBasedCpp <- function(design, weights, subGroups, prevalences, piControls, kappa, phi, eventTime, hazardRatios, directionUpper, stratifiedAnalysis, plannedEvents, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction = NULL, calcEventsFunctionIsUserDefined = FALSE, selectPopulationsFunction = NULL) {
     .Call(`_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased`, design, weights, subGroups, prevalences, piControls, kappa, phi, eventTime, hazardRatios, directionUpper, stratifiedAnalysis, plannedEvents, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectPopulationsFunction)
 }

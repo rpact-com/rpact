@@ -364,6 +364,29 @@ List getSurvDropoutTimes(int numberOfSubjects,
 	);
 }
 
+// [[Rcpp::export(name = ".updateSubGroupVectorCpp")]]
+CharacterVector updateSubGroupVector(int k,
+						  int maxNumberOfSubjects,
+						  IntegerVector numberOfSubjects,
+						  const CharacterVector& subGroupVector,
+						  CharacterVector subGroups,
+						  NumericVector prevSelected) {
+	int numberNewSubjects = maxNumberOfSubjects - numberOfSubjects[k - 1];
+	CharacterVector newSubGroupVector = sample(
+	 	subGroups,
+		numberNewSubjects,
+		true,
+		prevSelected
+	);
+	// We keep subGroupVector[seq(0, numberOfSubjects[k - 1] - 1)]
+	// and just update the rest
+	IntegerVector newSubjectsInds = seq(numberOfSubjects[k - 1], maxNumberOfSubjects - 1);
+	CharacterVector result = clone(subGroupVector);
+	result[newSubjectsInds] = newSubGroupVector;
+	return result;
+}
+
+
 
  
 // Get Simulated Stage Results Survival Enrichment Subjects Based
@@ -461,8 +484,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	std::fill(adjustedPValues.begin(), adjustedPValues.end(), NA_REAL);
 	NumericVector analysisTime(kMax);
 	std::fill(analysisTime.begin(), analysisTime.end(), NA_REAL);
-	NumericVector numberOfSubjects(kMax);
-	std::fill(numberOfSubjects.begin(), numberOfSubjects.end(), NA_REAL);
+	IntegerVector numberOfSubjects(kMax);
+	std::fill(numberOfSubjects.begin(), numberOfSubjects.end(), NA_INTEGER);
 	LogicalVector eventsNotAchieved(kMax);
 
 	// Generate treatments and random subgroups according to allocation numbers and prevalences
@@ -553,18 +576,28 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				NumericVector prevSelected = prevalences / sum(prevInSelected);
 				prevSelected[!selectedsubGroupsIndices(_, k)] = 0.0;
 						
-				// Sample new subgroups for new subjects
 				int numberNewSubjects = maxNumberOfSubjects - numberOfSubjects[k - 1];
-				CharacterVector newSubGroupVector = sample(
+				IntegerVector newSubjectsInds = seq(numberOfSubjects[k - 1], maxNumberOfSubjects - 1);
+
+				// Sample new subgroups for new subjects
+				subGroupVector = updateSubGroupVector(
+					k,
+					maxNumberOfSubjects,
+					numberOfSubjects,
+					subGroupVector,
 					subGroups,
-					numberNewSubjects,
-					true,
 					prevSelected
 				);
-				// We keep subGroupVector[seq(0, numberOfSubjects[k - 1] - 1)]
-				// and just update the rest
-				IntegerVector newSubjectsInds = seq(numberOfSubjects[k - 1], maxNumberOfSubjects - 1);
-				subGroupVector[newSubjectsInds] = newSubGroupVector;
+
+				// CharacterVector newSubGroupVector = sample(
+				// 	subGroups,
+				// 	numberNewSubjects,
+				// 	true,
+				// 	prevSelected
+				// );
+				// // We keep subGroupVector[seq(0, numberOfSubjects[k - 1] - 1)]
+				// // and just update the rest
+				// subGroupVector[newSubjectsInds] = newSubGroupVector;
 				
 				tmp = getSurvDropoutTimes(
 					numberNewSubjects,
@@ -951,6 +984,8 @@ List performSimulationEnrichmentSurvivalLoop(
 	
 	int index = 0;
 	
+	
+
 	// Main simulation loop
 	for (int i = 0; i < cols; i++) {
 		for (int j = 0; j < maxNumberOfIterations; j++) {

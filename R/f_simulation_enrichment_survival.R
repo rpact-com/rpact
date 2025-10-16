@@ -58,6 +58,25 @@ NULL
     list(treatments = treatments, subGroupVector = subGroupVector)
 }
 
+updateSubGroupVector <- function(k,
+                                 maxNumberOfSubjects,
+                                 numberOfSubjects,
+                                 subGroupVector,
+                                 subGroups,
+                                 prevSelected,
+                                 allocationFraction) {
+    subGroupVector <- subGroupVector[1:numberOfSubjects[k - 1]]
+
+    while (length(subGroupVector) < maxNumberOfSubjects) {
+        subGroup <- subGroups[which(rmultinom(1, 1, prevSelected) == 1)]
+        subGroupVector <- c(
+            subGroupVector,
+            rep(subGroup, allocationFraction[1] + allocationFraction[2])
+        )
+    }
+    subGroupVector[1:maxNumberOfSubjects]
+}
+
 
 #'
 #' Calculates stage results for each simulation iteration step
@@ -174,7 +193,7 @@ NULL
                         logRank <- .logRankTestEnrichmentCpp(
                             gMax = gMax,
                             survivalDataSet = survivalDataSet,
-                            time = analysisTime[1],
+                            time = analysisTime[k],
                             subPopulation = g,
                             stratifiedAnalysis = stratifiedAnalysis,
                             directionUpper = directionUpper
@@ -194,15 +213,16 @@ NULL
                     prevSelected <- prevalences / sum(prevalences[selectedsubGroupsIndices[, k]])
                     prevSelected[!selectedsubGroupsIndices[, k]] <- 0
 
-                    subGroupVector <- subGroupVector[1:numberOfSubjects[k - 1]]
+                    subGroupVector <- updateSubGroupVector(
+                        k,
+                        maxNumberOfSubjects,
+                        numberOfSubjects,
+                        subGroupVector,
+                        subGroups,
+                        prevSelected,
+                        allocationFraction
+                    )
 
-                    while (length(subGroupVector) < maxNumberOfSubjects) {
-                        subGroup <- subGroups[which(rmultinom(1, 1, prevSelected) == 1)]
-                        subGroupVector <- c(
-                            subGroupVector,
-                            rep(subGroup, allocationFraction[1] + allocationFraction[2])
-                        )
-                    }
                     survivalDataSet$subGroup <- subGroupVector[1:maxNumberOfSubjects]
 
                     for (i in numberOfSubjects[k - 1]:maxNumberOfSubjects) {
@@ -495,7 +515,7 @@ NULL
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
-            stageResults <- .getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
+            stageResults <- .getSimulatedStageResultsSurvivalEnrichmentSubjectsBasedCpp(
                 design = design,
                 weights = weights,
                 subGroups = effectList$subGroups,
@@ -981,7 +1001,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
     }
 
     # Perform the main simulation
-    loopResult <- .performSimulationEnrichmentSurvivalLoopCpp(
+    loopResult <- .performSimulationEnrichmentSurvivalLoop(
         cols = cols,
         maxNumberOfIterations = maxNumberOfIterations,
         design = design,
