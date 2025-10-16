@@ -240,6 +240,28 @@ NULL
     return(FALSE)
 }
 
+#'
+#' @examples
+#' \dontrun{
+#' .getConcatenatedValues(1)
+#' .getConcatenatedValues(1:2)
+#' .getConcatenatedValues(1:3)
+#' .getConcatenatedValues(1, mode = "vector")
+#' .getConcatenatedValues(1:2, mode = "vector")
+#' .getConcatenatedValues(1:3, mode = "vector")
+#' .getConcatenatedValues(1, mode = "and")
+#' .getConcatenatedValues(1:2, mode = "and")
+#' .getConcatenatedValues(1:3, mode = "and")
+#' .getConcatenatedValues(1, mode = "or")
+#' .getConcatenatedValues(1:2, mode = "or")
+#' .getConcatenatedValues(1:3, mode = "or")
+#' .getConcatenatedValues(1, mode = "or", separator = ";")
+#' .getConcatenatedValues(1:2, mode = "or", separator = ";")
+#' .getConcatenatedValues(1:3, mode = "or", separator = ";")
+#' }
+#'
+#' @noRd
+#'
 .getConcatenatedValues <- function(x, separator = ", ", mode = c("csv", "vector", "and", "or")) {
     if (is.null(x) || length(x) <= 1) {
         return(x)
@@ -265,27 +287,53 @@ NULL
 }
 
 #'
+#' Get Test Label
+#'
+#' @description
+#' Returns a string representation of the input value for use as a test label. 
+#' Handles various types, including NULL, NA, vectors, and custom objects.
+#'
+#' @param x The value to be converted into a test label.
+#'
+#' @return A character string representing the input value.
+#'
 #' @examples
 #' \dontrun{
-#' .getConcatenatedValues(1)
-#' .getConcatenatedValues(1:2)
-#' .getConcatenatedValues(1:3)
-#' .getConcatenatedValues(1, mode = "vector")
-#' .getConcatenatedValues(1:2, mode = "vector")
-#' .getConcatenatedValues(1:3, mode = "vector")
-#' .getConcatenatedValues(1, mode = "and")
-#' .getConcatenatedValues(1:2, mode = "and")
-#' .getConcatenatedValues(1:3, mode = "and")
-#' .getConcatenatedValues(1, mode = "or")
-#' .getConcatenatedValues(1:2, mode = "or")
-#' .getConcatenatedValues(1:3, mode = "or")
-#' .getConcatenatedValues(1, mode = "or", separator = ";")
-#' .getConcatenatedValues(1:2, mode = "or", separator = ";")
-#' .getConcatenatedValues(1:3, mode = "or", separator = ";")
+#' getTestLabel(NULL)
+#' getTestLabel(NA)
+#' getTestLabel(1:3)
+#' getTestLabel(6)
+#' getTestLabel(getDesignFisher())
 #' }
 #'
-#' @noRd
-#'
+#' @keywords internal
+#' 
+#' @export 
+#' 
+getTestLabel <- function(x) {
+    if (is.null(x)) {
+        return("NULL")
+    }
+    
+    if (!is.vector(x) && !is.numeric(x) && !is.character(x) && !is.logical(x) && !is.integer(x)) {
+        return(.getClassName(x))
+    }
+    
+    if (length(x) == 0) {
+        return(paste0(.getClassName(x), "(0)"))
+    }
+    
+    if (all(is.na(x))) {
+        return("NA")
+    }
+    
+    if (is.character(x)) {
+        x <- paste0('"', x, '"')
+    }
+    
+    return(.arrayToString(x, mode = "vector", digits = 4, maxLength = 10L, maxCharacters = 40L))
+}
+
 .arrayToString <- function(x, ..., separator = ", ",
         vectorLookAndFeelEnabled = FALSE,
         encapsulate = FALSE,
@@ -293,6 +341,7 @@ NULL
         maxLength = 80L,
         maxCharacters = 160L,
         mode = c("csv", "vector", "and", "or")) {
+        
     .assertIsSingleInteger(digits, "digits", naAllowed = TRUE, validateType = FALSE)
     .assertIsInClosedInterval(digits, "digits", lower = 0, upper = NULL)
     .assertIsSingleInteger(maxLength, "maxLength", naAllowed = FALSE, validateType = FALSE)

@@ -50,8 +50,8 @@ NULL
     return(result)
 }
 
-
 #'
+#' @title
 #' Print Futility Bounds
 #'
 #' @description
@@ -59,7 +59,9 @@ NULL
 #'
 #' @param x An object of class \code{FutilityBounds}.
 #' @param ... Additional arguments passed to \code{print.default}.
+#' 
 #' @keywords internal
+#' 
 #' @export 
 #' 
 print.FutilityBounds <- function(x, ...) {
@@ -67,6 +69,7 @@ print.FutilityBounds <- function(x, ...) {
 }
 
 #'
+#' @title 
 #' Get Futility Bounds
 #'
 #' @description
@@ -84,12 +87,13 @@ print.FutilityBounds <- function(x, ...) {
 #' be converted. Must be one of \code{"zValue"}, \code{"pValue"},
 #' \code{"conditionalPower"}, "condPowerAtObserved", \code{"predictivePower"},
 #' \code{"reverseCondPower"}, or \code{"effectEstimate"}.
-#' @param design
-#'
-#' @param theta
-#'
-#' @param information
-#'
+#' @param design The trial design. Required if either the \code{sourceScale} or 
+#' \code{targetScale} is \code{"reverseCondPower"} or if the conversion
+#' involves conditional or predictive power in a group sequential or Fisher design.
+#' Must be a one-sided two-stage group sequential design or Fisher's combination test design.
+#' @param theta Numeric. The assumed effect size under the alternative hypothesis.
+#' @param information Numeric vector of length 2. The information levels at the two stages.
+#' @inheritParams param_three_dots
 #'
 #' @details
 #' If the \code{sourceScale} and \code{targetScale} are the same, the function

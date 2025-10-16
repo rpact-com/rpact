@@ -3384,11 +3384,11 @@ NULL
             )
         }
     } else if (!is.na(lambda) && all(!is.na(lambda1))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'lambda2' and/or 'theta' need not to be specified if 'lambda' and 'lambda1' are specified",
-            call. = FALSE
-        )
+#        stop(
+#            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+#            "'lambda2' and/or 'theta' need not to be specified if 'lambda' and 'lambda1' are specified",
+#            call. = FALSE
+#        )
     } else if (!is.na(lambda) && !is.na(lambda2)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
