@@ -717,6 +717,7 @@ NULL
     return(designPlan)
 }
 
+#' 
 #' @title
 #' Get Sample Size Means
 #'
@@ -797,6 +798,7 @@ getSampleSizeMeans <- function(
     return(.calculateSampleSizeMeansAndRates(designPlan))
 }
 
+#' 
 #' @title
 #' Get Power Means
 #'

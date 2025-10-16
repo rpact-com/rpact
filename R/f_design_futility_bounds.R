@@ -39,13 +39,12 @@ NULL
     ))
 }
 
-.addFutilityBoundParameterTypes <- function(result, paramTypeSourceScale, paramTypeTargetScale, paramTypeTheta, paramTypeInformation) {
-    attr(result, "parameterTypes") <- list(
-        sourceScale = paramTypeSourceScale,
-        targetScale = paramTypeTargetScale,
-        theta = paramTypeTheta,
-        information = paramTypeInformation
-    )
+.addFutilityBoundParameterTypes <- function(result, args) {
+    if (!is.null(args) && length(args) > 0) {
+        for (argName in names(args)) {
+            attr(result, argName) <- args[[argName]]
+        }
+    }
     class(result) <- c("FutilityBounds", class(result))
     return(result)
 }
@@ -149,6 +148,9 @@ getFutilityBounds <- function(
         ),
         theta = NA_real_,
         information = NA_real_) {
+       
+    sourceScale <- match.arg(sourceScale)
+    targetScale <- match.arg(targetScale)
         
     infos <- .getFutilityBoundInformations(
         information = information,
@@ -166,16 +168,31 @@ getFutilityBounds <- function(
         ...
     )
     
-    paramTypeSourceScale <- ifelse(sourceScale == "zValue", C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED)
-    paramTypeTargetScale <- ifelse(targetScale == "zValue", C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED)
-    paramTypeTheta <- ifelse(is.na(theta), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
-    paramTypeInformation <- ifelse(all(is.na(information)), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
+    args <- list(
+        `sourceValue` = list(
+            `value` = sourceValue,
+            `type` = C_PARAM_USER_DEFINED
+        ),
+        `sourceScale` = list(
+            `value` = sourceScale,
+            `type` = ifelse(sourceScale == "zValue", C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED)
+        ),
+        `targetScale` = list(
+            `value` = targetScale,
+            `type` = ifelse(targetScale == "zValue", C_PARAM_DEFAULT_VALUE, C_PARAM_USER_DEFINED)
+        ),
+        `theta` = list(
+            `value` = theta,
+            `type` = ifelse(is.na(theta), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
+        ),
+        `information` = list(
+            `value` = information,
+            `type` = ifelse(all(is.na(information)), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
+        )
+    )
 
-    sourceScale <- match.arg(sourceScale)
-    targetScale <- match.arg(targetScale)
     if (sourceScale == targetScale) {
-        return(.addFutilityBoundParameterTypes(sourceValue, paramTypeSourceScale, 
-            paramTypeTargetScale, paramTypeTheta, paramTypeInformation))
+        return(.addFutilityBoundParameterTypes(sourceValue, args))
     }
 
     if ((sourceScale == "reverseCondPower" ||
@@ -281,14 +298,11 @@ getFutilityBounds <- function(
     }
 
     if (targetScale == "zValue") {
-        return(.addFutilityBoundParameterTypes(sourceValues, paramTypeSourceScale, 
-            paramTypeTargetScale, paramTypeTheta, paramTypeInformation))
+        return(.addFutilityBoundParameterTypes(sourceValues, args))
     } else if (targetScale == "pValue") {
-        return(.addFutilityBoundParameterTypes(1 - pnorm(sourceValues), paramTypeSourceScale, 
-            paramTypeTargetScale, paramTypeTheta, paramTypeInformation))
+        return(.addFutilityBoundParameterTypes(1 - pnorm(sourceValues), args))
     } else if (targetScale == "effectEstimate") {
-        return(.addFutilityBoundParameterTypes(sourceValues / sqrt(information1), paramTypeSourceScale, 
-            paramTypeTargetScale, paramTypeTheta, paramTypeInformation))
+        return(.addFutilityBoundParameterTypes(sourceValues / sqrt(information1), args))
     } else if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
         result <- .getFutilityBoundGroupSequential(
             sourceValues,
@@ -300,8 +314,7 @@ getFutilityBounds <- function(
             information2,
             design
         )
-        return(.addFutilityBoundParameterTypes(result, paramTypeSourceScale, 
-            paramTypeTargetScale, paramTypeTheta, paramTypeInformation))
+        return(.addFutilityBoundParameterTypes(result, args))
     } else if (.isTrialDesignFisher(design)) {
         result <- numeric()
         for (x in sourceValues) {
@@ -316,8 +329,7 @@ getFutilityBounds <- function(
             ))
         }
         .showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange(result, upperBound = NULL)
-        return(.addFutilityBoundParameterTypes(result, paramTypeSourceScale, 
-                paramTypeTargetScale, paramTypeTheta, paramTypeInformation))
+        return(.addFutilityBoundParameterTypes(result, args))
     }
 
     stop(
