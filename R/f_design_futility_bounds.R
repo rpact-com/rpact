@@ -125,9 +125,8 @@ print.FutilityBounds <- function(x, ...) {
 #' @export
 #' 
 getFutilityBounds <- function(
-        design = NULL,
-        ...,
         sourceValue,
+        ...,
         sourceScale = c(
             "zValue",
             "pValue",
@@ -146,11 +145,17 @@ getFutilityBounds <- function(
             "reverseCondPower",
             "effectEstimate"
         ),
+        design = NULL,
         theta = NA_real_,
         information = NA_real_) {
        
     sourceScale <- match.arg(sourceScale)
     targetScale <- match.arg(targetScale)
+    
+    .assertIsNumericVector(sourceValue, "sourceValue")
+    if (is(sourceValue, "FutilityBounds")) {
+        sourceValue <- as.numeric(sourceValue)
+    }
         
     infos <- .getFutilityBoundInformations(
         information = information,

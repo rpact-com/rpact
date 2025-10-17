@@ -590,14 +590,15 @@ NULL
     return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
-.assertIsNumericVector <- function(x,
+.assertIsNumericVector <- function(
+        x,
         argumentName,
         ...,
         naAllowed = FALSE,
         noDefaultAvailable = FALSE,
         len = NA_integer_,
         call. = FALSE) {
-    if (missing(x) || is.null(x) || length(x) == 0) {
+    if (missing("x") || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
