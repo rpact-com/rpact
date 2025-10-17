@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8691 $
-## |  Last changed: $Date: 2025-04-17 13:35:03 +0200 (Do, 17 Apr 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_utilities.R
 NULL
@@ -273,6 +269,31 @@ NULL
     }
 }
 
+#'
+#' Assert Values Are in a Closed Interval
+#'
+#' @description
+#' Checks if every element of \code{x} is within the closed interval defined by \code{lower} and \code{upper}.
+#' If any element is outside the interval, an error is thrown.
+#'
+#' @param x Numeric vector. The values to be checked.
+#' @param xName Character. Used to label \code{x} in error messages.
+#' @param ... Additional arguments (unused).
+#' @param lower Numeric. The inclusive lower bound of the interval.
+#' @param upper Numeric. The inclusive upper bound of the interval. If \code{NULL} or \code{NA}, only the lower bound is enforced.
+#' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
+#' @param call. Logical. If \code{TRUE} the error message will include the call. Default is \code{FALSE}.
+#'
+#' @return Invisibly returns \code{x} if all elements are within the specified interval.
+#'
+#' @examples
+#' \dontrun{
+#' .assertIsInClosedInterval(1:10, "x", lower = 1, upper = 10)
+#' .assertIsInClosedInterval(c(1, NA, 5), "x", lower = 1, upper = 10, naAllowed = TRUE)
+#' }
+#'
+#' @noRd
+#'
 .assertIsInClosedInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
     if (naAllowed && all(is.na(x))) {
@@ -305,7 +326,31 @@ NULL
     }
 }
 
-.assertIsInOpenInterval <- function(x, xName, lower, upper, naAllowed = FALSE, call. = FALSE) {
+#'
+#' Assert Values Are in an Open Interval
+#'
+#' @description
+#' Checks if every element of \code{x} is within the open interval defined by \code{lower} and \code{upper}.
+#' If any element is outside the interval (i.e., less than or equal to \code{lower} or greater than or equal to \code{upper}),
+#' an error is thrown.
+#'
+#' @param x Numeric vector. The values to be checked.
+#' @param xName Character. Label used for \code{x} in error messages.
+#' @param lower Numeric. The exclusive lower bound of the interval.
+#' @param upper Numeric. The exclusive upper bound of the interval.
+#' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
+#' @param call. Logical. If \code{TRUE}, the error message will include the original function call. Default is \code{FALSE}.
+#'
+#' @return Invisibly returns \code{x} if all elements are within the specified open interval.
+#'
+#' @examples
+#' \dontrun{
+#' .assertIsInOpenInterval(1:10, "x", lower = 0, upper = 11)
+#' }
+#'
+#' @noRd
+#'
+.assertIsInOpenInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
     if (naAllowed && all(is.na(x))) {
         return(invisible())
     }
@@ -545,14 +590,15 @@ NULL
     return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
-.assertIsNumericVector <- function(x,
+.assertIsNumericVector <- function(
+        x,
         argumentName,
         ...,
         naAllowed = FALSE,
         noDefaultAvailable = FALSE,
         len = NA_integer_,
         call. = FALSE) {
-    if (missing(x) || is.null(x) || length(x) == 0) {
+    if (missing("x") || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
@@ -1767,11 +1813,10 @@ NULL
     .assertPackageIsInstalled("testthat")
 }
 
-.assertIsValidThetaH0 <- function(
-        thetaH0, 
-        ..., 
+.assertIsValidThetaH0 <- function(thetaH0,
+        ...,
         endpoint = c("means", "rates", "survival", "counts"),
-        groups, 
+        groups,
         ratioEnabled = FALSE,
         naAllowed = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsValidThetaH0", ...)
@@ -1807,10 +1852,11 @@ NULL
     } else {
         endpoint <- "means"
     }
-    .assertIsValidThetaH0(thetaH0, 
-        endpoint = endpoint, 
+    .assertIsValidThetaH0(thetaH0,
+        endpoint = endpoint,
         groups = dataInput$getNumberOfGroups(),
-        naAllowed = naAllowed)
+        naAllowed = naAllowed
+    )
 }
 
 .assertIsValidThetaRange <- function(..., thetaRange, thetaAutoSeqEnabled = TRUE, survivalDataEnabled = FALSE) {
@@ -1948,7 +1994,8 @@ NULL
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
     .assertIsInOpenInterval(
         allocationRatioPlanned,
-        "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM
+        "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
     )
 }
 
@@ -2816,30 +2863,30 @@ NULL
 
 .assertIsValidStdErrorEstimateRates <- function(stdErrorEstimate, dataInput) {
     .assertIsSingleCharacter(stdErrorEstimate, "stdErrorEstimate", naAllowed = TRUE)
-    
+
     if (dataInput$getNumberOfGroups() == 1) {
         if (!is.na(stdErrorEstimate)) {
             warning("'stdErrorEstimate' (", stdErrorEstimate, ") will be ignored because data input has only one group",
                 call. = FALSE
             )
         }
-        
+
         return(invisible(stdErrorEstimate))
     }
-    
+
     if (is.na(stdErrorEstimate)) {
         stdErrorEstimate <- C_RATES_STD_ERROR_ESTIMATE_DEFAULT
     }
-    
+
     if (!stdErrorEstimate %in% C_RATES_STD_ERROR_ESTIMATE) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'stdErrorEstimate' (", stdErrorEstimate, ") must be ",
             .arrayToString(C_RATES_STD_ERROR_ESTIMATE, mode = "or", encapsulate = TRUE),
             call. = FALSE
         )
     }
-    
+
     return(invisible(stdErrorEstimate))
 }
 
@@ -3090,10 +3137,12 @@ NULL
         .assertIsNumericVector(valueMaxVector, valueMaxVectorName, naAllowed = TRUE)
         valueMaxVectorDefault <- C_ALTERNATIVE_POWER_SIMULATION_DEFAULT
         if (valueMaxVectorName == "piMaxVector") {
-            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, 1, naAllowed = FALSE)
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix",
+                lower = 0, upper = 1, naAllowed = FALSE
+            )
             valueMaxVectorDefault <- C_PI_1_DEFAULT
         } else if (valueMaxVectorName == "omegaMaxVector") {
-            .assertIsInOpenInterval(effectMatrix, "effectMatrix", 0, NULL, naAllowed = FALSE)
+            .assertIsInOpenInterval(effectMatrix, "effectMatrix", lower = 0, upper = NULL, naAllowed = FALSE)
             valueMaxVectorDefault <- C_RANGE_OF_HAZARD_RATIOS_DEFAULT
         }
         if (!all(is.na(valueMaxVector)) && !identical(valueMaxVector, valueMaxVectorDefault)) {
@@ -3336,11 +3385,11 @@ NULL
             )
         }
     } else if (!is.na(lambda) && all(!is.na(lambda1))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'lambda2' and/or 'theta' need not to be specified if 'lambda' and 'lambda1' are specified",
-            call. = FALSE
-        )
+#        stop(
+#            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+#            "'lambda2' and/or 'theta' need not to be specified if 'lambda' and 'lambda1' are specified",
+#            call. = FALSE
+#        )
     } else if (!is.na(lambda) && !is.na(lambda2)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -3589,4 +3638,194 @@ NULL
         !all(is.na(design$futilityBounds)) &&
             any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
     )
+}
+
+.showFutilityBoundsUnnecessaryArgumentWarning <- function(
+        argumentName, argValue, sourceScale, targetScale) {
+   
+   valueStr <- ""
+   if (!is.null(argValue) && is.numeric(argValue) && length(argValue) > 0) {
+       valueStr <- paste0(" (", .arrayToString(argValue), ")")
+   }
+        
+    warning(
+        sQuote(argumentName), valueStr, " need not to be specified ",
+        "for 'sourceScale' = ", dQuote(sourceScale),
+        " and 'targetScale' = ", dQuote(targetScale),
+        call. = FALSE
+    )
+}
+
+.showFutilityBoundsMissingArgumentError <- function(
+        argumentName, scaleName, scaleValue) {
+    stop(
+        C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+        sQuote(argumentName), " needs to be specified for ",
+        sQuote(scaleName), " = ", dQuote(scaleValue),
+        call. = FALSE
+    )
+}
+
+C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
+    "vector" = list(
+        effectEstimate = c("information[1]"),
+        conditionalPower = c("design", "theta", "information[2]"),
+        condPowerAtObserved = c("design", "information"),
+        predictivePower = c("design", "information")
+    ),
+    "separate" = list(
+        effectEstimate = c("information1"),
+        conditionalPower = c("design", "theta", "information2"),
+        condPowerAtObserved = c("design", "information1", "information2"),
+        predictivePower = c("design", "information1", "information2")
+    )
+)
+
+.getFutilityBoundVectorLength = function(sourceScale, targetScale) {
+    if (sourceScale == "effectEstimate" && !targetScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
+        return(1L)
+    }
+    
+    if (targetScale == "effectEstimate" && !sourceScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
+        return(1L)
+    }
+    
+    return(2L)
+}
+
+.isFutilityBoundsArgumentMissing <- function(name, value) {
+    if (identical(name, "design")) {
+        return(is.null(value))
+    }
+    
+    return(all(is.na(value)))
+}
+
+.checkFutilityBoundsScaleArgs <- function(scaleValue, scaleLabel, args, informationVectorInput) {
+    type <- ifelse(informationVectorInput, "vector", "separate")
+    reqs <- C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE[[type]][[scaleValue]]
+    if (length(reqs) == 0L) {
+        return(invisible())
+    }
+    
+    for (arg in reqs) {
+        argName <- gsub("\\[.*\\]$", "", arg)
+        
+        if (grepl("\\[\\d+\\]$", arg)) {
+            number <- sub("^.*\\[(\\d+)\\]$", "\\1", arg)
+            argName <- paste0(argName, number)
+        }
+        
+        argValue <- args[[argName]]
+        if (.isFutilityBoundsArgumentMissing(arg, argValue)) {
+            .showFutilityBoundsMissingArgumentError(arg, scaleLabel, scaleValue)
+        }
+    }
+}
+
+.checkForUnnecessaryFutilityBoundsScaleArgs <- function(argName, argValue, sourceScale, targetScale, allowedScales) {
+    if (!(sourceScale %in% allowedScales || targetScale %in% allowedScales) &&
+            !.isFutilityBoundsArgumentMissing(argName, argValue)) {
+        .showFutilityBoundsUnnecessaryArgumentWarning(argName, argValue, sourceScale, targetScale)
+    }
+}
+
+#' Assert Valid Futility Bounds Scale Arguments
+#'
+#' @description
+#' Verifies that futility bounds scale arguments are specified correctly. It checks for
+#' unnecessary or missing arguments based on the provided source and target scales.
+#'
+#' @param design Object. The trial design.
+#' @param sourceScale Character. The scale on which the futility bounds are currently specified.
+#' @param targetScale Character. The scale to which the futility bounds are to be converted.
+#' @param theta Numeric. The theta value for conditional power calculations.
+#' @param information1 Numeric. The first information rate.
+#' @param information2 Numeric. The second information rate.
+#' @param ... Additional arguments (not used).
+#'
+#' @return Invisibly returns \code{NULL} if the futility bounds scale arguments are valid.
+#'
+#' @examples
+#' \dontrun{
+#'   .assertAreValidFutilityBoundsScaleArguments(design,
+#'       sourceScale = "conditionalPower",
+#'       targetScale = "effectEstimate",
+#'       theta = 0.5,
+#'       information1 = 0.2,
+#'       information2 = 0.8)
+#' }
+#'
+#' @noRd
+#' 
+.assertAreValidFutilityBoundsScaleArguments <- function(
+        ...,
+        design,
+        sourceScale,
+        targetScale,
+        theta,
+        information) {
+        
+    baseScales <- c(
+        "conditionalPower",
+        "condPowerAtObserved",
+        "predictivePower"
+    )
+    scalesWithReverse <- c(baseScales, "reverseCondPower")
+    scalesWithEffect  <- c(baseScales, "effectEstimate")
+    
+    infos <- .getFutilityBoundInformations(
+        information = information, 
+        sourceScale = sourceScale,
+        targetScale = targetScale,
+        ...
+    )
+    information1 <- infos$information1
+    information2 <- infos$information2
+    
+    .checkForUnnecessaryFutilityBoundsScaleArgs("design", design, sourceScale, targetScale, scalesWithReverse)
+    if (infos$vectorInput) {
+        .checkForUnnecessaryFutilityBoundsScaleArgs("information", information, sourceScale, targetScale, scalesWithEffect)
+    } else {
+        .checkForUnnecessaryFutilityBoundsScaleArgs(infos$paramNames[1], information1, sourceScale, targetScale, scalesWithEffect)
+        .checkForUnnecessaryFutilityBoundsScaleArgs(infos$paramNames[2], information2, sourceScale, targetScale, baseScales)
+    }
+    .checkForUnnecessaryFutilityBoundsScaleArgs("theta", theta, sourceScale, targetScale, "conditionalPower")
+        
+    args <- list(
+        design       = design,
+        information1 = information1,
+        information2 = information2,
+        theta        = theta
+    )
+    
+    .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args, informationVectorInput = infos$vectorInput)
+    .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args, informationVectorInput = infos$vectorInput)
+}
+
+.showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(
+        futilityBounds,
+        ..., 
+        lowerBound = 1e-12, 
+        upperBound = 1 - 1e-12) {
+        
+    if (all(is.na(futilityBounds))) {
+        return(invisible())
+    }
+        
+    if (!is.null(lowerBound) && length(lowerBound) > 0 && !any(is.na(lowerBound)) && 
+            any(futilityBounds < lowerBound, na.rm = TRUE)) {
+        warning(
+            "At least one calculated futility bound outside acceptable range",
+            call. = FALSE
+        )
+    }
+    
+    if (!is.null(upperBound) && length(upperBound) > 0 && !any(is.na(upperBound)) && 
+            any(futilityBounds > upperBound, na.rm = TRUE)) {
+        warning(
+            "At least one calculated futility bound outside acceptable range",
+            call. = FALSE
+        )
+    }
 }

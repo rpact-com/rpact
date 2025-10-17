@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8623 $
-## |  Last changed: $Date: 2025-03-20 14:21:02 +0100 (Do, 20 Mrz 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' Parameter Description: "..."
 #' @param ... Ensures that all arguments (starting from the "...") are to be named and

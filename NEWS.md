@@ -1,3 +1,18 @@
+# rpact 4.3.0
+
+## New features
+
+* The new function `getFutilityBounds()` converts futility bounds between different 
+  scales such as z-value, p-value, conditional power, predictive power, reverse conditional
+  power, and effect estimate.
+
+## Improvements, issues, and changes
+
+* Documentation for `maxNumberOfRawDatasetsPerStage` in survival clarified
+* Issue [#94](https://github.com/rpact-com/rpact/issues/94) fixed
+* Testing improved, e.g., new helper function `getTestLabel()` introduced
+
+
 # rpact 4.2.1
 
 ## New features

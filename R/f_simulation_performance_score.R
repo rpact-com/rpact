@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7954 $
-## |  Last changed: $Date: 2024-05-29 12:02:48 +0200 (Mi, 29 Mai 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #'
 #' @title

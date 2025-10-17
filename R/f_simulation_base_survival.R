@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8712 $
-## |  Last changed: $Date: 2025-05-15 09:57:14 +0200 (Do, 15 Mai 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include class_simulation_results.R
 #' @include f_core_utilities.R
@@ -224,6 +220,26 @@ NULL
 #' \code{\link[=getRawData]{getRawData()}} can be used to get the simulated raw data from the
 #' object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival()}
 #' must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
+#' 
+#' **What `maxNumberOfRawDatasetsPerStage` does**
+#' 
+#' When `maxNumberOfRawDatasetsPerStage = 0` (the default), simulations run as usual but *no* 
+#' patient-level ("raw") data are kept - only summary results.
+#' 
+#' If you set `maxNumberOfRawDatasetsPerStage > 0`, rpact will **save up to that many 
+#' full patient-level datasets *per stage*** (i.e., per interim/final look). 
+#' Each saved dataset corresponds to one simulated iteration and contains all 
+#' subject-wise records accrued up to the stage at which that iteration stopped. 
+#' You can later retrieve these datasets with \code{\link[=getRawData]{getRawData()}}.
+#' 
+#' **Why "max" and not `numberOfRawDatasetsPerStage`?**
+#' 
+#' The value is an *upper bound per stage*, not a fixed count. The actual number of datasets stored can be smaller because:
+#' 
+#' - Some iterations stop early (e.g., at stage 1), so later stages receive fewer datasets.
+#' - The simulation might finish before reaching the cap due to other stopping or iteration limits.
+#' 
+#' As a result, the number specified is the **maximum possible** datasets saved *per stage*, not the exact number.
 #'
 #' @template return_object_simulation_results
 #' @template how_to_get_help_for_generics
@@ -291,13 +307,14 @@ getSimulationSurvival <- function(design = NULL, ...,
         objectType = "power", userFunctionCallEnabled = TRUE
     )
     .assertIsSingleNumber(thetaH0, "thetaH0")
-    .assertIsInOpenInterval(thetaH0, "thetaH0", 0, NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsNumericVector(minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
     .assertIsNumericVector(maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage", naAllowed = TRUE)
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
-    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 
+        lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE)
-    .assertIsInOpenInterval(thetaH1, "thetaH1", 0, NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(thetaH1, "thetaH1", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)

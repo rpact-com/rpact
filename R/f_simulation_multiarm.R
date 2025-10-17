@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8738 $
-## |  Last changed: $Date: 2025-06-04 13:12:30 +0200 (Mi, 04 Jun 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_core_utilities.R
 NULL
@@ -31,7 +27,7 @@ NULL
 }
 
 .getIndicesOfClosedHypothesesSystemSorted <- function(gMax) {
-    #   Not necessary for simulation and therefore not used
+    # Not necessary for simulation and therefore not used
     indices <- as.data.frame(expand.grid(rep(list(1:0), gMax)))[1:(2^gMax - 1), ]
     if (gMax == 1) {
         return(as.matrix(indices))
@@ -178,7 +174,7 @@ NULL
                             df = NA_real_
                         )
                 } else if (intersectionTest == "Bonferroni") {
-                    #  Bonferroni adjusted p-values
+                    # Bonferroni adjusted p-values
                     adjustedStageWisePValues[i, k] <- min(c(
                         sum(indices[
                             i,
@@ -188,7 +184,7 @@ NULL
                         1
                     ))
                 } else if (intersectionTest == "Simes") {
-                    #  Simes adjusted p-values
+                    # Simes adjusted p-values
                     adjustedStageWisePValues[i, k] <- min(
                         sum(indices[
                             i,
@@ -198,7 +194,7 @@ NULL
                             sort(separatePValues[indices[i, ] == 1, k])
                     )
                 } else if (intersectionTest == "Sidak") {
-                    #  Sidak adjusted p-values
+                    # Sidak adjusted p-values
                     adjustedStageWisePValues[i, k] <- 1 -
                         (1 -
                             min(separatePValues[indices[i, ] == 1, k], na.rm = TRUE))^sum(indices[
@@ -206,10 +202,11 @@ NULL
                             !is.na(separatePValues[, k])
                         ])
                 } else if (intersectionTest == "Hierarchical") {
-                    #  Hierarchically ordered hypotheses
-                    separatePValues <- separatePValues
-                    separatePValues[is.na(separatePValues[, 1:kMax])] <- 1
-                    adjustedStageWisePValues[i, k] <- separatePValues[min(which(indices[i, ] == 1)), k]
+                    # Hierarchically ordered hypotheses
+                    adjustedStageWisePValues[i, k] <- separatePValues[
+                        min(which(indices[i, ] == 1 & !is.na(separatePValues[, k]))),
+                        k
+                    ]
                 }
 
                 if (.isTrialDesignFisher(design)) {
@@ -237,7 +234,7 @@ NULL
 
             rejectedIntersections[is.na(rejectedIntersections[, k]), k] <- FALSE
 
-            if ((k == kMax) && !rejectedIntersections[1, k]) {
+            if (k == kMax && !rejectedIntersections[1, k]) {
                 break
             }
         }
@@ -539,10 +536,10 @@ NULL
 
     .assertIsSingleNumber(threshold, "threshold", naAllowed = FALSE)
     .assertIsSingleNumber(gED50, "gED50", naAllowed = TRUE)
-    .assertIsInOpenInterval(gED50, "gED50", 0, NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(gED50, "gED50", lower = 0, upper = NULL, naAllowed = TRUE)
 
     .assertIsSingleNumber(slope, "slope", naAllowed = TRUE)
-    .assertIsInOpenInterval(slope, "slope", 0, NULL, naAllowed = TRUE)
+    .assertIsInOpenInterval(slope, "slope", lower = 0, upper = NULL, naAllowed = TRUE)
 
     .assertIsSinglePositiveInteger(rValue, "rValue", naAllowed = TRUE, validateType = FALSE)
 
@@ -550,13 +547,13 @@ NULL
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned",
-        0,
-        C_ALLOCATION_RATIO_MAXIMUM,
+        lower = 0,
+        upper = C_ALLOCATION_RATIO_MAXIMUM,
         naAllowed = TRUE
     )
 
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
-    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(conditionalPower, "conditionalPower", lower = 0, upper = 1, naAllowed = TRUE)
 
     .assertIsLogicalVector(adaptations, "adaptations", naAllowed = TRUE)
 
@@ -583,7 +580,7 @@ NULL
     if (endpoint == "means") {
         .assertIsValidStandardDeviation(stDev) # means only
         .assertIsSingleNumber(stDevH1, "stDevH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(stDevH1, "stDevH1", 0, NULL, naAllowed = TRUE)
+        .assertIsInOpenInterval(stDevH1, "stDevH1", lower = 0, upper = NULL, naAllowed = TRUE)
     }
 
     successCriterion <- .assertIsValidSuccessCriterion(successCriterion)
@@ -653,7 +650,7 @@ NULL
         }
     } else if (endpoint == "rates") {
         .assertIsSingleNumber(piTreatmentsH1, "piTreatmentsH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(piTreatmentsH1, "piTreatmentsH1", 0, 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(piTreatmentsH1, "piTreatmentsH1", lower = 0, upper = 1, naAllowed = TRUE)
         piTreatmentsH1 <- .ignoreParameterIfNotUsed(
             "piTreatmentsH1",
             piTreatmentsH1,
@@ -665,7 +662,7 @@ NULL
         .setValueAndParameterType(simulationResults, "piTreatmentsH1", piTreatmentsH1, NA_real_)
 
         .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE) # , noDefaultAvailable = TRUE)
-        .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = FALSE)
+        .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = FALSE)
         .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
 
         piControlH1 <- .ignoreParameterIfNotUsed(
@@ -677,7 +674,7 @@ NULL
         )
 
         .assertIsSingleNumber(piControlH1, "piControlH1", naAllowed = TRUE)
-        .assertIsInOpenInterval(piControlH1, "piControlH1", 0, 1, naAllowed = TRUE)
+        .assertIsInOpenInterval(piControlH1, "piControlH1", lower = 0, upper = 1, naAllowed = TRUE)
         .setValueAndParameterType(simulationResults, "piControlH1", piControlH1, NA_real_)
 
         effectMatrix <- .assertIsValidEffectMatrixRates(
@@ -718,8 +715,8 @@ NULL
             simulationResults$.setParameterType("omegaMaxVector", C_PARAM_DERIVED)
         }
 
-        .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE) # , noDefaultAvailable = TRUE)
-        .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = TRUE)
+        .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)
+        .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = TRUE)
         .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
         .setValueAndParameterType(simulationResults, "eventTime", eventTime, 12)
 

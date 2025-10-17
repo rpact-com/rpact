@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8087 $
-## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 .logBase <- function(s, ..., logLevel) {
     .assertIsSingleCharacter(s, "s")

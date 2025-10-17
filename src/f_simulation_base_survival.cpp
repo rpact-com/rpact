@@ -14,10 +14,6 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 8620 $
- * Last changed: $Date: 2025-03-20 09:03:31 +0100 (Do, 20 Mrz 2025) $
- * Last changed by: $Author: pahlke $
- *
  */
 
 #include <Rcpp.h>
@@ -108,12 +104,12 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		if (eventSorted[i]) {
 			if (treatmentGroupSorted[i] == 1) {
 				if (subjectsT1 + subjectsT2 > 0) {
-					numerator -= subjectsT2 / (thetaH0 * subjectsT1 + subjectsT2);
+				  numerator += 1 - thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2);
 				}
 				events1++;
 			} else if (treatmentGroupSorted[i] == 2) {
 				if (subjectsT1 + subjectsT2 > 0) {
-					numerator += 1 - subjectsT2 / (thetaH0 * subjectsT1 + subjectsT2);
+				  numerator -= thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2);
 				}
 				events2++;
 			}
@@ -131,14 +127,15 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 	}
 
 	double logRank;
+	
 	if (denominator > 0) {
-		logRank = -numerator / sqrt(denominator);
+		logRank = numerator / sqrt(denominator);
 	} else {
-		logRank = R_NegInf;
+	 	logRank = 0;
 	}
-
+	
 	if (!R_IsNA(directionUpper) && !directionUpper) {
-		logRank = -logRank;
+	logRank = -logRank;
 	}
 
 	NumericVector out(4);

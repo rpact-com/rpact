@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8712 $
-## |  Last changed: $Date: 2025-05-15 09:57:14 +0200 (Do, 15 Mai 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_logger.R
 NULL

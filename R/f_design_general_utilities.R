@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8630 $
-## |  Last changed: $Date: 2025-03-24 09:59:32 +0100 (Mo, 24 Mrz 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_core_assertions.R
 #' @include f_core_utilities.R

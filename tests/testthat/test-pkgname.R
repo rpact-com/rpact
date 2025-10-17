@@ -13,12 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File name: test-pkgname.R
-## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 8333 $
-## |  Last changed: $Date: 2024-10-18 10:54:09 +0200 (Fr, 18 Okt 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 
 test_that("Run just one basic rpact test", {

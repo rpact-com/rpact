@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.2.1
-Date: 2025-07-23
+Version: 4.3.0.9292
+Date: 2025-10-17
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -50,8 +50,8 @@ Encoding: UTF-8
 LazyData: true
 URL: https://www.rpact.org,
     https://www.rpact.com,
+    https://docs.rpact.org,
     https://github.com/rpact-com/rpact,
-    https://rpact-com.github.io/rpact/,
     https://rpact.shinyapps.io/connect
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US
@@ -74,7 +74,7 @@ Suggests:
 	rmarkdown (>= 1.10),
     rappdirs (>= 0.3.3)
 VignetteBuilder: knitr, rmarkdown
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
@@ -125,6 +125,7 @@ Collate:
     'f_as251.R'
     'f_core_output_formats.R'
     'f_design_fisher_combination_test.R'
+    'f_design_futility_bounds.R'
     'f_design_group_sequential.R'
     'f_design_plan_counts.R'
     'f_design_plan_means.R'

@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8730 $
-## |  Last changed: $Date: 2025-05-23 12:07:33 +0200 (Fr, 23 Mai 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_simulation_multiarm.R
 NULL

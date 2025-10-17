@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8738 $
-## |  Last changed: $Date: 2025-06-04 13:12:30 +0200 (Mi, 04 Jun 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_core_constants.R
 #' @include f_logger.R

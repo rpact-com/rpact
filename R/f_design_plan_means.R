@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8674 $
-## |  Last changed: $Date: 2025-04-10 15:45:44 +0200 (Do, 10 Apr 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_utilities.R
 NULL
@@ -595,7 +591,8 @@ NULL
         if (identical(alternative, C_ALTERNATIVE_POWER_SIMULATION_DEFAULT)) {
             alternative <- C_ALTERNATIVE_POWER_SIMULATION_MEAN_RATIO_DEFAULT
         }
-        .assertIsInOpenInterval(alternative, "alternative", 0, NULL, naAllowed = TRUE)
+        .assertIsInOpenInterval(alternative, "alternative", 
+            lower = 0, upper = NULL, naAllowed = TRUE)
     }
 
     directionUpper <- .assertIsValidDirectionUpper(directionUpper,
@@ -720,6 +717,7 @@ NULL
     return(designPlan)
 }
 
+#' 
 #' @title
 #' Get Sample Size Means
 #'
@@ -757,7 +755,9 @@ NULL
 #'
 #' @export
 #'
-getSampleSizeMeans <- function(design = NULL, ...,
+getSampleSizeMeans <- function(
+        design = NULL, 
+        ...,
         groups = 2L,
         normalApproximation = FALSE,
         meanRatio = FALSE,
@@ -798,6 +798,7 @@ getSampleSizeMeans <- function(design = NULL, ...,
     return(.calculateSampleSizeMeansAndRates(designPlan))
 }
 
+#' 
 #' @title
 #' Get Power Means
 #'

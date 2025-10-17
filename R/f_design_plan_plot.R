@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8629 $
-## |  Last changed: $Date: 2025-03-24 09:50:39 +0100 (Mo, 24 Mrz 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 
 .addPlotSubTitleItems <- function(designPlan, designMaster, main, type, ..., warningEnabled = FALSE) {

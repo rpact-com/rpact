@@ -14,10 +14,6 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 8660 $
- * Last changed: $Date: 2025-04-01 11:45:17 +0200 (Di, 01 Apr 2025) $
- * Last changed by: $Author: pahlke $
- *
  */
 
 #include <algorithm>

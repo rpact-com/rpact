@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8361 $
-## |  Last changed: $Date: 2024-11-04 16:27:39 +0100 (Mo, 04 Nov 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_utilities.R
 NULL
@@ -940,7 +936,8 @@ getRawData <- function(x, aggregate = FALSE) {
                 matrix(doseLevels / max(doseLevels), nrow = 1, ncol = gMax)
         } else if (valueMaxVectorName == "piMaxVector") {
             .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE, noDefaultAvailable = TRUE)
-            .assertIsInOpenInterval(piControl, "piControl", 0, 1, naAllowed = FALSE)
+            .assertIsInOpenInterval(piControl, "piControl", 
+                lower = 0, upper = 1, naAllowed = FALSE)
             effectMatrix <- piControl +
                 matrix(valueMaxVector - piControl, nrow = length(valueMaxVector), ncol = 1) %*%
                 matrix(doseLevels / max(doseLevels), nrow = 1, ncol = gMax)
