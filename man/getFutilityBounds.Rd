@@ -5,28 +5,23 @@
 \title{Get Futility Bounds}
 \usage{
 getFutilityBounds(
-  design = NULL,
-  ...,
   sourceValue,
+  ...,
   sourceScale = c("zValue", "pValue", "conditionalPower", "condPowerAtObserved",
     "predictivePower", "reverseCondPower", "effectEstimate"),
   targetScale = c("zValue", "pValue", "conditionalPower", "condPowerAtObserved",
     "predictivePower", "reverseCondPower", "effectEstimate"),
+  design = NULL,
   theta = NA_real_,
   information = NA_real_
 )
 }
 \arguments{
-\item{design}{The trial design. Required if either the \code{sourceScale} or
-\code{targetScale} is \code{"reverseCondPower"} or if the conversion
-involves conditional or predictive power in a group sequential or Fisher design.
-Must be a one-sided two-stage group sequential design or Fisher's combination test design.}
+\item{sourceValue}{A numeric vector representing the
+futility bounds in the source scale.}
 
 \item{...}{Ensures that all arguments (starting from the "...") are to be named and
 that a warning will be displayed if unknown arguments are passed.}
-
-\item{sourceValue}{A numeric vector representing the
-futility bounds in the source scale.}
 
 \item{sourceScale}{Character. The scale of the input futility bounds.
 Must be one of \code{"zValue"}, \code{"pValue"},
@@ -37,6 +32,11 @@ Must be one of \code{"zValue"}, \code{"pValue"},
 be converted. Must be one of \code{"zValue"}, \code{"pValue"},
 \code{"conditionalPower"}, "condPowerAtObserved", \code{"predictivePower"},
 \code{"reverseCondPower"}, or \code{"effectEstimate"}.}
+
+\item{design}{The trial design. Required if either the \code{sourceScale} or
+\code{targetScale} is \code{"reverseCondPower"} or if the conversion
+involves conditional or predictive power in a group sequential or Fisher design.
+Must be a one-sided two-stage group sequential design or Fisher's combination test design.}
 
 \item{theta}{Numeric. The assumed effect size under the alternative hypothesis.}
 
