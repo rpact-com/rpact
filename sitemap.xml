@@ -118,6 +118,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/getEventProbabilities.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getFinalConfidenceInterval.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getFinalPValue.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/getFutilityBounds.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getGroupSequentialProbabilities.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getLambdaStepFunction.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getLogLevel.html</loc></url>
@@ -157,6 +158,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/getStageResults.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getSystemIdentifier.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getTestActions.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/getTestLabel.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/getWideFormat.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/index.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/kableParameterSet.html</loc></url>
@@ -294,6 +296,7 @@
 <url><loc>https://rpact-com.github.io/rpact/reference/plot.TrialDesignSummaries.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.Dataset.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.FieldSet.html</loc></url>
+<url><loc>https://rpact-com.github.io/rpact/reference/print.FutilityBounds.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.InstallationQualificationResult.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.ParameterSet.html</loc></url>
 <url><loc>https://rpact-com.github.io/rpact/reference/print.SummaryFactory.html</loc></url>

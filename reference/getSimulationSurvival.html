@@ -9,7 +9,7 @@ for testing the hazard ratio in a two treatment groups survival design."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.3.0.9292</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,7 @@ for testing the hazard ratio in a two treatment groups survival design."><meta p
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Get Simulation Survival</h1>
-      <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/v4.2.1/R/f_simulation_base_survival.R" class="external-link"><code>R/f_simulation_base_survival.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/main/R/f_simulation_base_survival.R" class="external-link"><code>R/f_simulation_base_survival.R</code></a></small>
       <div class="d-none name"><code>getSimulationSurvival.Rd</code></div>
     </div>
 
@@ -418,6 +418,18 @@ user defined with <code>thetaH1</code>.</p></li>
 <p><code><a href="getRawData.html">getRawData()</a></code> can be used to get the simulated raw data from the
 object as <code><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></code>. Note that <code>getSimulationSurvival()</code>
 must called before with <code>maxNumberOfRawDatasetsPerStage</code> &gt; 0.</p>
+<p><strong>What <code>maxNumberOfRawDatasetsPerStage</code> does</strong></p>
+<p>When <code>maxNumberOfRawDatasetsPerStage = 0</code> (the default), simulations run as usual but <em>no</em>
+patient-level ("raw") data are kept - only summary results.</p>
+<p>If you set <code>maxNumberOfRawDatasetsPerStage &gt; 0</code>, rpact will <strong>save up to that many
+full patient-level datasets <em>per stage</em></strong> (i.e., per interim/final look).
+Each saved dataset corresponds to one simulated iteration and contains all
+subject-wise records accrued up to the stage at which that iteration stopped.
+You can later retrieve these datasets with <code><a href="getRawData.html">getRawData()</a></code>.</p>
+<p><strong>Why "max" and not <code>numberOfRawDatasetsPerStage</code>?</strong></p>
+<p>The value is an <em>upper bound per stage</em>, not a fixed count. The actual number of datasets stored can be smaller because:</p><ul><li><p>Some iterations stop early (e.g., at stage 1), so later stages receive fewer datasets.</p></li>
+<li><p>The simulation might finish before reaching the cap due to other stopping or iteration limits.</p></li>
+</ul><p>As a result, the number specified is the <strong>maximum possible</strong> datasets saved <em>per stage</em>, not the exact number.</p>
     </div>
     <div class="section level2">
     <h2 id="how-to-get-help-for-generic-functions">How to get help for generic functions<a class="anchor" aria-label="anchor" href="#how-to-get-help-for-generic-functions"></a></h2>
