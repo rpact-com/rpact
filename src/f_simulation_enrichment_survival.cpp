@@ -984,7 +984,7 @@ List performSimulationEnrichmentSurvivalLoop(
 	
 	int index = 0;
 	
-	
+	Function set_seed("set.seed");
 
 	// Main simulation loop
 	for (int i = 0; i < cols; i++) {
@@ -992,6 +992,8 @@ List performSimulationEnrichmentSurvivalLoop(
 
 			NumericVector hazardRatiosThisScenario = hazardRatios(i, _);
 			
+			set_seed(index + 1);
+
 			List stageResults = getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				design,
 				weights,
@@ -1046,6 +1048,22 @@ List performSimulationEnrichmentSurvivalLoop(
 			NumericVector conditionalPowerPerStage = stageResults["conditionalPowerPerStage"];
 			LogicalMatrix selectedPopulations = stageResults["selectedPopulations"];
 			
+			/* // Print populationEventsPerStage
+			// Debug: print populationEventsPerStage for this iteration
+			Rcout << "Iteration " << j + 1 << ", Scenario " << i + 1 << ":\n";
+			for (int k = 0; k < kMax; k++) {
+				Rcout << "Stage " << k + 1 << ": ";
+				for (int g = 0; g < gMax; g++) {
+					if (!R_IsNA(populationEventsPerStage(g, k))) {
+						Rcout << "Pop" << g + 1 << "=" << populationEventsPerStage(g, k) << " ";
+					} else {
+						Rcout << "Pop" << g + 1 << "=NA ";
+					}
+				}
+				Rcout << "\n";
+			}
+			Rcout << "\n"; */
+
 			// Extract closed test results
 			LogicalMatrix rejected = closedTest["rejected"];
 			LogicalMatrix selectedPopulationsTest = closedTest["selectedPopulations"];
