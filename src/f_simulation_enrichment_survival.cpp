@@ -310,6 +310,9 @@ List getTreatmentsSubgroups(int maxNumberOfSubjects,
 							IntegerVector allocationFraction,
 							CharacterVector subGroups,
 							NumericVector prevalences) {
+	// This is important to ensure that R's random number generator state is properly managed.
+	Rcpp::RNGScope scope; 
+
 	IntegerVector twoGroups = IntegerVector::create(1, 2);
 	IntegerVector allocatedTreatments = repInt(twoGroups, allocationFraction);
 	IntegerVector treatments = rep_len(allocatedTreatments, maxNumberOfSubjects);
@@ -330,6 +333,9 @@ List getSurvDropoutTimes(int numberOfSubjects,
 						NumericVector lambdaActive,
 						double kappa,
 						NumericVector phi) {
+	// This is important to ensure that R's random number generator state is properly managed.
+	Rcpp::RNGScope scope; 
+
 	NumericVector survivalTime(numberOfSubjects);
 	NumericVector dropoutTime(numberOfSubjects);
 	
@@ -371,6 +377,9 @@ CharacterVector updateSubGroupVector(int k,
 						  const CharacterVector& subGroupVector,
 						  CharacterVector subGroups,
 						  NumericVector prevSelected) {
+	// This is important to ensure that R's random number generator state is properly managed.
+	Rcpp::RNGScope scope; 
+
 	int numberNewSubjects = maxNumberOfSubjects - numberOfSubjects[k - 1];
 	CharacterVector newSubGroupVector = sample(
 	 	subGroups,
@@ -385,9 +394,6 @@ CharacterVector updateSubGroupVector(int k,
 	result[newSubjectsInds] = newSubGroupVector;
 	return result;
 }
-
-
-
  
 // Get Simulated Stage Results Survival Enrichment Subjects Based
 //
@@ -587,17 +593,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					subGroupVector,
 					subGroups,
 					prevSelected
-				);
-
-				// CharacterVector newSubGroupVector = sample(
-				// 	subGroups,
-				// 	numberNewSubjects,
-				// 	true,
-				// 	prevSelected
-				// );
-				// // We keep subGroupVector[seq(0, numberOfSubjects[k - 1] - 1)]
-				// // and just update the rest
-				// subGroupVector[newSubjectsInds] = newSubGroupVector;
+				);				
 				
 				tmp = getSurvDropoutTimes(
 					numberNewSubjects,
@@ -984,16 +980,12 @@ List performSimulationEnrichmentSurvivalLoop(
 	
 	int index = 0;
 	
-	Function set_seed("set.seed");
-
 	// Main simulation loop
 	for (int i = 0; i < cols; i++) {
 		for (int j = 0; j < maxNumberOfIterations; j++) {
 
 			NumericVector hazardRatiosThisScenario = hazardRatios(i, _);
 			
-			set_seed(index + 1);
-
 			List stageResults = getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				design,
 				weights,
@@ -1047,22 +1039,6 @@ List performSimulationEnrichmentSurvivalLoop(
 			NumericVector conditionalCriticalValue = stageResults["conditionalCriticalValue"];
 			NumericVector conditionalPowerPerStage = stageResults["conditionalPowerPerStage"];
 			LogicalMatrix selectedPopulations = stageResults["selectedPopulations"];
-			
-			/* // Print populationEventsPerStage
-			// Debug: print populationEventsPerStage for this iteration
-			Rcout << "Iteration " << j + 1 << ", Scenario " << i + 1 << ":\n";
-			for (int k = 0; k < kMax; k++) {
-				Rcout << "Stage " << k + 1 << ": ";
-				for (int g = 0; g < gMax; g++) {
-					if (!R_IsNA(populationEventsPerStage(g, k))) {
-						Rcout << "Pop" << g + 1 << "=" << populationEventsPerStage(g, k) << " ";
-					} else {
-						Rcout << "Pop" << g + 1 << "=NA ";
-					}
-				}
-				Rcout << "\n";
-			}
-			Rcout << "\n"; */
 
 			// Extract closed test results
 			LogicalMatrix rejected = closedTest["rejected"];

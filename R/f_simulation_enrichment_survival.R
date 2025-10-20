@@ -515,8 +515,6 @@ updateSubGroupVector <- function(k,
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
-            set.seed(index)
-
             stageResults <- .getSimulatedStageResultsSurvivalEnrichmentSubjectsBasedCpp(
                 design = design,
                 weights = weights,
@@ -546,9 +544,6 @@ updateSubGroupVector <- function(k,
                 calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
                 selectPopulationsFunction = selectPopulationsFunction
             )
-
-            # cat("stageResults$populationEventsPerStage for iteration", j, ":\n")
-            # print(t(stageResults$populationEventsPerStage))
 
             closedTest <- .performClosedCombinationTestForSimulationEnrichmentCpp(
                 stageResults = stageResults,
