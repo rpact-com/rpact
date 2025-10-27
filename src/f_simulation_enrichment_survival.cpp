@@ -686,15 +686,15 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		}
 
 		// Calculate overall effects
+		double allocationRatioPlanned = (1.0 * allocationFraction[0]) / allocationFraction[1];
 		for (int g = 0; g < gMax; g++) {
 			if (!R_IsNA(overallTestStatistics(g, k)) && populationEventsPerStage(g, k) > 0) {
 				double direction = (2.0 * directionUpper - 1.0);
-				double numerator = direction * overallTestStatistics(g, k) * (1.0 + allocationFraction[0] / allocationFraction[1]);
-				double denominator = sqrt(allocationFraction[0] / (1.0 * allocationFraction[1])) * sqrt(populationEventsPerStage(g, k));
+				double numerator = direction * overallTestStatistics(g, k) * (1.0 + allocationRatioPlanned);
+				double denominator = sqrt(allocationRatioPlanned) * sqrt(populationEventsPerStage(g, k));
 				overallEffects(g, k) = exp(numerator / denominator);
 			}
-		}
-		double allocationRatioPlanned = (1.0 * allocationFraction[0]) / allocationFraction[1];
+		}	
 
 		// Stage-specific calculations for intermediate stages
 		if (k < kMax - 1) {
@@ -717,12 +717,10 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				for (int i = 0; i <= k; i++) {
 					expPvals[i] = pow(adjustedPValues[i], weights[i]);
 				}				
-				double denominator = pow(
-					// prod(expPvals):
-					std::accumulate(expPvals.begin(), expPvals.end(), 1, std::multiplies<double>()), 
-					1.0 / weights[k + 1]
-				);
-				conditionalCriticalValue[k] = getOneMinusQNorm(std::min(numerator / denominator, 1.0 - 1e-07));
+				// prod(expPvals)
+				double denominator = std::accumulate(expPvals.begin(), expPvals.end(), 1, std::multiplies<double>());
+				double term = pow(numerator / denominator, 1.0 / weights[k + 1]);
+				conditionalCriticalValue[k] = getOneMinusQNorm(std::min(term, 1.0 - 1e-07));
 			} else {
 				NumericVector informationRates = design.get("informationRates");
 				double minuend = criticalValues[k + 1] * sqrt(informationRates[k + 1]);
