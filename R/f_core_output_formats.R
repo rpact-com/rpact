@@ -63,7 +63,7 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
     if (futilityProbabilityEnabled) {
         value[value >= 0 & value < 1e-09] <- 0 # only futility probilities
     }
-
+    
     if (!is.na(roundFunction)) {
         if (roundFunction == "ceiling") {
             value <- ceiling(value * 10^digits) / 10^digits
@@ -75,7 +75,16 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
             value <- round(value, digits = digits)
         } else if (roundFunction == "signif ") {
             value <- signif(value, digits = digits)
+        } else {
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+                "invalid 'roundFunction' specified: ", dQuote(roundFunction))
         }
+        if (digits <= 0) {
+            return(value)
+        }
+    } else if (digits <= 0) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+            "'digits' must be greater than 0 if no 'roundFunction' is specified")
     }
 
     if (is.na(nsmall)) {
@@ -389,7 +398,8 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 # Digits = 1, nsmall = 1
 #
 .formatSampleSizes <- function(value) {
-    x <- .getOptionBasedFormattedValue("rpact.output.format.sample.size",
+    x <- .getOptionBasedFormattedValue(
+        optionKey = "rpact.output.format.sample.size",
         value = value, digits = 1, nsmall = 1, trimSingleZeros = TRUE,
         trimEndingZerosAfterDecimalPoint = TRUE
     )
@@ -1252,5 +1262,5 @@ getOutputFormat <- function(parameterName = NA_character_, ...,
 
 .resetAllOutputFormats <- function() {
     base::options(C_OUTPUT_FORMAT_DEFAULT_VALUES)
-    message(length(C_OUTPUT_FORMAT_DEFAULT_VALUES), "output formats were successfully reset")
+    message(length(C_OUTPUT_FORMAT_DEFAULT_VALUES), " output formats were successfully reset")
 }

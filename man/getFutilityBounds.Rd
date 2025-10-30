@@ -13,7 +13,8 @@ getFutilityBounds(
     "predictivePower", "reverseCondPower", "effectEstimate"),
   design = NULL,
   theta = NA_real_,
-  information = NA_real_
+  information = NA_real_,
+  naAllowed = FALSE
 )
 }
 \arguments{
@@ -41,6 +42,8 @@ Must be a one-sided two-stage group sequential design or Fisher's combination te
 \item{theta}{Numeric. The assumed effect size under the alternative hypothesis.}
 
 \item{information}{Numeric vector of length 2. The information levels at the two stages.}
+
+\item{naAllowed}{Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.}
 }
 \value{
 A numeric vector representing the futility bounds in the target scale, or
