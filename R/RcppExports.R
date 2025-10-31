@@ -85,6 +85,10 @@
     .Call(`_rpact_getSimulationSurvivalCpp`, designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocationRatioPlanned, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa, calcEventsFunctionType, calcEventsFunctionR, calcEventsFunctionCpp)
 }
 
+.selectPopulationsCpp <- function(effectVector, typeOfSelection, epsilonValue = NA_real_, rValue = NA_integer_, threshold = NA_real_) {
+    .Call(`_rpact_selectPopulations`, effectVector, typeOfSelection, epsilonValue, rValue, threshold)
+}
+
 .performClosedCombinationTestForSimulationEnrichmentCpp <- function(stageResults, design, indices, intersectionTest, successCriterion) {
     .Call(`_rpact_performClosedCombinationTestForSimulationEnrichment`, stageResults, design, indices, intersectionTest, successCriterion)
 }

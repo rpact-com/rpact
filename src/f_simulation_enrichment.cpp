@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include <cmath>
+#include <algorithm>
 
 // [[Rcpp::plugins(cpp11)]]
 
@@ -8,6 +9,72 @@
 #include "rpact_types.h"
 
 using namespace Rcpp;
+
+// Select Populations
+//
+// Selects populations based on effect vector and selection criteria
+//
+// @param effectVector Numeric vector of effect estimates
+// @param typeOfSelection String specifying selection type: "all", "best", "rBest", "epsilon"
+// @param epsilonValue Epsilon value for epsilon selection (ignored if not applicable)
+// @param rValue Number of populations to select for rBest (ignored if not applicable)  
+// @param threshold Threshold value - populations with effects <= threshold are excluded
+//
+// [[Rcpp::export(name = ".selectPopulationsCpp")]]
+LogicalVector selectPopulations(NumericVector effectVector,
+                               std::string typeOfSelection,
+                               double epsilonValue = NA_REAL,
+                               int rValue = NA_INTEGER,
+                               double threshold = NA_REAL) {
+
+    int gMax = effectVector.size();
+    LogicalVector selectedPopulations(gMax, false);
+    
+    // Convert typeOfSelection to lowercase for case-insensitive comparison
+    std::string typeOfSelectionLower = typeOfSelection;
+    std::transform(typeOfSelectionLower.begin(), typeOfSelectionLower.end(), 
+                   typeOfSelectionLower.begin(), ::tolower);
+    
+    if (typeOfSelectionLower == "all") {
+        std::fill(selectedPopulations.begin(), selectedPopulations.end(), true);        
+    } else if (typeOfSelectionLower == "best") {
+        // Find index of maximum effect (excluding NA values)
+        LogicalVector is_not_na = !is_na(effectVector);
+        IntegerVector which_is_not_na = which(is_not_na);
+        NumericVector availableEffectVector = effectVector[which_is_not_na];
+        if (availableEffectVector.size() > 0) {
+            auto maxIndex = std::max_element(availableEffectVector.begin(), availableEffectVector.end());
+            selectedPopulations[which_is_not_na[std::distance(availableEffectVector.begin(), maxIndex)]] = true;
+        }
+    } else if (typeOfSelectionLower == "rbest") {
+        if (R_IsNA(rValue) || rValue <= 0) {
+            stop("rValue must be a positive integer for rBest selection");
+        }
+        rValue = std::min(rValue, gMax); // Ensure rValue does not exceed gMax
+        LogicalVector is_not_na = !is_na(effectVector);
+        IntegerVector which_is_not_na = which(is_not_na);
+        NumericVector availableEffectVector = effectVector[which_is_not_na];
+        IntegerVector effectOrder = order(-availableEffectVector);
+        effectOrder = effectOrder[seq(0, rValue - 1)]; // Get top rValue indices
+        IntegerVector mapped_indices = which_is_not_na[effectOrder - 1];
+        selectedPopulations[mapped_indices] = true; // Convert to 0-based index
+    } else if (typeOfSelectionLower == "epsilon") {
+        if (R_IsNA(epsilonValue) || epsilonValue <= 0) {
+            stop("positive epsilonValue must be specified for epsilon selection");
+        }      
+        double maxEffect = max(effectVector);
+        NumericVector deltaToMax = maxEffect - effectVector;
+        LogicalVector withinEpsilon = deltaToMax <= epsilonValue;
+        selectedPopulations = withinEpsilon;
+        selectedPopulations[which(is_na(effectVector))] = false; // Exclude NAs
+    } else {
+        stop("Invalid typeOfSelection. Must be 'all', 'best', 'rBest', or 'epsilon'");
+    }
+    LogicalVector effectBelowThreshold = is_na(effectVector) | (effectVector <= threshold);
+    selectedPopulations[effectBelowThreshold] = false; // Exclude populations below threshold
+
+    return selectedPopulations;
+}
 
 // Perform Closed Combination Test for Simulation Enrichment
 //

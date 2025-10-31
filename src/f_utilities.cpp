@@ -810,7 +810,7 @@ List getFractions(
 	);
 }
 
-// Returns the indices of TRUE values in a logical vector
+// Returns the 0-based indices of TRUE values in a logical vector
 IntegerVector which(const LogicalVector& x) {
 	std::vector<int> indices;
 	for (int i = 0; i < x.size(); i++) {

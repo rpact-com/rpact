@@ -4,6 +4,12 @@
 
 using namespace Rcpp;
 
+LogicalVector selectPopulations(NumericVector effectVector,
+                               std::string typeOfSelection,
+                               double epsilonValue = NA_REAL,
+                               int rValue = NA_INTEGER,
+                               double threshold = NA_REAL);
+
 List performClosedCombinationTestForSimulationEnrichment(
     List stageResults,
     Environment design,

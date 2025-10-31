@@ -60,7 +60,7 @@ CharacterVector createSubGroups(int gMax) {
 		return CharacterVector::create("S", "R");
 	} else if (gMax == 3) {
 		return CharacterVector::create("S1", "S2", "S12", "R");
-	} else if (gMax == 5) {
+	} else if (gMax == 4) {
 		return CharacterVector::create("S1", "S2", "S3", "S12", "S13", "S23", "S123", "R");
 	}
 	return CharacterVector::create(NA_STRING);
@@ -738,40 +738,53 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			}
 
 			if (adaptations[k]) {
-				List selectPopulationsFunctionArgs = List::create(
-					_["effectVector"] = R_NilValue,
-					_["stage"] = k,
-					_["directionUpper"] = directionUpper,
-					_["conditionalPower"] = conditionalPower,
-					_["conditionalCriticalValue"] = conditionalCriticalValue,
-					_["plannedEvents"] = plannedEvents,
-					_["allocationRatioPlanned"] = allocationRatioPlanned,
-					_["selectedPopulations"] = selectedPopulations,
-					_["thetaH1"] = thetaH1,
-					_["overallEffects"] = overallEffects
-				);
-
+				
+				NumericVector effectVector;
 				double thresholdArg = threshold;
 				if (effectMeasure == "testStatistic") {
-					selectPopulationsFunctionArgs["effectVector"] = overallTestStatistics(_, k);
+					effectVector = overallTestStatistics(_, k);
 				} else if (effectMeasure == "effectEstimate") {
 					if (R_IsNA(directionUpper) || directionUpper) {
-						selectPopulationsFunctionArgs["effectVector"] = overallEffects(_, k);
+						effectVector = overallEffects(_, k);
 					} else {
-						selectPopulationsFunctionArgs["effectVector"] = 1.0 / overallEffects(_, k);
+						effectVector = 1.0 / overallEffects(_, k);
 						thresholdArg = 1.0 / thresholdArg;
 					}
 				}
 
-				Function selectPopulations(".selectPopulations");
-				LogicalVector selectedNow = selectPopulations(
-					Named("typeOfSelection") = typeOfSelection,
-					Named("epsilonValue") = epsilonValue,
-					Named("rValue") = rValue,
-					Named("threshold") = thresholdArg,
-					Named("selectPopulationsFunction") = selectPopulationsFunction,
-					Named("selectPopulationsFunctionArgs") = selectPopulationsFunctionArgs
-				);
+				LogicalVector selectedNow;
+				if (typeOfSelection == "userDefined") {
+					List selectPopulationsFunctionArgs = List::create(
+						_["effectVector"] = effectVector,
+						_["stage"] = k,
+						_["directionUpper"] = directionUpper,
+						_["conditionalPower"] = conditionalPower,
+						_["conditionalCriticalValue"] = conditionalCriticalValue,
+						_["plannedEvents"] = plannedEvents,
+						_["allocationRatioPlanned"] = allocationRatioPlanned,
+						_["selectedPopulations"] = selectedPopulations,
+						_["thetaH1"] = thetaH1,
+						_["overallEffects"] = overallEffects
+					);
+
+					Function selectPopulations(".selectPopulations");
+					selectedNow = selectPopulations(
+						Named("typeOfSelection") = typeOfSelection,
+						Named("epsilonValue") = epsilonValue,
+						Named("rValue") = rValue,
+						Named("threshold") = thresholdArg,
+						Named("selectPopulationsFunction") = selectPopulationsFunction,
+						Named("selectPopulationsFunctionArgs") = selectPopulationsFunctionArgs
+					);
+				} else {
+					selectedNow = selectPopulations(
+						effectVector,
+						typeOfSelection,
+						epsilonValue,
+						rValue,
+						thresholdArg
+					);
+				}
 				selectedPopulations(_, k + 1) = selectedPopulations(_, k) & selectedNow;
 
 				double newEventsValue;
