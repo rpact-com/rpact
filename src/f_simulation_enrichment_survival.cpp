@@ -774,29 +774,46 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				);
 				selectedPopulations(_, k + 1) = selectedPopulations(_, k) & selectedNow;
 
-				Function calcEventsFunc = calcEventsFunction.get();
-				RObject newEvents = calcEventsFunc(
-					Named("stage") = k + 2, // need 1-based index here!
-					Named("directionUpper") = directionUpper,
-					Named("conditionalPower") = conditionalPower,
-					Named("conditionalCriticalValue") = conditionalCriticalValue,
-					Named("plannedEvents") = plannedEvents,
-					Named("allocationRatioPlanned") = allocationRatioPlanned,
-					Named("selectedPopulations") = selectedPopulations,
-					Named("thetaH1") = thetaH1,
-					Named("overallEffects") = overallEffects,
-					Named("minNumberOfEventsPerStage") = minNumberOfEventsPerStage,
-					Named("maxNumberOfEventsPerStage") = maxNumberOfEventsPerStage
-				);
+				double newEventsValue;
+				if (calcEventsFunctionIsUserDefined) {
+					Function calcEventsFunc = calcEventsFunction.get();
+					RObject newEvents = calcEventsFunc(
+						Named("stage") = k + 2, // need 1-based index here!
+						Named("directionUpper") = directionUpper,
+						Named("conditionalPower") = conditionalPower,
+						Named("conditionalCriticalValue") = conditionalCriticalValue,
+						Named("plannedEvents") = plannedEvents,
+						Named("allocationRatioPlanned") = allocationRatioPlanned,
+						Named("selectedPopulations") = selectedPopulations,
+						Named("thetaH1") = thetaH1,
+						Named("overallEffects") = overallEffects,
+						Named("minNumberOfEventsPerStage") = minNumberOfEventsPerStage,
+						Named("maxNumberOfEventsPerStage") = maxNumberOfEventsPerStage
+					);
 
-				if (Rf_isNull(newEvents) || Rf_length(newEvents) != 1 || !Rf_isReal(newEvents) || R_IsNA(REAL(newEvents)[0])) {
-					stop(
-						"'calcEventsFunction' returned an illegal or undefined result; ",
-						"the output must be a single numeric value"
+					if (Rf_isNull(newEvents) || Rf_length(newEvents) != 1 || !Rf_isReal(newEvents) || R_IsNA(REAL(newEvents)[0])) {
+						stop(
+							"'calcEventsFunction' returned an illegal or undefined result; ",
+							"the output must be a single numeric value"
+						);
+					}
+					newEventsValue = REAL(newEvents)[0];
+				} else {
+					newEventsValue = getSimulationSurvivalEnrichmentStageEvents(
+						k + 2, // need 1-based index here!
+						directionUpper,
+						conditionalPower,
+						conditionalCriticalValue,
+						plannedEvents,
+						NumericVector::create(allocationRatioPlanned),
+						selectedPopulations,
+						thetaH1,
+						overallEffects,
+						minNumberOfEventsPerStage,
+						maxNumberOfEventsPerStage
 					);
 				}
-
-				double newEventsValue = REAL(newEvents)[0];
+				 
                 if (!R_IsNA(conditionalPower) || calcEventsFunctionIsUserDefined) {
 					NumericVector newEventsIncrements = cumsum(rep(newEventsValue, kMax - 1 - k));
 					plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;
