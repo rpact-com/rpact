@@ -54,11 +54,13 @@ LogicalVector createSelectedSubsets(LogicalVector selectedPopulationsAtStagek) {
 //
 // [[Rcpp::export(name = ".createSubGroupsCpp")]]
 CharacterVector createSubGroups(int gMax) {
-	if (gMax == 2) {
+  if (gMax == 1) {
+    return CharacterVector::create("F");
+  } else if (gMax == 2) {
 		return CharacterVector::create("S", "R");
 	} else if (gMax == 3) {
 		return CharacterVector::create("S1", "S2", "S12", "R");
-	} else if (gMax == 4) {
+	} else if (gMax == 5) {
 		return CharacterVector::create("S1", "S2", "S3", "S12", "S13", "S23", "S123", "R");
 	}
 	return CharacterVector::create(NA_STRING);
@@ -73,9 +75,11 @@ CharacterVector createSubGroups(int gMax) {
 //
 // [[Rcpp::export(name = ".createSubGroupsFromPopulationCpp")]]
 CharacterVector createSubGroupsFromPopulation(int gMax, int subPopulation) {
-	if (gMax == 2) {
+	if (gMax == 1) {
+		return CharacterVector::create("F");
+	} else if (gMax == 2) {
 		if (subPopulation == 1) {
-			return CharacterVector::create("S");
+		  return CharacterVector::create("S");
 		} else if (subPopulation == 2) {
 			return CharacterVector::create("S", "R");
 		}
