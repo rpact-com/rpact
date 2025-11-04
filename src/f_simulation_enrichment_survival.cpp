@@ -1198,8 +1198,9 @@ List performSimulationEnrichmentSurvivalLoop(
 		}
 		
 		if (kMax > 1) {
-			// Adjust rejections for stage-wise differences
-			for (int k = 1; k < kMax; k++) {
+			// Adjust rejections for stage-wise differences		
+			// Need to process in reverse order to avoid using modified values
+			for (int k = kMax - 1; k >= 1; k--) {
 				for (int g = 0; g < gMax; g++) {
 					simulatedRejections[k + i * kMax + g * kMax * cols] -= 
 						simulatedRejections[(k-1) + i * kMax + g * kMax * cols];
