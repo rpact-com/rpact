@@ -729,7 +729,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				NumericVector informationRates = design.get("informationRates");
 				double minuend = criticalValues[k + 1] * sqrt(informationRates[k + 1]);
 				double subtrahend = 0.0;
-				for (int j = 0; j < k;  j++) {
+				for (int j = 0; j <= k; j++) {
 					subtrahend += weights[j] * getOneMinusQNorm(adjustedPValues[j]);
 				}
 				double numerator = minuend - subtrahend;
@@ -850,11 +850,12 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 			} else {
 				thetaStandardized = log(thetaH1);
 			}
-			thetaStandardized = (2.0 * directionUpper - 1.0) * thetaStandardized;					
+			thetaStandardized = (2.0 * directionUpper - 1.0) * thetaStandardized;	
 			double numerator = thetaStandardized * sqrt(plannedEvents[k + 1] - plannedEvents[k]) *
-				sqrt(allocationFraction[0] / (1.0 * allocationFraction[1]));
-			double denominator = (1.0 + allocationFraction[0] / allocationFraction[1]);
+				sqrt(allocationRatioPlanned);
+			double denominator = 1.0 + allocationRatioPlanned;
 			double quantile = conditionalCriticalValue[k] - numerator / denominator;
+			// pnorm5(double x, double mu, double sigma, int lower_tail, int log_p)
 			// pnorm(quantile, lower.tail = FALSE):
 			conditionalPowerPerStage[k] = R::pnorm(quantile, 0.0, 1.0, 0, 0);
 		}
