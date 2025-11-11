@@ -259,8 +259,11 @@ getFutilityBounds <- function(
     .assertIsSingleNumber(theta, "theta", naAllowed = TRUE)
 
     if (sourceScale %in% c(
-            "conditionalPower", "condPowerAtObserved",
-            "predictivePower", "reverseCondPower", "pValue"
+            "conditionalPower", 
+            "condPowerAtObserved",
+            "predictivePower", 
+            "reverseCondPower", 
+            "pValue"
         )) {
         .assertIsInClosedInterval(
             sourceValue,
@@ -393,6 +396,12 @@ getFutilityBounds <- function(
                     upper = qnorm(1 - criticalValue) - 1e-07,
                     tol = .Machine$double.eps^0.5
                 )$root)
+            } else {
+                warning(
+                    "Source scale '", sourceScale, "' not implemented for Fisher's combination test design",
+                    call. = FALSE
+                )
+                return(NA_real_)
             }
         },
         warning = function(w) {
