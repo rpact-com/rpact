@@ -1,0 +1,316 @@
+# rpact
+
+[![](https://www.r-pkg.org/badges/version/rpact)](https://cran.r-project.org/package=rpact)
+[![R-CMD-check](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpact-com/rpact/actions/workflows/R-CMD-check.yaml)
+[![Total
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
+[![Monthly
+downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-project.org/package=rpact)
+[![Lifecycle:
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![License: LGPL
+v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Codecov test
+coverage](https://codecov.io/gh/rpact-com/rpact/branch/main/graph/badge.svg)](https://app.codecov.io/gh/rpact-com/rpact?branch=main)
+[![](https://img.shields.io/badge/DOI-10.1007/978--3--319--32562--0-yellow.svg?logo=doi)](https://doi.org/10.1007/978-3-319-32562-0)
+[![](https://img.shields.io/badge/RPACT-Cloud-blue.svg?logo=r)](https://rpact.shinyapps.io/cloud)
+[![](https://img.shields.io/badge/RPACT-Connect-669999.svg?labelColor=336699)](https://rpact.shinyapps.io/connect)
+
+Confirmatory Adaptive Clinical Trial Design, Simulation, and Analysis.
+
+## Functional Range
+
+- Fixed sample design and designs with interim analysis stages
+- Sample size and power calculation for
+  - means (continuous endpoint)
+  - rates (binary endpoint)
+  - survival trials with flexible recruitment and survival time options
+  - count data
+- Simulation tool for means, rates, survival data, and count data
+  - Assessment of adaptive sample size/event number recalculations based
+    on conditional power
+  - Assessment of treatment selection strategies in multi-arm trials
+- Adaptive analysis of means, rates, and survival data
+- Adaptive designs and analysis for multi-arm trials
+- Adaptive analysis and simulation tools for enrichment design testing
+  means, rates, and hazard ratios
+- Automatic boundary recalculations during the trial for analysis with
+  alpha spending approach, including under- and over-running
+
+## Installation
+
+Install the latest CRAN release via
+
+``` r
+install.packages("rpact")
+```
+
+### Development version
+
+To use a feature from the development version, you can install the
+development version of rpact from
+[GitHub](https://github.com/rpact-com/rpact).
+
+``` r
+# install.packages("pak")
+pak::pak("rpact-com/rpact")
+```
+
+## Documentation
+
+The documentation is hosted at [www.rpact.org](https://www.rpact.org)
+
+## Vignettes
+
+The vignettes are hosted at
+[www.rpact.org/vignettes](https://www.rpact.org/vignettes/)
+
+## RPACT Connect
+
+Connecting you to insights, downloads, and premium support:
+[connect.rpact.com](https://rpact.shinyapps.io/connect)
+
+## The RPACT User Group
+
+The *rpact project* has an active user group consisting of
+decision-makers and users from the pharmaceutical industry and CROs, who
+meet regularly and, e.g., discuss best practices.
+
+We invite you to be part of the *RPACT User Group*: benefit from
+know-how, shape open source development in Pharma!
+
+## Use on corporate computer systems
+
+Please [contact](https://www.rpact.com/contact/) us to learn how to use
+`rpact` on FDA/GxP-compliant validated corporate computer systems and
+how to get a copy of the formal validation documentation that is
+customized and licensed for exclusive use by your company, e.g., to
+fulfill regulatory requirements. The validation documentation contains
+the personal access data for performing the installation qualification
+with
+[`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md).
+
+> [www.rpact.com/contact](https://www.rpact.com/contact/)
+
+# About
+
+- **rpact** is a comprehensive validated[¹](#fn1) R package for clinical
+  research which
+  - enables the design and analysis of confirmatory adaptive group
+    sequential designs
+  - is a powerful sample size calculator
+  - is a free of charge open-source software licensed under
+    [LGPL-3](https://cran.r-project.org/web/licenses/LGPL-3)
+  - particularly, implements the methods described in the recent
+    monograph by [Wassmer and Brannath
+    (2016)](https://doi.org/10.1007%2F978-3-319-32562-0)
+
+> For more information please visit
+> [www.rpact.org](https://www.rpact.org)
+
+- **RPACT** is a company which offers
+  - enterprise R/Shiny software development services
+  - technical support for the
+    [rpact](https://cran.r-project.org/package=rpact) package
+  - consultancy and user training for scientists using R
+  - validated software solutions and R package development for clinical
+    research
+
+> For more information please visit
+> [www.rpact.com](https://www.rpact.com)
+
+------------------------------------------------------------------------
+
+1.  The rpact validation documentation is available exclusively for our
+    customers and supporting members. For more information visit
+    [www.rpact.com/services/sla](https://www.rpact.com/services/service-level-agreement/)
+
+# Package index
+
+## All functions
+
+- [`as251Normal()`](https://rpact-com.github.io/rpact/reference/as251Normal.md)
+  : Algorithm AS 251: Normal Distribution
+- [`as251StudentT()`](https://rpact-com.github.io/rpact/reference/as251StudentT.md)
+  : Algorithm AS 251: Student T Distribution
+- [`obtain()`](https://rpact-com.github.io/rpact/reference/fetch.ParameterSet.md)
+  [`fetch()`](https://rpact-com.github.io/rpact/reference/fetch.ParameterSet.md)
+  : Extract a single parameter
+- [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md)
+  : Get Accrual Time
+- [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+  : Get Analysis Results
+- [`plotTypes()`](https://rpact-com.github.io/rpact/reference/getAvailablePlotTypes.md)
+  [`getAvailablePlotTypes()`](https://rpact-com.github.io/rpact/reference/getAvailablePlotTypes.md)
+  : Get Available Plot Types
+- [`getClosedCombinationTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedCombinationTestResults.md)
+  : Get Closed Combination Test Results
+- [`getClosedConditionalDunnettTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedConditionalDunnettTestResults.md)
+  : Get Closed Conditional Dunnett Test Results
+- [`getConditionalPower()`](https://rpact-com.github.io/rpact/reference/getConditionalPower.md)
+  : Get Conditional Power
+- [`getConditionalRejectionProbabilities()`](https://rpact-com.github.io/rpact/reference/getConditionalRejectionProbabilities.md)
+  : Get Conditional Rejection Probabilities
+- [`getData()`](https://rpact-com.github.io/rpact/reference/getData.md)
+  [`getData.SimulationResults()`](https://rpact-com.github.io/rpact/reference/getData.md)
+  : Get Simulation Data
+- [`getDataset()`](https://rpact-com.github.io/rpact/reference/getDataset.md)
+  [`getDataSet()`](https://rpact-com.github.io/rpact/reference/getDataset.md)
+  : Get Dataset
+- [`getDesignCharacteristics()`](https://rpact-com.github.io/rpact/reference/getDesignCharacteristics.md)
+  : Get Design Characteristics
+- [`getDesignConditionalDunnett()`](https://rpact-com.github.io/rpact/reference/getDesignConditionalDunnett.md)
+  : Get Design Conditional Dunnett Test
+- [`getDesignFisher()`](https://rpact-com.github.io/rpact/reference/getDesignFisher.md)
+  : Get Design Fisher
+- [`getDesignGroupSequential()`](https://rpact-com.github.io/rpact/reference/getDesignGroupSequential.md)
+  : Get Design Group Sequential
+- [`getDesignInverseNormal()`](https://rpact-com.github.io/rpact/reference/getDesignInverseNormal.md)
+  : Get Design Inverse Normal
+- [`getDesignSet()`](https://rpact-com.github.io/rpact/reference/getDesignSet.md)
+  : Get Design Set
+- [`getEventProbabilities()`](https://rpact-com.github.io/rpact/reference/getEventProbabilities.md)
+  : Get Event Probabilities
+- [`getFinalConfidenceInterval()`](https://rpact-com.github.io/rpact/reference/getFinalConfidenceInterval.md)
+  : Get Final Confidence Interval
+- [`getFinalPValue()`](https://rpact-com.github.io/rpact/reference/getFinalPValue.md)
+  : Get Final P Value
+- [`getFutilityBounds()`](https://rpact-com.github.io/rpact/reference/getFutilityBounds.md)
+  : Get Futility Bounds
+- [`getGroupSequentialProbabilities()`](https://rpact-com.github.io/rpact/reference/getGroupSequentialProbabilities.md)
+  : Get Group Sequential Probabilities
+- [`getNumberOfSubjects()`](https://rpact-com.github.io/rpact/reference/getNumberOfSubjects.md)
+  : Get Number Of Subjects
+- [`rcmd()`](https://rpact-com.github.io/rpact/reference/getObjectRCode.md)
+  [`getObjectRCode()`](https://rpact-com.github.io/rpact/reference/getObjectRCode.md)
+  : Get Object R Code
+- [`getObservedInformationRates()`](https://rpact-com.github.io/rpact/reference/getObservedInformationRates.md)
+  : Get Observed Information Rates
+- [`getOutputFormat()`](https://rpact-com.github.io/rpact/reference/getOutputFormat.md)
+  : Get Output Format
+- [`getPerformanceScore()`](https://rpact-com.github.io/rpact/reference/getPerformanceScore.md)
+  : Get Performance Score
+- [`getPiecewiseSurvivalTime()`](https://rpact-com.github.io/rpact/reference/getPiecewiseSurvivalTime.md)
+  : Get Piecewise Survival Time
+- [`getPowerAndAverageSampleNumber()`](https://rpact-com.github.io/rpact/reference/getPowerAndAverageSampleNumber.md)
+  : Get Power And Average Sample Number
+- [`getPowerCounts()`](https://rpact-com.github.io/rpact/reference/getPowerCounts.md)
+  : Get Power Counts
+- [`getPowerMeans()`](https://rpact-com.github.io/rpact/reference/getPowerMeans.md)
+  : Get Power Means
+- [`getPowerRates()`](https://rpact-com.github.io/rpact/reference/getPowerRates.md)
+  : Get Power Rates
+- [`getPowerSurvival()`](https://rpact-com.github.io/rpact/reference/getPowerSurvival.md)
+  : Get Power Survival
+- [`getRawData()`](https://rpact-com.github.io/rpact/reference/getRawData.md)
+  : Get Simulation Raw Data for Survival
+- [`getRepeatedConfidenceIntervals()`](https://rpact-com.github.io/rpact/reference/getRepeatedConfidenceIntervals.md)
+  : Get Repeated Confidence Intervals
+- [`getRepeatedPValues()`](https://rpact-com.github.io/rpact/reference/getRepeatedPValues.md)
+  : Get Repeated P Values
+- [`getSampleSizeCounts()`](https://rpact-com.github.io/rpact/reference/getSampleSizeCounts.md)
+  : Get Sample Size Counts
+- [`getSampleSizeMeans()`](https://rpact-com.github.io/rpact/reference/getSampleSizeMeans.md)
+  : Get Sample Size Means
+- [`getSampleSizeRates()`](https://rpact-com.github.io/rpact/reference/getSampleSizeRates.md)
+  : Get Sample Size Rates
+- [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md)
+  : Get Sample Size Survival
+- [`getSimulationCounts()`](https://rpact-com.github.io/rpact/reference/getSimulationCounts.md)
+  : Get Simulation Counts
+- [`getSimulationEnrichmentMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentMeans.md)
+  : Get Simulation Enrichment Means
+- [`getSimulationEnrichmentRates()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentRates.md)
+  : Get Simulation Enrichment Rates
+- [`getSimulationEnrichmentSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentSurvival.md)
+  : Get Simulation Enrichment Survival
+- [`getSimulationMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMeans.md)
+  : Get Simulation Means
+- [`getSimulationMultiArmMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmMeans.md)
+  : Get Simulation Multi-Arm Means
+- [`getSimulationMultiArmRates()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmRates.md)
+  : Get Simulation Multi-Arm Rates
+- [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md)
+  : Get Simulation Multi-Arm Survival
+- [`getSimulationRates()`](https://rpact-com.github.io/rpact/reference/getSimulationRates.md)
+  : Get Simulation Rates
+- [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md)
+  : Get Simulation Survival
+- [`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md)
+  : Get Stage Results
+- [`getTestActions()`](https://rpact-com.github.io/rpact/reference/getTestActions.md)
+  : Get Test Actions
+- [`knit_print(`*`<SummaryFactory>`*`)`](https://rpact-com.github.io/rpact/reference/knit_print.SummaryFactory.md)
+  : Print Summary Factory in Markdown Code Chunks
+- [`mvnprd()`](https://rpact-com.github.io/rpact/reference/mvnprd.md) :
+  Original Algorithm AS 251: Normal Distribution
+- [`mvstud()`](https://rpact-com.github.io/rpact/reference/mvstud.md) :
+  Original Algorithm AS 251: Student T Distribution
+- [`plot(`*`<AnalysisResults>`*`)`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md)
+  : Analysis Results Plotting
+- [`plot(`*`<Dataset>`*`)`](https://rpact-com.github.io/rpact/reference/plot.Dataset.md)
+  : Dataset Plotting
+- [`plot(`*`<EventProbabilities>`*`)`](https://rpact-com.github.io/rpact/reference/plot.EventProbabilities.md)
+  : Event Probabilities Plotting
+- [`plot(`*`<NumberOfSubjects>`*`)`](https://rpact-com.github.io/rpact/reference/plot.NumberOfSubjects.md)
+  : Number Of Subjects Plotting
+- [`plot(`*`<ParameterSet>`*`)`](https://rpact-com.github.io/rpact/reference/plot.ParameterSet.md)
+  : Parameter Set Plotting
+- [`plot(`*`<SimulationResults>`*`)`](https://rpact-com.github.io/rpact/reference/plot.SimulationResults.md)
+  : Simulation Results Plotting
+- [`plot(`*`<StageResults>`*`)`](https://rpact-com.github.io/rpact/reference/plot.StageResults.md)
+  : Stage Results Plotting
+- [`plot(`*`<SummaryFactory>`*`)`](https://rpact-com.github.io/rpact/reference/plot.SummaryFactory.md)
+  : Summary Factory Plotting
+- [`plot(`*`<TrialDesign>`*`)`](https://rpact-com.github.io/rpact/reference/plot.TrialDesign.md)
+  [`plot(`*`<TrialDesignCharacteristics>`*`)`](https://rpact-com.github.io/rpact/reference/plot.TrialDesign.md)
+  : Trial Design Plotting
+- [`plot(`*`<TrialDesignPlan>`*`)`](https://rpact-com.github.io/rpact/reference/plot.TrialDesignPlan.md)
+  : Trial Design Plan Plotting
+- [`plot(`*`<TrialDesignSet>`*`)`](https://rpact-com.github.io/rpact/reference/plot.TrialDesignSet.md)
+  : Trial Design Set Plotting
+- [`plot(`*`<TrialDesignSummaries>`*`)`](https://rpact-com.github.io/rpact/reference/plot.TrialDesignSummaries.md)
+  : Plot Trial Design Summaries
+- [`print(`*`<SummaryFactory>`*`)`](https://rpact-com.github.io/rpact/reference/print.SummaryFactory.md)
+  : Summary Factory Printing
+- [`print(`*`<TrialDesignCharacteristics>`*`)`](https://rpact-com.github.io/rpact/reference/print.TrialDesignCharacteristics.md)
+  : Trial Design Characteristics Printing
+- [`print(`*`<TrialDesignSummaries>`*`)`](https://rpact-com.github.io/rpact/reference/print.TrialDesignSummaries.md)
+  : Print Trial Design Summaries
+- [`readDataset()`](https://rpact-com.github.io/rpact/reference/readDataset.md)
+  : Read Dataset
+- [`readDatasets()`](https://rpact-com.github.io/rpact/reference/readDatasets.md)
+  : Read Multiple Datasets
+- [`rpact-package`](https://rpact-com.github.io/rpact/reference/rpact.md)
+  [`rpact`](https://rpact-com.github.io/rpact/reference/rpact.md) :
+  rpact - Confirmatory Adaptive Clinical Trial Design and Analysis
+- [`setOutputFormat()`](https://rpact-com.github.io/rpact/reference/setOutputFormat.md)
+  : Set Output Format
+- [`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md)
+  : Test and Validate the rpact Package Installation
+- [`getPiecewiseExponentialDistribution()`](https://rpact-com.github.io/rpact/reference/utilitiesForPiecewiseExponentialDistribution.md)
+  [`ppwexp()`](https://rpact-com.github.io/rpact/reference/utilitiesForPiecewiseExponentialDistribution.md)
+  [`getPiecewiseExponentialQuantile()`](https://rpact-com.github.io/rpact/reference/utilitiesForPiecewiseExponentialDistribution.md)
+  [`qpwexp()`](https://rpact-com.github.io/rpact/reference/utilitiesForPiecewiseExponentialDistribution.md)
+  [`getPiecewiseExponentialRandomNumbers()`](https://rpact-com.github.io/rpact/reference/utilitiesForPiecewiseExponentialDistribution.md)
+  [`rpwexp()`](https://rpact-com.github.io/rpact/reference/utilitiesForPiecewiseExponentialDistribution.md)
+  : The Piecewise Exponential Distribution
+- [`getLambdaByPi()`](https://rpact-com.github.io/rpact/reference/utilitiesForSurvivalTrials.md)
+  [`getLambdaByMedian()`](https://rpact-com.github.io/rpact/reference/utilitiesForSurvivalTrials.md)
+  [`getHazardRatioByPi()`](https://rpact-com.github.io/rpact/reference/utilitiesForSurvivalTrials.md)
+  [`getPiByLambda()`](https://rpact-com.github.io/rpact/reference/utilitiesForSurvivalTrials.md)
+  [`getPiByMedian()`](https://rpact-com.github.io/rpact/reference/utilitiesForSurvivalTrials.md)
+  [`getMedianByLambda()`](https://rpact-com.github.io/rpact/reference/utilitiesForSurvivalTrials.md)
+  [`getMedianByPi()`](https://rpact-com.github.io/rpact/reference/utilitiesForSurvivalTrials.md)
+  : Survival Helper Functions for Conversion of Pi, Lambda, Median
+- [`writeDataset()`](https://rpact-com.github.io/rpact/reference/writeDataset.md)
+  : Write Dataset
+- [`writeDatasets()`](https://rpact-com.github.io/rpact/reference/writeDatasets.md)
+  : Write Multiple Datasets
+
+# Articles
+
+### All vignettes
+
+- [Getting started with
+  rpact](https://rpact-com.github.io/rpact/articles/rpact_getting_started.md):

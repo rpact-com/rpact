@@ -1,0 +1,185 @@
+# Getting started with rpact
+
+**Confirmatory Adaptive Clinical Trial Design, Simulation, and
+Analysis**
+
+## Functional Range
+
+- Fixed sample design and designs with interim analysis stages
+- Sample size and power calculation for
+  - means (continuous endpoint)
+  - rates (binary endpoint)
+  - survival trials with flexible recruitment and survival time options
+  - count data
+- Simulation tool for means, rates, survival data, and count data
+  - Assessment of adaptive sample size/event number recalculations based
+    on conditional power
+  - Assessment of treatment selection strategies in multi-arm trials
+- Adaptive analysis of means, rates, and survival data
+- Adaptive designs and analysis for multi-arm trials
+- Adaptive analysis and simulation tools for enrichment design testing
+  means, rates, and hazard ratios
+- Automatic boundary recalculations during the trial for analysis with
+  alpha spending approach, including under- and over-running
+
+## Learn to use rpact
+
+We recommend three ways to learn how to use `rpact`:
+
+> 1.  Use the Shiny app:
+>     [shiny.rpact.com](https://www.rpact.com/products/#public-rpact-shiny-app)
+> 2.  Use the Vignettes:
+>     [www.rpact.org/vignettes](https://www.rpact.org/vignettes/)
+> 3.  Book a training:
+>     [www.rpact.com](https://www.rpact.com/services/#learning-and-training)
+
+### Vignettes
+
+The vignettes are hosted at
+[www.rpact.org/vignettes](https://www.rpact.org/vignettes/) and cover
+the following topics:
+
+1.  Defining Group Sequential Boundaries with rpact
+2.  Designing Group Sequential Trials with Two Groups and a Continuous
+    Endpoint with rpact
+3.  Designing Group Sequential Trials with a Binary Endpoint with rpact
+4.  Designing Group Sequential Trials with Two Groups and a Survival
+    Endpoint with rpact
+5.  Simulation-Based Design of Group Sequential Trials with a Survival
+    Endpoint with rpact
+6.  An Example to Illustrate Boundary Re-Calculations during the Trial
+    with rpact
+7.  Analysis of a Group Sequential Trial with a Survival Endpoint using
+    rpact
+8.  Defining Accrual Time and Accrual Intensity with rpact
+9.  How to use R Generics with rpact
+10. How to Create Admirable Plots with rpact
+11. Comparing Sample Size and Power Calculation Results for a Group
+    Sequential Trial with a Survival Endpoint: rpact vs. gsDesign
+12. Supplementing and Enhancing rpact’s Graphical Capabilities with
+    ggplot2
+13. Using the Inverse Normal Combination Test for Analyzing a Trial with
+    Continuous Endpoint and Potential Sample Size Re-Assessment with
+    rpact
+14. Planning a Trial with Binary Endpoints with rpact
+15. Planning a Survival Trial with rpact
+16. Simulation of a Trial with a Binary Endpoint and Unblinded Sample
+    Size Re-Calculation with rpact
+17. How to Create Summaries with rpact
+18. How to Create One- and Multi-Arm Analysis Result Plots with rpact
+19. How to Create One- and Multi-Arm Simulation Result Plots with rpact
+20. Simulating Multi-Arm Designs with a Continuous Endpoint using rpact
+21. Analysis of a Multi-Arm Design with a Binary Endpoint using rpact
+22. Step-by-Step rpact Tutorial
+23. Planning and Analyzing a Group-Sequential Multi-Arm Multi-Stage
+    Design with Binary Endpoint using rpact  
+24. Two-arm Analysis for Continuous Data with Covariates from Raw Data
+    using rpact (*exclusive*)
+25. How to Install the Latest rpact Developer Version (*exclusive*)
+26. Delayed Response Designs with rpact
+27. Sample Size Calculation for Count Data
+
+## User Concept
+
+### Workflow
+
+- Everything is starting with a design, e.g.:
+  `design <- getDesignGroupSequential()`
+- Find the optimal design parameters with help of `rpact` comparison
+  tools: `getDesignSet`
+- Calculate the required sample size, e.g.:
+  [`getSampleSizeMeans()`](https://rpact-com.github.io/rpact/reference/getSampleSizeMeans.md),
+  [`getPowerMeans()`](https://rpact-com.github.io/rpact/reference/getPowerMeans.md)
+- Simulate specific characteristics of an adaptive design, e.g.:
+  [`getSimulationMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMeans.md)
+- Collect your data, import it into R and create a dataset:
+  `data <- getDataset()`
+- Analyze your data: `getAnalysisResults(design, data)`
+
+### Focus on Usability
+
+The most important `rpact` functions have intuitive names:
+
+- `getDesign`\[`GroupSequential`/`InverseNormal`/`Fisher`\]`()`
+- [`getDesignCharacteristics()`](https://rpact-com.github.io/rpact/reference/getDesignCharacteristics.md)
+- `getSampleSize`\[`Means`/`Rates`/`Survival`/`Counts`\]`()`
+- `getPower`\[`Means`/`Rates`/`Survival`/`Counts`\]`()`
+- `getSimulation`\[`MultiArm`/`Enrichment`\]\``[`Means`/`Rates`/`Survival`]`()\`
+- [`getDataSet()`](https://rpact-com.github.io/rpact/reference/getDataset.md)
+- [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+- [`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md)
+
+RStudio/Eclipse: auto code completion makes it easy to use these
+functions.
+
+### R generics
+
+In general, everything runs with the R standard functions which are
+always present in R: so-called R generics, e.g., `print`, `summary`,
+`plot`, `as.data.frame`, `names`, `length`
+
+### Utilities
+
+Several utility functions are available, e.g.
+
+- [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md)
+- [`getPiecewiseSurvivalTime()`](https://rpact-com.github.io/rpact/reference/getPiecewiseSurvivalTime.md)
+- [`getNumberOfSubjects()`](https://rpact-com.github.io/rpact/reference/getNumberOfSubjects.md)
+- [`getEventProbabilities()`](https://rpact-com.github.io/rpact/reference/getEventProbabilities.md)
+- [`getPiecewiseExponentialDistribution()`](https://rpact-com.github.io/rpact/reference/utilitiesForPiecewiseExponentialDistribution.md)
+- survival helper functions for conversion of `pi`, `lambda` and
+  `median`, e.g.,
+  [`getLambdaByMedian()`](https://rpact-com.github.io/rpact/reference/utilitiesForSurvivalTrials.md)
+- [`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md):
+  installation qualification on a client computer or company server (via
+  unit tests)
+
+## Validation
+
+Please [contact](https://www.rpact.com/contact/) us to learn how to use
+`rpact` on FDA/GxP-compliant validated corporate computer systems and
+how to get a copy of the formal validation documentation that is
+customized and licensed for exclusive use by your company, e.g., to
+fulfill regulatory requirements.
+
+## RPACT Connect
+
+Connecting you to insights, downloads, and premium support:
+[connect.rpact.com](https://rpact.shinyapps.io/connect)
+
+## About
+
+- **rpact** is a comprehensive validated[¹](#fn1) R package for clinical
+  research which
+  - enables the design and analysis of confirmatory adaptive group
+    sequential designs
+  - is a powerful sample size calculator
+  - is a free of charge open-source software licensed under
+    [LGPL-3](https://cran.r-project.org/web/licenses/LGPL-3)
+  - particularly, implements the methods described in the recent
+    monograph by [Wassmer and Brannath
+    (2016)](https://doi.org/10.1007%2F978-3-319-32562-0)
+
+> For more information please visit
+> [www.rpact.org](https://www.rpact.org)
+
+- **RPACT** is a company which offers
+  - enterprise software development services
+  - technical support for the `rpact` package
+  - consultancy and user training for clinical research using R
+  - validated software solutions and R package development for clinical
+    research
+
+> For more information please visit
+> [www.rpact.com](https://www.rpact.com)
+
+## Contact
+
+- <info@rpact.com>
+- [www.rpact.com/contact](https://www.rpact.com/contact/)
+
+------------------------------------------------------------------------
+
+1.  The rpact validation documentation is available exclusively for our
+    customers and supporting companies. For more information visit
+    [www.rpact.com/services/sla](https://www.rpact.com/services/service-level-agreement/)

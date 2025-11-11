@@ -1,0 +1,16 @@
+# Enrichment Dataset of Means
+
+A dataset containing the sample sizes, means, and standard deviations of
+two groups. Use `getDataset(dataEnrichmentMeans)` to create a dataset
+object that can be processed by
+[`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md).
+
+## Usage
+
+``` r
+dataEnrichmentMeans
+```
+
+## Format
+
+A [`data.frame`](https://rdrr.io/r/base/data.frame.html) object.
