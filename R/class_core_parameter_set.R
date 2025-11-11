@@ -566,7 +566,6 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 parameterName <- substr(parameterName, index + 1, nchar(parameterName))
                 obj <- base::get(objectName, envir = self)
                 paramValue <- base::get(parameterName, envir = obj)
-                #paramValue <- self[[objectName]][[parameterName]]
             
                 if (objectName == ".closedTestResults" && parameterName == "rejected") {
                     paramValueLogical <- as.logical(paramValue)

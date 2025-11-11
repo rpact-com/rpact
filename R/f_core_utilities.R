@@ -155,7 +155,8 @@ NULL
 #'
 .getOptionalArgument <- function(optionalArgumentName, ..., optionalArgumentDefaultValue = NULL) {
     args <- list(...)
-    if (optionalArgumentName %in% names(args)) {
+    .assertIsSingleCharacter(optionalArgumentName, "optionalArgumentName")
+    if (length(args) > 0 && !is.null(names(args)) && optionalArgumentName %in% names(args)) {
         return(args[[optionalArgumentName]])
     }
 

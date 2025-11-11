@@ -22,18 +22,22 @@ NULL
         len <- .getFutilityBoundVectorLength(sourceScale, targetScale)
         .assertIsNumericVector(information, "information", naAllowed = TRUE, len = len)
         return(list(
-            information1 = information[1], 
-            information2 = information[2], 
+            information1 = information[1],
+            information2 = information[2],
             vectorInput = TRUE,
             paramNames = c("information[1]", "information[2]")
         ))
     }
-    
-    information1 <- .getOptionalArgument("information1", ..., optionalArgumentDefaultValue = NA_real_)
-    information2 <- .getOptionalArgument("information2", ..., optionalArgumentDefaultValue = NA_real_)
+
+    information1 <- NA_real_
+    information2 <- NA_real_
+    if (length(list(...)) > 0) {
+        information1 <- .getOptionalArgument("information1", optionalArgumentDefaultValue = NA_real_, ...)
+        information2 <- .getOptionalArgument("information2", optionalArgumentDefaultValue = NA_real_, ...)
+    }
     return(list(
-        information1 = information1, 
-        information2 = information2, 
+        information1 = information1,
+        information2 = information2,
         vectorInput = FALSE,
         paramNames = c("information1", "information2")
     ))
@@ -58,17 +62,17 @@ NULL
 #'
 #' @param x An object of class \code{FutilityBounds}.
 #' @param ... Additional arguments passed to \code{print.default}.
-#' 
+#'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 print.FutilityBounds <- function(x, ...) {
     print.default(as.numeric(x))
 }
 
 #'
-#' @title 
+#' @title
 #' Get Futility Bounds
 #'
 #' @description
@@ -86,12 +90,13 @@ print.FutilityBounds <- function(x, ...) {
 #' be converted. Must be one of \code{"zValue"}, \code{"pValue"},
 #' \code{"conditionalPower"}, "condPowerAtObserved", \code{"predictivePower"},
 #' \code{"reverseCondPower"}, or \code{"effectEstimate"}.
-#' @param design The trial design. Required if either the \code{sourceScale} or 
+#' @param design The trial design. Required if either the \code{sourceScale} or
 #' \code{targetScale} is \code{"reverseCondPower"} or if the conversion
 #' involves conditional or predictive power in a group sequential or Fisher design.
 #' Must be a one-sided two-stage group sequential design or Fisher's combination test design.
 #' @param theta Numeric. The assumed effect size under the alternative hypothesis.
 #' @param information Numeric vector of length 2. The information levels at the two stages.
+#' @param naAllowed Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -121,9 +126,9 @@ print.FutilityBounds <- function(x, ...) {
 #'     targetScale = "pValue"
 #' )
 #' }
-#' 
+#'
 #' @export
-#' 
+#'
 getFutilityBounds <- function(
         sourceValue,
         ...,
@@ -147,21 +152,22 @@ getFutilityBounds <- function(
         ),
         design = NULL,
         theta = NA_real_,
-        information = NA_real_) {
-       
+        information = NA_real_,
+        naAllowed = FALSE) {
     sourceScale <- match.arg(sourceScale)
     targetScale <- match.arg(targetScale)
-    
-    .assertIsNumericVector(sourceValue, "sourceValue")
+
+    .assertIsNumericVector(sourceValue, "sourceValue", naAllowed = naAllowed)
     if (is(sourceValue, "FutilityBounds")) {
         sourceValue <- as.numeric(sourceValue)
     }
-        
+
     infos <- .getFutilityBoundInformations(
         information = information,
         sourceScale = sourceScale,
         targetScale = targetScale,
-        ...)
+        ...
+    )
     information1 <- infos$information1
     information2 <- infos$information2
     .assertAreValidFutilityBoundsScaleArguments(
@@ -172,7 +178,7 @@ getFutilityBounds <- function(
         information = information,
         ...
     )
-    
+
     args <- list(
         `sourceValue` = list(
             `value` = sourceValue,
@@ -292,14 +298,15 @@ getFutilityBounds <- function(
                 sqrt(design$informationRates[1]) * criticalValue
         }
     } else if (.isTrialDesignFisher(design)) {
-        sourceValues <- .getFutilityBoundSourceValueFisher(
+        sourceValues <- .getFutilityBoundSourceValuesFisher(
             sourceValue,
             criticalValue,
             gsWeights,
             sourceScale,
             theta,
             information1,
-            information2)
+            information2
+        )
     }
 
     if (targetScale == "zValue") {
@@ -344,76 +351,82 @@ getFutilityBounds <- function(
     )
 }
 
-.getFutilityBoundSourceValueFisher <- function(sourceValue,
+.getFutilityBoundSourceValueFisher <- function(
+        sourceValue,
         criticalValue,
         gsWeights,
         sourceScale,
         theta,
         information1,
         information2) {
-    sourceValues <- numeric()
-    if (sourceScale == "conditionalPower") {
-        for (y in sourceValue) {
-            result <- NA_real_
-            if (!is.na(y) && y < 1 - 1e-07) {
-                result <- qnorm(1 - criticalValue /
-                    pnorm((qnorm(y) - theta * sqrt(information2)))^gsWeights[2])
-            }
-            sourceValues <- c(sourceValues, result)
-        }
-    } else if (sourceScale == "condPowerAtObserved") {
-        for (y in sourceValue) {
-            result <- NA_real_
-            if (!is.na(y) && y < 1 - 1e-07) {
-                tryCatch(
-                    {
-                        result <- stats::uniroot(
-                            function(x) {
-                                pmin(1, pnorm(
-                                    qnorm((criticalValue / (1 - pnorm(x)))^(1 / gsWeights[2])) +
-                                        x * sqrt(information2 / information1)
-                                )) - y
-                            },
-                            lower = -3,
-                            upper = qnorm(1 - criticalValue) - 1e-07,
-                            tol = .Machine$double.eps^0.5
-                        )$root
-                    },
-                    error = function(e) {
-                        warning("Failed to calculate 'sourceValue': ", e$message)
-                    }
-                )
-            }
-            sourceValues <- c(sourceValues, result)
-        }
-    } else if (sourceScale == "predictivePower") {
-        for (y in sourceValue) {
-            result <- NA_real_
-            if (!is.na(y) && y < 1 - 1e-07) {
-                tryCatch(
-                    {
-                        result <- stats::uniroot(
-                            function(x) {
-                                pmin(1, pnorm(
-                                    sqrt(information1 / (information1 + information2)) *
-                                        (qnorm((criticalValue / (1 - pnorm(x)))^(1 / gsWeights[2])) +
-                                            x * sqrt(information2 / information1))
-                                )) - y
-                            },
-                            lower = -3,
-                            upper = qnorm(1 - criticalValue) - 1e-07,
-                            tol = .Machine$double.eps^0.5
-                        )$root
-                    },
-                    error = function(e) {
-                        warning("Failed to calculate 'sourceValue': ", e$message)
-                    }
-                )
-            }
-            sourceValues <- c(sourceValues, result)
-        }
+    if (is.na(sourceValue) || sourceValue >= 1 - 1e-07) {
+        return(NA_real_)
     }
-    return(sourceValues)
+
+    tryCatch(
+        {
+            if (sourceScale == "conditionalPower") {
+                return(qnorm(1 - criticalValue /
+                    pnorm((qnorm(sourceValue) - theta * sqrt(information2)))^gsWeights[2]))
+            } else if (sourceScale == "condPowerAtObserved") {
+                return(stats::uniroot(
+                    function(x) {
+                        pmin(1, pnorm(
+                            qnorm((criticalValue / (1 - pnorm(x)))^(1 / gsWeights[2])) +
+                                x * sqrt(information2 / information1)
+                        )) - sourceValue
+                    },
+                    lower = -3,
+                    upper = qnorm(1 - criticalValue) - 1e-07,
+                    tol = .Machine$double.eps^0.5
+                )$root)
+            } else if (sourceScale == "predictivePower") {
+                return(stats::uniroot(
+                    function(x) {
+                        pmin(1, pnorm(
+                            sqrt(information1 / (information1 + information2)) *
+                                (qnorm((criticalValue / (1 - pnorm(x)))^(1 / gsWeights[2])) +
+                                    x * sqrt(information2 / information1))
+                        )) - sourceValue
+                    },
+                    lower = -3,
+                    upper = qnorm(1 - criticalValue) - 1e-07,
+                    tol = .Machine$double.eps^0.5
+                )$root)
+            }
+        },
+        warning = function(w) {
+            warning("Failed to calculate ", sQuote(sourceScale), " source value from ", sourceValue, ": ", w$message, call. = FALSE)
+        },
+        error = function(e) {
+            warning("Failed to calculate ", sQuote(sourceScale), " source value from ", sourceValue, ": ", e$message, call. = FALSE)
+        }
+    )
+    
+    return(NA_real_)
+}
+
+.getFutilityBoundSourceValuesFisher <- function(
+        sourceValues,
+        criticalValue,
+        gsWeights,
+        sourceScale,
+        theta,
+        information1,
+        information2) {
+    sourceValuesCalculated <- numeric()
+    for (sourceValue in sourceValues) {
+        sourceValuesCalculated <- c(sourceValuesCalculated, .getFutilityBoundSourceValueFisher(
+            sourceValue,
+            criticalValue,
+            gsWeights,
+            sourceScale,
+            theta,
+            information1,
+            information2
+        ))
+    }
+    return(sourceValuesCalculated)
 }
 
 .getFutilityBoundGroupSequential <- function(sourceValues,
