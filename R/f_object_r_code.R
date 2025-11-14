@@ -318,6 +318,59 @@ rcmd <- function(
     ))
 }
 
+.getObjectRCodeFutilityBounds <- function(
+        obj,
+        ...,
+        precondition,
+        leadingArguments,
+        includeDefaultParameters,
+        stringWrapParagraphWidth,
+        postfix,
+        stringWrapPrefix,
+        newArgumentValues,
+        pipeOperator,
+        pipeOperatorPostfix,
+        output,
+        explicitPrint = FALSE
+        ) {
+    args <- character()
+    for (paramName in c("sourceValue", "sourceScale", "targetScale", "theta", "information", "design")) {
+        if (identical(attr(obj, paramName)$type, C_PARAM_USER_DEFINED)) {
+            paramValue <- attr(obj, paramName)$value
+            if (.isTrialDesign(paramValue)) {
+                preconditionDesign <- .getPreconditionDesignRCode(
+                    paramValue, pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
+                    stringWrapParagraphWidth, stringWrapPrefix, newArgumentValues,
+                    leadingArguments
+                )
+                precondition <- c(precondition, preconditionDesign$precondition)
+                leadingArguments <- c(leadingArguments, preconditionDesign$leadingArguments)
+            } else {
+                paramValue <- .getArgumentValueRCode(paramValue, paramName)
+                args <- c(args, paste0(paramName, " = ", paramValue))
+            }
+        }
+    }
+    args <- unique(c(leadingArguments, args)) 
+    rCode <- paste0("getFutilityBounds(", paste0(args, collapse = ", "), ")")
+    rCode <- .formatRCode(
+        rCode = rCode,
+        precondition = precondition,
+        stringWrapParagraphWidth = stringWrapParagraphWidth,
+        postfix = postfix,
+        stringWrapPrefix = stringWrapPrefix,
+        pipeOperator = pipeOperator,
+        pipeOperatorPostfix = pipeOperatorPostfix,
+        output = output,
+        explicitPrint = explicitPrint
+    )
+    if (output %in% c("vector", "internal", "markdown")) {
+        return(rCode)
+    }
+    
+    return(invisible(rCode))
+}
+
 #'
 #' @title
 #' Get Object R Code
@@ -436,45 +489,20 @@ getObjectRCode <- function(
     }
     
     if (!is.null(obj) && is(obj, "FutilityBounds")) {
-        args <- character()
-
-        for (paramName in c("sourceValue", "sourceScale", "targetScale", "theta", "information", "design")) {
-            if (identical(attr(obj, paramName)$type, C_PARAM_USER_DEFINED)) {
-                paramValue <- attr(obj, paramName)$value
-                if (.isTrialDesign(paramValue)) {
-                    preconditionDesign <- .getPreconditionDesignRCode(
-                        paramValue, pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
-                        stringWrapParagraphWidth, stringWrapPrefix, newArgumentValues,
-                        leadingArguments
-                    )
-                    precondition <- c(precondition, preconditionDesign$precondition)
-                    leadingArguments <- c(leadingArguments, preconditionDesign$leadingArguments)
-                } else {
-                    paramValue <- .getArgumentValueRCode(paramValue, paramName)
-                    args <- c(args, paste0(paramName, " = ", paramValue))
-                }
-            }
-        }
-        
-        args <- unique(c(leadingArguments, args)) 
-
-        rCode <- paste0("getFutilityBounds(", paste0(args, collapse = ", "), ")")
-        rCode <- .formatRCode(
-            rCode = rCode,
+        return(.getObjectRCodeFutilityBounds(
+            obj = obj,
             precondition = precondition,
+            leadingArguments = leadingArguments,
+            includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
             postfix = postfix,
             stringWrapPrefix = stringWrapPrefix,
+            newArgumentValues = newArgumentValues,
             pipeOperator = pipeOperator,
             pipeOperatorPostfix = pipeOperatorPostfix,
             output = output,
             explicitPrint = explicitPrint
-        )
-        if (output %in% c("vector", "internal", "markdown")) {
-            return(rCode)
-        }
-
-        return(invisible(rCode))
+            ))
     }
 
     .assertIsParameterSetClass(obj, "ParameterSet")
@@ -834,11 +862,35 @@ getObjectRCode <- function(
 
                 futilityBoundsScale <- NULL
                 if (objName == "futilityBounds" && is(value, "FutilityBounds")) {
-                    futilityBoundsScale <- attr(value, "sourceScale")$value
-                    if (!is.null(futilityBoundsScale) && !identical(futilityBoundsScale, "zValue")) {
-                        value <- attr(value, "sourceValue")$value
+                    
+                    sourceScale <- attr(value, "sourceScale")$value
+                    if (!is.null(sourceScale) && sourceScale %in% 
+                            c("conditionalPower", "condPowerAtObserved", "predictivePower", "effectEstimate")) {
+                        precondition <- c(
+                            precondition,
+                            getObjectRCode(
+                                value,
+                                prefix = ifelse(pipeOperator == "none", "futilityBounds <- ", ""),
+                                postfix = pipeOperatorPostfix,
+                                includeDefaultParameters = includeDefaultParameters,
+                                stringWrapParagraphWidth = stringWrapParagraphWidth,
+                                stringWrapPrefix = stringWrapPrefix,
+                                newArgumentValues = newArgumentValues,
+                                pipeOperator = pipeOperator,
+                                output = "internal"
+                            )
+                        )
+                        if (pipeOperator == "none") {
+                            leadingArguments <- c(leadingArguments, "futilityBounds = futilityBounds")
+                        }
+                        next
                     } else {
-                        futilityBoundsScale <- NULL
+                        futilityBoundsScale <- attr(value, "sourceScale")$value
+                        if (!is.null(futilityBoundsScale) && !identical(futilityBoundsScale, "zValue")) {
+                            value <- attr(value, "sourceValue")$value
+                        } else {
+                            futilityBoundsScale <- NULL
+                        }
                     }
                 }
 
