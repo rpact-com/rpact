@@ -1704,6 +1704,15 @@ NULL
             ifelse(inherits(arg, "StageResults"), "stageResultsName", paste0("%param", i, "%")),
             argNames[i]
         )
+        if (is(arg, "FutilityBounds")) {
+            if (grepl("^getDesign(InverseNormal|GroupSequential)", functionName)) {
+                next
+            }
+            if (grepl("^getDesignFisher", functionName)) {
+                argName <- "futilityBounds"
+            }
+        }
+        
         if (!(argName %in% ignore) && !grepl("^\\.", argName)) {
             if (.isResultObjectBaseClass(arg) || is.environment(arg)) {
                 arg <- .getClassName(arg)

@@ -400,7 +400,36 @@ getObjectRCode <- function(
         }
         return(lines)
     }
+    
+    if (!is.null(obj) && is(obj, "FutilityBounds")) {
+        args <- character()
+        
+        for (paramName in c("sourceValue", "sourceScale", "targetScale", "theta", "information")) {
+            if (identical(attr(obj, paramName)$type, C_PARAM_USER_DEFINED)) {
+                paramValue <- attr(obj, paramName)$value
+                paramValue <- .getArgumentValueRCode(paramValue, paramName)
+                args <- c(args, paste0(paramName, " = ", paramValue))
+            }
+        }
+        
+        rCode <- paste0('getFutilityBounds(', paste0(args, collapse = ', '), ')')
+        rCode <- .formatRCode(
+            rCode = rCode,
+            precondition = character(),
+            stringWrapParagraphWidth = stringWrapParagraphWidth,
+            postfix = postfix,
+            stringWrapPrefix = stringWrapPrefix,
+            pipeOperator = pipeOperator,
+            pipeOperatorPostfix = pipeOperatorPostfix,
+            output = output,
+            explicitPrint = explicitPrint)
+        if (output %in% c("vector", "internal", "markdown")) {
+            return(rCode)
+        }
 
+        return(invisible(rCode))
+    }
+    
     .assertIsParameterSetClass(obj, "ParameterSet")
 
     if (!is.list(newArgumentValues)) {
@@ -772,6 +801,16 @@ getObjectRCode <- function(
                 ) {
                     value <- obj$.accrualTime$accrualIntensityRelative
                 }
+                
+                futilityBoundsScale <- NULL
+                if (objName == "futilityBounds" && is(value, "FutilityBounds")) {
+                    futilityBoundsScale <- attr(value, "sourceScale")$value 
+                    if (!is.null(futilityBoundsScale) && !identical(futilityBoundsScale, "zValue")) {
+                        value <- attr(value, "sourceValue")$value 
+                    } else {
+                        futilityBoundsScale <- NULL
+                    }
+                }
 
                 originalValue <- value
                 newValue <- newArgumentValues[[objName]]
@@ -816,7 +855,7 @@ getObjectRCode <- function(
                 ) {
                     value <- "calcEventsFunction"
                 }
-
+                
                 if ((objName == "twoSidedPower" && isFALSE(originalValue)) || objName == "accrualIntensityRelative") {
                     # do not add
                     # arguments <- c(arguments, paste0(name, "_DoNotAdd"))
@@ -831,6 +870,10 @@ getObjectRCode <- function(
                     }
                     if (!is.null(argument) && !(argument %in% leadingArguments)) {
                         arguments <- c(arguments, argument)
+                    }
+                    
+                    if (!is.null(futilityBoundsScale)) {
+                        arguments <- c(arguments, paste0('futilityBoundsScale = "', futilityBoundsScale, '"'))
                     }
                 }
             }
@@ -932,6 +975,29 @@ getObjectRCode <- function(
     }
 
     rCode <- paste0(prefix, functionName, "(", argumentsRCode, ")")
+    .formatRCode(
+        rCode = rCode,
+        precondition = precondition,
+        stringWrapParagraphWidth = stringWrapParagraphWidth,
+        postfix = postfix,
+        stringWrapPrefix = stringWrapPrefix,
+        pipeOperator = pipeOperator,
+        pipeOperatorPostfix = pipeOperatorPostfix,
+        output = output,
+        explicitPrint = explicitPrint) 
+}
+
+.formatRCode <- function(
+        rCode,
+        precondition,
+        stringWrapParagraphWidth,
+        postfix,
+        stringWrapPrefix,
+        pipeOperator,
+        pipeOperatorPostfix,
+        output,
+        explicitPrint) {
+    
     if (any(postfix != "")) {
         if (length(postfix) > 1 && grepl("(\\|>)|(%>%)", postfix[1])) {
             if (!grepl("(\\|>)|(%>%) *$", rCode[length(rCode)])) {
@@ -944,7 +1010,7 @@ getObjectRCode <- function(
             rCode <- paste0(rCode, paste0(postfix, collapse = ""))
         }
     }
-
+    
     if (output != "internal" && explicitPrint) {
         if (pipeOperator == "none") {
             rCode <- paste0("print(", rCode, ")")
@@ -953,20 +1019,20 @@ getObjectRCode <- function(
             rCode <- c(rCode, "print()")
         }
     }
-
+    
     rCode <- c(precondition, rCode)
-
+    
     if (
         !is.null(stringWrapParagraphWidth) &&
-            length(stringWrapParagraphWidth) == 1 &&
-            !is.na(stringWrapParagraphWidth) &&
-            is.numeric(stringWrapParagraphWidth) &&
-            stringWrapParagraphWidth >= 10 &&
-            !is.null(stringWrapPrefix) &&
-            length(stringWrapPrefix) == 1 &&
-            !is.na(stringWrapPrefix) &&
-            is.character(stringWrapPrefix)
-    ) {
+        length(stringWrapParagraphWidth) == 1 &&
+        !is.na(stringWrapParagraphWidth) &&
+        is.numeric(stringWrapParagraphWidth) &&
+        stringWrapParagraphWidth >= 10 &&
+        !is.null(stringWrapPrefix) &&
+        length(stringWrapPrefix) == 1 &&
+        !is.na(stringWrapPrefix) &&
+        is.character(stringWrapPrefix)
+        ) {
         rCodeNew <- character()
         for (rCodeLine in rCode) {
             for (i in 12:2) {
@@ -1005,11 +1071,11 @@ getObjectRCode <- function(
         }
         rCode <- rCodeNew
     }
-
+    
     if (output %in% c("vector", "internal")) {
         return(rCode)
     }
-
+    
     if (output == "cat") {
         collapse <- "\n"
         if (pipeOperator != "none") {
@@ -1018,7 +1084,7 @@ getObjectRCode <- function(
         cat(paste0(rCode, collapse = collapse), "\n")
         return(invisible(rCode))
     }
-
+    
     if (output == "markdown") {
         collapse <- "\n"
         if (pipeOperator != "none") {
@@ -1027,16 +1093,16 @@ getObjectRCode <- function(
                 rCode <- gsub("print\\(\\)", "print(markdown = TRUE)", rCode)
             }
         }
-
+        
         return(paste0(rCode, collapse = collapse))
     }
-
+    
     if (output == "test") {
         message("Evaluate and parse the following code:")
         cat(rCode, "\n")
         x <- eval(parse(text = rCode))
         return(invisible(x))
     }
-
+    
     return(invisible(rCode))
 }

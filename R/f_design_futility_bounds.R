@@ -71,6 +71,70 @@ print.FutilityBounds <- function(x, ...) {
     print.default(as.numeric(x))
 }
 
+.getFutilityBoundsFromThreeDots <- function(...) {
+    args <- list(...)
+    if (length(args) == 0) {
+        return(NA_real_)
+    }
+    
+    for (arg in args) {
+        if (is(arg, "FutilityBounds")) {
+            .assertIsNumericVector(as.numeric(arg), "futilityBounds", naAllowed = TRUE)
+            return(arg)
+        }
+    }
+    
+    return(NA_real_)
+}
+
+.getFutilityBoundsFromArgs <- function(..., futilityBounds, futilityBoundsScale, functionName, design) {
+    futilityBoundsFromArgs <- .getFutilityBoundsFromThreeDots(...)
+    if (!all(is.na(futilityBoundsFromArgs))) {
+        futilityBoundsOld <- futilityBounds
+        futilityBounds <- futilityBoundsFromArgs
+        if (!all(is.na(futilityBoundsOld))) {
+            .warnInCaseOfUnusedArgument(
+                futilityBoundsOld, 
+                "futilityBounds", 
+                defaultValue = NA_real_,
+                functionName = functionName)
+        }
+        
+    } else {
+        .assertIsNumericVector(futilityBounds, "futilityBounds", naAllowed = TRUE)
+        if (futilityBoundsScale != "zValue") {
+            if (!all(is.na(futilityBounds))) {
+                futilityBounds <- getFutilityBounds(
+                    sourceValue = futilityBounds,
+                    sourceScale = futilityBoundsScale,
+                    targetScale = "zValue",
+                    design = design
+                )
+            } else {
+                .warnInCaseOfUnusedArgument(
+                    futilityBoundsScale, 
+                    "futilityBoundsScale", 
+                    defaultValue = "zScale",
+                    functionName = functionName)
+            }
+        }
+    }
+    return(futilityBounds)
+}
+
+.futilityBoundsCalculationRequiresDesign <- function(scale) {
+    if (is.null(scale) || length(scale) != 1 || is.na(scale)) {
+        return(FALSE)
+    }
+    
+    scale %in% c(
+        "conditionalPower",
+        "condPowerAtObserved",
+        "predictivePower",
+        "reverseCondPower"
+    )
+}
+
 #'
 #' @title
 #' Get Futility Bounds
@@ -206,36 +270,33 @@ getFutilityBounds <- function(
         return(.addFutilityBoundParameterTypes(sourceValue, args))
     }
 
-    if ((sourceScale == "reverseCondPower" ||
-            targetScale == "reverseCondPower") &&
-            (is.null(design) || !.isTrialDesignInverseNormalOrGroupSequential(design))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "design not correctly specified, needs to be one-sided two-stage group sequential",
-            call. = FALSE
-        )
-    }
 
     if (!is.null(design)) {
+        if (sourceScale == "reverseCondPower" || targetScale == "reverseCondPower") {
+            .assertIsTrialDesignInverseNormalOrGroupSequential(design)
+        } else {
+            .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design)            
+        }
         if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
             gsWeights <- c(sqrt(design$informationRates[1]), sqrt(1 - design$informationRates[1]))
         } else if (.isTrialDesignFisher(design)) {
             gsWeights <- c(1, sqrt((1 - design$informationRates[1]) / design$informationRates[1]))
-        } else {
+        } 
+        if (design$sided != 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "design not correctly specified",
+                "Futility bounds conversion is available only for one-sided two-stage designs (sided = ", design$sided, ")",
+                call. = FALSE
+            )
+        }
+        if (design$kMax != 2) {
+            stop(
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "Futility bounds conversion is available only for one-sided two-stage designs (kMax = ", design$kMax, ")",
                 call. = FALSE
             )
         }
         criticalValue <- design$criticalValues[2]
-        if (design$kMax != 2 || design$sided != 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Futility bounds conversion is available only for one-sided two-stage designs",
-                call. = FALSE
-            )
-        }
     }
 
     .assertIsSingleNumber(information1, infos$paramNames[1], naAllowed = TRUE)
