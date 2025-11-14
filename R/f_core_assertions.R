@@ -3791,6 +3791,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     )
     information1 <- infos$information1
     information2 <- infos$information2
+    information <- infos$information
     
     .checkForUnnecessaryFutilityBoundsScaleArgs("design", design, sourceScale, targetScale, scalesWithReverse)
     if (infos$vectorInput) {

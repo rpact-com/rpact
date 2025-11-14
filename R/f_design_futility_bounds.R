@@ -24,6 +24,7 @@ NULL
         return(list(
             information1 = information[1],
             information2 = information[2],
+            information = information,
             vectorInput = TRUE,
             paramNames = c("information[1]", "information[2]")
         ))
@@ -35,9 +36,14 @@ NULL
         information1 <- .getOptionalArgument("information1", optionalArgumentDefaultValue = NA_real_, ...)
         information2 <- .getOptionalArgument("information2", optionalArgumentDefaultValue = NA_real_, ...)
     }
+    information <- c(information1, information2)
+    if (all(is.na(information))) {
+        information <- NA_real_
+    }
     return(list(
         information1 = information1,
         information2 = information2,
+        information = information,
         vectorInput = FALSE,
         paramNames = c("information1", "information2")
     ))
@@ -87,9 +93,33 @@ print.FutilityBounds <- function(x, ...) {
     return(NA_real_)
 }
 
+.getDesignFromThreeDots <- function(design, ...) {
+    if (!is.null(design)) {
+        return(design)
+    }
+    
+    args <- list(...)
+    for (arg in args) {
+        if (.isTrialDesign(arg)) {
+            return(arg)
+        }
+    }
+    
+    return(NULL)
+}
+
 .getFutilityBoundsFromArgs <- function(..., futilityBounds, futilityBoundsScale, functionName, design) {
     futilityBoundsFromArgs <- .getFutilityBoundsFromThreeDots(...)
     if (!all(is.na(futilityBoundsFromArgs))) {
+        
+        if (is(futilityBoundsFromArgs, "FutilityBounds") && 
+                !identical(attr(futilityBoundsFromArgs, "targetScale")$value, "zValue")) {
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+                "'futilityBounds' (", .arrayToString(futilityBoundsFromArgs), ") ",
+                "must be on 'zValue' scale or converted to 'zValue' scale",
+                call. = FALSE)
+        }
+        
         futilityBoundsOld <- futilityBounds
         futilityBounds <- futilityBoundsFromArgs
         if (!all(is.na(futilityBoundsOld))) {
@@ -225,6 +255,8 @@ getFutilityBounds <- function(
     if (is(sourceValue, "FutilityBounds")) {
         sourceValue <- as.numeric(sourceValue)
     }
+    
+    design <- .getDesignFromThreeDots(design, ...)
 
     infos <- .getFutilityBoundInformations(
         information = information,
@@ -234,6 +266,7 @@ getFutilityBounds <- function(
     )
     information1 <- infos$information1
     information2 <- infos$information2
+    information <- infos$information
     .assertAreValidFutilityBoundsScaleArguments(
         design = design,
         sourceScale = sourceScale,
@@ -263,6 +296,10 @@ getFutilityBounds <- function(
         `information` = list(
             `value` = information,
             `type` = ifelse(all(is.na(information)), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
+        ),
+        `design` = list(
+            `value` = design,
+            `type` = ifelse(is.null(design), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
         )
     )
 
