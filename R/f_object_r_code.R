@@ -288,9 +288,11 @@ rcmd <- function(
     )
 }
 
-.getPreconditionDesignRCode <- function(design, pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
-                                                stringWrapParagraphWidth, stringWrapPrefix, newArgumentValues,
-                                                leadingArguments) {
+.getPreconditionDesignRCode <- function(
+        design, pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
+        stringWrapParagraphWidth, stringWrapPrefix, newArgumentValues,
+        leadingArguments
+        ) {
     preconditionDesign <- getObjectRCode(
         design,
         prefix = ifelse(pipeOperator == "none", "design <- ", ""),
@@ -325,6 +327,7 @@ rcmd <- function(
         leadingArguments,
         includeDefaultParameters,
         stringWrapParagraphWidth,
+        prefix,
         postfix,
         stringWrapPrefix,
         newArgumentValues,
@@ -351,8 +354,8 @@ rcmd <- function(
             }
         }
     }
-    args <- unique(c(leadingArguments, args)) 
-    rCode <- paste0("getFutilityBounds(", paste0(args, collapse = ", "), ")")
+    args <- unique(c(leadingArguments, args))
+    rCode <- paste0(prefix, "getFutilityBounds(", paste0(args, collapse = ", "), ")")
     rCode <- .formatRCode(
         rCode = rCode,
         precondition = precondition,
@@ -367,7 +370,7 @@ rcmd <- function(
     if (output %in% c("vector", "internal", "markdown")) {
         return(rCode)
     }
-    
+
     return(invisible(rCode))
 }
 
@@ -487,7 +490,7 @@ getObjectRCode <- function(
     if (is.null(leadingArguments)) {
         leadingArguments <- character()
     }
-    
+
     if (!is.null(obj) && is(obj, "FutilityBounds")) {
         return(.getObjectRCodeFutilityBounds(
             obj = obj,
@@ -495,6 +498,7 @@ getObjectRCode <- function(
             leadingArguments = leadingArguments,
             includeDefaultParameters = includeDefaultParameters,
             stringWrapParagraphWidth = stringWrapParagraphWidth,
+            prefix = prefix,
             postfix = postfix,
             stringWrapPrefix = stringWrapPrefix,
             newArgumentValues = newArgumentValues,
@@ -502,7 +506,7 @@ getObjectRCode <- function(
             pipeOperatorPostfix = pipeOperatorPostfix,
             output = output,
             explicitPrint = explicitPrint
-            ))
+        ))
     }
 
     .assertIsParameterSetClass(obj, "ParameterSet")
@@ -520,7 +524,7 @@ getObjectRCode <- function(
     if (!inherits(obj, "ConditionalPowerResults") &&
             !is.null(obj[[".design"]]) &&
             (is.null(leadingArguments) || !any(grepl("design", leadingArguments)))
-            ) {
+        ) {
         preconditionDesign <- .getPreconditionDesignRCode(
             obj[[".design"]], pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
             stringWrapParagraphWidth, stringWrapPrefix, newArgumentValues,
@@ -862,9 +866,8 @@ getObjectRCode <- function(
 
                 futilityBoundsScale <- NULL
                 if (objName == "futilityBounds" && is(value, "FutilityBounds")) {
-                    
                     sourceScale <- attr(value, "sourceScale")$value
-                    if (!is.null(sourceScale) && sourceScale %in% 
+                    if (!is.null(sourceScale) && sourceScale %in%
                             c("conditionalPower", "condPowerAtObserved", "predictivePower", "effectEstimate")) {
                         precondition <- c(
                             precondition,
@@ -1070,15 +1073,17 @@ getObjectRCode <- function(
     )
 }
 
-.formatRCode <- function(rCode,
-                                 precondition,
-                                 stringWrapParagraphWidth,
-                                 postfix,
-                                 stringWrapPrefix,
-                                 pipeOperator,
-                                 pipeOperatorPostfix,
-                                 output,
-                                 explicitPrint) {
+.formatRCode <- function(
+        rCode,
+        precondition,
+        stringWrapParagraphWidth,
+        postfix,
+        stringWrapPrefix,
+        pipeOperator,
+        pipeOperatorPostfix,
+        output,
+        explicitPrint
+        ) {
     if (any(postfix != "")) {
         if (length(postfix) > 1 && grepl("(\\|>)|(%>%)", postfix[1])) {
             if (!grepl("(\\|>)|(%>%) *$", rCode[length(rCode)])) {
