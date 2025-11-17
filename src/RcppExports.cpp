@@ -644,9 +644,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dunnetIntegrand1Int
-double dunnetIntegrand1Int(double criticalValue, double informationAtInterim, NumericMatrix signedTestStatistics, NumericVector frac, LogicalVector indicesRow);
-RcppExport SEXP _rpact_dunnetIntegrand1Int(SEXP criticalValueSEXP, SEXP informationAtInterimSEXP, SEXP signedTestStatisticsSEXP, SEXP fracSEXP, SEXP indicesRowSEXP) {
+// dunnettIntegrand1Int
+double dunnettIntegrand1Int(double criticalValue, double informationAtInterim, NumericMatrix signedTestStatistics, NumericVector frac, LogicalVector indicesRow);
+RcppExport SEXP _rpact_dunnettIntegrand1Int(SEXP criticalValueSEXP, SEXP informationAtInterimSEXP, SEXP signedTestStatisticsSEXP, SEXP fracSEXP, SEXP indicesRowSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -655,13 +655,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type signedTestStatistics(signedTestStatisticsSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type frac(fracSEXP);
     Rcpp::traits::input_parameter< LogicalVector >::type indicesRow(indicesRowSEXP);
-    rcpp_result_gen = Rcpp::wrap(dunnetIntegrand1Int(criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow));
+    rcpp_result_gen = Rcpp::wrap(dunnettIntegrand1Int(criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow));
     return rcpp_result_gen;
 END_RCPP
 }
-// dunnetIntegrand1Evaluate
-NumericVector dunnetIntegrand1Evaluate(NumericVector x, double criticalValue, double informationAtInterim, NumericMatrix signedTestStatistics, NumericVector frac, LogicalVector indicesRow);
-RcppExport SEXP _rpact_dunnetIntegrand1Evaluate(SEXP xSEXP, SEXP criticalValueSEXP, SEXP informationAtInterimSEXP, SEXP signedTestStatisticsSEXP, SEXP fracSEXP, SEXP indicesRowSEXP) {
+// dunnettIntegrand1Evaluate
+NumericVector dunnettIntegrand1Evaluate(NumericVector x, double criticalValue, double informationAtInterim, NumericMatrix signedTestStatistics, NumericVector frac, LogicalVector indicesRow);
+RcppExport SEXP _rpact_dunnettIntegrand1Evaluate(SEXP xSEXP, SEXP criticalValueSEXP, SEXP informationAtInterimSEXP, SEXP signedTestStatisticsSEXP, SEXP fracSEXP, SEXP indicesRowSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -671,7 +671,69 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type signedTestStatistics(signedTestStatisticsSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type frac(fracSEXP);
     Rcpp::traits::input_parameter< LogicalVector >::type indicesRow(indicesRowSEXP);
-    rcpp_result_gen = Rcpp::wrap(dunnetIntegrand1Evaluate(x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow));
+    rcpp_result_gen = Rcpp::wrap(dunnettIntegrand1Evaluate(x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dunnettIntegrand2Int
+double dunnettIntegrand2Int(double maxOverallTestStatistic, double informationAtInterim, NumericMatrix signedTestStatistics, NumericVector frac, LogicalVector indicesRow, NumericMatrix overallTestStatistics);
+RcppExport SEXP _rpact_dunnettIntegrand2Int(SEXP maxOverallTestStatisticSEXP, SEXP informationAtInterimSEXP, SEXP signedTestStatisticsSEXP, SEXP fracSEXP, SEXP indicesRowSEXP, SEXP overallTestStatisticsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type maxOverallTestStatistic(maxOverallTestStatisticSEXP);
+    Rcpp::traits::input_parameter< double >::type informationAtInterim(informationAtInterimSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type signedTestStatistics(signedTestStatisticsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type frac(fracSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type indicesRow(indicesRowSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type overallTestStatistics(overallTestStatisticsSEXP);
+    rcpp_result_gen = Rcpp::wrap(dunnettIntegrand2Int(maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dunnettIntegrand2Evaluate
+NumericVector dunnettIntegrand2Evaluate(NumericVector x, double maxOverallTestStatistic, double informationAtInterim, NumericMatrix signedTestStatistics, NumericVector frac, LogicalVector indicesRow, NumericMatrix overallTestStatistics);
+RcppExport SEXP _rpact_dunnettIntegrand2Evaluate(SEXP xSEXP, SEXP maxOverallTestStatisticSEXP, SEXP informationAtInterimSEXP, SEXP signedTestStatisticsSEXP, SEXP fracSEXP, SEXP indicesRowSEXP, SEXP overallTestStatisticsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type maxOverallTestStatistic(maxOverallTestStatisticSEXP);
+    Rcpp::traits::input_parameter< double >::type informationAtInterim(informationAtInterimSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type signedTestStatistics(signedTestStatisticsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type frac(fracSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type indicesRow(indicesRowSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type overallTestStatistics(overallTestStatisticsSEXP);
+    rcpp_result_gen = Rcpp::wrap(dunnettIntegrand2Evaluate(x, maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dunnettIntegrand3Int
+double dunnettIntegrand3Int(double maxTestStatistic, NumericVector frac, LogicalVector indicesRow, NumericMatrix separatePValues);
+RcppExport SEXP _rpact_dunnettIntegrand3Int(SEXP maxTestStatisticSEXP, SEXP fracSEXP, SEXP indicesRowSEXP, SEXP separatePValuesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type maxTestStatistic(maxTestStatisticSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type frac(fracSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type indicesRow(indicesRowSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type separatePValues(separatePValuesSEXP);
+    rcpp_result_gen = Rcpp::wrap(dunnettIntegrand3Int(maxTestStatistic, frac, indicesRow, separatePValues));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dunnettIntegrand3Evaluate
+NumericVector dunnettIntegrand3Evaluate(NumericVector x, double maxTestStatistic, NumericVector frac, LogicalVector indicesRow, NumericMatrix separatePValues);
+RcppExport SEXP _rpact_dunnettIntegrand3Evaluate(SEXP xSEXP, SEXP maxTestStatisticSEXP, SEXP fracSEXP, SEXP indicesRowSEXP, SEXP separatePValuesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type maxTestStatistic(maxTestStatisticSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type frac(fracSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type indicesRow(indicesRowSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type separatePValues(separatePValuesSEXP);
+    rcpp_result_gen = Rcpp::wrap(dunnettIntegrand3Evaluate(x, maxTestStatistic, frac, indicesRow, separatePValues));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -980,8 +1042,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_updateSubGroupVector", (DL_FUNC) &_rpact_updateSubGroupVector, 6},
     {"_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased", (DL_FUNC) &_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased, 27},
     {"_rpact_performSimulationEnrichmentSurvivalLoop", (DL_FUNC) &_rpact_performSimulationEnrichmentSurvivalLoop, 31},
-    {"_rpact_dunnetIntegrand1Int", (DL_FUNC) &_rpact_dunnetIntegrand1Int, 5},
-    {"_rpact_dunnetIntegrand1Evaluate", (DL_FUNC) &_rpact_dunnetIntegrand1Evaluate, 6},
+    {"_rpact_dunnettIntegrand1Int", (DL_FUNC) &_rpact_dunnettIntegrand1Int, 5},
+    {"_rpact_dunnettIntegrand1Evaluate", (DL_FUNC) &_rpact_dunnettIntegrand1Evaluate, 6},
+    {"_rpact_dunnettIntegrand2Int", (DL_FUNC) &_rpact_dunnettIntegrand2Int, 6},
+    {"_rpact_dunnettIntegrand2Evaluate", (DL_FUNC) &_rpact_dunnettIntegrand2Evaluate, 7},
+    {"_rpact_dunnettIntegrand3Int", (DL_FUNC) &_rpact_dunnettIntegrand3Int, 4},
+    {"_rpact_dunnettIntegrand3Evaluate", (DL_FUNC) &_rpact_dunnettIntegrand3Evaluate, 5},
     {"_rpact_getSimulatedStageMeansMultiArmCpp", (DL_FUNC) &_rpact_getSimulatedStageMeansMultiArmCpp, 19},
     {"_rpact_simulationMultiArmMeansInnerLoopCpp", (DL_FUNC) &_rpact_simulationMultiArmMeansInnerLoopCpp, 57},
     {"_rpact_hmm", (DL_FUNC) &_rpact_hmm, 9},

@@ -129,12 +129,28 @@
     .Call(`_rpact_performSimulationEnrichmentSurvivalLoop`, cols, maxNumberOfIterations, design, weights, effectList, kappa, phi, eventTime, recruitmentTimes, allocationFraction, directionUpper, stratifiedAnalysis, plannedEvents, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectPopulationsFunction, indices, intersectionTest, successCriterion, gMax, kMax)
 }
 
-.dunnetIntegrand1IntCpp <- function(criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow) {
-    .Call(`_rpact_dunnetIntegrand1Int`, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow)
+.dunnettIntegrand1IntCpp <- function(criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow) {
+    .Call(`_rpact_dunnettIntegrand1Int`, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow)
 }
 
-.dunnetIntegrand1EvaluateCpp <- function(x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow) {
-    .Call(`_rpact_dunnetIntegrand1Evaluate`, x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow)
+.dunnettIntegrand1EvaluateCpp <- function(x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow) {
+    .Call(`_rpact_dunnettIntegrand1Evaluate`, x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow)
+}
+
+.dunnettIntegrand2IntCpp <- function(maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics) {
+    .Call(`_rpact_dunnettIntegrand2Int`, maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics)
+}
+
+.dunnettIntegrand2EvaluateCpp <- function(x, maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics) {
+    .Call(`_rpact_dunnettIntegrand2Evaluate`, x, maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics)
+}
+
+.dunnettIntegrand3IntCpp <- function(maxTestStatistic, frac, indicesRow, separatePValues) {
+    .Call(`_rpact_dunnettIntegrand3Int`, maxTestStatistic, frac, indicesRow, separatePValues)
+}
+
+.dunnettIntegrand3EvaluateCpp <- function(x, maxTestStatistic, frac, indicesRow, separatePValues) {
+    .Call(`_rpact_dunnettIntegrand3Evaluate`, x, maxTestStatistic, frac, indicesRow, separatePValues)
 }
 
 .getSimulatedStageMeansMultiArmCpp <- function(design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {

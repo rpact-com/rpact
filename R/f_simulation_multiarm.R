@@ -425,7 +425,7 @@ NULL
     ))
 }
 
-dunnetIntegrand1 <- function(
+dunnettIntegrand1 <- function(
     criticalValue,
     informationAtInterim,
     signedTestStatistics,
@@ -444,6 +444,55 @@ dunnetIntegrand1 <- function(
                             sqrt(1 - informationAtInterim) * sqrt(frac[g]) * x)) /
                             sqrt((1 - informationAtInterim) * (1 - frac[g]))
                     )
+            }
+        }
+        innerProduct * dnorm(x)
+    }
+    int <- stats::integrate(fun, lower = -Inf, upper = Inf)$value
+    list(fun = fun, int = int)
+}
+
+dunnettIntegrand2 <- function(
+    maxOverallTestStatistic,
+    informationAtInterim,
+    signedTestStatistics,
+    frac,
+    indicesRow,
+    overallTestStatistics
+) {
+    fun <- function(x) {
+        gMax <- nrow(signedTestStatistics)
+        innerProduct <- rep(1, length(x))
+        for (g in (1:gMax)) {
+            if ((indicesRow[g] == 1) && !is.na(overallTestStatistics[g, 2])) {
+                innerProduct <- innerProduct *
+                    stats::pnorm(
+                        ((maxOverallTestStatistic -
+                            sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
+                            sqrt(1 - informationAtInterim) * sqrt(frac[g]) * x)) /
+                            sqrt((1 - informationAtInterim) * (1 - frac[g]))
+                    )
+            }
+        }
+        innerProduct * dnorm(x)
+    }
+    int <- stats::integrate(fun, lower = -Inf, upper = Inf)$value
+    list(fun = fun, int = int)
+}
+
+dunnettIntegrand3 <- function(
+    maxTestStatistic,
+    frac,
+    indicesRow,
+    separatePValues
+) {
+    fun <- function(x) {
+        gMax <- nrow(separatePValues)
+        innerProduct <- rep(1, length(x))
+        for (g in (1:gMax)) {
+            if ((indicesRow[g] == 1) && !is.na(separatePValues[g, 2])) {
+                innerProduct <- innerProduct *
+                    stats::pnorm(((maxTestStatistic + sqrt(frac[g]) * x)) / sqrt(1 - frac[g]))
             }
         }
         innerProduct * dnorm(x)
@@ -489,7 +538,7 @@ dunnetIntegrand1 <- function(
     }
 
     for (i in 1:(2^gMax - 1)) {
-        int1 <- .dunnetIntegrand1IntCpp(
+        int1 <- .dunnettIntegrand1IntCpp(
             criticalValue = criticalValuesDunnett[i],
             informationAtInterim = informationAtInterim,
             signedTestStatistics = signedTestStatistics,
@@ -504,35 +553,24 @@ dunnetIntegrand1 <- function(
                     signedOverallTestStatistics[indices[i, ] == 1, 2],
                     na.rm = TRUE
                 )
-                integrand <- function(x) {
-                    innerProduct <- 1
-                    for (g in (1:gMax)) {
-                        if ((indices[i, g] == 1) && !is.na(overallTestStatistics[g, 2])) {
-                            innerProduct <- innerProduct *
-                                stats::pnorm(
-                                    ((maxOverallTestStatistic -
-                                        sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
-                                        sqrt(1 - informationAtInterim) * sqrt(frac[g]) * x)) /
-                                        sqrt((1 - informationAtInterim) * (1 - frac[g]))
-                                )
-                        }
-                    }
-                    return(innerProduct * dnorm(x))
-                }
-                secondStagePValues[i, 2] <- 1 - stats::integrate(integrand, lower = -Inf, upper = Inf)$value
+                int2 <- .dunnettIntegrand2IntCpp(
+                    maxOverallTestStatistic = maxOverallTestStatistic,
+                    informationAtInterim = informationAtInterim,
+                    signedTestStatistics = signedTestStatistics,
+                    frac = frac,
+                    indicesRow = indices[i, ],
+                    overallTestStatistics = overallTestStatistics
+                )
+                secondStagePValues[i, 2] <- 1 - int2
             } else {
                 maxTestStatistic <- max(signedTestStatistics[indices[i, ] == 1, 2], na.rm = TRUE)
-                integrand <- function(x) {
-                    innerProduct <- 1
-                    for (g in (1:gMax)) {
-                        if ((indices[i, g] == 1) && !is.na(separatePValues[g, 2])) {
-                            innerProduct <- innerProduct *
-                                stats::pnorm(((maxTestStatistic + sqrt(frac[g]) * x)) / sqrt(1 - frac[g]))
-                        }
-                    }
-                    return(innerProduct * dnorm(x))
-                }
-                secondStagePValues[i, 2] <- 1 - stats::integrate(integrand, lower = -Inf, upper = Inf)$value
+                int3 <- .dunnettIntegrand3IntCpp(
+                    maxTestStatistic = maxTestStatistic,
+                    frac = frac,
+                    indicesRow = indices[i, ],
+                    separatePValues = separatePValues
+                )
+                secondStagePValues[i, 2] <- 1 - int3
             }
         }
 

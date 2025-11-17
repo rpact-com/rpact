@@ -35,10 +35,9 @@ double integrateInfinite(const T* integrand,
     return result;
 }
 
-
-class DunnettIntegrand1 {
-private:
-    double criticalValue;
+// Base class for Dunnett integrands
+class DunnettIntegrandBase {
+protected:
     double informationAtInterim;
     NumericMatrix signedTestStatistics;
     NumericVector frac;
@@ -47,21 +46,60 @@ private:
     
 public:
     // Constructor
-    DunnettIntegrand1(double criticalValue_,
-                     double informationAtInterim_,
-                     NumericMatrix signedTestStatistics_,
-                     NumericVector frac_,
-                     LogicalVector indicesRow_)
-        : criticalValue(criticalValue_),
-          informationAtInterim(informationAtInterim_),
+    DunnettIntegrandBase(double informationAtInterim_,
+                        NumericMatrix signedTestStatistics_,
+                        NumericVector frac_,
+                        LogicalVector indicesRow_)
+        : informationAtInterim(informationAtInterim_),
           signedTestStatistics(signedTestStatistics_),
           frac(frac_),
           indicesRow(indicesRow_) {
         gMax = signedTestStatistics.nrow();
     }
     
+    virtual ~DunnettIntegrandBase() {}
+    
+    // Pure virtual function to be implemented by derived classes
+    virtual double evaluate(double x) const = 0;
+    
+    // Vectorized evaluation for integration
+    void evaluateVector(double *x, int n) const {
+        for (int i = 0; i < n; i++) {
+            x[i] = evaluate(x[i]);
+        }
+    }
+    
+    // Integration function - can be used by all derived classes
+    template<typename Derived>
+    double integrate() const {
+        return integrateInfinite(static_cast<const Derived*>(this));
+    }
+};
+
+// Template function to generate static wrapper for derived classes
+template<typename T>
+void dunnettWrapperFunction(double *x, int n, void *ex) {
+    const T *integrand = static_cast<const T*>(ex);
+    integrand->evaluateVector(x, n);
+}
+
+class DunnettIntegrand1 : public DunnettIntegrandBase {
+private:
+    double criticalValue;
+    
+public:
+    // Constructor
+    DunnettIntegrand1(double criticalValue_,
+                     double informationAtInterim_,
+                     NumericMatrix signedTestStatistics_,
+                     NumericVector frac_,
+                     LogicalVector indicesRow_)
+        : DunnettIntegrandBase(informationAtInterim_, signedTestStatistics_, frac_, indicesRow_),
+          criticalValue(criticalValue_) {
+    }
+    
     // Function to evaluate the integrand at a single point
-    double evaluate(double x) const {
+    double evaluate(double x) const override {
         double innerProduct = 1.0;
         
         for (int g = 0; g < gMax; g++) {
@@ -78,27 +116,98 @@ public:
         return innerProduct * R::dnorm(x, 0.0, 1.0, 0);
     }
     
-    // Vectorized evaluation for integration
-    void evaluateVector(double *x, int n) const {
-        for (int i = 0; i < n; i++) {
-            x[i] = evaluate(x[i]);
-        }
-    }
-    
-    // Static wrapper function for Rdqagi - can be used with C-style function pointers
+    // Static wrapper function for Rdqagi
     static void wrapperFunction(double *x, int n, void *ex) {
-        const DunnettIntegrand1 *integrand = static_cast<const DunnettIntegrand1*>(ex);
-        integrand->evaluateVector(x, n);
-    }
-    
-    // Integration function
-    double integrate() const {
-        return integrateInfinite(this);
+        dunnettWrapperFunction<DunnettIntegrand1>(x, n, ex);
     }
 };
 
-// [[Rcpp::export(name = ".dunnetIntegrand1IntCpp")]]
-double dunnetIntegrand1Int(double criticalValue,
+class DunnettIntegrand2 : public DunnettIntegrandBase {
+private:
+    double maxOverallTestStatistic;
+    NumericMatrix overallTestStatistics;
+    
+public:
+    // Constructor
+    DunnettIntegrand2(double maxOverallTestStatistic_,
+                     double informationAtInterim_,
+                     NumericMatrix signedTestStatistics_,
+                     NumericVector frac_,
+                     LogicalVector indicesRow_,
+                     NumericMatrix overallTestStatistics_)
+        : DunnettIntegrandBase(informationAtInterim_, signedTestStatistics_, frac_, indicesRow_),
+          maxOverallTestStatistic(maxOverallTestStatistic_),
+          overallTestStatistics(overallTestStatistics_) {
+    }
+    
+    // Function to evaluate the integrand at a single point
+    double evaluate(double x) const override {
+        double innerProduct = 1.0;
+        
+        for (int g = 0; g < gMax; g++) {
+            if (indicesRow[g] && !R_IsNA(overallTestStatistics(g, 1))) {
+                double numerator = maxOverallTestStatistic -
+                    sqrt(informationAtInterim) * signedTestStatistics(g, 0) +
+                    sqrt(1.0 - informationAtInterim) * sqrt(frac[g]) * x;
+                double denominator = sqrt((1.0 - informationAtInterim) * (1.0 - frac[g]));
+                
+                innerProduct *= R::pnorm(numerator / denominator, 0.0, 1.0, 1, 0);
+            }
+        }
+        
+        return innerProduct * R::dnorm(x, 0.0, 1.0, 0);
+    }
+    
+    // Static wrapper function for Rdqagi
+    static void wrapperFunction(double *x, int n, void *ex) {
+        dunnettWrapperFunction<DunnettIntegrand2>(x, n, ex);
+    }
+};
+
+class DunnettIntegrand3 : public DunnettIntegrandBase {
+private:
+    double maxTestStatistic;
+    NumericMatrix separatePValues;
+    
+public:
+    // Constructor
+    DunnettIntegrand3(double maxTestStatistic_,
+                     NumericVector frac_,
+                     LogicalVector indicesRow_,
+                     NumericMatrix separatePValues_)
+        : DunnettIntegrandBase(0.0, // informationAtInterim not used in this integrand
+                              NumericMatrix(0, 0), // signedTestStatistics not used
+                              frac_,
+                              indicesRow_),
+          maxTestStatistic(maxTestStatistic_),
+          separatePValues(separatePValues_) {
+        gMax = separatePValues.nrow();
+    }
+    
+    // Function to evaluate the integrand at a single point
+    double evaluate(double x) const override {
+        double innerProduct = 1.0;
+        
+        for (int g = 0; g < gMax; g++) {
+            if (indicesRow[g] && !R_IsNA(separatePValues(g, 1))) {
+                double numerator = maxTestStatistic + sqrt(frac[g]) * x;
+                double denominator = sqrt(1.0 - frac[g]);
+                
+                innerProduct *= R::pnorm(numerator / denominator, 0.0, 1.0, 1, 0);
+            }
+        }
+        
+        return innerProduct * R::dnorm(x, 0.0, 1.0, 0);
+    }
+    
+    // Static wrapper function for Rdqagi
+    static void wrapperFunction(double *x, int n, void *ex) {
+        dunnettWrapperFunction<DunnettIntegrand3>(x, n, ex);
+    }
+};
+
+// [[Rcpp::export(name = ".dunnettIntegrand1IntCpp")]]
+double dunnettIntegrand1Int(double criticalValue,
                         double informationAtInterim,
                         NumericMatrix signedTestStatistics,
                         NumericVector frac,
@@ -107,14 +216,11 @@ double dunnetIntegrand1Int(double criticalValue,
     DunnettIntegrand1 integrand(criticalValue, informationAtInterim, 
                                signedTestStatistics, frac, indicesRow);
     
-    // Compute the integral
-    double integralValue = integrand.integrate();    
-    return integralValue;
+    return integrand.integrate<DunnettIntegrand1>();
 }
 
-// Separate export for evaluating the function at specific points
-// [[Rcpp::export(name = ".dunnetIntegrand1EvaluateCpp")]]
-NumericVector dunnetIntegrand1Evaluate(NumericVector x,
+// [[Rcpp::export(name = ".dunnettIntegrand1EvaluateCpp")]]
+NumericVector dunnettIntegrand1Evaluate(NumericVector x,
                                          double criticalValue,
                                          double informationAtInterim,
                                          NumericMatrix signedTestStatistics,
@@ -123,6 +229,74 @@ NumericVector dunnetIntegrand1Evaluate(NumericVector x,
     
     DunnettIntegrand1 integrand(criticalValue, informationAtInterim, 
                                signedTestStatistics, frac, indicesRow);
+    
+    int n = x.size();
+    NumericVector result(n);
+    
+    for (int i = 0; i < n; i++) {
+        result[i] = integrand.evaluate(x[i]);
+    }
+    
+    return result;
+}
+
+// [[Rcpp::export(name = ".dunnettIntegrand2IntCpp")]]
+double dunnettIntegrand2Int(double maxOverallTestStatistic,
+                        double informationAtInterim,
+                        NumericMatrix signedTestStatistics,
+                        NumericVector frac,
+                        LogicalVector indicesRow,
+                        NumericMatrix overallTestStatistics) {
+    
+    DunnettIntegrand2 integrand(maxOverallTestStatistic, informationAtInterim, 
+                               signedTestStatistics, frac, indicesRow, 
+                               overallTestStatistics);
+    
+    return integrand.integrate<DunnettIntegrand2>();
+}
+
+// [[Rcpp::export(name = ".dunnettIntegrand2EvaluateCpp")]]
+NumericVector dunnettIntegrand2Evaluate(NumericVector x,
+                                         double maxOverallTestStatistic,
+                                         double informationAtInterim,
+                                         NumericMatrix signedTestStatistics,
+                                         NumericVector frac,
+                                         LogicalVector indicesRow,
+                                         NumericMatrix overallTestStatistics) {
+    
+    DunnettIntegrand2 integrand(maxOverallTestStatistic, informationAtInterim, 
+                               signedTestStatistics, frac, indicesRow,
+                               overallTestStatistics);
+    
+    int n = x.size();
+    NumericVector result(n);
+    
+    for (int i = 0; i < n; i++) {
+        result[i] = integrand.evaluate(x[i]);
+    }
+    
+    return result;
+}
+
+// [[Rcpp::export(name = ".dunnettIntegrand3IntCpp")]]
+double dunnettIntegrand3Int(double maxTestStatistic,
+                        NumericVector frac,
+                        LogicalVector indicesRow,
+                        NumericMatrix separatePValues) {
+    
+    DunnettIntegrand3 integrand(maxTestStatistic, frac, indicesRow, separatePValues);
+    
+    return integrand.integrate<DunnettIntegrand3>();
+}
+
+// [[Rcpp::export(name = ".dunnettIntegrand3EvaluateCpp")]]
+NumericVector dunnettIntegrand3Evaluate(NumericVector x,
+                                         double maxTestStatistic,
+                                         NumericVector frac,
+                                         LogicalVector indicesRow,
+                                         NumericMatrix separatePValues) {
+    
+    DunnettIntegrand3 integrand(maxTestStatistic, frac, indicesRow, separatePValues);
     
     int n = x.size();
     NumericVector result(n);
