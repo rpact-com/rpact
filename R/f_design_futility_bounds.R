@@ -318,20 +318,17 @@ getFutilityBounds <- function(
             gsWeights <- c(sqrt(design$informationRates[1]), sqrt(1 - design$informationRates[1]))
         } else if (.isTrialDesignFisher(design)) {
             gsWeights <- c(1, sqrt((1 - design$informationRates[1]) / design$informationRates[1]))
-        } 
-        if (design$sided != 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Futility bounds conversion is available only for one-sided two-stage designs (sided = ", design$sided, ")",
-                call. = FALSE
-            )
         }
-        if (design$kMax != 2) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Futility bounds conversion is available only for one-sided two-stage designs (kMax = ", design$kMax, ")",
-                call. = FALSE
-            )
+        if (design$sided != 1 || design$kMax != 2) {
+            msg <- paste0(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale), 
+                " is available only for one-sided two-stage designs ")
+            if (design$sided != 1) {
+                stop(msg, "(sided = ", design$sided, ")", call. = FALSE)
+            }
+            if (design$kMax != 2) {
+                stop(msg, "(kMax = ", design$kMax, ")", call. = FALSE)
+            }
         }
         criticalValue <- design$criticalValues[2]
     }

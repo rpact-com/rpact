@@ -439,7 +439,17 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             self$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
             self$.initStages()
         },
-        hasChanged = function(kMax, alpha, sided, method, informationRates, alpha0Vec, userAlphaSpending, bindingFutility) {
+        hasChanged = function(
+                ...,
+                kMax, 
+                alpha, 
+                sided, 
+                method, 
+                informationRates, 
+                alpha0Vec, 
+                alpha0Scale, 
+                userAlphaSpending, 
+                bindingFutility) {
             informationRatesTemp <- informationRates
             if (any(is.na(informationRatesTemp))) {
                 informationRatesTemp <- .getInformationRatesDefault(kMax)
@@ -448,7 +458,9 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             if (any(is.na(alpha0VecTemp))) {
                 alpha0VecTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
             }
-
+            if (!isTRUE(all.equal(alpha0Scale, self$alpha0Scale))) {
+                return(TRUE)
+            }
             if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(TRUE)
             }
@@ -652,7 +664,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 name, "_old = ", .arrayToString(self$.formatComparisonResult(oldValue)), " (", .getClassName(oldValue), ")"
             ))
         },
-        hasChanged = function(...,
+        hasChanged = function(
+                ...,
                 kMax,
                 alpha,
                 beta,
@@ -663,6 +676,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 deltaPT0,
                 informationRates,
                 futilityBounds,
+                futilityBoundsScale,
                 optimizationCriterion,
                 typeBetaSpending,
                 gammaA,
@@ -682,7 +696,9 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             if (any(is.na(futilityBoundsTemp))) {
                 futilityBoundsTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
             }
-
+            if (!isTRUE(all.equal(futilityBoundsScale, self$futilityBoundsScale))) {
+                return(self$.pasteComparisonResult("futilityBoundsScale", futilityBoundsScale, self$futilityBoundsScale))
+            }
             if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(self$.pasteComparisonResult("kMax", kMax, self$kMax))
             }
