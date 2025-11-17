@@ -190,7 +190,7 @@ print.FutilityBounds <- function(x, ...) {
 #' Must be a one-sided two-stage group sequential design or Fisher's combination test design.
 #' @param theta Numeric. The assumed effect size under the alternative hypothesis.
 #' @param information Numeric vector of length 2. The information levels at the two stages.
-#' @param naAllowed Logical. Indicates if \code{NA} `sourceValue` are permitted. Default is \code{FALSE}.
+#' @param naAllowed Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.
 #' @inheritParams param_three_dots
 #'
 #' @details
