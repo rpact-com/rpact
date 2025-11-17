@@ -644,6 +644,37 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dunnetIntegrand1Int
+double dunnetIntegrand1Int(double criticalValue, double informationAtInterim, NumericMatrix signedTestStatistics, NumericVector frac, LogicalVector indicesRow);
+RcppExport SEXP _rpact_dunnetIntegrand1Int(SEXP criticalValueSEXP, SEXP informationAtInterimSEXP, SEXP signedTestStatisticsSEXP, SEXP fracSEXP, SEXP indicesRowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type criticalValue(criticalValueSEXP);
+    Rcpp::traits::input_parameter< double >::type informationAtInterim(informationAtInterimSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type signedTestStatistics(signedTestStatisticsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type frac(fracSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type indicesRow(indicesRowSEXP);
+    rcpp_result_gen = Rcpp::wrap(dunnetIntegrand1Int(criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dunnetIntegrand1Evaluate
+NumericVector dunnetIntegrand1Evaluate(NumericVector x, double criticalValue, double informationAtInterim, NumericMatrix signedTestStatistics, NumericVector frac, LogicalVector indicesRow);
+RcppExport SEXP _rpact_dunnetIntegrand1Evaluate(SEXP xSEXP, SEXP criticalValueSEXP, SEXP informationAtInterimSEXP, SEXP signedTestStatisticsSEXP, SEXP fracSEXP, SEXP indicesRowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type criticalValue(criticalValueSEXP);
+    Rcpp::traits::input_parameter< double >::type informationAtInterim(informationAtInterimSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type signedTestStatistics(signedTestStatisticsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type frac(fracSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type indicesRow(indicesRowSEXP);
+    rcpp_result_gen = Rcpp::wrap(dunnetIntegrand1Evaluate(x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getSimulatedStageMeansMultiArmCpp
 List getSimulatedStageMeansMultiArmCpp(Environment design, NumericVector muVector, double stDev, NumericVector plannedSubjects, std::string typeOfSelection, std::string effectMeasure, LogicalVector adaptations, double epsilonValue, double rValue, double threshold, NumericVector allocationRatioPlanned, NumericVector minNumberOfSubjectsPerStage, NumericVector maxNumberOfSubjectsPerStage, double conditionalPower, double thetaH1, double stDevH1, Function calcSubjectsFunction, bool calcSubjectsFunctionIsUserDefined, Nullable<Function> selectArmsFunction);
 RcppExport SEXP _rpact_getSimulatedStageMeansMultiArmCpp(SEXP designSEXP, SEXP muVectorSEXP, SEXP stDevSEXP, SEXP plannedSubjectsSEXP, SEXP typeOfSelectionSEXP, SEXP effectMeasureSEXP, SEXP adaptationsSEXP, SEXP epsilonValueSEXP, SEXP rValueSEXP, SEXP thresholdSEXP, SEXP allocationRatioPlannedSEXP, SEXP minNumberOfSubjectsPerStageSEXP, SEXP maxNumberOfSubjectsPerStageSEXP, SEXP conditionalPowerSEXP, SEXP thetaH1SEXP, SEXP stDevH1SEXP, SEXP calcSubjectsFunctionSEXP, SEXP calcSubjectsFunctionIsUserDefinedSEXP, SEXP selectArmsFunctionSEXP) {
@@ -949,6 +980,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_updateSubGroupVector", (DL_FUNC) &_rpact_updateSubGroupVector, 6},
     {"_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased", (DL_FUNC) &_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased, 27},
     {"_rpact_performSimulationEnrichmentSurvivalLoop", (DL_FUNC) &_rpact_performSimulationEnrichmentSurvivalLoop, 31},
+    {"_rpact_dunnetIntegrand1Int", (DL_FUNC) &_rpact_dunnetIntegrand1Int, 5},
+    {"_rpact_dunnetIntegrand1Evaluate", (DL_FUNC) &_rpact_dunnetIntegrand1Evaluate, 6},
     {"_rpact_getSimulatedStageMeansMultiArmCpp", (DL_FUNC) &_rpact_getSimulatedStageMeansMultiArmCpp, 19},
     {"_rpact_simulationMultiArmMeansInnerLoopCpp", (DL_FUNC) &_rpact_simulationMultiArmMeansInnerLoopCpp, 57},
     {"_rpact_hmm", (DL_FUNC) &_rpact_hmm, 9},

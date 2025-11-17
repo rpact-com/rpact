@@ -425,6 +425,146 @@ NULL
     ))
 }
 
+dunnetIntegrand1 <- function(
+    criticalValue,
+    informationAtInterim,
+    signedTestStatistics,
+    frac,
+    indicesRow
+) {
+    fun <- function(x) {
+        gMax <- nrow(signedTestStatistics)
+        innerProduct <- rep(1, length(x))
+        for (g in (1:gMax)) {
+            if (indicesRow[g] == 1) {
+                innerProduct <- innerProduct *
+                    stats::pnorm(
+                        ((criticalValue -
+                            sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
+                            sqrt(1 - informationAtInterim) * sqrt(frac[g]) * x)) /
+                            sqrt((1 - informationAtInterim) * (1 - frac[g]))
+                    )
+            }
+        }
+        innerProduct * dnorm(x)
+    }
+    int <- stats::integrate(fun, lower = -Inf, upper = Inf)$value
+    list(fun = fun, int = int)
+}
+
+.performClosedConditionalDunnettTestForSimulationRefactored <- function(
+    stageResults,
+    design,
+    indices,
+    criticalValuesDunnett,
+    successCriterion
+) {
+    testStatistics <- stageResults$testStatistics
+    separatePValues <- stageResults$separatePValues
+    subjectsPerStage <- stageResults$subjectsPerStage
+    overallTestStatistics <- stageResults$overallTestStatistics
+
+    gMax <- nrow(testStatistics)
+    informationAtInterim <- design$informationAtInterim
+    secondStageConditioning <- design$secondStageConditioning
+    kMax <- 2
+
+    frac <- rep(stageResults$allocationRatioPlanned[1], gMax) / (1 + stageResults$allocationRatioPlanned[1])
+
+    conditionalErrorRate <- matrix(NA_real_, nrow = 2^gMax - 1, ncol = 2)
+    secondStagePValues <- matrix(NA_real_, nrow = 2^gMax - 1, ncol = 2)
+    rejected <- matrix(FALSE, nrow = gMax, ncol = 2)
+    rejectedIntersections <- matrix(FALSE, nrow = nrow(indices), ncol = kMax)
+    futilityStop <- FALSE
+    successStop <- rep(FALSE, kMax)
+
+    signedTestStatistics <- testStatistics
+    signedOverallTestStatistics <- overallTestStatistics
+    signedOverallTestStatistics[, 2] <- sqrt(informationAtInterim) *
+        testStatistics[, 1] +
+        sqrt(1 - informationAtInterim) * testStatistics[, 2]
+
+    if (all(!stageResults$selectedArms[1:gMax, 2], na.rm = TRUE)) {
+        futilityStop <- TRUE
+    }
+
+    for (i in 1:(2^gMax - 1)) {
+        int1 <- .dunnetIntegrand1IntCpp(
+            criticalValue = criticalValuesDunnett[i],
+            informationAtInterim = informationAtInterim,
+            signedTestStatistics = signedTestStatistics,
+            frac = frac,
+            indicesRow = indices[i, ]
+        )
+        conditionalErrorRate[i, 1] <- 1 - int1
+
+        if (!all(is.na(separatePValues[indices[i, ] == 1, 2]))) {
+            if (secondStageConditioning) {
+                maxOverallTestStatistic <- max(
+                    signedOverallTestStatistics[indices[i, ] == 1, 2],
+                    na.rm = TRUE
+                )
+                integrand <- function(x) {
+                    innerProduct <- 1
+                    for (g in (1:gMax)) {
+                        if ((indices[i, g] == 1) && !is.na(overallTestStatistics[g, 2])) {
+                            innerProduct <- innerProduct *
+                                stats::pnorm(
+                                    ((maxOverallTestStatistic -
+                                        sqrt(informationAtInterim) * signedTestStatistics[g, 1] +
+                                        sqrt(1 - informationAtInterim) * sqrt(frac[g]) * x)) /
+                                        sqrt((1 - informationAtInterim) * (1 - frac[g]))
+                                )
+                        }
+                    }
+                    return(innerProduct * dnorm(x))
+                }
+                secondStagePValues[i, 2] <- 1 - stats::integrate(integrand, lower = -Inf, upper = Inf)$value
+            } else {
+                maxTestStatistic <- max(signedTestStatistics[indices[i, ] == 1, 2], na.rm = TRUE)
+                integrand <- function(x) {
+                    innerProduct <- 1
+                    for (g in (1:gMax)) {
+                        if ((indices[i, g] == 1) && !is.na(separatePValues[g, 2])) {
+                            innerProduct <- innerProduct *
+                                stats::pnorm(((maxTestStatistic + sqrt(frac[g]) * x)) / sqrt(1 - frac[g]))
+                        }
+                    }
+                    return(innerProduct * dnorm(x))
+                }
+                secondStagePValues[i, 2] <- 1 - stats::integrate(integrand, lower = -Inf, upper = Inf)$value
+            }
+        }
+
+        rejectedIntersections[i, 2] <- (secondStagePValues[i, 2] <= conditionalErrorRate[i, 1])
+
+        rejectedIntersections[is.na(rejectedIntersections[, 2]), 2] <- FALSE
+
+        if (!rejectedIntersections[1, 2]) {
+            break
+        }
+    }
+    for (j in 1:gMax) {
+        rejected[j, 2] <- all(rejectedIntersections[indices[, j] == 1, 2], na.rm = TRUE)
+    }
+    if (successCriterion == "all") {
+        successStop[2] <- all(rejected[stageResults$selectedArms[1:gMax, 2], 2])
+    } else {
+        successStop[2] <- any(rejected[, 2])
+    }
+
+    return(list(
+        separatePValues = separatePValues,
+        conditionalErrorRate = conditionalErrorRate,
+        secondStagePValues = secondStagePValues,
+        rejected = rejected,
+        rejectedIntersections = rejectedIntersections,
+        selectedArms = stageResults$selectedArms,
+        successStop = successStop,
+        futilityStop = futilityStop
+    ))
+}
+
 .createSimulationResultsMultiArmObject <- function(
     ...,
     design,

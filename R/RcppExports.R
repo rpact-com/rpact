@@ -129,6 +129,14 @@
     .Call(`_rpact_performSimulationEnrichmentSurvivalLoop`, cols, maxNumberOfIterations, design, weights, effectList, kappa, phi, eventTime, recruitmentTimes, allocationFraction, directionUpper, stratifiedAnalysis, plannedEvents, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectPopulationsFunction, indices, intersectionTest, successCriterion, gMax, kMax)
 }
 
+.dunnetIntegrand1IntCpp <- function(criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow) {
+    .Call(`_rpact_dunnetIntegrand1Int`, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow)
+}
+
+.dunnetIntegrand1EvaluateCpp <- function(x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow) {
+    .Call(`_rpact_dunnetIntegrand1Evaluate`, x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow)
+}
+
 .getSimulatedStageMeansMultiArmCpp <- function(design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
     .Call(`_rpact_getSimulatedStageMeansMultiArmCpp`, design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction)
 }
