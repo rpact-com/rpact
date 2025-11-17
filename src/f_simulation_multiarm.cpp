@@ -5,9 +5,36 @@
 using namespace Rcpp;
 
 // [[Rcpp::plugins(cpp11)]]
+// Template function for numerical integration over (-Inf, +Inf)
+// T must have a static wrapperFunction(double *x, int n, void *ex) method
+template<typename T>
+double integrateInfinite(const T* integrand, 
+                        double epsabs = 1e-4, 
+                        double epsrel = 1e-4) {
+    void *ex = (void*) integrand;
+    
+    double bound = 0.0;  // is ignored for inf = 2
+    int inf = 2;         // corresponds to (-Inf, +Inf)
+    double result = 0.0;
+    double abserr = 0.0;
+    int neval = 0;
+    int ier = 0;
+    int limit = 100;
+    int lenw = 400;
+    int last = 0;
+    int iwork[100];
+    double work[400];
+    
+    Rdqagi(T::wrapperFunction, ex, &bound, &inf, &epsabs, &epsrel, &result, 
+           &abserr, &neval, &ier, &limit, &lenw, &last, iwork, work);
+    
+    if (ier != 0) {
+        Rcpp::warning("Integration error code: %d", ier);
+    }
+    
+    return result;
+}
 
-// Forward declaration of the integration wrapper function
-void dunnetIntegrand1Wrapper(double *x, int n, void *ex);
 
 class DunnettIntegrand1 {
 private:
@@ -58,42 +85,17 @@ public:
         }
     }
     
+    // Static wrapper function for Rdqagi - can be used with C-style function pointers
+    static void wrapperFunction(double *x, int n, void *ex) {
+        const DunnettIntegrand1 *integrand = static_cast<const DunnettIntegrand1*>(ex);
+        integrand->evaluateVector(x, n);
+    }
+    
     // Integration function
     double integrate() const {
-        // Pack parameters into ex array
-        // We need to pass 'this' pointer through the void* ex parameter
-        void *ex = (void*) this;
-        
-        double bound = 0.0;  // is ignored for inf = 2
-        int inf = 2;       // corresponds to (-Inf, +Inf)
-        double epsabs = 1e-4;
-        double epsrel = 1e-4;
-        double result = 0.0;
-        double abserr = 0.0;
-        int neval = 0;
-        int ier = 0;
-        int limit = 100;
-        int lenw = 400;
-        int last = 0;
-        int iwork[100];
-        double work[400];
-        
-        Rdqagi(dunnetIntegrand1Wrapper, ex, &bound, &inf, &epsabs, &epsrel, &result, 
-               &abserr, &neval, &ier, &limit, &lenw, &last, iwork, work);
-        
-        if (ier != 0) {
-            Rcpp::warning("Integration error code: %d", ier);
-        }
-        
-        return result;
+        return integrateInfinite(this);
     }
 };
-
-// Wrapper function for Rdqagi - must be a C-style function
-void dunnetIntegrand1Wrapper(double *x, int n, void *ex) {
-    const DunnettIntegrand1 *integrand = static_cast<const DunnettIntegrand1*>(ex);
-    integrand->evaluateVector(x, n);
-}
 
 // [[Rcpp::export(name = ".dunnetIntegrand1IntCpp")]]
 double dunnetIntegrand1Int(double criticalValue,
