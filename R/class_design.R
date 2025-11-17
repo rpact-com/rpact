@@ -1026,7 +1026,7 @@ TrialDesignConditionalDunnett <- R6::R6Class("TrialDesignConditionalDunnett",
 #' p-values only in the design definition, and not in the analysis call.\cr
 #' See \code{\link[=getClosedConditionalDunnettTestResults]{getClosedConditionalDunnettTestResults()}}
 #' for an example and Koenig et al. (2008) and
-#' Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
+#' Wassmer & Brannath (2025), chapter 11 for details of the test procedure.
 #'
 #' @template return_object_trial_design
 #' @template how_to_get_help_for_generics

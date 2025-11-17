@@ -718,7 +718,7 @@ getClosedCombinationTestResults <- function(stageResults) {
 #' @details
 #' For performing the conditional Dunnett test the design must be defined through the function
 #' \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}.\cr
-#' See Koenig et al. (2008) and Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
+#' See Koenig et al. (2008) and Wassmer & Brannath (2025), chapter 11 for details of the test procedure.
 #'
 #' @template return_object_closed_combination_test_results
 #' @template how_to_get_help_for_generics
