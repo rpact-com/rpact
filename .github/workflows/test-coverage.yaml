@@ -34,7 +34,7 @@ jobs:
         with:
           repository: 'rpact-com/rpact.tests'
           ref: main
-          token: ${{ secrets.RPACT_TESTS_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: 'private-tests'
           sparse-checkout: |
             tests
