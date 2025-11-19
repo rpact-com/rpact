@@ -1243,14 +1243,25 @@ plot.TrialDesignSet <- function(
             colour = .data[["legend"]]
         ),
         size = plotSettings$scaleSize(plotSettings$pointSize, TRUE),
-        shape = 4, stroke = 1.25, show.legend = FALSE
+        shape = 4, 
+        stroke = 1.25, 
+        show.legend = TRUE
+    )
+    p <- p + ggplot2::guides(
+        colour = ggplot2::guide_legend(
+            override.aes = list(
+                shape = c(NA, NA, 4)
+            )
+        )
     )
 
     for (i in 1:nrow(data)) {
         label <- paste0("(", round(data[i, 1], 3), ", ", round(data[i, 2], 3), ")")
         p <- p + ggplot2::annotate("text",
-            x = data[i, 1], y = data[i, 2],
-            label = label, vjust = plotSettings$scaleSize(3.0),
+            x = data[i, 1], 
+            y = data[i, 2],
+            label = label, 
+            vjust = plotSettings$scaleSize(3.0),
             size = plotSettings$scaleSize(2.5)
         )
     }

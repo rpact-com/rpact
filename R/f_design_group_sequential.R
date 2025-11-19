@@ -1134,6 +1134,7 @@ getDesignInverseNormal <- function(
             betaAdjustment = betaAdjustment,
             constantBoundsHP = constantBoundsHP,
             twoSidedPower = twoSidedPower,
+            delayedInformation = NA_real_,
             tolerance = tolerance,
             efficacyStops = efficacyStops,
             futilityStops = futilityStops)
@@ -1169,6 +1170,7 @@ getDesignInverseNormal <- function(
         betaAdjustment = betaAdjustment,
         constantBoundsHP = constantBoundsHP,
         twoSidedPower = twoSidedPower,
+        delayedInformation = NA_real_,
         tolerance = tolerance,
         efficacyStops = efficacyStops,
         futilityStops = futilityStops))
@@ -1198,6 +1200,7 @@ getDesignInverseNormal <- function(
         betaAdjustment,
         constantBoundsHP,
         twoSidedPower,
+        delayedInformation,
         tolerance,
         efficacyStops,
         futilityStops
@@ -1247,6 +1250,7 @@ getDesignInverseNormal <- function(
         betaAdjustment = betaAdjustment,
         constantBoundsHP = constantBoundsHP,
         twoSidedPower = twoSidedPower,
+        delayedInformation = delayedInformation,
         tolerance = tolerance,
         userFunctionCallEnabled = TRUE
     ))
@@ -2169,6 +2173,7 @@ getDesignGroupSequential <- function(...,
             betaAdjustment = betaAdjustment,
             constantBoundsHP = constantBoundsHP,
             twoSidedPower = twoSidedPower,
+            delayedInformation = NA_real_,
             tolerance = tolerance,
             efficacyStops = efficacyStops,
             futilityStops = futilityStops)
@@ -2204,6 +2209,7 @@ getDesignGroupSequential <- function(...,
         betaAdjustment = betaAdjustment,
         constantBoundsHP = constantBoundsHP,
         twoSidedPower = twoSidedPower,
+        delayedInformation = delayedInformation,
         tolerance = tolerance,
         efficacyStops = efficacyStops,
         futilityStops = futilityStops))

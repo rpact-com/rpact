@@ -50,7 +50,7 @@ You can define the information fraction and the way of how to compute the second
 p-values only in the design definition, and not in the analysis call.\cr
 See \code{\link[=getClosedConditionalDunnettTestResults]{getClosedConditionalDunnettTestResults()}}
 for an example and Koenig et al. (2008) and
-Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
+Wassmer & Brannath (2025), chapter 11 for details of the test procedure.
 }
 \section{How to get help for generic functions}{
 

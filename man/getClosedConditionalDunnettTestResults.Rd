@@ -36,7 +36,7 @@ Calculates and returns the results from the closed conditional Dunnett test.
 \details{
 For performing the conditional Dunnett test the design must be defined through the function
 \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}.\cr
-See Koenig et al. (2008) and Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
+See Koenig et al. (2008) and Wassmer & Brannath (2025), chapter 11 for details of the test procedure.
 }
 \section{How to get help for generic functions}{
 
