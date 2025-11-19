@@ -18,7 +18,13 @@
 NULL
 
 .getFutilityBoundInformations <- function(..., information, sourceScale, targetScale) {
-    if (!is.null(information) && !all(is.na(information)) && length(information) > 0) {
+    args <- list(...)
+    separateInformationArguments <- length(args) > 0 && 
+        !is.null(names(args)) && 
+        any(c("information1", "information2") %in% names(args))
+    
+    if (!separateInformationArguments && !is.null(information) && 
+            !all(is.na(information)) && length(information) > 0) {
         len <- .getFutilityBoundVectorLength(sourceScale, targetScale)
         .assertIsNumericVector(information, "information", naAllowed = TRUE, len = len)
         return(list(

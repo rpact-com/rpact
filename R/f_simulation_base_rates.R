@@ -518,6 +518,10 @@ getSimulationRates <- function(design = NULL, ...,
     simulationResults$futilityPerStage <- cppResult$futilityPerStage
     simulationResults$futilityStop <- cppResult$futilityStop
     simulationResults$earlyStop <- cppResult$earlyStop
+    if (design$kMax > 1) {
+        simulationResults$.setParameterType("futilityStop", C_PARAM_GENERATED)
+        simulationResults$.setParameterType("earlyStop", C_PARAM_GENERATED)
+    }
     simulationResults$expectedNumberOfSubjects <- cppResult$expectedNumberOfSubjects
     simulationResults$conditionalPowerAchieved <- cppResult$conditionalPowerAchieved
 

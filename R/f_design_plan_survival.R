@@ -1517,6 +1517,7 @@ NULL
         designPlan$.setParameterType("futilityStop", C_PARAM_GENERATED)
 
         designPlan$earlyStop <- designPlan$earlyStop + sum(designPlan$futilityPerStage)
+        designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
     }
 
     designPlan$informationRates <- matrix(informationRates, ncol = 1)
@@ -2722,6 +2723,9 @@ getPowerSurvival <- function(design = NULL, ...,
         designPlan$.setParameterType("futilityStop", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("earlyStop", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("rejectPerStage", C_PARAM_NOT_APPLICABLE)
+    } else {
+        designPlan$.setParameterType("futilityStop", C_PARAM_GENERATED)
+        designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
     }
 
     if (!any(is.na(designPlan$analysisTime)) && !any(is.na(designPlan$accrualTime))) {

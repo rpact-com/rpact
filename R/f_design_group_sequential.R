@@ -1328,6 +1328,7 @@ getDesignInverseNormal <- function(
         sided = C_SIDED_DEFAULT,
         informationRates = NA_real_,
         futilityBounds = NA_real_,
+        futilityBoundsScale = "zValue",
         typeOfDesign = C_DEFAULT_TYPE_OF_DESIGN,
         deltaWT = NA_real_,
         deltaPT1 = NA_real_,

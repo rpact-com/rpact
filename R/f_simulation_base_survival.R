@@ -823,6 +823,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         simulationResults$futilityStop <- matrix(overview$futilityStop, nrow = design$kMax)[1, ]
         simulationResults$earlyStop <- simulationResults$futilityStop +
             simulationResults$overallReject - simulationResults$rejectPerStage[design$kMax, ]
+        simulationResults$.setParameterType("earlyStop", C_PARAM_GENERATED)
     } else {
         simulationResults$futilityStop <- rep(0, numberOfResults)
         simulationResults$earlyStop <- rep(0, numberOfResults)
