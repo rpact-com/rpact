@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.3.0.9293
-Date: 2025-10-29
+Version: 4.3.0.9295
+Date: 2025-11-19
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -44,7 +44,7 @@ Authors@R: c(
     	comment = c(ORCID = "0000-0002-4111-1941"), 
     	role = c("ctb")
 	))
-Description: Design and analysis of confirmatory adaptive clinical trials with continuous, binary, and survival endpoints according to the methods described in the monograph by Wassmer and Brannath (2016) <doi:10.1007/978-3-319-32562-0>. This includes classical group sequential as well as multi-stage adaptive hypotheses tests that are based on the combination testing principle.
+Description: Design and analysis of confirmatory adaptive clinical trials with continuous, binary, and survival endpoints according to the methods described in the monograph by Wassmer and Brannath (2025) <doi:10.1007/978-3-031-89669-9>. This includes classical group sequential as well as multi-stage adaptive hypotheses tests that are based on the combination testing principle.
 License: LGPL-3
 Encoding: UTF-8
 LazyData: true

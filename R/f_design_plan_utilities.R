@@ -262,6 +262,7 @@ NULL
             designPlan$.setParameterType("futilityStop", C_PARAM_GENERATED)
 
             designPlan$earlyStop <- designPlan$earlyStop + sum(designPlan$futilityPerStage)
+            designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
         }
     }
 

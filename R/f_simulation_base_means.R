@@ -519,6 +519,8 @@ getSimulationMeans <- function(design = NULL, ...,
             }
             simulationResults$earlyStop <- colSums(cppResult$futilityPerStage) + rejectPerStageColSum
         }
+        simulationResults$.setParameterType("earlyStop", C_PARAM_GENERATED)
+        simulationResults$.setParameterType("futilityStop", C_PARAM_GENERATED)
     } else {
         simulationResults$earlyStop <- rep(0, length(alternative))
     }

@@ -387,16 +387,18 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
     return(.getFormattedValue(value, digits = digits, nsmall = nsmall))
 }
 
-#
-# @title
-# Format Sample Sizes
-#
-# @description
-# Formats the output of sample sizes.
-#
-# @details
-# Digits = 1, nsmall = 1
-#
+#'
+#' @title
+#' Format Sample Sizes
+#'
+#' @description
+#' Formats the output of sample sizes.
+#'
+#' @details
+#' Digits = 1, nsmall = 1
+#'
+#' @noRd 
+#' 
 .formatSampleSizes <- function(value) {
     x <- .getOptionBasedFormattedValue(
         optionKey = "rpact.output.format.sample.size",

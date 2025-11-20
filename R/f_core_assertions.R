@@ -1704,6 +1704,15 @@ NULL
             ifelse(inherits(arg, "StageResults"), "stageResultsName", paste0("%param", i, "%")),
             argNames[i]
         )
+        if (is(arg, "FutilityBounds")) {
+            if (grepl("^getDesign(InverseNormal|GroupSequential)", functionName)) {
+                next
+            }
+            if (grepl("^getDesignFisher", functionName)) {
+                argName <- "futilityBounds"
+            }
+        }
+        
         if (!(argName %in% ignore) && !grepl("^\\.", argName)) {
             if (.isResultObjectBaseClass(arg) || is.environment(arg)) {
                 arg <- .getClassName(arg)
@@ -3671,22 +3680,26 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         effectEstimate = c("information[1]"),
         conditionalPower = c("design", "theta", "information[2]"),
         condPowerAtObserved = c("design", "information"),
-        predictivePower = c("design", "information")
+        predictivePower = c("design", "information"),
+        reverseCondPower = c("design")
     ),
     "separate" = list(
         effectEstimate = c("information1"),
         conditionalPower = c("design", "theta", "information2"),
         condPowerAtObserved = c("design", "information1", "information2"),
-        predictivePower = c("design", "information1", "information2")
+        predictivePower = c("design", "information1", "information2"),
+        reverseCondPower = c("design")
     )
 )
 
 .getFutilityBoundVectorLength = function(sourceScale, targetScale) {
-    if (sourceScale == "effectEstimate" && !targetScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
+    if (sourceScale == "effectEstimate" && 
+            !targetScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
         return(1L)
     }
     
-    if (targetScale == "effectEstimate" && !sourceScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
+    if (targetScale == "effectEstimate" && 
+            !sourceScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
         return(1L)
     }
     
@@ -3782,8 +3795,10 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     )
     information1 <- infos$information1
     information2 <- infos$information2
+    information <- infos$information
     
     .checkForUnnecessaryFutilityBoundsScaleArgs("design", design, sourceScale, targetScale, scalesWithReverse)
+    
     if (infos$vectorInput) {
         .checkForUnnecessaryFutilityBoundsScaleArgs("information", information, sourceScale, targetScale, scalesWithEffect)
     } else {

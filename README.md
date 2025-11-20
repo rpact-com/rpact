@@ -8,9 +8,9 @@
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) 
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0) 
 [![Codecov test coverage](https://codecov.io/gh/rpact-com/rpact/branch/main/graph/badge.svg)](https://app.codecov.io/gh/rpact-com/rpact?branch=main)
-[![](https://img.shields.io/badge/DOI-10.1007/978--3--319--32562--0-yellow.svg?logo=doi)](https://doi.org/10.1007/978-3-319-32562-0) 
-[![](https://img.shields.io/badge/RPACT-Cloud-blue.svg?logo=r)](https://rpact.shinyapps.io/cloud)
-[![](https://img.shields.io/badge/RPACT-Connect-669999.svg?labelColor=336699)](https://rpact.shinyapps.io/connect)
+[![](https://img.shields.io/badge/DOI-10.1007/978--3--031--89669--9-yellow.svg?logo=doi)](https://doi.org/10.1007/978-3-031-89669-9) 
+[![](https://img.shields.io/badge/RPACT-Cloud-blue.svg?logo=r)](https://rpact-cloud.share.connect.posit.cloud)
+[![](https://img.shields.io/badge/RPACT-Connect-669999.svg?labelColor=336699)](https://rpact-connect.share.connect.posit.cloud)
  <!-- badges: end -->
 
 # rpact <a href="https://www.rpact.com"><img src="man/figures/logo.png" align="right" height="138" /></a>
@@ -67,7 +67,7 @@ The vignettes are hosted at
 ## RPACT Connect
 
 Connecting you to insights, downloads, and premium support:
-[connect.rpact.com](https://rpact.shinyapps.io/connect)
+[connect.rpact.com](https://rpact-connect.share.connect.posit.cloud)
 
 ## The RPACT User Group
 
@@ -101,7 +101,7 @@ with `testPackage()`.
     [LGPL-3](https://cran.r-project.org/web/licenses/LGPL-3)
   - particularly, implements the methods described in the recent
     monograph by [Wassmer and Brannath
-    (2016)](https://doi.org/10.1007%2F978-3-319-32562-0)
+    (2025)](https://doi.org/10.1007%2F978-3-031-89669-9)
 
 > For more information please visit
 > [www.rpact.org](https://www.rpact.org)

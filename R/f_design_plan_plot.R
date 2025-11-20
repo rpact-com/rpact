@@ -185,10 +185,6 @@
 }
 
 .getPlotAlphaBetaSpentParameterNames <- function(designMaster, ...) {
-    if (length(list(...)) == 0) {
-        return("alphaSpent")
-    }
-    
     if (.isTrialDesignFisher(designMaster) ||
             designMaster$typeBetaSpending == C_TYPE_OF_DESIGN_BS_NONE) {
         return("alphaSpent")
@@ -198,8 +194,12 @@
     if (is.na(alphaSpentEnabled)) {
         alphaSpentEnabled <- isTRUE(as.logical(getOption("rpact.plot.show.alpha.spent", TRUE)))
     }
-    betaSpentEnabled <- isTRUE(as.logical(getOption("rpact.plot.show.beta.spent", FALSE))) || 
-        isTRUE(.getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = FALSE))
+
+    betaSpentEnabled <- .getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(betaSpentEnabled)) {
+        betaSpentEnabled <- isTRUE(as.logical(getOption("rpact.plot.show.beta.spent", FALSE)))
+    }
+    
     yParameterNames <- character()
     if (alphaSpentEnabled) {
         yParameterNames <- c(yParameterNames, "alphaSpent")

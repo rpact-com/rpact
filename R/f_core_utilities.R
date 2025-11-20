@@ -994,7 +994,7 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
             Sys.setenv(LANGUAGE = language)
 
             if (inclusiveR) {
-                citR <- utils::capture.output(print(citation("base"), bibtex = FALSE))
+                citR <- utils::capture.output(print(utils::citation("base"), bibtex = FALSE))
                 indices <- which(citR == "")
                 indices <- indices[indices != 1 & indices != length(citR)]
                 if (length(indices) > 1) {
@@ -1004,7 +1004,7 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
                 cat("\n", trimws(paste(citR, collapse = "\n")), "\n\n", sep = "")
             }
 
-            print(citation("rpact"), bibtex = FALSE)
+            print(utils::citation("rpact"), bibtex = FALSE)
         },
         finally = {
             Sys.setenv(LANGUAGE = currentLanguage)
