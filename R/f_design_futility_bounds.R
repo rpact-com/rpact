@@ -150,7 +150,7 @@ print.FutilityBounds <- function(x, ...) {
                 .warnInCaseOfUnusedArgument(
                     futilityBoundsScale, 
                     "futilityBoundsScale", 
-                    defaultValue = "zScale",
+                    defaultValue = "zValue",
                     functionName = functionName)
             }
         }

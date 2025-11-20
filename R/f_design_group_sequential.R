@@ -2174,7 +2174,7 @@ getDesignGroupSequential <- function(...,
             betaAdjustment = betaAdjustment,
             constantBoundsHP = constantBoundsHP,
             twoSidedPower = twoSidedPower,
-            delayedInformation = NA_real_,
+            delayedInformation = delayedInformation,
             tolerance = tolerance,
             efficacyStops = efficacyStops,
             futilityStops = futilityStops)
