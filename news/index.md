@@ -104,7 +104,7 @@ CRAN release: 2025-03-24
   repository. Only members of the ‘RPACT User Group’ have access to the
   tests. For more information, please visit:
   [rpact.org/iq](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/)
-  and [RPACT Connect](https://rpact.shinyapps.io/connect)
+  and [RPACT Connect](https://rpact-connect.share.connect.posit.cloud)
 - Usage of `maxInformation` improved (see enhancement
   [\#65](https://github.com/rpact-com/rpact/issues/65))
 - Line breaks in the output of
@@ -302,7 +302,8 @@ CRAN release: 2024-01-25
 - Argument `theta` can be used for plotting of sample size and power
   results
 - Pipe operator usage improved
-- Shiny app link changed to <https://rpact.shinyapps.io/cloud>
+- Shiny app link changed to
+  <https://rpact-cloud.share.connect.posit.cloud>
 - Several minor improvements
 
 ## rpact 3.4.0

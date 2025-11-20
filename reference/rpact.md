@@ -4,7 +4,7 @@ rpact (R Package for Adaptive Clinical Trials) is a comprehensive
 package that enables the design, simulation, and analysis of
 confirmatory adaptive group sequential designs. Particularly, the
 methods described in the recent monograph by Wassmer and Brannath
-(published by Springer, 2016) are implemented. It also comprises
+(published by Springer, 2025) are implemented. It also comprises
 advanced methods for sample size calculations for fixed sample size
 designs incl., e.g., sample size calculation for survival trials with
 piecewise exponentially distributed survival times and staggered
@@ -42,10 +42,10 @@ rpact is developed by
 
 ## References
 
-Wassmer, G., Brannath, W. (2016) Group Sequential and Confirmatory
+Wassmer, G., Brannath, W. (2025) Group Sequential and Confirmatory
 Adaptive Designs in Clinical Trials (Springer Series in Pharmaceutical
 Statistics;
-[doi:10.1007/978-3-319-32562-0](https://doi.org/10.1007/978-3-319-32562-0)
+[doi:10.1007/978-3-031-89669-9](https://doi.org/10.1007/978-3-031-89669-9)
 )
 
 ## See also

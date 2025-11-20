@@ -28,6 +28,7 @@ getDesignInverseNormal(
   futilityStops = NA,
   gammaB = NA_real_,
   bindingFutility = NA,
+  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower"),
   directionUpper = NA,
   betaAdjustment = NA,
   constantBoundsHP = 3,
@@ -79,8 +80,8 @@ getDesignInverseNormal(
 
 - futilityBounds:
 
-  The futility bounds, defined on the test statistic z scale (numeric
-  vector of length `kMax - 1`).
+  The futility bounds, defined on the scale defined by
+  `futilityBoundsScale`. (numeric vector of length `kMax - 1`).
 
 - typeOfDesign:
 
@@ -154,6 +155,12 @@ getDesignInverseNormal(
   the critical values is affected by the futility bounds and the
   futility threshold is binding in the sense that the study must be
   stopped if the futility condition was reached (default is `FALSE`).
+
+- futilityBoundsScale:
+
+  Character. The scale of the futility bounds. Must be one of
+  `"zValue"`, `"pValue"`, or `"reverseCondPower"`. Default is
+  `"zValue"`.
 
 - directionUpper:
 

@@ -82,7 +82,7 @@ way of how to compute the second stage p-values only in the design
 definition, and not in the analysis call.  
 See
 [`getClosedConditionalDunnettTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedConditionalDunnettTestResults.md)
-for an example and Koenig et al. (2008) and Wassmer & Brannath (2016),
+for an example and Koenig et al. (2008) and Wassmer & Brannath (2025),
 chapter 11 for details of the test procedure.
 
 ## How to get help for generic functions

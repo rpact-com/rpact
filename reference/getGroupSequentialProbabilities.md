@@ -49,7 +49,7 @@ the cumulative probabilities for values specified in decisionMatrix and
 Inf, and reaching the stage, i.e., the test statistics is in the
 continuation region for the preceding stages. For 4 rows, the
 continuation region contains of two regions and the probability matrix
-is obtained analogously (cf., Wassmer and Brannath, 2016).
+is obtained analogously (cf., Wassmer and Brannath, 2025).
 
 ## See also
 
