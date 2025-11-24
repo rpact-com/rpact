@@ -122,7 +122,7 @@ NULL
 .getStageResultsSurvivalEnrichment <- function(..., 
         design, 
         dataInput,
-        thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT,
+        thetaH0 = NA_real_,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
@@ -131,6 +131,7 @@ NULL
     .assertIsTrialDesign(design)
     .assertIsDatasetSurvival(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
+    thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
     .assertIsSingleLogical(calculateSingleStepAdjusted, "calculateSingleStepAdjusted")
     .warnInCaseOfUnknownArguments(
         functionName = ".getStageResultsSurvivalEnrichment",

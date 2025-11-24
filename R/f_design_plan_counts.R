@@ -703,7 +703,7 @@
     if (any(is.na(allocationRatioPlanned))) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
-
+    
     .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     .assertIsValidEffectCountData(
         sampleSizeEnabled = sampleSizeEnabled,
@@ -735,7 +735,7 @@
     .setValueAndParameterType(designPlan, "lambda2", lambda2, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "lambda", lambda, NA_real_, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "theta", theta, NA_real_, notApplicableIfNA = TRUE)
-    .setValueAndParameterType(designPlan, "thetaH0", thetaH0, 1, notApplicableIfNA = TRUE)
+    .setValueAndParameterType(designPlan, "thetaH0", thetaH0, C_THETA_H0_COUNTS_DEFAULT, notApplicableIfNA = TRUE)
     .setValueAndParameterType(designPlan, "overdispersion", overdispersion, 0)
     .setValueAndParameterType(designPlan, "fixedExposureTime",
         fixedExposureTime, NA_real_,

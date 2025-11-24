@@ -408,7 +408,7 @@ NULL
         ...,
         design,
         dataInput,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT,
+        thetaH0 = NA_real_,
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         equalVariances = C_EQUAL_VARIANCES_DEFAULT,
@@ -416,6 +416,7 @@ NULL
         userFunctionCallEnabled = FALSE) {
     .assertIsDatasetMeans(dataInput = dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
+    thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsSingleLogical(equalVariances, "equalVariances")
     .warnInCaseOfUnknownArguments(

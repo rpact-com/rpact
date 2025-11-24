@@ -1822,7 +1822,8 @@ NULL
     .assertPackageIsInstalled("testthat")
 }
 
-.assertIsValidThetaH0 <- function(thetaH0,
+.assertIsValidThetaH0 <- function(
+        thetaH0,
         ...,
         endpoint = c("means", "rates", "survival", "counts"),
         groups,
@@ -1854,15 +1855,8 @@ NULL
 }
 
 .assertIsValidThetaH0DataInput <- function(thetaH0, dataInput, ..., naAllowed = TRUE) {
-    if (.isDatasetRates(dataInput)) {
-        endpoint <- "rates"
-    } else if (.isDatasetSurvival(dataInput)) {
-        endpoint <- "survival"
-    } else {
-        endpoint <- "means"
-    }
     .assertIsValidThetaH0(thetaH0,
-        endpoint = endpoint,
+        endpoint = .getDatasetEndpoint(dataInput),
         groups = dataInput$getNumberOfGroups(),
         naAllowed = naAllowed
     )
