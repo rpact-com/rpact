@@ -72,28 +72,27 @@ readDataset(
 
 ## Value
 
-Returns a
-[`Dataset`](https://rpact-com.github.io/rpact/reference/Dataset.md)
+Returns a [`Dataset`](https://docs.rpact.org/reference/Dataset.md)
 object. The following generics (R generic functions) are available for
 this result object:
 
-- [`names()`](https://rpact-com.github.io/rpact/reference/names.FieldSet.md)
-  to obtain the field names,
+- [`names()`](https://docs.rpact.org/reference/names.FieldSet.md) to
+  obtain the field names,
 
-- [`print()`](https://rpact-com.github.io/rpact/reference/print.FieldSet.md)
-  to print the object,
+- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
+  print the object,
 
-- [`summary()`](https://rpact-com.github.io/rpact/reference/summary.ParameterSet.md)
+- [`summary()`](https://docs.rpact.org/reference/summary.ParameterSet.md)
   to display a summary of the object,
 
-- [`plot()`](https://rpact-com.github.io/rpact/reference/plot.Dataset.md)
-  to plot the object,
+- [`plot()`](https://docs.rpact.org/reference/plot.Dataset.md) to plot
+  the object,
 
-- [`as.data.frame()`](https://rpact-com.github.io/rpact/reference/as.data.frame.ParameterSet.md)
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.ParameterSet.md)
   to coerce the object to a
   [`data.frame`](https://rdrr.io/r/base/data.frame.html),
 
-- [`as.matrix()`](https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.md)
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
@@ -103,17 +102,17 @@ this result object:
 [`read.table`](https://rdrr.io/r/utils/read.table.html) to read the CSV
 file into a data frame, transfers it from long to wide format with
 [`reshape`](https://rdrr.io/r/stats/reshape.html) and puts the data to
-[`getDataset()`](https://rpact-com.github.io/rpact/reference/getDataset.md).
+[`getDataset()`](https://docs.rpact.org/reference/getDataset.md).
 
 ## See also
 
-- [`readDatasets()`](https://rpact-com.github.io/rpact/reference/readDatasets.md)
+- [`readDatasets()`](https://docs.rpact.org/reference/readDatasets.md)
   for reading multiple datasets,
 
-- [`writeDataset()`](https://rpact-com.github.io/rpact/reference/writeDataset.md)
+- [`writeDataset()`](https://docs.rpact.org/reference/writeDataset.md)
   for writing a single dataset,
 
-- [`writeDatasets()`](https://rpact-com.github.io/rpact/reference/writeDatasets.md)
+- [`writeDatasets()`](https://docs.rpact.org/reference/writeDatasets.md)
   for writing multiple datasets.
 
 ## Examples

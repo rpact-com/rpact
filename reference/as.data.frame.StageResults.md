@@ -21,8 +21,7 @@ as.data.frame(
 
 - x:
 
-  A
-  [`StageResults`](https://rpact-com.github.io/rpact/reference/StageResults.md)
+  A [`StageResults`](https://docs.rpact.org/reference/StageResults.md)
   object.
 
 - niceColumnNamesEnabled:

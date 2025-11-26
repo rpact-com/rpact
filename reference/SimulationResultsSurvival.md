@@ -5,17 +5,17 @@ A class for simulation results survival.
 ## Details
 
 Use
-[`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md)
+[`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md)
 to create an object of this type.
 
 `SimulationResultsSurvival` is the basic class for
 
 - `SimulationResultsSurvival`,
 
-- [`SimulationResultsMultiArmSurvival`](https://rpact-com.github.io/rpact/reference/SimulationResultsMultiArmSurvival.md),
+- [`SimulationResultsMultiArmSurvival`](https://docs.rpact.org/reference/SimulationResultsMultiArmSurvival.md),
   and
 
-- [`SimulationResultsEnrichmentSurvival`](https://rpact-com.github.io/rpact/reference/SimulationResultsEnrichmentSurvival.md).
+- [`SimulationResultsEnrichmentSurvival`](https://docs.rpact.org/reference/SimulationResultsEnrichmentSurvival.md).
 
 ## Fields
 

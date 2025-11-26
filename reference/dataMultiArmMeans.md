@@ -3,7 +3,7 @@
 A dataset containing the sample sizes, means, and standard deviations of
 four groups. Use `getDataset(dataMultiArmMeans)` to create a dataset
 object that can be processed by
-[`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md).
+[`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md).
 
 ## Usage
 

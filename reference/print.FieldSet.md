@@ -1,8 +1,8 @@
 # Print Field Set Values
 
 `print` prints its
-[`FieldSet`](https://rpact-com.github.io/rpact/reference/FieldSet.md)
-argument and returns it invisibly (via `invisible(x)`).
+[`FieldSet`](https://docs.rpact.org/reference/FieldSet.md) argument and
+returns it invisibly (via `invisible(x)`).
 
 ## Usage
 
@@ -15,9 +15,8 @@ print(x, ..., markdown = NA)
 
 - x:
 
-  The
-  [`FieldSet`](https://rpact-com.github.io/rpact/reference/FieldSet.md)
-  object to print.
+  The [`FieldSet`](https://docs.rpact.org/reference/FieldSet.md) object
+  to print.
 
 - ...:
 

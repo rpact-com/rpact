@@ -5,7 +5,7 @@ A class for simulation results survival in enrichment designs.
 ## Details
 
 Use
-[`getSimulationEnrichmentSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentSurvival.md)
+[`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.md)
 to create an object of this type.
 
 ## Fields

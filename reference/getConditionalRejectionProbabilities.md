@@ -14,7 +14,7 @@ getConditionalRejectionProbabilities(stageResults, ...)
 - stageResults:
 
   The results at given stage, obtained from
-  [`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md).
+  [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md).
 
 - ...:
 
@@ -57,16 +57,16 @@ calculation via simulation.
 ## See also
 
 Other analysis functions:
-[`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md),
-[`getClosedCombinationTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedCombinationTestResults.md),
-[`getClosedConditionalDunnettTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedConditionalDunnettTestResults.md),
-[`getConditionalPower()`](https://rpact-com.github.io/rpact/reference/getConditionalPower.md),
-[`getFinalConfidenceInterval()`](https://rpact-com.github.io/rpact/reference/getFinalConfidenceInterval.md),
-[`getFinalPValue()`](https://rpact-com.github.io/rpact/reference/getFinalPValue.md),
-[`getRepeatedConfidenceIntervals()`](https://rpact-com.github.io/rpact/reference/getRepeatedConfidenceIntervals.md),
-[`getRepeatedPValues()`](https://rpact-com.github.io/rpact/reference/getRepeatedPValues.md),
-[`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md),
-[`getTestActions()`](https://rpact-com.github.io/rpact/reference/getTestActions.md)
+[`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md),
+[`getClosedCombinationTestResults()`](https://docs.rpact.org/reference/getClosedCombinationTestResults.md),
+[`getClosedConditionalDunnettTestResults()`](https://docs.rpact.org/reference/getClosedConditionalDunnettTestResults.md),
+[`getConditionalPower()`](https://docs.rpact.org/reference/getConditionalPower.md),
+[`getFinalConfidenceInterval()`](https://docs.rpact.org/reference/getFinalConfidenceInterval.md),
+[`getFinalPValue()`](https://docs.rpact.org/reference/getFinalPValue.md),
+[`getRepeatedConfidenceIntervals()`](https://docs.rpact.org/reference/getRepeatedConfidenceIntervals.md),
+[`getRepeatedPValues()`](https://docs.rpact.org/reference/getRepeatedPValues.md),
+[`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md),
+[`getTestActions()`](https://docs.rpact.org/reference/getTestActions.md)
 
 ## Examples
 

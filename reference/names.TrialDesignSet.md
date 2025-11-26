@@ -1,7 +1,7 @@
 # Names of a Trial Design Set Object
 
 Function to get the names of a
-[`TrialDesignSet`](https://rpact-com.github.io/rpact/reference/TrialDesignSet.md)
+[`TrialDesignSet`](https://docs.rpact.org/reference/TrialDesignSet.md)
 object.
 
 ## Usage
@@ -16,14 +16,14 @@ names(x)
 - x:
 
   A
-  [`TrialDesignSet`](https://rpact-com.github.io/rpact/reference/TrialDesignSet.md)
+  [`TrialDesignSet`](https://docs.rpact.org/reference/TrialDesignSet.md)
   object.
 
 ## Value
 
 Returns a [`character`](https://rdrr.io/r/base/character.html) vector
 containing the names of the
-[`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+[`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
 object.
 
 ## Details

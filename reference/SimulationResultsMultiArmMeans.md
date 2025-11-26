@@ -5,7 +5,7 @@ A class for simulation results means in multi-arm designs.
 ## Details
 
 Use
-[`getSimulationMultiArmMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmMeans.md)
+[`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md)
 to create an object of this type.
 
 ## Fields

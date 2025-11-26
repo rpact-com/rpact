@@ -13,9 +13,7 @@ as.matrix(x, ..., enforceRowNames = TRUE, niceColumnNamesEnabled = TRUE)
 
 - x:
 
-  A
-  [`FieldSet`](https://rpact-com.github.io/rpact/reference/FieldSet.md)
-  object.
+  A [`FieldSet`](https://docs.rpact.org/reference/FieldSet.md) object.
 
 - ...:
 

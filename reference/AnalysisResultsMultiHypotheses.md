@@ -6,7 +6,7 @@ A basic class for multi-hypotheses analysis results.
 
 `AnalysisResultsMultiHypotheses` is the basic class for
 
-- [`AnalysisResultsMultiArm`](https://rpact-com.github.io/rpact/reference/AnalysisResultsMultiArm.md)
+- [`AnalysisResultsMultiArm`](https://docs.rpact.org/reference/AnalysisResultsMultiArm.md)
   and
 
-- [`AnalysisResultsEnrichment`](https://rpact-com.github.io/rpact/reference/AnalysisResultsEnrichment.md).
+- [`AnalysisResultsEnrichment`](https://docs.rpact.org/reference/AnalysisResultsEnrichment.md).

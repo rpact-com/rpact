@@ -93,7 +93,7 @@ testPackage(
 ## Value
 
 Invisibly returns an
-[`InstallationQualificationResult`](https://rpact-com.github.io/rpact/reference/InstallationQualificationResult.md))
+[`InstallationQualificationResult`](https://docs.rpact.org/reference/InstallationQualificationResult.md))
 object.
 
 ## Details

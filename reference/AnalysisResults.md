@@ -6,18 +6,18 @@ A basic class for analysis results.
 
 `AnalysisResults` is the basic class for
 
-- [`AnalysisResultsFisher`](https://rpact-com.github.io/rpact/reference/AnalysisResultsFisher.md),
+- [`AnalysisResultsFisher`](https://docs.rpact.org/reference/AnalysisResultsFisher.md),
 
-- [`AnalysisResultsGroupSequential`](https://rpact-com.github.io/rpact/reference/AnalysisResultsGroupSequential.md),
+- [`AnalysisResultsGroupSequential`](https://docs.rpact.org/reference/AnalysisResultsGroupSequential.md),
 
-- [`AnalysisResultsInverseNormal`](https://rpact-com.github.io/rpact/reference/AnalysisResultsInverseNormal.md),
+- [`AnalysisResultsInverseNormal`](https://docs.rpact.org/reference/AnalysisResultsInverseNormal.md),
 
-- [`AnalysisResultsMultiArmFisher`](https://rpact-com.github.io/rpact/reference/AnalysisResultsMultiArmFisher.md),
+- [`AnalysisResultsMultiArmFisher`](https://docs.rpact.org/reference/AnalysisResultsMultiArmFisher.md),
 
-- [`AnalysisResultsMultiArmInverseNormal`](https://rpact-com.github.io/rpact/reference/AnalysisResultsMultiArmInverseNormal.md),
+- [`AnalysisResultsMultiArmInverseNormal`](https://docs.rpact.org/reference/AnalysisResultsMultiArmInverseNormal.md),
 
-- [`AnalysisResultsConditionalDunnett`](https://rpact-com.github.io/rpact/reference/AnalysisResultsConditionalDunnett.md),
+- [`AnalysisResultsConditionalDunnett`](https://docs.rpact.org/reference/AnalysisResultsConditionalDunnett.md),
 
-- [`AnalysisResultsEnrichmentFisher`](https://rpact-com.github.io/rpact/reference/AnalysisResultsEnrichmentFisher.md),
+- [`AnalysisResultsEnrichmentFisher`](https://docs.rpact.org/reference/AnalysisResultsEnrichmentFisher.md),
 
-- [`AnalysisResultsEnrichmentInverseNormal`](https://rpact-com.github.io/rpact/reference/AnalysisResultsEnrichmentInverseNormal.md).
+- [`AnalysisResultsEnrichmentInverseNormal`](https://docs.rpact.org/reference/AnalysisResultsEnrichmentInverseNormal.md).

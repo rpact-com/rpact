@@ -66,4 +66,4 @@ falls in a rectangle in n-space with error less than eps.
 
 This function calculates the `bdp` value from `sigma`, determines the
 right `inf` value and calls
-[`mvstud`](https://rpact-com.github.io/rpact/reference/mvstud.md).
+[`mvstud`](https://docs.rpact.org/reference/mvstud.md).

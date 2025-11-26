@@ -24,6 +24,6 @@ and the dataset contains an additional "group" column.
 
 ## See also
 
-[`getWideFormat()`](https://rpact-com.github.io/rpact/reference/getWideFormat.md)
+[`getWideFormat()`](https://docs.rpact.org/reference/getWideFormat.md)
 for returning the dataset as a
 [`data.frame`](https://rdrr.io/r/base/data.frame.html) in wide format.

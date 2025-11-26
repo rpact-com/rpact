@@ -50,7 +50,7 @@ A named list of output formats.
 ## Details
 
 Output formats can be written to a text file by specifying a `file`. See
-[`setOutputFormat()`](https://rpact-com.github.io/rpact/reference/setOutputFormat.md)()
+[`setOutputFormat()`](https://docs.rpact.org/reference/setOutputFormat.md)()
 to learn how to read a formerly saved file.
 
 Note that the `parameterName` must not match exactly, e.g., for p-values
@@ -69,7 +69,7 @@ the following parameter names will be recognized amongst others:
 ## See also
 
 Other output formats:
-[`setOutputFormat()`](https://rpact-com.github.io/rpact/reference/setOutputFormat.md)
+[`setOutputFormat()`](https://docs.rpact.org/reference/setOutputFormat.md)
 
 ## Examples
 

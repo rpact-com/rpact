@@ -5,7 +5,7 @@ Trial design for Fisher's combination test.
 ## Details
 
 This object should not be created directly; use
-[`getDesignFisher`](https://rpact-com.github.io/rpact/reference/getDesignFisher.md)
+[`getDesignFisher`](https://docs.rpact.org/reference/getDesignFisher.md)
 with suitable arguments to create a Fisher combination test design.
 
 ## Fields
@@ -112,5 +112,5 @@ with suitable arguments to create a Fisher combination test design.
 
 ## See also
 
-[`getDesignFisher`](https://rpact-com.github.io/rpact/reference/getDesignFisher.md)
+[`getDesignFisher`](https://docs.rpact.org/reference/getDesignFisher.md)
 for creating a Fisher combination test design.

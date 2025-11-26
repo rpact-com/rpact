@@ -1,7 +1,7 @@
 # Names of a Analysis Results Object
 
 Function to get the names of an
-[`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+[`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
 object.
 
 ## Usage
@@ -16,15 +16,15 @@ names(x)
 - x:
 
   An
-  [`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+  [`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
   object created by
-  [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md).
+  [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md).
 
 ## Value
 
 Returns a [`character`](https://rdrr.io/r/base/character.html) vector
 containing the names of the
-[`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+[`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
 object.
 
 ## Details

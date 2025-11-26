@@ -6,9 +6,9 @@ Basic class for trial design plans.
 
 `TrialDesignPlan` is the basic class for
 
-- [`TrialDesignPlanMeans`](https://rpact-com.github.io/rpact/reference/TrialDesignPlanMeans.md),
+- [`TrialDesignPlanMeans`](https://docs.rpact.org/reference/TrialDesignPlanMeans.md),
 
-- [`TrialDesignPlanRates`](https://rpact-com.github.io/rpact/reference/TrialDesignPlanRates.md),
+- [`TrialDesignPlanRates`](https://docs.rpact.org/reference/TrialDesignPlanRates.md),
   and
 
-- [`TrialDesignPlanSurvival`](https://rpact-com.github.io/rpact/reference/TrialDesignPlanSurvival.md).
+- [`TrialDesignPlanSurvival`](https://docs.rpact.org/reference/TrialDesignPlanSurvival.md).

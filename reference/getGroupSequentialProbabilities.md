@@ -54,12 +54,12 @@ is obtained analogously (cf., Wassmer and Brannath, 2025).
 ## See also
 
 Other design functions:
-[`getDesignCharacteristics()`](https://rpact-com.github.io/rpact/reference/getDesignCharacteristics.md),
-[`getDesignConditionalDunnett()`](https://rpact-com.github.io/rpact/reference/getDesignConditionalDunnett.md),
-[`getDesignFisher()`](https://rpact-com.github.io/rpact/reference/getDesignFisher.md),
-[`getDesignGroupSequential()`](https://rpact-com.github.io/rpact/reference/getDesignGroupSequential.md),
-[`getDesignInverseNormal()`](https://rpact-com.github.io/rpact/reference/getDesignInverseNormal.md),
-[`getPowerAndAverageSampleNumber()`](https://rpact-com.github.io/rpact/reference/getPowerAndAverageSampleNumber.md)
+[`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.md),
+[`getDesignConditionalDunnett()`](https://docs.rpact.org/reference/getDesignConditionalDunnett.md),
+[`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md),
+[`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md),
+[`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md),
+[`getPowerAndAverageSampleNumber()`](https://docs.rpact.org/reference/getPowerAndAverageSampleNumber.md)
 
 ## Examples
 

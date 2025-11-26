@@ -41,5 +41,5 @@ the specified time values.
 The first element of the vector `piecewiseSurvivalTime` must be equal to
 `0`. This function is used for plotting of sample size survival results
 (cf.,
-[`plot`](https://rpact-com.github.io/rpact/reference/plot.TrialDesignPlan.md),
+[`plot`](https://docs.rpact.org/reference/plot.TrialDesignPlan.md),
 `type = 13` and `type = 14`).

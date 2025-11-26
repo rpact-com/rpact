@@ -15,15 +15,15 @@ getData.SimulationResults(x)
 - x:
 
   A
-  [`SimulationResults`](https://rpact-com.github.io/rpact/reference/SimulationResults.md)
+  [`SimulationResults`](https://docs.rpact.org/reference/SimulationResults.md)
   object created by
-  [`getSimulationMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMeans.md),  
-  [`getSimulationRates()`](https://rpact-com.github.io/rpact/reference/getSimulationRates.md),
-  [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md),
-  [`getSimulationMultiArmMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmMeans.md),  
-  [`getSimulationMultiArmRates()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmRates.md),
+  [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md),  
+  [`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md),
+  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md),
+  [`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md),  
+  [`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md),
   or
-  [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md).
+  [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md).
 
 ## Value
 
@@ -33,7 +33,7 @@ Returns a [`data.frame`](https://rdrr.io/r/base/data.frame.html).
 
 This function can be used to get the aggregated simulated data from an
 simulation results object, for example, obtained by
-[`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md).
+[`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md).
 In this case, the data frame contains the following columns:
 
 1.  `iterationNumber`: The number of the simulation iteration.
@@ -87,12 +87,12 @@ In this case, the data frame contains the following columns:
     the log-rank statistic.
 
 A subset of variables is provided for
-[`getSimulationMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMeans.md),
-[`getSimulationRates()`](https://rpact-com.github.io/rpact/reference/getSimulationRates.md),
-[`getSimulationMultiArmMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmMeans.md),  
-[`getSimulationMultiArmRates()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmRates.md),
+[`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md),
+[`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md),
+[`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md),  
+[`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md),
 or
-[`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md).
+[`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md).
 
 ## Examples
 

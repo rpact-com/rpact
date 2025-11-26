@@ -79,9 +79,9 @@ following elements:
 ## Details
 
 The object is returned by the function
-[`testPackage`](https://rpact-com.github.io/rpact/reference/testPackage.md)
-and is of class `InstallationQualificationResult`.
+[`testPackage`](https://docs.rpact.org/reference/testPackage.md) and is
+of class `InstallationQualificationResult`.
 
 ## See also
 
-[`testPackage`](https://rpact-com.github.io/rpact/reference/testPackage.md)
+[`testPackage`](https://docs.rpact.org/reference/testPackage.md)

@@ -24,9 +24,8 @@ plot(
 
 - x:
 
-  The
-  [`Dataset`](https://rpact-com.github.io/rpact/reference/Dataset.md)
-  object to plot.
+  The [`Dataset`](https://docs.rpact.org/reference/Dataset.md) object to
+  plot.
 
 - y:
 
@@ -84,7 +83,7 @@ plot(
 - plotSettings:
 
   An object of class `PlotSettings` created by
-  [`getPlotSettings()`](https://rpact-com.github.io/rpact/reference/getPlotSettings.md).
+  [`getPlotSettings()`](https://docs.rpact.org/reference/getPlotSettings.md).
 
 ## Value
 

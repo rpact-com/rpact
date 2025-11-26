@@ -29,7 +29,7 @@ plot(
 - x:
 
   The simulation results, obtained from  
-  [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md).
+  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md).
 
 - y:
 
@@ -173,7 +173,7 @@ plot(
 - plotSettings:
 
   An object of class `PlotSettings` created by
-  [`getPlotSettings()`](https://rpact-com.github.io/rpact/reference/getPlotSettings.md).
+  [`getPlotSettings()`](https://docs.rpact.org/reference/getPlotSettings.md).
 
 ## Value
 

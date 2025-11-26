@@ -1,7 +1,7 @@
 # Names of a Stage Results Object
 
 Function to get the names of a
-[`StageResults`](https://rpact-com.github.io/rpact/reference/StageResults.md)
+[`StageResults`](https://docs.rpact.org/reference/StageResults.md)
 object.
 
 ## Usage
@@ -15,15 +15,14 @@ names(x)
 
 - x:
 
-  A
-  [`StageResults`](https://rpact-com.github.io/rpact/reference/StageResults.md)
+  A [`StageResults`](https://docs.rpact.org/reference/StageResults.md)
   object.
 
 ## Value
 
 Returns a [`character`](https://rdrr.io/r/base/character.html) vector
 containing the names of the
-[`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+[`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
 object.
 
 ## Details

@@ -5,8 +5,8 @@ Class for a dataset of means.
 ## Details
 
 This object cannot be created directly; better use
-[`getDataset`](https://rpact-com.github.io/rpact/reference/getDataset.md)
-with suitable arguments to create a dataset of means.
+[`getDataset`](https://docs.rpact.org/reference/getDataset.md) with
+suitable arguments to create a dataset of means.
 
 ## Fields
 

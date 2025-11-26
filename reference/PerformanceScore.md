@@ -7,5 +7,5 @@ result.
 ## Details
 
 Use
-[getPerformanceScore](https://rpact-com.github.io/rpact/reference/getPerformanceScore.md)
+[getPerformanceScore](https://docs.rpact.org/reference/getPerformanceScore.md)
 to calculate the performance score.

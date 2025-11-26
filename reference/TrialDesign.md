@@ -6,14 +6,14 @@ Basic class for trial designs.
 
 `TrialDesign` is the basic class for
 
-- [`TrialDesignFisher`](https://rpact-com.github.io/rpact/reference/TrialDesignFisher.md),
+- [`TrialDesignFisher`](https://docs.rpact.org/reference/TrialDesignFisher.md),
 
-- [`TrialDesignGroupSequential`](https://rpact-com.github.io/rpact/reference/TrialDesignGroupSequential.md),
+- [`TrialDesignGroupSequential`](https://docs.rpact.org/reference/TrialDesignGroupSequential.md),
 
-- [`TrialDesignInverseNormal`](https://rpact-com.github.io/rpact/reference/TrialDesignInverseNormal.md),
+- [`TrialDesignInverseNormal`](https://docs.rpact.org/reference/TrialDesignInverseNormal.md),
   and
 
-- [`TrialDesignConditionalDunnett`](https://rpact-com.github.io/rpact/reference/TrialDesignConditionalDunnett.md).
+- [`TrialDesignConditionalDunnett`](https://docs.rpact.org/reference/TrialDesignConditionalDunnett.md).
 
 ## Fields
 

@@ -7,4 +7,4 @@ Parameter Description: Stage Results
 - stageResults:
 
   The results at given stage, obtained from
-  [`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md).
+  [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md).

@@ -10,4 +10,4 @@ Parameter Description: Piecewise Survival Time
   definition of the exponential survival time cumulative distribution
   function  
   (for details see
-  [`getPiecewiseSurvivalTime()`](https://rpact-com.github.io/rpact/reference/getPiecewiseSurvivalTime.md)).
+  [`getPiecewiseSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTime.md)).

@@ -5,7 +5,7 @@ Class for conditional power calculations of means data
 ## Details
 
 This object cannot be created directly; use
-[`getConditionalPower`](https://rpact-com.github.io/rpact/reference/getConditionalPower.md)
+[`getConditionalPower`](https://docs.rpact.org/reference/getConditionalPower.md)
 with suitable arguments to create the results of a group sequential or a
 combination test design.
 

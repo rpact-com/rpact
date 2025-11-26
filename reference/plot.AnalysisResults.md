@@ -30,7 +30,7 @@ plot(
 - x:
 
   The analysis results at given stage, obtained from
-  [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md).
+  [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md).
 
 - y:
 
@@ -40,7 +40,7 @@ plot(
 - ...:
 
   Optional [plot
-  arguments](https://rpact-com.github.io/rpact/reference/param_three_dots_plot.md).
+  arguments](https://docs.rpact.org/reference/param_three_dots_plot.md).
   Furthermore the following arguments can be defined:
 
   - `thetaRange`: A range of assumed effect sizes if testing means or a
@@ -51,17 +51,17 @@ plot(
   - `piTreatmentRange`: A range of assumed rates pi1 to calculate the
     conditional power. Additionally, if a two-sample comparison was
     selected, `pi2` can be specified (default is the value from
-    [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)).
+    [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)).
 
   - `directionUpper`: Specifies the direction of the alternative, only
     applicable for one-sided testing; default is `TRUE` which means that
     larger values of the test statistics yield smaller p-values.
 
-  - [`thetaH0`](https://rpact-com.github.io/rpact/reference/param_thetaH0.md):
-    The null hypothesis value, default is `0` for the normal and the
-    binary case, it is `1` for the survival case. For testing a rate in
-    one sample, a value thetaH0 in (0, 1) has to be specified for
-    defining the null hypothesis H0: `pi = thetaH0`.
+  - [`thetaH0`](https://docs.rpact.org/reference/param_thetaH0.md): The
+    null hypothesis value, default is `0` for the normal and the binary
+    case, it is `1` for the survival case. For testing a rate in one
+    sample, a value thetaH0 in (0, 1) has to be specified for defining
+    the null hypothesis H0: `pi = thetaH0`.
 
 - type:
 
@@ -172,7 +172,7 @@ plot(
 - plotSettings:
 
   An object of class `PlotSettings` created by
-  [`getPlotSettings()`](https://rpact-com.github.io/rpact/reference/getPlotSettings.md).
+  [`getPlotSettings()`](https://docs.rpact.org/reference/getPlotSettings.md).
 
 ## Value
 

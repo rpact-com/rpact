@@ -13,7 +13,7 @@ getConditionalPower(stageResults, ..., nPlanned, allocationRatioPlanned = 1)
 - stageResults:
 
   The results at given stage, obtained from
-  [`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md).
+  [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md).
 
 - ...:
 
@@ -76,27 +76,27 @@ getConditionalPower(stageResults, ..., nPlanned, allocationRatioPlanned = 1)
 ## Value
 
 Returns a
-[`ConditionalPowerResults`](https://rpact-com.github.io/rpact/reference/ConditionalPowerResults.md)
+[`ConditionalPowerResults`](https://docs.rpact.org/reference/ConditionalPowerResults.md)
 object. The following generics (R generic functions) are available for
 this result object:
 
-- [`names()`](https://rpact-com.github.io/rpact/reference/names.FieldSet.md)
-  to obtain the field names,
+- [`names()`](https://docs.rpact.org/reference/names.FieldSet.md) to
+  obtain the field names,
 
-- [`print()`](https://rpact-com.github.io/rpact/reference/print.FieldSet.md)
-  to print the object,
+- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
+  print the object,
 
-- [`summary()`](https://rpact-com.github.io/rpact/reference/summary.ParameterSet.md)
+- [`summary()`](https://docs.rpact.org/reference/summary.ParameterSet.md)
   to display a summary of the object,
 
-- [`plot()`](https://rpact-com.github.io/rpact/reference/plot.ParameterSet.md)
-  to plot the object,
+- [`plot()`](https://docs.rpact.org/reference/plot.ParameterSet.md) to
+  plot the object,
 
-- [`as.data.frame()`](https://rpact-com.github.io/rpact/reference/as.data.frame.ParameterSet.md)
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.ParameterSet.md)
   to coerce the object to a
   [`data.frame`](https://rdrr.io/r/base/data.frame.html),
 
-- [`as.matrix()`](https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.md)
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
@@ -126,26 +126,26 @@ of a generic and to identify the object specific name of it, e.g., use
 `methods("plot")` to get all the methods for the `plot` generic. There
 you can find, e.g., `plot.AnalysisResults` and obtain the specific help
 documentation linked above by typing
-[`?plot.AnalysisResults`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md).
+[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
 
 ## See also
 
-[`plot.StageResults()`](https://rpact-com.github.io/rpact/reference/plot.StageResults.md)
+[`plot.StageResults()`](https://docs.rpact.org/reference/plot.StageResults.md)
 or
-[`plot.AnalysisResults()`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md)
+[`plot.AnalysisResults()`](https://docs.rpact.org/reference/plot.AnalysisResults.md)
 for plotting the conditional power.
 
 Other analysis functions:
-[`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md),
-[`getClosedCombinationTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedCombinationTestResults.md),
-[`getClosedConditionalDunnettTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedConditionalDunnettTestResults.md),
-[`getConditionalRejectionProbabilities()`](https://rpact-com.github.io/rpact/reference/getConditionalRejectionProbabilities.md),
-[`getFinalConfidenceInterval()`](https://rpact-com.github.io/rpact/reference/getFinalConfidenceInterval.md),
-[`getFinalPValue()`](https://rpact-com.github.io/rpact/reference/getFinalPValue.md),
-[`getRepeatedConfidenceIntervals()`](https://rpact-com.github.io/rpact/reference/getRepeatedConfidenceIntervals.md),
-[`getRepeatedPValues()`](https://rpact-com.github.io/rpact/reference/getRepeatedPValues.md),
-[`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md),
-[`getTestActions()`](https://rpact-com.github.io/rpact/reference/getTestActions.md)
+[`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md),
+[`getClosedCombinationTestResults()`](https://docs.rpact.org/reference/getClosedCombinationTestResults.md),
+[`getClosedConditionalDunnettTestResults()`](https://docs.rpact.org/reference/getClosedConditionalDunnettTestResults.md),
+[`getConditionalRejectionProbabilities()`](https://docs.rpact.org/reference/getConditionalRejectionProbabilities.md),
+[`getFinalConfidenceInterval()`](https://docs.rpact.org/reference/getFinalConfidenceInterval.md),
+[`getFinalPValue()`](https://docs.rpact.org/reference/getFinalPValue.md),
+[`getRepeatedConfidenceIntervals()`](https://docs.rpact.org/reference/getRepeatedConfidenceIntervals.md),
+[`getRepeatedPValues()`](https://docs.rpact.org/reference/getRepeatedPValues.md),
+[`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md),
+[`getTestActions()`](https://docs.rpact.org/reference/getTestActions.md)
 
 ## Examples
 

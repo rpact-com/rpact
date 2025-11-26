@@ -3,7 +3,7 @@
 This function checks whether the installation qualification for the
 `rpact` package has been completed. If not, it provides a message
 prompting the user to run the
-[`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md)
+[`testPackage()`](https://docs.rpact.org/reference/testPackage.md)
 function to perform the qualification.
 
 ## Usage

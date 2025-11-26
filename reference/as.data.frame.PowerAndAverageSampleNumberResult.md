@@ -1,7 +1,7 @@
 # Coerce Power And Average Sample Number Result to a Data Frame
 
 Returns the
-[`PowerAndAverageSampleNumberResult`](https://rpact-com.github.io/rpact/reference/PowerAndAverageSampleNumberResult.md)
+[`PowerAndAverageSampleNumberResult`](https://docs.rpact.org/reference/PowerAndAverageSampleNumberResult.md)
 as data frame.
 
 ## Usage
@@ -23,7 +23,7 @@ as.data.frame(
 - x:
 
   A
-  [`PowerAndAverageSampleNumberResult`](https://rpact-com.github.io/rpact/reference/PowerAndAverageSampleNumberResult.md)
+  [`PowerAndAverageSampleNumberResult`](https://docs.rpact.org/reference/PowerAndAverageSampleNumberResult.md)
   object.
 
 - niceColumnNamesEnabled:
@@ -50,7 +50,7 @@ Returns a [`data.frame`](https://rdrr.io/r/base/data.frame.html).
 ## Details
 
 Coerces the
-[`PowerAndAverageSampleNumberResult`](https://rpact-com.github.io/rpact/reference/PowerAndAverageSampleNumberResult.md)
+[`PowerAndAverageSampleNumberResult`](https://docs.rpact.org/reference/PowerAndAverageSampleNumberResult.md)
 object to a data frame.
 
 ## Examples

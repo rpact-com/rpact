@@ -1,7 +1,7 @@
 # Event Probabilities Plotting
 
 Plots an object that inherits from class
-[`EventProbabilities`](https://rpact-com.github.io/rpact/reference/EventProbabilities.md).
+[`EventProbabilities`](https://docs.rpact.org/reference/EventProbabilities.md).
 
 ## Usage
 
@@ -30,12 +30,12 @@ plot(
 - x:
 
   The object that inherits from
-  [`EventProbabilities`](https://rpact-com.github.io/rpact/reference/EventProbabilities.md).
+  [`EventProbabilities`](https://docs.rpact.org/reference/EventProbabilities.md).
 
 - y:
 
   An optional object that inherits from
-  [`NumberOfSubjects`](https://rpact-com.github.io/rpact/reference/NumberOfSubjects.md).
+  [`NumberOfSubjects`](https://docs.rpact.org/reference/NumberOfSubjects.md).
 
 - ...:
 
@@ -133,7 +133,7 @@ plot(
 - plotSettings:
 
   An object of class `PlotSettings` created by
-  [`getPlotSettings()`](https://rpact-com.github.io/rpact/reference/getPlotSettings.md).
+  [`getPlotSettings()`](https://docs.rpact.org/reference/getPlotSettings.md).
 
 ## Value
 

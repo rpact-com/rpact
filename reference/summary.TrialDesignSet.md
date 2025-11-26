@@ -1,7 +1,7 @@
 # Trial Design Set Summary
 
 Displays a summary of
-[`ParameterSet`](https://rpact-com.github.io/rpact/reference/ParameterSet.md)
+[`ParameterSet`](https://docs.rpact.org/reference/ParameterSet.md)
 object.
 
 ## Usage
@@ -15,8 +15,7 @@ summary(object, ..., type = 1, digits = NA_integer_)
 
 - object:
 
-  A
-  [`ParameterSet`](https://rpact-com.github.io/rpact/reference/ParameterSet.md)
+  A [`ParameterSet`](https://docs.rpact.org/reference/ParameterSet.md)
   object.
 
 - ...:
@@ -32,15 +31,15 @@ summary(object, ..., type = 1, digits = NA_integer_)
 ## Value
 
 Returns a
-[`SummaryFactory`](https://rpact-com.github.io/rpact/reference/SummaryFactory.md)
+[`SummaryFactory`](https://docs.rpact.org/reference/SummaryFactory.md)
 object. The following generics (R generic functions) are available for
 this result object:
 
-- [`names()`](https://rpact-com.github.io/rpact/reference/names.FieldSet.md)
-  to obtain the field names,
+- [`names()`](https://docs.rpact.org/reference/names.FieldSet.md) to
+  obtain the field names,
 
-- [`print()`](https://rpact-com.github.io/rpact/reference/print.FieldSet.md)
-  to print the object
+- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
+  print the object
 
 ## Details
 
@@ -86,4 +85,4 @@ of a generic and to identify the object specific name of it, e.g., use
 `methods("plot")` to get all the methods for the `plot` generic. There
 you can find, e.g., `plot.AnalysisResults` and obtain the specific help
 documentation linked above by typing
-[`?plot.AnalysisResults`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md).
+[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).

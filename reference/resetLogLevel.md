@@ -15,11 +15,11 @@ system to the default value `"PROGRESS"`.
 
 ## See also
 
-- [`getLogLevel()`](https://rpact-com.github.io/rpact/reference/getLogLevel.md)
-  for getting the current log level,
+- [`getLogLevel()`](https://docs.rpact.org/reference/getLogLevel.md) for
+  getting the current log level,
 
-- [`setLogLevel()`](https://rpact-com.github.io/rpact/reference/setLogLevel.md)
-  for setting the log level.
+- [`setLogLevel()`](https://docs.rpact.org/reference/setLogLevel.md) for
+  setting the log level.
 
 ## Examples
 

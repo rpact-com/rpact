@@ -24,30 +24,30 @@ getDesignSet(...)
 ## Value
 
 Returns a
-[`TrialDesignSet`](https://rpact-com.github.io/rpact/reference/TrialDesignSet.md)
+[`TrialDesignSet`](https://docs.rpact.org/reference/TrialDesignSet.md)
 object. The following generics (R generic functions) are available for
 this result object:
 
-- [`names`](https://rpact-com.github.io/rpact/reference/names.TrialDesignSet.md)
-  to obtain the field names,
+- [`names`](https://docs.rpact.org/reference/names.TrialDesignSet.md) to
+  obtain the field names,
 
-- [`length`](https://rpact-com.github.io/rpact/reference/length.TrialDesignSet.md)
+- [`length`](https://docs.rpact.org/reference/length.TrialDesignSet.md)
   to obtain the number of design,
 
-- [`print()`](https://rpact-com.github.io/rpact/reference/print.FieldSet.md)
-  to print the object,
+- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
+  print the object,
 
-- [`summary()`](https://rpact-com.github.io/rpact/reference/summary.TrialDesignSet.md)
+- [`summary()`](https://docs.rpact.org/reference/summary.TrialDesignSet.md)
   to display a summary of the object,
 
-- [`plot()`](https://rpact-com.github.io/rpact/reference/plot.TrialDesignSet.md)
-  to plot the object,
+- [`plot()`](https://docs.rpact.org/reference/plot.TrialDesignSet.md) to
+  plot the object,
 
-- [`as.data.frame()`](https://rpact-com.github.io/rpact/reference/as.data.frame.TrialDesignSet.md)
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.TrialDesignSet.md)
   to coerce the object to a
   [`data.frame`](https://rdrr.io/r/base/data.frame.html),
 
-- [`as.matrix()`](https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.md)
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
@@ -66,7 +66,7 @@ of a generic and to identify the object specific name of it, e.g., use
 `methods("plot")` to get all the methods for the `plot` generic. There
 you can find, e.g., `plot.AnalysisResults` and obtain the specific help
 documentation linked above by typing
-[`?plot.AnalysisResults`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md).
+[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
 
 ## Examples
 

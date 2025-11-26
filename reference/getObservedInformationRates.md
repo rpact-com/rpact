@@ -58,7 +58,7 @@ proportion if `informationEpsilon` \< 1.
 
 ## See also
 
-- [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+- [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)
   for using `getObservedInformationRates()` implicit,
 
 - [www.rpact.org/vignettes/planning/rpact_boundary_update_example](https://www.rpact.org/vignettes/planning/rpact_boundary_update_example/)

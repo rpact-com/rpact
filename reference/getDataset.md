@@ -26,28 +26,27 @@ getDataSet(..., floatingPointNumbersEnabled = FALSE)
 
 ## Value
 
-Returns a
-[`Dataset`](https://rpact-com.github.io/rpact/reference/Dataset.md)
+Returns a [`Dataset`](https://docs.rpact.org/reference/Dataset.md)
 object. The following generics (R generic functions) are available for
 this result object:
 
-- [`names()`](https://rpact-com.github.io/rpact/reference/names.FieldSet.md)
-  to obtain the field names,
+- [`names()`](https://docs.rpact.org/reference/names.FieldSet.md) to
+  obtain the field names,
 
-- [`print()`](https://rpact-com.github.io/rpact/reference/print.FieldSet.md)
-  to print the object,
+- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
+  print the object,
 
-- [`summary()`](https://rpact-com.github.io/rpact/reference/summary.ParameterSet.md)
+- [`summary()`](https://docs.rpact.org/reference/summary.ParameterSet.md)
   to display a summary of the object,
 
-- [`plot()`](https://rpact-com.github.io/rpact/reference/plot.Dataset.md)
-  to plot the object,
+- [`plot()`](https://docs.rpact.org/reference/plot.Dataset.md) to plot
+  the object,
 
-- [`as.data.frame()`](https://rpact-com.github.io/rpact/reference/as.data.frame.ParameterSet.md)
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.ParameterSet.md)
   to coerce the object to a
   [`data.frame`](https://rdrr.io/r/base/data.frame.html),
 
-- [`as.matrix()`](https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.md)
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
@@ -57,16 +56,16 @@ The different dataset types `DatasetMeans`, of `DatasetRates`, or
 `DatasetSurvival` can be created as follows:
 
 - An element of
-  [`DatasetMeans`](https://rpact-com.github.io/rpact/reference/DatasetMeans.md)
-  for one sample is created by  
+  [`DatasetMeans`](https://docs.rpact.org/reference/DatasetMeans.md) for
+  one sample is created by  
   `getDataset(sampleSizes =, means =, stDevs =)` where  
   `sampleSizes`, `means`, `stDevs` are vectors with stage-wise sample
   sizes, means and standard deviations of length given by the number of
   available stages.
 
 - An element of
-  [`DatasetMeans`](https://rpact-com.github.io/rpact/reference/DatasetMeans.md)
-  for two samples is created by  
+  [`DatasetMeans`](https://docs.rpact.org/reference/DatasetMeans.md) for
+  two samples is created by  
   `getDataset(sampleSizes1 =, sampleSizes2 =, means1 =, means2 =, `  
   `stDevs1 =, stDevs2 =)` where `sampleSizes1`, `sampleSizes2`,
   `means1`, `means2`, `stDevs1`, `stDevs2` are vectors with stage-wise
@@ -74,32 +73,32 @@ The different dataset types `DatasetMeans`, of `DatasetRates`, or
   groups of length given by the number of available stages.
 
 - An element of
-  [`DatasetRates`](https://rpact-com.github.io/rpact/reference/DatasetRates.md)
-  for one sample is created by  
+  [`DatasetRates`](https://docs.rpact.org/reference/DatasetRates.md) for
+  one sample is created by  
   `getDataset(sampleSizes =, events =)` where `sampleSizes`, `events`
   are vectors with stage-wise sample sizes and events of length given by
   the number of available stages.
 
 - An element of
-  [`DatasetRates`](https://rpact-com.github.io/rpact/reference/DatasetRates.md)
-  for two samples is created by  
+  [`DatasetRates`](https://docs.rpact.org/reference/DatasetRates.md) for
+  two samples is created by  
   `getDataset(sampleSizes1 =, sampleSizes2 =, events1 =, events2 =)`
   where `sampleSizes1`, `sampleSizes2`, `events1`, `events2` are vectors
   with stage-wise sample sizes and events for the two treatment groups
   of length given by the number of available stages.
 
 - An element of
-  [`DatasetSurvival`](https://rpact-com.github.io/rpact/reference/DatasetSurvival.md)
+  [`DatasetSurvival`](https://docs.rpact.org/reference/DatasetSurvival.md)
   is created by  
   `getDataset(events =, logRanks =, allocationRatios =)` where `events`,
   `logRanks`, and `allocation ratios` are the stage-wise events,
   (one-sided) logrank statistics, and allocation ratios.
 
 - An element of
-  [`DatasetMeans`](https://rpact-com.github.io/rpact/reference/DatasetMeans.md),
-  [`DatasetRates`](https://rpact-com.github.io/rpact/reference/DatasetRates.md),
+  [`DatasetMeans`](https://docs.rpact.org/reference/DatasetMeans.md),
+  [`DatasetRates`](https://docs.rpact.org/reference/DatasetRates.md),
   and
-  [`DatasetSurvival`](https://rpact-com.github.io/rpact/reference/DatasetSurvival.md)
+  [`DatasetSurvival`](https://docs.rpact.org/reference/DatasetSurvival.md)
   for more than one comparison is created by adding subsequent digits to
   the variable names. The system can analyze these data in a multi-arm
   many-to-one comparison setting where the group with the highest index
@@ -135,14 +134,14 @@ For non-stratified (sub-population wise) data input the data sets are
 defined for the sub-populations S1, S2, ..., F, where F refers to the
 full populations. Use of `getDataset(S1 = , S2, ..., F = )` defines the
 data set to be used in
-[`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+[`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)
 (see examples)  
 For stratified data input the data sets are defined for the strata S1,
 S12, S2, ..., R, where R refers to the remainder of the strata such that
 the union of all sets is the full population. Use of
 `getDataset(S1 = , S12 = , S2, ..., R = )` defines the data set to be
 used in
-[`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+[`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)
 (see examples)  
 For survival data, for enrichment designs the log-rank statistics can
 only be entered as stratified log-rank statistics in order to provide

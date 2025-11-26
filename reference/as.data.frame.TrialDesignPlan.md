@@ -1,7 +1,7 @@
 # Coerce Trial Design Plan to a Data Frame
 
 Returns the
-[`TrialDesignPlan`](https://rpact-com.github.io/rpact/reference/TrialDesignPlan.md)
+[`TrialDesignPlan`](https://docs.rpact.org/reference/TrialDesignPlan.md)
 as data frame.
 
 ## Usage
@@ -23,7 +23,7 @@ as.data.frame(
 - x:
 
   A
-  [`TrialDesignPlan`](https://rpact-com.github.io/rpact/reference/TrialDesignPlan.md)
+  [`TrialDesignPlan`](https://docs.rpact.org/reference/TrialDesignPlan.md)
   object.
 
 - niceColumnNamesEnabled:

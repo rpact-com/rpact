@@ -5,7 +5,7 @@ Class for multi-arm analysis results based on a closed combination test.
 ## Details
 
 This object cannot be created directly; use
-[`getAnalysisResults`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+[`getAnalysisResults`](https://docs.rpact.org/reference/getAnalysisResults.md)
 with suitable arguments to create the multi-arm analysis results of a
 closed combination test design.
 

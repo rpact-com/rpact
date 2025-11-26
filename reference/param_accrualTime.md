@@ -8,4 +8,4 @@ Parameter Description: Accrual Time
 
   The assumed accrual time intervals for the study, default is
   `c(0, 12)` (for details see
-  [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md)).
+  [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)).

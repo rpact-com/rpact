@@ -80,7 +80,7 @@ setOutputFormat(
 ## Details
 
 Output formats can be written to a text file (see
-[`getOutputFormat()`](https://rpact-com.github.io/rpact/reference/getOutputFormat.md)).
+[`getOutputFormat()`](https://docs.rpact.org/reference/getOutputFormat.md)).
 To load your personal output formats read a formerly saved file at the
 beginning of your work with `rpact`, e.g. execute
 `setOutputFormat(file = "my_rpact_output_formats.txt")`.
@@ -104,7 +104,7 @@ the following parameter names will be recognized amongst others:
 function used internally to format the values.
 
 Other output formats:
-[`getOutputFormat()`](https://rpact-com.github.io/rpact/reference/getOutputFormat.md)
+[`getOutputFormat()`](https://docs.rpact.org/reference/getOutputFormat.md)
 
 ## Examples
 

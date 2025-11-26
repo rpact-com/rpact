@@ -29,16 +29,16 @@ plot(
 - x:
 
   The trial design plan, obtained from  
-  [`getSampleSizeMeans()`](https://rpact-com.github.io/rpact/reference/getSampleSizeMeans.md),  
-  [`getSampleSizeRates()`](https://rpact-com.github.io/rpact/reference/getSampleSizeRates.md),  
-  [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md),  
-  [`getSampleSizeCounts()`](https://rpact-com.github.io/rpact/reference/getSampleSizeCounts.md),  
-  [`getPowerMeans()`](https://rpact-com.github.io/rpact/reference/getPowerMeans.md),  
-  [`getPowerRates()`](https://rpact-com.github.io/rpact/reference/getPowerRates.md)
+  [`getSampleSizeMeans()`](https://docs.rpact.org/reference/getSampleSizeMeans.md),  
+  [`getSampleSizeRates()`](https://docs.rpact.org/reference/getSampleSizeRates.md),  
+  [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md),  
+  [`getSampleSizeCounts()`](https://docs.rpact.org/reference/getSampleSizeCounts.md),  
+  [`getPowerMeans()`](https://docs.rpact.org/reference/getPowerMeans.md),  
+  [`getPowerRates()`](https://docs.rpact.org/reference/getPowerRates.md)
   or  
-  [`getPowerSurvival()`](https://rpact-com.github.io/rpact/reference/getPowerSurvival.md)
+  [`getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.md)
   or  
-  [`getPowerCounts()`](https://rpact-com.github.io/rpact/reference/getPowerCounts.md).
+  [`getPowerCounts()`](https://docs.rpact.org/reference/getPowerCounts.md).
 
 - y:
 
@@ -174,7 +174,7 @@ plot(
 - plotSettings:
 
   An object of class `PlotSettings` created by
-  [`getPlotSettings()`](https://rpact-com.github.io/rpact/reference/getPlotSettings.md).
+  [`getPlotSettings()`](https://docs.rpact.org/reference/getPlotSettings.md).
 
 ## Value
 

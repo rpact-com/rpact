@@ -5,7 +5,7 @@ Trial design plan for survival data.
 ## Details
 
 This object cannot be created directly; use
-[`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md)
+[`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
 with suitable arguments to create a design plan for a dataset of
 survival data.
 

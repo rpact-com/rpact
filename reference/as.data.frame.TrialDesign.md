@@ -20,8 +20,7 @@ as.data.frame(
 
 - x:
 
-  A
-  [`TrialDesign`](https://rpact-com.github.io/rpact/reference/TrialDesign.md)
+  A [`TrialDesign`](https://docs.rpact.org/reference/TrialDesign.md)
   object.
 
 - niceColumnNamesEnabled:
@@ -48,8 +47,8 @@ Returns a [`data.frame`](https://rdrr.io/r/base/data.frame.html).
 ## Details
 
 Each element of the
-[`TrialDesign`](https://rpact-com.github.io/rpact/reference/TrialDesign.md)
-is converted to a column in the data frame.
+[`TrialDesign`](https://docs.rpact.org/reference/TrialDesign.md) is
+converted to a column in the data frame.
 
 ## Examples
 

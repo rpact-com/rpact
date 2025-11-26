@@ -5,7 +5,7 @@ Trial design for conditional Dunnett tests.
 ## Details
 
 This object should not be created directly; use
-[`getDesignConditionalDunnett`](https://rpact-com.github.io/rpact/reference/getDesignConditionalDunnett.md)
+[`getDesignConditionalDunnett`](https://docs.rpact.org/reference/getDesignConditionalDunnett.md)
 with suitable arguments to create a conditional Dunnett test design.
 
 ## Fields
@@ -85,5 +85,5 @@ with suitable arguments to create a conditional Dunnett test design.
 
 ## See also
 
-[`getDesignConditionalDunnett`](https://rpact-com.github.io/rpact/reference/getDesignConditionalDunnett.md)
+[`getDesignConditionalDunnett`](https://docs.rpact.org/reference/getDesignConditionalDunnett.md)
 for creating a conditional Dunnett test design.

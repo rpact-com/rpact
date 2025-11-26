@@ -5,7 +5,7 @@
 ### New features
 
 - The new function
-  [`getFutilityBounds()`](https://rpact-com.github.io/rpact/reference/getFutilityBounds.md)
+  [`getFutilityBounds()`](https://docs.rpact.org/reference/getFutilityBounds.md)
   converts futility bounds between different scales such as z-value,
   p-value, conditional power, predictive power, reverse conditional
   power, and effect estimate.
@@ -15,8 +15,9 @@
 - Documentation for `maxNumberOfRawDatasetsPerStage` in survival
   clarified
 - Issue [\#94](https://github.com/rpact-com/rpact/issues/94) fixed
+- Issue [\#99](https://github.com/rpact-com/rpact/issues/99) fixed
 - Testing improved, e.g., new helper function
-  [`getTestLabel()`](https://rpact-com.github.io/rpact/reference/getTestLabel.md)
+  [`getTestLabel()`](https://docs.rpact.org/reference/getTestLabel.md)
   introduced
 
 ## rpact 4.2.1
@@ -30,7 +31,7 @@ CRAN release: 2025-07-24
 - parameter `stdErrorEstimate` (`"pooled"` or `"unpooled"`) added for
   calculation of final confidence intervals in two-sample situation for
   rates
-- [`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md)
+- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md)
   returns an `InstallationQualificationResult` object
 
 ### Improvements, issues, and changes
@@ -40,7 +41,7 @@ CRAN release: 2025-07-24
 - Recruitment times for count and survival data situation improved
   (issue [\#86](https://github.com/rpact-com/rpact/issues/86))
 - Bug fix for
-  [`getSimulationCounts()`](https://rpact-com.github.io/rpact/reference/getSimulationCounts.md)
+  [`getSimulationCounts()`](https://docs.rpact.org/reference/getSimulationCounts.md)
   (issue [\#84](https://github.com/rpact-com/rpact/issues/84))
 - Minor improvements
 
@@ -51,34 +52,34 @@ CRAN release: 2025-03-24
 ### New features
 
 - For the functions
-  [`getSimulationMultiArmMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmMeans.md),
-  [`getSimulationMultiArmRates()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmRates.md),
+  [`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md),
+  [`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md),
   and
-  [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md)
+  [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md)
   it is now possible to specify a parameter `doseLevels` to define the
   dose levels for a `linear` or `sigmoidEmax` dose-response relationship
   (see feature request
   [\#63](https://github.com/rpact-com/rpact/issues/63))
 - Added support for unequal variances between two groups in
-  [`getSampleSizeMeans()`](https://rpact-com.github.io/rpact/reference/getSampleSizeMeans.md),
-  [`getPowerMeans()`](https://rpact-com.github.io/rpact/reference/getPowerMeans.md),
+  [`getSampleSizeMeans()`](https://docs.rpact.org/reference/getSampleSizeMeans.md),
+  [`getPowerMeans()`](https://docs.rpact.org/reference/getPowerMeans.md),
   and
-  [`getSimulationMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMeans.md)
+  [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md)
   functions, see enhancement
   [\#70](https://github.com/rpact-com/rpact/issues/70)
-- [`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md)
+- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md)
   produces a comprehensive installation qualification report in html and
   pdf format (see new vignette [Installation Qualification of
   rpact](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/))
-- [`setupPackageTests()`](https://rpact-com.github.io/rpact/reference/setupPackageTests.md)
+- [`setupPackageTests()`](https://docs.rpact.org/reference/setupPackageTests.md)
   sets up the package tests by downloading the test files and copying
   them to the rpact installation directory
-- [`saveOptions()`](https://rpact-com.github.io/rpact/reference/saveOptions.md)
+- [`saveOptions()`](https://docs.rpact.org/reference/saveOptions.md)
   saves the current `rpact` options to a configuration file
-- [`resetOptions()`](https://rpact-com.github.io/rpact/reference/resetOptions.md)
+- [`resetOptions()`](https://docs.rpact.org/reference/resetOptions.md)
   resets the `rpact` options to their default values
 - Argument `conservative` added to
-  [`getSampleSizeRates()`](https://rpact-com.github.io/rpact/reference/getSampleSizeRates.md)
+  [`getSampleSizeRates()`](https://docs.rpact.org/reference/getSampleSizeRates.md)
   function, see enhancement
   [\#39](https://github.com/rpact-com/rpact/issues/39)
 - Enable futility boundaries in *Boundaries p Values Scale plot* plot
@@ -98,7 +99,7 @@ CRAN release: 2025-03-24
 
 - Issue for calculation of confidence intervals when using the
   conditional Dunnett test design
-  ([`getDesignConditionalDunnett()`](https://rpact-com.github.io/rpact/reference/getDesignConditionalDunnett.md))
+  ([`getDesignConditionalDunnett()`](https://docs.rpact.org/reference/getDesignConditionalDunnett.md))
   in analysis tool is fixed.
 - The full set of unit tests for rpact is now stored in a private
   repository. Only members of the ‘RPACT User Group’ have access to the
@@ -108,15 +109,15 @@ CRAN release: 2025-03-24
 - Usage of `maxInformation` improved (see enhancement
   [\#65](https://github.com/rpact-com/rpact/issues/65))
 - Line breaks in the output of
-  [`getObjectRCode()`](https://rpact-com.github.io/rpact/reference/getObjectRCode.md)
+  [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md)
   improved (see [\#81](https://github.com/rpact-com/rpact/issues/81))
-- [`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md):
+- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md):
   additional warning details will be added to the test report if
   warnings exist\* Issue
   [\#61](https://github.com/rpact-com/rpact/issues/61) fixed
 - Issue [\#68](https://github.com/rpact-com/rpact/issues/68) fixed
 - Flexibility of function
-  [`getPiecewiseSurvivalTime()`](https://rpact-com.github.io/rpact/reference/getPiecewiseSurvivalTime.md)
+  [`getPiecewiseSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTime.md)
   improved
 - Simulation allows the case \#events = \#patients
 - Test coverage improved
@@ -132,7 +133,7 @@ CRAN release: 2024-09-27
 ### New features
 
 - The new function
-  [`getSimulationCounts()`](https://rpact-com.github.io/rpact/reference/getSimulationCounts.md)
+  [`getSimulationCounts()`](https://docs.rpact.org/reference/getSimulationCounts.md)
   can be used to perform power simulations for clinical trials with
   negative binomial distributed count data. The function returns the
   simulated power, stopping probabilities, conditional power, and
@@ -140,22 +141,22 @@ CRAN release: 2024-09-27
   distributed event numbers in the two treatment groups testing
   situation
 - The functions
-  [`getDesignGroupSequential()`](https://rpact-com.github.io/rpact/reference/getDesignGroupSequential.md),
-  [`getDesignInverseNormal()`](https://rpact-com.github.io/rpact/reference/getDesignInverseNormal.md),
+  [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md),
+  [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md),
   and
-  [`getDesignFisher()`](https://rpact-com.github.io/rpact/reference/getDesignFisher.md)
+  [`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md)
   now support the argument `directionUpper` to specify the direction of
   the alternative for one-sided testing early at the design phase, see
   enhancement [\#26](https://github.com/rpact-com/rpact/issues/26)
-- [`getSampleSizeCounts()`](https://rpact-com.github.io/rpact/reference/getSampleSizeCounts.md)
+- [`getSampleSizeCounts()`](https://docs.rpact.org/reference/getSampleSizeCounts.md)
   and
-  [`getPowerCounts()`](https://rpact-com.github.io/rpact/reference/getPowerCounts.md)
+  [`getPowerCounts()`](https://docs.rpact.org/reference/getPowerCounts.md)
   output boundary values also on the treatment effect scale, see
   enhancement [\#40](https://github.com/rpact-com/rpact/issues/40)
 - The
-  [`fetch()`](https://rpact-com.github.io/rpact/reference/fetch.ParameterSet.md)
+  [`fetch()`](https://docs.rpact.org/reference/fetch.ParameterSet.md)
   and
-  [`obtain()`](https://rpact-com.github.io/rpact/reference/fetch.ParameterSet.md)
+  [`obtain()`](https://docs.rpact.org/reference/fetch.ParameterSet.md)
   functions can be used to extract multiple parameters from an rpact
   result object and support various output formats
 
@@ -165,8 +166,8 @@ CRAN release: 2024-09-27
 - Analysis progress messages are only displayed when R is used
   interactively
 - Manual use of
-  [`kable()`](https://rpact-com.github.io/rpact/reference/kableParameterSet.md)
-  for rpact result objects marked as deprecated, as the formatting and
+  [`kable()`](https://docs.rpact.org/reference/kableParameterSet.md) for
+  rpact result objects marked as deprecated, as the formatting and
   display will be handled automatically by rpact
 - The order of all summary entries has been revised and optimized
 - Minimum version of suggested package `ggplot2` changed from 2.2.0 to
@@ -197,15 +198,15 @@ CRAN release: 2024-05-31
   facilitating the creation and maintenance of complex data structures
   and workflows
 - Extension of the function
-  [`getPerformanceScore()`](https://rpact-com.github.io/rpact/reference/getPerformanceScore.md)
+  [`getPerformanceScore()`](https://docs.rpact.org/reference/getPerformanceScore.md)
   for sample size recalculation rules to the setting of binary endpoints
   according to [Bokelmann et
   al. (2024)](https://doi.org/10.1186/s12874-024-02150-4)
 - The
-  [`getSimulationMultiArmMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmMeans.md),
-  [`getSimulationMultiArmRates()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmRates.md),
+  [`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md),
+  [`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md),
   and
-  [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md)
+  [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md)
   functions now support an enhanced `selectArmsFunction` argument.
   Previously, only `effectVector` and `stage` were allowed as arguments.
   Now, users can optionally utilize additional arguments for more
@@ -217,18 +218,18 @@ CRAN release: 2024-05-31
   `piTreatmentsH1`, `piControlH1`, `overallRates`, and
   `overallRatesControl`
 - Same as above for
-  [`getSimulationEnrichmentMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentMeans.md),
-  [`getSimulationEnrichmentRates()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentRates.md),
+  [`getSimulationEnrichmentMeans()`](https://docs.rpact.org/reference/getSimulationEnrichmentMeans.md),
+  [`getSimulationEnrichmentRates()`](https://docs.rpact.org/reference/getSimulationEnrichmentRates.md),
   and
-  [`getSimulationEnrichmentSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentSurvival.md).
+  [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.md).
   Specifically, support for population selection with
   `selectPopulationsFunction` argument based on predictive/posterior
   probabilities added (see
   [\#32](https://github.com/rpact-com/rpact/issues/32))
 - The
-  [`fetch()`](https://rpact-com.github.io/rpact/reference/fetch.ParameterSet.md)
+  [`fetch()`](https://docs.rpact.org/reference/fetch.ParameterSet.md)
   and
-  [`obtain()`](https://rpact-com.github.io/rpact/reference/fetch.ParameterSet.md)
+  [`obtain()`](https://docs.rpact.org/reference/fetch.ParameterSet.md)
   functions can be used to extract a single parameter from an rpact
   result object, which is useful for writing pipe-operator linked
   commands
@@ -254,21 +255,21 @@ CRAN release: 2024-02-27
   [\#23](https://github.com/rpact-com/rpact/issues/23) fixed
 - Fixed inconsistent naming of variables and class fields (issue
   [\#21](https://github.com/rpact-com/rpact/issues/21))
-  - [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md)
+  - [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
     /
-    [`getPowerSurvival()`](https://rpact-com.github.io/rpact/reference/getPowerSurvival.md):
+    [`getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.md):
     - Field `eventsPerStage` replaced by `cumulativeEventsPerStage`
     - Field `singleEventsPerStage` added
-  - [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md):
+  - [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md):
     - Field `eventsPerStage` replaced by `singleEventsPerStage`
     - Field `overallEventsPerStage` replaced by
       `cumulativeEventsPerStage`
-  - [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md):
+  - [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md):
     - Field `eventsPerStage` replaced by `cumulativeEventsPerStage`
     - Field `singleNumberOfEventsPerStage` replaced by
       `singleEventsPerArmAndStage`
     - Field `singleEventsPerStage` added
-  - [`getSimulationEnrichmentSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentSurvival.md):
+  - [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.md):
     - field `singleNumberOfEventsPerStage` replaced by
       `singleEventsPerSubsetAndStage`
 - Test coverage CI/CD pipeline activated with the assistance of GitHub
@@ -283,9 +284,9 @@ CRAN release: 2024-01-25
 ### New features
 
 - The new functions
-  [`getSampleSizeCounts()`](https://rpact-com.github.io/rpact/reference/getSampleSizeCounts.md)
+  [`getSampleSizeCounts()`](https://docs.rpact.org/reference/getSampleSizeCounts.md)
   and
-  [`getPowerCounts()`](https://rpact-com.github.io/rpact/reference/getPowerCounts.md)
+  [`getPowerCounts()`](https://docs.rpact.org/reference/getPowerCounts.md)
   can be used to perform sample size calculations and the assessment of
   test characteristics for clinical trials with negative binomial
   distributed count data. This is possible for fixed sample size and
@@ -313,19 +314,19 @@ CRAN release: 2023-07-03
 ### New features
 
 - The new function
-  [`getPerformanceScore()`](https://rpact-com.github.io/rpact/reference/getPerformanceScore.md)
+  [`getPerformanceScore()`](https://docs.rpact.org/reference/getPerformanceScore.md)
   calculates the conditional performance score, its sub-scores and
   components according to [Herrmann et
   al. (2020)](https://doi.org/10.1002/sim.8534) for a given simulation
   result from a two-stage design
 - `allocationRatioPlanned` for simulating multi-arm and enrichment
   designs can be a vector of length kMax, the number of stages
-- [`getObjectRCode()`](https://rpact-com.github.io/rpact/reference/getObjectRCode.md)
+- [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md)
   (short:
-  [`rcmd()`](https://rpact-com.github.io/rpact/reference/getObjectRCode.md)):
-  with the new arguments `pipeOperator` and `output` many new output
-  variants can be specified, e.g., the native R pipe operator or the
-  magrittr pipe operator can be used
+  [`rcmd()`](https://docs.rpact.org/reference/getObjectRCode.md)): with
+  the new arguments `pipeOperator` and `output` many new output variants
+  can be specified, e.g., the native R pipe operator or the magrittr
+  pipe operator can be used
 - Generic function
   [`knitr::knit_print`](https://rdrr.io/pkg/knitr/man/knit_print.html)
   for all result objects implemented and automatic code chunk option
@@ -363,7 +364,7 @@ CRAN release: 2023-02-13
 - `calcSubjectsFunction` can be used in C++ version for simulating means
   and rates
 - `calcEventsFunction` added in getSimulationSurvival()
-- [`getPerformanceScore()`](https://rpact-com.github.io/rpact/reference/getPerformanceScore.md)
+- [`getPerformanceScore()`](https://docs.rpact.org/reference/getPerformanceScore.md)
   added: calculates the performance score for simulation means results
   (1 and 2 groups; 2 stages)
 - Performance of simulation rates improved for 1 and 2 groups (by
@@ -379,8 +380,8 @@ CRAN release: 2023-02-13
 CRAN release: 2022-11-04
 
 - Design objects can be piped into
-  [`getDataset()`](https://rpact-com.github.io/rpact/reference/getDataset.md)
-  to enable pipe syntax for analysis, e.g.,
+  [`getDataset()`](https://docs.rpact.org/reference/getDataset.md) to
+  enable pipe syntax for analysis, e.g.,
   `getDesignGroupSequential() |> getDataset(dataMeans) |> getAnalysisResults()`
 - Performance of simulation means improved for 1 and 2 groups (by
   translating from R to C++)
@@ -396,24 +397,24 @@ CRAN release: 2022-08-24
 
 - Help pages improved
 - Parameter `betaAdjustment` can also be used in
-  [`getDesignInverseNormal()`](https://rpact-com.github.io/rpact/reference/getDesignInverseNormal.md)
+  [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md)
 - `subsets` removed from result of
-  [`getWideFormat()`](https://rpact-com.github.io/rpact/reference/getWideFormat.md)
+  [`getWideFormat()`](https://docs.rpact.org/reference/getWideFormat.md)
   for non-enrichment datasets
 - Summary of enrichment survival simulation results improved
 - Parameter `populations` in
-  [`getSimulationEnrichmentMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentMeans.md),
-  [`getSimulationEnrichmentRates()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentRates.md),
+  [`getSimulationEnrichmentMeans()`](https://docs.rpact.org/reference/getSimulationEnrichmentMeans.md),
+  [`getSimulationEnrichmentRates()`](https://docs.rpact.org/reference/getSimulationEnrichmentRates.md),
   and
-  [`getSimulationEnrichmentSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentSurvival.md)
+  [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.md)
   has been removed since it is always derived from `effectList`
 - Bug fixed in
-  [`getSimulationEnrichmentRates()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentRates.md)
+  [`getSimulationEnrichmentRates()`](https://docs.rpact.org/reference/getSimulationEnrichmentRates.md)
   for calculated non-integer number of subjects
 - Futility probabilities and futility bounds corrected for two-sided
   beta-spending function approach
-- [`getRawData()`](https://rpact-com.github.io/rpact/reference/getRawData.md):
-  the resulting `data.frame` now contains the correct `stopStage` and
+- [`getRawData()`](https://docs.rpact.org/reference/getRawData.md): the
+  resulting `data.frame` now contains the correct `stopStage` and
   `lastObservationTime` (formerly `observationTime`)
 - `deltaWT` is provided with three decimal points for typeOfDesign =
   “WToptimum”
@@ -435,16 +436,16 @@ CRAN release: 2022-06-15
 
 ### Improvements, issues, and changes
 
-- [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md):
+- [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md):
   single stage treatment arm specific event numbers account for
   selection procedure
 - User defined selection function can be used in
-  [`getSimulationEnrichmentRates()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentRates.md)
+  [`getSimulationEnrichmentRates()`](https://docs.rpact.org/reference/getSimulationEnrichmentRates.md)
   and
-  [`getSimulationEnrichmentSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentSurvival.md)
+  [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.md)
 - Design summary extended by information of
-  [`getDesignCharacteristics()`](https://rpact-com.github.io/rpact/reference/getDesignCharacteristics.md)
-- [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md):
+  [`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.md)
+- [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md):
   the result object now contains the new parameter
   `overallEventsPerStage`, which contains the values previously given in
   `eventsPerStage` (it was “cumulative” by mistake); `eventsPerStage`
@@ -481,7 +482,7 @@ CRAN release: 2022-01-06
   is of floating point type” under r-devel-linux-x86_64-debian-clang
   removed
 - getDataset: support of emmeans result objects as input improved
-- [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md):
+- [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md):
   issue with zero values in the argument ‘userAlphaSpending’ fixed
 - Minor improvements
 
@@ -493,34 +494,34 @@ CRAN release: 2021-12-16
 
 - Simulation tools for enrichment design testing means, rates, and
   hazard ratios: function
-  [`getSimulationEnrichmentMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentMeans.md),
-  [`getSimulationEnrichmentRates()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentRates.md),
-  [`getSimulationEnrichmentSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentSurvival.md)
+  [`getSimulationEnrichmentMeans()`](https://docs.rpact.org/reference/getSimulationEnrichmentMeans.md),
+  [`getSimulationEnrichmentRates()`](https://docs.rpact.org/reference/getSimulationEnrichmentRates.md),
+  [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.md)
   available for simulation of enrichment designs; note that this is a
   novel implementation, hence experimental
-- [`getDesignGroupSequential()`](https://rpact-com.github.io/rpact/reference/getDesignGroupSequential.md)
+- [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md)
   /
-  [`getDesignInverseNormal()`](https://rpact-com.github.io/rpact/reference/getDesignInverseNormal.md):
+  [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md):
   new typeOfDesign = “noEarlyEfficacy” added
 
 ### Improvements, issues, and changes
 
-- [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md):
+- [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md):
   bug fixed for accruallIntensity = 0 at some accrual intervals
 - For observed conditional power, standardized theta not truncated to 0
   any more in
-  [`getSimulationMultiArmMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmMeans.md),
-  [`getSimulationMultiArmRates()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmRates.md),
+  [`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md),
+  [`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md),
   and
-  [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md)
+  [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md)
 - Conditional power calculation for analysis rates takes into account
   differently the null value of condErrorRate
 - Function
-  [`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md):
-  a problem with downloading full set of unit tests under Debian/Linux
-  has been fixed
+  [`testPackage()`](https://docs.rpact.org/reference/testPackage.md): a
+  problem with downloading full set of unit tests under Debian/Linux has
+  been fixed
 - Generic function
-  [`kable()`](https://rpact-com.github.io/rpact/reference/kableParameterSet.md)
+  [`kable()`](https://docs.rpact.org/reference/kableParameterSet.md)
   improved: optional knitr::kable arguments enabled, e.g., format
 - In print and summary output, “overall” renamed to “cumulative” if
   means, stDevs, or rate are calculated over stages rather than
@@ -560,29 +561,29 @@ CRAN release: 2021-06-10
 
 - Analysis tools for enrichment design testing means, rates, and hazard
   ratios: function
-  [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+  [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)
   generalized for enrichment designs; function
-  [`getDataset()`](https://rpact-com.github.io/rpact/reference/getDataset.md)
+  [`getDataset()`](https://docs.rpact.org/reference/getDataset.md)
   generalized for entering stratified data; manual extended for
   enrichment designs
 - Automatic boundary recalculations during the trial for analysis with
   alpha spending approach, including under- and over-running: setup via
   the optional parameters ‘maxInformation’ and ‘informationEpsilon’ in
   function
-  [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+  [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)
 - The new function
-  [`getObjectRCode()`](https://rpact-com.github.io/rpact/reference/getObjectRCode.md)
+  [`getObjectRCode()`](https://docs.rpact.org/reference/getObjectRCode.md)
   (short:
-  [`rcmd()`](https://rpact-com.github.io/rpact/reference/getObjectRCode.md))
+  [`rcmd()`](https://docs.rpact.org/reference/getObjectRCode.md))
   returns the original R command which produced any rpact result object,
   including all dependencies
-- [`getWideFormat()`](https://rpact-com.github.io/rpact/reference/getWideFormat.md)
+- [`getWideFormat()`](https://docs.rpact.org/reference/getWideFormat.md)
   and
-  [`getLongFormat()`](https://rpact-com.github.io/rpact/reference/getLongFormat.md)
+  [`getLongFormat()`](https://docs.rpact.org/reference/getLongFormat.md)
   return a dataset object in wide format (unstacked) or long format
   (narrow, stacked)
 - Generic function
-  [`kable()`](https://rpact-com.github.io/rpact/reference/kableParameterSet.md)
+  [`kable()`](https://docs.rpact.org/reference/kableParameterSet.md)
   returns the output of an rpact result object formatted in Markdown.
 - Generic function [`t()`](https://rdrr.io/r/base/t.html) returns the
   transpose of an rpact result object
@@ -592,14 +593,14 @@ CRAN release: 2021-06-10
 - New argument ‘plotSettings’ added to all plot functions
 - Summary for design, simulation, and analysis unified and extended
 - Issue in
-  [`getDesignFisher()`](https://rpact-com.github.io/rpact/reference/getDesignFisher.md)
+  [`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md)
   fixed: `getDesignFisher(method = "noInteraction", kMax = 3)` and
   `getDesignFisher(method = "noInteraction")` produced different results
 - ‘normalApproximation’ default value changed to TRUE for multi-arm
   analysis of rates
 - Repeated p-values: in search algorithm, upper bound of significance
   level corrected when considering binding futility bounds
-- [`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md):
+- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md):
   the default call is now running only a small subset of all available
   unit tests; with the new argument ‘connection’ the owners of the rpact
   validation documentation can enter a ‘token’ and a ‘secret’ to get
@@ -615,11 +616,11 @@ CRAN release: 2021-03-02
 - Pampallona & Tsiatis design with binding and non-binding futility
   bounds
 - Argument ‘accrualIntensityType’ added to
-  [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md),
-  [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md),
-  [`getNumberOfSubjects()`](https://rpact-com.github.io/rpact/reference/getNumberOfSubjects.md),
+  [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md),
+  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md),
+  [`getNumberOfSubjects()`](https://docs.rpact.org/reference/getNumberOfSubjects.md),
   and
-  [`getEventProbabilities()`](https://rpact-com.github.io/rpact/reference/getEventProbabilities.md)
+  [`getEventProbabilities()`](https://docs.rpact.org/reference/getEventProbabilities.md)
 - Specification of Weibull survival times possible through definition of
   hazard rates or medians in simulation tool
 - Minor improvements
@@ -629,21 +630,21 @@ CRAN release: 2021-03-02
 CRAN release: 2020-12-01
 
 - New utility functions
-  [`getParameterCaption()`](https://rpact-com.github.io/rpact/reference/getParameterCaption.md)
+  [`getParameterCaption()`](https://docs.rpact.org/reference/getParameterCaption.md)
   and
-  [`getParameterName()`](https://rpact-com.github.io/rpact/reference/getParameterName.md)
+  [`getParameterName()`](https://docs.rpact.org/reference/getParameterName.md)
   implemented
 - Design parameters added to simulation print output
 - Generic function [`as.matrix()`](https://rdrr.io/r/base/matrix.html)
   improved for several result objects
 - Issue in
-  [`getAvailablePlotTypes()`](https://rpact-com.github.io/rpact/reference/getAvailablePlotTypes.md)
+  [`getAvailablePlotTypes()`](https://docs.rpact.org/reference/getAvailablePlotTypes.md)
   for sample size and power results fixed
 - Issue for `getDesignFisher(kMax = 1)` in `getSimulationMultiArm...()`
   fixed
-- [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md):
+- [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md):
   correlation of log-rank statistics revised and improved
-- [`getSimulationMultiArmMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmMeans.md):
+- [`getSimulationMultiArmMeans()`](https://docs.rpact.org/reference/getSimulationMultiArmMeans.md):
   name of the first effectMeasure option “effectDifference” changed to
   “effectEstimate”
 - `getSimulation[MultiArm][Means/Rates/Survival]()`: argument
@@ -651,13 +652,13 @@ CRAN release: 2020-12-01
   default for multi-arm and non-multi-arm
 - `getSimulation[MultiArm]Survival()`: generic function
   [`summary()`](https://rdrr.io/r/base/summary.html) improved
-- [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md):
+- [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md):
   generic function [`summary()`](https://rdrr.io/r/base/summary.html)
   improved
-- [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md):
+- [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md):
   improved and new argument ‘accrualIntensityType’ added
 - Header text added to design summaries
-- [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md):
+- [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md):
   field ‘studyDurationH1’ in result object was replaced by
   ‘studyDuration’, i.e., ‘studyDurationH1’ is deprecated and will be
   removed in future versions
@@ -668,14 +669,14 @@ CRAN release: 2020-12-01
 
 CRAN release: 2020-11-09
 
-- [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md):
+- [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md):
   plannedEvents redefined as overall events over treatment arms
-- [`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md):
+- [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md):
   element overallPooledStDevs added; print output improved
 - Unit tests improved: test coverage and references to the functional
   specification optimized
 - plot type 13 of
-  [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md)
+  [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
   with user defined lambdas with different lengths: issue fixed
 - Minor improvements
 
@@ -688,13 +689,13 @@ CRAN release: 2020-09-25
 - Generic function [`summary()`](https://rdrr.io/r/base/summary.html)
   improved for several result objects
 - Result output of function
-  [`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md)
+  [`testPackage()`](https://docs.rpact.org/reference/testPackage.md)
   improved
 - `getSimulationMultiArm[Means/Rates/Survival]()`: stage index corrected
   for user defined calcSubjectsFunction or calcEventsFunction
-- [`getSimulationMultiArmRates()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmRates.md):
+- [`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md):
   adjustment for identical simulated rates to account for ties
-- [`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md):
+- [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md):
   corrected correlation of test statistics
 - Output formatting improved
 - Minor improvements
@@ -709,7 +710,7 @@ CRAN release: 2020-09-07
   ratios
 - Analysis tools for multi-arm design testing means, rates, and hazard
   ratios
-- [`getSimulationRates()`](https://rpact-com.github.io/rpact/reference/getSimulationRates.md):
+- [`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md):
   exact versions for testing a rate (one-sample case) and equality of
   rates (two-sample case)
 - getDataset: multi-arm datasets for means, rates, and survival data
@@ -717,21 +718,21 @@ CRAN release: 2020-09-07
 - Summary for analysis and simulation result objects newly implemented
 - Summary for most rpact result objects substantially improved and
   enhanced
-- [`getEventProbabilities()`](https://rpact-com.github.io/rpact/reference/getEventProbabilities.md):
+- [`getEventProbabilities()`](https://docs.rpact.org/reference/getEventProbabilities.md):
   plot of result object
-- [`getNumberOfSubjects()`](https://rpact-com.github.io/rpact/reference/getNumberOfSubjects.md):
+- [`getNumberOfSubjects()`](https://docs.rpact.org/reference/getNumberOfSubjects.md):
   plot of result object
 - Visual comparison of two designs: `plot(design1, design2)`
 - Functions setOutputFormat and getOutputFormat implemented: definition
   of user defined output formats
-- [`getSimulationMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMeans.md):
+- [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md):
   thetaH1 and stDevH1 can be specified for assessment of sample size
   recalculation (replaces thetaStandardized)
-- [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md):
+- [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md):
   separate p-values added to the aggregated simulation data for Fisher
   designs
-- [`getSimulationMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMeans.md),
-  [`getSimulationRates()`](https://rpact-com.github.io/rpact/reference/getSimulationRates.md):
+- [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md),
+  [`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md):
   Cumulated number of subjects integrated in getData object
 - `getSimulation[MultiArm][Means/Rates/Survival]()`: new logical
   argument ‘showStatistics’ added
@@ -745,15 +746,15 @@ CRAN release: 2020-09-07
 
 ### Improvements, issues, and changes
 
-- [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md):
+- [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md):
   list output implemented analogous to the output of all other rpact
   objects
-- [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md):
+- [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md):
   the following stage result arguments were removed from result object
   because they were redundant: effectSizes, testStatistics, and pValues.
   Please use the ‘.stageResults’ object to access them, e.g.,
   results\$.stageResults\$effectSizes
-- [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md):
+- [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md):
   the following design arguments were removed from result object because
   they were redundant: stages, informationRates, criticalValues,
   futilityBounds, alphaSpent, and stageLevels. Please use the ‘.design’
@@ -770,27 +771,27 @@ CRAN release: 2020-09-07
   eventTime only required for pi-based definitions
 - `plot(x, showSource = TRUE)` improved for all rpact result objects x
 - Performance of plotting analysis results of Fisher designs improved
-- [`getSimulationRates()`](https://rpact-com.github.io/rpact/reference/getSimulationRates.md):
+- [`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md):
   issue for futility stopping for Fisher’s combination test fixed
-- [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md):
+- [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md):
   issue for expected number of events fixed
-- [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md):
+- [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md):
   if eventsNotAchieved \> 0, rejection/futility rate and analysis time
   is estimated for valid simulation runs
-- [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md):
+- [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md):
   output improved for lambda1/median1/hazardRatio with length \> 1
-- [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md):
+- [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md):
   calculation of the maximum number of subjects given the provided
   argument ‘followUpTime’ improved
-- [`getPiecewiseSurvivalTime()`](https://rpact-com.github.io/rpact/reference/getPiecewiseSurvivalTime.md):
+- [`getPiecewiseSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTime.md):
   delayed response via list-based piecewiseSurvivalTime definition
   enabled
-- [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md)
+- [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)
   /
-  [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md):
+  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md):
   issue with the calculation of absolute accrual intensity by given
   relative accrual intensity fixed
-- [`getRawData()`](https://rpact-com.github.io/rpact/reference/getRawData.md):
+- [`getRawData()`](https://docs.rpact.org/reference/getRawData.md):
   issue for multiple pi1 solved
 - Implementation of the generic function ‘names’ improved
 - Test coverage improved: lots of new unit tests added
@@ -806,13 +807,13 @@ CRAN release: 2019-12-12
   unknown variance case
 - `getAnalysisSurvival()`: calculation of stage wise results not more in
   getStageResults
-- [`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md):
+- [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md):
   the calculation of ‘effectSizes’ for survival data and thetaH0 != 1
   was corrected
-- [`getDataset()`](https://rpact-com.github.io/rpact/reference/getDataset.md)
-  of survival data: issue with the internal storage of log ranks fixed
+- [`getDataset()`](https://docs.rpact.org/reference/getDataset.md) of
+  survival data: issue with the internal storage of log ranks fixed
 - Sample size plot: issue for kMax = 1 fixed
-- [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md)
+- [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
   with piecewise survival time: issue with calculation of
   ‘maxNumberOfSubjects’ for given ‘followUpTime’ fixed
 - Internal Shiny app interface improved
@@ -829,7 +830,7 @@ CRAN release: 2019-11-08
   [`summary()`](https://rdrr.io/r/base/summary.html) improved
 - Plot type 5 of getPower\[…\] and getSimulation\[…\] objects improved
 - Output of
-  [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md)
+  [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
   with given maxNumberOfSubjects improved
 - Output of `get[SampleSize/Power]Survival()` for Kappa != 1 improved
 - Assert function for minNumberOfSubjectsPerStage corrected for
@@ -867,7 +868,7 @@ CRAN release: 2019-09-20
   `getSampleSize[...]()`, `getPower[...]()`, and `getSimulation[...]()`
   results
 - Output of
-  [`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md)
+  [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md)
   improved
 - Improvements for Shiny app compatibility and better Shiny app
   performance
@@ -900,12 +901,12 @@ CRAN release: 2019-07-24
 - Parameter maxNumberOfAdditionalSubjectsPerStage renamed to
   maxNumberOfSubjectsPerStage
 - Output of function
-  [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md)
+  [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)
   improved
 - Validation of arguments maxNumberOfIterations, allocation1, and
   allocation2 added: check for positive integer
 - Function
-  [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md)
+  [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
   improved: numeric search for accrualTime if followUpTime is given
 - Default value improved for analysis tools: if no effect was specified
   for conditional power calculation, the observed effect is selected
@@ -961,7 +962,7 @@ CRAN release: 2019-05-28
 - Minor code optimizations, e.g. ‘return()’ replaced by
   ‘return(invisible())’ if reasonable
 - Bug in
-  [`readDatasets()`](https://rpact-com.github.io/rpact/reference/readDatasets.md)
+  [`readDatasets()`](https://docs.rpact.org/reference/readDatasets.md)
   fixed: variable names ‘group’ and ‘groups’ are now accepted
 - “Overall reject per stage” and “Overall futility per stage” renamed to
   “Overall reject” and “Overall futility”, respectively (also variable
@@ -971,7 +972,7 @@ CRAN release: 2019-05-28
 - Output format for ‘allocationRatioPlanned’ specified
 - Method ‘show’ of class ‘ParameterSet’ expanded: R Markdown output
   features implemented
-- [`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md):
+- [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md):
   argument ‘maxNumberOfPatients’ was renamed in ‘maxNumberOfSubjects’
 - Result output, inline help and documentation: the word ‘patient’ was
   replaced by ‘subject’

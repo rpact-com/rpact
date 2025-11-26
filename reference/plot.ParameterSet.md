@@ -1,7 +1,7 @@
 # Parameter Set Plotting
 
 Plots an object that inherits from class
-[`ParameterSet`](https://rpact-com.github.io/rpact/reference/ParameterSet.md).
+[`ParameterSet`](https://docs.rpact.org/reference/ParameterSet.md).
 
 ## Usage
 
@@ -27,7 +27,7 @@ plot(
 - x:
 
   The object that inherits from
-  [`ParameterSet`](https://rpact-com.github.io/rpact/reference/ParameterSet.md).
+  [`ParameterSet`](https://docs.rpact.org/reference/ParameterSet.md).
 
 - y:
 
@@ -109,7 +109,7 @@ plot(
 - plotSettings:
 
   An object of class `PlotSettings` created by
-  [`getPlotSettings()`](https://rpact-com.github.io/rpact/reference/getPlotSettings.md).
+  [`getPlotSettings()`](https://docs.rpact.org/reference/getPlotSettings.md).
 
 ## Value
 

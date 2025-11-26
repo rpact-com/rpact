@@ -22,16 +22,16 @@ setLogLevel(
 This function sets the log level of the `rpact` internal log message
 system. By default only calculation progress messages will be shown on
 the output console, particularly
-[`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+[`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md)
 shows this kind of messages. The output of these messages can be
 disabled by setting the log level to `"DISABLED"`.
 
 ## See also
 
-- [`getLogLevel()`](https://rpact-com.github.io/rpact/reference/getLogLevel.md)
-  for getting the current log level,
+- [`getLogLevel()`](https://docs.rpact.org/reference/getLogLevel.md) for
+  getting the current log level,
 
-- [`resetLogLevel()`](https://rpact-com.github.io/rpact/reference/resetLogLevel.md)
+- [`resetLogLevel()`](https://docs.rpact.org/reference/resetLogLevel.md)
   for resetting the log level to default.
 
 ## Examples

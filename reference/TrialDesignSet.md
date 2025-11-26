@@ -6,7 +6,7 @@ designs.
 ## Details
 
 This object cannot be created directly; better use
-[`getDesignSet()`](https://rpact-com.github.io/rpact/reference/getDesignSet.md)
+[`getDesignSet()`](https://docs.rpact.org/reference/getDesignSet.md)
 with suitable arguments to create a set of designs.
 
 ## Fields
@@ -26,4 +26,4 @@ with suitable arguments to create a set of designs.
 
 ## See also
 
-[`getDesignSet()`](https://rpact-com.github.io/rpact/reference/getDesignSet.md)
+[`getDesignSet()`](https://docs.rpact.org/reference/getDesignSet.md)

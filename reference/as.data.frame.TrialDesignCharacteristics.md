@@ -21,7 +21,7 @@ as.data.frame(
 - x:
 
   A
-  [`TrialDesignCharacteristics`](https://rpact-com.github.io/rpact/reference/TrialDesignCharacteristics.md)
+  [`TrialDesignCharacteristics`](https://docs.rpact.org/reference/TrialDesignCharacteristics.md)
   object.
 
 - niceColumnNamesEnabled:
@@ -48,7 +48,7 @@ Returns a [`data.frame`](https://rdrr.io/r/base/data.frame.html).
 ## Details
 
 Each element of the
-[`TrialDesignCharacteristics`](https://rpact-com.github.io/rpact/reference/TrialDesignCharacteristics.md)
+[`TrialDesignCharacteristics`](https://docs.rpact.org/reference/TrialDesignCharacteristics.md)
 is converted to a column in the data frame.
 
 ## Examples

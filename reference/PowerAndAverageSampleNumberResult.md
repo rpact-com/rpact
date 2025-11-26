@@ -5,7 +5,7 @@ Class for power and average sample number (ASN) results.
 ## Details
 
 This object cannot be created directly; use
-[`getPowerAndAverageSampleNumber()`](https://rpact-com.github.io/rpact/reference/getPowerAndAverageSampleNumber.md)
+[`getPowerAndAverageSampleNumber()`](https://docs.rpact.org/reference/getPowerAndAverageSampleNumber.md)
 with suitable arguments to create it.
 
 ## Fields

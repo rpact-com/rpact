@@ -23,6 +23,6 @@ are in separate columns.
 
 ## See also
 
-[`getLongFormat()`](https://rpact-com.github.io/rpact/reference/getLongFormat.md)
+[`getLongFormat()`](https://docs.rpact.org/reference/getLongFormat.md)
 for returning the dataset as a
 [`data.frame`](https://rdrr.io/r/base/data.frame.html) in long format.

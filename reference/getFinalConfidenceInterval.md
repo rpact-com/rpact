@@ -29,9 +29,9 @@ getFinalConfidenceInterval(
   The summary data used for calculating the test results. This is either
   an element of `DatasetMeans`, of `DatasetRates`, or of
   `DatasetSurvival` and should be created with the function
-  [`getDataset()`](https://rpact-com.github.io/rpact/reference/getDataset.md).
-  For more information see
-  [`getDataset()`](https://rpact-com.github.io/rpact/reference/getDataset.md).
+  [`getDataset()`](https://docs.rpact.org/reference/getDataset.md). For
+  more information see
+  [`getDataset()`](https://docs.rpact.org/reference/getDataset.md).
 
 - ...:
 
@@ -130,16 +130,16 @@ is theoretically shown only if no sample size change was performed.
 ## See also
 
 Other analysis functions:
-[`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md),
-[`getClosedCombinationTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedCombinationTestResults.md),
-[`getClosedConditionalDunnettTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedConditionalDunnettTestResults.md),
-[`getConditionalPower()`](https://rpact-com.github.io/rpact/reference/getConditionalPower.md),
-[`getConditionalRejectionProbabilities()`](https://rpact-com.github.io/rpact/reference/getConditionalRejectionProbabilities.md),
-[`getFinalPValue()`](https://rpact-com.github.io/rpact/reference/getFinalPValue.md),
-[`getRepeatedConfidenceIntervals()`](https://rpact-com.github.io/rpact/reference/getRepeatedConfidenceIntervals.md),
-[`getRepeatedPValues()`](https://rpact-com.github.io/rpact/reference/getRepeatedPValues.md),
-[`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md),
-[`getTestActions()`](https://rpact-com.github.io/rpact/reference/getTestActions.md)
+[`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md),
+[`getClosedCombinationTestResults()`](https://docs.rpact.org/reference/getClosedCombinationTestResults.md),
+[`getClosedConditionalDunnettTestResults()`](https://docs.rpact.org/reference/getClosedConditionalDunnettTestResults.md),
+[`getConditionalPower()`](https://docs.rpact.org/reference/getConditionalPower.md),
+[`getConditionalRejectionProbabilities()`](https://docs.rpact.org/reference/getConditionalRejectionProbabilities.md),
+[`getFinalPValue()`](https://docs.rpact.org/reference/getFinalPValue.md),
+[`getRepeatedConfidenceIntervals()`](https://docs.rpact.org/reference/getRepeatedConfidenceIntervals.md),
+[`getRepeatedPValues()`](https://docs.rpact.org/reference/getRepeatedPValues.md),
+[`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md),
+[`getTestActions()`](https://docs.rpact.org/reference/getTestActions.md)
 
 ## Examples
 

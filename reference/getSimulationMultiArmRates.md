@@ -271,27 +271,27 @@ getSimulationMultiArmRates(
 ## Value
 
 Returns a
-[`SimulationResults`](https://rpact-com.github.io/rpact/reference/SimulationResults.md)
+[`SimulationResults`](https://docs.rpact.org/reference/SimulationResults.md)
 object. The following generics (R generic functions) are available for
 this object:
 
-- [`names()`](https://rpact-com.github.io/rpact/reference/names.FieldSet.md)
-  to obtain the field names,
+- [`names()`](https://docs.rpact.org/reference/names.FieldSet.md) to
+  obtain the field names,
 
-- [`print()`](https://rpact-com.github.io/rpact/reference/print.FieldSet.md)
-  to print the object,
+- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
+  print the object,
 
-- [`summary()`](https://rpact-com.github.io/rpact/reference/summary.ParameterSet.md)
+- [`summary()`](https://docs.rpact.org/reference/summary.ParameterSet.md)
   to display a summary of the object,
 
-- [`plot()`](https://rpact-com.github.io/rpact/reference/plot.SimulationResults.md)
+- [`plot()`](https://docs.rpact.org/reference/plot.SimulationResults.md)
   to plot the object,
 
-- [`as.data.frame()`](https://rpact-com.github.io/rpact/reference/as.data.frame.ParameterSet.md)
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.ParameterSet.md)
   to coerce the object to a
   [`data.frame`](https://rdrr.io/r/base/data.frame.html),
 
-- [`as.matrix()`](https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.md)
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
@@ -329,7 +329,7 @@ of a generic and to identify the object specific name of it, e.g., use
 `methods("plot")` to get all the methods for the `plot` generic. There
 you can find, e.g., `plot.AnalysisResults` and obtain the specific help
 documentation linked above by typing
-[`?plot.AnalysisResults`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md).
+[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
 
 ## Examples
 

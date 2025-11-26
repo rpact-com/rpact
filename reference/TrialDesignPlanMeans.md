@@ -5,7 +5,7 @@ Trial design plan for means.
 ## Details
 
 This object cannot be created directly; use
-[`getSampleSizeMeans()`](https://rpact-com.github.io/rpact/reference/getSampleSizeMeans.md)
+[`getSampleSizeMeans()`](https://docs.rpact.org/reference/getSampleSizeMeans.md)
 with suitable arguments to create a design plan for a dataset of means.
 
 ## Fields

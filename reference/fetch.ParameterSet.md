@@ -20,8 +20,7 @@ fetch(x, ..., output = c("named", "labeled", "value", "list"))
 
 - x:
 
-  The
-  [`ParameterSet`](https://rpact-com.github.io/rpact/reference/ParameterSet.md)
+  The [`ParameterSet`](https://docs.rpact.org/reference/ParameterSet.md)
   object to fetch from.
 
 - ...:

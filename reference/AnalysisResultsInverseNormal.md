@@ -5,7 +5,7 @@ Class for analysis results results based on an inverse normal design.
 ## Details
 
 This object cannot be created directly; use
-[`getAnalysisResults`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md)
+[`getAnalysisResults`](https://docs.rpact.org/reference/getAnalysisResults.md)
 with suitable arguments to create the analysis results of a inverse
 normal design.
 

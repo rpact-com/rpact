@@ -6,14 +6,14 @@ Basic class for datasets.
 
 `Dataset` is the basic class for
 
-- [`DatasetMeans`](https://rpact-com.github.io/rpact/reference/DatasetMeans.md),
+- [`DatasetMeans`](https://docs.rpact.org/reference/DatasetMeans.md),
 
-- [`DatasetRates`](https://rpact-com.github.io/rpact/reference/DatasetRates.md),
+- [`DatasetRates`](https://docs.rpact.org/reference/DatasetRates.md),
 
-- [`DatasetSurvival`](https://rpact-com.github.io/rpact/reference/DatasetSurvival.md),
+- [`DatasetSurvival`](https://docs.rpact.org/reference/DatasetSurvival.md),
   and
 
-- [`DatasetEnrichmentSurvival`](https://rpact-com.github.io/rpact/reference/DatasetSurvival.md).
+- [`DatasetEnrichmentSurvival`](https://docs.rpact.org/reference/DatasetSurvival.md).
 
 This basic class contains the fields `stages` and `groups` and several
 commonly used functions.

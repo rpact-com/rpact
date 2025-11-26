@@ -56,6 +56,6 @@ vector will be returned.
 
 Can be used, e.g., to convert median values into pi or lambda values for
 usage in
-[`getSampleSizeSurvival()`](https://rpact-com.github.io/rpact/reference/getSampleSizeSurvival.md)
+[`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
 or
-[`getPowerSurvival()`](https://rpact-com.github.io/rpact/reference/getPowerSurvival.md).
+[`getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.md).

@@ -14,7 +14,7 @@ length(x)
 - x:
 
   A
-  [`TrialDesignSet`](https://rpact-com.github.io/rpact/reference/TrialDesignSet.md)
+  [`TrialDesignSet`](https://docs.rpact.org/reference/TrialDesignSet.md)
   object.
 
 ## Value

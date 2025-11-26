@@ -24,9 +24,9 @@ getAvailablePlotTypes(
 
   The object for which the plot types shall be identified, e.g. produced
   by
-  [`getDesignGroupSequential()`](https://rpact-com.github.io/rpact/reference/getDesignGroupSequential.md)
+  [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md)
   or
-  [`getSampleSizeMeans()`](https://rpact-com.github.io/rpact/reference/getSampleSizeMeans.md).
+  [`getSampleSizeMeans()`](https://docs.rpact.org/reference/getSampleSizeMeans.md).
 
 - output:
 

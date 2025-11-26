@@ -5,7 +5,7 @@ A class for simulation results rates in multi-arm designs.
 ## Details
 
 Use
-[`getSimulationMultiArmRates()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmRates.md)
+[`getSimulationMultiArmRates()`](https://docs.rpact.org/reference/getSimulationMultiArmRates.md)
 to create an object of this type.
 
 ## Fields

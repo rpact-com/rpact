@@ -87,8 +87,7 @@ how to get a copy of the formal validation documentation that is
 customized and licensed for exclusive use by your company, e.g., to
 fulfill regulatory requirements. The validation documentation contains
 the personal access data for performing the installation qualification
-with
-[`testPackage()`](https://rpact-com.github.io/rpact/reference/testPackage.md).
+with [`testPackage()`](https://docs.rpact.org/reference/testPackage.md).
 
 > [www.rpact.com/contact](https://www.rpact.com/contact/)
 

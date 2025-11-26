@@ -55,10 +55,10 @@ use-cases, the so-called rpact vignettes, are hosted at
   [rpact](https://cran.r-project.org/package=rpact) comparison tools:
   `getDesignSet`
 - Calculate the required sample size, e.g.:
-  [`getSampleSizeMeans()`](https://rpact-com.github.io/rpact/reference/getSampleSizeMeans.md),
-  [`getPowerMeans()`](https://rpact-com.github.io/rpact/reference/getPowerMeans.md)
+  [`getSampleSizeMeans()`](https://docs.rpact.org/reference/getSampleSizeMeans.md),
+  [`getPowerMeans()`](https://docs.rpact.org/reference/getPowerMeans.md)
 - Simulate specific characteristics of an adaptive design, e.g.:
-  [`getSimulationMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMeans.md)
+  [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md)
 - Collect your data, import it into R and create a dataset:
   `data <- getDataset()`
 - Analyze your data: `getAnalysisResults(design, data)`

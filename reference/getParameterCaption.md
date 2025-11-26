@@ -31,7 +31,7 @@ print outputs of an rpact result object.
 
 ## See also
 
-[`getParameterName()`](https://rpact-com.github.io/rpact/reference/getParameterName.md)
+[`getParameterName()`](https://docs.rpact.org/reference/getParameterName.md)
 for getting the parameter name for a given caption.
 
 ## Examples

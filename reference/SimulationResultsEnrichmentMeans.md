@@ -5,7 +5,7 @@ A class for simulation results means in enrichment designs.
 ## Details
 
 Use
-[`getSimulationEnrichmentMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentMeans.md)
+[`getSimulationEnrichmentMeans()`](https://docs.rpact.org/reference/getSimulationEnrichmentMeans.md)
 to create an object of this type.
 
 ## Fields

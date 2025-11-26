@@ -6,7 +6,7 @@ A basic class for enrichment analysis results.
 
 `AnalysisResultsEnrichment` is the basic class for
 
-- [`AnalysisResultsEnrichmentFisher`](https://rpact-com.github.io/rpact/reference/AnalysisResultsEnrichmentFisher.md)
+- [`AnalysisResultsEnrichmentFisher`](https://docs.rpact.org/reference/AnalysisResultsEnrichmentFisher.md)
   and
 
-- [`AnalysisResultsEnrichmentInverseNormal`](https://rpact-com.github.io/rpact/reference/AnalysisResultsEnrichmentInverseNormal.md).
+- [`AnalysisResultsEnrichmentInverseNormal`](https://docs.rpact.org/reference/AnalysisResultsEnrichmentInverseNormal.md).

@@ -6,9 +6,9 @@ A basic class for multi-arm analysis results.
 
 `AnalysisResultsMultiArm` is the basic class for
 
-- [`AnalysisResultsMultiArmFisher`](https://rpact-com.github.io/rpact/reference/AnalysisResultsMultiArmFisher.md),
+- [`AnalysisResultsMultiArmFisher`](https://docs.rpact.org/reference/AnalysisResultsMultiArmFisher.md),
 
-- [`AnalysisResultsMultiArmInverseNormal`](https://rpact-com.github.io/rpact/reference/AnalysisResultsMultiArmInverseNormal.md),
+- [`AnalysisResultsMultiArmInverseNormal`](https://docs.rpact.org/reference/AnalysisResultsMultiArmInverseNormal.md),
   and
 
-- [`AnalysisResultsConditionalDunnett`](https://rpact-com.github.io/rpact/reference/AnalysisResultsConditionalDunnett.md).
+- [`AnalysisResultsConditionalDunnett`](https://docs.rpact.org/reference/AnalysisResultsConditionalDunnett.md).

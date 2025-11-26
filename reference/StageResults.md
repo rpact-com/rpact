@@ -6,24 +6,24 @@ Basic class for stage results.
 
 `StageResults` is the basic class for
 
-- [`StageResultsMeans`](https://rpact-com.github.io/rpact/reference/StageResultsMeans.md),
+- [`StageResultsMeans`](https://docs.rpact.org/reference/StageResultsMeans.md),
 
-- [`StageResultsRates`](https://rpact-com.github.io/rpact/reference/StageResultsRates.md),
+- [`StageResultsRates`](https://docs.rpact.org/reference/StageResultsRates.md),
 
-- [`StageResultsSurvival`](https://rpact-com.github.io/rpact/reference/StageResultsSurvival.md),
+- [`StageResultsSurvival`](https://docs.rpact.org/reference/StageResultsSurvival.md),
 
-- [`StageResultsMultiArmMeans`](https://rpact-com.github.io/rpact/reference/StageResultsMultiArmMeans.md),
+- [`StageResultsMultiArmMeans`](https://docs.rpact.org/reference/StageResultsMultiArmMeans.md),
 
-- [`StageResultsMultiArmRates`](https://rpact-com.github.io/rpact/reference/StageResultsMultiArmRates.md),
+- [`StageResultsMultiArmRates`](https://docs.rpact.org/reference/StageResultsMultiArmRates.md),
 
-- [`StageResultsMultiArmSurvival`](https://rpact-com.github.io/rpact/reference/StageResultsMultiArmSurvival.md),
+- [`StageResultsMultiArmSurvival`](https://docs.rpact.org/reference/StageResultsMultiArmSurvival.md),
 
-- [`StageResultsEnrichmentMeans`](https://rpact-com.github.io/rpact/reference/StageResultsEnrichmentMeans.md),
+- [`StageResultsEnrichmentMeans`](https://docs.rpact.org/reference/StageResultsEnrichmentMeans.md),
 
-- [`StageResultsEnrichmentRates`](https://rpact-com.github.io/rpact/reference/StageResultsEnrichmentRates.md),
+- [`StageResultsEnrichmentRates`](https://docs.rpact.org/reference/StageResultsEnrichmentRates.md),
   and
 
-- [`StageResultsEnrichmentSurvival`](https://rpact-com.github.io/rpact/reference/StageResultsEnrichmentSurvival.md).
+- [`StageResultsEnrichmentSurvival`](https://docs.rpact.org/reference/StageResultsEnrichmentSurvival.md).
 
 ## Fields
 

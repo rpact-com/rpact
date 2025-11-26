@@ -18,9 +18,9 @@ effects.
 
 Once this function is called, the startup messages will remain enabled
 until explicitly disabled using the
-[`disableStartupMessages()`](https://rpact-com.github.io/rpact/reference/disableStartupMessages.md)
+[`disableStartupMessages()`](https://docs.rpact.org/reference/disableStartupMessages.md)
 function. The current state is saved using the
-[`saveOptions()`](https://rpact-com.github.io/rpact/reference/saveOptions.md)
+[`saveOptions()`](https://docs.rpact.org/reference/saveOptions.md)
 function.
 
 ## Examples

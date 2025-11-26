@@ -5,7 +5,7 @@ A class for simulation results rates in enrichment designs.
 ## Details
 
 Use
-[`getSimulationEnrichmentRates()`](https://rpact-com.github.io/rpact/reference/getSimulationEnrichmentRates.md)
+[`getSimulationEnrichmentRates()`](https://docs.rpact.org/reference/getSimulationEnrichmentRates.md)
 to create an object of this type.
 
 ## Fields

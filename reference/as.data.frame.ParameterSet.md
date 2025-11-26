@@ -20,9 +20,7 @@ as.data.frame(
 
 - x:
 
-  A
-  [`FieldSet`](https://rpact-com.github.io/rpact/reference/FieldSet.md)
-  object.
+  A [`FieldSet`](https://docs.rpact.org/reference/FieldSet.md) object.
 
 - ...:
 

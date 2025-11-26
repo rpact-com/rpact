@@ -1,8 +1,8 @@
 # Print Dataset Values
 
 `print` prints its
-[`Dataset`](https://rpact-com.github.io/rpact/reference/Dataset.md)
-argument and returns it invisibly (via `invisible(x)`).
+[`Dataset`](https://docs.rpact.org/reference/Dataset.md) argument and
+returns it invisibly (via `invisible(x)`).
 
 ## Usage
 
@@ -20,8 +20,7 @@ print(
 
 - x:
 
-  A [`Dataset`](https://rpact-com.github.io/rpact/reference/Dataset.md)
-  object.
+  A [`Dataset`](https://docs.rpact.org/reference/Dataset.md) object.
 
 - ...:
 

@@ -31,9 +31,9 @@ getAnalysisResults(
   The summary data used for calculating the test results. This is either
   an element of `DatasetMeans`, of `DatasetRates`, or of
   `DatasetSurvival` and should be created with the function
-  [`getDataset()`](https://rpact-com.github.io/rpact/reference/getDataset.md).
-  For more information see
-  [`getDataset()`](https://rpact-com.github.io/rpact/reference/getDataset.md).
+  [`getDataset()`](https://docs.rpact.org/reference/getDataset.md). For
+  more information see
+  [`getDataset()`](https://docs.rpact.org/reference/getDataset.md).
 
 - ...:
 
@@ -198,27 +198,27 @@ getAnalysisResults(
 ## Value
 
 Returns an
-[`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+[`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
 object. The following generics (R generic functions) are available for
 this result object:
 
-- [`names`](https://rpact-com.github.io/rpact/reference/names.AnalysisResults.md)
+- [`names`](https://docs.rpact.org/reference/names.AnalysisResults.md)
   to obtain the field names,
 
-- [`print()`](https://rpact-com.github.io/rpact/reference/print.ParameterSet.md)
-  to print the object,
+- [`print()`](https://docs.rpact.org/reference/print.ParameterSet.md) to
+  print the object,
 
-- [`summary()`](https://rpact-com.github.io/rpact/reference/summary.AnalysisResults.md)
+- [`summary()`](https://docs.rpact.org/reference/summary.AnalysisResults.md)
   to display a summary of the object,
 
-- [`plot()`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md)
+- [`plot()`](https://docs.rpact.org/reference/plot.AnalysisResults.md)
   to plot the object,
 
-- [`as.data.frame()`](https://rpact-com.github.io/rpact/reference/as.data.frame.AnalysisResults.md)
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.AnalysisResults.md)
   to coerce the object to a
   [`data.frame`](https://rdrr.io/r/base/data.frame.html),
 
-- [`as.matrix()`](https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.md)
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
@@ -277,23 +277,23 @@ of a generic and to identify the object specific name of it, e.g., use
 `methods("plot")` to get all the methods for the `plot` generic. There
 you can find, e.g., `plot.AnalysisResults` and obtain the specific help
 documentation linked above by typing
-[`?plot.AnalysisResults`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md).
+[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
 
 ## See also
 
-[`getObservedInformationRates()`](https://rpact-com.github.io/rpact/reference/getObservedInformationRates.md)
+[`getObservedInformationRates()`](https://docs.rpact.org/reference/getObservedInformationRates.md)
 
 Other analysis functions:
-[`getClosedCombinationTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedCombinationTestResults.md),
-[`getClosedConditionalDunnettTestResults()`](https://rpact-com.github.io/rpact/reference/getClosedConditionalDunnettTestResults.md),
-[`getConditionalPower()`](https://rpact-com.github.io/rpact/reference/getConditionalPower.md),
-[`getConditionalRejectionProbabilities()`](https://rpact-com.github.io/rpact/reference/getConditionalRejectionProbabilities.md),
-[`getFinalConfidenceInterval()`](https://rpact-com.github.io/rpact/reference/getFinalConfidenceInterval.md),
-[`getFinalPValue()`](https://rpact-com.github.io/rpact/reference/getFinalPValue.md),
-[`getRepeatedConfidenceIntervals()`](https://rpact-com.github.io/rpact/reference/getRepeatedConfidenceIntervals.md),
-[`getRepeatedPValues()`](https://rpact-com.github.io/rpact/reference/getRepeatedPValues.md),
-[`getStageResults()`](https://rpact-com.github.io/rpact/reference/getStageResults.md),
-[`getTestActions()`](https://rpact-com.github.io/rpact/reference/getTestActions.md)
+[`getClosedCombinationTestResults()`](https://docs.rpact.org/reference/getClosedCombinationTestResults.md),
+[`getClosedConditionalDunnettTestResults()`](https://docs.rpact.org/reference/getClosedConditionalDunnettTestResults.md),
+[`getConditionalPower()`](https://docs.rpact.org/reference/getConditionalPower.md),
+[`getConditionalRejectionProbabilities()`](https://docs.rpact.org/reference/getConditionalRejectionProbabilities.md),
+[`getFinalConfidenceInterval()`](https://docs.rpact.org/reference/getFinalConfidenceInterval.md),
+[`getFinalPValue()`](https://docs.rpact.org/reference/getFinalPValue.md),
+[`getRepeatedConfidenceIntervals()`](https://docs.rpact.org/reference/getRepeatedConfidenceIntervals.md),
+[`getRepeatedPValues()`](https://docs.rpact.org/reference/getRepeatedPValues.md),
+[`getStageResults()`](https://docs.rpact.org/reference/getStageResults.md),
+[`getTestActions()`](https://docs.rpact.org/reference/getTestActions.md)
 
 ## Examples
 

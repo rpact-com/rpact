@@ -5,7 +5,7 @@ Trial design plan for rates.
 ## Details
 
 This object cannot be created directly; use
-[`getSampleSizeRates()`](https://rpact-com.github.io/rpact/reference/getSampleSizeRates.md)
+[`getSampleSizeRates()`](https://docs.rpact.org/reference/getSampleSizeRates.md)
 with suitable arguments to create a design plan for a dataset of rates.
 
 ## Fields

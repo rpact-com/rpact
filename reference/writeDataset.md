@@ -103,13 +103,13 @@ a CSV file.
 
 ## See also
 
-- [`writeDatasets()`](https://rpact-com.github.io/rpact/reference/writeDatasets.md)
+- [`writeDatasets()`](https://docs.rpact.org/reference/writeDatasets.md)
   for writing multiple datasets,
 
-- [`readDataset()`](https://rpact-com.github.io/rpact/reference/readDataset.md)
-  for reading a single dataset,
+- [`readDataset()`](https://docs.rpact.org/reference/readDataset.md) for
+  reading a single dataset,
 
-- [`readDatasets()`](https://rpact-com.github.io/rpact/reference/readDatasets.md)
+- [`readDatasets()`](https://docs.rpact.org/reference/readDatasets.md)
   for reading multiple datasets.
 
 ## Examples

@@ -5,7 +5,7 @@ Trial design for inverse normal method.
 ## Details
 
 This object should not be created directly; use
-[`getDesignInverseNormal()`](https://rpact-com.github.io/rpact/reference/getDesignInverseNormal.md)
+[`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md)
 with suitable arguments to create a inverse normal design.
 
 ## Fields
@@ -183,5 +183,5 @@ with suitable arguments to create a inverse normal design.
 
 ## See also
 
-[`getDesignInverseNormal()`](https://rpact-com.github.io/rpact/reference/getDesignInverseNormal.md)
+[`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md)
 for creating a inverse normal design.

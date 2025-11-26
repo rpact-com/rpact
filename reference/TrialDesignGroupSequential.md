@@ -5,7 +5,7 @@ Trial design for group sequential design.
 ## Details
 
 This object should not be created directly; use
-[`getDesignGroupSequential()`](https://rpact-com.github.io/rpact/reference/getDesignGroupSequential.md)
+[`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md)
 with suitable arguments to create a group sequential design.
 
 ## Fields
@@ -183,5 +183,5 @@ with suitable arguments to create a group sequential design.
 
 ## See also
 
-[`getDesignGroupSequential()`](https://rpact-com.github.io/rpact/reference/getDesignGroupSequential.md)
+[`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md)
 for creating a group sequential design.

@@ -13,15 +13,14 @@ getRawData(x, aggregate = FALSE)
 - x:
 
   A
-  [`SimulationResults`](https://rpact-com.github.io/rpact/reference/SimulationResults.md)
+  [`SimulationResults`](https://docs.rpact.org/reference/SimulationResults.md)
   object created by
-  [`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md).
+  [`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md).
 
 - aggregate:
 
   Logical. If `TRUE` the raw data will be aggregated similar to the
-  result of
-  [`getData()`](https://rpact-com.github.io/rpact/reference/getData.md),
+  result of [`getData()`](https://docs.rpact.org/reference/getData.md),
   default is `FALSE`.
 
 ## Value
@@ -31,15 +30,15 @@ Returns a [`data.frame`](https://rdrr.io/r/base/data.frame.html).
 ## Details
 
 This function works only if
-[`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md)
+[`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md)
 was called with a  
 `maxNumberOfRawDatasetsPerStage` \> 0 (default is `0`).
 
 This function can be used to get the simulated raw data from a
 simulation results object obtained by
-[`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md).
+[`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md).
 Note that
-[`getSimulationSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationSurvival.md)
+[`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md)
 must called before with `maxNumberOfRawDatasetsPerStage` \> 0. The data
 frame contains the following columns:
 

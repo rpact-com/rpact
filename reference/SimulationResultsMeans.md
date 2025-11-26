@@ -5,17 +5,17 @@ A class for simulation results means.
 ## Details
 
 Use
-[`getSimulationMeans()`](https://rpact-com.github.io/rpact/reference/getSimulationMeans.md)
+[`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md)
 to create an object of this type.
 
 `SimulationResultsMeans` is the basic class for
 
 - `SimulationResultsMeans`,
 
-- [`SimulationResultsMultiArmMeans`](https://rpact-com.github.io/rpact/reference/SimulationResultsMultiArmMeans.md),
+- [`SimulationResultsMultiArmMeans`](https://docs.rpact.org/reference/SimulationResultsMultiArmMeans.md),
   and
 
-- [`SimulationResultsEnrichmentMeans`](https://rpact-com.github.io/rpact/reference/SimulationResultsEnrichmentMeans.md).
+- [`SimulationResultsEnrichmentMeans`](https://docs.rpact.org/reference/SimulationResultsEnrichmentMeans.md).
 
 ## Fields
 

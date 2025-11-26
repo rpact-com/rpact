@@ -5,7 +5,7 @@ A class for simulation results survival in multi-arm designs.
 ## Details
 
 Use
-[`getSimulationMultiArmSurvival()`](https://rpact-com.github.io/rpact/reference/getSimulationMultiArmSurvival.md)
+[`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md)
 to create an object of this type.
 
 ## Fields

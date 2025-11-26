@@ -154,7 +154,7 @@ getSimulationSurvival(
   definition of the exponential survival time cumulative distribution
   function  
   (for details see
-  [`getPiecewiseSurvivalTime()`](https://rpact-com.github.io/rpact/reference/getPiecewiseSurvivalTime.md)).
+  [`getPiecewiseSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTime.md)).
 
 - allocation1:
 
@@ -175,13 +175,13 @@ getSimulationSurvival(
 
   The assumed accrual time intervals for the study, default is
   `c(0, 12)` (for details see
-  [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md)).
+  [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)).
 
 - accrualIntensity:
 
   A numeric vector of accrual intensities, default is the relative
   intensity `0.1` (for details see
-  [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md)).
+  [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)).
 
 - accrualIntensityType:
 
@@ -261,8 +261,7 @@ getSimulationSurvival(
 
   The number of raw datasets per stage that shall be extracted and saved
   as [`data.frame`](https://rdrr.io/r/base/data.frame.html), default is
-  `0`.
-  [`getRawData()`](https://rpact-com.github.io/rpact/reference/getRawData.md)
+  `0`. [`getRawData()`](https://docs.rpact.org/reference/getRawData.md)
   can be used to get the extracted raw data from the object.
 
 - longTimeSimulationAllowed:
@@ -291,27 +290,27 @@ getSimulationSurvival(
 ## Value
 
 Returns a
-[`SimulationResults`](https://rpact-com.github.io/rpact/reference/SimulationResults.md)
+[`SimulationResults`](https://docs.rpact.org/reference/SimulationResults.md)
 object. The following generics (R generic functions) are available for
 this object:
 
-- [`names()`](https://rpact-com.github.io/rpact/reference/names.FieldSet.md)
-  to obtain the field names,
+- [`names()`](https://docs.rpact.org/reference/names.FieldSet.md) to
+  obtain the field names,
 
-- [`print()`](https://rpact-com.github.io/rpact/reference/print.FieldSet.md)
-  to print the object,
+- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
+  print the object,
 
-- [`summary()`](https://rpact-com.github.io/rpact/reference/summary.ParameterSet.md)
+- [`summary()`](https://docs.rpact.org/reference/summary.ParameterSet.md)
   to display a summary of the object,
 
-- [`plot()`](https://rpact-com.github.io/rpact/reference/plot.SimulationResults.md)
+- [`plot()`](https://docs.rpact.org/reference/plot.SimulationResults.md)
   to plot the object,
 
-- [`as.data.frame()`](https://rpact-com.github.io/rpact/reference/as.data.frame.ParameterSet.md)
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.ParameterSet.md)
   to coerce the object to a
   [`data.frame`](https://rdrr.io/r/base/data.frame.html),
 
-- [`as.matrix()`](https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.md)
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
@@ -414,8 +413,8 @@ Example 2:
 `simulationResults$setShowStatistics(FALSE)`  
 `simulationResults`  
 
-[`getData()`](https://rpact-com.github.io/rpact/reference/getData.md)
-can be used to get the aggregated simulated data from the object as
+[`getData()`](https://docs.rpact.org/reference/getData.md) can be used
+to get the aggregated simulated data from the object as
 [`data.frame`](https://rdrr.io/r/base/data.frame.html). The data frame
 contains the following columns:
 
@@ -471,8 +470,8 @@ contains the following columns:
 
 ## Raw Data
 
-[`getRawData()`](https://rpact-com.github.io/rpact/reference/getRawData.md)
-can be used to get the simulated raw data from the object as
+[`getRawData()`](https://docs.rpact.org/reference/getRawData.md) can be
+used to get the simulated raw data from the object as
 [`data.frame`](https://rdrr.io/r/base/data.frame.html). Note that
 `getSimulationSurvival()` must called before with
 `maxNumberOfRawDatasetsPerStage` \> 0.
@@ -488,8 +487,7 @@ that many full patient-level datasets *per stage*** (i.e., per
 interim/final look). Each saved dataset corresponds to one simulated
 iteration and contains all subject-wise records accrued up to the stage
 at which that iteration stopped. You can later retrieve these datasets
-with
-[`getRawData()`](https://rpact-com.github.io/rpact/reference/getRawData.md).
+with [`getRawData()`](https://docs.rpact.org/reference/getRawData.md).
 
 **Why "max" and not `numberOfRawDatasetsPerStage`?**
 
@@ -515,7 +513,7 @@ of a generic and to identify the object specific name of it, e.g., use
 `methods("plot")` to get all the methods for the `plot` generic. There
 you can find, e.g., `plot.AnalysisResults` and obtain the specific help
 documentation linked above by typing
-[`?plot.AnalysisResults`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md).
+[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
 
 ## Examples
 

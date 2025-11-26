@@ -1,7 +1,7 @@
 # Coerce AnalysisResults to a Data Frame
 
 Returns the
-[`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+[`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
 object as data frame.
 
 ## Usage
@@ -22,9 +22,9 @@ as.data.frame(
 - x:
 
   An
-  [`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+  [`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
   object created by
-  [`getAnalysisResults()`](https://rpact-com.github.io/rpact/reference/getAnalysisResults.md).
+  [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.md).
 
 - ...:
 

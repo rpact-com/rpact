@@ -31,7 +31,7 @@ caption that will be used in print outputs of an rpact result object.
 
 ## See also
 
-[`getParameterCaption()`](https://rpact-com.github.io/rpact/reference/getParameterCaption.md)
+[`getParameterCaption()`](https://docs.rpact.org/reference/getParameterCaption.md)
 for getting the parameter caption for a given name.
 
 ## Examples

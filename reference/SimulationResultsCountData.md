@@ -5,7 +5,7 @@ A class for simulation results count data.
 ## Details
 
 Use
-[`getSimulationCounts()`](https://rpact-com.github.io/rpact/reference/getSimulationCounts.md)
+[`getSimulationCounts()`](https://docs.rpact.org/reference/getSimulationCounts.md)
 to create an object of this type.
 
 ## Fields

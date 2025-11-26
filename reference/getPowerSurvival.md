@@ -150,7 +150,7 @@ getPowerSurvival(
   definition of the exponential survival time cumulative distribution
   function  
   (for details see
-  [`getPiecewiseSurvivalTime()`](https://rpact-com.github.io/rpact/reference/getPiecewiseSurvivalTime.md)).
+  [`getPiecewiseSurvivalTime()`](https://docs.rpact.org/reference/getPiecewiseSurvivalTime.md)).
 
 - allocationRatioPlanned:
 
@@ -173,13 +173,13 @@ getPowerSurvival(
 
   The assumed accrual time intervals for the study, default is
   `c(0, 12)` (for details see
-  [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md)).
+  [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)).
 
 - accrualIntensity:
 
   A numeric vector of accrual intensities, default is the relative
   intensity `0.1` (for details see
-  [`getAccrualTime()`](https://rpact-com.github.io/rpact/reference/getAccrualTime.md)).
+  [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)).
 
 - accrualIntensityType:
 
@@ -215,27 +215,27 @@ getPowerSurvival(
 ## Value
 
 Returns a
-[`TrialDesignPlan`](https://rpact-com.github.io/rpact/reference/TrialDesignPlan.md)
+[`TrialDesignPlan`](https://docs.rpact.org/reference/TrialDesignPlan.md)
 object. The following generics (R generic functions) are available for
 this result object:
 
-- [`names()`](https://rpact-com.github.io/rpact/reference/names.FieldSet.md)
-  to obtain the field names,
+- [`names()`](https://docs.rpact.org/reference/names.FieldSet.md) to
+  obtain the field names,
 
-- [`print()`](https://rpact-com.github.io/rpact/reference/print.FieldSet.md)
-  to print the object,
+- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
+  print the object,
 
-- [`summary()`](https://rpact-com.github.io/rpact/reference/summary.TrialDesignSet.md)
+- [`summary()`](https://docs.rpact.org/reference/summary.TrialDesignSet.md)
   to display a summary of the object,
 
-- [`plot()`](https://rpact-com.github.io/rpact/reference/plot.TrialDesignPlan.md)
+- [`plot()`](https://docs.rpact.org/reference/plot.TrialDesignPlan.md)
   to plot the object,
 
-- [`as.data.frame()`](https://rpact-com.github.io/rpact/reference/as.data.frame.TrialDesignPlan.md)
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.TrialDesignPlan.md)
   to coerce the object to a
   [`data.frame`](https://rdrr.io/r/base/data.frame.html),
 
-- [`as.matrix()`](https://rpact-com.github.io/rpact/reference/as.matrix.FieldSet.md)
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
@@ -307,14 +307,14 @@ of a generic and to identify the object specific name of it, e.g., use
 `methods("plot")` to get all the methods for the `plot` generic. There
 you can find, e.g., `plot.AnalysisResults` and obtain the specific help
 documentation linked above by typing
-[`?plot.AnalysisResults`](https://rpact-com.github.io/rpact/reference/plot.AnalysisResults.md).
+[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
 
 ## See also
 
 Other power functions:
-[`getPowerCounts()`](https://rpact-com.github.io/rpact/reference/getPowerCounts.md),
-[`getPowerMeans()`](https://rpact-com.github.io/rpact/reference/getPowerMeans.md),
-[`getPowerRates()`](https://rpact-com.github.io/rpact/reference/getPowerRates.md)
+[`getPowerCounts()`](https://docs.rpact.org/reference/getPowerCounts.md),
+[`getPowerMeans()`](https://docs.rpact.org/reference/getPowerMeans.md),
+[`getPowerRates()`](https://docs.rpact.org/reference/getPowerRates.md)
 
 ## Examples
 

@@ -5,7 +5,7 @@ Trial design plan for count data.
 ## Details
 
 This object cannot be created directly; use
-[`getSampleSizeCounts()`](https://rpact-com.github.io/rpact/reference/getSampleSizeCounts.md)
+[`getSampleSizeCounts()`](https://docs.rpact.org/reference/getSampleSizeCounts.md)
 with suitable arguments to create a design plan for a dataset of rates.
 
 ## Fields

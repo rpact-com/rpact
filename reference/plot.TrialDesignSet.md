@@ -30,7 +30,7 @@ plot(
 - x:
 
   The trial design set, obtained from
-  [`getDesignSet()`](https://rpact-com.github.io/rpact/reference/getDesignSet.md).
+  [`getDesignSet()`](https://docs.rpact.org/reference/getDesignSet.md).
 
 - y:
 
@@ -156,7 +156,7 @@ plot(
 - plotSettings:
 
   An object of class `PlotSettings` created by
-  [`getPlotSettings()`](https://rpact-com.github.io/rpact/reference/getPlotSettings.md).
+  [`getPlotSettings()`](https://docs.rpact.org/reference/getPlotSettings.md).
 
 ## Value
 

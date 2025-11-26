@@ -69,5 +69,5 @@ use `getDesignCharacteristics` with suitable arguments to create it.
 
 ## See also
 
-[`getDesignCharacteristics`](https://rpact-com.github.io/rpact/reference/getDesignCharacteristics.md)
+[`getDesignCharacteristics`](https://docs.rpact.org/reference/getDesignCharacteristics.md)
 for getting the design characteristics.

@@ -73,24 +73,23 @@ readDatasets(
 ## Value
 
 Returns a [`list`](https://rdrr.io/r/base/list.html) of
-[`Dataset`](https://rpact-com.github.io/rpact/reference/Dataset.md)
-objects.
+[`Dataset`](https://docs.rpact.org/reference/Dataset.md) objects.
 
 ## Details
 
 Reads a file that was written by
-[`writeDatasets()`](https://rpact-com.github.io/rpact/reference/writeDatasets.md)
+[`writeDatasets()`](https://docs.rpact.org/reference/writeDatasets.md)
 before.
 
 ## See also
 
-- [`readDataset()`](https://rpact-com.github.io/rpact/reference/readDataset.md)
-  for reading a single dataset,
+- [`readDataset()`](https://docs.rpact.org/reference/readDataset.md) for
+  reading a single dataset,
 
-- [`writeDatasets()`](https://rpact-com.github.io/rpact/reference/writeDatasets.md)
+- [`writeDatasets()`](https://docs.rpact.org/reference/writeDatasets.md)
   for writing multiple datasets,
 
-- [`writeDataset()`](https://rpact-com.github.io/rpact/reference/writeDataset.md)
+- [`writeDataset()`](https://docs.rpact.org/reference/writeDataset.md)
   for writing a single dataset.
 
 ## Examples

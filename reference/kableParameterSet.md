@@ -41,7 +41,7 @@ kable(x, ...)
 - x:
 
   A `ParameterSet`. If x does not inherit from class
-  [`ParameterSet`](https://rpact-com.github.io/rpact/reference/ParameterSet.md),
+  [`ParameterSet`](https://docs.rpact.org/reference/ParameterSet.md),
   `knitr::kable(x)` will be returned.
 
 - ...:

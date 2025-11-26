@@ -33,10 +33,10 @@ plot(x, y, ..., type = 1L, grid = 1)
 - x:
 
   The trial design, obtained from  
-  [`getDesignGroupSequential()`](https://rpact-com.github.io/rpact/reference/getDesignGroupSequential.md),  
-  [`getDesignInverseNormal()`](https://rpact-com.github.io/rpact/reference/getDesignInverseNormal.md)
+  [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md),  
+  [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md)
   or  
-  [`getDesignFisher()`](https://rpact-com.github.io/rpact/reference/getDesignFisher.md).
+  [`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md).
 
 - y:
 
@@ -162,7 +162,7 @@ plot(x, y, ..., type = 1L, grid = 1)
 - plotSettings:
 
   An object of class `PlotSettings` created by
-  [`getPlotSettings()`](https://rpact-com.github.io/rpact/reference/getPlotSettings.md).
+  [`getPlotSettings()`](https://docs.rpact.org/reference/getPlotSettings.md).
 
 ## Value
 
@@ -174,24 +174,22 @@ Generic function to plot a trial design.
 
 Generic function to plot a trial design.
 
-Note that
-[`nMax`](https://rpact-com.github.io/rpact/reference/param_nMax.md) is
+Note that [`nMax`](https://docs.rpact.org/reference/param_nMax.md) is
 not an argument that it passed to `ggplot2`. Rather, the underlying
 calculations (e.g. power for different theta's or average sample size)
 are based on calls to function
-[`getPowerAndAverageSampleNumber()`](https://rpact-com.github.io/rpact/reference/getPowerAndAverageSampleNumber.md)
+[`getPowerAndAverageSampleNumber()`](https://docs.rpact.org/reference/getPowerAndAverageSampleNumber.md)
 which has argument
-[`nMax`](https://rpact-com.github.io/rpact/reference/param_nMax.md).
-I.e.,
-[`nMax`](https://rpact-com.github.io/rpact/reference/param_nMax.md) is
-not an argument to ggplot2 but to
-[`getPowerAndAverageSampleNumber()`](https://rpact-com.github.io/rpact/reference/getPowerAndAverageSampleNumber.md)
+[`nMax`](https://docs.rpact.org/reference/param_nMax.md). I.e.,
+[`nMax`](https://docs.rpact.org/reference/param_nMax.md) is not an
+argument to ggplot2 but to
+[`getPowerAndAverageSampleNumber()`](https://docs.rpact.org/reference/getPowerAndAverageSampleNumber.md)
 which is called prior to plotting.
 
 ## See also
 
-[`plot()`](https://rpact-com.github.io/rpact/reference/plot.TrialDesignSet.md)
-to compare different designs or design parameters visual.
+[`plot()`](https://docs.rpact.org/reference/plot.TrialDesignSet.md) to
+compare different designs or design parameters visual.
 
 ## Examples
 

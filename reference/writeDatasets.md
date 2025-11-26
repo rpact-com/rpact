@@ -97,18 +97,18 @@ writeDatasets(
 ## Details
 
 The format of the CSV file is optimized for usage of
-[`readDatasets()`](https://rpact-com.github.io/rpact/reference/readDatasets.md).
+[`readDatasets()`](https://docs.rpact.org/reference/readDatasets.md).
 
 ## See also
 
-- [`writeDataset()`](https://rpact-com.github.io/rpact/reference/writeDataset.md)
+- [`writeDataset()`](https://docs.rpact.org/reference/writeDataset.md)
   for writing a single dataset,
 
-- [`readDatasets()`](https://rpact-com.github.io/rpact/reference/readDatasets.md)
+- [`readDatasets()`](https://docs.rpact.org/reference/readDatasets.md)
   for reading multiple datasets,
 
-- [`readDataset()`](https://rpact-com.github.io/rpact/reference/readDataset.md)
-  for reading a single dataset.
+- [`readDataset()`](https://docs.rpact.org/reference/readDataset.md) for
+  reading a single dataset.
 
 ## Examples
 

@@ -20,10 +20,10 @@ system.
 
 ## See also
 
-- [`setLogLevel()`](https://rpact-com.github.io/rpact/reference/setLogLevel.md)
-  for setting the log level,
+- [`setLogLevel()`](https://docs.rpact.org/reference/setLogLevel.md) for
+  setting the log level,
 
-- [`resetLogLevel()`](https://rpact-com.github.io/rpact/reference/resetLogLevel.md)
+- [`resetLogLevel()`](https://docs.rpact.org/reference/resetLogLevel.md)
   for resetting the log level to default.
 
 ## Examples

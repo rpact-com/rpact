@@ -1,8 +1,7 @@
 # Names of a Field Set Object
 
 Function to get the names of a
-[`FieldSet`](https://rpact-com.github.io/rpact/reference/FieldSet.md)
-object.
+[`FieldSet`](https://docs.rpact.org/reference/FieldSet.md) object.
 
 ## Usage
 
@@ -15,15 +14,13 @@ names(x)
 
 - x:
 
-  A
-  [`FieldSet`](https://rpact-com.github.io/rpact/reference/FieldSet.md)
-  object.
+  A [`FieldSet`](https://docs.rpact.org/reference/FieldSet.md) object.
 
 ## Value
 
 Returns a [`character`](https://rdrr.io/r/base/character.html) vector
 containing the names of the
-[`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+[`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
 object.
 
 ## Details

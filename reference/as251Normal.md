@@ -61,4 +61,4 @@ falls in a rectangle in n-space with error less than eps.
 
 This function calculates the `bdp` value from `sigma`, determines the
 right `inf` value and calls
-[`mvnprd`](https://rpact-com.github.io/rpact/reference/mvnprd.md).
+[`mvnprd`](https://docs.rpact.org/reference/mvnprd.md).

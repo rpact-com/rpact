@@ -5,17 +5,17 @@ A class for simulation results rates.
 ## Details
 
 Use
-[`getSimulationRates()`](https://rpact-com.github.io/rpact/reference/getSimulationRates.md)
+[`getSimulationRates()`](https://docs.rpact.org/reference/getSimulationRates.md)
 to create an object of this type.
 
 `SimulationResultsRates` is the basic class for
 
 - `SimulationResultsRates`,
 
-- [`SimulationResultsMultiArmRates`](https://rpact-com.github.io/rpact/reference/SimulationResultsMultiArmRates.md),
+- [`SimulationResultsMultiArmRates`](https://docs.rpact.org/reference/SimulationResultsMultiArmRates.md),
   and
 
-- [`SimulationResultsEnrichmentRates`](https://rpact-com.github.io/rpact/reference/SimulationResultsEnrichmentRates.md).
+- [`SimulationResultsEnrichmentRates`](https://docs.rpact.org/reference/SimulationResultsEnrichmentRates.md).
 
 ## Fields
 

@@ -1,7 +1,7 @@
 # Names of a Simulation Results Object
 
 Function to get the names of a
-[`SimulationResults`](https://rpact-com.github.io/rpact/reference/SimulationResults.md)
+[`SimulationResults`](https://docs.rpact.org/reference/SimulationResults.md)
 object.
 
 ## Usage
@@ -16,7 +16,7 @@ names(x)
 - x:
 
   A
-  [`SimulationResults`](https://rpact-com.github.io/rpact/reference/SimulationResults.md)
+  [`SimulationResults`](https://docs.rpact.org/reference/SimulationResults.md)
   object created by
   `getSimulationResults[MultiArm/Enrichment][Means/Rates/Survival]`.
 
@@ -24,7 +24,7 @@ names(x)
 
 Returns a [`character`](https://rdrr.io/r/base/character.html) vector
 containing the names of the
-[`AnalysisResults`](https://rpact-com.github.io/rpact/reference/AnalysisResults.md)
+[`AnalysisResults`](https://docs.rpact.org/reference/AnalysisResults.md)
 object.
 
 ## Details
