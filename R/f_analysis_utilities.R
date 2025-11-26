@@ -1063,15 +1063,15 @@ getLongFormat <- function(dataInput) {
         return(thetaH0)
     }
     
-    if (dataInput$isDatasetMeans()) {
+    if (.isDatasetMeans(dataInput)) {
         return(C_THETA_H0_MEANS_DEFAULT)
     }
     
-    if (dataInput$isDatasetRates()) {
+    if (.isDatasetRates(dataInput)) {
         return(C_THETA_H0_RATES_DEFAULT)
     }
     
-    if (dataInput$isDatasetSurvival()) {
+    if (.isDatasetSurvival(dataInput)) {
         return(C_THETA_H0_SURVIVAL_DEFAULT)
     }
     

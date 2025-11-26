@@ -375,7 +375,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (!is.null(showType) && showType == 2) {
                 self$.cat("Technical developer summary of the ", self$.toString(), " object (",
                     methods::classLabel(class(self)), "):\n\n",
-                    sep = "", heading = 1,
+                    sep = "", 
+                    heading = 1,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
                 self$.showAllParameters(consoleOutputEnabled = consoleOutputEnabled)
@@ -471,8 +472,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 }
             ) 
         },
-        .showParameterSingle = function(param,
-                parameterName, ...,
+        .showParameterSingle = function(
+                param,
+                parameterName, 
+                ...,
                 category = NULL,
                 showParameterType = FALSE,
                 consoleOutputEnabled = TRUE) {
