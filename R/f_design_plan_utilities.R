@@ -77,7 +77,7 @@ NULL
         }
         boundaries <- .getEffectScaleBoundaryDataSurvival(designPlan)
     } else if (.isTrialDesignPlanCountData(designPlan)) {
-        boundaries <- .getEffectScaleBoundaryDataCounts(designPlan)
+        boundaries <- .getEffectScaleBoundaryCountData(designPlan)
     }
 
     if (designPlan$.design$sided == 1) {

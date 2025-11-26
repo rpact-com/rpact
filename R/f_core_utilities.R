@@ -291,7 +291,7 @@ NULL
 #' Get Test Label
 #'
 #' @description
-#' Returns a string representation of the input value for use as a test label. 
+#' Returns a string representation of the input value for use as a test label.
 #' Handles various types, including NULL, NA, vectors, and custom objects.
 #'
 #' @param x The value to be converted into a test label.
@@ -308,30 +308,30 @@ NULL
 #' }
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 getTestLabel <- function(x) {
     if (is.null(x)) {
         return("NULL")
     }
-    
+
     if (!is.vector(x) && !is.numeric(x) && !is.character(x) && !is.logical(x) && !is.integer(x)) {
         return(.getClassName(x))
     }
-    
+
     if (length(x) == 0) {
         return(paste0(.getClassName(x), "(0)"))
     }
-    
+
     if (all(is.na(x))) {
         return("NA")
     }
-    
+
     if (is.character(x)) {
         x <- paste0('"', x, '"')
     }
-    
+
     return(.arrayToString(x, mode = "vector", digits = 4, maxLength = 10L, maxCharacters = 40L))
 }
 
@@ -342,7 +342,6 @@ getTestLabel <- function(x) {
         maxLength = 80L,
         maxCharacters = 160L,
         mode = c("csv", "vector", "and", "or")) {
-        
     .assertIsSingleInteger(digits, "digits", naAllowed = TRUE, validateType = FALSE)
     .assertIsInClosedInterval(digits, "digits", lower = 0, upper = NULL)
     .assertIsSingleInteger(maxLength, "maxLength", naAllowed = FALSE, validateType = FALSE)
@@ -1649,7 +1648,7 @@ getParameterName <- function(obj, parameterCaption) {
             "'", .getClassName(parameterSet), "' does not contain a field with name '", fieldName, "'"
         )
     }
-    
+
     parameterSet[[fieldName]] <- fieldValues
     parameterSet$.setParameterType(fieldName, C_PARAM_NOT_APPLICABLE)
     parameterSet$.deprecatedFieldNames <- unique(c(parameterSet$.deprecatedFieldNames, fieldName))
@@ -2005,5 +2004,3 @@ resetOptions <- function(persist = TRUE) {
         }
     )
 }
-
-
