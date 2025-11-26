@@ -140,7 +140,7 @@ NULL
                 }
             } else {
                 formatFunctionName <- .getParameterFormatFunction(parameterName, obj)
-                if (!is.null(formatFunctionName)) {
+                if (!is.null(formatFunctionName) && !is.null(paramValueFormatted)) {
                     tryCatch({
                         paramValueFormatted <- eval(call(formatFunctionName, paramValueFormatted))
                     }, error = function(e) {

@@ -10,6 +10,7 @@
 
 * Documentation for `maxNumberOfRawDatasetsPerStage` in survival clarified
 * Issue [#94](https://github.com/rpact-com/rpact/issues/94) fixed
+* Issue [#99](https://github.com/rpact-com/rpact/issues/99) fixed
 * Testing improved, e.g., new helper function `getTestLabel()` introduced
 
 

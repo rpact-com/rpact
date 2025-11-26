@@ -372,12 +372,13 @@ NULL
         ...,
         design,
         dataInput,
-        thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT,
+        thetaH0 = NA_real_,
         directionUpper = NA,
         stage = NA_integer_,
         userFunctionCallEnabled = FALSE) {
     .assertIsDatasetSurvival(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
+    thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
     .warnInCaseOfUnknownArguments(
         functionName = "getStageResultsSurvival",
         ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE),

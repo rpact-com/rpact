@@ -80,8 +80,7 @@ NULL
         ))
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
-        "'", .getClassName(dataInput), "' is not implemented yet")
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
@@ -92,10 +91,12 @@ NULL
 #'
 #' @noRd
 #'
-.getStageResultsEnrichment <- function(design,
+.getStageResultsEnrichment <- function(
+        design,
         dataInput,
         ...,
         directionUpper = C_DIRECTION_UPPER_DEFAULT) {
+        
     .assertIsTrialDesignInverseNormalOrFisher(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
@@ -131,10 +132,7 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
-        "'", .getClassName(dataInput), "' is not supported"
-    )
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
@@ -178,10 +176,7 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
-        "'", .getClassName(dataInput), "' is not implemented yet"
-    )
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
@@ -223,10 +218,7 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '",
-        .getClassName(stageResults$.dataInput), "' is not implemented yet"
-    )
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
@@ -469,8 +461,5 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '",
-        .getClassName(stageResults$.dataInput), "' is not implemented yet"
-    )
+    .fireDataInputNotSupportedException(dataInput)
 }

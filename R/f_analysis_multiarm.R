@@ -92,10 +92,7 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
-        "'", .getClassName(dataInput), "' is not implemented yet"
-    )
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
@@ -104,7 +101,8 @@ NULL
 #'
 #' @noRd
 #'
-.getStageResultsMultiArm <- function(design,
+.getStageResultsMultiArm <- function(
+        design,
         dataInput,
         ...,
         directionUpper = NA) {
@@ -143,10 +141,7 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
-        "'", .getClassName(dataInput), "' is not supported"
-    )
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
@@ -188,7 +183,7 @@ NULL
         ))
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
@@ -237,10 +232,7 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '",
-        .getClassName(stageResults$.dataInput), "' is not implemented yet"
-    )
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 .getIndicesOfClosedHypothesesSystem <- function(gMax) {
@@ -1301,8 +1293,5 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '",
-        .getClassName(stageResults$.dataInput), "' is not implemented yet"
-    )
+    .fireDataInputNotSupportedException(dataInput)
 }

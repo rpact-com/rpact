@@ -186,10 +186,11 @@ NULL
     ))
 }
 
-.getStageResultsMeansEnrichment <- function(..., 
+.getStageResultsMeansEnrichment <- function(
+        ..., 
         design, 
         dataInput,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT,
+        thetaH0 = NA_real_,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
@@ -200,6 +201,7 @@ NULL
     .assertIsTrialDesign(design)
     .assertIsDatasetMeans(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
+    thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsValidVarianceOptionEnrichment(varianceOption)
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
