@@ -1109,6 +1109,11 @@ NULL
     # Shifted decision region for use in getGroupSequentialProbabilities
     # Inverse normal method
     condError <- getConditionalRejectionProbabilities(stageResults = stageResults)[stage]
+    if (is.na(condError)) {
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+            "conditional error could not be calculated at stage ", stage, 
+            call. = FALSE)
+    }
 
     if (stageResults$isOneSampleDataset()) {
         if (condError < 1e-12) {
@@ -1563,7 +1568,7 @@ NULL
     }
 
     if (.isTrialDesignGroupSequential(stageResults$.design)) {
-        cp <- .getConditionalPowerRatesInverseNormal(
+        cp <- .getConditionalPowerRatesGroupSequential(
             ...,
             stageResults = stageResults,
             nPlanned = nPlanned,

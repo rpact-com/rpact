@@ -1648,8 +1648,10 @@ plot.StageResults <- function(
     }
 
     plotData <- .getConditionalPowerPlot(
-        stageResults = x, nPlanned = nPlanned,
-        allocationRatioPlanned = allocationRatioPlanned, ...
+        stageResults = x, 
+        nPlanned = nPlanned,
+        allocationRatioPlanned = allocationRatioPlanned, 
+        ...
     )
 
     yParameterName1 <- "Conditional power"

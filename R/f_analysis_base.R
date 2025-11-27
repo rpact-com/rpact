@@ -904,8 +904,12 @@ getConditionalPower <- function(stageResults,
     .fireDataInputNotSupportedException(dataInput)
 }
 
-.getConditionalPowerPlot <- function(...,
-        stageResults, nPlanned, allocationRatioPlanned = NA_real_) {
+.getConditionalPowerPlot <- function(
+        ...,
+        stageResults, 
+        nPlanned, 
+        allocationRatioPlanned = NA_real_) {
+        
     if (.isMultiArmStageResults(stageResults)) {
         return(.getConditionalPowerPlotMultiArm(
             stageResults = stageResults,
@@ -936,21 +940,30 @@ getConditionalPower <- function(stageResults,
     if (stageResults$isDatasetMeans()) {
         return(.getConditionalPowerPlotMeans(
             stageResults = stageResults,
-            stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned, ...
+            stage = stage, 
+            nPlanned = nPlanned, 
+            allocationRatioPlanned = allocationRatioPlanned, 
+            ...
         ))
     }
 
     if (stageResults$isDatasetRates()) {
         return(.getConditionalPowerPlotRates(
             stageResults = stageResults,
-            stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned, ...
+            stage = stage, 
+            nPlanned = nPlanned, 
+            allocationRatioPlanned = allocationRatioPlanned, 
+            ...
         ))
     }
 
     if (stageResults$isDatasetSurvival()) {
         return(.getConditionalPowerPlotSurvival(
             stageResults = stageResults,
-            stage = stage, nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned, ...
+            stage = stage, 
+            nPlanned = nPlanned, 
+            allocationRatioPlanned = allocationRatioPlanned, 
+            ...
         ))
     }
 
