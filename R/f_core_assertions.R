@@ -3717,12 +3717,10 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     
     for (arg in reqs) {
         argName <- gsub("\\[.*\\]$", "", arg)
-        
         if (grepl("\\[\\d+\\]$", arg)) {
             number <- sub("^.*\\[(\\d+)\\]$", "\\1", arg)
             argName <- paste0(argName, number)
         }
-        
         argValue <- args[[argName]]
         if (.isFutilityBoundsArgumentMissing(arg, argValue)) {
             .showFutilityBoundsMissingArgumentError(arg, scaleLabel, scaleValue)
@@ -3785,8 +3783,11 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         information = information, 
         sourceScale = sourceScale,
         targetScale = targetScale,
+        design = design,
+        showWarnings = FALSE,
         ...
     )
+    
     information1 <- infos$information1
     information2 <- infos$information2
     information <- infos$information
@@ -3803,6 +3804,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         
     args <- list(
         design       = design,
+        information  = c(information1, information2),
         information1 = information1,
         information2 = information2,
         theta        = theta

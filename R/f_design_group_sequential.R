@@ -1091,7 +1091,9 @@ getDesignInverseNormal <- function(
         futilityBoundsScale = c(
             "zValue",
             "pValue",
-            "reverseCondPower"
+            "reverseCondPower",
+            "condPowerAtObserved",
+            "predictivePower"
         ),
         directionUpper = NA,
         betaAdjustment = NA,

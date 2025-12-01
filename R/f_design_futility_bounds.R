@@ -17,7 +17,7 @@
 #' @include f_core_utilities.R
 NULL
 
-.getFutilityBoundInformations <- function(..., information, sourceScale, targetScale) {
+.getFutilityBoundInformations <- function(..., information, sourceScale, targetScale, design, showWarnings = TRUE) {
     args <- list(...)
     separateInformationArguments <- length(args) > 0 && 
         !is.null(names(args)) && 
@@ -42,6 +42,34 @@ NULL
         information1 <- .getOptionalArgument("information1", optionalArgumentDefaultValue = NA_real_, ...)
         information2 <- .getOptionalArgument("information2", optionalArgumentDefaultValue = NA_real_, ...)
     }
+    
+    
+    if (any(is.na(c(information1, information2))) && 
+            !is.null(design) && .isTrialDesignInverseNormalOrGroupSequential(design) && 
+            (sourceScale %in% c("predictivePower", "condPowerAtObserved") ||
+            targetScale %in% c("predictivePower", "condPowerAtObserved"))) {
+        
+        .assertIsValidDesignForFutilityBoundsConversion(design, sourceScale, targetScale)
+        
+        if (isTRUE(showWarnings) && !is.na(information1)) {
+            warning(
+                "'information1' (", information1, ") will be ignored ", 
+                "because it will only be taken into account if the information is provided for both stages",
+                call. = FALSE
+            )
+        }
+        if (isTRUE(showWarnings) && !is.na(information2)) {
+            warning(
+                "'information2' (", information2, ") will be ignored ", 
+                "because it will only be taken into account if the information is provided for both stages",
+                call. = FALSE
+            )
+        }
+        
+        information1 <- sqrt(design$informationRates[1])
+        information2 <- sqrt(1 - design$informationRates[1]) 
+    }
+    
     information <- c(information1, information2)
     if (all(is.na(information))) {
         information <- NA_real_
@@ -158,17 +186,34 @@ print.FutilityBounds <- function(x, ...) {
     return(futilityBounds)
 }
 
+.assertIsValidDesignForFutilityBoundsConversion <- function(design, sourceScale, targetScale) {
+    if (design$sided == 1 && design$kMax == 2) {
+        return(invisible())
+    }
+    
+    msg <- paste0(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale), 
+        " is available only for one-sided two-stage designs ")
+    if (design$sided != 1) {
+        stop(msg, "(sided = ", design$sided, ")", call. = FALSE)
+    }
+    
+    if (design$kMax != 2) {
+        stop(msg, "(kMax = ", design$kMax, ")", call. = FALSE)
+    }
+}
+
 .futilityBoundsCalculationRequiresDesign <- function(scale) {
     if (is.null(scale) || length(scale) != 1 || is.na(scale)) {
         return(FALSE)
     }
     
-    scale %in% c(
+    return(scale %in% c(
         "conditionalPower",
         "condPowerAtObserved",
         "predictivePower",
         "reverseCondPower"
-    )
+    ))
 }
 
 #'
@@ -268,6 +313,7 @@ getFutilityBounds <- function(
         information = information,
         sourceScale = sourceScale,
         targetScale = targetScale,
+        design = design,
         ...
     )
     information1 <- infos$information1
@@ -313,28 +359,17 @@ getFutilityBounds <- function(
         return(.addFutilityBoundParameterTypes(sourceValue, args))
     }
 
-
     if (!is.null(design)) {
         if (sourceScale == "reverseCondPower" || targetScale == "reverseCondPower") {
             .assertIsTrialDesignInverseNormalOrGroupSequential(design)
         } else {
             .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design)            
         }
+        .assertIsValidDesignForFutilityBoundsConversion(design, sourceScale, targetScale)
         if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
             gsWeights <- c(sqrt(design$informationRates[1]), sqrt(1 - design$informationRates[1]))
         } else if (.isTrialDesignFisher(design)) {
             gsWeights <- c(1, sqrt((1 - design$informationRates[1]) / design$informationRates[1]))
-        }
-        if (design$sided != 1 || design$kMax != 2) {
-            msg <- paste0(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale), 
-                " is available only for one-sided two-stage designs ")
-            if (design$sided != 1) {
-                stop(msg, "(sided = ", design$sided, ")", call. = FALSE)
-            }
-            if (design$kMax != 2) {
-                stop(msg, "(kMax = ", design$kMax, ")", call. = FALSE)
-            }
         }
         criticalValue <- design$criticalValues[2]
     }
