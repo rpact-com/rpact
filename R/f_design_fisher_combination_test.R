@@ -36,6 +36,9 @@ NULL
 #' default is \code{"equalAlpha"} (for details, see Wassmer, 1999).
 #' @inheritParams param_userAlphaSpending
 #' @param alpha0Vec Stopping for futility bounds for stage-wise p-values.
+#' @param alpha0Scale Character. The scale of the futility bounds.
+#'        Must be one of \code{"zValue"}, \code{"pValue"}, or \code{"reverseCondPower"}.
+#'        Default is \code{"zValue"}.
 #' @inheritParams param_informationRates
 #' @inheritParams param_sided
 #' @param bindingFutility If \code{bindingFutility = TRUE} is specified the calculation of
@@ -64,12 +67,18 @@ NULL
 #'
 #' @export
 #'
-getDesignFisher <- function(...,
+getDesignFisher <- function(
+        ...,
         kMax = NA_integer_,
         alpha = NA_real_,
         method = c("equalAlpha", "fullAlpha", "noInteraction", "userDefinedAlpha"), # C_FISHER_METHOD_DEFAULT
         userAlphaSpending = NA_real_,
         alpha0Vec = NA_real_,
+        alpha0Scale = c(
+            "pValue",
+            "zValue",
+            "reverseCondPower"
+        ),
         informationRates = NA_real_,
         sided = 1, # C_SIDED_DEFAULT
         bindingFutility = NA,
@@ -80,6 +89,33 @@ getDesignFisher <- function(...,
     .assertIsValidTolerance(tolerance)
     .assertIsValidIterationsAndSeed(iterations, seed)
     .warnInCaseOfUnknownArguments(functionName = "getDesignFisher", ...)
+    alpha0Scale <- match.arg(alpha0Scale)
+    
+    design <- NULL
+    if (!all(is.na(alpha0Vec)) && .futilityBoundsCalculationRequiresDesign(alpha0Scale)) {
+        design <- .getDesignFisher(
+            kMax = kMax, 
+            alpha = alpha, 
+            method = method,
+            userAlphaSpending = userAlphaSpending, 
+            alpha0Vec = NA_real_, 
+            informationRates = informationRates,
+            sided = sided, 
+            bindingFutility = bindingFutility,
+            directionUpper = directionUpper,
+            tolerance = tolerance, 
+            iterations = iterations, 
+            seed = seed
+        )
+    }
+    
+    alpha0Vec <- .getFutilityBoundsFromArgs(
+        futilityBounds = alpha0Vec,
+        futilityBoundsScale = alpha0Scale, 
+        functionName = "getDesignGroupSequential",
+        design = design,
+        fisherDesign = TRUE,
+        ...) 
 
     return(.getDesignFisher(
         kMax = kMax, 

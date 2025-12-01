@@ -2085,7 +2085,8 @@ getDesignInverseNormal <- function(
 #'
 #' @export
 #'
-getDesignGroupSequential <- function(...,
+getDesignGroupSequential <- function(
+        ...,
         kMax = NA_integer_,
         alpha = NA_real_,
         beta = NA_real_,

@@ -36,13 +36,13 @@ NULL
         ))
     }
 
+    vectorInput <- FALSE
     information1 <- NA_real_
     information2 <- NA_real_
     if (length(list(...)) > 0) {
         information1 <- .getOptionalArgument("information1", optionalArgumentDefaultValue = NA_real_, ...)
         information2 <- .getOptionalArgument("information2", optionalArgumentDefaultValue = NA_real_, ...)
     }
-    
     
     if (any(is.na(c(information1, information2))) && 
             !is.null(design) && .isTrialDesignInverseNormalOrGroupSequential(design) && 
@@ -68,17 +68,19 @@ NULL
         
         information1 <- sqrt(design$informationRates[1])
         information2 <- sqrt(1 - design$informationRates[1]) 
+        vectorInput <- TRUE
     }
     
     information <- c(information1, information2)
     if (all(is.na(information))) {
         information <- NA_real_
+        vectorInput <- TRUE
     }
     return(list(
         information1 = information1,
         information2 = information2,
         information = information,
-        vectorInput = FALSE,
+        vectorInput = vectorInput,
         paramNames = c("information1", "information2")
     ))
 }
@@ -142,15 +144,19 @@ print.FutilityBounds <- function(x, ...) {
     return(NULL)
 }
 
-.getFutilityBoundsFromArgs <- function(..., futilityBounds, futilityBoundsScale, functionName, design) {
+.getFutilityBoundsFromArgs <- function(..., futilityBounds, futilityBoundsScale, functionName, design, fisherDesign = FALSE) {
     futilityBoundsFromArgs <- .getFutilityBoundsFromThreeDots(...)
+    
+    futilityBoundsName <- ifelse(fisherDesign, "alpha0Vec", "futilityBounds")
+    futilityBoundsScaleName <- ifelse(fisherDesign, "alpha0Scale", "futilityBoundsScale")
+    targetScale <- ifelse(fisherDesign, "pValue", "zValue")
+    
     if (!all(is.na(futilityBoundsFromArgs))) {
-        
         if (is(futilityBoundsFromArgs, "FutilityBounds") && 
-                !identical(attr(futilityBoundsFromArgs, "targetScale")$value, "zValue")) {
+                !identical(attr(futilityBoundsFromArgs, "targetScale")$value, targetScale)) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-                "'futilityBounds' (", .arrayToString(futilityBoundsFromArgs), ") ",
-                "must be on 'zValue' scale or converted to 'zValue' scale",
+                "'", futilityBoundsName, "' (", .arrayToString(futilityBoundsFromArgs), ") ",
+                "must be on '", targetScale, "' scale or converted to '", targetScale, "' scale",
                 call. = FALSE)
         }
         
@@ -159,26 +165,25 @@ print.FutilityBounds <- function(x, ...) {
         if (!all(is.na(futilityBoundsOld))) {
             .warnInCaseOfUnusedArgument(
                 futilityBoundsOld, 
-                "futilityBounds", 
+                futilityBoundsName, 
                 defaultValue = NA_real_,
                 functionName = functionName)
         }
-        
     } else {
-        .assertIsNumericVector(futilityBounds, "futilityBounds", naAllowed = TRUE)
-        if (futilityBoundsScale != "zValue") {
+        .assertIsNumericVector(futilityBounds, futilityBoundsName, naAllowed = TRUE)
+        if (futilityBoundsScale != targetScale) {
             if (!all(is.na(futilityBounds))) {
                 futilityBounds <- getFutilityBounds(
                     sourceValue = futilityBounds,
                     sourceScale = futilityBoundsScale,
-                    targetScale = "zValue",
+                    targetScale = targetScale,
                     design = design
                 )
             } else {
                 .warnInCaseOfUnusedArgument(
                     futilityBoundsScale, 
-                    "futilityBoundsScale", 
-                    defaultValue = "zValue",
+                    futilityBoundsScaleName, 
+                    defaultValue = targetScale,
                     functionName = functionName)
             }
         }

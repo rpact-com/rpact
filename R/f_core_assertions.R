@@ -1705,11 +1705,14 @@ NULL
             argNames[i]
         )
         if (is(arg, "FutilityBounds")) {
-            if (grepl("^getDesign(InverseNormal|GroupSequential)", functionName)) {
+            if (grepl("^getDesign(InverseNormal|GroupSequential|Fisher)", functionName)) {
                 next
             }
+            
             if (grepl("^getDesignFisher", functionName)) {
                 argName <- "futilityBounds"
+            } else {
+                argName <- "alpha0Vec"
             }
         }
         
