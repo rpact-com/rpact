@@ -2,6 +2,8 @@
 #include <Rcpp.h>
 #include <cmath>
 
+#include "f_utilities.h"
+
 using namespace Rcpp;
 
 // [[Rcpp::plugins(cpp11)]]
@@ -306,4 +308,162 @@ NumericVector dunnettIntegrand3Evaluate(NumericVector x,
     }
     
     return result;
+}
+
+// [[Rcpp::export(name = ".performClosedConditionalDunnettTestForSimulationCpp")]]
+List performClosedConditionalDunnettTestForSimulation(
+        List stageResults,
+        Environment design,
+        LogicalMatrix indices,
+        NumericVector criticalValuesDunnett,
+        std::string successCriterion) {
+    
+    NumericMatrix testStatistics = stageResults["testStatistics"];
+    NumericMatrix separatePValues = stageResults["separatePValues"];
+    NumericMatrix subjectsPerStage = stageResults["subjectsPerStage"];
+    NumericMatrix overallTestStatistics = stageResults["overallTestStatistics"];
+    
+    int gMax = testStatistics.nrow();
+    double informationAtInterim = Rcpp::as<double>(design.get("informationAtInterim"));
+    bool secondStageConditioning = Rcpp::as<bool>(design.get("secondStageConditioning"));
+    int kMax = 2;
+    
+    NumericVector allocationRatioPlanned = stageResults["allocationRatioPlanned"];
+    NumericVector frac = rep(
+        allocationRatioPlanned[0] / (1.0 + allocationRatioPlanned[0]), 
+        gMax
+    );
+    
+    NumericMatrix conditionalErrorRate(pow(2, gMax) - 1, 2);
+    std::fill(conditionalErrorRate.begin(), conditionalErrorRate.end(), NA_REAL);
+    NumericMatrix secondStagePValues(pow(2, gMax) - 1, 2);
+    std::fill(secondStagePValues.begin(), secondStagePValues.end(), NA_REAL);
+    LogicalMatrix rejected(gMax, 2);
+    std::fill(rejected.begin(), rejected.end(), false);
+    LogicalMatrix rejectedIntersections(indices.nrow(), kMax);
+    std::fill(rejectedIntersections.begin(), rejectedIntersections.end(), false);
+    bool futilityStop = false;
+    LogicalVector successStop(kMax, false);
+    
+    NumericMatrix signedTestStatistics = clone(testStatistics);
+    NumericMatrix signedOverallTestStatistics = clone(overallTestStatistics);
+    signedOverallTestStatistics(_, 1) = sqrt(informationAtInterim) * testStatistics(_, 0) +
+            sqrt(1.0 - informationAtInterim) * testStatistics(_, 1);   
+    
+    LogicalMatrix selectedArms = stageResults["selectedArms"];
+    bool notAnySelected = !any(na_omit(selectedArms(_, 1)));
+    if (notAnySelected) {
+        futilityStop = true;
+    }
+    
+    for (int i = 0; i < indices.nrow(); i++) {
+        LogicalVector indicesRow = indices(i, _);
+        
+        double int1 = dunnettIntegrand1Int(
+            criticalValuesDunnett[i],
+            informationAtInterim,
+            signedTestStatistics,
+            frac,
+            indicesRow
+        );
+        conditionalErrorRate(i, 0) = 1.0 - int1;
+        
+        // Check if all separatePValues for selected indices are NA
+        NumericVector separatePValues2ndStage = separatePValues(_, 1);
+        separatePValues2ndStage = separatePValues2ndStage[which(indicesRow)];
+        separatePValues2ndStage = na_omit(separatePValues2ndStage);
+        bool any_sep_pvalue_available = (separatePValues2ndStage.size() > 0);
+                
+        if (any_sep_pvalue_available) {
+            if (secondStageConditioning) {
+                NumericVector signedOverallTestStatistics2ndStage = signedOverallTestStatistics(_, 1);
+                signedOverallTestStatistics2ndStage = signedOverallTestStatistics2ndStage[which(indicesRow)];
+                signedOverallTestStatistics2ndStage = na_omit(signedOverallTestStatistics2ndStage);
+                double maxOverallTestStatistic = max(signedOverallTestStatistics2ndStage);
+                
+                double int2 = dunnettIntegrand2Int(
+                    maxOverallTestStatistic,
+                    informationAtInterim,
+                    signedTestStatistics,
+                    frac,
+                    indicesRow,
+                    overallTestStatistics
+                );
+                secondStagePValues(i, 1) = 1.0 - int2;
+            } else {
+                NumericVector signedTestStatistics2ndStage = signedTestStatistics(_, 1);
+                signedTestStatistics2ndStage = signedTestStatistics2ndStage[which(indicesRow)];
+                signedTestStatistics2ndStage = na_omit(signedTestStatistics2ndStage);
+                double maxTestStatistic = max(signedTestStatistics2ndStage);
+               
+                double int3 = dunnettIntegrand3Int(
+                    maxTestStatistic,
+                    frac,
+                    indicesRow,
+                    separatePValues
+                );
+                secondStagePValues(i, 1) = 1.0 - int3;
+            }
+        }
+        
+        rejectedIntersections(i, 1) = (secondStagePValues(i, 1) <= conditionalErrorRate(i, 0));
+        
+        LogicalVector missingRejectedIntersections2ndStage = is_na(rejectedIntersections(_, 1));
+        IntegerVector missingIndices = which(missingRejectedIntersections2ndStage);
+        for (int j = 0; j < missingIndices.size(); j++) {
+            int missingIndex = missingIndices[j];
+            rejectedIntersections(missingIndex, 1) = false;
+        }
+        
+        if (!rejectedIntersections(0, 1)) {
+            break;
+        }
+    }
+    
+    for (int j = 0; j < gMax; j++) {
+        bool allRejected = true;
+        for (int i = 0; i < indices.nrow(); i++) {
+            if (indices(i, j)) {
+                if (R_IsNA(rejectedIntersections(i, 1))) {
+                    continue;
+                }
+                if (!rejectedIntersections(i, 1)) {
+                    allRejected = false;
+                    break;
+                }
+            }
+        }
+        rejected(j, 1) = allRejected;
+    }
+    
+    if (successCriterion == "all") {
+        bool allRejected = true;
+        for (int g = 0; g < gMax; g++) {
+            if (selectedArms(g, 1) && !rejected(g, 1)) {
+                allRejected = false;
+                break;
+            }
+        }
+        successStop[1] = allRejected;
+    } else {
+        bool anyRejected = false;
+        for (int g = 0; g < gMax; g++) {
+            if (rejected(g, 1)) {
+                anyRejected = true;
+                break;
+            }
+        }
+        successStop[1] = anyRejected;
+    }
+    
+    return List::create(
+        _["separatePValues"] = separatePValues,
+        _["conditionalErrorRate"] = conditionalErrorRate,
+        _["secondStagePValues"] = secondStagePValues,
+        _["rejected"] = rejected,
+        _["rejectedIntersections"] = rejectedIntersections,
+        _["selectedArms"] = selectedArms,
+        _["successStop"] = successStop,
+        _["futilityStop"] = futilityStop
+    );
 }
