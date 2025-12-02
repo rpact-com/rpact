@@ -767,6 +767,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// selectTreatmentArms
+LogicalVector selectTreatmentArms(NumericVector effectVector, std::string typeOfSelection, double epsilonValue, int rValue, double threshold, bool survival);
+RcppExport SEXP _rpact_selectTreatmentArms(SEXP effectVectorSEXP, SEXP typeOfSelectionSEXP, SEXP epsilonValueSEXP, SEXP rValueSEXP, SEXP thresholdSEXP, SEXP survivalSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type effectVector(effectVectorSEXP);
+    Rcpp::traits::input_parameter< std::string >::type typeOfSelection(typeOfSelectionSEXP);
+    Rcpp::traits::input_parameter< double >::type epsilonValue(epsilonValueSEXP);
+    Rcpp::traits::input_parameter< int >::type rValue(rValueSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< bool >::type survival(survivalSEXP);
+    rcpp_result_gen = Rcpp::wrap(selectTreatmentArms(effectVector, typeOfSelection, epsilonValue, rValue, threshold, survival));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getSimulatedStageMeansMultiArmCpp
 List getSimulatedStageMeansMultiArmCpp(Environment design, NumericVector muVector, double stDev, NumericVector plannedSubjects, std::string typeOfSelection, std::string effectMeasure, LogicalVector adaptations, double epsilonValue, double rValue, double threshold, NumericVector allocationRatioPlanned, NumericVector minNumberOfSubjectsPerStage, NumericVector maxNumberOfSubjectsPerStage, double conditionalPower, double thetaH1, double stDevH1, Function calcSubjectsFunction, bool calcSubjectsFunctionIsUserDefined, Nullable<Function> selectArmsFunction);
 RcppExport SEXP _rpact_getSimulatedStageMeansMultiArmCpp(SEXP designSEXP, SEXP muVectorSEXP, SEXP stDevSEXP, SEXP plannedSubjectsSEXP, SEXP typeOfSelectionSEXP, SEXP effectMeasureSEXP, SEXP adaptationsSEXP, SEXP epsilonValueSEXP, SEXP rValueSEXP, SEXP thresholdSEXP, SEXP allocationRatioPlannedSEXP, SEXP minNumberOfSubjectsPerStageSEXP, SEXP maxNumberOfSubjectsPerStageSEXP, SEXP conditionalPowerSEXP, SEXP thetaH1SEXP, SEXP stDevH1SEXP, SEXP calcSubjectsFunctionSEXP, SEXP calcSubjectsFunctionIsUserDefinedSEXP, SEXP selectArmsFunctionSEXP) {
@@ -1112,6 +1128,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_dunnettIntegrand3Evaluate", (DL_FUNC) &_rpact_dunnettIntegrand3Evaluate, 5},
     {"_rpact_performClosedConditionalDunnettTestForSimulation", (DL_FUNC) &_rpact_performClosedConditionalDunnettTestForSimulation, 5},
     {"_rpact_performClosedCombinationTestForSimulationMultiArm", (DL_FUNC) &_rpact_performClosedCombinationTestForSimulationMultiArm, 5},
+    {"_rpact_selectTreatmentArms", (DL_FUNC) &_rpact_selectTreatmentArms, 6},
     {"_rpact_getSimulatedStageMeansMultiArmCpp", (DL_FUNC) &_rpact_getSimulatedStageMeansMultiArmCpp, 19},
     {"_rpact_simulationMultiArmMeansInnerLoopCpp", (DL_FUNC) &_rpact_simulationMultiArmMeansInnerLoopCpp, 57},
     {"_rpact_hmm", (DL_FUNC) &_rpact_hmm, 9},

@@ -161,6 +161,10 @@
     .Call(`_rpact_performClosedCombinationTestForSimulationMultiArm`, stageResults, design, indices, intersectionTest, successCriterion)
 }
 
+.selectTreatmentArmsCpp <- function(effectVector, typeOfSelection, epsilonValue = NA_real_, rValue = NA_integer_, threshold = NA_real_, survival = FALSE) {
+    .Call(`_rpact_selectTreatmentArms`, effectVector, typeOfSelection, epsilonValue, rValue, threshold, survival)
+}
+
 .getSimulatedStageMeansMultiArmCpp <- function(design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
     .Call(`_rpact_getSimulatedStageMeansMultiArmCpp`, design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction)
 }

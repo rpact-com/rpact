@@ -741,3 +741,84 @@ List performClosedCombinationTestForSimulationMultiArm(
         _["futilityStop"] = futilityStop
     );
 }
+
+// Select Treatment Arms
+//
+// Selects treatment arms based on effect vector and selection criteria
+//
+// @param effectVector Numeric vector of effect estimates
+// @param typeOfSelection String specifying selection type: "all", "best", "rBest", "epsilon", "userDefined"
+// @param epsilonValue Epsilon value for epsilon selection
+// @param rValue R value for rBest selection
+// @param threshold Threshold below which arms are not selected
+// @param survival Whether this is for survival endpoint (if TRUE, do not append control arm)
+//
+// [[Rcpp::export(name = ".selectTreatmentArmsCpp")]]
+LogicalVector selectTreatmentArms(NumericVector effectVector,
+                                  std::string typeOfSelection,
+                                  double epsilonValue = NA_REAL,
+                                  int rValue = NA_INTEGER,
+                                  double threshold = NA_REAL,
+                                  bool survival = false) {
+    
+    int gMax = effectVector.size();
+    LogicalVector selectedArms(gMax, false);
+    
+    // Convert typeOfSelection to lowercase for case-insensitive comparison
+    std::string typeOfSelectionLower = typeOfSelection;
+    std::transform(typeOfSelectionLower.begin(), typeOfSelectionLower.end(), 
+                   typeOfSelectionLower.begin(), ::tolower);
+    
+    if (typeOfSelectionLower == "all") {
+        std::fill(selectedArms.begin(), selectedArms.end(), true);
+    } else if (typeOfSelectionLower == "best") {
+        // Find index of maximum effect (excluding NA values)
+        LogicalVector is_not_na = !is_na(effectVector);
+        IntegerVector which_is_not_na = which(is_not_na);
+        NumericVector availableEffectVector = effectVector[which_is_not_na];
+        if (availableEffectVector.size() > 0) {
+            auto maxIndex = std::max_element(availableEffectVector.begin(), availableEffectVector.end());
+            selectedArms[which_is_not_na[std::distance(availableEffectVector.begin(), maxIndex)]] = true;
+        }
+    } else if (typeOfSelectionLower == "rbest") {
+        if (R_IsNA(rValue) || rValue <= 0) {
+            stop("rValue must be a positive integer for rBest selection");
+        }
+        rValue = std::min(rValue, gMax);
+        LogicalVector is_not_na = !is_na(effectVector);
+        IntegerVector which_is_not_na = which(is_not_na);
+        NumericVector availableEffectVector = effectVector[which_is_not_na];
+        if (availableEffectVector.size() > 0) {
+            IntegerVector effectOrder = order(-availableEffectVector);
+            int numToSelect = std::min(rValue, static_cast<int>(availableEffectVector.size()));
+            effectOrder = effectOrder[seq(0, numToSelect - 1)];
+            IntegerVector mapped_indices = which_is_not_na[effectOrder - 1];
+            selectedArms[mapped_indices] = true;
+        }
+    } else if (typeOfSelectionLower == "epsilon") {
+        if (R_IsNA(epsilonValue) || epsilonValue <= 0) {
+            stop("positive epsilonValue must be specified for epsilon selection");
+        }
+        double maxEffect = max(na_omit(effectVector));
+        NumericVector deltaToMax = maxEffect - effectVector;
+        LogicalVector withinEpsilon = deltaToMax <= epsilonValue;
+        selectedArms = withinEpsilon;
+        // Exclude NAs
+        selectedArms[which(is_na(effectVector))] = false;
+    } else {
+        stop("Invalid typeOfSelection. Must be 'all', 'best', 'rBest', or 'epsilon'");
+    }
+    
+    // Apply threshold: exclude arms below threshold
+    if (!R_IsNA(threshold)) {
+        LogicalVector effectBelowThreshold = is_na(effectVector) | (effectVector <= threshold);
+        selectedArms[effectBelowThreshold] = false;
+    }
+    
+    // If not survival, append control arm (TRUE) which is always selected.
+    if (!survival) {
+        selectedArms.push_back(true);
+    }
+    
+    return selectedArms;
+}
