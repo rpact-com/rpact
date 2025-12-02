@@ -145,4 +145,6 @@ std::string getClassName(const Environment& x);
 
 double getMultivarNormalDistribution(NumericVector upper, NumericMatrix sigma);
 
+NumericMatrix tcrossprod(NumericVector x);
+
 #endif

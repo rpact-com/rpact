@@ -936,3 +936,16 @@ double getMultivarNormalDistribution(NumericVector upper, NumericMatrix sigma) {
     NumericVector lower = NumericVector::create(R_NegInf);
     return as251Normal(lower, upper, sigma);
 }
+
+// Calculates x %*% t(x)
+// [[Rcpp::export(name = ".tcrossprodCpp")]]
+NumericMatrix tcrossprod(NumericVector x) {
+    int n = x.size();
+    NumericMatrix result(n, n);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            result(i, j) = x[i] * x[j];
+        }
+    }
+    return result;
+}

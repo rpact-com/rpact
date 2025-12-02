@@ -157,6 +157,10 @@
     .Call(`_rpact_performClosedConditionalDunnettTestForSimulation`, stageResults, design, indices, criticalValuesDunnett, successCriterion)
 }
 
+.performClosedCombinationTestForSimulationMultiArmCpp <- function(stageResults, design, indices, intersectionTest, successCriterion) {
+    .Call(`_rpact_performClosedCombinationTestForSimulationMultiArm`, stageResults, design, indices, intersectionTest, successCriterion)
+}
+
 .getSimulatedStageMeansMultiArmCpp <- function(design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
     .Call(`_rpact_getSimulatedStageMeansMultiArmCpp`, design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction)
 }
@@ -211,5 +215,9 @@ getCipheredValue <- function(x) {
 
 .getMultivarNormalDistributionCpp <- function(upper, sigma) {
     .Call(`_rpact_getMultivarNormalDistribution`, upper, sigma)
+}
+
+.tcrossprodCpp <- function(x) {
+    .Call(`_rpact_tcrossprod`, x)
 }
 

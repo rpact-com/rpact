@@ -2,7 +2,9 @@
 #include <Rcpp.h>
 #include <cmath>
 
+#include "f_analysis_base.h"
 #include "f_utilities.h"
+#include "rpact_types.h"
 
 using namespace Rcpp;
 
@@ -459,6 +461,279 @@ List performClosedConditionalDunnettTestForSimulation(
         _["separatePValues"] = separatePValues,
         _["conditionalErrorRate"] = conditionalErrorRate,
         _["secondStagePValues"] = secondStagePValues,
+        _["rejected"] = rejected,
+        _["rejectedIntersections"] = rejectedIntersections,
+        _["selectedArms"] = selectedArms,
+        _["successStop"] = successStop,
+        _["futilityStop"] = futilityStop
+    );
+}
+
+// [[Rcpp::export(name = ".performClosedCombinationTestForSimulationMultiArmCpp")]]
+List performClosedCombinationTestForSimulationMultiArm(
+        List stageResults,
+        Environment design,
+        LogicalMatrix indices,
+        std::string intersectionTest,
+        std::string successCriterion) {
+    
+    // Check design type compatibility
+    std::string designClass = getClassName(design);
+    bool isGroupSequential = designClass == "TrialDesignGroupSequential";
+    int kMax = Rcpp::as<int>(design.get("kMax"));
+    
+    if (isGroupSequential && kMax > 1) {
+        stop("Group sequential design cannot be used for designs with treatment arm selection");
+    }
+    
+    // Extract stage results
+    NumericMatrix testStatistics = stageResults["testStatistics"];
+    NumericMatrix separatePValues = stageResults["separatePValues"];
+    LogicalMatrix selectedArms = stageResults["selectedArms"];
+    
+    int gMax = testStatistics.nrow();
+    int nIntersections = indices.nrow();
+    
+    // Verify that nIntersections equals 2^gMax - 1
+    int expectedIntersections = static_cast<int>(pow(2, gMax)) - 1;
+    if (nIntersections != expectedIntersections) {
+        stop("Number of intersections must equal 2^gMax - 1");
+    }
+    
+    // Initialize result matrices
+    NumericMatrix adjustedStageWisePValues(nIntersections, kMax);
+    std::fill(adjustedStageWisePValues.begin(), adjustedStageWisePValues.end(), NA_REAL);
+    
+    NumericMatrix overallAdjustedTestStatistics(nIntersections, kMax);
+    std::fill(overallAdjustedTestStatistics.begin(), overallAdjustedTestStatistics.end(), NA_REAL);
+    
+    LogicalMatrix rejected(gMax, kMax);
+    std::fill(rejected.begin(), rejected.end(), false);
+    
+    LogicalMatrix rejectedIntersections(nIntersections, kMax);
+    std::fill(rejectedIntersections.begin(), rejectedIntersections.end(), false);
+    
+    LogicalMatrix futility(gMax, kMax - 1);
+    std::fill(futility.begin(), futility.end(), false);
+    
+    LogicalMatrix futilityIntersections(nIntersections, kMax - 1);
+    std::fill(futilityIntersections.begin(), futilityIntersections.end(), false);
+    
+    LogicalVector rejectedIntersectionsBefore(nIntersections);
+    std::fill(rejectedIntersectionsBefore.begin(), rejectedIntersectionsBefore.end(), false);
+    
+    LogicalVector successStop(kMax);
+    std::fill(successStop.begin(), successStop.end(), false);
+    
+    LogicalVector futilityStop(kMax - 1);
+    std::fill(futilityStop.begin(), futilityStop.end(), false);
+    
+    // Get weights based on design type
+    bool isDesignFisher = designClass == "TrialDesignFisher";
+    bool isDesignInverseNormal = designClass == "TrialDesignInverseNormal";
+    NumericVector weights;
+    if (isDesignFisher) {
+        weights = getWeightsFisher(design);
+    } else {
+        weights = getWeightsInverseNormal(design);
+    }
+    
+    // For single arm, force Bonferroni
+    if (gMax == 1) {
+        intersectionTest = "Bonferroni";
+    }
+    
+    // Handle Dunnett-specific data
+    NumericMatrix subjectsPerStage;
+    bool hasDunnettData = (intersectionTest == "Dunnett");
+    if (hasDunnettData) {
+        if (stageResults.containsElementNamed("subjectsPerStage")) {
+            subjectsPerStage = Rcpp::as<NumericMatrix>(stageResults["subjectsPerStage"]);
+        } else if (stageResults.containsElementNamed("cumulativeEventsPerStage")) {
+            subjectsPerStage = Rcpp::as<NumericMatrix>(stageResults["cumulativeEventsPerStage"]);
+        }
+    }
+    
+    // Main loop over stages
+    for (int k = 0; k < kMax; k++) {
+        
+        NumericVector stageSeparatePValues = separatePValues(_, k);
+        NumericVector allocationRatioPlanned = stageResults["allocationRatioPlanned"];
+        NumericVector allocationRatiosPerStage(gMax);
+        NumericVector stageTestStatistics = testStatistics(_, k);
+        
+        // For Dunnett, set up allocation ratios
+        if (hasDunnettData) {
+            for (int g = 0; g < gMax; g++) {
+                allocationRatiosPerStage[g] = 
+                  R_IsNA(subjectsPerStage(g, k)) ? NA_REAL : allocationRatioPlanned[k];
+            }
+        }
+        
+        // Loop over intersection hypotheses
+        for (int i = 0; i < nIntersections; i++) {
+            
+            // Get p-values available for this intersection
+            LogicalVector isInIntersection = indices(i, _);
+            NumericVector intersectStageSeparatePValues = stageSeparatePValues[isInIntersection];
+            intersectStageSeparatePValues = na_omit(intersectStageSeparatePValues);
+            int nAvailablePVals = intersectStageSeparatePValues.size();
+            bool hasValidPValues = nAvailablePVals > 0;
+            
+            if (hasValidPValues) {
+                // Calculate adjusted stage-wise p-value based on intersection test
+                if (intersectionTest == "Dunnett") {
+                    // Collect selected allocation ratios
+                    NumericVector allocationRatiosSelected = allocationRatiosPerStage[isInIntersection];
+                    allocationRatiosSelected = na_omit(allocationRatiosSelected);
+                    
+                    // Compute covariance matrix step by step
+                    NumericVector sigmaVec = sqrt(allocationRatiosSelected / (1.0 + allocationRatiosSelected));
+                    NumericMatrix sigma = tcrossprod(sigmaVec);
+                    for (int i = 0; i < sigma.nrow(); i++) {
+                        sigma(i, i) = 1.0;
+                    }
+                    
+                    double maxTestStatistic = 
+                        max(na_omit(Rcpp::as<NumericVector>(stageTestStatistics[isInIntersection])));
+                    
+                    adjustedStageWisePValues(i, k) = 1.0 - getMultivarNormalDistribution(wrap(maxTestStatistic), sigma);
+                    
+                } else if (intersectionTest == "Bonferroni") {
+                    // Bonferroni adjusted p-values
+                    double minAvailablePvals = min(intersectStageSeparatePValues);
+                    double bonferroniAdjustedPval = nAvailablePVals * minAvailablePvals;
+                    adjustedStageWisePValues(i, k) = std::min(1.0, bonferroniAdjustedPval);
+                    
+                } else if (intersectionTest == "Simes") {
+                    // Simes adjusted p-values
+                    NumericVector sortedPValues = clone(intersectStageSeparatePValues);
+                    std::sort(sortedPValues.begin(), sortedPValues.end());
+                    IntegerVector seqAlongPvals = seq_len(nAvailablePVals);
+                    NumericVector seqAlongPvalsDouble = Rcpp::as<NumericVector>(seqAlongPvals);
+                    NumericVector simesAdjustedPValues = rep(nAvailablePVals * 1.0, nAvailablePVals) /
+                        seqAlongPvalsDouble * sortedPValues;
+                    adjustedStageWisePValues(i, k) = min(simesAdjustedPValues);
+                    
+                } else if (intersectionTest == "Sidak") {
+                    // Sidak adjusted p-values
+                    double minAvailablePvals = min(intersectStageSeparatePValues);
+                    double OneMinusMinPvalsToPower = pow(1.0 - minAvailablePvals, nAvailablePVals);
+                    adjustedStageWisePValues(i, k) = 1.0 - OneMinusMinPvalsToPower;
+                    
+                } else if (intersectionTest == "Hierarchical") {
+                    // Hierarchically ordered hypotheses
+                    NumericMatrix filledSeparatePValues = separatePValues;
+                    for (int j = 0; j < gMax; j++) {
+                        for (int l = 0; l < kMax; l++) {
+                            if (R_IsNA(filledSeparatePValues(j, l))) {
+                                filledSeparatePValues(j, l) = 1.0;
+                            }
+                        }
+                    }
+                    NumericVector filledStageSeparatePValues = filledSeparatePValues(_, k);
+                    NumericVector intersectFilledStageSeparatePValues = filledStageSeparatePValues[isInIntersection];
+                    adjustedStageWisePValues(i, k) = intersectFilledStageSeparatePValues[0];
+                }
+                
+                // Calculate overall adjusted test statistic
+                if (isDesignFisher) {
+                    double product = 1.0;
+                    for (int j = 0; j <= k; j++) {
+                        product *= pow(adjustedStageWisePValues(i, j), weights[j]);
+                    }
+                    overallAdjustedTestStatistics(i, k) = product;
+                } else {
+                    double numerator = 0.0;
+                    double denominator = 0.0;
+                    for (int j = 0; j <= k; j++) {
+                        numerator += weights[j] * getOneMinusQNorm(adjustedStageWisePValues(i, j));
+                        denominator += pow(weights[j], 2.0);
+                    }
+                    overallAdjustedTestStatistics(i, k) = numerator / sqrt(denominator);
+                }
+                
+            }
+            // Determine rejection and futility
+            NumericVector criticalValues = design.get("criticalValues");
+            
+            if (isDesignFisher) {
+                rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= criticalValues[k];
+                if (k < kMax - 1) {
+                    NumericVector alpha0Vec = design.get("alpha0Vec");
+                    futilityIntersections(i, k) = adjustedStageWisePValues(i, k) >= alpha0Vec[k];
+                }
+            } else if (isDesignInverseNormal) {
+                rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) >= criticalValues[k];
+                if (k < kMax - 1) {
+                    NumericVector futilityBounds = design.get("futilityBounds");
+                    futilityIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= futilityBounds[k];
+                }
+            }
+            
+            // Handle missing values
+            for (int j = 0; j < rejectedIntersections.nrow(); j++) {
+                if (R_IsNA(rejectedIntersections(j, k))) {
+                    rejectedIntersections(j, k) = false;
+                }
+            }
+            
+            // Early termination check for final stage
+            if (k == kMax - 1 && !rejectedIntersections(0, k)) {
+                break;
+            }
+        }
+        
+        // Update rejectedIntersections with previous rejections
+        rejectedIntersections(_, k) = rejectedIntersections(_, k) | rejectedIntersectionsBefore;
+        rejectedIntersectionsBefore = rejectedIntersections(_, k);
+        
+        LogicalVector futilityIntersectionsBefore;
+        if (k < kMax - 1) {
+            futilityIntersectionsBefore = futilityIntersections(_, k);
+        }
+        
+        // Determine arm-level rejections and futility
+        for (int j = 0; j < gMax; j++) {
+            LogicalVector isInStage = indices(_, j);
+            LogicalVector rejectedIntersectionInStage = rejectedIntersectionsBefore[isInStage];
+            rejected(j, k) = Rcpp::as<bool>(all(na_omit(rejectedIntersectionInStage)));
+            
+            if (k < kMax - 1) {
+                LogicalVector futilityIntersectionInStage = futilityIntersectionsBefore[isInStage];
+                futility(j, k) = Rcpp::as<bool>(any(na_omit(futilityIntersectionInStage)));
+            }
+        }
+        
+        // Determine success stopping
+        LogicalVector selectedArmsThisStage = selectedArms(_, k);
+        LogicalVector rejectedThisStage = rejected(_, k);
+        
+        if (successCriterion == "all") {
+            LogicalVector rejectedThisStageThisArm = rejectedThisStage[selectedArmsThisStage];
+            successStop[k] = Rcpp::as<bool>(all(rejectedThisStageThisArm));
+        } else {
+            successStop[k] = Rcpp::as<bool>(any(rejectedThisStage));
+        }
+        
+        // Determine futility stopping for intermediate stages
+        if (k < kMax - 1) {
+            LogicalVector futilityThisStage = futility(_, k);
+            LogicalVector futilityThisStageThisArm = futilityThisStage[selectedArmsThisStage];
+            futilityStop[k] = Rcpp::as<bool>(all(futilityThisStageThisArm));
+            
+            LogicalVector selectedArmsNextStage = selectedArms(_, k + 1);
+            bool noArmInNextStage = Rcpp::as<bool>(all(na_omit(!selectedArmsNextStage)));
+            if (noArmInNextStage) {
+                futilityStop[k] = true;
+            }
+        }
+    }
+    
+    return List::create(
+        _["separatePValues"] = separatePValues,
+        _["adjustedStageWisePValues"] = adjustedStageWisePValues,
+        _["overallAdjustedTestStatistics"] = overallAdjustedTestStatistics,
         _["rejected"] = rejected,
         _["rejectedIntersections"] = rejectedIntersections,
         _["selectedArms"] = selectedArms,
