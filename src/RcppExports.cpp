@@ -933,6 +933,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getSimulationSurvivalMultiArmStageEvents
+double getSimulationSurvivalMultiArmStageEvents(int stage, bool directionUpper, double conditionalPower, NumericVector conditionalCriticalValue, NumericVector plannedEvents, NumericVector allocationRatioPlanned, LogicalMatrix selectedArms, double thetaH1, NumericMatrix overallEffects, NumericVector minNumberOfEventsPerStage, NumericVector maxNumberOfEventsPerStage);
+RcppExport SEXP _rpact_getSimulationSurvivalMultiArmStageEvents(SEXP stageSEXP, SEXP directionUpperSEXP, SEXP conditionalPowerSEXP, SEXP conditionalCriticalValueSEXP, SEXP plannedEventsSEXP, SEXP allocationRatioPlannedSEXP, SEXP selectedArmsSEXP, SEXP thetaH1SEXP, SEXP overallEffectsSEXP, SEXP minNumberOfEventsPerStageSEXP, SEXP maxNumberOfEventsPerStageSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type stage(stageSEXP);
+    Rcpp::traits::input_parameter< bool >::type directionUpper(directionUpperSEXP);
+    Rcpp::traits::input_parameter< double >::type conditionalPower(conditionalPowerSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type conditionalCriticalValue(conditionalCriticalValueSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type plannedEvents(plannedEventsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type allocationRatioPlanned(allocationRatioPlannedSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type selectedArms(selectedArmsSEXP);
+    Rcpp::traits::input_parameter< double >::type thetaH1(thetaH1SEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type overallEffects(overallEffectsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type minNumberOfEventsPerStage(minNumberOfEventsPerStageSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type maxNumberOfEventsPerStage(maxNumberOfEventsPerStageSEXP);
+    rcpp_result_gen = Rcpp::wrap(getSimulationSurvivalMultiArmStageEvents(stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedArms, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage));
+    return rcpp_result_gen;
+END_RCPP
+}
 // findObservationTime
 double findObservationTime(NumericVector accrualTime, NumericVector survivalTime, NumericVector dropoutTime, double requiredStageEvents);
 RcppExport SEXP _rpact_findObservationTime(SEXP accrualTimeSEXP, SEXP survivalTimeSEXP, SEXP dropoutTimeSEXP, SEXP requiredStageEventsSEXP) {
@@ -1097,6 +1118,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_first", (DL_FUNC) &_rpact_first, 7},
     {"_rpact_funnyBool", (DL_FUNC) &_rpact_funnyBool, 3},
     {"_rpact_lastSection", (DL_FUNC) &_rpact_lastSection, 11},
+    {"_rpact_getSimulationSurvivalMultiArmStageEvents", (DL_FUNC) &_rpact_getSimulationSurvivalMultiArmStageEvents, 11},
     {"_rpact_findObservationTime", (DL_FUNC) &_rpact_findObservationTime, 4},
     {"_rpact_getOneMinusQNorm", (DL_FUNC) &_rpact_getOneMinusQNorm, 6},
     {"_rpact_order", (DL_FUNC) &_rpact_order, 1},

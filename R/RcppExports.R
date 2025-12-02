@@ -185,6 +185,10 @@
     .Call(`_rpact_lastSection`, simulatedSubjectsPerStage, iterations, i, gMax, kMax, cols, simulatedRejections, simulatedSuccessStopping, simulatedFutilityStopping, maxNumberOfIterations, expectedNumberOfSubjects)
 }
 
+.getSimulationSurvivalMultiArmStageEventsCpp <- function(stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedArms, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage) {
+    .Call(`_rpact_getSimulationSurvivalMultiArmStageEvents`, stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedArms, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage)
+}
+
 .findObservationTimeCpp <- function(accrualTime, survivalTime, dropoutTime, requiredStageEvents) {
     .Call(`_rpact_findObservationTime`, accrualTime, survivalTime, dropoutTime, requiredStageEvents)
 }
