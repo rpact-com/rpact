@@ -737,6 +737,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// performClosedConditionalDunnettTestForSimulation
+List performClosedConditionalDunnettTestForSimulation(List stageResults, Environment design, LogicalMatrix indices, NumericVector criticalValuesDunnett, std::string successCriterion);
+RcppExport SEXP _rpact_performClosedConditionalDunnettTestForSimulation(SEXP stageResultsSEXP, SEXP designSEXP, SEXP indicesSEXP, SEXP criticalValuesDunnettSEXP, SEXP successCriterionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type stageResults(stageResultsSEXP);
+    Rcpp::traits::input_parameter< Environment >::type design(designSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type indices(indicesSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type criticalValuesDunnett(criticalValuesDunnettSEXP);
+    Rcpp::traits::input_parameter< std::string >::type successCriterion(successCriterionSEXP);
+    rcpp_result_gen = Rcpp::wrap(performClosedConditionalDunnettTestForSimulation(stageResults, design, indices, criticalValuesDunnett, successCriterion));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getSimulatedStageMeansMultiArmCpp
 List getSimulatedStageMeansMultiArmCpp(Environment design, NumericVector muVector, double stDev, NumericVector plannedSubjects, std::string typeOfSelection, std::string effectMeasure, LogicalVector adaptations, double epsilonValue, double rValue, double threshold, NumericVector allocationRatioPlanned, NumericVector minNumberOfSubjectsPerStage, NumericVector maxNumberOfSubjectsPerStage, double conditionalPower, double thetaH1, double stDevH1, Function calcSubjectsFunction, bool calcSubjectsFunctionIsUserDefined, Nullable<Function> selectArmsFunction);
 RcppExport SEXP _rpact_getSimulatedStageMeansMultiArmCpp(SEXP designSEXP, SEXP muVectorSEXP, SEXP stDevSEXP, SEXP plannedSubjectsSEXP, SEXP typeOfSelectionSEXP, SEXP effectMeasureSEXP, SEXP adaptationsSEXP, SEXP epsilonValueSEXP, SEXP rValueSEXP, SEXP thresholdSEXP, SEXP allocationRatioPlannedSEXP, SEXP minNumberOfSubjectsPerStageSEXP, SEXP maxNumberOfSubjectsPerStageSEXP, SEXP conditionalPowerSEXP, SEXP thetaH1SEXP, SEXP stDevH1SEXP, SEXP calcSubjectsFunctionSEXP, SEXP calcSubjectsFunctionIsUserDefinedSEXP, SEXP selectArmsFunctionSEXP) {
@@ -1048,6 +1063,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_dunnettIntegrand2Evaluate", (DL_FUNC) &_rpact_dunnettIntegrand2Evaluate, 7},
     {"_rpact_dunnettIntegrand3Int", (DL_FUNC) &_rpact_dunnettIntegrand3Int, 4},
     {"_rpact_dunnettIntegrand3Evaluate", (DL_FUNC) &_rpact_dunnettIntegrand3Evaluate, 5},
+    {"_rpact_performClosedConditionalDunnettTestForSimulation", (DL_FUNC) &_rpact_performClosedConditionalDunnettTestForSimulation, 5},
     {"_rpact_getSimulatedStageMeansMultiArmCpp", (DL_FUNC) &_rpact_getSimulatedStageMeansMultiArmCpp, 19},
     {"_rpact_simulationMultiArmMeansInnerLoopCpp", (DL_FUNC) &_rpact_simulationMultiArmMeansInnerLoopCpp, 57},
     {"_rpact_hmm", (DL_FUNC) &_rpact_hmm, 9},

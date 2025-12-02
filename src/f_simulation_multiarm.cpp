@@ -320,7 +320,6 @@ List performClosedConditionalDunnettTestForSimulation(
     
     NumericMatrix testStatistics = stageResults["testStatistics"];
     NumericMatrix separatePValues = stageResults["separatePValues"];
-    NumericMatrix subjectsPerStage = stageResults["subjectsPerStage"];
     NumericMatrix overallTestStatistics = stageResults["overallTestStatistics"];
     
     int gMax = testStatistics.nrow();
@@ -351,8 +350,8 @@ List performClosedConditionalDunnettTestForSimulation(
             sqrt(1.0 - informationAtInterim) * testStatistics(_, 1);   
     
     LogicalMatrix selectedArms = stageResults["selectedArms"];
-    bool notAnySelected = !any(na_omit(selectedArms(_, 1)));
-    if (notAnySelected) {
+    bool anySelected = Rcpp::as<bool>(any(na_omit(selectedArms(_, 1))));
+    if (!anySelected) {
         futilityStop = true;
     }
     

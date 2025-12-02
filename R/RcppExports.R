@@ -153,6 +153,10 @@
     .Call(`_rpact_dunnettIntegrand3Evaluate`, x, maxTestStatistic, frac, indicesRow, separatePValues)
 }
 
+.performClosedConditionalDunnettTestForSimulationCpp <- function(stageResults, design, indices, criticalValuesDunnett, successCriterion) {
+    .Call(`_rpact_performClosedConditionalDunnettTestForSimulation`, stageResults, design, indices, criticalValuesDunnett, successCriterion)
+}
+
 .getSimulatedStageMeansMultiArmCpp <- function(design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction) {
     .Call(`_rpact_getSimulatedStageMeansMultiArmCpp`, design, muVector, stDev, plannedSubjects, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationRatioPlanned, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, thetaH1, stDevH1, calcSubjectsFunction, calcSubjectsFunctionIsUserDefined, selectArmsFunction)
 }
