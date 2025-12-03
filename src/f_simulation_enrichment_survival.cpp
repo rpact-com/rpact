@@ -756,7 +756,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				if (typeOfSelection == "userDefined") {
 					List selectPopulationsFunctionArgs = List::create(
 						_["effectVector"] = effectVector,
-						_["stage"] = k,
+						_["stage"] = k + 1, // R 1-based
 						_["directionUpper"] = directionUpper,
 						_["conditionalPower"] = conditionalPower,
 						_["conditionalCriticalValue"] = conditionalCriticalValue,
