@@ -2038,7 +2038,8 @@ getDesignInverseNormal <- function(
 #' @param futilityBounds The futility bounds, defined on the scale defined by \code{futilityBoundsScale}.
 #'        (numeric vector of length \code{kMax - 1}).
 #' @param futilityBoundsScale Character. The scale of the futility bounds.
-#'        Must be one of \code{"zValue"}, \code{"pValue"}, or \code{"reverseCondPower"}.
+#'        Must be one of \code{"zValue"}, \code{"pValue"}, \code{"reverseCondPower"}, 
+#'        \code{"condPowerAtObserved"}, or \code{"predictivePower"}.
 #'        Default is \code{"zValue"}.
 #' @inheritParams param_bindingFutility
 #' @inheritParams param_directionUpper
@@ -2133,7 +2134,9 @@ getDesignGroupSequential <- function(
         futilityBoundsScale = c(
             "zValue",
             "pValue",
-            "reverseCondPower"
+            "reverseCondPower",
+            "condPowerAtObserved",
+            "predictivePower"
         ),
         directionUpper = NA,
         betaAdjustment = NA,

@@ -26,7 +26,8 @@ getDesignGroupSequential(
   futilityStops = NA,
   gammaB = NA_real_,
   bindingFutility = NA,
-  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower"),
+  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower", "condPowerAtObserved",
+    "predictivePower"),
   directionUpper = NA,
   betaAdjustment = NA,
   constantBoundsHP = 3,
@@ -106,7 +107,8 @@ the critical values is affected by the futility bounds and the futility threshol
 sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
 
 \item{futilityBoundsScale}{Character. The scale of the futility bounds.
-Must be one of \code{"zValue"}, \code{"pValue"}, or \code{"reverseCondPower"}.
+Must be one of \code{"zValue"}, \code{"pValue"}, \code{"reverseCondPower"},
+\code{"condPowerAtObserved"}, or \code{"predictivePower"}.
 Default is \code{"zValue"}.}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
