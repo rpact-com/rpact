@@ -985,6 +985,70 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getTreatmentsMultiArm
+IntegerVector getTreatmentsMultiArm(int gMax, int maxNumberOfSubjects, IntegerVector allocationFraction);
+RcppExport SEXP _rpact_getTreatmentsMultiArm(SEXP gMaxSEXP, SEXP maxNumberOfSubjectsSEXP, SEXP allocationFractionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type gMax(gMaxSEXP);
+    Rcpp::traits::input_parameter< int >::type maxNumberOfSubjects(maxNumberOfSubjectsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type allocationFraction(allocationFractionSEXP);
+    rcpp_result_gen = Rcpp::wrap(getTreatmentsMultiArm(gMax, maxNumberOfSubjects, allocationFraction));
+    return rcpp_result_gen;
+END_RCPP
+}
+// updateTreatmentsVector
+IntegerVector updateTreatmentsVector(int k, int gMax, int maxNumberOfSubjects, IntegerVector numberOfSubjects, IntegerVector treatments, LogicalMatrix selectedArms, IntegerVector allocationFraction);
+RcppExport SEXP _rpact_updateTreatmentsVector(SEXP kSEXP, SEXP gMaxSEXP, SEXP maxNumberOfSubjectsSEXP, SEXP numberOfSubjectsSEXP, SEXP treatmentsSEXP, SEXP selectedArmsSEXP, SEXP allocationFractionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type gMax(gMaxSEXP);
+    Rcpp::traits::input_parameter< int >::type maxNumberOfSubjects(maxNumberOfSubjectsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type numberOfSubjects(numberOfSubjectsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type treatments(treatmentsSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type selectedArms(selectedArmsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type allocationFraction(allocationFractionSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateTreatmentsVector(k, gMax, maxNumberOfSubjects, numberOfSubjects, treatments, selectedArms, allocationFraction));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getSimulatedStageResultsSurvivalMultiArmSubjectsBased
+List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(Environment design, NumericVector weights, bool directionUpper, NumericVector omegaVector, double piControl, double kappa, NumericVector phi, double eventTime, NumericVector plannedEvents, NumericVector recruitmentTimes, IntegerVector allocationFraction, std::string typeOfSelection, std::string effectMeasure, LogicalVector adaptations, double epsilonValue, double rValue, double threshold, NumericVector minNumberOfEventsPerStage, NumericVector maxNumberOfEventsPerStage, double conditionalPower, double thetaH1, Nullable<Function> calcEventsFunction, bool calcEventsFunctionIsUserDefined, Nullable<Function> selectArmsFunction);
+RcppExport SEXP _rpact_getSimulatedStageResultsSurvivalMultiArmSubjectsBased(SEXP designSEXP, SEXP weightsSEXP, SEXP directionUpperSEXP, SEXP omegaVectorSEXP, SEXP piControlSEXP, SEXP kappaSEXP, SEXP phiSEXP, SEXP eventTimeSEXP, SEXP plannedEventsSEXP, SEXP recruitmentTimesSEXP, SEXP allocationFractionSEXP, SEXP typeOfSelectionSEXP, SEXP effectMeasureSEXP, SEXP adaptationsSEXP, SEXP epsilonValueSEXP, SEXP rValueSEXP, SEXP thresholdSEXP, SEXP minNumberOfEventsPerStageSEXP, SEXP maxNumberOfEventsPerStageSEXP, SEXP conditionalPowerSEXP, SEXP thetaH1SEXP, SEXP calcEventsFunctionSEXP, SEXP calcEventsFunctionIsUserDefinedSEXP, SEXP selectArmsFunctionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Environment >::type design(designSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type weights(weightsSEXP);
+    Rcpp::traits::input_parameter< bool >::type directionUpper(directionUpperSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type omegaVector(omegaVectorSEXP);
+    Rcpp::traits::input_parameter< double >::type piControl(piControlSEXP);
+    Rcpp::traits::input_parameter< double >::type kappa(kappaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type phi(phiSEXP);
+    Rcpp::traits::input_parameter< double >::type eventTime(eventTimeSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type plannedEvents(plannedEventsSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type recruitmentTimes(recruitmentTimesSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type allocationFraction(allocationFractionSEXP);
+    Rcpp::traits::input_parameter< std::string >::type typeOfSelection(typeOfSelectionSEXP);
+    Rcpp::traits::input_parameter< std::string >::type effectMeasure(effectMeasureSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type adaptations(adaptationsSEXP);
+    Rcpp::traits::input_parameter< double >::type epsilonValue(epsilonValueSEXP);
+    Rcpp::traits::input_parameter< double >::type rValue(rValueSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type minNumberOfEventsPerStage(minNumberOfEventsPerStageSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type maxNumberOfEventsPerStage(maxNumberOfEventsPerStageSEXP);
+    Rcpp::traits::input_parameter< double >::type conditionalPower(conditionalPowerSEXP);
+    Rcpp::traits::input_parameter< double >::type thetaH1(thetaH1SEXP);
+    Rcpp::traits::input_parameter< Nullable<Function> >::type calcEventsFunction(calcEventsFunctionSEXP);
+    Rcpp::traits::input_parameter< bool >::type calcEventsFunctionIsUserDefined(calcEventsFunctionIsUserDefinedSEXP);
+    Rcpp::traits::input_parameter< Nullable<Function> >::type selectArmsFunction(selectArmsFunctionSEXP);
+    rcpp_result_gen = Rcpp::wrap(getSimulatedStageResultsSurvivalMultiArmSubjectsBased(design, weights, directionUpper, omegaVector, piControl, kappa, phi, eventTime, plannedEvents, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectArmsFunction));
+    return rcpp_result_gen;
+END_RCPP
+}
 // findObservationTime
 double findObservationTime(NumericVector accrualTime, NumericVector survivalTime, NumericVector dropoutTime, double requiredStageEvents);
 RcppExport SEXP _rpact_findObservationTime(SEXP accrualTimeSEXP, SEXP survivalTimeSEXP, SEXP dropoutTimeSEXP, SEXP requiredStageEventsSEXP) {
@@ -1152,6 +1216,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_lastSection", (DL_FUNC) &_rpact_lastSection, 11},
     {"_rpact_getSimulationSurvivalMultiArmStageEvents", (DL_FUNC) &_rpact_getSimulationSurvivalMultiArmStageEvents, 11},
     {"_rpact_logRankTestMultiArm", (DL_FUNC) &_rpact_logRankTestMultiArm, 5},
+    {"_rpact_getTreatmentsMultiArm", (DL_FUNC) &_rpact_getTreatmentsMultiArm, 3},
+    {"_rpact_updateTreatmentsVector", (DL_FUNC) &_rpact_updateTreatmentsVector, 7},
+    {"_rpact_getSimulatedStageResultsSurvivalMultiArmSubjectsBased", (DL_FUNC) &_rpact_getSimulatedStageResultsSurvivalMultiArmSubjectsBased, 24},
     {"_rpact_findObservationTime", (DL_FUNC) &_rpact_findObservationTime, 4},
     {"_rpact_getOneMinusQNorm", (DL_FUNC) &_rpact_getOneMinusQNorm, 6},
     {"_rpact_order", (DL_FUNC) &_rpact_order, 1},

@@ -197,6 +197,18 @@
     .Call(`_rpact_logRankTestMultiArm`, survivalDataSet, time, comparedTreatmentArms, directionUpper, thetaH0)
 }
 
+.getTreatmentsMultiArmCpp <- function(gMax, maxNumberOfSubjects, allocationFraction) {
+    .Call(`_rpact_getTreatmentsMultiArm`, gMax, maxNumberOfSubjects, allocationFraction)
+}
+
+.updateTreatmentsVectorCpp <- function(k, gMax, maxNumberOfSubjects, numberOfSubjects, treatments, selectedArms, allocationFraction) {
+    .Call(`_rpact_updateTreatmentsVector`, k, gMax, maxNumberOfSubjects, numberOfSubjects, treatments, selectedArms, allocationFraction)
+}
+
+.getSimulatedStageResultsSurvivalMultiArmSubjectsBasedCpp <- function(design, weights, directionUpper, omegaVector, piControl, kappa, phi, eventTime, plannedEvents, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction = NULL, calcEventsFunctionIsUserDefined = FALSE, selectArmsFunction = NULL) {
+    .Call(`_rpact_getSimulatedStageResultsSurvivalMultiArmSubjectsBased`, design, weights, directionUpper, omegaVector, piControl, kappa, phi, eventTime, plannedEvents, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectArmsFunction)
+}
+
 .findObservationTimeCpp <- function(accrualTime, survivalTime, dropoutTime, requiredStageEvents) {
     .Call(`_rpact_findObservationTime`, accrualTime, survivalTime, dropoutTime, requiredStageEvents)
 }
