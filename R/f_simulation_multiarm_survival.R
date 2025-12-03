@@ -155,17 +155,18 @@ NULL
         if (survivalDataSetSelectedArmsSorted$event[i]) {
             if (survivalDataSetSelectedArmsSorted$treatmentArm[i] == treatmentArms[1]) {
                 if (subjectsT1 + subjectsT2 > 0) {
-                    numerator <- numerator - thetaH0 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)
+                    numerator <- numerator + 1 - thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2)
                 }
                 events1 <- events1 + 1
             } else if (survivalDataSetSelectedArmsSorted$treatmentArm[i] == treatmentArms[2]) {
                 if (subjectsT1 + subjectsT2 > 0) {
-                    numerator <- numerator + 1 - thetaH0 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)
+                    numerator <- numerator - thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2)
                 }
                 events2 <- events2 + 1
             }
             if (subjectsT1 + subjectsT2 > 0) {
-                denominator <- denominator + thetaH0 * subjectsT1 * subjectsT2 / (subjectsT1 + thetaH0 * subjectsT2)^2
+                denominator <- denominator +
+                    thetaH0 * subjectsT1 * subjectsT2 / (thetaH0 * subjectsT1 + subjectsT2)^2
             }
         }
         if (survivalDataSetSelectedArmsSorted$treatmentArm[i] == treatmentArms[1]) {
@@ -176,19 +177,16 @@ NULL
         }
     }
 
-    if (denominator > 0) {
+    if (directionUpper && denominator > 0) {
+        logRank <- numerator / sqrt(denominator)
+    } else if (!directionUpper && denominator > 0) {
         logRank <- -numerator / sqrt(denominator)
     } else {
-        logRank <- -Inf
-    }
-
-    if (!directionUpper) {
-        logRank <- -logRank
+        logRank <- 0
     }
 
     return(list(
         logRank = logRank,
-        # 			check = check,
         thetaH0 = thetaH0,
         directionUpper = directionUpper,
         subjectNumber = subjectNumber,
