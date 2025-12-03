@@ -141,6 +141,7 @@ getDesignFisher <- function(
         method = C_FISHER_METHOD_DEFAULT,
         userAlphaSpending = NA_real_,
         alpha0Vec = NA_real_,
+        alpha0Scale = "pValue",
         informationRates = NA_real_,
         sided = 1,
         bindingFutility = C_BINDING_FUTILITY_FISHER_DEFAULT,
