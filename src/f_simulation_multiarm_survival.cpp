@@ -39,8 +39,6 @@ double getSimulationSurvivalMultiArmStageEvents(int stage,
     // To be consistent with the non-multiarm situation:
     stage = stage - 1;
 
-    int gMax = overallEffects.nrow();
-
     double newEvents;
 
     if (!R_IsNA(conditionalPower)) {
