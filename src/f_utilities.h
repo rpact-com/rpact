@@ -132,6 +132,8 @@ IntegerVector which(const LogicalVector& x);
 
 LogicalVector charInSet(const CharacterVector& x, CharacterVector set);
 
+LogicalVector intInSet(const IntegerVector& x, IntegerVector set);
+
 IntegerVector repInt(const IntegerVector& values, const IntegerVector& times);
 
 int firstMatch(const CharacterVector& x, std::string value);

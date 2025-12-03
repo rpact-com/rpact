@@ -470,8 +470,11 @@ updateTreatmentsVector <- function(k,
                     }
                 }
             }
+
+            survivalDataSetSelected <- survivalDataSet[survivalDataSet$treatmentArm %in% c(which(selectedArms[, k]), gMax + 1), ]
+
             analysisTime[k] <- .findObservationTime(
-                survivalDataSet[survivalDataSet$treatmentArm %in% c(which(selectedArms[, k]), gMax + 1), ],
+                survivalDataSetSelected,
                 plannedEvents[k]
             )$time
 
@@ -488,6 +491,7 @@ updateTreatmentsVector <- function(k,
                             treatmentArms = c(g, gMax + 1),
                             directionUpper = directionUpper
                         )
+                        print(logRank)
 
                         overallTestStatistics[g, k] <- logRank$logRank
                         singleEventsPerStage[g, k] <- logRank$events[1]

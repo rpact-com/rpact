@@ -523,8 +523,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		kappa,
 		phi
 	);
-	NumericVector survivalTime = tmp["survivalTime"];
-	NumericVector dropoutTime = tmp["dropoutTime"];
+	NumericVector survivalTime = clone(as<NumericVector>(tmp["survivalTime"]));
+	NumericVector dropoutTime = clone(as<NumericVector>(tmp["dropoutTime"]));
 
 	// Combine into a DataFrame
 	DataFrame survivalDataSet = DataFrame::create(

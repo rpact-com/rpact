@@ -971,12 +971,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // logRankTestMultiArm
-List logRankTestMultiArm(DataFrame survivalDataSet, double time, IntegerVector comparedTreatmentArms, bool directionUpper, double thetaH0);
+List logRankTestMultiArm(const DataFrame& survivalDataSet, double time, IntegerVector comparedTreatmentArms, bool directionUpper, double thetaH0);
 RcppExport SEXP _rpact_logRankTestMultiArm(SEXP survivalDataSetSEXP, SEXP timeSEXP, SEXP comparedTreatmentArmsSEXP, SEXP directionUpperSEXP, SEXP thetaH0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type survivalDataSet(survivalDataSetSEXP);
+    Rcpp::traits::input_parameter< const DataFrame& >::type survivalDataSet(survivalDataSetSEXP);
     Rcpp::traits::input_parameter< double >::type time(timeSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type comparedTreatmentArms(comparedTreatmentArmsSEXP);
     Rcpp::traits::input_parameter< bool >::type directionUpper(directionUpperSEXP);
@@ -999,7 +999,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // updateTreatmentsVector
-IntegerVector updateTreatmentsVector(int k, int gMax, int maxNumberOfSubjects, IntegerVector numberOfSubjects, IntegerVector treatments, LogicalMatrix selectedArms, IntegerVector allocationFraction);
+IntegerVector updateTreatmentsVector(int k, int gMax, int maxNumberOfSubjects, IntegerVector numberOfSubjects, const IntegerVector& treatments, LogicalMatrix selectedArms, IntegerVector allocationFraction);
 RcppExport SEXP _rpact_updateTreatmentsVector(SEXP kSEXP, SEXP gMaxSEXP, SEXP maxNumberOfSubjectsSEXP, SEXP numberOfSubjectsSEXP, SEXP treatmentsSEXP, SEXP selectedArmsSEXP, SEXP allocationFractionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -1008,7 +1008,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type gMax(gMaxSEXP);
     Rcpp::traits::input_parameter< int >::type maxNumberOfSubjects(maxNumberOfSubjectsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type numberOfSubjects(numberOfSubjectsSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type treatments(treatmentsSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type treatments(treatmentsSEXP);
     Rcpp::traits::input_parameter< LogicalMatrix >::type selectedArms(selectedArmsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type allocationFraction(allocationFractionSEXP);
     rcpp_result_gen = Rcpp::wrap(updateTreatmentsVector(k, gMax, maxNumberOfSubjects, numberOfSubjects, treatments, selectedArms, allocationFraction));

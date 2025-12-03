@@ -100,7 +100,7 @@ double getSimulationSurvivalMultiArmStageEvents(int stage,
 // @param thetaH0 Null hypothesis hazard ratio
 //
 // [[Rcpp::export(name = ".logRankTestMultiArmCpp")]]
-List logRankTestMultiArm(DataFrame survivalDataSet,
+List logRankTestMultiArm(const DataFrame& survivalDataSet,
 						 double time,
 						 IntegerVector comparedTreatmentArms,
 						 bool directionUpper = true,
@@ -110,6 +110,7 @@ List logRankTestMultiArm(DataFrame survivalDataSet,
 	NumericVector survivalTime = survivalDataSet["survivalTime"];
 	NumericVector dropoutTime = survivalDataSet["dropoutTime"];
 	IntegerVector treatmentArm = survivalDataSet["treatmentArm"];
+    IntegerVector treatmentArmModified = clone(treatmentArm);
 
     // Assert comparedTreatmentArms properties.
     if (comparedTreatmentArms.size() != 2) {
@@ -127,8 +128,8 @@ List logRankTestMultiArm(DataFrame survivalDataSet,
     // by logRankTest() below.
     LogicalVector isInFirstArm = (treatmentArm == comparedTreatmentArms[0]);
     LogicalVector isInSecondArm = (treatmentArm == comparedTreatmentArms[1]);
-	treatmentArm[isInFirstArm] = 1;
-    treatmentArm[isInSecondArm] = 2;	
+	treatmentArmModified[isInFirstArm] = 1;
+    treatmentArmModified[isInSecondArm] = 2;	
 
     // Select subjects in the treatment arms to be compared and call
     // logRankTest().    
@@ -137,7 +138,7 @@ List logRankTestMultiArm(DataFrame survivalDataSet,
         accrualTime[isInSelectedArms],
         survivalTime[isInSelectedArms],
         dropoutTime[isInSelectedArms],
-        treatmentArm[isInSelectedArms],
+        treatmentArmModified[isInSelectedArms],
         time,
         directionUpper,
         thetaH0,
@@ -219,19 +220,31 @@ List getSurvDropoutTimesMultiArm(int numberOfSubjects,
 	NumericVector survivalTime(numberOfSubjects);
 	NumericVector dropoutTime(numberOfSubjects);
 	
+	// Match R's loop structure: for each subject, generate survival then dropout
 	for (int i = 0; i < numberOfSubjects; i++) {
-        int treatmentArm = treatments[i] - 1; // Convert to 0-based!
+        int treatmentArm = treatments[i] - 1; // Convert to 0-based
+        
+        // Generate survival time
         double u = R::runif(0, 1);
         survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[treatmentArm];
         
+        // Then handle dropout within same subject iteration
+        // Match R's exact structure with separate if statements
+        dropoutTime[i] = NA_REAL; // Initialize
+        
         if (any(phi > 0).is_true()) {
-            if (treatmentArm < gMax && phi[0] > 0) {
-                dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[0];
-            } else if (treatmentArm == gMax && phi[1] > 0) {
-                dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[1];
+            if (phi[0] > 0) {
+                for (int g = 0; g < gMax; g++) {
+                    if (treatmentArm == g) {
+                        dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[0];
+                    }
+                }
             }
-        } else {
-            dropoutTime[i] = NA_REAL;
+            if (phi[1] > 0) {
+                if (treatmentArm == gMax) {
+                    dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[1];
+                }
+            }
         }
     }
     
@@ -251,7 +264,7 @@ IntegerVector updateTreatmentsVector(int k,
                                     int gMax,
                                     int maxNumberOfSubjects,
                                     IntegerVector numberOfSubjects,
-                                    IntegerVector treatments,
+                                    const IntegerVector& treatments,
                                     LogicalMatrix selectedArms,
                                     IntegerVector allocationFraction) {
     // Keep existing assignments up to previous stage
@@ -340,9 +353,9 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
     
     // Initialize matrices and vectors
     NumericMatrix singleEventsPerStage(gMax + 1, kMax);
-    std::fill(singleEventsPerStage.begin(), singleEventsPerStage.end(), NA_INTEGER);
+    std::fill(singleEventsPerStage.begin(), singleEventsPerStage.end(), NA_REAL);
     NumericMatrix cumulativeEventsPerStage(gMax, kMax);
-    std::fill(cumulativeEventsPerStage.begin(), cumulativeEventsPerStage.end(), NA_INTEGER);
+    std::fill(cumulativeEventsPerStage.begin(), cumulativeEventsPerStage.end(), NA_REAL);
     NumericMatrix simSurvival(gMax, kMax);
     std::fill(simSurvival.begin(), simSurvival.end(), NA_REAL);
     NumericMatrix overallEffects(gMax, kMax);
@@ -379,7 +392,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         lambdaVector[g] = omegaVector[g] * lambdaControl;
     }
     lambdaVector[gMax] = lambdaControl;
-    
+
     // Generate survival and dropout times
     List tmp = getSurvDropoutTimesMultiArm(
         maxNumberOfSubjects,
@@ -389,8 +402,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         kappa,
         phi
     );
-    NumericVector survivalTime = tmp["survivalTime"];
-	NumericVector dropoutTime = tmp["dropoutTime"];
+    NumericVector survivalTime = clone(as<NumericVector>(tmp["survivalTime"]));
+	NumericVector dropoutTime = clone(as<NumericVector>(tmp["dropoutTime"]));
     
     // Create survival dataset
     DataFrame survivalDataSet = DataFrame::create(
@@ -399,7 +412,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         _["survivalTime"] = survivalTime,
         _["dropoutTime"] = dropoutTime
     );
-    
+
     // Main simulation loop over stages
     for (int k = 0; k < kMax; k++) {
         if (k == 0) {
@@ -417,6 +430,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
             } else {
                 numberOfSubjects[k] = sum(recruitmentTimes <= analysisTime[k]);
                 
+                int lastControlEvents = NA_INTEGER;
                 for (int g = 0; g < gMax; g++) {
                     IntegerVector comparedArms = IntegerVector::create(g + 1, gMax + 1);
                     List logRankResult = logRankTestMultiArm(
@@ -431,11 +445,9 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                     IntegerVector events = logRankResult["events"];
                     cumulativeEventsPerStage(g, k) = sum(events);
                     singleEventsPerStage(g, k) = events[0];
-                    
-                    if (g == gMax - 1) {
-                        singleEventsPerStage(gMax, k) = events[1];
-                    }
+                    lastControlEvents = events[1];
                 }
+                singleEventsPerStage(gMax, k) = lastControlEvents;
             }
         } else {
             // Subsequent stages
@@ -460,28 +472,30 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                 
                 survivalDataSet["treatmentArm"] = treatments;
                 
-                // Generate new survival/dropout times for new subjects
-                for (int i = numberOfSubjects[k - 1]; i < maxNumberOfSubjects; i++) {
-                    int treatmentArm = treatments[i] - 1; // now 0-based!
-                    
-                    if (treatmentArm < gMax && selectedArms(treatmentArm, k)) {
-                        double u = R::runif(0, 1);
-                        survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[treatmentArm];
+                // Generate new survival times for new subjects (matching R loop order)
+                for (int i = numberOfSubjects[k - 1] - 1; i < maxNumberOfSubjects; i++) {
+                    int treatmentArm = treatments[i] - 1; // 0-based
+                    for (int g = 0; g < gMax; g++) {
+                        if (treatmentArm == g && selectedArms(g, k)) {
+                            double u = R::runif(0, 1);
+                            survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[g];
+                        }
                     }
-                    
                     if (any(phi > 0).is_true()) {
-                        if (treatmentArm < gMax && selectedArms(treatmentArm, k) && phi[0] > 0) {
-                            dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[0];
-                        } else if (treatmentArm == gMax && phi[1] > 0) {
-                            dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[1];
-                        } else {
-                            dropoutTime[i] = NA_REAL;
+                        if (phi[0] > 0) { 
+                            for (int g = 0; g < gMax; g++) {
+                                if (treatmentArm == g && selectedArms(g, k)) {
+                                    dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[0];
+                                }
+                            }
+                            if (treatmentArm == gMax) {
+                                dropoutTime[i] = -std::log(1 - R::runif(0, 1)) / phi[1];
+                            }
                         }
                     } else {
                         dropoutTime[i] = NA_REAL;
                     }
-                }
-                
+                }                    
                 survivalDataSet["survivalTime"] = survivalTime;
                 survivalDataSet["dropoutTime"] = dropoutTime;
             }
@@ -491,16 +505,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
             selectedArmIndices.push_back(gMax + 1);
             
             IntegerVector treatmentArms = survivalDataSet["treatmentArm"];
-            LogicalVector inSelectedArms(maxNumberOfSubjects);
-            for (int i = 0; i < maxNumberOfSubjects; i++) {
-                inSelectedArms[i] = false;
-                for (int j = 0; j < selectedArmIndices.size(); j++) {
-                    if (treatmentArms[i] == selectedArmIndices[j]) {
-                        inSelectedArms[i] = true;
-                        break;
-                    }
-                }
-            }
+            LogicalVector inSelectedArms = intInSet(treatmentArms, selectedArmIndices);
             
             DataFrame survivalDataSetSelected = DataFrame::create(
                 _["accrualTime"] = as<NumericVector>(survivalDataSet["accrualTime"])[inSelectedArms],
@@ -522,31 +527,34 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
             } else {
                 numberOfSubjects[k] = sum(recruitmentTimes <= analysisTime[k]);
                 
+                int lastControlEvents = NA_INTEGER;
                 for (int g = 0; g < gMax; g++) {
                     if (selectedArms(g, k)) {
                         IntegerVector comparedArms = IntegerVector::create(g + 1, gMax + 1);
+
                         List logRankResult = logRankTestMultiArm(
                             survivalDataSet,
                             analysisTime[k],
                             comparedArms,
                             directionUpper
                         );
+                        print(logRankResult);
                         
                         overallTestStatistics(g, k) = logRankResult["logRank"];
                         IntegerVector events = logRankResult["events"];
                         singleEventsPerStage(g, k) = events[0];
                         cumulativeEventsPerStage(g, k) = sum(events);
+                        lastControlEvents = events[1];
                         
                         // Stage-wise test statistic
                         double numerator = std::sqrt(cumulativeEventsPerStage(g, k)) * overallTestStatistics(g, k) -
                                          std::sqrt(cumulativeEventsPerStage(g, k - 1)) * overallTestStatistics(g, k - 1);
                         double denominator = std::sqrt(cumulativeEventsPerStage(g, k) - cumulativeEventsPerStage(g, k - 1));
                         testStatistics(g, k) = numerator / denominator;
-                        
-                        if (g == gMax - 1) {
-                            singleEventsPerStage(gMax, k) = events[1];
-                        }
                     }
+                }
+                if (lastControlEvents != NA_INTEGER) {
+                    singleEventsPerStage(gMax, k) = lastControlEvents;
                 }
             }
         }

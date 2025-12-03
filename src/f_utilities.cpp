@@ -837,6 +837,22 @@ LogicalVector charInSet(const CharacterVector& x, CharacterVector set) {
     return result;
 }
 
+// Returns a logical vector if elements of IntegerVector x are in the set
+LogicalVector intInSet(const IntegerVector& x, IntegerVector set) {
+    int n = x.size();
+    LogicalVector result(n);
+    for (int i = 0; i < n; i++) {
+        result[i] = false;
+        for (int j = 0; j < set.size(); j++) {
+            if (x[i] == set[j]) {
+                result[i] = true;
+                break;
+            }
+        }
+    }
+    return result;
+}
+
 // Replicates each element in 'values' according to the corresponding count in 'times'
 IntegerVector repInt(const IntegerVector& values, const IntegerVector& times) {
     int n = values.size();
