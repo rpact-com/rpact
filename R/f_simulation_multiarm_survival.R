@@ -267,6 +267,51 @@ NULL
     return(newEvents)
 }
 
+.getTreatmentsMultiArm <- function(gMax, maxNumberOfSubjects, allocationFraction) {
+    treatments <- c()
+    while (length(treatments) < maxNumberOfSubjects) {
+        if (allocationFraction[1] > allocationFraction[2]) {
+            treatments <- c(
+                treatments,
+                rep(1:(gMax + 1), allocationFraction[2]),
+                rep(1:gMax, allocationFraction[1] - allocationFraction[2])
+            )
+        } else {
+            treatments <- c(
+                treatments,
+                rep(1:(gMax + 1), allocationFraction[1]),
+                rep(gMax + 1, allocationFraction[2] - allocationFraction[1])
+            )
+        }
+    }
+    treatments[1:maxNumberOfSubjects]
+}
+
+updateTreatmentsVector <- function(k,
+                                   gMax,
+                                   maxNumberOfSubjects,
+                                   numberOfSubjects,
+                                   treatments,
+                                   selectedArms,
+                                   allocationFraction) {
+    treatments <- treatments[1:numberOfSubjects[k - 1]]
+    while (length(treatments) < maxNumberOfSubjects) {
+        if (allocationFraction[1] > allocationFraction[2]) {
+            treatments <- c(
+                treatments,
+                rep(c(which(selectedArms[, k]), gMax + 1), allocationFraction[2]),
+                rep(which(selectedArms[, k]), allocationFraction[1] - allocationFraction[2])
+            )
+        } else {
+            treatments <- c(
+                treatments,
+                rep(c(which(selectedArms[, k]), gMax + 1), allocationFraction[1]),
+                rep(gMax + 1, allocationFraction[2] - allocationFraction[1])
+            )
+        }
+    }
+    treatments
+}
 
 #'
 #' Calculates stage results for each simulation iteration step
@@ -324,29 +369,16 @@ NULL
     }
 
     ##  Create data set for first stage  ##
-    treatments <- c()
-    while (length(treatments) < maxNumberOfSubjects) {
-        if (allocationFraction[1] > allocationFraction[2]) {
-            treatments <- c(
-                treatments,
-                rep(1:(gMax + 1), allocationFraction[2]),
-                rep(1:gMax, allocationFraction[1] - allocationFraction[2])
-            )
-        } else {
-            treatments <- c(
-                treatments,
-                rep(1:(gMax + 1), allocationFraction[1]),
-                rep(gMax + 1, allocationFraction[2] - allocationFraction[1])
-            )
-        }
-    }
-    treatments <- treatments[1:maxNumberOfSubjects]
+    treatments <- .getTreatmentsMultiArm(gMax, maxNumberOfSubjects, allocationFraction)
+
     survivalDataSet <- data.frame(
         accrualTime = recruitmentTimes,
         treatmentArm = treatments
     )
+
     lambdaControl <- getLambdaByPi(piControl, eventTime, kappa)
     lambdaVector <- c(omegaVector * lambdaControl, lambdaControl)
+
     for (i in 1:maxNumberOfSubjects) {
         for (g in 1:(gMax + 1)) {
             if (survivalDataSet$treatmentArm[i] == g) {
@@ -374,7 +406,10 @@ NULL
     ##   Perform test results over stages  ##
     for (k in 1:kMax) {
         if (k == 1) {
-            analysisTime[k] <- .findObservationTime(survivalDataSet, plannedEvents[k])$time
+            analysisTime[k] <- .findObservationTime(
+                survivalDataSet,
+                plannedEvents[k]
+            )$time
             if (is.na(analysisTime[k])) {
                 eventsNotAchieved[k] <- TRUE
                 break
@@ -399,23 +434,18 @@ NULL
             if (analysisTime[k - 1] < max(survivalDataSet$accrualTime)) {
                 #  create new survival and dropout times for selected treatment arms
                 if (!all(selectedArms[, k] & selectedArms[, k - 1])) {
-                    treatments <- treatments[1:numberOfSubjects[k - 1]]
-                    while (length(treatments) < maxNumberOfSubjects) {
-                        if (allocationFraction[1] > allocationFraction[2]) {
-                            treatments <- c(
-                                treatments,
-                                rep(c(which(selectedArms[, k]), gMax + 1), allocationFraction[2]),
-                                rep(which(selectedArms[, k]), allocationFraction[1] - allocationFraction[2])
-                            )
-                        } else {
-                            treatments <- c(
-                                treatments,
-                                rep(c(which(selectedArms[, k]), gMax + 1), allocationFraction[1]),
-                                rep(gMax + 1, allocationFraction[2] - allocationFraction[1])
-                            )
-                        }
-                    }
+                    treatments <- updateTreatmentsVector(
+                        k,
+                        gMax,
+                        maxNumberOfSubjects,
+                        numberOfSubjects,
+                        treatments,
+                        selectedArms,
+                        allocationFraction
+                    )
+
                     survivalDataSet$treatmentArm <- treatments[1:maxNumberOfSubjects]
+
                     for (i in numberOfSubjects[k - 1]:maxNumberOfSubjects) {
                         for (g in 1:gMax) {
                             if (survivalDataSet$treatmentArm[i] == g && selectedArms[g, k]) {
@@ -479,11 +509,6 @@ NULL
                 sqrt(allocationFraction[1] / allocationFraction[2]) /
                 sqrt(cumulativeEventsPerStage[, k])
         )
-
-        # cat ("k = ", k, ", ovEffects = ", overallEffects[, k],", ovStat = ", overallTestStatistics[, k], "\n" )
-        # cat ("k = ", k, ", plannedEvents = ", plannedEvents[k], ", singleEvents = ", singleEventsPerStage[, k],
-        #      ", cumEvents = ", cumulativeEventsPerStage[, k], "\n" )
-        # if (k == 3) cat("\n")
 
         if (k < kMax) {
             if (base::colSums(selectedArms)[k] == 0) {
