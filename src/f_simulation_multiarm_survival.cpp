@@ -4,6 +4,7 @@
 // [[Rcpp::plugins(cpp11)]]
 
 #include "f_utilities.h"
+#include "f_simulation_base_survival.h"
 
 using namespace Rcpp;
 
@@ -87,4 +88,73 @@ double getSimulationSurvivalMultiArmStageEvents(int stage,
     }
 
     return newEvents;
+}
+
+// Log-Rank Test Multi-Arm
+//
+// @param survivalDataSet DataFrame with columns: 
+//   accrualTime, survivalTime, dropoutTime, treatmentArm, subGroup
+// @param time Time point for analysis
+// @param comparedTreatmentArms treatment arms to be compared (e.g. c(1,2))
+// @param directionUpper Direction of test
+// @param thetaH0 Null hypothesis hazard ratio
+//
+// [[Rcpp::export(name = ".logRankTestMultiArmCpp")]]
+List logRankTestMultiArm(DataFrame survivalDataSet,
+						 double time,
+						 IntegerVector comparedTreatmentArms,
+						 bool directionUpper = true,
+						 double thetaH0 = 1.0) {
+
+	NumericVector accrualTime = survivalDataSet["accrualTime"];
+	NumericVector survivalTime = survivalDataSet["survivalTime"];
+	NumericVector dropoutTime = survivalDataSet["dropoutTime"];
+	IntegerVector treatmentArm = survivalDataSet["treatmentArm"];
+
+    // Assert comparedTreatmentArms properties.
+    if (comparedTreatmentArms.size() != 2) {
+        stop("comparedTreatmentArms must be of length 2");
+    }
+    if (comparedTreatmentArms[0] == comparedTreatmentArms[1]) {
+        stop("comparedTreatmentArms must contain two different treatment arms");
+    }
+    if (comparedTreatmentArms[0] < 1 || comparedTreatmentArms[1] < 1) {
+        stop("comparedTreatmentArms must be positive integers");
+    }
+
+    // Check which patients are in the treatment arms to be compared
+    // and recode treatmentArm to 1 and 2, because that is assumed
+    // by logRankTest() below.
+    LogicalVector isInFirstArm = (treatmentArm == comparedTreatmentArms[0]);
+    LogicalVector isInSecondArm = (treatmentArm == comparedTreatmentArms[1]);
+	treatmentArm[isInFirstArm] = 1;
+    treatmentArm[isInSecondArm] = 2;	
+
+    // Select subjects in the treatment arms to be compared and call
+    // logRankTest().    
+    LogicalVector isInSelectedArms = isInFirstArm | isInSecondArm;
+    List results = logRankTest(
+        accrualTime[isInSelectedArms],
+        survivalTime[isInSelectedArms],
+        dropoutTime[isInSelectedArms],
+        treatmentArm[isInSelectedArms],
+        time,
+        directionUpper,
+        thetaH0,
+        false
+    );
+    NumericVector result = results["result"];
+
+    double logRank = result[0];
+    int subjectNumber = result[1];
+    int events1 = result[2];
+    int events2 = result[3];		
+
+	return List::create(
+		_["logRank"] = logRank,
+		_["thetaH0"] = thetaH0,
+		_["directionUpper"] = directionUpper,
+		_["subjectNumber"] = subjectNumber,
+		_["events"] = IntegerVector::create(events1, events2)
+	);
 }

@@ -67,9 +67,10 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		} else {
 			if (treatmentGroup[i] == 1) {
 				subjectsT1++;
-			}
-			else if (treatmentGroup[i] == 2) {
+			} else if (treatmentGroup[i] == 2) {
 				subjectsT2++;
+			} else {
+				stop("treatmentGroup must be either 1 or 2");
 			}
 
 			if (treatmentGroup[i] > 0 && accrualTime[i] + survivalTime[i] < time &&

@@ -970,6 +970,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// logRankTestMultiArm
+List logRankTestMultiArm(DataFrame survivalDataSet, double time, IntegerVector comparedTreatmentArms, bool directionUpper, double thetaH0);
+RcppExport SEXP _rpact_logRankTestMultiArm(SEXP survivalDataSetSEXP, SEXP timeSEXP, SEXP comparedTreatmentArmsSEXP, SEXP directionUpperSEXP, SEXP thetaH0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< DataFrame >::type survivalDataSet(survivalDataSetSEXP);
+    Rcpp::traits::input_parameter< double >::type time(timeSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type comparedTreatmentArms(comparedTreatmentArmsSEXP);
+    Rcpp::traits::input_parameter< bool >::type directionUpper(directionUpperSEXP);
+    Rcpp::traits::input_parameter< double >::type thetaH0(thetaH0SEXP);
+    rcpp_result_gen = Rcpp::wrap(logRankTestMultiArm(survivalDataSet, time, comparedTreatmentArms, directionUpper, thetaH0));
+    return rcpp_result_gen;
+END_RCPP
+}
 // findObservationTime
 double findObservationTime(NumericVector accrualTime, NumericVector survivalTime, NumericVector dropoutTime, double requiredStageEvents);
 RcppExport SEXP _rpact_findObservationTime(SEXP accrualTimeSEXP, SEXP survivalTimeSEXP, SEXP dropoutTimeSEXP, SEXP requiredStageEventsSEXP) {
@@ -1136,6 +1151,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_funnyBool", (DL_FUNC) &_rpact_funnyBool, 3},
     {"_rpact_lastSection", (DL_FUNC) &_rpact_lastSection, 11},
     {"_rpact_getSimulationSurvivalMultiArmStageEvents", (DL_FUNC) &_rpact_getSimulationSurvivalMultiArmStageEvents, 11},
+    {"_rpact_logRankTestMultiArm", (DL_FUNC) &_rpact_logRankTestMultiArm, 5},
     {"_rpact_findObservationTime", (DL_FUNC) &_rpact_findObservationTime, 4},
     {"_rpact_getOneMinusQNorm", (DL_FUNC) &_rpact_getOneMinusQNorm, 6},
     {"_rpact_order", (DL_FUNC) &_rpact_order, 1},

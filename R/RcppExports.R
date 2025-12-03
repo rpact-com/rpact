@@ -193,6 +193,10 @@
     .Call(`_rpact_getSimulationSurvivalMultiArmStageEvents`, stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedArms, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage)
 }
 
+.logRankTestMultiArmCpp <- function(survivalDataSet, time, comparedTreatmentArms, directionUpper = TRUE, thetaH0 = 1.0) {
+    .Call(`_rpact_logRankTestMultiArm`, survivalDataSet, time, comparedTreatmentArms, directionUpper, thetaH0)
+}
+
 .findObservationTimeCpp <- function(accrualTime, survivalTime, dropoutTime, requiredStageEvents) {
     .Call(`_rpact_findObservationTime`, accrualTime, survivalTime, dropoutTime, requiredStageEvents)
 }
