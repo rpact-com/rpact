@@ -1747,7 +1747,12 @@ NULL
 .warnInCaseOfUnusedArgument <- function(arg, argName, defaultValue, functionName) {
     if (!identical(arg, defaultValue)) {
         warning("Unused argument in ", functionName, "(...): '",
-            argName, "' = ", .arrayToString(arg, vectorLookAndFeelEnabled = (length(arg) > 1), maxLength = 10),
+            argName, "' = ", .arrayToString(
+                arg, 
+                vectorLookAndFeelEnabled = (length(arg) > 1), 
+                maxLength = 10,
+                encapsulate = !is.null(arg) && any(is.character(arg))
+            ),
             " will be ignored",
             call. = FALSE
         )

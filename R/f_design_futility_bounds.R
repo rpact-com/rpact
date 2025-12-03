@@ -31,6 +31,7 @@ NULL
             information1 = information[1],
             information2 = information[2],
             information = information,
+            informationDerived = FALSE,
             vectorInput = TRUE,
             paramNames = c("information[1]", "information[2]")
         ))
@@ -39,6 +40,7 @@ NULL
     vectorInput <- FALSE
     information1 <- NA_real_
     information2 <- NA_real_
+    informationDerived <- FALSE
     if (length(list(...)) > 0) {
         information1 <- .getOptionalArgument("information1", optionalArgumentDefaultValue = NA_real_, ...)
         information2 <- .getOptionalArgument("information2", optionalArgumentDefaultValue = NA_real_, ...)
@@ -67,19 +69,22 @@ NULL
         }
         
         information1 <- sqrt(design$informationRates[1])
-        information2 <- sqrt(1 - design$informationRates[1]) 
+        information2 <- sqrt(1 - design$informationRates[1])
+        informationDerived <- TRUE
         vectorInput <- TRUE
     }
     
     information <- c(information1, information2)
     if (all(is.na(information))) {
         information <- NA_real_
+        informationDerived <- NA
         vectorInput <- TRUE
     }
     return(list(
         information1 = information1,
         information2 = information2,
         information = information,
+        informationDerived = informationDerived,
         vectorInput = vectorInput,
         paramNames = c("information1", "information2")
     ))
@@ -111,6 +116,102 @@ NULL
 #'
 print.FutilityBounds <- function(x, ...) {
     print.default(as.numeric(x))
+}
+
+#'
+#' @title
+#' Summarize Futility Bounds
+#'
+#' @description
+#' S3 summary method for objects of class \code{FutilityBounds}. 
+#'
+#' @param object An object of class \code{FutilityBounds}.
+#' @param ... Additional arguments (currently not used).
+#' 
+#' @details 
+#' Prints a categorized summary of futility bound parameters, 
+#' including user-defined, derived, default, and generated values.
+#' 
+#' @examples 
+#' \dontrun{
+#' futilityBounds <- getFutilityBounds(
+#'     design = getDesignInverseNormal(kMax = 2),
+#'     sourceValue = 0.5,
+#'     sourceScale = "condPowerAtObserved",
+#'     targetScale = "zValue"
+#' )
+#' summary(futilityBounds)
+#' }
+#'
+#' @keywords internal
+#'
+#' @export
+#' 
+summary.FutilityBounds <- function(object, ...) {
+    objAttr <- attributes(object)
+    objAttr$targetValue <- list(
+        value = as.numeric(object),
+        type = "g"
+    )
+    
+    if (!is.null(objAttr$design) && !is.null(objAttr$design$value)) {
+        objAttr$design$value <- objAttr$design$value$.toString(TRUE)
+    }
+    
+    userDefinedParams <- character(0)
+    derivedDefinedParams <- character(0)
+    defaultParams <- character(0)
+    generatedParams <- character(0)
+    
+    for (paramName in names(objAttr)) {
+        entry <- objAttr[[paramName]]
+        if (!is.list(entry) || !all(c("value", "type") %in% names(entry))) {
+            next
+        }
+        paramValue <- entry$value
+        paramType <- entry$type
+        paramSummary <- paste0(paramName, ": ", 
+            .arrayToString(paramValue, encapsulate = is.character(paramValue)))
+        if (paramType == C_PARAM_USER_DEFINED) {
+            userDefinedParams <- c(userDefinedParams, paramSummary)
+        } else if (paramType == C_PARAM_DERIVED) {
+            derivedDefinedParams <- c(derivedDefinedParams, paramSummary)
+        } else if (paramType == C_PARAM_DEFAULT_VALUE) {
+            defaultParams <- c(defaultParams, paramSummary)
+        } else if (paramType == C_PARAM_GENERATED) {
+            generatedParams <- c(generatedParams, paramSummary)
+        }
+    }
+    
+    cat("Futility bounds summary:\n\n")
+    if (length(userDefinedParams) > 0) {
+        cat("User-defined parameters:\n")
+        for (param in userDefinedParams) {
+            cat("  ", param, "\n", sep = "")
+        }
+        cat("\n")
+    }
+    if (length(derivedDefinedParams) > 0) {
+        cat("Derived parameters:\n")
+        for (param in derivedDefinedParams) {
+            cat("  ", param, "\n", sep = "")
+        }
+        cat("\n")
+    }
+    if (length(defaultParams) > 0) {
+        cat("Default parameters:\n")
+        for (param in defaultParams) {
+            cat("  ", param, "\n", sep = "")
+        }
+        cat("\n")
+    }
+    if (length(generatedParams) > 0) {
+        cat("Output:\n")
+        for (param in generatedParams) {
+            cat("  ", param, "\n", sep = "")
+        }
+        cat("\n")
+    }
 }
 
 .getFutilityBoundsFromThreeDots <- function(...) {
@@ -352,7 +453,9 @@ getFutilityBounds <- function(
         ),
         `information` = list(
             `value` = information,
-            `type` = ifelse(all(is.na(information)), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
+            `type` = ifelse(all(is.na(information)), 
+                C_PARAM_NOT_APPLICABLE, 
+                ifelse(isTRUE(infos$informationDerived), C_PARAM_DERIVED, C_PARAM_USER_DEFINED))
         ),
         `design` = list(
             `value` = design,
