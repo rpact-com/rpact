@@ -79,3 +79,10 @@ getFutilityBounds(
 }
 
 }
+\seealso{
+\code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
+\code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+\code{\link[=getDesignFisher]{getDesignFisher()}} for direct
+specification of futility bounds on different scales using the
+argument \code{futilityBoundsScale}.
+}

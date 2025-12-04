@@ -111,6 +111,11 @@ getDesignFisher(kMax = 2, method = "fullAlpha", alpha = 0.05, alpha0Vec = 0.50)
 \seealso{
 \code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare.
 
+\code{\link[=getFutilityBounds]{getFutilityBounds()}} for the
+specification of futility bounds on scales other than the p-value scale.
+
+\href{https://www.rpact.org/vignettes/planning/rpact_futility_bounds/}{Vignette: Enhanced Futility Bounds Specification}
+
 Other design functions: 
 \code{\link{getDesignCharacteristics}()},
 \code{\link{getDesignConditionalDunnett}()},

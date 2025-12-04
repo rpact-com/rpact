@@ -194,6 +194,11 @@ getDesignGroupSequential(informationRates = c(0.4, 0.7), typeOfDesign = "asP")
 \seealso{
 \code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare different designs.
 
+\code{\link[=getFutilityBounds]{getFutilityBounds()}} for the
+specification of futility bounds on scales other than the z-value scale.
+
+\href{https://www.rpact.org/vignettes/planning/rpact_futility_bounds/}{Vignette: Enhanced Futility Bounds Specification}
+
 Other design functions: 
 \code{\link{getDesignCharacteristics}()},
 \code{\link{getDesignConditionalDunnett}()},
