@@ -2083,6 +2083,10 @@ getDesignInverseNormal <- function(
 #' @family design functions
 #'
 #' @template examples_get_design_group_sequential
+#' 
+#' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}} for the 
+#'     specification of futility bounds on scales other than the z-value scale.
+#' @seealso [Vignette: Enhanced Futility Bounds Specification](https://www.rpact.org/vignettes/planning/rpact_futility_bounds/)
 #'
 #' @export
 #'

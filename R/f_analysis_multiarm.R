@@ -232,7 +232,7 @@ NULL
         ))
     }
 
-    .fireDataInputNotSupportedException(dataInput)
+    .fireDataInputNotSupportedException(stageResults$getDataInput())
 }
 
 .getIndicesOfClosedHypothesesSystem <- function(gMax) {
@@ -1293,5 +1293,5 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
         ))
     }
 
-    .fireDataInputNotSupportedException(dataInput)
+    .fireDataInputNotSupportedException(stageResults$getDataInput())
 }
