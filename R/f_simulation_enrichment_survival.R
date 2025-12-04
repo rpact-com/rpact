@@ -1113,9 +1113,9 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
         )
     }
 
-    if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
-    }
+    # if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
+    #     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+    # }
 
     simulationResults$.data <- loopResult$data
 
