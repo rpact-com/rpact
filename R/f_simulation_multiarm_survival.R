@@ -491,7 +491,6 @@ updateTreatmentsVector <- function(k,
                             treatmentArms = c(g, gMax + 1),
                             directionUpper = directionUpper
                         )
-                        print(logRank)
 
                         overallTestStatistics[g, k] <- logRank$logRank
                         singleEventsPerStage[g, k] <- logRank$events[1]

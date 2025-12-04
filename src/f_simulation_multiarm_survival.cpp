@@ -538,7 +538,6 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                             comparedArms,
                             directionUpper
                         );
-                        print(logRankResult);
                         
                         overallTestStatistics(g, k) = logRankResult["logRank"];
                         IntegerVector events = logRankResult["events"];
