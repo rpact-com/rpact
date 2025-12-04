@@ -322,6 +322,7 @@ List getTreatmentsSubgroups(int maxNumberOfSubjects,
 	IntegerVector treatments = rep_len(allocatedTreatments, maxNumberOfSubjects);
 
 	CharacterVector subGroupsVector = sample(subGroups, maxNumberOfSubjects, true, prevalences);
+	
 	return List::create(
 		_["treatments"] = treatments,
 		_["subGroups"] = subGroupsVector
@@ -739,7 +740,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 
 			if (adaptations[k]) {
 				
-				NumericVector effectVector;
+				NumericVector effectVector(gMax);
 				double thresholdArg = threshold;
 				if (effectMeasure == "testStatistic") {
 					effectVector = overallTestStatistics(_, k);
@@ -747,13 +748,21 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					if (R_IsNA(directionUpper) || directionUpper) {
 						effectVector = overallEffects(_, k);
 					} else {
-						effectVector = 1.0 / overallEffects(_, k);
+						// Preserve NAs when inverting: 1/NA = NA, not NaN
+						for (int g = 0; g < gMax; g++) {
+							if (R_IsNA(overallEffects(g, k))) {
+								effectVector[g] = NA_REAL;
+							} else {
+								effectVector[g] = 1.0 / overallEffects(g, k);
+							}
+						}
 						thresholdArg = 1.0 / thresholdArg;
 					}
 				}
-
+				
 				LogicalVector selectedNow;
 				if (typeOfSelection == "userDefined") {
+					effectVector[is_na(effectVector)] = 1.0; // set NAs to null effect for selection
 					List selectPopulationsFunctionArgs = List::create(
 						_["effectVector"] = effectVector,
 						_["stage"] = k + 1, // R 1-based
