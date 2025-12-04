@@ -650,6 +650,296 @@ updateTreatmentsVector <- function(k,
     ))
 }
 
+.performSimulationMultiArmSurvivalLoop <- function(cols,
+                                                   maxNumberOfIterations,
+                                                   design,
+                                                   directionUpper,
+                                                   effectMatrix,
+                                                   piControl,
+                                                   kappa,
+                                                   phi,
+                                                   eventTime,
+                                                   plannedEvents,
+                                                   recruitmentTimes,
+                                                   typeOfSelection,
+                                                   effectMeasure,
+                                                   adaptations,
+                                                   epsilonValue,
+                                                   rValue,
+                                                   threshold,
+                                                   allocationFraction,
+                                                   minNumberOfEventsPerStage,
+                                                   maxNumberOfEventsPerStage,
+                                                   conditionalPower,
+                                                   thetaH1,
+                                                   calcEventsFunction,
+                                                   calcEventsFunctionIsUserDefined,
+                                                   selectArmsFunction,
+                                                   indices,
+                                                   intersectionTest,
+                                                   criticalValuesDunnett,
+                                                   successCriterion,
+                                                   gMax,
+                                                   kMax) {
+    # Initialize simulation result matrices
+    simulatedNumberEventsNotAchieved <- matrix(0, nrow = kMax, ncol = cols)
+    simulatedAnalysisTime <- matrix(0, nrow = kMax, ncol = cols)
+    simulatedNumberOfSubjects <- matrix(0, nrow = kMax, ncol = cols)
+    simulatedSelections <- array(0, dim = c(kMax, cols, gMax))
+    simulatedRejections <- array(0, dim = c(kMax, cols, gMax))
+    simulatedNumberOfActiveArms <- matrix(0, nrow = kMax, ncol = cols)
+    simulatedSingleEventsPerStage <- array(0, dim = c(kMax, cols, gMax + 1))
+    simulatedPlannedEvents <- matrix(0, nrow = kMax, ncol = cols)
+    simulatedSuccessStopping <- matrix(0, nrow = kMax, ncol = cols)
+    simulatedFutilityStopping <- matrix(0, nrow = kMax - 1, ncol = cols)
+    simulatedConditionalPower <- matrix(0, nrow = kMax, ncol = cols)
+    simulatedRejectAtLeastOne <- rep(0, cols)
+    expectedNumberOfEvents <- rep(0, cols)
+    expectedNumberOfSubjects <- rep(0, cols)
+    expectedStudyDuration <- rep(0, cols)
+    iterations <- matrix(0, nrow = kMax, ncol = cols)
+
+    len <- maxNumberOfIterations * kMax * gMax * cols
+
+    dataIterationNumber <- rep(NA_real_, len)
+    dataStageNumber <- rep(NA_real_, len)
+    dataArmNumber <- rep(NA_real_, len)
+    dataAlternative <- rep(NA_real_, len)
+    dataEffect <- rep(NA_real_, len)
+    dataAnalysisTime <- rep(NA_real_, len)
+    dataNumberOfSubjects <- rep(NA_real_, len)
+    dataNumberOfEvents <- rep(NA_real_, len)
+    dataRejectPerStage <- rep(NA, len)
+    dataFutilityStop <- rep(NA_real_, len)
+    dataSuccessStop <- rep(NA, len)
+    dataFutilityStop <- rep(NA, len)
+    dataTestStatistics <- rep(NA_real_, len)
+    dataConditionalCriticalValue <- rep(NA_real_, len)
+    dataConditionalPowerAchieved <- rep(NA_real_, len)
+    dataEffectEstimate <- rep(NA_real_, len)
+    dataPValuesSeparate <- rep(NA_real_, len)
+
+    index <- 1
+    for (i in seq_len(cols)) {
+        for (j in seq_len(maxNumberOfIterations)) {
+            stageResults <- .getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
+                design = design,
+                directionUpper = directionUpper,
+                omegaVector = effectMatrix[i, ],
+                piControl = piControl,
+                kappa = kappa,
+                phi = phi,
+                eventTime = eventTime,
+                plannedEvents = plannedEvents,
+                recruitmentTimes = recruitmentTimes,
+                typeOfSelection = typeOfSelection,
+                effectMeasure = effectMeasure,
+                adaptations = adaptations,
+                epsilonValue = epsilonValue,
+                rValue = rValue,
+                threshold = threshold,
+                allocationFraction = allocationFraction,
+                minNumberOfEventsPerStage = minNumberOfEventsPerStage,
+                maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
+                conditionalPower = conditionalPower,
+                thetaH1 = thetaH1,
+                calcEventsFunction = calcEventsFunction,
+                calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
+                selectArmsFunction = selectArmsFunction
+            )
+            closedTest <- if (.isTrialDesignConditionalDunnett(design)) {
+                .performClosedConditionalDunnettTestForSimulation(
+                    stageResults = stageResults,
+                    design = design,
+                    indices = indices,
+                    criticalValuesDunnett = criticalValuesDunnett,
+                    successCriterion = successCriterion
+                )
+            } else {
+                .performClosedCombinationTestForSimulationMultiArm(
+                    stageResults = stageResults,
+                    design = design,
+                    indices = indices,
+                    intersectionTest = intersectionTest,
+                    successCriterion = successCriterion
+                )
+            }
+
+            rejectAtSomeStage <- FALSE
+            rejectedArmsBefore <- rep(FALSE, gMax)
+
+            for (k in 1:kMax) {
+                if (stageResults$eventsNotAchieved[k]) {
+                    simulatedNumberEventsNotAchieved[k, i] <- simulatedNumberEventsNotAchieved[k, i] + 1
+                } else {
+                    simulatedAnalysisTime[k, i] <- simulatedAnalysisTime[k, i] + stageResults$analysisTime[k]
+                    simulatedNumberOfSubjects[k, i] <- simulatedNumberOfSubjects[k, i] +
+                        stageResults$numberOfSubjects[k]
+                    simulatedRejections[k, i, ] <- simulatedRejections[k, i, ] +
+                        (closedTest$rejected[, k] & closedTest$selectedArms[1:gMax, k] | rejectedArmsBefore)
+                    simulatedSelections[k, i, ] <- simulatedSelections[k, i, ] + closedTest$selectedArms[, k]
+                    simulatedNumberOfActiveArms[k, i] <- simulatedNumberOfActiveArms[k, i] +
+                        sum(closedTest$selectedArms[, k])
+                    if (!any(is.na(closedTest$successStop))) {
+                        simulatedSuccessStopping[k, i] <- simulatedSuccessStopping[k, i] + closedTest$successStop[k]
+                    }
+                    if ((kMax > 1) && (k < kMax)) {
+                        if (!any(is.na(closedTest$futilityStop))) {
+                            simulatedFutilityStopping[k, i] <- simulatedFutilityStopping[k, i] +
+                                (closedTest$futilityStop[k] && !closedTest$successStop[k])
+                        }
+                        if (!closedTest$successStop[k] && !closedTest$futilityStop[k]) {
+                            simulatedConditionalPower[k + 1, i] <- simulatedConditionalPower[k + 1, i] +
+                                stageResults$conditionalPowerPerStage[k]
+                        }
+                    }
+                    for (g in (1:gMax)) {
+                        if (!is.na(stageResults$cumulativeEventsPerStage[g, k])) {
+                            simulatedSingleEventsPerStage[k, i, g] <- simulatedSingleEventsPerStage[k, i, g] +
+                                stageResults$singleEventsPerStage[g, k]
+                        }
+                    }
+                    simulatedSingleEventsPerStage[k, i, gMax + 1] <- simulatedSingleEventsPerStage[k, i, gMax + 1] +
+                        stageResults$singleEventsPerStage[gMax + 1, k]
+
+                    simulatedPlannedEvents[k, i] <- simulatedPlannedEvents[k, i] +
+                        sum(stageResults$singleEventsPerStage[, k], na.rm = TRUE)
+
+                    iterations[k, i] <- iterations[k, i] + 1
+
+                    for (g in 1:gMax) {
+                        dataIterationNumber[index] <- j
+                        dataStageNumber[index] <- k
+                        dataArmNumber[index] <- g
+                        dataAlternative[index] <- omegaMaxVector[i]
+                        dataEffect[index] <- effectMatrix[i, g]
+                        dataAnalysisTime[index] <- stageResults$analysisTime[k]
+                        dataNumberOfSubjects[index] <- stageResults$numberOfSubjects[k]
+                        dataNumberOfEvents[index] <- round(stageResults$cumulativeEventsPerStage[g, k], 1)
+                        dataRejectPerStage[index] <- closedTest$rejected[g, k]
+                        dataTestStatistics[index] <- stageResults$testStatistics[g, k]
+                        dataSuccessStop[index] <- closedTest$successStop[k]
+                        if (k < kMax) {
+                            dataFutilityStop[index] <- closedTest$futilityStop[k]
+                            dataConditionalCriticalValue[index] <- stageResults$conditionalCriticalValue[k]
+                            dataConditionalPowerAchieved[index + 1] <- stageResults$conditionalPowerPerStage[k]
+                        }
+                        dataEffectEstimate[index] <- stageResults$overallEffects[g, k]
+                        dataPValuesSeparate[index] <- closedTest$separatePValues[g, k]
+                        index <- index + 1
+                    }
+
+                    if (
+                        !rejectAtSomeStage &&
+                            any(closedTest$rejected[, k] & closedTest$selectedArms[1:gMax, k] | rejectedArmsBefore)
+                    ) {
+                        simulatedRejectAtLeastOne[i] <- simulatedRejectAtLeastOne[i] + 1
+                        rejectAtSomeStage <- TRUE
+                    }
+
+                    if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
+                        # rejected hypotheses remain rejected also in case of early stopping
+                        simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
+                            matrix(
+                                (closedTest$rejected[, k] & closedTest$selectedArms[1:gMax, k] | rejectedArmsBefore),
+                                kMax - k,
+                                gMax,
+                                byrow = TRUE
+                            )
+                        break
+                    }
+
+                    rejectedArmsBefore <- closedTest$rejected[, k] &
+                        closedTest$selectedArms[1:gMax, k] |
+                        rejectedArmsBefore
+                }
+            }
+        }
+
+        for (g in 1:(gMax + 1)) {
+            simulatedSingleEventsPerStage[, i, g] <- simulatedSingleEventsPerStage[, i, g] / iterations[, i]
+        }
+        simulatedPlannedEvents[, i] <- simulatedPlannedEvents[, i] / iterations[, i]
+        simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / iterations[, i]
+        simulatedAnalysisTime[, i] <- simulatedAnalysisTime[, i] / iterations[, i]
+        simulatedNumberOfActiveArms[, i] <- simulatedNumberOfActiveArms[, i] / iterations[, i]
+
+        if (kMax > 1) {
+            simulatedRejections[2:kMax, i, ] <- simulatedRejections[2:kMax, i, ] -
+                simulatedRejections[1:(kMax - 1), i, ]
+
+            stopping <- cumsum(simulatedSuccessStopping[1:(kMax - 1), i] + simulatedFutilityStopping[, i]) /
+                maxNumberOfIterations
+
+            expectedNumberOfEvents[i] <- simulatedPlannedEvents[1, i] +
+                t(1 - stopping) %*%
+                (simulatedPlannedEvents[2:kMax, i] - simulatedPlannedEvents[1:(kMax - 1), i])
+
+            expectedNumberOfSubjects[i] <- simulatedNumberOfSubjects[1, i] +
+                t(1 - stopping) %*%
+                (simulatedNumberOfSubjects[2:kMax, i] - simulatedNumberOfSubjects[1:(kMax - 1), i])
+
+            expectedStudyDuration[i] <- simulatedAnalysisTime[1, i] +
+                t(1 - stopping) %*%
+                (simulatedAnalysisTime[2:kMax, i] - simulatedAnalysisTime[1:(kMax - 1), i])
+        } else {
+            expectedNumberOfEvents[i] <- simulatedPlannedEvents[1, i]
+            expectedNumberOfSubjects[i] <- simulatedNumberOfSubjects[1, i]
+            expectedStudyDuration[i] <- simulatedAnalysisTime[1, i]
+        }
+    }
+
+    simulatedConditionalPower[1, ] <- NA_real_
+    if (kMax > 1) {
+        for (k in 2:kMax) {
+            simulatedConditionalPower[k, ] <- simulatedConditionalPower[k, ] /
+                (iterations[k, ] + simulatedNumberEventsNotAchieved[k, ])
+        }
+    }
+
+    # Create data frame for detailed results
+    data <- data.frame(
+        iterationNumber = dataIterationNumber,
+        stageNumber = dataStageNumber,
+        armNumber = dataArmNumber,
+        omegaMax = dataAlternative,
+        effect = dataEffect,
+        analysisTime = dataAnalysisTime,
+        numberOfSubjects = dataNumberOfSubjects,
+        numberOfEvents = dataNumberOfEvents,
+        effectEstimate = dataEffectEstimate,
+        testStatistics = dataTestStatistics,
+        pValue = dataPValuesSeparate,
+        conditionalCriticalValue = round(dataConditionalCriticalValue, 6),
+        conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6),
+        rejectPerStage = dataRejectPerStage,
+        successStop = dataSuccessStop,
+        futilityPerStage = dataFutilityStop
+    )
+
+    data <- data[!is.na(data$effectEstimate), ]
+
+    list(
+        simulatedNumberEventsNotAchieved = simulatedNumberEventsNotAchieved,
+        simulatedAnalysisTime = simulatedAnalysisTime,
+        simulatedNumberOfSubjects = simulatedNumberOfSubjects,
+        simulatedSelections = simulatedSelections,
+        simulatedRejections = simulatedRejections,
+        simulatedNumberOfActiveArms = simulatedNumberOfActiveArms,
+        simulatedSingleEventsPerStage = simulatedSingleEventsPerStage,
+        simulatedPlannedEvents = simulatedPlannedEvents,
+        simulatedSuccessStopping = simulatedSuccessStopping,
+        simulatedFutilityStopping = simulatedFutilityStopping,
+        simulatedConditionalPower = simulatedConditionalPower,
+        simulatedRejectAtLeastOne = simulatedRejectAtLeastOne,
+        expectedNumberOfEvents = expectedNumberOfEvents,
+        expectedNumberOfSubjects = expectedNumberOfSubjects,
+        expectedStudyDuration = expectedStudyDuration,
+        iterations = iterations,
+        data = data
+    )
+}
+
 #'
 #' @title
 #' Get Simulation Multi-Arm Survival
@@ -898,43 +1188,6 @@ getSimulationMultiArmSurvivalNew <- function(design = NULL,
 
     cols <- length(omegaMaxVector)
 
-    simulatedNumberEventsNotAchieved <- matrix(0, nrow = kMax, ncol = cols)
-    simulatedAnalysisTime <- matrix(0, nrow = kMax, ncol = cols)
-    simulatedNumberOfSubjects <- matrix(0, nrow = kMax, ncol = cols)
-    simulatedSelections <- array(0, dim = c(kMax, cols, gMax))
-    simulatedRejections <- array(0, dim = c(kMax, cols, gMax))
-    simulatedNumberOfActiveArms <- matrix(0, nrow = kMax, ncol = cols)
-    simulatedSingleEventsPerStage <- array(0, dim = c(kMax, cols, gMax + 1))
-    simulatedPlannedEvents <- matrix(0, nrow = kMax, ncol = cols)
-    simulatedSuccessStopping <- matrix(0, nrow = kMax, ncol = cols)
-    simulatedFutilityStopping <- matrix(0, nrow = kMax - 1, ncol = cols)
-    simulatedConditionalPower <- matrix(0, nrow = kMax, ncol = cols)
-    simulatedRejectAtLeastOne <- rep(0, cols)
-    expectedNumberOfEvents <- rep(0, cols)
-    expectedNumberOfSubjects <- rep(0, cols)
-    expectedStudyDuration <- rep(0, cols)
-    iterations <- matrix(0, nrow = kMax, ncol = cols)
-
-    len <- maxNumberOfIterations * kMax * gMax * cols
-
-    dataIterationNumber <- rep(NA_real_, len)
-    dataStageNumber <- rep(NA_real_, len)
-    dataArmNumber <- rep(NA_real_, len)
-    dataAlternative <- rep(NA_real_, len)
-    dataEffect <- rep(NA_real_, len)
-    dataAnalysisTime <- rep(NA_real_, len)
-    dataNumberOfSubjects <- rep(NA_real_, len)
-    dataNumberOfEvents <- rep(NA_real_, len)
-    dataRejectPerStage <- rep(NA, len)
-    dataFutilityStop <- rep(NA_real_, len)
-    dataSuccessStop <- rep(NA, len)
-    dataFutilityStop <- rep(NA, len)
-    dataTestStatistics <- rep(NA_real_, len)
-    dataConditionalCriticalValue <- rep(NA_real_, len)
-    dataConditionalPowerAchieved <- rep(NA_real_, len)
-    dataEffectEstimate <- rep(NA_real_, len)
-    dataPValuesSeparate <- rep(NA_real_, len)
-
     accrualSetup <- getAccrualTime(
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
@@ -971,183 +1224,61 @@ getSimulationMultiArmSurvivalNew <- function(design = NULL,
     # to force last value to be last accrualTime
     recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
 
-    index <- 1
-    for (i in 1:cols) {
-        for (j in 1:maxNumberOfIterations) {
-            stageResults <- .getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
-                design = design,
-                directionUpper = directionUpper,
-                omegaVector = effectMatrix[i, ],
-                piControl = piControl,
-                kappa = kappa,
-                phi = phi,
-                eventTime = eventTime,
-                plannedEvents = plannedEvents,
-                recruitmentTimes = recruitmentTimes,
-                typeOfSelection = typeOfSelection,
-                effectMeasure = effectMeasure,
-                adaptations = adaptations,
-                epsilonValue = epsilonValue,
-                rValue = rValue,
-                threshold = threshold,
-                allocationFraction = allocationFraction,
-                minNumberOfEventsPerStage = minNumberOfEventsPerStage,
-                maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
-                conditionalPower = conditionalPower,
-                thetaH1 = thetaH1,
-                calcEventsFunction = calcEventsFunction,
-                calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
-                selectArmsFunction = selectArmsFunction
-            )
-            if (.isTrialDesignConditionalDunnett(design)) {
-                closedTest <- .performClosedConditionalDunnettTestForSimulation(
-                    stageResults = stageResults,
-                    design = design,
-                    indices = indices,
-                    criticalValuesDunnett = criticalValuesDunnett,
-                    successCriterion = successCriterion
-                )
-            } else {
-                closedTest <- .performClosedCombinationTestForSimulationMultiArm(
-                    stageResults = stageResults,
-                    design = design,
-                    indices = indices,
-                    intersectionTest = intersectionTest,
-                    successCriterion = successCriterion
-                )
-            }
-
-            rejectAtSomeStage <- FALSE
-            rejectedArmsBefore <- rep(FALSE, gMax)
-
-            for (k in 1:kMax) {
-                if (stageResults$eventsNotAchieved[k]) {
-                    simulatedNumberEventsNotAchieved[k, i] <- simulatedNumberEventsNotAchieved[k, i] + 1
-                } else {
-                    simulatedAnalysisTime[k, i] <- simulatedAnalysisTime[k, i] + stageResults$analysisTime[k]
-                    simulatedNumberOfSubjects[k, i] <- simulatedNumberOfSubjects[k, i] +
-                        stageResults$numberOfSubjects[k]
-                    simulatedRejections[k, i, ] <- simulatedRejections[k, i, ] +
-                        (closedTest$rejected[, k] & closedTest$selectedArms[1:gMax, k] | rejectedArmsBefore)
-                    simulatedSelections[k, i, ] <- simulatedSelections[k, i, ] + closedTest$selectedArms[, k]
-                    simulatedNumberOfActiveArms[k, i] <- simulatedNumberOfActiveArms[k, i] +
-                        sum(closedTest$selectedArms[, k])
-                    if (!any(is.na(closedTest$successStop))) {
-                        simulatedSuccessStopping[k, i] <- simulatedSuccessStopping[k, i] + closedTest$successStop[k]
-                    }
-                    if ((kMax > 1) && (k < kMax)) {
-                        if (!any(is.na(closedTest$futilityStop))) {
-                            simulatedFutilityStopping[k, i] <- simulatedFutilityStopping[k, i] +
-                                (closedTest$futilityStop[k] && !closedTest$successStop[k])
-                        }
-                        if (!closedTest$successStop[k] && !closedTest$futilityStop[k]) {
-                            simulatedConditionalPower[k + 1, i] <- simulatedConditionalPower[k + 1, i] +
-                                stageResults$conditionalPowerPerStage[k]
-                        }
-                    }
-                    for (g in (1:gMax)) {
-                        if (!is.na(stageResults$cumulativeEventsPerStage[g, k])) {
-                            simulatedSingleEventsPerStage[k, i, g] <- simulatedSingleEventsPerStage[k, i, g] +
-                                stageResults$singleEventsPerStage[g, k]
-                        }
-                    }
-                    simulatedSingleEventsPerStage[k, i, gMax + 1] <- simulatedSingleEventsPerStage[k, i, gMax + 1] +
-                        stageResults$singleEventsPerStage[gMax + 1, k]
-
-                    simulatedPlannedEvents[k, i] <- simulatedPlannedEvents[k, i] +
-                        sum(stageResults$singleEventsPerStage[, k], na.rm = TRUE)
-
-                    iterations[k, i] <- iterations[k, i] + 1
-
-                    for (g in 1:gMax) {
-                        dataIterationNumber[index] <- j
-                        dataStageNumber[index] <- k
-                        dataArmNumber[index] <- g
-                        dataAlternative[index] <- omegaMaxVector[i]
-                        dataEffect[index] <- effectMatrix[i, g]
-                        dataAnalysisTime[index] <- stageResults$analysisTime[k]
-                        dataNumberOfSubjects[index] <- stageResults$numberOfSubjects[k]
-                        dataNumberOfEvents[index] <- round(stageResults$cumulativeEventsPerStage[g, k], 1)
-                        dataRejectPerStage[index] <- closedTest$rejected[g, k]
-                        dataTestStatistics[index] <- stageResults$testStatistics[g, k]
-                        dataSuccessStop[index] <- closedTest$successStop[k]
-                        if (k < kMax) {
-                            dataFutilityStop[index] <- closedTest$futilityStop[k]
-                            dataConditionalCriticalValue[index] <- stageResults$conditionalCriticalValue[k]
-                            dataConditionalPowerAchieved[index + 1] <- stageResults$conditionalPowerPerStage[k]
-                        }
-                        dataEffectEstimate[index] <- stageResults$overallEffects[g, k]
-                        dataPValuesSeparate[index] <- closedTest$separatePValues[g, k]
-                        index <- index + 1
-                    }
-
-                    if (
-                        !rejectAtSomeStage &&
-                            any(closedTest$rejected[, k] & closedTest$selectedArms[1:gMax, k] | rejectedArmsBefore)
-                    ) {
-                        simulatedRejectAtLeastOne[i] <- simulatedRejectAtLeastOne[i] + 1
-                        rejectAtSomeStage <- TRUE
-                    }
-
-                    if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
-                        # rejected hypotheses remain rejected also in case of early stopping
-                        simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
-                            matrix(
-                                (closedTest$rejected[, k] & closedTest$selectedArms[1:gMax, k] | rejectedArmsBefore),
-                                kMax - k,
-                                gMax,
-                                byrow = TRUE
-                            )
-                        break
-                    }
-
-                    rejectedArmsBefore <- closedTest$rejected[, k] &
-                        closedTest$selectedArms[1:gMax, k] |
-                        rejectedArmsBefore
-                }
-            }
-        }
-
-        for (g in 1:(gMax + 1)) {
-            simulatedSingleEventsPerStage[, i, g] <- simulatedSingleEventsPerStage[, i, g] / iterations[, i]
-        }
-        simulatedPlannedEvents[, i] <- simulatedPlannedEvents[, i] / iterations[, i]
-        simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / iterations[, i]
-        simulatedAnalysisTime[, i] <- simulatedAnalysisTime[, i] / iterations[, i]
-        simulatedNumberOfActiveArms[, i] <- simulatedNumberOfActiveArms[, i] / iterations[, i]
-
-        if (kMax > 1) {
-            simulatedRejections[2:kMax, i, ] <- simulatedRejections[2:kMax, i, ] -
-                simulatedRejections[1:(kMax - 1), i, ]
-
-            stopping <- cumsum(simulatedSuccessStopping[1:(kMax - 1), i] + simulatedFutilityStopping[, i]) /
-                maxNumberOfIterations
-
-            expectedNumberOfEvents[i] <- simulatedPlannedEvents[1, i] +
-                t(1 - stopping) %*%
-                (simulatedPlannedEvents[2:kMax, i] - simulatedPlannedEvents[1:(kMax - 1), i])
-
-            expectedNumberOfSubjects[i] <- simulatedNumberOfSubjects[1, i] +
-                t(1 - stopping) %*%
-                (simulatedNumberOfSubjects[2:kMax, i] - simulatedNumberOfSubjects[1:(kMax - 1), i])
-
-            expectedStudyDuration[i] <- simulatedAnalysisTime[1, i] +
-                t(1 - stopping) %*%
-                (simulatedAnalysisTime[2:kMax, i] - simulatedAnalysisTime[1:(kMax - 1), i])
+    loopResult <- .performSimulationMultiArmSurvivalLoop(
+        cols = cols,
+        maxNumberOfIterations = maxNumberOfIterations,
+        design = design,
+        directionUpper = directionUpper,
+        effectMatrix = effectMatrix,
+        piControl = piControl,
+        kappa = kappa,
+        phi = phi,
+        eventTime = eventTime,
+        plannedEvents = plannedEvents,
+        recruitmentTimes = recruitmentTimes,
+        typeOfSelection = typeOfSelection,
+        effectMeasure = effectMeasure,
+        adaptations = adaptations,
+        epsilonValue = epsilonValue,
+        rValue = rValue,
+        threshold = threshold,
+        allocationFraction = allocationFraction,
+        minNumberOfEventsPerStage = minNumberOfEventsPerStage,
+        maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
+        conditionalPower = conditionalPower,
+        thetaH1 = thetaH1,
+        calcEventsFunction = calcEventsFunction,
+        calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
+        selectArmsFunction = selectArmsFunction,
+        indices = indices,
+        intersectionTest = intersectionTest,
+        criticalValuesDunnett = if (.isTrialDesignConditionalDunnett(design)) {
+            criticalValuesDunnett
         } else {
-            expectedNumberOfEvents[i] <- simulatedPlannedEvents[1, i]
-            expectedNumberOfSubjects[i] <- simulatedNumberOfSubjects[1, i]
-            expectedStudyDuration[i] <- simulatedAnalysisTime[1, i]
-        }
-    }
+            NULL
+        },
+        successCriterion = successCriterion,
+        gMax = gMax,
+        kMax = kMax
+    )
 
-    simulatedConditionalPower[1, ] <- NA_real_
-    if (kMax > 1) {
-        for (k in 2:kMax) {
-            simulatedConditionalPower[k, ] <- simulatedConditionalPower[k, ] /
-                (iterations[k, ] + simulatedNumberEventsNotAchieved[k, ])
-        }
-    }
+    # Extract results from the simulation
+    simulatedNumberEventsNotAchieved <- loopResult$simulatedNumberEventsNotAchieved
+    simulatedAnalysisTime <- loopResult$simulatedAnalysisTime
+    simulatedNumberOfSubjects <- loopResult$simulatedNumberOfSubjects
+    simulatedSelections <- loopResult$simulatedSelections
+    simulatedRejections <- loopResult$simulatedRejections
+    simulatedNumberOfActiveArms <- loopResult$simulatedNumberOfActiveArms
+    simulatedSingleEventsPerStage <- loopResult$simulatedSingleEventsPerStage
+    simulatedPlannedEvents <- loopResult$simulatedPlannedEvents
+    simulatedSuccessStopping <- loopResult$simulatedSuccessStopping
+    simulatedFutilityStopping <- loopResult$simulatedFutilityStopping
+    simulatedConditionalPower <- loopResult$simulatedConditionalPower
+    simulatedRejectAtLeastOne <- loopResult$simulatedRejectAtLeastOne
+    expectedNumberOfEvents <- loopResult$expectedNumberOfEvents
+    expectedNumberOfSubjects <- loopResult$expectedNumberOfSubjects
+    expectedStudyDuration <- loopResult$expectedStudyDuration
+    iterations <- loopResult$iterations
 
     simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
@@ -1211,27 +1342,7 @@ getSimulationMultiArmSurvivalNew <- function(design = NULL,
         )
     }
 
-    data <- data.frame(
-        iterationNumber = dataIterationNumber,
-        stageNumber = dataStageNumber,
-        armNumber = dataArmNumber,
-        omegaMax = dataAlternative,
-        effect = dataEffect,
-        analysisTime = dataAnalysisTime,
-        numberOfSubjects = dataNumberOfSubjects,
-        numberOfEvents = dataNumberOfEvents,
-        effectEstimate = dataEffectEstimate,
-        testStatistics = dataTestStatistics,
-        pValue = dataPValuesSeparate,
-        conditionalCriticalValue = round(dataConditionalCriticalValue, 6),
-        conditionalPowerAchieved = round(dataConditionalPowerAchieved, 6),
-        rejectPerStage = dataRejectPerStage,
-        successStop = dataSuccessStop,
-        futilityPerStage = dataFutilityStop
-    )
-
-    data <- data[!is.na(data$effectEstimate), ]
-    simulationResults$.data <- data
+    simulationResults$.data <- loopResult$data
 
     return(simulationResults)
 }
