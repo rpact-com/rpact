@@ -442,7 +442,7 @@ getFutilityBounds <- function(
         ),
         design = NULL,
         theta = NA_real_,
-        information = NA_real_, # TODO allow single value
+        information = NA_real_,
         naAllowed = FALSE) {
     sourceScale <- match.arg(sourceScale)
     targetScale <- match.arg(targetScale)
