@@ -1131,7 +1131,7 @@ getDesignInverseNormal <- function(
             userAlphaSpending = userAlphaSpending,
             userBetaSpending = userBetaSpending,
             gammaB = gammaB,
-            bindingFutility = bindingFutility,
+            bindingFutility = NA,
             directionUpper = directionUpper,
             betaAdjustment = betaAdjustment,
             constantBoundsHP = constantBoundsHP,
@@ -1578,12 +1578,26 @@ getDesignInverseNormal <- function(
 
     if (is.na(bindingFutility)) {
         bindingFutility <- C_BINDING_FUTILITY_DEFAULT
-    } else if (userFunctionCallEnabled && typeOfDesign != C_TYPE_OF_DESIGN_PT &&
-            !(typeBetaSpending == "bsP" || typeBetaSpending == "bsOF" || typeBetaSpending == "bsKD" ||
-                typeBetaSpending == "bsHSD" || typeBetaSpending == "bsUser") &&
-            ((!is.na(kMax) && kMax == 1) || any(is.na(futilityBounds)) ||
-                (!any(is.na(futilityBounds)) && all(futilityBounds == C_FUTILITY_BOUNDS_DEFAULT)))) {
-        warning("'bindingFutility' (", bindingFutility, ") will be ignored", call. = FALSE)
+    } else if (userFunctionCallEnabled && 
+            !identical(typeOfDesign, C_TYPE_OF_DESIGN_PT) &&
+            !grepl("^bs", typeBetaSpending)) {
+        if (!is.na(kMax) && kMax == 1) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because kMax = 1", call. = FALSE)
+        }
+        else if (any(is.na(futilityBounds))) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because 'futilityBounds' is not defined",
+                call. = FALSE
+            )
+        } 
+        else if (all(futilityBounds == C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because 'futilityBounds' (", .arrayToString(futilityBounds), ") ",
+                "is set to default values",
+                call. = FALSE
+            )
+        }
     }
 
     futilityBounds <- .applyDirectionOfAlternative(futilityBounds,
@@ -2179,7 +2193,7 @@ getDesignGroupSequential <- function(
             userAlphaSpending = userAlphaSpending,
             userBetaSpending = userBetaSpending,
             gammaB = gammaB,
-            bindingFutility = bindingFutility,
+            bindingFutility = NA,
             directionUpper = directionUpper,
             betaAdjustment = betaAdjustment,
             constantBoundsHP = constantBoundsHP,

@@ -868,7 +868,7 @@ getObjectRCode <- function(
                 if (objName == "futilityBounds" && is(value, "FutilityBounds")) {
                     sourceScale <- attr(value, "sourceScale")$value
                     if (!is.null(sourceScale) && sourceScale %in%
-                            c("conditionalPower", "condPowerAtObserved", "predictivePower", "effectEstimate")) {
+                            c("conditionalPower", "effectEstimate")) {
                         precondition <- c(
                             precondition,
                             getObjectRCode(

@@ -25,11 +25,44 @@ NULL
     
     if (!separateInformationArguments && !is.null(information) && 
             !all(is.na(information)) && length(information) > 0) {
-        len <- .getFutilityBoundVectorLength(sourceScale, targetScale)
-        .assertIsNumericVector(information, "information", naAllowed = TRUE, len = len)
+            
+            
+        indices <- .getValidFutilityBoundVectorIndices(sourceScale, targetScale)
+        if (length(information) > 1) {
+            .assertIsNumericVector(information, "information", naAllowed = TRUE, len = 2L)
+            
+            information1 = information[1]
+            information2 = information[2]
+            if (!any(indices == 1) && !is.na(information1)) {
+                if (isTRUE(showWarnings)) {
+                    warning(
+                        "'information[1]' (", information1, ") will be ignored ",
+                        "because it is not required for the conversion from '", 
+                        sourceScale, "' to '", targetScale, "'",
+                        call. = FALSE
+                    )
+                }
+                information1 = NA_real_
+            }
+            if (!any(indices == 2) && !is.na(information2)) {
+                if (isTRUE(showWarnings)) {
+                    warning(
+                        "'information[2]' (", information2, ") will be ignored ",
+                        "because it is not required for the conversion from '", 
+                        sourceScale, "' to '", targetScale, "'",
+                        call. = FALSE
+                    )
+                }
+                information2 = NA_real_
+            }
+        } else {
+            information1 = information[1]
+            information2 = information[1]
+        }
+            
         return(list(
-            information1 = information[1],
-            information2 = information[2],
+            information1 = information1,
+            information2 = information2,
             information = information,
             informationDerived = FALSE,
             vectorInput = TRUE,
@@ -68,8 +101,8 @@ NULL
             )
         }
         
-        information1 <- sqrt(design$informationRates[1])
-        information2 <- sqrt(1 - design$informationRates[1])
+        information1 <- design$informationRates[1]
+        information2 <- 1 - design$informationRates[1]
         informationDerived <- TRUE
         vectorInput <- TRUE
     }
@@ -409,10 +442,17 @@ getFutilityBounds <- function(
         ),
         design = NULL,
         theta = NA_real_,
-        information = NA_real_,
+        information = NA_real_, # TODO allow single value
         naAllowed = FALSE) {
     sourceScale <- match.arg(sourceScale)
     targetScale <- match.arg(targetScale)
+    
+    .warnInCaseOfUnknownArguments(
+        functionName = "getFutilityBounds", 
+        ignore = c("information1", "information2"),
+        numberOfAllowedUnnamedParameters = 1, 
+        exceptionEnabled = FALSE, 
+        ...)
 
     .assertIsNumericVector(sourceValue, "sourceValue", naAllowed = naAllowed)
     if (is(sourceValue, "FutilityBounds")) {

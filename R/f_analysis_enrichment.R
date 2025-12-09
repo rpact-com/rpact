@@ -467,5 +467,5 @@ NULL
         ))
     }
 
-    .fireDataInputNotSupportedException(dataInput)
+    .fireDataInputNotSupportedException(stageResults$getDataInput())
 }

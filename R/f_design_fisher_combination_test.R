@@ -205,10 +205,24 @@ getDesignFisher <- function(
 
     if (is.na(bindingFutility)) {
         bindingFutility <- C_BINDING_FUTILITY_FISHER_DEFAULT
-    } else if (userFunctionCallEnabled &&
-            ((!is.na(kMax) && kMax == 1) ||
-                (!any(is.na(alpha0Vec)) && all(alpha0Vec == C_ALPHA_0_VEC_DEFAULT)))) {
-        warning("'bindingFutility' (", bindingFutility, ") will be ignored", call. = FALSE)
+    } else if (userFunctionCallEnabled) {
+        if (!is.na(kMax) && kMax == 1) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because kMax = 1", call. = FALSE)
+        }
+        else if (any(is.na(alpha0Vec))) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because 'alpha0Vec' is not defined",
+                call. = FALSE
+            )
+        } 
+        else if (all(alpha0Vec == C_ALPHA_0_VEC_DEFAULT, na.rm = TRUE)) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because 'alpha0Vec' (", .arrayToString(alpha0Vec), ") ",
+                "is set to default values",
+                call. = FALSE
+            )
+        }
     }
 
     design <- TrialDesignFisher$new(
