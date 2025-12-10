@@ -513,6 +513,9 @@ updateSubGroupVector <- function(k,
     dataEffectEstimate <- rep(NA_real_, len)
     dataPValuesSeparate <- rep(NA_real_, len)
 
+    # Save original plannedEvents to avoid cross-iteration contamination
+    plannedEventsOriginal <- plannedEvents
+
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
@@ -530,7 +533,7 @@ updateSubGroupVector <- function(k,
                 allocationFraction = allocationFraction,
                 directionUpper = directionUpper,
                 stratifiedAnalysis = stratifiedAnalysis,
-                plannedEvents = plannedEvents,
+                plannedEvents = plannedEventsOriginal, # Use original, not modified version
                 typeOfSelection = typeOfSelection,
                 effectMeasure = effectMeasure,
                 adaptations = adaptations,
@@ -556,6 +559,7 @@ updateSubGroupVector <- function(k,
                 print(diffs)
                 browser()
             }
+            stageResults <- stageResultsCpp
 
             closedTest <- .performClosedCombinationTestForSimulationEnrichmentCpp(
                 stageResults = stageResults,
@@ -1013,7 +1017,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
     }
 
     # Perform the main simulation
-    loopResult <- .performSimulationEnrichmentSurvivalLoop(
+    loopResult <- .performSimulationEnrichmentSurvivalLoopCpp(
         cols = cols,
         maxNumberOfIterations = maxNumberOfIterations,
         design = design,
