@@ -306,10 +306,6 @@ updateSubGroupVector <- function(k,
         allocationRatioPlanned <- allocationFraction[1] / allocationFraction[2]
 
         if (k < kMax) {
-            if (colSums(selectedPopulations)[k] == 0) {
-                break
-            }
-
             # Bonferroni adjustment
             adjustedPValues[k] <- min(
                 min(separatePValues[, k], na.rm = TRUE) * (colSums(selectedPopulations)[k]),
@@ -367,6 +363,11 @@ updateSubGroupVector <- function(k,
                 args$selectPopulationsFunctionArgs <- selectPopulationsFunctionArgs
 
                 selectedPopulations[, k + 1] <- (selectedPopulations[, k] & do.call(.selectPopulations, args))
+
+                # Stop if no population is selected for the next stage.
+                if (colSums(selectedPopulations)[k + 1] == 0) {
+                    break
+                }
 
                 newEvents <- calcEventsFunction(
                     stage = k + 1, # to be consistent with non-enrichment situation, cf. line 38
@@ -515,7 +516,7 @@ updateSubGroupVector <- function(k,
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
-            stageResults <- .getSimulatedStageResultsSurvivalEnrichmentSubjectsBasedCpp(
+            stageResults <- .getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
                 design = design,
                 weights = weights,
                 subGroups = effectList$subGroups,
@@ -545,7 +546,7 @@ updateSubGroupVector <- function(k,
                 selectPopulationsFunction = selectPopulationsFunction
             )
 
-            closedTest <- .performClosedCombinationTestForSimulationEnrichmentCpp(
+            closedTest <- .performClosedCombinationTestForSimulationEnrichment(
                 stageResults = stageResults,
                 design = design,
                 indices = indices,
@@ -1001,7 +1002,7 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
     }
 
     # Perform the main simulation
-    loopResult <- .performSimulationEnrichmentSurvivalLoopCpp(
+    loopResult <- .performSimulationEnrichmentSurvivalLoop(
         cols = cols,
         maxNumberOfIterations = maxNumberOfIterations,
         design = design,
