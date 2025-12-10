@@ -11,7 +11,8 @@ getDesignFisher(
   method = c("equalAlpha", "fullAlpha", "noInteraction", "userDefinedAlpha"),
   userAlphaSpending = NA_real_,
   alpha0Vec = NA_real_,
-  alpha0Scale = c("pValue", "zValue", "reverseCondPower"),
+  alpha0Scale = c("pValue", "zValue", "reverseCondPower", "condPowerAtObserved",
+    "predictivePower"),
   informationRates = NA_real_,
   sided = 1,
   bindingFutility = NA,
@@ -42,8 +43,9 @@ alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 
 \item{alpha0Vec}{Stopping for futility bounds for stage-wise p-values.}
 
 \item{alpha0Scale}{Character. The scale of the futility bounds.
-Must be one of \code{"zValue"}, \code{"pValue"}, or \code{"reverseCondPower"}.
-Default is \code{"zValue"}.}
+Must be one of \code{"pValue"}, \code{"zValue"}, or \code{"reverseCondPower"},
+\code{"condPowerAtObserved"}, or \code{"predictivePower"}.
+Default is \code{"pValue"}.}
 
 \item{informationRates}{The information rates t_1, ..., t_kMax (that must be fixed prior to the trial),
 default is \code{(1:kMax) / kMax}. For the weighted inverse normal design, the weights are derived

@@ -71,7 +71,8 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        ) {
     .assertIsTrialDesignInverseNormal(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
@@ -119,7 +120,8 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        ) {
     .assertIsTrialDesignGroupSequential(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
@@ -168,7 +170,8 @@ NULL
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
         iterations = C_ITERATIONS_DEFAULT,
-        seed = NA_real_) {
+        seed = NA_real_
+        ) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -231,7 +234,8 @@ NULL
         stdErrorEstimate,
         tolerance,
         iterations,
-        seed) {
+        seed
+        ) {
     startTime <- Sys.time()
     stageResults <- .getStageResultsRates(
         design = design,
@@ -462,7 +466,8 @@ NULL
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stage = NA_integer_,
-        userFunctionCallEnabled = FALSE) {
+        userFunctionCallEnabled = FALSE
+        ) {
     .assertIsDatasetRates(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
     thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
@@ -826,7 +831,8 @@ NULL
         secondValue,
         tolerance,
         acceptResultsOutOfTolerance,
-        callingFunctionInformation) {
+        callingFunctionInformation
+        ) {
     if (dataInput$getNumberOfGroups() == 2) {
         thetaLow <- -1 + tolerance
     } else {
@@ -871,7 +877,8 @@ NULL
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        firstParameterName) {
+        firstParameterName
+        ) {
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
 
     if (!normalApproximation && dataInput$getNumberOfGroups() == 2) {
@@ -1011,7 +1018,8 @@ NULL
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         directionUpper = NA,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        ) {
     .warnInCaseOfUnknownArguments(
         functionName = ".getRepeatedConfidenceIntervalsRatesGroupSequential",
         ignore = c(
@@ -1046,7 +1054,8 @@ NULL
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         directionUpper = NA,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        ) {
     .warnInCaseOfUnknownArguments(
         functionName = ".getRepeatedConfidenceIntervalsRatesInverseNormal",
         ignore = c(
@@ -1081,7 +1090,8 @@ NULL
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         directionUpper = NA,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        ) {
     .warnInCaseOfUnknownArguments(
         functionName = ".getRepeatedConfidenceIntervalsRatesFisher",
         ignore = c(
@@ -1110,9 +1120,10 @@ NULL
     # Inverse normal method
     condError <- getConditionalRejectionProbabilities(stageResults = stageResults)[stage]
     if (is.na(condError)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
-            "conditional error could not be calculated at stage ", stage, 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+            "conditional error could not be calculated at stage ", stage,
+            call. = FALSE
+        )
     }
 
     if (stageResults$isOneSampleDataset()) {
@@ -1192,7 +1203,8 @@ NULL
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         pi1,
-        pi2) {
+        pi2
+        ) {
     design <- stageResults$.design
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     .assertIsValidStage(stage, design$kMax)
@@ -1320,7 +1332,8 @@ NULL
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         pi1,
-        pi2) {
+        pi2
+        ) {
     design <- stageResults$.design
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     .assertIsValidStage(stage, design$kMax)
@@ -1360,7 +1373,7 @@ NULL
         sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):kMax]^2)) /
         sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
         c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
-        sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
+            sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
         thetaH1 *
             cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2))
@@ -1370,7 +1383,7 @@ NULL
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):kMax]^2)) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
             c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
-            sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
+                sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
             thetaH1 *
                 cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
                 sqrt(cumsum(weights[(stage + 1):kMax]^2))
@@ -1382,7 +1395,7 @@ NULL
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):(kMax - 1)]^2)) /
             sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
             c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
-            sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
+                sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
             thetaH1 *
                 cumsum(sqrt(nPlanned[(stage + 1):(kMax - 1)]) * weights[(stage + 1):(kMax - 1)]) /
                 sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2))
@@ -1448,7 +1461,8 @@ NULL
         pi1,
         pi2,
         iterations = C_ITERATIONS_DEFAULT,
-        seed = NA_real_) {
+        seed = NA_real_
+        ) {
     design <- stageResults$.design
     .assertIsTrialDesignFisher(design)
     .assertIsValidStage(stage, design$kMax)
@@ -1525,7 +1539,8 @@ NULL
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         pi1 = NA_real_,
-        pi2 = NA_real_) {
+        pi2 = NA_real_
+        ) {
     pi1H1 <- .getOptionalArgument("pi1H1", ...)
     if (!is.null(pi1H1) && !is.na(pi1H1)) {
         if (!is.na(pi1)) {
@@ -1623,7 +1638,8 @@ NULL
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         piTreatmentRange,
-        pi2) {
+        pi2
+        ) {
     if (stageResults$isOneSampleDataset()) {
         .associatedArgumentsAreDefined(
             nPlanned = nPlanned,
@@ -1801,7 +1817,8 @@ NULL
         thetaH0,
         stage,
         stdErrorEstimate,
-        tolerance) {
+        tolerance
+        ) {
     finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
     medianUnbiasedGeneral <- NA_real_
 
@@ -2065,7 +2082,8 @@ NULL
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        ) {
     stageResults <- .getStageResultsRates(
         design = design,
         dataInput = dataInput,
@@ -2118,7 +2136,8 @@ NULL
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        ) {
     stageResults <- .getStageResultsRates(
         design = design,
         dataInput = dataInput,
@@ -2171,7 +2190,8 @@ NULL
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        ) {
     stageResults <- .getStageResultsRates(
         design = design,
         dataInput = dataInput,
@@ -2217,7 +2237,8 @@ NULL
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
+        ) {
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
 
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)

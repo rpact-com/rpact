@@ -37,8 +37,9 @@ NULL
 #' @inheritParams param_userAlphaSpending
 #' @param alpha0Vec Stopping for futility bounds for stage-wise p-values.
 #' @param alpha0Scale Character. The scale of the futility bounds.
-#'        Must be one of \code{"zValue"}, \code{"pValue"}, or \code{"reverseCondPower"}.
-#'        Default is \code{"zValue"}.
+#'        Must be one of \code{"pValue"}, \code{"zValue"}, or \code{"reverseCondPower"}, 
+#'        \code{"condPowerAtObserved"}, or \code{"predictivePower"}.
+#'        Default is \code{"pValue"}.
 #' @inheritParams param_informationRates
 #' @inheritParams param_sided
 #' @param bindingFutility If \code{bindingFutility = TRUE} is specified the calculation of
@@ -81,7 +82,9 @@ getDesignFisher <- function(
         alpha0Scale = c(
             "pValue",
             "zValue",
-            "reverseCondPower"
+            "reverseCondPower",
+            "condPowerAtObserved",
+            "predictivePower"
         ),
         informationRates = NA_real_,
         sided = 1, # C_SIDED_DEFAULT
@@ -116,7 +119,7 @@ getDesignFisher <- function(
     alpha0Vec <- .getFutilityBoundsFromArgs(
         futilityBounds = alpha0Vec,
         futilityBoundsScale = alpha0Scale, 
-        functionName = "getDesignGroupSequential",
+        functionName = "getDesignFisher",
         design = design,
         fisherDesign = TRUE,
         ...) 

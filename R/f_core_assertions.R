@@ -1710,9 +1710,9 @@ NULL
             }
             
             if (grepl("^getDesignFisher", functionName)) {
-                argName <- "futilityBounds"
-            } else {
                 argName <- "alpha0Vec"
+            } else {
+                argName <- "futilityBounds"
             }
         }
         
