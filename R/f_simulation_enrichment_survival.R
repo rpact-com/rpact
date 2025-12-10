@@ -516,7 +516,7 @@ updateSubGroupVector <- function(k,
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
-            stageResults <- .getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
+            args <- list(
                 design = design,
                 weights = weights,
                 subGroups = effectList$subGroups,
@@ -546,6 +546,17 @@ updateSubGroupVector <- function(k,
                 selectPopulationsFunction = selectPopulationsFunction
             )
 
+            set.seed(j + i * 1000)
+            stageResults <- do.call(.getSimulatedStageResultsSurvivalEnrichmentSubjectsBased, args)
+
+            set.seed(j + i * 1000)
+            stageResultsCpp <- do.call(.getSimulatedStageResultsSurvivalEnrichmentSubjectsBasedCpp, args)
+
+            if (!isTRUE(diffs <- all.equal(stageResults, stageResultsCpp))) {
+                print(diffs)
+                browser()
+            }
+
             closedTest <- .performClosedCombinationTestForSimulationEnrichmentCpp(
                 stageResults = stageResults,
                 design = design,
@@ -553,8 +564,6 @@ updateSubGroupVector <- function(k,
                 intersectionTest = intersectionTest,
                 successCriterion = successCriterion
             )
-            print(paste0("Stage results from iteration ", j, " and alternative ", i, ":"))
-            print(stageResults)
 
             rejectAtSomeStage <- FALSE
             rejectedPopulationsBefore <- rep(FALSE, gMax)
@@ -643,7 +652,6 @@ updateSubGroupVector <- function(k,
                     }
 
                     if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
-                        print(paste("Early stopping at stage ", k, "\n"))
                         # rejected hypotheses remain rejected also in case of early stopping
                         simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
                             matrix(
@@ -654,7 +662,6 @@ updateSubGroupVector <- function(k,
                                 gMax,
                                 byrow = TRUE
                             )
-                        print(simulatedRejections)
                         break
                     }
 
