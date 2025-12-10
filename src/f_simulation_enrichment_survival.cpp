@@ -376,28 +376,30 @@ List getSurvDropoutTimes(int numberOfSubjects,
 }
 
 // [[Rcpp::export(name = ".updateSubGroupVectorCpp")]]
-CharacterVector updateSubGroupVector(int k,
+CharacterVector updateSubGroupVector(int k, // 0-based
 						  int maxNumberOfSubjects,
 						  IntegerVector numberOfSubjects,
 						  const CharacterVector& subGroupVector,
 						  CharacterVector subGroups,
-						  NumericVector prevSelected) {
+						  NumericVector prevSelected,
+						  IntegerVector allocationFraction) {
 	// This is important to ensure that R's random number generator state is properly managed.
 	Rcpp::RNGScope scope; 
 
-	int numberNewSubjects = maxNumberOfSubjects - numberOfSubjects[k - 1];
-	CharacterVector newSubGroupVector = sample(
-	 	subGroups,
-		numberNewSubjects,
-		true,
-		prevSelected
-	);
-	// We keep subGroupVector[seq(0, numberOfSubjects[k - 1] - 1)]
-	// and just update the rest
-	IntegerVector newSubjectsInds = seq(numberOfSubjects[k - 1], maxNumberOfSubjects - 1);
-	CharacterVector result = clone(subGroupVector);
-	result[newSubjectsInds] = newSubGroupVector;
-	return result;
+	CharacterVector result = subGroupVector[seq(0, numberOfSubjects[k - 1] - 1)];
+	
+	while (result.size() < maxNumberOfSubjects) {
+		IntegerVector multinomResult(prevSelected.size());
+		rmultinom(1, prevSelected.begin(), prevSelected.size(), multinomResult.begin());
+		int selectedIndex = which(multinomResult == 1)[0];
+		std::string subGroup = Rcpp::as<std::string>(subGroups[selectedIndex]);
+		
+		for (int i = 0; i < allocationFraction[0] + allocationFraction[1]; i++) {
+			result.push_back(subGroup);
+		}
+	}
+	
+	return result[seq(0, maxNumberOfSubjects - 1)];
 }
  
 // Get Simulated Stage Results Survival Enrichment Subjects Based
@@ -597,7 +599,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					numberOfSubjects,
 					subGroupVector,
 					subGroups,
-					prevSelected
+					prevSelected,
+					allocationFraction
 				);				
 				
 				tmp = getSurvDropoutTimes(
@@ -703,13 +706,12 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 
 		// Stage-specific calculations for intermediate stages
 		if (k < kMax - 1) {
-			// Check if any populations selected
-			int selectedCount = sum(selectedPopulations(_, k));
-			if (selectedCount == 0) {
-				break;
-			}
 
 			// Bonferroni adjustment
+			int selectedCount = sum(selectedPopulations(_, k));
+			if (selectedCount == 0) {
+				stop("selectedCount must be greater than 0");
+			}
 			double minPValue = min(na_omit(separatePValues(_, k)));
 			adjustedPValues[k] = std::min(minPValue * selectedCount, 1.0 - 1e-07);
 
@@ -762,7 +764,6 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				
 				LogicalVector selectedNow;
 				if (typeOfSelection == "userDefined") {
-					effectVector[is_na(effectVector)] = 1.0; // set NAs to null effect for selection
 					List selectPopulationsFunctionArgs = List::create(
 						_["effectVector"] = effectVector,
 						_["stage"] = k + 1, // R 1-based
@@ -795,6 +796,12 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					);
 				}
 				selectedPopulations(_, k + 1) = selectedPopulations(_, k) & selectedNow;
+
+				// Check if any populations selected for the next stage, otherwise stop early here.
+      			int selectedCountNextStage = sum(selectedPopulations(_, k + 1));
+	    		if (selectedCountNextStage == 0) {
+		    		break;
+    			}
 
 				double newEventsValue;
 				if (calcEventsFunctionIsUserDefined) {

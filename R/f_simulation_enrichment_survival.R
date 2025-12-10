@@ -137,7 +137,7 @@ updateSubGroupVector <- function(k,
     eventsNotAchieved <- rep(FALSE, kMax)
 
     ##  Create data set for first stage  ##
-    treatmentsAndSubGroups <- .getTreatmentsSubgroups(maxNumberOfSubjects, allocationFraction, subGroups, prevalences)
+    treatmentsAndSubGroups <- .getTreatmentsSubgroups2(maxNumberOfSubjects, allocationFraction, subGroups, prevalences)
     treatments <- treatmentsAndSubGroups$treatments
     subGroupVector <- treatmentsAndSubGroups$subGroupVector
 
@@ -546,13 +546,15 @@ updateSubGroupVector <- function(k,
                 selectPopulationsFunction = selectPopulationsFunction
             )
 
-            closedTest <- .performClosedCombinationTestForSimulationEnrichment(
+            closedTest <- .performClosedCombinationTestForSimulationEnrichmentCpp(
                 stageResults = stageResults,
                 design = design,
                 indices = indices,
                 intersectionTest = intersectionTest,
                 successCriterion = successCriterion
             )
+            print(paste0("Stage results from iteration ", j, " and alternative ", i, ":"))
+            print(stageResults)
 
             rejectAtSomeStage <- FALSE
             rejectedPopulationsBefore <- rep(FALSE, gMax)
@@ -641,6 +643,7 @@ updateSubGroupVector <- function(k,
                     }
 
                     if ((k < kMax) && (closedTest$successStop[k] || closedTest$futilityStop[k])) {
+                        print(paste("Early stopping at stage ", k, "\n"))
                         # rejected hypotheses remain rejected also in case of early stopping
                         simulatedRejections[(k + 1):kMax, i, ] <- simulatedRejections[(k + 1):kMax, i, ] +
                             matrix(
@@ -651,6 +654,7 @@ updateSubGroupVector <- function(k,
                                 gMax,
                                 byrow = TRUE
                             )
+                        print(simulatedRejections)
                         break
                     }
 
@@ -1115,10 +1119,9 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
     }
 
     # if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-    #     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+    # stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
     # }
 
     simulationResults$.data <- loopResult$data
-
     return(simulationResults)
 }
