@@ -447,7 +447,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		NumericVector hazardRatios,
 		bool directionUpper,
 		bool stratifiedAnalysis,
-		NumericVector plannedEvents,
+		NumericVector plannedEvents_,
 		NumericVector recruitmentTimes,
 		IntegerVector allocationFraction,
 		std::string typeOfSelection,
@@ -463,6 +463,9 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		Nullable<Function> calcEventsFunction = R_NilValue,
 		bool calcEventsFunctionIsUserDefined = false,
 		Nullable<Function> selectPopulationsFunction = R_NilValue) {
+	
+	// Clone plannedEvents to avoid modifying the input parameter
+	NumericVector plannedEvents = clone(plannedEvents_);
 	
 	bool isDesignFisher = getClassName(design) == "TrialDesignFisher";
 
@@ -589,8 +592,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				NumericVector prevSelected = prevalences / sum(prevInSelected);
 				prevSelected[!selectedsubGroupsIndices(_, k)] = 0.0;
 						
-				int numberNewSubjects = maxNumberOfSubjects - numberOfSubjects[k - 1];
-				IntegerVector newSubjectsInds = seq(numberOfSubjects[k - 1], maxNumberOfSubjects - 1);
+				int numberNewSubjects = maxNumberOfSubjects - numberOfSubjects[k - 1] + 1;
+				IntegerVector newSubjectsInds = seq(numberOfSubjects[k - 1] - 1, maxNumberOfSubjects - 1);
 
 				// Sample new subgroups for new subjects
 				subGroupVector = updateSubGroupVector(
