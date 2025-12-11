@@ -901,7 +901,7 @@ getConditionalPower <- function(stageResults,
         return(conditionalPower)
     }
     
-    .fireDataInputNotSupportedException(dataInput)
+    .fireDataInputNotSupportedException(stageResults$getDataInput())
 }
 
 .getConditionalPowerPlot <- function(
@@ -967,7 +967,7 @@ getConditionalPower <- function(stageResults,
         ))
     }
 
-    .fireDataInputNotSupportedException(dataInput)
+    .fireDataInputNotSupportedException(stageResults$getDataInput())
 }
 
 #'

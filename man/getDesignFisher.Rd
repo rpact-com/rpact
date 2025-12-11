@@ -11,6 +11,8 @@ getDesignFisher(
   method = c("equalAlpha", "fullAlpha", "noInteraction", "userDefinedAlpha"),
   userAlphaSpending = NA_real_,
   alpha0Vec = NA_real_,
+  alpha0Scale = c("pValue", "zValue", "reverseCondPower", "condPowerAtObserved",
+    "predictivePower"),
   informationRates = NA_real_,
   sided = 1,
   bindingFutility = NA,
@@ -39,6 +41,11 @@ Numeric vector of length \code{kMax} containing the cumulative
 alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 <= ... <= alpha_K <= alpha}.}
 
 \item{alpha0Vec}{Stopping for futility bounds for stage-wise p-values.}
+
+\item{alpha0Scale}{Character. The scale of the futility bounds.
+Must be one of \code{"pValue"}, \code{"zValue"}, \code{"reverseCondPower"},
+\code{"condPowerAtObserved"}, or \code{"predictivePower"}.
+Default is \code{"pValue"}.}
 
 \item{informationRates}{The information rates t_1, ..., t_kMax (that must be fixed prior to the trial),
 default is \code{(1:kMax) / kMax}. For the weighted inverse normal design, the weights are derived
@@ -105,6 +112,11 @@ getDesignFisher(kMax = 2, method = "fullAlpha", alpha = 0.05, alpha0Vec = 0.50)
 }
 \seealso{
 \code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare.
+
+\code{\link[=getFutilityBounds]{getFutilityBounds()}} for the
+specification of futility bounds on scales other than the p-value scale.
+
+\href{https://www.rpact.org/vignettes/planning/rpact_futility_bounds/}{Vignette: Enhanced Futility Bounds Specification}
 
 Other design functions: 
 \code{\link{getDesignCharacteristics}()},

@@ -36,6 +36,10 @@ NULL
 #' default is \code{"equalAlpha"} (for details, see Wassmer, 1999).
 #' @inheritParams param_userAlphaSpending
 #' @param alpha0Vec Stopping for futility bounds for stage-wise p-values.
+#' @param alpha0Scale Character. The scale of the futility bounds.
+#'        Must be one of \code{"pValue"}, \code{"zValue"}, \code{"reverseCondPower"}, 
+#'        \code{"condPowerAtObserved"}, or \code{"predictivePower"}.
+#'        Default is \code{"pValue"}.
 #' @inheritParams param_informationRates
 #' @inheritParams param_sided
 #' @param bindingFutility If \code{bindingFutility = TRUE} is specified the calculation of
@@ -62,14 +66,26 @@ NULL
 #'
 #' @template examples_get_design_fisher
 #'
+#' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}} for the 
+#'     specification of futility bounds on scales other than the p-value scale.
+#' @seealso [Vignette: Enhanced Futility Bounds Specification](https://www.rpact.org/vignettes/planning/rpact_futility_bounds/)
+#' 
 #' @export
 #'
-getDesignFisher <- function(...,
+getDesignFisher <- function(
+        ...,
         kMax = NA_integer_,
         alpha = NA_real_,
         method = c("equalAlpha", "fullAlpha", "noInteraction", "userDefinedAlpha"), # C_FISHER_METHOD_DEFAULT
         userAlphaSpending = NA_real_,
         alpha0Vec = NA_real_,
+        alpha0Scale = c(
+            "pValue",
+            "zValue",
+            "reverseCondPower",
+            "condPowerAtObserved",
+            "predictivePower"
+        ),
         informationRates = NA_real_,
         sided = 1, # C_SIDED_DEFAULT
         bindingFutility = NA,
@@ -80,6 +96,33 @@ getDesignFisher <- function(...,
     .assertIsValidTolerance(tolerance)
     .assertIsValidIterationsAndSeed(iterations, seed)
     .warnInCaseOfUnknownArguments(functionName = "getDesignFisher", ...)
+    alpha0Scale <- match.arg(alpha0Scale)
+    
+    design <- NULL
+    if (!all(is.na(alpha0Vec)) && .futilityBoundsCalculationRequiresDesign(alpha0Scale)) {
+        design <- .getDesignFisher(
+            kMax = kMax, 
+            alpha = alpha, 
+            method = method,
+            userAlphaSpending = userAlphaSpending, 
+            alpha0Vec = NA_real_, 
+            informationRates = informationRates,
+            sided = sided, 
+            bindingFutility = bindingFutility,
+            directionUpper = directionUpper,
+            tolerance = tolerance, 
+            iterations = iterations, 
+            seed = seed
+        )
+    }
+    
+    alpha0Vec <- .getFutilityBoundsFromArgs(
+        futilityBounds = alpha0Vec,
+        futilityBoundsScale = alpha0Scale, 
+        functionName = "getDesignFisher",
+        design = design,
+        fisherDesign = TRUE,
+        ...) 
 
     return(.getDesignFisher(
         kMax = kMax, 
@@ -105,6 +148,7 @@ getDesignFisher <- function(...,
         method = C_FISHER_METHOD_DEFAULT,
         userAlphaSpending = NA_real_,
         alpha0Vec = NA_real_,
+        alpha0Scale = "pValue",
         informationRates = NA_real_,
         sided = 1,
         bindingFutility = C_BINDING_FUTILITY_FISHER_DEFAULT,
@@ -164,10 +208,24 @@ getDesignFisher <- function(...,
 
     if (is.na(bindingFutility)) {
         bindingFutility <- C_BINDING_FUTILITY_FISHER_DEFAULT
-    } else if (userFunctionCallEnabled &&
-            ((!is.na(kMax) && kMax == 1) ||
-                (!any(is.na(alpha0Vec)) && all(alpha0Vec == C_ALPHA_0_VEC_DEFAULT)))) {
-        warning("'bindingFutility' (", bindingFutility, ") will be ignored", call. = FALSE)
+    } else if (userFunctionCallEnabled) {
+        if (!is.na(kMax) && kMax == 1) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because kMax = 1", call. = FALSE)
+        }
+        else if (any(is.na(alpha0Vec))) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because 'alpha0Vec' is not defined",
+                call. = FALSE
+            )
+        } 
+        else if (all(alpha0Vec == C_ALPHA_0_VEC_DEFAULT, na.rm = TRUE)) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because 'alpha0Vec' (", .arrayToString(alpha0Vec), ") ",
+                "is set to default values",
+                call. = FALSE
+            )
+        }
     }
 
     design <- TrialDesignFisher$new(

@@ -667,48 +667,60 @@
     return(NA_real_)
 }
 
-.getMaximumSampleSizeTwoGroups <- function(
-        allocationRatioPlanned,
+.getMaximumSampleSizeTwoGroups <- function(allocationRatioPlanned,
         shift,
         accrualTime,
         followUpTime,
         lambda1,
         lambda2,
         thetaH0,
-        overdispersion
-        ) {
-    n2 <- stats::uniroot(
-        function(y) {
-            n2 <- y
-            n1 <- allocationRatioPlanned * n2
-            timeUnderObservation1 <-
-                pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n1), 0)
-            timeUnderObservation2 <-
-                pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n2), 0)
+        overdispersion) {
+    tryCatch(
+        {
+            n2 <- stats::uniroot(
+                function(y) {
+                    n2 <- y
+                    n1 <- allocationRatioPlanned * n2
+                    timeUnderObservation1 <-
+                        pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n1), 0)
+                    timeUnderObservation2 <-
+                        pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n2), 0)
+                    sumLambda1 <- sum(
+                        timeUnderObservation1 * lambda1 / (1 + overdispersion * timeUnderObservation1 * lambda1)
+                    )
+                    sumLambda2 <- sum(
+                        timeUnderObservation2 * lambda2 / (1 + overdispersion * timeUnderObservation2 * lambda2)
+                    )
+                    return(1 / (1 / sumLambda1 + 1 / sumLambda2) - shift / log(lambda1 / lambda2 / thetaH0)^2)
+                },
+                interval = c(0, 10^5),
+                extendInt = "yes",
+                tol = 1e-02
+            )$root
+            n1 <- ceiling(allocationRatioPlanned * n2)
+            n2 <- ceiling(n2)
+
+            # ensure that information is reached (necessary, gscounts does not check!)
+            timeUnderObservation1 <- pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n1), 0)
+            timeUnderObservation2 <- pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n2), 0)
             sumLambda1 <- sum(timeUnderObservation1 * lambda1 / (1 + overdispersion * timeUnderObservation1 * lambda1))
             sumLambda2 <- sum(timeUnderObservation2 * lambda2 / (1 + overdispersion * timeUnderObservation2 * lambda2))
-            return(1 / (1 / sumLambda1 + 1 / sumLambda2) - shift / log(lambda1 / lambda2 / thetaH0)^2)
+            if (1 / (1 / sumLambda1 + 1 / sumLambda2) < shift / log(lambda1 / lambda2 / thetaH0)^2) {
+                n2 <- n2 + 1
+                n1 <- n1 + 1
+            }
+            return(list(
+                n1 = n1,
+                n2 = n2
+            ))
         },
-        interval = c(0, 10^4),
-        extendInt = "yes",
-        tol = 1e-02
-    )$root
-    n1 <- ceiling(allocationRatioPlanned * n2)
-    n2 <- ceiling(n2)
-
-    # ensure that information is reached (necessary, gscounts does not check!)
-    timeUnderObservation1 <- pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n1), 0)
-    timeUnderObservation2 <- pmax(accrualTime + followUpTime - seq(0, accrualTime, length.out = n2), 0)
-    sumLambda1 <- sum(timeUnderObservation1 * lambda1 / (1 + overdispersion * timeUnderObservation1 * lambda1))
-    sumLambda2 <- sum(timeUnderObservation2 * lambda2 / (1 + overdispersion * timeUnderObservation2 * lambda2))
-    if (1 / (1 / sumLambda1 + 1 / sumLambda2) < shift / log(lambda1 / lambda2 / thetaH0)^2) {
-        n2 <- n2 + 1
-        n1 <- n1 + 1
-    }
-    return(list(
-        n1 = n1,
-        n2 = n2
-    ))
+        error = function(e) {
+            return(list(
+                n1 = NA_real_,
+                n2 = NA_real_
+            ))
+        }
+    )
 }
 
 .getDesignPlanCountData <- function(

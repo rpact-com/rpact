@@ -868,7 +868,7 @@ getObjectRCode <- function(
                 if (objName == "futilityBounds" && is(value, "FutilityBounds")) {
                     sourceScale <- attr(value, "sourceScale")$value
                     if (!is.null(sourceScale) && sourceScale %in%
-                            c("conditionalPower", "condPowerAtObserved", "predictivePower", "effectEstimate")) {
+                            c("conditionalPower", "effectEstimate")) {
                         precondition <- c(
                             precondition,
                             getObjectRCode(
@@ -893,6 +893,39 @@ getObjectRCode <- function(
                             value <- attr(value, "sourceValue")$value
                         } else {
                             futilityBoundsScale <- NULL
+                        }
+                    }
+                }
+
+                alpha0Scale <- NULL
+                if (objName == "alpha0Vec" && is(value, "FutilityBounds")) {
+                    sourceScale <- attr(value, "sourceScale")$value
+                    if (!is.null(sourceScale) && sourceScale %in%
+                            c("conditionalPower", "condPowerAtObserved", "predictivePower", "effectEstimate")) {
+                        precondition <- c(
+                            precondition,
+                            getObjectRCode(
+                                value,
+                                prefix = ifelse(pipeOperator == "none", "alpha0Vec <- ", ""),
+                                postfix = pipeOperatorPostfix,
+                                includeDefaultParameters = includeDefaultParameters,
+                                stringWrapParagraphWidth = stringWrapParagraphWidth,
+                                stringWrapPrefix = stringWrapPrefix,
+                                newArgumentValues = newArgumentValues,
+                                pipeOperator = pipeOperator,
+                                output = "internal"
+                            )
+                        )
+                        if (pipeOperator == "none") {
+                            leadingArguments <- c(leadingArguments, "alpha0Vec = alpha0Vec")
+                        }
+                        next
+                    } else {
+                        alpha0Scale <- attr(value, "sourceScale")$value
+                        if (!is.null(alpha0Scale) && !identical(alpha0Scale, "pValue")) {
+                            value <- attr(value, "sourceValue")$value
+                        } else {
+                            alpha0Scale <- NULL
                         }
                     }
                 }
@@ -959,6 +992,9 @@ getObjectRCode <- function(
 
                     if (!is.null(futilityBoundsScale)) {
                         arguments <- c(arguments, paste0('futilityBoundsScale = "', futilityBoundsScale, '"'))
+                    }
+                    if (!is.null(alpha0Scale)) {
+                        arguments <- c(arguments, paste0('alpha0Scale = "', alpha0Scale, '"'))
                     }
                 }
             }

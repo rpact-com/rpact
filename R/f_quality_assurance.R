@@ -899,6 +899,21 @@ setupPackageTests <- function(token, secret) {
     )
 }
 
+.getExistingTestResultFiles <- function(path) {
+    .assertIsSingleCharacter(path, "path", naAllowed = FALSE)
+    subDir <- file.path(path, "rpact-tests")
+    if (dir.exists(subDir)) {
+        path <- c(path, subDir)
+    }
+    resultFiles <- list.files(
+        path = path,
+        pattern = "^testthat\\.Rout(\\.fail)?$",
+        recursive = FALSE,
+        full.names = TRUE
+    )
+    return(resultFiles)
+}
+
 #' @title
 #' Test and Validate the rpact Package Installation
 #'
@@ -1131,12 +1146,7 @@ testPackage <- function(
         }
     }
 
-    oldResultFiles <- list.files(
-        path = outDir,
-        pattern = "^testthat\\.Rout(\\.fail)?$",
-        recursive = TRUE,
-        full.names = TRUE
-    )
+    oldResultFiles <- .getExistingTestResultFiles(outDir)
     for (oldResultFile in oldResultFiles) {
         if (file.exists(oldResultFile)) {
             file.remove(oldResultFile)
@@ -1205,19 +1215,9 @@ testPackage <- function(
         pkgName = pkgName
     )
 
-    newResultFiles <- list.files(
-        path = outDir,
-        pattern = "^testthat\\.Rout(\\.fail)?$",
-        recursive = TRUE,
-        full.names = TRUE
-    )
+    newResultFiles <- .getExistingTestResultFiles(outDir)
     if (length(newResultFiles) == 0) {
-        newResultFiles <- list.files(
-            path = testFileTargetDirectory,
-            pattern = "^testthat\\.Rout(\\.fail)?$",
-            recursive = TRUE,
-            full.names = TRUE
-        )
+        newResultFiles <- .getExistingTestResultFiles(testFileTargetDirectory)
     }
 
     resultDir <- file.path(outDir, paste0(pkgName, "-tests"))

@@ -200,25 +200,31 @@ NULL
 
         return(.getConditionalPowerMeansEnrichment(
             stageResults = stageResults,
-            nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned, ...
+            nPlanned = nPlanned, 
+            allocationRatioPlanned = allocationRatioPlanned, 
+            ...
         ))
     }
 
     if (stageResults$isDatasetRates()) {
         return(.getConditionalPowerRatesEnrichment(
             stageResults = stageResults,
-            nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned, ...
+            nPlanned = nPlanned, 
+            allocationRatioPlanned = allocationRatioPlanned, 
+            ...
         ))
     }
 
     if (stageResults$isDatasetSurvival()) {
         return(.getConditionalPowerSurvivalEnrichment(
             stageResults = stageResults,
-            nPlanned = nPlanned, allocationRatioPlanned = allocationRatioPlanned, ...
+            nPlanned = nPlanned, 
+            allocationRatioPlanned = allocationRatioPlanned, 
+            ...
         ))
     }
 
-    .fireDataInputNotSupportedException(dataInput)
+    .fireDataInputNotSupportedException(stageResults$getDataInput())
 }
 
 #'
@@ -461,5 +467,5 @@ NULL
         ))
     }
 
-    .fireDataInputNotSupportedException(dataInput)
+    .fireDataInputNotSupportedException(stageResults$getDataInput())
 }

@@ -17,40 +17,106 @@
 #' @include f_core_utilities.R
 NULL
 
-.getFutilityBoundInformations <- function(..., information, sourceScale, targetScale) {
+.getFutilityBoundInformations <- function(..., information, sourceScale, targetScale, design, showWarnings = TRUE) {
     args <- list(...)
-    separateInformationArguments <- length(args) > 0 && 
-        !is.null(names(args)) && 
+    separateInformationArguments <- length(args) > 0 &&
+        !is.null(names(args)) &&
         any(c("information1", "information2") %in% names(args))
-    
-    if (!separateInformationArguments && !is.null(information) && 
+
+    if (!separateInformationArguments && !is.null(information) &&
             !all(is.na(information)) && length(information) > 0) {
-        len <- .getFutilityBoundVectorLength(sourceScale, targetScale)
-        .assertIsNumericVector(information, "information", naAllowed = TRUE, len = len)
+        indices <- .getValidFutilityBoundVectorIndices(sourceScale, targetScale)
+        if (length(information) > 1) {
+            .assertIsNumericVector(information, "information", naAllowed = TRUE, len = 2L)
+
+            information1 <- information[1]
+            information2 <- information[2]
+            if (!any(indices == 1) && !is.na(information1)) {
+                if (isTRUE(showWarnings)) {
+                    warning(
+                        "'information[1]' (", information1, ") will be ignored ",
+                        "because it is not required for the conversion from '",
+                        sourceScale, "' to '", targetScale, "'",
+                        call. = FALSE
+                    )
+                }
+                information1 <- NA_real_
+            }
+            if (!any(indices == 2) && !is.na(information2)) {
+                if (isTRUE(showWarnings)) {
+                    warning(
+                        "'information[2]' (", information2, ") will be ignored ",
+                        "because it is not required for the conversion from '",
+                        sourceScale, "' to '", targetScale, "'",
+                        call. = FALSE
+                    )
+                }
+                information2 <- NA_real_
+            }
+        } else {
+            information1 <- information[1]
+            information2 <- information[1]
+        }
+
         return(list(
-            information1 = information[1],
-            information2 = information[2],
+            information1 = information1,
+            information2 = information2,
             information = information,
+            informationDerived = FALSE,
             vectorInput = TRUE,
             paramNames = c("information[1]", "information[2]")
         ))
     }
 
+    vectorInput <- FALSE
     information1 <- NA_real_
     information2 <- NA_real_
+    informationDerived <- FALSE
     if (length(list(...)) > 0) {
         information1 <- .getOptionalArgument("information1", optionalArgumentDefaultValue = NA_real_, ...)
         information2 <- .getOptionalArgument("information2", optionalArgumentDefaultValue = NA_real_, ...)
     }
+
+    if (any(is.na(c(information1, information2))) &&
+            !is.null(design) && .isTrialDesign(design) &&
+            !.isTrialDesignConditionalDunnett(design) &&
+            (sourceScale %in% c("predictivePower", "condPowerAtObserved") ||
+                targetScale %in% c("predictivePower", "condPowerAtObserved"))) {
+        .assertIsValidDesignForFutilityBoundsConversion(design, sourceScale, targetScale)
+
+        if (isTRUE(showWarnings) && !is.na(information1)) {
+            warning(
+                "'information1' (", information1, ") will be ignored ",
+                "because it will only be taken into account if the information is provided for both stages",
+                call. = FALSE
+            )
+        }
+        if (isTRUE(showWarnings) && !is.na(information2)) {
+            warning(
+                "'information2' (", information2, ") will be ignored ",
+                "because it will only be taken into account if the information is provided for both stages",
+                call. = FALSE
+            )
+        }
+
+        information1 <- design$informationRates[1]
+        information2 <- 1 - design$informationRates[1]
+        informationDerived <- TRUE
+        vectorInput <- TRUE
+    }
+
     information <- c(information1, information2)
     if (all(is.na(information))) {
         information <- NA_real_
+        informationDerived <- NA
+        vectorInput <- TRUE
     }
     return(list(
         information1 = information1,
         information2 = information2,
         information = information,
-        vectorInput = FALSE,
+        informationDerived = informationDerived,
+        vectorInput = vectorInput,
         paramNames = c("information1", "information2")
     ))
 }
@@ -83,19 +149,119 @@ print.FutilityBounds <- function(x, ...) {
     print.default(as.numeric(x))
 }
 
+#'
+#' @title
+#' Summarize Futility Bounds
+#'
+#' @description
+#' S3 summary method for objects of class \code{FutilityBounds}.
+#'
+#' @param object An object of class \code{FutilityBounds}.
+#' @param ... Additional arguments (currently not used).
+#'
+#' @details
+#' Prints a categorized summary of futility bound parameters,
+#' including user-defined, derived, default, and generated values.
+#'
+#' @examples
+#' \dontrun{
+#' futilityBounds <- getFutilityBounds(
+#'     design = getDesignInverseNormal(kMax = 2),
+#'     sourceValue = 0.5,
+#'     sourceScale = "condPowerAtObserved",
+#'     targetScale = "zValue"
+#' )
+#' summary(futilityBounds)
+#' }
+#'
+#' @keywords internal
+#'
+#' @export
+#'
+summary.FutilityBounds <- function(object, ...) {
+    objAttr <- attributes(object)
+    objAttr$targetValue <- list(
+        value = as.numeric(object),
+        type = C_PARAM_GENERATED
+    )
+
+    if (!is.null(objAttr$design) && !is.null(objAttr$design$value)) {
+        objAttr$design$value <- objAttr$design$value$.toString(TRUE)
+    }
+
+    userDefinedParams <- character(0)
+    derivedDefinedParams <- character(0)
+    defaultParams <- character(0)
+    generatedParams <- character(0)
+
+    for (paramName in names(objAttr)) {
+        entry <- objAttr[[paramName]]
+        if (!is.list(entry) || !all(c("value", "type") %in% names(entry))) {
+            next
+        }
+        paramValue <- entry$value
+        paramType <- entry$type
+        paramSummary <- paste0(
+            paramName, ": ",
+            .arrayToString(paramValue, encapsulate = is.character(paramValue))
+        )
+        if (paramType == C_PARAM_USER_DEFINED) {
+            userDefinedParams <- c(userDefinedParams, paramSummary)
+        } else if (paramType == C_PARAM_DERIVED) {
+            derivedDefinedParams <- c(derivedDefinedParams, paramSummary)
+        } else if (paramType == C_PARAM_DEFAULT_VALUE) {
+            defaultParams <- c(defaultParams, paramSummary)
+        } else if (paramType == C_PARAM_GENERATED) {
+            generatedParams <- c(generatedParams, paramSummary)
+        }
+    }
+
+    cat("Futility bounds summary:\n\n")
+    if (length(userDefinedParams) > 0) {
+        cat("User-defined parameters:\n")
+        for (param in userDefinedParams) {
+            cat("  ", param, "\n", sep = "")
+        }
+        cat("\n")
+    }
+    if (length(derivedDefinedParams) > 0) {
+        cat("Derived parameters:\n")
+        for (param in derivedDefinedParams) {
+            cat("  ", param, "\n", sep = "")
+        }
+        cat("\n")
+    }
+    if (length(defaultParams) > 0) {
+        cat("Default parameters:\n")
+        for (param in defaultParams) {
+            cat("  ", param, "\n", sep = "")
+        }
+        cat("\n")
+    }
+    if (length(generatedParams) > 0) {
+        cat("Output:\n")
+        for (param in generatedParams) {
+            cat("  ", param, "\n", sep = "")
+        }
+        cat("\n")
+    }
+    
+    return(invisible(object))
+}
+
 .getFutilityBoundsFromThreeDots <- function(...) {
     args <- list(...)
     if (length(args) == 0) {
         return(NA_real_)
     }
-    
+
     for (arg in args) {
         if (is(arg, "FutilityBounds")) {
             .assertIsNumericVector(as.numeric(arg), "futilityBounds", naAllowed = TRUE)
             return(arg)
         }
     }
-    
+
     return(NA_real_)
 }
 
@@ -103,72 +269,97 @@ print.FutilityBounds <- function(x, ...) {
     if (!is.null(design)) {
         return(design)
     }
-    
+
     args <- list(...)
     for (arg in args) {
         if (.isTrialDesign(arg)) {
             return(arg)
         }
     }
-    
+
     return(NULL)
 }
 
-.getFutilityBoundsFromArgs <- function(..., futilityBounds, futilityBoundsScale, functionName, design) {
+.getFutilityBoundsFromArgs <- function(..., futilityBounds, futilityBoundsScale, functionName, design, fisherDesign = FALSE) {
     futilityBoundsFromArgs <- .getFutilityBoundsFromThreeDots(...)
+
+    futilityBoundsName <- ifelse(fisherDesign, "alpha0Vec", "futilityBounds")
+    futilityBoundsScaleName <- ifelse(fisherDesign, "alpha0Scale", "futilityBoundsScale")
+    targetScale <- ifelse(fisherDesign, "pValue", "zValue")
+
     if (!all(is.na(futilityBoundsFromArgs))) {
-        
-        if (is(futilityBoundsFromArgs, "FutilityBounds") && 
-                !identical(attr(futilityBoundsFromArgs, "targetScale")$value, "zValue")) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-                "'futilityBounds' (", .arrayToString(futilityBoundsFromArgs), ") ",
-                "must be on 'zValue' scale or converted to 'zValue' scale",
-                call. = FALSE)
+        if (is(futilityBoundsFromArgs, "FutilityBounds") &&
+                !identical(attr(futilityBoundsFromArgs, "targetScale")$value, targetScale)) {
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "'", futilityBoundsName, "' (", .arrayToString(futilityBoundsFromArgs), ") ",
+                "must be on '", targetScale, "' scale or converted to '", targetScale, "' scale",
+                call. = FALSE
+            )
         }
-        
+
         futilityBoundsOld <- futilityBounds
         futilityBounds <- futilityBoundsFromArgs
         if (!all(is.na(futilityBoundsOld))) {
             .warnInCaseOfUnusedArgument(
-                futilityBoundsOld, 
-                "futilityBounds", 
+                futilityBoundsOld,
+                futilityBoundsName,
                 defaultValue = NA_real_,
-                functionName = functionName)
+                functionName = functionName
+            )
         }
-        
     } else {
-        .assertIsNumericVector(futilityBounds, "futilityBounds", naAllowed = TRUE)
-        if (futilityBoundsScale != "zValue") {
+        .assertIsNumericVector(futilityBounds, futilityBoundsName, naAllowed = TRUE)
+        if (futilityBoundsScale != targetScale) {
             if (!all(is.na(futilityBounds))) {
                 futilityBounds <- getFutilityBounds(
                     sourceValue = futilityBounds,
                     sourceScale = futilityBoundsScale,
-                    targetScale = "zValue",
+                    targetScale = targetScale,
                     design = design
                 )
             } else {
                 .warnInCaseOfUnusedArgument(
-                    futilityBoundsScale, 
-                    "futilityBoundsScale", 
-                    defaultValue = "zValue",
-                    functionName = functionName)
+                    futilityBoundsScale,
+                    futilityBoundsScaleName,
+                    defaultValue = targetScale,
+                    functionName = functionName
+                )
             }
         }
     }
     return(futilityBounds)
 }
 
+.assertIsValidDesignForFutilityBoundsConversion <- function(design, sourceScale, targetScale) {
+    if (design$sided == 1 && design$kMax == 2) {
+        return(invisible())
+    }
+
+    msg <- paste0(
+        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale),
+        " is available only for one-sided two-stage designs "
+    )
+    if (design$sided != 1) {
+        stop(msg, "(sided = ", design$sided, ")", call. = FALSE)
+    }
+
+    if (design$kMax != 2) {
+        stop(msg, "(kMax = ", design$kMax, ")", call. = FALSE)
+    }
+}
+
 .futilityBoundsCalculationRequiresDesign <- function(scale) {
     if (is.null(scale) || length(scale) != 1 || is.na(scale)) {
         return(FALSE)
     }
-    
-    scale %in% c(
+
+    return(scale %in% c(
         "conditionalPower",
         "condPowerAtObserved",
         "predictivePower",
         "reverseCondPower"
-    )
+    ))
 }
 
 #'
@@ -227,10 +418,15 @@ print.FutilityBounds <- function(x, ...) {
 #' )
 #' }
 #'
+#' @seealso \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
+#'     \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+#'     \code{\link[=getDesignFisher]{getDesignFisher()}} for direct
+#'     specification of futility bounds on different scales using the
+#'     argument `futilityBoundsScale`.
+#'
 #' @export
 #'
-getFutilityBounds <- function(
-        sourceValue,
+getFutilityBounds <- function(sourceValue,
         ...,
         sourceScale = c(
             "zValue",
@@ -257,17 +453,26 @@ getFutilityBounds <- function(
     sourceScale <- match.arg(sourceScale)
     targetScale <- match.arg(targetScale)
 
+    .warnInCaseOfUnknownArguments(
+        functionName = "getFutilityBounds",
+        ignore = c("information1", "information2"),
+        numberOfAllowedUnnamedParameters = 1,
+        exceptionEnabled = FALSE,
+        ...
+    )
+
     .assertIsNumericVector(sourceValue, "sourceValue", naAllowed = naAllowed)
     if (is(sourceValue, "FutilityBounds")) {
         sourceValue <- as.numeric(sourceValue)
     }
-    
+
     design <- .getDesignFromThreeDots(design, ...)
 
     infos <- .getFutilityBoundInformations(
         information = information,
         sourceScale = sourceScale,
         targetScale = targetScale,
+        design = design,
         ...
     )
     information1 <- infos$information1
@@ -301,7 +506,10 @@ getFutilityBounds <- function(
         ),
         `information` = list(
             `value` = information,
-            `type` = ifelse(all(is.na(information)), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
+            `type` = ifelse(all(is.na(information)),
+                C_PARAM_NOT_APPLICABLE,
+                ifelse(isTRUE(infos$informationDerived), C_PARAM_DERIVED, C_PARAM_USER_DEFINED)
+            )
         ),
         `design` = list(
             `value` = design,
@@ -313,28 +521,17 @@ getFutilityBounds <- function(
         return(.addFutilityBoundParameterTypes(sourceValue, args))
     }
 
-
     if (!is.null(design)) {
         if (sourceScale == "reverseCondPower" || targetScale == "reverseCondPower") {
             .assertIsTrialDesignInverseNormalOrGroupSequential(design)
         } else {
-            .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design)            
+            .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design)
         }
+        .assertIsValidDesignForFutilityBoundsConversion(design, sourceScale, targetScale)
         if (.isTrialDesignInverseNormalOrGroupSequential(design)) {
             gsWeights <- c(sqrt(design$informationRates[1]), sqrt(1 - design$informationRates[1]))
         } else if (.isTrialDesignFisher(design)) {
             gsWeights <- c(1, sqrt((1 - design$informationRates[1]) / design$informationRates[1]))
-        }
-        if (design$sided != 1 || design$kMax != 2) {
-            msg <- paste0(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale), 
-                " is available only for one-sided two-stage designs ")
-            if (design$sided != 1) {
-                stop(msg, "(sided = ", design$sided, ")", call. = FALSE)
-            }
-            if (design$kMax != 2) {
-                stop(msg, "(kMax = ", design$kMax, ")", call. = FALSE)
-            }
         }
         criticalValue <- design$criticalValues[2]
     }
@@ -360,10 +557,10 @@ getFutilityBounds <- function(
     .assertIsSingleNumber(theta, "theta", naAllowed = TRUE)
 
     if (sourceScale %in% c(
-            "conditionalPower", 
+            "conditionalPower",
             "condPowerAtObserved",
-            "predictivePower", 
-            "reverseCondPower", 
+            "predictivePower",
+            "reverseCondPower",
             "pValue"
         )) {
         .assertIsInClosedInterval(
@@ -455,8 +652,7 @@ getFutilityBounds <- function(
     )
 }
 
-.getFutilityBoundSourceValueFisher <- function(
-        sourceValue,
+.getFutilityBoundSourceValueFisher <- function(sourceValue,
         criticalValue,
         gsWeights,
         sourceScale,
@@ -512,12 +708,11 @@ getFutilityBounds <- function(
             warning("Failed to calculate ", sQuote(sourceScale), " source value from ", sourceValue, ": ", e$message, call. = FALSE)
         }
     )
-    
+
     return(NA_real_)
 }
 
-.getFutilityBoundSourceValuesFisher <- function(
-        sourceValues,
+.getFutilityBoundSourceValuesFisher <- function(sourceValues,
         criticalValue,
         gsWeights,
         sourceScale,

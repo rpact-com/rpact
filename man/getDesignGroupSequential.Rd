@@ -26,7 +26,8 @@ getDesignGroupSequential(
   futilityStops = NA,
   gammaB = NA_real_,
   bindingFutility = NA,
-  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower"),
+  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower", "condPowerAtObserved",
+    "predictivePower"),
   directionUpper = NA,
   betaAdjustment = NA,
   constantBoundsHP = 3,
@@ -106,7 +107,8 @@ the critical values is affected by the futility bounds and the futility threshol
 sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
 
 \item{futilityBoundsScale}{Character. The scale of the futility bounds.
-Must be one of \code{"zValue"}, \code{"pValue"}, or \code{"reverseCondPower"}.
+Must be one of \code{"zValue"}, \code{"pValue"}, \code{"reverseCondPower"},
+\code{"condPowerAtObserved"}, or \code{"predictivePower"}.
 Default is \code{"zValue"}.}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
@@ -191,6 +193,11 @@ getDesignGroupSequential(informationRates = c(0.4, 0.7), typeOfDesign = "asP")
 }
 \seealso{
 \code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare different designs.
+
+\code{\link[=getFutilityBounds]{getFutilityBounds()}} for the
+specification of futility bounds on scales other than the z-value scale.
+
+\href{https://www.rpact.org/vignettes/planning/rpact_futility_bounds/}{Vignette: Enhanced Futility Bounds Specification}
 
 Other design functions: 
 \code{\link{getDesignCharacteristics}()},

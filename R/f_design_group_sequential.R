@@ -1091,7 +1091,9 @@ getDesignInverseNormal <- function(
         futilityBoundsScale = c(
             "zValue",
             "pValue",
-            "reverseCondPower"
+            "reverseCondPower",
+            "condPowerAtObserved",
+            "predictivePower"
         ),
         directionUpper = NA,
         betaAdjustment = NA,
@@ -1129,7 +1131,7 @@ getDesignInverseNormal <- function(
             userAlphaSpending = userAlphaSpending,
             userBetaSpending = userBetaSpending,
             gammaB = gammaB,
-            bindingFutility = bindingFutility,
+            bindingFutility = NA,
             directionUpper = directionUpper,
             betaAdjustment = betaAdjustment,
             constantBoundsHP = constantBoundsHP,
@@ -1576,12 +1578,26 @@ getDesignInverseNormal <- function(
 
     if (is.na(bindingFutility)) {
         bindingFutility <- C_BINDING_FUTILITY_DEFAULT
-    } else if (userFunctionCallEnabled && typeOfDesign != C_TYPE_OF_DESIGN_PT &&
-            !(typeBetaSpending == "bsP" || typeBetaSpending == "bsOF" || typeBetaSpending == "bsKD" ||
-                typeBetaSpending == "bsHSD" || typeBetaSpending == "bsUser") &&
-            ((!is.na(kMax) && kMax == 1) || any(is.na(futilityBounds)) ||
-                (!any(is.na(futilityBounds)) && all(futilityBounds == C_FUTILITY_BOUNDS_DEFAULT)))) {
-        warning("'bindingFutility' (", bindingFutility, ") will be ignored", call. = FALSE)
+    } else if (userFunctionCallEnabled && 
+            !identical(typeOfDesign, C_TYPE_OF_DESIGN_PT) &&
+            !grepl("^bs", typeBetaSpending)) {
+        if (!is.na(kMax) && kMax == 1) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because kMax = 1", call. = FALSE)
+        }
+        else if (any(is.na(futilityBounds))) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because 'futilityBounds' is not defined",
+                call. = FALSE
+            )
+        } 
+        else if (all(futilityBounds == C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+            warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
+                "because 'futilityBounds' (", .arrayToString(futilityBounds), ") ",
+                "is set to default values",
+                call. = FALSE
+            )
+        }
     }
 
     futilityBounds <- .applyDirectionOfAlternative(futilityBounds,
@@ -2036,7 +2052,8 @@ getDesignInverseNormal <- function(
 #' @param futilityBounds The futility bounds, defined on the scale defined by \code{futilityBoundsScale}.
 #'        (numeric vector of length \code{kMax - 1}).
 #' @param futilityBoundsScale Character. The scale of the futility bounds.
-#'        Must be one of \code{"zValue"}, \code{"pValue"}, or \code{"reverseCondPower"}.
+#'        Must be one of \code{"zValue"}, \code{"pValue"}, \code{"reverseCondPower"}, 
+#'        \code{"condPowerAtObserved"}, or \code{"predictivePower"}.
 #'        Default is \code{"zValue"}.
 #' @inheritParams param_bindingFutility
 #' @inheritParams param_directionUpper
@@ -2080,10 +2097,15 @@ getDesignInverseNormal <- function(
 #' @family design functions
 #'
 #' @template examples_get_design_group_sequential
+#' 
+#' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}} for the 
+#'     specification of futility bounds on scales other than the z-value scale.
+#' @seealso [Vignette: Enhanced Futility Bounds Specification](https://www.rpact.org/vignettes/planning/rpact_futility_bounds/)
 #'
 #' @export
 #'
-getDesignGroupSequential <- function(...,
+getDesignGroupSequential <- function(
+        ...,
         kMax = NA_integer_,
         alpha = NA_real_,
         beta = NA_real_,
@@ -2130,7 +2152,9 @@ getDesignGroupSequential <- function(...,
         futilityBoundsScale = c(
             "zValue",
             "pValue",
-            "reverseCondPower"
+            "reverseCondPower",
+            "condPowerAtObserved",
+            "predictivePower"
         ),
         directionUpper = NA,
         betaAdjustment = NA,
@@ -2169,7 +2193,7 @@ getDesignGroupSequential <- function(...,
             userAlphaSpending = userAlphaSpending,
             userBetaSpending = userBetaSpending,
             gammaB = gammaB,
-            bindingFutility = bindingFutility,
+            bindingFutility = NA,
             directionUpper = directionUpper,
             betaAdjustment = betaAdjustment,
             constantBoundsHP = constantBoundsHP,
