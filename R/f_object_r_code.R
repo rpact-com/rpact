@@ -922,7 +922,7 @@ getObjectRCode <- function(
                         next
                     } else {
                         alpha0Scale <- attr(value, "sourceScale")$value
-                        if (!is.null(alpha0Scale) && !identical(alpha0Scale, "zValue")) {
+                        if (!is.null(alpha0Scale) && !identical(alpha0Scale, "pValue")) {
                             value <- attr(value, "sourceValue")$value
                         } else {
                             alpha0Scale <- NULL

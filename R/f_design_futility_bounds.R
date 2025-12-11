@@ -245,6 +245,8 @@ summary.FutilityBounds <- function(object, ...) {
         }
         cat("\n")
     }
+    
+    return(invisible(object))
 }
 
 .getFutilityBoundsFromThreeDots <- function(...) {

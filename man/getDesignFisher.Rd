@@ -43,7 +43,7 @@ alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 
 \item{alpha0Vec}{Stopping for futility bounds for stage-wise p-values.}
 
 \item{alpha0Scale}{Character. The scale of the futility bounds.
-Must be one of \code{"pValue"}, \code{"zValue"}, or \code{"reverseCondPower"},
+Must be one of \code{"pValue"}, \code{"zValue"}, \code{"reverseCondPower"},
 \code{"condPowerAtObserved"}, or \code{"predictivePower"}.
 Default is \code{"pValue"}.}
 

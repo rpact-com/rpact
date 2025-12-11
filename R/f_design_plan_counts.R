@@ -667,16 +667,14 @@
     return(NA_real_)
 }
 
-.getMaximumSampleSizeTwoGroups <- function(
-        allocationRatioPlanned,
+.getMaximumSampleSizeTwoGroups <- function(allocationRatioPlanned,
         shift,
         accrualTime,
         followUpTime,
         lambda1,
         lambda2,
         thetaH0,
-        overdispersion
-        ) {
+        overdispersion) {
     tryCatch(
         {
             n2 <- stats::uniroot(
