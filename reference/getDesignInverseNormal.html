@@ -9,7 +9,7 @@ the inverse normal combination test."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.3.0.9296</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.3.0.9297</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,8 @@ the inverse normal combination test.</p>
 <span>  futilityStops <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  gammaB <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  bindingFutility <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  futilityBoundsScale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"zValue"</span>, <span class="st">"pValue"</span>, <span class="st">"reverseCondPower"</span><span class="op">)</span>,</span>
+<span>  futilityBoundsScale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"zValue"</span>, <span class="st">"pValue"</span>, <span class="st">"reverseCondPower"</span>, <span class="st">"condPowerAtObserved"</span>,</span>
+<span>    <span class="st">"predictivePower"</span><span class="op">)</span>,</span>
 <span>  directionUpper <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  betaAdjustment <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  constantBoundsHP <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -191,7 +192,8 @@ sense that the study must be stopped if the futility condition was reached (defa
 
 <dt id="arg-futilityboundsscale">futilityBoundsScale<a class="anchor" aria-label="anchor" href="#arg-futilityboundsscale"></a></dt>
 <dd><p>Character. The scale of the futility bounds.
-Must be one of <code>"zValue"</code>, <code>"pValue"</code>, or <code>"reverseCondPower"</code>.
+Must be one of <code>"zValue"</code>, <code>"pValue"</code>, <code>"reverseCondPower"</code>,
+<code>"condPowerAtObserved"</code>, or <code>"predictivePower"</code>.
 Default is <code>"zValue"</code>.</p></dd>
 
 

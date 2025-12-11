@@ -77,6 +77,14 @@ If the `sourceScale` and `targetScale` are the same, the function
 returns the input `sourceValue` without modification. Otherwise, the
 function is designed to convert between the specified scales.
 
+## See also
+
+[`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md),
+[`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md),
+[`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md)
+for direct specification of futility bounds on different scales using
+the argument `futilityBoundsScale`.
+
 ## Examples
 
 ``` r

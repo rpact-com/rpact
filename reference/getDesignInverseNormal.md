@@ -28,7 +28,8 @@ getDesignInverseNormal(
   futilityStops = NA,
   gammaB = NA_real_,
   bindingFutility = NA,
-  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower"),
+  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower", "condPowerAtObserved",
+    "predictivePower"),
   directionUpper = NA,
   betaAdjustment = NA,
   constantBoundsHP = 3,
@@ -159,8 +160,8 @@ getDesignInverseNormal(
 - futilityBoundsScale:
 
   Character. The scale of the futility bounds. Must be one of
-  `"zValue"`, `"pValue"`, or `"reverseCondPower"`. Default is
-  `"zValue"`.
+  `"zValue"`, `"pValue"`, `"reverseCondPower"`, `"condPowerAtObserved"`,
+  or `"predictivePower"`. Default is `"zValue"`.
 
 - directionUpper:
 

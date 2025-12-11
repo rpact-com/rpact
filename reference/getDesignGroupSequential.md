@@ -27,7 +27,8 @@ getDesignGroupSequential(
   futilityStops = NA,
   gammaB = NA_real_,
   bindingFutility = NA,
-  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower"),
+  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower", "condPowerAtObserved",
+    "predictivePower"),
   directionUpper = NA,
   betaAdjustment = NA,
   constantBoundsHP = 3,
@@ -159,8 +160,8 @@ getDesignGroupSequential(
 - futilityBoundsScale:
 
   Character. The scale of the futility bounds. Must be one of
-  `"zValue"`, `"pValue"`, or `"reverseCondPower"`. Default is
-  `"zValue"`.
+  `"zValue"`, `"pValue"`, `"reverseCondPower"`, `"condPowerAtObserved"`,
+  or `"predictivePower"`. Default is `"zValue"`.
 
 - directionUpper:
 
@@ -256,6 +257,13 @@ documentation linked above by typing
 
 [`getDesignSet()`](https://docs.rpact.org/reference/getDesignSet.md) for
 creating a set of designs to compare different designs.
+
+[`getFutilityBounds()`](https://docs.rpact.org/reference/getFutilityBounds.md)
+for the specification of futility bounds on scales other than the
+z-value scale.
+
+[Vignette: Enhanced Futility Bounds
+Specification](https://www.rpact.org/vignettes/planning/rpact_futility_bounds/)
 
 Other design functions:
 [`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.md),

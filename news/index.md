@@ -94,6 +94,11 @@ CRAN release: 2025-03-24
   `options("rpact.plot.show.alpha.spent" = FALSE)` or argument
   `showAlphaSpent = FALSE` can be used to show only beta-spending in the
   plot
+- [`getSampleSizeMeans()`](https://docs.rpact.org/reference/getSampleSizeMeans.md),
+  [`getPowerMeans()`](https://docs.rpact.org/reference/getPowerMeans.md),
+  [`getSimulationMeans()`](https://docs.rpact.org/reference/getSimulationMeans.md):
+  For two-armed trials, it is allowed to specify the standard deviations
+  (`stDev`) separately, i.e., as vector with two elements.
 
 ### Improvements, issues, and changes
 

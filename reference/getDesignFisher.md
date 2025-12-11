@@ -13,6 +13,8 @@ getDesignFisher(
   method = c("equalAlpha", "fullAlpha", "noInteraction", "userDefinedAlpha"),
   userAlphaSpending = NA_real_,
   alpha0Vec = NA_real_,
+  alpha0Scale = c("pValue", "zValue", "reverseCondPower", "condPowerAtObserved",
+    "predictivePower"),
   informationRates = NA_real_,
   sided = 1,
   bindingFutility = NA,
@@ -57,6 +59,12 @@ getDesignFisher(
 - alpha0Vec:
 
   Stopping for futility bounds for stage-wise p-values.
+
+- alpha0Scale:
+
+  Character. The scale of the futility bounds. Must be one of
+  `"pValue"`, `"zValue"`, `"reverseCondPower"`, `"condPowerAtObserved"`,
+  or `"predictivePower"`. Default is `"pValue"`.
 
 - informationRates:
 
@@ -150,6 +158,13 @@ documentation linked above by typing
 
 [`getDesignSet()`](https://docs.rpact.org/reference/getDesignSet.md) for
 creating a set of designs to compare.
+
+[`getFutilityBounds()`](https://docs.rpact.org/reference/getFutilityBounds.md)
+for the specification of futility bounds on scales other than the
+p-value scale.
+
+[Vignette: Enhanced Futility Bounds
+Specification](https://www.rpact.org/vignettes/planning/rpact_futility_bounds/)
 
 Other design functions:
 [`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.md),
