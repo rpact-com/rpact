@@ -11,8 +11,7 @@ getDesignFisher(
   method = c("equalAlpha", "fullAlpha", "noInteraction", "userDefinedAlpha"),
   userAlphaSpending = NA_real_,
   alpha0Vec = NA_real_,
-  alpha0Scale = c("pValue", "zValue", "reverseCondPower", "condPowerAtObserved",
-    "predictivePower"),
+  alpha0Scale = c("pValue", "zValue", "condPowerAtObserved", "predictivePower"),
   informationRates = NA_real_,
   sided = 1,
   bindingFutility = NA,
@@ -43,7 +42,7 @@ alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 
 \item{alpha0Vec}{Stopping for futility bounds for stage-wise p-values.}
 
 \item{alpha0Scale}{Character. The scale of the futility bounds.
-Must be one of \code{"pValue"}, \code{"zValue"}, \code{"reverseCondPower"},
+Must be one of \code{"pValue"}, \code{"zValue"},
 \code{"condPowerAtObserved"}, or \code{"predictivePower"}.
 Default is \code{"pValue"}.}
 

@@ -78,8 +78,7 @@ NULL
     }
 
     if (any(is.na(c(information1, information2))) &&
-            !is.null(design) && .isTrialDesign(design) &&
-            !.isTrialDesignConditionalDunnett(design) &&
+            !is.null(design) && .isTrialDesignInverseNormalOrGroupSequentialOrFisher(design) &&
             (sourceScale %in% c("predictivePower", "condPowerAtObserved") ||
                 targetScale %in% c("predictivePower", "condPowerAtObserved"))) {
         .assertIsValidDesignForFutilityBoundsConversion(design, sourceScale, targetScale)

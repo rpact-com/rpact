@@ -37,7 +37,7 @@ NULL
 #' @inheritParams param_userAlphaSpending
 #' @param alpha0Vec Stopping for futility bounds for stage-wise p-values.
 #' @param alpha0Scale Character. The scale of the futility bounds.
-#'        Must be one of \code{"pValue"}, \code{"zValue"}, \code{"reverseCondPower"}, 
+#'        Must be one of \code{"pValue"}, \code{"zValue"}, 
 #'        \code{"condPowerAtObserved"}, or \code{"predictivePower"}.
 #'        Default is \code{"pValue"}.
 #' @inheritParams param_informationRates
@@ -82,7 +82,6 @@ getDesignFisher <- function(
         alpha0Scale = c(
             "pValue",
             "zValue",
-            "reverseCondPower",
             "condPowerAtObserved",
             "predictivePower"
         ),

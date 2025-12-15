@@ -867,8 +867,7 @@ getObjectRCode <- function(
                 futilityBoundsScale <- NULL
                 if (objName == "futilityBounds" && is(value, "FutilityBounds")) {
                     sourceScale <- attr(value, "sourceScale")$value
-                    if (!is.null(sourceScale) && sourceScale %in%
-                            c("conditionalPower", "effectEstimate")) {
+                    if (!is.null(sourceScale) && sourceScale %in% c("conditionalPower", "effectEstimate")) {
                         precondition <- c(
                             precondition,
                             getObjectRCode(
@@ -900,8 +899,7 @@ getObjectRCode <- function(
                 alpha0Scale <- NULL
                 if (objName == "alpha0Vec" && is(value, "FutilityBounds")) {
                     sourceScale <- attr(value, "sourceScale")$value
-                    if (!is.null(sourceScale) && sourceScale %in%
-                            c("conditionalPower", "condPowerAtObserved", "predictivePower", "effectEstimate")) {
+                    if (!is.null(sourceScale) && sourceScale %in% c("conditionalPower", "effectEstimate")) {
                         precondition <- c(
                             precondition,
                             getObjectRCode(
