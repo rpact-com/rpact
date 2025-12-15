@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.3.0.9297</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,8 +49,7 @@
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"equalAlpha"</span>, <span class="st">"fullAlpha"</span>, <span class="st">"noInteraction"</span>, <span class="st">"userDefinedAlpha"</span><span class="op">)</span>,</span>
 <span>  userAlphaSpending <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  alpha0Vec <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
-<span>  alpha0Scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pValue"</span>, <span class="st">"zValue"</span>, <span class="st">"reverseCondPower"</span>, <span class="st">"condPowerAtObserved"</span>,</span>
-<span>    <span class="st">"predictivePower"</span><span class="op">)</span>,</span>
+<span>  alpha0Scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pValue"</span>, <span class="st">"zValue"</span>, <span class="st">"condPowerAtObserved"</span>, <span class="st">"predictivePower"</span><span class="op">)</span>,</span>
 <span>  informationRates <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
 <span>  sided <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bindingFutility <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -98,7 +97,7 @@ alpha-spending (Type I error rate) up to each interim stage: <code>0 &lt;= alpha
 
 <dt id="arg-alpha-scale">alpha0Scale<a class="anchor" aria-label="anchor" href="#arg-alpha-scale"></a></dt>
 <dd><p>Character. The scale of the futility bounds.
-Must be one of <code>"pValue"</code>, <code>"zValue"</code>, <code>"reverseCondPower"</code>,
+Must be one of <code>"pValue"</code>, <code>"zValue"</code>,
 <code>"condPowerAtObserved"</code>, or <code>"predictivePower"</code>.
 Default is <code>"pValue"</code>.</p></dd>
 

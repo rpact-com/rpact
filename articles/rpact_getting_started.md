@@ -77,7 +77,7 @@ functions have intuitive names:
 - [`getAnalysisResults()`](https://docs.rpact.org/reference/getAnalysisResults.html)
 - [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.html)
 
-[RStudio](https://www.rstudio.com/) /
+[RStudio](https://posit.co/downloads/) /
 [Positron](https://positron.posit.co/) /
 [Eclipse](https://www.eclipse.org): auto code completion makes it easy
 to use these functions.

@@ -13,8 +13,7 @@ getDesignFisher(
   method = c("equalAlpha", "fullAlpha", "noInteraction", "userDefinedAlpha"),
   userAlphaSpending = NA_real_,
   alpha0Vec = NA_real_,
-  alpha0Scale = c("pValue", "zValue", "reverseCondPower", "condPowerAtObserved",
-    "predictivePower"),
+  alpha0Scale = c("pValue", "zValue", "condPowerAtObserved", "predictivePower"),
   informationRates = NA_real_,
   sided = 1,
   bindingFutility = NA,
@@ -63,8 +62,8 @@ getDesignFisher(
 - alpha0Scale:
 
   Character. The scale of the futility bounds. Must be one of
-  `"pValue"`, `"zValue"`, `"reverseCondPower"`, `"condPowerAtObserved"`,
-  or `"predictivePower"`. Default is `"pValue"`.
+  `"pValue"`, `"zValue"`, `"condPowerAtObserved"`, or
+  `"predictivePower"`. Default is `"pValue"`.
 
 - informationRates:
 

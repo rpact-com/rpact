@@ -9,7 +9,7 @@ downloads](https://cranlogs.r-pkg.org/badges/rpact?color=blue)](https://CRAN.R-p
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![License: LGPL
-v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://cran.r-project.org/web/licenses/LGPL-3)
 [![Codecov test
 coverage](https://codecov.io/gh/rpact-com/rpact/branch/main/graph/badge.svg)](https://app.codecov.io/gh/rpact-com/rpact?branch=main)
 [![](https://img.shields.io/badge/DOI-10.1007/978--3--031--89669--9-yellow.svg?logo=doi)](https://doi.org/10.1007/978-3-031-89669-9)
