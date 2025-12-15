@@ -187,6 +187,22 @@ NULL
     }
 }
 
+.isTrialDesignInverseNormalOrGroupSequentialOrFisher <- function(design) {
+    return(.isTrialDesignInverseNormalOrGroupSequential(design) || .isTrialDesignFisher(design))
+}
+
+.assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher <- function(design) {
+    if (!.isTrialDesignInverseNormalOrGroupSequentialOrFisher(design)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'design' must be an instance of class ",
+            "'TrialDesignInverseNormal', 'TrialDesignGroupSequential', or 'TrialDesignFisher' (is '",
+            .getClassName(design), "')",
+            call. = FALSE
+        )
+    }
+}
+
 .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher <- function(design) {
     if (!.isTrialDesignInverseNormalOrGroupSequential(design) && !.isTrialDesignFisher(design)) {
         stop(
