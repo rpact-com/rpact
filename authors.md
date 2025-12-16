@@ -21,7 +21,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/rpact-com/rpact/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/rpact-com/rpact/blob/v4.3.0/inst/CITATION)
 
 Wassmer G, Pahlke F (2025). *rpact: Confirmatory Adaptive Clinical Trial
 Design and Analysis*.
