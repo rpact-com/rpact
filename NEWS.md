@@ -5,6 +5,11 @@
 * The new function `getFutilityBounds()` converts futility bounds between different 
   scales such as z-value, p-value, conditional power, predictive power, reverse conditional
   power, and effect estimate.
+* The new argument `futilityBoundsScale` in `getDesignInverseNormal()` and
+  `getDesignGroupSequential()` allows specifying futility bounds directly
+  on alternative scales (e.g. p-value), which are internally converted as needed.
+* The new argument `alpha0Scale` in `getDesignFisher()` allows specifying alpha0 bounds directly
+  on alternative scales, which are internally converted as needed.
 
 ## Improvements, issues, and changes
 
@@ -12,6 +17,7 @@
 * Issue [#94](https://github.com/rpact-com/rpact/issues/94) fixed
 * Issue [#99](https://github.com/rpact-com/rpact/issues/99) fixed
 * Testing improved, e.g., new helper function `getTestLabel()` introduced
+* Several minor improvements
 
 
 # rpact 4.2.1

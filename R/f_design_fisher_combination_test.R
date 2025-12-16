@@ -115,6 +115,14 @@ getDesignFisher <- function(
         )
     }
     
+    if (alpha0Scale %in% c("condPowerAtObserved", "predictivePower")) {
+        .assertIsNumericVector(alpha0Vec, "alpha0Vec")
+        if (!all(is.na(alpha0Vec))) {
+            eps <- ifelse(identical(alpha0Scale, "condPowerAtObserved"), 1e-08, 0.00002)
+            alpha0Vec[!is.na(alpha0Vec) & alpha0Vec < eps] <- eps
+        }
+    }
+    
     alpha0Vec <- .getFutilityBoundsFromArgs(
         futilityBounds = alpha0Vec,
         futilityBoundsScale = alpha0Scale, 
@@ -122,6 +130,9 @@ getDesignFisher <- function(
         design = design,
         fisherDesign = TRUE,
         ...) 
+    if (alpha0Scale %in% c("condPowerAtObserved", "predictivePower")) {
+        alpha0Vec[!is.na(alpha0Vec) & alpha0Vec > 0.9971] <- 1
+    }
 
     return(.getDesignFisher(
         kMax = kMax, 
