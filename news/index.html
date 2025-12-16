@@ -40,6 +40,8 @@
 <div class="section level3">
 <h3 id="new-features-4-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-3-0"></a></h3>
 <ul><li>The new function <code><a href="../reference/getFutilityBounds.html">getFutilityBounds()</a></code> converts futility bounds between different scales such as z-value, p-value, conditional power, predictive power, reverse conditional power, and effect estimate.</li>
+<li>The new argument <code>futilityBoundsScale</code> in <code><a href="../reference/getDesignInverseNormal.html">getDesignInverseNormal()</a></code> and <code><a href="../reference/getDesignGroupSequential.html">getDesignGroupSequential()</a></code> allows specifying futility bounds directly on alternative scales (e.g. p-value), which are internally converted as needed.</li>
+<li>The new argument <code>alpha0Scale</code> in <code><a href="../reference/getDesignFisher.html">getDesignFisher()</a></code> allows specifying alpha0 bounds directly on alternative scales, which are internally converted as needed.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-3-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-3-0"></a></h3>
@@ -47,6 +49,7 @@
 <li>Issue <a href="https://github.com/rpact-com/rpact/issues/94" class="external-link">#94</a> fixed</li>
 <li>Issue <a href="https://github.com/rpact-com/rpact/issues/99" class="external-link">#99</a> fixed</li>
 <li>Testing improved, e.g., new helper function <code><a href="../reference/getTestLabel.html">getTestLabel()</a></code> introduced</li>
+<li>Several minor improvements</li>
 </ul></div>
 </div>
     <div class="section level2">
