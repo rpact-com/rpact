@@ -780,11 +780,11 @@ updateTreatmentsVector <- function(k,
                     simulatedSelections[k, i, ] <- simulatedSelections[k, i, ] + closedTest$selectedArms[, k]
                     simulatedNumberOfActiveArms[k, i] <- simulatedNumberOfActiveArms[k, i] +
                         sum(closedTest$selectedArms[, k])
-                    if (!any(is.na(closedTest$successStop))) {
+                    if (!anyNA(closedTest$successStop)) {
                         simulatedSuccessStopping[k, i] <- simulatedSuccessStopping[k, i] + closedTest$successStop[k]
                     }
                     if ((kMax > 1) && (k < kMax)) {
-                        if (!any(is.na(closedTest$futilityStop))) {
+                        if (!anyNA(closedTest$futilityStop)) {
                             simulatedFutilityStopping[k, i] <- simulatedFutilityStopping[k, i] +
                                 (closedTest$futilityStop[k] && !closedTest$successStop[k])
                         }
