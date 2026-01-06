@@ -1160,7 +1160,7 @@ List performSimulationMultiArmSurvivalLoop(
 	}
 	
 	// Filter out NA rows in effectEstimate
-	LogicalVector validRows = !is_na(dataEffectEstimate);
+	LogicalVector validRows = !is_na(dataEffectEstimate); // rep(true, dataEffectEstimate.length());  // 
 	
 	// Create data frame
     dataConditionalCriticalValue = round(dataConditionalCriticalValue, 6);

@@ -858,12 +858,12 @@ updateTreatmentsVector <- function(k,
         }
 
         for (g in 1:(gMax + 1)) {
-            simulatedSingleEventsPerStage[, i, g] <- simulatedSingleEventsPerStage[, i, g] / iterations[, i]
+            simulatedSingleEventsPerStage[, i, g] <- simulatedSingleEventsPerStage[, i, g] / pmax(iterations[, i], 1)
         }
-        simulatedPlannedEvents[, i] <- simulatedPlannedEvents[, i] / iterations[, i]
-        simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / iterations[, i]
-        simulatedAnalysisTime[, i] <- simulatedAnalysisTime[, i] / iterations[, i]
-        simulatedNumberOfActiveArms[, i] <- simulatedNumberOfActiveArms[, i] / iterations[, i]
+        simulatedPlannedEvents[, i] <- simulatedPlannedEvents[, i] / pmax(iterations[, i], 1)
+        simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / pmax(iterations[, i], 1)
+        simulatedAnalysisTime[, i] <- simulatedAnalysisTime[, i] / pmax(iterations[, i], 1)
+        simulatedNumberOfActiveArms[, i] <- simulatedNumberOfActiveArms[, i] / pmax(iterations[, i], 1)
 
         if (kMax > 1) {
             simulatedRejections[2:kMax, i, ] <- simulatedRejections[2:kMax, i, ] -
