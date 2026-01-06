@@ -5,6 +5,7 @@
 #include "f_analysis_base.h"
 #include "f_utilities.h"
 #include "rpact_types.h"
+#include "f_simulation_multiarm.h"
 
 using namespace Rcpp;
 

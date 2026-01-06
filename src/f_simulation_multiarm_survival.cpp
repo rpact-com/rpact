@@ -764,3 +764,443 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
     );
 }
 
+// Perform Simulation Multi-Arm Survival Loop
+//
+// Performs the main simulation loop for multi-arm survival simulation
+//
+// @param cols Number of effect scenarios  
+// @param maxNumberOfIterations Maximum number of iterations per scenario
+// @param design Trial design object
+// @param weights Numeric vector of weights per stage
+// @param directionUpper Direction of test
+// @param effectMatrix Matrix of effects (rows: scenarios, columns: arms)
+// @param omegaMaxVector Vector of omega max values per scenario
+// @param piControl Control group hazard
+// @param kappa Shape parameter for Weibull distribution
+// @param phi Dropout rates for treatment groups
+// @param eventTime Event time
+// @param plannedEvents Planned events per stage
+// @param recruitmentTimes Recruitment times
+// @param typeOfSelection Type of arm selection
+// @param effectMeasure Effect measure type
+// @param adaptations Adaptation indicators per stage
+// @param epsilonValue Epsilon value for selection
+// @param rValue R value for selection
+// @param threshold Threshold for selection
+// @param allocationFraction Allocation fractions
+// @param minNumberOfEventsPerStage Minimum events per stage
+// @param maxNumberOfEventsPerStage Maximum events per stage
+// @param conditionalPower Conditional power
+// @param thetaH1 Alternative hypothesis hazard ratio
+// @param calcEventsFunction Events calculation function
+// @param calcEventsFunctionIsUserDefined Whether calc function is user defined
+// @param selectArmsFunction Arm selection function
+// @param indices Matrix of indices for intersection hypotheses
+// @param intersectionTest String specifying intersection test method
+// @param criticalValuesDunnett Critical values for Dunnett test (can be NULL)
+// @param successCriterion String specifying success criterion
+// @param gMax Number of arms
+// @param kMax Number of stages
+//
+// [[Rcpp::export(name = ".performSimulationMultiArmSurvivalLoopCpp")]]
+List performSimulationMultiArmSurvivalLoop(
+		int cols,
+		int maxNumberOfIterations,
+		Environment design,
+        NumericVector weights,
+		bool directionUpper,
+		NumericMatrix effectMatrix,
+		NumericVector omegaMaxVector,
+		double piControl,
+		double kappa,
+		NumericVector phi,
+		double eventTime,
+		NumericVector plannedEvents,
+		NumericVector recruitmentTimes,
+		std::string typeOfSelection,
+		std::string effectMeasure,
+		LogicalVector adaptations,
+		double epsilonValue,
+		double rValue,
+		double threshold,
+		IntegerVector allocationFraction,
+		NumericVector minNumberOfEventsPerStage,
+		NumericVector maxNumberOfEventsPerStage,
+		double conditionalPower,
+		double thetaH1,
+		Nullable<Function> calcEventsFunction,
+		bool calcEventsFunctionIsUserDefined,
+		Nullable<Function> selectArmsFunction,
+		LogicalMatrix indices,
+		std::string intersectionTest,
+		Nullable<NumericVector> criticalValuesDunnett,
+		std::string successCriterion,
+		int gMax,
+		int kMax) {
+	// Initialize simulation result matrices
+	IntegerMatrix simulatedNumberEventsNotAchieved(kMax, cols);
+	NumericMatrix simulatedAnalysisTime(kMax, cols);
+	NumericMatrix simulatedNumberOfSubjects(kMax, cols);
+	// This is how an array() is created in Rcpp: Create a NumericVector and set the "dim" attribute.
+	NumericVector simulatedSelections(kMax * cols * gMax);
+	simulatedSelections.attr("dim") = IntegerVector::create(kMax, cols, gMax);
+	NumericVector simulatedRejections(kMax * cols * gMax);
+	simulatedRejections.attr("dim") = IntegerVector::create(kMax, cols, gMax);
+	NumericMatrix simulatedNumberOfActiveArms(kMax, cols);
+	NumericVector simulatedSingleEventsPerStage(kMax * cols * (gMax + 1));
+	simulatedSingleEventsPerStage.attr("dim") = IntegerVector::create(kMax, cols, gMax + 1);
+	NumericMatrix simulatedPlannedEvents(kMax, cols);
+	NumericMatrix simulatedSuccessStopping(kMax, cols);
+	NumericMatrix simulatedFutilityStopping(kMax - 1, cols);
+	NumericMatrix simulatedConditionalPower(kMax, cols);
+	NumericVector simulatedRejectAtLeastOne(cols);
+	NumericVector expectedNumberOfEvents(cols);
+	NumericVector expectedNumberOfSubjects(cols);
+	NumericVector expectedStudyDuration(cols);
+	NumericMatrix iterations(kMax, cols);
+	
+	// Initialize all these with zeros
+	std::fill(simulatedNumberEventsNotAchieved.begin(), simulatedNumberEventsNotAchieved.end(), 0);
+	std::fill(simulatedAnalysisTime.begin(), simulatedAnalysisTime.end(), 0.0);
+	std::fill(simulatedNumberOfSubjects.begin(), simulatedNumberOfSubjects.end(), 0.0);
+	std::fill(simulatedSelections.begin(), simulatedSelections.end(), 0.0);
+	std::fill(simulatedRejections.begin(), simulatedRejections.end(), 0.0);
+	std::fill(simulatedNumberOfActiveArms.begin(), simulatedNumberOfActiveArms.end(), 0.0);
+	std::fill(simulatedSingleEventsPerStage.begin(), simulatedSingleEventsPerStage.end(), 0.0);
+	std::fill(simulatedPlannedEvents.begin(), simulatedPlannedEvents.end(), 0.0);
+	std::fill(simulatedSuccessStopping.begin(), simulatedSuccessStopping.end(), 0.0);
+	std::fill(simulatedFutilityStopping.begin(), simulatedFutilityStopping.end(), 0.0);
+	std::fill(simulatedConditionalPower.begin(), simulatedConditionalPower.end(), 0.0);
+	std::fill(simulatedRejectAtLeastOne.begin(), simulatedRejectAtLeastOne.end(), 0.0);
+	std::fill(expectedNumberOfEvents.begin(), expectedNumberOfEvents.end(), 0.0);
+	std::fill(expectedNumberOfSubjects.begin(), expectedNumberOfSubjects.end(), 0.0);
+	std::fill(expectedStudyDuration.begin(), expectedStudyDuration.end(), 0.0);
+	std::fill(iterations.begin(), iterations.end(), 0.0);
+	
+	// Initialize data collection vectors
+	int len = maxNumberOfIterations * kMax * gMax * cols;
+	NumericVector dataIterationNumber(len, NA_REAL);
+	NumericVector dataStageNumber(len, NA_REAL);
+	NumericVector dataArmNumber(len, NA_REAL);
+	NumericVector dataAlternative(len, NA_REAL);
+	NumericVector dataEffect(len, NA_REAL);
+	NumericVector dataAnalysisTime(len, NA_REAL);
+	NumericVector dataNumberOfSubjects(len, NA_REAL);
+	NumericVector dataNumberOfEvents(len, NA_REAL);
+	LogicalVector dataRejectPerStage(len, NA_LOGICAL);
+	LogicalVector dataFutilityStop(len, NA_LOGICAL);
+	LogicalVector dataSuccessStop(len, NA_LOGICAL);
+	NumericVector dataTestStatistics(len, NA_REAL);
+	NumericVector dataConditionalCriticalValue(len, NA_REAL);
+	NumericVector dataConditionalPowerAchieved(len, NA_REAL);
+	NumericVector dataEffectEstimate(len, NA_REAL);
+	NumericVector dataPValuesSeparate(len, NA_REAL);
+	
+	// Check design type
+	bool isDesignConditionalDunnett = (getClassName(design) == "TrialDesignConditionalDunnett");
+	
+	int index = 0;
+	
+	// Main simulation loop
+	for (int i = 0; i < cols; i++) {
+		for (int j = 0; j < maxNumberOfIterations; j++) {
+			NumericVector omegaVectorThisScenario = effectMatrix(i, _);
+			
+			List stageResults = getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
+				design,
+				weights,
+				directionUpper,
+				omegaVectorThisScenario,
+				piControl,
+				kappa,
+				phi,
+				eventTime,
+				plannedEvents,
+				recruitmentTimes,
+				allocationFraction,
+				typeOfSelection,
+				effectMeasure,
+				adaptations,
+				epsilonValue,
+				rValue,
+				threshold,
+				minNumberOfEventsPerStage,
+				maxNumberOfEventsPerStage,
+				conditionalPower,
+				thetaH1,
+				calcEventsFunction,
+				calcEventsFunctionIsUserDefined,
+				selectArmsFunction
+			);
+			
+			List closedTest;
+			if (isDesignConditionalDunnett) {
+				closedTest = performClosedConditionalDunnettTestForSimulation(
+					stageResults,
+					design,
+					indices,
+					criticalValuesDunnett.get(),
+					successCriterion
+				);
+			} else {
+				closedTest = performClosedCombinationTestForSimulationMultiArm(
+					stageResults,
+					design,
+					indices,
+					intersectionTest,
+					successCriterion
+				);
+			}
+			
+			bool rejectAtSomeStage = false;
+			LogicalVector rejectedArmsBefore(gMax, false);
+			
+			// Extract stage results components
+			LogicalVector eventsNotAchieved = stageResults["eventsNotAchieved"];
+			NumericVector analysisTime = stageResults["analysisTime"];
+			IntegerVector numberOfSubjects = stageResults["numberOfSubjects"];
+			NumericMatrix singleEventsPerStage = stageResults["singleEventsPerStage"];
+			NumericMatrix cumulativeEventsPerStage = stageResults["cumulativeEventsPerStage"];
+			NumericMatrix testStatistics = stageResults["testStatistics"];
+			NumericMatrix overallEffects = stageResults["overallEffects"];
+			NumericMatrix separatePValues = stageResults["separatePValues"];
+			NumericVector conditionalCriticalValue = stageResults["conditionalCriticalValue"];
+			NumericVector conditionalPowerPerStage = stageResults["conditionalPowerPerStage"];
+			LogicalMatrix selectedArms = stageResults["selectedArms"];
+			
+			// Extract closed test results
+			LogicalMatrix rejected = closedTest["rejected"];
+			LogicalMatrix selectedArmsTest = closedTest["selectedArms"];
+			LogicalVector successStop = closedTest["successStop"];
+			LogicalVector futilityStop = closedTest["futilityStop"];
+			NumericMatrix separatePValuesTest = closedTest["separatePValues"];
+			
+			// Loop over stages
+			for (int k = 0; k < kMax; k++) {
+				if (eventsNotAchieved[k]) {
+					simulatedNumberEventsNotAchieved(k, i)++;
+				} else {
+					simulatedAnalysisTime(k, i) += analysisTime[k];
+					simulatedNumberOfSubjects(k, i) += numberOfSubjects[k];
+					
+					// Update rejections - need to combine rejected and selected arms or previously rejected
+					for (int g = 0; g < gMax; g++) {
+						if ((rejected(g, k) && selectedArmsTest(g, k)) || rejectedArmsBefore[g]) {
+							simulatedRejections[k + i * kMax + g * kMax * cols]++;
+						}
+						if (selectedArmsTest(g, k)) {
+							simulatedSelections[k + i * kMax + g * kMax * cols]++;
+						}
+					}
+					
+					// Count active arms
+					simulatedNumberOfActiveArms(k, i) += sum(selectedArmsTest(_, k));
+					
+					bool successStopComplete = !Rcpp::as<bool>(any(is_na(successStop)));
+					if (successStopComplete) {
+						simulatedSuccessStopping(k, i) += successStop[k];
+					}
+					
+					if ((kMax > 1) && (k < kMax - 1)) {
+						bool futilityStopComplete = !Rcpp::as<bool>(any(is_na(futilityStop)));
+						if (futilityStopComplete) {
+							if (futilityStop[k] && !successStop[k]) {
+								simulatedFutilityStopping(k, i)++;
+							}
+						}
+						if (!successStop[k] && !futilityStop[k]) {
+							simulatedConditionalPower(k + 1, i) += conditionalPowerPerStage[k];
+						}
+					}
+					
+					// Update single events per stage
+					for (int g = 0; g < gMax; g++) {
+						if (!R_IsNA(cumulativeEventsPerStage(g, k))) {
+							simulatedSingleEventsPerStage[k + i * kMax + g * kMax * cols] += 
+								singleEventsPerStage(g, k);
+						}
+					}
+					simulatedSingleEventsPerStage[k + i * kMax + gMax * kMax * cols] += 
+						singleEventsPerStage(gMax, k);					
+					simulatedPlannedEvents(k, i) += sum(na_omit(singleEventsPerStage(_, k)));
+
+					iterations(k, i)++;
+					
+					// Collect detailed data
+					for (int g = 0; g < gMax; g++) {
+						dataIterationNumber[index] = j + 1; // Careful: R uses 1-based indexing
+						dataStageNumber[index] = k + 1;
+						dataArmNumber[index] = g + 1;
+						dataAlternative[index] = omegaMaxVector[i];
+						dataEffect[index] = effectMatrix(i, g);
+						dataAnalysisTime[index] = analysisTime[k];
+						dataNumberOfSubjects[index] = numberOfSubjects[k];
+						dataNumberOfEvents[index] = round(cumulativeEventsPerStage(g, k), 1);
+						dataRejectPerStage[index] = rejected(g, k);
+						dataTestStatistics[index] = testStatistics(g, k);
+						dataSuccessStop[index] = successStop[k];
+						if (k < kMax - 1) {
+							dataFutilityStop[index] = futilityStop[k];
+							dataConditionalCriticalValue[index] = conditionalCriticalValue[k];
+							dataConditionalPowerAchieved[index + 1] = conditionalPowerPerStage[k];
+						}
+						dataEffectEstimate[index] = overallEffects(g, k);
+						dataPValuesSeparate[index] = separatePValuesTest(g, k);
+						index++;
+					}
+					
+                    // Check if at least one hypothesis is rejected
+                    if (!rejectAtSomeStage) {
+                        bool anyRejected = false;
+                        for (int g = 0; g < gMax; g++) {
+                            if ((rejected(g, k) && selectedArmsTest(g, k)) || rejectedArmsBefore[g]) {
+                                anyRejected = true;
+                                break;
+                            }
+                        }
+                        if (anyRejected) {
+                            simulatedRejectAtLeastOne[i]++;
+                            rejectAtSomeStage = true;
+                        }
+                    }
+					
+					// Early stopping
+					if ((k < kMax - 1) && (successStop[k] || futilityStop[k])) {
+						// Rejected hypotheses remain rejected also in case of early stopping
+						for (int l = k + 1; l < kMax; l++) {
+							for (int g = 0; g < gMax; g++) {
+								if ((rejected(g, k) && selectedArmsTest(g, k)) || rejectedArmsBefore[g]) {
+									simulatedRejections[l + i * kMax + g * kMax * cols]++;
+								}
+							}
+						}
+						break;
+					}
+					
+					// Update rejected arms
+					for (int g = 0; g < gMax; g++) {
+						if ((rejected(g, k) && selectedArmsTest(g, k)) || rejectedArmsBefore[g]) {
+							rejectedArmsBefore[g] = true;
+						}
+					}
+				}
+			}
+		}
+		
+		// Post-processing for this scenario
+		for (int g = 0; g <= gMax; g++) {
+			for (int k = 0; k < kMax; k++) {
+				if (iterations(k, i) > 0) {
+					simulatedSingleEventsPerStage[k + i * kMax + g * kMax * cols] /= iterations(k, i);
+				}
+			}
+		}
+		
+		for (int k = 0; k < kMax; k++) {
+			if (iterations(k, i) > 0) {
+				simulatedPlannedEvents(k, i) /= iterations(k, i);
+				simulatedNumberOfSubjects(k, i) /= iterations(k, i);
+				simulatedAnalysisTime(k, i) /= iterations(k, i);
+				simulatedNumberOfActiveArms(k, i) /= iterations(k, i);
+			}
+		}
+		
+		if (kMax > 1) {
+			// Adjust rejections for stage-wise differences		
+			// Need to process in reverse order to avoid using modified values
+			for (int k = kMax - 1; k >= 1; k--) {
+				for (int g = 0; g < gMax; g++) {
+					simulatedRejections[k + i * kMax + g * kMax * cols] -= 
+						simulatedRejections[(k - 1) + i * kMax + g * kMax * cols];
+				}
+			}
+			
+			// Calculate expected values
+			NumericVector stopping(kMax - 1);
+			for (int k = 0; k < kMax - 1; k++) {
+				stopping[k] = (simulatedSuccessStopping(k, i) + simulatedFutilityStopping(k, i)) / 
+					maxNumberOfIterations;
+			}
+			NumericVector cumStopping = cumsum(stopping);
+			
+			expectedNumberOfEvents[i] = simulatedPlannedEvents(0, i);
+			expectedNumberOfSubjects[i] = simulatedNumberOfSubjects(0, i);
+			expectedStudyDuration[i] = simulatedAnalysisTime(0, i);
+			
+			for (int k = 1; k < kMax; k++) {
+				double factor = 1.0 - cumStopping[k - 1];
+				expectedNumberOfEvents[i] += factor * 
+					(simulatedPlannedEvents(k, i) - simulatedPlannedEvents(k - 1, i));
+				expectedNumberOfSubjects[i] += factor * 
+					(simulatedNumberOfSubjects(k, i) - simulatedNumberOfSubjects(k - 1, i));
+				expectedStudyDuration[i] += factor * 
+					(simulatedAnalysisTime(k, i) - simulatedAnalysisTime(k - 1, i));
+			}
+		} else {
+			expectedNumberOfEvents[i] = simulatedPlannedEvents(0, i);
+			expectedNumberOfSubjects[i] = simulatedNumberOfSubjects(0, i);
+			expectedStudyDuration[i] = simulatedAnalysisTime(0, i);
+		}
+	}
+	
+	// Set first stage conditional power to NA
+	for (int i = 0; i < cols; i++) {
+		simulatedConditionalPower(0, i) = NA_REAL;
+	}
+	
+	// Calculate conditional power averages
+	if (kMax > 1) {
+		for (int k = 1; k < kMax; k++) {
+			for (int i = 0; i < cols; i++) {
+				double denom = iterations(k, i) + simulatedNumberEventsNotAchieved(k, i);
+				simulatedConditionalPower(k, i) /= denom;
+			}
+		}
+	}
+	
+	// Filter out NA rows in effectEstimate
+	LogicalVector validRows = !is_na(dataEffectEstimate);
+	
+	// Create data frame
+    dataConditionalCriticalValue = round(dataConditionalCriticalValue, 6);
+    dataConditionalPowerAchieved = round(dataConditionalPowerAchieved, 6);
+	DataFrame filteredData = DataFrame::create(
+		_["iterationNumber"] = dataIterationNumber[validRows],
+		_["stageNumber"] = dataStageNumber[validRows],
+		_["armNumber"] = dataArmNumber[validRows],
+		_["omegaMax"] = dataAlternative[validRows],
+		_["effect"] = dataEffect[validRows],
+		_["analysisTime"] = dataAnalysisTime[validRows],
+		_["numberOfSubjects"] = dataNumberOfSubjects[validRows],
+		_["numberOfEvents"] = dataNumberOfEvents[validRows],
+		_["effectEstimate"] = dataEffectEstimate[validRows],
+		_["testStatistics"] = dataTestStatistics[validRows],
+		_["pValue"] = dataPValuesSeparate[validRows],
+		_["conditionalCriticalValue"] = dataConditionalCriticalValue[validRows],
+		_["conditionalPowerAchieved"] = dataConditionalPowerAchieved[validRows],
+		_["rejectPerStage"] = dataRejectPerStage[validRows],
+		_["successStop"] = dataSuccessStop[validRows],
+		_["futilityPerStage"] = dataFutilityStop[validRows]
+	);
+	
+	return List::create(
+		_["simulatedNumberEventsNotAchieved"] = simulatedNumberEventsNotAchieved,
+		_["simulatedAnalysisTime"] = simulatedAnalysisTime,
+		_["simulatedNumberOfSubjects"] = simulatedNumberOfSubjects,
+		_["simulatedSelections"] = simulatedSelections,
+		_["simulatedRejections"] = simulatedRejections,
+		_["simulatedNumberOfActiveArms"] = simulatedNumberOfActiveArms,
+		_["simulatedSingleEventsPerStage"] = simulatedSingleEventsPerStage,
+		_["simulatedPlannedEvents"] = simulatedPlannedEvents,
+		_["simulatedSuccessStopping"] = simulatedSuccessStopping,
+		_["simulatedFutilityStopping"] = simulatedFutilityStopping,
+		_["simulatedConditionalPower"] = simulatedConditionalPower,
+		_["simulatedRejectAtLeastOne"] = simulatedRejectAtLeastOne,
+		_["expectedNumberOfEvents"] = expectedNumberOfEvents,
+		_["expectedNumberOfSubjects"] = expectedNumberOfSubjects,
+		_["expectedStudyDuration"] = expectedStudyDuration,
+		_["iterations"] = iterations,
+		_["data"] = filteredData
+	);
+}
+
