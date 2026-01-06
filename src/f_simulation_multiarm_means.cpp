@@ -467,8 +467,8 @@ List simulationMultiArmMeansInnerLoopCpp(NumericMatrix iterations, NumericMatrix
 
 	for (int k = 0; k < kMax; k++) {
 		for (int idx = 0; idx < gMax; idx++) {
-			simulatedRejections[k + i * kMax + idx * kMax * cols] += (as<LogicalMatrix>(closedTest["rejected"])(idx, k)
-				& as<LogicalMatrix>(closedTest["selectedArms"])(idx, k) | rejectedArmsBefore[idx]);
+			simulatedRejections[k + i * kMax + idx * kMax * cols] += ((as<LogicalMatrix>(closedTest["rejected"])(idx, k)
+				& as<LogicalMatrix>(closedTest["selectedArms"])(idx, k)) | rejectedArmsBefore[idx]);
 		}
 		for (int idx = 0; idx < gMax + 1; idx++) {
 			simulatedSelections[k + i * kMax + idx * kMax * cols] +=
@@ -549,8 +549,8 @@ List simulationMultiArmMeansInnerLoopCpp(NumericMatrix iterations, NumericMatrix
 				for (int idx = k + 1; idx < kMax; idx++) {
 					simulatedRejections[idx + (i * kMax + g * kMax * cols)] = simulatedRejections[idx
 						+ (i * kMax + g * kMax * cols)]
-						+ (as<LogicalMatrix>(closedTest["rejected"])(g, k)
-							& as<LogicalMatrix>(closedTest["selectedArms"])(g, k) | rejectedArmsBefore[g]);
+						+ ((as<LogicalMatrix>(closedTest["rejected"])(g, k)
+							& as<LogicalMatrix>(closedTest["selectedArms"])(g, k)) | rejectedArmsBefore[g]);
 				}
 			}
 			break;
@@ -599,7 +599,7 @@ NumericVector hmm(int gMax, int k, int i, int cols, int kMax, NumericVector simu
 		for (int idx = k + 1; idx < kMax; idx++) {
 			simulatedRejections[idx + (i * kMax + g * kMax * cols)] = simulatedRejections[idx
 				+ (i * kMax + g * kMax * cols)]
-				+ (as<LogicalMatrix>(closedTest["rejected"])(g, k) & as<LogicalMatrix>(closedTest["selectedArms"])(g, k)
+				+ ((as<LogicalMatrix>(closedTest["rejected"])(g, k) & as<LogicalMatrix>(closedTest["selectedArms"])(g, k))
 					| rejectedArmsBefore[g]);
 		}
 	}

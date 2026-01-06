@@ -1010,10 +1010,10 @@ getSimulationEnrichmentSurvival <- function(design = NULL,
     # to force last value to be last accrualTime
     recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
 
-    if (.isTrialDesignFisher(design)) {
-        weights <- .getWeightsFisher(design)
+    weights <- if (.isTrialDesignFisher(design)) {
+        .getWeightsFisher(design)
     } else if (.isTrialDesignInverseNormal(design)) {
-        weights <- .getWeightsInverseNormal(design)
+        .getWeightsInverseNormal(design)
     }
 
     # Perform the main simulation

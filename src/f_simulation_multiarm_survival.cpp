@@ -771,7 +771,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
 // @param cols Number of effect scenarios  
 // @param maxNumberOfIterations Maximum number of iterations per scenario
 // @param design Trial design object
-// @param weights Numeric vector of weights per stage
+// @param weights Numeric vector of weights per stage (note: these
+//   are not used for a conditional Dunnett design)
 // @param directionUpper Direction of test
 // @param effectMatrix Matrix of effects (rows: scenarios, columns: arms)
 // @param omegaMaxVector Vector of omega max values per scenario

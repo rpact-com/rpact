@@ -1064,7 +1064,8 @@ getSimulationMultiArmSurvivalNew <- function(design = NULL,
                                              seed = NA_real_,
                                              calcEventsFunction = NULL,
                                              selectArmsFunction = NULL,
-                                             showStatistics = FALSE) {
+                                             showStatistics = FALSE,
+                                             use_cpp = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "simulation")
         .warnInCaseOfUnknownArguments(
@@ -1223,46 +1224,95 @@ getSimulationMultiArmSurvivalNew <- function(design = NULL,
     phi <- c(-log(1 - dropoutRate1), -log(1 - dropoutRate2)) / dropoutTime
 
     # to force last value to be last accrualTime
-    recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
+    recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]  
 
-    loopResult <- .performSimulationMultiArmSurvivalLoop(
-        cols = cols,
-        maxNumberOfIterations = maxNumberOfIterations,
-        design = design,
-        directionUpper = directionUpper,
-        effectMatrix = effectMatrix,
-        omegaMaxVector = omegaMaxVector,
-        piControl = piControl,
-        kappa = kappa,
-        phi = phi,
-        eventTime = eventTime,
-        plannedEvents = plannedEvents,
-        recruitmentTimes = recruitmentTimes,
-        typeOfSelection = typeOfSelection,
-        effectMeasure = effectMeasure,
-        adaptations = adaptations,
-        epsilonValue = epsilonValue,
-        rValue = rValue,
-        threshold = threshold,
-        allocationFraction = allocationFraction,
-        minNumberOfEventsPerStage = minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
-        conditionalPower = conditionalPower,
-        thetaH1 = thetaH1,
-        calcEventsFunction = calcEventsFunction,
-        calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
-        selectArmsFunction = selectArmsFunction,
-        indices = indices,
-        intersectionTest = intersectionTest,
-        criticalValuesDunnett = if (.isTrialDesignConditionalDunnett(design)) {
-            criticalValuesDunnett
-        } else {
-            NULL
-        },
-        successCriterion = successCriterion,
-        gMax = gMax,
-        kMax = kMax
-    )
+    loopResult <- if (use_cpp) {
+        weights <- if (.isTrialDesignFisher(design)) {
+                .getWeightsFisher(design)
+            } else if (.isTrialDesignInverseNormal(design)) {
+                .getWeightsInverseNormal(design)
+            } else if (.isTrialDesignConditionalDunnett(design)) {
+                numeric() # Not used.
+            }
+        .performSimulationMultiArmSurvivalLoopCpp(
+            cols = cols,
+            maxNumberOfIterations = maxNumberOfIterations,
+            design = design,
+            weights = weights,
+            directionUpper = directionUpper,
+            effectMatrix = effectMatrix,
+            omegaMaxVector = omegaMaxVector,
+            piControl = piControl,
+            kappa = kappa,
+            phi = phi,
+            eventTime = eventTime,
+            plannedEvents = plannedEvents,
+            recruitmentTimes = recruitmentTimes,
+            typeOfSelection = typeOfSelection,
+            effectMeasure = effectMeasure,
+            adaptations = adaptations,
+            epsilonValue = epsilonValue,
+            rValue = rValue,
+            threshold = threshold,
+            allocationFraction = allocationFraction,
+            minNumberOfEventsPerStage = minNumberOfEventsPerStage,
+            maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
+            conditionalPower = conditionalPower,
+            thetaH1 = thetaH1,
+            calcEventsFunction = calcEventsFunction,
+            calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
+            selectArmsFunction = selectArmsFunction,
+            indices = indices,
+            intersectionTest = intersectionTest,
+            criticalValuesDunnett = if (.isTrialDesignConditionalDunnett(design)) {
+                criticalValuesDunnett
+            } else {
+                NULL
+            },
+            successCriterion = successCriterion,
+            gMax = gMax,
+            kMax = kMax
+        )
+    } else {
+        .performSimulationMultiArmSurvivalLoop(
+            cols = cols,
+            maxNumberOfIterations = maxNumberOfIterations,
+            design = design,
+            directionUpper = directionUpper,
+            effectMatrix = effectMatrix,
+            omegaMaxVector = omegaMaxVector,
+            piControl = piControl,
+            kappa = kappa,
+            phi = phi,
+            eventTime = eventTime,
+            plannedEvents = plannedEvents,
+            recruitmentTimes = recruitmentTimes,
+            typeOfSelection = typeOfSelection,
+            effectMeasure = effectMeasure,
+            adaptations = adaptations,
+            epsilonValue = epsilonValue,
+            rValue = rValue,
+            threshold = threshold,
+            allocationFraction = allocationFraction,
+            minNumberOfEventsPerStage = minNumberOfEventsPerStage,
+            maxNumberOfEventsPerStage = maxNumberOfEventsPerStage,
+            conditionalPower = conditionalPower,
+            thetaH1 = thetaH1,
+            calcEventsFunction = calcEventsFunction,
+            calcEventsFunctionIsUserDefined = calcEventsFunctionIsUserDefined,
+            selectArmsFunction = selectArmsFunction,
+            indices = indices,
+            intersectionTest = intersectionTest,
+            criticalValuesDunnett = if (.isTrialDesignConditionalDunnett(design)) {
+                criticalValuesDunnett
+            } else {
+                NULL
+            },
+            successCriterion = successCriterion,
+            gMax = gMax,
+            kMax = kMax
+        )
+    }
 
     # Extract results from the simulation
     simulatedNumberEventsNotAchieved <- loopResult$simulatedNumberEventsNotAchieved
