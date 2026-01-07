@@ -1026,7 +1026,7 @@ updateTreatmentsVector <- function(k,
 #'
 #' @export
 #'
-getSimulationMultiArmSurvivalNew <- function(design = NULL,
+getSimulationMultiArmSurvival <- function(design = NULL,
                                              ...,
                                              activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
                                              piControl = NA_real_,
