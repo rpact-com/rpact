@@ -43,7 +43,8 @@ getSimulationMultiArmSurvival(
   seed = NA_real_,
   calcEventsFunction = NULL,
   selectArmsFunction = NULL,
-  showStatistics = FALSE
+  showStatistics = FALSE,
+  use_cpp = FALSE
 )
 }
 \arguments{
