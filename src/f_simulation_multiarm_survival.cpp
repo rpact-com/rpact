@@ -712,7 +712,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                 }
                 
                 if (!R_IsNA(conditionalPower) || calcEventsFunctionIsUserDefined) {
-                    NumericVector newEventsIncrements = cumsum(rep(newEventsValue, kMax - 1 - k));
+                    double ceilingNewEventsValue = std::ceil(newEventsValue);
+                    NumericVector newEventsIncrements = cumsum(rep(ceilingNewEventsValue, kMax - 1 - k));
 					plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;
                 }
             } else {
@@ -838,6 +839,7 @@ List performSimulationMultiArmSurvivalLoop(
 		std::string successCriterion,
 		int gMax,
 		int kMax) {
+
 	// Initialize simulation result matrices
 	IntegerMatrix simulatedNumberEventsNotAchieved(kMax, cols);
 	NumericMatrix simulatedAnalysisTime(kMax, cols);
