@@ -1640,7 +1640,9 @@ NULL
 #'
 #' @export
 #'
-getEventProbabilities <- function(time, ...,
+getEventProbabilities <- function(
+        time, 
+        ...,
         accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
         accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
         accrualIntensityType = c("auto", "absolute", "relative"),

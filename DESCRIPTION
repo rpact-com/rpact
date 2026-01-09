@@ -52,7 +52,7 @@ URL: https://www.rpact.org,
     https://www.rpact.com,
     https://docs.rpact.org,
     https://github.com/rpact-com/rpact,
-    https://rpact.shinyapps.io/connect
+    https://rpact-cloud.share.connect.posit.cloud
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US
 Depends: 

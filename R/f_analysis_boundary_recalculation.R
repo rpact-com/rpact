@@ -250,13 +250,13 @@ getObservedInformationRates <- function(dataInput,
 .getRecalculatedDesign <- function(design, newArgumentValues, ignore = character()) {
     parametersToIgnore <- character()
     if (!("kMax" %in% names(newArgumentValues))) {
-        if (design$.getParameterType("kMax") %in% C_PARAM_USER_DEFINED) {
+        if (identical(design$.getParameterType("kMax"), C_PARAM_USER_DEFINED)) {
             parametersToIgnore <- c(parametersToIgnore, "kMax")
         }
         newArgumentValues$kMax <- NA_integer_
     }
-    for (paramName in c("futilityBounds", "informationRates", ignore)) {
-        if (design$.getParameterType(paramName) %in% C_PARAM_USER_DEFINED) {
+    for (paramName in c("futilityBounds", ignore)) {
+        if (identical(design$.getParameterType(paramName), C_PARAM_USER_DEFINED)) {
             parametersToIgnore <- c(parametersToIgnore, paramName)
             if (!(paramName %in% names(newArgumentValues))) {
                 newArgumentValues[[paramName]] <- NA_real_
@@ -264,7 +264,8 @@ getObservedInformationRates <- function(dataInput,
         }
     }
     if (length(parametersToIgnore) > 0) {
-        warning("The user-defined parameters ", 
+        warning("The user-defined parameter", 
+            ifelse(length(parametersToIgnore) == 1, "", "s"), " ", 
             .arrayToString(sQuote(parametersToIgnore), mode = "and"),
             " will be ignored because they are not applicable ",
             "for automatic recalculation of the boundaries",
