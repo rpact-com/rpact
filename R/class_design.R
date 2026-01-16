@@ -447,7 +447,6 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
                 method, 
                 informationRates, 
                 alpha0Vec, 
-                alpha0Scale, 
                 userAlphaSpending, 
                 bindingFutility) {
             informationRatesTemp <- informationRates
@@ -457,9 +456,6 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             alpha0VecTemp <- alpha0Vec[1:(kMax - 1)]
             if (any(is.na(alpha0VecTemp))) {
                 alpha0VecTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
-            }
-            if (!isTRUE(all.equal(alpha0Scale, self$alpha0Scale))) {
-                return(TRUE)
             }
             if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(TRUE)
@@ -676,7 +672,6 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 deltaPT0,
                 informationRates,
                 futilityBounds,
-                futilityBoundsScale,
                 optimizationCriterion,
                 typeBetaSpending,
                 gammaA,
@@ -695,9 +690,6 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             futilityBoundsTemp <- futilityBounds[1:(kMax - 1)]
             if (any(is.na(futilityBoundsTemp))) {
                 futilityBoundsTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
-            }
-            if (!isTRUE(all.equal(futilityBoundsScale, self$futilityBoundsScale))) {
-                return(self$.pasteComparisonResult("futilityBoundsScale", futilityBoundsScale, self$futilityBoundsScale))
             }
             if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(self$.pasteComparisonResult("kMax", kMax, self$kMax))
