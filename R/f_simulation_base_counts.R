@@ -306,7 +306,7 @@ getSimulationCounts <- function(design = NULL,
     } else if (!any(is.na(lambda1)) && !any(is.na(theta))) {
         lambda2 <- lambda1 / theta
     }
-    .assertIsValidParametersCountData(
+    .assertAreValidParametersCountData(
         sampleSizeEnabled = sampleSizeEnabled,
         simulationEnabled = TRUE,
         fixedExposureTime = fixedExposureTime,

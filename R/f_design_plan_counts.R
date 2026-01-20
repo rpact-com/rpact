@@ -848,7 +848,7 @@
         designPlan$accrualTime <- accrualTime
     }
 
-    .assertIsValidParametersCountData(
+    .assertAreValidParametersCountData(
         sampleSizeEnabled = sampleSizeEnabled,
         simulationEnabled = FALSE,
         fixedExposureTime = fixedExposureTime,

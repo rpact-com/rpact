@@ -3339,7 +3339,55 @@ NULL
     return(all(!is.na(delayedInformation)) && any(delayedInformation >= 1e-03))
 }
 
-.assertIsValidEffectCountData <- function(sampleSizeEnabled,
+.assertIsValidCountsParameterCombination <- function(
+        existingParamNames, 
+        forbiddenParamNames, 
+        params) {
+    
+    theta <- numeric(0)
+    for (existingParamName in existingParamNames) {
+        existingParamValue <- params[[existingParamName]]
+        if (is.null(existingParamValue) || all(is.na(existingParamValue))) {
+            return(invisible())
+        }
+        if (identical(existingParamName, "theta") && 
+                any(c("lambda", "lambda1") %in% existingParamNames)) {
+            theta <- existingParamValue
+        }
+    }
+    
+    foundParamNames <- character(0)
+    for (forbiddenParamName in forbiddenParamNames) {
+        forbiddenParamValue <- params[[forbiddenParamName]]
+        if (!is.null(forbiddenParamValue) && !all(is.na(forbiddenParamValue))) {
+            foundParamNames <- c(foundParamNames, forbiddenParamName)
+        }
+    }
+    
+    if (length(theta) > 1) {
+        existingParamNames <- existingParamNames[existingParamNames != "theta"]
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'theta' cannot be specified as vector if ", sQuote(existingParamNames[1]), " is specified",
+            call. = FALSE
+        )
+    }
+    
+    if (length(foundParamNames) == 0) {
+        return(invisible())
+    }
+    
+    stop(
+        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+        "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE), 
+        " are specified, ", .arrayToString(foundParamNames, mode = "and", encapsulate = TRUE), 
+        " must not be specified",
+        call. = FALSE
+    )
+}
+
+.assertIsValidEffectCountData <- function(
+        sampleSizeEnabled,
         sided,
         lambda1,
         lambda2,
@@ -3365,78 +3413,50 @@ NULL
     .assertIsValidThetaH0(thetaH0, endpoint = "counts", groups = 2)
     .assertIsSingleNumber(overdispersion, "overdispersion", naAllowed = TRUE)
     .assertIsInClosedInterval(overdispersion, "overdispersion", lower = 0, upper = NULL, naAllowed = TRUE)
-    if (!is.na(lambda) && all(!is.na(theta))) {
-        if (all(!is.na(lambda1)) || !is.na(lambda2)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda1' and/or 'lambda2' need not to be specified if 'lambda' and 'theta' are specified",
-                call. = FALSE
-            )
-        }
-        if (length(theta) > 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "theta cannot be specified as vector if lambda is specified",
-                call. = FALSE
-            )
-        }
-    } else if (!is.na(lambda2) && all(!is.na(theta))) {
-        if (all(!is.na(lambda1)) || !is.na(lambda)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda1' and/or 'lambda' need not to be specified if 'lambda2' and 'theta' are specified",
-                call. = FALSE
-            )
-        }
-    } else if (all(!is.na(lambda1)) && all(!is.na(theta))) {
-        if (!is.na(lambda2) || !is.na(lambda)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda2' and/or 'lambda' need not to be specified if 'lambda1' and 'theta' are specified",
-                call. = FALSE
-            )
-        }
-        if (length(theta) > 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "theta cannot be specified as vector if lambda1 is specified",
-                call. = FALSE
-            )
-        }
-    } else if (all(!is.na(lambda1)) && !is.na(lambda2)) {
-        if (!is.na(lambda) || all(!is.na(theta))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda' and/or 'theta' need not to be specified if 'lambda1' and 'lambda2' are specified",
-                call. = FALSE
-            )
-        }
-    } else if (!is.na(lambda) && all(!is.na(lambda1))) {
-        # nothing to do
-    } else if (!is.na(lambda) && !is.na(lambda2)) {
+    
+    params <- list(
+        "lambda1" = lambda1,
+        "lambda2" = lambda2,
+        "lambda" = lambda,
+        "theta" = theta,
+        "thetaH0" = thetaH0,
+        "overdispersion" = overdispersion
+    )
+#    params <- list(
+#        "lambda1" = 2,
+#        "lambda2" = NA_real_,
+#        "lambda" = NA_real_,
+#        "theta" = c(2, 3),
+#        "thetaH0" = NA_real_,
+#        "overdispersion" = 0
+#    )
+    .assertIsValidCountsParameterCombination(c("lambda", "theta"), c("lambda1", "lambda2"), params)
+    .assertIsValidCountsParameterCombination(c("lambda2", "theta"), c("lambda1", "lambda"), params)
+    .assertIsValidCountsParameterCombination(c("lambda1", "theta"), c("lambda2", "lambda"), params)
+    .assertIsValidCountsParameterCombination(c("lambda", "lambda1"), c("lambda2", "theta"), params)
+    .assertIsValidCountsParameterCombination(c("lambda", "lambda2"), c("lambda1", "theta"), params)
+    .assertIsValidCountsParameterCombination(c("lambda1", "lambda2"), c("lambda", "theta"), params)
+    
+    numberOfParameters <- sum(is.na(lambda2), any(is.na(lambda1)), is.na(lambda), any(is.na(theta)))
+    if (numberOfParameters != 2) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'lambda1' and/or 'theta' need not to be specified if 'lambda' and 'lambda2' are specified",
-            call. = FALSE
-        )
-    } else if (sum(is.na(lambda2), any(is.na(lambda1)), is.na(lambda), any(is.na(theta))) != 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "this parameter configuration is not possible: exactly two of the ",
-            "parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified",
+            ifelse(numberOfParameters > 2, C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, C_EXCEPTION_TYPE_MISSING_ARGUMENT),
+            "exactly two of the parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified",
             call. = FALSE
         )
     }
-    if (!is.na(lambda2) && !any(is.na(theta))) {
+    
+    if (!is.na(lambda2) && all(!is.na(theta))) {
         lambda1 <- lambda2 * theta
-    } else if (!any(is.na(lambda1)) && !any(is.na(theta))) {
+    } else if (all(!is.na(lambda1)) && all(!is.na(theta))) {
         lambda2 <- lambda1 / theta
     }
-    if (!any(is.na(c(lambda1, lambda2))) && any(abs(lambda1 / lambda2 - thetaH0) < 1e-12) &&
-            sampleSizeEnabled) {
+    
+    if (sampleSizeEnabled && any(!is.na(lambda1)) && !is.na(lambda2) && !is.na(thetaH0) && 
+            any(abs(lambda1 / lambda2 - thetaH0) < 1e-12, na.rm = TRUE)) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "any 'lambda1 / lambda2' (", .arrayToString(lambda1 / lambda2), ") must be != 'thetaH0' (", thetaH0, ")",
+            C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+            "'lambda1 / lambda2' (", .arrayToString(round(lambda1 / lambda2, 4)), ") must be != 'thetaH0' (", thetaH0, ")",
             call. = FALSE
         )
     }
@@ -3480,7 +3500,7 @@ NULL
     }
 }
 
-.assertIsValidParametersCountData <- function(...,
+.assertAreValidParametersCountData <- function(...,
         sampleSizeEnabled,
         simulationEnabled,
         fixedExposureTime,
@@ -3533,6 +3553,14 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'accrualTime' needs to be specified if 'followUpTime' (", followUpTime, ") is specified",
+            call. = FALSE
+        )
+    }
+    if (!is.na(followUpTime) && length(accrualTime) > 2) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements; ",
+            "'followUpTime' (", followUpTime, ") can only be specified if 'accrualTime' has one or two elements",
             call. = FALSE
         )
     }
