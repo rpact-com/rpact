@@ -1065,21 +1065,28 @@ getSampleSizeCounts <- function(
                 lambda1[iCase] <- lambda2 * theta[iCase]
             }
 
+            # Ensure lambda2 has always length totalCases.
+            if (length(lambda2) == 1) {
+                lambda2 <- rep_len(lambda2, totalCases)
+            } else {
+                .assertIsNumericVector(lambda2, "lambda2", len = totalCases)
+            }
+
             # method 2 of Zhu & Lakkis (2013), coincides with Friede & Schmidli (2010)
             varianceEstimate <- 1 /
                 fixedExposureTime *
-                (1 / lambda2 + 1 / (lambda1[iCase] * allocationRatioPlanned[iCase])) +
+                (1 / lambda2[iCase] + 1 / (lambda1[iCase] * allocationRatioPlanned[iCase])) +
                 overdispersion * (1 + 1 / allocationRatioPlanned[iCase])
             n2[iCase] <- designCharacteristics$inflationFactor *
                 (qnorm(1 - alpha / sided) + qnorm(1 - beta))^2 *
                 varianceEstimate /
-                log(lambda1[iCase] / lambda2 / thetaH0)^2
+                log(lambda1[iCase] / lambda2[iCase] / thetaH0)^2
 
             n1[iCase] <- allocationRatioPlanned[iCase] * n2[iCase]
             n2[iCase] <- ceiling(n2[iCase])
             n1[iCase] <- ceiling(n1[iCase])
 
-            if (!any(is.na(accrualTime))) {
+            if (!anyNA(accrualTime)) {
                 recruit1 <- seq(0, accrualTime, length.out = n1[iCase])
                 recruit2 <- seq(0, accrualTime, length.out = n2[iCase])
                 if (kMax > 1) {
@@ -1094,7 +1101,7 @@ getSampleSizeCounts <- function(
                             NA_real_,
                             fixedExposureTime,
                             lambda1[iCase],
-                            lambda2,
+                            lambda2[iCase],
                             thetaH0,
                             overdispersion
                         )
@@ -1111,7 +1118,14 @@ getSampleSizeCounts <- function(
                 lambda1[iCase] <- lambda2 * theta[iCase]
             }
 
-            if (!any(is.na(accrualIntensity))) {
+            # Ensure lambda2 has always length totalCases.
+            if (length(lambda2) == 1) {
+                lambda2 <- rep_len(lambda2, totalCases)
+            } else {
+                .assertIsNumericVector(lambda2, "lambda2", len = totalCases)
+            }
+
+            if (!anyNA(accrualIntensity)) {
                 # build up general recruitment times
                 recruitmentTimes <- .generateRecruitmentTimes(
                     allocationRatioPlanned[iCase],
@@ -1133,7 +1147,7 @@ getSampleSizeCounts <- function(
                     recruit2,
                     NA_real_,
                     lambda1[iCase],
-                    lambda2,
+                    lambda2[iCase],
                     thetaH0,
                     overdispersion
                 )
@@ -1150,7 +1164,7 @@ getSampleSizeCounts <- function(
                             recruit2,
                             NA_real_,
                             lambda1[iCase],
-                            lambda2,
+                            lambda2[iCase],
                             thetaH0,
                             overdispersion
                         )
@@ -1172,7 +1186,7 @@ getSampleSizeCounts <- function(
                     NA_real_,
                     NA_real_,
                     lambda1[iCase],
-                    lambda2,
+                    lambda2[iCase],
                     thetaH0,
                     overdispersion
                 )
@@ -1189,7 +1203,7 @@ getSampleSizeCounts <- function(
                             NA_real_,
                             NA_real_,
                             lambda1[iCase],
-                            lambda2,
+                            lambda2[iCase],
                             thetaH0,
                             overdispersion
                         )
@@ -1206,13 +1220,19 @@ getSampleSizeCounts <- function(
                             lambda2 <- (1 + x) * lambda / (1 + x * theta[iCase])
                             lambda1[iCase] <- lambda2 * theta[iCase]
                         }
+
+                        # Ensure lambda2 has always length totalCases.
+                        if (length(lambda2) == 1) {
+                            lambda2 <- rep_len(lambda2, totalCases)
+                        }
+
                         n2[iCase] <- .getMaximumSampleSizeTwoGroups(
                             x,
                             shift,
                             accrualTime,
                             followUpTime,
                             lambda1[iCase],
-                            lambda2,
+                            lambda2[iCase],
                             thetaH0,
                             overdispersion
                         )$n2
@@ -1230,19 +1250,26 @@ getSampleSizeCounts <- function(
                 lambda1[iCase] <- lambda2 * theta[iCase]
             }
 
+            # Ensure lambda2 has always length totalCases.
+            if (length(lambda2) == 1) {
+                lambda2 <- rep_len(lambda2, totalCases)
+            } else {
+                .assertIsNumericVector(lambda2, "lambda2", len = totalCases)
+            }
+
             sampleSizes <- .getMaximumSampleSizeTwoGroups(
                 allocationRatioPlanned[iCase],
                 shift,
                 accrualTime,
                 followUpTime,
                 lambda1[iCase],
-                lambda2,
+                lambda2[iCase],
                 thetaH0,
                 overdispersion
             )
             n1[iCase] <- sampleSizes$n1
             n2[iCase] <- sampleSizes$n2
-            if (!any(is.na(accrualTime))) {
+            if (!anyNA(accrualTime)) {
                 recruit1 <- seq(0, accrualTime, length.out = n1[iCase])
                 recruit2 <- seq(0, accrualTime, length.out = n2[iCase])
             }
@@ -1258,7 +1285,7 @@ getSampleSizeCounts <- function(
                         NA_real_,
                         NA_real_,
                         lambda1[iCase],
-                        lambda2,
+                        lambda2[iCase],
                         thetaH0,
                         overdispersion
                     )
@@ -1292,7 +1319,7 @@ getSampleSizeCounts <- function(
             }
         }
         informationOverStages[, iCase] <-
-            designCharacteristics$shift / log(lambda1[iCase] / lambda2 / thetaH0)^2 * informationRates
+            designCharacteristics$shift / log(lambda1[iCase] / lambda2[iCase] / thetaH0)^2 * informationRates
     }
     if (length(unique(allocationRatioPlanned)) == 1) {
         allocationRatioPlanned <- allocationRatioPlanned[1]
