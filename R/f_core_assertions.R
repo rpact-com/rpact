@@ -3452,7 +3452,7 @@ NULL
         lambda2 <- lambda1 / theta
     }
     
-    if (sampleSizeEnabled && any(!is.na(lambda1)) && !is.na(lambda2) && !is.na(thetaH0) && 
+    if (sampleSizeEnabled && !all(is.na(lambda1)) && !all(is.na(lambda2)) && !is.na(thetaH0) && 
             any(abs(lambda1 / lambda2 - thetaH0) < 1e-12, na.rm = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
