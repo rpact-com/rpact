@@ -266,7 +266,7 @@ NULL
 }
 
 .downloadUnitTestsViaHttp <- function(testFileTargetDirectory, ..., testthatSubDirectory, token, secret) {
-    indexFile <- file.path(testFileTargetDirectory, "index.html")
+    indexFile <- file.path(testFileTargetDirectory, "index.txt")
     currentFile <- NA_character_
     tryCatch(
         {
@@ -291,7 +291,7 @@ NULL
                     method = "auto", mode = "wb"
                 )
                 if (result != 0) {
-                    warning("'testthat.R' download result in ", result)
+                    warning("'testthat.R' download result in ", result, call. = FALSE)
                 }
             }
 
@@ -302,7 +302,7 @@ NULL
                 method = "auto", mode = "wb"
             )
             if (result != 0) {
-                warning("Unit test index file download result in ", result)
+                warning("Unit test index file download result in ", result, call. = FALSE)
             }
 
             lines <- .readLinesFromFile(indexFile)
@@ -319,6 +319,7 @@ NULL
 
             startTime <- Sys.time()
             message("Start to download ", length(testFiles), " unit test files (http). Please wait...")
+            counter <- 0
             for (testFile in testFiles) {
                 currentFile <- testFile
                 result <- utils::download.file(
@@ -326,11 +327,22 @@ NULL
                     destfile = file.path(testthatSubDirectory, testFile), quiet = TRUE,
                     method = "auto", mode = "wb"
                 )
+                if (identical(result, 0) || identical(result, 0L)) {
+                    counter <- counter + 1
+                }
             }
-            message(
-                length(testFiles), " unit test files downloaded successfully (needed ",
-                .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
-            )
+            if (counter < length(testFiles)) {
+                warning(
+                    "Only ", counter, " of ", length(testFiles),
+                    " unit test files were downloaded successfully (needed ",
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")", call. = FALSE
+                )
+            } else {
+                message(
+                    counter, " unit test files downloaded successfully (needed ",
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
+                )
+            }
         },
         warning = function(w) {
             if (grepl("404 Not Found", w$message)) {
@@ -380,7 +392,7 @@ NULL
             if (file.exists(testthatBaseFile)) {
                 file.copy(testthatBaseFile, file.path(testFileTargetDirectory, "testthat.R"))
             } else {
-                result <- download.file(
+                result <- utils::download.file(
                     url = paste0(baseUrl, "testthat.R"),
                     destfile = file.path(testFileTargetDirectory, "testthat.R"),
                     method = method, quiet = TRUE, mode = mode,
@@ -391,7 +403,7 @@ NULL
                 }
             }
 
-            result <- download.file(
+            result <- utils::download.file(
                 url = paste0(baseUrl, "testthat/"),
                 destfile = indexFile,
                 method = method, quiet = TRUE, mode = mode,
@@ -414,8 +426,9 @@ NULL
 
             startTime <- Sys.time()
             message("Start to download ", length(testFiles), " unit test files (ftp). Please wait...")
+            counter <- 0
             for (testFile in testFiles) {
-                result <- download.file(
+                result <- utils::download.file(
                     url = paste0(baseUrl, "testthat/", testFile),
                     destfile = file.path(testthatSubDirectory, testFile),
                     method = method, quiet = TRUE, mode = mode,
@@ -423,11 +436,22 @@ NULL
                     extra = extra,
                     headers = NULL
                 )
+                if (identical(result, 0) || identical(result, 0L)) {
+                    counter <- counter + 1
+                }
             }
-            message(
-                length(testFiles), " unit test files downloaded successfully (needed ",
-                .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
-            )
+            if (counter < length(testFiles)) {
+                warning(
+                    "Only ", counter, " of ", length(testFiles),
+                    " unit test files were downloaded successfully (needed ",
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")", call. = FALSE
+                )
+            } else {
+                message(
+                    counter, " unit test files downloaded successfully (needed ",
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
+                )
+            }
         },
         error = function(e) {
             .logDebug(e$message)

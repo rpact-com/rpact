@@ -50,7 +50,7 @@ Useful links:
   \item \url{https://www.rpact.com}
   \item \url{https://docs.rpact.org}
   \item \url{https://github.com/rpact-com/rpact}
-  \item \url{https://rpact.shinyapps.io/connect}
+  \item \url{https://rpact-cloud.share.connect.posit.cloud}
   \item Report bugs at \url{https://github.com/rpact-com/rpact/issues}
 }
 
