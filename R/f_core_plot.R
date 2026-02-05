@@ -398,7 +398,10 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
             if (!.isTrialDesignPlanCountData(obj)) {
                 types <- c(types, 2)
             }
-            types <- c(types, 3:4)
+            if (!inherits(obj, "TrialDesignPlanCountData")) {
+                types <- c(types, 3)
+            }
+            types <- c(types, 4)
         }
         if (obj$.isSampleSizeObject()) {
             if (!.isTrialDesignPlanCountData(obj) || length(obj[["theta"]]) > 1) {

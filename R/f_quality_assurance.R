@@ -1970,9 +1970,26 @@ MarkdownReporter <- R6::R6Class(
             self$log("## References")
             self$log("")
             citePackage <- utils::capture.output(print(citation("rpact"), bibtex = FALSE))
-            citePackage <- trimws(citePackage[!grepl("(^$)|(^To cite package)", citePackage)])
-            citePackage <- paste(citePackage, collapse = " ")
-            self$log("- ", citePackage)
+            citePackage <- trimws(citePackage[!grepl("^($)|(To cite )|(Um Paket )|(Please )", citePackage)])
+            
+            indices <- grep("^Wassmer", citePackage)
+            if (length(indices) > 1) {
+                if (indices[length(indices)] < length(citePackage)) {
+                    indices <- c(indices, length(citePackage))
+                }
+                
+                citePackageParts <- list()
+                for (i in 2:length(indices)) {
+                    part <- citePackage[indices[i - 1]:indices[i]]
+                    citePackageParts[[length(citePackageParts) + 1]] <- paste(part, collapse = " ")
+                }
+            } else {
+                citePackagePart <- list(paste(citePackage, collapse = " "))
+            }
+            
+            for (citePackagePart in citePackageParts) {
+                self$log("- ", citePackagePart)
+            }
             self$log(
                 "- rpact test coverage: [app.codecov.io/gh/rpact-com/rpact]",
                 "(https://app.codecov.io/gh/rpact-com/rpact?branch=main)"

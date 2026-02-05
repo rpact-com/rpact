@@ -146,6 +146,10 @@
 #' @noRd
 #'
 .generateRecruitmentTimes <- function(allocationRatio, accrualTime, accrualIntensity) {
+    .assertIsSingleNumber(allocationRatio, "allocationRatio")
+    .assertIsNumericVector(accrualTime, "accrualTime")
+    .assertIsNumericVector(accrualIntensity, "accrualIntensity")
+    
     if (length(accrualTime) != length(accrualIntensity)) {
         stop(
             C_EXCEPTION_TYPE_RUNTIME_ISSUE,
@@ -167,6 +171,7 @@
     } else {
         maxNumberOfSubjects <- ceiling(accrualTime * accrualIntensity)
     }
+    
     subjectFractions <- cumsum(densityIntervals * accrualIntensity) / maxNumberOfSubjects
     subjectFractions[length(accrualTime)] <- 1
 
@@ -741,6 +746,7 @@
         maxNumberOfSubjects,
         allocationRatioPlanned
         ) {
+            
     designPlan <- TrialDesignPlanCountData$new(
         design = design,
         designCharacteristics = designCharacteristics
