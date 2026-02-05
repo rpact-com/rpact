@@ -1011,40 +1011,6 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
     )
 }
 
-.writeLinesToFile <- function(lines, fileName) {
-    if (is.null(lines) || length(lines) == 0 || !is.character(lines)) {
-        warning("Empty lines. Stop to write '", fileName, "'")
-        return(invisible(fileName))
-    }
-
-    fileConn <- base::file(fileName)
-    tryCatch(
-        {
-            base::writeLines(lines, fileConn)
-        },
-        finally = {
-            base::close(fileConn)
-        }
-    )
-    invisible(fileName)
-}
-
-#'
-#' Windows: CR (Carriage Return \r) and LF (LineFeed \n) pair
-#'
-#' OSX, Linux: LF (LineFeed \n)
-#'
-#' @noRd
-#'
-.readLinesFromFile <- function(inputFileName) {
-    content <- .readContentFromFile(inputFileName)
-    return(strsplit(content, split = "(\r?\n)|(\r\n?)")[[1]])
-}
-
-.readContentFromFile <- function(inputFileName) {
-    return(readChar(inputFileName, file.info(inputFileName)$size))
-}
-
 .integerToWrittenNumber <- function(x) {
     if (is.null(x) || length(x) != 1 || !is.numeric(x) || is.na(x)) {
         return(x)

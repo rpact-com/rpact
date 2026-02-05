@@ -508,24 +508,30 @@ NULL
     return(value)
 }
 
-.getReportAuthor <- function(token, secret, action) {
+.getReportAuthor <- function(token, secret, action, default = "RPACT") {
     tryCatch(
         {
             result <- base::readLines(sprintf(
-                paste(c(
-                    "https://rpact.shinyapps.io",
-                    "metadata",
+                paste0(
+                    "https://rpact-",
+                    paste0(c(
+                        "metadata", 
+                        "share", 
+                        "connect", 
+                        "posit", 
+                        "cloud"), collapse = "."),
                     "?token=%s&secret=%s&action=%s"
-                ), collapse = "/"),
+                ),
                 token, secret, action
             ))
             companyLine <- grep('<meta name="company"', result, value = TRUE)
             company <- sub('.*content="([^"]+)".*', "\\1", companyLine)
             company <- gsub("&amp;", "&", company)
+            company <- ifelse(grepl("unknown|anonymous", company, ignore.case = TRUE), default, company)
             return(company)
         },
         error = function(e) {
-            return("RPACT")
+            return(default)
         }
     )
 }
@@ -970,6 +976,13 @@ setupPackageTests <- function(token, secret) {
 #' @param openHtmlReport If \code{TRUE}, the HTML report is opened after the tests are completed, default is \code{TRUE}.
 #' @param keepSourceFiles If \code{TRUE}, the source files are kept after the tests are completed.
 #'     A copy of them can be found in the subdirectory \code{src}.
+#' @param reportFileBaseName The base name for the report files (without path or extension).
+#' @param metaData A named \code{list} containing additional metadata to be included in the test report.
+#'    This can include information such as \code{company}, \code{container name}, \code{host name}, etc. 
+#'    Default is an empty list. 
+#'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
+#' @param metaDataFile An optional path to a text file containing metadata: one entry per line in the form \code{KEY=VALUE}.
+#'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -1023,18 +1036,32 @@ testPackage <- function(
         testInstalledBasicPackages = TRUE,
         scope = c("basic", "devel", "both", "internet", "all"),
         openHtmlReport = TRUE,
-        keepSourceFiles = FALSE) {
+        keepSourceFiles = FALSE,
+        reportFileBaseName = "rpact_test_result_report",
+        metaData = list(),
+        metaDataFile = NULL) {
     .assertTestthatIsInstalled()
     .assertIsSingleCharacter(outDir, "outDir", naAllowed = FALSE)
     .assertIsSingleLogical(completeUnitTestSetEnabled, "completeUnitTestSetEnabled", naAllowed = FALSE)
     .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = TRUE)
+    .assertIsSingleCharacter(reportFileBaseName, "reportFileBaseName", naAllowed = FALSE)
     .assertIsSingleLogical(downloadTestsOnly, "downloadTestsOnly", naAllowed = FALSE)
     .assertIsSingleLogical(addWarningDetailsToReport, "addWarningDetailsToReport", naAllowed = FALSE)
     .assertIsSingleLogical(testInstalledBasicPackages, "testInstalledBasicPackages", naAllowed = FALSE)
     .assertIsSingleLogical(openHtmlReport, "openHtmlReport", naAllowed = FALSE)
     .assertIsSingleLogical(keepSourceFiles, "keepSourceFiles", naAllowed = FALSE)
+    
     reportType <- match.arg(reportType)
     scope <- match.arg(scope)
+    
+    if (grepl("/|:|\\\\", reportFileBaseName)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'reportFileBaseName' (", dQuote(reportFileBaseName), ") ",
+            "must not contain path separators or drive specifiers"
+        )
+    }
+    
     if (!dir.exists(outDir)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -1059,7 +1086,7 @@ testPackage <- function(
             "test file directory '", testFileDirectory, "' does not exist"
         )
     }
-
+    
     if (isTRUE(addWarningDetailsToReport)) {
         valueBefore <- Sys.getenv("NOT_CRAN")
         on.exit(Sys.setenv(NOT_CRAN = valueBefore), add = TRUE)
@@ -1187,6 +1214,15 @@ testPackage <- function(
     } else if (executionMode %in% c("downloadAndRunTests", "downloadOnly")) {
         testFileTargetDirectory <- file.path(outDir, paste0(pkgName, "-tests"))
     }
+    
+    if (!is.null(metaData) && length(metaData) > 0) {
+        if (is.null(metaDataFile)) {
+            metaDataFile <- file.path(testFileTargetDirectory, "meta_data.txt")
+        }
+        writeKeyValueFile(
+            keyValueList = metaData,
+            filePath = metaDataFile)
+    }
 
     if (executionMode %in% c("downloadAndRunTests", "downloadOnly")) {
         .downloadUnitTests(
@@ -1213,7 +1249,7 @@ testPackage <- function(
             on.exit(file.rename(testthatMainFileBak, testthatMainFile))
         }
 
-        markdownReportFileName <- "rpact_test_result_report.md"
+        markdownReportFileName <- paste0(reportFileBaseName, ".md")
         testFileTargetDirectory <- gsub("\\\\", "/", testFileTargetDirectory)
         testthatCommands <- paste0(
             "\n",
@@ -1227,7 +1263,8 @@ testPackage <- function(
             "keepSourceFiles = ", keepSourceFiles, ", ",
             "testInstalledBasicPackages = ", testInstalledBasicPackages, ", ",
             'author = "', author, '", ',
-            'scope = "', scope, '"',
+            'scope = "', scope, '", ',
+            'metaDataFile = "', metaDataFile, '"',
             ")",
             ")\n\n"
         )
@@ -1273,12 +1310,12 @@ testPackage <- function(
             reportFileNames <- c(reportFileNames, markdownReportFileName)
         }
 
-        reportFileNameHtml <- sub("\\.md$", ".html", markdownReportFileName)
+        reportFileNameHtml <- paste0(reportFileBaseName, ".html")
         if (file.exists(file.path(testFileTargetDirectory, reportFileNameHtml))) {
             reportFileNames <- c(reportFileNames, reportFileNameHtml)
         }
 
-        reportFileNamePdf <- sub("\\.md$", ".pdf", markdownReportFileName)
+        reportFileNamePdf <- paste0(reportFileBaseName, ".pdf")
         if (file.exists(file.path(testFileTargetDirectory, reportFileNamePdf))) {
             reportFileNames <- c(reportFileNames, reportFileNamePdf)
         }
@@ -1720,6 +1757,8 @@ MarkdownReporter <- R6::R6Class(
         author = "RPACT",
         scope = "basic",
         rpactCranReference = "[rpact](https://cran.r-project.org/package=rpact)",
+        metaData = list(),
+        metaDataFile = NULL,
         initialize = function(...,
                 outputSize = c("compact", "detailed"),
                 outputFile = "test_results.md",
@@ -1728,7 +1767,8 @@ MarkdownReporter <- R6::R6Class(
                 keepSourceFiles = FALSE,
                 testInstalledBasicPackages = TRUE,
                 author = "RPACT",
-                scope = "basic") {
+                scope = "basic",
+                metaDataFile = NULL) {
             # self$capabilities$parallel_support <- TRUE
             super$initialize(...)
             self$outputSize <- match.arg(outputSize)
@@ -1739,17 +1779,27 @@ MarkdownReporter <- R6::R6Class(
             self$testInstalledBasicPackages <- testInstalledBasicPackages
             self$author <- author
             self$scope <- scope
+            self$metaDataFile <- metaDataFile
             self$minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
+            if (file.exists(self$metaDataFile)) {
+                self$metaData <- readKeyValueFile(self$metaDataFile)
+            }
         },
         log = function(...) {
             args <- list(...)
             self$output <- c(self$output, paste(args, collapse = ""))
         },
         start_reporter = function() {
+            authorValidated <- ifelse(is.null(self$author) || 
+                length(self$author) != 1 || 
+                is.na(self$author) || 
+                nchar(trimws(self$author)) == 0 ||
+                grepl("unknown|anonymous", self$author, ignore.case = TRUE), 
+                "RPACT", self$author)
             self$startTime <- Sys.time()
             self$log("---")
             self$log('title: "Installation Qualification for rpact"')
-            self$log('author: "', self$author, '"')
+            self$log('author: "', authorValidated, '"')
             self$log('date: "', format(Sys.time(), "%B %d, %Y"), '"')
             self$log("output:")
             self$log("  html_document:")
@@ -1793,6 +1843,14 @@ MarkdownReporter <- R6::R6Class(
             self$log("- **rpact package release date**: ", format(packageDate("rpact"), "%B %d, %Y"))
             self$log("- **System user**: *", Sys.info()[["user"]], "*")
             self$log("- **System ID**: ", getSystemIdentifier(), "")
+            if (!is.null(self$metaData) && length(self$metaData) > 0) {
+                for (metaDataName in names(self$metaData)) {
+                    self$log(
+                        "- **", metaDataName, "**: ",
+                        self$metaData[[metaDataName]], ""
+                    )
+                }
+            }
             self$log("")
             self$log(.getSessionInfoMarkdown())
             self$log("")

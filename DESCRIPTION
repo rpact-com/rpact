@@ -133,6 +133,7 @@ Collate:
     'f_design_plan_rates.R'
     'f_design_plan_survival.R'
     'f_design_plan_utilities.R'
+    'f_io_utilities.R'
     'f_quality_assurance.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'
