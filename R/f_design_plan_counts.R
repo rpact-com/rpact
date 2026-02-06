@@ -1084,7 +1084,7 @@ getSampleSizeCounts <- function(
             n1[iCase] <- allocationRatioPlanned[iCase] * n2[iCase]
             n2[iCase] <- ceiling(n2[iCase])
             n1[iCase] <- ceiling(n1[iCase])
-
+            
             if (!any(is.na(accrualTime))) {
                 recruit1 <- seq(0, accrualTime, length.out = n1[iCase])
                 recruit2 <- seq(0, accrualTime, length.out = n2[iCase])
@@ -1316,6 +1316,10 @@ getSampleSizeCounts <- function(
         "calendarTime",
         ifelse(!all(is.na(calendarTime)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
     )
+    # TODO add message if calendarTime is NA due to bounded information
+    if (!is.na(fixedExposureTime) && any(is.na(accrualTime)) && all(is.na(calendarTime))) {
+        warning("The calendar time was not calculated due to missing accrual time", call. = FALSE)
+    }
 
     designPlan$studyTime <- studyTime
     designPlan$.setParameterType(

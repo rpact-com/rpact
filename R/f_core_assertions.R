@@ -3372,6 +3372,13 @@ NULL
             call. = FALSE
         )
     }
+    else if (length(theta) > 0 && "lambda1" %in% names(params) && length(params$lambda1) > 1) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'lambda1' cannot be specified as vector if ", sQuote("theta"), " is specified",
+            call. = FALSE
+        )
+    }
     
     if (length(foundParamNames) == 0) {
         return(invisible())
@@ -3422,14 +3429,7 @@ NULL
         "thetaH0" = thetaH0,
         "overdispersion" = overdispersion
     )
-#    params <- list(
-#        "lambda1" = 2,
-#        "lambda2" = NA_real_,
-#        "lambda" = NA_real_,
-#        "theta" = c(2, 3),
-#        "thetaH0" = NA_real_,
-#        "overdispersion" = 0
-#    )
+
     .assertIsValidCountsParameterCombination(c("lambda", "theta"), c("lambda1", "lambda2"), params)
     .assertIsValidCountsParameterCombination(c("lambda2", "theta"), c("lambda1", "lambda"), params)
     .assertIsValidCountsParameterCombination(c("lambda1", "theta"), c("lambda2", "lambda"), params)
@@ -3468,8 +3468,8 @@ NULL
     params <- list(...)
     if (length(params) != 2) {
         if (is.null(names(params)) ||
-                length(params[!(names(params) %in% c("case", ".paramNames"))]) != 2) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "exactly two parameters must be specified")
+                length(params[!(names(params) %in% c("case", ".paramNames"))]) < 2) {
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "two or more parameters must be specified")
         }
     }
     case <- match.arg(case)
@@ -3482,19 +3482,19 @@ NULL
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "all arguments must be named")
     }
     if (case == "notTogether" && !all(is.na(params[[1]])) && !all(is.na(params[[2]]))) {
+        paramVector <- c()
+        for (i in seq_along(params)) {
+            paramVector <- c(paramVector, paste0(sQuote(paramNames[i]), " (", .arrayToString(params[[i]]), ")"))
+        }
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sQuote(paramNames[1]), " (", .arrayToString(params[[1]]), ") ",
-            "and ", sQuote(paramNames[2]), " (", .arrayToString(params[[2]]), ") ",
-            "cannot be specified together",
+            .arrayToString(paramVector, mode = "and"), " cannot be specified together",
             call. = FALSE
         )
     } else if (case == "eitherOr" && all(is.na(params[[1]])) && all(is.na(params[[2]]))) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "either ", sQuote(paramNames[1]), " ",
-            "or ", sQuote(paramNames[2]), " ",
-            "needs to be specified",
+            C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "either ", .arrayToString(paramNames, mode = "or", encapsulate = TRUE), " must be specified",
             call. = FALSE
         )
     }
@@ -3520,17 +3520,35 @@ NULL
     .assertIsInClosedInterval(accrualIntensity, "accrualIntensity", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
 
+    if (!all(is.na(accrualTime)) && length(accrualTime) > 2 && all(is.na(accrualIntensity))) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'accrualIntensity' need to be specified if piecewise accrual is enabled, i.e., ",
+            "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements",
+            call. = FALSE
+        )
+    }
+    
     if (sampleSizeEnabled) {
         if (is.na(maxNumberOfSubjects) && any(is.na(accrualIntensity))) {
             .assertParametersAreSpecifiedCorrectlyTogether(
                 "fixedExposureTime" = fixedExposureTime,
                 "followUpTime" = followUpTime
             )
-            .assertParametersAreSpecifiedCorrectlyTogether(
-                "fixedExposureTime" = fixedExposureTime,
-                "followUpTime" = followUpTime,
-                case = "eitherOr"
-            )
+            if (!all(is.na(accrualTime))) {
+                .assertParametersAreSpecifiedCorrectlyTogether(
+                    "fixedExposureTime" = fixedExposureTime,
+                    "followUpTime" = followUpTime,
+                    "accrualIntensity" = accrualIntensity,
+                    case = "eitherOr"
+                )
+            } else {
+                .assertParametersAreSpecifiedCorrectlyTogether(
+                    "fixedExposureTime" = fixedExposureTime,
+                    "followUpTime" = followUpTime,
+                    case = "eitherOr"
+                )
+            }
         }
     } else {
         .assertParametersAreSpecifiedCorrectlyTogether(
@@ -3561,6 +3579,14 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements; ",
             "'followUpTime' (", followUpTime, ") can only be specified if 'accrualTime' has one or two elements",
+            call. = FALSE
+        )
+    }
+    if (!is.na(maxNumberOfSubjects) && length(accrualTime) > 2) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements; ",
+            "'maxNumberOfSubjects' (", maxNumberOfSubjects, ") can only be specified if 'accrualTime' has one or two elements",
             call. = FALSE
         )
     }
