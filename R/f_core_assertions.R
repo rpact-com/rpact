@@ -3341,8 +3341,10 @@ NULL
 
 .assertIsValidCountsParameterCombination <- function(
         existingParamNames, 
-        forbiddenParamNames, 
-        params) {
+        forbiddenParamNames,
+        params,
+        ...,
+        requiredParamNames = character(0)) {
     
     theta <- numeric(0)
     for (existingParamName in existingParamNames) {
@@ -3353,6 +3355,25 @@ NULL
         if (identical(existingParamName, "theta") && 
                 any(c("lambda", "lambda1") %in% existingParamNames)) {
             theta <- existingParamValue
+        }
+    }
+    
+    paramNames <- names(params)
+    if (length(requiredParamNames) > 0) {
+        existingParamNamesWithValue <- paramNames[sapply(paramNames, function(name) {
+            value <- params[[name]]
+            return(!is.null(value) && !all(is.na(value)))
+        })]
+        requiredParamNamesFound <- requiredParamNames[requiredParamNames %in% existingParamNamesWithValue]
+        if (length(requiredParamNamesFound) < length(requiredParamNames)) {
+            stop(
+                C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+                "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE), 
+                " ", ifelse(length(requiredParamNames) == 1, "is", "are"), 
+                " specified, ", .arrayToString(requiredParamNames, mode = "and", encapsulate = TRUE), 
+                " must also be specified",
+                call. = FALSE
+            )
         }
     }
     
@@ -3372,7 +3393,7 @@ NULL
             call. = FALSE
         )
     }
-    else if (length(theta) > 0 && "lambda1" %in% names(params) && length(params$lambda1) > 1) {
+    else if (length(theta) > 0 && "lambda1" %in% paramNames && length(params$lambda1) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'lambda1' cannot be specified as vector if ", sQuote("theta"), " is specified",

@@ -1070,6 +1070,12 @@ getSampleSizeCounts <- function(
                     (1 + allocationRatioPlanned[iCase] * theta[iCase])
                 lambda1[iCase] <- lambda2 * theta[iCase]
             }
+            else if (!is.na(lambda) && !any(is.na(lambda1))) {
+                lambda2 <- ((1 + allocationRatioPlanned[iCase]) * lambda) / (allocationRatioPlanned[iCase] * lambda1[iCase])
+            }
+            else if (!is.na(lambda) && !any(is.na(lambda2))) {
+                lambda1 <- ((1 + allocationRatioPlanned[iCase]) * lambda - lambda2) / allocationRatioPlanned[iCase]
+            }
 
             # method 2 of Zhu & Lakkis (2013), coincides with Friede & Schmidli (2010)
             varianceEstimate <- 1 /
@@ -1316,9 +1322,8 @@ getSampleSizeCounts <- function(
         "calendarTime",
         ifelse(!all(is.na(calendarTime)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
     )
-    # TODO add message if calendarTime is NA due to bounded information
     if (!is.na(fixedExposureTime) && any(is.na(accrualTime)) && all(is.na(calendarTime))) {
-        warning("The calendar time was not calculated due to missing accrual time", call. = FALSE)
+        .logDebug("The calendar time was not calculated due to missing accrual time")
     }
 
     designPlan$studyTime <- studyTime
@@ -1595,6 +1600,16 @@ getPowerCounts <- function(
             varianceEstimate <- nTotal * (1 / sumLambda1 + 1 / sumLambda2)
         }
         oneSidedFactor <- ifelse(sided == 1, 2 * directionUpper - 1, 1)
+        
+        print("lambda1")
+        print(lambda1)
+        print("lambda2")
+        print(lambda2)
+        print("theta")
+        print(theta)
+        print("thetaH0")
+        print(thetaH0)
+        
         powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
             design = design,
             theta = oneSidedFactor * log(lambda1[iCase] / lambda2 / thetaH0) / sqrt(varianceEstimate),
