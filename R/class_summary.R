@@ -1928,7 +1928,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 )
             } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
                 header <- .concatenateSummaryText(header,
-                    paste0("(", .arrayToString(round(design$userAlphaSpending, 3)), ")"),
+                    paste0("(", .arrayToString(design$userAlphaSpending, digits = 6), ")"),
                     sep = " "
                 )
             }
@@ -1943,7 +1943,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     )
                 } else if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_USER) {
                     header <- .concatenateSummaryText(header,
-                        paste0("(", .arrayToString(round(design$userBetaSpending, 3)), ")"),
+                        paste0("(", .arrayToString(design$userBetaSpending, digits = 6), ")"),
                         sep = " "
                     )
                 }
@@ -2287,11 +2287,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             treatmentRateText <- paste0(treatmentRateText, ", piecewise survival distribution")
             treatmentRateText <- paste0(
                 treatmentRateText, ", \n",
-                "piecewise survival time = ", .arrayToString(round(designPlan$piecewiseSurvivalTime, 4),
-                    vectorLookAndFeelEnabled = TRUE
+                "piecewise survival time = ", .arrayToString(round(designPlan$piecewiseSurvivalTime, 4), 
+                    digits = 4, vectorLookAndFeelEnabled = TRUE
                 ), ", \n",
-                "control lambda(2) = ", .arrayToString(round(designPlan$lambda2, 4),
-                    vectorLookAndFeelEnabled = TRUE
+                "control lambda(2) = ", .arrayToString(round(designPlan$lambda2, 4), 
+                    digits = 4, vectorLookAndFeelEnabled = TRUE
                 )
             )
         }

@@ -3452,6 +3452,7 @@ NULL
     )
 
     .assertIsValidCountsParameterCombination(c("lambda", "theta"), c("lambda1", "lambda2"), params)
+    .assertIsValidCountsParameterCombination("lambda", c("lambda1", "lambda2"), params, requiredParamNames = "theta")
     .assertIsValidCountsParameterCombination(c("lambda2", "theta"), c("lambda1", "lambda"), params)
     .assertIsValidCountsParameterCombination(c("lambda1", "theta"), c("lambda2", "lambda"), params)
     .assertIsValidCountsParameterCombination(c("lambda", "lambda1"), c("lambda2", "theta"), params)
