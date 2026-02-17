@@ -992,13 +992,13 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
 
                             .logDebug(".init: calculate lambda2 and median2 by median1")
 
-                            self$lambda2 <- getLambdaByMedian(self$median1, self$kappa) / self$hazardRatio^(1 / self$kappa)
+                            self$lambda2 <- getLambda2ByHazardRatio(getLambdaByMedian(self$median1, self$kappa), self$hazardRatio)
 
                             if (!self$delayedResponseAllowed && length(unique(round(self$lambda2, 8))) > 1) {
                                 stop(
                                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                                     "'lambda2' can only be calculated if ",
-                                    "'unique(lambda1 / hazardRatio^(1 / kappa))' ",
+                                    "'unique(lambda1 / hazardRatio)' ",
                                     "result in a single value; current result = ",
                                     .arrayToString(round(self$lambda2, 4), vectorLookAndFeelEnabled = TRUE),
                                     " (e.g., delayed response is not allowed)"

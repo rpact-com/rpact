@@ -1005,7 +1005,6 @@ getPiByLambda <- function(
     return(1 - x)
 }
 
-# alternative: return(1 - exp(-(log(2)^(1 / kappa) / median * eventTime)^kappa))
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getPiByMedian <- function(

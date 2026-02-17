@@ -39,7 +39,7 @@ NULL
             return(lambda1)
         }
 
-        lambda2 <- lambda2 * hazardRatio^(1 / kappa)
+        lambda2 <- lambda2 * hazardRatio^(1 / kappa) # TODO check
     }
     return(lambda2)
 }
