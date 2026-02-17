@@ -263,7 +263,6 @@ writeKeyValueFile <- function(
     invisible(filePath)
 }
 
-
 #'
 #' @title
 #' Read a key-value file (KEY=VALUE) into a named list
