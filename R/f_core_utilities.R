@@ -1937,7 +1937,7 @@ resetOptions <- function(persist = TRUE) {
                 return(invisible(FALSE))
             }
 
-            optionFileContent <- readLines(pkgConfigFile)
+            optionFileContent <- base::readLines(pkgConfigFile)
             if (length(optionFileContent) == 0) {
                 return(invisible(TRUE))
             }

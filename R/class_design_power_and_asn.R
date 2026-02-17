@@ -115,9 +115,10 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             .assertIsValidSidedParameter(self$.design$sided)
 
             if (self$nMax <= 0) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-                    "'nMax' must be an integer > 0", 
-                    call. = FALSE)
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                    "'nMax' must be an integer > 0",
+                    call. = FALSE
+                )
             }
 
             self$.setParameterType("nMax", ifelse(self$nMax == C_NA_MAX_DEFAULT,
@@ -193,10 +194,10 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                 decisionCriticalValues <- self$.design$decisionCriticalValues
                 probs <- .calculateDecisionProbabilities(
                     sqrtShift = sqrt(self$nMax) * theta,
-                    informationRates, 
-                    delayedInformation, 
-                    contRegionUpper, 
-                    contRegionLower, 
+                    informationRates,
+                    delayedInformation,
+                    contRegionUpper,
+                    contRegionLower,
                     decisionCriticalValues
                 )
 
@@ -317,7 +318,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
 #' head(data)
 #' dim(data)
 #' }
-#' 
+#'
 #' @export
 #'
 #' @keywords internal

@@ -610,8 +610,8 @@ NULL
 .createDesignPlanSurvival <- function(..., objectType = c("sampleSize", "power"),
         design,
         typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
-        thetaH0, 
-        pi2, 
+        thetaH0,
+        pi2,
         pi1,
         allocationRatioPlanned,
         accountForObservationTimes,
@@ -645,7 +645,9 @@ NULL
         .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
         .assertIsValidKappa(kappa)
         directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-            design, objectType = objectType, userFunctionCallEnabled = TRUE)
+            design,
+            objectType = objectType, userFunctionCallEnabled = TRUE
+        )
 
         if (objectType == "power") {
             .assertIsSingleNumber(maxNumberOfEvents, "maxNumberOfEvents")
@@ -787,8 +789,9 @@ NULL
     if (isTRUE(all.equal(accrualSetup$accrualTime, C_ACCRUAL_TIME_DEFAULT)) ||
             isTRUE(all.equal(
                 as.integer(c(0L, accrualSetup$.getAccrualTimeWithoutLeadingZero())),
-                C_ACCRUAL_TIME_DEFAULT))
-            ) {
+                C_ACCRUAL_TIME_DEFAULT
+            ))
+        ) {
         designPlan$.setParameterType("accrualTime", C_PARAM_DEFAULT_VALUE)
     } else {
         designPlan$.setParameterType("accrualTime", accrualSetup$.getParameterType("accrualTime"))
@@ -1473,7 +1476,7 @@ NULL
             }
 
             stoppingProbs[kMax] <- 1 - sum(stoppingProbs[1:(kMax - 1)])
-            
+
             studyDuration[i] <- analysisTime[, i] %*% stoppingProbs
 
             expectedNumberOfSubjectsH1[i] <- numberOfSubjects[, i] %*% stoppingProbs
@@ -1640,8 +1643,7 @@ NULL
 #'
 #' @export
 #'
-getEventProbabilities <- function(
-        time, 
+getEventProbabilities <- function(time,
         ...,
         accrualTime = c(0, 12), # C_ACCRUAL_TIME_DEFAULT
         accrualIntensity = 0.1, # C_ACCRUAL_INTENSITY_DEFAULT
@@ -1694,9 +1696,9 @@ getEventProbabilities <- function(
 
     setting <- getPiecewiseSurvivalTime(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
-        lambda2 = lambda2, 
+        lambda2 = lambda2,
         lambda1 = lambda1,
-        hazardRatio = hazardRatio, 
+        hazardRatio = hazardRatio,
         kappa = kappa,
         delayedResponseAllowed = TRUE,
         .lambdaBased = TRUE
@@ -1705,12 +1707,14 @@ getEventProbabilities <- function(
     if (!setting$delayedResponseEnabled && length(setting$lambda1) > 1 &&
             setting$.getParameterType("lambda1") == C_PARAM_USER_DEFINED) {
         warning("Only the first 'lambda1' (", lambda1[1], ") ",
-            "was used to calculate event probabilities", call. = FALSE)
+            "was used to calculate event probabilities",
+            call. = FALSE
+        )
         setting <- getPiecewiseSurvivalTime(
             piecewiseSurvivalTime = piecewiseSurvivalTime,
-            lambda2 = lambda2, 
+            lambda2 = lambda2,
             lambda1 = lambda1[1],
-            hazardRatio = hazardRatio, 
+            hazardRatio = hazardRatio,
             kappa = kappa,
             delayedResponseAllowed = TRUE,
             .lambdaBased = TRUE
@@ -2071,12 +2075,12 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         if (is.na(followUpTime)) {
             if (accrualSetup$piecewiseAccrualEnabled && !accrualSetup$endOfAccrualIsUserDefined) {
                 if (length(accrualIntensity) + 1 < length(accrualTime)) {
-                  stop(
-                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                    "length of 'accrualTime' (", length(accrualTime), ") must be greater ",
-                    "than length of 'accrualIntensity' (", length(accrualIntensity), ") + 1"
-                  )
-                }             
+                    stop(
+                        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+                        "length of 'accrualTime' (", length(accrualTime), ") must be greater ",
+                        "than length of 'accrualIntensity' (", length(accrualIntensity), ") + 1"
+                    )
+                }
                 stop(
                     C_EXCEPTION_TYPE_MISSING_ARGUMENT,
                     "'followUpTime', 'maxNumberOfSubjects' or end of accrual must be defined"
@@ -2161,7 +2165,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                 steps <- 0
 
                 while (searchAccrualTimeEnabled && maxSearchIterations >= 0 &&
-                        (is.na(maxNumberOfSubjectsLower) ||
+                    (is.na(maxNumberOfSubjectsLower) ||
                         maxNumberOfSubjectsLower < maxNumberOfSubjectsLowerBefore ||
                         maxNumberOfSubjectsLower < 1e8)) {
                     tryCatch(
@@ -2179,24 +2183,24 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                             sampleSize <- .getSampleSizeSurvival(
                                 design = design,
                                 typeOfComputation = typeOfComputation,
-                                thetaH0 = thetaH0, 
-                                pi2 = pi2, 
+                                thetaH0 = thetaH0,
+                                pi2 = pi2,
                                 pi1 = pi1,
                                 allocationRatioPlanned = allocationRatioPlanned,
                                 accountForObservationTimes = accountForObservationTimes,
-                                eventTime = eventTime, 
+                                eventTime = eventTime,
                                 accrualTime = accrualSetup$accrualTime,
-                                accrualIntensity = accrualSetup$accrualIntensity, 
+                                accrualIntensity = accrualSetup$accrualIntensity,
                                 kappa = kappa,
                                 piecewiseSurvivalTime = piecewiseSurvivalTime,
-                                lambda2 = lambda2, 
-                                lambda1 = lambda1, 
-                                median1 = median1, 
+                                lambda2 = lambda2,
+                                lambda1 = lambda1,
+                                median1 = median1,
                                 median2 = median2,
-                                followUpTime = NA_real_, 
+                                followUpTime = NA_real_,
                                 maxNumberOfSubjects = maxNumberOfSubjectsLower,
-                                dropoutRate1 = dropoutRate1, 
-                                dropoutRate2 = dropoutRate2, 
+                                dropoutRate1 = dropoutRate1,
+                                dropoutRate2 = dropoutRate2,
                                 dropoutTime = dropoutTime,
                                 hazardRatio = hazardRatio
                             )
@@ -2214,7 +2218,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                         stop(expectionMessage, call. = FALSE)
                     }
                     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                        "'additionalAccrual' could not be found in ", steps, 
+                        "'additionalAccrual' could not be found in ", steps,
                         " search iterations, change accrual time specification",
                         call. = FALSE
                     )
@@ -2556,8 +2560,9 @@ getPowerSurvival <- function(design = NULL, ...,
     )
 
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
 
     if (designPlan$typeOfComputation == "Schoenfeld") {
         theta <- sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned) *
@@ -2670,10 +2675,10 @@ getPowerSurvival <- function(design = NULL, ...,
             powerAndAverageSampleNumber$futilityPerStage[is.na(
                 powerAndAverageSampleNumber$futilityPerStage[, i]
             ), i] <- 0
-        
+
             stoppingProbs[, i] <- powerAndAverageSampleNumber$rejectPerStage[, i] +
                 c(powerAndAverageSampleNumber$futilityPerStage[, i], 0)
-            
+
             stoppingProbs[kMax, i] <- 1 - sum(stoppingProbs[1:(kMax - 1), i])
             designPlan$studyDuration[i] <- designPlan$analysisTime[, i] %*% stoppingProbs[, i]
             designPlan$.setParameterType("studyDuration", C_PARAM_GENERATED)

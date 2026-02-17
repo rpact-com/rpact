@@ -393,12 +393,13 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
     if (.isCppCode(calcFunction)) {
         tryCatch(
             {
-                if (.isPackageInstalled("pkgbuild") && 
+                if (.isPackageInstalled("pkgbuild") &&
                         !isTRUE(eval(parse(text = "pkgbuild::has_build_tools(debug = FALSE)")))) {
-                    stop("no C++ compiler found", ifelse(.Platform$OS.type == "windows", 
-                        " (install RTools to solve the issue)", ""))
+                    stop("no C++ compiler found", ifelse(.Platform$OS.type == "windows",
+                        " (install RTools to solve the issue)", ""
+                    ))
                 }
-                
+
                 survivalEnabled <- inherits(simulationResults, "SimulationResultsSurvival")
                 expectedFunctionName <- ifelse(survivalEnabled,
                     "calcEventsFunctionCppTemp", "calcSubjectsFunctionCppTemp"

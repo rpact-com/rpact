@@ -193,28 +193,33 @@ getSimulationMeans <- function(design = NULL, ...,
     )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     if (meanRatio) {
-        .assertIsInOpenInterval(thetaH0, "thetaH0", 
-            lower = 0, upper = NULL, naAllowed = TRUE)
-        .assertIsInOpenInterval(thetaH1, "thetaH1", 
-            lower = 0, upper = NULL, naAllowed = TRUE)
+        .assertIsInOpenInterval(thetaH0, "thetaH0",
+            lower = 0, upper = NULL, naAllowed = TRUE
+        )
+        .assertIsInOpenInterval(thetaH1, "thetaH1",
+            lower = 0, upper = NULL, naAllowed = TRUE
+        )
         if (identical(alternative, C_ALTERNATIVE_POWER_SIMULATION_DEFAULT)) {
             alternative <- C_ALTERNATIVE_POWER_SIMULATION_MEAN_RATIO_DEFAULT
         }
-        .assertIsInOpenInterval(alternative, "alternative", 
-            lower = 0, upper = NULL, naAllowed = TRUE)
+        .assertIsInOpenInterval(alternative, "alternative",
+            lower = 0, upper = NULL, naAllowed = TRUE
+        )
     }
     .assertIsValidGroupsParameter(groups)
     .assertIsNumericVector(alternative, "alternative", naAllowed = FALSE)
     .assertIsNumericVector(minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
     .assertIsNumericVector(maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
-    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 
-        lower = 0, upper = 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(conditionalPower, "conditionalPower",
+        lower = 0, upper = 1, naAllowed = TRUE
+    )
     .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE)
     .assertIsValidStandardDeviation(stDevH1, groups = groups, name = "stDevH1", naAllowed = TRUE)
     .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
+    )
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsValidStandardDeviation(stDev, groups = groups)

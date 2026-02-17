@@ -102,8 +102,10 @@ FieldSet <- R6::R6Class("FieldSet",
                     line <- paste0(args, collapse = sep)
                     listItemEnabled <- grepl("^  ", line)
 
-                    headingBaseNumber <- as.integer(getOption("rpact.print.heading.base.number", 
-                            C_HEADING_BASE_NUMBER_DEFAULT))
+                    headingBaseNumber <- as.integer(getOption(
+                        "rpact.print.heading.base.number",
+                        C_HEADING_BASE_NUMBER_DEFAULT
+                    ))
                     if (is.na(headingBaseNumber)) {
                         headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
@@ -165,7 +167,7 @@ FieldSet <- R6::R6Class("FieldSet",
             if (length(self$.catLines) == 0) {
                 return(invisible())
             }
-            
+
             for (line in self$.catLines) {
                 cat(line)
             }
@@ -307,13 +309,16 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (self$isUserDefinedParameter(parameterName) || self$isDefaultParameter(parameterName)) {
                 return(self[[parameterName]])
             }
-            
-            tryCatch({
-                parameterType <- .getClassName(self[[parameterName]])
-            }, error = function(e) {
-                parameterType <- "unknown"
-            })
-        
+
+            tryCatch(
+                {
+                    parameterType <- .getClassName(self[[parameterName]])
+                },
+                error = function(e) {
+                    parameterType <- "unknown"
+                }
+            )
+
             if (parameterType == "numeric") {
                 return(NA_real_)
             }
@@ -334,7 +339,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             } else {
                 parameterNames <- names(self$.parameterTypes[which(self$.parameterTypes %in% parameterType)])
             }
-            
+
             parametersToShow <- self$.getParametersToShow()
             if (is.null(parametersToShow) || length(parametersToShow) == 0) {
                 return(parameterNames)
@@ -375,7 +380,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (!is.null(showType) && showType == 2) {
                 self$.cat("Technical developer summary of the ", self$.toString(), " object (",
                     methods::classLabel(class(self)), "):\n\n",
-                    sep = "", 
+                    sep = "",
                     heading = 1,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
@@ -432,7 +437,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                             consoleOutputEnabled = consoleOutputEnabled
                         ))
                     }
-                    
+
                     output <- ""
                     for (i in seq_len(length(params))) {
                         param <- params[[i]]
@@ -443,7 +448,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                             param$paramName <- parameterName
 
                             category <- parts[2]
-                            
+
                             categoryCaption <- .getParameterCaption(category, self[[parameterName]])
                             if (is.null(categoryCaption)) {
                                 categoryCaption <- paste0("%", category, "%")
@@ -470,11 +475,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         warning("Failed to show parameter '", parameterName, "': ", e$message)
                     }
                 }
-            ) 
+            )
         },
-        .showParameterSingle = function(
-                param,
-                parameterName, 
+        .showParameterSingle = function(param,
+                parameterName,
                 ...,
                 category = NULL,
                 showParameterType = FALSE,
@@ -555,35 +559,38 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(invisible(output))
         },
         .extractParameterNameAndValue = function(parameterName) {
-            tryCatch({
-                d <- regexpr("\\..+\\$", parameterName)
-                if (d[1] != 1) {
-                    return(list(
-                        parameterName = parameterName,
-                        paramValue = base::get(parameterName, envir = self)
-                    ))
-                }
-                
-                index <- attr(d, "match.length")
-                objectName <- substr(parameterName, 1, index - 1)
-                parameterName <- substr(parameterName, index + 1, nchar(parameterName))
-                obj <- base::get(objectName, envir = self)
-                paramValue <- base::get(parameterName, envir = obj)
-            
-                if (objectName == ".closedTestResults" && parameterName == "rejected") {
-                    paramValueLogical <- as.logical(paramValue)
-                    if (is.matrix(paramValue)) {
-                        paramValueLogical <- matrix(paramValueLogical, ncol = ncol(paramValue))
+            tryCatch(
+                {
+                    d <- regexpr("\\..+\\$", parameterName)
+                    if (d[1] != 1) {
+                        return(list(
+                            parameterName = parameterName,
+                            paramValue = base::get(parameterName, envir = self)
+                        ))
                     }
-                    paramValue <- paramValueLogical
+
+                    index <- attr(d, "match.length")
+                    objectName <- substr(parameterName, 1, index - 1)
+                    parameterName <- substr(parameterName, index + 1, nchar(parameterName))
+                    obj <- base::get(objectName, envir = self)
+                    paramValue <- base::get(parameterName, envir = obj)
+
+                    if (objectName == ".closedTestResults" && parameterName == "rejected") {
+                        paramValueLogical <- as.logical(paramValue)
+                        if (is.matrix(paramValue)) {
+                            paramValueLogical <- matrix(paramValueLogical, ncol = ncol(paramValue))
+                        }
+                        paramValue <- paramValueLogical
+                    }
+                    return(list(parameterName = parameterName, paramValue = paramValue))
+                },
+                error = function(e) {
+                    if (consoleOutputEnabled) {
+                        warning("Failed to extract parameter name and value from ", sQuote(parameterName), ": ", e$message)
+                    }
+                    return(list(parameterName = parameterName, paramValue = ""))
                 }
-                return(list(parameterName = parameterName, paramValue = paramValue))
-            }, error = function(e) {
-                if (consoleOutputEnabled) {
-                    warning("Failed to extract parameter name and value from ", sQuote(parameterName), ": ", e$message)
-                }
-                return(list(parameterName = parameterName, paramValue = ""))
-            })
+            )
         },
         .showUnknownParameters = function(consoleOutputEnabled = TRUE) {
             params <- self$.getUndefinedParameters()
@@ -593,21 +600,19 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 )
             }
         },
-        .showParameterFormatted = function(
-                paramName, 
-                paramValue, 
-                ..., 
+        .showParameterFormatted = function(paramName,
+                paramValue,
+                ...,
                 paramValueFormatted = NA_character_,
-                showParameterType = FALSE, 
-                category = NULL, 
-                matrixRow = NA_integer_, 
+                showParameterType = FALSE,
+                category = NULL,
+                matrixRow = NA_integer_,
                 consoleOutputEnabled = TRUE,
-                paramNameRaw = NA_character_, 
+                paramNameRaw = NA_character_,
                 numberOfCategories = NA_integer_) {
-                
             paramCaption <- NULL
             if (!is.na(paramNameRaw)) {
-                paramCaption <- .getParameterCaption(paramNameRaw, self) 
+                paramCaption <- .getParameterCaption(paramNameRaw, self)
             }
             if (is.null(paramCaption)) {
                 paramCaption <- .getParameterCaption(paramName, self)
@@ -747,7 +752,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 parameterValues <- self[[parameterName]]
                 if (is.vector(parameterValues) && length(parameterValues) > numberOfRows) {
                     numberOfRows <- length(parameterValues)
-                } else if (is.matrix(parameterValues) && 
+                } else if (is.matrix(parameterValues) &&
                         (nrow(parameterValues) == 1 || ncol(parameterValues) == 1) &&
                         length(parameterValues) > numberOfRows) {
                     numberOfRows <- length(parameterValues)
@@ -906,19 +911,19 @@ ParameterSet <- R6::R6Class("ParameterSet",
     }
 
     parameterNames <- parameterNames[!(parameterNames %in% c(
-        "accrualTime", 
+        "accrualTime",
         "accrualIntensity",
         "accrualIntensityRelative",
-        "plannedSubjects", 
+        "plannedSubjects",
         "plannedEvents",
-        "minNumberOfSubjectsPerStage", 
+        "minNumberOfSubjectsPerStage",
         "maxNumberOfSubjectsPerStage",
-        "minNumberOfEventsPerStage", 
+        "minNumberOfEventsPerStage",
         "maxNumberOfEventsPerStage",
-        "piecewiseSurvivalTime", 
-        "lambda2", 
+        "piecewiseSurvivalTime",
+        "lambda2",
         "adaptations",
-        "adjustedStageWisePValues", 
+        "adjustedStageWisePValues",
         "overallAdjustedTestStatistics",
         "plannedCalendarTime",
         "doseLevels",
@@ -984,7 +989,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
     if (parameterName %in% c("adjustedStageWisePValues", "overallAdjustedTestStatistics")) {
         return(NULL)
     }
-    
+
     if (!is.matrix(parameterValues)) {
         if (length(parameterValues) == 1) {
             return(rep(parameterValues, numberOfVariants * numberOfStages))
@@ -1002,11 +1007,11 @@ ParameterSet <- R6::R6Class("ParameterSet",
 
         if (length(parameterValues) == numberOfStages &&
                 parameterName %in% c(
-                    "plannedEvents", 
+                    "plannedEvents",
                     "plannedSubjects",
-                    "minNumberOfEventsPerStage", 
+                    "minNumberOfEventsPerStage",
                     "maxNumberOfEventsPerStage",
-                    "minNumberOfSubjectsPerStage", 
+                    "minNumberOfSubjectsPerStage",
                     "maxNumberOfSubjectsPerStage",
                     "allocationRatioPlanned"
                 )) {
@@ -1018,23 +1023,22 @@ ParameterSet <- R6::R6Class("ParameterSet",
         }
 
         if (parameterName %in% c(
-                "accrualTime", 
+                "accrualTime",
                 "accrualIntensity",
-                "plannedEvents", 
+                "plannedEvents",
                 "plannedSubjects",
-                "minNumberOfEventsPerStage", 
+                "minNumberOfEventsPerStage",
                 "maxNumberOfEventsPerStage",
-                "minNumberOfSubjectsPerStage", 
+                "minNumberOfSubjectsPerStage",
                 "maxNumberOfSubjectsPerStage",
-                "piecewiseSurvivalTime", 
+                "piecewiseSurvivalTime",
                 "lambda2",
                 "stDev"
-                )) {
-
+            )) {
             if (parameterName == "stDev" && length(unique(parameterValues)) == 1) {
                 return(parameterValues[1])
             }
-            
+
             return(paste(parameterValues, collapse = ", "))
         }
 
@@ -1165,8 +1169,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
     for (parameterName in parameterNames) {
         tryCatch(
             {
-                if (!(parameterName %in% c("stages", "adaptations", "effectList", 
-                            "doseLevels", "plannedCalendarTime")) && 
+                if (!(parameterName %in% c(
+                        "stages", "adaptations", "effectList",
+                        "doseLevels", "plannedCalendarTime"
+                    )) &&
                         !grepl("Function$", parameterName) &&
                         (is.null(variedParameter) || parameterName != variedParameter)) {
                     columnValues <- .getDataFrameColumnValues(
@@ -1174,16 +1180,16 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         numberOfVariants, numberOfStages,
                         includeAllParameters, mandatoryParameterNames
                     )
-                    
+
                     if (!is.null(columnValues)) {
                         columnCaption <- parameterSet$.getDataFrameColumnCaption(
                             parameterName, niceColumnNamesEnabled
                         )
-                        
+
                         if (parameterName == "stDev" && length(columnValues) == 2) {
                             columnValues <- paste(columnValues, collapse = ", ")
                         }
-                        
+
                         dataFrame[[columnCaption]] <- columnValues
                         if (returnParametersAsCharacter) {
                             parameterSet$.formatDataFrameParametersAsCharacter(
@@ -1349,8 +1355,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
     if (!inherits(parameterSet, "AccrualTime")) {
         accrualTime <- parameterSet[[".accrualTime"]]
         if (!is.null(accrualTime) && length(accrualTime) > 1) {
-            parametersToIgnore <- c(parametersToIgnore, 
-                c("accrualTime", "accrualIntensity", "accrualIntensityRelative"))
+            parametersToIgnore <- c(
+                parametersToIgnore,
+                c("accrualTime", "accrualIntensity", "accrualIntensityRelative")
+            )
         }
     }
 
@@ -1446,21 +1454,21 @@ names.FieldSet <- function(x) {
 #'
 print.FieldSet <- function(x, ..., markdown = NA) {
     sysCalls <- sys.calls()
-    
+
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("print")
     }
-    
+
     if (isTRUE(markdown)) {
         if (.isPrintCall(sysCalls)) {
             result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
             return(knitr::asis_output(result))
         }
-        
+
         .addObjectToPipeOperatorQueue(x)
         return(invisible(x))
     }
-    
+
     x$show()
     return(invisible(x))
 }
@@ -1486,12 +1494,11 @@ print.FieldSet <- function(x, ..., markdown = NA) {
 #'
 #' @keywords internal
 #'
-as.data.frame.ParameterSet <- function(
-        x, 
+as.data.frame.ParameterSet <- function(x,
         row.names = NULL,
-        optional = FALSE, 
-        ..., 
-        niceColumnNamesEnabled = FALSE, 
+        optional = FALSE,
+        ...,
+        niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame", ...)
 
@@ -1542,8 +1549,10 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
     if (inherits(x, "AnalysisResults")) {
         dfDesign <- as.data.frame(x$.design, niceColumnNamesEnabled = niceColumnNamesEnabled)
         dfStageResults <- as.data.frame(x$.stageResults, niceColumnNamesEnabled = niceColumnNamesEnabled)
-        dfStageResults <- dfStageResults[!is.na(dfStageResults[, 
-            grep("(test statistic)|(testStatistics)", colnames(dfStageResults))]), ]
+        dfStageResults <- dfStageResults[!is.na(dfStageResults[
+            ,
+            grep("(test statistic)|(testStatistics)", colnames(dfStageResults))
+        ]), ]
         if (length(intersect(names(dfDesign), names(dfStageResults))) == 1) {
             dfTemp <- merge(dfDesign, dfStageResults)
             if (length(intersect(names(dfTemp), names(dataFrame))) >= 1) {
@@ -1615,13 +1624,12 @@ summary.ParameterSet <- function(object, ...,
         output = c("all", "title", "overview", "body"),
         printObject = FALSE,
         sep = NA_character_) {
-        
     .warnInCaseOfUnknownArguments(functionName = "summary", ignore = c("printObject"), ...)
     .assertIsSingleCharacter(sep, "sep", naAllowed = TRUE)
     if (is.na(sep)) {
         sep <- .getMarkdownPlotPrintSeparator()
     }
-    
+
     base::attr(object, "printObject") <- printObject
     base::attr(object, "printObjectSeparator") <- sep
 
@@ -1665,7 +1673,7 @@ summary.ParameterSet <- function(object, ...,
             }
         }
     }
-    
+
     object$.printAsDataFrame(parameterNames = parametersToShow, niceColumnNamesEnabled = TRUE)
     invisible(object)
 }
@@ -1674,11 +1682,11 @@ summary.ParameterSet <- function(object, ...,
     if (is.null(sysCalls) || length(sysCalls) == 0) {
         return(TRUE)
     }
-    
+
     for (i in length(sysCalls):1) {
         callObj <- sysCalls[[i]]
         if (!is.null(callObj) && is.call(callObj)) {
-            callText <- capture.output(print(callObj))            
+            callText <- capture.output(print(callObj))
             if (any(grepl("(plot|summary)\\(", callText))) {
                 return(FALSE)
             }
@@ -1708,11 +1716,11 @@ summary.ParameterSet <- function(object, ...,
 #'
 print.ParameterSet <- function(x, ..., markdown = NA) {
     sysCalls <- sys.calls()
-    
+
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("print")
     }
-    
+
     showStatistics <- NULL
     if (inherits(x, "SimulationResults")) {
         showStatistics <- .getOptionalArgument("showStatistics", ...)
@@ -1720,22 +1728,23 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
             .assertIsSingleLogical(showStatistics, "showStatistics")
         }
     }
-    
+
     if (isTRUE(markdown)) {
         if (.isPrintCall(sysCalls)) {
             if (!is.null(showStatistics)) {
                 result <- paste0(utils::capture.output(
-                    x$.catMarkdownText(showStatistics = showStatistics)), collapse = "\n")
+                    x$.catMarkdownText(showStatistics = showStatistics)
+                ), collapse = "\n")
             } else {
                 result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
             }
             return(knitr::asis_output(result))
         }
-        
+
         .addObjectToPipeOperatorQueue(x)
         return(invisible(x))
     }
-    
+
     if (!is.null(showStatistics)) {
         x$show(showStatistics = showStatistics)
     } else {
@@ -1744,78 +1753,78 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     return(invisible(x))
 }
 
-#' 
+#'
 #' @rdname fetch.ParameterSet
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 obtain <- function(x, ..., output) UseMethod("obtain")
 
 #'
 #' @rdname fetch.ParameterSet
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 obtain.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "list")) {
     fCall <- match.call(expand.dots = TRUE)
     output <- match.arg(output)
-    return(.fetchParameterSetValues(x, fCall, output))   
+    return(.fetchParameterSetValues(x, fCall, output))
 }
 
-#' 
+#'
 #' @rdname fetch.ParameterSet
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 fetch <- function(x, ..., output) UseMethod("fetch")
 
 #'
 #' @title
 #' Extract a single parameter
-#' 
+#'
 #' @description
 #' Fetch a parameter from a parameter set.
-#' 
+#'
 #' @param x The \code{\link{ParameterSet}} object to fetch from.
-#' @param ... One or more variables specified as: 
-#'  - a literal variable name 
-#'  - a positive integer, giving the position counting from the left 
-#'  - a negative integer, giving the position counting from the right. 
-#' The default returns the last parameter.  
+#' @param ... One or more variables specified as:
+#'  - a literal variable name
+#'  - a positive integer, giving the position counting from the left
+#'  - a negative integer, giving the position counting from the right.
+#' The default returns the last parameter.
 #' This argument is taken by expression and supports quasiquotation (you can unquote column names and column locations).
 #' @param output A character defining the output type as follows:
 #'  - "named" (default) returns the named value if the value is a single value, the value inside a named list otherwise
 #'  - "value" returns only the value itself
 #'  - "list" returns the value inside a named list
-#' 
+#'
 #' @template examples_fetch_parameter_from_result
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "list")) {
     fCall <- match.call(expand.dots = TRUE)
     output <- match.arg(output)
-    return(.fetchParameterSetValues(x, fCall, output))   
+    return(.fetchParameterSetValues(x, fCall, output))
 }
 
 .getParameterSetVarIndices <- function(var, x) {
     if (!is.character(var) && !is.call(var)) {
         return(var)
     }
-    
+
     if (is.character(var) && var %in% names(x)) {
         return(var)
     }
-    
-    if (is.call(var) ) {
+
+    if (is.call(var)) {
         var <- as.character(var)
     }
-    
+
     result <- try(eval(parse(text = var)), silent = TRUE)
     if (methods::is(result, "try-error")) {
         return(var)
     }
-    
+
     return(result)
 }
 
@@ -1832,8 +1841,9 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
             if (is.pairlist(varValue)) {
                 for (j in 1:length(varValue)) {
                     var <- .getParameterSetVarNameOrIndex(
-                        varName = deparse(varValue[[j]]), 
-                        var = .getParameterSetVarIndices(varValue[[j]], x))
+                        varName = deparse(varValue[[j]]),
+                        var = .getParameterSetVarIndices(varValue[[j]], x)
+                    )
                     vars <- c(vars, var)
                 }
             } else {
@@ -1843,15 +1853,15 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
             }
         }
     }
-    
+
     if (length(vars) == 0) {
-        vars <- -1 
+        vars <- -1
     }
-    
+
     if (length(vars) == 1) {
         return(.getParameterSetValue(x = x, var = vars[[1]], output = output))
     }
-    
+
     results <- list()
     for (var in vars) {
         result <- .getParameterSetValue(x = x, var = var, output = output)
@@ -1861,7 +1871,7 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
             results[[length(results) + 1]] <- result
         }
     }
-    return(results)  
+    return(results)
 }
 
 .getParameterSetVar <- function(fCall, var) {
@@ -1869,43 +1879,43 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
     return(.getParameterSetVarNameOrIndex(varName, var))
 }
 
-#' 
-#' @examples 
+#'
+#' @examples
 #' .getParameterSetVarNameOrIndex("a", "a")
 #' .getParameterSetVarNameOrIndex("a", a)
 #' b <- 1
 #' .getParameterSetVarNameOrIndex("b", b)
-#' 
-#' @noRd 
-#' 
+#'
+#' @noRd
+#'
 .getParameterSetVarNameOrIndex <- function(varName, var) {
     if (identical(varName, "NULL")) {
         return(var)
     }
-    
+
     varNameExists <- !is.null(varName) && exists(varName)
     if (varNameExists) {
         return(var)
     }
-    
+
     if (grepl("\"|'", varName)) {
         varName <- gsub('"', "", varName)
         varName <- gsub("'", "", varName)
         return(varName)
     }
-    
+
     var <- suppressWarnings(as.integer(varName))
     if (!is.na(var)) {
         return(var)
     }
-    
+
     varName <- gsub('"', "", varName)
     varName <- gsub("'", "", varName)
     return(varName)
 }
 
 .getParameterSetValue <- function(..., x, var, output) {
-    if (is.character(var) && 
+    if (is.character(var) &&
             identical(as.character(suppressWarnings(as.integer(var))), var)) {
         var <- as.integer(var)
     }
@@ -1951,30 +1961,30 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
         if (length(var) == 0 || !(var %in% names(x))) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(varRoot), " does not exist")
         }
-        
+
         value <- x[[var]]
-        
+
         if (output == "value") {
             return(value)
         }
-        
+
         label <- var
         if (output == "labeled") {
             label <- getParameterCaption(x, var)
         } else if (!is.na(varOriginal)) {
             label <- varOriginal
         }
-        
+
         if (output %in% c("named", "labeled") && is.vector(value) && length(value) <= 1) {
             names(value) <- label
             return(value)
         }
-        
+
         result <- list(value = value)
         names(result) <- label
         return(result)
     }
-    
+
     .assertIsSingleInteger(var, "var", validateType = FALSE)
     varNames <- names(x)
     .assertIsInClosedInterval(var, "var", lower = -length(varNames), upper = length(varNames))
@@ -1984,24 +1994,24 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
     if (var < 0) {
         var <- length(varNames) + var + 1
     }
-    
+
     varName <- varNames[var]
     value <- x[[varName]]
-    
+
     if (output == "value") {
         return(value)
     }
-    
+
     label <- names(x)[var]
     if (output == "labeled") {
         label <- getParameterCaption(x, names(x)[var])
     }
-    
+
     if (output %in% c("named", "labeled") && is.vector(value) && length(value) <= 1) {
         names(value) <- label
         return(value)
     }
-    
+
     result <- list(value = value)
     names(result) <- label
     return(result)
@@ -2037,7 +2047,7 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
         legendPosition = NA_integer_, showSource = FALSE, plotSettings = NULL) {
     .assertGgplotIsInstalled()
-    
+
     stop(
         C_EXCEPTION_TYPE_RUNTIME_ISSUE,
         "sorry, function 'plot' is not implemented yet for class '", .getClassName(x), "'"
@@ -2059,14 +2069,14 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
 #'
 #' @details
 #' Generic function to print a field set in Markdown.
-#' 
+#'
 #' @template details_knit_print
 #'
 #' @keywords internal
-#' 
+#'
 #' @export
 #'
-knit_print.FieldSet <- function(x, ...) { 
+knit_print.FieldSet <- function(x, ...) {
     result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
     return(knitr::asis_output(result))
 }
@@ -2086,14 +2096,14 @@ knit_print.FieldSet <- function(x, ...) {
 #'
 #' @details
 #' Generic function to print a parameter set in Markdown.
-#' 
+#'
 #' @template details_knit_print
 #'
 #' @keywords internal
-#' 
+#'
 #' @export
 #'
-knit_print.ParameterSet <- function(x, ...) { 
+knit_print.ParameterSet <- function(x, ...) {
     result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
     return(knitr::asis_output(result))
 }
@@ -2111,32 +2121,36 @@ knit_print.ParameterSet <- function(x, ...) {
 #'
 #' @details
 #' This function is deprecated and should no longer be used.
-#' Manual use of kable() for rpact result objects is no longer needed, 
-#' as the formatting and display will be handled automatically by the rpact package. 
-#' Please remove any manual kable() calls from your code to avoid redundancy and potential issues. 
+#' Manual use of kable() for rpact result objects is no longer needed,
+#' as the formatting and display will be handled automatically by the rpact package.
+#' Please remove any manual kable() calls from your code to avoid redundancy and potential issues.
 #' The results will be displayed in a consistent format automatically.
-#' 
+#'
 #' @name kableParameterSet
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @export
 #'
 kable.ParameterSet <- function(x, ...) {
     fCall <- match.call(expand.dots = FALSE)
-    
+
     lastWarningTime <- getOption("rpact.deprecated.message.time.function.kable")
     if (is.null(lastWarningTime) || difftime(Sys.time(), lastWarningTime, units = "hours") > 8) {
         base::options("rpact.deprecated.message.time.function.kable" = Sys.time())
-        .Deprecated(new = "",  
-            msg = paste0("Manual use of kable() for rpact result objects is no longer needed, ",
-                "as the formatting and display will be handled automatically by the rpact package"),
-            old = "kable")
+        .Deprecated(
+            new = "",
+            msg = paste0(
+                "Manual use of kable() for rpact result objects is no longer needed, ",
+                "as the formatting and display will be handled automatically by the rpact package"
+            ),
+            old = "kable"
+        )
     }
-    
+
     if (inherits(x, "ParameterSet")) {
         objName <- deparse(fCall$x)
-        
+
         if (length(objName) > 0) {
             if (length(objName) > 1) {
                 objName <- paste0(objName[1], "...")
@@ -2158,110 +2172,111 @@ kable.ParameterSet <- function(x, ...) {
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
-kable.FieldSet <- function(x, ..., 
+#'
+#' @export
+#'
+kable.FieldSet <- function(x, ...,
         enforceRowNames = TRUE, niceColumnNamesEnabled = TRUE) {
     .assertPackageIsInstalled("knitr")
-    knitr::kable(as.matrix(x, 
-        enforceRowNames = enforceRowNames, 
-        niceColumnNamesEnabled = niceColumnNamesEnabled), ...)
+    knitr::kable(as.matrix(x,
+        enforceRowNames = enforceRowNames,
+        niceColumnNamesEnabled = niceColumnNamesEnabled
+    ), ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.data.frame <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.table <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.matrix <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.array <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.numeric <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.character <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.logical <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable <- function(x, ...) UseMethod("kable")

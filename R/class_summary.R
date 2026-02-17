@@ -579,7 +579,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     numberOfStages <- ncol(values)
                 }
             }
-            
+
             if (!is.null(parameterSet[[".piecewiseSurvivalTime"]]) &&
                     isTRUE(parameterSet[[".piecewiseSurvivalTime"]]$delayedResponseEnabled)) {
                 numberOfVariants <- 1
@@ -797,8 +797,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                         if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE")) {
                             warning(
                                 "Failed to get varied parameter from ", .getClassName(parameterSet),
-                                " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ";", 
-                                length(variedParameter),  " varied parameter values)"
+                                " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ";",
+                                length(variedParameter), " varied parameter values)"
                             )
                         }
                         return(invisible())
@@ -1102,8 +1102,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     }
                     if (!is.na(roundDigits) && roundDigits == 0) {
                         if (inherits(fieldSet, "Dataset") &&
-                                grepl("samplesize|event", tolower(parameterName))) {
-                        } else {
+                                grepl("samplesize|event", tolower(parameterName))) {} else {
                             formatFunctionName <- .getParameterFormatFunction(parameterName, fieldSet)
                         }
                     }
@@ -1958,17 +1957,21 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 paste0(ifelse(design$bindingFutility, "binding", "non-binding"), " futility")
             )
         }
-        
+
         if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
                 !all(is.na(design$efficacyStops)) && !all(design$efficacyStops, na.rm = TRUE)) {
-            header <- .concatenateSummaryText(header, 
-                paste0("efficacy stops ", .arrayToString(design$efficacyStops, vectorLookAndFeelEnabled = TRUE)))
+            header <- .concatenateSummaryText(
+                header,
+                paste0("efficacy stops ", .arrayToString(design$efficacyStops, vectorLookAndFeelEnabled = TRUE))
+            )
         }
-        
+
         if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
                 !all(is.na(design$futilityStops)) && !all(design$futilityStops, na.rm = TRUE)) {
-            header <- .concatenateSummaryText(header, 
-                paste0("futility stops ", .arrayToString(design$futilityStops, vectorLookAndFeelEnabled = TRUE)))
+            header <- .concatenateSummaryText(
+                header,
+                paste0("futility stops ", .arrayToString(design$futilityStops, vectorLookAndFeelEnabled = TRUE))
+            )
         }
 
         header <- .addAlphaAndBetaToHeader(header, design, designPlan)
@@ -2287,10 +2290,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             treatmentRateText <- paste0(treatmentRateText, ", piecewise survival distribution")
             treatmentRateText <- paste0(
                 treatmentRateText, ", \n",
-                "piecewise survival time = ", .arrayToString(round(designPlan$piecewiseSurvivalTime, 4), 
+                "piecewise survival time = ", .arrayToString(round(designPlan$piecewiseSurvivalTime, 4),
                     digits = 4, vectorLookAndFeelEnabled = TRUE
                 ), ", \n",
-                "control lambda(2) = ", .arrayToString(round(designPlan$lambda2, 4), 
+                "control lambda(2) = ", .arrayToString(round(designPlan$lambda2, 4),
                     digits = 4, vectorLookAndFeelEnabled = TRUE
                 )
             )
@@ -2488,10 +2491,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 )
             ))
         }
-        if (settings$survivalEnabled && 
-                !is.null(designPlan[["dropoutTime"]]) && 
+        if (settings$survivalEnabled &&
+                !is.null(designPlan[["dropoutTime"]]) &&
                 !is.na(designPlan$dropoutTime)) {
-            if ((!is.na(designPlan$dropoutRate1) && designPlan$dropoutRate1 > 0) || 
+            if ((!is.na(designPlan$dropoutRate1) && designPlan$dropoutRate1 > 0) ||
                     (!is.na(designPlan$dropoutRate2) && designPlan$dropoutRate2 > 0)) {
                 header <- .concatenateSummaryText(header, paste0(
                     "dropout rate(1) = ",
@@ -3143,8 +3146,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             {
                 digitsProbabilities <- as.integer(getOption("rpact.summary.digits.probs", digits + 1))
             },
-            warning = function(e) {
-            }
+            warning = function(e) {}
         )
         if (is.na(digitsProbabilities)) {
             digitsProbabilities <- digits + 1
@@ -3256,7 +3258,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
     }
-    
+
     summaryFactory$addParameter(design,
         parameterName = "stageLevels",
         twoSided = design$sided == 2,

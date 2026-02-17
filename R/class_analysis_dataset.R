@@ -455,7 +455,7 @@ writeDatasets <- function(datasets, file, ..., append = FALSE, quote = TRUE, sep
         if (length(args) == 2 && !is.null(design)) {
             dataset <- .getDatasetFromArgs(...)
             if (!is.null(dataset)) {
-                dataset <- dataset$clone(deep = TRUE) 
+                dataset <- dataset$clone(deep = TRUE)
                 dataset$.design <- design
                 return(dataset)
             }
@@ -690,7 +690,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 }
 
 
-#' 
+#'
 #' Calculate Standard Deviation from Standard Error
 #'
 #' @description
@@ -727,14 +727,13 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
 #' }
 #'
 #' @noRd
-#' 
-.getStandardDeviationFromStandardError <- function(
-        sampleSize, 
-        standardError, 
+#'
+.getStandardDeviationFromStandardError <- function(sampleSize,
+        standardError,
         ...,
-        dfValue = NA_real_, 
-        alpha = 0.05, 
-        lmEnabled = TRUE, 
+        dfValue = NA_real_,
+        alpha = 0.05,
+        lmEnabled = TRUE,
         stDevCalcMode = "auto") {
     qtCalcEnabled <- length(stDevCalcMode) == 1 && !is.na(stDevCalcMode) && stDevCalcMode == "t"
     if ((qtCalcEnabled || !lmEnabled) && !is.na(dfValue) && !is.infinite(dfValue) && dfValue > 0) {
@@ -770,7 +769,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 .getClassName(emmeansResultPerStage), stage
             ))
         }
-        
+
         levelsList <- methods::slot(emmeansResultPerStage, "levels")
         if (!is.null(levelsList) && length(levelsList) > 1) {
             stop(
@@ -779,7 +778,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
             )
         }
     }
-    
+
     stages <- integer(0)
     groups <- integer(0)
     means <- numeric(0)
@@ -791,7 +790,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         {
             modelCall <- emmeansResults[[1]]@model.info$call
             modelFunction <- as.character(modelCall)[1]
-            
+
             lmEnabled <- grepl("^(stats::)?lm$", modelFunction)
             if (!grepl(paste0("::", modelFunction), modelFunction)) {
                 packageName <- .getPackageName(modelFunction)
@@ -960,7 +959,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
             }
         }
     }
-    
+
     subsetNames <- subsetNames[subsetNames != ""]
     subsets <- NULL
     subsetType <- NA_character_
@@ -2320,7 +2319,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #'     fixedCovariates = list(gender = c("f", "m"), bmi = c(17, 40))
 #' )
 #' }
-#' 
+#'
 #' @noRd
 #'
 .getRandomDataMeans <- function(dataset, ...,
@@ -2582,37 +2581,37 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
 #'
 #' @export
 #'
-plot.Dataset <- function(x, y, ..., 
-        main = "Dataset", 
-        xlab = "Stage", 
+plot.Dataset <- function(x, y, ...,
+        main = "Dataset",
+        xlab = "Stage",
         ylab = NA_character_,
-        legendTitle = "Group", 
-        palette = "Set1", 
-        showSource = FALSE, 
+        legendTitle = "Group",
+        palette = "Set1",
+        showSource = FALSE,
         plotSettings = NULL) {
-        
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
-    
+
     args <- list(
-        x = x, 
+        x = x,
         y = NULL,
         main = main,
         xlab = xlab,
         ylab = ylab,
         legendTitle = legendTitle,
         palette = palette,
-        plotSettings = plotSettings, 
-        ...)
-    
+        plotSettings = plotSettings,
+        ...
+    )
+
     if (markdown) {
         sep <- .getMarkdownPlotPrintSeparator()
         print(do.call(.plot.Dataset, args))
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
-    
+
     return(do.call(.plot.Dataset, args))
 }
 
@@ -2621,7 +2620,7 @@ plot.Dataset <- function(x, y, ...,
     if (x$.enrichmentEnabled) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of enrichment data is not implemented yet")
     }
-    
+
     .assertGgplotIsInstalled()
 
     if (x$isDatasetMeans()) {
@@ -2655,7 +2654,8 @@ plot.Dataset <- function(x, y, ...,
             )
             p <- p + ggplot2::geom_boxplot(
                 ggplot2::aes(fill = .data[["stage"]]),
-                na.rm = TRUE)
+                na.rm = TRUE
+            )
             p <- p + ggplot2::geom_point(
                 colour = "#0e414e", shape = 20,
                 position = ggplot2::position_jitter(width = .1),
@@ -2704,8 +2704,10 @@ plot.Dataset <- function(x, y, ...,
                 fill = factor(.data[["group"]])
             ), data = data)
             p <- p + ggplot2::geom_point(
-                    ggplot2::aes(colour = .data[["group"]],
-                    na.rm = TRUE),
+                ggplot2::aes(
+                    colour = .data[["group"]],
+                    na.rm = TRUE
+                ),
                 shape = 20,
                 position = ggplot2::position_dodge(.75),
                 size = plotSettings$pointSize
@@ -4267,24 +4269,24 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
     if (is.null(sysCalls) || length(sysCalls) == 0) {
         return(FALSE)
     }
-    
+
     callText <- character()
     for (i in length(sysCalls):1) {
         callObj <- sysCalls[[i]]
         if (!is.null(callObj) && is.call(callObj)) {
-            callText <- c(callText, capture.output(print(callObj)))            
+            callText <- c(callText, capture.output(print(callObj)))
         }
     }
     callText <- paste(callText, collapse = " ")
-    
+
     if (grepl("plot\\(", callText)) {
         return(FALSE)
     }
-    
+
     if (grepl("summary\\(print\\(", callText) && !grepl("getAnalysisResults", callText)) {
         return(TRUE)
     }
-    
+
     return(FALSE)
 }
 
@@ -4310,13 +4312,13 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
 print.Dataset <- function(x, ..., markdown = NA, output = c("list", "long", "wide", "r", "rComplete")) {
     fCall <- match.call(expand.dots = FALSE)
     sysCalls <- sys.calls()
-    
+
     datasetName <- deparse(fCall$x)
-    
+
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("print")
     }
-    
+
     output <- match.arg(output)
 
     if (isTRUE(markdown)) {
@@ -4326,16 +4328,16 @@ print.Dataset <- function(x, ..., markdown = NA, output = c("list", "long", "wid
                 call. = FALSE
             )
         }
-        
-        if (.isPrintCall(sysCalls)) { 
+
+        if (.isPrintCall(sysCalls)) {
             result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
             return(knitr::asis_output(result))
         }
-        
+
         if (.isPrintSummaryCall(sysCalls)) {
             .addObjectToPipeOperatorQueue(x)
         }
-        
+
         return(invisible(x))
     }
 

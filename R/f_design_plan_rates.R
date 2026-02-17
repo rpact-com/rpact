@@ -314,8 +314,7 @@ NULL
     ))
 }
 
-.getSampleSizeFixedRates <- function(
-        ...,
+.getSampleSizeFixedRates <- function(...,
         alpha = 0.025,
         beta = 0.2,
         sided = 1,
@@ -326,8 +325,7 @@ NULL
         pi1 = seq(0.4, 0.6, 0.1),
         pi2 = 0.2,
         groups = 2,
-        allocationRatioPlanned = 1
-        ) {
+        allocationRatioPlanned = 1) {
     if (groups == 1) {
         nFixed <- rep(NA_real_, length(pi1))
 
@@ -634,8 +632,7 @@ NULL
 # note that 'directionUpper' and 'maxNumberOfSubjects' are
 # only applicable for 'objectType' = "power"
 #
-.createDesignPlanRates <- function(
-        ...,
+.createDesignPlanRates <- function(...,
         objectType = c("sampleSize", "power"),
         design,
         normalApproximation = TRUE,
@@ -647,8 +644,7 @@ NULL
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
         groups = 2,
-        allocationRatioPlanned = NA_real_
-        ) {
+        allocationRatioPlanned = NA_real_) {
     objectType <- match.arg(objectType)
 
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
@@ -942,8 +938,7 @@ NULL
 #'
 #' @export
 #'
-getPowerRates <- function(
-        design = NULL,
+getPowerRates <- function(design = NULL,
         ...,
         groups = 2L,
         riskRatio = FALSE,
@@ -1139,8 +1134,7 @@ getPowerRates <- function(
 #'
 #' @export
 #'
-getSampleSizeRates <- function(
-        design = NULL,
+getSampleSizeRates <- function(design = NULL,
         ...,
         groups = 2L,
         normalApproximation = TRUE,

@@ -335,7 +335,8 @@ NULL
                 warning(
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
-                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")", call. = FALSE
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
+                    call. = FALSE
                 )
             } else {
                 message(
@@ -444,7 +445,8 @@ NULL
                 warning(
                     "Only ", counter, " of ", length(testFiles),
                     " unit test files were downloaded successfully (needed ",
-                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")", call. = FALSE
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
+                    call. = FALSE
                 )
             } else {
                 message(
@@ -511,19 +513,20 @@ NULL
 .getReportAuthor <- function(token, secret, action, default = "RPACT") {
     tryCatch(
         {
-            result <- base::readLines(sprintf(
+            result <- suppressWarnings(base::readLines(sprintf(
                 paste0(
                     "https://rpact-",
                     paste0(c(
-                        "metadata", 
-                        "share", 
-                        "connect", 
-                        "posit", 
-                        "cloud"), collapse = "."),
+                        "metadata",
+                        "share",
+                        "connect",
+                        "posit",
+                        "cloud"
+                    ), collapse = "."),
                     "?token=%s&secret=%s&action=%s"
                 ),
                 token, secret, action
-            ))
+            )))
             companyLine <- grep('<meta name="company"', result, value = TRUE)
             company <- sub('.*content="([^"]+)".*', "\\1", companyLine)
             company <- gsub("&amp;", "&", company)
@@ -944,6 +947,67 @@ setupPackageTests <- function(token, secret) {
     return(resultFiles)
 }
 
+.getTestExecutionMode <- function(testFileDirectory, credentialsAvailable, downloadOnlyModeEnabled) {
+    if (!is.na(testFileDirectory)) {
+        # run test files from the user defined directory 'testFileDirectory'
+        return("runTestsInTestFileDirectory")
+    }
+    
+    
+    if (credentialsAvailable) {
+        if (downloadOnlyModeEnabled) {
+            # download test files only
+            return("downloadOnly")
+        } 
+        
+        # download test files and run them
+        return("downloadAndRunTests")
+    } 
+    
+    # run test from directory 'inst/tests'
+    return("default")
+}
+
+.getTestFileTargetDirectory <- function(outDir, testFileDirectory, executionMode, pkgName) {
+    if (executionMode == "runTestsInTestFileDirectory") {
+        return(testFileDirectory)
+    } 
+    
+    if (executionMode %in% c("downloadAndRunTests", "downloadOnly")) {
+        return(file.path(outDir, paste0(pkgName, "-tests")))
+    }
+    
+    return(file.path(find.package("rpact"), "tests"))
+}
+
+.getTestReportFileNames <- function(reportType, markdownReportFileName, 
+        keepSourceFiles, testFileTargetDirectory, resultDir, reportFileBaseName) {
+    if (identical(reportType, "Rout") || is.null(markdownReportFileName)) {
+        return(NULL)
+    }
+    
+    reportFileNames <- character()
+    if (keepSourceFiles && file.exists(file.path(testFileTargetDirectory, markdownReportFileName))) {
+        reportFileNames <- c(reportFileNames, markdownReportFileName)
+    }
+    
+    reportFileNameHtml <- paste0(reportFileBaseName, ".html")
+    if (file.exists(file.path(testFileTargetDirectory, reportFileNameHtml))) {
+        reportFileNames <- c(reportFileNames, reportFileNameHtml)
+    }
+    
+    reportFileNamePdf <- paste0(reportFileBaseName, ".pdf")
+    if (file.exists(file.path(testFileTargetDirectory, reportFileNamePdf))) {
+        reportFileNames <- c(reportFileNames, reportFileNamePdf)
+    }
+    
+    if (length(reportFileNames) > 0) {
+        file.copy(file.path(testFileTargetDirectory, reportFileNames), resultDir)
+    }
+    
+    return(reportFileNames)
+}
+
 #' @title
 #' Test and Validate the rpact Package Installation
 #'
@@ -978,8 +1042,8 @@ setupPackageTests <- function(token, secret) {
 #'     A copy of them can be found in the subdirectory \code{src}.
 #' @param reportFileBaseName The base name for the report files (without path or extension).
 #' @param metaData A named \code{list} containing additional metadata to be included in the test report.
-#'    This can include information such as \code{company}, \code{container name}, \code{host name}, etc. 
-#'    Default is an empty list. 
+#'    This can include information such as \code{company}, \code{container name}, \code{host name}, etc.
+#'    Default is an empty list.
 #'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
 #' @param metaDataFile An optional path to a text file containing metadata: one entry per line in the form \code{KEY=VALUE}.
 #'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
@@ -1050,10 +1114,38 @@ testPackage <- function(
     .assertIsSingleLogical(testInstalledBasicPackages, "testInstalledBasicPackages", naAllowed = FALSE)
     .assertIsSingleLogical(openHtmlReport, "openHtmlReport", naAllowed = FALSE)
     .assertIsSingleLogical(keepSourceFiles, "keepSourceFiles", naAllowed = FALSE)
+
+    token <- .getConnectionArgument(connection, "token")
+    secret <- .getConnectionArgument(connection, "secret")
+    credentialsAvailable <- (!is.null(token) && !is.null(secret) &&
+        length(token) == 1 && length(secret) == 1 &&
+        !is.na(token) && !is.na(secret))
+
+    downloadOnlyModeEnabled <- is.na(testFileDirectory) &&
+        isTRUE(downloadTestsOnly) && isTRUE(credentialsAvailable)
+
+    executionMode <- .getTestExecutionMode(testFileDirectory, credentialsAvailable, downloadOnlyModeEnabled)
+    
+    pkgName <- "rpact"
+    testFileTargetDirectory <- .getTestFileTargetDirectory(outDir, testFileDirectory, executionMode, pkgName) 
+    if (!is.null(metaData) && length(metaData) > 0) {
+        if (is.null(metaDataFile)) {
+            metaDataFile <- file.path(testFileTargetDirectory, "meta_data.txt")
+        }
+        writeKeyValueFile(
+            keyValueList = metaData,
+            filePath = metaDataFile,
+            safeKeyCheck = FALSE
+        )
+    }
+    
+    if (!is.null(metaDataFile)) {
+        metaData <- readKeyValueFile(metaDataFile)
+    }
     
     reportType <- match.arg(reportType)
     scope <- match.arg(scope)
-    
+
     if (grepl("/|:|\\\\", reportFileBaseName)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -1061,7 +1153,7 @@ testPackage <- function(
             "must not contain path separators or drive specifiers"
         )
     }
-    
+
     if (!dir.exists(outDir)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -1086,7 +1178,7 @@ testPackage <- function(
             "test file directory '", testFileDirectory, "' does not exist"
         )
     }
-    
+
     if (isTRUE(addWarningDetailsToReport)) {
         valueBefore <- Sys.getenv("NOT_CRAN")
         on.exit(Sys.setenv(NOT_CRAN = valueBefore), add = TRUE)
@@ -1118,12 +1210,6 @@ testPackage <- function(
     }
     on.exit(resetLogLevel(), add = TRUE)
 
-    token <- .getConnectionArgument(connection, "token")
-    secret <- .getConnectionArgument(connection, "secret")
-    credentialsAvailable <- (!is.null(token) && !is.null(secret) &&
-        length(token) == 1 && length(secret) == 1 &&
-        !is.na(token) && !is.na(secret))
-
     author <- NA_character_
     if (credentialsAvailable) {
         author <- .getReportAuthor(
@@ -1137,9 +1223,6 @@ testPackage <- function(
     if (is.null(author) || length(author) != 1 || is.na(author) || nchar(trimws(author)) == 0) {
         author <- "RPACT"
     }
-    
-    downloadOnlyModeEnabled <- is.na(testFileDirectory) &&
-        isTRUE(downloadTestsOnly) && isTRUE(credentialsAvailable)
 
     if (!is.na(testFileDirectory)) {
         if (credentialsAvailable) {
@@ -1149,24 +1232,6 @@ testPackage <- function(
             )
         }
         credentialsAvailable <- TRUE
-    }
-
-    if (is.na(testFileDirectory)) {
-        if (credentialsAvailable) {
-            if (downloadOnlyModeEnabled) {
-                # download test files only
-                executionMode <- "downloadOnly"
-            } else {
-                # download test files and run them
-                executionMode <- "downloadAndRunTests"
-            }
-        } else {
-            # run test from directory 'inst/tests'
-            executionMode <- "default"
-        }
-    } else {
-        # run test files from the user defined directory 'testFileDirectory'
-        executionMode <- "runTestsInTestFileDirectory"
     }
 
     if (executionMode == "downloadOnly") {
@@ -1185,7 +1250,7 @@ testPackage <- function(
     } else if (executionMode %in% c("downloadAndRunTests", "runTestsInTestFileDirectory")) {
         if (completeUnitTestSetEnabled) {
             cat("Run all tests. Please wait...\n")
-            cat("Have a break - it takes about 20 minutes.\n")
+            cat("Have a break - it takes about 30 minutes.\n")
             cat("Exceution of all available unit tests startet at ",
                 format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
                 sep = ""
@@ -1196,32 +1261,19 @@ testPackage <- function(
             cat("The test will take about a minute.\n")
         }
     }
+    
+    if (!is.null(metaData) && length(metaData) > 0) {
+        cat("The following additional metadata will be included in the test report:\n")
+        for (key in names(metaData)) {
+            cat("- ", key, ": ", metaData[[key]], "\n", sep = "")
+        }
+    }
 
     oldResultFiles <- .getExistingTestResultFiles(outDir)
     for (oldResultFile in oldResultFiles) {
         if (file.exists(oldResultFile)) {
             file.remove(oldResultFile)
         }
-    }
-
-    markdownReportFileName <- NULL
-    pkgName <- "rpact"
-
-    if (executionMode == "default") {
-        testFileTargetDirectory <- file.path(find.package("rpact"), "tests")
-    } else if (executionMode == "runTestsInTestFileDirectory") {
-        testFileTargetDirectory <- testFileDirectory
-    } else if (executionMode %in% c("downloadAndRunTests", "downloadOnly")) {
-        testFileTargetDirectory <- file.path(outDir, paste0(pkgName, "-tests"))
-    }
-    
-    if (!is.null(metaData) && length(metaData) > 0) {
-        if (is.null(metaDataFile)) {
-            metaDataFile <- file.path(testFileTargetDirectory, "meta_data.txt")
-        }
-        writeKeyValueFile(
-            keyValueList = metaData,
-            filePath = metaDataFile)
     }
 
     if (executionMode %in% c("downloadAndRunTests", "downloadOnly")) {
@@ -1241,6 +1293,7 @@ testPackage <- function(
         }
     }
 
+    markdownReportFileName <- NULL
     if (reportType %in% c("compact", "detailed")) {
         testthatMainFile <- file.path(testFileTargetDirectory, "testthat.R")
         if (file.exists(testthatMainFile)) {
@@ -1302,28 +1355,8 @@ testPackage <- function(
         endTime = endTime, runtimeUnits = "auto"
     ), ".\n", sep = "")
 
-    reportFileNames <- NULL
-    if (reportType != "Rout" && !is.null(markdownReportFileName)) {
-        reportFileNames <- character()
-
-        if (keepSourceFiles && file.exists(file.path(testFileTargetDirectory, markdownReportFileName))) {
-            reportFileNames <- c(reportFileNames, markdownReportFileName)
-        }
-
-        reportFileNameHtml <- paste0(reportFileBaseName, ".html")
-        if (file.exists(file.path(testFileTargetDirectory, reportFileNameHtml))) {
-            reportFileNames <- c(reportFileNames, reportFileNameHtml)
-        }
-
-        reportFileNamePdf <- paste0(reportFileBaseName, ".pdf")
-        if (file.exists(file.path(testFileTargetDirectory, reportFileNamePdf))) {
-            reportFileNames <- c(reportFileNames, reportFileNamePdf)
-        }
-
-        if (length(reportFileNames) > 0) {
-            file.copy(file.path(testFileTargetDirectory, reportFileNames), resultDir)
-        }
-    }
+    reportFileNames <- .getTestReportFileNames(reportType, markdownReportFileName, 
+        keepSourceFiles, testFileTargetDirectory, resultDir, reportFileBaseName)
 
     minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
     totalNumberOfTests <- NA_integer_
@@ -1374,10 +1407,10 @@ testPackage <- function(
             )
         }
         cat("-------------------------------------------------------------------------\n")
-        cat("Please visit www.rpact.com to learn how to use rpact on FDA/GxP-compliant \n",
+        cat("Please visit www.rpact.org/iq to learn how to use rpact on FDA/GxP-compliant \n",
             "validated corporate computer systems and how to get a copy of the formal \n",
             "validation documentation that is customized and licensed for exclusive use \n",
-            "by your company/organization, e.g., to fulfill regulatory requirements.\n",
+            "by your organization, e.g., to fulfill regulatory requirements.\n",
             sep = ""
         )
     } else {
@@ -1449,17 +1482,17 @@ testPackage <- function(
     return(invisible(result))
 }
 
-#' 
-#' @title 
+#'
+#' @title
 #' Installation Qualification Result Object
 #'
-#' @description 
+#' @description
 #' This object represents the structured result of a full or partial
 #' installation qualification test execution. It includes metadata about
 #' the executed test suite, paths used, summary statistics, and status
 #' messages.
 #'
-#' @details 
+#' @details
 #' The object is returned by the function \code{\link{testPackage}} and
 #' is of class \code{InstallationQualificationResult}.
 #'
@@ -1469,7 +1502,7 @@ testPackage <- function(
 #'   \item{testFileDirectory}{Directory containing test scripts}
 #'   \item{testFileTargetDirectory}{Directory to which tests are copied or linked}
 #'   \item{reportType}{Report type selected (\code{"compact"}, \code{"detailed"}, or \code{"Rout"})}
-#'   \item{executionMode}{Execution mode (\code{"default"}, \code{"downloadOnly"}, 
+#'   \item{executionMode}{Execution mode (\code{"default"}, \code{"downloadOnly"},
 #'        \code{"downloadAndRunTests"}, or \code{"runTestsInTestFileDirectory"})}
 #'   \item{scope}{Scope of the qualification (`"basic"`, `"devel"`, `"both"`, `"internet"`, or `"all"`)}
 #'   \item{resultDir}{Directory where the result reports are stored}
@@ -1489,11 +1522,11 @@ testPackage <- function(
 #' @seealso \code{\link{testPackage}}
 #' @docType class
 #' @aliases InstallationQualificationResult-class
-#' 
+#'
 NULL
 
-#' 
-#' @title 
+#'
+#' @title
 #' Print Installation Qualification Result
 #'
 #' @description
@@ -1513,11 +1546,11 @@ NULL
 #' result <- testPackage()
 #' print(result)
 #' }
-#' 
+#'
 #' @keywords internal
 #'
 #' @export
-#' 
+#'
 print.InstallationQualificationResult <- function(x, ...) {
     cat("Installation Qualification Result:\n")
     cat(x$resultMessage, "\n\n")
@@ -1781,7 +1814,11 @@ MarkdownReporter <- R6::R6Class(
             self$scope <- scope
             self$metaDataFile <- metaDataFile
             self$minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
-            if (file.exists(self$metaDataFile)) {
+            if (!is.null(self$metaDataFile) && 
+                    length(self$metaDataFile) == 1 &&
+                    !is.na(self$metaDataFile) &&
+                    is.character(self$metaDataFile) &&
+                    file.exists(self$metaDataFile)) {
                 self$metaData <- readKeyValueFile(self$metaDataFile)
             }
         },
@@ -1790,12 +1827,13 @@ MarkdownReporter <- R6::R6Class(
             self$output <- c(self$output, paste(args, collapse = ""))
         },
         start_reporter = function() {
-            authorValidated <- ifelse(is.null(self$author) || 
-                length(self$author) != 1 || 
-                is.na(self$author) || 
+            authorValidated <- ifelse(is.null(self$author) ||
+                length(self$author) != 1 ||
+                is.na(self$author) ||
                 nchar(trimws(self$author)) == 0 ||
-                grepl("unknown|anonymous", self$author, ignore.case = TRUE), 
-                "RPACT", self$author)
+                grepl("unknown|anonymous", self$author, ignore.case = TRUE),
+            "RPACT", self$author
+            )
             self$startTime <- Sys.time()
             self$log("---")
             self$log('title: "Installation Qualification for rpact"')
@@ -2053,13 +2091,13 @@ MarkdownReporter <- R6::R6Class(
             self$log("")
             citePackage <- utils::capture.output(print(citation("rpact"), bibtex = FALSE))
             citePackage <- trimws(citePackage[!grepl("^($)|(To cite )|(Um Paket )|(Please )", citePackage)])
-            
+
             indices <- grep("^Wassmer", citePackage)
             if (length(indices) > 1) {
                 if (indices[length(indices)] < length(citePackage)) {
                     indices <- c(indices, length(citePackage))
                 }
-                
+
                 citePackageParts <- list()
                 for (i in 2:length(indices)) {
                     part <- citePackage[indices[i - 1]:indices[i]]
@@ -2068,7 +2106,7 @@ MarkdownReporter <- R6::R6Class(
             } else {
                 citePackagePart <- list(paste(citePackage, collapse = " "))
             }
-            
+
             for (citePackagePart in citePackageParts) {
                 self$log("- ", citePackagePart)
             }

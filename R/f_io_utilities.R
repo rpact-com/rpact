@@ -49,18 +49,18 @@
     return(readChar(inputFileName, file.info(inputFileName)$size))
 }
 
-#' 
-#' @title 
+#'
+#' @title
 #' Write a key-value file (KEY=VALUE) from a named list
 #'
-#' @description 
+#' @description
 #' Writes a human-editable text file in a widely used key-value format
 #' (INI/.env-like): one entry per line in the form \code{KEY=VALUE}.
 #' Blank lines and comment lines (starting with \code{#} or \code{;})
 #' are allowed. Values are written as a single line; special characters
 #' are escaped so that the file remains one key per line.
 #'
-#' @details 
+#' @details
 #' Keys are restricted to \code{[A-Za-z0-9_.-]} to keep the file portable
 #' and easy to edit.
 #'
@@ -76,11 +76,15 @@
 #' @param writeHeader Logical; if \code{TRUE}, writes a short header comment.
 #' @param sortKeys Logical; if \code{TRUE}, keys are written in alphabetical order.
 #' @param overwrite Logical; if \code{FALSE} and the file exists, an error is raised.
+#' @param safeKeyCheck Logical; if \code{TRUE}, checks that keys only contain
+#'        allowed characters. Set to \code{FALSE} to allow arbitrary keys, but be aware that
+#'        this may lead to issues when reading the file back, as keys with special characters
+#'        may not be parsed correctly.
 #' @param ... Currently unused.
 #'
 #' @return Invisibly returns \code{filePath}.
-#' 
-#' @examples 
+#'
+#' @examples
 #' \dontrun{
 #' keyValueList <- list(
 #'     STUDY_NAME = "Trial A",
@@ -97,29 +101,37 @@
 #'     overwrite = TRUE
 #' )
 #' }
-#' 
+#'
 #' @keywords internal
-#' @export 
-#' 
+#' @export
+#'
 writeKeyValueFile <- function(
         keyValueList,
         filePath,
         ...,
         writeHeader = TRUE,
         sortKeys = FALSE,
-        overwrite = TRUE
-        ) {
+        overwrite = TRUE,
+        safeKeyCheck = TRUE) {
+    .assertIsSingleCharacter(filePath, "filePath")
+    .assertIsSingleLogical(writeHeader, "writeHeader")
+    .assertIsSingleLogical(sortKeys, "sortKeys")
+    .assertIsSingleLogical(overwrite, "overwrite")
+    .assertIsSingleLogical(safeKeyCheck, "safeKeyCheck")
+        
     if (!is.list(keyValueList)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'keyValueList' must be a list()", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'keyValueList' must be a list()",
+            call. = FALSE
+        )
     }
 
     keyNames <- names(keyValueList)
     if (is.null(keyNames) || any(!nzchar(keyNames))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'keyValueList' must be a named list()", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'keyValueList' must be a named list()",
+            call. = FALSE
+        )
     }
 
     isInvalidValue <- vapply(
@@ -130,7 +142,7 @@ writeKeyValueFile <- function(
         FUN.VALUE = logical(1)
     )
     if (any(isInvalidValue)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "all values must be length-1 atomic (no lists/vectors). Problem keys: ",
             paste(names(keyValueList)[isInvalidValue], collapse = ", "),
             call. = FALSE
@@ -138,9 +150,10 @@ writeKeyValueFile <- function(
     }
 
     if (file.exists(filePath) && !overwrite) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "file exists and overwrite = FALSE: ", sQuote(filePath), 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "file exists and overwrite = FALSE: ", sQuote(filePath),
+            call. = FALSE
+        )
     }
 
     outputDirectory <- dirname(filePath)
@@ -171,8 +184,10 @@ writeKeyValueFile <- function(
 
     convertValueToString <- function(value) {
         if (length(value) != 1L) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
-                "value must be length 1", call. = FALSE)
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+                "value must be length 1",
+                call. = FALSE
+            )
         }
 
         if (is.na(value)) {
@@ -222,8 +237,8 @@ writeKeyValueFile <- function(
     for (index in seq_along(keyNames)) {
         key <- keyNames[index]
 
-        if (!grepl("^[A-Za-z0-9_.-]+$", key)) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
+        if (isTRUE(safeKeyCheck) && !grepl("^[A-Za-z0-9_.-]+$", key)) {
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
                 "invalid key name '", key, "'. Allowed: A-Za-z0-9_.-",
                 call. = FALSE
             )
@@ -249,18 +264,18 @@ writeKeyValueFile <- function(
 }
 
 
-#' 
-#' @title 
+#'
+#' @title
 #' Read a key-value file (KEY=VALUE) into a named list
 #'
-#' @description 
+#' @description
 #' Reads a human-editable key-value file in a widely used format
 #' (INI/.env-like): \code{KEY=VALUE}. Blank lines are ignored.
 #' Full-line comments starting with \code{#} or \code{;} are ignored.
 #' Inline comments are supported for unquoted values when preceded by whitespace,
 #' e.g., \code{KEY=123 # comment}.
 #'
-#' @details 
+#' @details
 #' Values can be quoted with double quotes. Escape sequences \code{\\n},
 #' \code{\\r}, \code{\\t}, \code{\\\\}, and \code{\"} are supported.
 #'
@@ -272,11 +287,15 @@ writeKeyValueFile <- function(
 #'   logical/integer/numeric and \code{NA}. If \code{FALSE}, returns character values.
 #' @param duplicateKeys How to handle duplicate keys: \code{"error"} (default),
 #'   \code{"last"} (keep last occurrence), or \code{"first"} (keep first occurrence).
+#' @param safeKeyCheck Logical; if \code{TRUE}, checks that keys only contain
+#'        allowed characters. Set to \code{FALSE} (default) to allow arbitrary keys, but be aware that
+#'        this may lead to issues when reading the file back, as keys with special characters
+#'        may not be parsed correctly.
 #' @param ... Currently unused.
 #'
 #' @return A named list with parsed values.
-#' 
-#' @examples 
+#'
+#' @examples
 #' \dontrun{
 #' keyValueList <- list(
 #'     STUDY_NAME = "Trial A",
@@ -294,26 +313,31 @@ writeKeyValueFile <- function(
 #' )
 #' readKeyValueFile(filePath)
 #' }
-#' 
+#'
 #' @keywords internal
-#' @export 
-#' 
+#' @export
+#'
 readKeyValueFile <- function(
         filePath,
         ...,
         inferTypes = TRUE,
-        duplicateKeys = c("error", "last", "first")
-        ) {
+        duplicateKeys = c("error", "last", "first"),
+        safeKeyCheck = FALSE) {
+    .assertIsSingleCharacter(filePath, "filePath")
+    .assertIsSingleLogical(inferTypes, "inferTypes")
+    .assertIsSingleLogical(safeKeyCheck, "safeKeyCheck")
     duplicateKeys <- match.arg(duplicateKeys)
-
+    
     if (!file.exists(filePath)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "file not found: ", sQuote(filePath), call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "file not found: ", sQuote(filePath),
+            call. = FALSE
+        )
     }
 
     con <- file(filePath, open = "r", encoding = "UTF-8")
     on.exit(close(con), add = TRUE)
-    inputLines <- readLines(con, warn = FALSE)
+    inputLines <- base::readLines(con, warn = FALSE)
 
     trimWhitespace <- function(text) {
         sub("^\\s+|\\s+$", "", text)
@@ -402,15 +426,19 @@ readKeyValueFile <- function(
             next
         }
 
-        if (!grepl("^[A-Za-z0-9_.-]+$", key)) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
-                "invalid key name in file: ", sQuote(key), ". Allowed: A-Za-z0-9_.-", call. = FALSE)
+        if (isTRUE(safeKeyCheck) && !grepl("^[A-Za-z0-9_.-]+$", key)) {
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+                "invalid key name in file: ", sQuote(key), ". Allowed: A-Za-z0-9_.-",
+                call. = FALSE
+            )
         }
 
         if (key %in% seenKeys) {
             if (duplicateKeys == "error") {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, 
-                    "duplicate key in file: ", sQuote(key), call. = FALSE)
+                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+                    "duplicate key in file: ", sQuote(key),
+                    call. = FALSE
+                )
             }
             if (duplicateKeys == "first") {
                 next

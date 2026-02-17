@@ -18,21 +18,21 @@
 NULL
 
 .getSimulationRatesEnrichmentStageSubjects <- function(
-    ...,
-    stage,
-    directionUpper,
-    conditionalPower,
-    conditionalCriticalValue,
-    plannedSubjects,
-    allocationRatioPlanned,
-    selectedPopulations,
-    piTreatmentH1,
-    piControlH1,
-    overallRatesTreatment,
-    overallRatesControl,
-    minNumberOfSubjectsPerStage,
-    maxNumberOfSubjectsPerStage
-) {
+        ...,
+        stage,
+        directionUpper,
+        conditionalPower,
+        conditionalCriticalValue,
+        plannedSubjects,
+        allocationRatioPlanned,
+        selectedPopulations,
+        piTreatmentH1,
+        piControlH1,
+        overallRatesTreatment,
+        overallRatesControl,
+        minNumberOfSubjectsPerStage,
+        maxNumberOfSubjectsPerStage
+        ) {
     stage <- stage - 1 # to be consistent with non-enrichment situation
     gMax <- nrow(overallRatesTreatment)
 
@@ -81,31 +81,31 @@ NULL
 }
 
 .getSimulatedStageRatesEnrichment <- function(
-    ...,
-    design,
-    subsets,
-    prevalences,
-    directionUpper,
-    piTreatments,
-    piControls,
-    stratifiedAnalysis,
-    plannedSubjects,
-    typeOfSelection,
-    effectMeasure,
-    adaptations,
-    epsilonValue,
-    rValue,
-    threshold,
-    allocationRatioPlanned,
-    minNumberOfSubjectsPerStage,
-    maxNumberOfSubjectsPerStage,
-    conditionalPower,
-    piTreatmentH1,
-    piControlH1,
-    calcSubjectsFunction,
-    calcSubjectsFunctionIsUserDefined,
-    selectPopulationsFunction
-) {
+        ...,
+        design,
+        subsets,
+        prevalences,
+        directionUpper,
+        piTreatments,
+        piControls,
+        stratifiedAnalysis,
+        plannedSubjects,
+        typeOfSelection,
+        effectMeasure,
+        adaptations,
+        epsilonValue,
+        rValue,
+        threshold,
+        allocationRatioPlanned,
+        minNumberOfSubjectsPerStage,
+        maxNumberOfSubjectsPerStage,
+        conditionalPower,
+        piTreatmentH1,
+        piControlH1,
+        calcSubjectsFunction,
+        calcSubjectsFunctionIsUserDefined,
+        selectPopulationsFunction
+        ) {
     kMax <- length(plannedSubjects)
     pMax <- length(piTreatments)
     gMax <- log(length(piTreatments), 2) + 1
@@ -156,7 +156,7 @@ NULL
         if (
             any(round(subjectsPerStage[selsubs, k] * const / (1 + const)) < 1) ||
                 any(round(subjectsPerStage[selsubs, k] / (1 + const)) < 1)
-        ) {
+            ) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "at least one sample size specification too small to create simulation results, ",
@@ -851,7 +851,7 @@ NULL
 
                 if (
                     is.null(newSubjects) || length(newSubjects) != 1 || !is.numeric(newSubjects) || is.na(newSubjects)
-                ) {
+                    ) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "'calcSubjectsFunction' returned an illegal or ",
@@ -1011,32 +1011,32 @@ NULL
 #' @export
 #'
 getSimulationEnrichmentRates <- function(
-    design = NULL,
-    ...,
-    effectList = NULL,
-    intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
-    stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT,
-    directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
-    adaptations = NA,
-    typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
-    effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
-    successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
-    epsilonValue = NA_real_,
-    rValue = NA_real_,
-    threshold = -Inf,
-    plannedSubjects = NA_real_,
-    allocationRatioPlanned = NA_real_,
-    minNumberOfSubjectsPerStage = NA_real_,
-    maxNumberOfSubjectsPerStage = NA_real_,
-    conditionalPower = NA_real_,
-    piTreatmentH1 = NA_real_,
-    piControlH1 = NA_real_,
-    maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
-    seed = NA_real_,
-    calcSubjectsFunction = NULL,
-    selectPopulationsFunction = NULL,
-    showStatistics = FALSE
-) {
+        design = NULL,
+        ...,
+        effectList = NULL,
+        intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+        stratifiedAnalysis = TRUE, # C_STRATIFIED_ANALYSIS_DEFAULT,
+        directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
+        adaptations = NA,
+        typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"), # C_TYPE_OF_SELECTION_DEFAULT
+        effectMeasure = c("effectEstimate", "testStatistic"), # C_EFFECT_MEASURE_DEFAULT
+        successCriterion = c("all", "atLeastOne"), # C_SUCCESS_CRITERION_DEFAULT
+        epsilonValue = NA_real_,
+        rValue = NA_real_,
+        threshold = -Inf,
+        plannedSubjects = NA_real_,
+        allocationRatioPlanned = NA_real_,
+        minNumberOfSubjectsPerStage = NA_real_,
+        maxNumberOfSubjectsPerStage = NA_real_,
+        conditionalPower = NA_real_,
+        piTreatmentH1 = NA_real_,
+        piControlH1 = NA_real_,
+        maxNumberOfIterations = 1000L, # C_MAX_SIMULATION_ITERATIONS_DEFAULT
+        seed = NA_real_,
+        calcSubjectsFunction = NULL,
+        selectPopulationsFunction = NULL,
+        showStatistics = FALSE
+        ) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "simulation")
         .warnInCaseOfUnknownArguments(
@@ -1257,7 +1257,7 @@ getSimulationEnrichmentRates <- function(
                                 closedTest$selectedPopulations[1:gMax, k] |
                                 rejectedPopulationsBefore
                         )
-                ) {
+                    ) {
                     simulatedRejectAtLeastOne[i] <- simulatedRejectAtLeastOne[i] + 1
                     rejectAtSomeStage <- TRUE
                 }
@@ -1297,7 +1297,7 @@ getSimulationEnrichmentRates <- function(
             expectedNumberOfSubjects[i] <- sum(
                 simulatedSubjectsPerStage[1, i, ] +
                     t(1 - stopping) %*%
-                        simulatedSubjectsPerStage[2:kMax, i, ]
+                    simulatedSubjectsPerStage[2:kMax, i, ]
             )
         } else {
             expectedNumberOfSubjects[i] <- sum(simulatedSubjectsPerStage[1, i, ])

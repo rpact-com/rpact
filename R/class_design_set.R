@@ -125,7 +125,7 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
             "cannot create summary because the design set is empty"
         )
     }
-    
+
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("summary")
@@ -166,40 +166,41 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
 #'   \item \code{"all"}: creates all available plots and returns it as a grid plot or list
 #' }
 #' @param ... further arguments passed to or from other methods.
-#' 
+#'
 #' @export
 #'
 plot.TrialDesignSummaries <- function(x, ..., type = 1L, grid = 1) {
     .assertIsValidPlotType(type, naAllowed = FALSE)
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
-    
+
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
-    
+
     trialDesignSet <- attr(x, "object")
-    
+
     args <- list(
         x = trialDesignSet,
         type = type,
         grid = grid,
-        ...)
+        ...
+    )
     args$markdown <- markdown
-    
+
     if (markdown) {
         sep <- .getMarkdownPlotPrintSeparator()
         if (!all(is.na(type)) && length(type) > 1 && grid == 1) {
             grid <- 0
         }
         if (grid > 0) {
-            print(do.call(.plot.TrialDesignSet, args))            
+            print(do.call(.plot.TrialDesignSet, args))
         } else {
             do.call(.plot.TrialDesignSet, args)
         }
         return(.knitPrintQueue(trialDesignSet, sep = sep, prefix = sep))
     }
-    
+
     plot(trialDesignSet, ...)
 }
 
@@ -212,7 +213,7 @@ plot.TrialDesignSummaries <- function(x, ..., type = 1L, grid = 1) {
 #'
 #' @param x a \code{TrialDesignSummaries} object to print.
 #' @param ... further arguments passed to or from other methods.
-#' 
+#'
 #' @export
 #'
 print.TrialDesignSummaries <- function(x, ...) {
@@ -285,11 +286,13 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             )
             for (design in self$designs) {
                 designOutputLines <- utils::capture.output(design$.show(
-                    showType = showType, consoleOutputEnabled = TRUE))
+                    showType = showType, consoleOutputEnabled = TRUE
+                ))
                 for (designOutputLine in designOutputLines) {
-                    self$.cat(designOutputLine, "\n", 
+                    self$.cat(designOutputLine, "\n",
                         heading = ifelse(grepl(":$", designOutputLine), 2, 0),
-                        consoleOutputEnabled = consoleOutputEnabled)
+                        consoleOutputEnabled = consoleOutputEnabled
+                    )
                 }
             }
         },
@@ -376,7 +379,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                     "e.g., deltaWT = c(0.1, 0.3, 0.4)"
                 )
             }
-            
+
             if (is.null(design) && length(args) == 1 && .isTrialDesign(args[[1]])) {
                 design <- args[[1]]
                 self$designs <- c(self$designs, design)
@@ -413,7 +416,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             if (length(args) == 0) {
                 return(character())
             }
-            
+
             if (length(args) == 1 && .isTrialDesign(args[[1]])) {
                 return("design")
             }
@@ -478,7 +481,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                 warning("Creation of design variants stopped: no valid design parameters found", call. = FALSE)
                 return(list())
             }
-            
+
             if (identical(argumentNames, "design")) {
                 return(list())
             }
@@ -663,7 +666,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 #' designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))
 #' names(designSet)
 #' }
-#' 
+#'
 #' @export
 #'
 #' @keywords internal
@@ -692,7 +695,7 @@ names.TrialDesignSet <- function(x) {
 #' designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))
 #' length(designSet)
 #' }
-#' 
+#'
 #' @export
 #'
 #' @keywords internal
@@ -791,7 +794,7 @@ length.TrialDesignSet <- function(x) {
 #' designSet <- getDesignSet(design = getDesignGroupSequential(), alpha = c(0.01, 0.05))
 #' as.data.frame(designSet)
 #' }
-#' 
+#'
 #' @export
 #'
 #' @keywords internal
@@ -947,46 +950,45 @@ as.data.frame.TrialDesignSet <- function(x,
 #'
 #' @export
 #'
-plot.TrialDesignSet <- function(
-        x, 
-        y, 
-        ..., 
-        type = 1L, 
+plot.TrialDesignSet <- function(x,
+        y,
+        ...,
+        type = 1L,
         main = NA_character_,
-        xlab = NA_character_, 
-        ylab = NA_character_, 
+        xlab = NA_character_,
+        ylab = NA_character_,
         palette = "Set1",
-        theta = seq(-1, 1, 0.02), 
-        nMax = NA_integer_, 
+        theta = seq(-1, 1, 0.02),
+        nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_, 
+        legendPosition = NA_integer_,
         showSource = FALSE,
-        grid = 1, 
+        grid = 1,
         plotSettings = NULL) {
-     
     .assertIsValidPlotType(type, naAllowed = FALSE)
     .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
-    
+
     args <- list(
-        x = x, 
+        x = x,
         y = NULL,
         type = type,
         main = main,
         xlab = xlab,
         ylab = ylab,
         palette = palette,
-        theta = theta, 
+        theta = theta,
         plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition,
         showSource = showSource,
         grid = grid,
-        plotSettings = plotSettings, 
-        ...)
-    
+        plotSettings = plotSettings,
+        ...
+    )
+
     if (markdown) {
         sep <- .getMarkdownPlotPrintSeparator()
         if (length(type) > 1 && grid == 1) {
@@ -994,33 +996,31 @@ plot.TrialDesignSet <- function(
             args$grid <- 0
         }
         if (grid > 0) {
-            print(do.call(.plot.TrialDesignSet, args))            
+            print(do.call(.plot.TrialDesignSet, args))
         } else {
             do.call(.plot.TrialDesignSet, args)
         }
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
-    
+
     return(do.call(.plot.TrialDesignSet, args))
 }
 
-.plot.TrialDesignSet <- function(
-        x, 
-        y, 
-        ..., 
-        type = 1L, 
+.plot.TrialDesignSet <- function(x,
+        y,
+        ...,
+        type = 1L,
         main = NA_character_,
-        xlab = NA_character_, 
-        ylab = NA_character_, 
+        xlab = NA_character_,
+        ylab = NA_character_,
         palette = "Set1",
-        theta = seq(-1, 1, 0.02), 
-        nMax = NA_integer_, 
+        theta = seq(-1, 1, 0.02),
+        nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_, 
+        legendPosition = NA_integer_,
         showSource = FALSE,
-        grid = 1, 
+        grid = 1,
         plotSettings = NULL) {
-        
     fCall <- match.call(expand.dots = FALSE)
     designSetName <- deparse(fCall$x)
     .assertGgplotIsInstalled()
@@ -1031,23 +1031,23 @@ plot.TrialDesignSet <- function(
     }
     p <- NULL
     plotList <- list()
-    
+
     for (typeNumber in typeNumbers) {
         p <- .plotTrialDesignSet(
-            x = x, 
-            y = y, 
-            type = typeNumber, 
+            x = x,
+            y = y,
+            type = typeNumber,
             main = main,
-            xlab = xlab, 
-            ylab = ylab, 
+            xlab = xlab,
+            ylab = ylab,
             palette = palette,
-            theta = theta, 
-            nMax = nMax, 
+            theta = theta,
+            nMax = nMax,
             plotPointsEnabled = plotPointsEnabled,
             legendPosition = .getGridLegendPosition(legendPosition, typeNumbers, grid),
-            showSource = showSource, 
+            showSource = showSource,
             designSetName = designSetName,
-            plotSettings = plotSettings, 
+            plotSettings = plotSettings,
             ...
         )
         .printPlotShowSourceSeparator(showSource, typeNumber, typeNumbers)
@@ -1059,7 +1059,7 @@ plot.TrialDesignSet <- function(
     if (length(typeNumbers) == 1) {
         return(p)
     }
-    
+
     return(.createPlotResultObject(plotList, grid))
 }
 
@@ -1067,7 +1067,7 @@ plot.TrialDesignSet <- function(
     if (is.call(main) || .isResultObjectBaseClass(main) || !is.na(main)) {
         return(main)
     }
-    
+
     main <- PlotSubTitleItems$new(title = title)
     if (!is.na(nMax)) {
         main$add("N", nMax, "max")
@@ -1075,23 +1075,21 @@ plot.TrialDesignSet <- function(
     return(main)
 }
 
-.plotTrialDesignSet <- function(
-        ..., 
-        x, 
-        y, 
-        type = 1L, 
+.plotTrialDesignSet <- function(...,
+        x,
+        y,
+        type = 1L,
         main = NA_character_,
-        xlab = NA_character_, 
-        ylab = NA_character_, 
+        xlab = NA_character_,
+        ylab = NA_character_,
         palette = "Set1",
-        theta = seq(-1, 1, 0.02), 
-        nMax = NA_integer_, 
+        theta = seq(-1, 1, 0.02),
+        nMax = NA_integer_,
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_, 
+        legendPosition = NA_integer_,
         showSource = FALSE,
-        designSetName = NA_character_, 
+        designSetName = NA_character_,
         plotSettings = NULL) {
-      
     .assertGgplotIsInstalled()
     if (!is.call(main) && !.isResultObjectBaseClass(main)) {
         .assertIsSingleCharacter(main, "main", naAllowed = TRUE)
@@ -1186,24 +1184,25 @@ plot.TrialDesignSet <- function(
     }
 
     p <- .plotParameterSet(
-        parameterSet = parameterSet, 
+        parameterSet = parameterSet,
         designMaster = designMaster,
         xParameterName = xParameterName,
-        yParameterNames = yParameterNames, 
-        mainTitle = main, 
-        xlab = xlab, 
+        yParameterNames = yParameterNames,
+        mainTitle = main,
+        xlab = xlab,
         ylab = ylab,
-        palette = palette, 
-        theta = theta, 
-        nMax = nMax, 
+        palette = palette,
+        theta = theta,
+        nMax = nMax,
         plotPointsEnabled = plotPointsEnabled,
-        legendPosition = legendPosition, 
+        legendPosition = legendPosition,
         plotSettings = plotSettings
     )
 
     p <- .addDecisionCriticalValuesToPlot(
-        p = p, designMaster = designMaster, 
-        type = type, nMax = nMax)
+        p = p, designMaster = designMaster,
+        type = type, nMax = nMax
+    )
 
     return(p)
 }
@@ -1212,7 +1211,7 @@ plot.TrialDesignSet <- function(
     if (type != 1 || !.isTrialDesignInverseNormalOrGroupSequential(designMaster)) {
         return(p)
     }
-    
+
     data <- as.data.frame(designMaster)
     xyNames <- c("delayedInformationRates", "decisionCriticalValues")
     if (!all(xyNames %in% colnames(data))) {
@@ -1243,8 +1242,8 @@ plot.TrialDesignSet <- function(
             colour = .data[["legend"]]
         ),
         size = plotSettings$scaleSize(plotSettings$pointSize, TRUE),
-        shape = 4, 
-        stroke = 1.25, 
+        shape = 4,
+        stroke = 1.25,
         show.legend = TRUE
     )
     p <- p + ggplot2::guides(
@@ -1258,9 +1257,9 @@ plot.TrialDesignSet <- function(
     for (i in 1:nrow(data)) {
         label <- paste0("(", round(data[i, 1], 3), ", ", round(data[i, 2], 3), ")")
         p <- p + ggplot2::annotate("text",
-            x = data[i, 1], 
+            x = data[i, 1],
             y = data[i, 2],
-            label = label, 
+            label = label,
             vjust = plotSettings$scaleSize(3.0),
             size = plotSettings$scaleSize(2.5)
         )

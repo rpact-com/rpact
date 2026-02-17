@@ -591,8 +591,9 @@ NULL
         if (identical(alternative, C_ALTERNATIVE_POWER_SIMULATION_DEFAULT)) {
             alternative <- C_ALTERNATIVE_POWER_SIMULATION_MEAN_RATIO_DEFAULT
         }
-        .assertIsInOpenInterval(alternative, "alternative", 
-            lower = 0, upper = NULL, naAllowed = TRUE)
+        .assertIsInOpenInterval(alternative, "alternative",
+            lower = 0, upper = NULL, naAllowed = TRUE
+        )
     }
 
     directionUpper <- .assertIsValidDirectionUpper(directionUpper,
@@ -717,7 +718,7 @@ NULL
     return(designPlan)
 }
 
-#' 
+#'
 #' @title
 #' Get Sample Size Means
 #'
@@ -755,8 +756,7 @@ NULL
 #'
 #' @export
 #'
-getSampleSizeMeans <- function(
-        design = NULL, 
+getSampleSizeMeans <- function(design = NULL,
         ...,
         groups = 2L,
         normalApproximation = FALSE,
@@ -798,7 +798,7 @@ getSampleSizeMeans <- function(
     return(.calculateSampleSizeMeansAndRates(designPlan))
 }
 
-#' 
+#'
 #' @title
 #' Get Power Means
 #'
@@ -854,7 +854,7 @@ getPowerMeans <- function(design = NULL, ...,
         allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
         ) {
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
-    
+
     if ((length(stDev) == 1) && (groups == 2)) {
         stDev <- rep(stDev, 2)
     }

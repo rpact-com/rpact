@@ -415,7 +415,7 @@ getSimulationMultiArmMeans <- function(design = NULL, ...,
     maxNumberOfSubjectsPerStage <- simulationResults$maxNumberOfSubjectsPerStage
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcSubjectsFunction <- simulationResults$calcSubjectsFunction
-    
+
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
     }
@@ -618,7 +618,7 @@ getSimulationMultiArmMeans <- function(design = NULL, ...,
     simulationResults$sampleSizes <- simulatedSubjectsPerStage
     simulationResults$expectedNumberOfSubjects <- expectedNumberOfSubjects
     simulationResults$iterations <- iterations
-    
+
     if (!all(is.na(simulationResults$conditionalPowerAchieved))) {
         simulationResults$.setParameterType("conditionalPowerAchieved", C_PARAM_GENERATED)
     }

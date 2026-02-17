@@ -727,12 +727,11 @@ AnalysisResults <- R6::R6Class("AnalysisResults",
         pi2 = NULL,
         nPlanned = NULL,
         allocationRatioPlanned = NULL,
-        initialize = function(
-                design, 
-                dataInput, ..., 
-                .stageResults = NULL, 
-                .conditionalPowerResults = NULL, 
-                directionUpper = NULL, 
+        initialize = function(design,
+                dataInput, ...,
+                .stageResults = NULL,
+                .conditionalPowerResults = NULL,
+                directionUpper = NULL,
                 thetaH0 = NULL) {
             self$.design <- design
             self$.dataInput <- dataInput
@@ -970,10 +969,9 @@ AnalysisResultsBase <- R6::R6Class("AnalysisResultsBase",
         finalConfidenceIntervalUpperBounds = NULL,
         medianUnbiasedEstimates = NULL,
         stdErrorEstimate = NULL,
-        initialize = function(
-                design, 
-                dataInput, 
-                ..., 
+        initialize = function(design,
+                dataInput,
+                ...,
                 thetaH1 = NULL,
                 assumedStDev = NULL,
                 equalVariances = NULL,
@@ -1835,33 +1833,32 @@ AnalysisResultsConditionalDunnett <- R6::R6Class("AnalysisResultsConditionalDunn
 #'
 #' @export
 #'
-plot.AnalysisResults <- function(x, y, ..., 
+plot.AnalysisResults <- function(x, y, ...,
         type = 1L,
         nPlanned = NA_real_,
         allocationRatioPlanned = NA_real_,
-        main = NA_character_, 
-        xlab = NA_character_, 
+        main = NA_character_,
+        xlab = NA_character_,
         ylab = NA_character_,
-        legendTitle = NA_character_, 
-        palette = "Set1", 
+        legendTitle = NA_character_,
+        palette = "Set1",
         legendPosition = NA_integer_,
-        showSource = FALSE, 
-        grid = 1, 
+        showSource = FALSE,
+        grid = 1,
         plotSettings = NULL) {
-        
     .assertIsValidPlotType(type, naAllowed = FALSE)
     .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
-    
+
     args <- list(
-        x = x, 
+        x = x,
         y = NULL,
         type = type,
-        nPlanned = nPlanned, 
-        allocationRatioPlanned = allocationRatioPlanned, 
+        nPlanned = nPlanned,
+        allocationRatioPlanned = allocationRatioPlanned,
         main = main,
         xlab = xlab,
         ylab = ylab,
@@ -1870,9 +1867,10 @@ plot.AnalysisResults <- function(x, y, ...,
         legendPosition = legendPosition,
         showSource = showSource,
         grid = grid,
-        plotSettings = plotSettings, 
-        ...)
-    
+        plotSettings = plotSettings,
+        ...
+    )
+
     if (markdown) {
         sep <- .getMarkdownPlotPrintSeparator()
         if (length(type) > 1 && grid == 1) {
@@ -1880,7 +1878,7 @@ plot.AnalysisResults <- function(x, y, ...,
             args$grid <- 0
         }
         if (grid > 0) {
-            print(do.call(.plot.AnalysisResults, args))            
+            print(do.call(.plot.AnalysisResults, args))
         } else {
             do.call(.plot.AnalysisResults, args)
         }
@@ -1898,33 +1896,35 @@ plot.AnalysisResults <- function(x, y, ...,
         showSource = FALSE, grid = 1, plotSettings = NULL) {
     .assertGgplotIsInstalled()
     functionCall <- match.call(expand.dots = TRUE)
-    
-    analysisResultsName <- .getOptionalArgument("cmd", ..., 
-        optionalArgumentDefaultValue = as.character(functionCall)[1])
-    
+
+    analysisResultsName <- .getOptionalArgument("cmd", ...,
+        optionalArgumentDefaultValue = as.character(functionCall)[1]
+    )
+
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     typeNumbers <- .getPlotTypeNumber(type, x)
-    
+
     p <- NULL
     plotList <- list()
     for (typeNumber in typeNumbers) {
         p <- .plotAnalysisResults(
-            x = x, 
-            y = y, 
+            x = x,
+            y = y,
             type = typeNumber,
             nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
-            main = main, 
-            xlab = xlab, 
+            main = main,
+            xlab = xlab,
             ylab = ylab,
-            legendTitle = legendTitle, 
-            palette = palette, 
+            legendTitle = legendTitle,
+            palette = palette,
             legendPosition = legendPosition,
-            showSource = showSource, 
+            showSource = showSource,
             functionCall = functionCall,
-            analysisResultsName = analysisResultsName, 
-            plotSettings = plotSettings, 
-            ...)
+            analysisResultsName = analysisResultsName,
+            plotSettings = plotSettings,
+            ...
+        )
         .printPlotShowSourceSeparator(showSource, typeNumber, typeNumbers)
         if (length(typeNumbers) > 1) {
             caption <- .getPlotCaption(x, typeNumber, stopIfNotFound = TRUE)
@@ -1946,22 +1946,20 @@ plot.AnalysisResults <- function(x, y, ...,
     return(.createPlotResultObject(plotList, grid))
 }
 
-.plotAnalysisResultsRCI <- function(
-        ...,
-        x, 
-        y, 
-        nPlanned, 
-        allocationRatioPlanned, 
-        main, 
-        xlab, 
+.plotAnalysisResultsRCI <- function(...,
+        x,
+        y,
+        nPlanned,
+        allocationRatioPlanned,
+        main,
+        xlab,
         ylab,
-        legendTitle, 
-        palette, 
-        legendPosition, 
-        showSource, 
-        analysisResultsName, 
+        legendTitle,
+        palette,
+        legendPosition,
+        showSource,
+        analysisResultsName,
         plotSettings = NULL) {
-        
     .assertIsAnalysisResults(x)
     .warnInCaseOfUnknownArguments(functionName = "plot", ignore = c("treatmentArms", "populations"), ...)
 
@@ -1976,7 +1974,7 @@ plot.AnalysisResults <- function(x, y, ...,
     if (nrow(data) == 0) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "unable to create plot because no RCIs are available in the specified analysis result", 
+            "unable to create plot because no RCIs are available in the specified analysis result",
             call. = FALSE
         )
     }
@@ -2030,11 +2028,11 @@ plot.AnalysisResults <- function(x, y, ...,
     if (is.null(args) || length(args) == 0) {
         return(eval.parent(functionCall[[paramName]]))
     }
-    
+
     if (paramName %in% names(args)) {
         return(args[[paramName]])
     }
-    
+
     return(eval.parent(functionCall[[paramName]]))
 }
 
@@ -2042,38 +2040,38 @@ plot.AnalysisResults <- function(x, y, ...,
     if (is.null(result)) {
         result <- functionCall
     }
-    
+
     if (!inherits(x, "AnalysisResults")) {
         return(result)
     }
-    
+
     if (.isTrialDesignFisher(x$.design)) {
         result$iterations <- x$iterations
         result$seed <- x$seed
     }
-    
+
     if (x$getDataInput()$isDatasetMeans()) {
         if (.isMultiHypothesesAnalysisResults(x)) {
-            assumedStDevs <- .getAnalysisPlotArgument(functionCall, "assumedStDevs", args) 
+            assumedStDevs <- .getAnalysisPlotArgument(functionCall, "assumedStDevs", args)
             if (is.null(assumedStDevs)) {
                 assumedStDevs <- as.numeric(x$assumedStDevs)
             }
-            
+
             gMax <- x$.stageResults$getGMax()
             .assertIsValidAssumedStDevs(assumedStDevs, gMax)
-            
+
             result$assumedStDevs <- assumedStDevs
         } else {
-            assumedStDev <- .getAnalysisPlotArgument(functionCall, "assumedStDev", args)  
+            assumedStDev <- .getAnalysisPlotArgument(functionCall, "assumedStDev", args)
             if (is.null(assumedStDev)) {
                 assumedStDev <- x$assumedStDev
             }
             result$assumedStDev <- assumedStDev
         }
     }
-    
+
     if (x$getDataInput()$isDatasetMeans() || x$getDataInput()$isDatasetSurvival()) {
-        thetaRange <- .getAnalysisPlotArgument(functionCall, "thetaRange", args)  
+        thetaRange <- .getAnalysisPlotArgument(functionCall, "thetaRange", args)
         if (is.null(thetaRange)) {
             thetaRangeMin <- min(x$thetaH0, min(na.omit(as.numeric(x$thetaH1))))
             thetaRangeMax <- 2 * max(x$thetaH0, max(na.omit(as.numeric(x$thetaH1))))
@@ -2090,26 +2088,26 @@ plot.AnalysisResults <- function(x, y, ...,
         result$thetaRange <- thetaRange
     } else if (x$getDataInput()$isDatasetRates()) {
         if (.isMultiArmAnalysisResults(x)) {
-            piControl <- .getAnalysisPlotArgument(functionCall, "piControl", args) 
+            piControl <- .getAnalysisPlotArgument(functionCall, "piControl", args)
             if (is.null(piControl)) {
                 piControl <- as.numeric(x$piControl)
             }
             result$piControl <- piControl
         } else if (.isEnrichmentAnalysisResults(x)) {
-            piControl <- .getAnalysisPlotArgument(functionCall, "piControl", args) 
+            piControl <- .getAnalysisPlotArgument(functionCall, "piControl", args)
             if (is.null(piControl)) {
                 piControls <- as.numeric(x$piControls)
             }
             result$piControls <- piControls
         } else {
-            pi2 <- .getAnalysisPlotArgument(functionCall, "pi2", args) 
+            pi2 <- .getAnalysisPlotArgument(functionCall, "pi2", args)
             if (is.null(pi2)) {
                 pi2 <- x$pi2
             }
             result$pi2 <- pi2
         }
-        
-        piTreatmentRange <- .getAnalysisPlotArgument(functionCall, "piTreatmentRange", args) 
+
+        piTreatmentRange <- .getAnalysisPlotArgument(functionCall, "piTreatmentRange", args)
         if (is.null(piTreatmentRange)) {
             piTreatmentRange <- seq(0, 1, 1 / C_THETA_RANGE_SEQUENCE_LENGTH_DEFAULT) # default
         } else {
@@ -2117,33 +2115,32 @@ plot.AnalysisResults <- function(x, y, ...,
         }
         result$piTreatmentRange <- piTreatmentRange
     }
-    
+
     return(result)
 }
 
-.plotAnalysisResults <- function(
-        ...,
-        x, 
-        y, 
-        type, 
-        nPlanned, 
-        allocationRatioPlanned, 
-        main, 
-        xlab, 
+.plotAnalysisResults <- function(...,
+        x,
+        y,
+        type,
+        nPlanned,
+        allocationRatioPlanned,
+        main,
+        xlab,
         ylab,
-        legendTitle, 
-        palette, 
-        legendPosition, 
-        showSource, 
+        legendTitle,
+        palette,
+        legendPosition,
+        showSource,
         functionCall,
-        analysisResultsName, 
+        analysisResultsName,
         plotSettings = NULL) {
-        
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
     if (!(type %in% c(1, 2))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-            "'type' (", type, ") is not allowed; must be 1 or 2", 
-            call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'type' (", type, ") is not allowed; must be 1 or 2",
+            call. = FALSE
+        )
     }
 
     .assertIsAnalysisResults(x)
@@ -2151,27 +2148,28 @@ plot.AnalysisResults <- function(x, y, ...,
 
     if (type == 2) {
         return(.plotAnalysisResultsRCI(
-            x = x, 
-            y = y, 
-            nPlanned = nPlanned, 
+            x = x,
+            y = y,
+            nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
-            main = main, 
-            xlab = xlab, 
+            main = main,
+            xlab = xlab,
             ylab = ylab,
-            legendTitle = legendTitle, 
+            legendTitle = legendTitle,
             palette = palette,
-            legendPosition = legendPosition, 
+            legendPosition = legendPosition,
             showSource = showSource,
             analysisResultsName = analysisResultsName,
-            plotSettings = plotSettings, 
+            plotSettings = plotSettings,
             ...
         ))
     }
 
     if (!.isConditionalPowerEnabled(x$nPlanned) && !.isConditionalPowerEnabled(nPlanned)) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'nPlanned' must be defined to create conditional power plot", 
-            call. = FALSE)
+            "'nPlanned' must be defined to create conditional power plot",
+            call. = FALSE
+        )
     }
 
     .warnInCaseOfUnknownArguments(
@@ -2202,8 +2200,9 @@ plot.AnalysisResults <- function(x, y, ...,
     functionCall$type <- type
     functionCall$plotSettings <- plotSettings
     functionCall$allocationRatioPlanned <- plotArgs$allocationRatioPlanned
-    functionCall <- .addAnalysisPlotArgumentsToFunctionCall(x, functionCall, 
-        args = .getOptionalArgument("parentFunctionCallArgs", ..., optionalArgumentDefaultValue = list()))
+    functionCall <- .addAnalysisPlotArgumentsToFunctionCall(x, functionCall,
+        args = .getOptionalArgument("parentFunctionCallArgs", ..., optionalArgumentDefaultValue = list())
+    )
     functionCall[[1L]] <- as.name("plot")
     return(eval.parent(functionCall))
 }

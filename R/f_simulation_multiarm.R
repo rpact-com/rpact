@@ -44,14 +44,14 @@ NULL
 }
 
 .selectTreatmentArms <- function(
-    typeOfSelection,
-    epsilonValue,
-    rValue,
-    threshold,
-    selectArmsFunction,
-    selectArmsFunctionArgs,
-    survival = FALSE
-) {
+        typeOfSelection,
+        epsilonValue,
+        rValue,
+        threshold,
+        selectArmsFunction,
+        selectArmsFunctionArgs,
+        survival = FALSE
+        ) {
     effectVector <- selectArmsFunctionArgs$effectVector
     gMax <- length(effectVector)
 
@@ -101,13 +101,13 @@ NULL
 }
 
 .performClosedCombinationTestForSimulationMultiArm <- function(
-    ...,
-    stageResults,
-    design,
-    indices,
-    intersectionTest,
-    successCriterion
-) {
+        ...,
+        stageResults,
+        design,
+        indices,
+        intersectionTest,
+        successCriterion
+        ) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -215,7 +215,7 @@ NULL
                 } else {
                     overallAdjustedTestStatistics[i, k] <-
                         (weightsInverseNormal[1:k] %*% .getOneMinusQNorm(adjustedStageWisePValues[i, 1:k])) /
-                        sqrt(sum(weightsInverseNormal[1:k]^2))
+                            sqrt(sum(weightsInverseNormal[1:k]^2))
                 }
             }
 
@@ -302,12 +302,12 @@ NULL
 }
 
 .performClosedConditionalDunnettTestForSimulation <- function(
-    stageResults,
-    design,
-    indices,
-    criticalValuesDunnett,
-    successCriterion
-) {
+        stageResults,
+        design,
+        indices,
+        criticalValuesDunnett,
+        successCriterion
+        ) {
     testStatistics <- stageResults$testStatistics
     separatePValues <- stageResults$separatePValues
     subjectsPerStage <- stageResults$subjectsPerStage
@@ -423,56 +423,56 @@ NULL
 }
 
 .createSimulationResultsMultiArmObject <- function(
-    ...,
-    design,
-    activeArms,
-    effectMatrix,
-    typeOfShape,
-    kappa = NA_real_, # survival only
-    dropoutRate1 = NA_real_, # survival only
-    dropoutRate2 = NA_real_, # survival only
-    dropoutTime = NA_real_, # survival only
-    eventTime = NA_real_, # survival only
-    muMaxVector = NA_real_, # means only
-    piMaxVector = NA_real_, # rates only
-    piControl = NA_real_, # rates and survival only
-    omegaMaxVector = NA_real_, # survival only
-    gED50,
-    slope,
-    doseLevels,
-    intersectionTest,
-    stDev = NA_real_, # means only
-    directionUpper = NA, # rates + survival only
-    adaptations,
-    typeOfSelection,
-    effectMeasure,
-    successCriterion,
-    epsilonValue,
-    rValue,
-    threshold,
-    plannedSubjects = NA_real_,
-    accrualTime = NA_real_, # survival only
-    accrualIntensity = NA_real_, # survival only
-    maxNumberOfSubjects = NA_real_, # survival only
-    plannedEvents = NA_real_, # survival only
-    allocationRatioPlanned,
-    minNumberOfSubjectsPerStage = NA_real_, # means + rates only
-    maxNumberOfSubjectsPerStage = NA_real_, # means + rates only
-    minNumberOfEventsPerStage = NA_real_, # survival only
-    maxNumberOfEventsPerStage = NA_real_, # survival only
-    conditionalPower,
-    thetaH1 = NA_real_, # means + survival only
-    stDevH1 = NA_real_, # means only
-    piTreatmentsH1 = NA_real_, # rates only
-    piControlH1 = NA_real_, # rates only
-    maxNumberOfIterations,
-    seed,
-    calcSubjectsFunction = NULL, # means + rates only
-    calcEventsFunction = NULL, # survival only
-    selectArmsFunction,
-    showStatistics,
-    endpoint = c("means", "rates", "survival")
-) {
+        ...,
+        design,
+        activeArms,
+        effectMatrix,
+        typeOfShape,
+        kappa = NA_real_, # survival only
+        dropoutRate1 = NA_real_, # survival only
+        dropoutRate2 = NA_real_, # survival only
+        dropoutTime = NA_real_, # survival only
+        eventTime = NA_real_, # survival only
+        muMaxVector = NA_real_, # means only
+        piMaxVector = NA_real_, # rates only
+        piControl = NA_real_, # rates and survival only
+        omegaMaxVector = NA_real_, # survival only
+        gED50,
+        slope,
+        doseLevels,
+        intersectionTest,
+        stDev = NA_real_, # means only
+        directionUpper = NA, # rates + survival only
+        adaptations,
+        typeOfSelection,
+        effectMeasure,
+        successCriterion,
+        epsilonValue,
+        rValue,
+        threshold,
+        plannedSubjects = NA_real_,
+        accrualTime = NA_real_, # survival only
+        accrualIntensity = NA_real_, # survival only
+        maxNumberOfSubjects = NA_real_, # survival only
+        plannedEvents = NA_real_, # survival only
+        allocationRatioPlanned,
+        minNumberOfSubjectsPerStage = NA_real_, # means + rates only
+        maxNumberOfSubjectsPerStage = NA_real_, # means + rates only
+        minNumberOfEventsPerStage = NA_real_, # survival only
+        maxNumberOfEventsPerStage = NA_real_, # survival only
+        conditionalPower,
+        thetaH1 = NA_real_, # means + survival only
+        stDevH1 = NA_real_, # means only
+        piTreatmentsH1 = NA_real_, # rates only
+        piControlH1 = NA_real_, # rates only
+        maxNumberOfIterations,
+        seed,
+        calcSubjectsFunction = NULL, # means + rates only
+        calcEventsFunction = NULL, # survival only
+        selectArmsFunction,
+        showStatistics,
+        endpoint = c("means", "rates", "survival")
+        ) {
     endpoint <- match.arg(endpoint)
 
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
@@ -603,7 +603,7 @@ NULL
             !is.null(threshold) &&
             length(threshold) == 1 &&
             threshold != -Inf
-    ) {
+        ) {
         warning(
             "'threshold' (",
             threshold,
@@ -840,7 +840,7 @@ NULL
             if (
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage)) &&
                     any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0)
-            ) {
+                ) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'maxNumberOfSubjectsPerStage' (",
@@ -900,7 +900,7 @@ NULL
             if (
                 !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage)) &&
                     any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0)
-            ) {
+                ) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'maxNumberOfEventsPerStage' (",

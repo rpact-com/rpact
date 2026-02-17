@@ -257,8 +257,7 @@ NULL
 
 #' @rdname getObjectRCode
 #' @export
-rcmd <- function(
-        obj,
+rcmd <- function(obj,
         ...,
         leadingArguments = NULL,
         includeDefaultParameters = FALSE,
@@ -270,8 +269,7 @@ rcmd <- function(
         tolerance = 1e-07,
         pipeOperator = c("auto", "none", "magrittr", "R"),
         output = c("vector", "cat", "test", "markdown", "internal"),
-        explicitPrint = FALSE
-        ) {
+        explicitPrint = FALSE) {
     getObjectRCode(
         obj = obj,
         leadingArguments = leadingArguments,
@@ -288,11 +286,9 @@ rcmd <- function(
     )
 }
 
-.getPreconditionDesignRCode <- function(
-        design, pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
+.getPreconditionDesignRCode <- function(design, pipeOperator, pipeOperatorPostfix, includeDefaultParameters,
         stringWrapParagraphWidth, stringWrapPrefix, newArgumentValues,
-        leadingArguments
-        ) {
+        leadingArguments) {
     preconditionDesign <- getObjectRCode(
         design,
         prefix = ifelse(pipeOperator == "none", "design <- ", ""),
@@ -320,8 +316,7 @@ rcmd <- function(
     ))
 }
 
-.getObjectRCodeFutilityBounds <- function(
-        obj,
+.getObjectRCodeFutilityBounds <- function(obj,
         ...,
         precondition,
         leadingArguments,
@@ -334,8 +329,7 @@ rcmd <- function(
         pipeOperator,
         pipeOperatorPostfix,
         output,
-        explicitPrint = FALSE
-        ) {
+        explicitPrint = FALSE) {
     args <- character()
     for (paramName in c("sourceValue", "sourceScale", "targetScale", "theta", "information", "design")) {
         if (identical(attr(obj, paramName)$type, C_PARAM_USER_DEFINED)) {
@@ -408,8 +402,7 @@ rcmd <- function(
 #'
 #' @export
 #'
-getObjectRCode <- function(
-        obj,
+getObjectRCode <- function(obj,
         ...,
         leadingArguments = NULL,
         includeDefaultParameters = FALSE,
@@ -421,8 +414,7 @@ getObjectRCode <- function(
         tolerance = 1e-07,
         pipeOperator = c("auto", "none", "magrittr", "R"),
         output = c("vector", "cat", "test", "markdown", "internal"),
-        explicitPrint = FALSE
-        ) {
+        explicitPrint = FALSE) {
     functionName <- deparse(substitute(obj))
     functionName <- sub("\\(.*\\)$", "", functionName)
 
@@ -1107,8 +1099,7 @@ getObjectRCode <- function(
     )
 }
 
-.formatRCode <- function(
-        rCode,
+.formatRCode <- function(rCode,
         precondition,
         stringWrapParagraphWidth,
         postfix,
@@ -1116,8 +1107,7 @@ getObjectRCode <- function(
         pipeOperator,
         pipeOperatorPostfix,
         output,
-        explicitPrint
-        ) {
+        explicitPrint) {
     if (any(postfix != "")) {
         if (length(postfix) > 1 && grepl("(\\|>)|(%>%)", postfix[1])) {
             if (!grepl("(\\|>)|(%>%) *$", rCode[length(rCode)])) {

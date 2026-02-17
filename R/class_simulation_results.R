@@ -122,14 +122,12 @@ SimulationResults <- R6::R6Class(
                 consoleOutputEnabled = TRUE
             )
         },
-        .show = function(
-            ...,
-            showType = 1,
-            digits = NA_integer_,
-            showStatistics = FALSE,
-            consoleOutputEnabled = TRUE,
-            performanceScore = NULL
-        ) {
+        .show = function(...,
+                showType = 1,
+                digits = NA_integer_,
+                showStatistics = FALSE,
+                consoleOutputEnabled = TRUE,
+                performanceScore = NULL) {
             "Method for automatically printing simulation result objects"
 
             self$.resetCat()
@@ -171,7 +169,7 @@ SimulationResults <- R6::R6Class(
                     if (
                         inherits(self, "SimulationResultsSurvival") &&
                             self$.piecewiseSurvivalTime$delayedResponseEnabled
-                    ) {
+                        ) {
                         userDefinedParameters <- c(
                             userDefinedParameters,
                             ".piecewiseSurvivalTime$delayedResponseEnabled"
@@ -210,9 +208,9 @@ SimulationResults <- R6::R6Class(
                 ## statistics of simulated data
                 if (
                     isTRUE(showStatistics) ||
-                    isTRUE(self$.showStatistics) ||
-                    (is.character(showStatistics) && showStatistics == "exclusive")
-                ) {
+                        isTRUE(self$.showStatistics) ||
+                        (is.character(showStatistics) && showStatistics == "exclusive")
+                    ) {
                     self$.cat("Simulated data:\n", heading = 2, consoleOutputEnabled = consoleOutputEnabled)
                     params <- c()
                     if (inherits(self, "SimulationResultsMeans")) {
@@ -242,7 +240,7 @@ SimulationResults <- R6::R6Class(
                     } else if (
                         inherits(self, "SimulationResultsMultiArmMeans") ||
                             inherits(self, "SimulationResultsMultiArmRates")
-                    ) {
+                        ) {
                         params <- c(
                             "effectMeasure",
                             "subjectsActiveArm",
@@ -255,7 +253,7 @@ SimulationResults <- R6::R6Class(
                     } else if (
                         inherits(self, "SimulationResultsEnrichmentMeans") ||
                             inherits(self, "SimulationResultsEnrichmentRates")
-                    ) {
+                        ) {
                         params <- c(
                             "effectMeasure",
                             "subjectsPopulation",
@@ -268,7 +266,7 @@ SimulationResults <- R6::R6Class(
                     } else if (
                         inherits(self, "SimulationResultsMultiArmSurvival") ||
                             inherits(self, "SimulationResultsEnrichmentSurvival")
-                    ) {
+                        ) {
                         params <- c(
                             "effectMeasure",
                             "analysisTime",
@@ -289,7 +287,7 @@ SimulationResults <- R6::R6Class(
                             !all(is.na(self$conditionalPowerAchieved)) &&
                             any(!is.na(self$conditionalPowerAchieved)) &&
                             any(na.omit(self$conditionalPowerAchieved) != 0)
-                    ) {
+                        ) {
                         params <- c(params, "conditionalPowerAchieved")
                     }
 
@@ -417,7 +415,7 @@ SimulationResults <- R6::R6Class(
                         !inherits(self, "SimulationResultsRates") &&
                         !inherits(self, "SimulationResultsSurvival") &&
                         grepl("MultiArm", .getClassName(self))
-                ) {
+                    ) {
                     return("armNumber")
                 }
                 return(NA_character_)
@@ -429,7 +427,7 @@ SimulationResults <- R6::R6Class(
             } else if (
                 inherits(self, "SimulationResultsRates") ||
                     inherits(self, "SimulationResultsSurvival")
-            ) {
+                ) {
                 variedParameterName1 <- "pi1"
             } else if (grepl("MultiArm", .getClassName(self))) {
                 if (inherits(self, "SimulationResultsMultiArmMeans")) {
@@ -465,17 +463,15 @@ SimulationResults <- R6::R6Class(
             variedParameterName <- sub("Max$", "_max", variedParameterName)
             return(paste0(", ", variedParameterName, " = ", round(parameterValue[1], 4)))
         },
-        .catStatisticsLine = function(
-            ...,
-            stage,
-            parameterName,
-            paramCaption,
-            parameterValue1,
-            variedParameterName1,
-            parameterValue2 = NA_real_,
-            variedParameterName2 = NA_character_,
-            consoleOutputEnabled = TRUE
-        ) {
+        .catStatisticsLine = function(...,
+                stage,
+                parameterName,
+                paramCaption,
+                parameterValue1,
+                variedParameterName1,
+                parameterValue2 = NA_real_,
+                variedParameterName2 = NA_character_,
+                consoleOutputEnabled = TRUE) {
             if (stage == 1 && parameterName == "conditionalPowerAchieved") {
                 return(invisible())
             }
@@ -570,7 +566,7 @@ SimulationResults <- R6::R6Class(
                 grepl("MultiArm", .getClassName(self)) &&
                     !is.null(self[["activeArms"]]) &&
                     self$activeArms > 1
-            ) {
+                ) {
                 s <- paste(s, "multi-arm")
             }
 
@@ -578,7 +574,7 @@ SimulationResults <- R6::R6Class(
                 grepl("Enrichment", .getClassName(self)) &&
                     !is.null(self[["populations"]]) &&
                     self$populations > 1
-            ) {
+                ) {
                 s <- paste(s, "enrichment")
             }
 
@@ -901,7 +897,7 @@ SimulationResultsBaseRates <- R6::R6Class(
             if (design$kMax > 1) {
                 generatedParams <- c(generatedParams, c("earlyStop", "futilityStop"))
             }
-            
+
             for (generatedParam in generatedParams) {
                 self$.setParameterType(generatedParam, C_PARAM_GENERATED)
             }
@@ -1272,7 +1268,7 @@ SimulationResultsSurvival <- R6::R6Class(
         initialize = function(design, ...) {
             super$initialize(design = design, ...)
             for (notApplicableParam in c(
-                "earlyStop", 
+                "earlyStop",
                 "futilityStop",
                 "numberOfSubjects1",
                 "numberOfSubjects2",

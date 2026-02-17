@@ -141,12 +141,17 @@ NULL
             } else {
                 formatFunctionName <- .getParameterFormatFunction(parameterName, obj)
                 if (!is.null(formatFunctionName) && !is.null(paramValueFormatted)) {
-                    tryCatch({
-                        paramValueFormatted <- eval(call(formatFunctionName, paramValueFormatted))
-                    }, error = function(e) {
-                        warning("Failed to format value ", sQuote(parameterName), " with function ", 
-                            formatFunctionName, "(): ", e$message, call. = FALSE)
-                    })
+                    tryCatch(
+                        {
+                            paramValueFormatted <- eval(call(formatFunctionName, paramValueFormatted))
+                        },
+                        error = function(e) {
+                            warning("Failed to format value ", sQuote(parameterName), " with function ",
+                                formatFunctionName, "(): ", e$message,
+                                call. = FALSE
+                            )
+                        }
+                    )
                     if (.isArray(paramValue) && length(dim(paramValue)) == 2) {
                         paramValueFormatted <- matrix(paramValueFormatted, ncol = ncol(paramValue))
                     }

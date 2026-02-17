@@ -43,8 +43,9 @@ NULL
             }
             if (is.na(piTreatmentsH1)) {
                 piAssumedH1 <- .applyDirectionOfAlternative(
-                    overallRates[selectedArms[1:gMax, stage + 1], stage], 
-                    directionUpper, type = "minMax", phase = "planning"
+                    overallRates[selectedArms[1:gMax, stage + 1], stage],
+                    directionUpper,
+                    type = "minMax", phase = "planning"
                 )
             } else {
                 piAssumedH1 <- piTreatmentsH1
@@ -259,8 +260,9 @@ NULL
 
             if (is.na(piTreatmentsH1)) {
                 piAssumedH1 <- .applyDirectionOfAlternative(
-                    overallRates[selectedArms[1:gMax, k], k], 
-                    directionUpper, type = "minMax", phase = "planning"
+                    overallRates[selectedArms[1:gMax, k], k],
+                    directionUpper,
+                    type = "minMax", phase = "planning"
                 )
             } else {
                 piAssumedH1 <- piTreatmentsH1
@@ -441,9 +443,11 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
 
     calcSubjectsFunctionIsUserDefined <- !is.null(calcSubjectsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
-    
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
+
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,

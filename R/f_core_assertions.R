@@ -606,8 +606,7 @@ NULL
     return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
-.assertIsNumericVector <- function(
-        x,
+.assertIsNumericVector <- function(x,
         argumentName,
         ...,
         naAllowed = FALSE,
@@ -1724,14 +1723,14 @@ NULL
             if (grepl("^getDesign(InverseNormal|GroupSequential|Fisher)", functionName)) {
                 next
             }
-            
+
             if (grepl("^getDesignFisher", functionName)) {
                 argName <- "alpha0Vec"
             } else {
                 argName <- "futilityBounds"
             }
         }
-        
+
         if (!(argName %in% ignore) && !grepl("^\\.", argName)) {
             if (.isResultObjectBaseClass(arg) || is.environment(arg)) {
                 arg <- .getClassName(arg)
@@ -1764,8 +1763,8 @@ NULL
     if (!identical(arg, defaultValue)) {
         warning("Unused argument in ", functionName, "(...): '",
             argName, "' = ", .arrayToString(
-                arg, 
-                vectorLookAndFeelEnabled = (length(arg) > 1), 
+                arg,
+                vectorLookAndFeelEnabled = (length(arg) > 1),
                 maxLength = 10,
                 encapsulate = !is.null(arg) && any(is.character(arg))
             ),
@@ -1846,8 +1845,7 @@ NULL
     .assertPackageIsInstalled("testthat")
 }
 
-.assertIsValidThetaH0 <- function(
-        thetaH0,
+.assertIsValidThetaH0 <- function(thetaH0,
         ...,
         endpoint = c("means", "rates", "survival", "counts"),
         groups,
@@ -3339,25 +3337,23 @@ NULL
     return(all(!is.na(delayedInformation)) && any(delayedInformation >= 1e-03))
 }
 
-.assertIsValidCountsParameterCombination <- function(
-        existingParamNames, 
+.assertIsValidCountsParameterCombination <- function(existingParamNames,
         forbiddenParamNames,
         params,
         ...,
         requiredParamNames = character(0)) {
-    
     theta <- numeric(0)
     for (existingParamName in existingParamNames) {
         existingParamValue <- params[[existingParamName]]
         if (is.null(existingParamValue) || all(is.na(existingParamValue))) {
             return(invisible())
         }
-        if (identical(existingParamName, "theta") && 
+        if (identical(existingParamName, "theta") &&
                 any(c("lambda", "lambda1") %in% existingParamNames)) {
             theta <- existingParamValue
         }
     }
-    
+
     paramNames <- names(params)
     if (length(requiredParamNames) > 0) {
         existingParamNamesWithValue <- paramNames[sapply(paramNames, function(name) {
@@ -3368,15 +3364,15 @@ NULL
         if (length(requiredParamNamesFound) < length(requiredParamNames)) {
             stop(
                 C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE), 
-                " ", ifelse(length(requiredParamNames) == 1, "is", "are"), 
-                " specified, ", .arrayToString(requiredParamNames, mode = "and", encapsulate = TRUE), 
+                "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE),
+                " ", ifelse(length(requiredParamNames) == 1, "is", "are"),
+                " specified, ", .arrayToString(requiredParamNames, mode = "and", encapsulate = TRUE),
                 " must also be specified",
                 call. = FALSE
             )
         }
     }
-    
+
     foundParamNames <- character(0)
     for (forbiddenParamName in forbiddenParamNames) {
         forbiddenParamValue <- params[[forbiddenParamName]]
@@ -3384,7 +3380,7 @@ NULL
             foundParamNames <- c(foundParamNames, forbiddenParamName)
         }
     }
-    
+
     if (length(theta) > 1) {
         existingParamNames <- existingParamNames[existingParamNames != "theta"]
         stop(
@@ -3392,30 +3388,28 @@ NULL
             "'theta' cannot be specified as vector if ", sQuote(existingParamNames[1]), " is specified",
             call. = FALSE
         )
-    }
-    else if (length(theta) > 0 && "lambda1" %in% paramNames && length(params$lambda1) > 1) {
+    } else if (length(theta) > 0 && "lambda1" %in% paramNames && length(params$lambda1) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'lambda1' cannot be specified as vector if ", sQuote("theta"), " is specified",
             call. = FALSE
         )
     }
-    
+
     if (length(foundParamNames) == 0) {
         return(invisible())
     }
-    
+
     stop(
         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-        "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE), 
-        " are specified, ", .arrayToString(foundParamNames, mode = "and", encapsulate = TRUE), 
+        "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE),
+        " are specified, ", .arrayToString(foundParamNames, mode = "and", encapsulate = TRUE),
         " must not be specified",
         call. = FALSE
     )
 }
 
-.assertIsValidEffectCountData <- function(
-        sampleSizeEnabled,
+.assertIsValidEffectCountData <- function(sampleSizeEnabled,
         sided,
         lambda1,
         lambda2,
@@ -3441,7 +3435,7 @@ NULL
     .assertIsValidThetaH0(thetaH0, endpoint = "counts", groups = 2)
     .assertIsSingleNumber(overdispersion, "overdispersion", naAllowed = TRUE)
     .assertIsInClosedInterval(overdispersion, "overdispersion", lower = 0, upper = NULL, naAllowed = TRUE)
-    
+
     params <- list(
         "lambda1" = lambda1,
         "lambda2" = lambda2,
@@ -3458,7 +3452,7 @@ NULL
     .assertIsValidCountsParameterCombination(c("lambda", "lambda1"), c("lambda2", "theta"), params)
     .assertIsValidCountsParameterCombination(c("lambda", "lambda2"), c("lambda1", "theta"), params)
     .assertIsValidCountsParameterCombination(c("lambda1", "lambda2"), c("lambda", "theta"), params)
-    
+
     numberOfParameters <- sum(is.na(lambda2), anyNA(lambda1), is.na(lambda), anyNA(theta))
     if (numberOfParameters != 2) {
         stop(
@@ -3467,14 +3461,14 @@ NULL
             call. = FALSE
         )
     }
-    
+
     if (!is.na(lambda2) && all(!is.na(theta))) {
         lambda1 <- lambda2 * theta
     } else if (all(!is.na(lambda1)) && all(!is.na(theta))) {
         lambda2 <- lambda1 / theta
     }
-    
-    if (sampleSizeEnabled && any(!is.na(lambda1)) && !is.na(lambda2) && !is.na(thetaH0) && 
+
+    if (sampleSizeEnabled && any(!is.na(lambda1)) && !is.na(lambda2) && !is.na(thetaH0) &&
             any(abs(lambda1 / lambda2 - thetaH0) < 1e-12, na.rm = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
@@ -3550,7 +3544,7 @@ NULL
             call. = FALSE
         )
     }
-    
+
     if (sampleSizeEnabled) {
         if (is.na(maxNumberOfSubjects) && anyNA(accrualIntensity)) {
             .assertParametersAreSpecifiedCorrectlyTogether(
@@ -3739,24 +3733,21 @@ NULL
     )
 }
 
-.showFutilityBoundsUnnecessaryArgumentWarning <- function(
-        argumentName, argValue, sourceScale, targetScale) {
-   
-   valueStr <- ""
-   if (!is.null(argValue) && is.numeric(argValue) && length(argValue) > 0) {
-       valueStr <- paste0(" (", .arrayToString(argValue), ")")
-   }
-        
+.showFutilityBoundsUnnecessaryArgumentWarning <- function(argumentName, argValue, sourceScale, targetScale) {
+    valueStr <- ""
+    if (!is.null(argValue) && is.numeric(argValue) && length(argValue) > 0) {
+        valueStr <- paste0(" (", .arrayToString(argValue), ")")
+    }
+
     warning(
         sQuote(argumentName), valueStr, " will be ignored ",
-        "because it is not required for the conversion from '", 
+        "because it is not required for the conversion from '",
         sourceScale, "' to '", targetScale, "'",
         call. = FALSE
     )
 }
 
-.showFutilityBoundsMissingArgumentError <- function(
-        argumentName, scaleName, scaleValue) {
+.showFutilityBoundsMissingArgumentError <- function(argumentName, scaleName, scaleValue) {
     stop(
         C_EXCEPTION_TYPE_MISSING_ARGUMENT,
         sQuote(argumentName), " needs to be specified for ",
@@ -3782,27 +3773,27 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     )
 )
 
-.getValidFutilityBoundVectorIndices = function(sourceScale, targetScale) {
-    if (sourceScale == "effectEstimate" && 
+.getValidFutilityBoundVectorIndices <- function(sourceScale, targetScale) {
+    if (sourceScale == "effectEstimate" &&
             !targetScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
         return(1L)
     }
-    
-    if (targetScale == "effectEstimate" && 
+
+    if (targetScale == "effectEstimate" &&
             !sourceScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
         return(1L)
     }
-    
-    if (sourceScale == "conditionalPower" && 
+
+    if (sourceScale == "conditionalPower" &&
             !targetScale %in% c("effectEstimate", "condPowerAtObserved", "predictivePower")) {
         return(2L)
     }
-    
-    if (targetScale == "conditionalPower" && 
+
+    if (targetScale == "conditionalPower" &&
             !sourceScale %in% c("effectEstimate", "condPowerAtObserved", "predictivePower")) {
         return(2L)
     }
-    
+
     return(c(1L, 2L))
 }
 
@@ -3810,7 +3801,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     if (identical(name, "design")) {
         return(is.null(value))
     }
-    
+
     return(all(is.na(value)))
 }
 
@@ -3820,7 +3811,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     if (length(reqs) == 0L) {
         return(invisible())
     }
-    
+
     for (arg in reqs) {
         argName <- gsub("\\[.*\\]$", "", arg)
         if (grepl("\\[\\d+\\]$", arg)) {
@@ -3859,48 +3850,47 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
 #'
 #' @examples
 #' \dontrun{
-#'   .assertAreValidFutilityBoundsScaleArguments(design,
-#'       sourceScale = "conditionalPower",
-#'       targetScale = "effectEstimate",
-#'       theta = 0.5,
-#'       information1 = 0.2,
-#'       information2 = 0.8)
+#' .assertAreValidFutilityBoundsScaleArguments(design,
+#'     sourceScale = "conditionalPower",
+#'     targetScale = "effectEstimate",
+#'     theta = 0.5,
+#'     information1 = 0.2,
+#'     information2 = 0.8
+#' )
 #' }
 #'
 #' @noRd
-#' 
-.assertAreValidFutilityBoundsScaleArguments <- function(
-        ...,
+#'
+.assertAreValidFutilityBoundsScaleArguments <- function(...,
         design,
         sourceScale,
         targetScale,
         theta,
         information) {
-        
     baseScales <- c(
         "conditionalPower",
         "condPowerAtObserved",
         "predictivePower"
     )
     scalesWithReverse <- c(baseScales, "reverseCondPower")
-    scalesWithEffect  <- c(baseScales, "effectEstimate")
-    scalesWithEffectSecondStageOnly  <- scalesWithEffect[scalesWithEffect != "conditionalPower"]
-    
+    scalesWithEffect <- c(baseScales, "effectEstimate")
+    scalesWithEffectSecondStageOnly <- scalesWithEffect[scalesWithEffect != "conditionalPower"]
+
     infos <- .getFutilityBoundInformations(
-        information = information, 
+        information = information,
         sourceScale = sourceScale,
         targetScale = targetScale,
         design = design,
         showWarnings = FALSE,
         ...
     )
-    
+
     information1 <- infos$information1
     information2 <- infos$information2
     information <- infos$information
-    
+
     .checkForUnnecessaryFutilityBoundsScaleArgs("design", design, sourceScale, targetScale, scalesWithReverse)
-    
+
     if (infos$vectorInput) {
         .checkForUnnecessaryFutilityBoundsScaleArgs("information", information, sourceScale, targetScale, scalesWithEffect)
     } else {
@@ -3908,7 +3898,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         .checkForUnnecessaryFutilityBoundsScaleArgs(infos$paramNames[2], information2, sourceScale, targetScale, baseScales)
     }
     .checkForUnnecessaryFutilityBoundsScaleArgs("theta", theta, sourceScale, targetScale, "conditionalPower")
-        
+
     args <- list(
         design       = design,
         information  = c(information1, information2),
@@ -3916,30 +3906,28 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         information2 = information2,
         theta        = theta
     )
-    
+
     .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args, informationVectorInput = infos$vectorInput)
     .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args, informationVectorInput = infos$vectorInput)
 }
 
-.showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(
-        futilityBounds,
-        ..., 
-        lowerBound = 1e-12, 
+.showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(futilityBounds,
+        ...,
+        lowerBound = 1e-12,
         upperBound = 1 - 1e-12) {
-        
     if (all(is.na(futilityBounds))) {
         return(invisible())
     }
-        
-    if (!is.null(lowerBound) && length(lowerBound) > 0 && !anyNA(lowerBound) && 
+
+    if (!is.null(lowerBound) && length(lowerBound) > 0 && !anyNA(lowerBound) &&
             any(futilityBounds < lowerBound, na.rm = TRUE)) {
         warning(
             "At least one calculated futility bound outside acceptable range",
             call. = FALSE
         )
     }
-    
-    if (!is.null(upperBound) && length(upperBound) > 0 && !anyNA(upperBound) && 
+
+    if (!is.null(upperBound) && length(upperBound) > 0 && !anyNA(upperBound) &&
             any(futilityBounds > upperBound, na.rm = TRUE)) {
         warning(
             "At least one calculated futility bound outside acceptable range",

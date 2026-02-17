@@ -45,7 +45,7 @@ createDictionary <- function(name, keyValuePairList = NULL) {
 #' x <- createDictionary("x", list(a = 1, b = 2, c = 3))
 #' getDictionaryKeyByValue(x, 2)
 #' }
-#' 
+#'
 #' @noRd
 #'
 getDictionaryKeyByValue <- function(x, value) {
@@ -61,7 +61,7 @@ getDictionaryKeyByValue <- function(x, value) {
 #' x <- createDictionary("x", list(a = 1, b = 2, c = 3))
 #' getDictionarySubset(x, c("b", "c"))
 #' }
-#' 
+#'
 #' @noRd
 #'
 getDictionarySubset <- function(x, subsetNames) {

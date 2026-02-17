@@ -45,8 +45,7 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getAnalysisResultsMeansInverseNormal <- function(
-        ...,
+.getAnalysisResultsMeansInverseNormal <- function(...,
         design,
         dataInput,
         directionUpper = NA,
@@ -93,8 +92,7 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsMeansGroupSequential <- function(
-        ...,
+.getAnalysisResultsMeansGroupSequential <- function(...,
         design,
         dataInput,
         directionUpper = NA,
@@ -156,8 +154,7 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsMeansFisher <- function(
-        ...,
+.getAnalysisResultsMeansFisher <- function(...,
         design,
         dataInput,
         directionUpper = NA,
@@ -217,8 +214,7 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsMeansAll <- function(
-        ...,
+.getAnalysisResultsMeansAll <- function(...,
         results,
         design,
         dataInput,
@@ -404,8 +400,7 @@ NULL
     return(results)
 }
 
-.getStageResultsMeans <- function(
-        ...,
+.getStageResultsMeans <- function(...,
         design,
         dataInput,
         thetaH0 = NA_real_,
@@ -722,8 +717,7 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getRootThetaMeans <- function(
-        ...,
+.getRootThetaMeans <- function(...,
         design,
         dataInput,
         stage,
@@ -761,8 +755,7 @@ NULL
     return(result)
 }
 
-.getUpperLowerThetaMeans <- function(
-        ...,
+.getUpperLowerThetaMeans <- function(...,
         design,
         dataInput,
         theta,
@@ -831,8 +824,7 @@ NULL
     return(theta)
 }
 
-.getRepeatedConfidenceIntervalsMeansAll <- function(
-        ...,
+.getRepeatedConfidenceIntervalsMeansAll <- function(...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -993,8 +985,7 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMeansGroupSequential <- function(
-        ...,
+.getRepeatedConfidenceIntervalsMeansGroupSequential <- function(...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1030,8 +1021,7 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMeansInverseNormal <- function(
-        ...,
+.getRepeatedConfidenceIntervalsMeansInverseNormal <- function(...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1067,8 +1057,7 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMeansFisher <- function(
-        ...,
+.getRepeatedConfidenceIntervalsMeansFisher <- function(...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -1104,8 +1093,7 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansGroupSequential <- function(
-        ...,
+.getConditionalPowerMeansGroupSequential <- function(...,
         stageResults,
         stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -1152,8 +1140,9 @@ NULL
 
     if (stageResults$isTwoSampleDataset()) {
         .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-        .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-            lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
+        .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+            lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+        )
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
 
@@ -1244,8 +1233,7 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansInverseNormal <- function(
-        ...,
+.getConditionalPowerMeansInverseNormal <- function(...,
         stageResults,
         stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -1292,8 +1280,9 @@ NULL
 
     if (stageResults$isTwoSampleDataset()) {
         .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-        .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-            lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
+        .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+            lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+        )
         nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
     }
 
@@ -1309,7 +1298,7 @@ NULL
         sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):kMax]^2)) /
         sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
         c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
-        sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
+            sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
         thetaH1 *
             cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2))
@@ -1318,7 +1307,7 @@ NULL
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):kMax]^2)) /
             sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
             c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
-            sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
+                sqrt(cumsum(weights[(stage + 1):kMax]^2)) -
             thetaH1 *
                 cumsum(sqrt(nPlanned[(stage + 1):kMax]) * weights[(stage + 1):kMax]) /
                 sqrt(cumsum(weights[(stage + 1):kMax]^2))
@@ -1330,7 +1319,7 @@ NULL
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):(kMax - 1)]^2)) /
             sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
             c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
-            sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
+                sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
             thetaH1 *
                 cumsum(sqrt(nPlanned[(stage + 1):(kMax - 1)]) * weights[(stage + 1):(kMax - 1)]) /
                 sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2))
@@ -1379,8 +1368,7 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansFisher <- function(
-        ...,
+.getConditionalPowerMeansFisher <- function(...,
         stageResults,
         stage = stageResults$stage,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -1483,8 +1471,7 @@ NULL
     ))
 }
 
-.getConditionalPowerMeans <- function(
-        ...,
+.getConditionalPowerMeans <- function(...,
         stageResults,
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
@@ -1574,8 +1561,7 @@ NULL
     return(results)
 }
 
-.getConditionalPowerPlotMeans <- function(
-        ...,
+.getConditionalPowerPlotMeans <- function(...,
         stageResults,
         stage,
         nPlanned,
@@ -1703,8 +1689,7 @@ NULL
     ))
 }
 
-.getFinalConfidenceIntervalMeansValues <- function(
-        design,
+.getFinalConfidenceIntervalMeansValues <- function(design,
         dataInput,
         stageResults,
         directionUpper,
@@ -1888,8 +1873,7 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalMeansGroupSequential <- function(
-        ...,
+.getFinalConfidenceIntervalMeansGroupSequential <- function(...,
         design,
         dataInput,
         stage,
@@ -1941,8 +1925,7 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalMeansInverseNormal <- function(
-        ...,
+.getFinalConfidenceIntervalMeansInverseNormal <- function(...,
         design,
         dataInput,
         stage,
@@ -1987,8 +1970,7 @@ NULL
     ))
 }
 
-.getQFunctionResultBasedOnDataInput <- function(
-        ...,
+.getQFunctionResultBasedOnDataInput <- function(...,
         design,
         dataInput,
         theta,
@@ -2034,8 +2016,7 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalMeansFisher <- function(
-        ...,
+.getFinalConfidenceIntervalMeansFisher <- function(...,
         design,
         dataInput,
         stage,
@@ -2239,8 +2220,7 @@ NULL
     }
 }
 
-.getFinalConfidenceIntervalMeans <- function(
-        ...,
+.getFinalConfidenceIntervalMeans <- function(...,
         design,
         dataInput,
         thetaH0 = NA_real_,

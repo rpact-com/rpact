@@ -472,15 +472,16 @@ getSimulationMultiArmSurvival <- function(design = NULL,
         endpoint                    = "survival"
     )
     for (notApplicableParam in c(
-            "accrualIntensity",
-            "accrualTime",
-            "dropoutRate1",
-            "dropoutRate2",
-            "dropoutTime",
-            "eventTime",
-            "kappa",
-            "piControl")
-            ) {
+        "accrualIntensity",
+        "accrualTime",
+        "dropoutRate1",
+        "dropoutRate2",
+        "dropoutTime",
+        "eventTime",
+        "kappa",
+        "piControl"
+    )
+    ) {
         simulationResults$.setParameterType(notApplicableParam, C_PARAM_NOT_APPLICABLE)
     }
 

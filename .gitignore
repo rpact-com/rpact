@@ -45,3 +45,4 @@ testthat-problems.rds
 /tests/testthat.Rout
 /release-notes-draft-full.md
 /release-notes-draft.md
+/pkgdown

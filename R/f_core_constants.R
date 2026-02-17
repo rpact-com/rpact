@@ -625,7 +625,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     singleEventsPerStage = "Single number of events",
     singleEventsPerArmAndStage = "Single number of events",
     singleEventsPerSubsetAndStage = "Single number of events",
-	populationEventsPerStage = "Number of events per population",
+    populationEventsPerStage = "Number of events per population",
     endOfAccrualIsUserDefined = "End of accrual is user defined",
     followUpTimeMustBeUserDefined = "Follow-up time must be user defined",
     maxNumberOfSubjectsIsUserDefined = "Max number of subjects is user defined",
@@ -1220,22 +1220,22 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
             obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
         return(".formatHowItIs")
     }
-    
+
     if (parameterName == "accrualTimeOriginal" && inherits(obj, "TrialDesignPlanCountData") &&
             obj$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED) {
         return(".formatHowItIs")
     }
-    
-    if (parameterName == "userAlphaSpending" && 
+
+    if (parameterName == "userAlphaSpending" &&
             obj$.getParameterType("userAlphaSpending") == C_PARAM_GENERATED) {
         return(".formatProbabilities")
     }
-    
-    if (parameterName == "userBetaSpending" && 
+
+    if (parameterName == "userBetaSpending" &&
             obj$.getParameterType("userBetaSpending") == C_PARAM_GENERATED) {
         return(".formatProbabilities")
     }
-    
+
     return(C_PARAMETER_FORMAT_FUNCTIONS[[parameterName]])
 }
 

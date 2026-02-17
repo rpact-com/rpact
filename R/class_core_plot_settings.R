@@ -30,7 +30,7 @@ PlotSubTitleItem <- R6::R6Class("PlotSubTitleItem",
             } else {
                 self$value <- value
             }
-            
+
             if (length(self$value) > 1) {
                 self$value <- .arrayToString(self$value, vectorLookAndFeelEnabled = TRUE)
             }
@@ -141,7 +141,7 @@ PlotSubTitleItems <- R6::R6Class("PlotSubTitleItems",
                     atop(.(self$subtitle) * "," ~ .(quotedItems))
                 )))
             }
-            
+
             return(bquote(atop(
                 bold(.(self$title)),
                 atop(.(quotedItems))
@@ -497,14 +497,14 @@ PlotSettings <- R6::R6Class("PlotSettings",
         getLegendPositionArguments = function(position, justification) {
             if (packageVersion("ggplot2") < "3.5.0") {
                 return(list(
-                    legend.position = position, 
+                    legend.position = position,
                     legend.justification = justification
                 ))
             }
-            
+
             return(list(
                 legend.position = "inside",
-                legend.position.inside = position, 
+                legend.position.inside = position,
                 legend.justification = justification
             ))
         },
@@ -512,12 +512,12 @@ PlotSettings <- R6::R6Class("PlotSettings",
             .assertIsValidLegendPosition(legendPosition)
 
             legendPosition <- as.character(legendPosition)
-            
+
             if (legendPosition %in% c("none", "left", "right", "bottom", "top")) {
                 p <- p + ggplot2::theme(legend.position = legendPosition)
                 return(p)
             }
-            
+
             args <- list()
             switch(legendPosition,
                 "-1" = {
@@ -545,11 +545,11 @@ PlotSettings <- R6::R6Class("PlotSettings",
                     args <- self$getLegendPositionArguments(c(0.95, 0.05), c(1, 0))
                 }
             )
-            
+
             if (length(args) > 0) {
-                p <- p + do.call(ggplot2::theme, args) 
+                p <- p + do.call(ggplot2::theme, args)
             }
-            
+
             return(p)
         },
         setLegendBorder = function(p) {
@@ -654,8 +654,8 @@ PlotSettings <- R6::R6Class("PlotSettings",
 
             p <- p + ggplot2::theme(
                 plot.title = ggplot2::element_text(
-                    hjust = 0.5, 
-                    size = self$scaleSize(self$mainTitleFontSize), 
+                    hjust = 0.5,
+                    size = self$scaleSize(self$mainTitleFontSize),
                     face = "bold"
                 )
             )
@@ -681,7 +681,7 @@ PlotSettings <- R6::R6Class("PlotSettings",
             if (!(length(margin) %in% c(1, 4))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'margin' (", .arrayToString(margin),
-                    ") must be a numeric vector with length 1 or 4", 
+                    ") must be a numeric vector with length 1 or 4",
                     call. = FALSE
                 )
             }

@@ -439,15 +439,14 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             self$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
             self$.initStages()
         },
-        hasChanged = function(
-                ...,
-                kMax, 
-                alpha, 
-                sided, 
-                method, 
-                informationRates, 
-                alpha0Vec, 
-                userAlphaSpending, 
+        hasChanged = function(...,
+                kMax,
+                alpha,
+                sided,
+                method,
+                informationRates,
+                alpha0Vec,
+                userAlphaSpending,
                 bindingFutility) {
             informationRatesTemp <- informationRates
             if (anyNA(informationRatesTemp)) {
@@ -660,8 +659,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 name, "_old = ", .arrayToString(self$.formatComparisonResult(oldValue)), " (", .getClassName(oldValue), ")"
             ))
         },
-        hasChanged = function(
-                ...,
+        hasChanged = function(...,
                 kMax,
                 alpha,
                 beta,
@@ -1134,8 +1132,7 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #'
 #' @export
 #'
-plot.TrialDesign <- function(
-        x,
+plot.TrialDesign <- function(x,
         y,
         ...,
         main = NA_character_,
@@ -1156,11 +1153,13 @@ plot.TrialDesign <- function(
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
-    
+
     .warnInCaseOfUnknownArguments(
         functionName = "plot",
-        ignore = c("xlim", "ylim", "companyAnnotationEnabled", "variedParameters", 
-            "showFutilityBounds", "showAlphaSpent", "showBetaSpent"), ...
+        ignore = c(
+            "xlim", "ylim", "companyAnnotationEnabled", "variedParameters",
+            "showFutilityBounds", "showAlphaSpent", "showBetaSpent"
+        ), ...
     )
     .showWarningIfPlotArgumentWillBeIgnored(type, ..., obj = x)
 
@@ -1290,23 +1289,21 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
     plot(x = x$.design, y = y, ...)
 }
 
-.plotTrialDesign <- function(
-        ..., 
-        x, 
-        y, 
+.plotTrialDesign <- function(...,
+        x,
+        y,
         main,
-        xlab, 
-        ylab, 
-        type, 
+        xlab,
+        ylab,
+        type,
         palette,
-        theta, 
-        nMax, 
+        theta,
+        nMax,
         plotPointsEnabled,
-        legendPosition, 
-        showSource, 
-        designName, 
+        legendPosition,
+        showSource,
+        designName,
         plotSettings = NULL) {
-        
     .assertGgplotIsInstalled()
 
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
