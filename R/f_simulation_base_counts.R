@@ -280,10 +280,10 @@ getSimulationCounts <- function(design = NULL,
         objectType = "power", userFunctionCallEnabled = TRUE
     )
 
-    if (!any(is.na(theta))) {
+    if (!anyNA(theta)) {
         totalCases <- length(theta)
         lambda1 <- rep(NA_real_, totalCases)
-    } else if (!any(is.na(lambda1))) {
+    } else if (!anyNA(lambda1)) {
         totalCases <- length(lambda1)
     } else {
         totalCases <- 1
@@ -301,9 +301,9 @@ getSimulationCounts <- function(design = NULL,
         sampleSizeEnabled, sided, lambda1, lambda2, lambda, theta,
         thetaH0, overdispersion
     )
-    if (!is.na(lambda2) && !any(is.na(theta))) {
+    if (!is.na(lambda2) && !anyNA(theta)) {
         lambda1 <- lambda2 * theta
-    } else if (!any(is.na(lambda1)) && !any(is.na(theta))) {
+    } else if (!anyNA(lambda1) && !anyNA(theta)) {
         lambda2 <- lambda1 / theta
     }
     .assertAreValidParametersCountData(
@@ -413,15 +413,15 @@ getSimulationCounts <- function(design = NULL,
     ))
     simulationResults$seed <- .setSeed(seed)
 
-    if (!is.na(lambda2) && !any(is.na(theta))) {
+    if (!is.na(lambda2) && !anyNA(theta)) {
         lambda1 <- lambda2 * theta
         simulationResults$lambda1 <- lambda1
         simulationResults$.setParameterType("lambda1", C_PARAM_GENERATED)
-    } else if (!any(is.na(lambda1)) && !any(is.na(theta))) {
+    } else if (!anyNA(lambda1) && !anyNA(theta)) {
         lambda2 <- lambda1 / theta
         simulationResults$lambda2 <- lambda2
         simulationResults$.setParameterType("lambda2", C_PARAM_GENERATED)
-    } else if (!is.na(lambda) && !any(is.na(theta))) {
+    } else if (!is.na(lambda) && !anyNA(theta)) {
         simulationResults$.setParameterType("lambda1", C_PARAM_GENERATED)
         simulationResults$.setParameterType("lambda2", C_PARAM_GENERATED)
     }
@@ -462,7 +462,7 @@ getSimulationCounts <- function(design = NULL,
     dataReject <- rep(0, len)
     dataFutility <- rep(0, len)
 
-    if (!any(is.na(accrualIntensity))) {
+    if (!anyNA(accrualIntensity)) {
         # build up general recruitment times
         recruitmentTimes <- .generateRecruitmentTimes(
             allocationRatioPlanned,
@@ -489,7 +489,7 @@ getSimulationCounts <- function(design = NULL,
 
     index <- 1
     for (iCase in 1:totalCases) {
-        if (!is.na(lambda) && !any(is.na(theta))) {
+        if (!is.na(lambda) && !anyNA(theta)) {
             lambda2 <- (1 + allocationRatioPlanned) * lambda / (1 + allocationRatioPlanned * theta[iCase])
             lambda1[iCase] <- lambda2 * theta[iCase]
         }
@@ -700,7 +700,7 @@ getSimulationCounts <- function(design = NULL,
     simulationResults$maxNumberOfSubjects <- n1 + n2
     simulationResults$.setParameterType(
         "maxNumberOfSubjects",
-        ifelse(any(is.na(accrualIntensity)), C_PARAM_USER_DEFINED, C_PARAM_GENERATED)
+        ifelse(anyNA(accrualIntensity), C_PARAM_USER_DEFINED, C_PARAM_GENERATED)
     )
 
     if (design$kMax > 1) {

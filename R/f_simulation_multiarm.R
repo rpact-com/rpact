@@ -1040,7 +1040,7 @@ NULL
         .setValueAndParameterType(simulationResults, "stDev", stDev, C_STDEV_DEFAULT)
     }
 
-    if (any(is.na(allocationRatioPlanned))) {
+    if (anyNA(allocationRatioPlanned)) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
 

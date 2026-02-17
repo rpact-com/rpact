@@ -305,7 +305,7 @@ plotTypes <- function(obj, output = c("numeric", "caption", "numcap", "capnum"),
     for (param in c("alternative", "pi1", "hazardRatio", "muMaxVector", "piMaxVector", "omegaMaxVector")) {
         if (!is.null(resultObject[[param]]) &&
                 resultObject$.getParameterType(param) != C_PARAM_NOT_APPLICABLE &&
-                (any(is.na(resultObject[[param]])) ||
+                (anyNA(resultObject[[param]]) ||
                     length(resultObject[[param]]) <= 1)) {
             return(FALSE)
         }
@@ -1584,7 +1584,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 }
 
 .getLambdaStepFunctionByTime <- function(time, piecewiseSurvivalTime, lambda2) {
-    if (length(piecewiseSurvivalTime) == 0 || any(is.na(piecewiseSurvivalTime))) {
+    if (length(piecewiseSurvivalTime) == 0 || anyNA(piecewiseSurvivalTime)) {
         return(lambda2[1])
     }
 

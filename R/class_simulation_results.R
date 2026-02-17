@@ -453,7 +453,7 @@ SimulationResults <- R6::R6Class(
             }
 
             parameterValues <- unique(parameterValues)
-            if (length(parameterValues) > 1 && !any(is.na(parameterValues))) {
+            if (length(parameterValues) > 1 && !anyNA(parameterValues)) {
                 parameterValues <- sort(parameterValues)
             }
             return(parameterValues)

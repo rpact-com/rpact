@@ -35,7 +35,7 @@ NULL
 
 .getLambda <- function(..., groupNumber, lambda2, lambda1, hazardRatio, kappa) {
     if (groupNumber == 1) {
-        if (!any(is.na(lambda1))) {
+        if (!anyNA(lambda1)) {
             return(lambda1)
         }
 
@@ -436,7 +436,7 @@ NULL
         designPlan <- .getSampleSizeSequentialSurvival(designPlan, designCharacteristics)
     }
 
-    if (designPlan$accountForObservationTimes && !any(is.na(designPlan$followUpTime)) &&
+    if (designPlan$accountForObservationTimes && !anyNA(designPlan$followUpTime) &&
             all(designPlan$followUpTime == C_FOLLOW_UP_TIME_DEFAULT)) {
         designPlan$.setParameterType("followUpTime", C_PARAM_DEFAULT_VALUE)
     }
@@ -518,7 +518,7 @@ NULL
     designPlan$maxNumberOfEvents <- designPlan$cumulativeEventsPerStage[designPlan$.design$kMax, ]
     designPlan$.setParameterType("maxNumberOfEvents", C_PARAM_GENERATED)
 
-    if (!any(is.na(designPlan$followUpTime))) {
+    if (!anyNA(designPlan$followUpTime)) {
         if (any(designPlan$followUpTime < -1e-02)) {
             warning("Accrual duration longer than maximal study ",
                 "duration (time to maximal number of events); followUpTime = ",
@@ -654,14 +654,14 @@ NULL
             )
         }
 
-        if (!any(is.na(pi1)) && (any(pi1 <= 0) || any(pi1 >= 1))) {
+        if (!anyNA(pi1) && (any(pi1 <= 0) || any(pi1 >= 1))) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "event rate 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)"
             )
         }
 
-        if (!any(is.na(pi2)) && (any(pi2 <= 0) || any(pi2 >= 1))) {
+        if (!anyNA(pi2) && (any(pi2 <= 0) || any(pi2 >= 1))) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "event rate 'pi2' (", .arrayToString(pi2), ") is out of bounds (0; 1)"
@@ -2093,7 +2093,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
             followUpTime <- 1e12
         }
 
-        if (!any(is.na(hazardRatio)) && !is.na(thetaH0)) {
+        if (!anyNA(hazardRatio) && !is.na(thetaH0)) {
             .assertIsValidHazardRatio(hazardRatio, thetaH0)
         }
 
@@ -2730,7 +2730,7 @@ getPowerSurvival <- function(design = NULL, ...,
         designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
     }
 
-    if (!any(is.na(designPlan$analysisTime)) && !any(is.na(designPlan$accrualTime))) {
+    if (!anyNA(designPlan$analysisTime) && !anyNA(designPlan$accrualTime)) {
         designPlan$followUpTime <- designPlan$analysisTime[kMax, ] -
             designPlan$accrualTime[length(designPlan$accrualTime)]
         designPlan$.setParameterType("followUpTime", C_PARAM_GENERATED)

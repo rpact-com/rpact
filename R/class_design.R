@@ -164,7 +164,7 @@ TrialDesign <- R6::R6Class("TrialDesign",
             return((inherits(self, "TrialDesignGroupSequential") || inherits(self, "TrialDesignInverseNormal")) &&
                 self$kMax > 1 &&
                 !is.null(self[["delayedInformation"]]) &&
-                !any(is.na(self$delayedInformation)) && any(self$delayedInformation > 0))
+                !anyNA(self$delayedInformation) && any(self$delayedInformation > 0))
         }
     )
 )
@@ -450,11 +450,11 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
                 userAlphaSpending, 
                 bindingFutility) {
             informationRatesTemp <- informationRates
-            if (any(is.na(informationRatesTemp))) {
+            if (anyNA(informationRatesTemp)) {
                 informationRatesTemp <- .getInformationRatesDefault(kMax)
             }
             alpha0VecTemp <- alpha0Vec[1:(kMax - 1)]
-            if (any(is.na(alpha0VecTemp))) {
+            if (anyNA(alpha0VecTemp)) {
                 alpha0VecTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
             }
             if (!isTRUE(all.equal(kMax, self$kMax))) {
@@ -684,11 +684,11 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 betaAdjustment = TRUE,
                 delayedInformation = NA_real_) {
             informationRatesTemp <- informationRates
-            if (any(is.na(informationRatesTemp))) {
+            if (anyNA(informationRatesTemp)) {
                 informationRatesTemp <- .getInformationRatesDefault(kMax)
             }
             futilityBoundsTemp <- futilityBounds[1:(kMax - 1)]
-            if (any(is.na(futilityBoundsTemp))) {
+            if (anyNA(futilityBoundsTemp)) {
                 futilityBoundsTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
             }
             if (!isTRUE(all.equal(kMax, self$kMax))) {

@@ -187,7 +187,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             .earlyStop <- rep(NA_real_, kMax)
             .futilityPerStage <- rep(NA_real_, kMax)
 
-            if (!any(is.na(delayedInformation))) {
+            if (!anyNA(delayedInformation)) {
                 contRegionLower <- futilityBounds
                 contRegionUpper <- criticalValues
                 decisionCriticalValues <- self$.design$decisionCriticalValues

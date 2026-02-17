@@ -804,7 +804,7 @@ NULL
         simulationResults$calcEventsFunction <- calcEventsFunction
     }
 
-    if (any(is.na(allocationRatioPlanned))) {
+    if (anyNA(allocationRatioPlanned)) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
 

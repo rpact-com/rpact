@@ -316,7 +316,7 @@ NULL
         return(invisible())
     }
 
-    if (!naAllowed && length(x) > 1 && any(is.na(x))) {
+    if (!naAllowed && length(x) > 1 && anyNA(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", xName, "' (", .arrayToString(x), ") must be a valid numeric vector or a single NA",
@@ -371,7 +371,7 @@ NULL
         return(invisible())
     }
 
-    if (!naAllowed && length(x) > 1 && any(is.na(x))) {
+    if (!naAllowed && length(x) > 1 && anyNA(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", xName, "' (", .arrayToString(x), ") ",
@@ -625,7 +625,7 @@ NULL
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
-    if ((!naAllowed && any(is.na(x))) || !is.numeric(x)) {
+    if ((!naAllowed && anyNA(x)) || !is.numeric(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(x), ") must be a valid numeric value or vector",
@@ -633,7 +633,7 @@ NULL
         )
     }
 
-    if (!any(is.na(len)) && !length(x) %in% len) {
+    if (!anyNA(len) && !length(x) %in% len) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(x), ") must have length ", .arrayToString(len, mode = "or"),
@@ -659,7 +659,7 @@ NULL
         return(invisible())
     }
 
-    if (!is.numeric(x) || (!naAllowed && any(is.na(x))) || (validateType && !is.integer(x)) ||
+    if (!is.numeric(x) || (!naAllowed && anyNA(x)) || (validateType && !is.integer(x)) ||
             (!validateType && any(as.integer(na.omit(x)) != na.omit(x)))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
@@ -681,7 +681,7 @@ NULL
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
-    if ((!naAllowed && any(is.na(x))) || !is.logical(x)) {
+    if ((!naAllowed && anyNA(x)) || !is.logical(x)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (", x, ") ",
             "must be a valid logical value or vector",
             call. = call.
@@ -876,7 +876,7 @@ NULL
         )
     }
 
-    if (!naAllowed && any(is.na(x))) {
+    if (!naAllowed && anyNA(x)) {
         stop(
             sprintf(
                 paste0(
@@ -1062,7 +1062,7 @@ NULL
         return(invisible())
     }
 
-    if (any(is.na(lambda))) {
+    if (anyNA(lambda)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(lambda), ") must be a valid numeric vector",
@@ -1349,7 +1349,7 @@ NULL
 }
 
 .assertContainsNoNas <- function(values, parameterName) {
-    if (any(is.na(values))) {
+    if (anyNA(values)) {
         stop(
             sprintf(
                 paste0(
@@ -1888,7 +1888,7 @@ NULL
 
 .assertIsValidThetaRange <- function(..., thetaRange, thetaAutoSeqEnabled = TRUE, survivalDataEnabled = FALSE) {
     if (is.null(thetaRange) || (thetaAutoSeqEnabled && length(thetaRange) <= 1) ||
-            any(is.na(thetaRange))) {
+            anyNA(thetaRange)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'thetaRange' (", .arrayToString(thetaRange), ") must be a vector ",
@@ -1920,7 +1920,7 @@ NULL
 
 .assertIsValidPiTreatmentRange <- function(..., piTreatmentRange, piAutoSeqEnabled = TRUE) {
     if (is.null(piTreatmentRange) || (piAutoSeqEnabled && length(piTreatmentRange) <= 1) ||
-            any(is.na(piTreatmentRange))) {
+            anyNA(piTreatmentRange)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'piTreatmentRange' (", .arrayToString(piTreatmentRange), ") must be a vector ",
@@ -1969,7 +1969,7 @@ NULL
         return(invisible())
     }
 
-    if (!is.numeric(piValue) || any(is.na(piValue))) {
+    if (!is.numeric(piValue) || anyNA(piValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", piName, "' (", .arrayToString(piValue), ") must be a valid numeric value",
@@ -2034,7 +2034,7 @@ NULL
     )
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
 
-    if (any(is.na(allocationRatioPlanned))) {
+    if (anyNA(allocationRatioPlanned)) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
 
@@ -3059,7 +3059,7 @@ NULL
         )
     }
 
-    if (!naAllowed && any(is.na(x))) {
+    if (!naAllowed && anyNA(x)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", argumentName, "' (", .arrayToString(x), ") must not contain NA's",
             call. = FALSE
@@ -3178,7 +3178,7 @@ NULL
                 call. = FALSE
             )
         }
-        if (!is.null(doseLevels) && !any(is.na(doseLevels))) {
+        if (!is.null(doseLevels) && !anyNA(doseLevels)) {
             warning("'doseLevels' (", .arrayToString(doseLevels), ") ",
                 "will be ignored because 'typeOfShape' ",
                 "is defined as '", typeOfShape, "'",
@@ -3192,7 +3192,7 @@ NULL
         )
     }
 
-    if (any(is.na(doseLevels))) {
+    if (anyNA(doseLevels)) {
         doseLevels <- 1:gMax
     }
 
@@ -3459,7 +3459,7 @@ NULL
     .assertIsValidCountsParameterCombination(c("lambda", "lambda2"), c("lambda1", "theta"), params)
     .assertIsValidCountsParameterCombination(c("lambda1", "lambda2"), c("lambda", "theta"), params)
     
-    numberOfParameters <- sum(is.na(lambda2), any(is.na(lambda1)), is.na(lambda), any(is.na(theta)))
+    numberOfParameters <- sum(is.na(lambda2), anyNA(lambda1), is.na(lambda), anyNA(theta))
     if (numberOfParameters != 2) {
         stop(
             ifelse(numberOfParameters > 2, C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, C_EXCEPTION_TYPE_MISSING_ARGUMENT),
@@ -3552,7 +3552,7 @@ NULL
     }
     
     if (sampleSizeEnabled) {
-        if (is.na(maxNumberOfSubjects) && any(is.na(accrualIntensity))) {
+        if (is.na(maxNumberOfSubjects) && anyNA(accrualIntensity)) {
             .assertParametersAreSpecifiedCorrectlyTogether(
                 "fixedExposureTime" = fixedExposureTime,
                 "followUpTime" = followUpTime
@@ -3589,7 +3589,7 @@ NULL
             .paramNames = if (simulationEnabled) c("maxNumberOfSubjects", "accrualIntensity") else NULL
         )
     }
-    if (any(is.na(accrualTime)) && !is.na(followUpTime)) {
+    if (anyNA(accrualTime) && !is.na(followUpTime)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'accrualTime' needs to be specified if 'followUpTime' (", followUpTime, ") is specified",
@@ -3629,7 +3629,7 @@ NULL
             "accrualIntensity" = accrualIntensity,
             "fixedExposureTime" = fixedExposureTime
         )
-        if (!is.na(maxNumberOfSubjects) && any(is.na(accrualTime))) {
+        if (!is.na(maxNumberOfSubjects) && anyNA(accrualTime)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' needs to be specified if 'maxNumberOfSubjects' ",
@@ -3638,21 +3638,21 @@ NULL
             )
         }
     } else if (!simulationEnabled) {
-        if (is.na(maxNumberOfSubjects) && (any(is.na(accrualIntensity)) || any(is.na(accrualTime)))) {
+        if (is.na(maxNumberOfSubjects) && (anyNA(accrualIntensity) || anyNA(accrualTime))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified",
                 call. = FALSE
             )
         }
-        if (any(is.na(accrualIntensity)) && !any(is.na(accrualTime)) && !is.na(fixedExposureTime)) {
+        if (anyNA(accrualIntensity) && !anyNA(accrualTime) && !is.na(fixedExposureTime)) {
             warning(
                 "Specification of 'accrualTime' has no influence of calculation and will be ignored",
                 call. = FALSE
             )
         }
     } else {
-        if (is.na(maxNumberOfSubjects) && (any(is.na(accrualIntensity)) || any(is.na(accrualTime)))) {
+        if (is.na(maxNumberOfSubjects) && (anyNA(accrualIntensity) || anyNA(accrualTime))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified",
@@ -3667,7 +3667,7 @@ NULL
         .paramNames = if (simulationEnabled) c("maxNumberOfSubjects", "accrualIntensity") else NULL
     )
 
-    if (!any(is.na(accrualIntensity)) && (accrualTime[1] != 0) &&
+    if (!anyNA(accrualIntensity) && (accrualTime[1] != 0) &&
             length(accrualIntensity) == 1 &&
             length(accrualTime) != length(accrualIntensity)) {
         stop(
@@ -3677,7 +3677,7 @@ NULL
             call. = FALSE
         )
     }
-    if (!any(is.na(accrualIntensity)) && (length(accrualIntensity) > 1) &&
+    if (!anyNA(accrualIntensity) && (length(accrualIntensity) > 1) &&
             length(accrualTime) != length(accrualIntensity) + 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -3686,7 +3686,7 @@ NULL
             call. = FALSE
         )
     }
-    if (accrualIntensityValidationEnabled && any(is.na(accrualIntensity)) &&
+    if (accrualIntensityValidationEnabled && anyNA(accrualIntensity) &&
             length(accrualTime) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -3931,7 +3931,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         return(invisible())
     }
         
-    if (!is.null(lowerBound) && length(lowerBound) > 0 && !any(is.na(lowerBound)) && 
+    if (!is.null(lowerBound) && length(lowerBound) > 0 && !anyNA(lowerBound) && 
             any(futilityBounds < lowerBound, na.rm = TRUE)) {
         warning(
             "At least one calculated futility bound outside acceptable range",
@@ -3939,7 +3939,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         )
     }
     
-    if (!is.null(upperBound) && length(upperBound) > 0 && !any(is.na(upperBound)) && 
+    if (!is.null(upperBound) && length(upperBound) > 0 && !anyNA(upperBound) && 
             any(futilityBounds > upperBound, na.rm = TRUE)) {
         warning(
             "At least one calculated futility bound outside acceptable range",

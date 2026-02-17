@@ -41,7 +41,7 @@ NULL
         # outside validated range
         criticalValues[criticalValues > 50] <- NA_real_
         if (design$typeOfDesign == "noEarlyEfficacy") {
-            if ((is.matrix(criticalValues) && any(is.na(criticalValues[design$kMax, ]))) ||
+            if ((is.matrix(criticalValues) && anyNA(criticalValues[design$kMax, ])) ||
                     (is.vector(criticalValues) && is.na(criticalValues[design$kMax]))) {
                 warning("The computation of last stage efficacy boundary on treatment ",
                     "effect scale not performed presumably ",
@@ -70,7 +70,7 @@ NULL
 
             # outside validated range
             futilityBounds[abs(futilityBounds) > 50] <- NA_real_
-            if (any(is.na(futilityBounds))) {
+            if (anyNA(futilityBounds)) {
                 warning("The computation of futility boundaries on ",
                     "treatment effect scale not performed presumably ",
                     "due to too small degrees of freedom",
@@ -600,7 +600,7 @@ NULL
         objectType = objectType, userFunctionCallEnabled = TRUE
     )
 
-    if (objectType == "sampleSize" && !any(is.na(alternative))) {
+    if (objectType == "sampleSize" && !anyNA(alternative)) {
         if (design$sided == 1 && any(alternative - thetaH0 <= 0)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,

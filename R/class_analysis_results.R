@@ -1743,7 +1743,7 @@ AnalysisResultsConditionalDunnett <- R6::R6Class("AnalysisResultsConditionalDunn
     data <- x[[paramName]]
 
     if (is.matrix(data) && !is.null(treatmentArmsToShow) &&
-            length(treatmentArmsToShow) > 0 && !any(is.na(treatmentArmsToShow))) {
+            length(treatmentArmsToShow) > 0 && !anyNA(treatmentArmsToShow)) {
         data <- data[treatmentArmsToShow, ]
     }
 

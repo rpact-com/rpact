@@ -258,11 +258,11 @@ writeKeyValueFile <- function(
 #' (INI/.env-like): \code{KEY=VALUE}. Blank lines are ignored.
 #' Full-line comments starting with \code{#} or \code{;} are ignored.
 #' Inline comments are supported for unquoted values when preceded by whitespace,
-#' e.g. \code{KEY=123  # comment}.
+#' e.g., \code{KEY=123 # comment}.
 #'
 #' @details 
 #' Values can be quoted with double quotes. Escape sequences \code{\\n},
-#' \code{\\r}, \code{\\t}, \code{\\\\}, and \code{\\"} are supported.
+#' \code{\\r}, \code{\\t}, \code{\\\\}, and \code{\"} are supported.
 #'
 #' UTF-8 handling: The file is read as UTF-8 and all character values are
 #' normalized to UTF-8 via \code{enc2utf8()}.

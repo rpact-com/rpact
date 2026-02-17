@@ -247,7 +247,7 @@ getSimulationMeans <- function(design = NULL, ...,
         }
         simulationResults$.setParameterType("allocationRatioPlanned", C_PARAM_NOT_APPLICABLE)
     } else {
-        if (any(is.na(allocationRatioPlanned))) {
+        if (anyNA(allocationRatioPlanned)) {
             allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
         }
 

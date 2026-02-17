@@ -655,7 +655,7 @@ NULL
         )
     }
 
-    if (any(is.na(piecewiseSurvivalTime))) {
+    if (anyNA(piecewiseSurvivalTime)) {
         .assertIsSingleNumber(kappa, "kappa")
     }
 

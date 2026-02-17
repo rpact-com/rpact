@@ -129,7 +129,7 @@
 
 .assertIsValidVariedParameterVectorForPlotting <- function(designPlan, plotType) {
     if (.isTrialDesignPlanMeans(designPlan)) {
-        if (is.null(designPlan$alternative) || any(is.na(designPlan$alternative)) ||
+        if (is.null(designPlan$alternative) || anyNA(designPlan$alternative) ||
                 length(designPlan$alternative) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
@@ -137,7 +137,7 @@
             )
         }
     } else if (.isTrialDesignPlanRates(designPlan)) {
-        if (is.null(designPlan$pi1) || any(is.na(designPlan$pi1)) ||
+        if (is.null(designPlan$pi1) || anyNA(designPlan$pi1) ||
                 length(designPlan$pi1) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
@@ -145,7 +145,7 @@
             )
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
-        if (is.null(designPlan$hazardRatio) || any(is.na(designPlan$hazardRatio)) ||
+        if (is.null(designPlan$hazardRatio) || anyNA(designPlan$hazardRatio) ||
                 length(designPlan$hazardRatio) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,

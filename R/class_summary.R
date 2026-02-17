@@ -1752,7 +1752,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         identical(unique(analysisResults$allocationRatioPlanned), 1), "", ",")
 
     if (case1) {
-        if (!any(is.na(paramValue1)) && length(unique(paramValue1)) == 1) {
+        if (!anyNA(paramValue1) && length(unique(paramValue1)) == 1) {
             paramValue1 <- paramValue1[1]
         }
         if (length(paramValue1) == 1) {
@@ -3320,7 +3320,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     )
 
     if (design$kMax > 1 && !is.null(designCharacteristics[["futilityProbabilities"]]) &&
-            !any(is.na(designCharacteristics$futilityProbabilities)) &&
+            !anyNA(designCharacteristics$futilityProbabilities) &&
             any(designCharacteristics$futilityProbabilities > 0)) {
         summaryFactory$addParameter(designCharacteristics,
             parameterName = "futilityProbabilities",
@@ -4035,7 +4035,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
         if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE) &&
                 !is.null(designPlan[["futilityPerStage"]]) &&
-                !any(is.na(designPlan[["futilityPerStage"]])) &&
+                !anyNA(designPlan[["futilityPerStage"]]) &&
                 any(designPlan$futilityPerStage != 0) &&
                 any(designPlan$futilityPerStage > 1e-08)) {
             summaryFactory$addParameter(designPlan,

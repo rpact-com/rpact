@@ -1126,7 +1126,7 @@ NULL
         allocationRatioPlanned = allocationRatioPlanned
     )
 
-    if (any(is.na(nPlanned))) {
+    if (anyNA(nPlanned)) {
         return(results)
     }
 

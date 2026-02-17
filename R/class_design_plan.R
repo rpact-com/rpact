@@ -128,7 +128,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
                 if (all(is.na(existingValue))) {
                     self$.setParameterType(parameterName, C_PARAM_DEFAULT_VALUE)
                 } else if (!is.null(defaultValue) && length(defaultValue) == length(existingValue) &&
-                        !any(is.na(defaultValue)) && !any(is.na(existingValue)) &&
+                        !anyNA(defaultValue) && !anyNA(existingValue) &&
                         sum(defaultValue == existingValue) == length(defaultValue)) {
                     self$.setParameterType(parameterName, C_PARAM_DEFAULT_VALUE)
                 } else {
@@ -450,7 +450,7 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
         },
         recreate = function(alternative = NA_real_) {
             alternativeTemp <- alternative
-            if (any(is.na(alternative))) {
+            if (anyNA(alternative)) {
                 alternativeTemp <- self$alternative
             }
             if (self$.objectType == "sampleSize") {
@@ -632,7 +632,7 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
         },
         recreate = function(pi1 = NA_real_) {
             pi1Temp <- pi1
-            if (any(is.na(pi1))) {
+            if (anyNA(pi1)) {
                 pi1Temp <- self$pi1
             }
             if (self$.objectType == "sampleSize") {
@@ -906,14 +906,14 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
             }
         },
         recreate = function(..., hazardRatio = NA_real_, pi1 = NA_real_, maxNumberOfSubjects = NA_integer_) {
-            if (any(is.na(hazardRatio)) && self$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
+            if (anyNA(hazardRatio) && self$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
                 hazardRatio <- self$hazardRatio
             }
             
-            if (any(is.na(pi1))) {
+            if (anyNA(pi1)) {
                 if (self$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
                     pi1 <- self$pi1
-                } else if (any(is.na(hazardRatio))) {
+                } else if (anyNA(hazardRatio)) {
                     if (self$.objectType == "sampleSize") {
                         pi1 <- C_PI_1_SAMPLE_SIZE_DEFAULT
                     } else {
@@ -1132,7 +1132,7 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
                 lambda1Temp <- self$.getParameterValueIfUserDefinedOrDefault("lambda1")
             } else {
                 lambda1Temp <- lambda1
-                if (any(is.na(lambda1))) {
+                if (anyNA(lambda1)) {
                     lambda1Temp <- self$lambda1
                 }
             }
@@ -1140,7 +1140,7 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
                 thetaTemp <- self$.getParameterValueIfUserDefinedOrDefault("theta")
             } else {
                 thetaTemp <- theta
-                if (any(is.na(theta))) {
+                if (anyNA(theta)) {
                     thetaTemp <- self$theta
                 }
             }

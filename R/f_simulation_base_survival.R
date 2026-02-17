@@ -512,7 +512,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         simulationResults$lambda1 <- pwsTimeObject$lambda1
         simulationResults$.setParameterType("lambda1", pwsTimeObject$.getParameterType("lambda1"))
 
-        if (any(is.na(pwsTimeObject$lambda1))) {
+        if (anyNA(pwsTimeObject$lambda1)) {
             .assertIsValidHazardRatioVector(pwsTimeObject$hazardRatio)
             .setValueAndParameterType(
                 simulationResults, "hazardRatio",

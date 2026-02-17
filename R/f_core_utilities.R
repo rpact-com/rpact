@@ -902,7 +902,7 @@ getTestLabel <- function(x) {
 }
 
 .getVariedParameterVector <- function(variedParameter, variedParameterName) {
-    if (is.null(variedParameter) || length(variedParameter) != 2 || any(is.na(variedParameter))) {
+    if (is.null(variedParameter) || length(variedParameter) != 2 || anyNA(variedParameter)) {
         return(variedParameter)
     }
 
@@ -945,7 +945,7 @@ getTestLabel <- function(x) {
 }
 
 .matchArgument <- function(arg, defaultValue) {
-    if (any(is.na(arg))) {
+    if (anyNA(arg)) {
         return(defaultValue)
     }
     return(ifelse(length(arg) > 0, arg[1], defaultValue))
@@ -1324,7 +1324,7 @@ getParameterName <- function(obj, parameterCaption) {
 
     if (is.list(x)) {
         listNames <- names(x)
-        if (is.null(listNames) || any(is.na(listNames)) || any(trimws(listNames) == "")) {
+        if (is.null(listNames) || anyNA(listNames) || any(trimws(listNames) == "")) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "list (", .arrayToString(unlist(x)), ") must be named")
         }
 
@@ -1478,7 +1478,7 @@ getParameterName <- function(obj, parameterCaption) {
         return(NA_character_)
     }
 
-    if (length(values) <= 3 || any(is.na(values))) {
+    if (length(values) <= 3 || anyNA(values)) {
         return(.arrayToString(values, vectorLookAndFeelEnabled = (length(values) != 1)))
     }
 

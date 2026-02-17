@@ -9,7 +9,7 @@ writeKeyValueFile(
   filePath,
   ...,
   writeHeader = TRUE,
-  sortKeys = TRUE,
+  sortKeys = FALSE,
   overwrite = TRUE
 )
 }
@@ -46,5 +46,24 @@ UTF-8 handling: Values are normalized to UTF-8 on write. The file is written
 with UTF-8 encoding when supported by the platform. On Windows, UTF-8 is
 enforced via \code{fileEncoding = "UTF-8"}. On other platforms, UTF-8 is
 typically the native encoding; we still normalize strings to UTF-8.
+}
+\examples{
+\dontrun{
+keyValueList <- list(
+    STUDY_NAME = "Trial A",
+    MAX_PATIENTS = 150L,
+    THRESHOLD = 0.075,
+    NOTES = "First phase\nSecond phase"
+)
+filePath <- tempfile(fileext = ".txt")
+writeKeyValueFile(
+    keyValueList = keyValueList,
+    filePath = filePath,
+    writeHeader = TRUE,
+    sortKeys = TRUE,
+    overwrite = TRUE
+)
+}
+
 }
 \keyword{internal}

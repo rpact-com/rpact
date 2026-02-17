@@ -300,7 +300,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     .assertIsSingleInteger(kMax, "kMax", naAllowed = TRUE, validateType = FALSE)
     .assertIsSingleCharacter(typeOfDesign, "typeOfDesign")
 
-    if (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER && !any(is.na(userAlphaSpending))) {
+    if (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER && !anyNA(userAlphaSpending)) {
         if (!is.na(kMax) && kMax != length(userAlphaSpending)) {
             stop(sprintf(
                 paste0(
@@ -1585,7 +1585,7 @@ getDesignInverseNormal <- function(
             warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because kMax = 1", call. = FALSE)
         }
-        else if (any(is.na(futilityBounds))) {
+        else if (anyNA(futilityBounds)) {
             warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'futilityBounds' is not defined",
                 call. = FALSE
@@ -1869,7 +1869,7 @@ getDesignInverseNormal <- function(
 
     # sensible interim choices are restricted by amount of delayed information
     eps <- design$informationRates[1:(design$kMax - 1)] + delayedInformation
-    if (!any(is.na(eps)) && any(eps >= 1)) {
+    if (!anyNA(eps) && any(eps >= 1)) {
         stages <- which(eps >= 1)
         stagesInfo <- ifelse(length(stages) == 1, paste0(" ", stages), paste0("s ", .arrayToString(stages, mode = "and")))
         stop(
@@ -2380,7 +2380,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
     }
 
     criticalValues <- .getCriticalValues(design)
-    if (!any(is.na(design$delayedInformation)) &&
+    if (!anyNA(design$delayedInformation) &&
             length(design$decisionCriticalValues) > 0) {
         contRegionUpper <- criticalValues
         contRegionLower <- design$futilityBounds

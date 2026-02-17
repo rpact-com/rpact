@@ -223,7 +223,7 @@ getDesignFisher <- function(
             warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because kMax = 1", call. = FALSE)
         }
-        else if (any(is.na(alpha0Vec))) {
+        else if (anyNA(alpha0Vec)) {
             warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'alpha0Vec' is not defined",
                 call. = FALSE
@@ -332,7 +332,7 @@ getDesignFisher <- function(
         alpha0Vec <- rep(1, design$kMax - 1)
     }
 
-    if (design$method == C_FISHER_METHOD_NO_INTERACTION && !any(is.na(alpha0Vec)) &&
+    if (design$method == C_FISHER_METHOD_NO_INTERACTION && !anyNA(alpha0Vec) &&
             all(alpha0Vec == C_ALPHA_0_VEC_DEFAULT)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,

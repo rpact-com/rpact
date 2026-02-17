@@ -1042,12 +1042,12 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 )
             )
         }
-        if (any(is.na(paramValue))) {
+        if (anyNA(paramValue)) {
             subsets <- unique(dataFrame$subset)
             for (s in subsets) {
                 subData <- dataFrame[dataFrame$subset == s, ]
                 subsetParamValues <- subData[[param]]
-                if (!all(is.na(subsetParamValues)) && any(is.na(subsetParamValues[subData$stage == 1]))) {
+                if (!all(is.na(subsetParamValues)) && anyNA(subsetParamValues[subData$stage == 1])) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         gettextf(
@@ -1071,7 +1071,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
     paramNames <- .getEndpointSpecificDataFrameParameterNames(dataFrame)
     for (i in 1:nrow(dataFrame)) {
         row <- dataFrame[i, paramNames]
-        if (any(is.na(row)) && !all(is.na(row))) {
+        if (anyNA(row) && !all(is.na(row))) {
             stop(
                 C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                 gettextf(
@@ -1102,7 +1102,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                 )
             }
 
-            if (any(is.na(subData))) {
+            if (anyNA(subData)) {
                 deselectedStage <- stage
             }
         }
@@ -1298,7 +1298,7 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
                             paramValueRest <- restData[[paramName]][restData$stage == stage & restData$group == group]
                             paramValueSubset <- subData[[paramName]]
                             if (length(paramValueRest) > 0 && length(paramValueSubset) > 0 &&
-                                    any(is.na(paramValueSubset)) && !all(is.na(paramValueRest))) {
+                                    anyNA(paramValueSubset) && !all(is.na(paramValueRest))) {
                                 stop(
                                     C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                                     gettextf(
@@ -1712,12 +1712,12 @@ Dataset <- R6::R6Class("Dataset",
                 stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'.data' must be defined")
             }
 
-            if (!is.null(stage) && !any(is.na(stage)) && all(stage < 0)) {
+            if (!is.null(stage) && !anyNA(stage) && all(stage < 0)) {
                 index <- 1:self$getNumberOfStages()
                 stage <- index[!(index %in% abs(stage))]
             }
 
-            if (!is.null(group) && !any(is.na(group)) && all(group < 0)) {
+            if (!is.null(group) && !anyNA(group) && all(group < 0)) {
                 index <- 1:self$getNumberOfGroups(survivalCorrectionEnabled = FALSE)
                 group <- index[!(index %in% abs(group))]
             }
@@ -2476,7 +2476,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
         for (fixedCovariateName in fixedCovariateNames) {
             data[[fixedCovariateName]] <- rep(NA, nrow(data))
             values <- fixedCovariates[[fixedCovariateName]]
-            if (is.null(values) || length(values) < 2 || any(is.na(values))) {
+            if (is.null(values) || length(values) < 2 || anyNA(values)) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(paste0("fixedCovariates$", fixedCovariateName)),
                     " (", .arrayToString(values), ") must be a valid numeric or character vector with a minimum of 2 values"
@@ -4217,7 +4217,7 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
                 parameterCaption = "Cumulative log rank statistic", roundDigits = digitsGeneral
             )
         }
-        if (!any(is.na(object$allocationRatios)) && any(object$allocationRatios != 1)) {
+        if (!anyNA(object$allocationRatios) && any(object$allocationRatios != 1)) {
             summaryFactory$addParameter(object,
                 parameterName = "allocationRatios",
                 parameterCaption = .firstCharacterToUpperCase(parameterCaptionPrefix, "allocation ratio"),

@@ -669,7 +669,7 @@ NULL
     )
 
     if (groups == 1) {
-        if (!any(is.na(pi1)) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
+        if (!anyNA(pi1) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "any 'pi1' (",
@@ -680,7 +680,7 @@ NULL
             )
         }
 
-        if (any(is.na(pi1)) || any(pi1 <= 0) || any(pi1 >= 1)) {
+        if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "probability 'pi1' (",
@@ -715,7 +715,7 @@ NULL
         }
     } else if (groups == 2) {
         if (
-            !any(is.na(c(pi1, pi2))) &&
+            !anyNA(c(pi1, pi2)) &&
                 any(abs(pi1 - pi2 - thetaH0) < 1e-12) &&
                 (objectType == "sampleSize") &&
                 !riskRatio
@@ -732,7 +732,7 @@ NULL
         }
 
         if (
-            !any(is.na(c(pi1, pi2))) &&
+            !anyNA(c(pi1, pi2)) &&
                 any(abs(pi1 / pi2 - thetaH0) < 1e-12) &&
                 (objectType == "sampleSize") &&
                 riskRatio
@@ -748,7 +748,7 @@ NULL
             )
         }
 
-        if (any(is.na(pi1)) || any(pi1 <= 0) || any(pi1 >= 1)) {
+        if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "probability 'pi1' (",
@@ -758,7 +758,7 @@ NULL
             )
         }
 
-        if (any(is.na(pi2)) || any(pi2 <= 0) || any(pi2 >= 1)) {
+        if (anyNA(pi2) || any(pi2 <= 0) || any(pi2 >= 1)) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "probability 'pi2' (",

@@ -1518,7 +1518,7 @@ NULL
         assumedStDev = assumedStDev
     )
 
-    if (any(is.na(nPlanned))) {
+    if (anyNA(nPlanned)) {
         return(results)
     }
 
@@ -1866,10 +1866,10 @@ NULL
         }
     }
 
-    if (!any(is.na(finalConfidenceIntervalGeneral))) {
+    if (!anyNA(finalConfidenceIntervalGeneral)) {
         finalConfidenceIntervalGeneral <- sort(finalConfidenceIntervalGeneral)
     }
-    if (!any(is.na(finalConfidenceInterval))) {
+    if (!anyNA(finalConfidenceInterval)) {
         finalConfidenceInterval <- sort(finalConfidenceInterval)
     }
 

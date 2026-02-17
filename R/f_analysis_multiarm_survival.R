@@ -683,7 +683,7 @@ NULL
             conditionFunction <- .isFirstValueGreaterThanSecondValue
         }
 
-        if (any(is.na(criticalValues[1:stage]))) {
+        if (anyNA(criticalValues[1:stage])) {
             warning("Repeated confidence intervals not because ", sum(is.na(criticalValues)),
                 " critical values are NA (", .arrayToString(criticalValues), ")",
                 call. = FALSE
@@ -952,7 +952,7 @@ NULL
         allocationRatioPlanned = allocationRatioPlanned
     )
 
-    if (any(is.na(nPlanned))) {
+    if (anyNA(nPlanned)) {
         return(results)
     }
 

@@ -367,7 +367,7 @@ getSimulationRates <- function(design = NULL, ...,
         }
         simulationResults$.setParameterType("pi2", C_PARAM_NOT_APPLICABLE)
     } else {
-        if (any(is.na(allocationRatioPlanned))) {
+        if (anyNA(allocationRatioPlanned)) {
             allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
         }
         if (is.na(pi2)) {

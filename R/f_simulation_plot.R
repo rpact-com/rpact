@@ -20,7 +20,7 @@ NULL
 .assertIsValidVariedParameterVectorForSimulationResultsPlotting <- function(simulationResults, plotType) {
     if (inherits(simulationResults, "SimulationResultsMeans")) {
         if (is.null(simulationResults$alternative) ||
-                any(is.na(simulationResults$alternative)) ||
+                anyNA(simulationResults$alternative) ||
                 length(simulationResults$alternative) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
@@ -29,7 +29,7 @@ NULL
         }
     } else if (inherits(simulationResults, "SimulationResultsRates")) {
         if (is.null(simulationResults$pi1) ||
-                any(is.na(simulationResults$pi1)) ||
+                anyNA(simulationResults$pi1) ||
                 length(simulationResults$pi1) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
@@ -38,7 +38,7 @@ NULL
         }
     } else if (inherits(simulationResults, "SimulationResultsSurvival")) {
         if (is.null(simulationResults$hazardRatio) ||
-                any(is.na(simulationResults$hazardRatio)) ||
+                anyNA(simulationResults$hazardRatio) ||
                 length(simulationResults$hazardRatio) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,

@@ -1574,7 +1574,7 @@ NULL
         pi2 = pi2
     )
 
-    if (any(is.na(nPlanned))) {
+    if (anyNA(nPlanned)) {
         return(results)
     }
 
@@ -1921,7 +1921,7 @@ NULL
             )
         }
 
-        if (any(is.na(finalConfidenceIntervalGeneral)) && (designStage > 1)) {
+        if (anyNA(finalConfidenceIntervalGeneral) && (designStage > 1)) {
             finalStage <- NA_integer_
         }
 
@@ -2036,10 +2036,10 @@ NULL
         }
     }
 
-    if (!any(is.na(finalConfidenceIntervalGeneral))) {
+    if (!anyNA(finalConfidenceIntervalGeneral)) {
         finalConfidenceIntervalGeneral <- sort(finalConfidenceIntervalGeneral)
     }
-    if (!any(is.na(finalConfidenceInterval))) {
+    if (!anyNA(finalConfidenceInterval)) {
         finalConfidenceInterval <- sort(finalConfidenceInterval)
     }
 

@@ -592,7 +592,7 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 # Digits = 3, nsmall = 3 if value < 1; digits = 1, nsmall = 1 otherwise
 #
 .formatRatesDynamic <- function(value) {
-    if (!any(is.na(value)) && all(value >= 1)) {
+    if (!anyNA(value) && all(value >= 1)) {
         x <- .getOptionBasedFormattedValue("rpact.output.format.rate1",
             value = value, digits = 1, nsmall = 1
         )
