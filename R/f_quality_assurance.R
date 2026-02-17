@@ -953,7 +953,6 @@ setupPackageTests <- function(token, secret) {
         return("runTestsInTestFileDirectory")
     }
     
-    
     if (credentialsAvailable) {
         if (downloadOnlyModeEnabled) {
             # download test files only

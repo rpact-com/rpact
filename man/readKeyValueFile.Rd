@@ -8,7 +8,8 @@ readKeyValueFile(
   filePath,
   ...,
   inferTypes = TRUE,
-  duplicateKeys = c("error", "last", "first")
+  duplicateKeys = c("error", "last", "first"),
+  safeKeyCheck = FALSE
 )
 }
 \arguments{
@@ -21,6 +22,11 @@ logical/integer/numeric and \code{NA}. If \code{FALSE}, returns character values
 
 \item{duplicateKeys}{How to handle duplicate keys: \code{"error"} (default),
 \code{"last"} (keep last occurrence), or \code{"first"} (keep first occurrence).}
+
+\item{safeKeyCheck}{Logical; if \code{TRUE}, checks that keys only contain
+allowed characters. Set to \code{FALSE} (default) to allow arbitrary keys, but be aware that
+this may lead to issues when reading the file back, as keys with special characters
+may not be parsed correctly.}
 }
 \value{
 A named list with parsed values.

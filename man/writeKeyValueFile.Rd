@@ -10,7 +10,8 @@ writeKeyValueFile(
   ...,
   writeHeader = TRUE,
   sortKeys = FALSE,
-  overwrite = TRUE
+  overwrite = TRUE,
+  safeKeyCheck = TRUE
 )
 }
 \arguments{
@@ -27,6 +28,11 @@ Supported value types: character, logical, integer, numeric.
 \item{sortKeys}{Logical; if \code{TRUE}, keys are written in alphabetical order.}
 
 \item{overwrite}{Logical; if \code{FALSE} and the file exists, an error is raised.}
+
+\item{safeKeyCheck}{Logical; if \code{TRUE}, checks that keys only contain
+allowed characters. Set to \code{FALSE} to allow arbitrary keys, but be aware that
+this may lead to issues when reading the file back, as keys with special characters
+may not be parsed correctly.}
 }
 \value{
 Invisibly returns \code{filePath}.
