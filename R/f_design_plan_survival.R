@@ -2103,10 +2103,15 @@ getSampleSizeSurvival <- function(design = NULL, ...,
 
         pwst <- getPiecewiseSurvivalTime(
             piecewiseSurvivalTime = piecewiseSurvivalTime,
-            lambda1 = lambda1, lambda2 = lambda2,
-            pi1 = pi1, pi2 = pi2,
-            median1 = median1, median2 = median2,
-            hazardRatio = hazardRatio, eventTime = eventTime, kappa = kappa,
+            lambda1 = lambda1, 
+            lambda2 = lambda2,
+            pi1 = pi1, 
+            pi2 = pi2,
+            median1 = median1, 
+            median2 = median2,
+            hazardRatio = hazardRatio, 
+            eventTime = eventTime, 
+            kappa = kappa,
             .silent = TRUE
         )
         paramName <- NULL

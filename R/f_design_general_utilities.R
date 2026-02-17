@@ -874,12 +874,12 @@ rpwexp <- function(n, ..., s = NA_real_, lambda = NA_real_, kappa = 1) {
 #' @description
 #' Functions to convert pi, lambda and median values into each other.
 #'
-#' @param piValue,pi1,pi2,lambda,median Value that shall be converted.
+#' @param piValue,pi1,pi2,lambda,lambda1,lambda2,median,median1,median2 Value that shall be converted.
 #' @inheritParams param_eventTime
 #' @inheritParams param_kappa
 #'
 #' @details
-#' Can be used, e.g., to convert median values into pi or lambda values for usage in
+#' Can be used, e.g., to convert pi, median, or lambda values into pi, median, lambda, or haszard ratio values, e.g, for usage in
 #' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}} or \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
 #'
 #' @return Returns a \code{\link[base]{numeric}} value or vector will be returned.
@@ -913,13 +913,39 @@ getLambdaByMedian <- function(median, kappa = 1) {
     return(log(2)^(1 / kappa) / median)
 }
 
+.assertHasCompatibleLength <- function(
+    paramValue1,
+    paramValue2,
+    paramName1,
+    paramName2) {
+    if (length(paramValue2) == 1L) {
+        return(invisible())
+    }
+    
+    if (length(paramValue1) == length(paramValue2)) {
+        return(invisible())
+    }
+    
+    stop(
+        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        "invalid length of ", sQuote(paramName2), ". ",
+        "Expected length 1 or the same length as ", sQuote(paramName1), " (",
+        length(paramValue1), "), but got length ",
+        length(paramValue2), ".",
+        call. = FALSE
+    )
+}
+
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getHazardRatioByPi <- function(pi1, pi2,
+getHazardRatioByPi <- function(
+        pi1, 
+        pi2,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(pi1, "pi1")
     .assertIsValidPi(pi2, "pi2")
+    .assertHasCompatibleLength(pi1, pi2, "pi1", "pi2") 
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
@@ -928,7 +954,40 @@ getHazardRatioByPi <- function(pi1, pi2,
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getPiByLambda <- function(lambda,
+getHazardRatioByLambda <- function(lambda1, lambda2) {
+    .assertIsValidLambda(lambda1, 1)
+    .assertIsValidLambda(lambda2, 2)
+    .assertHasCompatibleLength(lambda1, lambda2, "lambda1", "lambda2") 
+    return(lambda1 / lambda2)
+}
+
+#' @rdname utilitiesForSurvivalTrials
+#' @export
+getHazardRatioByMedian <- function(median1, median2, kappa = 1) {
+    .assertIsNumericVector(median1, "median1")
+    .assertIsNumericVector(median2, "median2")
+    .assertHasCompatibleLength(median1, median2, "median1", "median2") 
+    return(getLambdaByMedian(median1, kappa = kappa) / getLambdaByMedian(median2, kappa = kappa))
+}
+
+getLambda1ByHazardRatio <- function(lambda2, hazardRatio) {
+    .assertIsValidLambda(lambda2, 2)
+    .assertIsNumericVector(hazardRatio, "hazardRatio")
+    .assertHasCompatibleLength(lambda2, hazardRatio, "lambda2", "hazardRatio") 
+    return(lambda2 * hazardRatio)
+}
+
+getLambda2ByHazardRatio <- function(lambda1, hazardRatio) {
+    .assertIsValidLambda(lambda1, 1)
+    .assertIsNumericVector(hazardRatio, "hazardRatio")
+    .assertHasCompatibleLength(lambda1, hazardRatio, "lambda1", "hazardRatio") 
+    return(lambda1 / hazardRatio)
+}
+
+#' @rdname utilitiesForSurvivalTrials
+#' @export
+getPiByLambda <- function(
+        lambda,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidLambda(lambda)
@@ -938,7 +997,8 @@ getPiByLambda <- function(lambda,
     x <- exp(-(lambda * eventTime)^kappa)
     if (any(x < 1e-15, na.rm = TRUE)) {
         warning("Calculation of pi (1) by lambda (", .arrayToString(round(lambda, 4)),
-            ") results in a possible loss of precision because pi = 1 was returned but pi is not exactly 1",
+            ") results in a possible loss of precision ",
+            "because pi = 1 was returned but pi is not exactly 1",
             call. = FALSE
         )
     }
@@ -948,7 +1008,8 @@ getPiByLambda <- function(lambda,
 # alternative: return(1 - exp(-(log(2)^(1 / kappa) / median * eventTime)^kappa))
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getPiByMedian <- function(median,
+getPiByMedian <- function(
+        median,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsNumericVector(median, "median")

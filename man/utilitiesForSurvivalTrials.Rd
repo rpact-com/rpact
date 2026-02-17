@@ -5,6 +5,8 @@
 \alias{getLambdaByPi}
 \alias{getLambdaByMedian}
 \alias{getHazardRatioByPi}
+\alias{getHazardRatioByLambda}
+\alias{getHazardRatioByMedian}
 \alias{getPiByLambda}
 \alias{getPiByMedian}
 \alias{getMedianByLambda}
@@ -17,6 +19,10 @@ getLambdaByMedian(median, kappa = 1)
 
 getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1)
 
+getHazardRatioByLambda(lambda1, lambda2)
+
+getHazardRatioByMedian(median1, median2, kappa = 1)
+
 getPiByLambda(lambda, eventTime = 12, kappa = 1)
 
 getPiByMedian(median, eventTime = 12, kappa = 1)
@@ -26,7 +32,7 @@ getMedianByLambda(lambda, kappa = 1)
 getMedianByPi(piValue, eventTime = 12, kappa = 1)
 }
 \arguments{
-\item{piValue, pi1, pi2, lambda, median}{Value that shall be converted.}
+\item{piValue, pi1, pi2, lambda, lambda1, lambda2, median, median1, median2}{Value that shall be converted.}
 
 \item{eventTime}{The assumed time under which the event rates are calculated, default is \code{12}.}
 
@@ -49,6 +55,6 @@ Returns a \code{\link[base]{numeric}} value or vector will be returned.
 Functions to convert pi, lambda and median values into each other.
 }
 \details{
-Can be used, e.g., to convert median values into pi or lambda values for usage in
+Can be used, e.g., to convert pi, median, or lambda values into pi, median, lambda, or haszard ratio values, e.g, for usage in
 \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}} or \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
 }

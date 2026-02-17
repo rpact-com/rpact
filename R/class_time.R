@@ -852,7 +852,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             self$piecewiseSurvivalTime <- pwSurvStartTimes
             self$.setParameterType("piecewiseSurvivalTime", C_PARAM_USER_DEFINED)
             if (length(self$hazardRatio) == 1 && !is.na(self$hazardRatio)) {
-                self$lambda1 <- pwSurvLambda2 * self$hazardRatio^(1 / self$kappa)
+                self$lambda1 <- getLambda1ByHazardRatio(pwSurvLambda2, self$hazardRatio)
                 self$.setParameterType("lambda1", C_PARAM_GENERATED)
             } else if (length(self$hazardRatio) > 1 && self$delayedResponseAllowed) {
                 if (length(self$hazardRatio) != length(pwSurvLambda2)) {
@@ -865,7 +865,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 } else {
                     self$delayedResponseEnabled <- TRUE
                 }
-                self$lambda1 <- pwSurvLambda2 * self$hazardRatio^(1 / self$kappa)
+                self$lambda1 <- getLambda1ByHazardRatio(pwSurvLambda2, self$hazardRatio)
                 self$.setParameterType("lambda1", C_PARAM_GENERATED)
             } else {
                 self$lambda1 <- NA_real_
@@ -890,7 +890,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                     (length(self$lambda2) == 0 || all(is.na(self$lambda2))) &&
                     length(self$lambda1) > 0 && !anyNA(self$lambda1) &&
                     !self$isGeneratedParameter("lambda1")) {
-                self$lambda2 <- self$lambda1 / self$hazardRatio^(1 / self$kappa)
+                self$lambda2 <- getLambda2ByHazardRatio(self$lambda1, self$hazardRatio)
                 self$.setParameterType("lambda2", C_PARAM_GENERATED)
             }
             .logDebug(
@@ -935,7 +935,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                             .logDebug(".init: calculate pi2 via pi1 and hazard ratio")
                             self$lambda1 <- getLambdaByPi(pi = self$pi1, eventTime = self$eventTime, kappa = self$kappa)
                             self$.setParameterType("lambda1", C_PARAM_GENERATED)
-                            self$lambda2 <- self$lambda1 / self$hazardRatio^(1 / self$kappa)
+                            self$lambda2 <- getLambda2ByHazardRatio(self$lambda1, self$hazardRatio)
                             self$.setParameterType("lambda2", C_PARAM_GENERATED)
                             self$pi2 <- getPiByLambda(self$lambda2, eventTime = self$eventTime, kappa = self$kappa)
                             self$.setParameterType("pi2", C_PARAM_GENERATED)
@@ -1136,7 +1136,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                 hazardRatioCalculationEnabled <- TRUE
                 if ((length(self$lambda2) == 0 || all(is.na(self$lambda2))) &&
                         length(self$lambda1) > 0 && !anyNA(self$lambda1)) {
-                    self$lambda2 <- self$lambda1 / self$hazardRatio^(1 / self$kappa)
+                    self$lambda2 <- getLambda2ByHazardRatio(self$lambda1, self$hazardRatio)
                     self$.setParameterType("lambda2", C_PARAM_GENERATED)
                     hazardRatioCalculationEnabled <- FALSE
                 }
@@ -1306,7 +1306,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             if (length(self$lambda1) == 0 || anyNA(self$lambda1)) {
                 if (length(self$hazardRatio) > 0 && !anyNA(self$hazardRatio)) {
                     .logDebug(".initPi: calculate lambda1 by hazardRatio")
-                    self$lambda1 <- self$lambda2 * self$hazardRatio^(1 / self$kappa)
+                    self$lambda1 <- getLambda1ByHazardRatio(self$lambda2, self$hazardRatio)
                     self$.setParameterType("lambda1", C_PARAM_GENERATED)
                 } else if (length(self$lambda1) == 0) {
                     self$lambda1 <- NA_real_
@@ -1432,7 +1432,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             if ((length(self$lambda1) != 1 || is.na(self$lambda1)) &&
                     !(self$.getParameterType("lambda1") %in% c(C_PARAM_GENERATED, C_PARAM_USER_DEFINED))) {
                 if (length(self$hazardRatio) == 1 && !is.na(self$hazardRatio)) {
-                    self$lambda1 <- self$lambda2 * self$hazardRatio^(1 / self$kappa)
+                    self$lambda1 <- getLambda1ByHazardRatio(self$lambda2, self$hazardRatio)
                     self$.setParameterType("lambda1", C_PARAM_GENERATED)
                 } else if (length(self$hazardRatio) > 1 && self$delayedResponseAllowed &&
                         !is.na(self$hazardRatio[1])) {
@@ -1453,7 +1453,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
                             )
                             self$hazardRatio <- self$hazardRatio[1]
                         }
-                        self$lambda1 <- self$lambda2 * self$hazardRatio^(1 / self$kappa)
+                        self$lambda1 <- getLambda1ByHazardRatio(self$lambda2, self$hazardRatio)
                         self$.setParameterType("lambda1", C_PARAM_GENERATED)
                     }
                 } else if (!self$delayedResponseEnabled && !(length(self$lambda2) == 1 && length(self$lambda1) > 1)) {
@@ -1469,7 +1469,7 @@ PiecewiseSurvivalTime <- R6::R6Class("PiecewiseSurvivalTime",
             } else if (length(self$hazardRatio) == 1 && !is.na(self$hazardRatio) &&
                     length(self$lambda1) > 0 && !anyNA(self$lambda1) &&
                     length(self$lambda2) > 0 && !anyNA(self$lambda2)) {
-                target <- self$lambda2 * self$hazardRatio^(1 / self$kappa)
+                target <- getLambda1ByHazardRatio(self$lambda2, self$hazardRatio)
                 if (length(self$lambda1) > 0 && !all(is.na(self$lambda1)) &&
                         !isTRUE(all.equal(target, self$lambda1))) {
                     stop(
