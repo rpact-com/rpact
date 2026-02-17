@@ -902,7 +902,7 @@ getTestLabel <- function(x) {
 }
 
 .getVariedParameterVector <- function(variedParameter, variedParameterName) {
-    if (is.null(variedParameter) || length(variedParameter) != 2 || any(is.na(variedParameter))) {
+    if (is.null(variedParameter) || length(variedParameter) != 2 || anyNA(variedParameter)) {
         return(variedParameter)
     }
 
@@ -945,7 +945,7 @@ getTestLabel <- function(x) {
 }
 
 .matchArgument <- function(arg, defaultValue) {
-    if (any(is.na(arg))) {
+    if (anyNA(arg)) {
         return(defaultValue)
     }
     return(ifelse(length(arg) > 0, arg[1], defaultValue))
@@ -1009,40 +1009,6 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
             Sys.setenv(LANGUAGE = currentLanguage)
         }
     )
-}
-
-.writeLinesToFile <- function(lines, fileName) {
-    if (is.null(lines) || length(lines) == 0 || !is.character(lines)) {
-        warning("Empty lines. Stop to write '", fileName, "'")
-        return(invisible(fileName))
-    }
-
-    fileConn <- base::file(fileName)
-    tryCatch(
-        {
-            base::writeLines(lines, fileConn)
-        },
-        finally = {
-            base::close(fileConn)
-        }
-    )
-    invisible(fileName)
-}
-
-#'
-#' Windows: CR (Carriage Return \r) and LF (LineFeed \n) pair
-#'
-#' OSX, Linux: LF (LineFeed \n)
-#'
-#' @noRd
-#'
-.readLinesFromFile <- function(inputFileName) {
-    content <- .readContentFromFile(inputFileName)
-    return(strsplit(content, split = "(\r?\n)|(\r\n?)")[[1]])
-}
-
-.readContentFromFile <- function(inputFileName) {
-    return(readChar(inputFileName, file.info(inputFileName)$size))
 }
 
 .integerToWrittenNumber <- function(x) {
@@ -1358,7 +1324,7 @@ getParameterName <- function(obj, parameterCaption) {
 
     if (is.list(x)) {
         listNames <- names(x)
-        if (is.null(listNames) || any(is.na(listNames)) || any(trimws(listNames) == "")) {
+        if (is.null(listNames) || anyNA(listNames) || any(trimws(listNames) == "")) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "list (", .arrayToString(unlist(x)), ") must be named")
         }
 
@@ -1512,7 +1478,7 @@ getParameterName <- function(obj, parameterCaption) {
         return(NA_character_)
     }
 
-    if (length(values) <= 3 || any(is.na(values))) {
+    if (length(values) <= 3 || anyNA(values)) {
         return(.arrayToString(values, vectorLookAndFeelEnabled = (length(values) != 1)))
     }
 
@@ -1971,7 +1937,7 @@ resetOptions <- function(persist = TRUE) {
                 return(invisible(FALSE))
             }
 
-            optionFileContent <- readLines(pkgConfigFile)
+            optionFileContent <- base::readLines(pkgConfigFile)
             if (length(optionFileContent) == 0) {
                 return(invisible(TRUE))
             }

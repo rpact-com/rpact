@@ -1,3 +1,16 @@
+# rpact 4.4.0
+
+## New features
+
+* n/a
+
+## Improvements, issues, and changes
+
+* Improved parameter defaulting and assignment logic
+* Used `identical()` for user-defined parameter checks
+* Enhanced warning messages for ignored parameters
+
+
 # rpact 4.3.0
 
 ## New features

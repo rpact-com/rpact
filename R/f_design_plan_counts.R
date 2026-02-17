@@ -146,6 +146,10 @@
 #' @noRd
 #'
 .generateRecruitmentTimes <- function(allocationRatio, accrualTime, accrualIntensity) {
+    .assertIsSingleNumber(allocationRatio, "allocationRatio")
+    .assertIsNumericVector(accrualTime, "accrualTime")
+    .assertIsNumericVector(accrualIntensity, "accrualIntensity")
+
     if (length(accrualTime) != length(accrualIntensity)) {
         stop(
             C_EXCEPTION_TYPE_RUNTIME_ISSUE,
@@ -167,6 +171,7 @@
     } else {
         maxNumberOfSubjects <- ceiling(accrualTime * accrualIntensity)
     }
+
     subjectFractions <- cumsum(densityIntervals * accrualIntensity) / maxNumberOfSubjects
     subjectFractions[length(accrualTime)] <- 1
 
@@ -246,8 +251,7 @@
 #'
 #' @noRd
 #'
-.getVarianceEstimate <- function(
-        lambda1,
+.getVarianceEstimate <- function(lambda1,
         lambda2,
         allocation,
         overdispersion,
@@ -255,8 +259,7 @@
         followUpTime,
         fixedExposureTime,
         recruit1,
-        recruit2
-        ) {
+        recruit2) {
     if (!is.na(fixedExposureTime)) {
         varianceEstimate <- (1 + allocation) *
             (1 / fixedExposureTime * (1 / lambda2 + 1 / (lambda1 * allocation)) + overdispersion * (1 + 1 / allocation))
@@ -313,8 +316,7 @@
 #'
 #' @noRd
 #'
-.findThetaUniRoot <- function(
-        boundary,
+.findThetaUniRoot <- function(boundary,
         informationRate,
         lambda2,
         thetaH0,
@@ -326,8 +328,7 @@
         fixedExposureTime,
         numberOfSubjects,
         recruit1,
-        recruit2
-        ) {
+        recruit2) {
     tryCatch(
         {
             if ((2 * directionUpper - 1) * boundary < 0) {
@@ -468,7 +469,7 @@
     for (iCase in 1:nParameters) {
         allocationRatio <- allocationRatioPlanned[iCase]
 
-        if (!any(is.na(accrualIntensity))) {
+        if (!anyNA(accrualIntensity)) {
             # build up general recruitment times
             recruitmentTimes <- .generateRecruitmentTimes(
                 allocationRatio,
@@ -477,7 +478,7 @@
             )
             recruit1 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 1]
             recruit2 <- recruitmentTimes$recruit[recruitmentTimes$treatments == 2]
-        } else if (!any(is.na(accrualTime))) {
+        } else if (!anyNA(accrualTime)) {
             recruit1 <- seq(
                 0,
                 accrualTime,
@@ -604,8 +605,7 @@
     ))
 }
 
-.getCalendarTime <- function(
-        n1,
+.getCalendarTime <- function(n1,
         n2,
         information,
         shift,
@@ -616,12 +616,11 @@
         lambda1,
         lambda2,
         thetaH0,
-        overdispersion
-        ) {
-    if (any(is.na(recruit1))) {
+        overdispersion) {
+    if (anyNA(recruit1)) {
         recruit1 <- seq(0, accrualTime, length.out = n1)
     }
-    if (any(is.na(recruit2))) {
+    if (anyNA(recruit2)) {
         recruit2 <- seq(0, accrualTime, length.out = n2)
     }
     tryCatch(
@@ -723,8 +722,7 @@
     )
 }
 
-.getDesignPlanCountData <- function(
-        design,
+.getDesignPlanCountData <- function(design,
         designCharacteristics,
         objectType,
         sided,
@@ -739,8 +737,7 @@
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned
-        ) {
+        allocationRatioPlanned) {
     designPlan <- TrialDesignPlanCountData$new(
         design = design,
         designCharacteristics = designCharacteristics
@@ -770,7 +767,7 @@
         designPlan$.setParameterType("expectedInformationH1", C_PARAM_NOT_APPLICABLE)
     }
 
-    if (any(is.na(allocationRatioPlanned))) {
+    if (anyNA(allocationRatioPlanned)) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
 
@@ -793,9 +790,9 @@
         )
     }
 
-    if (!is.na(lambda2) && !any(is.na(theta))) {
+    if (!is.na(lambda2) && !anyNA(theta)) {
         totalCases <- length(theta)
-    } else if (!any(is.na(lambda1))) {
+    } else if (!anyNA(lambda1)) {
         totalCases <- length(lambda1)
     } else {
         totalCases <- 1
@@ -830,15 +827,15 @@
         designPlan$.setParameterType("optimumAllocationRatio", C_PARAM_USER_DEFINED)
     }
 
-    if (!is.na(lambda2) && !any(is.na(theta))) {
+    if (!is.na(lambda2) && !anyNA(theta)) {
         lambda1 <- lambda2 * theta
         designPlan$lambda1 <- lambda1
         designPlan$.setParameterType("lambda1", C_PARAM_GENERATED)
-    } else if (!any(is.na(lambda1)) && !any(is.na(theta))) {
+    } else if (!anyNA(lambda1) && !anyNA(theta)) {
         lambda2 <- lambda1 / theta
         designPlan$lambda2 <- lambda2
         designPlan$.setParameterType("lambda2", C_PARAM_GENERATED)
-    } else if (!is.na(lambda) && !any(is.na(theta))) {
+    } else if (!is.na(lambda) && !anyNA(theta)) {
         designPlan$.setParameterType("lambda1", C_PARAM_GENERATED)
         designPlan$.setParameterType("lambda2", C_PARAM_GENERATED)
     }
@@ -848,7 +845,7 @@
         designPlan$accrualTime <- accrualTime
     }
 
-    .assertIsValidParametersCountData(
+    .assertAreValidParametersCountData(
         sampleSizeEnabled = sampleSizeEnabled,
         simulationEnabled = FALSE,
         fixedExposureTime = fixedExposureTime,
@@ -915,8 +912,7 @@
 #'
 #' @export
 #'
-getSampleSizeCounts <- function(
-        design = NULL,
+getSampleSizeCounts <- function(design = NULL,
         ...,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
@@ -929,8 +925,7 @@ getSampleSizeCounts <- function(
         accrualIntensity = NA_real_,
         followUpTime = NA_real_,
         maxNumberOfSubjects = NA_integer_,
-        allocationRatioPlanned = NA_real_
-        ) {
+        allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "sampleSize")
         .warnInCaseOfUnknownArguments(
@@ -1040,7 +1035,7 @@ getSampleSizeCounts <- function(
                 allocationRatioPlanned[iCase] <-
                     stats::optimize(
                         function(x) {
-                            if (!is.na(lambda) && !any(is.na(theta))) {
+                            if (!is.na(lambda) && !anyNA(theta)) {
                                 lambda2 <- (1 + x) * lambda / (1 + x * theta[iCase])
                                 lambda1[iCase] <- lambda2 * theta[iCase]
                             }
@@ -1058,11 +1053,15 @@ getSampleSizeCounts <- function(
                     )$minimum
             }
 
-            if (!is.na(lambda) && !any(is.na(theta))) {
+            if (!is.na(lambda) && !anyNA(theta)) {
                 lambda2 <- (1 + allocationRatioPlanned[iCase]) *
                     lambda /
                     (1 + allocationRatioPlanned[iCase] * theta[iCase])
                 lambda1[iCase] <- lambda2 * theta[iCase]
+            } else if (!is.na(lambda) && !anyNA(lambda1)) {
+                lambda2 <- ((1 + allocationRatioPlanned[iCase]) * lambda) / (allocationRatioPlanned[iCase] * lambda1[iCase])
+            } else if (!is.na(lambda) && !anyNA(lambda2)) {
+                lambda1 <- ((1 + allocationRatioPlanned[iCase]) * lambda - lambda2) / allocationRatioPlanned[iCase]
             }
 
             # method 2 of Zhu & Lakkis (2013), coincides with Friede & Schmidli (2010)
@@ -1079,7 +1078,7 @@ getSampleSizeCounts <- function(
             n2[iCase] <- ceiling(n2[iCase])
             n1[iCase] <- ceiling(n1[iCase])
 
-            if (!any(is.na(accrualTime))) {
+            if (!anyNA(accrualTime)) {
                 recruit1 <- seq(0, accrualTime, length.out = n1[iCase])
                 recruit2 <- seq(0, accrualTime, length.out = n2[iCase])
                 if (kMax > 1) {
@@ -1103,15 +1102,15 @@ getSampleSizeCounts <- function(
                 calendarTime[kMax, iCase] <- accrualTime + fixedExposureTime
             }
             studyTime[iCase] <- calendarTime[kMax, iCase]
-        } else if (!is.na(maxNumberOfSubjects) || !any(is.na(accrualIntensity))) {
-            if (!is.na(lambda) && !any(is.na(theta))) {
+        } else if (!is.na(maxNumberOfSubjects) || !anyNA(accrualIntensity)) {
+            if (!is.na(lambda) && !anyNA(theta)) {
                 lambda2 <- (1 + allocationRatioPlanned[iCase]) *
                     lambda /
                     (1 + allocationRatioPlanned[iCase] * theta[iCase])
                 lambda1[iCase] <- lambda2 * theta[iCase]
             }
 
-            if (!any(is.na(accrualIntensity))) {
+            if (!anyNA(accrualIntensity)) {
                 # build up general recruitment times
                 recruitmentTimes <- .generateRecruitmentTimes(
                     allocationRatioPlanned[iCase],
@@ -1202,7 +1201,7 @@ getSampleSizeCounts <- function(
                 designPlan$.setParameterType("allocationRatioPlanned", C_PARAM_GENERATED)
                 allocationRatioPlanned[iCase] <- stats::optimize(
                     function(x) {
-                        if (!is.na(lambda) && !any(is.na(theta))) {
+                        if (!is.na(lambda) && !anyNA(theta)) {
                             lambda2 <- (1 + x) * lambda / (1 + x * theta[iCase])
                             lambda1[iCase] <- lambda2 * theta[iCase]
                         }
@@ -1223,7 +1222,7 @@ getSampleSizeCounts <- function(
                 )$minimum
             }
 
-            if (!(is.na(lambda)) && !any(is.na(theta))) {
+            if (!(is.na(lambda)) && !anyNA(theta)) {
                 lambda2 <- (1 + allocationRatioPlanned[iCase]) *
                     lambda /
                     (1 + allocationRatioPlanned[iCase] * theta[iCase])
@@ -1242,7 +1241,7 @@ getSampleSizeCounts <- function(
             )
             n1[iCase] <- sampleSizes$n1
             n2[iCase] <- sampleSizes$n2
-            if (!any(is.na(accrualTime))) {
+            if (!anyNA(accrualTime)) {
                 recruit1 <- seq(0, accrualTime, length.out = n1[iCase])
                 recruit2 <- seq(0, accrualTime, length.out = n2[iCase])
             }
@@ -1267,7 +1266,7 @@ getSampleSizeCounts <- function(
             calendarTime[kMax, iCase] <- accrualTime + followUpTime
         }
 
-        if (!any(is.na(calendarTime[, iCase]))) {
+        if (!anyNA(calendarTime[, iCase])) {
             expectedStudyDurationH1[iCase] <- calendarTime[kMax, iCase]
             if (kMax > 1) {
                 expectedStudyDurationH1[iCase] <- calendarTime[kMax, iCase] -
@@ -1310,6 +1309,9 @@ getSampleSizeCounts <- function(
         "calendarTime",
         ifelse(!all(is.na(calendarTime)), C_PARAM_GENERATED, C_PARAM_NOT_APPLICABLE)
     )
+    if (!is.na(fixedExposureTime) && anyNA(accrualTime) && all(is.na(calendarTime))) {
+        .logDebug("The calendar time was not calculated due to missing accrual time")
+    }
 
     designPlan$studyTime <- studyTime
     designPlan$.setParameterType(
@@ -1458,8 +1460,7 @@ getSampleSizeCounts <- function(
 #'
 #' @export
 #'
-getPowerCounts <- function(
-        design = NULL,
+getPowerCounts <- function(design = NULL,
         ...,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
@@ -1473,8 +1474,7 @@ getPowerCounts <- function(
         accrualTime = NA_real_,
         accrualIntensity = NA_real_,
         followUpTime = NA_real_,
-        allocationRatioPlanned = NA_real_
-        ) {
+        allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "power")
         .warnInCaseOfUnknownArguments(
@@ -1540,7 +1540,7 @@ getPowerCounts <- function(
     earlyStop <- rep(NA_real_, totalCases)
     overallReject <- rep(NA_real_, totalCases)
 
-    if (!any(is.na(accrualIntensity))) {
+    if (!anyNA(accrualIntensity)) {
         # build up general recruitment times
         recruitmentTimes <- .generateRecruitmentTimes(
             allocationRatioPlanned,
@@ -1556,14 +1556,14 @@ getPowerCounts <- function(
         n2 <- maxNumberOfSubjects / (1 + allocationRatioPlanned)
         n1 <- allocationRatioPlanned * n2
         nTotal <- n1 + n2
-        if (!any(is.na(accrualTime))) {
+        if (!anyNA(accrualTime)) {
             recruit1 <- seq(0, accrualTime, length.out = n1)
             recruit2 <- seq(0, accrualTime, length.out = n2)
         }
     }
 
     for (iCase in 1:totalCases) {
-        if (!is.na(lambda) && !any(is.na(theta))) {
+        if (!is.na(lambda) && !anyNA(theta)) {
             lambda2 <- (1 + allocationRatioPlanned) * lambda / (1 + allocationRatioPlanned * theta[iCase])
             lambda1[iCase] <- lambda2 * theta[iCase]
         }
@@ -1585,6 +1585,7 @@ getPowerCounts <- function(
             varianceEstimate <- nTotal * (1 / sumLambda1 + 1 / sumLambda2)
         }
         oneSidedFactor <- ifelse(sided == 1, 2 * directionUpper - 1, 1)
+
         powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
             design = design,
             theta = oneSidedFactor * log(lambda1[iCase] / lambda2 / thetaH0) / sqrt(varianceEstimate),
@@ -1600,7 +1601,7 @@ getPowerCounts <- function(
     designPlan$maxNumberOfSubjects <- n1 + n2
     designPlan$.setParameterType(
         "maxNumberOfSubjects",
-        ifelse(any(is.na(accrualIntensity)), C_PARAM_USER_DEFINED, C_PARAM_GENERATED)
+        ifelse(anyNA(accrualIntensity), C_PARAM_USER_DEFINED, C_PARAM_GENERATED)
     )
 
     designPlan$maxNumberOfSubjects1 <- n1
@@ -1653,7 +1654,7 @@ getPowerCounts <- function(
         designPlan$nFixed <- n1 + n2
         designPlan$.setParameterType(
             "nFixed",
-            ifelse(any(is.na(accrualIntensity)), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
+            ifelse(anyNA(accrualIntensity), C_PARAM_NOT_APPLICABLE, C_PARAM_GENERATED)
         )
 
         designPlan$nFixed1 <- n1

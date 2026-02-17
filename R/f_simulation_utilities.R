@@ -699,7 +699,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
 #' head(data)
 #' dim(data)
 #' }
-#' 
+#'
 #' @export
 #'
 getData <- function(x) {
@@ -873,26 +873,25 @@ getRawData <- function(x, aggregate = FALSE) {
     return(.getAggregatedData(rawData))
 }
 
-.nameEffectMatrixRowsAndColumns = function(effectMatrix, ..., transpose = FALSE) {
+.nameEffectMatrixRowsAndColumns <- function(effectMatrix, ..., transpose = FALSE) {
     if (is.null(effectMatrix) || !is.matrix(effectMatrix)) {
         return(effectMatrix)
     }
-    
+
     if (isTRUE(transpose)) {
         effectMatrix <- t(effectMatrix)
     }
-    
+
     if (nrow(effectMatrix) == 0 || ncol(effectMatrix) == 0) {
         return(effectMatrix)
     }
-    
+
     rownames(effectMatrix) <- paste("Situation", 1:nrow(effectMatrix))
     colnames(effectMatrix) <- paste("Arm", 1:ncol(effectMatrix))
     return(effectMatrix)
 }
 
-.createEffectMatrix <- function(
-        ...,
+.createEffectMatrix <- function(...,
         simulationResults,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
         effectMatrix,
@@ -903,19 +902,20 @@ getRawData <- function(x, aggregate = FALSE) {
         gMax,
         slope,
         doseLevels) {
-        
     typeOfShape <- match.arg(typeOfShape)
     valueMaxVectorName <- match.arg(valueMaxVectorName)
-    
+
     if (typeOfShape == "userDefined") {
         simulationResults$.setParameterType("effectMatrix", C_PARAM_USER_DEFINED)
         return(.nameEffectMatrixRowsAndColumns(effectMatrix))
     }
-    
+
     simulationResults$doseLevels <- doseLevels
-    simulationResults$.setParameterType("doseLevels", 
-        ifelse(is.null(doseLevels) || all(is.na(doseLevels)), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED))
-        
+    simulationResults$.setParameterType(
+        "doseLevels",
+        ifelse(is.null(doseLevels) || all(is.na(doseLevels)), C_PARAM_NOT_APPLICABLE, C_PARAM_USER_DEFINED)
+    )
+
     if (typeOfShape == "sigmoidEmax") {
         .assertIsSingleNumber(gED50, "gED50", naAllowed = FALSE, noDefaultAvailable = TRUE)
         if (valueMaxVectorName == "omegaMaxVector") {
@@ -928,7 +928,7 @@ getRawData <- function(x, aggregate = FALSE) {
         simulationResults$.setParameterType("effectMatrix", C_PARAM_DERIVED)
         return(.nameEffectMatrixRowsAndColumns(effectMatrix))
     }
-    
+
     if (typeOfShape == "linear") {
         if (valueMaxVectorName == "muMaxVector") {
             effectMatrix <-
@@ -936,8 +936,9 @@ getRawData <- function(x, aggregate = FALSE) {
                 matrix(doseLevels / max(doseLevels), nrow = 1, ncol = gMax)
         } else if (valueMaxVectorName == "piMaxVector") {
             .assertIsSingleNumber(piControl, "piControl", naAllowed = FALSE, noDefaultAvailable = TRUE)
-            .assertIsInOpenInterval(piControl, "piControl", 
-                lower = 0, upper = 1, naAllowed = FALSE)
+            .assertIsInOpenInterval(piControl, "piControl",
+                lower = 0, upper = 1, naAllowed = FALSE
+            )
             effectMatrix <- piControl +
                 matrix(valueMaxVector - piControl, nrow = length(valueMaxVector), ncol = 1) %*%
                 matrix(doseLevels / max(doseLevels), nrow = 1, ncol = gMax)
@@ -959,10 +960,9 @@ getRawData <- function(x, aggregate = FALSE) {
                 call. = FALSE
             )
         }
-        
+
         return(.nameEffectMatrixRowsAndColumns(effectMatrix))
     }
-    
+
     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'typeOfShape' (", typeOfShape, ") not yet implemented")
 }
-

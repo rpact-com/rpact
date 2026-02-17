@@ -1038,7 +1038,8 @@ getLongFormat <- function(dataInput) {
 .fireDataInputNotSupportedException <- function(dataInput) {
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
-        "'", .getClassName(dataInput), "' is not supported", call. = FALSE
+        "'", .getClassName(dataInput), "' is not supported",
+        call. = FALSE
     )
 }
 
@@ -1046,15 +1047,15 @@ getLongFormat <- function(dataInput) {
     if (.isDatasetMeans(dataInput)) {
         return("means")
     }
-    
+
     if (.isDatasetRates(dataInput)) {
         return("rates")
-    } 
-    
+    }
+
     if (.isDatasetSurvival(dataInput)) {
         return("survival")
     }
-    
+
     .fireDataInputNotSupportedException(dataInput)
 }
 
@@ -1062,18 +1063,18 @@ getLongFormat <- function(dataInput) {
     if (!is.na(thetaH0)) {
         return(thetaH0)
     }
-    
+
     if (.isDatasetMeans(dataInput)) {
         return(C_THETA_H0_MEANS_DEFAULT)
     }
-    
+
     if (.isDatasetRates(dataInput)) {
         return(C_THETA_H0_RATES_DEFAULT)
     }
-    
+
     if (.isDatasetSurvival(dataInput)) {
         return(C_THETA_H0_SURVIVAL_DEFAULT)
     }
-    
+
     .fireDataInputNotSupportedException(dataInput)
 }

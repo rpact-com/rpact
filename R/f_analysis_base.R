@@ -166,8 +166,7 @@ NULL
 #'
 #' @export
 #'
-getAnalysisResults <- function(
-        design,
+getAnalysisResults <- function(design,
         dataInput,
         ...,
         directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT
@@ -358,8 +357,7 @@ getAnalysisResults <- function(
 #'
 #' @export
 #'
-getStageResults <- function(
-        design,
+getStageResults <- function(design,
         dataInput,
         ...,
         stage = NA_integer_,
@@ -900,16 +898,14 @@ getConditionalPower <- function(stageResults,
 
         return(conditionalPower)
     }
-    
+
     .fireDataInputNotSupportedException(stageResults$getDataInput())
 }
 
-.getConditionalPowerPlot <- function(
-        ...,
-        stageResults, 
-        nPlanned, 
+.getConditionalPowerPlot <- function(...,
+        stageResults,
+        nPlanned,
         allocationRatioPlanned = NA_real_) {
-        
     if (.isMultiArmStageResults(stageResults)) {
         return(.getConditionalPowerPlotMultiArm(
             stageResults = stageResults,
@@ -940,9 +936,9 @@ getConditionalPower <- function(stageResults,
     if (stageResults$isDatasetMeans()) {
         return(.getConditionalPowerPlotMeans(
             stageResults = stageResults,
-            stage = stage, 
-            nPlanned = nPlanned, 
-            allocationRatioPlanned = allocationRatioPlanned, 
+            stage = stage,
+            nPlanned = nPlanned,
+            allocationRatioPlanned = allocationRatioPlanned,
             ...
         ))
     }
@@ -950,9 +946,9 @@ getConditionalPower <- function(stageResults,
     if (stageResults$isDatasetRates()) {
         return(.getConditionalPowerPlotRates(
             stageResults = stageResults,
-            stage = stage, 
-            nPlanned = nPlanned, 
-            allocationRatioPlanned = allocationRatioPlanned, 
+            stage = stage,
+            nPlanned = nPlanned,
+            allocationRatioPlanned = allocationRatioPlanned,
             ...
         ))
     }
@@ -960,9 +956,9 @@ getConditionalPower <- function(stageResults,
     if (stageResults$isDatasetSurvival()) {
         return(.getConditionalPowerPlotSurvival(
             stageResults = stageResults,
-            stage = stage, 
-            nPlanned = nPlanned, 
-            allocationRatioPlanned = allocationRatioPlanned, 
+            stage = stage,
+            nPlanned = nPlanned,
+            allocationRatioPlanned = allocationRatioPlanned,
             ...
         ))
     }
@@ -1531,8 +1527,7 @@ getFinalPValue <- function(stageResults, ...) {
 #'
 #' @export
 #'
-getFinalConfidenceInterval <- function(
-        design,
+getFinalConfidenceInterval <- function(design,
         dataInput,
         ...,
         directionUpper = NA, # C_DIRECTION_UPPER_DEFAULT

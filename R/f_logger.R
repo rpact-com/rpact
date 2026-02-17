@@ -81,7 +81,7 @@
     if (isFALSE(enforceLogging) && !interactive()) {
         return(invisible())
     }
-    
+
     if (!(getLogLevel() %in% c(
             C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG,
             C_LOG_LEVEL_INFO, C_LOG_LEVEL_WARN,
@@ -89,7 +89,7 @@
         ))) {
         return(invisible())
     }
-    
+
     if (.isMarkdownEnabled()) {
         return(invisible())
     }

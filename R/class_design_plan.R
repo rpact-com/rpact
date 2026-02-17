@@ -128,7 +128,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
                 if (all(is.na(existingValue))) {
                     self$.setParameterType(parameterName, C_PARAM_DEFAULT_VALUE)
                 } else if (!is.null(defaultValue) && length(defaultValue) == length(existingValue) &&
-                        !any(is.na(defaultValue)) && !any(is.na(existingValue)) &&
+                        !anyNA(defaultValue) && !anyNA(existingValue) &&
                         sum(defaultValue == existingValue) == length(defaultValue)) {
                     self$.setParameterType(parameterName, C_PARAM_DEFAULT_VALUE)
                 } else {
@@ -141,7 +141,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             if (length(objectType) == 0 || !(objectType %in% c("sampleSize", "power"))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'.objectType' (", objectType,
-                    ") must be specified as 'sampleSize' or 'power'", 
+                    ") must be specified as 'sampleSize' or 'power'",
                     call. = FALSE
                 )
             }
@@ -151,7 +151,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "'.objectType' must be specified as 'sampleSize' or 'power'", 
+                    "'.objectType' must be specified as 'sampleSize' or 'power'",
                     call. = FALSE
                 )
             }
@@ -161,7 +161,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "'.objectType' must be specified as 'sampleSize' or 'power'", 
+                    "'.objectType' must be specified as 'sampleSize' or 'power'",
                     call. = FALSE
                 )
             }
@@ -288,7 +288,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
 #' \dontrun{
 #' as.data.frame(getSampleSizeMeans())
 #' }
-#' 
+#'
 #' @export
 #'
 #' @keywords internal
@@ -450,7 +450,7 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
         },
         recreate = function(alternative = NA_real_) {
             alternativeTemp <- alternative
-            if (any(is.na(alternative))) {
+            if (anyNA(alternative)) {
                 alternativeTemp <- self$alternative
             }
             if (self$.objectType == "sampleSize") {
@@ -632,7 +632,7 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
         },
         recreate = function(pi1 = NA_real_) {
             pi1Temp <- pi1
-            if (any(is.na(pi1))) {
+            if (anyNA(pi1)) {
                 pi1Temp <- self$pi1
             }
             if (self$.objectType == "sampleSize") {
@@ -906,75 +906,70 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
             }
         },
         recreate = function(..., hazardRatio = NA_real_, pi1 = NA_real_, maxNumberOfSubjects = NA_integer_) {
-            hr <- NA_real_
-            if (self$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
-                hr <- hazardRatio
-                if (any(is.na(hazardRatio))) {
-                    hr <- self$hazardRatio
+            if (anyNA(hazardRatio) && self$.getParameterType("hazardRatio") == C_PARAM_USER_DEFINED) {
+                hazardRatio <- self$hazardRatio
+            }
+
+            if (anyNA(pi1)) {
+                if (self$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
+                    pi1 <- self$pi1
+                } else if (anyNA(hazardRatio)) {
+                    if (self$.objectType == "sampleSize") {
+                        pi1 <- C_PI_1_SAMPLE_SIZE_DEFAULT
+                    } else {
+                        pi1 <- C_PI_1_DEFAULT
+                    }
                 }
             }
 
-            lambda2 <- self$.getParameterValueIfUserDefinedOrDefault("lambda2")
+            accrualTime <- self$.getParameterValueIfUserDefinedOrDefault("accrualTime")
+            if (!is.null(accrualTime) && length(accrualTime) > 0 &&
+                    !all(is.na(accrualTime)) && accrualTime[1] != 0L) {
+                accrualTime <- c(0L, as.integer(accrualTime))
+            }
 
-            pi1Temp <- NA_real_
-            if (self$.getParameterType("pi1") == C_PARAM_USER_DEFINED) {
-                pi1Temp <- pi1
-                if (any(is.na(pi1))) {
-                    pi1Temp <- self$pi1
-                }
-            } else if (all(is.na(lambda2))) {
-                if (self$.objectType == "sampleSize") {
-                    pi1Temp <- C_PI_1_SAMPLE_SIZE_DEFAULT
-                } else {
-                    pi1Temp <- C_PI_1_DEFAULT
-                }
+            accrualIntensity <- self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity")
+            if (all(is.na(accrualIntensity))) {
+                accrualIntensity <- C_ACCRUAL_INTENSITY_DEFAULT
             }
-            accrualTimeTemp <- self$.getParameterValueIfUserDefinedOrDefault("accrualTime")
-            if (!is.null(accrualTimeTemp) && length(accrualTimeTemp) > 0 &&
-                    !all(is.na(accrualTimeTemp)) && accrualTimeTemp[1] != 0L) {
-                accrualTimeTemp <- c(0L, as.integer(accrualTimeTemp))
-            }
-            accrualIntensityTemp <- self$.getParameterValueIfUserDefinedOrDefault("accrualIntensity")
-            if (all(is.na(accrualIntensityTemp))) {
-                accrualIntensityTemp <- C_ACCRUAL_INTENSITY_DEFAULT
-            }
-            
+
             if (is.null(maxNumberOfSubjects) || length(maxNumberOfSubjects) != 1 || is.na(maxNumberOfSubjects)) {
                 maxNumberOfSubjects <- self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfSubjects")
             }
-            
+
             args <- list(
                 design = self$.design,
                 typeOfComputation = self$.getParameterValueIfUserDefinedOrDefault("typeOfComputation"),
                 thetaH0 = self$.getParameterValueIfUserDefinedOrDefault("thetaH0"),
-                pi1 = pi1Temp,
+                pi1 = pi1,
                 pi2 = self$.getParameterValueIfUserDefinedOrDefault("pi2"),
+                lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
+                lambda2 = self$.getParameterValueIfUserDefinedOrDefault("lambda2"),
+                median2 = self$.getParameterValueIfUserDefinedOrDefault("median2"),
                 allocationRatioPlanned = self$allocationRatioPlanned,
                 eventTime = ifelse(all(is.na(self$eventTime)), C_EVENT_TIME_DEFAULT, self$eventTime),
-                accrualTime = accrualTimeTemp,
-                accrualIntensity = accrualIntensityTemp,
+                accrualTime = accrualTime,
+                accrualIntensity = accrualIntensity,
                 kappa = self$kappa,
                 piecewiseSurvivalTime = self$.getParameterValueIfUserDefinedOrDefault("piecewiseSurvivalTime"),
-                lambda2 = lambda2,
-                lambda1 = self$.getParameterValueIfUserDefinedOrDefault("lambda1"),
-                hazardRatio = hr,
+                hazardRatio = hazardRatio,
                 maxNumberOfSubjects = maxNumberOfSubjects,
                 dropoutRate1 = self$dropoutRate1,
                 dropoutRate2 = self$dropoutRate2,
                 dropoutTime = self$dropoutTime
             )
-            
+
             if (self$.objectType == "sampleSize") {
-                args$ accountForObservationTimes = self$.getParameterValueIfUserDefinedOrDefault("accountForObservationTimes")
-                args$followUpTime = self$.getParameterValueIfUserDefinedOrDefault("followUpTime")
+                args$accountForObservationTimes <- self$.getParameterValueIfUserDefinedOrDefault("accountForObservationTimes")
+                args$followUpTime <- self$.getParameterValueIfUserDefinedOrDefault("followUpTime")
                 return(do.call(getSampleSizeSurvival, args))
             } else {
                 directionUpperTemp <- self$directionUpper
                 if (length(directionUpperTemp) > 1) {
                     directionUpperTemp <- directionUpperTemp[1]
                 }
-                args$directionUpper = directionUpperTemp
-                args$maxNumberOfEvents = self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfEvents")
+                args$directionUpper <- directionUpperTemp
+                args$maxNumberOfEvents <- self$.getParameterValueIfUserDefinedOrDefault("maxNumberOfEvents")
                 return(do.call(getPowerSurvival, args))
             }
         }
@@ -1119,11 +1114,11 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
             self$.setParameterType("groups", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("optimumAllocationRatio", C_PARAM_NOT_APPLICABLE)
-            
+
             self$.setParameterType("criticalValuesEffectScale", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("criticalValuesEffectScaleLower", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("criticalValuesEffectScaleUpper", C_PARAM_NOT_APPLICABLE)
-            
+
             self$.setParameterType("futilityBoundsEffectScale", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("futilityBoundsEffectScaleLower", C_PARAM_NOT_APPLICABLE)
             self$.setParameterType("futilityBoundsEffectScaleUpper", C_PARAM_NOT_APPLICABLE)
@@ -1137,7 +1132,7 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
                 lambda1Temp <- self$.getParameterValueIfUserDefinedOrDefault("lambda1")
             } else {
                 lambda1Temp <- lambda1
-                if (any(is.na(lambda1))) {
+                if (anyNA(lambda1)) {
                     lambda1Temp <- self$lambda1
                 }
             }
@@ -1145,7 +1140,7 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
                 thetaTemp <- self$.getParameterValueIfUserDefinedOrDefault("theta")
             } else {
                 thetaTemp <- theta
-                if (any(is.na(theta))) {
+                if (anyNA(theta)) {
                     thetaTemp <- self$theta
                 }
             }

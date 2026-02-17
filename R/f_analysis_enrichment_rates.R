@@ -17,13 +17,12 @@
 #' @include f_logger.R
 NULL
 
-.calcRatesTestStatistics <- function(
-        dataInput, 
-        subset, 
-        stage, 
+.calcRatesTestStatistics <- function(dataInput,
+        subset,
+        stage,
         thetaH0,
-        stratifiedAnalysis, 
-        normalApproximation, 
+        stratifiedAnalysis,
+        normalApproximation,
         directionUpper) {
     n <- rep(NA_real_, 2)
     on <- rep(NA_real_, 2)
@@ -36,9 +35,11 @@ NULL
         for (i in 1:2) {
             # calculation of sample size and events for overall data
             on[i] <- sum(dataInput$getOverallSampleSizes(
-                stage = stage, subset = subset, group = i), na.rm = TRUE)
+                stage = stage, subset = subset, group = i
+            ), na.rm = TRUE)
             oe[i] <- sum(dataInput$getOverallEvents(
-                stage = stage, subset = subset, group = i), na.rm = TRUE)
+                stage = stage, subset = subset, group = i
+            ), na.rm = TRUE)
         }
 
         if (stratifiedAnalysis) {
@@ -63,8 +64,8 @@ NULL
                 for (population in seq_len(length(subset))) {
                     y <- .getFarringtonManningValues(
                         rate1 = actEv[population] / actN[population],
-                        rate2 = ctrEv[population] / ctrN[population], theta = thetaH0, 
-                            allocation = actN[population] / ctrN[population], method = "diff"
+                        rate2 = ctrEv[population] / ctrN[population], theta = thetaH0,
+                        allocation = actN[population] / ctrN[population], method = "diff"
                     )
                     actMl[population] <- y$ml1
                     ctrMl[population] <- y$ml2
@@ -73,17 +74,23 @@ NULL
                     sqrt(sum((actMl * (1 - actMl) / actN + ctrMl * (1 - ctrMl) / ctrN) * weights^2, na.rm = TRUE))
             }
 
-            separatePValues <- .applyDirectionOfAlternative(stats::pnorm(testStatistics), 
-                directionUpper, type = "oneMinusValue", phase = "analysis")
+            separatePValues <- .applyDirectionOfAlternative(stats::pnorm(testStatistics),
+                directionUpper,
+                type = "oneMinusValue", phase = "analysis"
+            )
         }
 
         # non-stratified analysis
         else {
             for (i in 1:2) {
-                n[i] <- sum(dataInput$getSampleSizes(stage = stage, 
-                    subset = subset, group = i), na.rm = TRUE)
-                e[i] <- sum(dataInput$getEvents(stage = stage, 
-                    subset = subset, group = i), na.rm = TRUE)
+                n[i] <- sum(dataInput$getSampleSizes(
+                    stage = stage,
+                    subset = subset, group = i
+                ), na.rm = TRUE)
+                e[i] <- sum(dataInput$getEvents(
+                    stage = stage,
+                    subset = subset, group = i
+                ), na.rm = TRUE)
             }
 
             if (normalApproximation) {
@@ -109,8 +116,10 @@ NULL
                         sqrt(y$ml1 * (1 - y$ml1) / n[1] + y$ml2 * (1 - y$ml2) / n[2])
                 }
 
-                separatePValues <- .applyDirectionOfAlternative(stats::pnorm(testStatistics), 
-                    directionUpper, type = "oneMinusValue", phase = "analysis")
+                separatePValues <- .applyDirectionOfAlternative(stats::pnorm(testStatistics),
+                    directionUpper,
+                    type = "oneMinusValue", phase = "analysis"
+                )
             } else {
                 if (thetaH0 != 0) {
                     stop(
@@ -118,19 +127,23 @@ NULL
                         "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test"
                     )
                 }
-                
+
                 separatePValues <- stats::phyper(
                     .applyDirectionOfAlternative(e[1], directionUpper, type = "valueMinusOne"),
                     e[1] + e[2],
                     n[1] + n[2] - e[1] - e[2],
                     n[1],
-                    lower.tail = .applyDirectionOfAlternative(FALSE, 
-                        directionUpper, type = "negateIfLower", phase = "analysis")
+                    lower.tail = .applyDirectionOfAlternative(FALSE,
+                        directionUpper,
+                        type = "negateIfLower", phase = "analysis"
+                    )
                 )
-                
+
                 testStatistics <- .applyDirectionOfAlternative(
-                    .getOneMinusQNorm(separatePValues), 
-                    directionUpper, type = "negateIfLower", phase = "analysis")
+                    .getOneMinusQNorm(separatePValues),
+                    directionUpper,
+                    type = "negateIfLower", phase = "analysis"
+                )
             }
         }
     }
@@ -161,9 +174,8 @@ NULL
     ))
 }
 
-.getStageResultsRatesEnrichment <- function(
-        ..., 
-        design, 
+.getStageResultsRatesEnrichment <- function(...,
+        design,
         dataInput,
         thetaH0 = NA_real_,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -244,10 +256,14 @@ NULL
         stage = stage
     )
 
-    .setValueAndParameterType(stageResults, "stratifiedAnalysis", 
-        stratifiedAnalysis, C_STRATIFIED_ANALYSIS_DEFAULT)
-    .setValueAndParameterType(stageResults, "intersectionTest", 
-        intersectionTest, C_INTERSECTION_TEST_ENRICHMENT_DEFAULT)
+    .setValueAndParameterType(
+        stageResults, "stratifiedAnalysis",
+        stratifiedAnalysis, C_STRATIFIED_ANALYSIS_DEFAULT
+    )
+    .setValueAndParameterType(
+        stageResults, "intersectionTest",
+        intersectionTest, C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+    )
 
     overallSampleSizes1 <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     overallSampleSizes2 <- matrix(NA_real_, nrow = gMax, ncol = kMax)
@@ -330,9 +346,10 @@ NULL
                     }
                     singleStepAdjustedPValues[population, k] <- 1 - .getMultivariateDistribution(
                         type = "normal",
-                        upper = ifelse(!isFALSE(directionUpper), 
-                            testStatistics[population, k], 
-                            -testStatistics[population, k]),
+                        upper = ifelse(!isFALSE(directionUpper),
+                            testStatistics[population, k],
+                            -testStatistics[population, k]
+                        ),
                         sigma = sigma, df = NA
                     )
                 }
@@ -375,15 +392,15 @@ NULL
 }
 
 .getAnalysisResultsRatesInverseNormalEnrichment <- function(...,
-        design, 
+        design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
-        thetaH0 = C_THETA_H0_RATES_DEFAULT, 
+        thetaH0 = C_THETA_H0_RATES_DEFAULT,
         piTreatments = NA_real_,
-        piControls = NA_real_, 
+        piControls = NA_real_,
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
@@ -400,17 +417,17 @@ NULL
     results <- AnalysisResultsEnrichmentInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsRatesEnrichmentAll(
-        results = results, 
-        design = design, 
+        results = results,
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
-        stage = stage, 
+        intersectionTest = intersectionTest,
+        stage = stage,
         directionUpper = directionUpper,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
-        thetaH0 = thetaH0, 
-        piTreatments = piTreatments, 
-        piControls = piControls, 
+        thetaH0 = thetaH0,
+        piTreatments = piTreatments,
+        piControls = piControls,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
         tolerance = tolerance
@@ -420,19 +437,19 @@ NULL
 }
 
 .getAnalysisResultsRatesFisherEnrichment <- function(...,
-        design, 
+        design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         thetaH0 = C_THETA_H0_RATES_DEFAULT,
-        piTreatments = NA_real_, 
-        piControls = NA_real_, 
+        piTreatments = NA_real_,
+        piControls = NA_real_,
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, 
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
@@ -450,52 +467,52 @@ NULL
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
     results <- .getAnalysisResultsRatesEnrichmentAll(
-        results = results, 
-        design = design, 
+        results = results,
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
-        stage = stage, 
+        intersectionTest = intersectionTest,
+        stage = stage,
         directionUpper = directionUpper,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
-        thetaH0 = thetaH0, 
+        thetaH0 = thetaH0,
         piTreatments = piTreatments,
-        piControls = piControls, 
+        piControls = piControls,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
         tolerance = tolerance,
-        iterations = iterations, 
+        iterations = iterations,
         seed = seed
     )
 
     return(results)
 }
 
-.getAnalysisResultsRatesEnrichmentAll <- function(..., 
-        results, 
-        design, 
+.getAnalysisResultsRatesEnrichmentAll <- function(...,
+        results,
+        design,
         dataInput,
-        intersectionTest, 
-        stage, 
-        directionUpper, 
-        normalApproximation, 
+        intersectionTest,
+        stage,
+        directionUpper,
+        normalApproximation,
         stratifiedAnalysis,
-        thetaH0, 
-        piTreatments, 
-        piControls, 
-        nPlanned, 
+        thetaH0,
+        piTreatments,
+        piControls,
+        nPlanned,
         allocationRatioPlanned,
-        tolerance, 
-        iterations, 
+        tolerance,
+        iterations,
         seed) {
     startTime <- Sys.time()
 
     stageResults <- .getStageResultsRatesEnrichment(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         stage = stage,
-        thetaH0 = thetaH0, 
+        thetaH0 = thetaH0,
         directionUpper = directionUpper,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis
@@ -507,18 +524,30 @@ NULL
     gMax <- stageResults$getGMax()
 
     piControls <- .assertIsValidPiControlForEnrichment(
-        piControls, stageResults, stage, results = results)
+        piControls, stageResults, stage,
+        results = results
+    )
     piTreatments <- .assertIsValidPiTreatmentsForEnrichment(
-        piTreatments, stageResults, stage, results = results)
+        piTreatments, stageResults, stage,
+        results = results
+    )
 
-    .setValueAndParameterType(results, "intersectionTest", 
-        intersectionTest, C_INTERSECTION_TEST_ENRICHMENT_DEFAULT)
-    .setValueAndParameterType(results, "directionUpper", 
-        directionUpper, C_DIRECTION_UPPER_DEFAULT)
-    .setValueAndParameterType(results, "normalApproximation", 
-        normalApproximation, C_NORMAL_APPROXIMATION_RATES_DEFAULT)
-    .setValueAndParameterType(results, "stratifiedAnalysis", 
-        stratifiedAnalysis, C_STRATIFIED_ANALYSIS_DEFAULT)
+    .setValueAndParameterType(
+        results, "intersectionTest",
+        intersectionTest, C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
+    )
+    .setValueAndParameterType(
+        results, "directionUpper",
+        directionUpper, C_DIRECTION_UPPER_DEFAULT
+    )
+    .setValueAndParameterType(
+        results, "normalApproximation",
+        normalApproximation, C_NORMAL_APPROXIMATION_RATES_DEFAULT
+    )
+    .setValueAndParameterType(
+        results, "stratifiedAnalysis",
+        stratifiedAnalysis, C_STRATIFIED_ANALYSIS_DEFAULT
+    )
     .setValueAndParameterType(results, "thetaH0", thetaH0, C_THETA_H0_RATES_DEFAULT)
     .setConditionalPowerArguments(results, dataInput, nPlanned, allocationRatioPlanned)
     .setNPlannedAndPi(results, nPlanned, "piControls", piControls, piTreatments)
@@ -587,13 +616,13 @@ NULL
 
     # RCI - repeated confidence interval
     repeatedConfidenceIntervals <- .getRepeatedConfidenceIntervalsRatesEnrichment(
-        design = design, 
-        dataInput = dataInput, 
+        design = design,
+        dataInput = dataInput,
         stratifiedAnalysis = stratifiedAnalysis,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         stage = stage,
         directionUpper = directionUpper,
-        normalApproximation = normalApproximation, 
+        normalApproximation = normalApproximation,
         tolerance = tolerance
     )
 
@@ -618,29 +647,29 @@ NULL
     return(results)
 }
 
-.getRootThetaRatesEnrichment <- function(..., 
-        design, 
-        dataInput, 
-        population, 
+.getRootThetaRatesEnrichment <- function(...,
+        design,
+        dataInput,
+        population,
         stage,
-        directionUpper, 
-        normalApproximation, 
-        stratifiedAnalysis, 
+        directionUpper,
+        normalApproximation,
+        stratifiedAnalysis,
         intersectionTest,
-        thetaLow, 
-        thetaUp, 
-        firstParameterName, 
-        secondValue, 
+        thetaLow,
+        thetaUp,
+        firstParameterName,
+        secondValue,
         tolerance) {
     result <- .getOneDimensionalRoot(
         function(theta) {
             stageResults <- .getStageResultsRatesEnrichment(
-                design = design, 
+                design = design,
                 dataInput = dataInput,
-                stage = stage, 
-                thetaH0 = theta, 
+                stage = stage,
+                thetaH0 = theta,
                 directionUpper = directionUpper,
-                intersectionTest = intersectionTest, 
+                intersectionTest = intersectionTest,
                 normalApproximation = normalApproximation,
                 stratifiedAnalysis = stratifiedAnalysis,
                 calculateSingleStepAdjusted = TRUE
@@ -669,12 +698,12 @@ NULL
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
 
     stageResults <- .getStageResultsRatesEnrichment(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        stage = stage, 
-        thetaH0 = 0, 
+        stage = stage,
+        thetaH0 = 0,
         directionUpper = directionUpper,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
         calculateSingleStepAdjusted = FALSE
@@ -711,32 +740,32 @@ NULL
                 # finding upper and lower RCI limits through root function
                 repeatedConfidenceIntervals[population, 1, k] <- .getRootThetaRatesEnrichment(
                     design = design,
-                    dataInput = dataInput, 
-                    population = population, 
-                    stage = k, 
+                    dataInput = dataInput,
+                    population = population,
+                    stage = k,
                     directionUpper = TRUE,
                     normalApproximation = normalApproximation,
                     stratifiedAnalysis = stratifiedAnalysis,
-                    thetaLow = thetaLow, 
+                    thetaLow = thetaLow,
                     thetaUp = thetaUp,
-                    intersectionTest = intersectionTest, 
+                    intersectionTest = intersectionTest,
                     firstParameterName = firstParameterName,
-                    secondValue = criticalValues[k], 
+                    secondValue = criticalValues[k],
                     tolerance = tolerance
                 )
 
                 repeatedConfidenceIntervals[population, 2, k] <- .getRootThetaRatesEnrichment(
                     design = design,
-                    dataInput = dataInput, 
-                    population = population, 
-                    stage = k, 
+                    dataInput = dataInput,
+                    population = population,
+                    stage = k,
                     directionUpper = FALSE,
                     normalApproximation = normalApproximation,
                     stratifiedAnalysis = stratifiedAnalysis,
                     thetaLow = thetaLow, thetaUp = thetaUp,
-                    intersectionTest = intersectionTest, 
+                    intersectionTest = intersectionTest,
                     firstParameterName = firstParameterName,
-                    secondValue = criticalValues[k], 
+                    secondValue = criticalValues[k],
                     tolerance = tolerance
                 )
 
@@ -747,17 +776,17 @@ NULL
                     )
 
                     futilityCorr[k] <- .getRootThetaRatesEnrichment(
-                        design = design, 
+                        design = design,
                         dataInput = dataInput,
-                        population = population, 
-                        stage = k - 1, 
+                        population = population,
+                        stage = k - 1,
                         directionUpper = directionUpper,
                         normalApproximation = normalApproximation,
                         stratifiedAnalysis = stratifiedAnalysis,
                         thetaLow = thetaLow, thetaUp = thetaUp,
-                        intersectionTest = intersectionTest, 
+                        intersectionTest = intersectionTest,
                         firstParameterName = parameterName,
-                        secondValue = bounds[k - 1], 
+                        secondValue = bounds[k - 1],
                         tolerance = tolerance
                     )
 
@@ -793,7 +822,7 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsRatesEnrichmentInverseNormal <- function(...,
-        design, 
+        design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
@@ -815,14 +844,14 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsRatesEnrichmentAll(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        normalApproximation = normalApproximation, 
+        normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
-        directionUpper = directionUpper, 
+        directionUpper = directionUpper,
         intersectionTest = intersectionTest,
-        tolerance = tolerance, 
-        firstParameterName = "combInverseNormal", 
+        tolerance = tolerance,
+        firstParameterName = "combInverseNormal",
         ...
     ))
 }
@@ -833,7 +862,7 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsRatesEnrichmentFisher <- function(...,
-        design, 
+        design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
@@ -855,14 +884,14 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsRatesEnrichmentAll(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        normalApproximation = normalApproximation, 
+        normalApproximation = normalApproximation,
         stratifiedAnalysis = stratifiedAnalysis,
-        directionUpper = directionUpper, 
+        directionUpper = directionUpper,
         intersectionTest = intersectionTest,
-        tolerance = tolerance, 
-        firstParameterName = "combFisher", 
+        tolerance = tolerance,
+        firstParameterName = "combFisher",
         ...
     ))
 }
@@ -889,15 +918,15 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesEnrichment <- function(..., 
-        stageResults, 
+.getConditionalPowerRatesEnrichment <- function(...,
+        stageResults,
         stage = stageResults$stage,
-        nPlanned, 
+        nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        piTreatments = NA_real_, 
-        piControls = NA_real_, 
+        piTreatments = NA_real_,
+        piControls = NA_real_,
         useAdjustment = TRUE,
-        iterations = C_ITERATIONS_DEFAULT, 
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     design <- stageResults$.design
     gMax <- stageResults$getGMax()
@@ -938,7 +967,7 @@ NULL
         allocationRatioPlanned = allocationRatioPlanned
     )
 
-    if (any(is.na(nPlanned))) {
+    if (anyNA(nPlanned)) {
         return(results)
     }
 
@@ -957,8 +986,9 @@ NULL
 
     .assertIsValidNPlanned(nPlanned, kMax, stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
     results$.setParameterType(
         "allocationRatioPlanned",
@@ -966,15 +996,17 @@ NULL
     )
 
     piControls <- .assertIsValidPiControlForEnrichment(
-        piControls, 
-        stageResults, 
-        stage, 
-        results = results)
+        piControls,
+        stageResults,
+        stage,
+        results = results
+    )
     piTreatments <- .assertIsValidPiTreatmentsForEnrichment(
-        piTreatments, 
-        stageResults, 
-        stage, 
-        results = results)
+        piTreatments,
+        stageResults,
+        stage,
+        results = results
+    )
 
     if ((length(piTreatments) != 1) && (length(piTreatments) != gMax)) {
         stop(
@@ -999,28 +1031,28 @@ NULL
     if (.isTrialDesignInverseNormal(design)) {
         return(.getConditionalPowerRatesEnrichmentInverseNormal(
             results = results,
-            design = design, 
-            stageResults = stageResults, 
+            design = design,
+            stageResults = stageResults,
             stage = stage,
-            nPlanned = nPlanned, 
+            nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
             piControls = piControls,
-            piTreatments = piTreatments, 
+            piTreatments = piTreatments,
             ...
         ))
     } else if (.isTrialDesignFisher(design)) {
         return(.getConditionalPowerRatesEnrichmentFisher(
             results = results,
-            design = design, 
-            stageResults = stageResults, 
+            design = design,
+            stageResults = stageResults,
             stage = stage,
-            nPlanned = nPlanned, 
+            nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
             useAdjustment = useAdjustment,
             piControls = piControls,
             piTreatments = piTreatments,
             iterations = iterations,
-            seed = seed, 
+            seed = seed,
             ...
         ))
     }
@@ -1036,14 +1068,14 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesEnrichmentInverseNormal <- function(..., 
-        results, 
-        design, 
-        stageResults, 
+.getConditionalPowerRatesEnrichmentInverseNormal <- function(...,
+        results,
+        design,
+        stageResults,
         stage,
-        allocationRatioPlanned, 
-        nPlanned, 
-        piTreatments, 
+        allocationRatioPlanned,
+        nPlanned,
+        piTreatments,
         piControls) {
     .assertIsTrialDesignInverseNormal(design)
     .warnInCaseOfUnknownArguments(
@@ -1148,17 +1180,17 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesEnrichmentFisher <- function(..., 
-        results, 
-        design, 
-        stageResults, 
+.getConditionalPowerRatesEnrichmentFisher <- function(...,
+        results,
+        design,
+        stageResults,
         stage,
-        allocationRatioPlanned, 
-        nPlanned, 
-        piTreatments, 
-        piControls, 
+        allocationRatioPlanned,
+        nPlanned,
+        piTreatments,
+        piControls,
         useAdjustment = TRUE,
-        iterations, 
+        iterations,
         seed) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
@@ -1229,14 +1261,14 @@ NULL
                     reject <- 0
                     for (i in 1:iterations) {
                         reject <- reject + .getRejectValueConditionalPowerFisher(
-                            kMax = kMax, 
+                            kMax = kMax,
                             alpha0Vec = design$alpha0Vec,
-                            criticalValues = criticalValues, 
+                            criticalValues = criticalValues,
                             weightsFisher = weightsFisher,
-                            pValues = pValues, 
-                            currentKMax = k, 
+                            pValues = pValues,
+                            currentKMax = k,
                             thetaH1 = standardizedEffect[population],
-                            stage = stage, 
+                            stage = stage,
                             nPlanned = nPlanned
                         )
                     }
@@ -1278,19 +1310,20 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerLikelihoodRatesEnrichment <- function(..., 
-        stageResults, 
+.getConditionalPowerLikelihoodRatesEnrichment <- function(...,
+        stageResults,
         stage,
-        nPlanned, 
+        nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        piTreatmentRange, 
+        piTreatmentRange,
         piControls = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, 
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     .associatedArgumentsAreDefined(nPlanned = nPlanned, piTreatmentRange = piTreatmentRange)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
 
     design <- stageResults$.design
     kMax <- design$kMax
@@ -1330,9 +1363,9 @@ NULL
             if (.isTrialDesignInverseNormal(design)) {
                 condPowerValues[j] <- .getConditionalPowerRatesEnrichmentInverseNormal(
                     results = results,
-                    design = design, 
-                    stageResults = stageResults, 
-                    stage = stage, 
+                    design = design,
+                    stageResults = stageResults,
+                    stage = stage,
                     nPlanned = nPlanned,
                     allocationRatioPlanned = allocationRatioPlanned,
                     piControls = piControls,
@@ -1341,21 +1374,23 @@ NULL
             } else if (.isTrialDesignFisher(design)) {
                 condPowerValues[j] <- .getConditionalPowerRatesEnrichmentFisher(
                     results = results,
-                    design = design, 
-                    stageResults = stageResults, 
-                    stage = stage, 
+                    design = design,
+                    stageResults = stageResults,
+                    stage = stage,
                     nPlanned = nPlanned,
-                    allocationRatioPlanned = allocationRatioPlanned, 
+                    allocationRatioPlanned = allocationRatioPlanned,
                     useAdjustment = FALSE,
                     piControls = piControls,
                     piTreatments = piTreatmentRange[i],
-                    iterations = iterations, 
+                    iterations = iterations,
                     seed = seed
                 )$conditionalPower[population, kMax]
             }
 
-            likelihoodValues[j] <- stats::dnorm(piTreatmentRange[i], 
-                stageResults$overallPisTreatment[population, stage], stdErr[population]) /
+            likelihoodValues[j] <- stats::dnorm(
+                piTreatmentRange[i],
+                stageResults$overallPisTreatment[population, stage], stdErr[population]
+            ) /
                 stats::dnorm(0, 0, stdErr[population])
             j <- j + 1
         }

@@ -154,7 +154,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             design$.setParameterType("typeOfDesign", C_PARAM_DERIVED)
         }
     }
-    
+
     if (.isUndefinedArgument(design$alpha)) {
         design$alpha <- C_ALPHA_DEFAULT
         design$.setParameterType("alpha", C_PARAM_DEFAULT_VALUE)
@@ -300,7 +300,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     .assertIsSingleInteger(kMax, "kMax", naAllowed = TRUE, validateType = FALSE)
     .assertIsSingleCharacter(typeOfDesign, "typeOfDesign")
 
-    if (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER && !any(is.na(userAlphaSpending))) {
+    if (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER && !anyNA(userAlphaSpending)) {
         if (!is.na(kMax) && kMax != length(userAlphaSpending)) {
             stop(sprintf(
                 paste0(
@@ -316,7 +316,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             typeOfDesign <- C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY
         }
     }
-    
+
     .assertIsSingleLogical(bindingFutility, "bindingFutility")
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
     .assertIsNumericVector(delayedInformation, "delayedInformation", naAllowed = TRUE)
@@ -1043,8 +1043,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #'
 #' @export
 #'
-getDesignInverseNormal <- function(
-        ...,
+getDesignInverseNormal <- function(...,
         kMax = NA_integer_,
         alpha = NA_real_,
         beta = NA_real_,
@@ -1102,15 +1101,15 @@ getDesignInverseNormal <- function(
         tolerance = 1e-08 # C_DESIGN_TOLERANCE_DEFAULT
         ) {
     .warnInCaseOfUnknownArguments(functionName = "getDesignInverseNormal", ...)
-    
+
     typeBetaSpending <- .matchArgument(typeBetaSpending, C_TYPE_OF_DESIGN_BS_NONE)
     futilityBoundsScale <- match.arg(futilityBoundsScale)
 
     .assertIsLogicalVector(efficacyStops, "efficacyStops", naAllowed = TRUE)
     .assertIsLogicalVector(futilityStops, "futilityStops", naAllowed = TRUE)
-    
+
     designClass <- C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL
-    
+
     design <- NULL
     if (!all(is.na(futilityBounds)) && .futilityBoundsCalculationRequiresDesign(futilityBoundsScale)) {
         design <- .getDesignGroupSequentialOrWithInterimStops(
@@ -1139,16 +1138,18 @@ getDesignInverseNormal <- function(
             delayedInformation = NA_real_,
             tolerance = tolerance,
             efficacyStops = efficacyStops,
-            futilityStops = futilityStops)
+            futilityStops = futilityStops
+        )
     }
-    
+
     futilityBounds <- .getFutilityBoundsFromArgs(
         futilityBounds = futilityBounds,
-        futilityBoundsScale = futilityBoundsScale, 
+        futilityBoundsScale = futilityBoundsScale,
         functionName = "getDesignGroupSequential",
         design = design,
-        ...) 
-    
+        ...
+    )
+
     return(.getDesignGroupSequentialOrWithInterimStops(
         designClass = designClass,
         kMax = kMax,
@@ -1175,11 +1176,11 @@ getDesignInverseNormal <- function(
         delayedInformation = NA_real_,
         tolerance = tolerance,
         efficacyStops = efficacyStops,
-        futilityStops = futilityStops))
+        futilityStops = futilityStops
+    ))
 }
 
-.getDesignGroupSequentialOrWithInterimStops <- function(
-        ...,
+.getDesignGroupSequentialOrWithInterimStops <- function(...,
         designClass,
         kMax,
         alpha,
@@ -1205,8 +1206,7 @@ getDesignInverseNormal <- function(
         delayedInformation,
         tolerance,
         efficacyStops,
-        futilityStops
-        ) {
+        futilityStops) {
     if (!all(is.na(efficacyStops)) || !all(is.na(futilityStops))) {
         return(.getDesignWithInterimStops(
             designClass = designClass,
@@ -1226,9 +1226,10 @@ getDesignInverseNormal <- function(
             directionUpper = directionUpper,
             betaAdjustment = betaAdjustment,
             twoSidedPower = twoSidedPower,
-            tolerance = tolerance))
+            tolerance = tolerance
+        ))
     }
-    
+
     return(.getDesignGroupSequential(
         designClass = designClass,
         kMax = kMax,
@@ -1363,8 +1364,7 @@ getDesignInverseNormal <- function(
     return(.getDesignGroupSequentialDefaultValues())
 }
 
-.getDesignWithInterimStops <- function(
-        ...,
+.getDesignWithInterimStops <- function(...,
         designClass,
         kMax = NA_integer_,
         alpha = NA_real_,
@@ -1383,7 +1383,6 @@ getDesignInverseNormal <- function(
         betaAdjustment = NA,
         twoSidedPower = NA,
         tolerance = 1e-08) {
-    
     validTypesOfDesign <- c("asOF", "asP", "asKD", "asHSD")
     if (!(typeOfDesign %in% validTypesOfDesign)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -1392,7 +1391,7 @@ getDesignInverseNormal <- function(
             call. = FALSE
         )
     }
-    
+
     coreDesign <- .getDesignGroupSequential(
         designClass = designClass,
         kMax = kMax,
@@ -1412,31 +1411,33 @@ getDesignInverseNormal <- function(
         tolerance = tolerance,
         userFunctionCallEnabled = TRUE
     )
-    
+
     kMax <- coreDesign$kMax
     betaSpendingEnabled <- !identical(typeBetaSpending, C_TYPE_OF_DESIGN_BS_NONE)
-    
+
     if (length(efficacyStops) == 1 && is.na(efficacyStops)) {
         efficacyStops <- rep(TRUE, kMax - 1)
     }
 
     if (length(efficacyStops) != kMax - 1) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'efficacyStops' (", .arrayToString(efficacyStops, 
-                vectorLookAndFeelEnabled = FALSE),
+            "'efficacyStops' (", .arrayToString(efficacyStops,
+                vectorLookAndFeelEnabled = FALSE
+            ),
             ") must have length kMax - 1 (", kMax - 1, ")",
             call. = FALSE
         )
     }
-    
+
     if (betaSpendingEnabled && length(futilityStops) == 1 && is.na(futilityStops)) {
         futilityStops <- rep(TRUE, kMax - 1)
     }
 
     if (betaSpendingEnabled && length(futilityStops) != kMax - 1) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'futilityStops' (", .arrayToString(futilityStops, 
-                vectorLookAndFeelEnabled = FALSE),
+            "'futilityStops' (", .arrayToString(futilityStops,
+                vectorLookAndFeelEnabled = FALSE
+            ),
             ") must have length kMax - 1 (", kMax - 1, ")",
             call. = FALSE
         )
@@ -1448,14 +1449,14 @@ getDesignInverseNormal <- function(
     if (all(efficacyStops) && all(futilityStops)) {
         return(coreDesign)
     }
-    
+
     newAlphaSpending <- coreDesign$alphaSpent
     for (k in 1:(kMax - 1)) {
         if (!efficacyStops[k]) {
             newAlphaSpending[k] <- ifelse(k == 1, 0, newAlphaSpending[k - 1])
         }
     }
-    
+
     args <- list(
         designClass = designClass,
         kMax = kMax,
@@ -1471,7 +1472,7 @@ getDesignInverseNormal <- function(
         userFunctionCallEnabled = TRUE,
         userDefinedInterimStops = TRUE
     )
-    
+
     if (betaSpendingEnabled) {
         newBetaSpending <- coreDesign$betaSpent
         for (k in 1:(kMax - 1)) {
@@ -1479,14 +1480,14 @@ getDesignInverseNormal <- function(
                 newBetaSpending[k] <- ifelse(k == 1, 0, newBetaSpending[k - 1])
             }
         }
-        args$typeBetaSpending = "bsUser"
+        args$typeBetaSpending <- "bsUser"
         args$userBetaSpending <- newBetaSpending
     }
-    
+
     newDesign <- do.call(.getDesignGroupSequential, args)
     newDesign$criticalValues[which(!efficacyStops)] <- Inf
     newDesign$futilityBounds[which(!futilityStops)] <- -Inf
-    
+
     newDesign$efficacyStops <- efficacyStops
     newDesign$.setParameterType("efficacyStops", C_PARAM_USER_DEFINED)
 
@@ -1497,43 +1498,44 @@ getDesignInverseNormal <- function(
         newDesign$futilityStops <- futilityStops
         newDesign$.setParameterType("futilityStops", C_PARAM_USER_DEFINED)
     }
-    
+
     if (max(abs(newDesign$userAlphaSpending - newDesign$alphaSpent), na.rm = TRUE) <= 1e-07) {
         newDesign$.setParameterType("userAlphaSpending", C_PARAM_NOT_APPLICABLE)
     }
-    
+
     if (betaSpendingEnabled && max(abs(newDesign$userBetaSpending - newDesign$betaSpent), na.rm = TRUE) <= 1e-07) {
         newDesign$.setParameterType("userBetaSpending", C_PARAM_NOT_APPLICABLE)
     }
-    
-    noEarlyEfficacyEnabled <- 
+
+    noEarlyEfficacyEnabled <-
         identical(newDesign$typeOfDesign, C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY) &&
-        !identical(typeOfDesign, C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY)
+            !identical(typeOfDesign, C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY)
     for (paramName in coreDesign$.getUserDefinedParameters()) {
         if (noEarlyEfficacyEnabled && identical(paramName, "typeOfDesign")) {
             next
         }
-        
+
         newDesign[[paramName]] <- coreDesign[[paramName]]
         newDesign$.setParameterType(paramName, C_PARAM_USER_DEFINED)
     }
-    
+
     indices <- which(
-        !is.na(newDesign$stageLevels) & 
-        newDesign$stageLevels < 1e-07 & 
-        !is.na(newDesign$criticalValues) & 
-        is.infinite(newDesign$criticalValues))
+        !is.na(newDesign$stageLevels) &
+            newDesign$stageLevels < 1e-07 &
+            !is.na(newDesign$criticalValues) &
+            is.infinite(newDesign$criticalValues)
+    )
     if (length(indices) > 0) {
         newDesign$stageLevels[indices] <- 0
     }
-    
+
     return(newDesign)
 }
 
 #'
 #' @param userFunctionCallEnabled if \code{TRUE}, additional parameter validation methods will be called.
-#' 
-#' @noRd 
+#'
+#' @noRd
 #'
 .getDesignGroupSequential <- function(...,
         designClass = C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL,
@@ -1578,20 +1580,20 @@ getDesignInverseNormal <- function(
 
     if (is.na(bindingFutility)) {
         bindingFutility <- C_BINDING_FUTILITY_DEFAULT
-    } else if (userFunctionCallEnabled && 
+    } else if (userFunctionCallEnabled &&
             !identical(typeOfDesign, C_TYPE_OF_DESIGN_PT) &&
             !grepl("^bs", typeBetaSpending)) {
         if (!is.na(kMax) && kMax == 1) {
             warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
-                "because kMax = 1", call. = FALSE)
-        }
-        else if (any(is.na(futilityBounds))) {
+                "because kMax = 1",
+                call. = FALSE
+            )
+        } else if (anyNA(futilityBounds)) {
             warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'futilityBounds' is not defined",
                 call. = FALSE
             )
-        } 
-        else if (all(futilityBounds == C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+        } else if (all(futilityBounds == C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
             warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'futilityBounds' (", .arrayToString(futilityBounds), ") ",
                 "is set to default values",
@@ -1801,7 +1803,7 @@ getDesignInverseNormal <- function(
         design$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
         design$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
     }
-    
+
     .assertIsNumericVector(delayedInformation, "delayedInformation", naAllowed = TRUE)
     if (all(is.na(delayedInformation))) {
         design$futilityBounds <- .applyDirectionOfAlternative(
@@ -1869,7 +1871,7 @@ getDesignInverseNormal <- function(
 
     # sensible interim choices are restricted by amount of delayed information
     eps <- design$informationRates[1:(design$kMax - 1)] + delayedInformation
-    if (!any(is.na(eps)) && any(eps >= 1)) {
+    if (!anyNA(eps) && any(eps >= 1)) {
         stages <- which(eps >= 1)
         stagesInfo <- ifelse(length(stages) == 1, paste0(" ", stages), paste0("s ", .arrayToString(stages, mode = "and")))
         stop(
@@ -2052,7 +2054,7 @@ getDesignInverseNormal <- function(
 #' @param futilityBounds The futility bounds, defined on the scale defined by \code{futilityBoundsScale}.
 #'        (numeric vector of length \code{kMax - 1}).
 #' @param futilityBoundsScale Character. The scale of the futility bounds.
-#'        Must be one of \code{"zValue"}, \code{"pValue"}, \code{"reverseCondPower"}, 
+#'        Must be one of \code{"zValue"}, \code{"pValue"}, \code{"reverseCondPower"},
 #'        \code{"condPowerAtObserved"}, or \code{"predictivePower"}.
 #'        Default is \code{"zValue"}.
 #' @inheritParams param_bindingFutility
@@ -2097,15 +2099,14 @@ getDesignInverseNormal <- function(
 #' @family design functions
 #'
 #' @template examples_get_design_group_sequential
-#' 
-#' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}} for the 
+#'
+#' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}} for the
 #'     specification of futility bounds on scales other than the z-value scale.
 #' @seealso [Vignette: Enhanced Futility Bounds Specification](https://www.rpact.org/vignettes/planning/rpact_futility_bounds/)
 #'
 #' @export
 #'
-getDesignGroupSequential <- function(
-        ...,
+getDesignGroupSequential <- function(...,
         kMax = NA_integer_,
         alpha = NA_real_,
         beta = NA_real_,
@@ -2164,15 +2165,15 @@ getDesignGroupSequential <- function(
         tolerance = 1e-08 # C_DESIGN_TOLERANCE_DEFAULT
         ) {
     .warnInCaseOfUnknownArguments(functionName = "getDesignGroupSequential", ...)
-    
+
     typeBetaSpending <- .matchArgument(typeBetaSpending, C_TYPE_OF_DESIGN_BS_NONE)
     futilityBoundsScale <- match.arg(futilityBoundsScale)
-    
+
     .assertIsLogicalVector(efficacyStops, "efficacyStops", naAllowed = TRUE)
     .assertIsLogicalVector(futilityStops, "futilityStops", naAllowed = TRUE)
-    
+
     designClass <- C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL
-    
+
     design <- NULL
     if (!all(is.na(futilityBounds)) && .futilityBoundsCalculationRequiresDesign(futilityBoundsScale)) {
         design <- .getDesignGroupSequentialOrWithInterimStops(
@@ -2201,16 +2202,18 @@ getDesignGroupSequential <- function(
             delayedInformation = delayedInformation,
             tolerance = tolerance,
             efficacyStops = efficacyStops,
-            futilityStops = futilityStops)
+            futilityStops = futilityStops
+        )
     }
-    
+
     futilityBounds <- .getFutilityBoundsFromArgs(
         futilityBounds = futilityBounds,
-        futilityBoundsScale = futilityBoundsScale, 
+        futilityBoundsScale = futilityBoundsScale,
         functionName = "getDesignGroupSequential",
         design = design,
-        ...) 
-    
+        ...
+    )
+
     return(.getDesignGroupSequentialOrWithInterimStops(
         designClass = designClass,
         kMax = kMax,
@@ -2237,7 +2240,8 @@ getDesignGroupSequential <- function(
         delayedInformation = delayedInformation,
         tolerance = tolerance,
         efficacyStops = efficacyStops,
-        futilityStops = futilityStops))
+        futilityStops = futilityStops
+    ))
 }
 
 .getFixedSampleSize <- function(..., alpha, beta, sided, twoSidedPower) {
@@ -2380,7 +2384,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
     }
 
     criticalValues <- .getCriticalValues(design)
-    if (!any(is.na(design$delayedInformation)) &&
+    if (!anyNA(design$delayedInformation) &&
             length(design$decisionCriticalValues) > 0) {
         contRegionUpper <- criticalValues
         contRegionLower <- design$futilityBounds

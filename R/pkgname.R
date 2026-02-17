@@ -80,22 +80,30 @@
 
 .onAttach <- function(libname, pkgname) {
     if (grepl("^\\d\\.\\d\\.\\d\\.\\d{4,4}$", .getPackageVersionString())) {
-        packageStartupMessage(paste0("rpact developer version ", 
-            .getPackageVersionString(), " loaded"))
-    } 
-    if (!isTRUE(.installationQualificationDone()) && 
+        packageStartupMessage(paste0(
+            "rpact developer version ",
+            .getPackageVersionString(), " loaded"
+        ))
+    }
+    if (!isTRUE(.installationQualificationDone()) &&
             .isStartupMessagingEnabled()) {
-        packageStartupMessage(paste0("Installation qualification for rpact ", 
-            .getPackageVersionString(), " has not yet been performed."))
-        packageStartupMessage(paste0("Please run testPackage() before ",
-            "using the package in GxP relevant environments."))
+        packageStartupMessage(paste0(
+            "Installation qualification for rpact ",
+            .getPackageVersionString(), " has not yet been performed."
+        ))
+        packageStartupMessage(paste0(
+            "Please run testPackage() before ",
+            "using the package in GxP relevant environments."
+        ))
     }
 }
 
 .onDetach <- function(libpath) {
     if (grepl("^\\d\\.\\d\\.\\d\\.\\d{4,4}$", .getPackageVersionString())) {
-        packageStartupMessage(paste0("rpact developer version ", .getPackageVersionString(), 
-            " successfully unloaded"))
+        packageStartupMessage(paste0(
+            "rpact developer version ", .getPackageVersionString(),
+            " successfully unloaded"
+        ))
     }
 }
 
@@ -110,4 +118,3 @@
         }
     )
 }
-

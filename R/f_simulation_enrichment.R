@@ -78,13 +78,13 @@ NULL
 }
 
 .selectPopulations <- function(
-    typeOfSelection,
-    epsilonValue,
-    rValue,
-    threshold,
-    selectPopulationsFunction,
-    selectPopulationsFunctionArgs
-) {
+        typeOfSelection,
+        epsilonValue,
+        rValue,
+        threshold,
+        selectPopulationsFunction,
+        selectPopulationsFunctionArgs
+        ) {
     effectVector <- selectPopulationsFunctionArgs$effectVector
     gMax <- length(effectVector)
 
@@ -136,13 +136,13 @@ NULL
 
 
 .performClosedCombinationTestForSimulationEnrichment <- function(
-    ...,
-    stageResults,
-    design,
-    indices,
-    intersectionTest,
-    successCriterion
-) {
+        ...,
+        stageResults,
+        design,
+        indices,
+        intersectionTest,
+        successCriterion
+        ) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -249,7 +249,7 @@ NULL
                 } else {
                     overallAdjustedTestStatistics[i, k] <-
                         (weightsInverseNormal[1:k] %*% .getOneMinusQNorm(adjustedStageWisePValues[i, 1:k])) /
-                        sqrt(sum(weightsInverseNormal[1:k]^2))
+                            sqrt(sum(weightsInverseNormal[1:k]^2))
                 }
             }
 
@@ -269,7 +269,7 @@ NULL
             rejectedIntersections[is.na(rejectedIntersections[, k]), k] <- FALSE
 
             if (k == kMax && !rejectedIntersections[1, k]) {
-                #break
+                # break
             }
         }
 
@@ -310,47 +310,47 @@ NULL
 }
 
 .createSimulationResultsEnrichmentObject <- function(
-    ...,
-    design,
-    effectList,
-    kappa = NA_real_, # survival only
-    dropoutRate1 = NA_real_, # survival only
-    dropoutRate2 = NA_real_, # survival only
-    dropoutTime = NA_real_, # survival only
-    eventTime = NA_real_, # survival only
-    intersectionTest,
-    stratifiedAnalysis = NA,
-    directionUpper = NA, # rates + survival only
-    adaptations,
-    typeOfSelection,
-    effectMeasure,
-    successCriterion,
-    epsilonValue,
-    rValue,
-    threshold,
-    plannedSubjects = NA_real_, # means + rates only
-    plannedEvents = NA_real_, # survival only
-    accrualTime = NA_real_, # survival only
-    accrualIntensity = NA_real_, # survival only
-    maxNumberOfSubjects = NA_real_, # survival only
-    allocationRatioPlanned,
-    minNumberOfSubjectsPerStage = NA_real_, # means + rates only
-    maxNumberOfSubjectsPerStage = NA_real_, # means + rates only
-    minNumberOfEventsPerStage = NA_real_, # survival only
-    maxNumberOfEventsPerStage = NA_real_, # survival only
-    conditionalPower,
-    thetaH1 = NA_real_, # means + survival only
-    stDevH1 = NA_real_, # means only
-    piTreatmentH1 = NA_real_, # rates only
-    piControlH1 = NA_real_, # rates only
-    maxNumberOfIterations,
-    seed,
-    calcSubjectsFunction = NULL, # means + rates only
-    calcEventsFunction = NULL, # survival only
-    selectPopulationsFunction,
-    showStatistics,
-    endpoint = c("means", "rates", "survival")
-) {
+        ...,
+        design,
+        effectList,
+        kappa = NA_real_, # survival only
+        dropoutRate1 = NA_real_, # survival only
+        dropoutRate2 = NA_real_, # survival only
+        dropoutTime = NA_real_, # survival only
+        eventTime = NA_real_, # survival only
+        intersectionTest,
+        stratifiedAnalysis = NA,
+        directionUpper = NA, # rates + survival only
+        adaptations,
+        typeOfSelection,
+        effectMeasure,
+        successCriterion,
+        epsilonValue,
+        rValue,
+        threshold,
+        plannedSubjects = NA_real_, # means + rates only
+        plannedEvents = NA_real_, # survival only
+        accrualTime = NA_real_, # survival only
+        accrualIntensity = NA_real_, # survival only
+        maxNumberOfSubjects = NA_real_, # survival only
+        allocationRatioPlanned,
+        minNumberOfSubjectsPerStage = NA_real_, # means + rates only
+        maxNumberOfSubjectsPerStage = NA_real_, # means + rates only
+        minNumberOfEventsPerStage = NA_real_, # survival only
+        maxNumberOfEventsPerStage = NA_real_, # survival only
+        conditionalPower,
+        thetaH1 = NA_real_, # means + survival only
+        stDevH1 = NA_real_, # means only
+        piTreatmentH1 = NA_real_, # rates only
+        piControlH1 = NA_real_, # rates only
+        maxNumberOfIterations,
+        seed,
+        calcSubjectsFunction = NULL, # means + rates only
+        calcEventsFunction = NULL, # survival only
+        selectPopulationsFunction,
+        showStatistics,
+        endpoint = c("means", "rates", "survival")
+        ) {
     endpoint <- match.arg(endpoint)
 
     .assertIsSingleNumber(threshold, "threshold", naAllowed = FALSE)
@@ -436,7 +436,7 @@ NULL
             !is.null(threshold) &&
             length(threshold) == 1 &&
             threshold != -Inf
-    ) {
+        ) {
         warning(
             "'threshold' (",
             threshold,
@@ -608,7 +608,7 @@ NULL
             if (
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage)) &&
                     any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0)
-            ) {
+                ) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'maxNumberOfSubjectsPerStage' (",
@@ -668,7 +668,7 @@ NULL
             if (
                 !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage)) &&
                     any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0)
-            ) {
+                ) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'maxNumberOfEventsPerStage' (",
@@ -804,7 +804,7 @@ NULL
         simulationResults$calcEventsFunction <- calcEventsFunction
     }
 
-    if (any(is.na(allocationRatioPlanned))) {
+    if (anyNA(allocationRatioPlanned)) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
 

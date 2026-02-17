@@ -40,7 +40,7 @@
     } else {
         stop(
             C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'dataInput' class ",
-            .getClassName(dataInput), " is not supported", 
+            .getClassName(dataInput), " is not supported",
             call. = FALSE
         )
     }
@@ -114,7 +114,7 @@ getObservedInformationRates <- function(dataInput,
     .assertIsSingleNumber(maxInformation, "maxInformation")
     .assertIsInOpenInterval(
         maxInformation,
-        "maxInformation", 
+        "maxInformation",
         lower = 0, upper = NULL
     )
 
@@ -126,7 +126,7 @@ getObservedInformationRates <- function(dataInput,
     status <- "interim-stage"
 
     showObservedInformationRatesMessage <- .getOptionalArgument("showObservedInformationRatesMessage", ...)
-    if (is.null(showObservedInformationRatesMessage) || 
+    if (is.null(showObservedInformationRatesMessage) ||
             !is.logical(showObservedInformationRatesMessage)) {
         showObservedInformationRatesMessage <- TRUE
     }
@@ -138,8 +138,9 @@ getObservedInformationRates <- function(dataInput,
 
         if (!is.null(informationEpsilon)) {
             .assertIsSingleNumber(informationEpsilon, "informationEpsilon")
-            .assertIsInOpenInterval(informationEpsilon, "informationEpsilon", 
-                lower = 0, upper = maxInformation)
+            .assertIsInOpenInterval(informationEpsilon, "informationEpsilon",
+                lower = 0, upper = maxInformation
+            )
 
             lastInformationRate <- informationRates[length(informationRates)]
             lastInformationNumber <- absoluteInformations[length(absoluteInformations)]
@@ -250,13 +251,13 @@ getObservedInformationRates <- function(dataInput,
 .getRecalculatedDesign <- function(design, newArgumentValues, ignore = character()) {
     parametersToIgnore <- character()
     if (!("kMax" %in% names(newArgumentValues))) {
-        if (design$.getParameterType("kMax") %in% C_PARAM_USER_DEFINED) {
+        if (identical(design$.getParameterType("kMax"), C_PARAM_USER_DEFINED)) {
             parametersToIgnore <- c(parametersToIgnore, "kMax")
         }
         newArgumentValues$kMax <- NA_integer_
     }
-    for (paramName in c("futilityBounds", "informationRates", ignore)) {
-        if (design$.getParameterType(paramName) %in% C_PARAM_USER_DEFINED) {
+    for (paramName in c("futilityBounds", ignore)) {
+        if (identical(design$.getParameterType(paramName), C_PARAM_USER_DEFINED)) {
             parametersToIgnore <- c(parametersToIgnore, paramName)
             if (!(paramName %in% names(newArgumentValues))) {
                 newArgumentValues[[paramName]] <- NA_real_
@@ -264,7 +265,8 @@ getObservedInformationRates <- function(dataInput,
         }
     }
     if (length(parametersToIgnore) > 0) {
-        warning("The user-defined parameters ", 
+        warning("The user-defined parameter",
+            ifelse(length(parametersToIgnore) == 1, "", "s"), " ",
             .arrayToString(sQuote(parametersToIgnore), mode = "and"),
             " will be ignored because they are not applicable ",
             "for automatic recalculation of the boundaries",
@@ -297,9 +299,8 @@ getObservedInformationRates <- function(dataInput,
     if (!.isAlphaSpendingDesign(design) ||
             design$typeBetaSpending != "none" ||
             !.isTrialDesignGroupSequential(design) ||
-            .isMultiArmDataset(dataInput) || 
+            .isMultiArmDataset(dataInput) ||
             .isEnrichmentDataset(dataInput)) {
-            
         arguments <- character()
         if (!is.null(maxInformation) && !is.na(maxInformation)) {
             arguments <- c(arguments, paste0("'maxInformation' (", .arrayToString(maxInformation), ")"))
@@ -309,7 +310,7 @@ getObservedInformationRates <- function(dataInput,
         }
         if (length(arguments) > 0) {
             warning(.arrayToString(arguments, mode = "and"),
-                " will be ignored because ", ifelse(length(arguments) == 1, "it is", "they are"), 
+                " will be ignored because ", ifelse(length(arguments) == 1, "it is", "they are"),
                 " only applicable for alpha spending", "\n",
                 "group sequential designs with no futility bounds and a single hypothesis",
                 call. = FALSE
@@ -332,7 +333,7 @@ getObservedInformationRates <- function(dataInput,
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "recalculation of the information rates not possible ",
-            "for user-defined alpha spending designs", 
+            "for user-defined alpha spending designs",
             call. = FALSE
         )
     }
@@ -371,7 +372,7 @@ getObservedInformationRates <- function(dataInput,
     if (stageFromData == 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "recalculation of the information rates not possible at stage 1", 
+            "recalculation of the information rates not possible at stage 1",
             call. = FALSE
         )
     }

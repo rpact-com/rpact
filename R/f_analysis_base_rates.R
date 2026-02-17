@@ -59,8 +59,7 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getAnalysisResultsRatesInverseNormal <- function(
-        ...,
+.getAnalysisResultsRatesInverseNormal <- function(...,
         design,
         dataInput,
         directionUpper = NA,
@@ -71,8 +70,7 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        ) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .assertIsTrialDesignInverseNormal(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
@@ -108,8 +106,7 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsRatesGroupSequential <- function(
-        ...,
+.getAnalysisResultsRatesGroupSequential <- function(...,
         design,
         dataInput,
         directionUpper = NA,
@@ -120,8 +117,7 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        ) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .assertIsTrialDesignGroupSequential(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
@@ -157,8 +153,7 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsRatesFisher <- function(
-        ...,
+.getAnalysisResultsRatesFisher <- function(...,
         design,
         dataInput,
         directionUpper = NA,
@@ -170,8 +165,7 @@ NULL
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
         iterations = C_ITERATIONS_DEFAULT,
-        seed = NA_real_
-        ) {
+        seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -218,8 +212,7 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsRatesAll <- function(
-        ...,
+.getAnalysisResultsRatesAll <- function(...,
         results,
         design,
         dataInput,
@@ -234,8 +227,7 @@ NULL
         stdErrorEstimate,
         tolerance,
         iterations,
-        seed
-        ) {
+        seed) {
     startTime <- Sys.time()
     stageResults <- .getStageResultsRates(
         design = design,
@@ -458,16 +450,14 @@ NULL
 #'
 #' @noRd
 #'
-.getStageResultsRates <- function(
-        ...,
+.getStageResultsRates <- function(...,
         design,
         dataInput,
         thetaH0 = NA_real_,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stage = NA_integer_,
-        userFunctionCallEnabled = FALSE
-        ) {
+        userFunctionCallEnabled = FALSE) {
     .assertIsDatasetRates(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
     thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
@@ -820,8 +810,7 @@ NULL
     .stopWithWrongDesignMessage(design, inclusiveConditionalDunnett = FALSE)
 }
 
-.getRootThetaRates <- function(
-        ...,
+.getRootThetaRates <- function(...,
         design,
         dataInput,
         stage,
@@ -831,8 +820,7 @@ NULL
         secondValue,
         tolerance,
         acceptResultsOutOfTolerance,
-        callingFunctionInformation
-        ) {
+        callingFunctionInformation) {
     if (dataInput$getNumberOfGroups() == 2) {
         thetaLow <- -1 + tolerance
     } else {
@@ -870,15 +858,13 @@ NULL
     return(result)
 }
 
-.getRepeatedConfidenceIntervalsRatesAll <- function(
-        ...,
+.getRepeatedConfidenceIntervalsRatesAll <- function(...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         directionUpper = NA,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        firstParameterName
-        ) {
+        firstParameterName) {
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
 
     if (!normalApproximation && dataInput$getNumberOfGroups() == 2) {
@@ -1012,14 +998,12 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesGroupSequential <- function(
-        ...,
+.getRepeatedConfidenceIntervalsRatesGroupSequential <- function(...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         directionUpper = NA,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        ) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
         functionName = ".getRepeatedConfidenceIntervalsRatesGroupSequential",
         ignore = c(
@@ -1048,14 +1032,12 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesInverseNormal <- function(
-        ...,
+.getRepeatedConfidenceIntervalsRatesInverseNormal <- function(...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         directionUpper = NA,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        ) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
         functionName = ".getRepeatedConfidenceIntervalsRatesInverseNormal",
         ignore = c(
@@ -1084,14 +1066,12 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesFisher <- function(
-        ...,
+.getRepeatedConfidenceIntervalsRatesFisher <- function(...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         directionUpper = NA,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        ) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     .warnInCaseOfUnknownArguments(
         functionName = ".getRepeatedConfidenceIntervalsRatesFisher",
         ignore = c(
@@ -1196,15 +1176,13 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesGroupSequential <- function(
-        ...,
+.getConditionalPowerRatesGroupSequential <- function(...,
         stageResults,
         stage = stageResults$stage,
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         pi1,
-        pi2
-        ) {
+        pi2) {
     design <- stageResults$.design
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     .assertIsValidStage(stage, design$kMax)
@@ -1325,15 +1303,13 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesInverseNormal <- function(
-        ...,
+.getConditionalPowerRatesInverseNormal <- function(...,
         stageResults,
         stage = stageResults$stage,
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         pi1,
-        pi2
-        ) {
+        pi2) {
     design <- stageResults$.design
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     .assertIsValidStage(stage, design$kMax)
@@ -1452,8 +1428,7 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesFisher <- function(
-        ...,
+.getConditionalPowerRatesFisher <- function(...,
         stageResults,
         stage = stageResults$stage,
         nPlanned,
@@ -1461,8 +1436,7 @@ NULL
         pi1,
         pi2,
         iterations = C_ITERATIONS_DEFAULT,
-        seed = NA_real_
-        ) {
+        seed = NA_real_) {
     design <- stageResults$.design
     .assertIsTrialDesignFisher(design)
     .assertIsValidStage(stage, design$kMax)
@@ -1533,14 +1507,12 @@ NULL
     ))
 }
 
-.getConditionalPowerRates <- function(
-        ...,
+.getConditionalPowerRates <- function(...,
         stageResults,
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         pi1 = NA_real_,
-        pi2 = NA_real_
-        ) {
+        pi2 = NA_real_) {
     pi1H1 <- .getOptionalArgument("pi1H1", ...)
     if (!is.null(pi1H1) && !is.na(pi1H1)) {
         if (!is.na(pi1)) {
@@ -1574,7 +1546,7 @@ NULL
         pi2 = pi2
     )
 
-    if (any(is.na(nPlanned))) {
+    if (anyNA(nPlanned)) {
         return(results)
     }
 
@@ -1631,15 +1603,13 @@ NULL
     return(results)
 }
 
-.getConditionalPowerPlotRates <- function(
-        ...,
+.getConditionalPowerPlotRates <- function(...,
         stageResults,
         stage,
         nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         piTreatmentRange,
-        pi2
-        ) {
+        pi2) {
     if (stageResults$isOneSampleDataset()) {
         .associatedArgumentsAreDefined(
             nPlanned = nPlanned,
@@ -1808,8 +1778,7 @@ NULL
 }
 
 
-.getFinalConfidenceIntervalRatesValues <- function(
-        design,
+.getFinalConfidenceIntervalRatesValues <- function(design,
         dataInput,
         stageResults,
         directionUpper,
@@ -1817,8 +1786,7 @@ NULL
         thetaH0,
         stage,
         stdErrorEstimate,
-        tolerance
-        ) {
+        tolerance) {
     finalConfidenceIntervalGeneral <- rep(NA_real_, 2)
     medianUnbiasedGeneral <- NA_real_
 
@@ -1921,7 +1889,7 @@ NULL
             )
         }
 
-        if (any(is.na(finalConfidenceIntervalGeneral)) && (designStage > 1)) {
+        if (anyNA(finalConfidenceIntervalGeneral) && (designStage > 1)) {
             finalStage <- NA_integer_
         }
 
@@ -2036,10 +2004,10 @@ NULL
         }
     }
 
-    if (!any(is.na(finalConfidenceIntervalGeneral))) {
+    if (!anyNA(finalConfidenceIntervalGeneral)) {
         finalConfidenceIntervalGeneral <- sort(finalConfidenceIntervalGeneral)
     }
-    if (!any(is.na(finalConfidenceInterval))) {
+    if (!anyNA(finalConfidenceInterval)) {
         finalConfidenceInterval <- sort(finalConfidenceInterval)
     }
 
@@ -2073,8 +2041,7 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalRatesGroupSequential <- function(
-        ...,
+.getFinalConfidenceIntervalRatesGroupSequential <- function(...,
         design,
         dataInput,
         stage,
@@ -2082,8 +2049,7 @@ NULL
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        ) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsRates(
         design = design,
         dataInput = dataInput,
@@ -2127,8 +2093,7 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalRatesInverseNormal <- function(
-        ...,
+.getFinalConfidenceIntervalRatesInverseNormal <- function(...,
         design,
         dataInput,
         stage,
@@ -2136,8 +2101,7 @@ NULL
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        ) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsRates(
         design = design,
         dataInput = dataInput,
@@ -2181,8 +2145,7 @@ NULL
 #'
 #' @noRd
 #'
-.getFinalConfidenceIntervalRatesFisher <- function(
-        ...,
+.getFinalConfidenceIntervalRatesFisher <- function(...,
         design,
         dataInput,
         stage,
@@ -2190,8 +2153,7 @@ NULL
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        ) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stageResults <- .getStageResultsRates(
         design = design,
         dataInput = dataInput,
@@ -2229,16 +2191,14 @@ NULL
     ))
 }
 
-.getFinalConfidenceIntervalRates <- function(
-        ...,
+.getFinalConfidenceIntervalRates <- function(...,
         design,
         dataInput,
         thetaH0 = NA_real_,
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         stdErrorEstimate = NA_character_,
-        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT
-        ) {
+        tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
 
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)

@@ -32,12 +32,11 @@ NULL
 #'
 #' @noRd
 #'
-.calcSurvivalTestStatistics <- function(
-        dataInput, 
-        subset, 
-        stage, 
+.calcSurvivalTestStatistics <- function(dataInput,
+        subset,
+        stage,
         thetaH0,
-        stratifiedAnalysis, 
+        stratifiedAnalysis,
         directionUpper = TRUE) {
     overallEvents <- NA_real_
     testStatistics <- NA_real_
@@ -93,8 +92,10 @@ NULL
         }
 
         separatePValues <- .applyDirectionOfAlternative(
-            stats::pnorm(testStatistics), 
-            directionUpper, type = "oneMinusValue", phase = "analysis")
+            stats::pnorm(testStatistics),
+            directionUpper,
+            type = "oneMinusValue", phase = "analysis"
+        )
     }
 
     if (("R" %in% subset) && is.na(dataInput$getOverallEvents(stage = stage, subset = "R")) ||
@@ -119,8 +120,8 @@ NULL
     ))
 }
 
-.getStageResultsSurvivalEnrichment <- function(..., 
-        design, 
+.getStageResultsSurvivalEnrichment <- function(...,
+        design,
         dataInput,
         thetaH0 = NA_real_,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
@@ -259,9 +260,10 @@ NULL
                         }
                         singleStepAdjustedPValues[population, k] <- 1 - .getMultivariateDistribution(
                             type = "normal",
-                            upper = ifelse(!isFALSE(directionUpper), 
-                                testStatistics[population, k], 
-                                -testStatistics[population, k]),
+                            upper = ifelse(!isFALSE(directionUpper),
+                                testStatistics[population, k],
+                                -testStatistics[population, k]
+                            ),
                             sigma = sigma, df = NA
                         )
                     }
@@ -340,15 +342,15 @@ NULL
     results <- AnalysisResultsEnrichmentInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsSurvivalEnrichmentAll(
-        results = results, 
-        design = design, 
+        results = results,
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
-        stage = stage, 
+        intersectionTest = intersectionTest,
+        stage = stage,
         directionUpper = directionUpper,
         stratifiedAnalysis = stratifiedAnalysis,
-        thetaH0 = thetaH0, 
-        thetaH1 = thetaH1, 
+        thetaH0 = thetaH0,
+        thetaH1 = thetaH1,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
         tolerance = tolerance
@@ -358,7 +360,7 @@ NULL
 }
 
 .getAnalysisResultsSurvivalFisherEnrichment <- function(...,
-        design, 
+        design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
         directionUpper = NA,
@@ -368,7 +370,7 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, 
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
@@ -388,48 +390,48 @@ NULL
     .setValueAndParameterType(results, "seed", seed, NA_real_)
 
     results <- .getAnalysisResultsSurvivalEnrichmentAll(
-        results = results, 
-        design = design, 
+        results = results,
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
-        stage = stage, 
+        intersectionTest = intersectionTest,
+        stage = stage,
         directionUpper = directionUpper,
         stratifiedAnalysis = stratifiedAnalysis,
-        thetaH0 = thetaH0, 
-        thetaH1 = thetaH1, 
+        thetaH0 = thetaH0,
+        thetaH1 = thetaH1,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
         tolerance = tolerance,
-        iterations = iterations, 
+        iterations = iterations,
         seed = seed
     )
 
     return(results)
 }
 
-.getAnalysisResultsSurvivalEnrichmentAll <- function(..., 
+.getAnalysisResultsSurvivalEnrichmentAll <- function(...,
         results,
-        design, 
-        dataInput, 
-        intersectionTest, 
+        design,
+        dataInput,
+        intersectionTest,
         stage,
-        directionUpper, 
-        stratifiedAnalysis, 
-        thetaH0, 
-        thetaH1, 
+        directionUpper,
+        stratifiedAnalysis,
+        thetaH0,
+        thetaH1,
         nPlanned,
-        allocationRatioPlanned, 
-        tolerance, 
-        iterations, 
+        allocationRatioPlanned,
+        tolerance,
+        iterations,
         seed) {
     startTime <- Sys.time()
 
     stageResults <- .getStageResultsSurvivalEnrichment(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         stage = stage,
-        thetaH0 = thetaH0, 
+        thetaH0 = thetaH0,
         directionUpper = directionUpper,
         stratifiedAnalysis = stratifiedAnalysis
     )
@@ -492,7 +494,7 @@ NULL
     repeatedConfidenceIntervalUpperBounds <- numeric(0)
     startTime <- Sys.time()
     repeatedConfidenceIntervals <- .getRepeatedConfidenceIntervalsSurvivalEnrichment(
-        design = design, 
+        design = design,
         dataInput = dataInput,
         stratifiedAnalysis = stratifiedAnalysis,
         intersectionTest = intersectionTest,
@@ -526,29 +528,29 @@ NULL
     return(results)
 }
 
-.getRootThetaSurvivalEnrichment <- function(..., 
-        design, 
-        dataInput, 
-        treatmentArm, 
+.getRootThetaSurvivalEnrichment <- function(...,
+        design,
+        dataInput,
+        treatmentArm,
         stage,
-        directionUpper, 
-        stratifiedAnalysis, 
-        intersectionTest, 
-        thetaLow, 
+        directionUpper,
+        stratifiedAnalysis,
+        intersectionTest,
+        thetaLow,
         thetaUp,
-        firstParameterName, 
-        secondValue, 
+        firstParameterName,
+        secondValue,
         tolerance) {
     result <- .getOneDimensionalRoot(
         function(theta) {
             stageResults <- .getStageResultsSurvivalEnrichment(
-                design = design, 
+                design = design,
                 dataInput = dataInput,
-                stage = stage, 
-                thetaH0 = theta, 
+                stage = stage,
+                thetaH0 = theta,
                 directionUpper = directionUpper,
                 stratifiedAnalysis = stratifiedAnalysis,
-                intersectionTest = intersectionTest, 
+                intersectionTest = intersectionTest,
                 calculateSingleStepAdjusted = TRUE
             )
             firstValue <- stageResults[[firstParameterName]][treatmentArm, stage]
@@ -561,25 +563,25 @@ NULL
 }
 
 .getUpperLowerThetaSurvivalEnrichment <- function(...,
-        design, 
-        dataInput, 
-        theta, 
-        treatmentArm, 
+        design,
+        dataInput,
+        theta,
+        treatmentArm,
         stage,
-        directionUpper, 
-        conditionFunction, 
+        directionUpper,
+        conditionFunction,
         stratifiedAnalysis,
-        intersectionTest, 
-        firstParameterName, 
+        intersectionTest,
+        firstParameterName,
         secondValue) {
     stageResults <- .getStageResultsSurvivalEnrichment(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        stage = stage, 
-        thetaH0 = exp(theta), 
+        stage = stage,
+        thetaH0 = exp(theta),
         directionUpper = directionUpper,
         stratifiedAnalysis = stratifiedAnalysis,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         calculateSingleStepAdjusted = TRUE
     )
 
@@ -589,13 +591,13 @@ NULL
     while (conditionFunction(secondValue, firstValue)) {
         theta <- 2 * theta
         stageResults <- .getStageResultsSurvivalEnrichment(
-            design = design, 
+            design = design,
             dataInput = dataInput,
-            stage = stage, 
-            thetaH0 = exp(theta), 
+            stage = stage,
+            thetaH0 = exp(theta),
             directionUpper = directionUpper,
             stratifiedAnalysis = stratifiedAnalysis,
-            intersectionTest = intersectionTest, 
+            intersectionTest = intersectionTest,
             calculateSingleStepAdjusted = TRUE
         )
 
@@ -620,7 +622,7 @@ NULL
 }
 
 .getRepeatedConfidenceIntervalsSurvivalEnrichmentAll <- function(...,
-        design, 
+        design,
         dataInput,
         directionUpper = NA,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
@@ -631,13 +633,13 @@ NULL
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
 
     stageResults <- .getStageResultsSurvivalEnrichment(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        stage = stage, 
-        thetaH0 = 1, 
+        stage = stage,
+        thetaH0 = 1,
         directionUpper = directionUpper,
         stratifiedAnalysis = stratifiedAnalysis,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         calculateSingleStepAdjusted = FALSE
     )
 
@@ -658,7 +660,7 @@ NULL
         conditionFunction <- .isFirstValueGreaterThanSecondValue
     }
 
-    if (any(is.na(criticalValues[1:stage]))) {
+    if (anyNA(criticalValues[1:stage])) {
         warning("Repeated confidence intervals not because ", sum(is.na(criticalValues)),
             " critical values are NA (", .arrayToString(criticalValues), ")",
             call. = FALSE
@@ -676,29 +678,29 @@ NULL
             if (!is.na(stageResults$testStatistics[population, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
                 # Finding maximum upper and minimum lower bounds for RCIs
                 thetaLow <- exp(.getUpperLowerThetaSurvivalEnrichment(
-                    design = design, 
+                    design = design,
                     dataInput = dataInput,
-                    theta = -1, 
-                    treatmentArm = population, 
-                    stage = k, 
+                    theta = -1,
+                    treatmentArm = population,
+                    stage = k,
                     directionUpper = TRUE,
-                    stratifiedAnalysis = stratifiedAnalysis, 
+                    stratifiedAnalysis = stratifiedAnalysis,
                     intersectionTest = intersectionTest,
-                    conditionFunction = conditionFunction, 
+                    conditionFunction = conditionFunction,
                     firstParameterName = firstParameterName,
                     secondValue = criticalValues[k]
                 ))
 
                 thetaUp <- exp(.getUpperLowerThetaSurvivalEnrichment(
-                    design = design, 
+                    design = design,
                     dataInput = dataInput,
-                    theta = 1, 
-                    treatmentArm = population, 
-                    stage = k, 
+                    theta = 1,
+                    treatmentArm = population,
+                    stage = k,
                     directionUpper = FALSE,
-                    stratifiedAnalysis = stratifiedAnalysis, 
+                    stratifiedAnalysis = stratifiedAnalysis,
                     intersectionTest = intersectionTest,
-                    conditionFunction = conditionFunction, 
+                    conditionFunction = conditionFunction,
                     firstParameterName = firstParameterName,
                     secondValue = criticalValues[k]
                 ))
@@ -706,31 +708,31 @@ NULL
                 # finding upper and lower RCI limits through root function
                 repeatedConfidenceIntervals[population, 1, k] <- .getRootThetaSurvivalEnrichment(
                     design = design,
-                    dataInput = dataInput, 
-                    treatmentArm = population, 
-                    stage = k, 
+                    dataInput = dataInput,
+                    treatmentArm = population,
+                    stage = k,
                     directionUpper = TRUE,
-                    thetaLow = thetaLow, 
-                    thetaUp = thetaUp, 
+                    thetaLow = thetaLow,
+                    thetaUp = thetaUp,
                     stratifiedAnalysis = stratifiedAnalysis,
-                    intersectionTest = intersectionTest, 
+                    intersectionTest = intersectionTest,
                     firstParameterName = firstParameterName,
-                    secondValue = criticalValues[k], 
+                    secondValue = criticalValues[k],
                     tolerance = tolerance
                 )
 
                 repeatedConfidenceIntervals[population, 2, k] <- .getRootThetaSurvivalEnrichment(
                     design = design,
-                    dataInput = dataInput, 
-                    treatmentArm = population, 
-                    stage = k, 
+                    dataInput = dataInput,
+                    treatmentArm = population,
+                    stage = k,
                     directionUpper = FALSE,
-                    thetaLow = thetaLow, 
-                    thetaUp = thetaUp, 
+                    thetaLow = thetaLow,
+                    thetaUp = thetaUp,
                     stratifiedAnalysis = stratifiedAnalysis,
-                    intersectionTest = intersectionTest, 
+                    intersectionTest = intersectionTest,
                     firstParameterName = firstParameterName,
-                    secondValue = criticalValues[k], 
+                    secondValue = criticalValues[k],
                     tolerance = tolerance
                 )
 
@@ -747,30 +749,30 @@ NULL
                         thetaUp <- .getUpperLowerThetaSurvivalEnrichment(
                             design = design,
                             dataInput = dataInput,
-                            theta = 1, 
-                            treatmentArm = population, 
-                            stage = k - 1, 
+                            theta = 1,
+                            treatmentArm = population,
+                            stage = k - 1,
                             directionUpper = FALSE,
-                            conditionFunction = conditionFunction, 
+                            conditionFunction = conditionFunction,
                             stratifiedAnalysis = stratifiedAnalysis,
-                            intersectionTest = intersectionTest, 
+                            intersectionTest = intersectionTest,
                             firstParameterName = parameterName,
                             secondValue = bounds[k - 1]
                         )
                     }
 
                     futilityCorr[k] <- .getRootThetaSurvivalEnrichment(
-                        design = design, 
+                        design = design,
                         dataInput = dataInput,
-                        treatmentArm = population, 
-                        stage = k - 1, 
+                        treatmentArm = population,
+                        stage = k - 1,
                         directionUpper = directionUpper,
-                        thetaLow = thetaLow, 
-                        thetaUp = thetaUp, 
+                        thetaLow = thetaLow,
+                        thetaUp = thetaUp,
                         stratifiedAnalysis = stratifiedAnalysis,
-                        intersectionTest = intersectionTest, 
+                        intersectionTest = intersectionTest,
                         firstParameterName = parameterName,
-                        secondValue = bounds[k - 1], 
+                        secondValue = bounds[k - 1],
                         tolerance = tolerance
                     )
 
@@ -806,7 +808,7 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsSurvivalEnrichmentInverseNormal <- function(...,
-        design, 
+        design,
         dataInput,
         directionUpper = NA,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
@@ -822,13 +824,13 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsSurvivalEnrichmentAll(
-        design = design, 
+        design = design,
         dataInput = dataInput,
         directionUpper = directionUpper,
-        stratifiedAnalysis = stratifiedAnalysis, 
+        stratifiedAnalysis = stratifiedAnalysis,
         intersectionTest = intersectionTest,
-        tolerance = tolerance, 
-        firstParameterName = "combInverseNormal", 
+        tolerance = tolerance,
+        firstParameterName = "combInverseNormal",
         ...
     ))
 }
@@ -839,7 +841,7 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsSurvivalEnrichmentFisher <- function(...,
-        design, 
+        design,
         dataInput,
         directionUpper = NA,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
@@ -855,13 +857,13 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsSurvivalEnrichmentAll(
-        design = design, 
+        design = design,
         dataInput = dataInput,
         directionUpper = directionUpper,
-        stratifiedAnalysis = stratifiedAnalysis, 
+        stratifiedAnalysis = stratifiedAnalysis,
         intersectionTest = intersectionTest,
-        tolerance = tolerance, 
-        firstParameterName = "combFisher", 
+        tolerance = tolerance,
+        firstParameterName = "combFisher",
         ...
     ))
 }
@@ -888,13 +890,13 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalEnrichment <- function(..., 
-        stageResults, 
+.getConditionalPowerSurvivalEnrichment <- function(...,
+        stageResults,
         stage = stageResults$stage,
-        nPlanned, 
+        nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaH1 = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, 
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     design <- stageResults$.design
     gMax <- stageResults$getGMax()
@@ -908,7 +910,7 @@ NULL
         allocationRatioPlanned = allocationRatioPlanned
     )
 
-    if (any(is.na(nPlanned))) {
+    if (anyNA(nPlanned)) {
         return(results)
     }
 
@@ -927,8 +929,9 @@ NULL
 
     .assertIsValidNPlanned(nPlanned, kMax, stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
     results$.setParameterType(
         "allocationRatioPlanned",
@@ -953,24 +956,24 @@ NULL
     if (.isTrialDesignInverseNormal(design)) {
         return(.getConditionalPowerSurvivalEnrichmentInverseNormal(
             results = results,
-            design = design, 
-            stageResults = stageResults, 
+            design = design,
+            stageResults = stageResults,
             stage = stage,
-            nPlanned = nPlanned, 
+            nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
-            thetaH1 = thetaH1, 
+            thetaH1 = thetaH1,
             ...
         ))
     } else if (.isTrialDesignFisher(design)) {
         return(.getConditionalPowerSurvivalEnrichmentFisher(
             results = results,
-            design = design, 
-            stageResults = stageResults, 
+            design = design,
+            stageResults = stageResults,
             stage = stage,
-            nPlanned = nPlanned, 
+            nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
             thetaH1 = thetaH1,
-            iterations = iterations, 
+            iterations = iterations,
             seed = seed, ...
         ))
     }
@@ -986,13 +989,13 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalEnrichmentInverseNormal <- function(..., 
-        results, 
-        design, 
-        stageResults, 
+.getConditionalPowerSurvivalEnrichmentInverseNormal <- function(...,
+        results,
+        design,
+        stageResults,
         stage,
-        allocationRatioPlanned, 
-        nPlanned, 
+        allocationRatioPlanned,
+        nPlanned,
         thetaH1) {
     .assertIsTrialDesignInverseNormal(design)
     .warnInCaseOfUnknownArguments(functionName = ".getConditionalPowerSurvivalEnrichmentInverseNormal", ...)
@@ -1004,8 +1007,10 @@ NULL
     nPlanned <- c(rep(NA_real_, stage), nPlanned)
     nPlanned <- allocationRatioPlanned / (1 + allocationRatioPlanned)^2 * nPlanned
 
-    .setValueAndParameterType(results, "allocationRatioPlanned", 
-        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
+    .setValueAndParameterType(
+        results, "allocationRatioPlanned",
+        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
+    )
     if (length(thetaH1) == 1) {
         thetaH1 <- rep(thetaH1, gMax)
         results$.setParameterType("thetaH1", C_PARAM_GENERATED)
@@ -1019,7 +1024,7 @@ NULL
         standardizedEffect <- -log(thetaH1 / stageResults$thetaH0)
     }
     ctr <- .performClosedCombinationTest(stageResults = stageResults)
-    criticalValues <- .getCriticalValues(design) 
+    criticalValues <- .getCriticalValues(design)
     for (population in 1:gMax) {
         if (!is.na(ctr$separatePValues[population, stage])) {
             # shifted decision region for use in getGroupSeqProbs
@@ -1078,15 +1083,15 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalEnrichmentFisher <- function(..., 
-        results, 
-        design, 
-        stageResults, 
+.getConditionalPowerSurvivalEnrichmentFisher <- function(...,
+        results,
+        design,
+        stageResults,
         stage,
-        allocationRatioPlanned, 
-        nPlanned, 
-        thetaH1, 
-        iterations, 
+        allocationRatioPlanned,
+        nPlanned,
+        thetaH1,
+        iterations,
         seed) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
@@ -1133,14 +1138,14 @@ NULL
                     reject <- 0
                     for (i in 1:iterations) {
                         reject <- reject + .getRejectValueConditionalPowerFisher(
-                            kMax = kMax, 
+                            kMax = kMax,
                             alpha0Vec = design$alpha0Vec,
-                            criticalValues = criticalValues, 
+                            criticalValues = criticalValues,
                             weightsFisher = weightsFisher,
-                            pValues = pValues, 
-                            currentKMax = k, 
+                            pValues = pValues,
+                            currentKMax = k,
                             thetaH1 = standardizedEffect[population],
-                            stage = stage, 
+                            stage = stage,
                             nPlanned = nPlanned
                         )
                     }
@@ -1177,17 +1182,18 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerLikelihoodSurvivalEnrichment <- function(..., 
-        stageResults, 
+.getConditionalPowerLikelihoodSurvivalEnrichment <- function(...,
+        stageResults,
         stage,
-        nPlanned, 
+        nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        thetaRange, 
-        iterations = C_ITERATIONS_DEFAULT, 
+        thetaRange,
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 
-        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
     .associatedArgumentsAreDefined(nPlanned = nPlanned, thetaRange = thetaRange)
 
     design <- stageResults$.design
@@ -1227,25 +1233,25 @@ NULL
             if (.isTrialDesignInverseNormal(design)) {
                 condPowerValues[j] <- .getConditionalPowerSurvivalEnrichmentInverseNormal(
                     results = results,
-                    design = design, 
-                    stageResults = stageResults, 
-                    stage = stage, 
+                    design = design,
+                    stageResults = stageResults,
+                    stage = stage,
                     nPlanned = nPlanned,
                     allocationRatioPlanned = allocationRatioPlanned,
-                    thetaH1 = thetaRange[i], 
+                    thetaH1 = thetaRange[i],
                     ...
                 )$conditionalPower[population, kMax]
             } else if (.isTrialDesignFisher(design)) {
                 condPowerValues[j] <- .getConditionalPowerSurvivalEnrichmentFisher(
                     results = results,
-                    design = design, 
-                    stageResults = stageResults, 
-                    stage = stage, 
+                    design = design,
+                    stageResults = stageResults,
+                    stage = stage,
                     nPlanned = nPlanned,
                     allocationRatioPlanned = allocationRatioPlanned,
                     thetaH1 = thetaRange[i],
-                    iterations = iterations, 
-                    seed = seed, 
+                    iterations = iterations,
+                    seed = seed,
                     ...
                 )$conditionalPower[population, kMax]
             }

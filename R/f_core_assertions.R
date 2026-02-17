@@ -316,7 +316,7 @@ NULL
         return(invisible())
     }
 
-    if (!naAllowed && length(x) > 1 && any(is.na(x))) {
+    if (!naAllowed && length(x) > 1 && anyNA(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", xName, "' (", .arrayToString(x), ") must be a valid numeric vector or a single NA",
@@ -371,7 +371,7 @@ NULL
         return(invisible())
     }
 
-    if (!naAllowed && length(x) > 1 && any(is.na(x))) {
+    if (!naAllowed && length(x) > 1 && anyNA(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", xName, "' (", .arrayToString(x), ") ",
@@ -606,8 +606,7 @@ NULL
     return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
-.assertIsNumericVector <- function(
-        x,
+.assertIsNumericVector <- function(x,
         argumentName,
         ...,
         naAllowed = FALSE,
@@ -625,7 +624,7 @@ NULL
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
-    if ((!naAllowed && any(is.na(x))) || !is.numeric(x)) {
+    if ((!naAllowed && anyNA(x)) || !is.numeric(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(x), ") must be a valid numeric value or vector",
@@ -633,7 +632,7 @@ NULL
         )
     }
 
-    if (!any(is.na(len)) && !length(x) %in% len) {
+    if (!anyNA(len) && !length(x) %in% len) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(x), ") must have length ", .arrayToString(len, mode = "or"),
@@ -659,7 +658,7 @@ NULL
         return(invisible())
     }
 
-    if (!is.numeric(x) || (!naAllowed && any(is.na(x))) || (validateType && !is.integer(x)) ||
+    if (!is.numeric(x) || (!naAllowed && anyNA(x)) || (validateType && !is.integer(x)) ||
             (!validateType && any(as.integer(na.omit(x)) != na.omit(x)))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
@@ -681,7 +680,7 @@ NULL
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
-    if ((!naAllowed && any(is.na(x))) || !is.logical(x)) {
+    if ((!naAllowed && anyNA(x)) || !is.logical(x)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (", x, ") ",
             "must be a valid logical value or vector",
             call. = call.
@@ -876,7 +875,7 @@ NULL
         )
     }
 
-    if (!naAllowed && any(is.na(x))) {
+    if (!naAllowed && anyNA(x)) {
         stop(
             sprintf(
                 paste0(
@@ -1062,7 +1061,7 @@ NULL
         return(invisible())
     }
 
-    if (any(is.na(lambda))) {
+    if (anyNA(lambda)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(lambda), ") must be a valid numeric vector",
@@ -1349,7 +1348,7 @@ NULL
 }
 
 .assertContainsNoNas <- function(values, parameterName) {
-    if (any(is.na(values))) {
+    if (anyNA(values)) {
         stop(
             sprintf(
                 paste0(
@@ -1724,14 +1723,14 @@ NULL
             if (grepl("^getDesign(InverseNormal|GroupSequential|Fisher)", functionName)) {
                 next
             }
-            
+
             if (grepl("^getDesignFisher", functionName)) {
                 argName <- "alpha0Vec"
             } else {
                 argName <- "futilityBounds"
             }
         }
-        
+
         if (!(argName %in% ignore) && !grepl("^\\.", argName)) {
             if (.isResultObjectBaseClass(arg) || is.environment(arg)) {
                 arg <- .getClassName(arg)
@@ -1764,8 +1763,8 @@ NULL
     if (!identical(arg, defaultValue)) {
         warning("Unused argument in ", functionName, "(...): '",
             argName, "' = ", .arrayToString(
-                arg, 
-                vectorLookAndFeelEnabled = (length(arg) > 1), 
+                arg,
+                vectorLookAndFeelEnabled = (length(arg) > 1),
                 maxLength = 10,
                 encapsulate = !is.null(arg) && any(is.character(arg))
             ),
@@ -1846,8 +1845,7 @@ NULL
     .assertPackageIsInstalled("testthat")
 }
 
-.assertIsValidThetaH0 <- function(
-        thetaH0,
+.assertIsValidThetaH0 <- function(thetaH0,
         ...,
         endpoint = c("means", "rates", "survival", "counts"),
         groups,
@@ -1888,7 +1886,7 @@ NULL
 
 .assertIsValidThetaRange <- function(..., thetaRange, thetaAutoSeqEnabled = TRUE, survivalDataEnabled = FALSE) {
     if (is.null(thetaRange) || (thetaAutoSeqEnabled && length(thetaRange) <= 1) ||
-            any(is.na(thetaRange))) {
+            anyNA(thetaRange)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'thetaRange' (", .arrayToString(thetaRange), ") must be a vector ",
@@ -1920,7 +1918,7 @@ NULL
 
 .assertIsValidPiTreatmentRange <- function(..., piTreatmentRange, piAutoSeqEnabled = TRUE) {
     if (is.null(piTreatmentRange) || (piAutoSeqEnabled && length(piTreatmentRange) <= 1) ||
-            any(is.na(piTreatmentRange))) {
+            anyNA(piTreatmentRange)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'piTreatmentRange' (", .arrayToString(piTreatmentRange), ") must be a vector ",
@@ -1969,7 +1967,7 @@ NULL
         return(invisible())
     }
 
-    if (!is.numeric(piValue) || any(is.na(piValue))) {
+    if (!is.numeric(piValue) || anyNA(piValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", piName, "' (", .arrayToString(piValue), ") must be a valid numeric value",
@@ -2034,7 +2032,7 @@ NULL
     )
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
 
-    if (any(is.na(allocationRatioPlanned))) {
+    if (anyNA(allocationRatioPlanned)) {
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
 
@@ -3059,7 +3057,7 @@ NULL
         )
     }
 
-    if (!naAllowed && any(is.na(x))) {
+    if (!naAllowed && anyNA(x)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", argumentName, "' (", .arrayToString(x), ") must not contain NA's",
             call. = FALSE
@@ -3178,7 +3176,7 @@ NULL
                 call. = FALSE
             )
         }
-        if (!is.null(doseLevels) && !any(is.na(doseLevels))) {
+        if (!is.null(doseLevels) && !anyNA(doseLevels)) {
             warning("'doseLevels' (", .arrayToString(doseLevels), ") ",
                 "will be ignored because 'typeOfShape' ",
                 "is defined as '", typeOfShape, "'",
@@ -3192,7 +3190,7 @@ NULL
         )
     }
 
-    if (any(is.na(doseLevels))) {
+    if (anyNA(doseLevels)) {
         doseLevels <- 1:gMax
     }
 
@@ -3339,6 +3337,78 @@ NULL
     return(all(!is.na(delayedInformation)) && any(delayedInformation >= 1e-03))
 }
 
+.assertIsValidCountsParameterCombination <- function(existingParamNames,
+        forbiddenParamNames,
+        params,
+        ...,
+        requiredParamNames = character(0)) {
+    theta <- numeric(0)
+    for (existingParamName in existingParamNames) {
+        existingParamValue <- params[[existingParamName]]
+        if (is.null(existingParamValue) || all(is.na(existingParamValue))) {
+            return(invisible())
+        }
+        if (identical(existingParamName, "theta") &&
+                any(c("lambda", "lambda1") %in% existingParamNames)) {
+            theta <- existingParamValue
+        }
+    }
+
+    paramNames <- names(params)
+    if (length(requiredParamNames) > 0) {
+        existingParamNamesWithValue <- paramNames[sapply(paramNames, function(name) {
+            value <- params[[name]]
+            return(!is.null(value) && !all(is.na(value)))
+        })]
+        requiredParamNamesFound <- requiredParamNames[requiredParamNames %in% existingParamNamesWithValue]
+        if (length(requiredParamNamesFound) < length(requiredParamNames)) {
+            stop(
+                C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+                "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE),
+                " ", ifelse(length(requiredParamNames) == 1, "is", "are"),
+                " specified, ", .arrayToString(requiredParamNames, mode = "and", encapsulate = TRUE),
+                " must also be specified",
+                call. = FALSE
+            )
+        }
+    }
+
+    foundParamNames <- character(0)
+    for (forbiddenParamName in forbiddenParamNames) {
+        forbiddenParamValue <- params[[forbiddenParamName]]
+        if (!is.null(forbiddenParamValue) && !all(is.na(forbiddenParamValue))) {
+            foundParamNames <- c(foundParamNames, forbiddenParamName)
+        }
+    }
+
+    if (length(theta) > 1) {
+        existingParamNames <- existingParamNames[existingParamNames != "theta"]
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'theta' cannot be specified as vector if ", sQuote(existingParamNames[1]), " is specified",
+            call. = FALSE
+        )
+    } else if (length(theta) > 0 && "lambda1" %in% paramNames && length(params$lambda1) > 1) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'lambda1' cannot be specified as vector if ", sQuote("theta"), " is specified",
+            call. = FALSE
+        )
+    }
+
+    if (length(foundParamNames) == 0) {
+        return(invisible())
+    }
+
+    stop(
+        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+        "if ", .arrayToString(existingParamNames, mode = "and", encapsulate = TRUE),
+        " are specified, ", .arrayToString(foundParamNames, mode = "and", encapsulate = TRUE),
+        " must not be specified",
+        call. = FALSE
+    )
+}
+
 .assertIsValidEffectCountData <- function(sampleSizeEnabled,
         sided,
         lambda1,
@@ -3365,78 +3435,44 @@ NULL
     .assertIsValidThetaH0(thetaH0, endpoint = "counts", groups = 2)
     .assertIsSingleNumber(overdispersion, "overdispersion", naAllowed = TRUE)
     .assertIsInClosedInterval(overdispersion, "overdispersion", lower = 0, upper = NULL, naAllowed = TRUE)
-    if (!is.na(lambda) && all(!is.na(theta))) {
-        if (all(!is.na(lambda1)) || !is.na(lambda2)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda1' and/or 'lambda2' need not to be specified if 'lambda' and 'theta' are specified",
-                call. = FALSE
-            )
-        }
-        if (length(theta) > 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "theta cannot be specified as vector if lambda is specified",
-                call. = FALSE
-            )
-        }
-    } else if (!is.na(lambda2) && all(!is.na(theta))) {
-        if (all(!is.na(lambda1)) || !is.na(lambda)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda1' and/or 'lambda' need not to be specified if 'lambda2' and 'theta' are specified",
-                call. = FALSE
-            )
-        }
-    } else if (all(!is.na(lambda1)) && all(!is.na(theta))) {
-        if (!is.na(lambda2) || !is.na(lambda)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda2' and/or 'lambda' need not to be specified if 'lambda1' and 'theta' are specified",
-                call. = FALSE
-            )
-        }
-        if (length(theta) > 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "theta cannot be specified as vector if lambda1 is specified",
-                call. = FALSE
-            )
-        }
-    } else if (all(!is.na(lambda1)) && !is.na(lambda2)) {
-        if (!is.na(lambda) || all(!is.na(theta))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'lambda' and/or 'theta' need not to be specified if 'lambda1' and 'lambda2' are specified",
-                call. = FALSE
-            )
-        }
-    } else if (!is.na(lambda) && all(!is.na(lambda1))) {
-        # nothing to do
-    } else if (!is.na(lambda) && !is.na(lambda2)) {
+
+    params <- list(
+        "lambda1" = lambda1,
+        "lambda2" = lambda2,
+        "lambda" = lambda,
+        "theta" = theta,
+        "thetaH0" = thetaH0,
+        "overdispersion" = overdispersion
+    )
+
+    .assertIsValidCountsParameterCombination(c("lambda", "theta"), c("lambda1", "lambda2"), params)
+    .assertIsValidCountsParameterCombination("lambda", c("lambda1", "lambda2"), params, requiredParamNames = "theta")
+    .assertIsValidCountsParameterCombination(c("lambda2", "theta"), c("lambda1", "lambda"), params)
+    .assertIsValidCountsParameterCombination(c("lambda1", "theta"), c("lambda2", "lambda"), params)
+    .assertIsValidCountsParameterCombination(c("lambda", "lambda1"), c("lambda2", "theta"), params)
+    .assertIsValidCountsParameterCombination(c("lambda", "lambda2"), c("lambda1", "theta"), params)
+    .assertIsValidCountsParameterCombination(c("lambda1", "lambda2"), c("lambda", "theta"), params)
+
+    numberOfParameters <- sum(is.na(lambda2), anyNA(lambda1), is.na(lambda), anyNA(theta))
+    if (numberOfParameters != 2) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'lambda1' and/or 'theta' need not to be specified if 'lambda' and 'lambda2' are specified",
-            call. = FALSE
-        )
-    } else if (sum(is.na(lambda2), any(is.na(lambda1)), is.na(lambda), any(is.na(theta))) != 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "this parameter configuration is not possible: exactly two of the ",
-            "parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified",
+            ifelse(numberOfParameters > 2, C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, C_EXCEPTION_TYPE_MISSING_ARGUMENT),
+            "exactly two of the parameters 'lambda', 'lambda1', 'lambda2', 'theta' must be specified",
             call. = FALSE
         )
     }
-    if (!is.na(lambda2) && !any(is.na(theta))) {
+
+    if (!is.na(lambda2) && all(!is.na(theta))) {
         lambda1 <- lambda2 * theta
-    } else if (!any(is.na(lambda1)) && !any(is.na(theta))) {
+    } else if (all(!is.na(lambda1)) && all(!is.na(theta))) {
         lambda2 <- lambda1 / theta
     }
-    if (!any(is.na(c(lambda1, lambda2))) && any(abs(lambda1 / lambda2 - thetaH0) < 1e-12) &&
-            sampleSizeEnabled) {
+    
+    if (sampleSizeEnabled && !all(is.na(lambda1)) && !all(is.na(lambda2)) && !is.na(thetaH0) && 
+            any(abs(lambda1 / lambda2 - thetaH0) < 1e-12, na.rm = TRUE)) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "any 'lambda1 / lambda2' (", .arrayToString(lambda1 / lambda2), ") must be != 'thetaH0' (", thetaH0, ")",
+            C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+            "'lambda1 / lambda2' (", .arrayToString(round(lambda1 / lambda2, 4)), ") must be != 'thetaH0' (", thetaH0, ")",
             call. = FALSE
         )
     }
@@ -3448,8 +3484,8 @@ NULL
     params <- list(...)
     if (length(params) != 2) {
         if (is.null(names(params)) ||
-                length(params[!(names(params) %in% c("case", ".paramNames"))]) != 2) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "exactly two parameters must be specified")
+                length(params[!(names(params) %in% c("case", ".paramNames"))]) < 2) {
+            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "two or more parameters must be specified")
         }
     }
     case <- match.arg(case)
@@ -3462,25 +3498,25 @@ NULL
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "all arguments must be named")
     }
     if (case == "notTogether" && !all(is.na(params[[1]])) && !all(is.na(params[[2]]))) {
+        paramVector <- c()
+        for (i in seq_along(params)) {
+            paramVector <- c(paramVector, paste0(sQuote(paramNames[i]), " (", .arrayToString(params[[i]]), ")"))
+        }
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sQuote(paramNames[1]), " (", .arrayToString(params[[1]]), ") ",
-            "and ", sQuote(paramNames[2]), " (", .arrayToString(params[[2]]), ") ",
-            "cannot be specified together",
+            .arrayToString(paramVector, mode = "and"), " cannot be specified together",
             call. = FALSE
         )
     } else if (case == "eitherOr" && all(is.na(params[[1]])) && all(is.na(params[[2]]))) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "either ", sQuote(paramNames[1]), " ",
-            "or ", sQuote(paramNames[2]), " ",
-            "needs to be specified",
+            C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+            "either ", .arrayToString(paramNames, mode = "or", encapsulate = TRUE), " must be specified",
             call. = FALSE
         )
     }
 }
 
-.assertIsValidParametersCountData <- function(...,
+.assertAreValidParametersCountData <- function(...,
         sampleSizeEnabled,
         simulationEnabled,
         fixedExposureTime,
@@ -3500,17 +3536,35 @@ NULL
     .assertIsInClosedInterval(accrualIntensity, "accrualIntensity", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
 
+    if (!all(is.na(accrualTime)) && length(accrualTime) > 2 && all(is.na(accrualIntensity))) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'accrualIntensity' need to be specified if piecewise accrual is enabled, i.e., ",
+            "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements",
+            call. = FALSE
+        )
+    }
+
     if (sampleSizeEnabled) {
-        if (is.na(maxNumberOfSubjects) && any(is.na(accrualIntensity))) {
+        if (is.na(maxNumberOfSubjects) && anyNA(accrualIntensity)) {
             .assertParametersAreSpecifiedCorrectlyTogether(
                 "fixedExposureTime" = fixedExposureTime,
                 "followUpTime" = followUpTime
             )
-            .assertParametersAreSpecifiedCorrectlyTogether(
-                "fixedExposureTime" = fixedExposureTime,
-                "followUpTime" = followUpTime,
-                case = "eitherOr"
-            )
+            if (!all(is.na(accrualTime))) {
+                .assertParametersAreSpecifiedCorrectlyTogether(
+                    "fixedExposureTime" = fixedExposureTime,
+                    "followUpTime" = followUpTime,
+                    "accrualIntensity" = accrualIntensity,
+                    case = "eitherOr"
+                )
+            } else {
+                .assertParametersAreSpecifiedCorrectlyTogether(
+                    "fixedExposureTime" = fixedExposureTime,
+                    "followUpTime" = followUpTime,
+                    case = "eitherOr"
+                )
+            }
         }
     } else {
         .assertParametersAreSpecifiedCorrectlyTogether(
@@ -3529,10 +3583,26 @@ NULL
             .paramNames = if (simulationEnabled) c("maxNumberOfSubjects", "accrualIntensity") else NULL
         )
     }
-    if (any(is.na(accrualTime)) && !is.na(followUpTime)) {
+    if (anyNA(accrualTime) && !is.na(followUpTime)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'accrualTime' needs to be specified if 'followUpTime' (", followUpTime, ") is specified",
+            call. = FALSE
+        )
+    }
+    if (!is.na(followUpTime) && length(accrualTime) > 2) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements; ",
+            "'followUpTime' (", followUpTime, ") can only be specified if 'accrualTime' has one or two elements",
+            call. = FALSE
+        )
+    }
+    if (!is.na(maxNumberOfSubjects) && length(accrualTime) > 2) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'accrualTime' (", .arrayToString(accrualTime), ") has more than two elements; ",
+            "'maxNumberOfSubjects' (", maxNumberOfSubjects, ") can only be specified if 'accrualTime' has one or two elements",
             call. = FALSE
         )
     }
@@ -3553,7 +3623,7 @@ NULL
             "accrualIntensity" = accrualIntensity,
             "fixedExposureTime" = fixedExposureTime
         )
-        if (!is.na(maxNumberOfSubjects) && any(is.na(accrualTime))) {
+        if (!is.na(maxNumberOfSubjects) && anyNA(accrualTime)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' needs to be specified if 'maxNumberOfSubjects' ",
@@ -3562,21 +3632,21 @@ NULL
             )
         }
     } else if (!simulationEnabled) {
-        if (is.na(maxNumberOfSubjects) && (any(is.na(accrualIntensity)) || any(is.na(accrualTime)))) {
+        if (is.na(maxNumberOfSubjects) && (anyNA(accrualIntensity) || anyNA(accrualTime))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified",
                 call. = FALSE
             )
         }
-        if (any(is.na(accrualIntensity)) && !any(is.na(accrualTime)) && !is.na(fixedExposureTime)) {
+        if (anyNA(accrualIntensity) && !anyNA(accrualTime) && !is.na(fixedExposureTime)) {
             warning(
                 "Specification of 'accrualTime' has no influence of calculation and will be ignored",
                 call. = FALSE
             )
         }
     } else {
-        if (is.na(maxNumberOfSubjects) && (any(is.na(accrualIntensity)) || any(is.na(accrualTime)))) {
+        if (is.na(maxNumberOfSubjects) && (anyNA(accrualIntensity) || anyNA(accrualTime))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualTime' and 'accrualIntensity' need to be specified if 'maxNumberOfSubjects' is not specified",
@@ -3591,7 +3661,7 @@ NULL
         .paramNames = if (simulationEnabled) c("maxNumberOfSubjects", "accrualIntensity") else NULL
     )
 
-    if (!any(is.na(accrualIntensity)) && (accrualTime[1] != 0) &&
+    if (!anyNA(accrualIntensity) && (accrualTime[1] != 0) &&
             length(accrualIntensity) == 1 &&
             length(accrualTime) != length(accrualIntensity)) {
         stop(
@@ -3601,7 +3671,7 @@ NULL
             call. = FALSE
         )
     }
-    if (!any(is.na(accrualIntensity)) && (length(accrualIntensity) > 1) &&
+    if (!anyNA(accrualIntensity) && (length(accrualIntensity) > 1) &&
             length(accrualTime) != length(accrualIntensity) + 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -3610,7 +3680,7 @@ NULL
             call. = FALSE
         )
     }
-    if (accrualIntensityValidationEnabled && any(is.na(accrualIntensity)) &&
+    if (accrualIntensityValidationEnabled && anyNA(accrualIntensity) &&
             length(accrualTime) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -3663,24 +3733,21 @@ NULL
     )
 }
 
-.showFutilityBoundsUnnecessaryArgumentWarning <- function(
-        argumentName, argValue, sourceScale, targetScale) {
-   
-   valueStr <- ""
-   if (!is.null(argValue) && is.numeric(argValue) && length(argValue) > 0) {
-       valueStr <- paste0(" (", .arrayToString(argValue), ")")
-   }
-        
+.showFutilityBoundsUnnecessaryArgumentWarning <- function(argumentName, argValue, sourceScale, targetScale) {
+    valueStr <- ""
+    if (!is.null(argValue) && is.numeric(argValue) && length(argValue) > 0) {
+        valueStr <- paste0(" (", .arrayToString(argValue), ")")
+    }
+
     warning(
         sQuote(argumentName), valueStr, " will be ignored ",
-        "because it is not required for the conversion from '", 
+        "because it is not required for the conversion from '",
         sourceScale, "' to '", targetScale, "'",
         call. = FALSE
     )
 }
 
-.showFutilityBoundsMissingArgumentError <- function(
-        argumentName, scaleName, scaleValue) {
+.showFutilityBoundsMissingArgumentError <- function(argumentName, scaleName, scaleValue) {
     stop(
         C_EXCEPTION_TYPE_MISSING_ARGUMENT,
         sQuote(argumentName), " needs to be specified for ",
@@ -3706,27 +3773,27 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     )
 )
 
-.getValidFutilityBoundVectorIndices = function(sourceScale, targetScale) {
-    if (sourceScale == "effectEstimate" && 
+.getValidFutilityBoundVectorIndices <- function(sourceScale, targetScale) {
+    if (sourceScale == "effectEstimate" &&
             !targetScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
         return(1L)
     }
-    
-    if (targetScale == "effectEstimate" && 
+
+    if (targetScale == "effectEstimate" &&
             !sourceScale %in% c("conditionalPower", "condPowerAtObserved", "predictivePower")) {
         return(1L)
     }
-    
-    if (sourceScale == "conditionalPower" && 
+
+    if (sourceScale == "conditionalPower" &&
             !targetScale %in% c("effectEstimate", "condPowerAtObserved", "predictivePower")) {
         return(2L)
     }
-    
-    if (targetScale == "conditionalPower" && 
+
+    if (targetScale == "conditionalPower" &&
             !sourceScale %in% c("effectEstimate", "condPowerAtObserved", "predictivePower")) {
         return(2L)
     }
-    
+
     return(c(1L, 2L))
 }
 
@@ -3734,7 +3801,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     if (identical(name, "design")) {
         return(is.null(value))
     }
-    
+
     return(all(is.na(value)))
 }
 
@@ -3744,7 +3811,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     if (length(reqs) == 0L) {
         return(invisible())
     }
-    
+
     for (arg in reqs) {
         argName <- gsub("\\[.*\\]$", "", arg)
         if (grepl("\\[\\d+\\]$", arg)) {
@@ -3783,48 +3850,47 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
 #'
 #' @examples
 #' \dontrun{
-#'   .assertAreValidFutilityBoundsScaleArguments(design,
-#'       sourceScale = "conditionalPower",
-#'       targetScale = "effectEstimate",
-#'       theta = 0.5,
-#'       information1 = 0.2,
-#'       information2 = 0.8)
+#' .assertAreValidFutilityBoundsScaleArguments(design,
+#'     sourceScale = "conditionalPower",
+#'     targetScale = "effectEstimate",
+#'     theta = 0.5,
+#'     information1 = 0.2,
+#'     information2 = 0.8
+#' )
 #' }
 #'
 #' @noRd
-#' 
-.assertAreValidFutilityBoundsScaleArguments <- function(
-        ...,
+#'
+.assertAreValidFutilityBoundsScaleArguments <- function(...,
         design,
         sourceScale,
         targetScale,
         theta,
         information) {
-        
     baseScales <- c(
         "conditionalPower",
         "condPowerAtObserved",
         "predictivePower"
     )
     scalesWithReverse <- c(baseScales, "reverseCondPower")
-    scalesWithEffect  <- c(baseScales, "effectEstimate")
-    scalesWithEffectSecondStageOnly  <- scalesWithEffect[scalesWithEffect != "conditionalPower"]
-    
+    scalesWithEffect <- c(baseScales, "effectEstimate")
+    scalesWithEffectSecondStageOnly <- scalesWithEffect[scalesWithEffect != "conditionalPower"]
+
     infos <- .getFutilityBoundInformations(
-        information = information, 
+        information = information,
         sourceScale = sourceScale,
         targetScale = targetScale,
         design = design,
         showWarnings = FALSE,
         ...
     )
-    
+
     information1 <- infos$information1
     information2 <- infos$information2
     information <- infos$information
-    
+
     .checkForUnnecessaryFutilityBoundsScaleArgs("design", design, sourceScale, targetScale, scalesWithReverse)
-    
+
     if (infos$vectorInput) {
         .checkForUnnecessaryFutilityBoundsScaleArgs("information", information, sourceScale, targetScale, scalesWithEffect)
     } else {
@@ -3832,7 +3898,7 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         .checkForUnnecessaryFutilityBoundsScaleArgs(infos$paramNames[2], information2, sourceScale, targetScale, baseScales)
     }
     .checkForUnnecessaryFutilityBoundsScaleArgs("theta", theta, sourceScale, targetScale, "conditionalPower")
-        
+
     args <- list(
         design       = design,
         information  = c(information1, information2),
@@ -3840,30 +3906,28 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         information2 = information2,
         theta        = theta
     )
-    
+
     .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args, informationVectorInput = infos$vectorInput)
     .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args, informationVectorInput = infos$vectorInput)
 }
 
-.showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(
-        futilityBounds,
-        ..., 
-        lowerBound = 1e-12, 
+.showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(futilityBounds,
+        ...,
+        lowerBound = 1e-12,
         upperBound = 1 - 1e-12) {
-        
     if (all(is.na(futilityBounds))) {
         return(invisible())
     }
-        
-    if (!is.null(lowerBound) && length(lowerBound) > 0 && !any(is.na(lowerBound)) && 
+
+    if (!is.null(lowerBound) && length(lowerBound) > 0 && !anyNA(lowerBound) &&
             any(futilityBounds < lowerBound, na.rm = TRUE)) {
         warning(
             "At least one calculated futility bound outside acceptable range",
             call. = FALSE
         )
     }
-    
-    if (!is.null(upperBound) && length(upperBound) > 0 && !any(is.na(upperBound)) && 
+
+    if (!is.null(upperBound) && length(upperBound) > 0 && !anyNA(upperBound) &&
             any(futilityBounds > upperBound, na.rm = TRUE)) {
         warning(
             "At least one calculated futility bound outside acceptable range",

@@ -77,7 +77,7 @@ NULL
         information2 <- .getOptionalArgument("information2", optionalArgumentDefaultValue = NA_real_, ...)
     }
 
-    if (any(is.na(c(information1, information2))) &&
+    if (anyNA(c(information1, information2)) &&
             !is.null(design) && .isTrialDesignInverseNormalOrGroupSequentialOrFisher(design) &&
             (sourceScale %in% c("predictivePower", "condPowerAtObserved") ||
                 targetScale %in% c("predictivePower", "condPowerAtObserved"))) {
@@ -244,7 +244,7 @@ summary.FutilityBounds <- function(object, ...) {
         }
         cat("\n")
     }
-    
+
     return(invisible(object))
 }
 

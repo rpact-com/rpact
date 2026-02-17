@@ -164,7 +164,7 @@ TrialDesign <- R6::R6Class("TrialDesign",
             return((inherits(self, "TrialDesignGroupSequential") || inherits(self, "TrialDesignInverseNormal")) &&
                 self$kMax > 1 &&
                 !is.null(self[["delayedInformation"]]) &&
-                !any(is.na(self$delayedInformation)) && any(self$delayedInformation > 0))
+                !anyNA(self$delayedInformation) && any(self$delayedInformation > 0))
         }
     )
 )
@@ -439,27 +439,22 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             self$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
             self$.initStages()
         },
-        hasChanged = function(
-                ...,
-                kMax, 
-                alpha, 
-                sided, 
-                method, 
-                informationRates, 
-                alpha0Vec, 
-                alpha0Scale, 
-                userAlphaSpending, 
+        hasChanged = function(...,
+                kMax,
+                alpha,
+                sided,
+                method,
+                informationRates,
+                alpha0Vec,
+                userAlphaSpending,
                 bindingFutility) {
             informationRatesTemp <- informationRates
-            if (any(is.na(informationRatesTemp))) {
+            if (anyNA(informationRatesTemp)) {
                 informationRatesTemp <- .getInformationRatesDefault(kMax)
             }
             alpha0VecTemp <- alpha0Vec[1:(kMax - 1)]
-            if (any(is.na(alpha0VecTemp))) {
+            if (anyNA(alpha0VecTemp)) {
                 alpha0VecTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
-            }
-            if (!isTRUE(all.equal(alpha0Scale, self$alpha0Scale))) {
-                return(TRUE)
             }
             if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(TRUE)
@@ -664,8 +659,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 name, "_old = ", .arrayToString(self$.formatComparisonResult(oldValue)), " (", .getClassName(oldValue), ")"
             ))
         },
-        hasChanged = function(
-                ...,
+        hasChanged = function(...,
                 kMax,
                 alpha,
                 beta,
@@ -676,7 +670,6 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 deltaPT0,
                 informationRates,
                 futilityBounds,
-                futilityBoundsScale,
                 optimizationCriterion,
                 typeBetaSpending,
                 gammaA,
@@ -689,15 +682,12 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 betaAdjustment = TRUE,
                 delayedInformation = NA_real_) {
             informationRatesTemp <- informationRates
-            if (any(is.na(informationRatesTemp))) {
+            if (anyNA(informationRatesTemp)) {
                 informationRatesTemp <- .getInformationRatesDefault(kMax)
             }
             futilityBoundsTemp <- futilityBounds[1:(kMax - 1)]
-            if (any(is.na(futilityBoundsTemp))) {
+            if (anyNA(futilityBoundsTemp)) {
                 futilityBoundsTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
-            }
-            if (!isTRUE(all.equal(futilityBoundsScale, self$futilityBoundsScale))) {
-                return(self$.pasteComparisonResult("futilityBoundsScale", futilityBoundsScale, self$futilityBoundsScale))
             }
             if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(self$.pasteComparisonResult("kMax", kMax, self$kMax))
@@ -1142,8 +1132,7 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #'
 #' @export
 #'
-plot.TrialDesign <- function(
-        x,
+plot.TrialDesign <- function(x,
         y,
         ...,
         main = NA_character_,
@@ -1164,11 +1153,13 @@ plot.TrialDesign <- function(
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
-    
+
     .warnInCaseOfUnknownArguments(
         functionName = "plot",
-        ignore = c("xlim", "ylim", "companyAnnotationEnabled", "variedParameters", 
-            "showFutilityBounds", "showAlphaSpent", "showBetaSpent"), ...
+        ignore = c(
+            "xlim", "ylim", "companyAnnotationEnabled", "variedParameters",
+            "showFutilityBounds", "showAlphaSpent", "showBetaSpent"
+        ), ...
     )
     .showWarningIfPlotArgumentWillBeIgnored(type, ..., obj = x)
 
@@ -1298,23 +1289,21 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
     plot(x = x$.design, y = y, ...)
 }
 
-.plotTrialDesign <- function(
-        ..., 
-        x, 
-        y, 
+.plotTrialDesign <- function(...,
+        x,
+        y,
         main,
-        xlab, 
-        ylab, 
-        type, 
+        xlab,
+        ylab,
+        type,
         palette,
-        theta, 
-        nMax, 
+        theta,
+        nMax,
         plotPointsEnabled,
-        legendPosition, 
-        showSource, 
-        designName, 
+        legendPosition,
+        showSource,
+        designName,
         plotSettings = NULL) {
-        
     .assertGgplotIsInstalled()
 
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)

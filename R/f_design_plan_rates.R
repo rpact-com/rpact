@@ -314,8 +314,7 @@ NULL
     ))
 }
 
-.getSampleSizeFixedRates <- function(
-        ...,
+.getSampleSizeFixedRates <- function(...,
         alpha = 0.025,
         beta = 0.2,
         sided = 1,
@@ -326,8 +325,7 @@ NULL
         pi1 = seq(0.4, 0.6, 0.1),
         pi2 = 0.2,
         groups = 2,
-        allocationRatioPlanned = 1
-        ) {
+        allocationRatioPlanned = 1) {
     if (groups == 1) {
         nFixed <- rep(NA_real_, length(pi1))
 
@@ -634,8 +632,7 @@ NULL
 # note that 'directionUpper' and 'maxNumberOfSubjects' are
 # only applicable for 'objectType' = "power"
 #
-.createDesignPlanRates <- function(
-        ...,
+.createDesignPlanRates <- function(...,
         objectType = c("sampleSize", "power"),
         design,
         normalApproximation = TRUE,
@@ -647,8 +644,7 @@ NULL
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
         groups = 2,
-        allocationRatioPlanned = NA_real_
-        ) {
+        allocationRatioPlanned = NA_real_) {
     objectType <- match.arg(objectType)
 
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
@@ -669,7 +665,7 @@ NULL
     )
 
     if (groups == 1) {
-        if (!any(is.na(pi1)) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
+        if (!anyNA(pi1) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "any 'pi1' (",
@@ -680,7 +676,7 @@ NULL
             )
         }
 
-        if (any(is.na(pi1)) || any(pi1 <= 0) || any(pi1 >= 1)) {
+        if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "probability 'pi1' (",
@@ -715,7 +711,7 @@ NULL
         }
     } else if (groups == 2) {
         if (
-            !any(is.na(c(pi1, pi2))) &&
+            !anyNA(c(pi1, pi2)) &&
                 any(abs(pi1 - pi2 - thetaH0) < 1e-12) &&
                 (objectType == "sampleSize") &&
                 !riskRatio
@@ -732,7 +728,7 @@ NULL
         }
 
         if (
-            !any(is.na(c(pi1, pi2))) &&
+            !anyNA(c(pi1, pi2)) &&
                 any(abs(pi1 / pi2 - thetaH0) < 1e-12) &&
                 (objectType == "sampleSize") &&
                 riskRatio
@@ -748,7 +744,7 @@ NULL
             )
         }
 
-        if (any(is.na(pi1)) || any(pi1 <= 0) || any(pi1 >= 1)) {
+        if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "probability 'pi1' (",
@@ -758,7 +754,7 @@ NULL
             )
         }
 
-        if (any(is.na(pi2)) || any(pi2 <= 0) || any(pi2 >= 1)) {
+        if (anyNA(pi2) || any(pi2 <= 0) || any(pi2 >= 1)) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "probability 'pi2' (",
@@ -942,8 +938,7 @@ NULL
 #'
 #' @export
 #'
-getPowerRates <- function(
-        design = NULL,
+getPowerRates <- function(design = NULL,
         ...,
         groups = 2L,
         riskRatio = FALSE,
@@ -1139,8 +1134,7 @@ getPowerRates <- function(
 #'
 #' @export
 #'
-getSampleSizeRates <- function(
-        design = NULL,
+getSampleSizeRates <- function(design = NULL,
         ...,
         groups = 2L,
         normalApproximation = TRUE,
