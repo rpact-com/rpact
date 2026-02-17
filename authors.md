@@ -21,18 +21,33 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/rpact-com/rpact/blob/v4.3.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/rpact-com/rpact/blob/main/inst/CITATION)
 
-Wassmer G, Pahlke F (2025). *rpact: Confirmatory Adaptive Clinical Trial
-Design and Analysis*.
-[doi:10.32614/CRAN.package.rpact](https://doi.org/10.32614/CRAN.package.rpact),
-R package version 4.2.0, <https://cran.r-project.org/package=rpact>.
+Wassmer G, Pahlke F (2026). rpact: Confirmatory Adaptive Clinical Trial
+Design and Analysis. R package version 4.3.1.9301.
+doi:10.32614/CRAN.package.rpact
 
     @Manual{,
       title = {rpact: Confirmatory Adaptive Clinical Trial Design and Analysis},
       author = {Gernot Wassmer and Friedrich Pahlke},
-      year = {2025},
-      note = {R package version 4.2.0},
+      year = {2026},
+      note = {R package version 4.3.1.9301},
       doi = {10.32614/CRAN.package.rpact},
-      url = {https://cran.r-project.org/package=rpact},
+      url = {https://CRAN.R-project.org/package=rpact},
+    }
+
+Wassmer G, Brannath W (2025). *Group Sequential and Confirmatory
+Adaptive Designs in Clinical Trials*, 2nd edition. Springer, Cham,
+Switzerland. ISBN 978-3-031-89668-2,
+[doi:10.1007/978-3-031-89669-9](https://doi.org/10.1007/978-3-031-89669-9).
+
+    @Book{,
+      title = {Group Sequential and Confirmatory Adaptive Designs in Clinical Trials},
+      author = {Gernot Wassmer and Werner Brannath},
+      year = {2025},
+      edition = {2nd},
+      publisher = {Springer},
+      address = {Cham, Switzerland},
+      isbn = {978-3-031-89668-2},
+      doi = {10.1007/978-3-031-89669-9},
     }

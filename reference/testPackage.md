@@ -19,7 +19,10 @@ testPackage(
   testInstalledBasicPackages = TRUE,
   scope = c("basic", "devel", "both", "internet", "all"),
   openHtmlReport = TRUE,
-  keepSourceFiles = FALSE
+  keepSourceFiles = FALSE,
+  reportFileBaseName = "rpact_test_result_report",
+  metaData = list(),
+  metaDataFile = NULL
 )
 ```
 
@@ -89,6 +92,28 @@ testPackage(
 
   If `TRUE`, the source files are kept after the tests are completed. A
   copy of them can be found in the subdirectory `src`.
+
+- reportFileBaseName:
+
+  The base name for the report files (without path or extension).
+
+- metaData:
+
+  A named `list` containing additional metadata to be included in the
+  test report. This can include information such as `company`,
+  `container name`, `host name`, etc. Default is an empty list. For more
+  information, see
+  [`writeKeyValueFile`](https://docs.rpact.org/reference/writeKeyValueFile.md)
+  and
+  [`readKeyValueFile`](https://docs.rpact.org/reference/readKeyValueFile.md).
+
+- metaDataFile:
+
+  An optional path to a text file containing metadata: one entry per
+  line in the form `KEY=VALUE`. For more information, see
+  [`writeKeyValueFile`](https://docs.rpact.org/reference/writeKeyValueFile.md)
+  and
+  [`readKeyValueFile`](https://docs.rpact.org/reference/readKeyValueFile.md).
 
 ## Value
 

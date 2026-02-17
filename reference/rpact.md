@@ -60,7 +60,7 @@ Useful links:
 
 - <https://github.com/rpact-com/rpact>
 
-- <https://rpact.shinyapps.io/connect>
+- <https://rpact-cloud.share.connect.posit.cloud>
 
 - Report bugs at <https://github.com/rpact-com/rpact/issues>
 

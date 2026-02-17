@@ -1,6 +1,21 @@
 # Changelog
 
+## rpact 4.4.0
+
+### New features
+
+- n/a
+
+### Improvements, issues, and changes
+
+- Improved parameter defaulting and assignment logic
+- Used [`identical()`](https://rdrr.io/r/base/identical.html) for
+  user-defined parameter checks
+- Enhanced warning messages for ignored parameters
+
 ## rpact 4.3.0
+
+CRAN release: 2025-12-16
 
 ### New features
 

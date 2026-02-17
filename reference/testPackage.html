@@ -11,7 +11,7 @@ and other regulatory requirements."><meta property="og:image" content="https://d
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.3.1.9301</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@ and other regulatory requirements."><meta property="og:image" content="https://d
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Test and Validate the rpact Package Installation</h1>
-      <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/v4.3.0/R/f_quality_assurance.R" class="external-link"><code>R/f_quality_assurance.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rpact-com/rpact/blob/main/R/f_quality_assurance.R" class="external-link"><code>R/f_quality_assurance.R</code></a></small>
       <div class="d-none name"><code>testPackage.Rd</code></div>
     </div>
 
@@ -60,7 +60,10 @@ and other regulatory requirements.</p>
 <span>  testInstalledBasicPackages <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scope <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basic"</span>, <span class="st">"devel"</span>, <span class="st">"both"</span>, <span class="st">"internet"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
 <span>  openHtmlReport <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  keepSourceFiles <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  keepSourceFiles <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  reportFileBaseName <span class="op">=</span> <span class="st">"rpact_test_result_report"</span>,</span>
+<span>  metaData <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  metaDataFile <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -128,6 +131,22 @@ Only available if <code>testInstalledBasicPackages = TRUE</code>.</p></dd>
 <dt id="arg-keepsourcefiles">keepSourceFiles<a class="anchor" aria-label="anchor" href="#arg-keepsourcefiles"></a></dt>
 <dd><p>If <code>TRUE</code>, the source files are kept after the tests are completed.
 A copy of them can be found in the subdirectory <code>src</code>.</p></dd>
+
+
+<dt id="arg-reportfilebasename">reportFileBaseName<a class="anchor" aria-label="anchor" href="#arg-reportfilebasename"></a></dt>
+<dd><p>The base name for the report files (without path or extension).</p></dd>
+
+
+<dt id="arg-metadata">metaData<a class="anchor" aria-label="anchor" href="#arg-metadata"></a></dt>
+<dd><p>A named <code>list</code> containing additional metadata to be included in the test report.
+This can include information such as <code>company</code>, <code>container name</code>, <code>host name</code>, etc.
+Default is an empty list.
+For more information, see <code><a href="writeKeyValueFile.html">writeKeyValueFile</a></code> and <code><a href="readKeyValueFile.html">readKeyValueFile</a></code>.</p></dd>
+
+
+<dt id="arg-metadatafile">metaDataFile<a class="anchor" aria-label="anchor" href="#arg-metadatafile"></a></dt>
+<dd><p>An optional path to a text file containing metadata: one entry per line in the form <code>KEY=VALUE</code>.
+For more information, see <code><a href="writeKeyValueFile.html">writeKeyValueFile</a></code> and <code><a href="readKeyValueFile.html">readKeyValueFile</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

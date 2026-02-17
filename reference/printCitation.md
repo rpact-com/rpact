@@ -39,10 +39,14 @@ printCitation()
 #>   Computing_. R Foundation for Statistical Computing, Vienna, Austria.
 #>   <https://www.R-project.org/>.
 #> 
-#> To cite package ‘rpact’ in publications use:
+#> To cite package 'rpact' in publications use:
 #> 
-#>   Wassmer G, Pahlke F (2025). _rpact: Confirmatory Adaptive Clinical
-#>   Trial Design and Analysis_. doi:10.32614/CRAN.package.rpact
-#>   <https://doi.org/10.32614/CRAN.package.rpact>, R package version
-#>   4.2.0, <https://cran.r-project.org/package=rpact>.
+#>   Wassmer G, Pahlke F (2026). rpact: Confirmatory Adaptive Clinical
+#>   Trial Design and Analysis. R package version 4.3.1.9301.
+#>   doi:10.32614/CRAN.package.rpact
+#> 
+#>   Wassmer G, Brannath W (2025). _Group Sequential and Confirmatory
+#>   Adaptive Designs in Clinical Trials_, 2nd edition. Springer, Cham,
+#>   Switzerland. ISBN 978-3-031-89668-2, doi:10.1007/978-3-031-89669-9
+#>   <https://doi.org/10.1007/978-3-031-89669-9>.
 ```

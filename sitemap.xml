@@ -306,6 +306,7 @@
 <url><loc>https://docs.rpact.org/reference/rawDataTwoArmNormal.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/readDataset.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/readDatasets.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/readKeyValueFile.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/resetLogLevel.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/resetOptions.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/rpact.html</loc></url>
@@ -324,5 +325,6 @@
 <url><loc>https://docs.rpact.org/reference/utilitiesForSurvivalTrials.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/writeDataset.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/writeDatasets.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/writeKeyValueFile.html</loc></url>
 </urlset>
 
