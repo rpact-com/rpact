@@ -128,8 +128,9 @@ double getDensityValue(double x, int k, NumericVector informationRates, NumericV
 //' @keywords internal
 //' @noRd
 //'
-NumericVector getDensityValues(NumericVector x, int k, NumericVector informationRates, NumericVector epsilonVec,
-	NumericVector x2, NumericVector dn2) {
+NumericVector getDensityValues(
+		NumericVector x, int k, NumericVector informationRates,
+		NumericVector epsilonVec, NumericVector x2, NumericVector dn2) {
 	try {
 		int n = x.size();
 		NumericVector results = NumericVector(n, NA_REAL);
@@ -210,8 +211,9 @@ NumericVector getW(double dx, int constNewtonCotes) {
 //' @keywords internal
 //' @noRd
 //'
-double getSeqValue(int paramIndex, int k, NumericVector dn, NumericVector x, NumericMatrix decisionMatrix,
-	NumericVector informationRates, NumericVector epsilonVec) {
+double getSeqValue(int paramIndex, int k, NumericVector dn,
+		NumericVector x, NumericMatrix decisionMatrix,
+		NumericVector informationRates, NumericVector epsilonVec) {
 	try {
 		int kIndex = k - 1;
 		NumericVector vec = NumericVector(x.size(), NA_REAL);
@@ -500,7 +502,7 @@ NumericMatrix getGroupSequentialProbabilitiesCpp(NumericMatrix decisionMatrix, N
 //' [[Rcpp::export(name = ".getDesignGroupSequentialPampallonaTsiatisCpp")]]
 //'
 List getDesignGroupSequentialPampallonaTsiatisCpp(double tolerance, double beta, double alpha, double kMax,
-	double deltaPT0, double deltaPT1, NumericVector informationRates, int sided, bool bindingFutility) {
+		double deltaPT0, double deltaPT1, NumericVector informationRates, int sided, bool bindingFutility) {
 
 	NumericVector futilityBounds(kMax);
 	NumericVector rejectionBounds(kMax);
@@ -645,8 +647,10 @@ List getDesignGroupSequentialPampallonaTsiatisCpp(double tolerance, double beta,
 //' @keywords internal
 //' @noRd
 //'
-NumericMatrix getDecisionMatrixOneSided(NumericVector criticalValues, NumericVector futilityBounds,
-	bool bindingFutility) {
+NumericMatrix getDecisionMatrixOneSided(
+		NumericVector criticalValues,
+		NumericVector futilityBounds,
+		bool bindingFutility) {
 
 	int kMax = criticalValues.length();
 	NumericMatrix decisionMatrix(2, kMax);
@@ -714,8 +718,9 @@ NumericMatrix getDecisionMatrixSubset(NumericMatrix decisionMatrix, int k) {
 //' @keywords internal
 //' @noRd
 //'
-NumericMatrix getDecisionMatrix(NumericVector criticalValues, NumericVector futilityBounds, bool bindingFutility,
-	int sided, int k = -1) {
+NumericMatrix getDecisionMatrix(NumericVector criticalValues,
+		NumericVector futilityBounds, bool bindingFutility,
+		int sided, int k = -1) {
 	NumericMatrix decisionMatrix;
 	if (sided == 1) {
 		decisionMatrix = getDecisionMatrixOneSided(criticalValues, futilityBounds, bindingFutility);
@@ -858,9 +863,11 @@ double getCriticalValue(int k, NumericVector criticalValues, NumericVector userA
 //' @keywords internal
 //' @noRd
 //'
-NumericVector getDesignGroupSequentialAlphaSpending(int kMax, NumericVector userAlphaSpending, double alpha,
-	double gammaA, String typeOfDesign, double sided, NumericVector informationRates, bool bindingFutility,
-	NumericVector futilityBounds, double tolerance) {
+NumericVector getDesignGroupSequentialAlphaSpending(int kMax,
+		NumericVector userAlphaSpending, double alpha,
+		double gammaA, String typeOfDesign, double sided,
+		NumericVector informationRates, bool bindingFutility,
+		NumericVector futilityBounds, double tolerance) {
 
 	NumericVector criticalValues = NumericVector(kMax, NA_REAL);
 	for (int k = 1; k <= kMax; k++) {
@@ -892,8 +899,8 @@ NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(int kMax, Nume
 	double sided, NumericVector informationRates, bool bindingFutility, NumericVector futilityBounds,
 	double tolerance) {
 	return getDesignGroupSequentialAlphaSpending(kMax, userAlphaSpending,
-	NA_REAL,
-	NA_REAL, C_TYPE_OF_DESIGN_AS_USER, sided, informationRates, bindingFutility, futilityBounds, tolerance);
+		NA_REAL,
+		NA_REAL, C_TYPE_OF_DESIGN_AS_USER, sided, informationRates, bindingFutility, futilityBounds, tolerance);
 }
 
 //' @title Alpha-spending design critical values
@@ -916,9 +923,10 @@ NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(int kMax, Nume
 //'
 //' [[Rcpp::export(name = ".getDesignGroupSequentialAlphaSpendingCpp")]]
 //'
-NumericVector getDesignGroupSequentialAlphaSpendingCpp(int kMax, double alpha, double gammaA, String typeOfDesign,
-	double sided, NumericVector informationRates, bool bindingFutility, NumericVector futilityBounds,
-	double tolerance) {
+NumericVector getDesignGroupSequentialAlphaSpendingCpp(
+		int kMax, double alpha, double gammaA, String typeOfDesign,
+		double sided, NumericVector informationRates, bool bindingFutility,
+		NumericVector futilityBounds, double tolerance) {
 	return getDesignGroupSequentialAlphaSpending(kMax, NumericVector(0), alpha, gammaA, typeOfDesign, sided,
 		informationRates, bindingFutility, futilityBounds, tolerance);
 }
@@ -942,8 +950,9 @@ NumericVector getDesignGroupSequentialAlphaSpendingCpp(int kMax, double alpha, d
 //'
 //' [[Rcpp::export(name = ".getDesignGroupSequentialDeltaWTCpp")]]
 //'
-NumericVector getDesignGroupSequentialDeltaWTCpp(int kMax, double alpha, double sided, NumericVector informationRates,
-	bool bindingFutility, NumericVector futilityBounds, double tolerance, double deltaWT) {
+NumericVector getDesignGroupSequentialDeltaWTCpp(
+		int kMax, double alpha, double sided, NumericVector informationRates,
+		bool bindingFutility, NumericVector futilityBounds, double tolerance, double deltaWT) {
 
 	NumericVector criticalValues(kMax);
 	double scale = bizero([&](double scale) {
@@ -979,8 +988,9 @@ NumericVector getDesignGroupSequentialDeltaWTCpp(int kMax, double alpha, double 
 //'
 //' [[Rcpp::export(name = ".getDesignGroupSequentialPocockCpp")]]
 //'
-NumericVector getDesignGroupSequentialPocockCpp(int kMax, double alpha, double sided, NumericVector informationRates,
-	bool bindingFutility, NumericVector futilityBounds, double tolerance) {
+NumericVector getDesignGroupSequentialPocockCpp(
+		int kMax, double alpha, double sided, NumericVector informationRates,
+		bool bindingFutility, NumericVector futilityBounds, double tolerance) {
 	return getDesignGroupSequentialDeltaWTCpp(kMax, alpha, sided, informationRates, bindingFutility, futilityBounds,
 		tolerance, 0.5);
 }
@@ -1002,8 +1012,10 @@ NumericVector getDesignGroupSequentialPocockCpp(int kMax, double alpha, double s
 //'
 //' [[Rcpp::export(name = ".getDesignGroupSequentialOBrienAndFlemingCpp")]]
 //'
-NumericVector getDesignGroupSequentialOBrienAndFlemingCpp(int kMax, double alpha, double sided,
-	NumericVector informationRates, bool bindingFutility, NumericVector futilityBounds, double tolerance) {
+NumericVector getDesignGroupSequentialOBrienAndFlemingCpp(
+		int kMax, double alpha, double sided,
+		NumericVector informationRates, bool bindingFutility,
+		NumericVector futilityBounds, double tolerance) {
 	return getDesignGroupSequentialDeltaWTCpp(kMax, alpha, sided, informationRates, bindingFutility, futilityBounds,
 		tolerance, 0);
 }
@@ -1021,8 +1033,9 @@ NumericVector getDesignGroupSequentialOBrienAndFlemingCpp(int kMax, double alpha
 //' @keywords internal
 //' @noRd
 //'
-NumericMatrix getDecisionMatrixForFutilityBounds(NumericVector informationRates, NumericVector criticalValues,
-	NumericVector futilityBoundsTemp, double shift, double sided) {
+NumericMatrix getDecisionMatrixForFutilityBounds(
+		NumericVector informationRates, NumericVector criticalValues,
+		NumericVector futilityBoundsTemp, double shift, double sided) {
 
 	int kMax = criticalValues.length();
 	if (futilityBoundsTemp.length() < kMax) {
@@ -1060,8 +1073,9 @@ NumericMatrix getDecisionMatrixForFutilityBounds(NumericVector informationRates,
 //' @keywords internal
 //' @noRd
 //'
-double getFutilityBoundOneSided(int k, NumericVector betaSpendingValues, NumericVector informationRates,
-	NumericVector futilityBounds, NumericVector criticalValues, double shift, double tolerance) {
+double getFutilityBoundOneSided(
+		int k, NumericVector betaSpendingValues, NumericVector informationRates,
+		NumericVector futilityBounds, NumericVector criticalValues, double shift, double tolerance) {
 	if (k == 1) {
 		return getQNorm((double) betaSpendingValues[0]) + sqrt((double) informationRates[0]) * shift;
 	}
@@ -1096,9 +1110,10 @@ double getFutilityBoundOneSided(int k, NumericVector betaSpendingValues, Numeric
 //' @keywords internal
 //' @noRd
 //'
-NumericVector getFutilityBoundsOneSided(int kMax, NumericVector betaSpendingValues, NumericVector informationRates,
-	NumericVector criticalValues, double shift, double tolerance) {
-	NumericVector futilityBounds = NumericVector(kMax, NA_REAL);
+NumericVector getFutilityBoundsOneSided(
+		int kMax, NumericVector betaSpendingValues, NumericVector informationRates,
+		NumericVector criticalValues, double shift, double tolerance) {
+		NumericVector futilityBounds = NumericVector(kMax, NA_REAL);
 	for (int k = 1; k <= kMax; k++) {
 		futilityBounds[k - 1] = getFutilityBoundOneSided(k, betaSpendingValues, informationRates, futilityBounds,
 			criticalValues, shift, tolerance);
@@ -1121,8 +1136,9 @@ NumericVector getFutilityBoundsOneSided(int kMax, NumericVector betaSpendingValu
 //' @keywords internal
 //' @noRd
 //'
-NumericMatrix getProbabilitiesForFutilityBounds(NumericVector informationRates, NumericVector criticalValues,
-	NumericVector futilityBounds, double shift, int k, double sided) {
+NumericMatrix getProbabilitiesForFutilityBounds(
+		NumericVector informationRates, NumericVector criticalValues,
+		NumericVector futilityBounds, double shift, int k, double sided) {
 
 	NumericMatrix decisionMatrix = getDecisionMatrixForFutilityBounds(
 		informationRates, criticalValues, futilityBounds, shift, sided);
@@ -1153,10 +1169,11 @@ NumericMatrix getProbabilitiesForFutilityBounds(NumericVector informationRates, 
 //' @keywords internal
 //' @noRd
 //'
-List getDesignGroupSequentialBetaSpendingOneSidedCpp(NumericVector criticalValues, int kMax,
-	NumericVector userAlphaSpending, NumericVector userBetaSpending, NumericVector informationRates,
-	bool bindingFutility, double tolerance, String typeOfDesign, String typeBetaSpending, double gammaA, double gammaB,
-	double alpha, double beta) {
+List getDesignGroupSequentialBetaSpendingOneSidedCpp(
+		NumericVector criticalValues, int kMax,
+		NumericVector userAlphaSpending, NumericVector userBetaSpending, NumericVector informationRates,
+		bool bindingFutility, double tolerance, String typeOfDesign, String typeBetaSpending,
+		double gammaA, double gammaB, double alpha, double beta) {
 
 	double sided = 1.0;
 
@@ -1187,25 +1204,25 @@ List getDesignGroupSequentialBetaSpendingOneSidedCpp(NumericVector criticalValue
 	if (!bindingFutility) {
 		shiftResult = bizero(
 			[&](double shift) {
-				futilityBounds = getFutilityBoundsOneSided(kMax, betaSpendingValues, informationRates, criticalValues,
-					shift, tolerance);
-				return (double) futilityBounds[kMax - 1] - (double) criticalValues[kMax - 1];
-			}, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+			futilityBounds = getFutilityBoundsOneSided(kMax, betaSpendingValues, informationRates, criticalValues,
+				shift, tolerance);
+			return (double) futilityBounds[kMax - 1] - (double) criticalValues[kMax - 1];
+		}, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 	} else {
 		futilityBounds = NumericVector(kMax, NA_REAL);
 		shiftResult = bisection2(
 			[&](double shift) {
-				for (int k = 1; k <= kMax; k++) {
-					if (typeOfDesign != C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY) {
-						criticalValues[k - 1] = getCriticalValue(k, criticalValues, userAlphaSpending, alpha, gammaA,
-							typeOfDesign, sided, informationRates, bindingFutility, futilityBounds, tolerance);
-					}
-
-					futilityBounds[k - 1] = getFutilityBoundOneSided(k, betaSpendingValues, informationRates,
-						futilityBounds, criticalValues, shift, tolerance);
+			for (int k = 1; k <= kMax; k++) {
+				if (typeOfDesign != C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY) {
+					criticalValues[k - 1] = getCriticalValue(k, criticalValues, userAlphaSpending, alpha, gammaA,
+						typeOfDesign, sided, informationRates, bindingFutility, futilityBounds, tolerance);
 				}
-				return (double) criticalValues[kMax - 1] - (double) futilityBounds[kMax - 1];
-			}, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+
+				futilityBounds[k - 1] = getFutilityBoundOneSided(k, betaSpendingValues, informationRates,
+					futilityBounds, criticalValues, shift, tolerance);
+			}
+			return (double) criticalValues[kMax - 1] - (double) futilityBounds[kMax - 1];
+		}, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 	}
 
 	NumericMatrix probs = getProbabilitiesForFutilityBounds(informationRates, criticalValues, futilityBounds,
@@ -1263,7 +1280,7 @@ NumericVector getAdjustedBetaSpendingValues(int kMax, int kMin, NumericVector be
 	if (betaAdjustment) {
 		for (int k = kMin - 1; k < kMax; k++) {
 			betaSpendingValuesAdjusted[k] = (betaSpendingValues[k] - betaSpendingValues[kMin - 1])
-				/ (betaSpendingValues[kMax - 1] - betaSpendingValues[kMin - 1]) * betaSpendingValues[kMax - 1];
+					/ (betaSpendingValues[kMax - 1] - betaSpendingValues[kMin - 1]) * betaSpendingValues[kMax - 1];
 		}
 	}
 	return betaSpendingValuesAdjusted;
@@ -1287,15 +1304,16 @@ NumericVector getAdjustedBetaSpendingValues(int kMax, int kMin, NumericVector be
 //' @keywords internal
 //' @noRd
 //'
-double getFutilityBoundTwoSided(int k, NumericVector betaSpendingValues, NumericVector informationRates,
-	NumericVector futilityBounds, NumericVector futilityBoundsOneSided, NumericVector criticalValues, double shift,
-	double tolerance) {
+double getFutilityBoundTwoSided(
+		int k, NumericVector betaSpendingValues, NumericVector informationRates,
+		NumericVector futilityBounds, NumericVector futilityBoundsOneSided,
+		NumericVector criticalValues, double shift, double tolerance) {
 	if (k == 1) {
 		double futilityBound = bizero(
 			[&](double u) {
-				return getNormalDistribution(u - sqrt((double) informationRates[0]) * shift)
-					- getNormalDistribution(-u - sqrt((double) informationRates[0]) * shift) - betaSpendingValues[0];
-			}, -8.0, 8.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+			return getNormalDistribution(u - sqrt((double) informationRates[0]) * shift)
+				- getNormalDistribution(-u - sqrt((double) informationRates[0]) * shift) - betaSpendingValues[0];
+		}, -8.0, 8.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 		if (futilityBound > criticalValues[0]) {
 			futilityBound = criticalValues[0];
 		}
@@ -1347,8 +1365,10 @@ double getFutilityBoundTwoSided(int k, NumericVector betaSpendingValues, Numeric
 //' @keywords internal
 //' @noRd
 //'
-NumericVector getFutilityBoundsTwoSided(int kMax, NumericVector betaSpendingValues, NumericVector informationRates,
-	NumericVector futilityBoundsOneSided, NumericVector criticalValues, double shift, double tolerance) {
+NumericVector getFutilityBoundsTwoSided(
+		int kMax, NumericVector betaSpendingValues, NumericVector informationRates,
+		NumericVector futilityBoundsOneSided, NumericVector criticalValues,
+		double shift, double tolerance) {
 	NumericVector futilityBounds = NumericVector(kMax, NA_REAL);
 	for (int k = 1; k <= kMax; k++) {
 		futilityBounds[k - 1] = getFutilityBoundTwoSided(k, betaSpendingValues, informationRates, futilityBounds,
@@ -1377,9 +1397,10 @@ NumericVector getFutilityBoundsTwoSided(int kMax, NumericVector betaSpendingValu
 //' @keywords internal
 //' @noRd
 //'
-double getCriticalValueTwoSided(int kMax, int k, NumericVector criticalValues, NumericVector userAlphaSpending,
-	double alpha, double gammaA, String typeOfDesign, NumericVector informationRates, bool bindingFutility,
-	NumericVector futilityBounds, double tolerance) {
+double getCriticalValueTwoSided(
+		int kMax, int k, NumericVector criticalValues, NumericVector userAlphaSpending,
+		double alpha, double gammaA, String typeOfDesign, NumericVector informationRates,
+		bool bindingFutility, NumericVector futilityBounds, double tolerance) {
 
 	double sided = 2.0;
 	double alphaSpendingValue;
@@ -1436,9 +1457,9 @@ double getCriticalValueTwoSided(int kMax, int k, NumericVector criticalValues, N
 //' @noRd
 //'
 List getDesignGroupSequentialBetaSpendingTwoSidedCpp(NumericVector criticalValues, int kMax,
-	NumericVector userAlphaSpending, NumericVector userBetaSpending, NumericVector informationRates,
-	bool bindingFutility, double tolerance, String typeOfDesign, String typeBetaSpending, double gammaA, double gammaB,
-	double alpha, double beta, bool betaAdjustment, bool twoSidedPower) {
+		NumericVector userAlphaSpending, NumericVector userBetaSpending, NumericVector informationRates,
+		bool bindingFutility, double tolerance, String typeOfDesign, String typeBetaSpending,
+		double gammaA, double gammaB, double alpha, double beta, bool betaAdjustment, bool twoSidedPower) {
 
 	double sided = 2;
 
@@ -1479,23 +1500,23 @@ List getDesignGroupSequentialBetaSpendingTwoSidedCpp(NumericVector criticalValue
 	if (!bindingFutility) {
 		shiftResult = bisection2(
 			[&](double shift) {
-				futilityBounds = getFutilityBoundsTwoSided(kMax, betaSpendingValues, informationRates,
-					futilityBoundsOneSided, criticalValues, shift, tolerance);
-				return (double) criticalValues[kMax - 1] - (double) futilityBounds[kMax - 1];
-			}, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+			futilityBounds = getFutilityBoundsTwoSided(kMax, betaSpendingValues, informationRates,
+				futilityBoundsOneSided, criticalValues, shift, tolerance);
+			return (double) criticalValues[kMax - 1] - (double) futilityBounds[kMax - 1];
+		}, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 	} else {
 		futilityBounds = NumericVector(kMax, NA_REAL);
 		shiftResult = bisection2(
 			[&](double shift) {
-				for (int k = 1; k <= kMax; k++) {
-					criticalValues[k - 1] = getCriticalValueTwoSided(kMax, k, criticalValues, userAlphaSpending, alpha,
-						gammaA, typeOfDesign, informationRates, bindingFutility, futilityBounds, tolerance);
+			for (int k = 1; k <= kMax; k++) {
+				criticalValues[k - 1] = getCriticalValueTwoSided(kMax, k, criticalValues, userAlphaSpending, alpha,
+					gammaA, typeOfDesign, informationRates, bindingFutility, futilityBounds, tolerance);
 
-					futilityBounds[k - 1] = getFutilityBoundTwoSided(k, betaSpendingValues, informationRates,
-						futilityBounds, futilityBoundsOneSided, criticalValues, shift, tolerance);
-				}
-				return (double) criticalValues[kMax - 1] - (double) futilityBounds[kMax - 1];
-			}, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
+				futilityBounds[k - 1] = getFutilityBoundTwoSided(k, betaSpendingValues, informationRates,
+					futilityBounds, futilityBoundsOneSided, criticalValues, shift, tolerance);
+			}
+			return (double) criticalValues[kMax - 1] - (double) futilityBounds[kMax - 1];
+		}, -4.0, 10.0, tolerance, C_MAX_NUMBER_OF_ITERATIONS);
 	}
 
 	NumericMatrix probs = getProbabilitiesForFutilityBounds(informationRates, criticalValues, futilityBounds,
@@ -1542,10 +1563,11 @@ List getDesignGroupSequentialBetaSpendingTwoSidedCpp(NumericVector criticalValue
 //'
 //' [[Rcpp::export(name = ".getDesignGroupSequentialBetaSpendingCpp")]]
 //'
-List getDesignGroupSequentialBetaSpendingCpp(NumericVector criticalValues, int kMax, NumericVector userAlphaSpending,
-	NumericVector userBetaSpending, NumericVector informationRates, bool bindingFutility, double tolerance,
-	String typeOfDesign, String typeBetaSpending, double gammaA, double gammaB, double alpha, double beta, double sided,
-	bool betaAdjustment, bool twoSidedPower) {
+List getDesignGroupSequentialBetaSpendingCpp(
+		NumericVector criticalValues, int kMax, NumericVector userAlphaSpending,
+		NumericVector userBetaSpending, NumericVector informationRates, bool bindingFutility, double tolerance,
+		String typeOfDesign, String typeBetaSpending, double gammaA, double gammaB, double alpha,
+		double beta, double sided, bool betaAdjustment, bool twoSidedPower) {
 	if (sided == 1) {
 		return getDesignGroupSequentialBetaSpendingOneSidedCpp(criticalValues, kMax, userAlphaSpending,
 			userBetaSpending, informationRates, bindingFutility, tolerance, typeOfDesign, typeBetaSpending, gammaA,
@@ -1582,9 +1604,9 @@ List getDesignGroupSequentialBetaSpendingCpp(NumericVector criticalValues, int k
 //' [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedBetaSpendingCpp")]]
 //'
 List getDesignGroupSequentialUserDefinedBetaSpendingCpp(NumericVector criticalValues, int kMax,
-	NumericVector userAlphaSpending, NumericVector userBetaSpending, double sided, NumericVector informationRates,
-	bool bindingFutility, double tolerance, String typeOfDesign, double gammaA, double alpha, bool betaAdjustment,
-	bool twoSidedPower) {
+		NumericVector userAlphaSpending, NumericVector userBetaSpending, double sided, NumericVector informationRates,
+		bool bindingFutility, double tolerance, String typeOfDesign, double gammaA, double alpha,
+		bool betaAdjustment, bool twoSidedPower) {
 	String typeBetaSpending = C_TYPE_OF_DESIGN_BS_USER;
 	double gammaB = NA_REAL;
 	double beta = NA_REAL;
