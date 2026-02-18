@@ -786,7 +786,8 @@
     if (design$sided == 2 && thetaH0 != 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)"
+            "two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
+            call. = FALSE
         )
     }
 

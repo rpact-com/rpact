@@ -17,14 +17,20 @@
 #' @include f_core_utilities.R
 NULL
 
-.stopWithWrongDesignMessage <- function(design, ..., inclusiveConditionalDunnett = TRUE) {
+.stopWithWrongDesignMessage <- function(
+        design, 
+        ..., 
+        inclusiveConditionalDunnett = TRUE) {
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'design' must be an instance of ", .arrayToString(
         .getTrialDesignClassNames(inclusiveConditionalDunnett = inclusiveConditionalDunnett),
         vectorLookAndFeelEnabled = FALSE
     ), " (is '", .getClassName(design), "')", call. = FALSE)
 }
 
-.stopWithWrongDesignMessageEnrichment <- function(design, ..., inclusiveConditionalDunnett = TRUE) {
+.stopWithWrongDesignMessageEnrichment <- function(
+        design, 
+        ..., 
+        inclusiveConditionalDunnett = TRUE) {
     trialDesignClassNames <- c(C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL, C_CLASS_NAME_TRIAL_DESIGN_FISHER)
     stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'design' must be an instance of ", .arrayToString(
         trialDesignClassNames,
@@ -346,8 +352,10 @@ NULL
 #' Assert Values Are in an Open Interval
 #'
 #' @description
-#' Checks if every element of \code{x} is within the open interval defined by \code{lower} and \code{upper}.
-#' If any element is outside the interval (i.e., less than or equal to \code{lower} or greater than or equal to \code{upper}),
+#' Checks if every element of \code{x} is within the open 
+#' interval defined by \code{lower} and \code{upper}.
+#' If any element is outside the interval (i.e., less than 
+#' or equal to \code{lower} or greater than or equal to \code{upper}),
 #' an error is thrown.
 #'
 #' @param x Numeric vector. The values to be checked.
@@ -355,7 +363,8 @@ NULL
 #' @param lower Numeric. The exclusive lower bound of the interval.
 #' @param upper Numeric. The exclusive upper bound of the interval.
 #' @param naAllowed Logical. Indicates if \code{NA} values are permitted. Default is \code{FALSE}.
-#' @param call. Logical. If \code{TRUE}, the error message will include the original function call. Default is \code{FALSE}.
+#' @param call. Logical. If \code{TRUE}, the error message will 
+#'        include the original function call. Default is \code{FALSE}.
 #'
 #' @return Invisibly returns \code{x} if all elements are within the specified open interval.
 #'
@@ -603,7 +612,8 @@ NULL
 }
 
 .isDatasetSurvival <- function(dataInput) {
-    return(inherits(dataInput, "DatasetSurvival") || inherits(dataInput, "DatasetEnrichmentSurvival"))
+    return(inherits(dataInput, "DatasetSurvival") || 
+        inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
 .assertIsNumericVector <- function(x,
@@ -724,7 +734,8 @@ NULL
     }
 }
 
-.assertIsSingleNumber <- function(x, argumentName, ..., naAllowed = FALSE, noDefaultAvailable = FALSE, call. = FALSE) {
+.assertIsSingleNumber <- function(x, argumentName, ..., naAllowed = FALSE, 
+        noDefaultAvailable = FALSE, call. = FALSE) {
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid numeric value",
@@ -797,7 +808,8 @@ NULL
             (!validateType && !is.na(x) && !is.infinite(x) && as.integer(x) != x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(.isResultObjectBaseClass(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            "'", argumentName, "' (", ifelse(.isResultObjectBaseClass(x), 
+            .getClassName(x), x), ") must be a ", prefix, "integer value",
             call. = call.
         )
     }
@@ -805,7 +817,8 @@ NULL
     if (mustBePositive && !is.na(x) && !is.infinite(x) && x <= 0) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", argumentName, "' (", ifelse(.isResultObjectBaseClass(x), .getClassName(x), x), ") must be a ", prefix, "integer value",
+            "'", argumentName, "' (", ifelse(.isResultObjectBaseClass(x), 
+            .getClassName(x), x), ") must be a ", prefix, "integer value",
             call. = call.
         )
     }
@@ -1589,8 +1602,7 @@ NULL
     argNames <- names(args)
     if (sum(argNames == "") > 0) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "each argument must have a name defined, e.g. a = a",
-            call. = FALSE
+            "each argument must have a name defined, e.g. a = a"
         )
     }
 
@@ -3467,8 +3479,8 @@ NULL
     } else if (all(!is.na(lambda1)) && all(!is.na(theta))) {
         lambda2 <- lambda1 / theta
     }
-    
-    if (sampleSizeEnabled && !all(is.na(lambda1)) && !all(is.na(lambda2)) && !is.na(thetaH0) && 
+
+    if (sampleSizeEnabled && !all(is.na(lambda1)) && !all(is.na(lambda2)) && !is.na(thetaH0) &&
             any(abs(lambda1 / lambda2 - thetaH0) < 1e-12, na.rm = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
@@ -3889,15 +3901,22 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
     information2 <- infos$information2
     information <- infos$information
 
-    .checkForUnnecessaryFutilityBoundsScaleArgs("design", design, sourceScale, targetScale, scalesWithReverse)
+    .checkForUnnecessaryFutilityBoundsScaleArgs("design", 
+        design, sourceScale, targetScale, scalesWithReverse)
 
     if (infos$vectorInput) {
-        .checkForUnnecessaryFutilityBoundsScaleArgs("information", information, sourceScale, targetScale, scalesWithEffect)
+        .checkForUnnecessaryFutilityBoundsScaleArgs("information", 
+            information, sourceScale, targetScale, scalesWithEffect)
     } else {
-        .checkForUnnecessaryFutilityBoundsScaleArgs(infos$paramNames[1], information1, sourceScale, targetScale, scalesWithEffectSecondStageOnly)
-        .checkForUnnecessaryFutilityBoundsScaleArgs(infos$paramNames[2], information2, sourceScale, targetScale, baseScales)
+        .checkForUnnecessaryFutilityBoundsScaleArgs(
+            infos$paramNames[1], information1, sourceScale, 
+            targetScale, scalesWithEffectSecondStageOnly)
+        .checkForUnnecessaryFutilityBoundsScaleArgs(
+            infos$paramNames[2], information2, sourceScale, 
+            targetScale, baseScales)
     }
-    .checkForUnnecessaryFutilityBoundsScaleArgs("theta", theta, sourceScale, targetScale, "conditionalPower")
+    .checkForUnnecessaryFutilityBoundsScaleArgs(
+        "theta", theta, sourceScale, targetScale, "conditionalPower")
 
     args <- list(
         design       = design,
@@ -3907,8 +3926,10 @@ C_REQUIRED_FUTILITY_BOUNDS_ARGS_BY_SCALE <- list(
         theta        = theta
     )
 
-    .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args, informationVectorInput = infos$vectorInput)
-    .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args, informationVectorInput = infos$vectorInput)
+    .checkFutilityBoundsScaleArgs(sourceScale, "sourceScale", args, 
+        informationVectorInput = infos$vectorInput)
+    .checkFutilityBoundsScaleArgs(targetScale, "targetScale", args, 
+        informationVectorInput = infos$vectorInput)
 }
 
 .showWarningIfCalculatedFutiltyBoundsOutsideAcceptableRange <- function(futilityBounds,

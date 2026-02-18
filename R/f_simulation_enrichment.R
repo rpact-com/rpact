@@ -77,14 +77,12 @@ NULL
     return(selectedVector)
 }
 
-.selectPopulations <- function(
-        typeOfSelection,
+.selectPopulations <- function(typeOfSelection,
         epsilonValue,
         rValue,
         threshold,
         selectPopulationsFunction,
-        selectPopulationsFunctionArgs
-        ) {
+        selectPopulationsFunctionArgs) {
     effectVector <- selectPopulationsFunctionArgs$effectVector
     gMax <- length(effectVector)
 
@@ -125,28 +123,27 @@ NULL
             "); "
         )
         if (length(selectedPopulations) != gMax) {
-            stop(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")")
+            stop(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")", call. = FALSE)
         }
         if (!is.logical(selectedPopulations)) {
-            stop(msg, "the output must be a logical vector (is ", .getClassName(selectedPopulations), ")")
+            stop(msg, "the output must be a logical vector (is ", .getClassName(selectedPopulations), ")", call. = FALSE)
         }
     }
     return(selectedPopulations)
 }
 
 
-.performClosedCombinationTestForSimulationEnrichment <- function(
-        ...,
+.performClosedCombinationTestForSimulationEnrichment <- function(...,
         stageResults,
         design,
         indices,
         intersectionTest,
-        successCriterion
-        ) {
+        successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Group sequential design cannot be used for enrichment designs with population selection"
+            "Group sequential design cannot be used for enrichment designs with population selection",
+            call. = FALSE
         )
     }
 
@@ -309,8 +306,7 @@ NULL
     ))
 }
 
-.createSimulationResultsEnrichmentObject <- function(
-        ...,
+.createSimulationResultsEnrichmentObject <- function(...,
         design,
         effectList,
         kappa = NA_real_, # survival only
@@ -349,8 +345,7 @@ NULL
         calcEventsFunction = NULL, # survival only
         selectPopulationsFunction,
         showStatistics,
-        endpoint = c("means", "rates", "survival")
-        ) {
+        endpoint = c("means", "rates", "survival")) {
     endpoint <- match.arg(endpoint)
 
     .assertIsSingleNumber(threshold, "threshold", naAllowed = FALSE)
@@ -413,7 +408,7 @@ NULL
     effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
     gMax <- .getGMaxFromSubGroups(effectList$subGroups)
     if (gMax > 4) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (", gMax, ") must not exceed 4")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (", gMax, ") must not exceed 4", call. = FALSE)
     }
 
     .assertIsValidThreshold(threshold, activeArms = gMax)
@@ -425,7 +420,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "Spiessen & Debois intersection test cannot generally ",
-            "be used for enrichment designs with more than two populations"
+            "be used for enrichment designs with more than two populations",
+            call. = FALSE
         )
     }
 
@@ -462,7 +458,8 @@ NULL
     if (!stratifiedAnalysis && endpoint %in% c("means")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "For testing means, only stratified analysis is supported"
+            "For testing means, only stratified analysis is supported",
+            call. = FALSE
         )
     }
 
@@ -521,7 +518,8 @@ NULL
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "'dropoutRate1' (",
                 dropoutRate1,
-                ") is out of bounds [0; 1)"
+                ") is out of bounds [0; 1)",
+                call. = FALSE
             )
         }
         if (!is.na(dropoutRate2) && (dropoutRate2 < 0 || dropoutRate2 >= 1)) {
@@ -529,7 +527,8 @@ NULL
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "'dropoutRate2' (",
                 dropoutRate2,
-                ") is out of bounds [0; 1)"
+                ") is out of bounds [0; 1)",
+                call. = FALSE
             )
         }
 
@@ -540,7 +539,8 @@ NULL
                 "'plannedEvents' (",
                 .arrayToString(plannedEvents),
                 ") must have length ",
-                kMax
+                kMax,
+                call. = FALSE
             )
         }
         .assertIsInClosedInterval(plannedEvents, "plannedEvents", lower = 1, upper = NULL)
@@ -615,7 +615,8 @@ NULL
                     .arrayToString(maxNumberOfSubjectsPerStage),
                     ") must be not smaller than minNumberOfSubjectsPerStage' (",
                     .arrayToString(minNumberOfSubjectsPerStage),
-                    ")"
+                    ")",
+                    call. = FALSE
                 )
             }
             .setValueAndParameterType(
@@ -675,7 +676,8 @@ NULL
                     .arrayToString(maxNumberOfEventsPerStage),
                     ") must be not smaller than 'minNumberOfEventsPerStage' (",
                     .arrayToString(minNumberOfEventsPerStage),
-                    ")"
+                    ")",
+                    call. = FALSE
                 )
             }
             .setValueAndParameterType(
@@ -818,7 +820,8 @@ NULL
             ") ",
             "must have length 1 or ",
             design$kMax,
-            " (kMax)"
+            " (kMax)",
+            call. = FALSE
         )
     }
 
@@ -897,7 +900,7 @@ NULL
         adaptations <- rep(TRUE, kMax - 1)
     }
     if (length(adaptations) != kMax - 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'adaptations' must have length ", (kMax - 1), " (kMax - 1)")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'adaptations' must have length ", (kMax - 1), " (kMax - 1)", call. = FALSE)
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))
 

@@ -263,7 +263,8 @@ NULL
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
-                        "the output must be a single numeric value"
+                        "the output must be a single numeric value",
+                        call. = FALSE
                     )
                 }
 

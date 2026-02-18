@@ -663,8 +663,7 @@ NULL
 
         if (intersectionTest == "Hierarchical") {
             warning("Repeated confidence intervals not available for ",
-                "'intersectionTest' = \"Hierarchical\"",
-                call. = FALSE
+                "'intersectionTest' = \"Hierarchical\""
             )
             return(repeatedConfidenceIntervals)
         }
@@ -979,7 +978,7 @@ NULL
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
 
     if (any(thetaH1 <= 0, na.rm = TRUE)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'thetaH1' (", thetaH1, ") must be > 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'thetaH1' (", thetaH1, ") must be > 0", call. = FALSE)
     }
     if ((length(thetaH1) != 1) && (length(thetaH1) != gMax)) {
         stop(
@@ -1031,7 +1030,8 @@ NULL
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
-        "or TrialDesignConditionalDunnett"
+        "or TrialDesignConditionalDunnett",
+        call. = FALSE
     )
 }
 
@@ -1318,7 +1318,8 @@ NULL
     if (length(thetaRange) == 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2"
+            "length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2",
+            call. = FALSE
         )
     }
 

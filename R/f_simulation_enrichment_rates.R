@@ -80,8 +80,7 @@ NULL
     return(newSubjects)
 }
 
-.getSimulatedStageRatesEnrichment <- function(
-        ...,
+.getSimulatedStageRatesEnrichment <- function(...,
         design,
         subsets,
         prevalences,
@@ -104,8 +103,7 @@ NULL
         piControlH1,
         calcSubjectsFunction,
         calcSubjectsFunctionIsUserDefined,
-        selectPopulationsFunction
-        ) {
+        selectPopulationsFunction) {
     kMax <- length(plannedSubjects)
     pMax <- length(piTreatments)
     gMax <- log(length(piTreatments), 2) + 1
@@ -160,7 +158,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "at least one sample size specification too small to create simulation results, ",
-                "e.g., due to small prevalences of subsets"
+                "e.g., due to small prevalences of subsets",
+                call. = FALSE
             )
         }
 
@@ -858,7 +857,8 @@ NULL
                         "undefined result (",
                         newSubjects,
                         "); ",
-                        "the output must be a single numeric value"
+                        "the output must be a single numeric value",
+                        call. = FALSE
                     )
                 }
 
@@ -1010,8 +1010,7 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentRates <- function(
-        design = NULL,
+getSimulationEnrichmentRates <- function(design = NULL,
         ...,
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
@@ -1035,8 +1034,7 @@ getSimulationEnrichmentRates <- function(
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectPopulationsFunction = NULL,
-        showStatistics = FALSE
-        ) {
+        showStatistics = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "simulation")
         .warnInCaseOfUnknownArguments(

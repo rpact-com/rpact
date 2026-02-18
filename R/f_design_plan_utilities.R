@@ -378,7 +378,8 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "length of 'piecewiseSurvivalTime' (",
             length(piecewiseSurvivalTime),
-            ") must be > 1"
+            ") must be > 1",
+            call. = FALSE
         )
     }
 
@@ -395,7 +396,8 @@ NULL
             ") ",
             "must be equel to length of 'accrualIntensity' (",
             length(accrualIntensity),
-            ")"
+            ")",
+            call. = FALSE
         )
     }
 

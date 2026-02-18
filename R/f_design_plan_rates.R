@@ -672,7 +672,8 @@ NULL
                 .arrayToString(pi1),
                 ") must be != 'thetaH0' (",
                 thetaH0,
-                ")"
+                ")",
+                call. = FALSE
             )
         }
 
@@ -681,7 +682,8 @@ NULL
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "probability 'pi1' (",
                 .arrayToString(pi1),
-                ") is out of bounds (0; 1)"
+                ") is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
@@ -690,14 +692,16 @@ NULL
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "'thetaH0' (",
                 thetaH0,
-                ") is out of bounds (0; 1)"
+                ") is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "exact sample size calculation not available for two-sided testing"
+                "exact sample size calculation not available for two-sided testing",
+                call. = FALSE
             )
         }
 
@@ -706,7 +710,8 @@ NULL
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'conservative' (",
                 conservative,
-                ") has no effect on sample size calculation"
+                ") has no effect on sample size calculation",
+                call. = FALSE
             )
         }
     } else if (groups == 2) {
@@ -723,7 +728,8 @@ NULL
                 ") ",
                 "must be != 'thetaH0' (",
                 thetaH0,
-                ")"
+                ")",
+                call. = FALSE
             )
         }
 
@@ -740,7 +746,8 @@ NULL
                 ") ",
                 "must be != 'thetaH0' (",
                 thetaH0,
-                ")"
+                ")",
+                call. = FALSE
             )
         }
 
@@ -750,7 +757,8 @@ NULL
                 "probability 'pi1' (",
                 .arrayToString(pi1),
                 ") ",
-                "is out of bounds (0; 1)"
+                "is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
@@ -760,7 +768,8 @@ NULL
                 "probability 'pi2' (",
                 .arrayToString(pi2),
                 ") ",
-                "is out of bounds (0; 1)"
+                "is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
@@ -772,14 +781,16 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "two-sided case ",
-                "is implemented only for superiority testing"
+                "is implemented only for superiority testing",
+                call. = FALSE
             )
         }
 
         if (!normalApproximation) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "only normal approximation case is implemented for two groups"
+                "only normal approximation case is implemented for two groups",
+                call. = FALSE
             )
         }
 
@@ -788,7 +799,8 @@ NULL
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'conservative' (",
                 conservative,
-                ") has no effect on sample size calculation for two groups"
+                ") has no effect on sample size calculation for two groups",
+                call. = FALSE
             )
         }
 
@@ -801,7 +813,8 @@ NULL
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'allocationRatioPlanned' (",
                 allocationRatioPlanned,
-                ") must be >= 0"
+                ") must be >= 0",
+                call. = FALSE
             )
         }
 
@@ -809,7 +822,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "null hypothesis risk ratio is not allowed be negative or zero, ",
-                "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE"
+                "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE",
+                call. = FALSE
             )
         }
     }
@@ -982,7 +996,7 @@ getPowerRates <- function(design = NULL,
     )
 
     if (!is.na(allocationRatioPlanned) && allocationRatioPlanned <= 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "allocation ratio must be > 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "allocation ratio must be > 0", call. = FALSE)
     }
 
     allocationRatioPlanned <- designPlan$allocationRatioPlanned

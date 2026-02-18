@@ -40,8 +40,7 @@
     } else {
         stop(
             C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'dataInput' class ",
-            .getClassName(dataInput), " is not supported",
-            call. = FALSE
+            .getClassName(dataInput), " is not supported"
         )
     }
 

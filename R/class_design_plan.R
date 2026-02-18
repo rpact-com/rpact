@@ -141,8 +141,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             if (length(objectType) == 0 || !(objectType %in% c("sampleSize", "power"))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'.objectType' (", objectType,
-                    ") must be specified as 'sampleSize' or 'power'",
-                    call. = FALSE
+                    ") must be specified as 'sampleSize' or 'power'"
                 )
             }
             self$.objectType <- objectType
@@ -151,8 +150,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "'.objectType' must be specified as 'sampleSize' or 'power'",
-                    call. = FALSE
+                    "'.objectType' must be specified as 'sampleSize' or 'power'"
                 )
             }
             return(self$.objectType == "sampleSize")
@@ -161,8 +159,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "'.objectType' must be specified as 'sampleSize' or 'power'",
-                    call. = FALSE
+                    "'.objectType' must be specified as 'sampleSize' or 'power'"
                 )
             }
             return(self$.objectType == "power")

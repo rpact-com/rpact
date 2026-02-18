@@ -1408,8 +1408,7 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "failed to get 'dataInput' from ", .getClassName(x),
-            call. = FALSE
+            "failed to get 'dataInput' from ", .getClassName(x)
         )
     }
 
@@ -1446,8 +1445,7 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "failed to get 'dataInput' from ", .getClassName(x),
-            call. = FALSE
+            "failed to get 'dataInput' from ", .getClassName(x)
         )
     }
 

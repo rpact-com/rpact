@@ -258,14 +258,16 @@ getSimulationRates <- function(design = NULL, ...,
     if (design$sided == 2) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "only one-sided case is implemented for the simulation design"
+            "only one-sided case is implemented for the simulation design",
+            call. = FALSE
         )
     }
 
     if (!normalApproximation && (groups == 2) && (riskRatio || (thetaH0 != 0))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "in the two-sample case, exact test is implemented only for testing H0: pi1 - pi2 = 0"
+            "in the two-sample case, exact test is implemented only for testing H0: pi1 - pi2 = 0",
+            call. = FALSE
         )
     }
 
@@ -298,7 +300,8 @@ getSimulationRates <- function(design = NULL, ...,
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'maxNumberOfSubjectsPerStage' (",
                 .arrayToString(maxNumberOfSubjectsPerStage),
                 ") must be not smaller than minNumberOfSubjectsPerStage' (",
-                .arrayToString(minNumberOfSubjectsPerStage), ")"
+                .arrayToString(minNumberOfSubjectsPerStage), ")",
+                call. = FALSE
             )
         }
         .setValueAndParameterType(
@@ -389,7 +392,8 @@ getSimulationRates <- function(design = NULL, ...,
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
-                "must have length 1 or ", design$kMax, " (kMax)"
+                "must have length 1 or ", design$kMax, " (kMax)",
+                call. = FALSE
             )
         }
 

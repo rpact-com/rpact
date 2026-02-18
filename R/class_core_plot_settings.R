@@ -681,8 +681,7 @@ PlotSettings <- R6::R6Class("PlotSettings",
             if (!(length(margin) %in% c(1, 4))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'margin' (", .arrayToString(margin),
-                    ") must be a numeric vector with length 1 or 4",
-                    call. = FALSE
+                    ") must be a numeric vector with length 1 or 4"
                 )
             }
             p <- p + ggplot2::theme(plot.margin = ggplot2::unit(margin, "cm"))

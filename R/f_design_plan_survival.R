@@ -33,15 +33,16 @@ NULL
     }
 }
 
-.getLambda <- function(..., groupNumber, lambda2, lambda1, hazardRatio, kappa) {
-    if (groupNumber == 1) {
-        if (!anyNA(lambda1)) {
-            return(lambda1)
-        }
-
-        lambda2 <- lambda2 * hazardRatio^(1 / kappa)
+.getLambda <- function(..., groupNumber, lambda2, lambda1, hazardRatio) {
+    if (groupNumber == 2) {
+        return(lambda2)
     }
-    return(lambda2)
+
+    if (anyNA(lambda1)) {
+        lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
+    }
+
+    return(lambda1)
 }
 
 .getEventProbabilityFunction <- function(..., time, piecewiseLambda, piecewiseSurvivalTime, phi, kappa) {
@@ -61,7 +62,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "length of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime),
-            ") must be equal to length of 'piecewiseLambda' (", .arrayToString(piecewiseLambda), ")"
+            ") must be equal to length of 'piecewiseLambda' (", .arrayToString(piecewiseLambda), ")",
+            call. = FALSE
         )
     }
 
@@ -181,7 +183,8 @@ NULL
             length(densityIntervals) != length(accrualIntensity)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'densityIntervals' (", .arrayToString(densityIntervals),
-            ") and 'accrualIntensity' (", .arrayToString(accrualIntensity), ") must have same length"
+            ") and 'accrualIntensity' (", .arrayToString(accrualIntensity), ") must have same length",
+            call. = FALSE
         )
     }
 
@@ -197,8 +200,7 @@ NULL
                     groupNumber           = groupNumber,
                     lambda2               = lambda2,
                     lambda1               = lambda1,
-                    hazardRatio           = hazardRatio,
-                    kappa                 = kappa
+                    hazardRatio           = hazardRatio
                 )
 
                 inner <- function(x) {
@@ -238,8 +240,7 @@ NULL
             groupNumber           = groupNumber,
             lambda2               = lambda2,
             lambda1               = lambda1,
-            hazardRatio           = hazardRatio,
-            kappa                 = kappa
+            hazardRatio           = hazardRatio
         )
 
         inner <- function(x) {
@@ -460,7 +461,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'accrualIntensityRelative' (",
-                .arrayToString(designPlan$accrualIntensity), ") must be >= 0"
+                .arrayToString(designPlan$accrualIntensity), ") must be >= 0",
+                call. = FALSE
             )
         }
 
@@ -508,7 +510,8 @@ NULL
                         "(", paramName, " = ", .arrayToString(
                             paramValue,
                             vectorLookAndFeelEnabled = TRUE
-                        ), ")"
+                        ), ")",
+                        call. = FALSE
                     )
                 }
             }
@@ -659,28 +662,32 @@ NULL
         if (!anyNA(pi1) && (any(pi1 <= 0) || any(pi1 >= 1))) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "event rate 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)"
+                "event rate 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
         if (!anyNA(pi2) && (any(pi2 <= 0) || any(pi2 >= 1))) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "event rate 'pi2' (", .arrayToString(pi2), ") is out of bounds (0; 1)"
+                "event rate 'pi2' (", .arrayToString(pi2), ") is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
         if (design$sided == 2 && thetaH0 != 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)"
+                "two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
+                call. = FALSE
             )
         }
 
         if (thetaH0 <= 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "null hypothesis hazard ratio is not allowed be negative or zero"
+                "null hypothesis hazard ratio is not allowed be negative or zero",
+                call. = FALSE
             )
         }
 
@@ -688,14 +695,16 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "computation type ('", typeOfComputation, "') must be one of the following: ",
-                "'Schoenfeld', 'Freedman', or 'HsiehFreedman' "
+                "'Schoenfeld', 'Freedman', or 'HsiehFreedman' ",
+                call. = FALSE
             )
         }
 
         if (typeOfComputation != "Schoenfeld" && thetaH0 != 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Freedman test calculation is possible only for superiority testing (thetaH0 != 1)"
+                "Freedman test calculation is possible only for superiority testing (thetaH0 != 1)",
+                call. = FALSE
             )
         }
     }
@@ -850,25 +859,27 @@ NULL
         .assertIsSingleNumber(dropoutTime, "dropoutTime")
 
         if (!is.na(dropoutTime) && dropoutTime <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0", call. = FALSE)
         }
 
         if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)"
+                "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
+                call. = FALSE
             )
         }
 
         if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)"
+                "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
+                call. = FALSE
             )
         }
 
         if (!is.na(eventTime) && eventTime <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'eventTime' (", eventTime, ") must be > 0")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'eventTime' (", eventTime, ") must be > 0", call. = FALSE)
         }
 
         .assertIsValidAccrualTime(accrualSetup$accrualTime)
@@ -988,7 +999,8 @@ NULL
                     !designPlan$accountForObservationTimes) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'accountForObservationTimes' must be TRUE because 'maxNumberOfSubjects' is > 0"
+                    "'accountForObservationTimes' must be TRUE because 'maxNumberOfSubjects' is > 0",
+                    call. = FALSE
                 )
             }
 
@@ -1062,7 +1074,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
             "determination of optimum allocation ('allocationRatioPlanned' = 0) not possible ",
-            "for given 'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ")"
+            "for given 'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ")",
+            call. = FALSE
         )
     }
 
@@ -1139,7 +1152,8 @@ NULL
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "length of user defined 'maxNumberOfSubjects' (",
-                    .arrayToString(maxNumberOfSubjects), ") must be 1"
+                    .arrayToString(maxNumberOfSubjects), ") must be 1",
+                    call. = FALSE
                 )
             }
 
@@ -1193,7 +1207,8 @@ NULL
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "the number of subjects is too small to reach maximum number of events ",
-                        "(presumably due to drop-out rates), search algorithm failed"
+                        "(presumably due to drop-out rates), search algorithm failed",
+                        call. = FALSE
                     )
                 }
             }
@@ -1351,7 +1366,8 @@ NULL
                         stop(
                             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                             "the number of subjects is too small to reach maximum number of events ",
-                            "(presumably due to drop-out rates)"
+                            "(presumably due to drop-out rates)",
+                            call. = FALSE
                         )
                     }
                 }
@@ -1415,7 +1431,8 @@ NULL
                 if (is.na(designPlan$followUpTime)) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'followUpTime' must be defined because 'designPlan$.calculateFollowUpTime' = FALSE"
+                        "'followUpTime' must be defined because 'designPlan$.calculateFollowUpTime' = FALSE",
+                        call. = FALSE
                     )
                 }
 
@@ -1673,14 +1690,16 @@ getEventProbabilities <- function(time,
     if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)"
+            "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
+            call. = FALSE
         )
     }
 
     if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)"
+            "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
+            call. = FALSE
         )
     }
 
@@ -1737,27 +1756,28 @@ getEventProbabilities <- function(time,
     }
 
     if (any(accrualIntensity <= 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualIntensity' must be > 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualIntensity' must be > 0", call. = FALSE)
     }
 
     if (any(accrualTime <= 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualTime' must be > 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualTime' must be > 0", call. = FALSE)
     }
 
     if (kappa != 1 && any(phi > 0)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "for Weibull distribution (kappa != 1) drop-out rates (phi) cannot be specified"
+            "for Weibull distribution (kappa != 1) drop-out rates (phi) cannot be specified",
+            call. = FALSE
         )
     }
 
     if (any(phi < 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all drop-out rates (phi) must be >= 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all drop-out rates (phi) must be >= 0", call. = FALSE)
     }
 
     .assertIsNumericVector(lambda2, "lambda2")
     if (any(lambda2 <= 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all rates (lambda2) must be > 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all rates (lambda2) must be > 0", call. = FALSE)
     }
 
     eventProbabilities <- EventProbabilities$new(
@@ -1905,20 +1925,21 @@ getNumberOfSubjects <- function(time, ...,
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "length of 'accrualTime' (", length(accrualTime),
-            ") must be equal to length of 'accrualIntensity' (", length(accrualIntensity), ")"
+            ") must be equal to length of 'accrualIntensity' (", length(accrualIntensity), ")",
+            call. = FALSE
         )
     }
 
     if (any(accrualIntensity < 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualIntensity' must be >= 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualIntensity' must be >= 0", call. = FALSE)
     }
 
     if (all(accrualIntensity < 1)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "at least one value of 'accrualIntensity' must be >= 1")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "at least one value of 'accrualIntensity' must be >= 1", call. = FALSE)
     }
 
     if (any(accrualTime <= 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualTime' must be > 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualTime' must be > 0", call. = FALSE)
     }
 
     numberOfSubjects <- .getNumberOfSubjects(
@@ -2078,18 +2099,21 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                     stop(
                         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                         "length of 'accrualTime' (", length(accrualTime), ") must be greater ",
-                        "than length of 'accrualIntensity' (", length(accrualIntensity), ") + 1"
+                        "than length of 'accrualIntensity' (", length(accrualIntensity), ") + 1",
+                        call. = FALSE
                     )
                 }
                 stop(
                     C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                    "'followUpTime', 'maxNumberOfSubjects' or end of accrual must be defined"
+                    "'followUpTime', 'maxNumberOfSubjects' or end of accrual must be defined",
+                    call. = FALSE
                 )
             }
 
             stop(
                 C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                "'followUpTime' or 'maxNumberOfSubjects' must be defined"
+                "'followUpTime' or 'maxNumberOfSubjects' must be defined",
+                call. = FALSE
             )
         }
 
@@ -2103,10 +2127,15 @@ getSampleSizeSurvival <- function(design = NULL, ...,
 
         pwst <- getPiecewiseSurvivalTime(
             piecewiseSurvivalTime = piecewiseSurvivalTime,
-            lambda1 = lambda1, lambda2 = lambda2,
-            pi1 = pi1, pi2 = pi2,
-            median1 = median1, median2 = median2,
-            hazardRatio = hazardRatio, eventTime = eventTime, kappa = kappa,
+            lambda1 = lambda1,
+            lambda2 = lambda2,
+            pi1 = pi1,
+            pi2 = pi2,
+            median1 = median1,
+            median2 = median2,
+            hazardRatio = hazardRatio,
+            eventTime = eventTime,
+            kappa = kappa,
             .silent = TRUE
         )
         paramName <- NULL
@@ -2137,7 +2166,8 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                     paramName, " = ", .arrayToString(
                         paramValue,
                         vectorLookAndFeelEnabled = TRUE
-                    )
+                    ),
+                    call. = FALSE
                 )
             }
         }
@@ -2219,8 +2249,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                     }
                     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
                         "'additionalAccrual' could not be found in ", steps,
-                        " search iterations, change accrual time specification",
-                        call. = FALSE
+                        " search iterations, change accrual time specification"
                     )
                 }
 
@@ -2248,8 +2277,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                     iterations <- iterations + 1
                     if (iterations > 50) {
                         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                            "search algorithm failed to end",
-                            call. = FALSE
+                            "search algorithm failed to end"
                         )
                     }
                 }
@@ -2279,8 +2307,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                 if (is.na(maxNumberOfSubjectsUpper)) {
                     stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
                         "'maxNumberOfSubjectsUpper' could not be found ",
-                        "(fut = ", fut, ", followUpTime = ", followUpTime, ")",
-                        call. = FALSE
+                        "(fut = ", fut, ", followUpTime = ", followUpTime, ")"
                     )
                 }
 
@@ -2634,7 +2661,8 @@ getPowerSurvival <- function(design = NULL, ...,
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ") ",
                     "is too small to reach maximum number of events ",
-                    "(presumably due to drop-out rates)"
+                    "(presumably due to drop-out rates)",
+                    call. = FALSE
                 )
             }
         }

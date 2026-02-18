@@ -93,8 +93,7 @@ NULL
     return(newEvents)
 }
 
-.getSimulatedStageSurvivalEnrichment <- function(
-        ...,
+.getSimulatedStageSurvivalEnrichment <- function(...,
         design,
         subsets,
         prevalences,
@@ -116,8 +115,7 @@ NULL
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
-        selectPopulationsFunction
-        ) {
+        selectPopulationsFunction) {
     kMax <- length(plannedEvents)
     pMax <- length(hazardRatios)
     gMax <- log(length(hazardRatios), 2) + 1
@@ -464,7 +462,8 @@ NULL
                         "'calcEventsFunction' returned an illegal or undefined result (",
                         newEvents,
                         "); ",
-                        "the output must be a single numeric value"
+                        "the output must be a single numeric value",
+                        call. = FALSE
                     )
                 }
 
@@ -579,8 +578,7 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentSurvival <- function(
-        design = NULL,
+getSimulationEnrichmentSurvival <- function(design = NULL,
         ...,
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
@@ -603,8 +601,7 @@ getSimulationEnrichmentSurvival <- function(
         seed = NA_real_,
         calcEventsFunction = NULL,
         selectPopulationsFunction = NULL,
-        showStatistics = FALSE
-        ) {
+        showStatistics = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "simulation")
         .warnInCaseOfUnknownArguments(

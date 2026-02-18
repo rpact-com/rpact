@@ -232,7 +232,8 @@ getSimulationMeans <- function(design = NULL, ...,
     if (design$sided == 2) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "only one-sided case is implemented for the simulation design"
+            "only one-sided case is implemented for the simulation design",
+            call. = FALSE
         )
     }
 
@@ -262,7 +263,8 @@ getSimulationMeans <- function(design = NULL, ...,
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
-                "must have length 1 or ", design$kMax, " (kMax)"
+                "must have length 1 or ", design$kMax, " (kMax)",
+                call. = FALSE
             )
         }
 
@@ -322,7 +324,8 @@ getSimulationMeans <- function(design = NULL, ...,
             if (!all(is.na(minNumberOfSubjectsPerStage)) && (any(minNumberOfSubjectsPerStage < groups * 2))) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "minNumberOfSubjectsPerStage not correctly specified"
+                    "minNumberOfSubjectsPerStage not correctly specified",
+                    call. = FALSE
                 )
             }
         }
@@ -332,7 +335,8 @@ getSimulationMeans <- function(design = NULL, ...,
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'maxNumberOfSubjectsPerStage' (",
                 .arrayToString(maxNumberOfSubjectsPerStage),
                 ") must be not smaller than minNumberOfSubjectsPerStage' (",
-                .arrayToString(minNumberOfSubjectsPerStage), ")"
+                .arrayToString(minNumberOfSubjectsPerStage), ")",
+                call. = FALSE
             )
         }
         .setValueAndParameterType(

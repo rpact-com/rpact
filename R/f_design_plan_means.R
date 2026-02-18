@@ -606,7 +606,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "any 'alternative' (", .arrayToString(alternative),
-                ") must be > 'thetaH0' (", thetaH0, ")"
+                ") must be > 'thetaH0' (", thetaH0, ")",
+                call. = FALSE
             )
         }
 
@@ -614,7 +615,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "any 'alternative' (", .arrayToString(alternative),
-                ") must be != 'thetaH0' (", thetaH0, ")"
+                ") must be != 'thetaH0' (", thetaH0, ")",
+                call. = FALSE
             )
         }
     }
@@ -639,7 +641,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "two-sided case is implemented only for superiority testing ",
-                "(i.e., thetaH0 = ", ifelse(meanRatio, 1, 0), ")"
+                "(i.e., thetaH0 = ", ifelse(meanRatio, 1, 0), ")",
+                call. = FALSE
             )
         }
 
@@ -650,7 +653,8 @@ NULL
         if (allocationRatioPlanned < 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0"
+                "'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0",
+                call. = FALSE
             )
         }
 
@@ -663,7 +667,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "null hypothesis mean ratio is not allowed be negative or zero, ",
-                "i.e., 'thetaH0' must be > 0 if 'meanRatio' = TRUE"
+                "i.e., 'thetaH0' must be > 0 if 'meanRatio' = TRUE",
+                call. = FALSE
             )
         }
     }

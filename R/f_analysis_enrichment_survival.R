@@ -156,21 +156,24 @@ NULL
     if (gMax > 2 && intersectionTest == "SpiessensDebois") {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 2: Spiessens & Debois intersection test test can only be used for one subset"
+            ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
+            call. = FALSE
         )
     }
 
     if (!stratifiedAnalysis) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "only stratified analysis can be performed for enrichment survival designs"
+            "only stratified analysis can be performed for enrichment survival designs",
+            call. = FALSE
         )
     }
 
     if (dataInput$isStratified() && gMax > 4) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 4: Stratified analysis not implemented"
+            ") > 4: Stratified analysis not implemented",
+            call. = FALSE
         )
     }
 
@@ -662,8 +665,7 @@ NULL
 
     if (anyNA(criticalValues[1:stage])) {
         warning("Repeated confidence intervals not because ", sum(is.na(criticalValues)),
-            " critical values are NA (", .arrayToString(criticalValues), ")",
-            call. = FALSE
+            " critical values are NA (", .arrayToString(criticalValues), ")"
         )
         return(repeatedConfidenceIntervals)
     }
@@ -941,7 +943,7 @@ NULL
     thetaH1 <- .assertIsValidThetaH1ForEnrichment(thetaH1, stageResults, stage, results = results)
 
     if (any(thetaH1 <= 0, na.rm = TRUE)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'thetaH1' (", thetaH1, ") must be > 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'thetaH1' (", thetaH1, ") must be > 0", call. = FALSE)
     }
     if ((length(thetaH1) != 1) && (length(thetaH1) != gMax)) {
         stop(
@@ -980,7 +982,8 @@ NULL
 
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher"
+        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
+        call. = FALSE
     )
 }
 
@@ -1206,7 +1209,8 @@ NULL
     if (length(thetaRange) == 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2"
+            "length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2",
+            call. = FALSE
         )
     }
 

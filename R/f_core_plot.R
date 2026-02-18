@@ -200,7 +200,7 @@ NULL
         message("Available plot types: ", .arrayToString(tolower(
             getAvailablePlotTypes(x, output = "caption")
         ), encapsulate = TRUE))
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", .arrayToString(type), ") could not be identified")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", .arrayToString(type), ") could not be identified", call. = FALSE)
     }
 
     return(type)
@@ -602,7 +602,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (length(yParameterNames) == 0 || !all(is.character(yParameterNames)) || all(is.na(yParameterNames))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'yParameterNames' (", .arrayToString(yParameterNames),
-            ") must be a valid character vector"
+            ") must be a valid character vector",
+            call. = FALSE
         )
     }
     .assertIsSingleCharacter(hint, "hint", naAllowed = TRUE)
@@ -888,7 +889,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'", .getClassName(parameterSet), "' and '", .getClassName(designMaster), "' ",
-                    "do not contain a field with name '", parameterName, "'"
+                    "do not contain a field with name '", parameterName, "'",
+                    call. = FALSE
                 )
             }
         }
@@ -1300,7 +1302,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (is.infinite(scalingFactor2)) {
         stop(
             "Failed to calculate 'scalingFactor2' (", scalingFactor2, ") for ",
-            .arrayToString(leftAxisValues, maxLength = 15), " and ", .arrayToString(rightAxisValues, maxLength = 15)
+            .arrayToString(leftAxisValues, maxLength = 15), " and ", .arrayToString(rightAxisValues, maxLength = 15),
+            call. = FALSE
         )
     }
 
@@ -1608,7 +1611,8 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "length of 'piecewiseSurvivalTime' (", length(piecewiseSurvivalTime),
-            ") must be equal to length of 'piecewiseLambda' (", length(piecewiseLambda), ") - 1"
+            ") must be equal to length of 'piecewiseLambda' (", length(piecewiseLambda), ") - 1",
+            call. = FALSE
         )
     }
 
@@ -1696,7 +1700,8 @@ saveLastPlot <- function(filename, outputPath = .getRelativeFigureOutputPath()) 
     if (grepl("\\\\|/", filename)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'filename' seems to be a path. ",
-            "Please specify 'outputPath' separately"
+            "Please specify 'outputPath' separately",
+            call. = FALSE
         )
     }
 

@@ -1041,7 +1041,8 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
 
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or TrialDesignDunnett"
+        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or TrialDesignDunnett",
+        call. = FALSE
     )
 }
 
@@ -1236,13 +1237,14 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
         stage <- kMax - 1
     }
     if (stage < 1 || kMax == 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot plot conditional power of a fixed design")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot plot conditional power of a fixed design", call. = FALSE)
     }
     if (stage >= kMax) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "the conditional power plot is only available for subsequent stages. ",
-            "Please specify a 'stage' (", stage, ") < 'kMax' (", kMax, ")"
+            "Please specify a 'stage' (", stage, ") < 'kMax' (", kMax, ")",
+            call. = FALSE
         )
     }
 

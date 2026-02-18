@@ -1101,8 +1101,7 @@ NULL
     condError <- getConditionalRejectionProbabilities(stageResults = stageResults)[stage]
     if (is.na(condError)) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "conditional error could not be calculated at stage ", stage,
-            call. = FALSE
+            "conditional error could not be calculated at stage ", stage
         )
     }
 

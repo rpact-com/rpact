@@ -5,17 +5,35 @@
 \alias{getLambdaByPi}
 \alias{getLambdaByMedian}
 \alias{getHazardRatioByPi}
+\alias{getHazardRatioByLambda}
+\alias{getHazardRatioByMedian}
+\alias{getLambda1ByLambda2AndHazardRatio}
+\alias{getLambda2ByLambda1AndHazardRatio}
+\alias{getPi1ByPi2AndHazardRatio}
+\alias{getPi2ByPi1AndHazardRatio}
 \alias{getPiByLambda}
 \alias{getPiByMedian}
 \alias{getMedianByLambda}
 \alias{getMedianByPi}
-\title{Survival Helper Functions for Conversion of Pi, Lambda, Median}
+\title{Survival Helper Functions for Conversion of Pi, Lambda, Median, and Hazard Ratio Values}
 \usage{
 getLambdaByPi(piValue, eventTime = 12, kappa = 1)
 
 getLambdaByMedian(median, kappa = 1)
 
 getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1)
+
+getHazardRatioByLambda(lambda1, lambda2)
+
+getHazardRatioByMedian(median1, median2, kappa = 1)
+
+getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
+
+getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio)
+
+getPi1ByPi2AndHazardRatio(pi2, hazardRatio, eventTime = 12, kappa = 1)
+
+getPi2ByPi1AndHazardRatio(pi1, hazardRatio, eventTime = 12, kappa = 1)
 
 getPiByLambda(lambda, eventTime = 12, kappa = 1)
 
@@ -26,7 +44,7 @@ getMedianByLambda(lambda, kappa = 1)
 getMedianByPi(piValue, eventTime = 12, kappa = 1)
 }
 \arguments{
-\item{piValue, pi1, pi2, lambda, median}{Value that shall be converted.}
+\item{piValue, pi1, pi2, lambda, lambda1, lambda2, median, median1, median2}{Value that shall be converted.}
 
 \item{eventTime}{The assumed time under which the event rates are calculated, default is \code{12}.}
 
@@ -46,9 +64,10 @@ and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the same res
 Returns a \code{\link[base]{numeric}} value or vector will be returned.
 }
 \description{
-Functions to convert pi, lambda and median values into each other.
+Functions to convert pi, lambda, median, and hazard ratio values into each other.
 }
 \details{
-Can be used, e.g., to convert median values into pi or lambda values for usage in
+Can be used, e.g., to convert pi, median, or lambda values into pi, median, lambda, or hazard ratio values, e.g, for usage in
 \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}} or \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
 }
+\keyword{internal}

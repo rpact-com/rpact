@@ -133,7 +133,8 @@
                 length(designPlan$alternative) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'alternative' with length > 1 is defined"
+                " is only available if 'alternative' with length > 1 is defined",
+                call. = FALSE
             )
         }
     } else if (.isTrialDesignPlanRates(designPlan)) {
@@ -141,7 +142,8 @@
                 length(designPlan$pi1) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'pi1' with length > 1 is defined"
+                " is only available if 'pi1' with length > 1 is defined",
+                call. = FALSE
             )
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
@@ -149,7 +151,8 @@
                 length(designPlan$hazardRatio) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'hazardRatio' with length > 1 is defined"
+                " is only available if 'hazardRatio' with length > 1 is defined",
+                call. = FALSE
             )
         }
     }
@@ -890,7 +893,8 @@
             if (!designPlan$isGeneratedParameter("expectedNumberOfSubjectsH1")) {
                 stop(
                     "Plot type 9 is only available for count data endpoint ",
-                    "if 'expectedNumberOfSubjectsH1' was not calculated"
+                    "if 'expectedNumberOfSubjectsH1' was not calculated",
+                    call. = FALSE
                 )
             }
 
@@ -1009,10 +1013,10 @@
                 ...
             ))
         } else {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1, 2, ..., 14")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1, 2, ..., 14", call. = FALSE)
         }
     } else {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1, 2, ..., 9")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1, 2, ..., 9", call. = FALSE)
     }
 
     if (!is.null(srcCmd)) {
@@ -1096,26 +1100,26 @@
     startTime <- Sys.time()
     if (is.null(designPlan$piecewiseSurvivalTime) ||
             length(designPlan$piecewiseSurvivalTime) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'piecewiseSurvivalTime' must be specified")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'piecewiseSurvivalTime' must be specified", call. = FALSE)
     }
 
     type <- type[1]
     if (!(type %in% c(13, 14))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' must be 13 or 14")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' must be 13 or 14", call. = FALSE)
     }
 
     lambda1 <- designPlan[["lambda1"]]
     lambda2 <- designPlan[["lambda2"]]
     if (is.null(lambda2) || length(lambda2) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'lambda2' must be specified")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'lambda2' must be specified", call. = FALSE)
     }
 
     if (is.null(designPlan$kappa) || length(designPlan$kappa) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'kappa' must be specified")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'kappa' must be specified", call. = FALSE)
     }
 
     if (is.null(designPlan$hazardRatio) || length(designPlan$hazardRatio) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'hazardRatio' must be specified")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'hazardRatio' must be specified", call. = FALSE)
     }
 
     piecewiseSurvivalEnabled <- designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled
@@ -1613,7 +1617,8 @@ plot.TrialDesignPlan <- function(x,
             stop(
                 "No plot available for this ",
                 .formatCamelCaseSingleWord(x$.objectType), " ", x$.toString(),
-                " result object"
+                " result object",
+                call. = FALSE
             )
         }
 
