@@ -15,6 +15,7 @@
  * Contact us for information about our services: info@rpact.com
  *
  */
+
 #include <Rcpp.h>
 
 // [[Rcpp::plugins(cpp11)]]
@@ -48,6 +49,18 @@ const String C_TYPE_OF_DESIGN_AS_HSD = "asHSD";
 const String C_TYPE_OF_DESIGN_BS_HSD = "bsHSD";
 const String C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY = "noEarlyEfficacy";
 
+//' @title Normal density (fast internal)
+//' @description Compute the Gaussian probability density function (PDF) for a single point using a minimal implementation (no R overhead).
+//' @details
+//' This helper is used inside the recursive integration for group sequential boundaries, where the
+//' normal density is evaluated extremely often.
+//' @param x Evaluation point(s) on the integration grid (stage-wise Z-scale).
+//' @param mean Mean of the normal distribution.
+//' @param stDev Standard deviation of the normal distribution.
+//' @return A scalar double with the normal PDF value at `x` for mean `mean` and standard deviation `stDev`.
+//' @keywords internal
+//' @noRd
+//'
 double dnorm2(const double x, const double mean, const double stDev) {
 	static const double inv_sqrt_2pi = 0.3989422804014327;
 	double a = (x - mean) / stDev;
@@ -55,6 +68,25 @@ double dnorm2(const double x, const double mean, const double stDev) {
 	return inv_sqrt_2pi / stDev * exp(-0.5f * a * a);
 }
 
+//' @title Recursive density update at a single grid point
+//' @description Evaluate the stage-`k` recursive density \eqn{f_k(x)} at a single grid location.
+//' @details
+//' For `k=1`, the density is standard normal. For `k>1`, the density at stage `k` is obtained by
+//' integrating the previous-stage density over the continuation region, multiplied by the conditional
+//' normal density for the increment from information fraction \eqn{t_{k-1}} to \eqn{t_k}. The
+//' implementation uses a discrete grid (`x2`) and the previously computed, quadrature-weighted density
+//' values (`dn2`).
+//' @param x Evaluation point(s) on the integration grid (stage-wise Z-scale).
+//' @param k Stage index (1-based).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param epsilonVec Stage-wise information increments: `epsilonVec[1]=informationRates[1]`, `epsilonVec[k]=informationRates[k]-informationRates[k-1]`.
+//' @param x2 Grid points from the previous stage used in the recursion.
+//' @param dn2 Quadrature-weighted density values from the previous stage (`w * f_{k-1}(x2)`).
+//' @param n Number of grid points (length of `x2` / `dn2`).
+//' @return A scalar double: the approximated density value at `x` for stage `k`.
+//' @keywords internal
+//' @noRd
+//'
 double getDensityValue(double x, int k, NumericVector informationRates, NumericVector epsilonVec, NumericVector x2,
 	NumericVector dn2, int n) {
 	try {
@@ -81,6 +113,21 @@ double getDensityValue(double x, int k, NumericVector informationRates, NumericV
 	}
 }
 
+//' @title Recursive density update on a grid
+//' @description Vectorized version of `getDensityValue()` for all grid points of a stage.
+//' @details
+//' This is performance-critical: it updates the whole density vector on the current grid using the
+//' previous grid (`x2`) and weighted densities (`dn2`).
+//' @param x Evaluation point(s) on the integration grid (stage-wise Z-scale).
+//' @param k Stage index (1-based).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param epsilonVec Stage-wise information increments: `epsilonVec[1]=informationRates[1]`, `epsilonVec[k]=informationRates[k]-informationRates[k-1]`.
+//' @param x2 Grid points from the previous stage used in the recursion.
+//' @param dn2 Quadrature-weighted density values from the previous stage (`w * f_{k-1}(x2)`).
+//' @return A numeric vector of densities for the supplied grid `x`.
+//' @keywords internal
+//' @noRd
+//'
 NumericVector getDensityValues(NumericVector x, int k, NumericVector informationRates, NumericVector epsilonVec,
 	NumericVector x2, NumericVector dn2) {
 	try {
@@ -99,6 +146,20 @@ NumericVector getDensityValues(NumericVector x, int k, NumericVector information
 	}
 }
 
+//' @title Composite Newton–Cotes quadrature weights
+//' @description Build the weight vector \eqn{w} used for the composite closed Newton–Cotes rule on an equidistant grid.
+//' @details
+//' The recursion for multivariate normal probabilities in group sequential designs is implemented via
+//' sequential numerical integration over interim Z-statistics. The integral at each stage is
+//' approximated on a grid with spacing `dx` and a composite Newton–Cotes rule. The returned vector
+//' contains boundary weights at the first and last grid point (often denoted W in the literature /
+//' implementation) and the interior weights for all grid points.
+//' @param dx Grid spacing for the Newton–Cotes rule.
+//' @param constNewtonCotes Number of Newton–Cotes panels (composite rule parameter).
+//' @return A numeric vector of length `C_NEWTON_COTES_MULTIPLIER * constNewtonCotes + 1` containing quadrature weights aligned with the grid returned by `getXValues()`.
+//' @keywords internal
+//' @noRd
+//'
 NumericVector getW(double dx, int constNewtonCotes) {
 	try {
 		NumericVector vec;
@@ -132,6 +193,23 @@ NumericVector getW(double dx, int constNewtonCotes) {
 	}
 }
 
+//' @title Stage-wise sequential probability contribution
+//' @description Compute one probability component (reject/accept/continue) for stage `k` by integrating the current density over a decision region.
+//' @details
+//' The decision regions are encoded in `decisionMatrix` (critical values and optional futility bounds).
+//' The density values `dn` are already multiplied by quadrature weights (`w * f_k(x)`), so this
+//' function typically reduces to summing over grid indices that belong to the relevant region.
+//' @param paramIndex Index selecting the probability component/region to integrate (implementation-specific).
+//' @param k Stage index (1-based).
+//' @param dn Quadrature-weighted current-stage density values (`w * f_k(x)`) on the current grid.
+//' @param x Evaluation point(s) on the integration grid (stage-wise Z-scale).
+//' @param decisionMatrix Matrix encoding decision region bounds per stage (critical values and optional futility bounds).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param epsilonVec Stage-wise information increments: `epsilonVec[1]=informationRates[1]`, `epsilonVec[k]=informationRates[k]-informationRates[k-1]`.
+//' @return A scalar double with the probability contribution for the requested component (`paramIndex`).
+//' @keywords internal
+//' @noRd
+//'
 double getSeqValue(int paramIndex, int k, NumericVector dn, NumericVector x, NumericMatrix decisionMatrix,
 	NumericVector informationRates, NumericVector epsilonVec) {
 	try {
@@ -148,6 +226,19 @@ double getSeqValue(int paramIndex, int k, NumericVector dn, NumericVector x, Num
 	}
 }
 
+//' @title Grid step width for a decision region
+//' @description Compute the grid spacing `dx` for Newton–Cotes integration at stage `k` based on the decision region bounds.
+//' @details
+//' The integration range is derived from the relevant row in `decisionMatrix` and divided into
+//' `numberOfGridPoints - 1` equal intervals.
+//' @param decisionMatrix Matrix encoding decision region bounds per stage (critical values and optional futility bounds).
+//' @param k Stage index (1-based).
+//' @param numberOfGridPoints Total number of grid points for the stage-wise integration grid.
+//' @param rowIndex Row index in `decisionMatrix` selecting a particular decision region.
+//' @return A scalar double containing the grid step size.
+//' @keywords internal
+//' @noRd
+//'
 double getDxValue(NumericMatrix decisionMatrix, int k, int numberOfGridPoints, int rowIndex) {
 	try {
 		return (decisionMatrix(rowIndex + 1, k - 2) - decisionMatrix(rowIndex, k - 2)) / (numberOfGridPoints - 1);
@@ -157,6 +248,19 @@ double getDxValue(NumericMatrix decisionMatrix, int k, int numberOfGridPoints, i
 	}
 }
 
+//' @title Equidistant integration grid for a decision region
+//' @description Construct the equidistant grid `x` used at stage `k` for Newton–Cotes integration.
+//' @details
+//' The grid starts at the lower bound taken from `decisionMatrix` and increases by `dx` up to the upper
+//' bound. The bounds may be truncated to package-wide defaults to ensure numerical stability.
+//' @param decisionMatrix Matrix encoding decision region bounds per stage (critical values and optional futility bounds).
+//' @param k Stage index (1-based).
+//' @param numberOfGridPoints Total number of grid points for the stage-wise integration grid.
+//' @param rowIndex Row index in `decisionMatrix` selecting a particular decision region.
+//' @return A numeric vector of grid points.
+//' @keywords internal
+//' @noRd
+//'
 NumericVector getXValues(NumericMatrix decisionMatrix, int k, int numberOfGridPoints, int rowIndex) {
 	try {
 		NumericVector x = rep(decisionMatrix(rowIndex, k - 2), numberOfGridPoints);
@@ -171,6 +275,19 @@ NumericVector getXValues(NumericMatrix decisionMatrix, int k, int numberOfGridPo
 	}
 }
 
+//' @title Fast one-sided group sequential probabilities
+//' @description Compute stage-wise crossing probabilities for a one-sided group sequential design using recursive density integration.
+//' @details
+//' This is a streamlined implementation that returns only the efficacy crossing probabilities across
+//' stages. It sets up information increments (`epsilonVec`), grids and Newton–Cotes weights, then
+//' iterates stages `k=2..kMax` updating the density (`dn2 -> dn`) and integrating over the rejection
+//' region via `getSeqValue()`.
+//' @param decisionMatrix Matrix encoding decision region bounds per stage (critical values and optional futility bounds).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @return A numeric vector of length `kMax` with cumulative probabilities up to each stage.
+//' @keywords internal
+//' @noRd
+//'
 NumericVector getGroupSequentialProbabilitiesFast(NumericMatrix decisionMatrix, NumericVector informationRates) {
 
 	// maximum number of stages
@@ -227,7 +344,21 @@ NumericVector getGroupSequentialProbabilitiesFast(NumericMatrix decisionMatrix, 
 	return probs;
 }
 
-// [[Rcpp::export(name = ".getGroupSequentialProbabilitiesCpp")]]
+//' @title Group sequential probabilities for multiple decision regions
+//' @description Compute probabilities for efficacy and futility regions (and the remaining continuation probability) for a given decision matrix and information rates.
+//' @details
+//' The returned matrix contains one row per decision region plus an additional row for the remaining
+//' probability mass. Internally, the function performs recursive density integration using Newton–Cotes
+//' quadrature similarly to `getGroupSequentialProbabilitiesFast()`, but for potentially multiple rows
+//' in `decisionMatrix`.
+//' @param decisionMatrix Matrix encoding decision region bounds per stage (critical values and optional futility bounds).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @return A numeric matrix with probabilities by decision row and stage.
+//' @keywords internal
+//' @noRd
+//'
+//' [[Rcpp::export(name = ".getGroupSequentialProbabilitiesCpp")]]
+//'
 NumericMatrix getGroupSequentialProbabilitiesCpp(NumericMatrix decisionMatrix, NumericVector informationRates) {
 	try {
 		NumericMatrix decMatrix(Rcpp::clone(decisionMatrix));
@@ -346,7 +477,28 @@ NumericMatrix getGroupSequentialProbabilitiesCpp(NumericMatrix decisionMatrix, N
 	}
 }
 
-// [[Rcpp::export(name = ".getDesignGroupSequentialPampallonaTsiatisCpp")]]
+//' @title Pampallona–Tsiatis design search
+//' @description Search for critical values (and optionally futility bounds) for the Pampallona–Tsiatis family given error spending and information rates.
+//' @details
+//' Implements an iterative root-finding / optimization loop that adjusts boundary parameters so that
+//' the computed group sequential probabilities match the requested type I error (`alpha`) and type II
+//' error (`beta`) constraints at the specified information rates. Uses
+//' `getGroupSequentialProbabilitiesCpp()` as the inner probability engine.
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @param beta Target type II error (1 - power) at the design alternative.
+//' @param alpha Target type I error level.
+//' @param kMax Maximum number of stages (analyses).
+//' @param deltaPT0 Lower endpoint of the Pampallona–Tsiatis delta search interval (or initial value).
+//' @param deltaPT1 Upper endpoint of the Pampallona–Tsiatis delta search interval (or initial value).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param sided Number of sides for testing (1 or 2).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @return A list containing the computed critical values, futility bounds (if applicable), and diagnostic information from the iteration.
+//' @keywords internal
+//' @noRd
+//'
+//' [[Rcpp::export(name = ".getDesignGroupSequentialPampallonaTsiatisCpp")]]
+//'
 List getDesignGroupSequentialPampallonaTsiatisCpp(double tolerance, double beta, double alpha, double kMax,
 	double deltaPT0, double deltaPT1, NumericVector informationRates, int sided, bool bindingFutility) {
 
@@ -481,6 +633,18 @@ List getDesignGroupSequentialPampallonaTsiatisCpp(double tolerance, double beta,
 	return List::create(_["futilityBounds"] = futilityBounds, _["criticalValues"] = rejectionBounds, _["probs"] = probs);
 }
 
+//' @title Decision matrix for one-sided boundaries
+//' @description Create the decision matrix encoding efficacy and (optional) futility bounds for a one-sided design.
+//' @details
+//' Rows correspond to different decision regions used in the recursive integration (e.g., rejection at
+//' each stage, futility at each stage).
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @return A numeric matrix used by the probability engine.
+//' @keywords internal
+//' @noRd
+//'
 NumericMatrix getDecisionMatrixOneSided(NumericVector criticalValues, NumericVector futilityBounds,
 	bool bindingFutility) {
 
@@ -501,6 +665,15 @@ NumericMatrix getDecisionMatrixOneSided(NumericVector criticalValues, NumericVec
 	return decisionMatrix;
 }
 
+//' @title Decision matrix for two-sided boundaries
+//' @description Create the decision matrix encoding symmetric two-sided critical values.
+//' @details
+//' The matrix encodes lower and upper bounds per stage for the two-sided stopping regions.
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @return A numeric matrix used by the probability engine.
+//' @keywords internal
+//' @noRd
+
 NumericMatrix getDecisionMatrixTwoSided(NumericVector criticalValues) {
 	NumericMatrix decisionMatrix(2, criticalValues.length());
 	decisionMatrix(0, _) = -criticalValues;
@@ -508,6 +681,17 @@ NumericMatrix getDecisionMatrixTwoSided(NumericVector criticalValues) {
 	return decisionMatrix;
 }
 
+//' @title Decision matrix subset up to stage k
+//' @description Extract the subset of a decision matrix that is required to compute probabilities up to stage `k`.
+//' @details
+//' This is used in iterative boundary search routines where probabilities are recomputed repeatedly for
+//' increasing `k`.
+//' @param decisionMatrix Matrix encoding decision region bounds per stage (critical values and optional futility bounds).
+//' @param k Stage index (1-based).
+//' @return A numeric matrix containing the first `k` stages.
+//' @keywords internal
+//' @noRd
+//'
 NumericMatrix getDecisionMatrixSubset(NumericMatrix decisionMatrix, int k) {
 	NumericMatrix decisionMatrixSubset(decisionMatrix.nrow(), k);
 	for (int i = 0; i < k; i++) {
@@ -516,6 +700,20 @@ NumericMatrix getDecisionMatrixSubset(NumericMatrix decisionMatrix, int k) {
 	return decisionMatrixSubset;
 }
 
+//' @title Unified decision matrix constructor
+//' @description Dispatch to one- or two-sided decision matrix construction and optionally apply binding futility logic.
+//' @details
+//' Depending on `sided` and the presence of `futilityBounds`, the matrix encodes the correct stopping
+//' regions for the probability recursion.
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param sided Number of sides for testing (1 or 2).
+//' @param k Stage index (1-based).
+//' @return A numeric matrix used by the probability engine.
+//' @keywords internal
+//' @noRd
+//'
 NumericMatrix getDecisionMatrix(NumericVector criticalValues, NumericVector futilityBounds, bool bindingFutility,
 	int sided, int k = -1) {
 	NumericMatrix decisionMatrix;
@@ -530,6 +728,18 @@ NumericMatrix getDecisionMatrix(NumericVector criticalValues, NumericVector futi
 	return getDecisionMatrixSubset(decisionMatrix, k);
 }
 
+//' @title Initial root approximation for boundary search
+//' @description Compute an initial approximation for a root-finding problem when calibrating boundaries to a target alpha level.
+//' @details
+//' Uses already computed probability tables to derive a suitable starting value to accelerate
+//' convergence.
+//' @param probs Probability matrix returned by the group sequential recursion (rows = regions, cols = stages).
+//' @param alpha Target type I error level.
+//' @param sided Number of sides for testing (1 or 2).
+//' @return A scalar double initial value.
+//' @keywords internal
+//' @noRd
+//'
 double getZeroApproximation(NumericMatrix probs, double alpha, int sided) {
 	if (sided == 1) {
 		return sum(probs(2, _) - probs(1, _)) - alpha;
@@ -538,6 +748,21 @@ double getZeroApproximation(NumericMatrix probs, double alpha, int sided) {
 	return sum(probs(2, _) - probs(1, _) + probs(0, _)) - alpha;
 }
 
+//' @title Alpha-spending function value
+//' @description Evaluate the cumulative spending \eqn{\alpha(t)} for a given information fraction `x` and design type.
+//' @details
+//' Supports common spending families used in rpact (e.g., O'Brien–Fleming, Pocock, Kim–DeMets with
+//' parameter `gamma`). The `sided` argument determines whether the returned spending corresponds to
+//' one- or two-sided testing.
+//' @param alpha Target type I error level.
+//' @param x Evaluation point(s) on the integration grid (stage-wise Z-scale).
+//' @param sided Number of sides for testing (1 or 2).
+//' @param typeOfDesign Identifier for the spending/design family (e.g., "asOF", "asP", "asKD", "asUser").
+//' @param gamma Spending function parameter (e.g., Kim–DeMets).
+//' @return A scalar double with the cumulative spent alpha at information fraction `x`.
+//' @keywords internal
+//' @noRd
+//'
 double getSpendingValueCpp(double alpha, double x, double sided, String typeOfDesign, double gamma) {
 
 	if (typeOfDesign == C_TYPE_OF_DESIGN_AS_P || typeOfDesign == C_TYPE_OF_DESIGN_BS_P) {
@@ -566,6 +791,26 @@ double getSpendingValueCpp(double alpha, double x, double sided, String typeOfDe
 	return NA_REAL;
 }
 
+//' @title Calibrate one-sided critical value at stage k
+//' @description Compute/adjust the critical value at stage `k` so that the incremental (or cumulative) spent alpha matches the target spending.
+//' @details
+//' This function is used by alpha-spending boundary constructors. It repeatedly calls the probability
+//' engine with a candidate boundary to match the requested spending within `tolerance`.
+//' @param k Stage index (1-based).
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param userAlphaSpending User-provided cumulative alpha spending values per stage.
+//' @param alpha Target type I error level.
+//' @param gammaA Alpha spending parameter (e.g., Kim–DeMets gamma).
+//' @param typeOfDesign Identifier for the spending/design family (e.g., "asOF", "asP", "asKD", "asUser").
+//' @param sided Number of sides for testing (1 or 2).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A scalar double critical value for stage `k`.
+//' @keywords internal
+//' @noRd
+//'
 double getCriticalValue(int k, NumericVector criticalValues, NumericVector userAlphaSpending, double alpha,
 	double gammaA, String typeOfDesign, double sided, NumericVector informationRates, bool bindingFutility,
 	NumericVector futilityBounds, double tolerance) {
@@ -594,6 +839,25 @@ double getCriticalValue(int k, NumericVector criticalValues, NumericVector userA
 	return criticalValue;
 }
 
+//' @title Construct critical values from alpha spending (internal)
+//' @description Internal worker that builds the vector of critical values for an alpha-spending design.
+//' @details
+//' Iterates `k=1..kMax`, computes the target cumulative spending at each information rate, and
+//' calibrates the corresponding critical value via `getCriticalValue()`.
+//' @param kMax Maximum number of stages (analyses).
+//' @param userAlphaSpending User-provided cumulative alpha spending values per stage.
+//' @param alpha Target type I error level.
+//' @param gammaA Alpha spending parameter (e.g., Kim–DeMets gamma).
+//' @param typeOfDesign Identifier for the spending/design family (e.g., "asOF", "asP", "asKD", "asUser").
+//' @param sided Number of sides for testing (1 or 2).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A numeric vector of critical values.
+//' @keywords internal
+//' @noRd
+//'
 NumericVector getDesignGroupSequentialAlphaSpending(int kMax, NumericVector userAlphaSpending, double alpha,
 	double gammaA, String typeOfDesign, double sided, NumericVector informationRates, bool bindingFutility,
 	NumericVector futilityBounds, double tolerance) {
@@ -606,7 +870,24 @@ NumericVector getDesignGroupSequentialAlphaSpending(int kMax, NumericVector user
 	return criticalValues;
 }
 
-// [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedAlphaSpendingCpp")]]
+//' @title User-defined alpha-spending critical values
+//' @description Compute critical values for a group sequential design from user-supplied cumulative alpha-spending values.
+//' @details
+//' Uses the recursive integration engine to calibrate boundaries stage-by-stage so that the achieved
+//' cumulative type I error matches the provided `userAlphaSpending`.
+//' @param kMax Maximum number of stages (analyses).
+//' @param userAlphaSpending User-provided cumulative alpha spending values per stage.
+//' @param sided Number of sides for testing (1 or 2).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A numeric vector of critical values.
+//' @keywords internal
+//' @noRd
+//'
+//' [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedAlphaSpendingCpp")]]
+//'
 NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(int kMax, NumericVector userAlphaSpending,
 	double sided, NumericVector informationRates, bool bindingFutility, NumericVector futilityBounds,
 	double tolerance) {
@@ -615,7 +896,26 @@ NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(int kMax, Nume
 	NA_REAL, C_TYPE_OF_DESIGN_AS_USER, sided, informationRates, bindingFutility, futilityBounds, tolerance);
 }
 
-// [[Rcpp::export(name = ".getDesignGroupSequentialAlphaSpendingCpp")]]
+//' @title Alpha-spending design critical values
+//' @description Compute critical values for standard alpha-spending families (O'Brien–Fleming, Pocock, Kim–DeMets, etc.).
+//' @details
+//' Evaluates the spending function at the given information rates and calibrates the resulting
+//' boundaries using recursive integration. `gammaA` parametrizes the Kim–DeMets family when applicable.
+//' @param kMax Maximum number of stages (analyses).
+//' @param alpha Target type I error level.
+//' @param gammaA Alpha spending parameter (e.g., Kim–DeMets gamma).
+//' @param typeOfDesign Identifier for the spending/design family (e.g., "asOF", "asP", "asKD", "asUser").
+//' @param sided Number of sides for testing (1 or 2).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A numeric vector of critical values.
+//' @keywords internal
+//' @noRd
+//'
+//' [[Rcpp::export(name = ".getDesignGroupSequentialAlphaSpendingCpp")]]
+//'
 NumericVector getDesignGroupSequentialAlphaSpendingCpp(int kMax, double alpha, double gammaA, String typeOfDesign,
 	double sided, NumericVector informationRates, bool bindingFutility, NumericVector futilityBounds,
 	double tolerance) {
@@ -623,7 +923,25 @@ NumericVector getDesignGroupSequentialAlphaSpendingCpp(int kMax, double alpha, d
 		informationRates, bindingFutility, futilityBounds, tolerance);
 }
 
-// [[Rcpp::export(name = ".getDesignGroupSequentialDeltaWTCpp")]]
+//' @title Delta-WT design critical values
+//' @description Compute critical values for the Delta-WT design family at the specified information rates.
+//' @details
+//' Uses the same calibration approach as other spending designs but with Delta-WT specific
+//' parameterization (`deltaWT`).
+//' @param kMax Maximum number of stages (analyses).
+//' @param alpha Target type I error level.
+//' @param sided Number of sides for testing (1 or 2).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @param deltaWT Delta parameter for the Delta-WT design family.
+//' @return A numeric vector of critical values.
+//' @keywords internal
+//' @noRd
+//'
+//' [[Rcpp::export(name = ".getDesignGroupSequentialDeltaWTCpp")]]
+//'
 NumericVector getDesignGroupSequentialDeltaWTCpp(int kMax, double alpha, double sided, NumericVector informationRates,
 	bool bindingFutility, NumericVector futilityBounds, double tolerance, double deltaWT) {
 
@@ -644,20 +962,65 @@ NumericVector getDesignGroupSequentialDeltaWTCpp(int kMax, double alpha, double 
 	return criticalValues;
 }
 
-// [[Rcpp::export(name = ".getDesignGroupSequentialPocockCpp")]]
+//' @title Pocock design critical values
+//' @description Compute Pocock-type constant critical values calibrated to the requested overall alpha.
+//' @details
+//' This wrapper targets the Pocock boundary family using the generic calibration machinery.
+//' @param kMax Maximum number of stages (analyses).
+//' @param alpha Target type I error level.
+//' @param sided Number of sides for testing (1 or 2).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A numeric vector of critical values.
+//' @keywords internal
+//' @noRd
+//'
+//' [[Rcpp::export(name = ".getDesignGroupSequentialPocockCpp")]]
+//'
 NumericVector getDesignGroupSequentialPocockCpp(int kMax, double alpha, double sided, NumericVector informationRates,
 	bool bindingFutility, NumericVector futilityBounds, double tolerance) {
 	return getDesignGroupSequentialDeltaWTCpp(kMax, alpha, sided, informationRates, bindingFutility, futilityBounds,
 		tolerance, 0.5);
 }
 
-// [[Rcpp::export(name = ".getDesignGroupSequentialOBrienAndFlemingCpp")]]
+//' @title O'Brien–Fleming design critical values
+//' @description Compute O'Brien–Fleming-type critical values calibrated to the requested overall alpha.
+//' @details
+//' This wrapper targets the O'Brien–Fleming boundary family using the generic calibration machinery.
+//' @param kMax Maximum number of stages (analyses).
+//' @param alpha Target type I error level.
+//' @param sided Number of sides for testing (1 or 2).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A numeric vector of critical values.
+//' @keywords internal
+//' @noRd
+//'
+//' [[Rcpp::export(name = ".getDesignGroupSequentialOBrienAndFlemingCpp")]]
+//'
 NumericVector getDesignGroupSequentialOBrienAndFlemingCpp(int kMax, double alpha, double sided,
 	NumericVector informationRates, bool bindingFutility, NumericVector futilityBounds, double tolerance) {
 	return getDesignGroupSequentialDeltaWTCpp(kMax, alpha, sided, informationRates, bindingFutility, futilityBounds,
 		tolerance, 0);
 }
 
+//' @title Decision matrix for futility-bound calibration
+//' @description Build a temporary decision matrix used while solving for futility bounds under beta spending.
+//' @details
+//' Applies an optional `shift` and supports one- and two-sided designs via `sided`.
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param futilityBoundsTemp Temporary futility bounds used during calibration.
+//' @param shift Numeric shift applied to futility bounds during calibration (implementation detail for stability).
+//' @param sided Number of sides for testing (1 or 2).
+//' @return A numeric matrix used by the probability engine.
+//' @keywords internal
+//' @noRd
+//'
 NumericMatrix getDecisionMatrixForFutilityBounds(NumericVector informationRates, NumericVector criticalValues,
 	NumericVector futilityBoundsTemp, double shift, double sided) {
 
@@ -681,6 +1044,22 @@ NumericMatrix getDecisionMatrixForFutilityBounds(NumericVector informationRates,
 	return decisionMatrix;
 }
 
+//' @title Calibrate one-sided futility bound at stage k
+//' @description Solve for the futility boundary at stage `k` so that the achieved beta spending matches the target.
+//' @details
+//' Uses the recursive integration engine to compute type II error spending given candidate futility
+//' bounds and searches until the discrepancy is within `tolerance`.
+//' @param k Stage index (1-based).
+//' @param betaSpendingValues Cumulative beta spending values per stage.
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param shift Numeric shift applied to futility bounds during calibration (implementation detail for stability).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A scalar double futility bound for stage `k`.
+//' @keywords internal
+//' @noRd
+//'
 double getFutilityBoundOneSided(int k, NumericVector betaSpendingValues, NumericVector informationRates,
 	NumericVector futilityBounds, NumericVector criticalValues, double shift, double tolerance) {
 	if (k == 1) {
@@ -703,6 +1082,20 @@ double getFutilityBoundOneSided(int k, NumericVector betaSpendingValues, Numeric
 	return futilityBound;
 }
 
+//' @title One-sided futility bounds from beta spending
+//' @description Compute the vector of futility bounds for a one-sided design from beta spending values.
+//' @details
+//' Iterates stages and calls `getFutilityBoundOneSided()`.
+//' @param kMax Maximum number of stages (analyses).
+//' @param betaSpendingValues Cumulative beta spending values per stage.
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param shift Numeric shift applied to futility bounds during calibration (implementation detail for stability).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A numeric vector of futility bounds.
+//' @keywords internal
+//' @noRd
+//'
 NumericVector getFutilityBoundsOneSided(int kMax, NumericVector betaSpendingValues, NumericVector informationRates,
 	NumericVector criticalValues, double shift, double tolerance) {
 	NumericVector futilityBounds = NumericVector(kMax, NA_REAL);
@@ -713,6 +1106,21 @@ NumericVector getFutilityBoundsOneSided(int kMax, NumericVector betaSpendingValu
 	return futilityBounds;
 }
 
+//' @title Probability table for futility-bound solving
+//' @description Compute probabilities needed to evaluate the beta-spending objective for a given set of futility bounds.
+//' @details
+//' Wraps the group sequential probability engine with a decision matrix tailored for futility
+//' calibration.
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param shift Numeric shift applied to futility bounds during calibration (implementation detail for stability).
+//' @param k Stage index (1-based).
+//' @param sided Number of sides for testing (1 or 2).
+//' @return A numeric matrix of probabilities.
+//' @keywords internal
+//' @noRd
+//'
 NumericMatrix getProbabilitiesForFutilityBounds(NumericVector informationRates, NumericVector criticalValues,
 	NumericVector futilityBounds, double shift, int k, double sided) {
 
@@ -722,6 +1130,29 @@ NumericMatrix getProbabilitiesForFutilityBounds(NumericVector informationRates, 
 		rangeVector(informationRates, 0, k - 1));
 }
 
+//' @title One-sided beta-spending design
+//' @description Compute a one-sided group sequential design with efficacy boundaries (alpha spending) and futility boundaries (beta spending).
+//' @details
+//' Combines alpha-spending critical value calibration with beta-spending futility bound calibration.
+//' Supports user-defined spending or standard families depending on `typeOfDesign` and
+//' `typeBetaSpending`.
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param kMax Maximum number of stages (analyses).
+//' @param userAlphaSpending User-provided cumulative alpha spending values per stage.
+//' @param userBetaSpending User-provided cumulative beta spending values per stage.
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @param typeOfDesign Identifier for the spending/design family (e.g., "asOF", "asP", "asKD", "asUser").
+//' @param typeBetaSpending Identifier for beta spending family or user-defined spending.
+//' @param gammaA Alpha spending parameter (e.g., Kim–DeMets gamma).
+//' @param gammaB Beta spending parameter (e.g., Kim–DeMets gamma for beta).
+//' @param alpha Target type I error level.
+//' @param beta Target type II error (1 - power) at the design alternative.
+//' @return A list containing critical values, futility bounds, and intermediate spending/probability results.
+//' @keywords internal
+//' @noRd
+//'
 List getDesignGroupSequentialBetaSpendingOneSidedCpp(NumericVector criticalValues, int kMax,
 	NumericVector userAlphaSpending, NumericVector userBetaSpending, NumericVector informationRates,
 	bool bindingFutility, double tolerance, String typeOfDesign, String typeBetaSpending, double gammaA, double gammaB,
@@ -788,6 +1219,15 @@ List getDesignGroupSequentialBetaSpendingOneSidedCpp(NumericVector criticalValue
 		betaSpent, _["power"] = power, _["shift"] = shiftResult);
 }
 
+//' @title First positive entry index
+//' @description Return the first index where the vector is strictly larger than zero.
+//' @details
+//' Utility used when beta spending is partially specified (e.g., starts at a later look).
+//' @param vec Numeric vector to scan.
+//' @return An integer index (1-based in R sense when returned to R) or 0 if none found.
+//' @keywords internal
+//' @noRd
+//'
 int getFirstIndexOfValuLargerZero(NumericVector vec) {
 	for (int i = 0; i < vec.size(); i++) {
 		if (!R_IsNA((double) vec[i]) && vec[i] > 0) {
@@ -798,6 +1238,19 @@ int getFirstIndexOfValuLargerZero(NumericVector vec) {
 }
 
 // Add additional option betaAdjustment for group sequential design (default = FALSE)
+//' @title Adjust beta-spending vector
+//' @description Optionally adjust beta spending values to account for late start (`kMin`) and numerical constraints.
+//' @details
+//' If `betaAdjustment` is enabled, the spending vector is rescaled/shifted so that the cumulative
+//' spending is consistent with the target overall `beta`.
+//' @param kMax Maximum number of stages (analyses).
+//' @param kMin First stage where beta spending becomes active (used for adjustment).
+//' @param betaSpendingValues Cumulative beta spending values per stage.
+//' @param betaAdjustment Whether to apply beta-spending adjustment when beta spending starts later than stage 1.
+//' @return A numeric vector of adjusted beta spending values.
+//' @keywords internal
+//' @noRd
+//'
 NumericVector getAdjustedBetaSpendingValues(int kMax, int kMin, NumericVector betaSpendingValues, bool betaAdjustment) {
 	if (kMin <= 0) {
 		return betaSpendingValues;
@@ -816,6 +1269,24 @@ NumericVector getAdjustedBetaSpendingValues(int kMax, int kMin, NumericVector be
 	return betaSpendingValuesAdjusted;
 }
 
+//' @title Calibrate two-sided futility bound at stage k
+//' @description Solve for the two-sided futility boundary at stage `k` under beta spending, potentially using an auxiliary one-sided bound.
+//' @details
+//' Two-sided futility calibration is more complex because the acceptance region is typically central;
+//' this routine uses the probability engine and root finding to match the target spending within
+//' `tolerance`.
+//' @param k Stage index (1-based).
+//' @param betaSpendingValues Cumulative beta spending values per stage.
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param futilityBoundsOneSided Auxiliary one-sided futility bounds used to stabilize two-sided calibration.
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param shift Numeric shift applied to futility bounds during calibration (implementation detail for stability).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A scalar double futility bound for stage `k`.
+//' @keywords internal
+//' @noRd
+//'
 double getFutilityBoundTwoSided(int k, NumericVector betaSpendingValues, NumericVector informationRates,
 	NumericVector futilityBounds, NumericVector futilityBoundsOneSided, NumericVector criticalValues, double shift,
 	double tolerance) {
@@ -861,6 +1332,21 @@ double getFutilityBoundTwoSided(int k, NumericVector betaSpendingValues, Numeric
 	return futilityBound;
 }
 
+//' @title Two-sided futility bounds from beta spending
+//' @description Compute the vector of futility bounds for a two-sided design from beta spending values.
+//' @details
+//' Iterates stages and calls `getFutilityBoundTwoSided()`.
+//' @param kMax Maximum number of stages (analyses).
+//' @param betaSpendingValues Cumulative beta spending values per stage.
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param futilityBoundsOneSided Auxiliary one-sided futility bounds used to stabilize two-sided calibration.
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param shift Numeric shift applied to futility bounds during calibration (implementation detail for stability).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A numeric vector of futility bounds.
+//' @keywords internal
+//' @noRd
+//'
 NumericVector getFutilityBoundsTwoSided(int kMax, NumericVector betaSpendingValues, NumericVector informationRates,
 	NumericVector futilityBoundsOneSided, NumericVector criticalValues, double shift, double tolerance) {
 	NumericVector futilityBounds = NumericVector(kMax, NA_REAL);
@@ -871,6 +1357,26 @@ NumericVector getFutilityBoundsTwoSided(int kMax, NumericVector betaSpendingValu
 	return futilityBounds;
 }
 
+//' @title Calibrate two-sided critical value at stage k
+//' @description Compute/adjust the two-sided critical value at stage `k` so that the achieved cumulative alpha matches the target spending.
+//' @details
+//' Uses a symmetric boundary (±c_k) and repeatedly calls the probability engine until the alpha
+//' constraint is met within `tolerance`.
+//' @param kMax Maximum number of stages (analyses).
+//' @param k Stage index (1-based).
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param userAlphaSpending User-provided cumulative alpha spending values per stage.
+//' @param alpha Target type I error level.
+//' @param gammaA Alpha spending parameter (e.g., Kim–DeMets gamma).
+//' @param typeOfDesign Identifier for the spending/design family (e.g., "asOF", "asP", "asKD", "asUser").
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param futilityBounds Vector of futility bounds per stage (may be `NA` / default when not used).
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @return A scalar double two-sided critical value for stage `k`.
+//' @keywords internal
+//' @noRd
+//'
 double getCriticalValueTwoSided(int kMax, int k, NumericVector criticalValues, NumericVector userAlphaSpending,
 	double alpha, double gammaA, String typeOfDesign, NumericVector informationRates, bool bindingFutility,
 	NumericVector futilityBounds, double tolerance) {
@@ -905,6 +1411,30 @@ double getCriticalValueTwoSided(int kMax, int k, NumericVector criticalValues, N
 	return criticalValue;
 }
 
+//' @title Two-sided beta-spending design
+//' @description Compute a two-sided group sequential design with efficacy and futility boundaries under alpha/beta spending.
+//' @details
+//' Extends the one-sided machinery to two-sided testing, including options for beta adjustment and
+//' specifying whether power is defined two-sided.
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param kMax Maximum number of stages (analyses).
+//' @param userAlphaSpending User-provided cumulative alpha spending values per stage.
+//' @param userBetaSpending User-provided cumulative beta spending values per stage.
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @param typeOfDesign Identifier for the spending/design family (e.g., "asOF", "asP", "asKD", "asUser").
+//' @param typeBetaSpending Identifier for beta spending family or user-defined spending.
+//' @param gammaA Alpha spending parameter (e.g., Kim–DeMets gamma).
+//' @param gammaB Beta spending parameter (e.g., Kim–DeMets gamma for beta).
+//' @param alpha Target type I error level.
+//' @param beta Target type II error (1 - power) at the design alternative.
+//' @param betaAdjustment Whether to apply beta-spending adjustment when beta spending starts later than stage 1.
+//' @param twoSidedPower Whether to interpret power/beta in a two-sided sense in the two-sided design.
+//' @return A list containing critical values, futility bounds, and diagnostics.
+//' @keywords internal
+//' @noRd
+//'
 List getDesignGroupSequentialBetaSpendingTwoSidedCpp(NumericVector criticalValues, int kMax,
 	NumericVector userAlphaSpending, NumericVector userBetaSpending, NumericVector informationRates,
 	bool bindingFutility, double tolerance, String typeOfDesign, String typeBetaSpending, double gammaA, double gammaB,
@@ -985,7 +1515,33 @@ List getDesignGroupSequentialBetaSpendingTwoSidedCpp(NumericVector criticalValue
 		betaSpent, _["power"] = power, _["shift"] = shiftResult);
 }
 
-// [[Rcpp::export(name = ".getDesignGroupSequentialBetaSpendingCpp")]]
+//' @title General beta-spending design (one- or two-sided)
+//' @description Main entry point for constructing group sequential designs with both alpha and beta spending.
+//' @details
+//' Dispatches to one-sided or two-sided implementations depending on `sided` and returns a unified
+//' result structure.
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param kMax Maximum number of stages (analyses).
+//' @param userAlphaSpending User-provided cumulative alpha spending values per stage.
+//' @param userBetaSpending User-provided cumulative beta spending values per stage.
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @param typeOfDesign Identifier for the spending/design family (e.g., "asOF", "asP", "asKD", "asUser").
+//' @param typeBetaSpending Identifier for beta spending family or user-defined spending.
+//' @param gammaA Alpha spending parameter (e.g., Kim–DeMets gamma).
+//' @param gammaB Beta spending parameter (e.g., Kim–DeMets gamma for beta).
+//' @param alpha Target type I error level.
+//' @param beta Target type II error (1 - power) at the design alternative.
+//' @param sided Number of sides for testing (1 or 2).
+//' @param betaAdjustment Whether to apply beta-spending adjustment when beta spending starts later than stage 1.
+//' @param twoSidedPower Whether to interpret power/beta in a two-sided sense in the two-sided design.
+//' @return A list containing boundaries, spending vectors, and diagnostics.
+//' @keywords internal
+//' @noRd
+//'
+//' [[Rcpp::export(name = ".getDesignGroupSequentialBetaSpendingCpp")]]
+//'
 List getDesignGroupSequentialBetaSpendingCpp(NumericVector criticalValues, int kMax, NumericVector userAlphaSpending,
 	NumericVector userBetaSpending, NumericVector informationRates, bool bindingFutility, double tolerance,
 	String typeOfDesign, String typeBetaSpending, double gammaA, double gammaB, double alpha, double beta, double sided,
@@ -1001,7 +1557,30 @@ List getDesignGroupSequentialBetaSpendingCpp(NumericVector criticalValues, int k
 		betaAdjustment, twoSidedPower);
 }
 
-// [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedBetaSpendingCpp")]]
+//' @title User-defined beta spending design
+//' @description Construct a group sequential design from user-provided alpha and beta spending vectors.
+//' @details
+//' Calibrates critical values and futility bounds stage-by-stage to match the supplied spending, using
+//' recursive integration for probability evaluation.
+//' @param criticalValues Vector of efficacy (upper) critical values per stage.
+//' @param kMax Maximum number of stages (analyses).
+//' @param userAlphaSpending User-provided cumulative alpha spending values per stage.
+//' @param userBetaSpending User-provided cumulative beta spending values per stage.
+//' @param sided Number of sides for testing (1 or 2).
+//' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
+//' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
+//' @param tolerance Absolute convergence tolerance for iterative calibration / root finding.
+//' @param typeOfDesign Identifier for the spending/design family (e.g., "asOF", "asP", "asKD", "asUser").
+//' @param gammaA Alpha spending parameter (e.g., Kim–DeMets gamma).
+//' @param alpha Target type I error level.
+//' @param betaAdjustment Whether to apply beta-spending adjustment when beta spending starts later than stage 1.
+//' @param twoSidedPower Whether to interpret power/beta in a two-sided sense in the two-sided design.
+//' @return A list containing boundaries and diagnostics.
+//' @keywords internal
+//' @noRd
+//'
+//' [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedBetaSpendingCpp")]]
+//'
 List getDesignGroupSequentialUserDefinedBetaSpendingCpp(NumericVector criticalValues, int kMax,
 	NumericVector userAlphaSpending, NumericVector userBetaSpending, double sided, NumericVector informationRates,
 	bool bindingFutility, double tolerance, String typeOfDesign, double gammaA, double alpha, bool betaAdjustment,
