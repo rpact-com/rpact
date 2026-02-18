@@ -1,6 +1,7 @@
-# Survival Helper Functions for Conversion of Pi, Lambda, Median
+# Survival Helper Functions for Conversion of Pi, Lambda, Median, and Hazard Ratio Values
 
-Functions to convert pi, lambda and median values into each other.
+Functions to convert pi, lambda, median, and hazard ratio values into
+each other.
 
 ## Usage
 
@@ -10,6 +11,18 @@ getLambdaByPi(piValue, eventTime = 12, kappa = 1)
 getLambdaByMedian(median, kappa = 1)
 
 getHazardRatioByPi(pi1, pi2, eventTime = 12, kappa = 1)
+
+getHazardRatioByLambda(lambda1, lambda2)
+
+getHazardRatioByMedian(median1, median2, kappa = 1)
+
+getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
+
+getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio)
+
+getPi1ByPi2AndHazardRatio(pi2, hazardRatio, eventTime = 12, kappa = 1)
+
+getPi2ByPi1AndHazardRatio(pi1, hazardRatio, eventTime = 12, kappa = 1)
 
 getPiByLambda(lambda, eventTime = 12, kappa = 1)
 
@@ -22,7 +35,7 @@ getMedianByPi(piValue, eventTime = 12, kappa = 1)
 
 ## Arguments
 
-- piValue, pi1, pi2, lambda, median:
+- piValue, pi1, pi2, lambda, lambda1, lambda2, median, median1, median2:
 
   Value that shall be converted.
 
@@ -54,8 +67,8 @@ vector will be returned.
 
 ## Details
 
-Can be used, e.g., to convert median values into pi or lambda values for
-usage in
+Can be used, e.g., to convert pi, median, or lambda values into pi,
+median, lambda, or hazard ratio values, e.g, for usage in
 [`getSampleSizeSurvival()`](https://docs.rpact.org/reference/getSampleSizeSurvival.md)
 or
 [`getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.md).

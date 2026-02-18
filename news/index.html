@@ -39,13 +39,20 @@
 <h2 class="pkg-version" data-toc-text="4.4.0" id="rpact-440">rpact 4.4.0<a class="anchor" aria-label="anchor" href="#rpact-440"></a></h2>
 <div class="section level3">
 <h3 id="new-features-4-4-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-4-0"></a></h3>
-<ul><li>n/a</li>
+<ul><li>Extended <code><a href="../reference/testPackage.html">testPackage()</a></code> with additional options for report customization and metadata handling. A new argument <code>reportFileBaseName</code> allows explicit control over the base name of all generated report files.</li>
+<li>
+<code><a href="../reference/testPackage.html">testPackage()</a></code> now supports structured metadata via the new arguments <code>metaData</code> and <code>metaDataFile</code>. Users can either pass a named list of key–value pairs directly or provide an external text file in <code>KEY=VALUE</code> format. This metadata is included in the generated test reports and supports reproducible, auditable installation qualification and validation workflows.</li>
+<li>Added two internal utility functions, <code><a href="../reference/writeKeyValueFile.html">writeKeyValueFile()</a></code> and <code><a href="../reference/readKeyValueFile.html">readKeyValueFile()</a></code>, for writing and reading human-editable key–value metadata files (<code>KEY=VALUE</code>, INI/.env-like format). These functions are implemented using base R only, support UTF-8 encoding, comments, and robust parsing, and are intended for use in regulated environments.</li>
+<li>The new key–value file utilities are used internally by <code><a href="../reference/testPackage.html">testPackage()</a></code> to support structured metadata handling via the <code>metaData</code> and <code>metaDataFile</code> arguments, enabling reproducible and auditable inclusion of environment- and system-specific information in installation qualification and validation reports.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-issues-and-changes-4-4-0">Improvements, issues, and changes<a class="anchor" aria-label="anchor" href="#improvements-issues-and-changes-4-4-0"></a></h3>
-<ul><li>Improved parameter defaulting and assignment logic</li>
-<li>Used <code><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical()</a></code> for user-defined parameter checks</li>
-<li>Enhanced warning messages for ignored parameters</li>
+<ul><li>Improved parameter defaulting and assignment logic.</li>
+<li>Used <code><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical()</a></code> for user-defined parameter checks.</li>
+<li>Enhanced warning messages for ignored parameters.</li>
+<li>Adjusted the calculation in <code><a href="../reference/utilitiesForSurvivalTrials.html">getHazardRatioByPi()</a></code> to return the hazard ratio directly derived from the corresponding rate parameters, i.e., the hazard ratio is defined as <code>lambda1</code> / <code>lambda2</code>; the Weibull shape parameter <code>kappa</code> controls time-dependence only.</li>
+<li>Enhanced count data parameter validation logic</li>
+<li>Update version, citation handling, and references for rpact package</li>
 </ul></div>
 </div>
     <div class="section level2">

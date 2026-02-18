@@ -4,14 +4,47 @@
 
 ### New features
 
-- n/a
+- Extended
+  [`testPackage()`](https://docs.rpact.org/reference/testPackage.md)
+  with additional options for report customization and metadata
+  handling. A new argument `reportFileBaseName` allows explicit control
+  over the base name of all generated report files.
+- [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) now
+  supports structured metadata via the new arguments `metaData` and
+  `metaDataFile`. Users can either pass a named list of key–value pairs
+  directly or provide an external text file in `KEY=VALUE` format. This
+  metadata is included in the generated test reports and supports
+  reproducible, auditable installation qualification and validation
+  workflows.
+- Added two internal utility functions,
+  [`writeKeyValueFile()`](https://docs.rpact.org/reference/writeKeyValueFile.md)
+  and
+  [`readKeyValueFile()`](https://docs.rpact.org/reference/readKeyValueFile.md),
+  for writing and reading human-editable key–value metadata files
+  (`KEY=VALUE`, INI/.env-like format). These functions are implemented
+  using base R only, support UTF-8 encoding, comments, and robust
+  parsing, and are intended for use in regulated environments.
+- The new key–value file utilities are used internally by
+  [`testPackage()`](https://docs.rpact.org/reference/testPackage.md) to
+  support structured metadata handling via the `metaData` and
+  `metaDataFile` arguments, enabling reproducible and auditable
+  inclusion of environment- and system-specific information in
+  installation qualification and validation reports.
 
 ### Improvements, issues, and changes
 
-- Improved parameter defaulting and assignment logic
+- Improved parameter defaulting and assignment logic.
 - Used [`identical()`](https://rdrr.io/r/base/identical.html) for
-  user-defined parameter checks
-- Enhanced warning messages for ignored parameters
+  user-defined parameter checks.
+- Enhanced warning messages for ignored parameters.
+- Adjusted the calculation in
+  [`getHazardRatioByPi()`](https://docs.rpact.org/reference/utilitiesForSurvivalTrials.md)
+  to return the hazard ratio directly derived from the corresponding
+  rate parameters, i.e., the hazard ratio is defined as `lambda1` /
+  `lambda2`; the Weibull shape parameter `kappa` controls
+  time-dependence only.
+- Enhanced count data parameter validation logic
+- Update version, citation handling, and references for rpact package
 
 ## rpact 4.3.0
 

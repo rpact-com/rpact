@@ -294,14 +294,6 @@ with [`testPackage()`](https://docs.rpact.org/reference/testPackage.md).
   [`getPiecewiseExponentialRandomNumbers()`](https://docs.rpact.org/reference/utilitiesForPiecewiseExponentialDistribution.md)
   [`rpwexp()`](https://docs.rpact.org/reference/utilitiesForPiecewiseExponentialDistribution.md)
   : The Piecewise Exponential Distribution
-- [`getLambdaByPi()`](https://docs.rpact.org/reference/utilitiesForSurvivalTrials.md)
-  [`getLambdaByMedian()`](https://docs.rpact.org/reference/utilitiesForSurvivalTrials.md)
-  [`getHazardRatioByPi()`](https://docs.rpact.org/reference/utilitiesForSurvivalTrials.md)
-  [`getPiByLambda()`](https://docs.rpact.org/reference/utilitiesForSurvivalTrials.md)
-  [`getPiByMedian()`](https://docs.rpact.org/reference/utilitiesForSurvivalTrials.md)
-  [`getMedianByLambda()`](https://docs.rpact.org/reference/utilitiesForSurvivalTrials.md)
-  [`getMedianByPi()`](https://docs.rpact.org/reference/utilitiesForSurvivalTrials.md)
-  : Survival Helper Functions for Conversion of Pi, Lambda, Median
 - [`writeDataset()`](https://docs.rpact.org/reference/writeDataset.md) :
   Write Dataset
 - [`writeDatasets()`](https://docs.rpact.org/reference/writeDatasets.md)
