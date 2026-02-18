@@ -318,7 +318,8 @@ NULL
     stop(
         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
         "at least for one treatment arm the values for ", numberOfStages, " stages must be defined ",
-        "because the control arm defines ", numberOfStages, " stages"
+        "because the control arm defines ", numberOfStages, " stages",
+        call. = FALSE
     )
 }
 
@@ -327,7 +328,7 @@ NULL
     args <- .removeDesignFromArgs(args)
     argNames <- .getArgumentNames(...)
     if (length(args) == 0 || length(argNames) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "data.frame or data vectors expected")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "data.frame or data vectors expected", call. = FALSE)
     }
 
     multiArmEnabled <- any(grep("3", argNames))
@@ -353,14 +354,16 @@ NULL
         if (is.null(argValues) || length(argValues) == 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'", argName, "' is not a valid numeric vector"
+                "'", argName, "' is not a valid numeric vector",
+                call. = FALSE
             )
         }
 
         if (is.na(argValues[1])) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'", argName, "' is NA at first stage; a valid numeric value must be specified at stage 1"
+                "'", argName, "' is NA at first stage; a valid numeric value must be specified at stage 1",
+                call. = FALSE
             )
         }
 
@@ -369,7 +372,8 @@ NULL
                 C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                 "all data vectors must have the same length: '",
                 argName, "' (", length(argValues), ") differs from '",
-                argNames[1], "' (", numberOfValues, ")"
+                argNames[1], "' (", numberOfValues, ")",
+                call. = FALSE
             )
         }
 
@@ -377,7 +381,8 @@ NULL
             if (length(stats::na.omit(argValues)) != length(argValues)) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "NA's not allowed for '", argName, "'; stages must be defined completely"
+                    "NA's not allowed for '", argName, "'; stages must be defined completely",
+                    call. = FALSE
                 )
             }
 
@@ -386,7 +391,8 @@ NULL
                 if (length(definedStages) == 0) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "no valid stages are defined; ",
-                        "stages must be defined completely (", .arrayToString(1:numberOfValues), ")"
+                        "stages must be defined completely (", .arrayToString(1:numberOfValues), ")",
+                        call. = FALSE
                     )
                 }
                 if (!enrichmentEnabled) {
@@ -394,7 +400,7 @@ NULL
                         paste0("only stage ", definedStages, " is defined"),
                         paste0("only stages ", .arrayToString(definedStages), " are defined")
                     )
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, msg, "; stages must be defined completely")
+                    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, msg, "; stages must be defined completely", call. = FALSE)
                 }
             }
         }
@@ -403,7 +409,8 @@ NULL
                 length(na.omit(argValues)) < numberOfStages) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "control group '", argName, "' (", .arrayToString(argValues, digits = 2), ") must be defined for all stages"
+                "control group '", argName, "' (", .arrayToString(argValues, digits = 2), ") must be defined for all stages",
+                call. = FALSE
             )
         }
 
@@ -414,7 +421,8 @@ NULL
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'", argName, "' contains a NA at stage ", stageIndex,
-                    " followed by a value for a higher stage; NA's must be the last values"
+                    " followed by a value for a higher stage; NA's must be the last values",
+                    call. = FALSE
                 )
             }
         }
@@ -427,7 +435,8 @@ NULL
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "'", argName, "' contains alternating values and NA's; ",
-                        "NA's must be the last values"
+                        "NA's must be the last values",
+                        call. = FALSE
                     )
                 }
                 indexBefore <- index
@@ -441,7 +450,8 @@ NULL
                         stop(
                             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                             "inconsistent NA definition; ",
-                            "if NA's exist, then they are mandatory for each group at the same stage"
+                            "if NA's exist, then they are mandatory for each group at the same stage",
+                            call. = FALSE
                         )
                     }
                 }
@@ -455,7 +465,8 @@ NULL
                         stop(
                             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                             "values of treatment ", groupNumber, " not correctly specified; ",
-                            "if NA's exist, then they are mandatory for each parameter at the same stage"
+                            "if NA's exist, then they are mandatory for each parameter at the same stage",
+                            call. = FALSE
                         )
                     }
                 }
@@ -468,21 +479,24 @@ NULL
         if (sum(is.infinite(argValues)) > 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all data values must be finite; ",
-                "'", argName, "' contains infinite values"
+                "'", argName, "' contains infinite values",
+                call. = FALSE
             )
         }
 
         if (!any(grepl(paste0("^", sub("\\d*$", "", argName), "$"), C_KEY_WORDS_SUBSETS)) && !is.numeric(argValues)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all data vectors must be numeric ('",
-                argName, "' is ", .getClassName(argValues), ")"
+                argName, "' is ", .getClassName(argValues), ")",
+                call. = FALSE
             )
         }
 
         if (length(argValues) > C_KMAX_UPPER_BOUND * numberOfSubsets) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
-                "'", argName, "' is out of bounds [1, ", C_KMAX_UPPER_BOUND, "]"
+                "'", argName, "' is out of bounds [1, ", C_KMAX_UPPER_BOUND, "]",
+                call. = FALSE
             )
         }
     }
@@ -499,7 +513,8 @@ NULL
                         stop(
                             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                             "inconsistent NA definition for group ", groupNumber, "; ",
-                            "if NA's exist, then they are mandatory for each group at the same stage"
+                            "if NA's exist, then they are mandatory for each group at the same stage",
+                            call. = FALSE
                         )
                     }
                 }
@@ -520,7 +535,8 @@ NULL
     if (length(args) == 0) {
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "cannot initialize dataset because no data are defined"
+            "cannot initialize dataset because no data are defined",
+            call. = FALSE
         )
     }
 
@@ -657,13 +673,15 @@ NULL
         if (length(unknownArgs) == 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "the argument '", unknownArgs, "' is not a valid dataset argument"
+                "the argument '", unknownArgs, "' is not a valid dataset argument",
+                call. = FALSE
             )
         } else {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "the arguments ", .arrayToString(unknownArgs, encapsulate = TRUE),
-                " are no valid dataset arguments"
+                " are no valid dataset arguments",
+                call. = FALSE
             )
         }
     }
@@ -873,7 +891,7 @@ getWideFormat <- function(dataInput) {
 
 .getWideFormat <- function(dataFrame) {
     if (!is.data.frame(dataFrame)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataFrame' must be a data.frame (is ", .getClassName(dataFrame), ")")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataFrame' must be a data.frame (is ", .getClassName(dataFrame), ")", call. = FALSE)
     }
 
     paramNames <- names(dataFrame)
@@ -1038,8 +1056,7 @@ getLongFormat <- function(dataInput) {
 .fireDataInputNotSupportedException <- function(dataInput) {
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
-        "'", .getClassName(dataInput), "' is not supported",
-        call. = FALSE
+        "'", .getClassName(dataInput), "' is not supported"
     )
 }
 

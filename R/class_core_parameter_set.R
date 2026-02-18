@@ -230,7 +230,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterName' must be a valid character with length > 0"
+                    "'parameterName' must be a valid character with length > 0",
+                    call. = FALSE
                 )
             }
 
@@ -248,7 +249,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterName' must be a valid character with length > 0"
+                    "'parameterName' must be a valid character with length > 0",
+                    call. = FALSE
                 )
             }
 
@@ -260,7 +262,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 ))) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterType' ('", parameterType, "') is invalid"
+                    "'parameterType' ('", parameterType, "') is invalid",
+                    call. = FALSE
                 )
             }
 
@@ -812,7 +815,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         },
         .getDataFrameColumnCaption = function(parameterName, niceColumnNamesEnabled) {
             if (length(parameterName) == 0 || parameterName == "") {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterName' must be a valid parameter name")
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterName' must be a valid parameter name", call. = FALSE)
             }
 
             if (!niceColumnNamesEnabled) {
@@ -1959,7 +1962,7 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
             }
         }
         if (length(var) == 0 || !(var %in% names(x))) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(varRoot), " does not exist")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(varRoot), " does not exist", call. = FALSE)
         }
 
         value <- x[[var]]
@@ -1989,7 +1992,7 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
     varNames <- names(x)
     .assertIsInClosedInterval(var, "var", lower = -length(varNames), upper = length(varNames))
     if (var == 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'var' (", var, ") must != 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'var' (", var, ") must != 0", call. = FALSE)
     }
     if (var < 0) {
         var <- length(varNames) + var + 1
@@ -2160,7 +2163,7 @@ kable.ParameterSet <- function(x, ...) {
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") ",
                     "does not work correctly. ",
                     "Use ", sub("print", "kable", objName), " without 'print' ",
-                    "instead or ", sub("\\)", ", markdown = TRUE)", objName)
+                    "instead or ", sub("\\)", ", markdown = TRUE, call. = FALSE)", objName)
                 )
             }
         }

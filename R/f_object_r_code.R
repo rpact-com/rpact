@@ -509,7 +509,8 @@ getObjectRCode <- function(obj,
             "'newArgumentValues' must be a named list ",
             "(is ",
             .getClassName(newArgumentValues),
-            ")"
+            ")",
+            call. = FALSE
         )
     }
 
@@ -779,7 +780,8 @@ getObjectRCode <- function(obj,
                 illegalArgumentValueNames,
                 "' is not a valid ",
                 functionName,
-                "() argument"
+                "() argument",
+                call. = FALSE
             )
         }
 

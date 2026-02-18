@@ -573,8 +573,7 @@ NULL
                     secondValue,
                     firstValue,
                     theta
-                ),
-                call. = FALSE
+                )
             )
         }
     }

@@ -840,8 +840,7 @@ NULL
         # Repeated onfidence intervals when using combination tests
         if (intersectionTest == "Hierarchical") {
             warning("Repeated confidence intervals not available for ",
-                "'intersectionTest' = \"Hierarchical\"",
-                call. = FALSE
+                "'intersectionTest' = \"Hierarchical\""
             )
             return(repeatedConfidenceIntervals)
         }
@@ -1201,7 +1200,8 @@ NULL
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or ",
-        "TrialDesignConditionalDunnett"
+        "TrialDesignConditionalDunnett",
+        call. = FALSE
     )
 }
 

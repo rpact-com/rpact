@@ -386,7 +386,8 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", functionFieldName, "' must be a function or a character ",
-            "string specifying a function written in R/C++/Rcpp"
+            "string specifying a function written in R/C++/Rcpp",
+            call. = FALSE
         )
     }
 
@@ -448,7 +449,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
                     ),
                     verbose = FALSE, showOutput = TRUE
                 )
-                stop("Failed to compile '", functionFieldName, "': ", e$message)
+                stop("Failed to compile '", functionFieldName, "': ", e$message, call. = FALSE)
             }
         )
     }
@@ -464,7 +465,7 @@ C_SIMULATION_CALC_SUBJECTS_FUNCTION_ARGUMENTS[[C_SIMULATION_CALC_SUBJECTS_FUNCTI
             ))
         },
         error = function(e) {
-            stop("Failed to evaluate and parse '", functionFieldName, "': ", e$message)
+            stop("Failed to evaluate and parse '", functionFieldName, "': ", e$message, call. = FALSE)
         }
     )
 

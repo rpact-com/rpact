@@ -522,7 +522,7 @@ NULL
 .getPiecewiseExponentialDistributionSingleTime <- function(time, piecewiseLambda, piecewiseSurvivalTime = NA_real_, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'kappa' (", kappa, ") must be > 0")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'kappa' (", kappa, ") must be > 0", call. = FALSE)
         }
 
         return(stats::pweibull(time, kappa, scale = 1 / piecewiseLambda, lower.tail = TRUE, log.p = FALSE))
@@ -532,7 +532,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "length of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime),
-            ") must be equal to length of 'piecewiseLambda' (", .arrayToString(piecewiseLambda), ")"
+            ") must be equal to length of 'piecewiseLambda' (", .arrayToString(piecewiseLambda), ")",
+            call. = FALSE
         )
     }
 
@@ -541,7 +542,8 @@ NULL
     if (kappa != 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Weibull distribution cannot be used for piecewise survival definition"
+            "Weibull distribution cannot be used for piecewise survival definition",
+            call. = FALSE
         )
     }
 
@@ -577,10 +579,11 @@ NULL
         if (kappa <= 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "kappa needs to a positive number"
+                "kappa needs to a positive number",
+                call. = FALSE
             )
         }
-        
+
         # kappa is required here because quantiles depend on the Weibull shape parameter
         return((-log(1 - quantile))^(1 / kappa) / piecewiseLambda[1])
     }
@@ -588,7 +591,8 @@ NULL
     if (kappa != 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Weibull distribution cannot be used for piecewise exponential survival definition"
+            "Weibull distribution cannot be used for piecewise exponential survival definition",
+            call. = FALSE
         )
     }
 
@@ -653,7 +657,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
             "'piecewiseSurvivalTime' needs to be a numeric vector and not a list ",
-            "because 'piecewiseLambda' (", piecewiseLambda, ") is defined separately"
+            "because 'piecewiseLambda' (", piecewiseLambda, ") is defined separately",
+            call. = FALSE
         )
     }
 
@@ -755,20 +760,21 @@ getPiecewiseExponentialDistribution <- function(time, ...,
     if (any(time < 0)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "time needs to be a non-negative number"
+            "time needs to be a non-negative number",
+            call. = FALSE
         )
     }
 
     settings <- .getPiecewiseExponentialSettings(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
-        piecewiseLambda = piecewiseLambda, 
+        piecewiseLambda = piecewiseLambda,
         kappa = kappa
     )
 
     return(.getPiecewiseExponentialDistribution(
         time = time,
         piecewiseSurvivalTime = settings$piecewiseSurvivalTime,
-        piecewiseLambda = settings$piecewiseLambda, 
+        piecewiseLambda = settings$piecewiseLambda,
         kappa = kappa
     ))
 }
@@ -791,7 +797,8 @@ getPiecewiseExponentialQuantile <- function(quantile, ...,
     if (any(quantile < 0) || any(quantile > 1)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "quantile needs to be within [0; 1]"
+            "quantile needs to be within [0; 1]",
+            call. = FALSE
         )
     }
 
@@ -894,8 +901,7 @@ NULL
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getLambdaByPi <- function(
-        piValue,
+getLambdaByPi <- function(piValue,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(piValue, "pi")
@@ -904,11 +910,11 @@ getLambdaByPi <- function(
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
     for (value in piValue) {
         if (!is.na(value) && value > 1 - 1e-16 && value < 1 + 1e-16) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'pi' must be != 1")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'pi' must be != 1", call. = FALSE)
         }
     }
-    
-    # kappa enters here because lambda is derived from 
+
+    # kappa enters here because lambda is derived from
     # a Weibull distributional relationship (pi -> lambda)
     return((-log(1 - piValue))^(1 / kappa) / eventTime)
 }
@@ -921,19 +927,18 @@ getLambdaByMedian <- function(median, kappa = 1) {
     return(log(2)^(1 / kappa) / median)
 }
 
-.assertHasCompatibleLength <- function(
-        paramValue1,
+.assertHasCompatibleLength <- function(paramValue1,
         paramValue2,
         paramName1,
         paramName2) {
     if (length(paramValue1) == 1L || length(paramValue2) == 1L) {
         return(invisible())
     }
-    
+
     if (length(paramValue1) == length(paramValue2)) {
         return(invisible())
     }
-    
+
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "invalid length of ", sQuote(paramName2), ". ",
@@ -946,14 +951,13 @@ getLambdaByMedian <- function(median, kappa = 1) {
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getHazardRatioByPi <- function(
-        pi1, 
+getHazardRatioByPi <- function(pi1,
         pi2,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(pi1, "pi1")
     .assertIsValidPi(pi2, "pi2")
-    .assertHasCompatibleLength(pi1, pi2, "pi1", "pi2") 
+    .assertHasCompatibleLength(pi1, pi2, "pi1", "pi2")
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
@@ -965,7 +969,7 @@ getHazardRatioByPi <- function(
 getHazardRatioByLambda <- function(lambda1, lambda2) {
     .assertIsValidLambda(lambda1, 1)
     .assertIsValidLambda(lambda2, 2)
-    .assertHasCompatibleLength(lambda1, lambda2, "lambda1", "lambda2") 
+    .assertHasCompatibleLength(lambda1, lambda2, "lambda1", "lambda2")
     return(lambda1 / lambda2)
 }
 
@@ -974,7 +978,7 @@ getHazardRatioByLambda <- function(lambda1, lambda2) {
 getHazardRatioByMedian <- function(median1, median2, kappa = 1) {
     .assertIsNumericVector(median1, "median1")
     .assertIsNumericVector(median2, "median2")
-    .assertHasCompatibleLength(median1, median2, "median1", "median2") 
+    .assertHasCompatibleLength(median1, median2, "median1", "median2")
     return(getLambdaByMedian(median1, kappa = kappa) / getLambdaByMedian(median2, kappa = kappa))
 }
 
@@ -983,8 +987,8 @@ getHazardRatioByMedian <- function(median1, median2, kappa = 1) {
 #' @keywords internal
 getLambda1ByLambda2AndHazardRatio <- function(lambda2, hazardRatio) {
     .assertIsValidLambda(lambda2, 2)
-    .assertIsValidHazardRatioVector(hazardRatio) 
-    .assertHasCompatibleLength(lambda2, hazardRatio, "lambda2", "hazardRatio") 
+    .assertIsValidHazardRatioVector(hazardRatio)
+    .assertHasCompatibleLength(lambda2, hazardRatio, "lambda2", "hazardRatio")
     return(lambda2 * hazardRatio)
 }
 
@@ -993,8 +997,8 @@ getLambda1ByLambda2AndHazardRatio <- function(lambda2, hazardRatio) {
 #' @keywords internal
 getLambda2ByLambda1AndHazardRatio <- function(lambda1, hazardRatio) {
     .assertIsValidLambda(lambda1, 1)
-    .assertIsValidHazardRatioVector(hazardRatio) 
-    .assertHasCompatibleLength(lambda1, hazardRatio, "lambda1", "hazardRatio") 
+    .assertIsValidHazardRatioVector(hazardRatio)
+    .assertHasCompatibleLength(lambda1, hazardRatio, "lambda1", "hazardRatio")
     return(lambda1 / hazardRatio)
 }
 
@@ -1003,9 +1007,9 @@ getLambda2ByLambda1AndHazardRatio <- function(lambda1, hazardRatio) {
 #' @keywords internal
 getPi1ByPi2AndHazardRatio <- function(pi2, hazardRatio, eventTime = 12, kappa = 1) {
     .assertIsValidPi(pi2, "pi2")
-    .assertIsValidHazardRatioVector(hazardRatio) 
+    .assertIsValidHazardRatioVector(hazardRatio)
     .assertIsValidKappa(kappa)
-    lambda2 <- getLambdaByPi(pi2, eventTime, kappa = kappa) 
+    lambda2 <- getLambdaByPi(pi2, eventTime, kappa = kappa)
     lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
     pi1 <- getPiByLambda(lambda1, eventTime, kappa = kappa)
     return(pi1)
@@ -1016,9 +1020,9 @@ getPi1ByPi2AndHazardRatio <- function(pi2, hazardRatio, eventTime = 12, kappa = 
 #' @keywords internal
 getPi2ByPi1AndHazardRatio <- function(pi1, hazardRatio, eventTime = 12, kappa = 1) {
     .assertIsValidPi(pi1, "pi1")
-    .assertIsValidHazardRatioVector(hazardRatio) 
+    .assertIsValidHazardRatioVector(hazardRatio)
     .assertIsValidKappa(kappa)
-    lambda1 <- getLambdaByPi(pi1, eventTime, kappa = kappa) 
+    lambda1 <- getLambdaByPi(pi1, eventTime, kappa = kappa)
     lambda2 <- getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio)
     pi2 <- getPiByLambda(lambda2, eventTime, kappa = kappa)
     return(pi2)
@@ -1026,8 +1030,7 @@ getPi2ByPi1AndHazardRatio <- function(pi1, hazardRatio, eventTime = 12, kappa = 
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getPiByLambda <- function(
-        lambda,
+getPiByLambda <- function(lambda,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidLambda(lambda)
@@ -1047,8 +1050,7 @@ getPiByLambda <- function(
 
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getPiByMedian <- function(
-        median,
+getPiByMedian <- function(median,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsNumericVector(median, "median")

@@ -212,7 +212,7 @@ getDesignFisher <- function(...,
     }
 
     if (sided != 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "Fisher's combination test only available for one-sided testing")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "Fisher's combination test only available for one-sided testing", call. = FALSE)
     }
 
     if (is.na(bindingFutility)) {
@@ -263,7 +263,8 @@ getDesignFisher <- function(...,
     if (!.isFisherMethod(design$method)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'method' must be one of the following: ", .printFisherMethods()
+            "'method' must be one of the following: ", .printFisherMethods(),
+            call. = FALSE
         )
     }
 
@@ -313,7 +314,8 @@ getDesignFisher <- function(...,
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "method '", C_FISHER_METHOD_NO_INTERACTION,
-            "' is only allowed for kMax > 2 (kMax is ", design$kMax, ")"
+            "' is only allowed for kMax > 2 (kMax is ", design$kMax, ")",
+            call. = FALSE
         )
     }
 
@@ -338,7 +340,8 @@ getDesignFisher <- function(...,
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "for specified 'method' (\"", C_FISHER_METHOD_NO_INTERACTION,
             "\") the 'alpha0Vec' must be unequal to ", .arrayToString(alpha0Vec, vectorLookAndFeelEnabled = TRUE),
-            " and 'bindingFutility' must be TRUE"
+            " and 'bindingFutility' must be TRUE",
+            call. = FALSE
         )
     }
 
@@ -433,7 +436,8 @@ getDesignFisher <- function(...,
             if (!all(is.na(design$stageLevels)) && any(na.omit(design$stageLevels[1:(design$kMax - 1)]) > design$alpha)) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'alpha' (", design$alpha, ") not correctly specified"
+                    "'alpha' (", design$alpha, ") not correctly specified",
+                    call. = FALSE
                 )
             }
         }
@@ -443,7 +447,8 @@ getDesignFisher <- function(...,
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'alpha' (", design$alpha, ") or 'userAlphaSpending' (",
-                    .arrayToString(design$userAlphaSpending), ") not correctly specified"
+                    .arrayToString(design$userAlphaSpending), ") not correctly specified",
+                    call. = FALSE
                 )
             }
         }

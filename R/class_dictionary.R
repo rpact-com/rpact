@@ -28,13 +28,15 @@ createDictionary <- function(name, keyValuePairList = NULL) {
     if (is.null(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'x' must be a valid 'Dictionary' (is NULL)"
+            "'x' must be a valid 'Dictionary' (is NULL)",
+            call. = FALSE
         )
     }
     if (!inherits(x, "Dictionary")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'x' must be an instance of class 'Dictionary' (is ", .getClassName(x), ")"
+            "'x' must be an instance of class 'Dictionary' (is ", .getClassName(x), ")",
+            call. = FALSE
         )
     }
 }
@@ -127,11 +129,11 @@ print.Dictionary <- function(x, ...) {
 initDictionary <- function(x, keyValuePairList) {
     .assertIsDictionary(x)
     if (is.null(keyValuePairList) || length(keyValuePairList) == 0 || !is.list(keyValuePairList)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'keyValuePairList' must be a valid list")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'keyValuePairList' must be a valid list", call. = FALSE)
     }
 
     if (any(names(keyValuePairList) == "")) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'keyValuePairList' must be a named list")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'keyValuePairList' must be a named list", call. = FALSE)
     }
 
     for (key in names(keyValuePairList)) {

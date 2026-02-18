@@ -48,14 +48,16 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "if 'kappa' != 1 then 'lambda1' (",
-                .arrayToString(pwsTimeObject$lambda1), ") must be a single numeric value"
+                .arrayToString(pwsTimeObject$lambda1), ") must be a single numeric value",
+                call. = FALSE
             )
         }
         if (length(pwsTimeObject$lambda2) != 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "if 'kappa' != 1 then 'lambda2' (",
-                .arrayToString(pwsTimeObject$lambda2), ") must be a single numeric value"
+                .arrayToString(pwsTimeObject$lambda2), ") must be a single numeric value",
+                call. = FALSE
             )
         }
 
@@ -338,26 +340,30 @@ getSimulationSurvival <- function(design = NULL, ...,
     if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)"
+            "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
+            call. = FALSE
         )
     }
     if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)"
+            "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
+            call. = FALSE
         )
     }
     if (design$sided == 2) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Only one-sided case is implemented for the survival simulation design"
+            "Only one-sided case is implemented for the survival simulation design",
+            call. = FALSE
         )
     }
     if (!all(is.na(lambda2)) && !all(is.na(lambda1)) &&
             length(lambda2) != length(lambda1) && length(lambda2) > 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "length of 'lambda2' (", length(lambda2),
-            ") must be equal to length of 'lambda1' (", length(lambda1), ")"
+            ") must be equal to length of 'lambda1' (", length(lambda1), ")",
+            call. = FALSE
         )
     }
     if (all(is.na(lambda2)) && !all(is.na(lambda1))) {
@@ -371,7 +377,8 @@ getSimulationSurvival <- function(design = NULL, ...,
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'piecewiseSurvivalTime' needs to be a numeric vector and not a list ",
-            "because 'lambda2' (", .arrayToString(lambda2), ") is defined separately"
+            "because 'lambda2' (", .arrayToString(lambda2), ") is defined separately",
+            call. = FALSE
         )
     }
     thetaH1 <- .ignoreParameterIfNotUsed(
@@ -411,7 +418,8 @@ getSimulationSurvival <- function(design = NULL, ...,
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'maxNumberOfEventsPerStage' (",
                     .arrayToString(maxNumberOfEventsPerStage),
                     ") must be not smaller than minNumberOfEventsPerStage' (",
-                    .arrayToString(minNumberOfEventsPerStage), ")"
+                    .arrayToString(minNumberOfEventsPerStage), ")",
+                    call. = FALSE
                 )
             }
             .setValueAndParameterType(
@@ -446,12 +454,14 @@ getSimulationSurvival <- function(design = NULL, ...,
         if (identical(accrualIntensity, 1L)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'"
+                "choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
+                call. = FALSE
             )
         }
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'maxNumberOfSubjects' must be defined"
+            "'maxNumberOfSubjects' must be defined",
+            call. = FALSE
         )
     }
 
@@ -593,7 +603,8 @@ getSimulationSurvival <- function(design = NULL, ...,
                 "and the defined number of single simulation steps (", numberOfSimStepsTotal,
                 ") is larger than the threshold ", maxNumberOfSimStepsTotal, ". ",
                 "Set 'longTimeSimulationAllowed = TRUE' to enable simulations ",
-                "that take a long time (> 30 sec)"
+                "that take a long time (> 30 sec)",
+                call. = FALSE
             )
         }
 

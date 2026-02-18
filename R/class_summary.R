@@ -32,14 +32,16 @@ SummaryItem <- R6::R6Class("SummaryItem",
                 if (is.null(names(self$legendEntry))) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        sQuote("legendEntry"), " must be a named list"
+                        sQuote("legendEntry"), " must be a named list",
+                        call. = FALSE
                     )
                 }
                 for (l in self$legendEntry) {
                     if (length(l) == 0) {
                         stop(
                             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                            sQuote("legendEntry"), " must be not empty"
+                            sQuote("legendEntry"), " must be not empty",
+                            call. = FALSE
                         )
                     }
                 }
@@ -423,7 +425,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'summaryItem' must be an instance of class ",
-                    "'SummaryItem' (was '", .getClassName(summaryItem), "')"
+                    "'SummaryItem' (was '", .getClassName(summaryItem), "')",
+                    call. = FALSE
                 )
             }
             self$summaryItems <- c(self$summaryItems, summaryItem)
@@ -661,7 +664,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "for varied values 'parameterSet' must be an instance of ",
-                        "class 'ParameterSet' (was '", .getClassName(parameterSet), "')"
+                        "class 'ParameterSet' (was '", .getClassName(parameterSet), "')",
+                        call. = FALSE
                     )
                 }
 
@@ -1307,7 +1311,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'object' must be an instance of class 'AnalysisResults', 'TrialDesignPlan' ",
-            "or 'SimulationResults' (is '", .getClassName(object), "')"
+            "or 'SimulationResults' (is '", .getClassName(object), "')",
+            call. = FALSE
         )
     }
 
@@ -2787,7 +2792,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     if (!inherits(object, "AnalysisResults")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'object' must be a valid analysis result object (is class ", .getClassName(object), ")"
+            "'object' must be a valid analysis result object (is class ", .getClassName(object), ")",
+            call. = FALSE
         )
     }
 
@@ -3357,7 +3363,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'object' must be a valid design, design plan, ",
-            "or simulation result object (is class ", .getClassName(object), ")"
+            "or simulation result object (is class ", .getClassName(object), ")",
+            call. = FALSE
         )
     }
 

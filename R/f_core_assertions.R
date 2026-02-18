@@ -320,7 +320,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", xName, "' (", .arrayToString(x), ") must be a valid numeric vector or a single NA",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -330,14 +331,16 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, prefix,
                 "'", xName, "' (", .arrayToString(x), ") must be >= ", lower,
-                call. = call.
+                call. = call.,
+                call. = FALSE
             )
         }
     } else if (any(x < lower, na.rm = TRUE) || any(x > upper, na.rm = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
             "'", xName, "' (", .arrayToString(x), ") is out of bounds [", lower, "; ", upper, "]",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 }
@@ -376,7 +379,8 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", xName, "' (", .arrayToString(x), ") ",
             "must be a valid numeric vector or a single NA",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -386,14 +390,16 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, prefix,
                 "'", xName, "' (", .arrayToString(x), ") must be > ", lower,
-                call. = call.
+                call. = call.,
+                call. = FALSE
             )
         }
     } else if (any(x <= lower, na.rm = TRUE) || any(x >= upper, na.rm = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
             "'", xName, "' (", .arrayToString(x), ") is out of bounds (", lower, "; ", upper, ")",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 }
@@ -618,7 +624,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
             "' must be a valid numeric value or vector",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -628,7 +635,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(x), ") must be a valid numeric value or vector",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -636,7 +644,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(x), ") must have length ", .arrayToString(len, mode = "or"),
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 }
@@ -648,7 +657,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
             "' must be a valid integer value or vector",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -663,7 +673,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(x), ") must be a valid integer value or vector",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 }
@@ -674,7 +685,8 @@ NULL
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' ",
             "must be a valid logical value or vector",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -683,7 +695,8 @@ NULL
     if ((!naAllowed && anyNA(x)) || !is.logical(x)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (", x, ") ",
             "must be a valid logical value or vector",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 }
@@ -692,7 +705,8 @@ NULL
     if (noDefaultAvailable && (!checkNA || all(is.na(x)))) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' ",
             "must be specified, there is no default value",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 }
@@ -701,7 +715,8 @@ NULL
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a single logical value",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -711,7 +726,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
             .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single logical value",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -728,7 +744,8 @@ NULL
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid numeric value",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -738,7 +755,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
             .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single numeric value",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -778,7 +796,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT,
             "'", argumentName, "' must be a ", prefix, "integer value",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -789,7 +808,8 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
             .arrayToString(x, vectorLookAndFeelEnabled = TRUE),
             " must be a ", prefix, "integer value",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -820,7 +840,8 @@ NULL
     if (missing(x) || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName, "' must be a valid character value",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -830,7 +851,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' ",
             .arrayToString(x, vectorLookAndFeelEnabled = TRUE), " must be a single character value",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -860,7 +882,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_MISSING_ARGUMENT,
             "'", argumentName, "' must be a valid character value or vector",
-            call. = call.
+            call. = call.,
+            call. = FALSE
         )
     }
 
@@ -1589,8 +1612,7 @@ NULL
     argNames <- names(args)
     if (sum(argNames == "") > 0) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "each argument must have a name defined, e.g. a = a",
-            call. = FALSE
+            "each argument must have a name defined, e.g. a = a"
         )
     }
 
@@ -3467,8 +3489,8 @@ NULL
     } else if (all(!is.na(lambda1)) && all(!is.na(theta))) {
         lambda2 <- lambda1 / theta
     }
-    
-    if (sampleSizeEnabled && !all(is.na(lambda1)) && !all(is.na(lambda2)) && !is.na(thetaH0) && 
+
+    if (sampleSizeEnabled && !all(is.na(lambda1)) && !all(is.na(lambda2)) && !is.na(thetaH0) &&
             any(abs(lambda1 / lambda2 - thetaH0) < 1e-12, na.rm = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,

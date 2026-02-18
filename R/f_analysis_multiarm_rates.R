@@ -447,7 +447,8 @@ NULL
                 if (thetaH0 != 0) {
                     stop(
                         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test"
+                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
+                        call. = FALSE
                     )
                 }
 
@@ -512,7 +513,8 @@ NULL
                 if (thetaH0 != 0) {
                     stop(
                         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test"
+                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
+                        call. = FALSE
                     )
                 }
 
@@ -1149,7 +1151,8 @@ NULL
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
-        "or TrialDesignConditionalDunnett"
+        "or TrialDesignConditionalDunnett",
+        call. = FALSE
     )
 }
 
@@ -1493,7 +1496,8 @@ NULL
     if (length(piControl) != 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'piControl' (", .arrayToString(piControl), ") must be equal to 1"
+            "length of 'piControl' (", .arrayToString(piControl), ") must be equal to 1",
+            call. = FALSE
         )
     }
 

@@ -24,7 +24,8 @@ NULL
                 length(simulationResults$alternative) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'alternative' with length > 1 is defined"
+                " is only available if 'alternative' with length > 1 is defined",
+                call. = FALSE
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsRates")) {
@@ -33,7 +34,8 @@ NULL
                 length(simulationResults$pi1) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'pi1' with length > 1 is defined"
+                " is only available if 'pi1' with length > 1 is defined",
+                call. = FALSE
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsSurvival")) {
@@ -42,13 +44,15 @@ NULL
                 length(simulationResults$hazardRatio) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'hazardRatio' with length > 1 is defined or derived"
+                " is only available if 'hazardRatio' with length > 1 is defined or derived",
+                call. = FALSE
             )
         }
         if (length(simulationResults$hazardRatio) != length(simulationResults$overallReject)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is not available for piecewise survival (only type 13 and 14)"
+                " is not available for piecewise survival (only type 13 and 14)",
+                call. = FALSE
             )
         }
     }
@@ -222,7 +226,8 @@ NULL
     if (type %in% c(1:3) && !multiArmEnabled && !enrichmentEnabled) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-            ") is not available for non-multi-arm/non-enrichment simulation results (type must be > 3)"
+            ") is not available for non-multi-arm/non-enrichment simulation results (type must be > 3)",
+            call. = FALSE
         )
     }
 
@@ -230,12 +235,14 @@ NULL
         if (multiArmEnabled || enrichmentEnabled) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-                ") is only available for non-multi-arm/non-enrichment survival simulation results"
+                ") is only available for non-multi-arm/non-enrichment survival simulation results",
+                call. = FALSE
             )
         } else {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-                ") is only available for survival simulation results"
+                ") is only available for survival simulation results",
+                call. = FALSE
             )
         }
     }
@@ -747,7 +754,7 @@ NULL
         )
     } else if (type == 8) {
         if (designMaster$kMax == 1) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type 8 (Early Stopping) is not available for 'kMax' = 1")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type 8 (Early Stopping) is not available for 'kMax' = 1", call. = FALSE)
         }
 
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
@@ -889,7 +896,7 @@ NULL
             showSource = showSource, plotSettings = plotSettings
         ))
     } else {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 5, 6, ..., 14")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 5, 6, ..., 14", call. = FALSE)
     }
 
     if (!is.null(srcCmd)) {
@@ -984,7 +991,7 @@ plot.SimulationResults <- function(x,
     if (all(is.na(type))) {
         type <- na.omit(getAvailablePlotTypes(x))
         if (length(type) == 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "not plot type available")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "not plot type available", call. = FALSE)
         }
 
         type <- type[1]

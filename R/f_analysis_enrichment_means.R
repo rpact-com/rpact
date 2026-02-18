@@ -224,14 +224,16 @@ NULL
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 2: Spiessens & Debois intersection test test can only be used for one subset"
+            ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
+            call. = FALSE
         )
     }
     if (varianceOption == "pooledFromFull") {
         if (gMax > 2) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-                ") > 2: varianceOption 'pooledFromFull' can only be used for one subset"
+                ") > 2: varianceOption 'pooledFromFull' can only be used for one subset",
+                call. = FALSE
             )
         }
     }
@@ -255,7 +257,8 @@ NULL
     if (dataInput$isStratified() && (gMax > 4)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 4: Stratified analysis not implemented"
+            ") > 4: Stratified analysis not implemented",
+            call. = FALSE
         )
     }
 
@@ -1104,8 +1107,7 @@ NULL
     if (!is.null(stDevsH1) && !is.na(stDevsH1)) {
         if (!is.na(assumedStDevs)) {
             warning(sQuote("assumedStDevs"), " will be ignored because ",
-                sQuote("stDevsH1"), " is defined",
-                call. = FALSE
+                sQuote("stDevsH1"), " is defined"
             )
         }
         assumedStDevs <- stDevsH1
@@ -1169,7 +1171,8 @@ NULL
         if (any(is.na(assumedStDevs[!is.na(stageResults$testStatistics[, stage])]))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any of 'assumedStDevs' not correctly specified"
+                "any of 'assumedStDevs' not correctly specified",
+                call. = FALSE
             )
         }
     }
@@ -1178,7 +1181,8 @@ NULL
         if (any(is.na(thetaH1[!is.na(stageResults$testStatistics[, stage])]))) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any of 'thetaH1' not correctly specified"
+                "any of 'thetaH1' not correctly specified",
+                call. = FALSE
             )
         }
     }
@@ -1204,7 +1208,8 @@ NULL
 
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher"
+        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
+        call. = FALSE
     )
 }
 

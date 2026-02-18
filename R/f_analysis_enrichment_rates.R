@@ -124,7 +124,8 @@ NULL
                 if (thetaH0 != 0) {
                     stop(
                         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test"
+                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
+                        call. = FALSE
                     )
                 }
 
@@ -212,7 +213,8 @@ NULL
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 2: Spiessens & Debois intersection test test can only be used for one subset"
+            ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
+            call. = FALSE
         )
     }
 
@@ -227,21 +229,24 @@ NULL
     if (stratifiedAnalysis && !normalApproximation) {
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "stratified version is not available for Fisher's exact test"
+            "stratified version is not available for Fisher's exact test",
+            call. = FALSE
         )
     }
 
     if (stratifiedAnalysis && !dataInput$isStratified()) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "stratified analysis is only possible for stratified data input"
+            "stratified analysis is only possible for stratified data input",
+            call. = FALSE
         )
     }
 
     if (dataInput$isStratified() && (gMax > 4)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 4: stratified analysis not implemented"
+            ") > 4: stratified analysis not implemented",
+            call. = FALSE
         )
     }
 
@@ -1059,7 +1064,8 @@ NULL
 
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher"
+        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
+        call. = FALSE
     )
 }
 

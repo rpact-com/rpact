@@ -105,8 +105,7 @@
 #' @keywords internal
 #' @export
 #'
-writeKeyValueFile <- function(
-        keyValueList,
+writeKeyValueFile <- function(keyValueList,
         filePath,
         ...,
         writeHeader = TRUE,
@@ -118,7 +117,7 @@ writeKeyValueFile <- function(
     .assertIsSingleLogical(sortKeys, "sortKeys")
     .assertIsSingleLogical(overwrite, "overwrite")
     .assertIsSingleLogical(safeKeyCheck, "safeKeyCheck")
-        
+
     if (!is.list(keyValueList)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'keyValueList' must be a list()",
@@ -185,8 +184,7 @@ writeKeyValueFile <- function(
     convertValueToString <- function(value) {
         if (length(value) != 1L) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "value must be length 1",
-                call. = FALSE
+                "value must be length 1"
             )
         }
 
@@ -239,8 +237,7 @@ writeKeyValueFile <- function(
 
         if (isTRUE(safeKeyCheck) && !grepl("^[A-Za-z0-9_.-]+$", key)) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "invalid key name '", key, "'. Allowed: A-Za-z0-9_.-",
-                call. = FALSE
+                "invalid key name '", key, "'. Allowed: A-Za-z0-9_.-"
             )
         }
 
@@ -316,8 +313,7 @@ writeKeyValueFile <- function(
 #' @keywords internal
 #' @export
 #'
-readKeyValueFile <- function(
-        filePath,
+readKeyValueFile <- function(filePath,
         ...,
         inferTypes = TRUE,
         duplicateKeys = c("error", "last", "first"),
@@ -326,7 +322,7 @@ readKeyValueFile <- function(
     .assertIsSingleLogical(inferTypes, "inferTypes")
     .assertIsSingleLogical(safeKeyCheck, "safeKeyCheck")
     duplicateKeys <- match.arg(duplicateKeys)
-    
+
     if (!file.exists(filePath)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "file not found: ", sQuote(filePath),
@@ -427,16 +423,14 @@ readKeyValueFile <- function(
 
         if (isTRUE(safeKeyCheck) && !grepl("^[A-Za-z0-9_.-]+$", key)) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "invalid key name in file: ", sQuote(key), ". Allowed: A-Za-z0-9_.-",
-                call. = FALSE
+                "invalid key name in file: ", sQuote(key), ". Allowed: A-Za-z0-9_.-"
             )
         }
 
         if (key %in% seenKeys) {
             if (duplicateKeys == "error") {
                 stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "duplicate key in file: ", sQuote(key),
-                    call. = FALSE
+                    "duplicate key in file: ", sQuote(key)
                 )
             }
             if (duplicateKeys == "first") {

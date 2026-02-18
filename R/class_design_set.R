@@ -122,7 +122,8 @@ summary.TrialDesignSet <- function(object, ..., type = 1, digits = NA_integer_) 
     if (object$isEmpty()) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "cannot create summary because the design set is empty"
+            "cannot create summary because the design set is empty",
+            call. = FALSE
         )
     }
 
@@ -311,11 +312,11 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
         },
         .validateDesignsArgument = function(designsToAdd, args) {
             if (!is.list(designsToAdd)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designsToAdd' must be a list")
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designsToAdd' must be a list", call. = FALSE)
             }
 
             if (length(designsToAdd) == 0) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designsToAdd' must be not empty")
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'designsToAdd' must be not empty", call. = FALSE)
             }
 
             designsToAddValidated <- list()
@@ -327,7 +328,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                     if (is.null(parentDesign)) {
                         stop(
                             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                            "'designsToAdd' must be a list of trial designs (found '", .getClassName(d), "')"
+                            "'designsToAdd' must be a list of trial designs (found '", .getClassName(d), "')",
+                            call. = FALSE
                         )
                     }
 
@@ -357,7 +359,7 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
         },
         addVariedParameters = function(varPar) {
             if (is.null(varPar) || !is.character(varPar)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'varPar' must be a valid character vector")
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'varPar' must be a valid character vector", call. = FALSE)
             }
 
             self$variedParameters <- c(self$variedParameters, varPar)
@@ -376,7 +378,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "please specify a 'design' to add and/or a design parameter, ",
-                    "e.g., deltaWT = c(0.1, 0.3, 0.4)"
+                    "e.g., deltaWT = c(0.1, 0.3, 0.4)",
+                    call. = FALSE
                 )
             }
 
@@ -390,7 +393,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                 stop(
                     C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS,
                     "at least one design (master) must be defined in this ",
-                    "design set to respect any design parameters"
+                    "design set to respect any design parameters",
+                    call. = FALSE
                 )
             }
 
@@ -403,7 +407,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             if (!.isTrialDesign(design)) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'design' (", .getClassName(design), ") must be an instance of class 'TrialDesign'"
+                    "'design' (", .getClassName(design), ") must be an instance of class 'TrialDesign'",
+                    call. = FALSE
                 )
             }
 
@@ -468,7 +473,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                     stop(
                         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
                         "designs have different directions of alternative (design master is ",
-                        ifelse(sided == 1, "one", "two"), " sided)"
+                        ifelse(sided == 1, "one", "two"), " sided)",
+                        call. = FALSE
                     )
                 }
             }
@@ -490,7 +496,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "too many arguments (", .arrayToString(argumentNames, encapsulate = TRUE),
-                    "): up to 2 design parameters are allowed"
+                    "): up to 2 design parameters are allowed",
+                    call. = FALSE
                 )
             }
 
@@ -809,7 +816,7 @@ as.data.frame.TrialDesignSet <- function(x,
         nMax = NA_integer_, ...) {
     .assertIsTrialDesignSet(x)
     if (x$isEmpty()) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot create data.frame because the design set is empty")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot create data.frame because the design set is empty", call. = FALSE)
     }
 
     fCall <- match.call(expand.dots = FALSE)
@@ -828,7 +835,8 @@ as.data.frame.TrialDesignSet <- function(x,
         if (fisherDesignEnabled != .isTrialDesignFisher(design)) {
             stop(
                 C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, "all trial designs must be from the same type ",
-                "('", .getClassName(x$designs[[1]]), "' != '", .getClassName(design), ")'"
+                "('", .getClassName(x$designs[[1]]), "' != '", .getClassName(design), ")'",
+                call. = FALSE
             )
         }
 
@@ -1122,7 +1130,7 @@ plot.TrialDesignSet <- function(x,
             }
         }
     } else if (type == 2) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "designs with undefined endpoint do not support plot type 2")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "designs with undefined endpoint do not support plot type 2", call. = FALSE)
     } else if (type == 3) {
         main <- .getMainTitle(main, title = "Stage Levels", nMax = nMax)
         xParameterName <- "informationRates"
@@ -1153,7 +1161,7 @@ plot.TrialDesignSet <- function(x,
         xParameterName <- "theta"
         yParameterNames <- "averageSampleNumber"
     } else {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1, 2, ..., 9")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1, 2, ..., 9", call. = FALSE)
     }
 
     if (type >= 5 && type <= 9) {

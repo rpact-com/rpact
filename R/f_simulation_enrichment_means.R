@@ -78,8 +78,7 @@ NULL
     return(newSubjects)
 }
 
-.getSimulatedStageMeansEnrichment <- function(
-        ...,
+.getSimulatedStageMeansEnrichment <- function(...,
         design,
         subsets,
         prevalences,
@@ -101,8 +100,7 @@ NULL
         stDevH1,
         calcSubjectsFunction,
         calcSubjectsFunctionIsUserDefined,
-        selectPopulationsFunction
-        ) {
+        selectPopulationsFunction) {
     kMax <- length(plannedSubjects)
     pMax <- length(effects)
     gMax <- log(length(effects), 2) + 1
@@ -391,7 +389,8 @@ NULL
                         "'calcSubjectsFunction' returned an illegal or undefined result (",
                         newSubjects,
                         "); ",
-                        "the output must be a single numeric value >= 0"
+                        "the output must be a single numeric value >= 0",
+                        call. = FALSE
                     )
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
@@ -500,8 +499,7 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentMeans <- function(
-        design = NULL,
+getSimulationEnrichmentMeans <- function(design = NULL,
         ...,
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
@@ -524,8 +522,7 @@ getSimulationEnrichmentMeans <- function(
         seed = NA_real_,
         calcSubjectsFunction = NULL,
         selectPopulationsFunction = NULL,
-        showStatistics = FALSE
-        ) {
+        showStatistics = FALSE) {
     if (is.null(design)) {
         design <- .getDefaultDesign(..., type = "simulation")
         .warnInCaseOfUnknownArguments(

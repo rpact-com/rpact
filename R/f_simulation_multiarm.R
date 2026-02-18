@@ -43,15 +43,13 @@ NULL
     return(as.matrix(indices))
 }
 
-.selectTreatmentArms <- function(
-        typeOfSelection,
+.selectTreatmentArms <- function(typeOfSelection,
         epsilonValue,
         rValue,
         threshold,
         selectArmsFunction,
         selectArmsFunctionArgs,
-        survival = FALSE
-        ) {
+        survival = FALSE) {
     effectVector <- selectArmsFunctionArgs$effectVector
     gMax <- length(effectVector)
 
@@ -88,10 +86,10 @@ NULL
             "); "
         )
         if (length(selectedArms) != gMax) {
-            stop(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")")
+            stop(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")", call. = FALSE)
         }
         if (!is.logical(selectedArms)) {
-            stop(msg, "the output must be a logical vector (is ", .getClassName(selectedArms), ")")
+            stop(msg, "the output must be a logical vector (is ", .getClassName(selectedArms), ")", call. = FALSE)
         }
     }
     if (!survival) {
@@ -100,18 +98,17 @@ NULL
     return(selectedArms)
 }
 
-.performClosedCombinationTestForSimulationMultiArm <- function(
-        ...,
+.performClosedCombinationTestForSimulationMultiArm <- function(...,
         stageResults,
         design,
         indices,
         intersectionTest,
-        successCriterion
-        ) {
+        successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Group sequential design cannot be used for designs with treatment arm selection"
+            "Group sequential design cannot be used for designs with treatment arm selection",
+            call. = FALSE
         )
     }
 
@@ -279,7 +276,8 @@ NULL
     if (allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "The conditional Dunnett test assumes equal allocation ratios over the stages"
+            "The conditional Dunnett test assumes equal allocation ratios over the stages",
+            call. = FALSE
         )
     }
 
@@ -422,8 +420,7 @@ NULL
     ))
 }
 
-.createSimulationResultsMultiArmObject <- function(
-        ...,
+.createSimulationResultsMultiArmObject <- function(...,
         design,
         activeArms,
         effectMatrix,
@@ -471,8 +468,7 @@ NULL
         calcEventsFunction = NULL, # survival only
         selectArmsFunction,
         showStatistics,
-        endpoint = c("means", "rates", "survival")
-        ) {
+        endpoint = c("means", "rates", "survival")) {
     endpoint <- match.arg(endpoint)
 
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
@@ -494,7 +490,8 @@ NULL
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "Change 'typeOfShape' (",
                 typeOfShape,
-                ") to 'userDefined'"
+                ") to 'userDefined'",
+                call. = FALSE
             )
         }
     }
@@ -523,7 +520,8 @@ NULL
                 ncol(effectMatrix),
                 ") is not equal to specified 'activeArms' (",
                 activeArms,
-                ")"
+                ")",
+                call. = FALSE
             )
         }
         simulationResults$activeArms <- activeArms
@@ -531,7 +529,7 @@ NULL
     }
 
     if (activeArms > 8) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'activeArms' (", activeArms, ") max not exceed 8")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'activeArms' (", activeArms, ") max not exceed 8", call. = FALSE)
     }
 
     .assertIsSingleNumber(threshold, "threshold", naAllowed = FALSE)
@@ -741,7 +739,8 @@ NULL
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "'dropoutRate1' (",
                 dropoutRate1,
-                ") is out of bounds [0; 1)"
+                ") is out of bounds [0; 1)",
+                call. = FALSE
             )
         }
         if (!is.na(dropoutRate2) && (dropoutRate2 < 0 || dropoutRate2 >= 1)) {
@@ -749,7 +748,8 @@ NULL
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
                 "'dropoutRate2' (",
                 dropoutRate2,
-                ") is out of bounds [0; 1)"
+                ") is out of bounds [0; 1)",
+                call. = FALSE
             )
         }
 
@@ -760,7 +760,8 @@ NULL
                 "'plannedEvents' (",
                 .arrayToString(plannedEvents),
                 ") must have length ",
-                kMax
+                kMax,
+                call. = FALSE
             )
         }
         .assertIsInClosedInterval(plannedEvents, "plannedEvents", lower = 1, upper = NULL)
@@ -847,7 +848,8 @@ NULL
                     .arrayToString(maxNumberOfSubjectsPerStage),
                     ") must be not smaller than minNumberOfSubjectsPerStage' (",
                     .arrayToString(minNumberOfSubjectsPerStage),
-                    ")"
+                    ")",
+                    call. = FALSE
                 )
             }
             .setValueAndParameterType(
@@ -907,7 +909,8 @@ NULL
                     .arrayToString(maxNumberOfEventsPerStage),
                     ") must be not smaller than 'minNumberOfEventsPerStage' (",
                     .arrayToString(minNumberOfEventsPerStage),
-                    ")"
+                    ")",
+                    call. = FALSE
                 )
             }
             .setValueAndParameterType(
@@ -1054,7 +1057,8 @@ NULL
             ") ",
             "must have length 1 or ",
             design$kMax,
-            " (kMax)"
+            " (kMax)",
+            call. = FALSE
         )
     }
 
@@ -1133,7 +1137,7 @@ NULL
         adaptations <- rep(TRUE, kMax - 1)
     }
     if (length(adaptations) != kMax - 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'adaptations' must have length ", (kMax - 1), " (kMax - 1)")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'adaptations' must have length ", (kMax - 1), " (kMax - 1)", call. = FALSE)
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))
 

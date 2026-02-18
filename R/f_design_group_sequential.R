@@ -104,7 +104,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     if (!(design$typeOfDesign %in% .getDesignTypes())) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "type of design (", design$typeOfDesign, ") must be one of the following: ", .printDesignTypes()
+            "type of design (", design$typeOfDesign, ") must be one of the following: ", .printDesignTypes(),
+            call. = FALSE
         )
     }
 
@@ -124,7 +125,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         if (!.isOptimizationCriterion(design$optimizationCriterion)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "optimization criterion must be one of the following: ", .printOptimizationCriterion()
+                "optimization criterion must be one of the following: ", .printOptimizationCriterion(),
+                call. = FALSE
             )
         }
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_HP) {
@@ -169,7 +171,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             (design$informationRates[length(design$informationRates)] != 1)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "For specified design, last information rate should be equal 1"
+            "For specified design, last information rate should be equal 1",
+            call. = FALSE
         )
     }
 
@@ -179,7 +182,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         if (!.isBetaSpendingDesignType(design$typeBetaSpending, noneIncluded = TRUE)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "type of beta spending must be one of the following: ", .printBetaSpendingDesignTypes()
+                "type of beta spending must be one of the following: ", .printBetaSpendingDesignTypes(),
+                call. = FALSE
             )
         }
 
@@ -265,7 +269,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     if (design$tolerance < 1e-10 || design$tolerance > 1e-03) {
         stop(
             C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'tolerance' (", design$tolerance, ") out of bounds [1e-10; 1e-03]"
+            "'tolerance' (", design$tolerance, ") out of bounds [1e-10; 1e-03]",
+            call. = FALSE
         )
     }
 
@@ -340,7 +345,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'designClass' ('", designClass, "') must be '", C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL, "' or ",
-            "'", C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL, "'"
+            "'", C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL, "'",
+            call. = FALSE
         )
     }
 
@@ -850,7 +856,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     if (design$typeBetaSpending != C_TYPE_OF_DESIGN_BS_USER) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'typeBetaSpending' ('", design$typeBetaSpending, "') must be '", C_TYPE_OF_DESIGN_BS_USER, "'"
+            "'typeBetaSpending' ('", design$typeBetaSpending, "') must be '", C_TYPE_OF_DESIGN_BS_USER, "'",
+            call. = FALSE
         )
     }
 
@@ -1768,7 +1775,8 @@ getDesignInverseNormal <- function(...,
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'futilityBounds' (", .arrayToString(design$futilityBounds), ") ",
-                "too extreme for this situation"
+                "too extreme for this situation",
+                call. = FALSE
             )
         }
     }
@@ -1844,7 +1852,8 @@ getDesignInverseNormal <- function(...,
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "decision critical values for delayed response design are only available for ",
-            "one-sided designs with valid futility bounds"
+            "one-sided designs with valid futility bounds",
+            call. = FALSE
         )
     }
     if (length(delayedInformation) == 1) {
@@ -1854,7 +1863,8 @@ getDesignInverseNormal <- function(...,
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'delayedInformation' (", .arrayToString(delayedInformation), ") must have length ",
-            (kMax - 1), " (kMax - 1)"
+            (kMax - 1), " (kMax - 1)",
+            call. = FALSE
         )
     }
 
@@ -1880,7 +1890,8 @@ getDesignInverseNormal <- function(...,
             "stage", stagesInfo, " too large (>= 1). Recruitment stop analysis information + pipeline data ",
             "information cannot exceed overall trial information. Instead, the ",
             "recruitment stop analysis would be skipped, directly proceeding to the ",
-            "final analysis"
+            "final analysis",
+            call. = FALSE
         )
     }
 
@@ -2769,7 +2780,8 @@ getSimulatedRejectionsDelayedResponse <- function(design, ..., delta = 0, iterat
     if (!design$.isDelayedResponseDesign()) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'design' must be a delayed ",
-            "response design with specified 'delayedInformation'"
+            "response design with specified 'delayedInformation'",
+            call. = FALSE
         )
     }
     startTime <- Sys.time()

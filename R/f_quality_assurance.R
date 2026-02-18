@@ -169,7 +169,8 @@ NULL
     if (grepl("testthat(/|\\\\)?$", testFileTargetDirectory)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'testFileTargetDirectory' (", testFileTargetDirectory, ") must not end with 'testthat'"
+            "'testFileTargetDirectory' (", testFileTargetDirectory, ") must not end with 'testthat'",
+            call. = FALSE
         )
     }
 
@@ -218,14 +219,14 @@ NULL
     }
 
     if (!grepl("\\.tar\\.gz$", packageSource)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " must have a .tar.gz extension")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " must have a .tar.gz extension", call. = FALSE)
     }
 
     unlinkFile <- FALSE
     if (grepl("^http", packageSource)) {
         tempFile <- tempfile(fileext = ".tar.gz")
         if (utils::download.file(packageSource, tempFile) != 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(packageSource), " seems to be an invalid URL")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(packageSource), " seems to be an invalid URL", call. = FALSE)
         }
         packageSource <- tempFile
         unlinkFile <- TRUE
@@ -236,7 +237,7 @@ NULL
         {
             contentLines <- utils::untar(packageSource, list = TRUE)
             if (!("rpact/DESCRIPTION" %in% contentLines) || !("rpact/tests/testthat/" %in% contentLines)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " is not an rpact package source file")
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " is not an rpact package source file", call. = FALSE)
             }
 
             testthatTempDirectory <- file.path(testFileTargetDirectory, "temp")
@@ -313,7 +314,8 @@ NULL
             if (length(testFiles) == 0) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "online source does not contain any unit test files"
+                    "online source does not contain any unit test files",
+                    call. = FALSE
                 )
             }
 
@@ -349,21 +351,19 @@ NULL
             if (grepl("404 Not Found", w$message)) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "failed to download unit test files (http): file ", sQuote(currentFile), " not found",
-                    call. = FALSE
+                    "failed to download unit test files (http): file ", sQuote(currentFile), " not found"
                 )
             }
         },
         error = function(e) {
             if (grepl(C_EXCEPTION_TYPE_RUNTIME_ISSUE, e$message)) {
-                stop(e$message)
+                stop(e$message, call. = FALSE)
             }
             .logDebug(e$message)
             stop(
                 C_EXCEPTION_TYPE_RUNTIME_ISSUE,
                 "failed to download unit test files (http): ",
-                "illegal 'token' / 'secret' or rpact version ", version, " unknown",
-                call. = FALSE
+                "illegal 'token' / 'secret' or rpact version ", version, " unknown"
             )
         },
         finally = {
@@ -421,7 +421,8 @@ NULL
             if (length(testFiles) == 0) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "online source does not contain any unit test files"
+                    "online source does not contain any unit test files",
+                    call. = FALSE
                 )
             }
 
@@ -460,8 +461,7 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_RUNTIME_ISSUE,
                 "failed to download unit test files (ftp): ",
-                "illegal 'token' / 'secret' or rpact version ", version, " unknown",
-                call. = FALSE
+                "illegal 'token' / 'secret' or rpact version ", version, " unknown"
             )
         },
         finally = {
@@ -486,7 +486,8 @@ NULL
     if (is.null(connection) || !is.list(connection)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'connection' must be a list (is ", .getClassName(connection), ")"
+            "'connection' must be a list (is ", .getClassName(connection), ")",
+            call. = FALSE
         )
     }
 
@@ -857,22 +858,19 @@ setupPackageTests <- function(token, secret) {
     installPath <- find.package("rpact")
     if (!dir.exists(installPath)) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "the rpact package directory was not found",
-            call. = FALSE
+            "the rpact package directory was not found"
         )
     }
 
     if (!dir.exists(file.path(installPath, "tests"))) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "the rpact package directory does not contain a test directory",
-            call. = FALSE
+            "the rpact package directory does not contain a test directory"
         )
     }
 
     if (!dir.exists(file.path(installPath, "tests", "testthat"))) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "the rpact package directory does not contain a testthat directory",
-            call. = FALSE
+            "the rpact package directory does not contain a testthat directory"
         )
     }
 
@@ -952,17 +950,17 @@ setupPackageTests <- function(token, secret) {
         # run test files from the user defined directory 'testFileDirectory'
         return("runTestsInTestFileDirectory")
     }
-    
+
     if (credentialsAvailable) {
         if (downloadOnlyModeEnabled) {
             # download test files only
             return("downloadOnly")
-        } 
-        
+        }
+
         # download test files and run them
         return("downloadAndRunTests")
-    } 
-    
+    }
+
     # run test from directory 'inst/tests'
     return("default")
 }
@@ -970,40 +968,40 @@ setupPackageTests <- function(token, secret) {
 .getTestFileTargetDirectory <- function(outDir, testFileDirectory, executionMode, pkgName) {
     if (executionMode == "runTestsInTestFileDirectory") {
         return(testFileDirectory)
-    } 
-    
+    }
+
     if (executionMode %in% c("downloadAndRunTests", "downloadOnly")) {
         return(file.path(outDir, paste0(pkgName, "-tests")))
     }
-    
+
     return(file.path(find.package("rpact"), "tests"))
 }
 
-.getTestReportFileNames <- function(reportType, markdownReportFileName, 
+.getTestReportFileNames <- function(reportType, markdownReportFileName,
         keepSourceFiles, testFileTargetDirectory, resultDir, reportFileBaseName) {
     if (identical(reportType, "Rout") || is.null(markdownReportFileName)) {
         return(NULL)
     }
-    
+
     reportFileNames <- character()
     if (keepSourceFiles && file.exists(file.path(testFileTargetDirectory, markdownReportFileName))) {
         reportFileNames <- c(reportFileNames, markdownReportFileName)
     }
-    
+
     reportFileNameHtml <- paste0(reportFileBaseName, ".html")
     if (file.exists(file.path(testFileTargetDirectory, reportFileNameHtml))) {
         reportFileNames <- c(reportFileNames, reportFileNameHtml)
     }
-    
+
     reportFileNamePdf <- paste0(reportFileBaseName, ".pdf")
     if (file.exists(file.path(testFileTargetDirectory, reportFileNamePdf))) {
         reportFileNames <- c(reportFileNames, reportFileNamePdf)
     }
-    
+
     if (length(reportFileNames) > 0) {
         file.copy(file.path(testFileTargetDirectory, reportFileNames), resultDir)
     }
-    
+
     return(reportFileNames)
 }
 
@@ -1087,8 +1085,7 @@ setupPackageTests <- function(token, secret) {
 #'
 #' @export
 #'
-testPackage <- function(
-        outDir = ".",
+testPackage <- function(outDir = ".",
         ...,
         completeUnitTestSetEnabled = TRUE,
         connection = list(token = NULL, secret = NULL),
@@ -1124,9 +1121,9 @@ testPackage <- function(
         isTRUE(downloadTestsOnly) && isTRUE(credentialsAvailable)
 
     executionMode <- .getTestExecutionMode(testFileDirectory, credentialsAvailable, downloadOnlyModeEnabled)
-    
+
     pkgName <- "rpact"
-    testFileTargetDirectory <- .getTestFileTargetDirectory(outDir, testFileDirectory, executionMode, pkgName) 
+    testFileTargetDirectory <- .getTestFileTargetDirectory(outDir, testFileDirectory, executionMode, pkgName)
     if (!is.null(metaData) && length(metaData) > 0) {
         if (is.null(metaDataFile)) {
             metaDataFile <- file.path(testFileTargetDirectory, "meta_data.txt")
@@ -1137,11 +1134,11 @@ testPackage <- function(
             safeKeyCheck = FALSE
         )
     }
-    
+
     if (!is.null(metaDataFile)) {
         metaData <- readKeyValueFile(metaDataFile)
     }
-    
+
     reportType <- match.arg(reportType)
     scope <- match.arg(scope)
 
@@ -1149,21 +1146,24 @@ testPackage <- function(
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'reportFileBaseName' (", dQuote(reportFileBaseName), ") ",
-            "must not contain path separators or drive specifiers"
+            "must not contain path separators or drive specifiers",
+            call. = FALSE
         )
     }
 
     if (!dir.exists(outDir)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test output directory '", outDir, "' does not exist"
+            "test output directory '", outDir, "' does not exist",
+            call. = FALSE
         )
     }
 
     if (outDir != "." && !grepl("^([a-zA-Z]{1,1}:)?(/|\\\\)", outDir, ignore.case = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test output directory '", outDir, "' must be an absolute path"
+            "test output directory '", outDir, "' must be an absolute path",
+            call. = FALSE
         )
     }
 
@@ -1174,7 +1174,8 @@ testPackage <- function(
     if (!is.na(testFileDirectory) && !dir.exists(testFileDirectory)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test file directory '", testFileDirectory, "' does not exist"
+            "test file directory '", testFileDirectory, "' does not exist",
+            call. = FALSE
         )
     }
 
@@ -1260,7 +1261,7 @@ testPackage <- function(
             cat("The test will take about a minute.\n")
         }
     }
-    
+
     if (!is.null(metaData) && length(metaData) > 0) {
         cat("The following additional metadata will be included in the test report:\n")
         for (key in names(metaData)) {
@@ -1354,8 +1355,10 @@ testPackage <- function(
         endTime = endTime, runtimeUnits = "auto"
     ), ".\n", sep = "")
 
-    reportFileNames <- .getTestReportFileNames(reportType, markdownReportFileName, 
-        keepSourceFiles, testFileTargetDirectory, resultDir, reportFileBaseName)
+    reportFileNames <- .getTestReportFileNames(
+        reportType, markdownReportFileName,
+        keepSourceFiles, testFileTargetDirectory, resultDir, reportFileBaseName
+    )
 
     minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
     totalNumberOfTests <- NA_integer_
@@ -1587,7 +1590,7 @@ print.InstallationQualificationResult <- function(x, ...) {
 .testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", Ropts = character()) {
     .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = FALSE)
     if (!dir.exists(testFileDirectory)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'testFileDirectory' (", testFileDirectory, ") does not exist")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'testFileDirectory' (", testFileDirectory, ") does not exist", call. = FALSE)
     }
 
     workingDirectoryBefore <- getwd()
@@ -1813,7 +1816,7 @@ MarkdownReporter <- R6::R6Class(
             self$scope <- scope
             self$metaDataFile <- metaDataFile
             self$minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
-            if (!is.null(self$metaDataFile) && 
+            if (!is.null(self$metaDataFile) &&
                     length(self$metaDataFile) == 1 &&
                     !is.na(self$metaDataFile) &&
                     is.character(self$metaDataFile) &&

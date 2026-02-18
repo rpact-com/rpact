@@ -21,7 +21,7 @@ NULL
 
 .getDesignAndDataInput <- function(..., design, dataInput) {
     if (missing(design) && missing(dataInput)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, sQuote("dataInput"), " must be specified")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, sQuote("dataInput"), " must be specified", call. = FALSE)
     }
 
     if (missing(dataInput) && !missing(design) && inherits(design, "Dataset")) {
@@ -729,7 +729,7 @@ getRepeatedConfidenceIntervals <- function(design,
 
 .getStageResultsObject <- function(stageResults, ..., functionName) {
     if (missing(stageResults)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined", call. = FALSE)
     }
 
     .stopInCaseOfIllegalStageDefinition(stageResults, ...)
@@ -737,7 +737,7 @@ getRepeatedConfidenceIntervals <- function(design,
     args <- list(...)
     if (.isTrialDesign(stageResults)) {
         if (length(args) == 0) {
-            stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined")
+            stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined", call. = FALSE)
         }
 
         stageResults <- args[[1]]
@@ -757,7 +757,7 @@ getRepeatedConfidenceIntervals <- function(design,
                 return(arg)
             }
         }
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined")
+        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined", call. = FALSE)
     }
 
     return(stageResults)

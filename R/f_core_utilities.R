@@ -207,7 +207,8 @@ NULL
                 stop(
                     C_EXCEPTION_TYPE_MISSING_ARGUMENT,
                     "the object '", paramName, "' has not been defined anywhere. ",
-                    "Please define it first, e.g., run '", paramName, " <- 1'"
+                    "Please define it first, e.g., run '", paramName, " <- 1'",
+                    call. = FALSE
                 )
             }
         )
@@ -464,15 +465,15 @@ getTestLabel <- function(x) {
 
 .getInputForZeroOutputInsideTolerance <- function(input, output, tolerance = .Machine$double.eps^0.25) {
     if (is.null(tolerance) || is.na(tolerance)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' must be a valid double")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' must be a valid double", call. = FALSE)
     }
 
     if (tolerance < 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' (", tolerance, ") must be >= 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' (", tolerance, ") must be >= 0", call. = FALSE)
     }
 
     if (is.null(input)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'input' must be a valid double or NA")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'input' must be a valid double or NA", call. = FALSE)
     }
 
     if (is.null(output) || is.na(output)) {
@@ -786,13 +787,15 @@ getTestLabel <- function(x) {
     if (is.null(firstValue) || length(firstValue) != 1 || is.na(firstValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'firstValue' (", firstValue, ") must be a valid numeric value"
+            "'firstValue' (", firstValue, ") must be a valid numeric value",
+            call. = FALSE
         )
     }
     if (is.null(secondValue) || length(secondValue) != 1 || is.na(secondValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'secondValue' (", secondValue, ") must be a valid numeric value"
+            "'secondValue' (", secondValue, ") must be a valid numeric value",
+            call. = FALSE
         )
     }
     return(firstValue > secondValue)
@@ -802,13 +805,15 @@ getTestLabel <- function(x) {
     if (is.null(firstValue) || length(firstValue) != 1 || is.na(firstValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'firstValue' (", firstValue, ") must be a valid numeric value"
+            "'firstValue' (", firstValue, ") must be a valid numeric value",
+            call. = FALSE
         )
     }
     if (is.null(secondValue) || length(secondValue) != 1 || is.na(secondValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'secondValue' (", secondValue, ") must be a valid numeric value"
+            "'secondValue' (", secondValue, ") must be a valid numeric value",
+            call. = FALSE
         )
     }
     return(firstValue < secondValue)
@@ -827,13 +832,14 @@ getTestLabel <- function(x) {
     .assertIsParameterSetClass(parameterSet, "parameterSet")
 
     if (is.null(parameterSet)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null", call. = FALSE)
     }
 
     if (!(parameterName %in% names(parameterSet))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'"
+            "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'",
+            call. = FALSE
         )
     }
 
@@ -912,7 +918,8 @@ getTestLabel <- function(x) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", variedParameterName, "' with length 2 must contain minimum != maximum (",
-            minValue, " == ", maxValue, ")"
+            minValue, " == ", maxValue, ")",
+            call. = FALSE
         )
     }
     by <- .getVariedParameterVectorByValue(variedParameter)
@@ -1099,7 +1106,8 @@ getParameterCaption <- function(obj, var) {
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
-            "(", .getClassName(obj), ") must be an rpact result object"
+            "(", .getClassName(obj), ") must be an rpact result object",
+            call. = FALSE
         )
     }
     parameterName <- .getParameterSetVar(fCall, var)
@@ -1142,7 +1150,8 @@ getParameterType <- function(obj, var) {
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
-            "(", .getClassName(obj), ") must be an rpact result object"
+            "(", .getClassName(obj), ") must be an rpact result object",
+            call. = FALSE
         )
     }
 
@@ -1184,7 +1193,8 @@ getParameterName <- function(obj, parameterCaption) {
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
-            "(", .getClassName(obj), ") must be an rpact result object"
+            "(", .getClassName(obj), ") must be an rpact result object",
+            call. = FALSE
         )
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
@@ -1226,7 +1236,7 @@ getParameterName <- function(obj, parameterCaption) {
 
 .removeLastEntryFromArray <- function(x) {
     if (!is.array(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'x' (", .getClassName(x), ") must be an array")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'x' (", .getClassName(x), ") must be an array", call. = FALSE)
     }
 
     dataDim <- dim(x)
@@ -1244,27 +1254,29 @@ getParameterName <- function(obj, parameterCaption) {
 
 .moveColumn <- function(data, columnName, insertPositionColumnName) {
     if (!is.data.frame(data)) {
-        stop("Illegal argument: 'data' (", .getClassName(data), ") must be a data.frame")
+        stop("Illegal argument: 'data' (", .getClassName(data), ") must be a data.frame", call. = FALSE)
     }
     if (is.null(insertPositionColumnName) || length(insertPositionColumnName) != 1 ||
             is.na(insertPositionColumnName) || !is.character(insertPositionColumnName)) {
         stop(
             "Illegal argument: 'insertPositionColumnName' (", .getClassName(insertPositionColumnName),
-            ") must be a valid character value"
+            ") must be a valid character value",
+            call. = FALSE
         )
     }
     if (is.null(columnName) || length(columnName) != 1 || is.na(columnName) || !is.character(columnName)) {
-        stop("Illegal argument: 'columnName' (", .getClassName(columnName), ") must be a valid character value")
+        stop("Illegal argument: 'columnName' (", .getClassName(columnName), ") must be a valid character value", call. = FALSE)
     }
 
     colNames <- colnames(data)
     if (!(columnName %in% colNames)) {
-        stop("Illegal argument: 'columnName' (", columnName, ") does not exist in the specified data.frame 'data'")
+        stop("Illegal argument: 'columnName' (", columnName, ") does not exist in the specified data.frame 'data'", call. = FALSE)
     }
     if (!(insertPositionColumnName %in% colNames)) {
         stop(
             "Illegal argument: 'insertPositionColumnName' (", insertPositionColumnName,
-            ") does not exist in the specified data.frame 'data'"
+            ") does not exist in the specified data.frame 'data'",
+            call. = FALSE
         )
     }
     if (columnName == insertPositionColumnName) {
@@ -1434,26 +1446,30 @@ getParameterName <- function(obj, parameterCaption) {
     if (is.null(insertPositionValue) || length(insertPositionValue) != 1 || is.na(insertPositionValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'insertPositionValue' (", class(insertPositionValue), ") must be a valid single value"
+            "'insertPositionValue' (", class(insertPositionValue), ") must be a valid single value",
+            call. = FALSE
         )
     }
     if (is.null(value) || length(value) != 1 || is.na(value)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'value' (", class(value), ") must be a valid single value"
+            "'value' (", class(value), ") must be a valid single value",
+            call. = FALSE
         )
     }
     if (!(value %in% values)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'value' (", value, ") does not exist in the specified vector 'values'"
+            "'value' (", value, ") does not exist in the specified vector 'values'",
+            call. = FALSE
         )
     }
     if (!(insertPositionValue %in% values)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'insertPositionValue' (", insertPositionValue,
-            ") does not exist in the specified vector 'values'"
+            ") does not exist in the specified vector 'values'",
+            call. = FALSE
         )
     }
     if (value == insertPositionValue) {
@@ -1707,7 +1723,8 @@ getParameterName <- function(obj, parameterCaption) {
     if (length(directionUpper) > 1 && length(value) != length(directionUpper)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'value' (", .arrayToString(value), ") and ",
-            "'directionUpper' (", .arrayToString(directionUpper), ") must have the same length"
+            "'directionUpper' (", .arrayToString(directionUpper), ") must have the same length",
+            call. = FALSE
         )
     }
 
