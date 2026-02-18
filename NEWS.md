@@ -29,7 +29,9 @@
 * Used `identical()` for user-defined parameter checks.
 * Enhanced warning messages for ignored parameters.
 * Adjusted the calculation in `getHazardRatioByPi()` to return the hazard
-  ratio directly derived from the corresponding rate parameters.
+  ratio directly derived from the corresponding rate parameters, i.e., 
+  the hazard ratio is defined as `lambda1` / `lambda2`; 
+  the Weibull shape parameter `kappa` controls time-dependence only.
 * Enhanced count data parameter validation logic
 * Update version, citation handling, and references for rpact package
 

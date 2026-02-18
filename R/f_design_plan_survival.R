@@ -33,15 +33,16 @@ NULL
     }
 }
 
-.getLambda <- function(..., groupNumber, lambda2, lambda1, hazardRatio, kappa) {
-    if (groupNumber == 1) {
-        if (!anyNA(lambda1)) {
-            return(lambda1)
-        }
-
-        lambda2 <- lambda2 * hazardRatio^(1 / kappa) # TODO check
+.getLambda <- function(..., groupNumber, lambda2, lambda1, hazardRatio) {
+    if (groupNumber == 2) {
+        return(lambda2)
     }
-    return(lambda2)
+    
+    if (anyNA(lambda1)) {
+        lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
+    }
+
+    return(lambda1)
 }
 
 .getEventProbabilityFunction <- function(..., time, piecewiseLambda, piecewiseSurvivalTime, phi, kappa) {
@@ -197,8 +198,7 @@ NULL
                     groupNumber           = groupNumber,
                     lambda2               = lambda2,
                     lambda1               = lambda1,
-                    hazardRatio           = hazardRatio,
-                    kappa                 = kappa
+                    hazardRatio           = hazardRatio
                 )
 
                 inner <- function(x) {
@@ -238,8 +238,7 @@ NULL
             groupNumber           = groupNumber,
             lambda2               = lambda2,
             lambda1               = lambda1,
-            hazardRatio           = hazardRatio,
-            kappa                 = kappa
+            hazardRatio           = hazardRatio
         )
 
         inner <- function(x) {
