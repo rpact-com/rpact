@@ -50,7 +50,8 @@ const String C_TYPE_OF_DESIGN_BS_HSD = "bsHSD";
 const String C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY = "noEarlyEfficacy";
 
 //' @title Normal density (fast internal)
-//' @description Compute the Gaussian probability density function (PDF) for a single point using a minimal implementation (no R overhead).
+//' @description Compute the Gaussian probability density function (PDF) for a
+//'              single point using a minimal implementation (no R overhead).
 //' @details
 //' This helper is used inside the recursive integration for group sequential boundaries, where the
 //' normal density is evaluated extremely often.
@@ -157,7 +158,8 @@ NumericVector getDensityValues(
 //' implementation) and the interior weights for all grid points.
 //' @param dx Grid spacing for the Newton–Cotes rule.
 //' @param constNewtonCotes Number of Newton–Cotes panels (composite rule parameter).
-//' @return A numeric vector of length `C_NEWTON_COTES_MULTIPLIER * constNewtonCotes + 1` containing quadrature weights aligned with the grid returned by `getXValues()`.
+//' @return A numeric vector of length `C_NEWTON_COTES_MULTIPLIER * constNewtonCotes + 1` containing
+//'         quadrature weights aligned with the grid returned by `getXValues()`.
 //' @keywords internal
 //' @noRd
 //'
@@ -195,7 +197,8 @@ NumericVector getW(double dx, int constNewtonCotes) {
 }
 
 //' @title Stage-wise sequential probability contribution
-//' @description Compute one probability component (reject/accept/continue) for stage `k` by integrating the current density over a decision region.
+//' @description Compute one probability component (reject/accept/continue) for
+//'              stage `k` by integrating the current density over a decision region.
 //' @details
 //' The decision regions are encoded in `decisionMatrix` (critical values and optional futility bounds).
 //' The density values `dn` are already multiplied by quadrature weights (`w * f_k(x)`), so this
@@ -278,7 +281,8 @@ NumericVector getXValues(NumericMatrix decisionMatrix, int k, int numberOfGridPo
 }
 
 //' @title Fast one-sided group sequential probabilities
-//' @description Compute stage-wise crossing probabilities for a one-sided group sequential design using recursive density integration.
+//' @description Compute stage-wise crossing probabilities for a one-sided group
+//'              sequential design using recursive density integration.
 //' @details
 //' This is a streamlined implementation that returns only the efficacy crossing probabilities across
 //' stages. It sets up information increments (`epsilonVec`), grids and Newton–Cotes weights, then
@@ -347,7 +351,8 @@ NumericVector getGroupSequentialProbabilitiesFast(NumericMatrix decisionMatrix, 
 }
 
 //' @title Group sequential probabilities for multiple decision regions
-//' @description Compute probabilities for efficacy and futility regions (and the remaining continuation probability) for a given decision matrix and information rates.
+//' @description Compute probabilities for efficacy and futility regions (and the remaining
+//'              continuation probability) for a given decision matrix and information rates.
 //' @details
 //' The returned matrix contains one row per decision region plus an additional row for the remaining
 //' probability mass. Internally, the function performs recursive density integration using Newton–Cotes
@@ -359,8 +364,7 @@ NumericVector getGroupSequentialProbabilitiesFast(NumericMatrix decisionMatrix, 
 //' @keywords internal
 //' @noRd
 //'
-//' [[Rcpp::export(name = ".getGroupSequentialProbabilitiesCpp")]]
-//'
+// [[Rcpp::export(name = ".getGroupSequentialProbabilitiesCpp")]]
 NumericMatrix getGroupSequentialProbabilitiesCpp(NumericMatrix decisionMatrix, NumericVector informationRates) {
 	try {
 		NumericMatrix decMatrix(Rcpp::clone(decisionMatrix));
@@ -480,7 +484,8 @@ NumericMatrix getGroupSequentialProbabilitiesCpp(NumericMatrix decisionMatrix, N
 }
 
 //' @title Pampallona–Tsiatis design search
-//' @description Search for critical values (and optionally futility bounds) for the Pampallona–Tsiatis family given error spending and information rates.
+//' @description Search for critical values (and optionally futility bounds) for the
+//'              Pampallona–Tsiatis family given error spending and information rates.
 //' @details
 //' Implements an iterative root-finding / optimization loop that adjusts boundary parameters so that
 //' the computed group sequential probabilities match the requested type I error (`alpha`) and type II
@@ -495,12 +500,12 @@ NumericMatrix getGroupSequentialProbabilitiesCpp(NumericMatrix decisionMatrix, N
 //' @param informationRates Information rates / fractions per stage (monotone increasing, length kMax).
 //' @param sided Number of sides for testing (1 or 2).
 //' @param bindingFutility If `true`, futility bounds are binding (affect type I error); otherwise non-binding.
-//' @return A list containing the computed critical values, futility bounds (if applicable), and diagnostic information from the iteration.
+//' @return A list containing the computed critical values, futility bounds
+//'         (if applicable), and diagnostic information from the iteration.
 //' @keywords internal
 //' @noRd
 //'
-//' [[Rcpp::export(name = ".getDesignGroupSequentialPampallonaTsiatisCpp")]]
-//'
+// [[Rcpp::export(name = ".getDesignGroupSequentialPampallonaTsiatisCpp")]]
 List getDesignGroupSequentialPampallonaTsiatisCpp(double tolerance, double beta, double alpha, double kMax,
 		double deltaPT0, double deltaPT1, NumericVector informationRates, int sided, bool bindingFutility) {
 
@@ -893,8 +898,7 @@ NumericVector getDesignGroupSequentialAlphaSpending(int kMax,
 //' @keywords internal
 //' @noRd
 //'
-//' [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedAlphaSpendingCpp")]]
-//'
+// [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedAlphaSpendingCpp")]]
 NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(int kMax, NumericVector userAlphaSpending,
 	double sided, NumericVector informationRates, bool bindingFutility, NumericVector futilityBounds,
 	double tolerance) {
@@ -921,8 +925,7 @@ NumericVector getDesignGroupSequentialUserDefinedAlphaSpendingCpp(int kMax, Nume
 //' @keywords internal
 //' @noRd
 //'
-//' [[Rcpp::export(name = ".getDesignGroupSequentialAlphaSpendingCpp")]]
-//'
+// [[Rcpp::export(name = ".getDesignGroupSequentialAlphaSpendingCpp")]]
 NumericVector getDesignGroupSequentialAlphaSpendingCpp(
 		int kMax, double alpha, double gammaA, String typeOfDesign,
 		double sided, NumericVector informationRates, bool bindingFutility,
@@ -948,8 +951,7 @@ NumericVector getDesignGroupSequentialAlphaSpendingCpp(
 //' @keywords internal
 //' @noRd
 //'
-//' [[Rcpp::export(name = ".getDesignGroupSequentialDeltaWTCpp")]]
-//'
+// [[Rcpp::export(name = ".getDesignGroupSequentialDeltaWTCpp")]]
 NumericVector getDesignGroupSequentialDeltaWTCpp(
 		int kMax, double alpha, double sided, NumericVector informationRates,
 		bool bindingFutility, NumericVector futilityBounds, double tolerance, double deltaWT) {
@@ -986,8 +988,7 @@ NumericVector getDesignGroupSequentialDeltaWTCpp(
 //' @keywords internal
 //' @noRd
 //'
-//' [[Rcpp::export(name = ".getDesignGroupSequentialPocockCpp")]]
-//'
+// [[Rcpp::export(name = ".getDesignGroupSequentialPocockCpp")]]
 NumericVector getDesignGroupSequentialPocockCpp(
 		int kMax, double alpha, double sided, NumericVector informationRates,
 		bool bindingFutility, NumericVector futilityBounds, double tolerance) {
@@ -1010,8 +1011,7 @@ NumericVector getDesignGroupSequentialPocockCpp(
 //' @keywords internal
 //' @noRd
 //'
-//' [[Rcpp::export(name = ".getDesignGroupSequentialOBrienAndFlemingCpp")]]
-//'
+// [[Rcpp::export(name = ".getDesignGroupSequentialOBrienAndFlemingCpp")]]
 NumericVector getDesignGroupSequentialOBrienAndFlemingCpp(
 		int kMax, double alpha, double sided,
 		NumericVector informationRates, bool bindingFutility,
@@ -1147,7 +1147,8 @@ NumericMatrix getProbabilitiesForFutilityBounds(
 }
 
 //' @title One-sided beta-spending design
-//' @description Compute a one-sided group sequential design with efficacy boundaries (alpha spending) and futility boundaries (beta spending).
+//' @description Compute a one-sided group sequential design with efficacy boundaries
+//'              (alpha spending) and futility boundaries (beta spending).
 //' @details
 //' Combines alpha-spending critical value calibration with beta-spending futility bound calibration.
 //' Supports user-defined spending or standard families depending on `typeOfDesign` and
@@ -1287,7 +1288,8 @@ NumericVector getAdjustedBetaSpendingValues(int kMax, int kMin, NumericVector be
 }
 
 //' @title Calibrate two-sided futility bound at stage k
-//' @description Solve for the two-sided futility boundary at stage `k` under beta spending, potentially using an auxiliary one-sided bound.
+//' @description Solve for the two-sided futility boundary at stage `k` under
+//'              beta spending, potentially using an auxiliary one-sided bound.
 //' @details
 //' Two-sided futility calibration is more complex because the acceptance region is typically central;
 //' this routine uses the probability engine and root finding to match the target spending within
@@ -1378,7 +1380,8 @@ NumericVector getFutilityBoundsTwoSided(
 }
 
 //' @title Calibrate two-sided critical value at stage k
-//' @description Compute/adjust the two-sided critical value at stage `k` so that the achieved cumulative alpha matches the target spending.
+//' @description Compute/adjust the two-sided critical value at stage `k` so
+//'              that the achieved cumulative alpha matches the target spending.
 //' @details
 //' Uses a symmetric boundary (±c_k) and repeatedly calls the probability engine until the alpha
 //' constraint is met within `tolerance`.
@@ -1561,8 +1564,7 @@ List getDesignGroupSequentialBetaSpendingTwoSidedCpp(NumericVector criticalValue
 //' @keywords internal
 //' @noRd
 //'
-//' [[Rcpp::export(name = ".getDesignGroupSequentialBetaSpendingCpp")]]
-//'
+// [[Rcpp::export(name = ".getDesignGroupSequentialBetaSpendingCpp")]]
 List getDesignGroupSequentialBetaSpendingCpp(
 		NumericVector criticalValues, int kMax, NumericVector userAlphaSpending,
 		NumericVector userBetaSpending, NumericVector informationRates, bool bindingFutility, double tolerance,
@@ -1601,8 +1603,7 @@ List getDesignGroupSequentialBetaSpendingCpp(
 //' @keywords internal
 //' @noRd
 //'
-//' [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedBetaSpendingCpp")]]
-//'
+// [[Rcpp::export(name = ".getDesignGroupSequentialUserDefinedBetaSpendingCpp")]]
 List getDesignGroupSequentialUserDefinedBetaSpendingCpp(NumericVector criticalValues, int kMax,
 		NumericVector userAlphaSpending, NumericVector userBetaSpending, double sided, NumericVector informationRates,
 		bool bindingFutility, double tolerance, String typeOfDesign, double gammaA, double alpha,
