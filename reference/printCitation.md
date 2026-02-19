@@ -42,7 +42,7 @@ printCitation()
 #> To cite package 'rpact' in publications use:
 #> 
 #>   Wassmer G, Pahlke F (2026). rpact: Confirmatory Adaptive Clinical
-#>   Trial Design and Analysis. R package version 4.3.1.9301.
+#>   Trial Design and Analysis. R package version 4.3.1.9302.
 #>   doi:10.32614/CRAN.package.rpact
 #> 
 #>   Wassmer G, Brannath W (2025). _Group Sequential and Confirmatory
