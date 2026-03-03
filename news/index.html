@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.3.1.9302</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.3.1.9303</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,7 @@
 <li>Adjusted the calculation in <code><a href="../reference/utilitiesForSurvivalTrials.html">getHazardRatioByPi()</a></code> to return the hazard ratio directly derived from the corresponding rate parameters, i.e., the hazard ratio is defined as <code>lambda1</code> / <code>lambda2</code>; the Weibull shape parameter <code>kappa</code> controls time-dependence only.</li>
 <li>Enhanced count data parameter validation logic</li>
 <li>Update version, citation handling, and references for rpact package</li>
+<li>Corrected calculation of <code>finalPValues</code> for two-sided group-sequential designs in specific edge cases (see issue <a href="https://github.com/rpact-com/rpact/issues/114" class="external-link">#114</a>).</li>
 </ul></div>
 </div>
     <div class="section level2">
