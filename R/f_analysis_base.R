@@ -1133,41 +1133,41 @@ getRepeatedPValues <- function(stageResults, ...,
                 informationRates = design$informationRates[1:finalStage]
             )
             pFinal <- sum(probs[3, ] - probs[2, ])
+        }
 
-            if (design$sided == 2) {
-                if (stageInverseNormalOrGroupSequential == 1) {
-                    pFinalOtherDirection <- 1 - stageResults$pValues[1]
-                } else {
-                    if (.isTrialDesignInverseNormal(design)) {
-                        decisionMatrix <- matrix(
-                            c(
-                                rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
-                                c(criticalValues[1:(finalStage - 1)], -stageResults$combInverseNormal[finalStage])
-                            ),
-                            nrow = 2, byrow = TRUE
-                        )
-                    } else {
-                        decisionMatrix <- matrix(
-                            c(
-                                rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
-                                c(
-                                    criticalValues[1:(finalStage - 1)],
-                                    -.getOneMinusQNorm(stageResults$overallPValues[finalStage])
-                                )
-                            ),
-                            nrow = 2, byrow = TRUE
-                        )
-                    }
-                    probs <- .getGroupSequentialProbabilities(
-                        decisionMatrix = decisionMatrix,
-                        informationRates = design$informationRates[1:finalStage]
+        if (design$sided == 2) {
+            if (stageInverseNormalOrGroupSequential == 1) {
+                pFinalOtherDirection <- 1 - stageResults$pValues[1]
+            } else {
+                if (.isTrialDesignInverseNormal(design)) {
+                    decisionMatrix <- matrix(
+                        c(
+                            rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
+                            c(criticalValues[1:(finalStage - 1)], -stageResults$combInverseNormal[finalStage])
+                        ),
+                        nrow = 2, byrow = TRUE
                     )
-
-                    pFinalOtherDirection <- sum(probs[3, ] - probs[2, ])
+                } else {
+                    decisionMatrix <- matrix(
+                        c(
+                            rep(C_FUTILITY_BOUNDS_DEFAULT, finalStage),
+                            c(
+                                criticalValues[1:(finalStage - 1)],
+                                -.getOneMinusQNorm(stageResults$overallPValues[finalStage])
+                            )
+                        ),
+                        nrow = 2, byrow = TRUE
+                    )
                 }
+                probs <- .getGroupSequentialProbabilities(
+                    decisionMatrix = decisionMatrix,
+                    informationRates = design$informationRates[1:finalStage]
+                )
 
-                pFinal <- 2 * min(pFinal, pFinalOtherDirection)
+                pFinalOtherDirection <- sum(probs[3, ] - probs[2, ])
             }
+
+            pFinal <- 2 * min(pFinal, pFinalOtherDirection)
         }
 
         return(list(finalStage = finalStage, pFinal = pFinal))
