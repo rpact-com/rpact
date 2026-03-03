@@ -34,7 +34,8 @@
   the Weibull shape parameter `kappa` controls time-dependence only.
 * Enhanced count data parameter validation logic
 * Update version, citation handling, and references for rpact package
-
+* Corrected calculation of `finalPValues` for two-sided group-sequential 
+  designs in specific edge cases (see issue [#114](https://github.com/rpact-com/rpact/issues/114)).
 
 # rpact 4.3.0
 

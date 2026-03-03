@@ -1,14 +1,98 @@
-comment: false
+# codecov.yml
+# Purpose:
+# - Enforce strict coverage on new/changed code (patch/diff coverage)
+# - Treat overall project coverage mainly as a trend indicator
+# - Keep PR feedback focused and actionable
+
+codecov:
+  # Ensure Codecov only reports after CI succeeded
+  require_ci_to_pass: true
 
 coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+
   status:
+    # 1) Patch (diff) coverage: strict gate for pull requests
+    patch:
+      default:
+        target: 100%
+        threshold: 0%
+        informational: false
+        
+    # Additional patch status only for src/
+    patch_src:
+      default:
+        flags:
+          - src
+        target: 95%
+        threshold: 0%
+        informational: false
+
+    # 2) Project coverage: informational only (no merge blocker)
     project:
       default:
         target: auto
-        threshold: 1%
+        threshold: 0.5% # tolerate minimal fluctuations
         informational: true
-    patch:
-      default:
-        target: auto
-        threshold: 1%
-        informational: true
+
+comment:
+  # Compact PR comments that highlight uncovered lines in the diff
+  layout: "condensed_header, condensed_files, condensed_footer"
+  require_changes: false
+  hide_project_coverage: true # keep PR focus on patch coverage
+  show_carryforward_flags: true
+
+# --- Flags ---------------------------------------------------------------
+# Flags allow separating coverage by logical areas of the package.
+# This is especially useful for prioritizing work (e.g., R API vs. native code).
+flags:
+  r:
+    paths:
+      - "R"
+  src:
+    paths:
+      - "src"
+  tests:
+    paths:
+      - "tests"
+  inst:
+    paths:
+      - "inst"
+
+# --- Ignore rules --------------------------------------------------------
+# Exclude files that are generated, documentation-only, or not meaningfully testable.
+# Keep this list minimal to avoid hiding real coverage gaps.
+ignore:
+  - "**/RcppExports.R"
+  - "**/RcppExports.cpp"
+  - "src/**/RcppExports*"
+  - "inst/doc/**"
+  - "inst/extdata/**"
+  - "inst/include/**"
+  - "inst/tests/**"
+  - "vignettes/**"
+  - "doc/**"
+  - "docs/**"
+  - "_pkgdown/**"
+  - ".github/**"
+  - "R/pkgname.R"
+  - "R/class_core_plot_settings.R"
+  - "R/class_event_probabilities.R"
+  - "R/class_simulation_results.R"
+  - "R/class_analysis_results.R"
+  - "R/class_analysis_stage_results.R"
+  - "R/class_core_plot_settings.R"
+  - "R/class_design.R"
+  - "R/f_quality_assurance.R"
+  - "R/f_simulation_calc_subjects_function.R"
+  - "R/f_core_output_formats.R"
+  - "R/f_core_plot.R"
+  - "R/f_design_plan_plot.R"
+  - "R/f_simulation_plot.R"
+  - "src/f_assertions.cpp"
+  - "src/f_utilities.h"
+  - "src/f_count_data_estimation.cpp"
+
+
