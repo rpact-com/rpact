@@ -1,40 +1,49 @@
+pkgVersion <- "4.4.0"
+pkgYear <- format(Sys.Date(), "%Y")
+tryCatch({
+    meta <- suppressWarnings(utils::packageDescription("rpact"))
+    if (methods::is(meta, "packageDescription")) {
+        if (!is.null(meta$Date) && nchar(meta$Date) >= 4) {
+            pkgYear <- substr(meta$Date, 1, 4) 
+        }
+        if (!is.null(meta$Version) && nchar(meta$Version) >= 3) {
+            pkgVersion <- meta$Version 
+        }
+    }
+}, error = function(e) {})
 
-meta <- packageDescription("rpact")
-pkg_year <- meta$Date
-pkg_year <- if (!is.null(pkg_year) && nchar(pkg_year) >= 4) substr(pkg_year, 1, 4) else format(Sys.Date(), "%Y")
-
-citHeader("To cite package 'rpact' in publications use:")
+utils::citHeader("To cite package 'rpact' in publications use:")
 
 c(
-  citEntry(
-    entry  = "Manual",
-    title  = "rpact: Confirmatory Adaptive Clinical Trial Design and Analysis",
-    author = personList(
-      person(given = "Gernot", family = "Wassmer"),
-      person(given = "Friedrich", family = "Pahlke")
+    utils::bibentry(
+        bibtype  = "Manual",
+        title  = "rpact: Confirmatory Adaptive Clinical Trial Design and Analysis",
+        author = c(
+            utils::person(given = "Gernot", family = "Wassmer"),
+            utils::person(given = "Friedrich", family = "Pahlke")
+        ),
+        year   = pkgYear,
+        note   = paste("R package version", pkgVersion),
+        doi    = "10.32614/CRAN.package.rpact",
+        url    = "https://CRAN.R-project.org/package=rpact",
+        textVersion = paste0(
+            "Wassmer G, Pahlke F (", pkgYear, "). rpact: Confirmatory Adaptive Clinical Trial Design and Analysis. ",
+            "R package version ", pkgVersion, ". doi:10.32614/CRAN.package.rpact"
+        )
     ),
-    year   = pkg_year,
-    note   = paste("R package version", meta$Version),
-    doi    = "10.32614/CRAN.package.rpact",
-    url    = "https://CRAN.R-project.org/package=rpact",
-    textVersion = paste0(
-      "Wassmer G, Pahlke F (", pkg_year, "). rpact: Confirmatory Adaptive Clinical Trial Design and Analysis. ",
-      "R package version ", meta$Version, ". doi:10.32614/CRAN.package.rpact"
+    
+    utils::bibentry(
+        bibtype   = "Book",
+        title     = "Group Sequential and Confirmatory Adaptive Designs in Clinical Trials",
+        author    = c(
+            utils::person(given = "Gernot", family = "Wassmer"),
+            utils::person(given = "Werner", family = "Brannath")
+        ),
+        year      = "2025",
+        edition   = "2nd",
+        publisher = "Springer",
+        address   = "Cham, Switzerland",
+        isbn      = "978-3-031-89668-2",
+        doi       = "10.1007/978-3-031-89669-9"
     )
-  ),
-
-  citEntry(
-    entry  = "Book",
-    title  = "Group Sequential and Confirmatory Adaptive Designs in Clinical Trials",
-    author = personList(
-      person(given = "Gernot", family = "Wassmer"),
-      person(given = "Werner", family = "Brannath")
-    ),
-    year      = "2025",
-    edition   = "2nd",
-    publisher = "Springer",
-    address   = "Cham, Switzerland",
-    isbn      = "978-3-031-89668-2",
-    doi       = "10.1007/978-3-031-89669-9"
-  )
 )
