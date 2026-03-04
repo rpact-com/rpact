@@ -18,20 +18,22 @@
 - **Tobias Muetze**. Contributor.
   [](https://orcid.org/0000-0002-4111-1941)
 
+- **RPACT GmbH**. Copyright holder, funder.
+
 ## Citation
 
 Source:
 [`inst/CITATION`](https://github.com/rpact-com/rpact/blob/main/inst/CITATION)
 
 Wassmer G, Pahlke F (2026). rpact: Confirmatory Adaptive Clinical Trial
-Design and Analysis. R package version 4.3.1.9303.
+Design and Analysis. R package version 4.4.0.
 doi:10.32614/CRAN.package.rpact
 
     @Manual{,
       title = {rpact: Confirmatory Adaptive Clinical Trial Design and Analysis},
       author = {Gernot Wassmer and Friedrich Pahlke},
       year = {2026},
-      note = {R package version 4.3.1.9303},
+      note = {R package version 4.4.0},
       doi = {10.32614/CRAN.package.rpact},
       url = {https://CRAN.R-project.org/package=rpact},
     }

@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   rpact_getting_started: rpact_getting_started.html
-last_built: 2026-03-03T12:34Z
+last_built: 2026-03-04T06:25Z
 urls:
   reference: https://docs.rpact.org/reference
   article: https://docs.rpact.org/articles
