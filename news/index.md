@@ -2,6 +2,8 @@
 
 ## rpact 4.4.0
 
+CRAN release: 2026-03-04
+
 ### New features
 
 - Extended
