@@ -439,7 +439,8 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             self$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
             self$.initStages()
         },
-        hasChanged = function(...,
+        hasChanged = function(
+                ...,
                 kMax,
                 alpha,
                 sided,
@@ -659,7 +660,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 name, "_old = ", .arrayToString(self$.formatComparisonResult(oldValue)), " (", .getClassName(oldValue), ")"
             ))
         },
-        hasChanged = function(...,
+        hasChanged = function(
+                ...,
                 kMax,
                 alpha,
                 beta,
@@ -672,6 +674,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 futilityBounds,
                 optimizationCriterion,
                 typeBetaSpending,
+                efficacyStops,
+                futilityStops,
                 gammaA,
                 gammaB,
                 bindingFutility,
@@ -760,6 +764,18 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 return(self$.pasteComparisonResult(
                     "typeBetaSpending",
                     typeBetaSpending, self$typeBetaSpending
+                ))
+            }
+            if (!identical(efficacyStops, self$efficacyStops)) {
+                return(self$.pasteComparisonResult(
+                    "efficacyStops",
+                    efficacyStops, self$efficacyStops
+                ))
+            }
+            if (!identical(futilityStops, self$futilityStops)) {
+                return(self$.pasteComparisonResult(
+                    "futilityStops",
+                    futilityStops, self$futilityStops
                 ))
             }
             if (!identical(gammaA, self$gammaA)) {

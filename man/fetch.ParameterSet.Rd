@@ -24,7 +24,7 @@ fetch(x, ..., output)
 \item a positive integer, giving the position counting from the left
 \item a negative integer, giving the position counting from the right.
 The default returns the last parameter.
-This argument is taken by expression and supports quasiquotation (you can unquote column names and column locations).
+This argument is taken by expression and supports quasi-quotation (you can unquote column names and column locations).
 }}
 
 \item{output}{A character defining the output type as follows:

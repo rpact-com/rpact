@@ -1187,7 +1187,8 @@ getDesignInverseNormal <- function(...,
     ))
 }
 
-.getDesignGroupSequentialOrWithInterimStops <- function(...,
+.getDesignGroupSequentialOrWithInterimStops <- function(
+        ...,
         designClass,
         kMax,
         alpha,
@@ -1490,10 +1491,10 @@ getDesignInverseNormal <- function(...,
         args$typeBetaSpending <- "bsUser"
         args$userBetaSpending <- newBetaSpending
     }
-
+    
     newDesign <- do.call(.getDesignGroupSequential, args)
     newDesign$criticalValues[which(!efficacyStops)] <- Inf
-    newDesign$futilityBounds[which(!futilityStops)] <- -Inf
+    newDesign$futilityBounds[which(!futilityStops)] <- C_FUTILITY_BOUNDS_DEFAULT # TODO check -Inf
 
     newDesign$efficacyStops <- efficacyStops
     newDesign$.setParameterType("efficacyStops", C_PARAM_USER_DEFINED)
@@ -1535,7 +1536,7 @@ getDesignInverseNormal <- function(...,
     if (length(indices) > 0) {
         newDesign$stageLevels[indices] <- 0
     }
-
+    
     return(newDesign)
 }
 
