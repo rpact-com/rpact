@@ -1187,6 +1187,14 @@ getDesignInverseNormal <- function(...,
     ))
 }
 
+.isBoundayStoppingActivated <- function(boundaryStops) {
+    if (anyNA(boundaryStops) || all(boundaryStops)) {
+        return(FALSE)
+    }
+    
+    return(TRUE)
+}
+
 .getDesignGroupSequentialOrWithInterimStops <- function(
         ...,
         designClass,
@@ -1215,7 +1223,16 @@ getDesignInverseNormal <- function(...,
         tolerance,
         efficacyStops,
         futilityStops) {
-    if (!all(is.na(efficacyStops)) || !all(is.na(futilityStops))) {
+    if (.isBoundayStoppingActivated(efficacyStops) || .isBoundayStoppingActivated(futilityStops)) {
+        if (!all(is.na(delayedInformation))) {
+            warning(
+                "'delayedInformation' (", .arrayToString(delayedInformation), ") ",
+                "will be ignored because it is not applicable ",
+                "when 'efficacyStops' or 'futilityStops' are specified",
+                call. = FALSE
+            )
+        }
+        
         return(.getDesignWithInterimStops(
             designClass = designClass,
             kMax = kMax,
@@ -1393,9 +1410,17 @@ getDesignInverseNormal <- function(...,
         tolerance = 1e-08) {
     validTypesOfDesign <- c("asOF", "asP", "asKD", "asHSD")
     if (!(typeOfDesign %in% validTypesOfDesign)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'typeOfDesign' ('", typeOfDesign, "') must be one of the following: ",
+        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+            "'typeOfDesign' (", dQuote(typeOfDesign), ") must be one of the following ",
+            "when 'efficacyStops' or 'futilityStops' are specified: ",
             .arrayToString(validTypesOfDesign, encapsulate = TRUE),
+            call. = FALSE
+        )
+    }
+    if (identical(typeBetaSpending, C_TYPE_OF_DESIGN_BS_USER)) {
+        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+            "'typeBetaSpending' cannot be ", dQuote(C_TYPE_OF_DESIGN_BS_USER), " ",
+            "when 'efficacyStops' or 'futilityStops' are specified",
             call. = FALSE
         )
     }
