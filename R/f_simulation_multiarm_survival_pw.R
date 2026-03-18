@@ -70,6 +70,7 @@ NULL
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
 #' @inheritParams param_showStatistics
+#' @param simulationType 
 #'
 #' @details
 #' At given design the function simulates the analysis times, power, stopping
