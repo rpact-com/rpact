@@ -151,6 +151,8 @@ Collate:
     'f_simulation_multiarm_means.R'
     'f_simulation_multiarm_rates.R'
     'f_simulation_multiarm_survival.R'
+    'f_simulation_multiarm_survival_basic.R'
+    'f_simulation_multiarm_survival_utilities.R'
     'f_simulation_performance_score.R'
     'f_simulation_plot.R'
     'parameter_descriptions.R'
