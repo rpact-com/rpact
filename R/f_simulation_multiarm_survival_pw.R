@@ -74,6 +74,7 @@ NULL
 #' @inheritParams param_three_dots
 #' @inheritParams param_showStatistics
 #' @inheritParams param_simulationType_multiarm_survival
+#' @param piControl The assumed probability in the control arm, default is \code{0.2}.
 #'
 #' @details
 #' At given design the function simulates the analysis times, power, stopping

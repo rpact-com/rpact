@@ -959,7 +959,8 @@ NULL
 
 #' Parameter Description: Simulation Type
 #' @param simulationType Character value specifying the simulation approach:
-#' \code{"auto"}, \code{"patientWise"}, or \code{"testStatisticBased"}.
+#' \code{"auto"}, \code{"patientWise"}, \code{"testStatisticBased"}, or
+#' \code{"patientWiseBasic"}.
 #' If \code{"auto"} is specified, the simulation type is selected automatically based on
 #' the explicitly specified arguments. If patient-wise-specific arguments such as
 #' \code{eventTime}, \code{accrualTime}, \code{accrualIntensity}, \code{dropoutRate1},
