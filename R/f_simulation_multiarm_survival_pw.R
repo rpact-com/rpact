@@ -29,6 +29,11 @@ NULL
 #' Returns the simulated power, stopping and selection probabilities, conditional power, and
 #' expected sample size for testing hazard ratios in a multi-arm treatment groups testing situation.
 #'
+#' Depending on \code{simulationType}, either a patient-wise survival simulation is performed,
+#' a patient-wise basic approximation is used, or normally distributed log-rank test statistics
+#' are simulated. The default \code{simulationType = "auto"} chooses the simulation approach
+#' automatically based on the explicitly specified arguments.
+#'
 #' @param omegaMaxVector Range of hazard ratios with highest response for \code{"linear"} and
 #'        \code{"sigmoidEmax"} model, default is \code{seq(1, 2.6, 0.4)}.
 #' @inheritParams param_intersectionTest_MultiArm
@@ -40,11 +45,9 @@ NULL
 #' @inheritParams param_activeArms
 #' @inheritParams param_successCriterion
 #' @inheritParams param_typeOfShapeSurvival
-#' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
 #' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned
-#' @inheritParams param_kappa
 #' @inheritParams param_eventTime
 #' @inheritParams param_accrualTime
 #' @inheritParams param_accrualIntensity
@@ -70,7 +73,7 @@ NULL
 #' @inheritParams param_seed
 #' @inheritParams param_three_dots
 #' @inheritParams param_showStatistics
-#' @param simulationType 
+#' @inheritParams param_simulationType_multiarm_survival
 #'
 #' @details
 #' At given design the function simulates the analysis times, power, stopping
@@ -79,6 +82,15 @@ NULL
 #' arm selection rule in the multi-arm survival design situation. An allocation
 #' ratio can be specified referring to the ratio of number of subjects in the
 #' active treatment groups as compared to the control group.
+#'
+#' If \code{simulationType = "patientWise"}, patient-wise survival data are simulated based on
+#' the specified accrual, event-time, and dropout assumptions. If
+#' \code{simulationType = "patientWiseBasic"}, a simplified patient-wise survival approach is
+#' used. If \code{simulationType = "testStatisticBased"}, normally distributed log-rank test
+#' statistics are simulated instead. The default \code{simulationType = "auto"} selects the
+#' simulation approach automatically based on the explicitly specified arguments and uses the
+#' legacy test-statistic-based approach for backward compatibility if no patient-wise-specific
+#' arguments are provided.
 #'
 #' The definition of \code{thetaH1} makes only sense if \code{kMax} > 1
 #' and if \code{conditionalPower}, \code{minNumberOfEventsPerStage}, and
@@ -107,7 +119,8 @@ NULL
 #'
 #' @export
 #'
-getSimulationMultiArmSurvival <- function(design = NULL,
+getSimulationMultiArmSurvival <- function(
+        design = NULL,
         ...,
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
         activeArms = NA_integer_,
@@ -183,6 +196,11 @@ getSimulationMultiArmSurvival <- function(design = NULL,
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"")
         }
+        
+        message("Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed log-rank test statistics instead of patient-wise survival data. ",
+            "To simulate patient-wise survival data, specify 'simulationType' = \"patientWise\" and the corresponding arguments."
+        )
+        
         return(getSimulationMultiArmSurvivalBasic(
             design = design,
             ...,
@@ -428,6 +446,12 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         naAllowed = TRUE
     )
 
+    if (isFALSE(cppEnabled)) {
+        message("Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise survival data using R code instead of C++ code. ",
+            "This approach is less efficient and should only be used for testing purposes. ",
+            "To perform a more efficient patient-wise simulation, specify 'simulationType' = \"patientWise\".")
+    }
+    
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
     directionUpper <- .assertIsValidDirectionUpper(
@@ -562,7 +586,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         } else if (.isTrialDesignInverseNormal(design)) {
             .getWeightsInverseNormal(design)
         } else if (.isTrialDesignConditionalDunnett(design)) {
-            numeric() # Not used.
+            numeric(0) # not used
         }
         .performSimulationMultiArmSurvivalLoopCpp(
             cols = cols,

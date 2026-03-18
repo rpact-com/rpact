@@ -250,7 +250,7 @@ NULL
 
 #'
 #' @title
-#' Get Simulation Multi-Arm Survival
+#' Get Simulation Multi-Arm Survival (Test Statistic Based)
 #'
 #' @description
 #' Returns the simulated power, stopping and selection probabilities, conditional power, and

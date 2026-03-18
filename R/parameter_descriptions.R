@@ -956,3 +956,31 @@ NULL
 #' @name param_plannedCalendarTime
 #' @keywords internal
 NULL
+
+#' Parameter Description: Simulation Type
+#' @param simulationType Character value specifying the simulation approach:
+#' \code{"auto"}, \code{"patientWise"}, or \code{"testStatisticBased"}.
+#' If \code{"auto"} is specified, the simulation type is selected automatically based on
+#' the explicitly specified arguments. If patient-wise-specific arguments such as
+#' \code{eventTime}, \code{accrualTime}, \code{accrualIntensity}, \code{dropoutRate1},
+#' \code{dropoutRate2}, \code{dropoutTime}, \code{maxNumberOfSubjects}, or \code{kappa}
+#' are provided, patient-wise simulation is used; otherwise the test-statistic-based
+#' simulation is used for backward compatibility.
+#' @name param_simulationType_enrichment_survival
+#' @keywords internal
+NULL
+
+#' Parameter Description: Simulation Type
+#' @param simulationType Character value specifying the simulation approach:
+#' \code{"auto"}, \code{"patientWise"}, \code{"testStatisticBased"}, or
+#' \code{"patientWiseBasic"}.
+#' If \code{"auto"} is specified, the simulation type is selected automatically based on
+#' the explicitly specified arguments. If patient-wise-specific arguments such as
+#' \code{piControl}, \code{eventTime}, \code{accrualTime}, \code{accrualIntensity},
+#' \code{accrualIntensityType}, \code{dropoutRate1}, \code{dropoutRate2},
+#' \code{dropoutTime}, \code{maxNumberOfSubjects}, or \code{kappa} are provided,
+#' a patient-wise simulation approach is used; otherwise the test-statistic-based
+#' simulation is used for backward compatibility.
+#' @name param_simulationType_multiarm_survival
+#' @keywords internal
+NULL

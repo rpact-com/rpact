@@ -17,82 +17,6 @@
 #' @include f_simulation_enrichment.R
 NULL
 
-.getSimulationSurvivalEnrichmentStageEvents <- function(
-        ...,
-        stage,
-        directionUpper,
-        conditionalPower,
-        conditionalCriticalValue,
-        plannedEvents,
-        allocationRatioPlanned,
-        selectedPopulations,
-        thetaH1,
-        overallEffects,
-        minNumberOfEventsPerStage,
-        maxNumberOfEventsPerStage
-        ) {
-    stage <- stage - 1 # to be consistent with non-enrichment situation
-    gMax <- nrow(overallEffects)
-
-    if (!is.na(conditionalPower)) {
-        if (any(selectedPopulations[1:gMax, stage + 1], na.rm = TRUE)) {
-            if (is.na(thetaH1)) {
-                if (is.na(directionUpper) || isTRUE(directionUpper)) {
-                    thetaStandardized <- log(max(
-                        min(
-                            overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
-                            na.rm = TRUE
-                        ),
-                        1 + 1e-07
-                    ))
-                } else {
-                    thetaStandardized <- log(min(
-                        max(
-                            overallEffects[selectedPopulations[1:gMax, stage + 1], stage],
-                            na.rm = TRUE
-                        ),
-                        1 - 1e-07
-                    ))
-                }
-            } else {
-                thetaStandardized <- log(min(
-                    thetaH1,
-                    1 +
-                        ifelse(
-                            is.na(directionUpper) ||
-                                isTRUE(directionUpper),
-                            1e-07,
-                            -1e-07
-                        )
-                ))
-            }
-
-            if (conditionalCriticalValue[stage] > 8) {
-                newEvents <- maxNumberOfEventsPerStage[stage + 1]
-            } else {
-                newEvents <- (1 + allocationRatioPlanned[stage])^2 /
-                    allocationRatioPlanned[stage] *
-                    (max(
-                        0,
-                        conditionalCriticalValue[stage] +
-                            .getQNorm(conditionalPower),
-                        na.rm = TRUE
-                    ))^2 /
-                    thetaStandardized^2
-                newEvents <- min(
-                    max(minNumberOfEventsPerStage[stage + 1], newEvents),
-                    maxNumberOfEventsPerStage[stage + 1]
-                )
-            }
-        } else {
-            newEvents <- 0
-        }
-    } else {
-        newEvents <- plannedEvents[stage + 1] - plannedEvents[stage]
-    }
-    return(newEvents)
-}
-
 .getSimulatedStageSurvivalEnrichment <- function(...,
         design,
         subsets,
@@ -116,6 +40,7 @@ NULL
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
         selectPopulationsFunction) {
+        
     kMax <- length(plannedEvents)
     pMax <- length(hazardRatios)
     gMax <- log(length(hazardRatios), 2) + 1
@@ -510,7 +435,7 @@ NULL
 
 #'
 #' @title
-#' Get Simulation Enrichment Survival
+#' Get Simulation Enrichment Survival (Test Statistic Based)
 #'
 #' @description
 #' Returns the simulated power, stopping and selection probabilities, conditional power,
@@ -578,7 +503,10 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentSurvival <- function(design = NULL,
+#' @keywords internal
+#'
+getSimulationEnrichmentSurvivalBasic <- function(
+        design = NULL,
         ...,
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT

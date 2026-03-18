@@ -215,7 +215,7 @@ NULL
     treatments[1:maxNumberOfSubjects]
 }
 
-updateTreatmentsVector <- function(
+.updateTreatmentsVector <- function(
         k,
         gMax,
         maxNumberOfSubjects,
@@ -244,11 +244,11 @@ updateTreatmentsVector <- function(
 }
 
 #'
-#' Calculates stage results for each simulation iteration step
+#' Calculates stage results for each simulation iteration step (R Based)
 #'
 #' @noRd
 #'
-.getSimulatedStageResultsSurvivalMultiArmSubjectsBased <- function(
+.getSimulatedStageResultsSurvivalMultiArmPatientWise <- function(
         ...,
         design,
         directionUpper,
@@ -366,7 +366,7 @@ updateTreatmentsVector <- function(
             if (analysisTime[k - 1] < max(survivalDataSet$accrualTime)) {
                 #  create new survival and dropout times for selected treatment arms
                 if (!all(selectedArms[, k] & selectedArms[, k - 1])) {
-                    treatments <- updateTreatmentsVector(
+                    treatments <- .updateTreatmentsVector(
                         k,
                         gMax,
                         maxNumberOfSubjects,
@@ -657,7 +657,7 @@ updateTreatmentsVector <- function(
     index <- 1
     for (i in seq_len(cols)) {
         for (j in seq_len(maxNumberOfIterations)) {
-            stageResults <- .getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
+            stageResults <- .getSimulatedStageResultsSurvivalMultiArmPatientWise(
                 design = design,
                 directionUpper = directionUpper,
                 omegaVector = effectMatrix[i, ],
