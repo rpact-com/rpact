@@ -1598,6 +1598,9 @@ getPowerCounts <- function(design = NULL,
         overallReject[iCase] <- powerAndAverageSampleNumber$overallReject
         earlyStop[iCase] <- sum(powerAndAverageSampleNumber$earlyStop[1:(design$kMax - 1), ], na.rm = TRUE)
     }
+    
+    designPlan$lambda1 <- lambda1
+    designPlan$lambda2 <- lambda2
 
     designPlan$maxNumberOfSubjects <- n1 + n2
     designPlan$.setParameterType(

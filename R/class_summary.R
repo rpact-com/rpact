@@ -4025,7 +4025,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
     } else {
         rejectPerStageValues <- NULL
-        if (!is.null(probsH1)) {
+        if (!is.null(probsH1) && !simulationEnabled) {
             if (is.matrix(probsH1$rejectPerStage)) {
                 rejectPerStageValues <- matrix(probsH1$rejectPerStage[1:(design$kMax - 1), ], ncol = ncol(probsH1$rejectPerStage))
             } else {
