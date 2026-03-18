@@ -14,12 +14,17 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
+ * File version: $Revision: 8660 $
+ * Last changed: $Date: 2025-04-01 11:45:17 +0200 (Di, 01 Apr 2025) $
+ * Last changed by: $Author: pahlke $
+ *
  */
 
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <Rcpp.h>
+#include "f_as251.h"
 
 // [[Rcpp::plugins(cpp11)]]
 
@@ -167,6 +172,28 @@ IntegerVector getOrder(SEXP x, bool desc = false) {
             stop("Unsupported type.");
     }
     return IntegerVector::create();
+}
+
+// Custom order function that returns ascending permutation indices
+// @param x NumericVector to be ordered
+// @return IntegerVector of 1-based indices in ascending order
+//
+// [[Rcpp::export(name = ".orderCpp")]]
+IntegerVector order(NumericVector x) {
+	int n = x.size();
+	IntegerVector indices(n);
+	
+	// Initialize indices vector with 1-based indexing
+	for (int i = 0; i < n; i++) {
+		indices[i] = i + 1;
+	}
+	
+	// Sort indices based on corresponding values in x
+	std::sort(indices.begin(), indices.end(), [&](int a, int b) {
+		return x[a-1] < x[b-1];  // Convert back to 0-based for comparison
+	});
+	
+	return indices;
 }
 
 NumericVector vectorSum(NumericVector x, NumericVector y) {
@@ -783,5 +810,158 @@ List getFractions(
 	);
 }
 
+// Returns the 0-based indices of TRUE values in a logical vector
+IntegerVector which(const LogicalVector& x) {
+	std::vector<int> indices;
+	for (int i = 0; i < x.size(); i++) {
+		if (x[i]) {
+			indices.push_back(i);
+		}
+	}
+	return Rcpp::wrap(indices);
+}
 
+// Returns a logical vector indicating if elements of x are in the set
+LogicalVector charInSet(const CharacterVector& x, CharacterVector set) {
+    int n = x.size();
+    LogicalVector result(n);
+    for (int i = 0; i < n; i++) {
+        result[i] = false;
+        for (int j = 0; j < set.size(); j++) {
+            if (Rcpp::as<std::string>(x[i]) == Rcpp::as<std::string>(set[j])) {
+                result[i] = true;
+                break;
+            }
+        }
+    }
+    return result;
+}
 
+// Returns a logical vector if elements of IntegerVector x are in the set
+LogicalVector intInSet(const IntegerVector& x, IntegerVector set) {
+    int n = x.size();
+    LogicalVector result(n);
+    for (int i = 0; i < n; i++) {
+        result[i] = false;
+        for (int j = 0; j < set.size(); j++) {
+            if (x[i] == set[j]) {
+                result[i] = true;
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+// Replicates each element in 'values' according to the corresponding count in 'times'
+IntegerVector repInt(const IntegerVector& values, const IntegerVector& times) {
+    int n = values.size();
+    int n_times = times.size();
+    if (n != n_times) {
+        throw std::invalid_argument("Length of values and times must be the same.");
+    }
+    
+    int length_out = sum(times);
+    IntegerVector result(length_out);
+    int index = 0;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < times[i]; j++) {
+            result[index++] = values[i];
+        }
+    }
+    return result;
+}
+
+// Returns the index of the first match of 'value' in 'x', or -1 if not found
+int firstMatch(const CharacterVector& x, std::string value) {
+    int n = x.size();
+    for (int i = 0; i < n; i++) {
+        if (Rcpp::as<std::string>(x[i]) == value) {
+            return i;
+        }
+    }
+    return -1; // Return -1 if no match is found
+}
+
+// Simplified equivalent of R function .applyDirectionOfAlternative.
+// Note that directionUpper cannot be a vector here, and values cannot be a logical vector.
+NumericVector applyDirectionOfAlternative(const NumericVector& values, 
+                                          bool directionUpper, 
+                                          String type,
+                                          String phase) {
+    if (phase == "design") {
+        return values;
+    }
+    if (Rf_isNull(values) || values.size() == 0 || Rcpp::as<bool>(all(is_na(values)))) {
+        return values;
+    }
+    if (R_IsNA(directionUpper) || directionUpper) {
+        if (type == "oneMinusValue") {
+            return(1 - values);
+        }
+        if (type == "valueMinusOne") {
+            return(values - 1);
+        }
+        if (type == "negateIfLower") {
+            return(values);
+        }
+        if (type == "negateIfUpper") {
+            return(-values);
+        }
+        if (type == "minMax") {
+            return(wrap(min(na_omit(values))));
+        }
+        if (type == "maxMin") {
+            return(wrap(max(na_omit(values))));
+        }
+    }
+    if (type == "negateIfLower") {
+        return(-values);
+    }
+    if (type == "negateIfUpper") {
+        return(values);
+    }
+    if (type == "minMax") {
+        return(wrap(max(na_omit(values))));
+    }
+    if (type == "maxMin") {
+        return(wrap(min(na_omit(values))));
+    }   
+    stop("Unknown type of direction of alternative.");
+    return R_NaReal;
+}
+
+std::string getClassName(const Environment& x) {
+    if (!x.hasAttribute("class")) {
+		stop("x has no class attribute");
+	}
+	std::vector<std::string> xClass = x.attr("class");
+    return xClass[0];
+}
+
+// [[Rcpp::export(name = ".getMultivarNormalDistributionCpp")]]
+double getMultivarNormalDistribution(NumericVector upper, NumericMatrix sigma) {
+    
+    int dimensionSigma = sigma.ncol();
+    
+    if (dimensionSigma == 1) {
+        return R::pnorm(upper[0], 0.0, 1.0, 1, 0);
+    }
+    
+    NumericVector lower = NumericVector::create(R_NegInf);
+    return as251Normal(lower, upper, sigma);
+}
+
+// Calculates x %*% t(x)
+// [[Rcpp::export(name = ".tcrossprodCpp")]]
+NumericMatrix tcrossprod(NumericVector x) {
+    int n = x.size();
+    NumericMatrix result(n, n);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            result(i, j) = x[i] * x[j];
+        }
+    }
+    return result;
+}
