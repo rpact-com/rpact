@@ -27,17 +27,18 @@ using namespace Rcpp;
 // @param maxNumberOfEventsPerStage Maximum number of events per stage (length kMax)
 //
 // [[Rcpp::export(name = ".getSimulationSurvivalMultiArmStageEventsCpp")]]
-double getSimulationSurvivalMultiArmStageEvents(int stage,
-                                                bool directionUpper,
-                                                double conditionalPower,
-                                                NumericVector conditionalCriticalValue,
-                                                NumericVector plannedEvents,
-                                                NumericVector allocationRatioPlanned,
-                                                LogicalMatrix selectedArms,
-                                                double thetaH1,
-                                                NumericMatrix overallEffects,
-                                                NumericVector minNumberOfEventsPerStage,
-                                                NumericVector maxNumberOfEventsPerStage) {
+double getSimulationSurvivalMultiArmStageEvents(
+		int stage,
+		bool directionUpper,
+		double conditionalPower,
+		NumericVector conditionalCriticalValue,
+		NumericVector plannedEvents,
+		NumericVector allocationRatioPlanned,
+		LogicalMatrix selectedArms,
+		double thetaH1,
+		NumericMatrix overallEffects,
+		NumericVector minNumberOfEventsPerStage,
+		NumericVector maxNumberOfEventsPerStage) {
     // To be consistent with the non-multiarm situation:
     stage = stage - 1;
 
@@ -208,12 +209,14 @@ IntegerVector getTreatmentsMultiArm(int gMax,
 }
 
 // Generate survival and dropout times
-List getSurvDropoutTimesMultiArm(int numberOfSubjects, 
-                                 int gMax,
-						         IntegerVector treatments,
-						         NumericVector lambdaVector,
-						         double kappa,
-						         NumericVector phi) {
+List getSurvDropoutTimesMultiArm(
+		int numberOfSubjects,
+		int gMax,
+		IntegerVector treatments,
+		NumericVector lambdaVector,
+		double kappa,
+		NumericVector phi) {
+
 	// This is important to ensure that R's random number generator state is properly managed.
 	Rcpp::RNGScope scope; 
 
@@ -254,19 +257,20 @@ List getSurvDropoutTimesMultiArm(int numberOfSubjects,
 	);
 }
 
-
 // Update Treatments Vector
 //
 // Updates treatment assignments for subsequent stages based on selected arms
 //
 // [[Rcpp::export(name = ".updateTreatmentsVectorCpp")]]
-IntegerVector updateTreatmentsVector(int k,
-                                    int gMax,
-                                    int maxNumberOfSubjects,
-                                    IntegerVector numberOfSubjects,
-                                    const IntegerVector& treatments,
-                                    LogicalMatrix selectedArms,
-                                    IntegerVector allocationFraction) {
+IntegerVector updateTreatmentsVector(
+		int k,
+		int gMax,
+		int maxNumberOfSubjects,
+		IntegerVector numberOfSubjects,
+		const IntegerVector& treatments,
+		LogicalMatrix selectedArms,
+		IntegerVector allocationFraction) {
+
     // Keep existing assignments up to previous stage
     IntegerVector newTreatments = treatments[seq_len(numberOfSubjects[k - 1]) - 1];
     
@@ -307,6 +311,21 @@ IntegerVector updateTreatmentsVector(int k,
     }
     
     return newTreatments[seq_len(maxNumberOfSubjects) - 1];
+}
+
+// used effect size is either estimated from test statistic or pre-fixed
+double getEstimatedThetaMultiArm(
+		int stage,
+		double thetaH1,
+		bool directionUpper,
+		double allocationRatioPlanned) {
+
+	if (!R_IsNA(thetaH1)) {
+		// TODO implement estimation if thetaH1 is not NA
+		//return directionUpper ? thetaH1 * thetaH0 : 1 / thetaH1 * thetaH0;
+	}
+
+	return thetaH1; // TODO implement estimation if thetaH1 is NA
 }
 
 // Get Simulated Stage Results Survival Multi-Arm Subjects Based
@@ -632,6 +651,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                     }
                 }
                 
+                double allocationRatioPlanned = allocationFraction[0] / (1.0 * allocationFraction[1]);
+
                 // Select arms
                 LogicalVector selectedNow;
                 if (typeOfSelection == "userDefined") {
@@ -642,7 +663,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                         _["conditionalPower"] = conditionalPower,
                         _["conditionalCriticalValue"] = conditionalCriticalValue,
                         _["plannedEvents"] = plannedEvents,
-                        _["allocationRatioPlanned"] = allocationFraction[0] / (1.0 * allocationFraction[1]),
+                        _["allocationRatioPlanned"] = allocationRatioPlanned,
                         _["selectedArms"] = selectedArms,
                         _["thetaH1"] = thetaH1,
                         _["overallEffects"] = overallEffects
@@ -670,6 +691,8 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                 }
                 selectedArms(_, k + 1) = selectedArms(_, k) & selectedNow;
                 
+        		double estimatedTheta = getEstimatedThetaMultiArm(k, thetaH1, directionUpper, allocationRatioPlanned);
+
                 // Calculate new events
                 double newEventsValue;
                 if (calcEventsFunctionIsUserDefined) {
@@ -682,7 +705,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                         _["plannedEvents"] = plannedEvents,
                         _["allocationRatioPlanned"] = rep(allocationRatio, k + 2),
                         _["selectedArms"] = selectedArms,
-                        _["thetaH1"] = thetaH1,
+                        _["estimatedTheta"] = estimatedTheta,
                         _["overallEffects"] = overallEffects,
                         _["minNumberOfEventsPerStage"] = minNumberOfEventsPerStage,
                         _["maxNumberOfEventsPerStage"] = maxNumberOfEventsPerStage

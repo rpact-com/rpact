@@ -133,6 +133,13 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Effect Under Alternative
+#' @param estimatedTheta If specified, the value of the alternative under which
+#'   the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.
+#' @name param_estimatedTheta
+#' @keywords internal
+NULL
+
 #' Parameter Description: Standard Deviation
 #' @param stDev The standard deviation under which the sample size or power
 #'   calculation is performed, default is \code{1}.

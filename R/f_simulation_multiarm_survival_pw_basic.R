@@ -519,10 +519,10 @@ NULL
                     conditionalPower = conditionalPower,
                     conditionalCriticalValue = conditionalCriticalValue,
                     plannedEvents = plannedEvents,
-                    ##  necessary for use in .getSimulationSurvivalMultiArmStageEvents():
+                    # necessary for use in .getSimulationSurvivalMultiArmStageEventsBasic():
                     allocationRatioPlanned = rep(allocationFraction[1] / allocationFraction[2], k + 1),
                     selectedArms = selectedArms,
-                    thetaH1 = thetaH1,
+                    estimatedTheta = thetaH1,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                     maxNumberOfEventsPerStage = maxNumberOfEventsPerStage

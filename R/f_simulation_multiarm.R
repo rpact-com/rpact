@@ -468,8 +468,10 @@ NULL
         calcEventsFunction = NULL, # survival only
         selectArmsFunction,
         showStatistics,
-        endpoint = c("means", "rates", "survival")) {
+        endpoint = c("means", "rates", "survival"),
+        simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic")) {
     endpoint <- match.arg(endpoint)
+    simulationType <- match.arg(simulationType)
 
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
 
@@ -1027,13 +1029,18 @@ NULL
         }
         simulationResults$calcSubjectsFunction <- calcSubjectsFunction
     } else if (endpoint == "survival") {
+        expectedFunction <- if (identical(simulationType, "patientWiseBasic")) {
+            .getSimulationSurvivalMultiArmStageEventsBasic
+        } else {
+            .getSimulationSurvivalMultiArmStageEvents
+        }
         if (is.null(calcEventsFunction)) {
-            calcEventsFunction <- .getSimulationSurvivalMultiArmStageEvents
+            calcEventsFunction <- expectedFunction
         } else {
             .assertIsValidFunction(
                 fun = calcEventsFunction,
                 funArgName = "calcEventsFunction",
-                expectedFunction = .getSimulationSurvivalMultiArmStageEvents
+                expectedFunction = expectedFunction
             )
         }
         simulationResults$calcEventsFunction <- calcEventsFunction

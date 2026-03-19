@@ -59,6 +59,7 @@ NULL
 #' @inheritParams param_minNumberOfEventsPerStage
 #' @inheritParams param_maxNumberOfEventsPerStage
 #' @inheritParams param_conditionalPowerSimulation
+#' @inheritParams param_estimatedTheta
 #' @inheritParams param_thetaH1
 #' @inheritParams param_plannedEvents
 #' @inheritParams param_maxNumberOfIterations
@@ -163,7 +164,7 @@ getSimulationMultiArmSurvival <- function(
         selectArmsFunction = NULL,
         showStatistics = FALSE) {
     simulationType <- match.arg(simulationType)
-
+    
     callArgs <- names(as.list(match.call(expand.dots = FALSE)))
     hasArg <- function(x) x %in% callArgs
 
