@@ -17,6 +17,66 @@
 #' @include f_simulation_multiarm.R
 NULL
 
+#' Get number of events for a multi-arm survival stage (internal)
+#'
+#' @title Internal: compute additional events for a stage in multi-arm survival simulation
+#'
+#' @description
+#' Internal helper used by \code{getSimulationMultiArmSurvival} to compute the number
+#' of events to schedule for the given stage. The function supports conditional
+#' sample size reassessment when \code{conditionalPower} is specified and returns
+#' a single numeric value representing new events for the specified stage.
+#'
+#' @param ... Currently unused; reserved for compatibility with user-supplied callbacks.
+#' @param stage Integer stage index (1-based as used by callers). Note: the function
+#'        internally converts to 0-based (\code{stage <- stage - 1}) for calculations.
+#' @param directionUpper Logical or \code{NA}; one-sided test direction.
+#' @param conditionalPower Numeric target conditional power (or \code{NA} to use planned events).
+#' @param conditionalCriticalValue Numeric vector of conditional critical values (indexed by stage \- 1).
+#' @param plannedEvents Numeric vector of cumulative planned events per stage.
+#' @param allocationRatioPlanned Numeric vector of allocation ratios (active : control) per stage.
+#' @param selectedArms Logical matrix indicating selected arms per stage (rows = arms, cols = stages).
+#' @param thetaH1 Numeric hypothesized effect (hazard ratio) used instead of observed effects when provided.
+#' @param overallEffects Numeric matrix of observed overall effect estimates (rows = alternatives/arms, cols = stages).
+#' @param minNumberOfEventsPerStage Numeric vector of minimum events allowed per stage.
+#' @param maxNumberOfEventsPerStage Numeric vector of maximum events allowed per stage.
+#'
+#' @details
+#' - If \code{conditionalPower} is \code{NA} the function returns the planned incremental
+#'   events for the stage: \code{plannedEvents[stage+1] - plannedEvents[stage]}.\cr
+#' - Otherwise, if any arm is selected at the current stage the function computes a
+#'   standardized effect (\code{thetaStandardized}) using \code{overallEffects} or
+#'   \code{thetaH1} and applies the conditional power formula. If the conditional
+#'   critical value is very large (\> 8) the upper bound \code{maxNumberOfEventsPerStage}
+#'   for the next stage is returned. The result is clipped to the supplied min/max
+#'   event bounds.
+#' - The function returns a single numeric value (new events for the stage). Callers
+#'   should ensure inputs are valid; this helper does not perform extensive argument checking.
+#'
+#' @return A single numeric value giving the number of new events to schedule for the stage.
+#'
+#' @examples
+#' \dontrun{
+#' # return planned increment when no conditional power is requested
+#' .getSimulationSurvivalMultiArmStageEvents(
+#'   stage = 2,
+#'   directionUpper = TRUE,
+#'   conditionalPower = NA_real_,
+#'   conditionalCriticalValue = rep(NA_real_, 1),
+#'   plannedEvents = c(100, 200),
+#'   allocationRatioPlanned = c(1, 1),
+#'   selectedArms = matrix(TRUE, nrow = 3, ncol = 2),
+#'   thetaH1 = NA_real_,
+#'   overallEffects = matrix(1, nrow = 3, ncol = 2),
+#'   minNumberOfEventsPerStage = c(0, 50),
+#'   maxNumberOfEventsPerStage = c(0, 200)
+#' )
+#' }
+#'
+#' @keywords internal
+#' 
+#' @noRd
+#' 
 .getSimulationSurvivalMultiArmStageEvents <- function(...,
         stage,
         directionUpper,
@@ -328,8 +388,8 @@ NULL
 #'        matrix according to Deng et al. (Biometrics, 2019) accounting for the
 #'        respective alternative is used;
 #'        if \code{correlationComputation = "null"}, a constant correlation matrix valid
-#'        under the null, i.e., not accounting for the alternative is used,
-#'         default is \code{"alternative"}.
+#'        under the null, i.e., not accounting for the alternative is used, 
+#'        default is \code{"alternative"}.
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
