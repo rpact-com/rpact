@@ -94,12 +94,12 @@ NULL
     events2 <- 0
     for (i in (1:numberOfSubjects)) {
         if (survivalDataSetSelectedArmsSorted$event[i]) {
-            if (survivalDataSet$treatmentArm[i] == 1) {
+            if (survivalDataSetSelectedArmsSorted$treatmentArm[i] == treatmentArms[1]) {
                 if (subjectsT1 + subjectsT2 > 0) {
                     numerator <- numerator + 1 - thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2)
                 }
                 events1 <- events1 + 1
-            } else if (survivalDataSet$treatmentArm[i] == 2) {
+            } else if (survivalDataSetSelectedArmsSorted$treatmentArm[i] == treatmentArms[2]) {
                 if (subjectsT1 + subjectsT2 > 0) {
                     numerator <- numerator - thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2)
                 }
@@ -314,7 +314,8 @@ NULL
     for (i in 1:maxNumberOfSubjects) {
         for (g in 1:(gMax + 1)) {
             if (survivalDataSet$treatmentArm[i] == g) {
-                survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) / lambdaVector[g]
+                survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) / 
+                  lambdaVector[g]
             }
         }
         if (any(phi > 0)) {
@@ -363,6 +364,7 @@ NULL
                 singleEventsPerStage[gMax + 1, k] <- logRank$events[2]
             }
         } else {
+
             if (analysisTime[k - 1] < max(survivalDataSet$accrualTime)) {
                 #  create new survival and dropout times for selected treatment arms
                 if (!all(selectedArms[, k] & selectedArms[, k - 1])) {
@@ -375,16 +377,19 @@ NULL
                         selectedArms,
                         allocationFraction
                     )
-
                     survivalDataSet$treatmentArm <- treatments[1:maxNumberOfSubjects]
 
                     for (i in numberOfSubjects[k - 1]:maxNumberOfSubjects) {
                         for (g in 1:gMax) {
                             if (survivalDataSet$treatmentArm[i] == g && selectedArms[g, k]) {
-                                survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
+                                survivalDataSet$survivalTime[i] <-  (-log(1 - runif(1, 0, 1)))^(1 / kappa) / 
                                     lambdaVector[g]
                             }
                         }
+                        if (survivalDataSet$treatmentArm[i] == (gMax + 1)){
+                            survivalDataSet$survivalTime[i] <-  (-log(1 - runif(1, 0, 1)))^(1 / kappa) / 
+                              lambdaVector[gMax + 1]
+                        } 
                         if (any(phi > 0)) {
                             if (phi[1] > 0) {
                                 for (g in 1:gMax) {
@@ -392,7 +397,7 @@ NULL
                                         survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi[1]
                                     }
                                 }
-                                if (survivalDataSet$treatmentArm[i] == gMax + 1) {
+                                if (survivalDataSet$treatmentArm[i] == (gMax + 1)) {
                                     survivalDataSet$dropoutTime[i] <- -log(1 - runif(1, 0, 1)) / phi[2]
                                 }
                             }
@@ -409,7 +414,7 @@ NULL
                 survivalDataSetSelected,
                 plannedEvents[k]
             )$time
-
+            
             if (is.na(analysisTime[k])) {
                 eventsNotAchieved[k] <- TRUE
                 break
@@ -423,7 +428,6 @@ NULL
                             treatmentArms = c(g, gMax + 1),
                             directionUpper = directionUpper
                         )
-
                         overallTestStatistics[g, k] <- logRank$logRank
                         singleEventsPerStage[g, k] <- logRank$events[1]
                         cumulativeEventsPerStage[g, k] <- sum(logRank$events)
@@ -510,24 +514,50 @@ NULL
                 }
 
                 args$selectArmsFunctionArgs <- selectArmsFunctionArgs
+                
+                #  FP: Insert
+                if (is.na(thetaH1)){
+                  estimatedTheta <- min(overallEffects[, k], na.rm = TRUE)
+                } else {
+                  estimatedTheta <- thetaH1
+                }
+                if (!directionUpper){
+                  estimatedTheta <- 1 / estimatedTheta
+                }
+                if (calcEventsFunctionIsUserDefined) {
+                  conditionalCriticalValuePerStage <- conditionalCriticalValue[k]
+                } else {
+                  conditionalCriticalValuePerStage <- conditionalCriticalValue
+                } 
 
                 selectedArms[, k + 1] <- (selectedArms[, k] & do.call(.selectTreatmentArms, args))
-
+                
                 newEvents <- calcEventsFunction(
                     stage = k + 1, # to be consistent with non-multiarm situation, cf. line 38
                     directionUpper = directionUpper,
                     conditionalPower = conditionalPower,
-                    conditionalCriticalValue = conditionalCriticalValue,
+                    
+                    #  FP to change:
+                    conditionalCriticalValue = conditionalCriticalValuePerStage,
+                    
                     plannedEvents = plannedEvents,
+                    # DSB: In principle we can now pass here eventsOverStages, but this still
+                    # requires an adaptation of the custom calcEventsFunction because
+                    # this is a matrix and not a vector now
+                    # eventsOverStages = cumulativeEventsPerStage,
+                    
+                    # FP: Änderung in cpp bitte hier:
+                    eventsOverStages = colSums(singleEventsPerStage, na.rm = TRUE),
+                    
                     # necessary for use in .getSimulationSurvivalMultiArmStageEventsBasic():
                     allocationRatioPlanned = rep(allocationFraction[1] / allocationFraction[2], k + 1),
                     selectedArms = selectedArms,
-                    estimatedTheta = thetaH1,
+                    estimatedTheta = estimatedTheta,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                     maxNumberOfEventsPerStage = maxNumberOfEventsPerStage
                 )
-
+                
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -537,10 +567,16 @@ NULL
                         "the output must be a single numeric value"
                     )
                 }
-
-                if (!is.na(conditionalPower) || calcEventsFunctionIsUserDefined) {
-                    plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(ceiling(newEvents), kMax - k))
+                
+                #  FP ändern:
+                if (!is.na(conditionalPower)){
+                  if (!calcEventsFunctionIsUserDefined) {
+                      plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(ceiling(newEvents), kMax - k))
+                  } else {
+                      plannedEvents[k + 1] <- ceiling(newEvents)
+                  }
                 }
+
             } else {
                 selectedArms[, k + 1] <- selectedArms[, k]
             }

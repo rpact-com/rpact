@@ -490,7 +490,7 @@
             recruit2 <- NA_real_
         }
 
-        # calculate theta that solves (ln(theta) - ln(thetaH0) sqrt(FisherInformation_k) = boundary
+        # calculate theta that solves (ln(theta) - ln(thetaH0)) sqrt(FisherInformation_k) = boundary
         for (j in seq_len(length(criticalValues))) {
             if (all(is.na(numberOfSubjects[, iCase]))) {
                 numberOfSubjectsPerStage <- maxNumberOfSubjects[iCase]
@@ -1498,7 +1498,7 @@ getPowerCounts <- function(design = NULL,
     alpha <- design$alpha
     sided <- design$sided
     designCharacteristics <- getDesignCharacteristics(design)
-    shift <- designCharacteristics$shift
+#    shift <- designCharacteristics$shift
 
     designPlan <- .getDesignPlanCountData(
         design,

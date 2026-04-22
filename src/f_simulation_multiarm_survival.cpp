@@ -444,7 +444,9 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
             );
             
             if (R_IsNA(analysisTime[k])) {
-                eventsNotAchieved[k] = true;
+                for (int l = k; l < kMax; l++) {
+                    eventsNotAchieved[l] = true;
+                }
                 break;
             } else {
                 numberOfSubjects[k] = sum(recruitmentTimes <= analysisTime[k]);
@@ -500,6 +502,10 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                             survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[g];
                         }
                     }
+                    if (treatmentArm == gMax){
+                        double u = R::runif(0, 1);
+                    	survivalTime[i] = std::pow(-std::log(1 - u), 1.0 / kappa) / lambdaVector[gMax];
+                    }
                     if (any(phi > 0).is_true()) {
                         if (phi[0] > 0) { 
                             for (int g = 0; g < gMax; g++) {
@@ -541,7 +547,9 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
             );
             
             if (R_IsNA(analysisTime[k])) {
-                eventsNotAchieved[k] = true;
+                for (int l = k; l < kMax; l++) {
+                    eventsNotAchieved[l] = true;
+                }
                 break;
             } else {
                 numberOfSubjects[k] = sum(recruitmentTimes <= analysisTime[k]);
@@ -931,6 +939,7 @@ List performSimulationMultiArmSurvivalLoop(
 	for (int i = 0; i < cols; i++) {
 		for (int j = 0; j < maxNumberOfIterations; j++) {
 			NumericVector omegaVectorThisScenario = effectMatrix(i, _);
+            NumericVector plannedEventsThisIteration = clone(plannedEvents);
 			
 			List stageResults = getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
 				design,
@@ -941,7 +950,7 @@ List performSimulationMultiArmSurvivalLoop(
 				kappa,
 				phi,
 				eventTime,
-				plannedEvents,
+                plannedEventsThisIteration,
 				recruitmentTimes,
 				allocationFraction,
 				typeOfSelection,
