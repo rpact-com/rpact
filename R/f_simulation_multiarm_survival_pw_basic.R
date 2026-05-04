@@ -142,10 +142,8 @@ NULL
 #'
 #' @noRd
 #'
-.findObservationTime <- function(
-        survivalDataSet,
-        requiredStageEvents
-        ) {
+.findObservationTime <- function(survivalDataSet,
+        requiredStageEvents) {
     numberOfSubjects <- length(survivalDataSet$accrualTime)
     upperBound <- 1
     repeat {
@@ -215,15 +213,13 @@ NULL
     treatments[1:maxNumberOfSubjects]
 }
 
-.updateTreatmentsVector <- function(
-        k,
+.updateTreatmentsVector <- function(k,
         gMax,
         maxNumberOfSubjects,
         numberOfSubjects,
         treatments,
         selectedArms,
-        allocationFraction
-        ) {
+        allocationFraction) {
     treatments <- treatments[1:numberOfSubjects[k - 1]]
     while (length(treatments) < maxNumberOfSubjects) {
         if (allocationFraction[1] > allocationFraction[2]) {
@@ -248,8 +244,7 @@ NULL
 #'
 #' @noRd
 #'
-.getSimulatedStageResultsSurvivalMultiArmPatientWise <- function(
-        ...,
+.getSimulatedStageResultsSurvivalMultiArmPatientWise <- function(...,
         design,
         directionUpper,
         omegaVector,
@@ -272,8 +267,7 @@ NULL
         thetaH1,
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
-        selectArmsFunction
-        ) {
+        selectArmsFunction) {
     kMax <- length(plannedEvents)
     gMax <- length(omegaVector)
     maxNumberOfSubjects <- length(recruitmentTimes)
@@ -314,8 +308,8 @@ NULL
     for (i in 1:maxNumberOfSubjects) {
         for (g in 1:(gMax + 1)) {
             if (survivalDataSet$treatmentArm[i] == g) {
-                survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) / 
-                  lambdaVector[g]
+                survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
+                    lambdaVector[g]
             }
         }
         if (any(phi > 0)) {
@@ -364,7 +358,6 @@ NULL
                 singleEventsPerStage[gMax + 1, k] <- logRank$events[2]
             }
         } else {
-
             if (analysisTime[k - 1] < max(survivalDataSet$accrualTime)) {
                 #  create new survival and dropout times for selected treatment arms
                 if (!all(selectedArms[, k] & selectedArms[, k - 1])) {
@@ -382,14 +375,14 @@ NULL
                     for (i in numberOfSubjects[k - 1]:maxNumberOfSubjects) {
                         for (g in 1:gMax) {
                             if (survivalDataSet$treatmentArm[i] == g && selectedArms[g, k]) {
-                                survivalDataSet$survivalTime[i] <-  (-log(1 - runif(1, 0, 1)))^(1 / kappa) / 
+                                survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
                                     lambdaVector[g]
                             }
                         }
-                        if (survivalDataSet$treatmentArm[i] == (gMax + 1)){
-                            survivalDataSet$survivalTime[i] <-  (-log(1 - runif(1, 0, 1)))^(1 / kappa) / 
-                              lambdaVector[gMax + 1]
-                        } 
+                        if (survivalDataSet$treatmentArm[i] == (gMax + 1)) {
+                            survivalDataSet$survivalTime[i] <- (-log(1 - runif(1, 0, 1)))^(1 / kappa) /
+                                lambdaVector[gMax + 1]
+                        }
                         if (any(phi > 0)) {
                             if (phi[1] > 0) {
                                 for (g in 1:gMax) {
@@ -414,7 +407,7 @@ NULL
                 survivalDataSetSelected,
                 plannedEvents[k]
             )$time
-            
+
             if (is.na(analysisTime[k])) {
                 eventsNotAchieved[k] <- TRUE
                 break
@@ -514,41 +507,30 @@ NULL
                 }
 
                 args$selectArmsFunctionArgs <- selectArmsFunctionArgs
+
+                estimatedTheta <- thetaH1
+                if (is.na(thetaH1)) {
+                    estimatedTheta <- min(overallEffects[, k], na.rm = TRUE)
+                }
                 
-                #  FP: Insert
-                if (is.na(thetaH1)){
-                  estimatedTheta <- min(overallEffects[, k], na.rm = TRUE)
-                } else {
-                  estimatedTheta <- thetaH1
+                if (!directionUpper) {
+                    estimatedTheta <- 1 / estimatedTheta
                 }
-                if (!directionUpper){
-                  estimatedTheta <- 1 / estimatedTheta
-                }
+                
+                conditionalCriticalValuePerStage <- conditionalCriticalValue
                 if (calcEventsFunctionIsUserDefined) {
-                  conditionalCriticalValuePerStage <- conditionalCriticalValue[k]
-                } else {
-                  conditionalCriticalValuePerStage <- conditionalCriticalValue
-                } 
+                    conditionalCriticalValuePerStage <- conditionalCriticalValue[k]
+                }
 
                 selectedArms[, k + 1] <- (selectedArms[, k] & do.call(.selectTreatmentArms, args))
-                
+
                 newEvents <- calcEventsFunction(
                     stage = k + 1, # to be consistent with non-multiarm situation, cf. line 38
                     directionUpper = directionUpper,
                     conditionalPower = conditionalPower,
-                    
-                    #  FP to change:
                     conditionalCriticalValue = conditionalCriticalValuePerStage,
-                    
                     plannedEvents = plannedEvents,
-                    # DSB: In principle we can now pass here eventsOverStages, but this still
-                    # requires an adaptation of the custom calcEventsFunction because
-                    # this is a matrix and not a vector now
-                    # eventsOverStages = cumulativeEventsPerStage,
-                    
-                    # FP: Änderung in cpp bitte hier:
                     eventsOverStages = colSums(singleEventsPerStage, na.rm = TRUE),
-                    
                     # necessary for use in .getSimulationSurvivalMultiArmStageEventsBasic():
                     allocationRatioPlanned = rep(allocationFraction[1] / allocationFraction[2], k + 1),
                     selectedArms = selectedArms,
@@ -557,7 +539,7 @@ NULL
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                     maxNumberOfEventsPerStage = maxNumberOfEventsPerStage
                 )
-                
+
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -567,16 +549,14 @@ NULL
                         "the output must be a single numeric value"
                     )
                 }
-                
-                #  FP ändern:
-                if (!is.na(conditionalPower)){
-                  if (!calcEventsFunctionIsUserDefined) {
-                      plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(ceiling(newEvents), kMax - k))
-                  } else {
-                      plannedEvents[k + 1] <- ceiling(newEvents)
-                  }
-                }
 
+                if (!is.na(conditionalPower)) {
+                    if (!calcEventsFunctionIsUserDefined) {
+                        plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(ceiling(newEvents), kMax - k))
+                    } else {
+                        plannedEvents[k + 1] <- ceiling(newEvents)
+                    }
+                }
             } else {
                 selectedArms[, k + 1] <- selectedArms[, k]
             }
@@ -618,8 +598,7 @@ NULL
     ))
 }
 
-.performSimulationMultiArmSurvivalLoop <- function(
-        cols,
+.performSimulationMultiArmSurvivalLoop <- function(cols,
         maxNumberOfIterations,
         design,
         directionUpper,
@@ -650,8 +629,7 @@ NULL
         criticalValuesDunnett,
         successCriterion,
         gMax,
-        kMax
-        ) {
+        kMax) {
     # Initialize simulation result matrices
     simulatedNumberEventsNotAchieved <- matrix(0, nrow = kMax, ncol = cols)
     simulatedAnalysisTime <- matrix(0, nrow = kMax, ncol = cols)

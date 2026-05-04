@@ -318,14 +318,20 @@ double getEstimatedThetaMultiArm(
 		int stage,
 		double thetaH1,
 		bool directionUpper,
-		double allocationRatioPlanned) {
+		NumericMatrix overallEffects) {
 
 	if (!R_IsNA(thetaH1)) {
-		// TODO implement estimation if thetaH1 is not NA
-		//return directionUpper ? thetaH1 * thetaH0 : 1 / thetaH1 * thetaH0;
+		return thetaH1;
 	}
 
-	return thetaH1; // TODO implement estimation if thetaH1 is NA
+	NumericVector overallEffectsAtStage = overallEffects(_, stage);
+	double estimatedTheta = min(overallEffectsAtStage);
+
+	if (!directionUpper){
+      estimatedTheta = 1 / estimatedTheta;
+    }
+
+	return estimatedTheta;
 }
 
 // Get Simulated Stage Results Survival Multi-Arm Subjects Based
@@ -664,13 +670,17 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                 // Select arms
                 LogicalVector selectedNow;
                 if (typeOfSelection == "userDefined") {
+
+                	NumericVector eventsOverStages = Rcpp::colSums(singleEventsPerStage, true);
+
                     List selectArmsFunctionArgs = List::create(
                         _["effectVector"] = effectVector,
                         _["stage"] = k + 1, // R 1-based
                         _["directionUpper"] = directionUpper,
                         _["conditionalPower"] = conditionalPower,
-                        _["conditionalCriticalValue"] = conditionalCriticalValue,
+                        _["conditionalCriticalValue"] = conditionalCriticalValue[k],
                         _["plannedEvents"] = plannedEvents,
+                        _["eventsOverStages"] = eventsOverStages,
                         _["allocationRatioPlanned"] = allocationRatioPlanned,
                         _["selectedArms"] = selectedArms,
                         _["thetaH1"] = thetaH1,
@@ -699,7 +709,7 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                 }
                 selectedArms(_, k + 1) = selectedArms(_, k) & selectedNow;
                 
-        		double estimatedTheta = getEstimatedThetaMultiArm(k, thetaH1, directionUpper, allocationRatioPlanned);
+        		double estimatedTheta = getEstimatedThetaMultiArm(k, thetaH1, directionUpper, overallEffects);
 
                 // Calculate new events
                 double newEventsValue;
@@ -742,10 +752,14 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                     );
                 }
                 
-                if (!R_IsNA(conditionalPower) || calcEventsFunctionIsUserDefined) {
-                    double ceilingNewEventsValue = std::ceil(newEventsValue);
-                    NumericVector newEventsIncrements = cumsum(rep(ceilingNewEventsValue, kMax - 1 - k));
-					plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;
+                if (!R_IsNA(conditionalPower)) {
+					double ceilingNewEventsValue = std::ceil(newEventsValue);
+                	if (!calcEventsFunctionIsUserDefined) {
+						NumericVector newEventsIncrements = cumsum(rep(ceilingNewEventsValue, kMax - 1 - k));
+						plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;
+                	} else {
+                		plannedEvents[k + 1] = ceilingNewEventsValue;
+                	}
                 }
             } else {
                 selectedArms(_, k + 1) = selectedArms(_, k);
