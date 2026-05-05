@@ -669,9 +669,10 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
 
                 // Select arms
                 LogicalVector selectedNow;
+                NumericVector eventsOverStages = Rcpp::colSums(singleEventsPerStage, true);
                 if (typeOfSelection == "userDefined") {
 
-                	NumericVector eventsOverStages = Rcpp::colSums(singleEventsPerStage, true);
+                	//eventsOverStages = Rcpp::colSums(singleEventsPerStage, true);
 
                     List selectArmsFunctionArgs = List::create(
                         _["effectVector"] = effectVector,
@@ -712,15 +713,16 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
         		double estimatedTheta = getEstimatedThetaMultiArm(k, thetaH1, directionUpper, overallEffects);
 
                 // Calculate new events
-                double newEventsValue;
+                double newEventsValue = NA_REAL;
                 if (calcEventsFunctionIsUserDefined) {
                     Function calcEventsFunc = calcEventsFunction.get();                    
                     RObject newEvents = calcEventsFunc(
                         _["stage"] = k + 2, // R 1-based
                         _["directionUpper"] = directionUpper,
                         _["conditionalPower"] = conditionalPower,
-                        _["conditionalCriticalValue"] = conditionalCriticalValue,
+                        _["conditionalCriticalValue"] = conditionalCriticalValue[k],
                         _["plannedEvents"] = plannedEvents,
+						_["eventsOverStages"] = eventsOverStages,
                         _["allocationRatioPlanned"] = rep(allocationRatio, k + 2),
                         _["selectedArms"] = selectedArms,
                         _["estimatedTheta"] = estimatedTheta,
@@ -728,13 +730,6 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                         _["minNumberOfEventsPerStage"] = minNumberOfEventsPerStage,
                         _["maxNumberOfEventsPerStage"] = maxNumberOfEventsPerStage
                     );
-
-                    if (Rf_isNull(newEvents) || Rf_length(newEvents) != 1 || !Rf_isReal(newEvents) || R_IsNA(REAL(newEvents)[0])) {
-						stop(
-							"'calcEventsFunction' returned an illegal or undefined result; ",
-							"the output must be a single numeric value"
-						);
-					}
 					newEventsValue = REAL(newEvents)[0];
                 } else {
                     newEventsValue = getSimulationSurvivalMultiArmStageEvents(
@@ -753,7 +748,10 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                 }
                 
                 if (!R_IsNA(conditionalPower)) {
-					double ceilingNewEventsValue = std::ceil(newEventsValue);
+					double ceilingNewEventsValue = NA_REAL;
+					if (!R_IsNA(newEventsValue)) {
+						ceilingNewEventsValue = std::ceil(newEventsValue);
+					}
                 	if (!calcEventsFunctionIsUserDefined) {
 						NumericVector newEventsIncrements = cumsum(rep(ceilingNewEventsValue, kMax - 1 - k));
 						plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;

@@ -43,7 +43,8 @@ NULL
     return(as.matrix(indices))
 }
 
-.selectTreatmentArms <- function(typeOfSelection,
+.selectTreatmentArms <- function(
+        typeOfSelection,
         epsilonValue,
         rValue,
         threshold,
