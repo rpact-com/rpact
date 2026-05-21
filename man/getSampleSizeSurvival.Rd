@@ -314,9 +314,9 @@ getSampleSizeSurvival(accrualTime = c(0, 18), accrualIntensity = c(20, 30),
 
 }
 \seealso{
-Other sample size functions: 
-\code{\link{getSampleSizeCounts}()},
-\code{\link{getSampleSizeMeans}()},
-\code{\link{getSampleSizeRates}()}
+Other sample size functions:
+\code{\link[=getSampleSizeCounts]{getSampleSizeCounts()}},
+\code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}},
+\code{\link[=getSampleSizeRates]{getSampleSizeRates()}}
 }
 \concept{sample size functions}

@@ -76,7 +76,7 @@ getOutputFormat("sample size")
 }
 }
 \seealso{
-Other output formats: 
-\code{\link{setOutputFormat}()}
+Other output formats:
+\code{\link[=setOutputFormat]{setOutputFormat()}}
 }
 \concept{output formats}

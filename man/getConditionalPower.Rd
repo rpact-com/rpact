@@ -108,16 +108,16 @@ getConditionalPower(stageResults, thetaH1 = -0.4,
 \code{\link[=plot.StageResults]{plot.StageResults()}} or \code{\link[=plot.AnalysisResults]{plot.AnalysisResults()}}
 for plotting the conditional power.
 
-Other analysis functions: 
-\code{\link{getAnalysisResults}()},
-\code{\link{getClosedCombinationTestResults}()},
-\code{\link{getClosedConditionalDunnettTestResults}()},
-\code{\link{getConditionalRejectionProbabilities}()},
-\code{\link{getFinalConfidenceInterval}()},
-\code{\link{getFinalPValue}()},
-\code{\link{getRepeatedConfidenceIntervals}()},
-\code{\link{getRepeatedPValues}()},
-\code{\link{getStageResults}()},
-\code{\link{getTestActions}()}
+Other analysis functions:
+\code{\link[=getAnalysisResults]{getAnalysisResults()}},
+\code{\link[=getClosedCombinationTestResults]{getClosedCombinationTestResults()}},
+\code{\link[=getClosedConditionalDunnettTestResults]{getClosedConditionalDunnettTestResults()}},
+\code{\link[=getConditionalRejectionProbabilities]{getConditionalRejectionProbabilities()}},
+\code{\link[=getFinalConfidenceInterval]{getFinalConfidenceInterval()}},
+\code{\link[=getFinalPValue]{getFinalPValue()}},
+\code{\link[=getRepeatedConfidenceIntervals]{getRepeatedConfidenceIntervals()}},
+\code{\link[=getRepeatedPValues]{getRepeatedPValues()}},
+\code{\link[=getStageResults]{getStageResults()}},
+\code{\link[=getTestActions]{getTestActions()}}
 }
 \concept{analysis functions}

@@ -1470,8 +1470,11 @@ NULL
     }
 }
 
-.assertAreValidFutilityBounds <- function(futilityBounds, kMax = length(futilityBounds) + 1,
-        kMaxLowerBound = 1, kMaxUpperBound = C_KMAX_UPPER_BOUND) {
+.assertAreValidFutilityBounds <- function(
+        futilityBounds, 
+        kMax = length(futilityBounds) + 1,
+        kMaxLowerBound = 1, 
+        kMaxUpperBound = C_KMAX_UPPER_BOUND) {
     if (length(futilityBounds) < kMaxLowerBound - 1) {
         stop(
             sprintf(

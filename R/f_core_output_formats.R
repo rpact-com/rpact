@@ -70,9 +70,9 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
             value <- floor(value * 10^digits) / 10^digits
         } else if (roundFunction == "trunc") {
             value <- trunc(value)
-        } else if (roundFunction == "round ") {
+        } else if (roundFunction == "round") {
             value <- round(value, digits = digits)
-        } else if (roundFunction == "signif ") {
+        } else if (roundFunction == "signif") {
             value <- signif(value, digits = digits)
         } else {
             stop(
@@ -903,7 +903,7 @@ setOutputFormat <- function(parameterName = NA_character_, ...,
                     if (!is.null(key)) {
                         value <- trimws(keyValuePair[2])
                         .assertIsValitOutputFormatOptionValue(optionKey = key, optionValue = value)
-                        if (grepl("digits|nsmall|trimSingleZeros|futilityProbabilityEnabled", value)) {
+                        if (grepl("digits|nsmall|trimSingleZeros|futilityProbabilityEnabled|roundFunction", value)) {
                             args[[key]] <- value
                         } else {
                             warning('Line "', line, '" contains an invalid value: ', value)
@@ -1037,7 +1037,7 @@ setOutputFormat <- function(parameterName = NA_character_, ...,
         outputFormatLines <- c(outputFormatLines, paste(key, ":", outputFormatList[[key]]))
     }
     .writeLinesToFile(outputFormatLines, file)
-    cat(length(outputFormatList), " output format", ifelse(length(args) == 1, "", "s"),
+    cat(length(outputFormatList), " output format", ifelse(length(outputFormatList) == 1, "", "s"),
         " successfully written to file\n",
         sep = ""
     )

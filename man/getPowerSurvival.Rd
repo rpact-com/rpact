@@ -312,9 +312,9 @@ getPowerSurvival(median1 = 5, median2 = 3, kappa = 2,
 
 }
 \seealso{
-Other power functions: 
-\code{\link{getPowerCounts}()},
-\code{\link{getPowerMeans}()},
-\code{\link{getPowerRates}()}
+Other power functions:
+\code{\link[=getPowerCounts]{getPowerCounts()}},
+\code{\link[=getPowerMeans]{getPowerMeans()}},
+\code{\link[=getPowerRates]{getPowerRates()}}
 }
 \concept{power functions}

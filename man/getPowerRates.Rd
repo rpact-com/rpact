@@ -134,9 +134,9 @@ getPowerRates(getDesignGroupSequential(informationRates = c(0.2, 0.5,1),
 
 }
 \seealso{
-Other power functions: 
-\code{\link{getPowerCounts}()},
-\code{\link{getPowerMeans}()},
-\code{\link{getPowerSurvival}()}
+Other power functions:
+\code{\link[=getPowerCounts]{getPowerCounts()}},
+\code{\link[=getPowerMeans]{getPowerMeans()}},
+\code{\link[=getPowerSurvival]{getPowerSurvival()}}
 }
 \concept{power functions}

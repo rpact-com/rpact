@@ -146,14 +146,16 @@ NULL
 
 #' Parameter Description: Lambda (1)
 #' @param lambda1 The assumed hazard rate in the treatment group, there is no default.
-#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.
+#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). 
+#'   Must be a positive numeric of length 1.
 #' @name param_lambda1
 #' @keywords internal
 NULL
 
 #' Parameter Description: Lambda (2)
 #' @param lambda2 The assumed hazard rate in the reference group, there is no default.
-#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.
+#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). 
+#'   Must be a positive numeric of length 1.
 #' @name param_lambda2
 #' @keywords internal
 NULL

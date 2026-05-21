@@ -1570,7 +1570,8 @@ getDesignInverseNormal <- function(...,
 #'
 #' @noRd
 #'
-.getDesignGroupSequential <- function(...,
+.getDesignGroupSequential <- function(
+        ...,
         designClass = C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL,
         kMax = NA_integer_,
         alpha = NA_real_,
@@ -1635,8 +1636,7 @@ getDesignInverseNormal <- function(...,
         }
     }
 
-    futilityBounds <- .applyDirectionOfAlternative(futilityBounds,
-        directionUpper,
+    futilityBounds <- .applyDirectionOfAlternative(futilityBounds, directionUpper,
         type = "negateIfLower", phase = "design", syncLength = TRUE
     )
 
