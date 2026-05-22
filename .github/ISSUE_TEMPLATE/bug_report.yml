@@ -1,0 +1,334 @@
+name: Bug report for rpact
+description: Report a reproducible bug in the rpact R package
+title: "[rpact Bug]: "
+labels: ["bug", "needs triage", "rpact"]
+assignees:
+  - fpahlke
+  - danielinteractive
+  - gwassmer
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug in the **rpact** R package.
+
+        This is a public issue tracker. Please do **not** include confidential, customer-specific, personal, regulated, or security-sensitive information.
+
+        In particular, please do **not** include:
+        - customer names or project names
+        - confidential study names or protocol identifiers
+        - patient-level data or personal data
+        - proprietary trial assumptions unless they are anonymized/generalized
+        - credentials, tokens, license keys, or secrets
+        - confidential logs, reports, exports, or documents
+
+        Please use simulated, anonymized, or minimal example data whenever possible.
+
+        A useful bug report should include either:
+        - a minimal reproducible R code example, or
+        - a runnable R Markdown (`.Rmd`) or Quarto (`.qmd`) document.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Describe the bug
+      description: What happened?
+      placeholder: |
+        Please describe the bug clearly and concisely.
+        Example: Calling `...` with `...` returns an unexpected result / error / warning.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bug-category
+    attributes:
+      label: Bug category
+      description: What kind of issue is this?
+      options:
+        - Error or crash
+        - Incorrect or unexpected numerical result
+        - Unexpected warning or message
+        - Documentation or example issue
+        - Installation or build issue
+        - Performance issue
+        - Compatibility issue with another R package
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: affected-functions
+    attributes:
+      label: Affected rpact function(s)
+      description: Which rpact function(s) are involved?
+      placeholder: "e.g. getDesignGroupSequential(), getSampleSizeMeans(), getPowerRates()"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: reproducibility-artifact
+    attributes:
+      label: Reproducibility artifact
+      description: What are you providing to reproduce the issue?
+      options:
+        - Minimal reproducible R code pasted below
+        - Complete runnable R Markdown document pasted below
+        - Complete runnable Quarto document pasted below
+        - Attached R / Rmd / Qmd / zip file
+        - I cannot provide a reproducible example yet
+    validations:
+      required: true
+
+  - type: textarea
+    id: reprex
+    attributes:
+      label: Minimal reproducible example
+      description: |
+        Please provide the smallest possible example that reproduces the issue.
+
+        The example should run in a clean R session.
+
+        Please include:
+        - all required `library(...)` calls
+        - all required input objects
+        - `set.seed(...)` if randomness is involved
+        - no confidential or customer-specific data
+
+        You may paste plain R code, a complete R Markdown document, or a complete Quarto document here.
+
+        If you attach a file instead, please describe the file name and how to run it.
+      placeholder: |
+        ```r
+        library(rpact)
+
+        # Please keep the example as small as possible.
+        # The code should run in a clean R session.
+
+        packageVersion("rpact")
+
+        # Example:
+        design <- getDesignGroupSequential(
+            kMax = 2,
+            alpha = 0.025,
+            beta = 0.2
+        )
+
+        print(design)
+
+        # What command triggers the bug?
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: run-instructions
+    attributes:
+      label: How to run the example
+      description: |
+        If the example is more than a single R code block, please explain how to run it.
+        For R Markdown or Quarto examples, include the render command if applicable.
+      placeholder: |
+        Example:
+
+        ```r
+        rmarkdown::render("rpact-bug-reprex.Rmd")
+        ```
+
+        or
+
+        ```r
+        quarto::quarto_render("rpact-bug-reprex.qmd")
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+      placeholder: |
+        Please describe the expected result.
+
+        If this is about a numerical result, please explain why the expected value is expected.
+        For example, refer to the rpact documentation, a formula, a previous rpact version, or another validated calculation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened?
+      placeholder: |
+        Please describe the actual result.
+
+        Include the returned value, error, warning, or unexpected output.
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: Error message, warning, or console output
+      description: |
+        Paste the exact error message, warning, or relevant console output.
+
+        If an error occurred, please also run `traceback()` immediately after the error and paste the output if useful.
+      render: text
+      placeholder: |
+        Error in ... :
+          ...
+
+        traceback()
+          ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: numerical-details
+    attributes:
+      label: Numerical details, if applicable
+      description: |
+        Complete this section if the issue is about an unexpected numerical/statistical result.
+      placeholder: |
+        Expected value:
+        Actual value:
+        Difference:
+        Tolerance / acceptable precision:
+        Source of expected value:
+    validations:
+      required: false
+
+  - type: input
+    id: rpact-version
+    attributes:
+      label: rpact version
+      description: Please paste the output of `packageVersion("rpact")`.
+      placeholder: 'e.g. 4.2.1'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation-source
+    attributes:
+      label: Installation source
+      description: How was rpact installed?
+      options:
+        - CRAN
+        - GitHub
+        - R-universe
+        - Local source build
+        - Company/internal package repository
+        - Other
+        - Unknown
+    validations:
+      required: true
+
+  - type: input
+    id: r-version
+    attributes:
+      label: R version
+      description: Please paste the output of `R.version.string`.
+      placeholder: 'e.g. R version 4.4.3 (2025-02-28)'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: os-details
+    attributes:
+      label: Operating system details
+      placeholder: 'e.g. Windows 11, macOS 15.5, Ubuntu 24.04'
+    validations:
+      required: false
+
+  - type: dropdown
+    id: ide-environment
+    attributes:
+      label: R environment
+      description: Where did the issue occur?
+      options:
+        - R console
+        - RStudio
+        - Positron
+        - VS Code
+        - R Markdown
+        - Quarto
+        - Shiny
+        - CI/CD pipeline
+        - Other
+    validations:
+      required: false
+
+  - type: textarea
+    id: session-info
+    attributes:
+      label: Session information
+      description: |
+        Please paste the output of `sessionInfo()`.
+
+        This helps identify version, platform, and dependency-related issues.
+      render: text
+      placeholder: |
+        sessionInfo()
+    validations:
+      required: true
+
+  - type: textarea
+    id: regression
+    attributes:
+      label: Regression information
+      description: Did this work in an earlier version of rpact?
+      placeholder: |
+        If known:
+
+        Worked in rpact version:
+        Fails in rpact version:
+        Approximate date when this started:
+    validations:
+      required: false
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Workaround
+      description: Is there a known workaround?
+      placeholder: |
+        Describe any workaround you found.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other non-confidential context here.
+      placeholder: |
+        Add any other context that may help understand or reproduce the issue.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have searched existing issues to avoid creating a duplicate.
+          required: true
+        - label: I have provided a minimal reproducible example, runnable R Markdown/Quarto document, or attached a reproducible file.
+          required: true
+        - label: I have checked that this issue does not contain confidential, customer-specific, personal, regulated, or security-sensitive information.
+          required: true

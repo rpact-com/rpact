@@ -1,0 +1,148 @@
+name: Feature request for rpact
+description: Suggest an improvement or new feature for the rpact R package
+title: "[rpact Feature]: "
+labels: ["enhancement", "needs triage", "rpact"]
+assignees:
+  - fpahlke
+  - danielinteractive
+  - gwassmer
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an improvement to the **rpact** R package.
+
+        This is a public issue tracker. Please do **not** include confidential, customer-specific, personal, regulated, or security-sensitive information.
+
+        Please use simulated, anonymized, or generalized examples whenever possible.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature summary
+      description: What would you like to see added or improved?
+      placeholder: Briefly describe the requested feature or improvement.
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case or motivation
+      description: What problem would this solve, or which workflow would it improve?
+      placeholder: Describe the statistical, programming, validation, or usability need.
+    validations:
+      required: true
+
+  - type: input
+    id: affected-functions
+    attributes:
+      label: Related rpact function(s)
+      description: Which existing rpact function(s), if any, are related to this request?
+      placeholder: "e.g. getDesignGroupSequential(), getSampleSizeMeans(), getPowerRates()"
+    validations:
+      required: false
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: How should this ideally work?
+      placeholder: |
+        Describe the desired behavior, possible function arguments, output, or workflow.
+
+        If helpful, include a small non-confidential R code sketch.
+    validations:
+      required: false
+
+  - type: textarea
+    id: example-code
+    attributes:
+      label: Example R code, if applicable
+      description: Provide a small non-confidential R code example or pseudo-code showing the desired usage.
+      render: r
+      placeholder: |
+        library(rpact)
+
+        # Example of how the requested feature could be used:
+        # ...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which area of rpact is affected?
+      options:
+        - Group sequential designs
+        - Sample size calculation
+        - Power calculation
+        - Simulation
+        - Analysis
+        - Adaptive designs
+        - Multi-arm designs
+        - Survival endpoints
+        - Binary endpoints
+        - Continuous endpoints
+        - Rates / counts
+        - Plotting
+        - Printing / summaries
+        - Documentation / examples
+        - Validation / qualification
+        - Installation / packaging
+        - Other
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Importance
+      description: How important is this feature for your work?
+      options:
+        - Nice to have
+        - Useful improvement
+        - Important for regular work
+        - Blocking an important workflow
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or workaround
+      description: Is there a current workaround or alternative approach?
+      placeholder: Describe any workaround, if available.
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References, if applicable
+      description: Add non-confidential references such as publications, methods, regulatory guidance, or related software behavior.
+      placeholder: Add references or links, if helpful.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other non-confidential context here.
+      placeholder: Add any other context that may help evaluate the request.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have searched existing issues to avoid creating a duplicate.
+          required: true
+        - label: I have checked that this request does not contain confidential, customer-specific, personal, regulated, or security-sensitive information.
+          required: true
+
