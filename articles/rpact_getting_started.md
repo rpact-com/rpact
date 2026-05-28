@@ -120,7 +120,7 @@ Connecting you to insights, downloads, and premium support:
 
 ## About
 
-- **rpact** is a comprehensive validated[¹](#fn1) R package for clinical
+- **rpact** is a comprehensive validated[^1] R package for clinical
   research which
   - enables the design and analysis of confirmatory adaptive group
     sequential designs
@@ -147,8 +147,6 @@ Connecting you to insights, downloads, and premium support:
 - <info@rpact.com>
 - [rpact.com/contact](https://www.rpact.com/contact/)
 
-------------------------------------------------------------------------
-
-1.  The rpact validation documentation is available exclusively for our
-    customers and supporting companies. For more information visit
+[^1]: The rpact validation documentation is available exclusively for
+    our customers and supporting companies. For more information visit
     [rpact.com/services/service-level-agreement](https://www.rpact.com/services/service-level-agreement/)

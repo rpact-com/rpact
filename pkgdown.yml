@@ -1,9 +1,9 @@
-pandoc: 3.1.11
+pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   rpact_getting_started: rpact_getting_started.html
-last_built: 2026-03-06T08:11Z
+last_built: 2026-05-28T07:53Z
 urls:
   reference: https://docs.rpact.org/reference
   article: https://docs.rpact.org/articles

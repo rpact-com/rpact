@@ -35,8 +35,9 @@ printCitation()
 #> 
 #> To cite R in publications use:
 #> 
-#>   R Core Team (2025). _R: A Language and Environment for Statistical
+#>   R Core Team (2026). _R: A Language and Environment for Statistical
 #>   Computing_. R Foundation for Statistical Computing, Vienna, Austria.
+#>   doi:10.32614/R.manuals <https://doi.org/10.32614/R.manuals>.
 #>   <https://www.R-project.org/>.
 #> 
 #> To cite package 'rpact' in publications use:
@@ -47,6 +48,6 @@ printCitation()
 #> 
 #>   Wassmer G, Brannath W (2025). _Group Sequential and Confirmatory
 #>   Adaptive Designs in Clinical Trials_, 2nd edition. Springer, Cham,
-#>   Switzerland. ISBN 978-3-031-89668-2, doi:10.1007/978-3-031-89669-9
+#>   Switzerland. ISBN 978-3-031-89668-2. doi:10.1007/978-3-031-89669-9
 #>   <https://doi.org/10.1007/978-3-031-89669-9>.
 ```
