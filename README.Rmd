@@ -96,6 +96,16 @@ issues](https://github.com/rpact-com/rpact/issues) to avoid duplicates.
 Please do not include confidential, customer-specific, personal, regulated, or
 security-sensitive information in public issues.
 
+## RPACT Cloud
+
+**RPACT Cloud** is a web-based graphical user interface for `rpact`.
+
+It provides guided, browser-based access to selected `rpact` functionality,
+including study design, sample size calculation, simulation, and reporting,
+without requiring users to write R code.
+
+[rpact.cloud](https://rpact-cloud.share.connect.posit.cloud)
+
 ## RPACT Connect 
 
 Connecting you to insights, downloads, and premium support:
