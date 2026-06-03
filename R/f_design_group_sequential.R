@@ -1187,7 +1187,7 @@ getDesignInverseNormal <- function(...,
     ))
 }
 
-.isBoundayStoppingActivated <- function(boundaryStops) {
+.isBoundaryStoppingActivated <- function(boundaryStops) {
     if (anyNA(boundaryStops) || all(boundaryStops)) {
         return(FALSE)
     }
@@ -1223,7 +1223,7 @@ getDesignInverseNormal <- function(...,
         tolerance,
         efficacyStops,
         futilityStops) {
-    if (.isBoundayStoppingActivated(efficacyStops) || .isBoundayStoppingActivated(futilityStops)) {
+    if (.isBoundaryStoppingActivated(efficacyStops) || .isBoundayStoppingActivated(futilityStops)) {
         if (!all(is.na(delayedInformation))) {
             warning(
                 "'delayedInformation' (", .arrayToString(delayedInformation), ") ",
@@ -1519,7 +1519,7 @@ getDesignInverseNormal <- function(...,
     
     newDesign <- do.call(.getDesignGroupSequential, args)
     newDesign$criticalValues[which(!efficacyStops)] <- Inf
-    newDesign$futilityBounds[which(!futilityStops)] <- C_FUTILITY_BOUNDS_DEFAULT # TODO check -Inf
+    newDesign$futilityBounds[which(!futilityStops)] <- C_FUTILITY_BOUNDS_DEFAULT
 
     newDesign$efficacyStops <- efficacyStops
     newDesign$.setParameterType("efficacyStops", C_PARAM_USER_DEFINED)
