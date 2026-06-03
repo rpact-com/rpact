@@ -26,7 +26,7 @@ Authors@R: c(
     person(
     	given = "Daniel", 
     	family = "Sabanes Bove", 
-    	email = "daniel.sabanes_bove@rconis.com",
+    	email = "daniel.sabanes_bove@rpact.com",
         comment = c(ORCID = "0000-0002-0176-9239"), 
     	role = c("ctb")
 	),
