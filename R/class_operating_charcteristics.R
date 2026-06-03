@@ -37,6 +37,8 @@
 #'
 #' @export
 #' 
+#' @keywords internal
+#' 
 OperatingCharcteristics <- R6::R6Class(
     "OperatingCharcteristics",
     inherit = rpact:::FieldSet,
@@ -75,6 +77,8 @@ OperatingCharcteristics <- R6::R6Class(
 #' # See getOperatingCharcteristicsMeans for an end-to-end example.
 #'
 #' @export
+#' 
+#' @keywords internal
 #' 
 OperatingCharcteristicsMeans <- R6::R6Class(
     "OperatingCharcteristicsMeans",

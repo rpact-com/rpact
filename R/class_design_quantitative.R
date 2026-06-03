@@ -38,6 +38,8 @@
 #'
 #' @export
 #' 
+#' @keywords internal
+#' 
 TrialDesignPlanQuantitative <- R6::R6Class(
     "TrialDesignPlanQuantitative",
     inherit = rpact:::ParameterSet,

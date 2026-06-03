@@ -66,7 +66,7 @@ Suggests:
 	rmarkdown (>= 1.10),
     rappdirs (>= 0.3.3)
 VignetteBuilder: knitr, rmarkdown
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
@@ -94,7 +94,9 @@ Collate:
     'class_design_set.R'
     'class_design_plan.R'
     'class_design_power_and_asn.R'
+    'class_design_quantitative.R'
     'class_event_probabilities.R'
+    'class_operating_charcteristics.R'
     'f_simulation_base_counts.R'
     'f_simulation_utilities.R'
     'f_simulation_base_survival.R'
@@ -121,9 +123,11 @@ Collate:
     'f_design_plan_counts.R'
     'f_design_plan_means.R'
     'f_design_plan_plot.R'
+    'f_design_plan_qtd_means.R'
     'f_design_plan_rates.R'
     'f_design_plan_survival.R'
     'f_design_plan_utilities.R'
+    'f_design_qtd.R'
     'f_quality_assurance.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'
