@@ -144,6 +144,8 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 s <- "Fisher's combination test design"
             } else if (.isTrialDesignConditionalDunnett(self)) {
                 s <- "conditional Dunnett test design"
+            } else if (.isTrialDesignFixed(self)) {
+                s <- "fixed sample size design"
             }
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         },
@@ -359,6 +361,98 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
         handleParameterNamesAsToBeExcluded = TRUE
     ))
 }
+
+ #' @name TrialDesignFixed
+ #'
+ #' @title
+ #' Fixed Design
+ #'
+ #' @description
+ #' Trial design for fixed (single-stage) trials.
+ #'
+ #' @template field_kMax
+ #' @template field_alpha
+ #' @template field_stages
+ #' @template field_tolerance
+ #' @template field_sided
+ #' @template field_twoSidedPower
+ #'
+ #' @details
+ #' This object should not be created directly; use \code{\link[=getDesignFixed]{getDesignFixed()}}
+ #' with suitable arguments to create a fixed design.
+ #'
+ #' @seealso \code{\link[=getDesignFixed]{getDesignFixed()}} for creating a fixed design.
+ #'
+ #' @include class_core_parameter_set.R
+ #' @include class_core_plot_settings.R
+ #' @include f_core_constants.R
+ #'
+ #' @keywords internal
+ #'
+ #' @importFrom methods new
+TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
+    inherit = TrialDesign,
+    public = list(
+        beta = NULL,
+        sided = NULL,
+        twoSidedPower = NULL,
+        futilityBounds = NULL,
+        initialize = function(
+                ...,
+                beta = C_BETA_DEFAULT,
+                sided = as.integer(C_SIDED_DEFAULT),
+                twoSidedPower = C_TWO_SIDED_POWER_DEFAULT) {
+            self$kMax <- 1L
+            self$beta <- beta
+            self$sided <- sided
+            self$twoSidedPower <- twoSidedPower
+            super$initialize(...) # important: don't move to first line of constructor
+            self$informationRates <- 1
+            self$futilityBounds <- numeric(0)
+            
+            self$.initParameterTypes()
+            self$.initStages()
+        },
+        hasChanged = function(
+                ...,
+                alpha,
+                beta,
+                sided,
+                directionUpper,
+                twoSidedPower) {
+            if (!identical(alpha, self$alpha)) {
+                return(self$.pasteComparisonResult("alpha", alpha, self$alpha))
+            }
+            if (!identical(beta, self$beta)) {
+                return(self$.pasteComparisonResult("beta", beta, self$beta))
+            }
+            if (!isTRUE(all.equal(sided, self$sided))) {
+                return(self$.pasteComparisonResult("sided", sided, self$sided))
+            }
+            if (!identical(twoSidedPower, self$twoSidedPower)) {
+                return(self$.pasteComparisonResult("twoSidedPower", twoSidedPower, self$twoSidedPower))
+            }
+            if (!identical(directionUpper, self$directionUpper)) {
+                return(self$.pasteComparisonResult("directionUpper", directionUpper, self$directionUpper))
+            }
+            return(FALSE)
+        },
+
+        # Defines the order of the parameter output
+        .getParametersToShow = function() {
+            return(c(
+                "stages",
+                "alpha",
+                "beta",
+                "twoSidedPower",
+                "directionUpper",
+                "sided",
+                "criticalValues",
+                "stageLevels"
+            ))
+        }
+    )
+)
 
 #'
 #' @name TrialDesignFisher

@@ -954,7 +954,16 @@ NULL
 
 #' Parameter Description: Planned Calendar Time
 #' @param plannedCalendarTime For simulating count data, the time points where an analysis is planned to be performed.
-#' Should be a vector of length \code{kMax}
+#'     Should be a vector of length \code{kMax}
 #' @name param_plannedCalendarTime
+#' @keywords internal
+NULL
+
+#' Parameter Description: Two-sided Power
+#' @param twoSidedPower For two-sided testing, if \code{twoSidedPower = TRUE} is specified
+#'     the sample size calculation is performed by considering both tails of the distribution.
+#'     Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
+#'     should be directed to one part.#' 
+#' @name param_twoSidedPower
 #' @keywords internal
 NULL

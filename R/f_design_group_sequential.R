@@ -897,7 +897,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #'
 #' @noRd
 #'
-.calculateDecisionProbabilities <- function(sqrtShift,
+.calculateDecisionProbabilities <- function(
+        sqrtShift,
         informationRates,
         delayedInformation,
         contRegionUpper,
@@ -1223,7 +1224,7 @@ getDesignInverseNormal <- function(...,
         tolerance,
         efficacyStops,
         futilityStops) {
-    if (.isBoundaryStoppingActivated(efficacyStops) || .isBoundayStoppingActivated(futilityStops)) {
+    if (.isBoundaryStoppingActivated(efficacyStops) || .isBoundaryStoppingActivated(futilityStops)) {
         if (!all(is.na(delayedInformation))) {
             warning(
                 "'delayedInformation' (", .arrayToString(delayedInformation), ") ",
@@ -2007,11 +2008,6 @@ getDesignInverseNormal <- function(...,
             reversalProbabilities[stage] <- NA_real_
         }
         decisionCriticalValues[kMax] <- contRegionUpper[kMax]
-
-        alphaSpent <- .calculateDecisionProbabilities(
-            sqrtShift = 0, informationRates,
-            delayedInformation, contRegionUpper, contRegionLower, decisionCriticalValues
-        )$power
     }
 
     decisionCriticalValues[decisionCriticalValues <= -C_UPPER_BOUNDS_DEFAULT + 1e-06] <- NA_real_
@@ -2118,10 +2114,7 @@ getDesignInverseNormal <- function(...,
 #'        beta-spending up to each interim stage.
 #' @param efficacyStops Logical vector of length \code{kMax - 1} indicating efficacy stops. Default is \code{NA}.
 #' @param futilityStops Logical vector of length \code{kMax - 1} indicating futility stops. Default is \code{NA}.
-#' @param twoSidedPower For two-sided testing, if \code{twoSidedPower = TRUE} is specified
-#'        the sample size calculation is performed by considering both tails of the distribution.
-#'        Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
-#'        should be directed to one part.
+#' @inheritParams param_twoSidedPower
 #' @param betaAdjustment For two-sided beta spending designs, if \code{betaAdjustement = TRUE} a linear
 #' 		  adjustment of the beta spending values is performed if an overlapping of decision regions for futility
 #' 		  stopping at earlier stages occurs, otherwise no adjustment is performed (default is \code{TRUE}).

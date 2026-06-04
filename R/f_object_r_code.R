@@ -699,6 +699,7 @@ getObjectRCode <- function(obj,
 
     if (
         inherits(obj, "TrialDesign") &&
+            !inherits(obj, "TrialDesignFixed") &&
             !inherits(obj, "TrialDesignConditionalDunnett") &&
             !("informationRates" %in% objNames) &&
             !("kMax" %in% objNames) &&

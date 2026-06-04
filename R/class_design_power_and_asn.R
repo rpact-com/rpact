@@ -188,7 +188,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             .earlyStop <- rep(NA_real_, kMax)
             .futilityPerStage <- rep(NA_real_, kMax)
 
-            if (!anyNA(delayedInformation)) {
+            if (!is.null(delayedInformation) && !anyNA(delayedInformation)) {
                 contRegionLower <- futilityBounds
                 contRegionUpper <- criticalValues
                 decisionCriticalValues <- self$.design$decisionCriticalValues
@@ -209,7 +209,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                 .futilityPerStage <- probs$futilityProbabilities
             } else {
                 if (sided == 2) {
-                    if (self$.design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                    if (self$.design$kMax > 1 && self$.design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                             !is.null(self$.design$typeBetaSpending) && self$.design$typeBetaSpending != "none") {
                         futilityBounds[is.na(futilityBounds)] <- 0
                         decisionMatrix <- matrix(c(

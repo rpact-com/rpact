@@ -63,27 +63,31 @@ NULL
 }
 
 .isTrialDesignSet <- function(x) {
-    return(.getClassName(x) == "TrialDesignSet")
+    return(identical(.getClassName(x), "TrialDesignSet"))
+}
+
+.isTrialDesignFixed <- function(design) {
+    return(identical(.getClassName(design), C_CLASS_NAME_TRIAL_DESIGN_FIXED))
 }
 
 .isTrialDesignGroupSequential <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL)
+    return(identical(.getClassName(design), C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL))
 }
 
 .isTrialDesignInverseNormal <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL)
+    return(identical(.getClassName(design), C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL))
 }
 
 .isTrialDesignFisher <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_FISHER)
+    return(identical(.getClassName(design), C_CLASS_NAME_TRIAL_DESIGN_FISHER))
 }
 
 .isTrialDesignConditionalDunnett <- function(design) {
-    return(.getClassName(design) == C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT)
+    return(identical(.getClassName(design), C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT))
 }
 
 .isTrialDesignInverseNormalOrGroupSequential <- function(design) {
-    return(.isTrialDesignInverseNormal(design) || .isTrialDesignGroupSequential(design))
+    return(.isTrialDesignFixed(design) || .isTrialDesignInverseNormal(design) || .isTrialDesignGroupSequential(design))
 }
 
 .isTrialDesignInverseNormalOrFisher <- function(design) {
@@ -91,24 +95,28 @@ NULL
 }
 
 .isTrialDesign <- function(design) {
-    return(.isTrialDesignInverseNormal(design) || .isTrialDesignGroupSequential(design) ||
-        .isTrialDesignFisher(design) || .isTrialDesignConditionalDunnett(design))
+    return(
+        .isTrialDesignFixed(design) || 
+        .isTrialDesignInverseNormal(design) || 
+        .isTrialDesignGroupSequential(design) ||
+        .isTrialDesignFisher(design) || 
+        .isTrialDesignConditionalDunnett(design))
 }
 
 .isTrialDesignPlanMeans <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanMeans")
+    return(identical(.getClassName(designPlan), "TrialDesignPlanMeans"))
 }
 
 .isTrialDesignPlanRates <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanRates")
+    return(identical(.getClassName(designPlan), "TrialDesignPlanRates"))
 }
 
 .isTrialDesignPlanSurvival <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanSurvival")
+    return(identical(.getClassName(designPlan), "TrialDesignPlanSurvival"))
 }
 
 .isTrialDesignPlanCountData <- function(designPlan) {
-    return(.getClassName(designPlan) == "TrialDesignPlanCountData")
+    return(identical(.getClassName(designPlan), "TrialDesignPlanCountData"))
 }
 
 .isTrialDesignPlan <- function(designPlan) {

@@ -183,7 +183,7 @@ NumericVector getTestStatistics(int stage, int designNumber, NumericVector infor
 		NumericVector eventsOverStages, NumericVector logRankOverStages) {
 
 	// Group sequential design
-	if (designNumber == 1) {
+	if (designNumber <= 1L) { // fixed or group sequential design
 		return NumericVector::create(logRankOverStages[stage - 1], NA_REAL);
 	}
 
