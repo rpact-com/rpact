@@ -67,6 +67,7 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 Other design functions:
 \code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}},
 \code{\link[=getDesignFisher]{getDesignFisher()}},
+\code{\link[=getDesignFixed]{getDesignFixed()}},
 \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
 \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
 \code{\link[=getGroupSequentialProbabilities]{getGroupSequentialProbabilities()}},

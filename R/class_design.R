@@ -1242,13 +1242,14 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #'
 #' @export
 #'
-plot.TrialDesign <- function(x,
+plot.TrialDesign <- function(
+        x,
         y,
         ...,
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,
-        type = 1L,
+        type = NA_integer_,
         palette = "Set1",
         theta = seq(-1, 1, 0.01),
         nMax = NA_integer_,
@@ -1257,7 +1258,7 @@ plot.TrialDesign <- function(x,
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
-    .assertIsValidPlotType(type, naAllowed = FALSE)
+    .assertIsValidPlotType(type, naAllowed = TRUE)
     .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
@@ -1271,6 +1272,22 @@ plot.TrialDesign <- function(x,
             "showFutilityBounds", "showAlphaSpent", "showBetaSpent"
         ), ...
     )
+    
+    availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
+    if (length(availablePlotTypes) == 0) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "no plot type available for the specified design")
+    }
+    if (is.na(type)) {
+        type <- availablePlotTypes[1]
+    }
+    if (!(type %in% availablePlotTypes)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
+            ") is not available; 'type' can ", ifelse(length(availablePlotTypes) == 1, "only ", ""),
+            "be ", .arrayToString(availablePlotTypes, mode = "or")
+        )
+    }
+    
     .showWarningIfPlotArgumentWillBeIgnored(type, ..., obj = x)
 
     args <- list(

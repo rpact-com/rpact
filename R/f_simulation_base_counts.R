@@ -266,7 +266,7 @@ getSimulationCounts <- function(design = NULL,
             )
         )
     } else {
-        .assertIsTrialDesignGroupSequential(design)
+        .assertIsTrialDesignGroupSequentialOrFixed(design)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationCounts",
             ignore = c("showStatistics"), ...

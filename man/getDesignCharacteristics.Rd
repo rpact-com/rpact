@@ -57,6 +57,7 @@ getDesignCharacteristics(getDesignGroupSequential(beta = 0.1, typeOfDesign = "P"
 Other design functions:
 \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}},
 \code{\link[=getDesignFisher]{getDesignFisher()}},
+\code{\link[=getDesignFixed]{getDesignFixed()}},
 \code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
 \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
 \code{\link[=getGroupSequentialProbabilities]{getGroupSequentialProbabilities()}},

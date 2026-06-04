@@ -178,6 +178,17 @@ NULL
     }
 }
 
+.assertIsTrialDesignGroupSequentialOrFixed <- function(design) {
+    if (!.isTrialDesignGroupSequential(design) && !.isTrialDesignFixed(design)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'design' must be an instance of class 'TrialDesignFixed' or ",
+            "'TrialDesignGroupSequential' (is '", .getClassName(design), "')",
+            call. = FALSE
+        )
+    }
+}
+
 .assertIsTrialDesignConditionalDunnett <- function(design) {
     if (!.isTrialDesignConditionalDunnett(design)) {
         stop(

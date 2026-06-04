@@ -65,10 +65,12 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 \item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
-\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
+\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
+Must be a positive numeric of length 1.}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
-\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
+\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
+Must be a positive numeric of length 1.}
 
 \item{median1}{The assumed median survival time in the treatment group, there is no default.}
 

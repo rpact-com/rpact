@@ -229,7 +229,8 @@
     return(yParameterNames)
 }
 
-.plotTrialDesignPlan <- function(designPlan,
+.plotTrialDesignPlan <- function(
+        designPlan,
         type = 1L,
         main = NA_character_,
         xlab = NA_character_,

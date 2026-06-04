@@ -125,7 +125,7 @@ Haybittle & Peto design (default is \code{3}).}
 \item{twoSidedPower}{For two-sided testing, if \code{twoSidedPower = TRUE} is specified
 the sample size calculation is performed by considering both tails of the distribution.
 Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
-should be directed to one part.}
+should be directed to one part.#'}
 
 \item{delayedInformation}{Delay of information for delayed response designs. Can be a numeric value or a
 numeric vector of length \code{kMax - 1}}
@@ -203,6 +203,7 @@ Other design functions:
 \code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}},
 \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}},
 \code{\link[=getDesignFisher]{getDesignFisher()}},
+\code{\link[=getDesignFixed]{getDesignFixed()}},
 \code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
 \code{\link[=getGroupSequentialProbabilities]{getGroupSequentialProbabilities()}},
 \code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
