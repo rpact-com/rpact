@@ -294,7 +294,7 @@ double getSimulationSurvivalEnrichmentStageEvents(int stage,
 				double criticalPart = std::max(0.0, conditionalCriticalValue[stage - 1] + R::qnorm(conditionalPower, 0.0, 1.0, 1, 0));
 				double numerator = allocRatioSquared * pow(criticalPart, 2.0);
 				double allocRatio = allocationRatioPlanned[stage - 1];
-				double denominator = pow(allocRatio, 2.0) * pow(thetaStandardized, 2.0);
+				double denominator = allocRatio * pow(thetaStandardized, 2.0);
 				newEvents = numerator / denominator;
 				newEvents = std::min(std::max(minNumberOfEventsPerStage[stage], newEvents), maxNumberOfEventsPerStage[stage]);
 			}
@@ -855,7 +855,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						conditionalPower,
 						conditionalCriticalValue,
 						plannedEvents,
-						NumericVector::create(allocationRatioPlanned),
+						rep(allocationRatioPlanned, kMax),
 						selectedPopulations,
 						thetaH1,
 						overallEffects,
