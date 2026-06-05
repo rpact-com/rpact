@@ -335,6 +335,20 @@ updateSubGroupVector <- function(
 
                 args$selectPopulationsFunctionArgs <- selectPopulationsFunctionArgs
 
+                estimatedTheta <- thetaH1
+                if (is.na(thetaH1)) {
+                    estimatedTheta <- min(overallEffects[, k], na.rm = TRUE)
+                }
+
+                if (!directionUpper) {
+                    estimatedTheta <- 1 / estimatedTheta
+                }
+
+                conditionalCriticalValuePerStage <- conditionalCriticalValue
+                if (calcEventsFunctionIsUserDefined) {
+                    conditionalCriticalValuePerStage <- conditionalCriticalValue[k]
+                }
+
                 selectedPopulations[, k + 1] <- (selectedPopulations[, k] & do.call(.selectPopulations, args))
 
                 # Stop if no population is selected for the next stage.
@@ -346,11 +360,11 @@ updateSubGroupVector <- function(
                     stage = k + 1, # to be consistent with non-enrichment situation, cf. line 38
                     directionUpper = directionUpper,
                     conditionalPower = conditionalPower,
-                    conditionalCriticalValue = conditionalCriticalValue,
+                    conditionalCriticalValue = conditionalCriticalValuePerStage,
                     plannedEvents = plannedEvents,
                     allocationRatioPlanned = allocationRatioPlanned,
                     selectedPopulations = selectedPopulations,
-                    thetaH1 = thetaH1,
+                    estimatedTheta = estimatedTheta,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                     maxNumberOfEventsPerStage = maxNumberOfEventsPerStage
@@ -366,8 +380,12 @@ updateSubGroupVector <- function(
                     )
                 }
 
-                if (!is.na(conditionalPower) || calcEventsFunctionIsUserDefined) {
-                    plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(newEvents, kMax - k))
+                if (!is.na(conditionalPower)) {
+                    if (!calcEventsFunctionIsUserDefined) {
+                        plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(ceiling(newEvents), kMax - k))
+                    } else {
+                        plannedEvents[k + 1] <- ceiling(newEvents)
+                    }
                 }
             } else {
                 selectedPopulations[, k + 1] <- selectedPopulations[, k]
