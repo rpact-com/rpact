@@ -827,7 +827,6 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		    		break;
     			}
 
-				double newEventsValue;
 				double estimatedTheta = getEstimatedThetaEnrichment(k, thetaH1, directionUpper, overallEffects);
 
 				double newEventsValue = NA_REAL;
