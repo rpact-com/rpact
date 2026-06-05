@@ -356,6 +356,11 @@ updateSubGroupVector <- function(
                     break
                 }
 
+                estimatedThetaForCalc <- NA_real_
+                if (calcEventsFunctionIsUserDefined) {
+                    estimatedThetaForCalc <- estimatedTheta
+                }
+
                 newEvents <- calcEventsFunction(
                     stage = k + 1, # to be consistent with non-enrichment situation, cf. line 38
                     directionUpper = directionUpper,
@@ -365,7 +370,7 @@ updateSubGroupVector <- function(
                     # We need to pass one allocation ratio for each stage:
                     allocationRatioPlanned = rep(allocationRatioPlanned, length.out = k + 1),
                     selectedPopulations = selectedPopulations,
-                    estimatedTheta = estimatedTheta,
+                    estimatedTheta = estimatedThetaForCalc,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                     maxNumberOfEventsPerStage = maxNumberOfEventsPerStage
