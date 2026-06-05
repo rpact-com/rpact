@@ -402,6 +402,27 @@ CharacterVector updateSubGroupVector(int k, // 0-based
 	return result[seq(0, maxNumberOfSubjects - 1)];
 }
  
+// used effect size is either estimated from test statistic or pre-fixed
+double getEstimatedThetaEnrichment(
+		int stage,
+		double thetaH1,
+		bool directionUpper,
+		NumericMatrix overallEffects) {
+
+	if (!R_IsNA(thetaH1)) {
+		return thetaH1;
+	}
+
+	NumericVector overallEffectsAtStage = overallEffects(_, stage);
+	double estimatedTheta = min(overallEffectsAtStage);
+
+	if (!directionUpper){
+      estimatedTheta = 1 / estimatedTheta;
+    }
+
+	return estimatedTheta;
+}
+
 // Get Simulated Stage Results Survival Enrichment Subjects Based
 //
 // Calculates stage results for each simulation iteration step
@@ -807,28 +828,26 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
     			}
 
 				double newEventsValue;
+				double estimatedTheta = getEstimatedThetaEnrichment(k, thetaH1, directionUpper, overallEffects);
+
+				double newEventsValue = NA_REAL;
+
 				if (calcEventsFunctionIsUserDefined) {
 					Function calcEventsFunc = calcEventsFunction.get();
 					RObject newEvents = calcEventsFunc(
 						Named("stage") = k + 2, // need 1-based index here!
 						Named("directionUpper") = directionUpper,
 						Named("conditionalPower") = conditionalPower,
-						Named("conditionalCriticalValue") = conditionalCriticalValue,
+						Named("conditionalCriticalValue") = conditionalCriticalValue[k],
 						Named("plannedEvents") = plannedEvents,
 						Named("allocationRatioPlanned") = allocationRatioPlanned,
 						Named("selectedPopulations") = selectedPopulations,
-						Named("thetaH1") = thetaH1,
+					    Named("estimatedTheta") = estimatedTheta,
 						Named("overallEffects") = overallEffects,
 						Named("minNumberOfEventsPerStage") = minNumberOfEventsPerStage,
 						Named("maxNumberOfEventsPerStage") = maxNumberOfEventsPerStage
 					);
 
-					if (Rf_isNull(newEvents) || Rf_length(newEvents) != 1 || !Rf_isReal(newEvents) || R_IsNA(REAL(newEvents)[0])) {
-						stop(
-							"'calcEventsFunction' returned an illegal or undefined result; ",
-							"the output must be a single numeric value"
-						);
-					}
 					newEventsValue = REAL(newEvents)[0];
 				} else {
 					newEventsValue = getSimulationSurvivalEnrichmentStageEvents(
@@ -846,10 +865,18 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					);
 				}
 				 
-                if (!R_IsNA(conditionalPower) || calcEventsFunctionIsUserDefined) {
-					NumericVector newEventsIncrements = cumsum(rep(newEventsValue, kMax - 1 - k));
-					plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;
-				}
+                if (!R_IsNA(conditionalPower)) {
+					double ceilingNewEventsValue = NA_REAL;
+					if (!R_IsNA(newEventsValue)) {
+						ceilingNewEventsValue = std::ceil(newEventsValue);
+					}
+                	if (!calcEventsFunctionIsUserDefined) {
+						NumericVector newEventsIncrements = cumsum(rep(ceilingNewEventsValue, kMax - 1 - k));
+						plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;
+                	} else {
+                		plannedEvents[k + 1] = ceilingNewEventsValue;
+                	}
+                }
 			} else {
 				selectedPopulations(_, k + 1) = selectedPopulations(_, k);
 			}
@@ -1037,7 +1064,8 @@ List performSimulationEnrichmentSurvivalLoop(
 		for (int j = 0; j < maxNumberOfIterations; j++) {
 
 			NumericVector hazardRatiosThisScenario = hazardRatios(i, _);
-			
+			NumericVector plannedEventsThisIteration = clone(plannedEvents);
+
 			List stageResults = getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				design,
 				weights,
@@ -1050,7 +1078,7 @@ List performSimulationEnrichmentSurvivalLoop(
 				hazardRatiosThisScenario,
 				directionUpper,
 				stratifiedAnalysis,
-				plannedEvents,
+				plannedEventsThisIteration,
 				recruitmentTimes,
 				allocationFraction,
 				typeOfSelection,
