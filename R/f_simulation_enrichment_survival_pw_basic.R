@@ -362,7 +362,8 @@ updateSubGroupVector <- function(
                     conditionalPower = conditionalPower,
                     conditionalCriticalValue = conditionalCriticalValuePerStage,
                     plannedEvents = plannedEvents,
-                    allocationRatioPlanned = allocationRatioPlanned,
+                    # We need to pass one allocation ratio for each stage:
+                    allocationRatioPlanned = rep(allocationRatioPlanned, length.out = k + 1),
                     selectedPopulations = selectedPopulations,
                     estimatedTheta = estimatedTheta,
                     overallEffects = overallEffects,
