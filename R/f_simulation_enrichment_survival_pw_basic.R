@@ -91,6 +91,7 @@ updateSubGroupVector <- function(
     maxNumberOfSubjects <- length(recruitmentTimes)
 
     simLogRanks <- matrix(NA_real_, nrow = pMax, ncol = kMax)
+    singleEventsPerStage <- matrix(NA_integer_, nrow = gMax, ncol = kMax)
     populationEventsPerStage <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     overallEffects <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     testStatistics <- matrix(NA_real_, nrow = gMax, ncol = kMax)
@@ -174,6 +175,7 @@ updateSubGroupVector <- function(
                         testStatistics[g, k] <- logRank$logRank
                         overallTestStatistics[g, k] <- logRank$logRank
                         populationEventsPerStage[g, k] <- sum(logRank$events)
+                        singleEventsPerStage[g, k] <- logRank$events[1]
                     }
                 }
             }
@@ -250,6 +252,7 @@ updateSubGroupVector <- function(
                             directionUpper = directionUpper
                         )
                         overallTestStatistics[g, k] <- logRank$logRank
+                        singleEventsPerStage[g, k] <- logRank$events[1]
                         populationEventsPerStage[g, k] <- sum(logRank$events)
                         if (populationEventsPerStage[g, k] - populationEventsPerStage[g, k - 1] > 0) {
                             testStatistics[g, k] <- (sqrt(populationEventsPerStage[g, k]) *
@@ -367,6 +370,7 @@ updateSubGroupVector <- function(
                     conditionalPower = conditionalPower,
                     conditionalCriticalValue = conditionalCriticalValuePerStage,
                     plannedEvents = plannedEvents,
+                    eventsOverStages = colSums(singleEventsPerStage, na.rm = TRUE),
                     # We need to pass one allocation ratio for each stage:
                     allocationRatioPlanned = rep(allocationRatioPlanned, length.out = k + 1),
                     selectedPopulations = selectedPopulations,
@@ -422,6 +426,7 @@ updateSubGroupVector <- function(
 
     list(
         eventsNotAchieved = eventsNotAchieved,
+        singleEventsPerStage = singleEventsPerStage,
         populationEventsPerStage = populationEventsPerStage,
         plannedEvents = plannedEvents,
         analysisTime = analysisTime,
@@ -591,6 +596,7 @@ updateSubGroupVector <- function(
     simulatedRejections <- array(0, dim = c(kMax, cols, gMax))
     simulatedNumberOfPopulations <- matrix(0, nrow = kMax, ncol = cols)
     simulatedPopulationEventsPerStage <- array(0, dim = c(kMax, cols, gMax))
+    simulatedSingleEventsPerStage <- array(0, dim = c(kMax, cols, gMax))
     simulatedNumberOfEvents <- matrix(0, nrow = kMax, ncol = cols)
     simulatedSuccessStopping <- matrix(0, nrow = kMax, ncol = cols)
     simulatedFutilityStopping <- matrix(0, nrow = kMax - 1, ncol = cols)
