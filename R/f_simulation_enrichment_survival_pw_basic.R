@@ -91,6 +91,7 @@ updateSubGroupVector <- function(
     maxNumberOfSubjects <- length(recruitmentTimes)
 
     simLogRanks <- matrix(NA_real_, nrow = pMax, ncol = kMax)
+    overallEventsPerStage <- numeric(kMax)
     populationEventsPerStage <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     overallEffects <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     testStatistics <- matrix(NA_real_, nrow = gMax, ncol = kMax)
@@ -176,6 +177,20 @@ updateSubGroupVector <- function(
                         populationEventsPerStage[g, k] <- sum(logRank$events)
                     }
                 }
+
+                # Calculate overall number of events in this 
+                # stage.
+                logRankOverall <- .logRankTestCpp(
+                    accrualTime = survivalDataSet$accrualTime,
+                    survivalTime = survivalDataSet$survivalTime,
+                    dropoutTime = survivalDataSet$dropoutTime,
+                    treatmentGroup = survivalDataSet$treatmentArm,
+                    time = analysisTime[k],
+                    directionUpper = directionUpper,
+                    thetaH0 = 1,
+                    returnRawData = FALSE
+                )
+                overallEventsPerStage[k] <- sum(logRankOverall$events)
             }
         } else {
             selectedsubGroupsIndices[, k] <- .createSelectedSubsets(selectedPopulations[, k])
@@ -260,6 +275,20 @@ updateSubGroupVector <- function(
                         }
                     }
                 }
+
+                # Calculate overall number of events in this 
+                # stage.
+                logRankOverall <- .logRankTestCpp(
+                    accrualTime = survivalDataSet$accrualTime,
+                    survivalTime = survivalDataSet$survivalTime,
+                    dropoutTime = survivalDataSet$dropoutTime,
+                    treatmentGroup = survivalDataSet$treatmentArm,
+                    time = analysisTime[k],
+                    directionUpper = directionUpper,
+                    thetaH0 = 1,
+                    returnRawData = FALSE
+                )
+                overallEventsPerStage[k] <- sum(logRankOverall$events)
             }
             testStatistics[!selectedPopulations[, k], k] <- NA_real_
             overallEffects[!selectedPopulations[, k], k] <- NA_real_
@@ -367,6 +396,7 @@ updateSubGroupVector <- function(
                     conditionalPower = conditionalPower,
                     conditionalCriticalValue = conditionalCriticalValuePerStage,
                     plannedEvents = plannedEvents,
+                    eventsOverStages = overallEventsPerStage,
                     # We need to pass one allocation ratio for each stage:
                     allocationRatioPlanned = rep(allocationRatioPlanned, length.out = k + 1),
                     selectedPopulations = selectedPopulations,
