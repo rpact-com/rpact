@@ -742,6 +742,9 @@ updateSubGroupVector <- function(
                         if (!is.na(stageResults$populationEventsPerStage[g, k])) {
                             simulatedPopulationEventsPerStage[k, i, g] <- simulatedPopulationEventsPerStage[k, i, g] +
                                 stageResults$populationEventsPerStage[g, k]
+
+                            simulatedSingleEventsPerStage[k, i, g] <- simulatedSingleEventsPerStage[k, i, g] +
+                                stageResults$singleEventsPerStage[g, k]
                         }
                     }
                     simulatedNumberOfPopulations[k, i] <- simulatedNumberOfPopulations[k, i] +
@@ -832,6 +835,8 @@ updateSubGroupVector <- function(
                 simulatedPopulationEventsPerStage[, i, g] / iterations[, i],
                 1
             )
+
+            simulatedSingleEventsPerStage[, i, g] <- simulatedSingleEventsPerStage[, i, g] / pmax(iterations[, i], 1)
         }
         simulatedNumberOfEvents[, i] <- simulatedNumberOfEvents[, i] / iterations[, i]
         simulatedNumberOfSubjects[, i] <- simulatedNumberOfSubjects[, i] / iterations[, i]
@@ -869,6 +874,7 @@ updateSubGroupVector <- function(
     
     simulationResults$numberOfPopulations <- simulatedNumberOfPopulations / iterations
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
+    # simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
     simulationResults$populationEventsPerStage <- simulatedPopulationEventsPerStage
     simulationResults$analysisTime <- simulatedAnalysisTime
     simulationResults$eventsNotAchieved <- simulatedNumberEventsNotAchieved / maxNumberOfIterations
