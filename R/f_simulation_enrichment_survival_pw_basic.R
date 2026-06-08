@@ -394,7 +394,7 @@ updateSubGroupVector <- function(
                     if (!calcEventsFunctionIsUserDefined) {
                         plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(ceiling(newEvents), kMax - k))
                     } else {
-                        plannedEvents[k + 1] <- ceiling(newEvents)
+                        plannedEvents[k + 1] <- plannedEvents[k] + ceiling(newEvents)
                     }
                 }
             } else {
