@@ -497,6 +497,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	int maxNumberOfSubjects = recruitmentTimes.size();
 
 	// Initialize matrices and vectors
+	NumericVector overallEventsPerStage(kMax);
+	std::fill(overallEventsPerStage.begin(), overallEventsPerStage.end(), NA_REAL);
 	NumericMatrix populationEventsPerStage(gMax, kMax);
 	std::fill(populationEventsPerStage.begin(), populationEventsPerStage.end(), NA_REAL);
 	NumericMatrix populationEventsPerStageCumulated(gMax, kMax);
@@ -594,6 +596,19 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						populationEventsPerStage(g, k) = sum(events);
 					}
 				}
+
+				// Calculate overall number of events in this
+				// stage, i.e. for the full population.
+				List logRankOverall = logRankTestEnrichment(
+					1, 
+					survivalDataSet, 
+					analysisTime[k], 
+					1,
+					stratifiedAnalysis, 
+					directionUpper
+				);
+				IntegerVector eventsOverall = logRankOverall["events"];
+				overallEventsPerStage[k] = sum(eventsOverall);
 			}
 		} else {
 			// Subsequent stages
@@ -697,6 +712,19 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						}
 					}
 				}
+
+				// Calculate overall number of events in this
+				// stage, i.e. for the full population.
+				List logRankOverall = logRankTestEnrichment(
+					1, 
+					survivalDataSet, 
+					analysisTime[k], 
+					1,
+					stratifiedAnalysis, 
+					directionUpper
+				);
+				IntegerVector eventsOverall = logRankOverall["events"];
+				overallEventsPerStage[k] = sum(eventsOverall);
 			}
 
 			IntegerVector notSelectedPopulations = which(!selectedPopulations(_, k));
@@ -839,6 +867,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						Named("conditionalPower") = conditionalPower,
 						Named("conditionalCriticalValue") = conditionalCriticalValue[k],
 						Named("plannedEvents") = plannedEvents,
+						Named("eventsOverStages") = overallEventsPerStage,
 						Named("allocationRatioPlanned") = allocationRatioPlanned,
 						Named("selectedPopulations") = selectedPopulations,
 					    Named("estimatedTheta") = estimatedTheta,
