@@ -180,15 +180,13 @@ updateSubGroupVector <- function(
 
                 # Calculate overall number of events in this 
                 # stage.
-                logRankOverall <- .logRankTestCpp(
-                    accrualTime = survivalDataSet$accrualTime,
-                    survivalTime = survivalDataSet$survivalTime,
-                    dropoutTime = survivalDataSet$dropoutTime,
-                    treatmentGroup = survivalDataSet$treatmentArm,
+                logRankOverall <- .logRankTestEnrichmentCpp(
+                    gMax = 1,
+                    survivalDataSet = survivalDataSet,
                     time = analysisTime[k],
-                    directionUpper = directionUpper,
-                    thetaH0 = 1,
-                    returnRawData = FALSE
+                    subPopulation = 1,
+                    stratifiedAnalysis = stratifiedAnalysis,
+                    directionUpper = directionUpper
                 )
                 overallEventsPerStage[k] <- sum(logRankOverall$events)
             }
@@ -278,15 +276,13 @@ updateSubGroupVector <- function(
 
                 # Calculate overall number of events in this 
                 # stage.
-                logRankOverall <- .logRankTestCpp(
-                    accrualTime = survivalDataSet$accrualTime,
-                    survivalTime = survivalDataSet$survivalTime,
-                    dropoutTime = survivalDataSet$dropoutTime,
-                    treatmentGroup = survivalDataSet$treatmentArm,
+                logRankOverall <- .logRankTestEnrichmentCpp(
+                    gMax = 1,
+                    survivalDataSet = survivalDatasetSelected,
                     time = analysisTime[k],
-                    directionUpper = directionUpper,
-                    thetaH0 = 1,
-                    returnRawData = FALSE
+                    subPopulation = 1,
+                    stratifiedAnalysis = stratifiedAnalysis,
+                    directionUpper = directionUpper
                 )
                 overallEventsPerStage[k] <- sum(logRankOverall$events)
             }
@@ -420,7 +416,7 @@ updateSubGroupVector <- function(
                     if (!calcEventsFunctionIsUserDefined) {
                         plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(ceiling(newEvents), kMax - k))
                     } else {
-                        plannedEvents[k + 1] <- plannedEvents[k] + ceiling(newEvents)
+                        plannedEvents[k + 1] <- ceiling(newEvents)
                     }
                 }
             } else {
