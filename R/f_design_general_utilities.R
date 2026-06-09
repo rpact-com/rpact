@@ -101,9 +101,12 @@ NULL
     return(c(baseArgsToIgnore, "alpha", "beta", "sided", "twoSidedPower"))
 }
 
-
 .getValidatedFutilityBounds <- function(design, kMaxLowerBound = 1,
         writeToDesign = TRUE, twoSidedWarningForDefaultValues = TRUE) {
+    if (.isTrialDesignFixed(design)) {
+        return(numeric(0))
+    }
+        
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     return(.getValidatedFutilityBoundsOrAlpha0Vec(
         design = design, parameterName = "futilityBounds",
@@ -1164,6 +1167,10 @@ getMedianByPi <- function(piValue,
 }
 
 .isNoEarlyEfficacy <- function(design) {
+    if (.isTrialDesignFixed(design)) {
+        return(FALSE)
+    }
+    
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
 
     if (design$kMax == 1) {

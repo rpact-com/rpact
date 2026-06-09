@@ -31,7 +31,7 @@ NULL
         directionUpper = NA,
         thetaH0 = NA_real_,
         nPlanned = NA_real_) {
-    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
     .assertIsValidIntersectionTestMultiArm(design, intersectionTest)
     .assertIsOneSidedDesign(design, designType = "multi-arm", engineType = "analysis")
 
@@ -105,7 +105,7 @@ NULL
         dataInput,
         ...,
         directionUpper = NA) {
-    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
@@ -153,7 +153,7 @@ NULL
 .getRepeatedConfidenceIntervalsMultiArm <- function(design,
         dataInput,
         ...) {
-    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
@@ -460,7 +460,7 @@ NULL
 #' @export
 #'
 getClosedCombinationTestResults <- function(stageResults) {
-    .assertIsTrialDesignInverseNormalOrFisher(stageResults$.design)
+    .assertIsTrialDesignInverseNormalOrFisherOrFixed(stageResults$.design)
 
     result <- .performClosedCombinationTest(stageResults = stageResults)
     return(ClosedCombinationTestResults$new(

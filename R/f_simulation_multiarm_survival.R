@@ -187,7 +187,7 @@ NULL
 
     if (.isTrialDesignFisher(design)) {
         weights <- .getWeightsFisher(design)
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else {
         weights <- .getWeightsInverseNormal(design)
     }
 
@@ -485,7 +485,7 @@ getSimulationMultiArmSurvival <- function(design = NULL,
             ), "showStatistics"), ...
         )
     } else {
-        .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+        .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
         .warnInCaseOfUnknownArguments(functionName = "getSimulationMultiArmSurvival", ignore = "showStatistics", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
     }

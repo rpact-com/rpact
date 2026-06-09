@@ -212,6 +212,20 @@ NULL
     }
 }
 
+.assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed <- function(design) {
+    if (!.isTrialDesignInverseNormalOrGroupSequential(design) && !.isTrialDesignFixed(design)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'design' must be an instance of class ",
+            "'TrialDesignInverseNormal', ",
+            "'TrialDesignGroupSequential', or ",
+            "'TrialDesignFixed' (is '",
+            .getClassName(design), "')",
+            call. = FALSE
+        )
+    }
+}
+
 .isTrialDesignInverseNormalOrGroupSequentialOrFisher <- function(design) {
     return(.isTrialDesignInverseNormalOrGroupSequential(design) || .isTrialDesignFisher(design))
 }
@@ -221,43 +235,54 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal', 'TrialDesignGroupSequential', or 'TrialDesignFisher' (is '",
+            "'TrialDesignInverseNormal', ",
+            "'TrialDesignGroupSequential', or ",
+            "'TrialDesignFisher' (is '",
             .getClassName(design), "')",
             call. = FALSE
         )
     }
 }
 
-.assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher <- function(design) {
-    if (!.isTrialDesignInverseNormalOrGroupSequential(design) && !.isTrialDesignFisher(design)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'design' must be an instance of class 'TrialDesignInverseNormal', ",
-            "'TrialDesignGroupSequential', or 'TrialDesignFisher' (is '",
-            .getClassName(design), "')",
-            call. = FALSE
-        )
-    }
-}
-
-.assertIsTrialDesignInverseNormalOrFisher <- function(design) {
-    if (!.isTrialDesignInverseNormalOrFisher(design)) {
+.assertIsTrialDesignInverseNormalOrGroupSequentialOrFisherOrFixed <- function(design) {
+    if (!.isTrialDesignInverseNormalOrGroupSequentialOrFisher(design) && 
+            !.isTrialDesignFixed(design)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class ",
-            "'TrialDesignInverseNormal' or 'TrialDesignFisher' (is '",
+            "'TrialDesignInverseNormal', ",
+            "'TrialDesignGroupSequential', ",
+            "'TrialDesignFisher', or ",
+            "'TrialDesignFixed' (is '",
             .getClassName(design), "')",
             call. = FALSE
         )
     }
 }
 
-.assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett <- function(design) {
-    if (!.isTrialDesignInverseNormalOrFisher(design) && !.isTrialDesignConditionalDunnett(design)) {
+.assertIsTrialDesignInverseNormalOrFisherOrFixed <- function(design) {
+    if (!.isTrialDesignInverseNormalOrFisher(design) && 
+            !.isTrialDesignFixed(design)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'design' must be an instance of class ",
+            "'TrialDesignInverseNormal', ",
+            "'TrialDesignFisher', or ",
+            "'TrialDesignFixed' (is '",
+            .getClassName(design), "')",
+            call. = FALSE
+        )
+    }
+}
+
+.assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed <- function(design) {
+    if (!.isTrialDesignInverseNormalOrFisher(design) && 
+            !.isTrialDesignConditionalDunnett(design) && 
+            !.isTrialDesignFixed(design)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class 'TrialDesignInverseNormal', ",
-            "'TrialDesignFisher', or 'TrialDesignConditionalDunnett' (is '",
+            "'TrialDesignFisher', 'TrialDesignConditionalDunnett', or 'TrialDesignFixed' (is '",
             .getClassName(design), "')",
             call. = FALSE
         )

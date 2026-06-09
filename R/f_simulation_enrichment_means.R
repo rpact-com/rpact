@@ -123,7 +123,7 @@ NULL
 
     if (.isTrialDesignFisher(design)) {
         weights <- .getWeightsFisher(design)
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else {
         weights <- .getWeightsInverseNormal(design)
     }
 
@@ -537,7 +537,7 @@ getSimulationEnrichmentMeans <- function(design = NULL,
             ...
         )
     } else {
-        .assertIsTrialDesignInverseNormalOrFisher(design)
+        .assertIsTrialDesignInverseNormalOrFisherOrFixed(design)
         .warnInCaseOfUnknownArguments(functionName = "getSimulationEnrichmentMeans", ignore = "showStatistics", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
     }

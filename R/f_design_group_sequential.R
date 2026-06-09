@@ -2347,24 +2347,26 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 }
 
 .getDesignCharacteristics <- function(..., design, userFunctionCallEnabled = FALSE) {
-    .assertIsTrialDesignInverseNormalOrGroupSequential(design)
+    .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
     .assertDesignParameterExists(design, "sided", C_SIDED_DEFAULT)
     .assertIsValidSidedParameter(design$sided)
 
-    if (userFunctionCallEnabled) {
-        .validateAlphaAndBeta(design = design)
+    if (!.isTrialDesignFixed(design)) {
+        if (userFunctionCallEnabled) {
+            .validateAlphaAndBeta(design = design)
+        }
+    
+        design$informationRates <- .getValidatedInformationRates(design, writeToDesign = FALSE)
+    
+        if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2 && design$kMax == 2) {
+            design$futilityBounds[is.na(design$futilityBounds)] <- 0
+        }
+    
+        design$futilityBounds <- .getValidatedFutilityBounds(design,
+            writeToDesign = FALSE, twoSidedWarningForDefaultValues = FALSE
+        )
     }
-
-    design$informationRates <- .getValidatedInformationRates(design, writeToDesign = FALSE)
-
-    if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-            .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2 && design$kMax == 2) {
-        design$futilityBounds[is.na(design$futilityBounds)] <- 0
-    }
-
-    design$futilityBounds <- .getValidatedFutilityBounds(design,
-        writeToDesign = FALSE, twoSidedWarningForDefaultValues = FALSE
-    )
 
     designCharacteristics <- TrialDesignCharacteristics$new(design = design)
 
@@ -2385,15 +2387,14 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 
     design$criticalValues[design$criticalValues > 7.5] <- 7.5
     design$criticalValues[design$criticalValues < -7.5] <- -7.5
-    if (length(design$decisionCriticalValues) > 0) {
+    if (!.isTrialDesignFixed(design) && length(design$decisionCriticalValues) > 0) {
         design$decisionCriticalValues[!is.na(design$decisionCriticalValues) &
             design$decisionCriticalValues > 7.5] <- 7.5
         design$decisionCriticalValues[!is.na(design$decisionCriticalValues) &
             design$decisionCriticalValues < -7.5] <- -7.5
     }
-    informationRates <- design$informationRates
 
-    if (design$kMax == 1) {
+    if (.isTrialDesignFixed(design) || design$kMax == 1) {
         designCharacteristics$shift <- nFixed
         designCharacteristics$.setParameterType("shift", C_PARAM_GENERATED)
 
@@ -2413,6 +2414,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         return(designCharacteristics)
     }
 
+    informationRates <- design$informationRates
     criticalValues <- .getCriticalValues(design)
     if (!anyNA(design$delayedInformation) &&
             length(design$decisionCriticalValues) > 0) {

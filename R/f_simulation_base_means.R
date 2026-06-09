@@ -182,7 +182,7 @@ getSimulationMeans <- function(design = NULL, ...,
             ), ...
         )
     } else {
-        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design)
+        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisherOrFixed(design)
         .warnInCaseOfUnknownArguments(functionName = "getSimulationMeans", ignore = c("showStatistics"), ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)

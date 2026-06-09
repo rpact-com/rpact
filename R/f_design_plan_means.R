@@ -582,7 +582,7 @@ NULL
         allocationRatioPlanned = NA_real_) {
     objectType <- match.arg(objectType)
 
-    .assertIsTrialDesignInverseNormalOrGroupSequential(design)
+    .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
     .assertIsValidAlphaAndBeta(design$alpha, design$beta)
     .assertIsValidSidedParameter(design$sided)
     .assertIsValidGroupsParameter(groups)
