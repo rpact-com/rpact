@@ -78,6 +78,10 @@ NULL
     return(identical(.getClassName(design), C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL))
 }
 
+.isTrialDesignInverseNormalOrFixed <- function(design) {
+    return(.isTrialDesignInverseNormal(design) || .isTrialDesignFixed(design))
+}
+
 .isTrialDesignFisher <- function(design) {
     return(identical(.getClassName(design), C_CLASS_NAME_TRIAL_DESIGN_FISHER))
 }
@@ -151,6 +155,19 @@ NULL
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'design' must be an instance of class ",
             "'TrialDesignInverseNormal' (is '", .getClassName(design), "')",
+            call. = FALSE
+        )
+    }
+}
+
+.assertIsTrialDesignInverseNormalOrFixed <- function(design) {
+    if (!.isTrialDesignInverseNormal(design) && !.isTrialDesignFixed(design)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'design' must be an instance of class ",
+            "'TrialDesignInverseNormal', ",
+            "'TrialDesignFixed' (is '",
+            .getClassName(design), "')",
             call. = FALSE
         )
     }

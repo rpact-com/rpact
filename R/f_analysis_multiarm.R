@@ -571,7 +571,7 @@ getClosedCombinationTestResults <- function(stageResults) {
 
     intersectionTest <- stageResults$intersectionTest
 
-    if (!.isTrialDesignFisher(design) && (design$typeOfDesign == C_TYPE_OF_DESIGN_HP)) {
+    if (!.isTrialDesignFixed(design) && !.isTrialDesignFisher(design) && (design$typeOfDesign == C_TYPE_OF_DESIGN_HP)) {
         if (stage == kMax) {
             startTime <- Sys.time()
             for (g in 1:gMax) {
@@ -609,7 +609,7 @@ getClosedCombinationTestResults <- function(stageResults) {
             }
             .logProgress("Repeated p-values for final stage calculated", startTime = startTime)
         }
-    } else if (kMax == 1) {
+    } else if (.isTrialDesignFixed(design) || kMax == 1) {
         startTime <- Sys.time()
 
         for (g in 1:gMax) {

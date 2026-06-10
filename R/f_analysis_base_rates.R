@@ -40,7 +40,7 @@ NULL
         ))
     }
 
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getAnalysisResultsRatesInverseNormal(
             design = design,
             dataInput = dataInput,
@@ -71,7 +71,7 @@ NULL
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         stdErrorEstimate = NA_character_,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
-    .assertIsTrialDesignInverseNormal(design)
+    .assertIsTrialDesignInverseNormalOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
         functionName = ".getAnalysisResultsRatesInverseNormal",
@@ -781,7 +781,7 @@ NULL
     if (.isTrialDesignFisher(design)) {
         stageResults$.setParameterType("combFisher", C_PARAM_GENERATED)
         stageResults$.setParameterType("weightsFisher", C_PARAM_GENERATED)
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else if (.isTrialDesignInverseNormalOrFixed(design)) {
         stageResults$.setParameterType("combInverseNormal", C_PARAM_GENERATED)
         stageResults$.setParameterType("weightsInverseNormal", C_PARAM_GENERATED)
     }
@@ -799,7 +799,7 @@ NULL
         return(.getRepeatedConfidenceIntervalsRatesGroupSequential(design = design, ...))
     }
 
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getRepeatedConfidenceIntervalsRatesInverseNormal(design = design, ...))
     }
 
@@ -1660,7 +1660,7 @@ NULL
                         pi1 = piTreatmentRange[i],
                         pi2 = pi2
                     )$conditionalPower[design$kMax]
-                } else if (.isTrialDesignInverseNormal(design)) {
+                } else if (.isTrialDesignInverseNormalOrFixed(design)) {
                     condPowerValues[i] <- .getConditionalPowerRatesInverseNormal(
                         stageResults = stageResults,
                         nPlanned = nPlanned,
@@ -1711,7 +1711,7 @@ NULL
                         pi1 = piTreatmentRange[i],
                         pi2 = pi2
                     )$conditionalPower[design$kMax]
-                } else if (.isTrialDesignInverseNormal(design)) {
+                } else if (.isTrialDesignInverseNormalOrFixed(design)) {
                     condPowerValues[i] <- .getConditionalPowerRatesInverseNormal(
                         stageResults = stageResults,
                         nPlanned = nPlanned,
@@ -1851,7 +1851,7 @@ NULL
                     )
             }
         } else {
-            if (.isTrialDesignInverseNormal(design) && design$kMax > 2 && !.isNoEarlyEfficacy(design)) {
+            if (.isTrialDesignInverseNormalOrFixed(design) && design$kMax > 2 && !.isNoEarlyEfficacy(design)) {
                 message(
                     "Calculation of final confidence interval performed for kMax = ",
                     design$kMax,
@@ -2234,7 +2234,7 @@ NULL
         ))
     }
 
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getFinalConfidenceIntervalRatesInverseNormal(
             design = design,
             dataInput = dataInput,
