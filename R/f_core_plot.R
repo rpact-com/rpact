@@ -928,7 +928,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (addPowerAndAverageSampleNumber && .isMultiArmSimulationResults(parameterSet)) {
         addPowerAndAverageSampleNumber <- FALSE
     }
-
+    
     if (.isParameterSet(parameterSet) || .isTrialDesignSet(parameterSet)) {
         df <- .getParameterSetAsDataFrame(
             parameterSet = parameterSet,
