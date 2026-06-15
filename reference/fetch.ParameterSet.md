@@ -33,8 +33,8 @@ fetch(x, ..., output = c("named", "labeled", "value", "list"))
 
   - a negative integer, giving the position counting from the right. The
     default returns the last parameter. This argument is taken by
-    expression and supports quasiquotation (you can unquote column names
-    and column locations).
+    expression and supports quasi-quotation (you can unquote column
+    names and column locations).
 
 - output:
 

@@ -187,7 +187,8 @@ getDesignGroupSequential(
   For two-sided testing, if `twoSidedPower = TRUE` is specified the
   sample size calculation is performed by considering both tails of the
   distribution. Default is `FALSE`, i.e., it is assumed that one tail
-  probability is equal to 0 or the power should be directed to one part.
+  probability is equal to 0 or the power should be directed to one
+  part.#'
 
 - delayedInformation:
 
@@ -269,6 +270,7 @@ Other design functions:
 [`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.md),
 [`getDesignConditionalDunnett()`](https://docs.rpact.org/reference/getDesignConditionalDunnett.md),
 [`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md),
+[`getDesignFixed()`](https://docs.rpact.org/reference/getDesignFixed.md),
 [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md),
 [`getGroupSequentialProbabilities()`](https://docs.rpact.org/reference/getGroupSequentialProbabilities.md),
 [`getPowerAndAverageSampleNumber()`](https://docs.rpact.org/reference/getPowerAndAverageSampleNumber.md)

@@ -36,6 +36,8 @@
   : Get Design Conditional Dunnett Test
 - [`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md)
   : Get Design Fisher
+- [`getDesignFixed()`](https://docs.rpact.org/reference/getDesignFixed.md)
+  : Get Fixed Design
 - [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md)
   : Get Design Group Sequential
 - [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md)

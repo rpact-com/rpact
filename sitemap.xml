@@ -66,6 +66,7 @@
 <url><loc>https://docs.rpact.org/reference/TrialDesignCharacteristics.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignConditionalDunnett.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignFisher.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/TrialDesignFixed.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignGroupSequential.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignInverseNormal.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/TrialDesignPlan.html</loc></url>
@@ -113,6 +114,7 @@
 <url><loc>https://docs.rpact.org/reference/getDesignCharacteristics.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getDesignConditionalDunnett.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getDesignFisher.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/getDesignFixed.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getDesignGroupSequential.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getDesignInverseNormal.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getDesignSet.html</loc></url>
@@ -275,6 +277,7 @@
 <url><loc>https://docs.rpact.org/reference/param_three_dots_plot.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_threshold.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_tolerance.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/param_twoSidedPower.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_typeOfComputation.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_typeOfDesign.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_typeOfSelection.html</loc></url>

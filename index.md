@@ -155,7 +155,7 @@ with [`testPackage()`](https://docs.rpact.org/reference/testPackage.md).
   [crmPack](https://cran.r-project.org/package=crmPack), and [RPACT
   Cloud](https://rpact-cloud.share.connect.posit.cloud).
 
-> For more information, please visit
+> For more information please visit
 > [www.rpact.com](https://www.rpact.com)
 
 [^1]: The rpact validation documentation is available exclusively for

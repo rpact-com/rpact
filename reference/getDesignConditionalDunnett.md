@@ -102,6 +102,7 @@ documentation linked above by typing
 Other design functions:
 [`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.md),
 [`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md),
+[`getDesignFixed()`](https://docs.rpact.org/reference/getDesignFixed.md),
 [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md),
 [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md),
 [`getGroupSequentialProbabilities()`](https://docs.rpact.org/reference/getGroupSequentialProbabilities.md),

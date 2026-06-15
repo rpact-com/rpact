@@ -70,6 +70,7 @@ documentation linked above by typing
 Other design functions:
 [`getDesignConditionalDunnett()`](https://docs.rpact.org/reference/getDesignConditionalDunnett.md),
 [`getDesignFisher()`](https://docs.rpact.org/reference/getDesignFisher.md),
+[`getDesignFixed()`](https://docs.rpact.org/reference/getDesignFixed.md),
 [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md),
 [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md),
 [`getGroupSequentialProbabilities()`](https://docs.rpact.org/reference/getGroupSequentialProbabilities.md),

@@ -168,6 +168,7 @@ Specification](https://www.rpact.org/vignettes/planning/rpact_futility_bounds/)
 Other design functions:
 [`getDesignCharacteristics()`](https://docs.rpact.org/reference/getDesignCharacteristics.md),
 [`getDesignConditionalDunnett()`](https://docs.rpact.org/reference/getDesignConditionalDunnett.md),
+[`getDesignFixed()`](https://docs.rpact.org/reference/getDesignFixed.md),
 [`getDesignGroupSequential()`](https://docs.rpact.org/reference/getDesignGroupSequential.md),
 [`getDesignInverseNormal()`](https://docs.rpact.org/reference/getDesignInverseNormal.md),
 [`getGroupSequentialProbabilities()`](https://docs.rpact.org/reference/getGroupSequentialProbabilities.md),

@@ -10,7 +10,7 @@ plot(
   x,
   y,
   ...,
-  type = 1L,
+  type = NA_integer_,
   main = NA_character_,
   xlab = NA_character_,
   ylab = NA_character_,
