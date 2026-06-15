@@ -1453,7 +1453,9 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
         args <- list(...)
         variedParameters <- args[["variedParameters"]]
         if (is.null(variedParameters)) {
-            if (.isTrialDesignInverseNormalOrGroupSequential(x) &&
+            if (!.isTrialDesignFixed(x) &&
+                    !.isTrialDesignFixed(y) && 
+                    .isTrialDesignInverseNormalOrGroupSequential(x) &&
                     .isTrialDesignInverseNormalOrGroupSequential(y) &&
                     x$typeOfDesign != y$typeOfDesign) {
                 variedParameters <- "typeOfDesign"

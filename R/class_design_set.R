@@ -1232,7 +1232,7 @@ plot.TrialDesignSet <- function(
 }
 
 .addDecisionCriticalValuesToPlot <- function(p, designMaster, type, nMax = NA_integer_) {
-    if (type != 1 || !.isTrialDesignInverseNormalOrGroupSequential(designMaster)) {
+    if (type != 1 || .isTrialDesignFixed(designMaster) || !.isTrialDesignInverseNormalOrGroupSequential(designMaster)) {
         return(p)
     }
 

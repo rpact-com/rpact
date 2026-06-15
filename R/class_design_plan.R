@@ -235,7 +235,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             return(self$.design$alpha)
         },
         getBeta = function() {
-            if (.isTrialDesignInverseNormalOrGroupSequential(self$.design)) {
+            if (.isTrialDesignFixed(self$.design) || .isTrialDesignInverseNormalOrGroupSequential(self$.design)) {
                 return(self$.design$beta)
             }
             return(NA_real_)
@@ -244,7 +244,7 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
             return(self$.design$sided)
         },
         getTwoSidedPower = function() {
-            if (.isTrialDesignInverseNormalOrGroupSequential(self$.design)) {
+            if (.isTrialDesignFixed(self$.design) || .isTrialDesignInverseNormalOrGroupSequential(self$.design)) {
                 return(self$.design$twoSidedPower)
             }
             return(NA)

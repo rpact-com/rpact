@@ -74,6 +74,10 @@ NULL
     return(identical(.getClassName(design), C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL))
 }
 
+.isTrialDesignGroupSequentialOrFixed <- function(design) {
+    return(.isTrialDesignFixed(design) || .isTrialDesignGroupSequential(design))
+}
+
 .isTrialDesignInverseNormal <- function(design) {
     return(identical(.getClassName(design), C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL))
 }
@@ -245,6 +249,10 @@ NULL
 
 .isTrialDesignInverseNormalOrGroupSequentialOrFisher <- function(design) {
     return(.isTrialDesignInverseNormalOrGroupSequential(design) || .isTrialDesignFisher(design))
+}
+
+.isTrialDesignInverseNormalOrGroupSequentialOrFixed <- function(design) {
+    return(.isTrialDesignInverseNormalOrGroupSequential(design) || .isTrialDesignFixed(design))
 }
 
 .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher <- function(design) {
@@ -3400,6 +3408,10 @@ NULL
     }
 
     if (!is.null(design)) {
+        if (.isTrialDesignFixed(design)) {
+            return(FALSE)
+        }
+        
         if (!.isTrialDesignInverseNormalOrGroupSequential(design)) {
             return(FALSE)
         }

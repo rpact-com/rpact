@@ -1800,7 +1800,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         powerEnabled = NA,
         sep = ", ") {
     if (is.na(powerEnabled)) {
-        powerEnabled <- .isTrialDesignInverseNormalOrGroupSequential(design) &&
+        powerEnabled <- isTrialDesignGroupSequentialOrFixed(design) &&
             (is.null(designPlan) || (!.isSimulationResults(designPlan) &&
                 !identical("power", designPlan[[".objectType"]])))
     }
@@ -1867,7 +1867,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         return(NULL)
     }
 
-    if (!.isTrialDesignInverseNormalOrGroupSequential(design)) {
+    if (!isTrialDesignGroupSequentialOrFixed(design)) {
         return(NULL)
     }
 
@@ -2098,7 +2098,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     if (part != "") {
         header <- .concatenateSummaryText(header, paste0("(", part, ")"), sep = " ")
     }
-    if (settings$countDataEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
+    if (settings$countDataEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
         header <- .concatenateSummaryText(header, .createSummaryHypothesisText(designPlan, summaryFactory))
         if (!is.null(designPlan[["theta"]]) && length(designPlan$theta) == 1) {
@@ -2108,7 +2108,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
         header <- .concatenateSummaryText(header, effectText)
         header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
-    } else if (settings$meansEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
+    } else if (settings$meansEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
         header <- .concatenateSummaryText(header, .createSummaryHypothesisText(designPlan, summaryFactory))
         if (!is.null(designPlan[["alternative"]]) && length(designPlan$alternative) == 1) {
@@ -2156,7 +2156,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             ))
         }
         header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
-    } else if (settings$ratesEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
+    } else if (settings$ratesEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
         if (settings$groups == 1) {
             if (!is.null(designPlan[["pi1"]]) && length(designPlan$pi1) == 1) {
@@ -2218,7 +2218,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             header <- .addEnrichmentEffectListToHeader(header, designPlan)
             header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
         }
-    } else if (settings$survivalEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
+    } else if (settings$survivalEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
         parameterNames <- designPlan$.getVisibleFieldNamesOrdered()
         numberOfVariants <- .getMultidimensionalNumberOfVariants(designPlan, parameterNames)

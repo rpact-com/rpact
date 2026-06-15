@@ -149,7 +149,7 @@ NULL
     }
 
     if (design$sided == 2 && .isDefinedArgument(parameterValues) &&
-            (!.isTrialDesignInverseNormalOrGroupSequential(design) ||
+            (!.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
                 (design$typeOfDesign != C_TYPE_OF_DESIGN_PT) && !.isBetaSpendingDesignType(design$typeBetaSpending)
             ) &&
             (twoSidedWarningForDefaultValues && !all(is.na(parameterValues)) ||
