@@ -1800,7 +1800,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         powerEnabled = NA,
         sep = ", ") {
     if (is.na(powerEnabled)) {
-        powerEnabled <- isTrialDesignGroupSequentialOrFixed(design) &&
+        powerEnabled <- .isTrialDesignGroupSequentialOrFixed(design) &&
             (is.null(designPlan) || (!.isSimulationResults(designPlan) &&
                 !identical("power", designPlan[[".objectType"]])))
     }
@@ -1867,7 +1867,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         return(NULL)
     }
 
-    if (!isTrialDesignGroupSequentialOrFixed(design)) {
+    if (!.isTrialDesignGroupSequentialOrFixed(design)) {
         return(NULL)
     }
 
