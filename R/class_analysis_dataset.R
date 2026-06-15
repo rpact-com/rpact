@@ -3395,7 +3395,7 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
 
                     self$allocationRatios <- self$.getValuesByParameterName(
                         dataFrame, C_KEY_WORDS_ALLOCATION_RATIOS,
-                        defaultValues = .getAllocationRatioDefaultValues(self$stages, self$events, self$expectedEvents)
+                        defaultValues = self$.getAllocationRatioDefaultValues(self$stages, self$events, self$expectedEvents)
                     )
                     self$.validateValues(self$allocationRatios, "allocationRatios")
                 } else if (self$.paramExists(dataFrame, C_KEY_WORDS_OVERALL_EXPECTED_EVENTS) ||
@@ -3743,7 +3743,7 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
                     }
                     self$.data$overallEvent[indices] <- cumsum(self$.data$event[indices])
                     self$.data$overallExpectedEvent[indices] <- cumsum(self$.data$expectedEvent[indices])
-                    # .data$overallVarianceEvent[indices] <<- # maybe implemented later
+                    # self$.data$overallVarianceEvent[indices] <- # maybe implemented later
                     self$.data$overallLogRank[indices] <- self$.getOverallLogRanks(
                         self$.data$logRank[indices], self$.data$event[indices], self$.data$overallEvent[indices]
                     )
@@ -3923,7 +3923,7 @@ DatasetEnrichmentSurvival <- R6::R6Class("DatasetEnrichmentSurvival",
                 self$.validateValues(self$expectedEvents, "expectedEvents")
 
                 self$varianceEvents <- self$.getValuesByParameterName(dataFrame, C_KEY_WORDS_VARIANCE_EVENTS)
-                self$.validateValues(varianceEvents, "varianceEvents")
+                self$.validateValues(self$varianceEvents, "varianceEvents")
 
                 self$allocationRatios <- self$.getValuesByParameterName(
                     dataFrame,

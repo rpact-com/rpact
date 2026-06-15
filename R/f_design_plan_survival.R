@@ -641,7 +641,7 @@ NULL
     typeOfComputation <- .matchArgument(typeOfComputation, "Schoenfeld")
 
     if (userFunctionCallEnabled) {
-        .assertIsTrialDesignInverseNormalOrGroupSequential(design)
+        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
         .assertIsValidAlphaAndBeta(design$alpha, design$beta)
         .assertIsValidSidedParameter(design$sided)
         .assertIsSingleLogical(accountForObservationTimes, "accountForObservationTimes", naAllowed = TRUE)

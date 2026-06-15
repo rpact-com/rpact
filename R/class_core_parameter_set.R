@@ -1794,7 +1794,7 @@ fetch <- function(x, ..., output) UseMethod("fetch")
 #'  - a positive integer, giving the position counting from the left
 #'  - a negative integer, giving the position counting from the right.
 #' The default returns the last parameter.
-#' This argument is taken by expression and supports quasiquotation (you can unquote column names and column locations).
+#' This argument is taken by expression and supports quasi-quotation (you can unquote column names and column locations).
 #' @param output A character defining the output type as follows:
 #'  - "named" (default) returns the named value if the value is a single value, the value inside a named list otherwise
 #'  - "value" returns only the value itself

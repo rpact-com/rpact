@@ -124,7 +124,7 @@ Haybittle & Peto design (default is \code{3}).}
 \item{twoSidedPower}{For two-sided testing, if \code{twoSidedPower = TRUE} is specified
 the sample size calculation is performed by considering both tails of the distribution.
 Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
-should be directed to one part.}
+should be directed to one part.#'}
 
 \item{tolerance}{The numerical tolerance, default is \code{1e-08}.}
 }
@@ -191,12 +191,13 @@ getDesignInverseNormal(kMax = 3, informationRates = c(0.3, 0.75, 1),
 \seealso{
 \code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare different designs.
 
-Other design functions: 
-\code{\link{getDesignCharacteristics}()},
-\code{\link{getDesignConditionalDunnett}()},
-\code{\link{getDesignFisher}()},
-\code{\link{getDesignGroupSequential}()},
-\code{\link{getGroupSequentialProbabilities}()},
-\code{\link{getPowerAndAverageSampleNumber}()}
+Other design functions:
+\code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}},
+\code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}},
+\code{\link[=getDesignFisher]{getDesignFisher()}},
+\code{\link[=getDesignFixed]{getDesignFixed()}},
+\code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
+\code{\link[=getGroupSequentialProbabilities]{getGroupSequentialProbabilities()}},
+\code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 }
 \concept{design functions}

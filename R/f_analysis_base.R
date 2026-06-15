@@ -489,7 +489,8 @@ getTestActions <- function(stageResults, ...) {
     design <- stageResults$.design
     criticalValues <- .getCriticalValues(design)
     testActions <- rep(NA_character_, design$kMax)
-    if (.isTrialDesignInverseNormal(design)) {
+    
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         for (k in 1:stageResults$stage) {
             if (design$sided == 1) {
                 if (k < design$kMax) {

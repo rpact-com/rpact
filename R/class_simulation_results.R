@@ -608,9 +608,6 @@ SimulationResults <- R6::R6Class(
         .getParametersToShow = function() {
             parametersToShow <- self$.getVisibleFieldNames()
             y <- c(
-                "singleEventsPerStage",
-                "cumulativeEventsPerStage",
-                "singleEventsPerArmAndStage",
                 "iterations",
                 "overallReject", # base
                 "rejectAtLeastOne",
@@ -630,13 +627,16 @@ SimulationResults <- R6::R6Class(
                 "selectedPopulations",
                 "numberOfActiveArms",
                 "numberOfPopulations",
+                "singleEventsPerStage",
+                "singleEventsPerArmAndStage",
+                "singleEventsPerSubsetAndStage",
+                "cumulativeEventsPerStage",
                 "expectedNumberOfSubjects",
                 "expectedNumberOfEvents",
                 "numberOfSubjects",
                 "numberOfSubjects1",
                 "numberOfSubjects2",
                 "sampleSizes",
-                "singleEventsPerSubsetAndStage",
                 "conditionalPowerAchieved" # base
             )
             parametersToShow <- c(parametersToShow[!(parametersToShow %in% y)], y[y %in% parametersToShow])

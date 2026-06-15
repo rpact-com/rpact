@@ -101,9 +101,12 @@ NULL
     return(c(baseArgsToIgnore, "alpha", "beta", "sided", "twoSidedPower"))
 }
 
-
 .getValidatedFutilityBounds <- function(design, kMaxLowerBound = 1,
         writeToDesign = TRUE, twoSidedWarningForDefaultValues = TRUE) {
+    if (.isTrialDesignFixed(design)) {
+        return(numeric(0))
+    }
+        
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     return(.getValidatedFutilityBoundsOrAlpha0Vec(
         design = design, parameterName = "futilityBounds",
@@ -146,7 +149,7 @@ NULL
     }
 
     if (design$sided == 2 && .isDefinedArgument(parameterValues) &&
-            (!.isTrialDesignInverseNormalOrGroupSequential(design) ||
+            (!.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
                 (design$typeOfDesign != C_TYPE_OF_DESIGN_PT) && !.isBetaSpendingDesignType(design$typeBetaSpending)
             ) &&
             (twoSidedWarningForDefaultValues && !all(is.na(parameterValues)) ||
@@ -1164,6 +1167,10 @@ getMedianByPi <- function(piValue,
 }
 
 .isNoEarlyEfficacy <- function(design) {
+    if (.isTrialDesignFixed(design)) {
+        return(FALSE)
+    }
+    
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
 
     if (design$kMax == 1) {

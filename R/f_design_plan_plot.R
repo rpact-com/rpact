@@ -193,23 +193,24 @@
         return("alphaSpent")
     }
 
-    alphaSpentEnabled <- .getOptionalArgument("showAlphaSpent", ..., optionalArgumentDefaultValue = NA)
-    if (is.na(alphaSpentEnabled)) {
-        alphaSpentEnabled <- isTRUE(as.logical(getOption("rpact.plot.show.alpha.spent", TRUE)))
+    showAlphaSpent <- .getOptionalArgument("showAlphaSpent", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(showAlphaSpent)) {
+        showAlphaSpent <- isTRUE(as.logical(getOption("rpact.plot.show.alpha.spent", TRUE)))
     }
 
-    betaSpentEnabled <- .getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = NA)
-    if (is.na(betaSpentEnabled)) {
-        betaSpentEnabled <- isTRUE(as.logical(getOption("rpact.plot.show.beta.spent", FALSE)))
+    showBetaSpent <- .getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(showBetaSpent)) {
+        showBetaSpent <- isTRUE(as.logical(getOption("rpact.plot.show.beta.spent", FALSE)))
     }
 
     yParameterNames <- character()
-    if (alphaSpentEnabled) {
+    if (showAlphaSpent) {
         yParameterNames <- c(yParameterNames, "alphaSpent")
     }
-    if (betaSpentEnabled) {
+    if (showBetaSpent) {
         yParameterNames <- c(yParameterNames, "betaSpent")
     }
+    
     if (length(yParameterNames) == 0) {
         yParameterNames <- "alphaSpent"
         if (isFALSE(as.logical(getOption("rpact.plot.show.alpha.spent", TRUE))) &&
@@ -229,7 +230,8 @@
     return(yParameterNames)
 }
 
-.plotTrialDesignPlan <- function(designPlan,
+.plotTrialDesignPlan <- function(
+        designPlan,
         type = 1L,
         main = NA_character_,
         xlab = NA_character_,
@@ -295,7 +297,12 @@
             designPlan <- do.call(designPlan$recreate, parameterList)
         }
     }
-
+    
+    showBetaSpent <- .getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = NA)
+    if (is.na(showBetaSpent)) {
+        showBetaSpent <- isTRUE(as.logical(getOption("rpact.plot.show.beta.spent", NA)))
+    }
+    
     srcCmd <- NULL
     if (type == 1) { # Boundaries Z Scale
         if (survivalDesignPlanEnabled) {
@@ -572,6 +579,9 @@
                 cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
                 alphaSpent = designMaster$alphaSpent
             )
+            if (isTRUE(showBetaSpent)) {
+                designPlan$betaSpent <- designMaster$betaSpent
+            }
             xParameterNameSrc <- "cumulativeEventsPerStage[, 1]"
             yParameterNamesSrc <- ".design$alphaSpent"
         } else {
@@ -1045,7 +1055,6 @@
         plotSettings = plotSettings
     )
 
-    showBetaSpent <- .getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = NA)
     if (!is.na(showBetaSpent)) {
         args$showBetaSpent <- showBetaSpent
     }

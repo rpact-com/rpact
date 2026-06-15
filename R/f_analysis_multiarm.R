@@ -31,7 +31,7 @@ NULL
         directionUpper = NA,
         thetaH0 = NA_real_,
         nPlanned = NA_real_) {
-    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
     .assertIsValidIntersectionTestMultiArm(design, intersectionTest)
     .assertIsOneSidedDesign(design, designType = "multi-arm", engineType = "analysis")
 
@@ -105,7 +105,7 @@ NULL
         dataInput,
         ...,
         directionUpper = NA) {
-    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
@@ -153,7 +153,7 @@ NULL
 .getRepeatedConfidenceIntervalsMultiArm <- function(design,
         dataInput,
         ...) {
-    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
@@ -460,7 +460,7 @@ NULL
 #' @export
 #'
 getClosedCombinationTestResults <- function(stageResults) {
-    .assertIsTrialDesignInverseNormalOrFisher(stageResults$.design)
+    .assertIsTrialDesignInverseNormalOrFisherOrFixed(stageResults$.design)
 
     result <- .performClosedCombinationTest(stageResults = stageResults)
     return(ClosedCombinationTestResults$new(
@@ -571,7 +571,7 @@ getClosedCombinationTestResults <- function(stageResults) {
 
     intersectionTest <- stageResults$intersectionTest
 
-    if (!.isTrialDesignFisher(design) && (design$typeOfDesign == C_TYPE_OF_DESIGN_HP)) {
+    if (!.isTrialDesignFixed(design) && !.isTrialDesignFisher(design) && (design$typeOfDesign == C_TYPE_OF_DESIGN_HP)) {
         if (stage == kMax) {
             startTime <- Sys.time()
             for (g in 1:gMax) {
@@ -609,7 +609,7 @@ getClosedCombinationTestResults <- function(stageResults) {
             }
             .logProgress("Repeated p-values for final stage calculated", startTime = startTime)
         }
-    } else if (kMax == 1) {
+    } else if (.isTrialDesignFixed(design) || kMax == 1) {
         startTime <- Sys.time()
 
         for (g in 1:gMax) {

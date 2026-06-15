@@ -33,7 +33,7 @@ NULL
         directionUpper = NA,
         thetaH0 = NA_real_,
         nPlanned = NA_real_) {
-    .assertIsTrialDesignInverseNormalOrFisher(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrFixed(design)
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
     .assertIsOneSidedDesign(design, designType = "enrichment", engineType = "analysis")
 
@@ -95,7 +95,7 @@ NULL
         dataInput,
         ...,
         directionUpper = C_DIRECTION_UPPER_DEFAULT) {
-    .assertIsTrialDesignInverseNormalOrFisher(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
@@ -144,7 +144,7 @@ NULL
 .getRepeatedConfidenceIntervalsEnrichment <- function(design,
         dataInput,
         ...) {
-    .assertIsTrialDesignInverseNormalOrFisher(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())

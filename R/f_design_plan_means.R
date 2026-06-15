@@ -31,7 +31,6 @@ NULL
 
     if (designPlan$normalApproximation) {
         criticalValues <- .getCriticalValues(design)
-        futilityBounds <- design$futilityBounds
     } else {
         criticalValues <- stats::qt(
             1 - design$stageLevels,
@@ -40,7 +39,7 @@ NULL
 
         # outside validated range
         criticalValues[criticalValues > 50] <- NA_real_
-        if (design$typeOfDesign == "noEarlyEfficacy") {
+        if (design$kMax > 1 && identical(design$typeOfDesign, "noEarlyEfficacy")) {
             if ((is.matrix(criticalValues) && anyNA(criticalValues[design$kMax, ])) ||
                     (is.vector(criticalValues) && is.na(criticalValues[design$kMax]))) {
                 warning("The computation of last stage efficacy boundary on treatment ",
@@ -60,29 +59,35 @@ NULL
                 )
             }
         }
-
-        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
-            futilityBounds <- stats::qt(
-                stats::pnorm(design$futilityBounds),
-                pmax(design$informationRates[1:(design$kMax - 1)] %*%
-                    t(maxNumberOfSubjects) - designPlan$groups, 1e-04)
-            )
-
-            # outside validated range
-            futilityBounds[abs(futilityBounds) > 50] <- NA_real_
-            if (anyNA(futilityBounds)) {
-                warning("The computation of futility boundaries on ",
-                    "treatment effect scale not performed presumably ",
-                    "due to too small degrees of freedom",
-                    call. = FALSE
-                )
-            }
-        } else {
-            futilityBounds <- design$futilityBounds
-        }
     }
-    futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
+    
+    if (design$kMax > 1) {
+        if (designPlan$normalApproximation) {
+            futilityBounds <- design$futilityBounds
+        } else {
+            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+                futilityBounds <- stats::qt(
+                    stats::pnorm(design$futilityBounds),
+                    pmax(design$informationRates[1:(design$kMax - 1)] %*%
+                            t(maxNumberOfSubjects) - designPlan$groups, 1e-04)
+                )
 
+                # outside validated range
+                futilityBounds[abs(futilityBounds) > 50] <- NA_real_
+                if (anyNA(futilityBounds)) {
+                    warning("The computation of futility boundaries on ",
+                        "treatment effect scale not performed presumably ",
+                        "due to too small degrees of freedom",
+                        call. = FALSE
+                    )
+                }
+            } else {
+                futilityBounds <- design$futilityBounds
+            }
+        }
+        futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
+    }
+    
     if ((length(stDev) == 1) && (designPlan$groups == 2)) {
         stDev <- rep(stDev, 2)
     }
@@ -92,11 +97,11 @@ NULL
             sqrt(design$informationRates %*% t(maxNumberOfSubjects))
         criticalValuesEffectScaleLower <- thetaH0 - criticalValues * stDev /
             sqrt(design$informationRates %*% t(maxNumberOfSubjects))
-        if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
             futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds * stDev /
                 sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects))
         }
-        if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * stDev /
@@ -113,14 +118,14 @@ NULL
             sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) /
             (sqrt(allocationRatioPlanned *
                 design$informationRates %*% t(maxNumberOfSubjects)))
-        if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
             futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds *
                 sqrt(1 + allocationRatioPlanned) *
                 sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) /
                 (sqrt(allocationRatioPlanned *
                     design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
-        if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds *
@@ -138,13 +143,13 @@ NULL
             sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
             (sqrt(design$informationRates %*% t(maxNumberOfSubjects)))
 
-        if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
             futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds *
                 sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
                 sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
                 (sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
-        if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds *
@@ -577,7 +582,7 @@ NULL
         allocationRatioPlanned = NA_real_) {
     objectType <- match.arg(objectType)
 
-    .assertIsTrialDesignInverseNormalOrGroupSequential(design)
+    .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
     .assertIsValidAlphaAndBeta(design$alpha, design$beta)
     .assertIsValidSidedParameter(design$sided)
     .assertIsValidGroupsParameter(groups)

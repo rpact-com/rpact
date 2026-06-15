@@ -26,7 +26,7 @@ NULL
         ))
     }
 
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getAnalysisResultsMeansInverseNormal(
             design = design,
             dataInput = dataInput,
@@ -57,7 +57,7 @@ NULL
         assumedStDev = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
-    .assertIsTrialDesignInverseNormal(design)
+    .assertIsTrialDesignInverseNormalOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
         functionName = ".getAnalysisResultsMeansInverseNormal",
@@ -669,7 +669,7 @@ NULL
     if (.isTrialDesignFisher(design)) {
         stageResults$.setParameterType("combFisher", C_PARAM_GENERATED)
         stageResults$.setParameterType("weightsFisher", C_PARAM_GENERATED)
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else if (.isTrialDesignInverseNormalOrFixed(design)) {
         stageResults$.setParameterType("combInverseNormal", C_PARAM_GENERATED)
         stageResults$.setParameterType("weightsInverseNormal", C_PARAM_GENERATED)
     }
@@ -706,7 +706,7 @@ NULL
         return(.getRepeatedConfidenceIntervalsMeansGroupSequential(design = design, ...))
     }
 
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getRepeatedConfidenceIntervalsMeansInverseNormal(design = design, ...))
     }
 
@@ -1240,7 +1240,7 @@ NULL
         thetaH1 = NA_real_,
         assumedStDev = NA_real_) {
     design <- stageResults$.design
-    .assertIsTrialDesignInverseNormal(design)
+    .assertIsTrialDesignInverseNormalOrFixed(design)
     .assertIsValidStage(stage, design$kMax)
 
     assumedStDev <- .assertIsValidAssumedStDev(assumedStDev, stageResults, stage)
@@ -1521,7 +1521,7 @@ NULL
             assumedStDev = assumedStDev,
             ...
         )
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else if (.isTrialDesignInverseNormalOrFixed(design)) {
         cp <- .getConditionalPowerMeansInverseNormal(
             stageResults = stageResults,
             nPlanned = nPlanned,
@@ -1611,7 +1611,7 @@ NULL
                     thetaH1 = thetaRange[i],
                     assumedStDev = assumedStDev
                 )$conditionalPower[design$kMax]
-            } else if (.isTrialDesignInverseNormal(design)) {
+            } else if (.isTrialDesignInverseNormalOrFixed(design)) {
                 condPowerValues[i] <- .getConditionalPowerMeansInverseNormal(
                     stageResults = stageResults,
                     stage = stage,
@@ -1787,7 +1787,7 @@ NULL
             }
             medianUnbiased <- (finalConfidenceInterval[1] + finalConfidenceInterval[2]) / 2
         } else {
-            if (.isTrialDesignInverseNormal(design) && design$kMax > 2 && !.isNoEarlyEfficacy(design)) {
+            if (.isTrialDesignInverseNormalOrFixed(design) && design$kMax > 2 && !.isNoEarlyEfficacy(design)) {
                 message(
                     "Calculation of final confidence interval performed for kMax = ",
                     design$kMax,
@@ -2269,7 +2269,7 @@ NULL
         ))
     }
 
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getFinalConfidenceIntervalMeansInverseNormal(
             design = design,
             dataInput = dataInput,

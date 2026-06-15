@@ -144,6 +144,8 @@ TrialDesign <- R6::R6Class("TrialDesign",
                 s <- "Fisher's combination test design"
             } else if (.isTrialDesignConditionalDunnett(self)) {
                 s <- "conditional Dunnett test design"
+            } else if (.isTrialDesignFixed(self)) {
+                s <- "fixed sample size design"
             }
             return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         },
@@ -360,6 +362,98 @@ as.data.frame.TrialDesignCharacteristics <- function(x, row.names = NULL,
     ))
 }
 
+ #' @name TrialDesignFixed
+ #'
+ #' @title
+ #' Fixed Design
+ #'
+ #' @description
+ #' Trial design for fixed (single-stage) trials.
+ #'
+ #' @template field_kMax
+ #' @template field_alpha
+ #' @template field_stages
+ #' @template field_tolerance
+ #' @template field_sided
+ #' @template field_twoSidedPower
+ #'
+ #' @details
+ #' This object should not be created directly; use \code{\link[=getDesignFixed]{getDesignFixed()}}
+ #' with suitable arguments to create a fixed design.
+ #'
+ #' @seealso \code{\link[=getDesignFixed]{getDesignFixed()}} for creating a fixed design.
+ #'
+ #' @include class_core_parameter_set.R
+ #' @include class_core_plot_settings.R
+ #' @include f_core_constants.R
+ #'
+ #' @keywords internal
+ #'
+ #' @importFrom methods new
+TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
+    inherit = TrialDesign,
+    public = list(
+        beta = NULL,
+        sided = NULL,
+        twoSidedPower = NULL,
+        futilityBounds = NULL,
+        initialize = function(
+                ...,
+                beta = C_BETA_DEFAULT,
+                sided = as.integer(C_SIDED_DEFAULT),
+                twoSidedPower = C_TWO_SIDED_POWER_DEFAULT) {
+            self$kMax <- 1L
+            self$beta <- beta
+            self$sided <- sided
+            self$twoSidedPower <- twoSidedPower
+            super$initialize(...) # important: don't move to first line of constructor
+            self$informationRates <- 1
+            self$futilityBounds <- numeric(0)
+            
+            self$.initParameterTypes()
+            self$.initStages()
+        },
+        hasChanged = function(
+                ...,
+                alpha,
+                beta,
+                sided,
+                directionUpper,
+                twoSidedPower) {
+            if (!identical(alpha, self$alpha)) {
+                return(self$.pasteComparisonResult("alpha", alpha, self$alpha))
+            }
+            if (!identical(beta, self$beta)) {
+                return(self$.pasteComparisonResult("beta", beta, self$beta))
+            }
+            if (!isTRUE(all.equal(sided, self$sided))) {
+                return(self$.pasteComparisonResult("sided", sided, self$sided))
+            }
+            if (!identical(twoSidedPower, self$twoSidedPower)) {
+                return(self$.pasteComparisonResult("twoSidedPower", twoSidedPower, self$twoSidedPower))
+            }
+            if (!identical(directionUpper, self$directionUpper)) {
+                return(self$.pasteComparisonResult("directionUpper", directionUpper, self$directionUpper))
+            }
+            return(FALSE)
+        },
+
+        # Defines the order of the parameter output
+        .getParametersToShow = function() {
+            return(c(
+                "stages",
+                "alpha",
+                "beta",
+                "twoSidedPower",
+                "directionUpper",
+                "sided",
+                "criticalValues",
+                "stageLevels"
+            ))
+        }
+    )
+)
+
 #'
 #' @name TrialDesignFisher
 #'
@@ -439,7 +533,8 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             self$.setParameterType("seed", C_PARAM_NOT_APPLICABLE)
             self$.initStages()
         },
-        hasChanged = function(...,
+        hasChanged = function(
+                ...,
                 kMax,
                 alpha,
                 sided,
@@ -659,7 +754,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 name, "_old = ", .arrayToString(self$.formatComparisonResult(oldValue)), " (", .getClassName(oldValue), ")"
             ))
         },
-        hasChanged = function(...,
+        hasChanged = function(
+                ...,
                 kMax,
                 alpha,
                 beta,
@@ -672,6 +768,8 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 futilityBounds,
                 optimizationCriterion,
                 typeBetaSpending,
+                efficacyStops,
+                futilityStops,
                 gammaA,
                 gammaB,
                 bindingFutility,
@@ -760,6 +858,18 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 return(self$.pasteComparisonResult(
                     "typeBetaSpending",
                     typeBetaSpending, self$typeBetaSpending
+                ))
+            }
+            if (!identical(efficacyStops, self$efficacyStops)) {
+                return(self$.pasteComparisonResult(
+                    "efficacyStops",
+                    efficacyStops, self$efficacyStops
+                ))
+            }
+            if (!identical(futilityStops, self$futilityStops)) {
+                return(self$.pasteComparisonResult(
+                    "futilityStops",
+                    futilityStops, self$futilityStops
                 ))
             }
             if (!identical(gammaA, self$gammaA)) {
@@ -1132,13 +1242,14 @@ getDesignConditionalDunnett <- function(alpha = 0.025, # C_ALPHA_DEFAULT
 #'
 #' @export
 #'
-plot.TrialDesign <- function(x,
+plot.TrialDesign <- function(
+        x,
         y,
         ...,
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,
-        type = 1L,
+        type = NA_integer_,
         palette = "Set1",
         theta = seq(-1, 1, 0.01),
         nMax = NA_integer_,
@@ -1147,7 +1258,7 @@ plot.TrialDesign <- function(x,
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
-    .assertIsValidPlotType(type, naAllowed = FALSE)
+    .assertIsValidPlotType(type, naAllowed = TRUE)
     .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
@@ -1161,6 +1272,22 @@ plot.TrialDesign <- function(x,
             "showFutilityBounds", "showAlphaSpent", "showBetaSpent"
         ), ...
     )
+    
+    availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
+    if (length(availablePlotTypes) == 0) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "no plot type available for the specified design")
+    }
+    if (is.na(type)) {
+        type <- availablePlotTypes[1]
+    }
+    if (!(type %in% availablePlotTypes)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
+            ") is not available; 'type' can ", ifelse(length(availablePlotTypes) == 1, "only ", ""),
+            "be ", .arrayToString(availablePlotTypes, mode = "or")
+        )
+    }
+    
     .showWarningIfPlotArgumentWillBeIgnored(type, ..., obj = x)
 
     args <- list(
@@ -1326,7 +1453,9 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
         args <- list(...)
         variedParameters <- args[["variedParameters"]]
         if (is.null(variedParameters)) {
-            if (.isTrialDesignInverseNormalOrGroupSequential(x) &&
+            if (!.isTrialDesignFixed(x) &&
+                    !.isTrialDesignFixed(y) && 
+                    .isTrialDesignInverseNormalOrGroupSequential(x) &&
                     .isTrialDesignInverseNormalOrGroupSequential(y) &&
                     x$typeOfDesign != y$typeOfDesign) {
                 variedParameters <- "typeOfDesign"

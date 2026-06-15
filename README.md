@@ -66,28 +66,32 @@ The vignettes are hosted at
 
 ## Issues and Feature Requests
 
-Please use GitHub issues to report bugs or suggest improvements for `rpact`.
+Please use GitHub issues to report bugs or suggest improvements for
+`rpact`.
 
-* 🐞 [Report a bug](https://github.com/rpact-com/rpact/issues/new?template=bug_report.yml)  
-  Please include a minimal reproducible R example, or a runnable R Markdown
-  (`.Rmd`) or Quarto (`.qmd`) document.
+- 🐞 [Report a
+  bug](https://github.com/rpact-com/rpact/issues/new?template=bug_report.yml)  
+  Please include a minimal reproducible R example, or a runnable R
+  Markdown (`.Rmd`) or Quarto (`.qmd`) document.
 
-* ✨ [Request a feature](https://github.com/rpact-com/rpact/issues/new?template=feature_request.yml)  
-  Please describe the use case, affected function(s), and the expected benefit.
+- ✨ [Request a
+  feature](https://github.com/rpact-com/rpact/issues/new?template=feature_request.yml)  
+  Please describe the use case, affected function(s), and the expected
+  benefit.
 
 Before opening a new issue, please [search existing
 issues](https://github.com/rpact-com/rpact/issues) to avoid duplicates.
 
-Please do not include confidential, customer-specific, personal, regulated, or
-security-sensitive information in public issues.
+Please do not include confidential, customer-specific, personal,
+regulated, or security-sensitive information in public issues.
 
 ## RPACT Cloud
 
 **RPACT Cloud** is a web-based graphical user interface for `rpact`.
 
-It provides guided, browser-based access to selected `rpact` functionality,
-including study design, sample size calculation, simulation, and reporting,
-without requiring users to write R code.
+It provides guided, browser-based access to selected `rpact`
+functionality, including study design, sample size calculation,
+simulation, and reporting, without requiring users to write R code.
 
 [rpact.cloud](https://rpact-cloud.share.connect.posit.cloud)
 
@@ -119,16 +123,17 @@ with `testPackage()`.
 
 # About
 
-- **rpact** is a comprehensive, validated[^1] R package for clinical trial
-  planning, design, simulation, and analysis.
+- **rpact** is a comprehensive, validated[^1] R package for clinical
+  trial planning, design, simulation, and analysis.
 
-  It supports classic fixed designs, adaptive group sequential designs, sample size and power
-  calculations, simulation-based operating characteristics, and confirmatory
-  trial analysis with flexible interim decision rules.
+  It supports classic fixed designs, adaptive group sequential designs,
+  sample size and power calculations, simulation-based operating
+  characteristics, and confirmatory trial analysis with flexible interim
+  decision rules.
 
   `rpact` is free of charge and open source, licensed under
-  [LGPL-3](https://cran.r-project.org/web/licenses/LGPL-3), and implements a
-  broad range of methods described in the monograph by
+  [LGPL-3](https://cran.r-project.org/web/licenses/LGPL-3), and
+  implements a broad range of methods described in the monograph by
   [Wassmer and Brannath
   (2025)](https://doi.org/10.1007%2F978-3-031-89669-9).
 
@@ -139,13 +144,15 @@ with `testPackage()`.
 
   We build and support open-source and commercial software solutions for
   clinical research, including R packages, Shiny applications, validated
-  workflows, and cloud-based tools for trial planning, simulation, dose finding,
-  analysis, and reporting.
+  workflows, and cloud-based tools for trial planning, simulation, dose
+  finding, analysis, and reporting.
 
   RPACT is the team behind tools such as
-  [rpact](https://cran.r-project.org/package=rpact), [crmPack](https://cran.r-project.org/package=crmPack), and [RPACT Cloud](https://rpact-cloud.share.connect.posit.cloud).
+  [rpact](https://cran.r-project.org/package=rpact),
+  [crmPack](https://cran.r-project.org/package=crmPack), and [RPACT
+  Cloud](https://rpact-cloud.share.connect.posit.cloud).
 
-> For more information, please visit
+> For more information please visit
 > [www.rpact.com](https://www.rpact.com)
 
 [^1]: The rpact validation documentation is available exclusively for
