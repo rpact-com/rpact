@@ -91,6 +91,7 @@ updateSubGroupVector <- function(
     maxNumberOfSubjects <- length(recruitmentTimes)
 
     simLogRanks <- matrix(NA_real_, nrow = pMax, ncol = kMax)
+    overallEventsPerStage <- numeric(kMax)
     populationEventsPerStage <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     overallEffects <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     testStatistics <- matrix(NA_real_, nrow = gMax, ncol = kMax)
@@ -176,6 +177,18 @@ updateSubGroupVector <- function(
                         populationEventsPerStage[g, k] <- sum(logRank$events)
                     }
                 }
+
+                # Calculate overall number of events in this 
+                # stage.
+                logRankOverall <- .logRankTestEnrichmentCpp(
+                    gMax = 1,
+                    survivalDataSet = survivalDataSet,
+                    time = analysisTime[k],
+                    subPopulation = 1,
+                    stratifiedAnalysis = stratifiedAnalysis,
+                    directionUpper = directionUpper
+                )
+                overallEventsPerStage[k] <- sum(logRankOverall$events)
             }
         } else {
             selectedsubGroupsIndices[, k] <- .createSelectedSubsets(selectedPopulations[, k])
@@ -260,6 +273,18 @@ updateSubGroupVector <- function(
                         }
                     }
                 }
+
+                # Calculate overall number of events in this 
+                # stage.
+                logRankOverall <- .logRankTestEnrichmentCpp(
+                    gMax = 1,
+                    survivalDataSet = survivalDatasetSelected,
+                    time = analysisTime[k],
+                    subPopulation = 1,
+                    stratifiedAnalysis = stratifiedAnalysis,
+                    directionUpper = directionUpper
+                )
+                overallEventsPerStage[k] <- sum(logRankOverall$events)
             }
             testStatistics[!selectedPopulations[, k], k] <- NA_real_
             overallEffects[!selectedPopulations[, k], k] <- NA_real_
@@ -335,6 +360,20 @@ updateSubGroupVector <- function(
 
                 args$selectPopulationsFunctionArgs <- selectPopulationsFunctionArgs
 
+                estimatedTheta <- thetaH1
+                if (is.na(thetaH1)) {
+                    estimatedTheta <- min(overallEffects[, k], na.rm = TRUE)
+                }
+
+                if (!directionUpper) {
+                    estimatedTheta <- 1 / estimatedTheta
+                }
+
+                conditionalCriticalValuePerStage <- conditionalCriticalValue
+                if (calcEventsFunctionIsUserDefined) {
+                    conditionalCriticalValuePerStage <- conditionalCriticalValue[k]
+                }
+
                 selectedPopulations[, k + 1] <- (selectedPopulations[, k] & do.call(.selectPopulations, args))
 
                 # Stop if no population is selected for the next stage.
@@ -342,15 +381,22 @@ updateSubGroupVector <- function(
                     break
                 }
 
+                estimatedThetaForCalc <- NA_real_
+                if (calcEventsFunctionIsUserDefined) {
+                    estimatedThetaForCalc <- estimatedTheta
+                }
+
                 newEvents <- calcEventsFunction(
                     stage = k + 1, # to be consistent with non-enrichment situation, cf. line 38
                     directionUpper = directionUpper,
                     conditionalPower = conditionalPower,
-                    conditionalCriticalValue = conditionalCriticalValue,
+                    conditionalCriticalValue = conditionalCriticalValuePerStage,
                     plannedEvents = plannedEvents,
-                    allocationRatioPlanned = allocationRatioPlanned,
+                    eventsOverStages = overallEventsPerStage,
+                    # We need to pass one allocation ratio for each stage:
+                    allocationRatioPlanned = rep(allocationRatioPlanned, length.out = k + 1),
                     selectedPopulations = selectedPopulations,
-                    thetaH1 = thetaH1,
+                    estimatedTheta = estimatedThetaForCalc,
                     overallEffects = overallEffects,
                     minNumberOfEventsPerStage = minNumberOfEventsPerStage,
                     maxNumberOfEventsPerStage = maxNumberOfEventsPerStage
@@ -366,8 +412,12 @@ updateSubGroupVector <- function(
                     )
                 }
 
-                if (!is.na(conditionalPower) || calcEventsFunctionIsUserDefined) {
-                    plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(newEvents, kMax - k))
+                if (!is.na(conditionalPower)) {
+                    if (!calcEventsFunctionIsUserDefined) {
+                        plannedEvents[(k + 1):kMax] <- plannedEvents[k] + cumsum(rep(ceiling(newEvents), kMax - k))
+                    } else {
+                        plannedEvents[k + 1] <- ceiling(newEvents)
+                    }
                 }
             } else {
                 selectedPopulations[, k + 1] <- selectedPopulations[, k]

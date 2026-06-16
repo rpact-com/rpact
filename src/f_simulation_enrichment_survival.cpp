@@ -294,7 +294,7 @@ double getSimulationSurvivalEnrichmentStageEvents(int stage,
 				double criticalPart = std::max(0.0, conditionalCriticalValue[stage - 1] + R::qnorm(conditionalPower, 0.0, 1.0, 1, 0));
 				double numerator = allocRatioSquared * pow(criticalPart, 2.0);
 				double allocRatio = allocationRatioPlanned[stage - 1];
-				double denominator = pow(allocRatio, 2.0) * pow(thetaStandardized, 2.0);
+				double denominator = allocRatio * pow(thetaStandardized, 2.0);
 				newEvents = numerator / denominator;
 				newEvents = std::min(std::max(minNumberOfEventsPerStage[stage], newEvents), maxNumberOfEventsPerStage[stage]);
 			}
@@ -402,6 +402,27 @@ CharacterVector updateSubGroupVector(int k, // 0-based
 	return result[seq(0, maxNumberOfSubjects - 1)];
 }
  
+// used effect size is either estimated from test statistic or pre-fixed
+double getEstimatedThetaEnrichment(
+		int stage,
+		double thetaH1,
+		bool directionUpper,
+		NumericMatrix overallEffects) {
+
+	if (!R_IsNA(thetaH1)) {
+		return thetaH1;
+	}
+
+	NumericVector overallEffectsAtStage = overallEffects(_, stage);
+	double estimatedTheta = min(overallEffectsAtStage);
+
+	if (!directionUpper){
+      estimatedTheta = 1 / estimatedTheta;
+    }
+
+	return estimatedTheta;
+}
+
 // Get Simulated Stage Results Survival Enrichment Subjects Based
 //
 // Calculates stage results for each simulation iteration step
@@ -476,6 +497,8 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 	int maxNumberOfSubjects = recruitmentTimes.size();
 
 	// Initialize matrices and vectors
+	NumericVector overallEventsPerStage(kMax);
+	std::fill(overallEventsPerStage.begin(), overallEventsPerStage.end(), NA_REAL);
 	NumericMatrix populationEventsPerStage(gMax, kMax);
 	std::fill(populationEventsPerStage.begin(), populationEventsPerStage.end(), NA_REAL);
 	NumericMatrix populationEventsPerStageCumulated(gMax, kMax);
@@ -573,6 +596,19 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						populationEventsPerStage(g, k) = sum(events);
 					}
 				}
+
+				// Calculate overall number of events in this
+				// stage, i.e. for the full population.
+				List logRankOverall = logRankTestEnrichment(
+					1, 
+					survivalDataSet, 
+					analysisTime[k], 
+					1,
+					stratifiedAnalysis, 
+					directionUpper
+				);
+				IntegerVector eventsOverall = logRankOverall["events"];
+				overallEventsPerStage[k] = sum(eventsOverall);
 			}
 		} else {
 			// Subsequent stages
@@ -676,6 +712,19 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						}
 					}
 				}
+
+				// Calculate overall number of events in this
+				// stage, i.e. for the full population.
+				List logRankOverall = logRankTestEnrichment(
+					1, 
+					survivalDataSet, 
+					analysisTime[k], 
+					1,
+					stratifiedAnalysis, 
+					directionUpper
+				);
+				IntegerVector eventsOverall = logRankOverall["events"];
+				overallEventsPerStage[k] = sum(eventsOverall);
 			}
 
 			IntegerVector notSelectedPopulations = which(!selectedPopulations(_, k));
@@ -806,29 +855,27 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 		    		break;
     			}
 
-				double newEventsValue;
+				double estimatedTheta = getEstimatedThetaEnrichment(k, thetaH1, directionUpper, overallEffects);
+
+				double newEventsValue = NA_REAL;
+
 				if (calcEventsFunctionIsUserDefined) {
 					Function calcEventsFunc = calcEventsFunction.get();
 					RObject newEvents = calcEventsFunc(
 						Named("stage") = k + 2, // need 1-based index here!
 						Named("directionUpper") = directionUpper,
 						Named("conditionalPower") = conditionalPower,
-						Named("conditionalCriticalValue") = conditionalCriticalValue,
+						Named("conditionalCriticalValue") = conditionalCriticalValue[k],
 						Named("plannedEvents") = plannedEvents,
+						Named("eventsOverStages") = overallEventsPerStage,
 						Named("allocationRatioPlanned") = allocationRatioPlanned,
 						Named("selectedPopulations") = selectedPopulations,
-						Named("thetaH1") = thetaH1,
+					    Named("estimatedTheta") = estimatedTheta,
 						Named("overallEffects") = overallEffects,
 						Named("minNumberOfEventsPerStage") = minNumberOfEventsPerStage,
 						Named("maxNumberOfEventsPerStage") = maxNumberOfEventsPerStage
 					);
 
-					if (Rf_isNull(newEvents) || Rf_length(newEvents) != 1 || !Rf_isReal(newEvents) || R_IsNA(REAL(newEvents)[0])) {
-						stop(
-							"'calcEventsFunction' returned an illegal or undefined result; ",
-							"the output must be a single numeric value"
-						);
-					}
 					newEventsValue = REAL(newEvents)[0];
 				} else {
 					newEventsValue = getSimulationSurvivalEnrichmentStageEvents(
@@ -837,7 +884,7 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						conditionalPower,
 						conditionalCriticalValue,
 						plannedEvents,
-						NumericVector::create(allocationRatioPlanned),
+						rep(allocationRatioPlanned, kMax),
 						selectedPopulations,
 						thetaH1,
 						overallEffects,
@@ -846,10 +893,18 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 					);
 				}
 				 
-                if (!R_IsNA(conditionalPower) || calcEventsFunctionIsUserDefined) {
-					NumericVector newEventsIncrements = cumsum(rep(newEventsValue, kMax - 1 - k));
-					plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;
-				}
+                if (!R_IsNA(conditionalPower)) {
+					double ceilingNewEventsValue = NA_REAL;
+					if (!R_IsNA(newEventsValue)) {
+						ceilingNewEventsValue = std::ceil(newEventsValue);
+					}
+                	if (!calcEventsFunctionIsUserDefined) {
+						NumericVector newEventsIncrements = cumsum(rep(ceilingNewEventsValue, kMax - 1 - k));
+						plannedEvents[seq(k + 1, kMax - 1)] = plannedEvents[k] + newEventsIncrements;
+                	} else {
+                		plannedEvents[k + 1] = ceilingNewEventsValue;
+                	}
+                }
 			} else {
 				selectedPopulations(_, k + 1) = selectedPopulations(_, k);
 			}
@@ -1037,7 +1092,8 @@ List performSimulationEnrichmentSurvivalLoop(
 		for (int j = 0; j < maxNumberOfIterations; j++) {
 
 			NumericVector hazardRatiosThisScenario = hazardRatios(i, _);
-			
+			NumericVector plannedEventsThisIteration = clone(plannedEvents);
+
 			List stageResults = getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 				design,
 				weights,
@@ -1050,7 +1106,7 @@ List performSimulationEnrichmentSurvivalLoop(
 				hazardRatiosThisScenario,
 				directionUpper,
 				stratifiedAnalysis,
-				plannedEvents,
+				plannedEventsThisIteration,
 				recruitmentTimes,
 				allocationFraction,
 				typeOfSelection,

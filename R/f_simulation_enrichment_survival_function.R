@@ -21,9 +21,10 @@
         conditionalPower,
         conditionalCriticalValue,
         plannedEvents,
+        eventsOverStages,
         allocationRatioPlanned,
         selectedPopulations,
-        thetaH1,
+        estimatedTheta,
         overallEffects,
         minNumberOfEventsPerStage,
         maxNumberOfEventsPerStage
@@ -33,7 +34,7 @@
 
     if (!is.na(conditionalPower)) {
         if (any(selectedPopulations[1:gMax, stage + 1], na.rm = TRUE)) {
-            if (is.na(thetaH1)) {
+            if (is.na(estimatedTheta)) {
                 if (is.na(directionUpper) || isTRUE(directionUpper)) {
                     thetaStandardized <- log(max(
                         min(
@@ -53,7 +54,7 @@
                 }
             } else {
                 thetaStandardized <- log(min(
-                    thetaH1,
+                    estimatedTheta,
                     1 +
                         ifelse(
                             is.na(directionUpper) ||
