@@ -897,7 +897,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #'
 #' @noRd
 #'
-.calculateDecisionProbabilities <- function(sqrtShift,
+.calculateDecisionProbabilities <- function(
+        sqrtShift,
         informationRates,
         delayedInformation,
         contRegionUpper,
@@ -1187,7 +1188,7 @@ getDesignInverseNormal <- function(...,
     ))
 }
 
-.isBoundayStoppingActivated <- function(boundaryStops) {
+.isBoundaryStoppingActivated <- function(boundaryStops) {
     if (anyNA(boundaryStops) || all(boundaryStops)) {
         return(FALSE)
     }
@@ -1223,7 +1224,7 @@ getDesignInverseNormal <- function(...,
         tolerance,
         efficacyStops,
         futilityStops) {
-    if (.isBoundayStoppingActivated(efficacyStops) || .isBoundayStoppingActivated(futilityStops)) {
+    if (.isBoundaryStoppingActivated(efficacyStops) || .isBoundaryStoppingActivated(futilityStops)) {
         if (!all(is.na(delayedInformation))) {
             warning(
                 "'delayedInformation' (", .arrayToString(delayedInformation), ") ",
@@ -1519,7 +1520,7 @@ getDesignInverseNormal <- function(...,
     
     newDesign <- do.call(.getDesignGroupSequential, args)
     newDesign$criticalValues[which(!efficacyStops)] <- Inf
-    newDesign$futilityBounds[which(!futilityStops)] <- C_FUTILITY_BOUNDS_DEFAULT # TODO check -Inf
+    newDesign$futilityBounds[which(!futilityStops)] <- C_FUTILITY_BOUNDS_DEFAULT
 
     newDesign$efficacyStops <- efficacyStops
     newDesign$.setParameterType("efficacyStops", C_PARAM_USER_DEFINED)
@@ -1570,7 +1571,8 @@ getDesignInverseNormal <- function(...,
 #'
 #' @noRd
 #'
-.getDesignGroupSequential <- function(...,
+.getDesignGroupSequential <- function(
+        ...,
         designClass = C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL,
         kMax = NA_integer_,
         alpha = NA_real_,
@@ -1635,8 +1637,7 @@ getDesignInverseNormal <- function(...,
         }
     }
 
-    futilityBounds <- .applyDirectionOfAlternative(futilityBounds,
-        directionUpper,
+    futilityBounds <- .applyDirectionOfAlternative(futilityBounds, directionUpper,
         type = "negateIfLower", phase = "design", syncLength = TRUE
     )
 
@@ -2007,11 +2008,6 @@ getDesignInverseNormal <- function(...,
             reversalProbabilities[stage] <- NA_real_
         }
         decisionCriticalValues[kMax] <- contRegionUpper[kMax]
-
-        alphaSpent <- .calculateDecisionProbabilities(
-            sqrtShift = 0, informationRates,
-            delayedInformation, contRegionUpper, contRegionLower, decisionCriticalValues
-        )$power
     }
 
     decisionCriticalValues[decisionCriticalValues <= -C_UPPER_BOUNDS_DEFAULT + 1e-06] <- NA_real_
@@ -2118,10 +2114,7 @@ getDesignInverseNormal <- function(...,
 #'        beta-spending up to each interim stage.
 #' @param efficacyStops Logical vector of length \code{kMax - 1} indicating efficacy stops. Default is \code{NA}.
 #' @param futilityStops Logical vector of length \code{kMax - 1} indicating futility stops. Default is \code{NA}.
-#' @param twoSidedPower For two-sided testing, if \code{twoSidedPower = TRUE} is specified
-#'        the sample size calculation is performed by considering both tails of the distribution.
-#'        Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
-#'        should be directed to one part.
+#' @inheritParams param_twoSidedPower
 #' @param betaAdjustment For two-sided beta spending designs, if \code{betaAdjustement = TRUE} a linear
 #' 		  adjustment of the beta spending values is performed if an overlapping of decision regions for futility
 #' 		  stopping at earlier stages occurs, otherwise no adjustment is performed (default is \code{TRUE}).
@@ -2354,24 +2347,26 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 }
 
 .getDesignCharacteristics <- function(..., design, userFunctionCallEnabled = FALSE) {
-    .assertIsTrialDesignInverseNormalOrGroupSequential(design)
+    .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
     .assertDesignParameterExists(design, "sided", C_SIDED_DEFAULT)
     .assertIsValidSidedParameter(design$sided)
 
-    if (userFunctionCallEnabled) {
-        .validateAlphaAndBeta(design = design)
+    if (!.isTrialDesignFixed(design)) {
+        if (userFunctionCallEnabled) {
+            .validateAlphaAndBeta(design = design)
+        }
+    
+        design$informationRates <- .getValidatedInformationRates(design, writeToDesign = FALSE)
+    
+        if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2 && design$kMax == 2) {
+            design$futilityBounds[is.na(design$futilityBounds)] <- 0
+        }
+    
+        design$futilityBounds <- .getValidatedFutilityBounds(design,
+            writeToDesign = FALSE, twoSidedWarningForDefaultValues = FALSE
+        )
     }
-
-    design$informationRates <- .getValidatedInformationRates(design, writeToDesign = FALSE)
-
-    if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-            .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2 && design$kMax == 2) {
-        design$futilityBounds[is.na(design$futilityBounds)] <- 0
-    }
-
-    design$futilityBounds <- .getValidatedFutilityBounds(design,
-        writeToDesign = FALSE, twoSidedWarningForDefaultValues = FALSE
-    )
 
     designCharacteristics <- TrialDesignCharacteristics$new(design = design)
 
@@ -2392,15 +2387,14 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 
     design$criticalValues[design$criticalValues > 7.5] <- 7.5
     design$criticalValues[design$criticalValues < -7.5] <- -7.5
-    if (length(design$decisionCriticalValues) > 0) {
+    if (!.isTrialDesignFixed(design) && length(design$decisionCriticalValues) > 0) {
         design$decisionCriticalValues[!is.na(design$decisionCriticalValues) &
             design$decisionCriticalValues > 7.5] <- 7.5
         design$decisionCriticalValues[!is.na(design$decisionCriticalValues) &
             design$decisionCriticalValues < -7.5] <- -7.5
     }
-    informationRates <- design$informationRates
 
-    if (design$kMax == 1) {
+    if (.isTrialDesignFixed(design) || design$kMax == 1) {
         designCharacteristics$shift <- nFixed
         designCharacteristics$.setParameterType("shift", C_PARAM_GENERATED)
 
@@ -2420,6 +2414,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         return(designCharacteristics)
     }
 
+    informationRates <- design$informationRates
     criticalValues <- .getCriticalValues(design)
     if (!anyNA(design$delayedInformation) &&
             length(design$decisionCriticalValues) > 0) {

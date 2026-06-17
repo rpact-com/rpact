@@ -14,7 +14,11 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-.logBase <- function(s, ..., logLevel) {
+.logBase <- function(s, ..., logLevel, logEnabled = TRUE) {
+    if (isFALSE(logEnabled)) {
+        return(invisible())
+    }
+    
     .assertIsSingleCharacter(s, "s")
     if (length(list(...)) > 0) {
         cat(paste0("[", logLevel, "]"), sprintf(s, ...), "\n")

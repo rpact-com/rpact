@@ -473,16 +473,20 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         types <- .removeInvalidPlotTypes(obj, types, plotTypesToCheck)
     } else if (inherits(obj, "TrialDesign") || inherits(obj, "TrialDesignSet")) {
         design <- obj
-        if (inherits(obj, "TrialDesignSet")) {
-            design <- obj$getDesignMaster()
-        }
-        if (design$kMax > 1) {
-            types <- c(types, 1, 3)
-        }
-        if (inherits(design, "TrialDesignFisher")) {
-            types <- c(types, 4)
+        if (inherits(design, "TrialDesignFixed")) {
+            types <- c(types, 7)
         } else {
-            types <- c(types, 4:9)
+            if (inherits(obj, "TrialDesignSet")) {
+                design <- obj$getDesignMaster()
+            }
+            if (design$kMax > 1) {
+                types <- c(types, 1, 3)
+            }
+            if (inherits(design, "TrialDesignFisher")) {
+                types <- c(types, 4)
+            } else {
+                types <- c(types, 4:9)
+            }
         }
     } else if (inherits(obj, "AnalysisResults")) {
         types <- integer(0)
@@ -924,7 +928,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (addPowerAndAverageSampleNumber && .isMultiArmSimulationResults(parameterSet)) {
         addPowerAndAverageSampleNumber <- FALSE
     }
-
+    
     if (.isParameterSet(parameterSet) || .isTrialDesignSet(parameterSet)) {
         df <- .getParameterSetAsDataFrame(
             parameterSet = parameterSet,

@@ -935,7 +935,7 @@ getSampleSizeCounts <- function(design = NULL,
             ...
         )
     } else {
-        .assertIsTrialDesignGroupSequential(design)
+        .assertIsTrialDesignGroupSequentialOrFixed(design)
         .warnInCaseOfUnknownArguments(functionName = "getSampleSizeCounts", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
         .warnInCaseOfTwoSidedPowerIsDisabled(design)
@@ -1487,7 +1487,7 @@ getPowerCounts <- function(design = NULL,
             ...
         )
     } else {
-        .assertIsTrialDesignGroupSequential(design)
+        .assertIsTrialDesignGroupSequentialOrFixed(design)
         .warnInCaseOfUnknownArguments(functionName = "getPowerCounts", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
         .warnInCaseOfTwoSidedPowerIsDisabled(design)

@@ -163,11 +163,11 @@ IntegerVector order_impl(const Vector <RTYPE> &x, bool desc) {
 IntegerVector getOrder(SEXP x, bool desc = false) {
     switch (TYPEOF(x)) {
         case INTSXP:
-            return order_impl<INTSXP>(x, desc);
+            return order_impl<INTSXP>(x, desc); // @suppress("Function cannot be instantiated")
         case REALSXP:
-            return order_impl<REALSXP>(x, desc);
+            return order_impl<REALSXP>(x, desc); // @suppress("Function cannot be instantiated")
         case STRSXP:
-            return order_impl<STRSXP>(x, desc);
+            return order_impl<STRSXP>(x, desc); // @suppress("Function cannot be instantiated")
         default:
             stop("Unsupported type.");
     }

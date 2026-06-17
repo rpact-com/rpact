@@ -17,7 +17,7 @@
 #' @include f_simulation_multiarm.R
 NULL
 
-# Correlation matrix according to Deng et al. (2019) accounting for alternative
+# Correlation matrix according to Deng et al. (2019) accounting for alternative:
 .getCholeskyDecomposition <- function(allocationRatioPlanned,
         selectedArms,
         k,
@@ -72,7 +72,7 @@ NULL
 
     if (.isTrialDesignFisher(design)) {
         weights <- .getWeightsFisher(design)
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else {
         weights <- .getWeightsInverseNormal(design)
     }
 
@@ -273,8 +273,8 @@ NULL
 #'        matrix according to Deng et al. (Biometrics, 2019) accounting for the
 #'        respective alternative is used;
 #'        if \code{correlationComputation = "null"}, a constant correlation matrix valid
-#'        under the null, i.e., not accounting for the alternative is used,
-#'         default is \code{"alternative"}.
+#'        under the null, i.e., not accounting for the alternative is used, 
+#'        default is \code{"alternative"}.
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
@@ -372,7 +372,7 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
             ), "showStatistics"), ...
         )
     } else {
-        .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+        .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
         .warnInCaseOfUnknownArguments(functionName = "getSimulationMultiArmSurvival", ignore = "showStatistics", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
     }

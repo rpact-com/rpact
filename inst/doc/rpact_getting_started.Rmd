@@ -94,8 +94,8 @@ have intuitive names:
 -   [`getStageResults()`](https://docs.rpact.org/reference/getStageResults.html)
 
 [RStudio](https://posit.co/downloads/) / [Positron](https://positron.posit.co/)
-/ [Eclipse](https://www.eclipse.org): auto code completion makes it easy to use
-these functions.
+/ [VS Code](https://code.visualstudio.com) / [Eclipse](https://www.eclipse.org):
+auto code completion makes it easy to use these functions.
 
 
 ### R generics

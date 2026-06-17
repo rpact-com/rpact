@@ -466,7 +466,9 @@ getSimulationRates <- function(design = NULL, ...,
     ))
     simulationResults$seed <- .setSeed(seed)
 
-    if (.isTrialDesignGroupSequential(design)) {
+    if (.isTrialDesignFixed(design)) {
+        designNumber <- 0L
+    } else if (.isTrialDesignGroupSequential(design)) {
         designNumber <- 1L
     } else if (.isTrialDesignInverseNormal(design)) {
         designNumber <- 2L

@@ -182,7 +182,7 @@ getSimulationMeans <- function(design = NULL, ...,
             ), ...
         )
     } else {
-        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisher(design)
+        .assertIsTrialDesignInverseNormalOrGroupSequentialOrFisherOrFixed(design)
         .warnInCaseOfUnknownArguments(functionName = "getSimulationMeans", ignore = c("showStatistics"), ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
@@ -440,7 +440,9 @@ getSimulationMeans <- function(design = NULL, ...,
     ))
     simulationResults$seed <- .setSeed(seed)
 
-    if (.isTrialDesignGroupSequential(design)) {
+    if (.isTrialDesignFixed(design)) {
+        designNumber <- 0L
+    } else if (.isTrialDesignGroupSequential(design)) {
         designNumber <- 1L
     } else if (.isTrialDesignInverseNormal(design)) {
         designNumber <- 2L
@@ -506,7 +508,7 @@ getSimulationMeans <- function(design = NULL, ...,
         calcSubjectsFunctionR = calcSubjectsFunctionR,
         calcSubjectsFunctionCpp = calcSubjectsFunctionCpp
     )
-
+    
     sampleSizes <- cppResult$sampleSizes
     sampleSizes[is.na(sampleSizes)] <- 0
 

@@ -958,10 +958,11 @@ as.data.frame.TrialDesignSet <- function(x,
 #'
 #' @export
 #'
-plot.TrialDesignSet <- function(x,
+plot.TrialDesignSet <- function(
+        x,
         y,
         ...,
-        type = 1L,
+        type = NA_integer_,
         main = NA_character_,
         xlab = NA_character_,
         ylab = NA_character_,
@@ -973,11 +974,26 @@ plot.TrialDesignSet <- function(x,
         showSource = FALSE,
         grid = 1,
         plotSettings = NULL) {
-    .assertIsValidPlotType(type, naAllowed = FALSE)
+    .assertIsValidPlotType(type, naAllowed = TRUE)
     .assertIsSingleInteger(grid, "grid", naAllowed = FALSE, validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
+    }
+    
+    availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
+    if (length(availablePlotTypes) == 0) {
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "no plot type available for the specified design")
+    }
+    if (is.na(type)) {
+        type <- availablePlotTypes[1]
+    }
+    if (!(type %in% availablePlotTypes)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
+            ") is not available; 'type' can ", ifelse(length(availablePlotTypes) == 1, "only ", ""),
+            "be ", .arrayToString(availablePlotTypes, mode = "or")
+        )
     }
 
     args <- list(
@@ -1120,8 +1136,8 @@ plot.TrialDesignSet <- function(x,
         main <- .getMainTitle(main, title = "Boundaries", nMax = nMax)
         xParameterName <- "informationRates"
         yParameterNames <- "criticalValues"
-        if (designMaster$sided == 1 || (.isTrialDesignInverseNormalOrGroupSequential(designMaster) &&
-                (designMaster$typeOfDesign == C_TYPE_OF_DESIGN_PT || grepl("^bs", designMaster$typeBetaSpending)))) {
+        if (designMaster$sided == 1 || (designMaster$kMax > 1 && .isTrialDesignInverseNormalOrGroupSequential(designMaster) &&
+                (identical(designMaster$typeOfDesign, C_TYPE_OF_DESIGN_PT) || grepl("^bs", designMaster$typeBetaSpending)))) {
             if (.isTrialDesignWithValidFutilityBounds(designMaster)) {
                 yParameterNames <- c("futilityBounds", yParameterNames)
             }
@@ -1216,7 +1232,7 @@ plot.TrialDesignSet <- function(x,
 }
 
 .addDecisionCriticalValuesToPlot <- function(p, designMaster, type, nMax = NA_integer_) {
-    if (type != 1 || !.isTrialDesignInverseNormalOrGroupSequential(designMaster)) {
+    if (type != 1 || .isTrialDesignFixed(designMaster) || !.isTrialDesignInverseNormalOrGroupSequential(designMaster)) {
         return(p)
     }
 

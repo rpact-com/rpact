@@ -688,7 +688,9 @@ getSimulationSurvival <- function(design = NULL, ...,
         futilityBounds <- design$futilityBounds
     }
 
-    if (.isTrialDesignGroupSequential(design)) {
+    if (.isTrialDesignFixed(design)) {
+        designNumber <- 0L
+    } else if (.isTrialDesignGroupSequential(design)) {
         designNumber <- 1L
     } else if (.isTrialDesignInverseNormal(design)) {
         designNumber <- 2L

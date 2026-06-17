@@ -223,7 +223,7 @@ NULL
                 if (k < kMax) {
                     futilityIntersections[i, k] <- (adjustedStageWisePValues[i, k] >= design$alpha0Vec[k])
                 }
-            } else if (.isTrialDesignInverseNormal(design)) {
+            } else {
                 rejectedIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] >= criticalValues[k])
                 if (k < kMax) {
                     futilityIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] <= design$futilityBounds[k])

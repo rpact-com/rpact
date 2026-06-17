@@ -153,14 +153,16 @@ NULL
 
 #' Parameter Description: Lambda (1)
 #' @param lambda1 The assumed hazard rate in the treatment group, there is no default.
-#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.
+#'   \code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). 
+#'   Must be a positive numeric of length 1.
 #' @name param_lambda1
 #' @keywords internal
 NULL
 
 #' Parameter Description: Lambda (2)
 #' @param lambda2 The assumed hazard rate in the reference group, there is no default.
-#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.
+#'   \code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). 
+#'   Must be a positive numeric of length 1.
 #' @name param_lambda2
 #' @keywords internal
 NULL
@@ -959,7 +961,7 @@ NULL
 
 #' Parameter Description: Planned Calendar Time
 #' @param plannedCalendarTime For simulating count data, the time points where an analysis is planned to be performed.
-#' Should be a vector of length \code{kMax}
+#'     Should be a vector of length \code{kMax}
 #' @name param_plannedCalendarTime
 #' @keywords internal
 NULL
@@ -990,5 +992,14 @@ NULL
 #' a patient-wise simulation approach is used; otherwise the test-statistic-based
 #' simulation is used for backward compatibility.
 #' @name param_simulationType_multiarm_survival
+#' @keywords internal
+NULL
+
+#' Parameter Description: Two-sided Power
+#' @param twoSidedPower For two-sided testing, if \code{twoSidedPower = TRUE} is specified
+#'     the sample size calculation is performed by considering both tails of the distribution.
+#'     Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
+#'     should be directed to one part.#' 
+#' @name param_twoSidedPower
 #' @keywords internal
 NULL

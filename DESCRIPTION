@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.4.0.9303
-Date: 2026-03-18
+Version: 4.4.0.9305
+Date: 2026-06-15
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -26,7 +26,7 @@ Authors@R: c(
     person(
     	given = "Daniel", 
     	family = "Sabanes Bove", 
-    	email = "daniel.sabanes_bove@rconis.com",
+    	email = "daniel.sabanes_bove@rpact.com",
         comment = c(ORCID = "0000-0002-0176-9239"), 
     	role = c("ctb")
 	),
@@ -61,7 +61,7 @@ URL: https://www.rpact.org,
 BugReports: https://github.com/rpact-com/rpact/issues
 Language: en-US
 Depends: 
-	R (>= 3.6.0)
+	R (>= 4.1.0)
 Imports:
 	methods,
 	stats,
@@ -79,7 +79,6 @@ Suggests:
 	rmarkdown (>= 1.10),
     rappdirs (>= 0.3.3)
 VignetteBuilder: knitr, rmarkdown
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
@@ -130,6 +129,7 @@ Collate:
     'f_as251.R'
     'f_core_output_formats.R'
     'f_design_fisher_combination_test.R'
+    'f_design_fixed.R'
     'f_design_futility_bounds.R'
     'f_design_group_sequential.R'
     'f_design_plan_counts.R'
@@ -161,3 +161,4 @@ Collate:
     'f_simulation_plot.R'
     'parameter_descriptions.R'
     'pkgname.R'
+Config/roxygen2/version: 7.3.3.9000
