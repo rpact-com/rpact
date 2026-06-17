@@ -23,6 +23,41 @@ NULL
     return(ifelse(is.na(result), FALSE, result))
 }
 
+.getParsedEnvironmentVariable <- function(value, type = c("unknown", "character", "integer", "numeric", "logical")) {
+    type <- match.arg(type)
+    if (identical(type, "character")) {
+        return(as.character(value))
+    } else if (identical(type, "integer")) {
+        return(as.integer(value))
+    } else if (identical(type, "numeric")) {
+        return(as.numeric(value))
+    } else if (identical(type, "logical")) {
+        if (is.character(value)) {
+            return(tolower(trimws(value)) %in% c("true", "1", "yes", "on"))
+        }
+        return(as.logical(value))
+    }
+    return(value)
+}
+
+.getEnvironmentVariable <- function(envKey, optionKey = NULL, ..., type = c("unknown", "character", "integer", "numeric", "logical")) {
+    type <- match.arg(type)
+
+    value <- Sys.getenv(envKey)
+    if (!is.null(value) && !identical(value, "")) {
+        return(.getParsedEnvironmentVariable(value, type = type))
+    }
+
+    if (!is.null(optionKey)) {
+        value <- base::getOption(optionKey)
+        if (!is.null(value) && !identical(value, "")) {
+            return(.getParsedEnvironmentVariable(value, type = type))
+        }
+    }
+
+    return(NULL)
+}
+
 .getPackageName <- function(functionName) {
     .assertIsSingleCharacter(functionName, "functionName")
     tryCatch(
