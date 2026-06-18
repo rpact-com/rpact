@@ -303,7 +303,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             self$output <- output
             self$markdown <- markdown
             self$summaryItems <- list()
-            self$justify <- getOption("rpact.summary.justify", "right")
+            self$justify <- .getEnvironmentVariable(
+                "RPACT_SUMMARY_JUSTIFY",
+                "rpact.summary.justify",
+                default = "right",
+                type = "character"
+            )
         },
         show = function(showType = 1, digits = NA_integer_) {
             self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
@@ -432,7 +437,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             self$summaryItems <- c(self$summaryItems, summaryItem)
         },
         .getFormattedParameterValue = function(valuesToShow, valuesToShow2) {
-            naText <- getOption("rpact.summary.na", "")
+            naText <- .getEnvironmentVariable("RPACT_SUMMARY_NA", "rpact.summary.na", default = "", type = "character")
             if (length(valuesToShow) == length(valuesToShow2) && !all(is.na(valuesToShow2))) {
                 for (variantIndex in seq_len(length(valuesToShow))) {
                     value1 <- trimws(as.character(valuesToShow[variantIndex]))
@@ -998,12 +1003,18 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
     if (digits < 1) {
         formattedValue <- as.character(values)
-        formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <- getOption("rpact.summary.na", "")
+        formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <-
+            .getEnvironmentVariable("RPACT_SUMMARY_NA", 
+                "rpact.summary.na", default = "", type = "character")
         return(formattedValue)
     }
 
     if (sum(is.na(values)) == length(values)) {
-        formattedValue <- rep(getOption("rpact.summary.na", ""), length(values))
+        formattedValue <- rep(
+            .getEnvironmentVariable("RPACT_SUMMARY_NA", 
+                "rpact.summary.na", default = "", type = "character"),
+            length(values)
+        )
         return(formattedValue)
     }
 
@@ -1035,7 +1046,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             nchar(gsub("\\D", "", (formattedValue))) > 0 & formattedValue > 0.4999] <- ">0.5"
     }
 
-    if (as.logical(getOption("rpact.summary.trim.zeroes", TRUE))) {
+    if (as.logical(.getEnvironmentVariable(
+        "RPACT_SUMMARY_TRIM_ZEROES",
+        "rpact.summary.trim.zeroes",
+        default = TRUE,
+        type = "logical"
+    ))) {
         zeroes <- grepl("^0\\.0*$", formattedValue)
         if (sum(zeroes) > 0) {
             formattedValue[zeroes] <- "0"
@@ -1048,7 +1064,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <-
-        ifelse(showNA, "n/a", getOption("rpact.summary.na", ""))
+        ifelse(showNA, "n/a", .getEnvironmentVariable(
+            "RPACT_SUMMARY_NA",
+            "rpact.summary.na",
+            default = "",
+            type = "character"
+        ))
 
     return(formattedValue)
 }
@@ -1440,7 +1461,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 }
 
 .addSummaryLineBreak <- function(text, newLineLength) {
-    maxLineLength <- as.integer(getOption("rpact.summary.width", 83))
+    maxLineLength <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_WIDTH",
+        "rpact.summary.width",
+        default = 83,
+        type = "integer"
+    )
     lines <- strsplit(text, "\n", fixed = TRUE)[[1]]
     lastLine <- lines[length(lines)]
     if (nchar(lastLine) + newLineLength > maxLineLength) {
@@ -1988,7 +2014,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 header,
                 paste0("inflation factor ", round(designCharacteristics$inflationFactor, 4))
             )
-            outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
+            outputSize <- .getEnvironmentVariable(
+                "RPACT_SUMMARY_OUTPUT_SIZE",
+                "rpact.summary.output.size",
+                default = C_SUMMARY_OUTPUT_SIZE_DEFAULT,
+                type = "character"
+            )
             if (outputSize == "large") {
                 header <- .concatenateSummaryText(
                     header,
@@ -2492,7 +2523,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             header <- .concatenateSummaryText(header, paste0(
                 "follow-up time = ", round(
                     designPlan$followUpTime[1],
-                    as.integer(getOption("rpact.summary.digits", 3))
+                    .getEnvironmentVariable(
+                        "RPACT_SUMMARY_DIGITS",
+                        "rpact.summary.digits",
+                        default = 3L,
+                        type = "integer"
+                    )
                 )
             ))
         }
@@ -2799,9 +2835,19 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
     digitSettings <- .getSummaryDigits(digits)
 
-    outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
+    outputSize <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_OUTPUT_SIZE",
+        "rpact.summary.output.size",
+        default = C_SUMMARY_OUTPUT_SIZE_DEFAULT,
+        type = "character"
+    )
 
-    intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
+    intervalFormat <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_INTERVALFORMAT",
+        "rpact.summary.intervalFormat",
+        default = "[%s; %s]",
+        type = "character"
+    )
     .assertIsValidSummaryIntervalFormat(intervalFormat)
 
     multiArmEnabled <- .isMultiArmAnalysisResults(object)
@@ -3138,7 +3184,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
 .getSummaryDigits <- function(digits = NA_integer_) {
     if (is.na(digits)) {
-        digits <- as.integer(getOption("rpact.summary.digits", 3))
+        digits <- .getEnvironmentVariable(
+            "RPACT_SUMMARY_DIGITS",
+            "rpact.summary.digits",
+            default = 3L,
+            type = "integer"
+        )
     }
     .assertIsSingleInteger(digits, "digits", validateType = FALSE, naAllowed = TRUE)
     .assertIsInClosedInterval(digits, "digits", lower = -1, upper = 12, naAllowed = TRUE)
@@ -3150,7 +3201,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         digitsProbabilities <- NA_integer_
         tryCatch(
             {
-                digitsProbabilities <- as.integer(getOption("rpact.summary.digits.probs", digits + 1))
+                digitsProbabilities <- .getEnvironmentVariable(
+                    "RPACT_SUMMARY_DIGITS_PROBS",
+                    "rpact.summary.digits.probs",
+                    default = as.integer(digits + 1L),
+                    type = "integer"
+                )
             },
             warning = function(e) {}
         )
@@ -3369,9 +3425,19 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     digitSettings <- .getSummaryDigits(digits)
-    outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
+    outputSize <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_OUTPUT_SIZE",
+        "rpact.summary.output.size",
+        default = C_SUMMARY_OUTPUT_SIZE_DEFAULT,
+        type = "character"
+    )
 
-    intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
+    intervalFormat <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_INTERVALFORMAT",
+        "rpact.summary.intervalFormat",
+        default = "[%s; %s]",
+        type = "character"
+    )
     .assertIsValidSummaryIntervalFormat(intervalFormat)
 
     summaryFactory <- SummaryFactory$new(
@@ -3480,7 +3546,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             smoothedZeroFormat = TRUE
         )
 
-        outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
+        outputSize <- .getEnvironmentVariable(
+            "RPACT_SUMMARY_OUTPUT_SIZE",
+            "rpact.summary.output.size",
+            default = C_SUMMARY_OUTPUT_SIZE_DEFAULT,
+            type = "character"
+        )
         if (outputSize == "large") {
             summaryFactory$addParameter(design,
                 parameterName = "reversalProbabilities",
@@ -4139,7 +4210,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 }
 
 .getSummaryGroupCaption <- function(designPlan, parameterName, numberOfGroups, groupNumber) {
-    listItemPrefix <- getOption("rpact.summary.list.item.prefix", C_SUMMARY_LIST_ITEM_PREFIX_DEFAULT)
+    listItemPrefix <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_LIST_ITEM_PREFIX",
+        "rpact.summary.list.item.prefix",
+        default = C_SUMMARY_LIST_ITEM_PREFIX_DEFAULT,
+        type = "character"
+    )
 
     if (grepl("Enrichment", .getClassName(designPlan))) {
         categoryCaption <- .getCategoryCaptionEnrichment(designPlan, parameterName, groupNumber)

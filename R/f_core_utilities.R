@@ -40,6 +40,10 @@ NULL
     return(value)
 }
 
+.getEnvironmentVariableKey <- function(optionKey) {
+    return(toupper(gsub("\\.", "_", optionKey)))
+}
+
 .getEnvironmentVariable <- function(envKey, optionKey = NULL, ..., type = c("unknown", "character", "integer", "numeric", "logical")) {
     type <- match.arg(type)
 
@@ -49,8 +53,8 @@ NULL
     }
 
     if (!is.null(optionKey)) {
-        value <- base::getOption(optionKey)
-        if (!is.null(value) && !identical(value, "")) {
+        value <- base::getOption(optionKey, ...)
+        if (!is.null(value)) {
             return(.getParsedEnvironmentVariable(value, type = type))
         }
     }
@@ -1557,7 +1561,13 @@ getParameterName <- function(obj, parameterCaption) {
 
 .isMarkdownEnabled <- function(type = c("all", "print", "summary", "plot")) {
     type <- match.arg(type)
-    if (!as.logical(getOption(paste0("rpact.auto.markdown.", type), TRUE))) {
+    optionKey <- paste0("rpact.auto.markdown.", type)
+    if (isFALSE(.getEnvironmentVariable(
+        .getEnvironmentVariableKey(optionKey),
+        optionKey,
+        default = TRUE,
+        type = "logical"
+    ))) {
         return(FALSE)
     }
 
@@ -1589,7 +1599,12 @@ getParameterName <- function(obj, parameterCaption) {
     type <- match.arg(type)
 
     if (is.null(eps) || length(eps) != 1 || is.na(eps)) {
-        epsilon <- getOption("rpact.multivar.dist.eps", 1e-05)
+        epsilon <- .getEnvironmentVariable(
+            "RPACT_MULTIVAR_DIST_EPS",
+            "rpact.multivar.dist.eps",
+            default = 1e-05,
+            type = "numeric"
+        )
         if (is.numeric(epsilon) && epsilon < 0.1) {
             eps <- epsilon
         }
@@ -1716,7 +1731,12 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 .getMarkdownPlotPrintSeparator <- function() {
-    return(getOption("rpact.markdown.plot.print.separator", C_MARKDOWN_PLOT_PRINT_SEPARATOR))
+    return(.getEnvironmentVariable(
+        "RPACT_MARKDOWN_PLOT_PRINT_SEPARATOR",
+        "rpact.markdown.plot.print.separator",
+        default = C_MARKDOWN_PLOT_PRINT_SEPARATOR,
+        type = "character"
+    ))
 }
 
 .getCriticalValues <- function(design, indices = NULL) {

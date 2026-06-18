@@ -1025,7 +1025,12 @@ getRepeatedPValues <- function(stageResults, ...,
 
     if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
             design$typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER, C_TYPE_OF_DESIGN_WT_OPTIMUM)) {
-        showWarnings <- as.logical(getOption("rpact.analyis.repeated.p.values.warnings.enabled", "TRUE"))
+        showWarnings <- .getEnvironmentVariable(
+            "RPACT_ANALYIS_REPEATED_P_VALUES_WARNINGS_ENABLED",
+            "rpact.analyis.repeated.p.values.warnings.enabled",
+            default = TRUE,
+            type = "logical"
+        )
         if (showWarnings) {
             warning("Repeated p-values not available for 'typeOfDesign' = '",
                 design$typeOfDesign, "'",

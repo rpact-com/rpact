@@ -434,7 +434,12 @@ PlotSettings <- R6::R6Class("PlotSettings",
                 xAxisLabel <- xlab
             }
 
-            plotLabsType <- getOption("rpact.plot.labs.type", "quote")
+            plotLabsType <- .getEnvironmentVariable(
+                "RPACT_PLOT_LABS_TYPE",
+                "rpact.plot.labs.type",
+                default = "quote",
+                type = "character"
+            )
             if (plotLabsType == "quote" && !is.null(xAxisLabel)) {
                 if (xAxisLabel == "Theta") {
                     xAxisLabel <- bquote(bold("Theta" ~ Theta))
@@ -598,7 +603,12 @@ PlotSettings <- R6::R6Class("PlotSettings",
             caption <- NA_character_
             self$.htmlTitle <- NA_character_
             if (!is.null(mainTitle) && inherits(mainTitle, "PlotSubTitleItems")) {
-                plotLabsType <- getOption("rpact.plot.labs.type", "quote")
+                plotLabsType <- .getEnvironmentVariable(
+                    "RPACT_PLOT_LABS_TYPE",
+                    "rpact.plot.labs.type",
+                    default = "quote",
+                    type = "character"
+                )
                 if (plotLabsType == "quote") {
                     mainTitle <- mainTitle$toQuote()
                 } else {
@@ -613,8 +623,11 @@ PlotSettings <- R6::R6Class("PlotSettings",
                     }
                     s <- items$toString()
                     if (length(s) == 1 && !is.na(s) && nchar(s) > 0) {
-                        plotLabsCaptionEnabled <- as.logical(getOption(
-                            "rpact.plot.labs.caption.enabled", "true"
+                        plotLabsCaptionEnabled <- as.logical(.getEnvironmentVariable(
+                            "RPACT_PLOT_LABS_CAPTION_ENABLED",
+                            "rpact.plot.labs.caption.enabled",
+                            default = "true",
+                            type = "logical"
                         ))
                         if (isTRUE(plotLabsCaptionEnabled)) {
                             caption <- s

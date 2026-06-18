@@ -102,10 +102,12 @@ FieldSet <- R6::R6Class("FieldSet",
                     line <- paste0(args, collapse = sep)
                     listItemEnabled <- grepl("^  ", line)
 
-                    headingBaseNumber <- as.integer(getOption(
+                    headingBaseNumber <- .getEnvironmentVariable(
+                        "RPACT_PRINT_HEADING_BASE_NUMBER",
                         "rpact.print.heading.base.number",
-                        C_HEADING_BASE_NUMBER_DEFAULT
-                    ))
+                        default = C_HEADING_BASE_NUMBER_DEFAULT,
+                        type = "integer"
+                    )
                     if (is.na(headingBaseNumber)) {
                         headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
@@ -2138,7 +2140,10 @@ knit_print.ParameterSet <- function(x, ...) {
 kable.ParameterSet <- function(x, ...) {
     fCall <- match.call(expand.dots = FALSE)
 
-    lastWarningTime <- getOption("rpact.deprecated.message.time.function.kable")
+    lastWarningTime <- .getEnvironmentVariable(
+        "RPACT_DEPRECATED_MESSAGE_TIME_FUNCTION_KABLE",
+        "rpact.deprecated.message.time.function.kable"
+    )
     if (is.null(lastWarningTime) || difftime(Sys.time(), lastWarningTime, units = "hours") > 8) {
         base::options("rpact.deprecated.message.time.function.kable" = Sys.time())
         .Deprecated(

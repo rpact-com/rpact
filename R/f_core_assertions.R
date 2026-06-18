@@ -1111,7 +1111,12 @@ NULL
             suffix <- paste0(" ", trimws(suffix))
         }
 
-        type <- getOption("rpact.out.of.validated.bounds.message.type", "warning")
+        type <- .getEnvironmentVariable(
+            "RPACT_OUT_OF_VALIDATED_BOUNDS_MESSAGE_TYPE",
+            "rpact.out.of.validated.bounds.message.type",
+            default = "warning",
+            type = "character"
+        )
         if (identical(type, "warning")) {
             warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
                 spendingFunctionName, "is out of validated bounds ",

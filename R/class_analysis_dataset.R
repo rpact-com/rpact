@@ -821,7 +821,12 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         }
     )
 
-    stDevCalcMode <- getOption("rpact.dataset.stdev.calc.mode", "auto") # auto, sigma, norm, t
+    stDevCalcMode <- .getEnvironmentVariable(
+        "RPACT_DATASET_STDEV_CALC_MODE",
+        "rpact.dataset.stdev.calc.mode",
+        default = "auto",
+        type = "character"
+    ) # auto, sigma, norm, t
     for (stage in seq_len(length(emmeansResults))) {
         emmeansResult <- emmeansResults[[stage]]
         emmeansResultsSummary <- summary(emmeansResult)
@@ -4068,7 +4073,12 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         return(summary.ParameterSet(object, type = type, digits = digits, ...))
     }
 
-    intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
+    intervalFormat <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_INTERVALFORMAT",
+        "rpact.summary.intervalFormat",
+        "[%s; %s]",
+        type = "character"
+    )
     .assertIsValidSummaryIntervalFormat(intervalFormat)
 
     summaryFactory <- SummaryFactory$new(object = object, intervalFormat = intervalFormat)

@@ -195,12 +195,22 @@
 
     showAlphaSpent <- .getOptionalArgument("showAlphaSpent", ..., optionalArgumentDefaultValue = NA)
     if (is.na(showAlphaSpent)) {
-        showAlphaSpent <- isTRUE(as.logical(getOption("rpact.plot.show.alpha.spent", TRUE)))
+        showAlphaSpent <- .getEnvironmentVariable(
+            "RPACT_PLOT_SHOW_ALPHA_SPENT",
+            "rpact.plot.show.alpha.spent",
+            default = TRUE,
+            type = "logical"
+        )
     }
 
     showBetaSpent <- .getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = NA)
     if (is.na(showBetaSpent)) {
-        showBetaSpent <- isTRUE(as.logical(getOption("rpact.plot.show.beta.spent", FALSE)))
+        showBetaSpent <- .getEnvironmentVariable(
+            "RPACT_PLOT_SHOW_BETA_SPENT",
+            "rpact.plot.show.beta.spent",
+            default = FALSE,
+            type = "logical"
+        )
     }
 
     yParameterNames <- character()
@@ -213,8 +223,18 @@
     
     if (length(yParameterNames) == 0) {
         yParameterNames <- "alphaSpent"
-        if (isFALSE(as.logical(getOption("rpact.plot.show.alpha.spent", TRUE))) &&
-                isFALSE(as.logical(getOption("rpact.plot.show.beta.spent", TRUE)))) {
+        if (isFALSE(.getEnvironmentVariable(
+            "RPACT_PLOT_SHOW_ALPHA_SPENT",
+            "rpact.plot.show.alpha.spent",
+            default = TRUE,
+            type = "logical"
+        )) &&
+                isFALSE(.getEnvironmentVariable(
+                    "RPACT_PLOT_SHOW_BETA_SPENT",
+                    "rpact.plot.show.beta.spent",
+                    default = TRUE,
+                    type = "logical"
+                ))) {
             warning("Options 'rpact.plot.show.alpha.spent' and ",
                 "'rpact.plot.show.beta.spent' are both FALSE; ",
                 "'alphaSpent' will be shown",
@@ -300,7 +320,12 @@
     
     showBetaSpent <- .getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = NA)
     if (is.na(showBetaSpent)) {
-        showBetaSpent <- isTRUE(as.logical(getOption("rpact.plot.show.beta.spent", NA)))
+        showBetaSpent <- .getEnvironmentVariable(
+            "RPACT_PLOT_SHOW_BETA_SPENT",
+            "rpact.plot.show.beta.spent",
+            default = FALSE,
+            type = "logical"
+        )
     }
     
     srcCmd <- NULL
@@ -536,10 +561,12 @@
         }
 
         yParameterNames <- "criticalValuesPValueScale"
-        futilityBoundsPValueScaleEnabled <- isTRUE(as.logical(
-            getOption("rpact.plot.show.futility.on.pvalue.scale", FALSE)
-        )) ||
-            isTRUE(.getOptionalArgument("showFutilityBounds", ..., optionalArgumentDefaultValue = FALSE))
+        futilityBoundsPValueScaleEnabled <- .getEnvironmentVariable(
+                "RPACT_PLOT_SHOW_FUTILITY_ON_PVALUE_SCALE",
+                "rpact.plot.show.futility.on.pvalue.scale",
+                default = FALSE,
+                type = "logical"
+            ) || isTRUE(.getOptionalArgument("showFutilityBounds", ..., optionalArgumentDefaultValue = FALSE))
         if (futilityBoundsPValueScaleEnabled &&
                 !all(is.na(designMaster$futilityBounds)) &&
                 any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
