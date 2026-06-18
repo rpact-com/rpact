@@ -1,3 +1,14 @@
+# rpact 4.4.1
+
+## New features
+
+* The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
+* rpact options can be now configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles, see new vignette [Hidden rpact Features: Options and Environment Variables](https://www.rpact.org/vignettes/utilities/rpact_hidden_features/)
+
+## Improvements, issues, and changes
+
+* Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
+
 # rpact 4.4.0
 
 ## New features
