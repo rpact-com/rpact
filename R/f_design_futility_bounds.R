@@ -337,15 +337,17 @@ summary.FutilityBounds <- function(object, ...) {
     msg <- paste0(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale),
-        " is available only for one-sided two-stage designs "
+        " is available only for one-sided two-stage designs; invalid user input: "
     )
+    
+    invalidInputs <- character(0)
     if (design$sided != 1) {
-        stop(msg, "(sided = ", design$sided, ")", call. = FALSE)
+        invalidInputs <- c(invalidInputs, paste0("sided = ", design$sided))
     }
-
     if (design$kMax != 2) {
-        stop(msg, "(kMax = ", design$kMax, ")", call. = FALSE)
+        invalidInputs <- c(invalidInputs, paste0("kMax = ", design$kMax))
     }
+    stop(msg, paste(invalidInputs, collapse = ", "), call. = FALSE)
 }
 
 .futilityBoundsCalculationRequiresDesign <- function(scale) {

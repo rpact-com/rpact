@@ -23,7 +23,8 @@ NULL
 }
 
 .getDefaultDesign <- function(...,
-        type = c("sampleSize", "power", "simulation", "simulationCounts", "analysis", "characteristics"),
+        type = c("sampleSize", "power", "simulation", 
+            "simulationCounts", "analysis", "characteristics"),
         ignore = c()) {
     type <- match.arg(type)
 
@@ -65,29 +66,19 @@ NULL
     } else {
         ignore <- c(ignore, "twoSidedPower")
     }
-    if (type %in% c("analysis", "simulation")) {
-        design <- getDesignInverseNormal(
-            kMax = 1,
-            alpha = alpha,
-            beta = beta,
-            sided = sided,
-            twoSidedPower = twoSidedPower,
-            directionUpper = directionUpper
-        )
-    } else {
-        design <- getDesignGroupSequential(
-            kMax = 1,
-            alpha = alpha,
-            beta = beta,
-            sided = sided,
-            twoSidedPower = twoSidedPower,
-            directionUpper = directionUpper
-        )
-    }
+    
+    design <- getDesignFixed(
+        alpha = alpha,
+        beta = beta,
+        sided = sided,
+        twoSidedPower = twoSidedPower,
+        directionUpper = directionUpper
+    )
     return(design)
 }
 
-.getDesignArgumentsToIgnoreAtUnknownArgumentCheck <- function(design, powerCalculationEnabled = FALSE) {
+.getDesignArgumentsToIgnoreAtUnknownArgumentCheck <- function(
+        design, powerCalculationEnabled = FALSE) {
     baseArgsToIgnore <- c("showObservedInformationRatesMessage", "showWarnings")
 
     if (design$kMax > 1) {
@@ -198,7 +189,8 @@ NULL
             }
         }
 
-        if (.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds(design, parameterName, writeToDesign)) {
+        if (.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds(
+                design, parameterName, writeToDesign)) {
             return(rep(defaultValue, design$kMax - 1))
         }
 
@@ -232,7 +224,8 @@ NULL
 }
 
 # Check whether design is a beta spending or Pampallona Tsiatis design
-.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds <- function(design, parameterName, writeToDesign) {
+.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds <- function(
+        design, parameterName, writeToDesign) {
     if (.isTrialDesignFisher(design)) {
         return(FALSE)
     }

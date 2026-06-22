@@ -50,17 +50,24 @@
 #' @export
 #' 
 getDesignFixed <- function(
-        alpha = 0.025,
-        beta = 0.2,
+        alpha = NA_real_,
+        beta = NA_real_,
         sided = 1L, # C_SIDED_DEFAULT
         directionUpper = NA,
         twoSidedPower = NA
         ) {
     
-    .assertIsValidAlphaAndBeta(alpha = alpha, beta = beta, naAllowed = FALSE)
+    .assertIsValidAlphaAndBeta(alpha = alpha, beta = beta, naAllowed = TRUE)
     .assertIsValidSidedParameter(sided)
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
     .assertIsSingleLogical(twoSidedPower, "twoSidedPower", naAllowed = TRUE)
+    
+    if (is.na(alpha)) {
+        alpha <- 0.025
+    }
+    if (is.na(beta)) {
+        beta <- 0.2
+    }
         
     design <- TrialDesignFixed$new(
         kMax = 1L,
