@@ -182,8 +182,13 @@ NumericVector getIndependentIncrements(int stage, NumericVector eventsOverStages
 NumericVector getTestStatistics(int stage, int designNumber, NumericVector informationRates,
 		NumericVector eventsOverStages, NumericVector logRankOverStages) {
 
+	// Fixed design
+	if (designNumber == 0L) {
+		return NumericVector::create(logRankOverStages[0], 1 - getNormalDistribution((double) logRankOverStages[0]));
+	}
+
 	// Group sequential design
-	if (designNumber <= 1L) { // fixed or group sequential design
+	if (designNumber == 1L) {
 		return NumericVector::create(logRankOverStages[stage - 1], NA_REAL);
 	}
 

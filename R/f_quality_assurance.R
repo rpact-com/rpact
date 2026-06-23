@@ -1271,7 +1271,7 @@ testPackage <- function(outDir = ".",
     } else if (executionMode %in% c("downloadAndRunTests", "runTestsInTestFileDirectory")) {
         if (completeUnitTestSetEnabled) {
             cat("Run all tests. Please wait...\n")
-            cat("Have a break - it takes about 30 minutes.\n")
+            cat("Have a break - it takes about 45 minutes.\n")
             cat("Exceution of all available unit tests startet at ",
                 format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
                 sep = ""

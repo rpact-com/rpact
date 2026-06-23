@@ -623,11 +623,12 @@ getClosedCombinationTestResults <- function(stageResults) {
                     if (.isTrialDesignFisher(design)) {
                         designAlpha <- .getDesignFisher(kMax = 1, alpha = alpha)
                     } else {
-                        designAlpha <- .getDesignInverseNormal(kMax = 1, alpha = alpha)
+                        suppressWarnings(designAlpha <- .getDesignInverseNormal(kMax = 1, alpha = alpha))
                     }
                     ctr <- .performClosedCombinationTest(
                         stageResults = stageResults,
-                        design = designAlpha, intersectionTest = intersectionTest
+                        design = designAlpha, 
+                        intersectionTest = intersectionTest
                     )
                     ifelse(ctr$rejected[g, 1], upper <- alpha, lower <- alpha)
                     prec <- upper - lower
