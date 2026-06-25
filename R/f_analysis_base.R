@@ -176,7 +176,7 @@ getAnalysisResults <- function(design,
         stage = NA_integer_,
         maxInformation = NULL,
         informationEpsilon = NULL) {
-    on.exit(base::options("rpact.analyis.repeated.p.values.warnings.enabled" = "TRUE"))
+    on.exit(base::options("rpact.analysis.repeated.p.values.warnings.enabled" = "TRUE"))
     designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
     design <- designAndDataInput$design
     dataInput <- designAndDataInput$dataInput
@@ -1026,8 +1026,8 @@ getRepeatedPValues <- function(stageResults, ...,
     if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
             design$typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER, C_TYPE_OF_DESIGN_WT_OPTIMUM)) {
         showWarnings <- .getEnvironmentVariable(
-            "RPACT_ANALYIS_REPEATED_P_VALUES_WARNINGS_ENABLED",
-            "rpact.analyis.repeated.p.values.warnings.enabled",
+            "RPACT_ANALYSIS_REPEATED_P_VALUES_WARNINGS_ENABLED",
+            "rpact.analysis.repeated.p.values.warnings.enabled",
             default = TRUE,
             type = "logical"
         )
