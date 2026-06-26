@@ -773,6 +773,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 typeBetaSpending,
                 efficacyStops,
                 futilityStops,
+                directionUpper,
                 gammaA,
                 gammaB,
                 bindingFutility,
@@ -804,6 +805,9 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             }
             if (!identical(twoSidedPower, self$twoSidedPower)) {
                 return(self$.pasteComparisonResult("twoSidedPower", twoSidedPower, self$twoSidedPower))
+            }
+            if (!identical(directionUpper, self$directionUpper)) {
+                return(self$.pasteComparisonResult("directionUpper", directionUpper, self$directionUpper))
             }
             if (kMax == 1) {
                 return(FALSE)

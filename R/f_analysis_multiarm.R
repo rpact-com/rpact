@@ -1087,7 +1087,7 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
                 if (stageIndex == kMax - 1) {
                     shiftedFutilityBounds <- c()
                 } else {
-                    shiftedFutilityBounds <- design$futilityBounds[(stageIndex + 1):(kMax - 1)] *
+                    shiftedFutilityBounds <- .getFutilityBounds(design, (stageIndex + 1):(kMax - 1)) *
                         sqrt(sum(weights[1:stageIndex]^2) + cumsum(weights[(stageIndex + 1):(kMax - 1)]^2)) /
                         sqrt(cumsum(weights[(stageIndex + 1):(kMax - 1)]^2)) -
                         min(ctr$overallAdjustedTestStatistics[ctr$indices[, g] == 1, stageIndex], na.rm = TRUE) *

@@ -3822,7 +3822,7 @@ NULL
 .hasApplicableFutilityBounds <- function(design) {
     return(
         !all(is.na(design$futilityBounds)) &&
-            any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
+            any(.getFutilityBounds(design) > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
     )
 }
 

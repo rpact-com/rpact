@@ -496,7 +496,7 @@ getTestActions <- function(stageResults, ...) {
                 if (k < design$kMax) {
                     if (stageResults$combInverseNormal[k] > criticalValues[k]) {
                         testActions[k] <- "reject and stop"
-                    } else if (stageResults$combInverseNormal[k] < design$futilityBounds[k]) {
+                    } else if (stageResults$combInverseNormal[k] < .getFutilityBounds(design, k)) {
                         testActions[k] <- "accept and stop"
                     } else {
                         testActions[k] <- "continue"
@@ -531,7 +531,7 @@ getTestActions <- function(stageResults, ...) {
                 if (k < design$kMax) {
                     if (.getOneMinusQNorm(stageResults$overallPValues[k]) > criticalValues[k]) {
                         testActions[k] <- "reject and stop"
-                    } else if (.getOneMinusQNorm(stageResults$overallPValues[k]) < design$futilityBounds[k]) {
+                    } else if (.getOneMinusQNorm(stageResults$overallPValues[k]) < .getFutilityBounds(design, k)) {
                         testActions[k] <- "accept and stop"
                     } else {
                         testActions[k] <- "continue"
@@ -1100,7 +1100,7 @@ getRepeatedPValues <- function(stageResults, ...,
                 if (.isTrialDesignInverseNormal(design)) {
                     decisionMatrix <- matrix(
                         c(
-                            design$futilityBounds[1:(finalStage - 1)], C_FUTILITY_BOUNDS_DEFAULT,
+                            .getFutilityBounds(design, 1:(finalStage - 1)), C_FUTILITY_BOUNDS_DEFAULT,
                             c(criticalValues[1:(finalStage - 1)], stageResults$combInverseNormal[finalStage])
                         ),
                         nrow = 2, byrow = TRUE
@@ -1108,7 +1108,7 @@ getRepeatedPValues <- function(stageResults, ...,
                 } else {
                     decisionMatrix <- matrix(
                         c(
-                            design$futilityBounds[1:(finalStage - 1)], C_FUTILITY_BOUNDS_DEFAULT,
+                            .getFutilityBounds(design, 1:(finalStage - 1)), C_FUTILITY_BOUNDS_DEFAULT,
                             c(criticalValues[1:(finalStage - 1)], .getOneMinusQNorm(stageResults$overallPValues[finalStage]))
                         ),
                         nrow = 2, byrow = TRUE
@@ -1237,8 +1237,8 @@ getRepeatedPValues <- function(stageResults, ...,
             }
         }
 
-        if (design$bindingFutility && k < design$kMax && stageResults$combInverseNormal[k] <=
-                design$futilityBounds[k]) {
+        if (design$bindingFutility && k < design$kMax && 
+                stageResults$combInverseNormal[k] <= .getFutilityBounds(design, k)) {
             return(k)
         }
     }
@@ -2266,7 +2266,7 @@ getConditionalRejectionProbabilities <- function(stageResults, ...) {
     result <- .getOneDimensionalRoot(
         function(theta) {
             if (design$bindingFutility) {
-                row1part1 <- design$futilityBounds[1:(stage - 1)]
+                row1part1 <- .getFutilityBounds(design, 1:(stage - 1))
             } else {
                 row1part1 <- rep(C_FUTILITY_BOUNDS_DEFAULT, stage - 1)
             }

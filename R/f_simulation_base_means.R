@@ -457,7 +457,7 @@ getSimulationMeans <- function(design = NULL, ...,
         futilityBounds <- rep(NA_real_, design$kMax - 1)
     } else {
         alpha0Vec <- rep(NA_real_, design$kMax - 1)
-        futilityBounds <- design$futilityBounds
+        futilityBounds <- .getFutilityBounds(design)
     }
 
     if ((length(stDev) == 1) && (groups == 2)) {

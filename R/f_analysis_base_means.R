@@ -842,7 +842,7 @@ NULL
         border <- C_ALPHA_0_VEC_DEFAULT
         conditionFunction <- .isFirstValueSmallerThanSecondValue
     } else {
-        bounds <- design$futilityBounds
+        bounds <- .getFutilityBounds(design)
         border <- C_FUTILITY_BOUNDS_DEFAULT
         conditionFunction <- .isFirstValueGreaterThanSecondValue
     }
@@ -1178,7 +1178,7 @@ NULL
     if (stage == kMax - 1) {
         shiftedFutilityBounds <- c()
     } else {
-        shiftedFutilityBounds <- design$futilityBounds[(stage + 1):(kMax - 1)] *
+        shiftedFutilityBounds <- .getFutilityBounds(design, (stage + 1):(kMax - 1)) *
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):(kMax - 1)]^2)) /
             sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
             .getOneMinusQNorm(stageResults$overallPValues[stage]) *
@@ -1314,7 +1314,7 @@ NULL
     if (stage == kMax - 1) {
         shiftedFutilityBounds <- c()
     } else {
-        shiftedFutilityBounds <- design$futilityBounds[(stage + 1):(kMax - 1)] *
+        shiftedFutilityBounds <- .getFutilityBounds(design, (stage + 1):(kMax - 1)) *
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):(kMax - 1)]^2)) /
             sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
             c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /

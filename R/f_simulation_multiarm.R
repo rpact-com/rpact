@@ -225,7 +225,7 @@ NULL
             } else {
                 rejectedIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] >= criticalValues[k])
                 if (k < kMax) {
-                    futilityIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] <= design$futilityBounds[k])
+                    futilityIntersections[i, k] <- (overallAdjustedTestStatistics[i, k] <= .getFutilityBounds(design, k))
                 }
             }
 

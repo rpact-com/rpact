@@ -1739,15 +1739,25 @@ getParameterName <- function(obj, parameterCaption) {
     ))
 }
 
-.getCriticalValues <- function(design, indices = NULL) {
+.getCriticalValues <- function(design, indices = NULL) {   
+    criticalValues <- abs(design$criticalValues)
     if (!is.null(indices)) {
-        return(design$criticalValues[indices])
+        return(criticalValues[indices])
     }
-
-    return(design$criticalValues)
+    return(criticalValues)
 }
 
-.applyDirectionOfAlternative <- function(value,
+.getFutilityBounds <- function(design, indices = NULL) {
+    futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
+        design$directionUpper, type = "negateIfLower", phase = "design")
+    if (!is.null(indices)) {
+        return(futilityBounds[indices])
+    }
+    return(futilityBounds)
+}
+
+.applyDirectionOfAlternative <- function(
+        value,
         directionUpper,
         ...,
         type = c(
@@ -1763,9 +1773,9 @@ getParameterName <- function(obj, parameterCaption) {
     type <- match.arg(type)
     phase <- match.arg(phase)
 
-    if (phase == "design") {
-        return(value) # deactivate for current release
-    }
+#    if (phase == "design") {
+#        return(value) # deactivate for current release
+#    }
 
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
         return(value)

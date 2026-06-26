@@ -463,7 +463,7 @@
 
     informationRates <- design$informationRates
     criticalValues <- .getCriticalValues(design)
-    futilityBounds <- design$futilityBounds
+    futilityBounds <- .getFutilityBounds(design)
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
 
     for (iCase in 1:nParameters) {

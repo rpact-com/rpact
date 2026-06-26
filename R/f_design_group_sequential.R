@@ -1794,11 +1794,11 @@ getDesignInverseNormal <- function(...,
     }
 
     if (.hasApplicableFutilityBounds(design)) {
-        if (length(design$futilityBounds) == 0 || all(design$futilityBounds == C_FUTILITY_BOUNDS_DEFAULT)) {
+        if (length(design$futilityBounds) == 0 || all(.getFutilityBounds(design) == C_FUTILITY_BOUNDS_DEFAULT)) {
             design$.setParameterType("bindingFutility", C_PARAM_NOT_APPLICABLE)
             design$.setParameterType("futilityBounds", C_PARAM_NOT_APPLICABLE)
         } else if (userFunctionCallEnabled &&
-                any(design$futilityBounds > .getCriticalValues(design, 1:(design$kMax - 1)) - 0.01, na.rm = TRUE)) {
+                any(.getFutilityBounds(design) > .getCriticalValues(design, 1:(design$kMax - 1)) - 0.01, na.rm = TRUE)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'futilityBounds' (", .arrayToString(design$futilityBounds), ") ",
@@ -1817,11 +1817,9 @@ getDesignInverseNormal <- function(...,
     design$criticalValues[!is.na(design$criticalValues) & design$criticalValues >= 7.5] <- Inf
 
     design$criticalValues <- .applyDirectionOfAlternative(design$criticalValues,
-        design$directionUpper,
-        type = "negateIfLower", phase = "design"
-    )
+        directionUpper, type = "negateIfLower", phase = "design")
 
-    design$futilityBounds[!is.na(design$futilityBounds) & design$futilityBounds <=
+    design$futilityBounds[!is.na(design$futilityBounds) & .getFutilityBounds(design) <=
         C_FUTILITY_BOUNDS_DEFAULT] <- C_FUTILITY_BOUNDS_DEFAULT
 
     if (design$kMax == 1) {
@@ -1841,10 +1839,8 @@ getDesignInverseNormal <- function(...,
 
     .assertIsNumericVector(delayedInformation, "delayedInformation", naAllowed = TRUE)
     if (all(is.na(delayedInformation))) {
-        design$futilityBounds <- .applyDirectionOfAlternative(
-            design$futilityBounds, directionUpper,
-            type = "negateIfLower", phase = "design"
-        )
+        design$futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds, 
+            directionUpper, type = "negateIfLower", phase = "design")
 
         # delayed response design is disabled
         return(design)
@@ -1856,10 +1852,8 @@ getDesignInverseNormal <- function(...,
             call. = FALSE
         )
 
-        design$futilityBounds <- .applyDirectionOfAlternative(
-            design$futilityBounds, directionUpper,
-            type = "negateIfLower", phase = "design"
-        )
+        design$futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds, 
+            directionUpper, type = "negateIfLower", phase = "design")
 
         return(design)
     }
@@ -2019,10 +2013,8 @@ getDesignInverseNormal <- function(...,
     design$delayedInformation[design$delayedInformation < 1e-03] <- 0
     design$.setParameterType("decisionCriticalValues", C_PARAM_GENERATED)
     design$.setParameterType("reversalProbabilities", C_PARAM_GENERATED)
-    design$futilityBounds <- .applyDirectionOfAlternative(
-        design$futilityBounds, directionUpper,
-        type = "negateIfLower", phase = "design"
-    )
+    design$futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds, 
+        directionUpper, type = "negateIfLower", phase = "design")
 
     warning("The delayed information design feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
@@ -2415,11 +2407,16 @@ getDesignCharacteristics <- function(design = NULL, ...) {
     }
 
     informationRates <- design$informationRates
+    futilityBounds <- design$futilityBounds
+    futilityBounds <- .applyDirectionOfAlternative(futilityBounds, design$directionUpper,
+        type = "negateIfLower", phase = "design", syncLength = TRUE
+    )
     criticalValues <- .getCriticalValues(design)
+    
     if (!anyNA(design$delayedInformation) &&
             length(design$decisionCriticalValues) > 0) {
         contRegionUpper <- criticalValues
-        contRegionLower <- design$futilityBounds
+        contRegionLower <- futilityBounds
         informationRates <- design$informationRates
         decisionCriticalValues <- design$decisionCriticalValues
         informationRates <- design$informationRates
@@ -2485,14 +2482,14 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         designCharacteristics$futilityProbabilities <- futilityProbabilities
     } else if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
             .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2) {
-        design$futilityBounds[is.na(design$futilityBounds)] <- 0
+        futilityBounds[is.na(futilityBounds)] <- 0
 
         shift <- .getOneDimensionalRoot(
             function(shift) {
                 decisionMatrix <- matrix(c(
                     -criticalValues - sqrt(shift * informationRates),
-                    c(-design$futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]), 0),
-                    c(design$futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]), 0),
+                    c(-futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]), 0),
+                    c(futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]), 0),
                     criticalValues - sqrt(shift * informationRates)
                 ), nrow = 4, byrow = TRUE)
                 probs <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
@@ -2508,8 +2505,8 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 
         decisionMatrix <- matrix(c(
             -criticalValues - sqrt(shift * informationRates),
-            c(-design$futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]), 0),
-            c(design$futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]), 0),
+            c(-futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]), 0),
+            c(futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]), 0),
             criticalValues - sqrt(shift * informationRates)
         ), nrow = 4, byrow = TRUE)
         probs <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
@@ -2533,8 +2530,8 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 
         decisionMatrix <- matrix(c(
             -criticalValues,
-            c(-design$futilityBounds, 0),
-            c(design$futilityBounds, 0),
+            c(-futilityBounds, 0),
+            c(futilityBounds, 0),
             criticalValues
         ), nrow = 4, byrow = TRUE)
         probs0 <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
@@ -2544,8 +2541,8 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 
         decisionMatrix <- matrix(c(
             -criticalValues - sqrt(shift * informationRates) / 2,
-            c(-design$futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]) / 2, 0),
-            c(design$futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]) / 2, 0),
+            c(-futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]) / 2, 0),
+            c(futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]) / 2, 0),
             criticalValues - sqrt(shift * informationRates) / 2
         ), nrow = 4, byrow = TRUE)
         probs01 <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
@@ -2553,7 +2550,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
             design$kMax, design$informationRates, probs01, shift, nFixed
         )
 
-        design$futilityBounds[design$futilityBounds == 0] <- NA_real_
+        futilityBounds[futilityBounds == 0] <- NA_real_
     } else {
         shift <- .getOneDimensionalRoot(
             function(shift) {
@@ -2569,8 +2566,8 @@ getDesignCharacteristics <- function(design = NULL, ...) {
                         return(sum(probs[3, ] - probs[2, ]) - 1 + design$beta)
                     }
                 } else {
-                    shiftedFutilityBounds <- design$futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)])
-                    shiftedFutilityBounds[design$futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <-
+                    shiftedFutilityBounds <- futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)])
+                    shiftedFutilityBounds[futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <-
                         C_FUTILITY_BOUNDS_DEFAULT
                     decisionMatrix <- matrix(c(
                         shiftedFutilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
@@ -2590,8 +2587,8 @@ getDesignCharacteristics <- function(design = NULL, ...) {
                 criticalValues - sqrt(shift * informationRates)
             ), nrow = 2, byrow = TRUE)
         } else {
-            shiftedFutilityBounds <- design$futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)])
-            shiftedFutilityBounds[design$futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <-
+            shiftedFutilityBounds <- futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)])
+            shiftedFutilityBounds[futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <-
                 C_FUTILITY_BOUNDS_DEFAULT
             decisionMatrix <- matrix(c(
                 shiftedFutilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
@@ -2614,7 +2611,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
                 designCharacteristics$futilityProbabilities <- rep(0, design$kMax - 1)
             } else {
                 designCharacteristics$futilityProbabilities <- probs[1, 1:(design$kMax - 1)]
-                designCharacteristics$futilityProbabilities[design$futilityBounds == C_FUTILITY_BOUNDS_DEFAULT] <- 0
+                designCharacteristics$futilityProbabilities[futilityBounds == C_FUTILITY_BOUNDS_DEFAULT] <- 0
             }
             designCharacteristics$power <- .getNoEarlyEfficacyZeroCorrectedValues(
                 design, designCharacteristics$power
@@ -2632,7 +2629,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
             decisionMatrix <- matrix(c(-criticalValues, criticalValues), nrow = 2, byrow = TRUE)
         } else {
             decisionMatrix <- matrix(c(
-                design$futilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
+                futilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
                 criticalValues
             ), nrow = 2, byrow = TRUE)
         }
@@ -2647,8 +2644,8 @@ getDesignCharacteristics <- function(design = NULL, ...) {
                 criticalValues - sqrt(shift * informationRates) / 2
             ), nrow = 2, byrow = TRUE)
         } else {
-            shiftedFutilityBounds <- design$futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]) / 2
-            shiftedFutilityBounds[design$futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- C_FUTILITY_BOUNDS_DEFAULT
+            shiftedFutilityBounds <- futilityBounds - sqrt(shift * informationRates[1:(design$kMax - 1)]) / 2
+            shiftedFutilityBounds[futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- C_FUTILITY_BOUNDS_DEFAULT
             decisionMatrix <- matrix(c(shiftedFutilityBounds, C_FUTILITY_BOUNDS_DEFAULT, criticalValues -
                 sqrt(shift * informationRates) / 2), nrow = 2, byrow = TRUE)
         }
@@ -2811,7 +2808,7 @@ getSimulatedRejectionsDelayedResponse <- function(design, ..., delta = 0, iterat
         informationRates = design$informationRates,
         delayedInformation = design$delayedInformation,
         contRegionUpper = .getCriticalValues(design),
-        contRegionLower = design$futilityBounds,
+        contRegionLower = .getFutilityBounds(design),
         decisionCriticalValues = design$decisionCriticalValues,
         iterations = iterations,
         seed = seed
