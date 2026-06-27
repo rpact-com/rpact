@@ -39,9 +39,14 @@ be converted. Must be one of \code{"zValue"}, \code{"pValue"},
 involves conditional or predictive power in a group sequential or Fisher design.
 Must be a one-sided two-stage group sequential design or Fisher's combination test design.}
 
-\item{theta}{Numeric. The assumed effect size under the alternative hypothesis.}
+\item{theta}{Numeric. The assumed effect size under the alternative hypothesis on the scale of the
+test statistic. For example, in a survival design, this would be the on the log hazard ratio scale.}
 
-\item{information}{Numeric vector of length 2. The information levels at the two stages.}
+\item{information}{Numeric vector of length 1 or 2. The stage-wise information levels
+(i.e. this is \emph{not} the cumulative information). Note that depending on which conversion is performed,
+either the first or second stage information may not be needed. In that case, a warning will be issued
+if the unused information is provided. The warning can be avoided by either passing a single number,
+or setting the unused information to \code{NA}.}
 
 \item{naAllowed}{Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.}
 }
