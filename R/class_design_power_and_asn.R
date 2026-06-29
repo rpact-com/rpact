@@ -233,8 +233,6 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                     ), nrow = 2, byrow = TRUE)
                 }
 
-                print(futilityBounds) # TODO remove
-                
                 probs <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
                 
                 if (nrow(probs) == 3) {

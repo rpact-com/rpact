@@ -504,8 +504,8 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 # @details
 # Digits = 3, nsmall = 3
 #
-.formatCriticalValues <- function(value) {
-    value[value == C_FUTILITY_BOUNDS_DEFAULT] <- -Inf
+.formatCriticalValues <- function(value, design = NULL) {
+    value <- .getFormattedFutilityBounds(design = design, futilityBounds = value)
     x <- .getOptionBasedFormattedValue("rpact.output.format.critical.value",
         value = value, digits = 3, nsmall = 3
     )

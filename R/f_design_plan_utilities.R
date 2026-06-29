@@ -18,7 +18,7 @@
 NULL
 
 .hideFutilityStopsIfNotApplicable <- function(designPlan) {
-    if (all(.getFutilityBounds(designPlan$.design) == C_FUTILITY_BOUNDS_DEFAULT)) {
+    if (!.isTrialDesignWithValidFutilityBounds(designPlan$.design)) {
         designPlan$.setParameterType("futilityStop", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("futilityPerStage", C_PARAM_NOT_APPLICABLE)
     }

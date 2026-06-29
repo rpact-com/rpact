@@ -839,7 +839,7 @@ NULL
 
     if (.hasApplicableFutilityBounds(design)) {
         designPlan$futilityBoundsPValueScale <-
-            matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)
+            matrix(1 - stats::pnorm(.getFutilityBounds(design)), ncol = 1)
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }
 

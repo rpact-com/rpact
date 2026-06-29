@@ -552,7 +552,7 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             }
             alpha0VecTemp <- alpha0Vec[1:(kMax - 1)]
             if (anyNA(alpha0VecTemp)) {
-                alpha0VecTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
+                alpha0VecTemp <- rep(C_ALPHA_0_VEC_DEFAULT, kMax - 1)
             }
             if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(TRUE)

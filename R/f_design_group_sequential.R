@@ -1628,7 +1628,7 @@ getDesignInverseNormal <- function(...,
                 "because 'futilityBounds' is not defined",
                 call. = FALSE
             )
-        } else if (all(futilityBounds == C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+        } else if (!.anyFutilityBoundsAreInvalid(futilityBounds, directionUpper)) {
             warning("'bindingFutility' (", bindingFutility, ") will be ignored ",
                 "because 'futilityBounds' (", .arrayToString(futilityBounds), ") ",
                 "is set to default values",

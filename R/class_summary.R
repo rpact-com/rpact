@@ -1074,7 +1074,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     return(formattedValue)
 }
 
-.getSummaryValuesFormatted <- function(fieldSet,
+.getSummaryValuesFormatted <- function(
+        fieldSet,
         parameterName,
         values,
         ...,
@@ -1112,7 +1113,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     }
                 } else if (!is.null(parameterName) && length(parameterName) == 1 && !is.na(parameterName)) {
                     if (parameterName == "futilityBounds") {
-                        values[!is.na(values) & values <= C_FUTILITY_BOUNDS_DEFAULT] <- -Inf
+                        values <- .getFormattedFutilityBounds(design = fieldSet, futilityBounds = values)
                     } else if (parameterName %in% c(
                             "criticalValues",
                             "decisionCriticalValue", "overallAdjustedTestStatistics"
@@ -1134,7 +1135,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 }
 
                 if (!is.null(formatFunctionName)) {
-                    values <- eval(call(formatFunctionName, values))
+                    values <- .getParameterValueFormattedByFormatFunctionName(
+                        formatFunctionName, values, fieldSet)                    
                 } else {
                     values <- .formatSummaryValues(values,
                         digits = roundDigits,
@@ -1980,8 +1982,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             }
         }
         if (!.isDelayedInformationEnabled(design = design) &&
-                ((.isTrialDesignInverseNormalOrGroupSequential(design) &&
-                    any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) ||
+                (.isTrialDesignWithValidFutilityBounds(design) ||
                     (.isTrialDesignFisher(design) && any(design$alpha0Vec < 1, na.rm = TRUE)))) {
             header <- .concatenateSummaryText(
                 header,
@@ -3350,7 +3351,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
     } else {
-        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+        if (.isTrialDesignWithValidFutilityBounds(design)) {
             summaryFactory$addParameter(design,
                 parameterName = "futilityBounds",
                 parameterCaption = .getSummaryParameterCaptionFutilityBounds(design),
@@ -4025,7 +4026,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 probsH1$rejectPerStage <- probsH1$rejectPerStage[1:(design$kMax - 1)]
             }
 
-            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+            if (.isTrialDesignWithValidFutilityBounds(design)) {
                 if (is.matrix(probsH1$earlyStop)) {
                     probsH1$earlyStop <- matrix(probsH1$earlyStop[1:(design$kMax - 1), ],
                         ncol = ncol(probsH1$earlyStop)
@@ -4074,7 +4075,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 )
             }
 
-            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+            if (.isTrialDesignWithValidFutilityBounds(design)) {
                 summaryFactory$addParameter(probsH0,
                     parameterName = "futilityPerStage",
                     parameterCaption = "Exit probability for futility (under H0)",
@@ -4113,7 +4114,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
 
-        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE) &&
+        if (.isTrialDesignWithValidFutilityBounds(design) &&
                 !is.null(designPlan[["futilityPerStage"]]) &&
                 !anyNA(designPlan[["futilityPerStage"]]) &&
                 any(designPlan$futilityPerStage != 0) &&

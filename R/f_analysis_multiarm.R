@@ -570,7 +570,7 @@ getClosedCombinationTestResults <- function(stageResults) {
     }
 
     intersectionTest <- stageResults$intersectionTest
-
+    futilityBounds <- .getFutilityBounds(design)
     if (!.isTrialDesignFixed(design) && !.isTrialDesignFisher(design) && (design$typeOfDesign == C_TYPE_OF_DESIGN_HP)) {
         if (stage == kMax) {
             startTime <- Sys.time()
@@ -582,7 +582,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                         sided = design$sided,
                         informationRates = design$informationRates,
                         typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                        futilityBounds = design$futilityBounds,
+                        futilityBounds = futilityBounds,
                         bindingFutility = design$bindingFutility
                     )$alphaSpent[kMax - 1] + tolerance
                     upper <- 0.5
@@ -592,7 +592,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                         designAlpha <- .getDesignInverseNormal(
                             kMax = kMax,
                             alpha = alpha, typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                            futilityBounds = design$futilityBounds,
+                            futilityBounds = futilityBounds,
                             sided = design$sided, bindingFutility = design$bindingFutility,
                             informationRates = design$informationRates
                         )
@@ -671,7 +671,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                                 deltaPT1 = design$deltaPT1,
                                 beta = design$beta,
                                 gammaA = design$gammaA,
-                                futilityBounds = design$futilityBounds,
+                                futilityBounds = futilityBounds,
                                 sided = design$sided,
                                 bindingFutility = design$bindingFutility,
                                 informationRates = design$informationRates

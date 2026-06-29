@@ -100,9 +100,12 @@ NULL
         
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     return(.getValidatedFutilityBoundsOrAlpha0Vec(
-        design = design, parameterName = "futilityBounds",
-        defaultValue = C_FUTILITY_BOUNDS_DEFAULT, kMaxLowerBound = kMaxLowerBound,
-        writeToDesign = writeToDesign, twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
+        design = design, 
+        parameterName = "futilityBounds",
+        defaultValue = .getFutilityBoundsDefaultValue(design), 
+        kMaxLowerBound = kMaxLowerBound,
+        writeToDesign = writeToDesign, 
+        twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
     ))
 }
 
@@ -110,9 +113,12 @@ NULL
         writeToDesign = TRUE, twoSidedWarningForDefaultValues = TRUE) {
     .assertIsTrialDesignFisher(design)
     return(.getValidatedFutilityBoundsOrAlpha0Vec(
-        design = design, parameterName = "alpha0Vec",
-        defaultValue = C_ALPHA_0_VEC_DEFAULT, kMaxLowerBound = kMaxLowerBound,
-        writeToDesign = writeToDesign, twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
+        design = design, 
+        parameterName = "alpha0Vec",
+        defaultValue = C_ALPHA_0_VEC_DEFAULT, 
+        kMaxLowerBound = kMaxLowerBound,
+        writeToDesign = writeToDesign, 
+        twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
     ))
 }
 

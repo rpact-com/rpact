@@ -1747,9 +1747,10 @@ getParameterName <- function(obj, parameterCaption) {
     return(criticalValues)
 }
 
-.getFutilityBounds <- function(design, indices = NULL) {
+.getFutilityBounds <- function(design, indices = NULL, ..., phase = c("unknown", "design", "planning", "analysis")) {
+    phase <- match.arg(phase)
     futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
-        design$directionUpper, type = "negateIfLower", phase = "design")
+        design$directionUpper, type = "negateIfLower", phase = phase)
     if (!is.null(indices)) {
         return(futilityBounds[indices])
     }
@@ -1772,10 +1773,6 @@ getParameterName <- function(obj, parameterCaption) {
         syncLength = FALSE) {
     type <- match.arg(type)
     phase <- match.arg(phase)
-
-#    if (phase == "design") {
-#        return(value) # deactivate for current release
-#    }
 
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
         return(value)

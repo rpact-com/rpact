@@ -852,7 +852,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 {
                     formatFunctionName <- .getParameterFormatFunction(parameterName, self)
                     if (!is.null(formatFunctionName)) {
-                        parameterValuesFormatted <- eval(call(formatFunctionName, parameterValues))
+                        parameterValuesFormatted <- .getParameterValueFormattedByFormatFunctionName(
+                            formatFunctionName, parameterValues, self)
                     } else {
                         parameterValuesFormatted <- as.character(parameterValues)
                     }
@@ -1284,7 +1285,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 }
                 parameterValues <- parameterSet[[parameterName]]
                 if (parameterName == "futilityBounds") {
-                    parameterValues[parameterValues == C_FUTILITY_BOUNDS_DEFAULT] <- -Inf
+                    parameterValues <- .getFormattedFutilityBounds(parameterSet)
                 }
                 if (length(parameterValues) == 1) {
                     parameterValues <- rep(parameterValues, numberOfStages)

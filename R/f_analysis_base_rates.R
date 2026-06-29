@@ -1536,7 +1536,6 @@ NULL
     }
 
     results <- ConditionalPowerResultsRates$new(
-        # R6$new
         .stageResults = stageResults,
         .design = stageResults$.design,
         nPlanned = nPlanned,
@@ -1587,7 +1586,7 @@ NULL
     } else {
         .stopWithWrongDesignMessage(stageResults$.design, inclusiveConditionalDunnett = FALSE)
     }
-
+    
     results$nPlanned <- cp$nPlanned
     results$conditionalPower <- cp$conditionalPower
     results$.setParameterType("nPlanned", C_PARAM_GENERATED)

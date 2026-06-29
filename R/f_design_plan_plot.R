@@ -567,9 +567,7 @@
                 default = FALSE,
                 type = "logical"
             ) || isTRUE(.getOptionalArgument("showFutilityBounds", ..., optionalArgumentDefaultValue = FALSE))
-        if (futilityBoundsPValueScaleEnabled &&
-                !all(is.na(designMaster$futilityBounds)) &&
-                any(designMaster$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+        if (futilityBoundsPValueScaleEnabled && .isTrialDesignWithValidFutilityBounds(designMaster)) {
             yParameterNames <- c(yParameterNames, "futilityBoundsPValueScale")
             df$futilityBoundsPValueScale <- c(
                 designPlan$futilityBoundsPValueScale,
