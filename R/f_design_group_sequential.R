@@ -557,9 +557,9 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
 .calculateAlphaSpent <- function(design) {
     criticalValues <- .getCriticalValues(design)
+    futilityBounds <- .getFutilityBounds(design)
     if (design$sided == 2) {
         if (design$bindingFutility) {
-            futilityBounds <- design$futilityBounds
             futilityBounds[is.na(futilityBounds)] <- 0
             decisionMatrix <- matrix(c(
                 -criticalValues, -futilityBounds, 0,
@@ -574,7 +574,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     } else {
         if (design$bindingFutility) {
             decisionMatrix <- matrix(c(
-                design$futilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
+                futilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
                 criticalValues
             ), nrow = 2, byrow = TRUE)
         } else {
@@ -588,6 +588,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     tryCatch(
         {
             probs <- .getGroupSequentialProbabilities(decisionMatrix, design$informationRates)
+            
             if (design$sided == 1) {
                 design$alphaSpent <- cumsum(probs[3, ] - probs[2, ])
             } else if (nrow(decisionMatrix) == 2) {
@@ -598,6 +599,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             if (!is.na(design$alphaSpent[design$kMax])) {
                 design$alphaSpent[design$kMax] <- floor(design$alphaSpent[design$kMax] * 1e8) / 1e8
             }
+            
             design$.setParameterType("alphaSpent", C_PARAM_GENERATED)
         },
         error = function(e) {
@@ -742,9 +744,11 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         design$sided,
         design$informationRates,
         design$bindingFutility,
-        design$futilityBounds,
+        .getFutilityBounds(design),
         design$tolerance
     )
+    design$criticalValues <- .applyDirectionOfAlternative(design$criticalValues,
+        design$directionUpper, type = "negateIfLower", phase = "design")
     .calculateAlphaSpent(design)
     return(.getDesignGroupSequentialBetaSpendingApproaches(design, userFunctionCallEnabled))
 }
@@ -2006,6 +2010,11 @@ getDesignInverseNormal <- function(...,
 
     decisionCriticalValues[decisionCriticalValues <= -C_UPPER_BOUNDS_DEFAULT + 1e-06] <- NA_real_
     decisionCriticalValues[decisionCriticalValues >= C_UPPER_BOUNDS_DEFAULT - 1e-06] <- NA_real_
+    
+    # TODO negate decisionCriticalValues for directionUpper = FALSE? (currently not negated, but negated in .getDesignWithInterimStops())
+    #      The decision critical values for each stage of the trial in a delayed response design. 
+    # TODO futilityBoundsDelayedInformation = "Lower bounds of continuation (binding)" becomes the upper bounds for directionUpper = FALSE?
+    # TODO criticalValuesDelayedInformation = "Upper bounds of continuation" becomes the lower bounds for directionUpper = FALSE?
 
     design$decisionCriticalValues <- decisionCriticalValues
     design$reversalProbabilities <- reversalProbabilities
