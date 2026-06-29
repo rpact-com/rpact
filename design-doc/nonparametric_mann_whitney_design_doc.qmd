@@ -1,0 +1,315 @@
+---
+title: "Design Doc: Group Sequential Methods for the Mann-Whitney Parameter"
+subtitle: "Initial draft for rpact integration"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    html-math-method: mathjax
+execute:
+  echo: false
+---
+
+# Scope and status
+
+This document is an initial design sketch for adding group sequential methods
+for the Mann-Whitney parameter to `rpact`, based on the methodology described in
+Nowak, Mütze, and Konietschke, *Group sequential methods for the Mann-Whitney
+parameter*.
+
+The function names, argument names, and API ideas below are preliminary. They
+are intended as a starting point for discussion with the authors of the paper
+and the `rpact` development team. The text in this document is intentionally
+brief and should be extended by the paper authors, especially with respect to
+the statistical details, edge cases, validation scenarios, and recommended
+defaults.
+
+# Introduction
+
+The proposed methodology extends classical group sequential testing to
+nonparametric treatment comparisons based on the Mann-Whitney parameter, also
+known as the nonparametric relative effect or probabilistic index. For two
+independent outcomes $X_1 \sim F_1$ and $X_2 \sim F_2$, the parameter is
+defined as
+
+$$
+p = P(X_1 < X_2) + \frac{1}{2} P(X_1 = X_2).
+$$
+
+If lower values are favorable, $p$ can be interpreted as the probability that
+a patient from treatment arm 1 has a better outcome than a patient from
+treatment arm 2, with ties counted as half wins. The parameter can also be
+expressed on the win odds scale, $p / (1 - p)$, or on the log win odds scale,
+$\log\{p / (1 - p)\}$. These effect scales are particularly attractive for
+ordered categorical endpoints, clinical scores, patient-reported outcomes,
+disability scores, and continuous endpoints for which a rank-based
+interpretation is preferable to a mean difference.
+
+The paper develops group sequential versions of the Wilcoxon-Mann-Whitney test,
+the Brunner-Munzel test, and a log win odds test. A key feature is that the
+corresponding sequential test statistics asymptotically follow the canonical
+joint distribution used in standard group sequential theory. This makes the
+methodology conceptually well aligned with the existing `rpact` design
+framework, including information levels, alpha spending, repeated testing, power
+calculations, and repeated confidence intervals.
+
+From an `rpact` perspective, the methodology could provide a natural extension
+of existing group sequential designs to nonparametric and rank-based endpoints.
+It would allow users to plan and analyze trials with ordinal or non-normally
+distributed outcomes while continuing to use familiar `rpact` design objects and
+workflows.
+
+# Statistical methods to be supported
+
+The first implementation could focus on the methods described in the paper:
+
+- Wilcoxon-Mann-Whitney test
+- Brunner-Munzel test
+- Log win odds test
+
+The methods differ in their assumptions, estimands, information definitions, and
+small-sample behavior. This section should be completed by the paper authors.
+
+## Wilcoxon-Mann-Whitney test
+
+Preliminary notes:
+
+- Natural effect scale: Mann-Whitney parameter $p$
+- Typical null hypothesis: equality of distributions, or operationally
+  $p = 1/2$ under additional assumptions
+- Particularly suitable when the distributions can reasonably be assumed equal
+  under the null hypothesis
+- Needs clear documentation regarding ties and ordinal endpoints
+
+## Brunner-Munzel test
+
+Preliminary notes:
+
+- Natural effect scale: Mann-Whitney parameter $p$
+- More directly targets the nonparametric Behrens-Fisher setting
+- Allows testing $H_0: p = 1/2$ without requiring equality of the full
+  distributions
+- May require careful handling of small sample behavior and possible
+  t-approximation options
+
+## Log win odds test
+
+Preliminary notes:
+
+- Natural effect scale: log win odds, $\log\{p/(1-p)\}$
+- Can be mapped back to win odds or the Mann-Whitney parameter for
+  interpretation
+- May be useful as the default analysis scale if it provides better behaved
+  confidence intervals or more stable inference
+- Needs discussion of how results should be displayed to users
+
+# API design principles
+
+The implementation should reuse existing `rpact` group sequential design objects
+wherever possible. Users should be able to create a design with existing
+functions such as `getDesignGroupSequential()` and then use that design for
+nonparametric sample size calculation, power calculation, and analysis.
+
+The endpoint should be recognized by the function arguments and result objects.
+Therefore, the analysis function does not necessarily need `Nonparametric` in
+its name. However, for planning functions, explicit names may help users
+discover the functionality.
+
+The proposed function names below are preliminary and should be reviewed for
+consistency with existing `rpact` naming conventions.
+
+# Function sketch: `getSampleSizeNonparametric()`
+
+Preliminary purpose:
+
+Compute the required sample size for a group sequential design when the
+treatment effect is specified on a nonparametric scale such as the Mann-Whitney
+parameter, win odds, or log win odds.
+
+Possible function skeleton:
+
+```r
+getSampleSizeNonparametric(
+    design,
+    effect,
+    effectMeasure = c("mannWhitneyParameter", "winOdds", "logWinOdds"),
+    test = c("wilcoxonMannWhitney", "brunnerMunzel", "logWinOdds"),
+    endpointScale = c("continuous", "ordinal", "orderedCategorical"),
+    direction = c("lowerIsBetter", "higherIsBetter"),
+    allocationRatioPlanned = 1,
+    power = 0.8,
+    thetaH0 = NULL,
+    ...
+)
+```
+
+Open design questions:
+
+- Should `effect` always be interpreted according to `effectMeasure`, or should
+  separate arguments such as `p`, `winOdds`, and `logWinOdds` be preferred?
+- Should `test = "logWinOdds"` automatically imply
+  `effectMeasure = "logWinOdds"`, or should the test and reporting scale be
+  independent?
+- How should assumptions about the underlying endpoint distribution be specified
+  for planning?
+- Which defaults are statistically defensible for ordinal endpoints with many
+  ties?
+- Should small-sample corrections or t-approximation options be available
+  already in sample size planning?
+
+# Function sketch: `getPowerNonparametric()`
+
+Preliminary purpose:
+
+Compute the power of a fixed or group sequential design for a treatment effect
+specified on a nonparametric scale.
+
+Possible function skeleton:
+
+```r
+getPowerNonparametric(
+    design,
+    maxNumberOfSubjects,
+    effect,
+    effectMeasure = c("mannWhitneyParameter", "winOdds", "logWinOdds"),
+    test = c("wilcoxonMannWhitney", "brunnerMunzel", "logWinOdds"),
+    endpointScale = c("continuous", "ordinal", "orderedCategorical"),
+    direction = c("lowerIsBetter", "higherIsBetter"),
+    allocationRatioPlanned = 1,
+    thetaH0 = NULL,
+    ...
+)
+```
+
+Open design questions:
+
+- Should `maxNumberOfSubjects` be specified as total sample size or per group
+  sample size?
+- Should information levels be estimated internally from the nonparametric
+  variance formulas, or provided by the user?
+- Should the function support both approximate analytical power formulas and
+  simulation-based power?
+- How should the function report power by stage, cumulative rejection
+  probabilities, and expected sample size?
+
+# Function sketch: `getAnalysisResults()`
+
+Preliminary purpose:
+
+Analyze accumulating trial data for a nonparametric group sequential endpoint.
+The endpoint type and analysis method should be recognized from the data, so a
+separate function name such as `getAnalysisResultsNonparametric()` should not be
+necessary, but may be used internally as a non-exported helper function.
+
+Possible function skeleton:
+
+```r
+getAnalysisResults(
+    design,
+    data,
+    ...
+)
+```
+
+Possible function skeleton of the internal helper function:
+
+```r
+.getAnalysisResultsNonparametric(
+    design,
+    data,
+    endpoint,
+    treatment,
+    stage = NULL,
+    effectMeasure = c("mannWhitneyParameter", "winOdds", "logWinOdds"),
+    test = c("wilcoxonMannWhitney", "brunnerMunzel", "logWinOdds"),
+    endpointScale = c("continuous", "ordinal", "orderedCategorical"),
+    direction = c("lowerIsBetter", "higherIsBetter"),
+    confidenceLevel = 0.95,
+    ...
+)
+```
+
+Possible outputs:
+
+- Stage-wise estimate of the Mann-Whitney parameter $\hat p_k$
+- Win odds and log win odds estimates, if requested
+- Repeated test statistics
+- Estimated information levels and information fractions
+- Stage levels and repeated p-values
+- Repeated confidence intervals
+- Stop / continue decision at each stage
+- Clear indication of the analysis method and effect scale used
+
+Open design questions:
+
+- Should `effectMeasure` define only the reporting scale, or also the scale on
+  which confidence intervals are constructed?
+- Should `test` define the statistical test, while `effectMeasure` defines the
+  displayed estimand?
+- Should there be a separate argument such as `ciScale` if confidence intervals
+  are computed on one scale and back-transformed to another?
+- How should ties be reported, especially for ordered categorical endpoints?
+- How should the function behave if information decreases from one stage to the
+  next due to the estimated variance structure?
+
+# Endpoint and scale handling
+
+The endpoint scale is practically important and should be represented explicitly
+in the API. A possible initial approach is to use separate parameters for the
+statistical method, effect scale, endpoint scale, and direction of benefit:
+
+```r
+test = c("wilcoxonMannWhitney", "brunnerMunzel", "logWinOdds")
+effectMeasure = c("mannWhitneyParameter", "winOdds", "logWinOdds")
+endpointScale = c("continuous", "ordinal", "orderedCategorical")
+direction = c("lowerIsBetter", "higherIsBetter")
+```
+
+This keeps the concepts separate:
+
+- `test` defines the statistical procedure.
+- `effectMeasure` defines the effect scale used for planning and/or reporting.
+- `endpointScale` documents the nature of the endpoint and may guide tie
+  handling, warnings, and output formatting.
+- `direction` defines whether smaller or larger values represent better
+  outcomes.
+
+An alternative would be a single higher-level parameter, for example:
+
+```r
+endpointType = c(
+    "mannWhitney",
+    "brunnerMunzel",
+    "winOdds",
+    "logWinOdds"
+)
+```
+
+This would be simpler for users, but it may mix the concepts of endpoint,
+estimand, test, and reporting scale. For this reason, the more explicit
+parameterization above may be preferable, at least internally.
+
+A useful compromise could be to provide user-friendly shortcuts while storing
+the fully resolved choices in the resulting object. For example,
+`endpointType = "ordinalWinOdds"` could internally resolve to
+`endpointScale = "ordinal"`, `test = "logWinOdds"`, and
+`effectMeasure = "winOdds"`.
+
+# Validation and examples to be added
+
+This section should be completed with input from the paper authors.
+
+Potential validation examples:
+
+- Reproduce the simulation scenarios from the paper
+- Reproduce the FREEDOMS application
+- Compare analytical power formulas with simulation-based power
+- Check behavior under equal and unequal allocation ratios
+- Check behavior for continuous and ordered categorical endpoints
+- Check behavior with ties and small sample sizes
+
+# References
+
+Nowak, C. P., Mütze, T., & Konietschke, F. Group sequential methods for the
+Mann-Whitney parameter.
