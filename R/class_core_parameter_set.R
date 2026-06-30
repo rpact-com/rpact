@@ -211,7 +211,8 @@ FieldSet <- R6::R6Class("FieldSet",
                 collapse = "", 
                 outputType = c("all", "print", "summary", "json"), 
                 addHeading = TRUE,
-                addMetaData = TRUE) {
+                addMetaData = TRUE, 
+                addFunctionCall = TRUE) {
             headingBaseNumeber <- Sys.getenv("RPACT_PRINT_HEADING_BASE_NUMBER")
             Sys.setenv("RPACT_PRINT_HEADING_BASE_NUMBER" = 1L)
             on.exit(Sys.setenv("RPACT_PRINT_HEADING_BASE_NUMBER" = headingBaseNumeber), add = TRUE)
@@ -227,8 +228,11 @@ FieldSet <- R6::R6Class("FieldSet",
                 output <- c(output, "# rpact Output\n\n")
             }
             
-            if (addMetaData && outputType == "all" && !inherits(self, "SummaryFactory") && 
-                    "SummaryFactory" != .getClassName(self)) {
+            isSummayObject <- function() {
+                return(inherits(self, "SummaryFactory") || "SummaryFactory" == .getClassName(self))
+            }
+            
+            if (addMetaData && !isSummayObject()) {
                 functionName <- .getGeneratorFunctionName(self)
                 metaData <- c(
                     '## Object metadata',
@@ -244,18 +248,29 @@ FieldSet <- R6::R6Class("FieldSet",
                 output <- c(output, paste(metaData, collapse = "\n"), "\n")
             }
             
+            if (addFunctionCall && !isSummayObject()) {
+                functionCall <- getObjectRCode(self, 
+                    includeDefaultParameters = TRUE, 
+                    stringWrapParagraphWidth = 80,
+                    stringWrapPrefix = "  ")
+                if (!is.null(functionCall)) {
+                    output <- c(output, "## Function call inclusive default parameters\n\n")
+                    output <- c(output, paste0("```r\n", paste0(functionCall, collapse = "\n"), "\n```\n\n"))
+                }
+            }
+            
             if (outputType %in% c("all", "print")) {
                 if (addHeading) {
-                    output <- c(output, "## User-facing Print Output\n\n")
+                    output <- c(output, "## User-facing print output\n\n")
                 }
                 output <- c(output, paste(self$.catLines, collapse = collapse))
             }
-            if (outputType %in% c("all", "summary")) {
+            if (outputType %in% c("all", "summary") && !isSummayObject()) {
                 if (outputType %in% c("all", "print")) {
                     output <- c(output, "")
                 }
                 if (addHeading) {
-                    output <- c(output, "## User-facing Summary\n\n")
+                    output <- c(output, "## User-facing summary\n\n")
                 }
                 summaryOutput <- summary(self)
                 if (is(summaryOutput, "FieldSet")) {
@@ -267,8 +282,7 @@ FieldSet <- R6::R6Class("FieldSet",
             }
             
             jsonOutput <- character()
-            if (outputType %in% c("all", "json") && !inherits(self, "SummaryFactory") && 
-                    "SummaryFactory" != .getClassName(self)) {
+            if (outputType %in% c("all", "json") && !isSummayObject()) {
                 if (outputType == "all") {
                     jsonOutput <- paste0(jsonOutput, "\n")
                 }
