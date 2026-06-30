@@ -188,10 +188,10 @@ summary.FutilityBounds <- function(object, ...) {
         objAttr$design$value <- objAttr$design$value$.toString(TRUE)
     }
 
-    userDefinedParams <- character(0)
-    derivedDefinedParams <- character(0)
-    defaultParams <- character(0)
-    generatedParams <- character(0)
+    userDefinedParams <- character()
+    derivedDefinedParams <- character()
+    defaultParams <- character()
+    generatedParams <- character()
 
     for (paramName in names(objAttr)) {
         entry <- objAttr[[paramName]]
@@ -340,7 +340,7 @@ summary.FutilityBounds <- function(object, ...) {
         " is available only for one-sided two-stage designs; invalid user input: "
     )
     
-    invalidInputs <- character(0)
+    invalidInputs <- character()
     if (design$sided != 1) {
         invalidInputs <- c(invalidInputs, paste0("sided = ", design$sided))
     }

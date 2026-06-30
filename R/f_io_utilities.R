@@ -218,7 +218,7 @@ writeKeyValueFile <- function(keyValueList,
         grepl("[[:space:]]|[=#;]", valueString)
     }
 
-    outputLines <- character(0)
+    outputLines <- character()
 
     if (writeHeader) {
         outputLines <- c(
@@ -396,7 +396,7 @@ readKeyValueFile <- function(filePath,
     }
 
     resultList <- list()
-    seenKeys <- character(0)
+    seenKeys <- character()
 
     for (line in inputLines) {
         trimmedLine <- trimWhitespace(line)

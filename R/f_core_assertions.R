@@ -3494,7 +3494,7 @@ NULL
         forbiddenParamNames,
         params,
         ...,
-        requiredParamNames = character(0)) {
+        requiredParamNames = character()) {
     theta <- numeric(0)
     for (existingParamName in existingParamNames) {
         existingParamValue <- params[[existingParamName]]
@@ -3526,7 +3526,7 @@ NULL
         }
     }
 
-    foundParamNames <- character(0)
+    foundParamNames <- character()
     for (forbiddenParamName in forbiddenParamNames) {
         forbiddenParamValue <- params[[forbiddenParamName]]
         if (!is.null(forbiddenParamValue) && !all(is.na(forbiddenParamValue))) {

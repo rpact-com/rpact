@@ -42,6 +42,7 @@ FieldSet <- R6::R6Class("FieldSet",
         .parameterTypes = NULL,
         .showParameterTypeEnabled = NULL,
         .catLines = NULL,
+        .jsonLines = NULL,
         .deprecatedFieldNames = NULL,
         .getFieldNames = function() {
             classNames <- class(self)
@@ -62,6 +63,8 @@ FieldSet <- R6::R6Class("FieldSet",
         },
         .resetCat = function() {
             self$.catLines <- character()
+            self$.jsonLines <- character()
+            private$.resetJson()
         },
         .cat = function(..., file = "", sep = "", fill = FALSE, labels = NULL,
                 append = FALSE, heading = 0, tableColumns = 0, consoleOutputEnabled = TRUE,
@@ -73,6 +76,8 @@ FieldSet <- R6::R6Class("FieldSet",
 
             args <- list(...)
             line <- ""
+            jsonLine <- ""
+            jsonValues <- NULL
             if (length(args) > 0) {
                 if (tableColumns > 0) {
                     values <- unlist(args, use.names = FALSE)
@@ -88,6 +93,7 @@ FieldSet <- R6::R6Class("FieldSet",
                         }
                         values[is.na(values) | nchar(trimws(values)) == 0] <- naStr
                     }
+                    jsonValues <- values
                     line <- paste0(values, collapse = "| ")
                     if (trimws(line) != "" && !grepl("\\| *$", line)) {
                         line <- paste0(line, "|")
@@ -100,6 +106,7 @@ FieldSet <- R6::R6Class("FieldSet",
                     line <- paste0(line, "\n")
                 } else {
                     line <- paste0(args, collapse = sep)
+                    jsonLine <- line
                     listItemEnabled <- grepl("^  ", line)
 
                     headingBaseNumber <- .getEnvironmentVariable(
@@ -157,6 +164,9 @@ FieldSet <- R6::R6Class("FieldSet",
                     }
                 }
             }
+            private$.addJsonLine(jsonLine,
+                values = jsonValues, heading = heading, tableColumns = tableColumns
+            )
             if (length(self$.catLines) == 0) {
                 self$.catLines <- line
             } else {
@@ -184,6 +194,287 @@ FieldSet <- R6::R6Class("FieldSet",
                 result[[fld]] <- self[[fld]]
             }
             return(result)
+        },
+
+        #' 
+        #' @title Capture printed output as Markdown string
+        #' 
+        #' @param ... Additional args passed to print/show methods
+        #' @param collapse Character used to join multiple output lines (default "")
+        #' @param outputType Type of output to capture: "all", "print", "summary", or "json" (default "all")
+        #' @return Character scalar with markdown-formatted content
+        #' 
+        #' @keywords internal
+        #' 
+        getStructuredContent = function(
+                ..., 
+                collapse = "", 
+                outputType = c("all", "print", "summary", "json"), 
+                addHeading = TRUE,
+                addMetaData = TRUE) {
+            headingBaseNumeber <- Sys.getenv("RPACT_PRINT_HEADING_BASE_NUMBER")
+            Sys.setenv("RPACT_PRINT_HEADING_BASE_NUMBER" = 1L)
+            on.exit(Sys.setenv("RPACT_PRINT_HEADING_BASE_NUMBER" = headingBaseNumeber), add = TRUE)
+
+            self$.show(consoleOutputEnabled = FALSE, ...)
+            if (length(self$.catLines) == 0) {
+                return(character())
+            }
+            
+            outputType <- match.arg(outputType)
+            output <- character()
+            if (addHeading) {
+                output <- c(output, "# rpact Output\n\n")
+            }
+            
+            if (addMetaData && outputType == "all" && !inherits(self, "SummaryFactory") && 
+                    "SummaryFactory" != .getClassName(self)) {
+                functionName <- .getGeneratorFunctionName(self)
+                metaData <- c(
+                    '## Object metadata',
+                    '',
+                    '```json',
+                    '{',
+                    '  "package": "rpact",',
+                    paste0('  "object_class": ["', .getClassName(self), '"],'),
+                    paste0('  "rpact_version": "', .getPackageVersionString(), '",'),
+                    paste0('  "created_by": "', functionName, '"'),
+                    '}',
+                    '```\n')
+                output <- c(output, paste(metaData, collapse = "\n"), "\n")
+            }
+            
+            if (outputType %in% c("all", "print")) {
+                if (addHeading) {
+                    output <- c(output, "## User-facing Print Output\n\n")
+                }
+                output <- c(output, paste(self$.catLines, collapse = collapse))
+            }
+            if (outputType %in% c("all", "summary")) {
+                if (outputType %in% c("all", "print")) {
+                    output <- c(output, "")
+                }
+                if (addHeading) {
+                    output <- c(output, "## User-facing Summary\n\n")
+                }
+                summaryOutput <- summary(self)
+                if (is(summaryOutput, "FieldSet")) {
+                    summaryOutput <- summaryOutput$getStructuredContent(collapse = collapse, outputType = "print", addHeading = FALSE)
+                } else {
+                    summaryOutput <- capture.output(summary(self))
+                }
+                output <- c(output, summaryOutput)
+            }
+            
+            jsonOutput <- character()
+            if (outputType %in% c("all", "json") && !inherits(self, "SummaryFactory") && 
+                    "SummaryFactory" != .getClassName(self)) {
+                if (outputType == "all") {
+                    jsonOutput <- paste0(jsonOutput, "\n")
+                }
+                if (addHeading) {
+                    jsonOutput <- paste0(jsonOutput, "## Structured result\n\n")
+                }
+                jsonOutput <- paste0(jsonOutput,
+                    "```json\n",
+                    paste(design$.jsonLines, collapse = "\n"),
+                    "\n```"
+                )
+            }
+
+            return(paste0(paste(output, collapse = collapse), jsonOutput))
+        }
+    ),
+    private = list(
+        .jsonData = list(),
+        .jsonGroupPath = character(),
+        .jsonGroupLevels = integer(),
+        .resetJson = function() {
+            private$.jsonData <- list()
+            private$.jsonGroupPath <- character()
+            private$.jsonGroupLevels <- integer()
+            self$.jsonLines <- character()
+        },
+        .addJsonLine = function(line, values = NULL, heading = 0, tableColumns = 0) {
+            if (heading > 0) {
+                groupName <- private$.getJsonName(line)
+                if (nchar(groupName) == 0) {
+                    return(invisible())
+                }
+
+                while (length(private$.jsonGroupLevels) > 0 &&
+                        private$.jsonGroupLevels[length(private$.jsonGroupLevels)] >= heading) {
+                    private$.jsonGroupLevels <- private$.jsonGroupLevels[-length(private$.jsonGroupLevels)]
+                    private$.jsonGroupPath <- private$.jsonGroupPath[-length(private$.jsonGroupPath)]
+                }
+
+                private$.jsonGroupLevels <- c(private$.jsonGroupLevels, heading)
+                private$.jsonGroupPath <- c(private$.jsonGroupPath, groupName)
+                private$.jsonData <- private$.setJsonValue(private$.jsonData, private$.jsonGroupPath)
+                private$.updateJsonLines()
+                return(invisible())
+            }
+
+            if (tableColumns > 0 && !is.null(values) && length(values) > 0) {
+                values <- trimws(values)
+                key <- private$.getJsonName(values[1])
+                if (nchar(key) > 0 && !grepl("^-+$", gsub(" ", "", key))) {
+                    private$.addJsonParameter(key, values[-1])
+                }
+                return(invisible())
+            }
+
+            if (is.null(line) || length(line) == 0 || is.na(line) || nchar(trimws(line)) == 0) {
+                return(invisible())
+            }
+
+            parts <- strsplit(line, " *: ")[[1]]
+            if (length(parts) == 2) {
+                private$.addJsonParameter(parts[1], parts[2])
+            }
+            return(invisible())
+        },
+        .addJsonParameter = function(key, value) {
+            key <- private$.getJsonName(key)
+            if (nchar(key) == 0) {
+                return(invisible())
+            }
+
+            value <- trimws(value)
+            private$.jsonData <- private$.setJsonValue(
+                private$.jsonData, private$.jsonGroupPath, key, value
+            )
+            private$.updateJsonLines()
+            return(invisible())
+        },
+        .getJsonName = function(value) {
+            if (is.null(value) || length(value) == 0 || is.na(value[1])) {
+                return("")
+            }
+
+            value <- trimws(gsub("\n", " ", as.character(value[1])))
+            value <- sub(":\\s*$", "", value, perl = TRUE)
+            value <- gsub("^\\*+|\\*+$", "", value)
+            return(trimws(value))
+        },
+        .setJsonValue = function(node, path, key = NULL, value = NULL) {
+            if (length(path) > 0) {
+                groupName <- path[1]
+                if (is.null(node[[groupName]]) || !is.list(node[[groupName]])) {
+                    node[[groupName]] <- list()
+                }
+                node[[groupName]] <- private$.setJsonValue(node[[groupName]], path[-1], key, value)
+                return(node)
+            }
+
+            if (is.null(key)) {
+                return(node)
+            }
+
+            if (!is.null(node[[key]]) && !is.list(node[[key]])) {
+                node[[key]] <- c(node[[key]], value)
+            } else if (!is.null(node[[key]]) && is.list(node[[key]])) {
+                node[[key]][["_value"]] <- c(node[[key]][["_value"]], value)
+            } else {
+                node[[key]] <- value
+            }
+            return(node)
+        },
+        .updateJsonLines = function() {
+            if (length(private$.jsonData) == 0) {
+                self$.jsonLines <- character()
+            } else {
+                self$.jsonLines <- private$.renderJson(private$.jsonData)
+            }
+        },
+        .renderJson = function(value, indent = 0) {
+            indentString <- paste0(rep(" ", indent), collapse = "")
+            if (is.list(value)) {
+                if (length(value) == 0) {
+                    return("{}")
+                }
+
+                lines <- "{"
+                valueNames <- names(value)
+                for (i in seq_along(value)) {
+                    childLines <- private$.renderJson(value[[i]], indent + 2)
+                    entryIndentString <- paste0(rep(" ", indent + 2), collapse = "")
+                    entryLines <- childLines
+                    entryLines[1] <- paste0(
+                        entryIndentString, private$.quoteJsonString(valueNames[i]), ": ", entryLines[1]
+                    )
+                    if (i < length(value)) {
+                        entryLines[length(entryLines)] <- paste0(entryLines[length(entryLines)], ",")
+                    }
+                    lines <- c(lines, entryLines)
+                }
+                return(c(lines, paste0(indentString, "}")))
+            }
+
+            if (length(value) == 0) {
+                return("[]")
+            }
+
+            items <- unlist(lapply(value, private$.getJsonValueItems), use.names = FALSE)
+            return(paste0("[", paste(items, collapse = ", "), "]"))
+        },
+        .getJsonValueItems = function(value) {
+            if (is.null(value) || length(value) == 0 || is.na(value[1])) {
+                return("null")
+            }
+
+            value <- trimws(as.character(value[1]))
+            logicalValueItems <- private$.getJsonLogicalValueItems(value)
+            if (!is.null(logicalValueItems)) {
+                return(logicalValueItems)
+            }
+
+            numericValueItems <- private$.getJsonNumericValueItems(value)
+            if (!is.null(numericValueItems)) {
+                return(numericValueItems)
+            }
+
+            return(private$.quoteJsonString(value))
+        },
+        .getJsonLogicalValueItems = function(value) {
+            if (nchar(value) == 0) {
+                return(NULL)
+            }
+
+            valueItems <- trimws(strsplit(value, ",", fixed = TRUE)[[1]])
+            if (length(valueItems) == 0 || any(nchar(valueItems) == 0)) {
+                return(NULL)
+            }
+
+            lowerValueItems <- tolower(valueItems)
+            if (!all(lowerValueItems %in% c("true", "false"))) {
+                return(NULL)
+            }
+
+            return(lowerValueItems)
+        },
+        .getJsonNumericValueItems = function(value) {
+            if (nchar(value) == 0) {
+                return(NULL)
+            }
+
+            valueItems <- trimws(strsplit(value, ",", fixed = TRUE)[[1]])
+            if (length(valueItems) == 0 || any(nchar(valueItems) == 0)) {
+                return(NULL)
+            }
+
+            numericValues <- suppressWarnings(as.numeric(valueItems))
+            if (any(is.na(numericValues)) || any(!is.finite(numericValues))) {
+                return(NULL)
+            }
+
+            return(as.character(numericValues))
+        },
+        .quoteJsonString = function(value) {
+            if (is.null(value) || length(value) == 0 || is.na(value[1])) {
+                return("null")
+            }
+            return(encodeString(as.character(value[1]), quote = "\""))
         }
     )
 )
@@ -215,7 +506,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         initialize = function(..., .showParameterTypeEnabled = TRUE) {
             self$.showParameterTypeEnabled <- .showParameterTypeEnabled
             self$.parameterTypes <- list()
-            self$.catLines <- character()
+            self$.resetCat()
             self$.deprecatedFieldNames <- character()
         },
         .toString = function(startWithUpperCase = FALSE) {
