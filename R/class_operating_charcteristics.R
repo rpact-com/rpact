@@ -41,18 +41,21 @@
 #' 
 OperatingCharcteristics <- R6::R6Class(
     "OperatingCharcteristics",
-    inherit = rpact:::FieldSet,
+    inherit = ParameterSet,
     public = list(
-        design = NULL,
+        .design = NULL,
         numberOfSubjects = NULL,
         probabilities = NULL,
         initialize = function(
                 design,
                 numberOfSubjects,
-                probabilities) {
-            self$design <- design
+                probabilities = NA_real_
+                ) {
+            self$.design <- design
             self$numberOfSubjects <- numberOfSubjects
             self$probabilities <- probabilities
+            self$.setParameterType("numberOfSubjects", C_PARAM_USER_DEFINED)
+            self$.setParameterType("probabilities", C_PARAM_GENERATED)
         }
     )
 )
@@ -85,27 +88,65 @@ OperatingCharcteristicsMeans <- R6::R6Class(
     inherit = OperatingCharcteristics,
     public = list(
         normalApproximation = NULL,
+        groups = NULL,
         alternative = NULL,
         stDev = NULL,
-        initialize = function(...,
-                normalApproximation,
-                alternative,
-                stDev) {
-            super$initialize(...)
-            self$normalApproximation <- normalApproximation
-            self$alternative <- alternative
-            self$stDev <- stDev
+        initialize = function(
+                ...,
+                design,
+                numberOfSubjects,
+                normalApproximation = TRUE,
+                groups = 2L,
+                alternative = seq(0, 1, 0.2),
+                stDev = 1,
+                probabilities = NA_real_
+                ) {      
+            super$initialize(
+                design = design, 
+                numberOfSubjects = numberOfSubjects, 
+                probabilities = probabilities, ...)
+            
+            .setValueAndParameterType(self, "normalApproximation", normalApproximation, TRUE)
+            .setValueAndParameterType(self, "groups", groups, 2L)
+            .setValueAndParameterType(self, "alternative", alternative, seq(0, 1, 0.2))
+            .setValueAndParameterType(self, "stDev", stDev, 1)
         },
-        show = function() {
-            self$.show()
+        show = function(showType = 1, digits = NA_integer_) {
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
-        .show = function(consoleOutputEnabled = FALSE) {
-            cat("Operating Characteristics for Comparing Means:\n")
-            cat("Design: Fixed Design\n")
-            print(self$design)
-            cat("Number of Subjects:\n")
-            print(self$numberOfSubjects)
-            # etc.
+        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
+            "Method for automatically printing trial operating-characteristics"
+            self$.resetCat()
+            if (showType == 3) {
+                .createSummary(self, digits = digits)$.show(
+                    showType = 1,
+                    digits = digits, consoleOutputEnabled = consoleOutputEnabled
+                )
+            } else if (showType == 2) {
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+            } else {
+                self$.cat("Parameters and output of ", self$.toString(), ":\n\n",
+                    heading = 1,
+                    consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getDerivedParameters(), "Derived from user defined parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getGeneratedParameters(), "Output",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+            }
+        },
+        .toString = function(startWithUpperCase = FALSE) {
+            s <- "operating-characteristics for comparing means"
+            return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         },
         .catMarkdownText = function() {
             self$.show()

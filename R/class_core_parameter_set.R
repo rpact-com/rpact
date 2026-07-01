@@ -1104,7 +1104,11 @@ ParameterSet <- R6::R6Class("ParameterSet",
 
             fieldCaptions <- character()
             for (parameterName in fieldNames) {
-                fieldCaptions <- c(fieldCaptions, .getParameterCaption(parameterName, self))
+                paramCaption <- .getParameterCaption(parameterName, self)
+                if (is.null(paramCaption)) {
+                    paramCaption <- paste0("%", parameterName, "%")
+                }
+                fieldCaptions <- c(fieldCaptions, paramCaption)
             }
             return(min(40, max(nchar(fieldCaptions))) + 4)
         },

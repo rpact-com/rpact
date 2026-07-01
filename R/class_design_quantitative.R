@@ -42,27 +42,54 @@
 #' 
 TrialDesignPlanQuantitative <- R6::R6Class(
     "TrialDesignPlanQuantitative",
-    inherit = rpact:::ParameterSet,
+    inherit = ParameterSet,
     public = list(
         targetValue = NULL,
         lowerReferenceValue = NULL,
         upperPercentile = NULL,
         lowerPercentile = NULL,
-        initialize = function(targetValue, lowerReferenceValue, upperPercentile, lowerPercentile) {
-            self$targetValue <- targetValue
-            self$lowerReferenceValue <- lowerReferenceValue
-            self$upperPercentile <- upperPercentile
-            self$lowerPercentile <- lowerPercentile
+        initialize = function(
+                ...,
+                targetValue = NA_real_, 
+                lowerReferenceValue = NA_real_, 
+                upperPercentile = 0.9, 
+                lowerPercentile = 0.2) {
+                
+            .setValueAndParameterType(self, "targetValue", targetValue, NA_real_)
+            .setValueAndParameterType(self, "lowerReferenceValue", lowerReferenceValue, NA_real_)
+            .setValueAndParameterType(self, "upperPercentile", upperPercentile, 0.9)
+            .setValueAndParameterType(self, "lowerPercentile", lowerPercentile, 0.2)
         },
-        show = function() {
-            self$.show()
+        show = function(showType = 1, digits = NA_integer_) {
+            self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
         },
-        .show = function(consoleOutputEnabled = FALSE) {
-            cat("Decision Rule:\n")
-            cat("Target Value:", self$targetValue, "\n")
-            cat("Lower Reference Value:", self$lowerReferenceValue, "\n")
-            cat("Upper Percentile:", self$upperPercentile, "\n")
-            cat("Lower Percentile:", self$lowerPercentile, "\n")
+        .show = function(showType = 1, digits = NA_integer_, consoleOutputEnabled = TRUE) {
+            "Method for automatically printing trial design objects"
+            self$.resetCat()
+            if (showType == 3) {
+                .createSummary(self, digits = digits)$.show(
+                    showType = 1,
+                    digits = digits, consoleOutputEnabled = consoleOutputEnabled
+                )
+            } else if (showType == 2) {
+                super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
+            } else {
+                self$.cat("Design parameters and output of ", self$.toString(), ":\n\n",
+                    heading = 1,
+                    consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getUserDefinedParameters(), "User defined parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showParametersOfOneGroup(self$.getDefaultParameters(), "Default parameters",
+                    orderByParameterName = FALSE, consoleOutputEnabled = consoleOutputEnabled
+                )
+                self$.showUnknownParameters(consoleOutputEnabled = consoleOutputEnabled)
+            }
+        },
+        .toString = function(startWithUpperCase = FALSE) {
+            s <- "quantitative trial design (decision rule)"
+            return(ifelse(startWithUpperCase, .firstCharacterToUpperCase(s), s))
         }
     )
 )

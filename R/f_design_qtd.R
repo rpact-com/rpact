@@ -62,8 +62,8 @@ getDesignQuantitative <- function(targetValue, lowerReferenceValue, upperPercent
     .assertIsSingleNumber(lowerReferenceValue, "lowerReferenceValue")
     .assertIsSingleNumber(upperPercentile, "upperPercentile")
     .assertIsSingleNumber(lowerPercentile, "lowerPercentile")
-    .assertIsInOpenInterval(upperPercentile, "upperPercentile", 0, 1)
-    .assertIsInOpenInterval(lowerPercentile, "lowerPercentile", 0, upperPercentile)
+    .assertIsInOpenInterval(upperPercentile, "upperPercentile", lower = 0, upper = 1)
+    .assertIsInOpenInterval(lowerPercentile, "lowerPercentile", lower = 0, upper = upperPercentile)
 
     TrialDesignPlanQuantitative$new(
         targetValue = targetValue,

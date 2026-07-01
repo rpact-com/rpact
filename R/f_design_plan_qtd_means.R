@@ -114,6 +114,7 @@
 #'   seq(0, 1, 0.2).
 #' @param stDev Numeric scalar. Common standard deviation for the endpoint in
 #'   each group. Must be positive. Default: 1.
+#' @inheritParams param_three_dots
 #'
 #' @details
 #' The function validates inputs and then calls internal helpers to compute
@@ -149,7 +150,8 @@
 #' @export
 #' 
 getOperatingCharcteristicsMeans <- function(
-    design,
+        design,
+        ...,
         numberOfSubjects,
         normalApproximation = TRUE,
         groups = 2,
@@ -174,7 +176,6 @@ getOperatingCharcteristicsMeans <- function(
         stDev = stDev
     )
     OperatingCharcteristicsMeans$new(
-        design = design,
         design = design,
         numberOfSubjects = numberOfSubjects,
         normalApproximation = normalApproximation,
