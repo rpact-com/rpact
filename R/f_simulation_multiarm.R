@@ -473,7 +473,7 @@ NULL
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic")) {
     endpoint <- match.arg(endpoint)
     simulationType <- match.arg(simulationType)
-
+    
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
 
     if (endpoint == "means") {
@@ -1030,11 +1030,12 @@ NULL
         }
         simulationResults$calcSubjectsFunction <- calcSubjectsFunction
     } else if (endpoint == "survival") {
-        expectedFunction <- if (identical(simulationType, "patientWiseBasic")) {
+        expectedFunction <- if (identical(simulationType, "testStatisticBased")) {
             .getSimulationSurvivalMultiArmStageEventsBasic
         } else {
             .getSimulationSurvivalMultiArmStageEvents
         }
+    
         if (is.null(calcEventsFunction)) {
             calcEventsFunction <- expectedFunction
         } else {

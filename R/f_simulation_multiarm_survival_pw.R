@@ -192,7 +192,7 @@ getSimulationMultiArmSurvival <- function(
             simulationType <- "testStatisticBased"
         }
     }
-
+    
     if (simulationType == "testStatisticBased") {
         if (usesPatientWiseOnlyArgs) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -511,7 +511,8 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         calcEventsFunction = calcEventsFunction, # survival only
         selectArmsFunction = selectArmsFunction,
         showStatistics = showStatistics,
-        endpoint = "survival"
+        endpoint = "survival",
+        simulationType = "patientWise"
     )
 
     design <- simulationResults$.design

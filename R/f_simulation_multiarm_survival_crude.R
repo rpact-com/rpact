@@ -417,7 +417,8 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
         calcEventsFunction          = calcEventsFunction, # survival only
         selectArmsFunction          = selectArmsFunction,
         showStatistics              = showStatistics,
-        endpoint                    = "survival"
+        endpoint                    = "survival",
+        simulationType              = "testStatisticBased"
     )
     for (notApplicableParam in c(
         "accrualIntensity",
@@ -450,7 +451,7 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
     maxNumberOfEventsPerStage <- simulationResults$maxNumberOfEventsPerStage # survival only
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
-
+    
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
     }
