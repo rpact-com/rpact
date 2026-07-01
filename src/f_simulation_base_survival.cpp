@@ -14,10 +14,6 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 8188 $
- * Last changed: $Date: 2024-09-10 09:56:44 +0200 (Di, 10 Sep 2024) $
- * Last changed by: $Author: pahlke $
- *
  */
 
 #include <Rcpp.h>
@@ -108,12 +104,12 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 		if (eventSorted[i]) {
 			if (treatmentGroupSorted[i] == 1) {
 				if (subjectsT1 + subjectsT2 > 0) {
-					numerator -= subjectsT2 / (thetaH0 * subjectsT1 + subjectsT2);
+				  numerator += 1 - thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2);
 				}
 				events1++;
 			} else if (treatmentGroupSorted[i] == 2) {
 				if (subjectsT1 + subjectsT2 > 0) {
-					numerator += 1 - subjectsT2 / (thetaH0 * subjectsT1 + subjectsT2);
+				  numerator -= thetaH0 * subjectsT1 / (thetaH0 * subjectsT1 + subjectsT2);
 				}
 				events2++;
 			}
@@ -131,14 +127,15 @@ List logRankTest(NumericVector accrualTime, NumericVector survivalTime,
 	}
 
 	double logRank;
+	
 	if (denominator > 0) {
-		logRank = -numerator / sqrt(denominator);
+		logRank = numerator / sqrt(denominator);
 	} else {
-		logRank = R_NegInf;
+	 	logRank = 0;
 	}
-
+	
 	if (!R_IsNA(directionUpper) && !directionUpper) {
-		logRank = -logRank;
+	logRank = -logRank;
 	}
 
 	NumericVector out(4);
@@ -185,8 +182,13 @@ NumericVector getIndependentIncrements(int stage, NumericVector eventsOverStages
 NumericVector getTestStatistics(int stage, int designNumber, NumericVector informationRates,
 		NumericVector eventsOverStages, NumericVector logRankOverStages) {
 
+	// Fixed design
+	if (designNumber == 0L) {
+		return NumericVector::create(logRankOverStages[0], 1 - getNormalDistribution((double) logRankOverStages[0]));
+	}
+
 	// Group sequential design
-	if (designNumber == 1) {
+	if (designNumber == 1L) {
 		return NumericVector::create(logRankOverStages[stage - 1], NA_REAL);
 	}
 
@@ -288,7 +290,7 @@ double getEstimatedTheta(
 /**
  * Get recalculated event sizes (only for stage > 1)
  */
-double getSimulationSuvivalStageEventsCpp(
+double getSimulationSurvivalStageEventsCpp(
 		int stage,
 		double conditionalPower,
 		double thetaH0,
@@ -314,8 +316,8 @@ double getSimulationSuvivalStageEventsCpp(
 	return requiredStageEvents;
 }
 
-Rcpp::XPtr<calcEventsFunctionSurvivalPtr> getSimulationSuvivalStageEventsXPtrCpp() {
-  return(Rcpp::XPtr<calcEventsFunctionSurvivalPtr>(new calcEventsFunctionSurvivalPtr(&getSimulationSuvivalStageEventsCpp)));
+Rcpp::XPtr<calcEventsFunctionSurvivalPtr> getSimulationSurvivalStageEventsXPtrCpp() {
+  return(Rcpp::XPtr<calcEventsFunctionSurvivalPtr>(new calcEventsFunctionSurvivalPtr(&getSimulationSurvivalStageEventsCpp)));
 }
 
 NumericMatrix getSimulationStepResultsSurvival(
@@ -621,7 +623,7 @@ List getSimulationSurvivalCpp(
 		Nullable<Function> calcEventsFunctionR,
 		SEXP calcEventsFunctionCpp) {
 
-	Rcpp::XPtr<calcEventsFunctionSurvivalPtr> calcEventsFunctionCppXPtr = getSimulationSuvivalStageEventsXPtrCpp();
+	Rcpp::XPtr<calcEventsFunctionSurvivalPtr> calcEventsFunctionCppXPtr = getSimulationSurvivalStageEventsXPtrCpp();
 	if (calcEventsFunctionType == 0) {
 		calcEventsFunctionR = NULL;
 	}

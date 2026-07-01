@@ -7,7 +7,7 @@
 getSimulationMultiArmSurvival(
   design = NULL,
   ...,
-  activeArms = 3L,
+  activeArms = NA_integer_,
   effectMatrix = NULL,
   typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
   omegaMaxVector = seq(1, 2.6, 0.4),

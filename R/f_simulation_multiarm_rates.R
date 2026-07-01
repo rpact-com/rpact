@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Tue, 10 Dec 2024) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_simulation_multiarm.R
 NULL
@@ -47,8 +43,9 @@ NULL
             }
             if (is.na(piTreatmentsH1)) {
                 piAssumedH1 <- .applyDirectionOfAlternative(
-                    overallRates[selectedArms[1:gMax, stage + 1], stage], 
-                    directionUpper, type = "minMax", phase = "planning"
+                    overallRates[selectedArms[1:gMax, stage + 1], stage],
+                    directionUpper,
+                    type = "minMax", phase = "planning"
                 )
             } else {
                 piAssumedH1 <- piTreatmentsH1
@@ -100,7 +97,7 @@ NULL
 
     if (.isTrialDesignFisher(design)) {
         weights <- .getWeightsFisher(design)
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else {
         weights <- .getWeightsInverseNormal(design)
     }
 
@@ -243,7 +240,8 @@ NULL
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
-                        "the output must be a single numeric value"
+                        "the output must be a single numeric value",
+                        call. = FALSE
                     )
                 }
 
@@ -263,8 +261,9 @@ NULL
 
             if (is.na(piTreatmentsH1)) {
                 piAssumedH1 <- .applyDirectionOfAlternative(
-                    overallRates[selectedArms[1:gMax, k], k], 
-                    directionUpper, type = "minMax", phase = "planning"
+                    overallRates[selectedArms[1:gMax, k], k],
+                    directionUpper,
+                    type = "minMax", phase = "planning"
                 )
             } else {
                 piAssumedH1 <- piTreatmentsH1
@@ -394,7 +393,7 @@ NULL
 #' @export
 #'
 getSimulationMultiArmRates <- function(design = NULL, ...,
-        activeArms = 3L, # C_ACTIVE_ARMS_DEFAULT
+        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
         piMaxVector = seq(0.2, 0.5, 0.1), # C_PI_1_DEFAULT
@@ -433,7 +432,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
             ), "showStatistics"), ...
         )
     } else {
-        .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+        .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMultiArmRates",
             ignore = "showStatistics", ...
@@ -445,9 +444,11 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
 
     calcSubjectsFunctionIsUserDefined <- !is.null(calcSubjectsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
-    
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
+
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,
@@ -486,7 +487,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     successCriterion <- simulationResults$successCriterion
     effectMeasure <- simulationResults$effectMeasure
     adaptations <- simulationResults$adaptations
-    gMax <- activeArms
+    gMax <- simulationResults$activeArms
     kMax <- simulationResults$.design$kMax
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection
@@ -599,12 +600,12 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
 
                 simulatedNumberOfActiveArms[k, i] <- simulatedNumberOfActiveArms[k, i] + sum(closedTest$selectedArms[, k])
 
-                if (!any(is.na(closedTest$successStop))) {
+                if (!anyNA(closedTest$successStop)) {
                     simulatedSuccessStopping[k, i] <- simulatedSuccessStopping[k, i] + closedTest$successStop[k]
                 }
 
                 if ((kMax > 1) && (k < kMax)) {
-                    if (!any(is.na(closedTest$futilityStop))) {
+                    if (!anyNA(closedTest$futilityStop)) {
                         simulatedFutilityStopping[k, i] <- simulatedFutilityStopping[k, i] +
                             (closedTest$futilityStop[k] && !closedTest$successStop[k])
                     }
@@ -700,6 +701,7 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
     if (kMax > 1) {
         simulationResults$earlyStop <- simulationResults$futilityPerStage +
             simulationResults$successPerStage[1:(kMax - 1), ]
+        simulationResults$.setParameterType("earlyStop", C_PARAM_GENERATED)
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
     simulationResults$sampleSizes <- simulatedSubjectsPerStage

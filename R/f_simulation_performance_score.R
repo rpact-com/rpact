@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7954 $
-## |  Last changed: $Date: 2024-05-29 12:02:48 +0200 (Mi, 29 Mai 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #'
 #' @title
@@ -56,14 +52,16 @@ getPerformanceScore <- function(simulationResult) {
     if (!inherits(simulationResult, "SimulationResultsMeans") && !inherits(simulationResult, "SimulationResultsRates")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "performance score so far implemented only for single comparisons with continuous and binary endpoints"
+            "performance score so far implemented only for single comparisons with continuous and binary endpoints",
+            call. = FALSE
         )
     }
 
     if (design$kMax != 2) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "performance score so far implemented only for two-stage designs"
+            "performance score so far implemented only for two-stage designs",
+            call. = FALSE
         )
     }
 
@@ -108,7 +106,8 @@ getPerformanceScore <- function(simulationResult) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "performance score is not available for class ",
-            class(simulationResult)[1]
+            class(simulationResult)[1],
+            call. = FALSE
         )
     }
     alternativeValues <- simulationResult[[alternativeParamName]]

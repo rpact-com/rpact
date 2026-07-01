@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8607 $
-## |  Last changed: $Date: 2025-03-12 12:57:53 +0100 (Mi, 12 Mrz 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_core_utilities.R
 #' @include f_core_assertions.R
@@ -36,14 +32,16 @@ SummaryItem <- R6::R6Class("SummaryItem",
                 if (is.null(names(self$legendEntry))) {
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        sQuote("legendEntry"), " must be a named list"
+                        sQuote("legendEntry"), " must be a named list",
+                        call. = FALSE
                     )
                 }
                 for (l in self$legendEntry) {
                     if (length(l) == 0) {
                         stop(
                             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                            sQuote("legendEntry"), " must be not empty"
+                            sQuote("legendEntry"), " must be not empty",
+                            call. = FALSE
                         )
                     }
                 }
@@ -305,7 +303,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             self$output <- output
             self$markdown <- markdown
             self$summaryItems <- list()
-            self$justify <- getOption("rpact.summary.justify", "right")
+            self$justify <- .getEnvironmentVariable(
+                "RPACT_SUMMARY_JUSTIFY",
+                "rpact.summary.justify",
+                default = "right",
+                type = "character"
+            )
         },
         show = function(showType = 1, digits = NA_integer_) {
             self$.show(showType = showType, digits = digits, consoleOutputEnabled = TRUE)
@@ -427,13 +430,14 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                     "'summaryItem' must be an instance of class ",
-                    "'SummaryItem' (was '", .getClassName(summaryItem), "')"
+                    "'SummaryItem' (was '", .getClassName(summaryItem), "')",
+                    call. = FALSE
                 )
             }
             self$summaryItems <- c(self$summaryItems, summaryItem)
         },
         .getFormattedParameterValue = function(valuesToShow, valuesToShow2) {
-            naText <- getOption("rpact.summary.na", "")
+            naText <- .getEnvironmentVariable("RPACT_SUMMARY_NA", "rpact.summary.na", default = "", type = "character")
             if (length(valuesToShow) == length(valuesToShow2) && !all(is.na(valuesToShow2))) {
                 for (variantIndex in seq_len(length(valuesToShow))) {
                     value1 <- trimws(as.character(valuesToShow[variantIndex]))
@@ -665,7 +669,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "for varied values 'parameterSet' must be an instance of ",
-                        "class 'ParameterSet' (was '", .getClassName(parameterSet), "')"
+                        "class 'ParameterSet' (was '", .getClassName(parameterSet), "')",
+                        call. = FALSE
                     )
                 }
 
@@ -801,7 +806,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                         if (.getLogicalEnvironmentVariable("RPACT_DEVELOPMENT_MODE")) {
                             warning(
                                 "Failed to get varied parameter from ", .getClassName(parameterSet),
-                                " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ")"
+                                " (", length(parameterNames), " parameter names; numberOfVariants: ", numberOfVariants, ";",
+                                length(variedParameter), " varied parameter values)"
                             )
                         }
                         return(invisible())
@@ -997,12 +1003,18 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
     if (digits < 1) {
         formattedValue <- as.character(values)
-        formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <- getOption("rpact.summary.na", "")
+        formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <-
+            .getEnvironmentVariable("RPACT_SUMMARY_NA", 
+                "rpact.summary.na", default = "", type = "character")
         return(formattedValue)
     }
 
     if (sum(is.na(values)) == length(values)) {
-        formattedValue <- rep(getOption("rpact.summary.na", ""), length(values))
+        formattedValue <- rep(
+            .getEnvironmentVariable("RPACT_SUMMARY_NA", 
+                "rpact.summary.na", default = "", type = "character"),
+            length(values)
+        )
         return(formattedValue)
     }
 
@@ -1034,7 +1046,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             nchar(gsub("\\D", "", (formattedValue))) > 0 & formattedValue > 0.4999] <- ">0.5"
     }
 
-    if (as.logical(getOption("rpact.summary.trim.zeroes", TRUE))) {
+    if (as.logical(.getEnvironmentVariable(
+        "RPACT_SUMMARY_TRIM_ZEROES",
+        "rpact.summary.trim.zeroes",
+        default = TRUE,
+        type = "logical"
+    ))) {
         zeroes <- grepl("^0\\.0*$", formattedValue)
         if (sum(zeroes) > 0) {
             formattedValue[zeroes] <- "0"
@@ -1047,12 +1064,18 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     }
 
     formattedValue[is.na(formattedValue) | trimws(formattedValue) == "NA"] <-
-        ifelse(showNA, "n/a", getOption("rpact.summary.na", ""))
+        ifelse(showNA, "n/a", .getEnvironmentVariable(
+            "RPACT_SUMMARY_NA",
+            "rpact.summary.na",
+            default = "",
+            type = "character"
+        ))
 
     return(formattedValue)
 }
 
-.getSummaryValuesFormatted <- function(fieldSet,
+.getSummaryValuesFormatted <- function(
+        fieldSet,
         parameterName,
         values,
         ...,
@@ -1090,7 +1113,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     }
                 } else if (!is.null(parameterName) && length(parameterName) == 1 && !is.na(parameterName)) {
                     if (parameterName == "futilityBounds") {
-                        values[!is.na(values) & values <= C_FUTILITY_BOUNDS_DEFAULT] <- -Inf
+                        values <- .getFormattedFutilityBounds(design = fieldSet, futilityBounds = values)
                     } else if (parameterName %in% c(
                             "criticalValues",
                             "decisionCriticalValue", "overallAdjustedTestStatistics"
@@ -1105,15 +1128,15 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     }
                     if (!is.na(roundDigits) && roundDigits == 0) {
                         if (inherits(fieldSet, "Dataset") &&
-                                grepl("samplesize|event", tolower(parameterName))) {
-                        } else {
+                                grepl("samplesize|event", tolower(parameterName))) {} else {
                             formatFunctionName <- .getParameterFormatFunction(parameterName, fieldSet)
                         }
                     }
                 }
 
                 if (!is.null(formatFunctionName)) {
-                    values <- eval(call(formatFunctionName, values))
+                    values <- .getParameterValueFormattedByFormatFunctionName(
+                        formatFunctionName, values, fieldSet)                    
                 } else {
                     values <- .formatSummaryValues(values,
                         digits = roundDigits,
@@ -1311,7 +1334,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'object' must be an instance of class 'AnalysisResults', 'TrialDesignPlan' ",
-            "or 'SimulationResults' (is '", .getClassName(object), "')"
+            "or 'SimulationResults' (is '", .getClassName(object), "')",
+            call. = FALSE
         )
     }
 
@@ -1439,7 +1463,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 }
 
 .addSummaryLineBreak <- function(text, newLineLength) {
-    maxLineLength <- as.integer(getOption("rpact.summary.width", 83))
+    maxLineLength <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_WIDTH",
+        "rpact.summary.width",
+        default = 83,
+        type = "integer"
+    )
     lines <- strsplit(text, "\n", fixed = TRUE)[[1]]
     lastLine <- lines[length(lines)]
     if (nchar(lastLine) + newLineLength > maxLineLength) {
@@ -1755,7 +1784,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         identical(unique(analysisResults$allocationRatioPlanned), 1), "", ",")
 
     if (case1) {
-        if (!any(is.na(paramValue1)) && length(unique(paramValue1)) == 1) {
+        if (!anyNA(paramValue1) && length(unique(paramValue1)) == 1) {
             paramValue1 <- paramValue1[1]
         }
         if (length(paramValue1) == 1) {
@@ -1799,7 +1828,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         powerEnabled = NA,
         sep = ", ") {
     if (is.na(powerEnabled)) {
-        powerEnabled <- .isTrialDesignInverseNormalOrGroupSequential(design) &&
+        powerEnabled <- .isTrialDesignGroupSequentialOrFixed(design) &&
             (is.null(designPlan) || (!.isSimulationResults(designPlan) &&
                 !identical("power", designPlan[[".objectType"]])))
     }
@@ -1866,7 +1895,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         return(NULL)
     }
 
-    if (!.isTrialDesignInverseNormalOrGroupSequential(design)) {
+    if (!.isTrialDesignGroupSequentialOrFixed(design)) {
         return(NULL)
     }
 
@@ -1931,7 +1960,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 )
             } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_AS_USER) {
                 header <- .concatenateSummaryText(header,
-                    paste0("(", .arrayToString(round(design$userAlphaSpending, 3)), ")"),
+                    paste0("(", .arrayToString(design$userAlphaSpending, digits = 6), ")"),
                     sep = " "
                 )
             }
@@ -1946,21 +1975,37 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     )
                 } else if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_USER) {
                     header <- .concatenateSummaryText(header,
-                        paste0("(", .arrayToString(round(design$userBetaSpending, 3)), ")"),
+                        paste0("(", .arrayToString(design$userBetaSpending, digits = 6), ")"),
                         sep = " "
                     )
                 }
             }
         }
         if (!.isDelayedInformationEnabled(design = design) &&
-                ((.isTrialDesignInverseNormalOrGroupSequential(design) &&
-                    any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) ||
+                (.isTrialDesignWithValidFutilityBounds(design) ||
                     (.isTrialDesignFisher(design) && any(design$alpha0Vec < 1, na.rm = TRUE)))) {
             header <- .concatenateSummaryText(
                 header,
                 paste0(ifelse(design$bindingFutility, "binding", "non-binding"), " futility")
             )
         }
+
+        if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
+                !all(is.na(design$efficacyStops)) && !all(design$efficacyStops, na.rm = TRUE)) {
+            header <- .concatenateSummaryText(
+                header,
+                paste0("efficacy stops ", .arrayToString(design$efficacyStops, vectorLookAndFeelEnabled = TRUE))
+            )
+        }
+
+        if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
+                !all(is.na(design$futilityStops)) && !all(design$futilityStops, na.rm = TRUE)) {
+            header <- .concatenateSummaryText(
+                header,
+                paste0("futility stops ", .arrayToString(design$futilityStops, vectorLookAndFeelEnabled = TRUE))
+            )
+        }
+
         header <- .addAlphaAndBetaToHeader(header, design, designPlan)
         header <- .concatenateSummaryText(header, "undefined endpoint")
 
@@ -1970,7 +2015,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 header,
                 paste0("inflation factor ", round(designCharacteristics$inflationFactor, 4))
             )
-            outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
+            outputSize <- .getEnvironmentVariable(
+                "RPACT_SUMMARY_OUTPUT_SIZE",
+                "rpact.summary.output.size",
+                default = C_SUMMARY_OUTPUT_SIZE_DEFAULT,
+                type = "character"
+            )
             if (outputSize == "large") {
                 header <- .concatenateSummaryText(
                     header,
@@ -2080,7 +2130,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     if (part != "") {
         header <- .concatenateSummaryText(header, paste0("(", part, ")"), sep = " ")
     }
-    if (settings$countDataEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
+    if (settings$countDataEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
         header <- .concatenateSummaryText(header, .createSummaryHypothesisText(designPlan, summaryFactory))
         if (!is.null(designPlan[["theta"]]) && length(designPlan$theta) == 1) {
@@ -2090,7 +2140,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
         header <- .concatenateSummaryText(header, effectText)
         header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
-    } else if (settings$meansEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
+    } else if (settings$meansEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
         header <- .concatenateSummaryText(header, .createSummaryHypothesisText(designPlan, summaryFactory))
         if (!is.null(designPlan[["alternative"]]) && length(designPlan$alternative) == 1) {
@@ -2138,7 +2188,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             ))
         }
         header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
-    } else if (settings$ratesEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
+    } else if (settings$ratesEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
         if (settings$groups == 1) {
             if (!is.null(designPlan[["pi1"]]) && length(designPlan$pi1) == 1) {
@@ -2200,7 +2250,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             header <- .addEnrichmentEffectListToHeader(header, designPlan)
             header <- .addAdditionalArgumentsToHeader(header, designPlan, settings)
         }
-    } else if (settings$survivalEnabled && (.isTrialDesignInverseNormalOrGroupSequential(design) ||
+    } else if (settings$survivalEnabled && (.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
             inherits(designPlan, "SimulationResults"))) {
         parameterNames <- designPlan$.getVisibleFieldNamesOrdered()
         numberOfVariants <- .getMultidimensionalNumberOfVariants(designPlan, parameterNames)
@@ -2278,10 +2328,10 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             treatmentRateText <- paste0(
                 treatmentRateText, ", \n",
                 "piecewise survival time = ", .arrayToString(round(designPlan$piecewiseSurvivalTime, 4),
-                    vectorLookAndFeelEnabled = TRUE
+                    digits = 4, vectorLookAndFeelEnabled = TRUE
                 ), ", \n",
                 "control lambda(2) = ", .arrayToString(round(designPlan$lambda2, 4),
-                    vectorLookAndFeelEnabled = TRUE
+                    digits = 4, vectorLookAndFeelEnabled = TRUE
                 )
             )
         }
@@ -2474,12 +2524,20 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             header <- .concatenateSummaryText(header, paste0(
                 "follow-up time = ", round(
                     designPlan$followUpTime[1],
-                    as.integer(getOption("rpact.summary.digits", 3))
+                    .getEnvironmentVariable(
+                        "RPACT_SUMMARY_DIGITS",
+                        "rpact.summary.digits",
+                        default = 3L,
+                        type = "integer"
+                    )
                 )
             ))
         }
-        if (settings$survivalEnabled && !is.null(designPlan[["dropoutTime"]])) {
-            if (designPlan$dropoutRate1 > 0 || designPlan$dropoutRate2 > 0) {
+        if (settings$survivalEnabled &&
+                !is.null(designPlan[["dropoutTime"]]) &&
+                !is.na(designPlan$dropoutTime)) {
+            if ((!is.na(designPlan$dropoutRate1) && designPlan$dropoutRate1 > 0) ||
+                    (!is.na(designPlan$dropoutRate2) && designPlan$dropoutRate2 > 0)) {
                 header <- .concatenateSummaryText(header, paste0(
                     "dropout rate(1) = ",
                     .arrayToString(designPlan$dropoutRate1,
@@ -2771,15 +2829,26 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     if (!inherits(object, "AnalysisResults")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'object' must be a valid analysis result object (is class ", .getClassName(object), ")"
+            "'object' must be a valid analysis result object (is class ", .getClassName(object), ")",
+            call. = FALSE
         )
     }
 
     digitSettings <- .getSummaryDigits(digits)
 
-    outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
+    outputSize <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_OUTPUT_SIZE",
+        "rpact.summary.output.size",
+        default = C_SUMMARY_OUTPUT_SIZE_DEFAULT,
+        type = "character"
+    )
 
-    intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
+    intervalFormat <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_INTERVALFORMAT",
+        "rpact.summary.intervalFormat",
+        default = "[%s; %s]",
+        type = "character"
+    )
     .assertIsValidSummaryIntervalFormat(intervalFormat)
 
     multiArmEnabled <- .isMultiArmAnalysisResults(object)
@@ -3116,7 +3185,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
 .getSummaryDigits <- function(digits = NA_integer_) {
     if (is.na(digits)) {
-        digits <- as.integer(getOption("rpact.summary.digits", 3))
+        digits <- .getEnvironmentVariable(
+            "RPACT_SUMMARY_DIGITS",
+            "rpact.summary.digits",
+            default = 3L,
+            type = "integer"
+        )
     }
     .assertIsSingleInteger(digits, "digits", validateType = FALSE, naAllowed = TRUE)
     .assertIsInClosedInterval(digits, "digits", lower = -1, upper = 12, naAllowed = TRUE)
@@ -3128,10 +3202,14 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         digitsProbabilities <- NA_integer_
         tryCatch(
             {
-                digitsProbabilities <- as.integer(getOption("rpact.summary.digits.probs", digits + 1))
+                digitsProbabilities <- .getEnvironmentVariable(
+                    "RPACT_SUMMARY_DIGITS_PROBS",
+                    "rpact.summary.digits.probs",
+                    default = as.integer(digits + 1L),
+                    type = "integer"
+                )
             },
-            warning = function(e) {
-            }
+            warning = function(e) {}
         )
         if (is.na(digitsProbabilities)) {
             digitsProbabilities <- digits + 1
@@ -3273,7 +3351,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
     } else {
-        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+        if (.isTrialDesignWithValidFutilityBounds(design)) {
             summaryFactory$addParameter(design,
                 parameterName = "futilityBounds",
                 parameterCaption = .getSummaryParameterCaptionFutilityBounds(design),
@@ -3307,7 +3385,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
     )
 
     if (design$kMax > 1 && !is.null(designCharacteristics[["futilityProbabilities"]]) &&
-            !any(is.na(designCharacteristics$futilityProbabilities)) &&
+            !anyNA(designCharacteristics$futilityProbabilities) &&
             any(designCharacteristics$futilityProbabilities > 0)) {
         summaryFactory$addParameter(designCharacteristics,
             parameterName = "futilityProbabilities",
@@ -3342,14 +3420,25 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'object' must be a valid design, design plan, ",
-            "or simulation result object (is class ", .getClassName(object), ")"
+            "or simulation result object (is class ", .getClassName(object), ")",
+            call. = FALSE
         )
     }
 
     digitSettings <- .getSummaryDigits(digits)
-    outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
+    outputSize <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_OUTPUT_SIZE",
+        "rpact.summary.output.size",
+        default = C_SUMMARY_OUTPUT_SIZE_DEFAULT,
+        type = "character"
+    )
 
-    intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
+    intervalFormat <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_INTERVALFORMAT",
+        "rpact.summary.intervalFormat",
+        default = "[%s; %s]",
+        type = "character"
+    )
     .assertIsValidSummaryIntervalFormat(intervalFormat)
 
     summaryFactory <- SummaryFactory$new(
@@ -3458,7 +3547,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             smoothedZeroFormat = TRUE
         )
 
-        outputSize <- getOption("rpact.summary.output.size", C_SUMMARY_OUTPUT_SIZE_DEFAULT)
+        outputSize <- .getEnvironmentVariable(
+            "RPACT_SUMMARY_OUTPUT_SIZE",
+            "rpact.summary.output.size",
+            default = C_SUMMARY_OUTPUT_SIZE_DEFAULT,
+            type = "character"
+        )
         if (outputSize == "large") {
             summaryFactory$addParameter(design,
                 parameterName = "reversalProbabilities",
@@ -3932,7 +4026,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 probsH1$rejectPerStage <- probsH1$rejectPerStage[1:(design$kMax - 1)]
             }
 
-            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+            if (.isTrialDesignWithValidFutilityBounds(design)) {
                 if (is.matrix(probsH1$earlyStop)) {
                     probsH1$earlyStop <- matrix(probsH1$earlyStop[1:(design$kMax - 1), ],
                         ncol = ncol(probsH1$earlyStop)
@@ -3981,7 +4075,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                 )
             }
 
-            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+            if (.isTrialDesignWithValidFutilityBounds(design)) {
                 summaryFactory$addParameter(probsH0,
                     parameterName = "futilityPerStage",
                     parameterCaption = "Exit probability for futility (under H0)",
@@ -4003,7 +4097,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
     } else {
         rejectPerStageValues <- NULL
-        if (!is.null(probsH1)) {
+        if (!is.null(probsH1) && !simulationEnabled) {
             if (is.matrix(probsH1$rejectPerStage)) {
                 rejectPerStageValues <- matrix(probsH1$rejectPerStage[1:(design$kMax - 1), ], ncol = ncol(probsH1$rejectPerStage))
             } else {
@@ -4020,9 +4114,9 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             )
         }
 
-        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE) &&
+        if (.isTrialDesignWithValidFutilityBounds(design) &&
                 !is.null(designPlan[["futilityPerStage"]]) &&
-                !any(is.na(designPlan[["futilityPerStage"]])) &&
+                !anyNA(designPlan[["futilityPerStage"]]) &&
                 any(designPlan$futilityPerStage != 0) &&
                 any(designPlan$futilityPerStage > 1e-08)) {
             summaryFactory$addParameter(designPlan,
@@ -4117,7 +4211,12 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 }
 
 .getSummaryGroupCaption <- function(designPlan, parameterName, numberOfGroups, groupNumber) {
-    listItemPrefix <- getOption("rpact.summary.list.item.prefix", C_SUMMARY_LIST_ITEM_PREFIX_DEFAULT)
+    listItemPrefix <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_LIST_ITEM_PREFIX",
+        "rpact.summary.list.item.prefix",
+        default = C_SUMMARY_LIST_ITEM_PREFIX_DEFAULT,
+        type = "character"
+    )
 
     if (grepl("Enrichment", .getClassName(designPlan))) {
         categoryCaption <- .getCategoryCaptionEnrichment(designPlan, parameterName, groupNumber)

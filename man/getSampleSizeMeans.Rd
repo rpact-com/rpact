@@ -125,9 +125,9 @@ getSampleSizeMeans(getDesignGroupSequential(typeOfDesign = "P", alpha = 0.05,
 
 }
 \seealso{
-Other sample size functions: 
-\code{\link{getSampleSizeCounts}()},
-\code{\link{getSampleSizeRates}()},
-\code{\link{getSampleSizeSurvival}()}
+Other sample size functions:
+\code{\link[=getSampleSizeCounts]{getSampleSizeCounts()}},
+\code{\link[=getSampleSizeRates]{getSampleSizeRates()}},
+\code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}
 }
 \concept{sample size functions}

@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8558 $
-## |  Last changed: $Date: 2025-02-17 10:11:35 +0100 (Mo, 17 Feb 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_core_utilities.R
 NULL
@@ -35,7 +31,7 @@ NULL
         directionUpper = NA,
         thetaH0 = NA_real_,
         nPlanned = NA_real_) {
-    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
     .assertIsValidIntersectionTestMultiArm(design, intersectionTest)
     .assertIsOneSidedDesign(design, designType = "multi-arm", engineType = "analysis")
 
@@ -54,9 +50,13 @@ NULL
         }
         return(.getAnalysisResultsMeansMultiArm(
             design = design,
-            dataInput = dataInput, intersectionTest = intersectionTest,
-            directionUpper = directionUpper, thetaH0 = thetaH0,
-            nPlanned = nPlanned, stage = stage, ...
+            dataInput = dataInput,
+            intersectionTest = intersectionTest,
+            directionUpper = directionUpper,
+            thetaH0 = thetaH0,
+            nPlanned = nPlanned,
+            stage = stage,
+            ...
         ))
     }
 
@@ -66,9 +66,13 @@ NULL
         }
         return(.getAnalysisResultsRatesMultiArm(
             design = design,
-            dataInput = dataInput, intersectionTest = intersectionTest,
-            directionUpper = directionUpper, thetaH0 = thetaH0,
-            nPlanned = nPlanned, stage = stage, ...
+            dataInput = dataInput,
+            intersectionTest = intersectionTest,
+            directionUpper = directionUpper,
+            thetaH0 = thetaH0,
+            nPlanned = nPlanned,
+            stage = stage,
+            ...
         ))
     }
 
@@ -78,14 +82,17 @@ NULL
         }
         return(.getAnalysisResultsSurvivalMultiArm(
             design = design,
-            dataInput = dataInput, intersectionTest = intersectionTest,
-            directionUpper = directionUpper, thetaH0 = thetaH0,
-            nPlanned = nPlanned, stage = stage, ...
+            dataInput = dataInput,
+            intersectionTest = intersectionTest,
+            directionUpper = directionUpper,
+            thetaH0 = thetaH0,
+            nPlanned = nPlanned,
+            stage = stage,
+            ...
         ))
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
-        "'", .getClassName(dataInput), "' is not implemented yet")
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
@@ -94,88 +101,88 @@ NULL
 #'
 #' @noRd
 #'
-.getStageResultsMultiArm <- function(
-        design, 
-        dataInput, 
-        ..., 
+.getStageResultsMultiArm <- function(design,
+        dataInput,
+        ...,
         directionUpper = NA) {
-    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
 
     if (dataInput$isDatasetMeans()) {
         return(.getStageResultsMeansMultiArm(
-            design = design, 
-            dataInput = dataInput, 
-            directionUpper = directionUpper, 
-            userFunctionCallEnabled = TRUE, 
-            ...))
+            design = design,
+            dataInput = dataInput,
+            directionUpper = directionUpper,
+            userFunctionCallEnabled = TRUE,
+            ...
+        ))
     }
 
     if (dataInput$isDatasetRates()) {
         return(.getStageResultsRatesMultiArm(
-            design = design, 
-            dataInput = dataInput, 
-            directionUpper = directionUpper, 
-            userFunctionCallEnabled = TRUE, 
-            ...))
+            design = design,
+            dataInput = dataInput,
+            directionUpper = directionUpper,
+            userFunctionCallEnabled = TRUE,
+            ...
+        ))
     }
 
     if (dataInput$isDatasetSurvival()) {
         return(.getStageResultsSurvivalMultiArm(
-            design = design, 
-            dataInput = dataInput, 
-            directionUpper = directionUpper, 
-            userFunctionCallEnabled = TRUE, 
-            ...))
+            design = design,
+            dataInput = dataInput,
+            directionUpper = directionUpper,
+            userFunctionCallEnabled = TRUE,
+            ...
+        ))
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type ",
-        "'", .getClassName(dataInput), "' is not supported")
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
 #' Get Repeated Confidence Intervals for multi-arm case
-#' Calculates and returns the lower and upper limit of the repeated 
+#' Calculates and returns the lower and upper limit of the repeated
 #' confidence intervals of the trial for multi-arm designs.
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsMultiArm <- function(
-        design, 
-        dataInput, 
+.getRepeatedConfidenceIntervalsMultiArm <- function(design,
+        dataInput,
         ...) {
-    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+    .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .assertIsValidDataInput(dataInput = dataInput, design = design, stage = stage)
     on.exit(dataInput$.trim())
 
     if (dataInput$isDatasetMeans()) {
         return(.getRepeatedConfidenceIntervalsMeansMultiArm(
-            design = design, 
-            dataInput = dataInput, 
+            design = design,
+            dataInput = dataInput,
             ...
         ))
     }
 
     if (dataInput$isDatasetRates()) {
         return(.getRepeatedConfidenceIntervalsRatesMultiArm(
-            design = design, 
-            dataInput = dataInput, 
+            design = design,
+            dataInput = dataInput,
             ...
         ))
     }
 
     if (dataInput$isDatasetSurvival()) {
         return(.getRepeatedConfidenceIntervalsSurvivalMultiArm(
-            design = design, 
-            dataInput = dataInput, 
+            design = design,
+            dataInput = dataInput,
             ...
         ))
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '", .getClassName(dataInput), "' is not implemented yet")
+    .fireDataInputNotSupportedException(dataInput)
 }
 
 #'
@@ -200,8 +207,8 @@ NULL
 
         return(.getConditionalPowerMeansMultiArm(
             stageResults = stageResults,
-            nPlanned = nPlanned, 
-            allocationRatioPlanned = allocationRatioPlanned, 
+            nPlanned = nPlanned,
+            allocationRatioPlanned = allocationRatioPlanned,
             ...
         ))
     }
@@ -209,8 +216,8 @@ NULL
     if (stageResults$isDatasetRates()) {
         return(.getConditionalPowerRatesMultiArm(
             stageResults = stageResults,
-            nPlanned = nPlanned, 
-            allocationRatioPlanned = allocationRatioPlanned, 
+            nPlanned = nPlanned,
+            allocationRatioPlanned = allocationRatioPlanned,
             ...
         ))
     }
@@ -218,16 +225,13 @@ NULL
     if (stageResults$isDatasetSurvival()) {
         return(.getConditionalPowerSurvivalMultiArm(
             stageResults = stageResults,
-            nPlanned = nPlanned, 
-            allocationRatioPlanned = allocationRatioPlanned, 
+            nPlanned = nPlanned,
+            allocationRatioPlanned = allocationRatioPlanned,
             ...
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '",
-        .getClassName(stageResults$.dataInput), "' is not implemented yet"
-    )
+    .fireDataInputNotSupportedException(stageResults$getDataInput())
 }
 
 .getIndicesOfClosedHypothesesSystem <- function(gMax) {
@@ -253,7 +257,7 @@ NULL
     gMax <- stageResults$getGMax()
     kMax <- design$kMax
     indices <- .getIndicesOfClosedHypothesesSystem(gMax = gMax)
-    
+
     adjustedStageWisePValues <- matrix(NA_real_, nrow = 2^gMax - 1, ncol = kMax)
     adjustedOverallPValues <- matrix(NA_real_, nrow = 2^gMax - 1, ncol = kMax)
 
@@ -456,7 +460,7 @@ NULL
 #' @export
 #'
 getClosedCombinationTestResults <- function(stageResults) {
-    .assertIsTrialDesignInverseNormalOrFisher(stageResults$.design)
+    .assertIsTrialDesignInverseNormalOrFisherOrFixed(stageResults$.design)
 
     result <- .performClosedCombinationTest(stageResults = stageResults)
     return(ClosedCombinationTestResults$new(
@@ -566,8 +570,8 @@ getClosedCombinationTestResults <- function(stageResults) {
     }
 
     intersectionTest <- stageResults$intersectionTest
-
-    if (!.isTrialDesignFisher(design) && (design$typeOfDesign == C_TYPE_OF_DESIGN_HP)) {
+    futilityBounds <- .getFutilityBounds(design)
+    if (!.isTrialDesignFixed(design) && !.isTrialDesignFisher(design) && (design$typeOfDesign == C_TYPE_OF_DESIGN_HP)) {
         if (stage == kMax) {
             startTime <- Sys.time()
             for (g in 1:gMax) {
@@ -578,7 +582,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                         sided = design$sided,
                         informationRates = design$informationRates,
                         typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                        futilityBounds = design$futilityBounds,
+                        futilityBounds = futilityBounds,
                         bindingFutility = design$bindingFutility
                     )$alphaSpent[kMax - 1] + tolerance
                     upper <- 0.5
@@ -588,7 +592,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                         designAlpha <- .getDesignInverseNormal(
                             kMax = kMax,
                             alpha = alpha, typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                            futilityBounds = design$futilityBounds,
+                            futilityBounds = futilityBounds,
                             sided = design$sided, bindingFutility = design$bindingFutility,
                             informationRates = design$informationRates
                         )
@@ -605,7 +609,7 @@ getClosedCombinationTestResults <- function(stageResults) {
             }
             .logProgress("Repeated p-values for final stage calculated", startTime = startTime)
         }
-    } else if (kMax == 1) {
+    } else if (.isTrialDesignFixed(design) || kMax == 1) {
         startTime <- Sys.time()
 
         for (g in 1:gMax) {
@@ -619,11 +623,12 @@ getClosedCombinationTestResults <- function(stageResults) {
                     if (.isTrialDesignFisher(design)) {
                         designAlpha <- .getDesignFisher(kMax = 1, alpha = alpha)
                     } else {
-                        designAlpha <- .getDesignInverseNormal(kMax = 1, alpha = alpha)
+                        suppressWarnings(designAlpha <- .getDesignInverseNormal(kMax = 1, alpha = alpha))
                     }
                     ctr <- .performClosedCombinationTest(
                         stageResults = stageResults,
-                        design = designAlpha, intersectionTest = intersectionTest
+                        design = designAlpha, 
+                        intersectionTest = intersectionTest
                     )
                     ifelse(ctr$rejected[g, 1], upper <- alpha, lower <- alpha)
                     prec <- upper - lower
@@ -646,28 +651,28 @@ getClosedCombinationTestResults <- function(stageResults) {
                         alpha <- (lower + upper) / 2
                         if (.isTrialDesignFisher(design)) {
                             designAlpha <- .getDesignFisher(
-                                kMax = kMax, 
+                                kMax = kMax,
                                 alpha = alpha,
-                                method = design$method, 
+                                method = design$method,
                                 alpha0Vec = design$alpha0Vec,
-                                sided = design$sided, 
+                                sided = design$sided,
                                 bindingFutility = design$bindingFutility,
                                 informationRates = design$informationRates
                             )
                         } else {
                             designAlpha <- .getDesignInverseNormal(
                                 kMax = kMax,
-                                alpha = alpha, 
-                                typeOfDesign = typeOfDesign, 
+                                alpha = alpha,
+                                typeOfDesign = typeOfDesign,
                                 deltaWT = deltaWT,
-                                typeBetaSpending = typeBetaSpending, 
+                                typeBetaSpending = typeBetaSpending,
                                 gammaB = design$gammaB,
-                                deltaPT0 = design$deltaPT0, 
-                                deltaPT1 = design$deltaPT1, 
+                                deltaPT0 = design$deltaPT0,
+                                deltaPT1 = design$deltaPT1,
                                 beta = design$beta,
-                                gammaA = design$gammaA, 
-                                futilityBounds = design$futilityBounds,
-                                sided = design$sided, 
+                                gammaA = design$gammaA,
+                                futilityBounds = futilityBounds,
+                                sided = design$sided,
                                 bindingFutility = design$bindingFutility,
                                 informationRates = design$informationRates
                             )
@@ -705,7 +710,7 @@ getClosedCombinationTestResults <- function(stageResults) {
 #' @details
 #' For performing the conditional Dunnett test the design must be defined through the function
 #' \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}.\cr
-#' See Koenig et al. (2008) and Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
+#' See Koenig et al. (2008) and Wassmer & Brannath (2025), chapter 11 for details of the test procedure.
 #'
 #' @template return_object_closed_combination_test_results
 #' @template how_to_get_help_for_generics
@@ -714,16 +719,15 @@ getClosedCombinationTestResults <- function(stageResults) {
 #'
 #' @export
 #'
-getClosedConditionalDunnettTestResults <- function(
-        stageResults, 
-        ..., 
+getClosedConditionalDunnettTestResults <- function(stageResults,
+        ...,
         stage = stageResults$stage) {
-        
     .assertIsStageResultsMultiArm(stageResults)
     .assertIsValidStage(stage, kMax = 2)
     .warnInCaseOfUnknownArguments(
-        functionName = "getClosedConditionalDunnettTestResults", 
-        ignore = c("design"), ...)
+        functionName = "getClosedConditionalDunnettTestResults",
+        ignore = c("design"), ...
+    )
 
     design <- stageResults$.design
     if (!is.null(list(...)[["design"]])) {
@@ -732,9 +736,10 @@ getClosedConditionalDunnettTestResults <- function(
     .assertIsTrialDesignConditionalDunnett(design)
 
     result <- .getClosedConditionalDunnettTestResults(
-        stageResults = stageResults, 
-        design = design, 
-        stage = stage)
+        stageResults = stageResults,
+        design = design,
+        stage = stage
+    )
     return(ClosedCombinationTestResults$new(
         .design = result$.design,
         .enrichment = grepl("Enrichment", .getClassName(stageResults)),
@@ -778,7 +783,7 @@ getClosedConditionalDunnettTestResults <- function(
         if (stage == 2) {
             frac2 <- stageResults$.dataInput$sampleSizes[stageResults$.dataInput$stages == 2 &
                 stageResults$.dataInput$groups <= gMax] /
-               (stageResults$.dataInput$sampleSizes[stageResults$.dataInput$stages == 2 &
+                (stageResults$.dataInput$sampleSizes[stageResults$.dataInput$stages == 2 &
                     stageResults$.dataInput$groups <= gMax] +
                     stageResults$.dataInput$sampleSizes[stageResults$.dataInput$stages == 2 &
                         stageResults$.dataInput$groups == (gMax + 1)])
@@ -954,8 +959,8 @@ getClosedConditionalDunnettTestResults <- function(
         innerProduct <- 1
         for (g in (1:gMax)) {
             innerProduct <- innerProduct * stats::pnorm(((crit -
-              sqrt(informationAtInterim) * signedTestStatistics[treatmentArm, 1] +
-              sqrt(1 - informationAtInterim) * sqrt(frac1[g]) * x)) /
+                sqrt(informationAtInterim) * signedTestStatistics[treatmentArm, 1] +
+                sqrt(1 - informationAtInterim) * sqrt(frac1[g]) * x)) /
                 sqrt((1 - informationAtInterim) * (1 - frac1[g])))
         }
         return(innerProduct * dnorm(x))
@@ -971,9 +976,9 @@ getClosedConditionalDunnettTestResults <- function(
                     if (!is.na(stageResults$overallTestStatistics[g, 2])) {
                         innerProduct <- innerProduct *
                             stats::pnorm(((maxOverallTestStatistic -
-                               sqrt(informationAtInterim) * signedTestStatistics[treatmentArm, 1] +
-                               sqrt(1 - informationAtInterim) * sqrt(frac2[g]) * x)) /
-                               sqrt((1 - informationAtInterim) * (1 - frac2[g])))
+                                sqrt(informationAtInterim) * signedTestStatistics[treatmentArm, 1] +
+                                sqrt(1 - informationAtInterim) * sqrt(frac2[g]) * x)) /
+                                sqrt((1 - informationAtInterim) * (1 - frac2[g])))
                     }
                 }
                 return(innerProduct * dnorm(x))
@@ -995,11 +1000,11 @@ getClosedConditionalDunnettTestResults <- function(
         }
     }
 
-    # cat("upper = ", stageResults$directionUpper , ", gMax = ", gMax, 
-    #     ", selected = ", selected, ", treatmentArm = ", treatmentArm, 
+    # cat("upper = ", stageResults$directionUpper , ", gMax = ", gMax,
+    #     ", selected = ", selected, ", treatmentArm = ", treatmentArm,
     #     ", conditionalErrorRate = ", conditionalErrorRate,
     #     ", secondStagePValues = ", secondStagePValues, "\n")
-    
+
     return(secondStagePValues <= conditionalErrorRate)
 }
 
@@ -1008,37 +1013,37 @@ getClosedConditionalDunnettTestResults <- function(
 #'
 #' @noRd
 #'
-.getConditionalRejectionProbabilitiesMultiArm <- function(
-        stageResults, 
+.getConditionalRejectionProbabilitiesMultiArm <- function(stageResults,
         ...,
-        stage = stageResults$stage, 
-        iterations = C_ITERATIONS_DEFAULT, 
+        stage = stageResults$stage,
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     .assertIsValidStage(stage, stageResults$.design$kMax)
     gMax <- stageResults$getGMax()
 
     if (.isTrialDesignInverseNormal(stageResults$.design)) {
         return(.getConditionalRejectionProbabilitiesMultiArmInverseNormal(
-            stageResults = stageResults, 
-            stage = stage, 
+            stageResults = stageResults,
+            stage = stage,
             ...
         ))
     } else if (.isTrialDesignFisher(stageResults$.design)) {
         return(.getConditionalRejectionProbabilitiesMultiArmFisher(
-            stageResults = stageResults, 
-            stage = stage, 
+            stageResults = stageResults,
+            stage = stage,
             ...
         ))
     } else if (.isTrialDesignConditionalDunnett(stageResults$.design)) {
         return(.getConditionalRejectionProbabilitiesMultiArmConditionalDunnett(
-            stageResults = stageResults, 
+            stageResults = stageResults,
             ...
         ))
     }
 
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or TrialDesignDunnett"
+        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or TrialDesignDunnett",
+        call. = FALSE
     )
 }
 
@@ -1082,7 +1087,7 @@ getClosedConditionalDunnettTestResults <- function(
                 if (stageIndex == kMax - 1) {
                     shiftedFutilityBounds <- c()
                 } else {
-                    shiftedFutilityBounds <- design$futilityBounds[(stageIndex + 1):(kMax - 1)] *
+                    shiftedFutilityBounds <- .getFutilityBounds(design, (stageIndex + 1):(kMax - 1)) *
                         sqrt(sum(weights[1:stageIndex]^2) + cumsum(weights[(stageIndex + 1):(kMax - 1)]^2)) /
                         sqrt(cumsum(weights[(stageIndex + 1):(kMax - 1)]^2)) -
                         min(ctr$overallAdjustedTestStatistics[ctr$indices[, g] == 1, stageIndex], na.rm = TRUE) *
@@ -1233,44 +1238,47 @@ getClosedConditionalDunnettTestResults <- function(
         stage <- kMax - 1
     }
     if (stage < 1 || kMax == 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot plot conditional power of a fixed design")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot plot conditional power of a fixed design", call. = FALSE)
     }
     if (stage >= kMax) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "the conditional power plot is only available for subsequent stages. ",
-            "Please specify a 'stage' (", stage, ") < 'kMax' (", kMax, ")"
+            "Please specify a 'stage' (", stage, ") < 'kMax' (", kMax, ")",
+            call. = FALSE
         )
     }
 
     .assertIsValidNPlanned(nPlanned = nPlanned, kMax = kMax, stage = stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
 
     if (stageResults$isDatasetMeans()) {
         .warnInCaseOfUnusedArgument(piTreatmentRange, "piTreatmentRange", NA_real_, "plot")
         .warnInCaseOfUnusedArgument(piControl, "piControl", NA_real_, "plot")
         return(.getConditionalPowerLikelihoodMeansMultiArm(
-            stageResults = stageResults, 
+            stageResults = stageResults,
             stage = stage,
-            nPlanned = nPlanned, 
+            nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
-            thetaRange = thetaRange, 
-            assumedStDevs = assumedStDevs, 
-            iterations = iterations, 
+            thetaRange = thetaRange,
+            assumedStDevs = assumedStDevs,
+            iterations = iterations,
             seed = seed
         ))
     } else if (stageResults$isDatasetRates()) {
         .warnInCaseOfUnusedArgument(thetaRange, "thetaRange", NA_real_, "plot")
         .warnInCaseOfUnusedArgument(assumedStDevs, "assumedStDevs", NA_real_, "plot")
         return(.getConditionalPowerLikelihoodRatesMultiArm(
-            stageResults = stageResults, 
+            stageResults = stageResults,
             stage = stage,
-            nPlanned = nPlanned, 
+            nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
-            piTreatmentRange = piTreatmentRange, 
+            piTreatmentRange = piTreatmentRange,
             piControl = piControl,
-            iterations = iterations, 
+            iterations = iterations,
             seed = seed
         ))
     } else if (stageResults$isDatasetSurvival()) {
@@ -1278,18 +1286,15 @@ getClosedConditionalDunnettTestResults <- function(
         .warnInCaseOfUnusedArgument(piControl, "piControl", NA_real_, "plot")
         .warnInCaseOfUnusedArgument(assumedStDevs, "assumedStDevs", NA_real_, "plot")
         return(.getConditionalPowerLikelihoodSurvivalMultiArm(
-            stageResults = stageResults, 
+            stageResults = stageResults,
             stage = stage,
-            nPlanned = nPlanned, 
+            nPlanned = nPlanned,
             allocationRatioPlanned = allocationRatioPlanned,
-            thetaRange = thetaRange, 
-            iterations = iterations, 
+            thetaRange = thetaRange,
+            iterations = iterations,
             seed = seed
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dataInput' type '",
-        .getClassName(stageResults$.dataInput), "' is not implemented yet"
-    )
+    .fireDataInputNotSupportedException(stageResults$getDataInput())
 }

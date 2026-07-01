@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_constants.R
 #' @include f_logger.R
@@ -25,6 +21,45 @@ NULL
 .getLogicalEnvironmentVariable <- function(variableName) {
     result <- as.logical(Sys.getenv(variableName))
     return(ifelse(is.na(result), FALSE, result))
+}
+
+.getParsedEnvironmentVariable <- function(value, type = c("unknown", "character", "integer", "numeric", "logical")) {
+    type <- match.arg(type)
+    if (identical(type, "character")) {
+        return(as.character(value))
+    } else if (identical(type, "integer")) {
+        return(as.integer(value))
+    } else if (identical(type, "numeric")) {
+        return(as.numeric(value))
+    } else if (identical(type, "logical")) {
+        if (is.character(value)) {
+            return(tolower(trimws(value)) %in% c("true", "1", "yes", "on"))
+        }
+        return(as.logical(value))
+    }
+    return(value)
+}
+
+.getEnvironmentVariableKey <- function(optionKey) {
+    return(toupper(gsub("\\.", "_", optionKey)))
+}
+
+.getEnvironmentVariable <- function(envKey, optionKey = NULL, ..., type = c("unknown", "character", "integer", "numeric", "logical")) {
+    type <- match.arg(type)
+
+    value <- Sys.getenv(envKey)
+    if (!is.null(value) && !identical(value, "")) {
+        return(.getParsedEnvironmentVariable(value, type = type))
+    }
+
+    if (!is.null(optionKey)) {
+        value <- base::getOption(optionKey, ...)
+        if (!is.null(value)) {
+            return(.getParsedEnvironmentVariable(value, type = type))
+        }
+    }
+
+    return(NULL)
 }
 
 .getPackageName <- function(functionName) {
@@ -113,7 +148,7 @@ NULL
     if (is.null(x) || length(x) == 0) {
         return(x)
     }
-    
+
     args <- list(...)
     if (length(args) > 0) {
         x <- paste(c(x, unlist(args, use.names = FALSE)), collapse = sep, sep = sep)
@@ -159,7 +194,8 @@ NULL
 #'
 .getOptionalArgument <- function(optionalArgumentName, ..., optionalArgumentDefaultValue = NULL) {
     args <- list(...)
-    if (optionalArgumentName %in% names(args)) {
+    .assertIsSingleCharacter(optionalArgumentName, "optionalArgumentName")
+    if (length(args) > 0 && !is.null(names(args)) && optionalArgumentName %in% names(args)) {
         return(args[[optionalArgumentName]])
     }
 
@@ -210,7 +246,8 @@ NULL
                 stop(
                     C_EXCEPTION_TYPE_MISSING_ARGUMENT,
                     "the object '", paramName, "' has not been defined anywhere. ",
-                    "Please define it first, e.g., run '", paramName, " <- 1'"
+                    "Please define it first, e.g., run '", paramName, " <- 1'",
+                    call. = FALSE
                 )
             }
         )
@@ -244,6 +281,28 @@ NULL
     return(FALSE)
 }
 
+#'
+#' @examples
+#' \dontrun{
+#' .getConcatenatedValues(1)
+#' .getConcatenatedValues(1:2)
+#' .getConcatenatedValues(1:3)
+#' .getConcatenatedValues(1, mode = "vector")
+#' .getConcatenatedValues(1:2, mode = "vector")
+#' .getConcatenatedValues(1:3, mode = "vector")
+#' .getConcatenatedValues(1, mode = "and")
+#' .getConcatenatedValues(1:2, mode = "and")
+#' .getConcatenatedValues(1:3, mode = "and")
+#' .getConcatenatedValues(1, mode = "or")
+#' .getConcatenatedValues(1:2, mode = "or")
+#' .getConcatenatedValues(1:3, mode = "or")
+#' .getConcatenatedValues(1, mode = "or", separator = ";")
+#' .getConcatenatedValues(1:2, mode = "or", separator = ";")
+#' .getConcatenatedValues(1:3, mode = "or", separator = ";")
+#' }
+#'
+#' @noRd
+#'
 .getConcatenatedValues <- function(x, separator = ", ", mode = c("csv", "vector", "and", "or")) {
     if (is.null(x) || length(x) <= 1) {
         return(x)
@@ -269,27 +328,53 @@ NULL
 }
 
 #'
+#' Get Test Label
+#'
+#' @description
+#' Returns a string representation of the input value for use as a test label.
+#' Handles various types, including NULL, NA, vectors, and custom objects.
+#'
+#' @param x The value to be converted into a test label.
+#'
+#' @return A character string representing the input value.
+#'
 #' @examples
 #' \dontrun{
-#' .getConcatenatedValues(1)
-#' .getConcatenatedValues(1:2)
-#' .getConcatenatedValues(1:3)
-#' .getConcatenatedValues(1, mode = "vector")
-#' .getConcatenatedValues(1:2, mode = "vector")
-#' .getConcatenatedValues(1:3, mode = "vector")
-#' .getConcatenatedValues(1, mode = "and")
-#' .getConcatenatedValues(1:2, mode = "and")
-#' .getConcatenatedValues(1:3, mode = "and")
-#' .getConcatenatedValues(1, mode = "or")
-#' .getConcatenatedValues(1:2, mode = "or")
-#' .getConcatenatedValues(1:3, mode = "or")
-#' .getConcatenatedValues(1, mode = "or", separator = ";")
-#' .getConcatenatedValues(1:2, mode = "or", separator = ";")
-#' .getConcatenatedValues(1:3, mode = "or", separator = ";")
+#' getTestLabel(NULL)
+#' getTestLabel(NA)
+#' getTestLabel(1:3)
+#' getTestLabel(6)
+#' getTestLabel(getDesignFisher())
 #' }
 #'
-#' @noRd
+#' @keywords internal
 #'
+#' @export
+#'
+getTestLabel <- function(x) {
+    if (is.null(x)) {
+        return("NULL")
+    }
+
+    if (!is.vector(x) && !is.numeric(x) && !is.character(x) && !is.logical(x) && !is.integer(x)) {
+        return(.getClassName(x))
+    }
+
+    if (length(x) == 0) {
+        return(paste0(.getClassName(x), "(0)"))
+    }
+
+    if (all(is.na(x))) {
+        return("NA")
+    }
+
+    if (is.character(x)) {
+        x <- paste0('"', x, '"')
+    }
+
+    return(.arrayToString(x, mode = "vector", digits = 4, maxLength = 10L, maxCharacters = 40L))
+}
+
 .arrayToString <- function(x, ..., separator = ", ",
         vectorLookAndFeelEnabled = FALSE,
         encapsulate = FALSE,
@@ -419,15 +504,15 @@ NULL
 
 .getInputForZeroOutputInsideTolerance <- function(input, output, tolerance = .Machine$double.eps^0.25) {
     if (is.null(tolerance) || is.na(tolerance)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' must be a valid double")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' must be a valid double", call. = FALSE)
     }
 
     if (tolerance < 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' (", tolerance, ") must be >= 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'tolerance' (", tolerance, ") must be >= 0", call. = FALSE)
     }
 
     if (is.null(input)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'input' must be a valid double or NA")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'input' must be a valid double or NA", call. = FALSE)
     }
 
     if (is.null(output) || is.na(output)) {
@@ -741,13 +826,15 @@ NULL
     if (is.null(firstValue) || length(firstValue) != 1 || is.na(firstValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'firstValue' (", firstValue, ") must be a valid numeric value"
+            "'firstValue' (", firstValue, ") must be a valid numeric value",
+            call. = FALSE
         )
     }
     if (is.null(secondValue) || length(secondValue) != 1 || is.na(secondValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'secondValue' (", secondValue, ") must be a valid numeric value"
+            "'secondValue' (", secondValue, ") must be a valid numeric value",
+            call. = FALSE
         )
     }
     return(firstValue > secondValue)
@@ -757,13 +844,15 @@ NULL
     if (is.null(firstValue) || length(firstValue) != 1 || is.na(firstValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'firstValue' (", firstValue, ") must be a valid numeric value"
+            "'firstValue' (", firstValue, ") must be a valid numeric value",
+            call. = FALSE
         )
     }
     if (is.null(secondValue) || length(secondValue) != 1 || is.na(secondValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'secondValue' (", secondValue, ") must be a valid numeric value"
+            "'secondValue' (", secondValue, ") must be a valid numeric value",
+            call. = FALSE
         )
     }
     return(firstValue < secondValue)
@@ -782,13 +871,14 @@ NULL
     .assertIsParameterSetClass(parameterSet, "parameterSet")
 
     if (is.null(parameterSet)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterSet' must be not null", call. = FALSE)
     }
 
     if (!(parameterName %in% names(parameterSet))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'"
+            "'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName, "'",
+            call. = FALSE
         )
     }
 
@@ -857,7 +947,7 @@ NULL
 }
 
 .getVariedParameterVector <- function(variedParameter, variedParameterName) {
-    if (is.null(variedParameter) || length(variedParameter) != 2 || any(is.na(variedParameter))) {
+    if (is.null(variedParameter) || length(variedParameter) != 2 || anyNA(variedParameter)) {
         return(variedParameter)
     }
 
@@ -867,7 +957,8 @@ NULL
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'", variedParameterName, "' with length 2 must contain minimum != maximum (",
-            minValue, " == ", maxValue, ")"
+            minValue, " == ", maxValue, ")",
+            call. = FALSE
         )
     }
     by <- .getVariedParameterVectorByValue(variedParameter)
@@ -900,7 +991,7 @@ NULL
 }
 
 .matchArgument <- function(arg, defaultValue) {
-    if (any(is.na(arg))) {
+    if (anyNA(arg)) {
         return(defaultValue)
     }
     return(ifelse(length(arg) > 0, arg[1], defaultValue))
@@ -948,7 +1039,7 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
             Sys.setenv(LANGUAGE = language)
 
             if (inclusiveR) {
-                citR <- utils::capture.output(print(citation("base"), bibtex = FALSE))
+                citR <- utils::capture.output(print(utils::citation("base"), bibtex = FALSE))
                 indices <- which(citR == "")
                 indices <- indices[indices != 1 & indices != length(citR)]
                 if (length(indices) > 1) {
@@ -958,46 +1049,12 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
                 cat("\n", trimws(paste(citR, collapse = "\n")), "\n\n", sep = "")
             }
 
-            print(citation("rpact"), bibtex = FALSE)
+            print(utils::citation("rpact"), bibtex = FALSE)
         },
         finally = {
             Sys.setenv(LANGUAGE = currentLanguage)
         }
     )
-}
-
-.writeLinesToFile <- function(lines, fileName) {
-    if (is.null(lines) || length(lines) == 0 || !is.character(lines)) {
-        warning("Empty lines. Stop to write '", fileName, "'")
-        return(invisible(fileName))
-    }
-
-    fileConn <- base::file(fileName)
-    tryCatch(
-        {
-            base::writeLines(lines, fileConn)
-        },
-        finally = {
-            base::close(fileConn)
-        }
-    )
-    invisible(fileName)
-}
-
-#'
-#' Windows: CR (Carriage Return \r) and LF (LineFeed \n) pair
-#'
-#' OSX, Linux: LF (LineFeed \n)
-#'
-#' @noRd
-#'
-.readLinesFromFile <- function(inputFileName) {
-    content <- .readContentFromFile(inputFileName)
-    return(strsplit(content, split = "(\r?\n)|(\r\n?)")[[1]])
-}
-
-.readContentFromFile <- function(inputFileName) {
-    return(readChar(inputFileName, file.info(inputFileName)$size))
 }
 
 .integerToWrittenNumber <- function(x) {
@@ -1088,7 +1145,8 @@ getParameterCaption <- function(obj, var) {
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
-            "(", .getClassName(obj), ") must be an rpact result object"
+            "(", .getClassName(obj), ") must be an rpact result object",
+            call. = FALSE
         )
     }
     parameterName <- .getParameterSetVar(fCall, var)
@@ -1131,7 +1189,8 @@ getParameterType <- function(obj, var) {
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
-            "(", .getClassName(obj), ") must be an rpact result object"
+            "(", .getClassName(obj), ") must be an rpact result object",
+            call. = FALSE
         )
     }
 
@@ -1173,7 +1232,8 @@ getParameterName <- function(obj, parameterCaption) {
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'obj' ",
-            "(", .getClassName(obj), ") must be an rpact result object"
+            "(", .getClassName(obj), ") must be an rpact result object",
+            call. = FALSE
         )
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
@@ -1202,7 +1262,7 @@ getParameterName <- function(obj, parameterCaption) {
             return(parameterName)
         }
     }
-    
+
     if (!is.null(obj[[".design"]])) {
         result <- getParameterName(obj$.design, parameterCaption)
         if (!is.na(result)) {
@@ -1215,7 +1275,7 @@ getParameterName <- function(obj, parameterCaption) {
 
 .removeLastEntryFromArray <- function(x) {
     if (!is.array(x)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'x' (", .getClassName(x), ") must be an array")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'x' (", .getClassName(x), ") must be an array", call. = FALSE)
     }
 
     dataDim <- dim(x)
@@ -1233,27 +1293,29 @@ getParameterName <- function(obj, parameterCaption) {
 
 .moveColumn <- function(data, columnName, insertPositionColumnName) {
     if (!is.data.frame(data)) {
-        stop("Illegal argument: 'data' (", .getClassName(data), ") must be a data.frame")
+        stop("Illegal argument: 'data' (", .getClassName(data), ") must be a data.frame", call. = FALSE)
     }
     if (is.null(insertPositionColumnName) || length(insertPositionColumnName) != 1 ||
             is.na(insertPositionColumnName) || !is.character(insertPositionColumnName)) {
         stop(
             "Illegal argument: 'insertPositionColumnName' (", .getClassName(insertPositionColumnName),
-            ") must be a valid character value"
+            ") must be a valid character value",
+            call. = FALSE
         )
     }
     if (is.null(columnName) || length(columnName) != 1 || is.na(columnName) || !is.character(columnName)) {
-        stop("Illegal argument: 'columnName' (", .getClassName(columnName), ") must be a valid character value")
+        stop("Illegal argument: 'columnName' (", .getClassName(columnName), ") must be a valid character value", call. = FALSE)
     }
 
     colNames <- colnames(data)
     if (!(columnName %in% colNames)) {
-        stop("Illegal argument: 'columnName' (", columnName, ") does not exist in the specified data.frame 'data'")
+        stop("Illegal argument: 'columnName' (", columnName, ") does not exist in the specified data.frame 'data'", call. = FALSE)
     }
     if (!(insertPositionColumnName %in% colNames)) {
         stop(
             "Illegal argument: 'insertPositionColumnName' (", insertPositionColumnName,
-            ") does not exist in the specified data.frame 'data'"
+            ") does not exist in the specified data.frame 'data'",
+            call. = FALSE
         )
     }
     if (columnName == insertPositionColumnName) {
@@ -1313,7 +1375,7 @@ getParameterName <- function(obj, parameterCaption) {
 
     if (is.list(x)) {
         listNames <- names(x)
-        if (is.null(listNames) || any(is.na(listNames)) || any(trimws(listNames) == "")) {
+        if (is.null(listNames) || anyNA(listNames) || any(trimws(listNames) == "")) {
             stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "list (", .arrayToString(unlist(x)), ") must be named")
         }
 
@@ -1423,26 +1485,30 @@ getParameterName <- function(obj, parameterCaption) {
     if (is.null(insertPositionValue) || length(insertPositionValue) != 1 || is.na(insertPositionValue)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'insertPositionValue' (", class(insertPositionValue), ") must be a valid single value"
+            "'insertPositionValue' (", class(insertPositionValue), ") must be a valid single value",
+            call. = FALSE
         )
     }
     if (is.null(value) || length(value) != 1 || is.na(value)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'value' (", class(value), ") must be a valid single value"
+            "'value' (", class(value), ") must be a valid single value",
+            call. = FALSE
         )
     }
     if (!(value %in% values)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'value' (", value, ") does not exist in the specified vector 'values'"
+            "'value' (", value, ") does not exist in the specified vector 'values'",
+            call. = FALSE
         )
     }
     if (!(insertPositionValue %in% values)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'insertPositionValue' (", insertPositionValue,
-            ") does not exist in the specified vector 'values'"
+            ") does not exist in the specified vector 'values'",
+            call. = FALSE
         )
     }
     if (value == insertPositionValue) {
@@ -1467,7 +1533,7 @@ getParameterName <- function(obj, parameterCaption) {
         return(NA_character_)
     }
 
-    if (length(values) <= 3 || any(is.na(values))) {
+    if (length(values) <= 3 || anyNA(values)) {
         return(.arrayToString(values, vectorLookAndFeelEnabled = (length(values) != 1)))
     }
 
@@ -1495,7 +1561,13 @@ getParameterName <- function(obj, parameterCaption) {
 
 .isMarkdownEnabled <- function(type = c("all", "print", "summary", "plot")) {
     type <- match.arg(type)
-    if (!as.logical(getOption(paste0("rpact.auto.markdown.", type), TRUE))) {
+    optionKey <- paste0("rpact.auto.markdown.", type)
+    if (isFALSE(.getEnvironmentVariable(
+        .getEnvironmentVariableKey(optionKey),
+        optionKey,
+        default = TRUE,
+        type = "logical"
+    ))) {
         return(FALSE)
     }
 
@@ -1527,7 +1599,12 @@ getParameterName <- function(obj, parameterCaption) {
     type <- match.arg(type)
 
     if (is.null(eps) || length(eps) != 1 || is.na(eps)) {
-        epsilon <- getOption("rpact.multivar.dist.eps", 1e-05)
+        epsilon <- .getEnvironmentVariable(
+            "RPACT_MULTIVAR_DIST_EPS",
+            "rpact.multivar.dist.eps",
+            default = 1e-05,
+            type = "numeric"
+        )
         if (is.numeric(epsilon) && epsilon < 0.1) {
             eps <- epsilon
         }
@@ -1597,6 +1674,13 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 .addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues) {
+    if (!fieldName %in% names(parameterSet)) {
+        stop(
+            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+            "'", .getClassName(parameterSet), "' does not contain a field with name '", fieldName, "'"
+        )
+    }
+
     parameterSet[[fieldName]] <- fieldValues
     parameterSet$.setParameterType(fieldName, C_PARAM_NOT_APPLICABLE)
     parameterSet$.deprecatedFieldNames <- unique(c(parameterSet$.deprecatedFieldNames, fieldName))
@@ -1620,7 +1704,7 @@ getParameterName <- function(obj, parameterCaption) {
     if (inherits(x, "SummaryFactory")) {
         x <- x$object
     }
-    
+
     queue <- .getPipeOperatorQueue(x)
     queue[[length(queue) + 1]] <- x
     attr(x, "markdown") <- TRUE
@@ -1630,29 +1714,109 @@ getParameterName <- function(obj, parameterCaption) {
 
 .resetPipeOperatorQueue <- function(x) {
     for (attrName in c("queue", "printObject", "printObjectSeparator", "markdown")) {
-        tryCatch({
-            if (inherits(x, "SummaryFactory")) {
-                attr(x$object, attrName) <- NULL
-            } else {
-                attr(x, attrName) <- NULL
+        tryCatch(
+            {
+                if (inherits(x, "SummaryFactory")) {
+                    attr(x$object, attrName) <- NULL
+                } else {
+                    attr(x, attrName) <- NULL
+                }
+            },
+            error = function(e) {
+                message("Failed to reset pipe operator queue attribute ", sQuote(attrName), ": ", e$message)
             }
-        }, error = function(e) {
-            message("Failed to reset pipe operator queue attribute ", sQuote(attrName), ": ", e$message)
-        })
+        )
     }
     return(x)
 }
 
 .getMarkdownPlotPrintSeparator <- function() {
-    return(getOption("rpact.markdown.plot.print.separator", C_MARKDOWN_PLOT_PRINT_SEPARATOR))
+    return(.getEnvironmentVariable(
+        "RPACT_MARKDOWN_PLOT_PRINT_SEPARATOR",
+        "rpact.markdown.plot.print.separator",
+        default = C_MARKDOWN_PLOT_PRINT_SEPARATOR,
+        type = "character"
+    ))
 }
 
-.getCriticalValues <- function(design, indices = NULL) {
+.getCriticalValues <- function(design, indices = NULL) {   
+    criticalValues <- abs(design$criticalValues)
     if (!is.null(indices)) {
-        return(design$criticalValues[indices])
+        return(criticalValues[indices])
     }
-    
-    return(design$criticalValues)
+    return(criticalValues)
+}
+
+.getFutilityBounds <- function(
+        design, 
+        indices = NULL, 
+        ..., 
+        phase = c("unknown", "design", "planning", "analysis"),
+        adjustLengthToKMax = FALSE) {
+        
+    phase <- match.arg(phase)
+    futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
+        design$directionUpper, type = "negateIfLower", phase = phase)
+    if (adjustLengthToKMax) {
+        futilityBounds <- c(futilityBounds, C_FUTILITY_BOUNDS_DEFAULT)
+    }
+    if (!is.null(indices)) {
+        return(futilityBounds[indices])
+    }
+    return(futilityBounds)
+}
+
+.getInvalidFutilityBoundsIndices <- function(design) {
+    if (is.null(design) || !.isTrialDesignInverseNormalOrGroupSequential(design)) {
+        return(integer(0))
+    }
+
+    futilityBounds <- .getFutilityBounds(design)
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
+        return(integer(0))
+    }
+
+    if (isFALSE(design$directionUpper)) {
+        return(which(futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE))
+    }
+
+    return(which(futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE))
+}
+
+.getFutilityBoundsDefaultValue <- function(design) {
+    if (.isTrialDesign(design) && isFALSE(design$directionUpper)) {
+        return(C_FUTILITY_BOUNDS_MAX_VALUE)
+    }
+
+    return(C_FUTILITY_BOUNDS_MIN_VALUE)
+}
+
+.getFormattedFutilityBounds <- function(design, futilityBounds = design$futilityBounds) {
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
+        return(futilityBounds)
+    }
+
+    futilityBoundsFormatted <- futilityBounds
+    if (!is.null(design) && isFALSE(design$directionUpper)) {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- Inf
+    } else {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- -Inf
+    }
+    return(futilityBoundsFormatted)
+}
+
+.getHarmonizedFutilityBounds <- function(design, futilityBounds = design$futilityBounds) {
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
+        return(futilityBounds)
+    }
+
+    futilityBoundsFormatted <- futilityBounds
+    if (isFALSE(design$directionUpper)) {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- C_FUTILITY_BOUNDS_MAX_VALUE
+    } else {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- C_FUTILITY_BOUNDS_MIN_VALUE
+    }
+    return(futilityBoundsFormatted)
 }
 
 .applyDirectionOfAlternative <- function(
@@ -1667,20 +1831,15 @@ getParameterName <- function(obj, parameterCaption) {
             "minMax",
             "maxMin"
         ),
-        phase = c("unknown", "design", "planning", "analysis"), 
+        phase = c("unknown", "design", "planning", "analysis"),
         syncLength = FALSE) {
-        
     type <- match.arg(type)
     phase <- match.arg(phase)
 
-    if (phase == "design") {
-        return(value) # deactivate for current release
-    }
-    
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
         return(value)
     }
-    
+
     if (syncLength && length(directionUpper) > 1 && length(directionUpper) > length(value)) {
         directionUpper <- directionUpper[1:length(value)]
     }
@@ -1688,7 +1847,8 @@ getParameterName <- function(obj, parameterCaption) {
     if (length(directionUpper) > 1 && length(value) != length(directionUpper)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'value' (", .arrayToString(value), ") and ",
-            "'directionUpper' (", .arrayToString(directionUpper), ") must have the same length"
+            "'directionUpper' (", .arrayToString(directionUpper), ") must have the same length",
+            call. = FALSE
         )
     }
 
@@ -1714,8 +1874,7 @@ getParameterName <- function(obj, parameterCaption) {
     return(values)
 }
 
-.applyDirectionOfAlternativeSingle <- function(
-        ...,
+.applyDirectionOfAlternativeSingle <- function(...,
         value,
         directionUpper,
         type = c(
@@ -1776,7 +1935,18 @@ getParameterName <- function(obj, parameterCaption) {
     return(value)
 }
 
-#' 
+#'
+#' @note This is only needed such that we can mock the function in the tests.
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
+.isPackageNamespaceLoaded <- function(package, ..., quietly = FALSE) {
+    base::requireNamespace(package, quietly = quietly, ...)
+}
+
+#'
 #' @title
 #' Save Options
 #'
@@ -1797,42 +1967,45 @@ getParameterName <- function(obj, parameterCaption) {
 #' }
 #'
 #' @export
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 saveOptions <- function() {
-    tryCatch({
-        if (!requireNamespace("rappdirs", quietly = TRUE)) {
-            return(invisible(FALSE))
-        }
-            
-        pkgConfigDir <- rappdirs::user_config_dir("rpact")
-        if (!dir.exists(pkgConfigDir)) {
-            dir.create(pkgConfigDir, recursive = TRUE, showWarnings = FALSE)
-        }
-        if (!dir.exists(pkgConfigDir)) {
-            return(invisible(FALSE))
-        }
-        
-        optionNames <- make.names(names(base::options()))
-        optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
-        optionFileContent <- character()
-        for (optionName in optionNames) {
-            optionValue <- getOption(optionName)
-            if (!is.null(optionValue)) {
-                optionFileContent <- c(optionFileContent, paste0(optionName, ": ", optionValue))
+    tryCatch(
+        {
+            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                return(invisible(FALSE))
             }
+
+            pkgConfigDir <- rappdirs::user_config_dir("rpact")
+            if (!dir.exists(pkgConfigDir)) {
+                dir.create(pkgConfigDir, recursive = TRUE, showWarnings = FALSE)
+            }
+            if (!dir.exists(pkgConfigDir)) {
+                return(invisible(FALSE))
+            }
+
+            optionNames <- make.names(names(base::options()))
+            optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
+            optionFileContent <- character()
+            for (optionName in optionNames) {
+                optionValue <- getOption(optionName)
+                if (!is.null(optionValue)) {
+                    optionFileContent <- c(optionFileContent, paste0(optionName, ": ", optionValue))
+                }
+            }
+            optionsFile <- file.path(pkgConfigDir, "options.yml")
+            cat(optionFileContent, file = optionsFile, sep = "\n")
+            return(invisible(file.exists(optionsFile)))
+        },
+        error = function(e) {
+            warning("Failed to save rpact options: ", e$message, call. = FALSE)
+            return(invisible(FALSE))
         }
-        optionsFile <- file.path(pkgConfigDir, "options.yml")
-        cat(optionFileContent, file = optionsFile, sep = "\n")
-        return(invisible(file.exists(optionsFile)))
-    }, error = function(e) {
-        warning("Failed to save rpact options: ", e$message, call. = FALSE)
-        return(invisible(FALSE))
-    })
+    )
 }
 
-#' 
+#'
 #' @title
 #' Reset Options
 #'
@@ -1856,78 +2029,85 @@ saveOptions <- function() {
 #' }
 #'
 #' @export
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 resetOptions <- function(persist = TRUE) {
     .assertIsSingleLogical(persist, "persist")
-    tryCatch({
-        optionNames <- make.names(names(base::options()))
-        optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
-        if (length(optionNames) == 0) {
+    tryCatch(
+        {
+            optionNames <- make.names(names(base::options()))
+            optionNames <- optionNames[grepl("^rpact\\.", optionNames)]
+            if (length(optionNames) == 0) {
+                return(invisible(TRUE))
+            }
+
+            for (optionName in optionNames) {
+                eval(parse(text = paste0('base::options("', optionName, '" = NULL)')))
+            }
+            if (persist) {
+                saveOptions()
+            }
             return(invisible(TRUE))
+        },
+        error = function(e) {
+            warning("Failed to reset rpact options: ", e$message, call. = FALSE)
+            return(invisible(FALSE))
         }
-        
-        for (optionName in optionNames) {
-            eval(parse(text = paste0('base::options("', optionName, '" = NULL)')))
-        }
-        if (persist) {
-            saveOptions()
-        }
-        return(invisible(TRUE))
-    }, error = function(e) {
-        warning("Failed to reset rpact options: ", e$message, call. = FALSE)
-        return(invisible(FALSE))
-    })
+    )
 }
 
 .loadOptions <- function() {
-    tryCatch({
-        if (!requireNamespace("rappdirs", quietly = TRUE)) { 
-            packageStartupMessage("Package \"rappdirs\" is needed for saving and loading rpact options. ",
-                "Please install using, e.g., install.packages(\"rappdirs\")")
-            return(invisible(FALSE))
-        }
-            
-        pkgConfigDir <- rappdirs::user_config_dir("rpact")
-        if (!dir.exists(pkgConfigDir)) {
-            return(invisible(FALSE))
-        }
-        
-        pkgConfigFile <- file.path(pkgConfigDir, "options.yml")
-        if (!file.exists(pkgConfigFile)) {
-            return(invisible(FALSE))
-        }
-        
-        optionFileContent <- readLines(pkgConfigFile)
-        if (length(optionFileContent) == 0) {
-            return(invisible(TRUE))
-        }
-        
-        optionsList <- list()
-        for (line in optionFileContent) {
-            optionName <- sub(":.*", "", line)
-            if (is.null(optionName) || length(optionName) != 1 || nchar(trimws(optionName)) == 0) {
-                next
+    tryCatch(
+        {
+            if (!.isPackageNamespaceLoaded("rappdirs", quietly = TRUE)) {
+                packageStartupMessage(
+                    "Package \"rappdirs\" is needed for saving and loading rpact options. ",
+                    "Please install using, e.g., install.packages(\"rappdirs\")"
+                )
+                return(invisible(FALSE))
             }
-            
-            optionValue <- sub(".*: ", "", line)
-            if (is.null(optionValue) || length(optionValue) != 1 || nchar(trimws(optionValue)) == 0) {
-                next
-            }
-            
-            optionsList[[optionName]] <- optionValue
-        }
-        
-        if (length(optionsList) == 0) {
-            return(invisible(TRUE))
-        }
-        
-        base::options(optionsList)
-        return(invisible(TRUE))
-    }, error = function(e) {
-        packageStartupMessage("Failed to load and set rpact options: ", e$message)
-        return(invisible(FALSE))
-    })
-}
 
+            pkgConfigDir <- rappdirs::user_config_dir("rpact")
+            if (!dir.exists(pkgConfigDir)) {
+                return(invisible(FALSE))
+            }
+
+            pkgConfigFile <- file.path(pkgConfigDir, "options.yml")
+            if (!file.exists(pkgConfigFile)) {
+                return(invisible(FALSE))
+            }
+
+            optionFileContent <- base::readLines(pkgConfigFile)
+            if (length(optionFileContent) == 0) {
+                return(invisible(TRUE))
+            }
+
+            optionsList <- list()
+            for (line in optionFileContent) {
+                optionName <- sub(":.*", "", line)
+                if (is.null(optionName) || length(optionName) != 1 || nchar(trimws(optionName)) == 0) {
+                    next
+                }
+
+                optionValue <- sub(".*: ", "", line)
+                if (is.null(optionValue) || length(optionValue) != 1 || nchar(trimws(optionValue)) == 0) {
+                    next
+                }
+
+                optionsList[[optionName]] <- optionValue
+            }
+
+            if (length(optionsList) == 0) {
+                return(invisible(TRUE))
+            }
+
+            base::options(optionsList)
+            return(invisible(TRUE))
+        },
+        error = function(e) {
+            packageStartupMessage("Failed to load and set rpact options: ", e$message)
+            return(invisible(FALSE))
+        }
+    )
+}

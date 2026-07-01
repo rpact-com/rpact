@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include class_dictionary.R
 #' @include f_core_constants.R
@@ -46,6 +42,7 @@ FieldSet <- R6::R6Class("FieldSet",
         .parameterTypes = NULL,
         .showParameterTypeEnabled = NULL,
         .catLines = NULL,
+        .jsonLines = NULL,
         .deprecatedFieldNames = NULL,
         .getFieldNames = function() {
             classNames <- class(self)
@@ -66,6 +63,8 @@ FieldSet <- R6::R6Class("FieldSet",
         },
         .resetCat = function() {
             self$.catLines <- character()
+            self$.jsonLines <- character()
+            private$.resetJson()
         },
         .cat = function(..., file = "", sep = "", fill = FALSE, labels = NULL,
                 append = FALSE, heading = 0, tableColumns = 0, consoleOutputEnabled = TRUE,
@@ -77,6 +76,8 @@ FieldSet <- R6::R6Class("FieldSet",
 
             args <- list(...)
             line <- ""
+            jsonLine <- ""
+            jsonValues <- NULL
             if (length(args) > 0) {
                 if (tableColumns > 0) {
                     values <- unlist(args, use.names = FALSE)
@@ -92,6 +93,7 @@ FieldSet <- R6::R6Class("FieldSet",
                         }
                         values[is.na(values) | nchar(trimws(values)) == 0] <- naStr
                     }
+                    jsonValues <- values
                     line <- paste0(values, collapse = "| ")
                     if (trimws(line) != "" && !grepl("\\| *$", line)) {
                         line <- paste0(line, "|")
@@ -104,10 +106,15 @@ FieldSet <- R6::R6Class("FieldSet",
                     line <- paste0(line, "\n")
                 } else {
                     line <- paste0(args, collapse = sep)
+                    jsonLine <- line
                     listItemEnabled <- grepl("^  ", line)
 
-                    headingBaseNumber <- as.integer(getOption("rpact.print.heading.base.number", 
-                            C_HEADING_BASE_NUMBER_DEFAULT))
+                    headingBaseNumber <- .getEnvironmentVariable(
+                        "RPACT_PRINT_HEADING_BASE_NUMBER",
+                        "rpact.print.heading.base.number",
+                        default = C_HEADING_BASE_NUMBER_DEFAULT,
+                        type = "integer"
+                    )
                     if (is.na(headingBaseNumber)) {
                         headingBaseNumber <- C_HEADING_BASE_NUMBER_DEFAULT
                     }
@@ -157,6 +164,9 @@ FieldSet <- R6::R6Class("FieldSet",
                     }
                 }
             }
+            private$.addJsonLine(jsonLine,
+                values = jsonValues, heading = heading, tableColumns = tableColumns
+            )
             if (length(self$.catLines) == 0) {
                 self$.catLines <- line
             } else {
@@ -169,7 +179,7 @@ FieldSet <- R6::R6Class("FieldSet",
             if (length(self$.catLines) == 0) {
                 return(invisible())
             }
-            
+
             for (line in self$.catLines) {
                 cat(line)
             }
@@ -184,6 +194,376 @@ FieldSet <- R6::R6Class("FieldSet",
                 result[[fld]] <- self[[fld]]
             }
             return(result)
+        },
+
+        #' 
+        #' @title Capture printed output as Markdown string
+        #' 
+        #' @param ... Additional args passed to print/show methods
+        #' @param collapse Character used to join multiple output lines (default "")
+        #' @param outputType One or more types of output to capture: "default", "print", "summary", or "json" (default "default")
+        #' @return Character scalar with markdown-formatted content
+        #' 
+        #' @keywords internal
+        #' 
+        getStructuredContent = function(
+                ..., 
+                collapse = "", 
+                outputType = c("default", "print", "summary", "json"), 
+                addHeading = TRUE,
+                addMetaData = TRUE, 
+                addFunctionCall = TRUE) {
+            headingBaseNumeber <- Sys.getenv("RPACT_PRINT_HEADING_BASE_NUMBER")
+            Sys.setenv("RPACT_PRINT_HEADING_BASE_NUMBER" = 1L)
+            on.exit(Sys.setenv("RPACT_PRINT_HEADING_BASE_NUMBER" = headingBaseNumeber), add = TRUE)
+
+            self$.show(consoleOutputEnabled = FALSE, ...)
+            if (length(self$.catLines) == 0) {
+                return(character())
+            }
+            
+            output <- character()
+            if (addHeading) {
+                output <- c(output, "# rpact Output\n\n")
+            }
+            
+            isSummayObject <- function() {
+                return(inherits(self, "SummaryFactory") || "SummaryFactory" == .getClassName(self))
+            }
+            
+            if (addMetaData && !isSummayObject()) {
+                functionName <- .getGeneratorFunctionName(self)
+                metaData <- c(
+                    '## Object metadata',
+                    '',
+                    '```json',
+                    '{',
+                    '  "package": "rpact",',
+                    paste0('  "object_class": ["', .getClassName(self), '"],'),
+                    paste0('  "rpact_version": "', .getPackageVersionString(), '",'),
+                    paste0('  "created_by": "', functionName, '"'),
+                    '}',
+                    '```\n')
+                output <- c(output, paste(metaData, collapse = "\n"), "\n")
+            }
+            
+            if (addFunctionCall && !isSummayObject()) {
+                functionCall <- getObjectRCode(self, 
+                    includeDefaultParameters = TRUE, 
+                    stringWrapParagraphWidth = 80,
+                    stringWrapPrefix = "  ")
+                if (!is.null(functionCall)) {
+                    output <- c(output, "## Function call inclusive default parameters\n\n")
+                    output <- c(output, paste0("```r\n", paste0(functionCall, collapse = "\n"), "\n```\n\n"))
+                }
+            }
+            
+            if (any(outputType == "default")) {
+                outputType <- c("summary", "json")
+            }
+            
+            if (any(outputType == "print")) {
+                if (addHeading) {
+                    output <- c(output, "## User-facing print output\n\n")
+                }
+                output <- c(output, paste(self$.catLines, collapse = collapse))
+            }
+            
+            if (any(outputType == "summary") && !isSummayObject()) {
+                if (any(outputType == "print")) {
+                    output <- c(output, "")
+                }
+                if (addHeading) {
+                    output <- c(output, "## User-facing summary\n\n")
+                }
+                summaryOutput <- summary(self)
+                if (is(summaryOutput, "FieldSet")) {
+                    summaryOutput <- summaryOutput$getStructuredContent(collapse = collapse, outputType = "print", addHeading = FALSE)
+                } else {
+                    summaryOutput <- capture.output(summary(self))
+                }
+                output <- c(output, summaryOutput)
+            }
+            
+            jsonOutput <- character()
+            if (any(outputType == "json") && !isSummayObject()) {
+                if (length(outputType) > 1) {
+                    jsonOutput <- paste0(jsonOutput, "\n")
+                }
+                if (addHeading) {
+                    jsonOutput <- paste0(jsonOutput, "## Structured result\n\n")
+                }
+                jsonOutput <- paste0(jsonOutput,
+                    "```json\n",
+                    paste(self$.jsonLines, collapse = "\n"),
+                    "\n```\n\n"
+                )
+                if (addHeading) {
+                    jsonOutput <- paste0(jsonOutput, "### Table output of all input and ouput values\n\n")
+                }
+                df <- as.data.frame(self)
+                jsonOutput <- paste0(jsonOutput,
+                    "```json\n",
+                    private$.dataFrameToJson(df),
+                    "\n```\n\n"
+                )
+            }
+
+            return(paste0(paste(output, collapse = collapse), jsonOutput))
+        }
+    ),
+    private = list(
+        .jsonData = list(),
+        .jsonGroupPath = character(),
+        .jsonGroupLevels = integer(),
+        .resetJson = function() {
+            private$.jsonData <- list()
+            private$.jsonGroupPath <- character()
+            private$.jsonGroupLevels <- integer()
+            self$.jsonLines <- character()
+        },
+        .addJsonLine = function(line, values = NULL, heading = 0, tableColumns = 0) {
+            if (heading > 0) {
+                groupName <- private$.getJsonName(line)
+                if (nchar(groupName) == 0) {
+                    return(invisible())
+                }
+
+                while (length(private$.jsonGroupLevels) > 0 &&
+                        private$.jsonGroupLevels[length(private$.jsonGroupLevels)] >= heading) {
+                    private$.jsonGroupLevels <- private$.jsonGroupLevels[-length(private$.jsonGroupLevels)]
+                    private$.jsonGroupPath <- private$.jsonGroupPath[-length(private$.jsonGroupPath)]
+                }
+
+                private$.jsonGroupLevels <- c(private$.jsonGroupLevels, heading)
+                private$.jsonGroupPath <- c(private$.jsonGroupPath, groupName)
+                private$.jsonData <- private$.setJsonValue(private$.jsonData, private$.jsonGroupPath)
+                private$.updateJsonLines()
+                return(invisible())
+            }
+
+            if (tableColumns > 0 && !is.null(values) && length(values) > 0) {
+                values <- trimws(values)
+                key <- private$.getJsonName(values[1])
+                if (nchar(key) > 0 && !grepl("^-+$", gsub(" ", "", key))) {
+                    private$.addJsonParameter(key, values[-1])
+                }
+                return(invisible())
+            }
+
+            if (is.null(line) || length(line) == 0 || is.na(line) || nchar(trimws(line)) == 0) {
+                return(invisible())
+            }
+
+            parts <- strsplit(line, " *: ")[[1]]
+            if (length(parts) == 2) {
+                private$.addJsonParameter(parts[1], parts[2])
+            }
+            return(invisible())
+        },
+        .addJsonParameter = function(key, value) {
+            key <- private$.getJsonName(key)
+            if (nchar(key) == 0) {
+                return(invisible())
+            }
+
+            value <- trimws(value)
+            private$.jsonData <- private$.setJsonValue(
+                private$.jsonData, private$.jsonGroupPath, key, value
+            )
+            private$.updateJsonLines()
+            return(invisible())
+        },
+        .getJsonName = function(value) {
+            if (is.null(value) || length(value) == 0 || is.na(value[1])) {
+                return("")
+            }
+
+            value <- trimws(gsub("\n", " ", as.character(value[1])))
+            value <- sub(":\\s*$", "", value, perl = TRUE)
+            value <- gsub("^\\*+|\\*+$", "", value)
+            return(trimws(value))
+        },
+        .setJsonValue = function(node, path, key = NULL, value = NULL) {
+            if (length(path) > 0) {
+                groupName <- path[1]
+                if (is.null(node[[groupName]]) || !is.list(node[[groupName]])) {
+                    node[[groupName]] <- list()
+                }
+                node[[groupName]] <- private$.setJsonValue(node[[groupName]], path[-1], key, value)
+                return(node)
+            }
+
+            if (is.null(key)) {
+                return(node)
+            }
+
+            if (!is.null(node[[key]]) && !is.list(node[[key]])) {
+                node[[key]] <- c(node[[key]], value)
+            } else if (!is.null(node[[key]]) && is.list(node[[key]])) {
+                node[[key]][["_value"]] <- c(node[[key]][["_value"]], value)
+            } else {
+                node[[key]] <- value
+            }
+            return(node)
+        },
+        .updateJsonLines = function() {
+            if (length(private$.jsonData) == 0) {
+                self$.jsonLines <- character()
+            } else {
+                self$.jsonLines <- private$.renderJson(private$.jsonData)
+            }
+        },
+        .renderJson = function(value, indent = 0) {
+            indentString <- paste0(rep(" ", indent), collapse = "")
+            if (is.list(value)) {
+                if (length(value) == 0) {
+                    return("{}")
+                }
+
+                lines <- "{"
+                valueNames <- names(value)
+                for (i in seq_along(value)) {
+                    childLines <- private$.renderJson(value[[i]], indent + 2)
+                    entryIndentString <- paste0(rep(" ", indent + 2), collapse = "")
+                    entryLines <- childLines
+                    entryLines[1] <- paste0(
+                        entryIndentString, private$.quoteJsonString(valueNames[i]), ": ", entryLines[1]
+                    )
+                    if (i < length(value)) {
+                        entryLines[length(entryLines)] <- paste0(entryLines[length(entryLines)], ",")
+                    }
+                    lines <- c(lines, entryLines)
+                }
+                return(c(lines, paste0(indentString, "}")))
+            }
+
+            if (length(value) == 0) {
+                return("[]")
+            }
+
+            items <- unlist(lapply(value, private$.getJsonValueItems), use.names = FALSE)
+            return(paste0("[", paste(items, collapse = ", "), "]"))
+        },
+        .dataFrameToJson = function(df, indent = 2, digits = 6) {
+            # df: data.frame
+            if (is.null(df) || !is.data.frame(df) || nrow(df) == 0) {
+                return("[]")
+            }
+
+            indentString <- function(level) paste0(rep(" ", level), collapse = "")
+            quoteVal <- function(v) {
+                # handle NULL/NA
+                if (is.null(v) || (length(v) == 1 && (is.na(v) || is.nan(v)))) {
+                    return("null")
+                }
+                
+                # logical
+                if (is.logical(v) && length(v) == 1) {
+                    return(tolower(as.character(v)))
+                }
+
+                # numeric
+                sChar <- as.character(v)
+                numericVal <- suppressWarnings(as.numeric(sChar))
+                if (!is.na(numericVal) && is.finite(numericVal) && !is.logical(v)) {
+                    # use general format with digits significant digits
+                    return(formatC(numericVal, digits = digits, format = "g"))
+                }
+
+                # character: also handle explicit true/false or comma-separated lists
+                s <- as.character(v)
+                sTrim <- trimws(s)
+                # boolean-like strings
+                lower <- tolower(sTrim)
+                if (lower %in% c("true", "false")) {
+                    return(lower)
+                }
+
+                # fallback: quote string
+                return(private$.quoteJsonString(sTrim))
+            }
+
+            lines <- c("[")
+            n <- nrow(df)
+            cols <- colnames(df)
+            for (i in seq_len(n)) {
+                lines <- c(lines, paste0(indentString(indent), "{"))
+                entries <- character()
+                for (j in seq_along(cols)) {
+                    name <- cols[j]
+                    value <- df[i, j]
+                    jsonValue <- trimws(quoteVal(value))
+                    entry <- paste0(indentString(indent * 2), private$.quoteJsonString(name), ": ", jsonValue)
+                    entries <- c(entries, entry)
+                }
+                # join entries with commas
+                if (length(entries) > 0) {
+                    entries[length(entries)] <- paste0(entries[length(entries)], ifelse(i < n, ",", ""))
+                    lines <- c(lines, entries)
+                }
+                lines <- c(lines, paste0(indentString(indent), ifelse(i < n, "},", "}")))
+            }
+            lines <- c(lines, "]")
+            return(paste(lines, collapse = "\n"))
+        },
+        .getJsonValueItems = function(value) {
+            if (is.null(value) || length(value) == 0 || is.na(value[1])) {
+                return("null")
+            }
+
+            value <- trimws(as.character(value[1]))
+            logicalValueItems <- private$.getJsonLogicalValueItems(value)
+            if (!is.null(logicalValueItems)) {
+                return(logicalValueItems)
+            }
+
+            numericValueItems <- private$.getJsonNumericValueItems(value)
+            if (!is.null(numericValueItems)) {
+                return(numericValueItems)
+            }
+
+            return(private$.quoteJsonString(value))
+        },
+        .getJsonLogicalValueItems = function(value) {
+            if (nchar(value) == 0) {
+                return(NULL)
+            }
+
+            valueItems <- trimws(strsplit(value, ",", fixed = TRUE)[[1]])
+            if (length(valueItems) == 0 || any(nchar(valueItems) == 0)) {
+                return(NULL)
+            }
+
+            lowerValueItems <- tolower(valueItems)
+            if (!all(lowerValueItems %in% c("true", "false"))) {
+                return(NULL)
+            }
+
+            return(lowerValueItems)
+        },
+        .getJsonNumericValueItems = function(value) {
+            if (nchar(value) == 0) {
+                return(NULL)
+            }
+
+            valueItems <- trimws(strsplit(value, ",", fixed = TRUE)[[1]])
+            if (length(valueItems) == 0 || any(nchar(valueItems) == 0)) {
+                return(NULL)
+            }
+
+            numericValues <- suppressWarnings(as.numeric(valueItems))
+            if (any(is.na(numericValues)) || any(!is.finite(numericValues))) {
+                return(NULL)
+            }
+
+            return(as.character(numericValues))
+        },
+        .quoteJsonString = function(value) {
+            if (is.null(value) || length(value) == 0 || is.na(value[1])) {
+                return("null")
+            }
+            return(encodeString(as.character(value[1]), quote = "\""))
         }
     )
 )
@@ -215,7 +595,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         initialize = function(..., .showParameterTypeEnabled = TRUE) {
             self$.showParameterTypeEnabled <- .showParameterTypeEnabled
             self$.parameterTypes <- list()
-            self$.catLines <- character()
+            self$.resetCat()
             self$.deprecatedFieldNames <- character()
         },
         .toString = function(startWithUpperCase = FALSE) {
@@ -232,7 +612,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterName' must be a valid character with length > 0"
+                    "'parameterName' must be a valid character with length > 0",
+                    call. = FALSE
                 )
             }
 
@@ -250,7 +631,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterName' must be a valid character with length > 0"
+                    "'parameterName' must be a valid character with length > 0",
+                    call. = FALSE
                 )
             }
 
@@ -262,7 +644,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 ))) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterType' ('", parameterType, "') is invalid"
+                    "'parameterType' ('", parameterType, "') is invalid",
+                    call. = FALSE
                 )
             }
 
@@ -311,13 +694,16 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (self$isUserDefinedParameter(parameterName) || self$isDefaultParameter(parameterName)) {
                 return(self[[parameterName]])
             }
-            
-            tryCatch({
-                parameterType <- .getClassName(self[[parameterName]])
-            }, error = function(e) {
-                parameterType <- "unknown"
-            })
-        
+
+            tryCatch(
+                {
+                    parameterType <- .getClassName(self[[parameterName]])
+                },
+                error = function(e) {
+                    parameterType <- "unknown"
+                }
+            )
+
             if (parameterType == "numeric") {
                 return(NA_real_)
             }
@@ -338,6 +724,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
             } else {
                 parameterNames <- names(self$.parameterTypes[which(self$.parameterTypes %in% parameterType)])
             }
+
             parametersToShow <- self$.getParametersToShow()
             if (is.null(parametersToShow) || length(parametersToShow) == 0) {
                 return(parameterNames)
@@ -378,7 +765,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
             if (!is.null(showType) && showType == 2) {
                 self$.cat("Technical developer summary of the ", self$.toString(), " object (",
                     methods::classLabel(class(self)), "):\n\n",
-                    sep = "", heading = 1,
+                    sep = "",
+                    heading = 1,
                     consoleOutputEnabled = consoleOutputEnabled
                 )
                 self$.showAllParameters(consoleOutputEnabled = consoleOutputEnabled)
@@ -434,7 +822,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                             consoleOutputEnabled = consoleOutputEnabled
                         ))
                     }
-                    
+
                     output <- ""
                     for (i in seq_len(length(params))) {
                         param <- params[[i]]
@@ -445,7 +833,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                             param$paramName <- parameterName
 
                             category <- parts[2]
-                            
+
                             categoryCaption <- .getParameterCaption(category, self[[parameterName]])
                             if (is.null(categoryCaption)) {
                                 categoryCaption <- paste0("%", category, "%")
@@ -472,10 +860,11 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         warning("Failed to show parameter '", parameterName, "': ", e$message)
                     }
                 }
-            ) 
+            )
         },
         .showParameterSingle = function(param,
-                parameterName, ...,
+                parameterName,
+                ...,
                 category = NULL,
                 showParameterType = FALSE,
                 consoleOutputEnabled = TRUE) {
@@ -555,36 +944,38 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(invisible(output))
         },
         .extractParameterNameAndValue = function(parameterName) {
-            tryCatch({
-                d <- regexpr("\\..+\\$", parameterName)
-                if (d[1] != 1) {
-                    return(list(
-                        parameterName = parameterName,
-                        paramValue = base::get(parameterName, envir = self)
-                    ))
-                }
-                
-                index <- attr(d, "match.length")
-                objectName <- substr(parameterName, 1, index - 1)
-                parameterName <- substr(parameterName, index + 1, nchar(parameterName))
-                obj <- base::get(objectName, envir = self)
-                paramValue <- base::get(parameterName, envir = obj)
-                #paramValue <- self[[objectName]][[parameterName]]
-            
-                if (objectName == ".closedTestResults" && parameterName == "rejected") {
-                    paramValueLogical <- as.logical(paramValue)
-                    if (is.matrix(paramValue)) {
-                        paramValueLogical <- matrix(paramValueLogical, ncol = ncol(paramValue))
+            tryCatch(
+                {
+                    d <- regexpr("\\..+\\$", parameterName)
+                    if (d[1] != 1) {
+                        return(list(
+                            parameterName = parameterName,
+                            paramValue = base::get(parameterName, envir = self)
+                        ))
                     }
-                    paramValue <- paramValueLogical
+
+                    index <- attr(d, "match.length")
+                    objectName <- substr(parameterName, 1, index - 1)
+                    parameterName <- substr(parameterName, index + 1, nchar(parameterName))
+                    obj <- base::get(objectName, envir = self)
+                    paramValue <- base::get(parameterName, envir = obj)
+
+                    if (objectName == ".closedTestResults" && parameterName == "rejected") {
+                        paramValueLogical <- as.logical(paramValue)
+                        if (is.matrix(paramValue)) {
+                            paramValueLogical <- matrix(paramValueLogical, ncol = ncol(paramValue))
+                        }
+                        paramValue <- paramValueLogical
+                    }
+                    return(list(parameterName = parameterName, paramValue = paramValue))
+                },
+                error = function(e) {
+                    if (consoleOutputEnabled) {
+                        warning("Failed to extract parameter name and value from ", sQuote(parameterName), ": ", e$message)
+                    }
+                    return(list(parameterName = parameterName, paramValue = ""))
                 }
-                return(list(parameterName = parameterName, paramValue = paramValue))
-            }, error = function(e) {
-                if (consoleOutputEnabled) {
-                    warning("Failed to extract parameter name and value from ", sQuote(parameterName), ": ", e$message)
-                }
-                return(list(parameterName = parameterName, paramValue = ""))
-            })
+            )
         },
         .showUnknownParameters = function(consoleOutputEnabled = TRUE) {
             params <- self$.getUndefinedParameters()
@@ -594,21 +985,19 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 )
             }
         },
-        .showParameterFormatted = function(
-                paramName, 
-                paramValue, 
-                ..., 
+        .showParameterFormatted = function(paramName,
+                paramValue,
+                ...,
                 paramValueFormatted = NA_character_,
-                showParameterType = FALSE, 
-                category = NULL, 
-                matrixRow = NA_integer_, 
+                showParameterType = FALSE,
+                category = NULL,
+                matrixRow = NA_integer_,
                 consoleOutputEnabled = TRUE,
-                paramNameRaw = NA_character_, 
+                paramNameRaw = NA_character_,
                 numberOfCategories = NA_integer_) {
-                
             paramCaption <- NULL
             if (!is.na(paramNameRaw)) {
-                paramCaption <- .getParameterCaption(paramNameRaw, self) 
+                paramCaption <- .getParameterCaption(paramNameRaw, self)
             }
             if (is.null(paramCaption)) {
                 paramCaption <- .getParameterCaption(paramName, self)
@@ -748,7 +1137,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 parameterValues <- self[[parameterName]]
                 if (is.vector(parameterValues) && length(parameterValues) > numberOfRows) {
                     numberOfRows <- length(parameterValues)
-                } else if (is.matrix(parameterValues) && 
+                } else if (is.matrix(parameterValues) &&
                         (nrow(parameterValues) == 1 || ncol(parameterValues) == 1) &&
                         length(parameterValues) > numberOfRows) {
                     numberOfRows <- length(parameterValues)
@@ -808,7 +1197,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
         },
         .getDataFrameColumnCaption = function(parameterName, niceColumnNamesEnabled) {
             if (length(parameterName) == 0 || parameterName == "") {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterName' must be a valid parameter name")
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterName' must be a valid parameter name", call. = FALSE)
             }
 
             if (!niceColumnNamesEnabled) {
@@ -843,7 +1232,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 {
                     formatFunctionName <- .getParameterFormatFunction(parameterName, self)
                     if (!is.null(formatFunctionName)) {
-                        parameterValuesFormatted <- eval(call(formatFunctionName, parameterValues))
+                        parameterValuesFormatted <- .getParameterValueFormattedByFormatFunctionName(
+                            formatFunctionName, parameterValues, self)
                     } else {
                         parameterValuesFormatted <- as.character(parameterValues)
                     }
@@ -907,18 +1297,19 @@ ParameterSet <- R6::R6Class("ParameterSet",
     }
 
     parameterNames <- parameterNames[!(parameterNames %in% c(
-        "accrualTime", 
+        "accrualTime",
         "accrualIntensity",
-        "plannedSubjects", 
+        "accrualIntensityRelative",
+        "plannedSubjects",
         "plannedEvents",
-        "minNumberOfSubjectsPerStage", 
+        "minNumberOfSubjectsPerStage",
         "maxNumberOfSubjectsPerStage",
-        "minNumberOfEventsPerStage", 
+        "minNumberOfEventsPerStage",
         "maxNumberOfEventsPerStage",
-        "piecewiseSurvivalTime", 
-        "lambda2", 
+        "piecewiseSurvivalTime",
+        "lambda2",
         "adaptations",
-        "adjustedStageWisePValues", 
+        "adjustedStageWisePValues",
         "overallAdjustedTestStatistics",
         "plannedCalendarTime",
         "doseLevels",
@@ -1002,11 +1393,11 @@ ParameterSet <- R6::R6Class("ParameterSet",
 
         if (length(parameterValues) == numberOfStages &&
                 parameterName %in% c(
-                    "plannedEvents", 
+                    "plannedEvents",
                     "plannedSubjects",
-                    "minNumberOfEventsPerStage", 
+                    "minNumberOfEventsPerStage",
                     "maxNumberOfEventsPerStage",
-                    "minNumberOfSubjectsPerStage", 
+                    "minNumberOfSubjectsPerStage",
                     "maxNumberOfSubjectsPerStage",
                     "allocationRatioPlanned"
                 )) {
@@ -1018,18 +1409,23 @@ ParameterSet <- R6::R6Class("ParameterSet",
         }
 
         if (parameterName %in% c(
-                "accrualTime", 
+                "accrualTime",
                 "accrualIntensity",
-                "plannedEvents", 
+                "plannedEvents",
                 "plannedSubjects",
-                "minNumberOfEventsPerStage", 
+                "minNumberOfEventsPerStage",
                 "maxNumberOfEventsPerStage",
-                "minNumberOfSubjectsPerStage", 
+                "minNumberOfSubjectsPerStage",
                 "maxNumberOfSubjectsPerStage",
-                "piecewiseSurvivalTime", 
-                "lambda2"
+                "piecewiseSurvivalTime",
+                "lambda2",
+                "stDev"
             )) {
-            return(NULL)
+            if (parameterName == "stDev" && length(unique(parameterValues)) == 1) {
+                return(parameterValues[1])
+            }
+
+            return(paste(parameterValues, collapse = ", "))
         }
 
         stop(
@@ -1159,7 +1555,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
     for (parameterName in parameterNames) {
         tryCatch(
             {
-                if (!(parameterName %in% c("stages", "adaptations", "effectList", "doseLevels", "plannedCalendarTime", "stDev")) &&
+                if (!(parameterName %in% c(
+                        "stages", "adaptations", "effectList",
+                        "doseLevels", "plannedCalendarTime"
+                    )) &&
                         !grepl("Function$", parameterName) &&
                         (is.null(variedParameter) || parameterName != variedParameter)) {
                     columnValues <- .getDataFrameColumnValues(
@@ -1167,10 +1566,16 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         numberOfVariants, numberOfStages,
                         includeAllParameters, mandatoryParameterNames
                     )
+
                     if (!is.null(columnValues)) {
                         columnCaption <- parameterSet$.getDataFrameColumnCaption(
                             parameterName, niceColumnNamesEnabled
                         )
+
+                        if (parameterName == "stDev" && length(columnValues) == 2) {
+                            columnValues <- paste(columnValues, collapse = ", ")
+                        }
+
                         dataFrame[[columnCaption]] <- columnValues
                         if (returnParametersAsCharacter) {
                             parameterSet$.formatDataFrameParametersAsCharacter(
@@ -1260,7 +1665,7 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 }
                 parameterValues <- parameterSet[[parameterName]]
                 if (parameterName == "futilityBounds") {
-                    parameterValues[parameterValues == C_FUTILITY_BOUNDS_DEFAULT] <- -Inf
+                    parameterValues <- .getFormattedFutilityBounds(parameterSet)
                 }
                 if (length(parameterValues) == 1) {
                     parameterValues <- rep(parameterValues, numberOfStages)
@@ -1334,9 +1739,12 @@ ParameterSet <- R6::R6Class("ParameterSet",
     }
 
     if (!inherits(parameterSet, "AccrualTime")) {
-        accrualTime <- parameterSet[["accrualTime"]]
+        accrualTime <- parameterSet[[".accrualTime"]]
         if (!is.null(accrualTime) && length(accrualTime) > 1) {
-            parametersToIgnore <- c(parametersToIgnore, c("accrualTime", "accrualIntensity"))
+            parametersToIgnore <- c(
+                parametersToIgnore,
+                c("accrualTime", "accrualIntensity", "accrualIntensityRelative")
+            )
         }
     }
 
@@ -1432,21 +1840,21 @@ names.FieldSet <- function(x) {
 #'
 print.FieldSet <- function(x, ..., markdown = NA) {
     sysCalls <- sys.calls()
-    
+
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("print")
     }
-    
+
     if (isTRUE(markdown)) {
         if (.isPrintCall(sysCalls)) {
             result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
             return(knitr::asis_output(result))
         }
-        
+
         .addObjectToPipeOperatorQueue(x)
         return(invisible(x))
     }
-    
+
     x$show()
     return(invisible(x))
 }
@@ -1472,12 +1880,11 @@ print.FieldSet <- function(x, ..., markdown = NA) {
 #'
 #' @keywords internal
 #'
-as.data.frame.ParameterSet <- function(
-        x, 
+as.data.frame.ParameterSet <- function(x,
         row.names = NULL,
-        optional = FALSE, 
-        ..., 
-        niceColumnNamesEnabled = FALSE, 
+        optional = FALSE,
+        ...,
+        niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = "as.data.frame", ...)
 
@@ -1528,8 +1935,10 @@ as.matrix.FieldSet <- function(x, ..., enforceRowNames = TRUE, niceColumnNamesEn
     if (inherits(x, "AnalysisResults")) {
         dfDesign <- as.data.frame(x$.design, niceColumnNamesEnabled = niceColumnNamesEnabled)
         dfStageResults <- as.data.frame(x$.stageResults, niceColumnNamesEnabled = niceColumnNamesEnabled)
-        dfStageResults <- dfStageResults[!is.na(dfStageResults[, 
-            grep("(test statistic)|(testStatistics)", colnames(dfStageResults))]), ]
+        dfStageResults <- dfStageResults[!is.na(dfStageResults[
+            ,
+            grep("(test statistic)|(testStatistics)", colnames(dfStageResults))
+        ]), ]
         if (length(intersect(names(dfDesign), names(dfStageResults))) == 1) {
             dfTemp <- merge(dfDesign, dfStageResults)
             if (length(intersect(names(dfTemp), names(dataFrame))) >= 1) {
@@ -1601,13 +2010,12 @@ summary.ParameterSet <- function(object, ...,
         output = c("all", "title", "overview", "body"),
         printObject = FALSE,
         sep = NA_character_) {
-        
     .warnInCaseOfUnknownArguments(functionName = "summary", ignore = c("printObject"), ...)
     .assertIsSingleCharacter(sep, "sep", naAllowed = TRUE)
     if (is.na(sep)) {
         sep <- .getMarkdownPlotPrintSeparator()
     }
-    
+
     base::attr(object, "printObject") <- printObject
     base::attr(object, "printObjectSeparator") <- sep
 
@@ -1651,7 +2059,7 @@ summary.ParameterSet <- function(object, ...,
             }
         }
     }
-    
+
     object$.printAsDataFrame(parameterNames = parametersToShow, niceColumnNamesEnabled = TRUE)
     invisible(object)
 }
@@ -1660,11 +2068,11 @@ summary.ParameterSet <- function(object, ...,
     if (is.null(sysCalls) || length(sysCalls) == 0) {
         return(TRUE)
     }
-    
+
     for (i in length(sysCalls):1) {
         callObj <- sysCalls[[i]]
         if (!is.null(callObj) && is.call(callObj)) {
-            callText <- capture.output(print(callObj))            
+            callText <- capture.output(print(callObj))
             if (any(grepl("(plot|summary)\\(", callText))) {
                 return(FALSE)
             }
@@ -1694,11 +2102,11 @@ summary.ParameterSet <- function(object, ...,
 #'
 print.ParameterSet <- function(x, ..., markdown = NA) {
     sysCalls <- sys.calls()
-    
+
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("print")
     }
-    
+
     showStatistics <- NULL
     if (inherits(x, "SimulationResults")) {
         showStatistics <- .getOptionalArgument("showStatistics", ...)
@@ -1706,22 +2114,23 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
             .assertIsSingleLogical(showStatistics, "showStatistics")
         }
     }
-    
+
     if (isTRUE(markdown)) {
         if (.isPrintCall(sysCalls)) {
             if (!is.null(showStatistics)) {
                 result <- paste0(utils::capture.output(
-                    x$.catMarkdownText(showStatistics = showStatistics)), collapse = "\n")
+                    x$.catMarkdownText(showStatistics = showStatistics)
+                ), collapse = "\n")
             } else {
                 result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
             }
             return(knitr::asis_output(result))
         }
-        
+
         .addObjectToPipeOperatorQueue(x)
         return(invisible(x))
     }
-    
+
     if (!is.null(showStatistics)) {
         x$show(showStatistics = showStatistics)
     } else {
@@ -1730,78 +2139,78 @@ print.ParameterSet <- function(x, ..., markdown = NA) {
     return(invisible(x))
 }
 
-#' 
+#'
 #' @rdname fetch.ParameterSet
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 obtain <- function(x, ..., output) UseMethod("obtain")
 
 #'
 #' @rdname fetch.ParameterSet
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 obtain.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "list")) {
     fCall <- match.call(expand.dots = TRUE)
     output <- match.arg(output)
-    return(.fetchParameterSetValues(x, fCall, output))   
+    return(.fetchParameterSetValues(x, fCall, output))
 }
 
-#' 
+#'
 #' @rdname fetch.ParameterSet
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 fetch <- function(x, ..., output) UseMethod("fetch")
 
 #'
 #' @title
 #' Extract a single parameter
-#' 
+#'
 #' @description
 #' Fetch a parameter from a parameter set.
-#' 
+#'
 #' @param x The \code{\link{ParameterSet}} object to fetch from.
-#' @param ... One or more variables specified as: 
-#'  - a literal variable name 
-#'  - a positive integer, giving the position counting from the left 
-#'  - a negative integer, giving the position counting from the right. 
-#' The default returns the last parameter.  
-#' This argument is taken by expression and supports quasiquotation (you can unquote column names and column locations).
+#' @param ... One or more variables specified as:
+#'  - a literal variable name
+#'  - a positive integer, giving the position counting from the left
+#'  - a negative integer, giving the position counting from the right.
+#' The default returns the last parameter.
+#' This argument is taken by expression and supports quasi-quotation (you can unquote column names and column locations).
 #' @param output A character defining the output type as follows:
 #'  - "named" (default) returns the named value if the value is a single value, the value inside a named list otherwise
 #'  - "value" returns only the value itself
 #'  - "list" returns the value inside a named list
-#' 
+#'
 #' @template examples_fetch_parameter_from_result
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "list")) {
     fCall <- match.call(expand.dots = TRUE)
     output <- match.arg(output)
-    return(.fetchParameterSetValues(x, fCall, output))   
+    return(.fetchParameterSetValues(x, fCall, output))
 }
 
 .getParameterSetVarIndices <- function(var, x) {
     if (!is.character(var) && !is.call(var)) {
         return(var)
     }
-    
+
     if (is.character(var) && var %in% names(x)) {
         return(var)
     }
-    
-    if (is.call(var) ) {
+
+    if (is.call(var)) {
         var <- as.character(var)
     }
-    
+
     result <- try(eval(parse(text = var)), silent = TRUE)
     if (methods::is(result, "try-error")) {
         return(var)
     }
-    
+
     return(result)
 }
 
@@ -1818,8 +2227,9 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
             if (is.pairlist(varValue)) {
                 for (j in 1:length(varValue)) {
                     var <- .getParameterSetVarNameOrIndex(
-                        varName = deparse(varValue[[j]]), 
-                        var = .getParameterSetVarIndices(varValue[[j]], x))
+                        varName = deparse(varValue[[j]]),
+                        var = .getParameterSetVarIndices(varValue[[j]], x)
+                    )
                     vars <- c(vars, var)
                 }
             } else {
@@ -1829,15 +2239,15 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
             }
         }
     }
-    
+
     if (length(vars) == 0) {
-        vars <- -1 
+        vars <- -1
     }
-    
+
     if (length(vars) == 1) {
         return(.getParameterSetValue(x = x, var = vars[[1]], output = output))
     }
-    
+
     results <- list()
     for (var in vars) {
         result <- .getParameterSetValue(x = x, var = var, output = output)
@@ -1847,7 +2257,7 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
             results[[length(results) + 1]] <- result
         }
     }
-    return(results)  
+    return(results)
 }
 
 .getParameterSetVar <- function(fCall, var) {
@@ -1855,43 +2265,43 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
     return(.getParameterSetVarNameOrIndex(varName, var))
 }
 
-#' 
-#' @examples 
+#'
+#' @examples
 #' .getParameterSetVarNameOrIndex("a", "a")
 #' .getParameterSetVarNameOrIndex("a", a)
 #' b <- 1
 #' .getParameterSetVarNameOrIndex("b", b)
-#' 
-#' @noRd 
-#' 
+#'
+#' @noRd
+#'
 .getParameterSetVarNameOrIndex <- function(varName, var) {
     if (identical(varName, "NULL")) {
         return(var)
     }
-    
+
     varNameExists <- !is.null(varName) && exists(varName)
     if (varNameExists) {
         return(var)
     }
-    
+
     if (grepl("\"|'", varName)) {
         varName <- gsub('"', "", varName)
         varName <- gsub("'", "", varName)
         return(varName)
     }
-    
+
     var <- suppressWarnings(as.integer(varName))
     if (!is.na(var)) {
         return(var)
     }
-    
+
     varName <- gsub('"', "", varName)
     varName <- gsub("'", "", varName)
     return(varName)
 }
 
 .getParameterSetValue <- function(..., x, var, output) {
-    if (is.character(var) && 
+    if (is.character(var) &&
             identical(as.character(suppressWarnings(as.integer(var))), var)) {
         var <- as.integer(var)
     }
@@ -1935,59 +2345,59 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
             }
         }
         if (length(var) == 0 || !(var %in% names(x))) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(varRoot), " does not exist")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(varRoot), " does not exist", call. = FALSE)
         }
-        
+
         value <- x[[var]]
-        
+
         if (output == "value") {
             return(value)
         }
-        
+
         label <- var
         if (output == "labeled") {
             label <- getParameterCaption(x, var)
         } else if (!is.na(varOriginal)) {
             label <- varOriginal
         }
-        
+
         if (output %in% c("named", "labeled") && is.vector(value) && length(value) <= 1) {
             names(value) <- label
             return(value)
         }
-        
+
         result <- list(value = value)
         names(result) <- label
         return(result)
     }
-    
+
     .assertIsSingleInteger(var, "var", validateType = FALSE)
     varNames <- names(x)
     .assertIsInClosedInterval(var, "var", lower = -length(varNames), upper = length(varNames))
     if (var == 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'var' (", var, ") must != 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'var' (", var, ") must != 0", call. = FALSE)
     }
     if (var < 0) {
         var <- length(varNames) + var + 1
     }
-    
+
     varName <- varNames[var]
     value <- x[[varName]]
-    
+
     if (output == "value") {
         return(value)
     }
-    
+
     label <- names(x)[var]
     if (output == "labeled") {
         label <- getParameterCaption(x, names(x)[var])
     }
-    
+
     if (output %in% c("named", "labeled") && is.vector(value) && length(value) <= 1) {
         names(value) <- label
         return(value)
     }
-    
+
     result <- list(value = value)
     names(result) <- label
     return(result)
@@ -2023,10 +2433,10 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, type = 1L, palette = "Set1",
         legendPosition = NA_integer_, showSource = FALSE, plotSettings = NULL) {
     .assertGgplotIsInstalled()
-    
+
     stop(
         C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-        "sorry, function 'plot' is not implemented yet for class '", .getClassName(x), "'"
+        "sorry, function 'plot' is not yet implemented for class '", .getClassName(x), "'"
     )
 }
 
@@ -2045,14 +2455,14 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
 #'
 #' @details
 #' Generic function to print a field set in Markdown.
-#' 
+#'
 #' @template details_knit_print
 #'
 #' @keywords internal
-#' 
+#'
 #' @export
 #'
-knit_print.FieldSet <- function(x, ...) { 
+knit_print.FieldSet <- function(x, ...) {
     result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
     return(knitr::asis_output(result))
 }
@@ -2072,14 +2482,14 @@ knit_print.FieldSet <- function(x, ...) {
 #'
 #' @details
 #' Generic function to print a parameter set in Markdown.
-#' 
+#'
 #' @template details_knit_print
 #'
 #' @keywords internal
-#' 
+#'
 #' @export
 #'
-knit_print.ParameterSet <- function(x, ...) { 
+knit_print.ParameterSet <- function(x, ...) {
     result <- paste0(utils::capture.output(x$.catMarkdownText()), collapse = "\n")
     return(knitr::asis_output(result))
 }
@@ -2097,32 +2507,39 @@ knit_print.ParameterSet <- function(x, ...) {
 #'
 #' @details
 #' This function is deprecated and should no longer be used.
-#' Manual use of kable() for rpact result objects is no longer needed, 
-#' as the formatting and display will be handled automatically by the rpact package. 
-#' Please remove any manual kable() calls from your code to avoid redundancy and potential issues. 
+#' Manual use of kable() for rpact result objects is no longer needed,
+#' as the formatting and display will be handled automatically by the rpact package.
+#' Please remove any manual kable() calls from your code to avoid redundancy and potential issues.
 #' The results will be displayed in a consistent format automatically.
-#' 
+#'
 #' @name kableParameterSet
-#' 
+#'
 #' @keywords internal
-#' 
+#'
 #' @export
 #'
 kable.ParameterSet <- function(x, ...) {
     fCall <- match.call(expand.dots = FALSE)
-    
-    lastWarningTime <- getOption("rpact.deprecated.message.time.function.kable")
+
+    lastWarningTime <- .getEnvironmentVariable(
+        "RPACT_DEPRECATED_MESSAGE_TIME_FUNCTION_KABLE",
+        "rpact.deprecated.message.time.function.kable"
+    )
     if (is.null(lastWarningTime) || difftime(Sys.time(), lastWarningTime, units = "hours") > 8) {
         base::options("rpact.deprecated.message.time.function.kable" = Sys.time())
-        .Deprecated(new = "",  
-            msg = paste0("Manual use of kable() for rpact result objects is no longer needed, ",
-                "as the formatting and display will be handled automatically by the rpact package"),
-            old = "kable")
+        .Deprecated(
+            new = "",
+            msg = paste0(
+                "Manual use of kable() for rpact result objects is no longer needed, ",
+                "as the formatting and display will be handled automatically by the rpact package"
+            ),
+            old = "kable"
+        )
     }
-    
+
     if (inherits(x, "ParameterSet")) {
         objName <- deparse(fCall$x)
-        
+
         if (length(objName) > 0) {
             if (length(objName) > 1) {
                 objName <- paste0(objName[1], "...")
@@ -2132,7 +2549,7 @@ kable.ParameterSet <- function(x, ...) {
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") ",
                     "does not work correctly. ",
                     "Use ", sub("print", "kable", objName), " without 'print' ",
-                    "instead or ", sub("\\)", ", markdown = TRUE)", objName)
+                    "instead or ", sub("\\)", ", markdown = TRUE, call. = FALSE)", objName)
                 )
             }
         }
@@ -2144,110 +2561,111 @@ kable.ParameterSet <- function(x, ...) {
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
-kable.FieldSet <- function(x, ..., 
+#'
+#' @export
+#'
+kable.FieldSet <- function(x, ...,
         enforceRowNames = TRUE, niceColumnNamesEnabled = TRUE) {
     .assertPackageIsInstalled("knitr")
-    knitr::kable(as.matrix(x, 
-        enforceRowNames = enforceRowNames, 
-        niceColumnNamesEnabled = niceColumnNamesEnabled), ...)
+    knitr::kable(as.matrix(x,
+        enforceRowNames = enforceRowNames,
+        niceColumnNamesEnabled = niceColumnNamesEnabled
+    ), ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.data.frame <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.table <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.matrix <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.array <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.numeric <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.character <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable.logical <- function(x, ...) {
     .assertPackageIsInstalled("knitr")
     knitr::kable(x, ...)
 }
 
-#' 
+#'
 #' @rdname kableParameterSet
 #'
 #' @keywords internal
-#' 
-#' @export 
-#' 
+#'
+#' @export
+#'
 kable <- function(x, ...) UseMethod("kable")

@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8474 $
-## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #'
 #' @name EventProbabilities
@@ -189,7 +185,8 @@ NumberOfSubjects <- R6::R6Class("NumberOfSubjects",
         accrualIntensity = NULL,
         maxNumberOfSubjects = NULL,
         numberOfSubjects = NULL,
-        initialize = function(..., accrualSetup = NULL,
+        initialize = function(...,
+                accrualSetup = NULL,
                 time = NULL,
                 accrualTime = NULL,
                 accrualIntensity = NULL,
@@ -273,29 +270,27 @@ NumberOfSubjects <- R6::R6Class("NumberOfSubjects",
 #'
 #' @export
 #'
-plot.EventProbabilities <- function(
-        x, 
-        y, 
+plot.EventProbabilities <- function(x,
+        y,
         ...,
         allocationRatioPlanned = x$allocationRatioPlanned,
-        main = NA_character_, 
-        xlab = NA_character_, 
-        ylab = NA_character_, 
+        main = NA_character_,
+        xlab = NA_character_,
+        ylab = NA_character_,
         type = 1L,
-        legendTitle = NA_character_, 
+        legendTitle = NA_character_,
         palette = "Set1",
-        plotPointsEnabled = NA, 
-        legendPosition = NA_integer_, 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_,
         showSource = FALSE,
         plotSettings = NULL) {
-        
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
-    
+
     args <- list(
-        x = x, 
+        x = x,
         y = NULL,
         allocationRatioPlanned = allocationRatioPlanned,
         main = main,
@@ -307,31 +302,31 @@ plot.EventProbabilities <- function(
         plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition,
         showSource = showSource,
-        plotSettings = plotSettings, 
-        ...)
-    
+        plotSettings = plotSettings,
+        ...
+    )
+
     if (markdown) {
         sep <- .getMarkdownPlotPrintSeparator()
         print(do.call(.plot.EventProbabilities, args))
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
-    
+
     return(do.call(.plot.EventProbabilities, args))
 }
 
-.plot.EventProbabilities <- function(
-        x, 
-        y, 
+.plot.EventProbabilities <- function(x,
+        y,
         ...,
         allocationRatioPlanned = x$allocationRatioPlanned,
-        main = NA_character_, 
-        xlab = NA_character_, 
-        ylab = NA_character_, 
+        main = NA_character_,
+        xlab = NA_character_,
+        ylab = NA_character_,
         type = 1L,
-        legendTitle = NA_character_, 
+        legendTitle = NA_character_,
         palette = "Set1",
-        plotPointsEnabled = NA, 
-        legendPosition = NA_integer_, 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_,
         showSource = FALSE,
         plotSettings = NULL) {
     fCall <- match.call(expand.dots = FALSE)
@@ -361,9 +356,9 @@ plot.EventProbabilities <- function(
         maxNumberOfSubjectsToUse <- x$maxNumberOfSubjects
     } else if (!is.na(x$maxNumberOfSubjects) &&
             x$maxNumberOfSubjects != maxNumberOfSubjectsToUse) {
-        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS, 
+        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
             "'x' (EventProbabilities) and 'y' (NumberOfSubjects) ",
-            "must have the same 'maxNumberOfSubjects' defined", 
+            "must have the same 'maxNumberOfSubjects' defined",
             call. = FALSE
         )
     }
@@ -511,29 +506,27 @@ plot.EventProbabilities <- function(
 #'
 #' @export
 #'
-plot.NumberOfSubjects <- function(
-        x, 
-        y, 
+plot.NumberOfSubjects <- function(x,
+        y,
         ...,
         allocationRatioPlanned = NA_real_,
-        main = NA_character_, 
-        xlab = NA_character_, 
-        ylab = NA_character_, 
+        main = NA_character_,
+        xlab = NA_character_,
+        ylab = NA_character_,
         type = 1L,
-        legendTitle = NA_character_, 
+        legendTitle = NA_character_,
         palette = "Set1",
-        plotPointsEnabled = NA, 
-        legendPosition = NA_integer_, 
+        plotPointsEnabled = NA,
+        legendPosition = NA_integer_,
         showSource = FALSE,
         plotSettings = NULL) {
-
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
-    
+
     args <- list(
-        x = x, 
+        x = x,
         y = NULL,
         allocationRatioPlanned = allocationRatioPlanned,
         main = main,
@@ -545,16 +538,17 @@ plot.NumberOfSubjects <- function(
         plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition,
         showSource = showSource,
-        plotSettings = plotSettings, 
-        ...)
-    
+        plotSettings = plotSettings,
+        ...
+    )
+
     if (markdown) {
         sep <- .getMarkdownPlotPrintSeparator()
         print(do.call(.plot.NumberOfSubjects, args))
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
-    
-    return(do.call(.plot.NumberOfSubjects, args))    
+
+    return(do.call(.plot.NumberOfSubjects, args))
 }
 
 .plot.NumberOfSubjects <- function(x, y, ...,

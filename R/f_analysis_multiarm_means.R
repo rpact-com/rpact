@@ -13,16 +13,12 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8545 $
-## |  Last changed: $Date: 2025-02-10 12:37:59 +0100 (Mo, 10 Feb 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_logger.R
 NULL
 
 .getAnalysisResultsMeansMultiArm <- function(..., design, dataInput) {
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getAnalysisResultsMeansInverseNormalMultiArm(design = design, dataInput = dataInput, ...))
     }
 
@@ -38,7 +34,7 @@ NULL
 }
 
 .getAnalysisResultsMeansInverseNormalMultiArm <- function(...,
-        design, 
+        design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
         directionUpper = NA,
@@ -50,7 +46,7 @@ NULL
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         calculateSingleStepAdjusted = FALSE,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
-    .assertIsTrialDesignInverseNormal(design)
+    .assertIsTrialDesignInverseNormalOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
         functionName = ".getAnalysisResultsMeansInverseNormalMultiArm",
@@ -63,20 +59,20 @@ NULL
     results <- AnalysisResultsMultiArmInverseNormal$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansMultiArmAll(
-        results = results, 
-        design = design, 
+        results = results,
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
-        stage = stage, 
+        intersectionTest = intersectionTest,
+        stage = stage,
         directionUpper = directionUpper,
-        normalApproximation = normalApproximation, 
+        normalApproximation = normalApproximation,
         varianceOption = varianceOption,
-        thetaH0 = thetaH0, 
-        thetaH1 = thetaH1, 
-        assumedStDevs = assumedStDevs, 
+        thetaH0 = thetaH0,
+        thetaH1 = thetaH1,
+        assumedStDevs = assumedStDevs,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
-        calculateSingleStepAdjusted = calculateSingleStepAdjusted, 
+        calculateSingleStepAdjusted = calculateSingleStepAdjusted,
         tolerance = tolerance
     )
 
@@ -95,7 +91,7 @@ NULL
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         calculateSingleStepAdjusted = FALSE,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, 
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
@@ -110,22 +106,22 @@ NULL
 
     results <- AnalysisResultsMultiArmFisher$new(design = design, dataInput = dataInput)
     results <- .getAnalysisResultsMeansMultiArmAll(
-        results = results, 
-        design = design, 
+        results = results,
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
-        stage = stage, 
+        intersectionTest = intersectionTest,
+        stage = stage,
         directionUpper = directionUpper,
-        normalApproximation = normalApproximation, 
+        normalApproximation = normalApproximation,
         varianceOption = varianceOption,
-        thetaH0 = thetaH0, 
-        thetaH1 = thetaH1, 
-        assumedStDevs = assumedStDevs, 
+        thetaH0 = thetaH0,
+        thetaH1 = thetaH1,
+        assumedStDevs = assumedStDevs,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
         calculateSingleStepAdjusted = calculateSingleStepAdjusted,
-        tolerance = tolerance, 
-        iterations = iterations, 
+        tolerance = tolerance,
+        iterations = iterations,
         seed = seed
     )
 
@@ -144,7 +140,7 @@ NULL
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         calculateSingleStepAdjusted = FALSE,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, 
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     .assertIsTrialDesignConditionalDunnett(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -159,43 +155,43 @@ NULL
     results <- AnalysisResultsConditionalDunnett$new(design = design, dataInput = dataInput)
 
     results <- .getAnalysisResultsMeansMultiArmAll(
-        results = results, 
+        results = results,
         design = design,
-        dataInput = dataInput, 
+        dataInput = dataInput,
         intersectionTest = intersectionTest,
-        stage = stage, 
-        directionUpper = directionUpper, 
+        stage = stage,
+        directionUpper = directionUpper,
         normalApproximation = normalApproximation,
         varianceOption = varianceOption,
-        thetaH0 = thetaH0, 
-        thetaH1 = thetaH1, 
-        assumedStDevs = assumedStDevs, 
+        thetaH0 = thetaH0,
+        thetaH1 = thetaH1,
+        assumedStDevs = assumedStDevs,
         nPlanned = nPlanned,
         allocationRatioPlanned = allocationRatioPlanned,
         calculateSingleStepAdjusted = calculateSingleStepAdjusted,
         tolerance = tolerance,
-        iterations = iterations, 
+        iterations = iterations,
         seed = seed
     )
 
     return(results)
 }
 
-.getAnalysisResultsMeansMultiArmAll <- function(..., 
-        results, 
-        design, 
-        dataInput, 
-        intersectionTest, 
+.getAnalysisResultsMeansMultiArmAll <- function(...,
+        results,
+        design,
+        dataInput,
+        intersectionTest,
         stage,
-        directionUpper, 
-        normalApproximation, 
-        varianceOption, 
-        thetaH0, 
-        thetaH1, 
+        directionUpper,
+        normalApproximation,
+        varianceOption,
+        thetaH0,
+        thetaH1,
         assumedStDevs,
-        nPlanned, 
-        allocationRatioPlanned, 
-        calculateSingleStepAdjusted, 
+        nPlanned,
+        allocationRatioPlanned,
+        calculateSingleStepAdjusted,
         tolerance,
         iterations, seed) {
     startTime <- Sys.time()
@@ -203,13 +199,13 @@ NULL
     intersectionTest <- .getCorrectedIntersectionTestMultiArmIfNecessary(design, intersectionTest)
 
     stageResults <- .getStageResultsMeansMultiArm(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         stage = stage,
-        thetaH0 = thetaH0, 
+        thetaH0 = thetaH0,
         directionUpper = directionUpper,
-        normalApproximation = normalApproximation, 
+        normalApproximation = normalApproximation,
         varianceOption = varianceOption,
         calculateSingleStepAdjusted = calculateSingleStepAdjusted,
         userFunctionCallEnabled = TRUE
@@ -298,9 +294,9 @@ NULL
 
     # RCI - repeated confidence interval
     repeatedConfidenceIntervals <- .getRepeatedConfidenceIntervalsMeansMultiArm(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         stage = stage,
         directionUpper = directionUpper,
         normalApproximation = normalApproximation,
@@ -333,10 +329,10 @@ NULL
     return(results)
 }
 
-.getStageResultsMeansMultiArm <- function(..., 
-        design, 
+.getStageResultsMeansMultiArm <- function(...,
+        design,
         dataInput,
-        thetaH0 = C_THETA_H0_MEANS_DEFAULT,
+        thetaH0 = NA_real_,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
@@ -346,6 +342,7 @@ NULL
     .assertIsTrialDesign(design)
     .assertIsDatasetMeans(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
+    thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsValidVarianceOptionMultiArmed(design, varianceOption)
     .warnInCaseOfUnknownArguments(
@@ -514,8 +511,6 @@ NULL
             if (isFALSE(directionUpper)) {
                 separatePValues[treatmentArm, k] <- 1 - separatePValues[treatmentArm, k]
                 overallPValues[treatmentArm, k] <- 1 - overallPValues[treatmentArm, k]
-#                testStatistics[treatmentArm, k] <- -testStatistics[treatmentArm, k]
-#                overallTestStatistics[treatmentArm, k] <- -overallTestStatistics[treatmentArm, k]
             }
         }
     }
@@ -529,10 +524,14 @@ NULL
         combInverseNormal <- matrix(NA_real_, nrow = gMax, ncol = kMax)
         combFisher <- matrix(NA_real_, nrow = gMax, ncol = kMax)
 
+        weightsInverseNormal <- NULL
+        weightsFisher <- NULL
         if (.isTrialDesignInverseNormal(design)) {
             weightsInverseNormal <- stageResults$weightsInverseNormal
         } else if (.isTrialDesignFisher(design)) {
             weightsFisher <- stageResults$weightsFisher
+        } else if (.isTrialDesignFixed(design)) {
+            weightsInverseNormal <- 1
         }
 
         for (k in 1:stage) {
@@ -556,7 +555,7 @@ NULL
                         )
                     }
                 } else if (intersectionTest == "Sidak") {
-                    if (.isTrialDesignGroupSequential(design)) {
+                    if (.isTrialDesignGroupSequential(design)) { 
                         overallPValues[treatmentArm, k] <- 1 - (1 - overallPValues[treatmentArm, k])^selected
                     } else {
                         singleStepAdjustedPValues[treatmentArm, k] <- 1 - (1 -
@@ -571,14 +570,14 @@ NULL
                         singleStepAdjustedPValues[treatmentArm, k] <- 1 - .getMultivariateDistribution(
                             type = ifelse(normalApproximation, "normal", "t"),
                             upper = ifelse(!isFALSE(directionUpper),
-                                testStatistics[treatmentArm, k], 
+                                testStatistics[treatmentArm, k],
                                 -testStatistics[treatmentArm, k]
                             ),
                             sigma = sigma, df = df
                         )
                     }
                 }
-                if (.isTrialDesignInverseNormal(design)) {
+                if (.isTrialDesignInverseNormalOrFixed(design)) {
                     combInverseNormal[treatmentArm, k] <- (weightsInverseNormal[1:k] %*%
                         .getOneMinusQNorm(singleStepAdjustedPValues[treatmentArm, 1:k])) /
                         sqrt(sum(weightsInverseNormal[1:k]^2))
@@ -602,7 +601,7 @@ NULL
         if (.isTrialDesignFisher(design)) {
             stageResults$combFisher <- combFisher
             stageResults$.setParameterType("combFisher", C_PARAM_GENERATED)
-        } else if (.isTrialDesignInverseNormal(design)) {
+        } else if (.isTrialDesignInverseNormalOrFixed(design)) {
             stageResults$combInverseNormal <- combInverseNormal
             stageResults$.setParameterType("combInverseNormal", C_PARAM_GENERATED)
         }
@@ -615,35 +614,35 @@ NULL
         stageResults$testStatistics <- testStatistics
         stageResults$separatePValues <- separatePValues
     }
-
+    
     return(stageResults)
 }
 
-.getRootThetaMeansMultiArm <- function(..., 
-        design, 
-        dataInput, 
-        treatmentArm, 
+.getRootThetaMeansMultiArm <- function(...,
+        design,
+        dataInput,
+        treatmentArm,
         stage,
-        directionUpper, 
-        normalApproximation, 
-        varianceOption, 
+        directionUpper,
+        normalApproximation,
+        varianceOption,
         intersectionTest,
-        thetaLow, 
-        thetaUp, 
-        firstParameterName, 
-        secondValue, 
+        thetaLow,
+        thetaUp,
+        firstParameterName,
+        secondValue,
         tolerance) {
     result <- .getOneDimensionalRoot(
         function(theta) {
             stageResults <- .getStageResultsMeansMultiArm(
-                design = design, 
+                design = design,
                 dataInput = dataInput,
-                stage = stage, 
-                thetaH0 = theta, 
+                stage = stage,
+                thetaH0 = theta,
                 directionUpper = directionUpper,
-                intersectionTest = intersectionTest, 
+                intersectionTest = intersectionTest,
                 normalApproximation = normalApproximation,
-                varianceOption = varianceOption, 
+                varianceOption = varianceOption,
                 calculateSingleStepAdjusted = TRUE
             )
             firstValue <- stageResults[[firstParameterName]][treatmentArm, stage]
@@ -658,44 +657,44 @@ NULL
     return(result)
 }
 
-.getUpperLowerThetaMeansMultiArm <- function(..., 
-        design, 
-        dataInput, 
-        theta, 
-        treatmentArm, 
+.getUpperLowerThetaMeansMultiArm <- function(...,
+        design,
+        dataInput,
+        theta,
+        treatmentArm,
         stage,
-        directionUpper, 
-        normalApproximation, 
-        varianceOption, 
-        conditionFunction, 
+        directionUpper,
+        normalApproximation,
+        varianceOption,
+        conditionFunction,
         intersectionTest,
-        firstParameterName, 
+        firstParameterName,
         secondValue) {
     stageResults <- .getStageResultsMeansMultiArm(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        stage = stage, 
-        thetaH0 = theta, 
+        stage = stage,
+        thetaH0 = theta,
         directionUpper = directionUpper,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         normalApproximation = normalApproximation,
-        varianceOption = varianceOption, 
+        varianceOption = varianceOption,
         calculateSingleStepAdjusted = TRUE
     )
-
+    
     firstValue <- stageResults[[firstParameterName]][treatmentArm, stage]
     maxSearchIterations <- 30
     while (conditionFunction(secondValue, firstValue)) {
         theta <- 2 * theta
         stageResults <- .getStageResultsMeansMultiArm(
-            design = design, 
+            design = design,
             dataInput = dataInput,
-            stage = stage, 
-            thetaH0 = theta, 
+            stage = stage,
+            thetaH0 = theta,
             directionUpper = directionUpper,
-            intersectionTest = intersectionTest, 
+            intersectionTest = intersectionTest,
             normalApproximation = normalApproximation,
-            varianceOption = varianceOption, 
+            varianceOption = varianceOption,
             calculateSingleStepAdjusted = TRUE
         )
 
@@ -720,7 +719,7 @@ NULL
 }
 
 .getRepeatedConfidenceIntervalsMeansMultiArmAll <- function(...,
-        design, 
+        design,
         dataInput,
         directionUpper = NA,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
@@ -731,14 +730,14 @@ NULL
     .assertIsValidIntersectionTestMultiArm(design, intersectionTest)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     stageResults <- .getStageResultsMeansMultiArm(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        stage = stage, 
-        thetaH0 = 0, 
+        stage = stage,
+        thetaH0 = 0,
         directionUpper = directionUpper,
-        intersectionTest = intersectionTest, 
+        intersectionTest = intersectionTest,
         normalApproximation = normalApproximation,
-        varianceOption = varianceOption, 
+        varianceOption = varianceOption,
         calculateSingleStepAdjusted = FALSE
     )
 
@@ -811,7 +810,7 @@ NULL
                 thetaUp <- thetaUpLimit
                 iteration <- 30
                 prec <- 1
-                
+
                 while (prec > tolerance) {
                     theta <- (thetaLow + thetaUp) / 2
                     stageResults <- .getStageResultsMeansMultiArm(
@@ -843,8 +842,7 @@ NULL
         # Repeated onfidence intervals when using combination tests
         if (intersectionTest == "Hierarchical") {
             warning("Repeated confidence intervals not available for ",
-                "'intersectionTest' = \"Hierarchical\"",
-                call. = FALSE
+                "'intersectionTest' = \"Hierarchical\""
             )
             return(repeatedConfidenceIntervals)
         }
@@ -854,8 +852,8 @@ NULL
             border <- C_ALPHA_0_VEC_DEFAULT
             criticalValues <- .getCriticalValues(design)
             conditionFunction <- .isFirstValueSmallerThanSecondValue
-        } else if (.isTrialDesignInverseNormal(design)) {
-            bounds <- design$futilityBounds
+        } else if (.isTrialDesignInverseNormalOrFixed(design)) {
+            bounds <- .getFutilityBounds(design)
             border <- C_FUTILITY_BOUNDS_DEFAULT
             criticalValues <- .getCriticalValues(design)
             criticalValues[is.infinite(criticalValues) & criticalValues > 0] <- C_QNORM_MAXIMUM
@@ -865,28 +863,41 @@ NULL
 
         # Necessary for adjustment for binding futility boundaries
         futilityCorr <- rep(NA_real_, design$kMax)
-
+        
         stages <- (1:stage)
         for (k in stages) {
             startTime <- Sys.time()
             for (treatmentArm in 1:gMax) {
                 if (!is.na(stageResults$testStatistics[treatmentArm, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
+                    
                     # finding maximum upper and minimum lower bounds for RCIs
                     thetaLow <- .getUpperLowerThetaMeansMultiArm(
-                        design = design, dataInput = dataInput,
-                        theta = -1, treatmentArm = treatmentArm, stage = k, directionUpper = TRUE,
-                        normalApproximation = normalApproximation, varianceOption = varianceOption,
+                        design = design, 
+                        dataInput = dataInput,
+                        theta = -1, 
+                        treatmentArm = treatmentArm, 
+                        stage = k, 
+                        directionUpper = TRUE,
+                        normalApproximation = normalApproximation, 
+                        varianceOption = varianceOption,
                         conditionFunction = conditionFunction,
-                        intersectionTest = intersectionTest, firstParameterName = firstParameterName,
+                        intersectionTest = intersectionTest, 
+                        firstParameterName = firstParameterName,
                         secondValue = criticalValues[k]
                     )
 
                     thetaUp <- .getUpperLowerThetaMeansMultiArm(
-                        design = design, dataInput = dataInput,
-                        theta = 1, treatmentArm = treatmentArm, stage = k, directionUpper = FALSE,
-                        normalApproximation = normalApproximation, varianceOption = varianceOption,
+                        design = design, 
+                        dataInput = dataInput,
+                        theta = 1, 
+                        treatmentArm = treatmentArm, 
+                        stage = k, 
+                        directionUpper = FALSE,
+                        normalApproximation = normalApproximation, 
+                        varianceOption = varianceOption,
                         conditionFunction = conditionFunction,
-                        intersectionTest = intersectionTest, firstParameterName = firstParameterName,
+                        intersectionTest = intersectionTest, 
+                        firstParameterName = firstParameterName,
                         secondValue = criticalValues[k]
                     )
 
@@ -981,7 +992,7 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsMeansMultiArmInverseNormal <- function(...,
-        design, 
+        design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
@@ -995,13 +1006,13 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsMeansMultiArmAll(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        normalApproximation = normalApproximation, 
+        normalApproximation = normalApproximation,
         varianceOption = varianceOption,
-        directionUpper = directionUpper, 
+        directionUpper = directionUpper,
         intersectionTest = intersectionTest,
-        tolerance = tolerance, 
+        tolerance = tolerance,
         firstParameterName = "combInverseNormal", ...
     ))
 }
@@ -1012,7 +1023,7 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsMeansMultiArmFisher <- function(...,
-        design, 
+        design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
@@ -1026,14 +1037,14 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsMeansMultiArmAll(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        normalApproximation = normalApproximation, 
+        normalApproximation = normalApproximation,
         varianceOption = varianceOption,
-        directionUpper = directionUpper, 
+        directionUpper = directionUpper,
         intersectionTest = intersectionTest,
-        tolerance = tolerance, 
-        firstParameterName = "combFisher", 
+        tolerance = tolerance,
+        firstParameterName = "combFisher",
         ...
     ))
 }
@@ -1044,7 +1055,7 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsMeansMultiArmConditionalDunnett <- function(...,
-        design, 
+        design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_MEANS_DEFAULT,
         varianceOption = C_VARIANCE_OPTION_MULTIARMED_DEFAULT,
@@ -1061,14 +1072,14 @@ NULL
     )
 
     return(.getRepeatedConfidenceIntervalsMeansMultiArmAll(
-        design = design, 
+        design = design,
         dataInput = dataInput,
-        normalApproximation = normalApproximation, 
+        normalApproximation = normalApproximation,
         varianceOption = varianceOption,
-        directionUpper = directionUpper, 
+        directionUpper = directionUpper,
         intersectionTest = intersectionTest,
-        tolerance = tolerance, 
-        firstParameterName = NA, 
+        tolerance = tolerance,
+        firstParameterName = NA,
         ...
     ))
 }
@@ -1079,7 +1090,7 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsMeansMultiArm <- function(..., design) {
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getRepeatedConfidenceIntervalsMeansMultiArmInverseNormal(design = design, ...))
     }
     if (.isTrialDesignFisher(design)) {
@@ -1096,14 +1107,14 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansMultiArm <- function(..., 
-        stageResults, 
+.getConditionalPowerMeansMultiArm <- function(...,
+        stageResults,
         stage = stageResults$stage,
-        nPlanned, 
+        nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        thetaH1 = NA_real_, 
+        thetaH1 = NA_real_,
         assumedStDevs = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, 
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     stDevsH1 <- .getOptionalArgument("stDevsH1", ...)
     if (!is.null(stDevsH1) && !is.na(stDevsH1)) {
@@ -1129,7 +1140,7 @@ NULL
         allocationRatioPlanned = allocationRatioPlanned
     )
 
-    if (any(is.na(nPlanned))) {
+    if (anyNA(nPlanned)) {
         return(results)
     }
 
@@ -1148,7 +1159,9 @@ NULL
 
     .assertIsValidNPlanned(nPlanned, kMax, stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
     .setValueAndParameterType(results, "allocationRatioPlanned", allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
     assumedStDevs <- .assertIsValidAssumedStDevForMultiHypotheses(
         assumedStDevs, stageResults, stage,
@@ -1172,7 +1185,7 @@ NULL
         results$.setParameterType("assumedStDevs", C_PARAM_GENERATED)
     }
 
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getConditionalPowerMeansMultiArmInverseNormal(
             results = results, stageResults = stageResults, stage = stage,
             nPlanned = nPlanned,
@@ -1202,7 +1215,8 @@ NULL
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or ",
-        "TrialDesignConditionalDunnett"
+        "TrialDesignConditionalDunnett",
+        call. = FALSE
     )
 }
 
@@ -1211,13 +1225,13 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansMultiArmInverseNormal <- function(..., 
-        results, 
-        stageResults, 
+.getConditionalPowerMeansMultiArmInverseNormal <- function(...,
+        results,
+        stageResults,
         stage,
-        allocationRatioPlanned, 
-        nPlanned, 
-        thetaH1, 
+        allocationRatioPlanned,
+        nPlanned,
+        thetaH1,
         assumedStDevs) {
     design <- stageResults$.design
     .assertIsTrialDesignInverseNormal(design)
@@ -1228,7 +1242,6 @@ NULL
 
     kMax <- design$kMax
     gMax <- stageResults$getGMax()
-    # results$conditionalPower <- matrix(NA_real_, nrow = gMax, ncol = kMax)
 
     weights <- .getWeightsInverseNormal(design)
     informationRates <- design$informationRates
@@ -1266,7 +1279,7 @@ NULL
             if (stage == kMax - 1) {
                 shiftedFutilityBounds <- c()
             } else {
-                shiftedFutilityBounds <- design$futilityBounds[(stage + 1):(kMax - 1)] *
+                shiftedFutilityBounds <- .getFutilityBounds(design, (stage + 1):(kMax - 1)) *
                     sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):(kMax - 1)]^2)) /
                     sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
                     min(ctr$overallAdjustedTestStatistics[ctr$indices[, treatmentArm] == 1, stage], na.rm = TRUE) *
@@ -1310,15 +1323,15 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerMeansMultiArmFisher <- function(..., 
-        results, 
-        stageResults, 
+.getConditionalPowerMeansMultiArmFisher <- function(...,
+        results,
+        stageResults,
         stage,
-        allocationRatioPlanned, 
-        nPlanned, 
-        thetaH1, 
+        allocationRatioPlanned,
+        nPlanned,
+        thetaH1,
         assumedStDevs,
-        iterations, 
+        iterations,
         seed) {
     design <- stageResults$.design
     .assertIsTrialDesignFisher(design)
@@ -1482,18 +1495,20 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerLikelihoodMeansMultiArm <- function(..., 
-        stageResults, 
+.getConditionalPowerLikelihoodMeansMultiArm <- function(...,
+        stageResults,
         stage,
-        nPlanned, 
+        nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        thetaRange, 
+        thetaRange,
         assumedStDevs = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, 
+        iterations = C_ITERATIONS_DEFAULT,
         seed = NA_real_) {
     .associatedArgumentsAreDefined(nPlanned = nPlanned, thetaRange = thetaRange)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
 
     design <- stageResults$.design
     kMax <- design$kMax
@@ -1531,7 +1546,7 @@ NULL
             treatmentArms[j] <- treatmentArm
             effectValues[j] <- thetaRange[i]
 
-            if (.isTrialDesignInverseNormal(design)) {
+            if (.isTrialDesignInverseNormalOrFixed(design)) {
                 condPowerValues[j] <- .getConditionalPowerMeansMultiArmInverseNormal(
                     results = results,
                     stageResults = stageResults, stage = stage, nPlanned = nPlanned,

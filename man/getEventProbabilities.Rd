@@ -48,17 +48,19 @@ This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lamb
 of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
 For example,
 \code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
-and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample result.}
+and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the same result.}
 
 \item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise
 definition of the exponential survival time cumulative distribution function \cr
 (for details see \code{\link[=getPiecewiseSurvivalTime]{getPiecewiseSurvivalTime()}}).}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
-\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
+\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
+Must be a positive numeric of length 1.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
-\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
+\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
+Must be a positive numeric of length 1.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered,

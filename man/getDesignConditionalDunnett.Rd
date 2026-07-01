@@ -50,7 +50,7 @@ You can define the information fraction and the way of how to compute the second
 p-values only in the design definition, and not in the analysis call.\cr
 See \code{\link[=getClosedConditionalDunnettTestResults]{getClosedConditionalDunnettTestResults()}}
 for an example and Koenig et al. (2008) and
-Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
+Wassmer & Brannath (2025), chapter 11 for details of the test procedure.
 }
 \section{How to get help for generic functions}{
 
@@ -64,12 +64,13 @@ obtain the specific help documentation linked above by typing \code{?plot.Analys
 }
 
 \seealso{
-Other design functions: 
-\code{\link{getDesignCharacteristics}()},
-\code{\link{getDesignFisher}()},
-\code{\link{getDesignGroupSequential}()},
-\code{\link{getDesignInverseNormal}()},
-\code{\link{getGroupSequentialProbabilities}()},
-\code{\link{getPowerAndAverageSampleNumber}()}
+Other design functions:
+\code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}},
+\code{\link[=getDesignFisher]{getDesignFisher()}},
+\code{\link[=getDesignFixed]{getDesignFixed()}},
+\code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
+\code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+\code{\link[=getGroupSequentialProbabilities]{getGroupSequentialProbabilities()}},
+\code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 }
 \concept{design functions}

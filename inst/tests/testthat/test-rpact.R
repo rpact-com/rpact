@@ -13,12 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File name: test-rpact.R
-## |  Creation date: 21 April 2021, 15:04:49
-## |  File version: $Revision: 7403 $
-## |  Last changed: $Date: 2023-11-08 16:12:00 +0100 (Mi, 08 Nov 2023) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 
 test_that("'getDesignInverseNormal' with default parameters: parameters and results are as expected", {

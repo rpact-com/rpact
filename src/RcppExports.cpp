@@ -455,6 +455,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getFractions
+List getFractions(NumericVector x, double epsilon, int maxNumberOfSearchSteps);
+RcppExport SEXP _rpact_getFractions(SEXP xSEXP, SEXP epsilonSEXP, SEXP maxNumberOfSearchStepsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type epsilon(epsilonSEXP);
+    Rcpp::traits::input_parameter< int >::type maxNumberOfSearchSteps(maxNumberOfSearchStepsSEXP);
+    rcpp_result_gen = Rcpp::wrap(getFractions(x, epsilon, maxNumberOfSearchSteps));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rpact_mvnprd", (DL_FUNC) &_rpact_mvnprd, 7},
@@ -480,6 +493,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rpact_zeroin", (DL_FUNC) &_rpact_zeroin, 5},
     {"_rpact_getCipheredValue", (DL_FUNC) &_rpact_getCipheredValue, 1},
     {"_rpact_getFraction", (DL_FUNC) &_rpact_getFraction, 3},
+    {"_rpact_getFractions", (DL_FUNC) &_rpact_getFractions, 3},
     {NULL, NULL, 0}
 };
 

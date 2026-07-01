@@ -13,14 +13,70 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8449 $
-## |  Last changed: $Date: 2024-12-10 09:39:04 +0100 (Tue, 10 Dec 2024) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_simulation_multiarm.R
 NULL
 
+#' Get number of events for a multi-arm survival stage (internal)
+#'
+#' @title Internal: compute additional events for a stage in multi-arm survival simulation
+#'
+#' @description
+#' Internal helper used by \code{getSimulationMultiArmSurvival} to compute the number
+#' of events to schedule for the given stage. The function supports conditional
+#' sample size reassessment when \code{conditionalPower} is specified and returns
+#' a single numeric value representing new events for the specified stage.
+#'
+#' @param ... Currently unused; reserved for compatibility with user-supplied callbacks.
+#' @param stage Integer stage index (1-based as used by callers). Note: the function
+#'        internally converts to 0-based (\code{stage <- stage - 1}) for calculations.
+#' @param directionUpper Logical or \code{NA}; one-sided test direction.
+#' @param conditionalPower Numeric target conditional power (or \code{NA} to use planned events).
+#' @param conditionalCriticalValue Numeric vector of conditional critical values (indexed by stage \- 1).
+#' @param plannedEvents Numeric vector of cumulative planned events per stage.
+#' @param allocationRatioPlanned Numeric vector of allocation ratios (active : control) per stage.
+#' @param selectedArms Logical matrix indicating selected arms per stage (rows = arms, cols = stages).
+#' @param thetaH1 Numeric hypothesized effect (hazard ratio) used instead of observed effects when provided.
+#' @param overallEffects Numeric matrix of observed overall effect estimates (rows = alternatives/arms, cols = stages).
+#' @param minNumberOfEventsPerStage Numeric vector of minimum events allowed per stage.
+#' @param maxNumberOfEventsPerStage Numeric vector of maximum events allowed per stage.
+#'
+#' @details
+#' - If \code{conditionalPower} is \code{NA} the function returns the planned incremental
+#'   events for the stage: \code{plannedEvents[stage+1] - plannedEvents[stage]}.\cr
+#' - Otherwise, if any arm is selected at the current stage the function computes a
+#'   standardized effect (\code{thetaStandardized}) using \code{overallEffects} or
+#'   \code{thetaH1} and applies the conditional power formula. If the conditional
+#'   critical value is very large (\> 8) the upper bound \code{maxNumberOfEventsPerStage}
+#'   for the next stage is returned. The result is clipped to the supplied min/max
+#'   event bounds.
+#' - The function returns a single numeric value (new events for the stage). Callers
+#'   should ensure inputs are valid; this helper does not perform extensive argument checking.
+#'
+#' @return A single numeric value giving the number of new events to schedule for the stage.
+#'
+#' @examples
+#' \dontrun{
+#' # return planned increment when no conditional power is requested
+#' .getSimulationSurvivalMultiArmStageEvents(
+#'   stage = 2,
+#'   directionUpper = TRUE,
+#'   conditionalPower = NA_real_,
+#'   conditionalCriticalValue = rep(NA_real_, 1),
+#'   plannedEvents = c(100, 200),
+#'   allocationRatioPlanned = c(1, 1),
+#'   selectedArms = matrix(TRUE, nrow = 3, ncol = 2),
+#'   thetaH1 = NA_real_,
+#'   overallEffects = matrix(1, nrow = 3, ncol = 2),
+#'   minNumberOfEventsPerStage = c(0, 50),
+#'   maxNumberOfEventsPerStage = c(0, 200)
+#' )
+#' }
+#'
+#' @keywords internal
+#' 
+#' @noRd
+#' 
 .getSimulationSurvivalMultiArmStageEvents <- function(...,
         stage,
         directionUpper,
@@ -131,7 +187,7 @@ NULL
 
     if (.isTrialDesignFisher(design)) {
         weights <- .getWeightsFisher(design)
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else {
         weights <- .getWeightsInverseNormal(design)
     }
 
@@ -267,7 +323,8 @@ NULL
                     stop(
                         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                         "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
-                        "the output must be a single numeric value"
+                        "the output must be a single numeric value",
+                        call. = FALSE
                     )
                 }
 
@@ -331,8 +388,8 @@ NULL
 #'        matrix according to Deng et al. (Biometrics, 2019) accounting for the
 #'        respective alternative is used;
 #'        if \code{correlationComputation = "null"}, a constant correlation matrix valid
-#'        under the null, i.e., not accounting for the alternative is used,
-#'         default is \code{"alternative"}.
+#'        under the null, i.e., not accounting for the alternative is used, 
+#'        default is \code{"alternative"}.
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default
@@ -389,8 +446,9 @@ NULL
 #'
 #' @export
 #'
-getSimulationMultiArmSurvival <- function(design = NULL, ...,
-        activeArms = 3L, # C_ACTIVE_ARMS_DEFAULT
+getSimulationMultiArmSurvival <- function(design = NULL,
+        ...,
+        activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
         omegaMaxVector = seq(1, 2.6, 0.4), # C_RANGE_OF_HAZARD_RATIOS_DEFAULT
@@ -427,7 +485,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
             ), "showStatistics"), ...
         )
     } else {
-        .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnett(design)
+        .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
         .warnInCaseOfUnknownArguments(functionName = "getSimulationMultiArmSurvival", ignore = "showStatistics", ...)
         .warnInCaseOfTwoSidedPowerArgument(...)
     }
@@ -438,9 +496,11 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
 
     calcEventsFunctionIsUserDefined <- !is.null(calcEventsFunction)
 
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
-    
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
+
     simulationResults <- .createSimulationResultsMultiArmObject(
         design                      = design,
         activeArms                  = activeArms,
@@ -472,12 +532,25 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
         showStatistics              = showStatistics,
         endpoint                    = "survival"
     )
+    for (notApplicableParam in c(
+        "accrualIntensity",
+        "accrualTime",
+        "dropoutRate1",
+        "dropoutRate2",
+        "dropoutTime",
+        "eventTime",
+        "kappa",
+        "piControl"
+    )
+    ) {
+        simulationResults$.setParameterType(notApplicableParam, C_PARAM_NOT_APPLICABLE)
+    }
 
     design <- simulationResults$.design
     successCriterion <- simulationResults$successCriterion
     effectMeasure <- simulationResults$effectMeasure
     adaptations <- simulationResults$adaptations
-    gMax <- activeArms
+    gMax <- simulationResults$activeArms
     kMax <- simulationResults$.design$kMax
     intersectionTest <- simulationResults$intersectionTest
     typeOfSelection <- simulationResults$typeOfSelection
@@ -546,7 +619,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
 
     if (correlationComputation == "null") {
         # not accounting for alternative
-        corrMatrix <- matrix(rep(allocationRatioPlanned / (1 + allocationRatioPlanned), gMax^2), ncol = gMax, nrow = gMax)
+        corrMatrix <- matrix(rep(allocationRatioPlanned[1] / (1 + allocationRatioPlanned[1]), gMax^2), ncol = gMax, nrow = gMax)
         diag(corrMatrix) <- 1
         choleskyDecomposition <- chol(corrMatrix)
     }
@@ -605,12 +678,12 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
 
                 simulatedNumberOfActiveArms[k, i] <- simulatedNumberOfActiveArms[k, i] + sum(closedTest$selectedArms[, k])
 
-                if (!any(is.na(closedTest$successStop))) {
+                if (!anyNA(closedTest$successStop)) {
                     simulatedSuccessStopping[k, i] <- simulatedSuccessStopping[k, i] + closedTest$successStop[k]
                 }
 
                 if ((kMax > 1) && (k < kMax)) {
-                    if (!any(is.na(closedTest$futilityStop))) {
+                    if (!anyNA(closedTest$futilityStop)) {
                         simulatedFutilityStopping[k, i] <- simulatedFutilityStopping[k, i] +
                             (closedTest$futilityStop[k] && !closedTest$successStop[k])
                     }
@@ -720,6 +793,7 @@ getSimulationMultiArmSurvival <- function(design = NULL, ...,
     simulationResults$futilityStop <- base::colSums(simulatedFutilityStopping / maxNumberOfIterations)
     if (kMax > 1) {
         simulationResults$earlyStop <- simulationResults$futilityPerStage + simulationResults$successPerStage[1:(kMax - 1), ]
+        simulationResults$.setParameterType("earlyStop", C_PARAM_GENERATED)
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
 

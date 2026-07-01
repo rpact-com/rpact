@@ -13,12 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File name: test-pkgname.R
-## |  Creation date: 06 February 2023, 12:14:51
-## |  File version: $Revision: 8333 $
-## |  Last changed: $Date: 2024-10-18 10:54:09 +0200 (Fr, 18 Okt 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 
 test_that("Run just one basic rpact test", {
@@ -26,6 +20,49 @@ test_that("Run just one basic rpact test", {
     expect_equal(design$alphaSpent, c(0.00025917372, 0.0071600594, 0.02499999), tolerance = 1e-07)
     expect_equal(design$criticalValues, c(3.4710914, 2.4544323, 2.0040356), tolerance = 1e-07)
     expect_equal(design$stageLevels, c(0.00025917372, 0.0070553616, 0.022533125), tolerance = 1e-07)
+})
+
+test_that("getOutputFormat writes selected output format to a file", {
+    outputFile <- tempfile(fileext = ".txt")
+    on.exit(unlink(outputFile), add = TRUE)
+
+    expect_error(getOutputFormat("sample size", file = outputFile, fields = FALSE), NA)
+
+    expect_true(file.exists(outputFile))
+    outputLines <- readLines(outputFile, warn = FALSE)
+    expect_true(any(grepl("^rpact\\.output\\.format\\.sample\\.size\\s*:", outputLines)))
+})
+
+test_that("setOutputFormat imports roundFunction-only format definitions", {
+    outputFile <- tempfile(fileext = ".txt")
+    on.exit(unlink(outputFile), add = TRUE)
+    on.exit(setOutputFormat(resetToDefault = TRUE, persist = FALSE), add = TRUE)
+
+    writeLines("rpact.output.format.sample.size : roundFunction = ceiling", outputFile)
+
+    expect_message(
+        setOutputFormat(file = outputFile, persist = FALSE),
+        "output format successfully set via file"
+    )
+    expect_identical(
+        getOutputFormat("sample size", fields = FALSE)[[1]],
+        "roundFunction = ceiling"
+    )
+})
+
+test_that("round and signif round functions are usable for printed sample sizes", {
+    on.exit(setOutputFormat(resetToDefault = TRUE, persist = FALSE), add = TRUE)
+
+    sampleSizeMeans <- getSampleSizeMeans()
+    for (roundFunction in c("round", "signif")) {
+        setOutputFormat("sample size",
+            digits = 1,
+            roundFunction = roundFunction,
+            persist = FALSE
+        )
+
+        expect_warning(capture.output(print(sampleSizeMeans)), NA)
+    }
 })
 
 test_that("rpact unit test information", {

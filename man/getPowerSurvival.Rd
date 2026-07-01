@@ -70,10 +70,12 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 \item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
-\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
+\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
+Must be a positive numeric of length 1.}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
-\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
+\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
+Must be a positive numeric of length 1.}
 
 \item{median1}{The assumed median survival time in the treatment group, there is no default.}
 
@@ -89,7 +91,7 @@ This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lamb
 of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
 For example,
 \code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
-and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample result.}
+and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the same result.}
 
 \item{hazardRatio}{The vector of hazard ratios under consideration.
 If the event or hazard rates in both treatment groups are defined, the hazard ratio needs
@@ -312,9 +314,9 @@ getPowerSurvival(median1 = 5, median2 = 3, kappa = 2,
 
 }
 \seealso{
-Other power functions: 
-\code{\link{getPowerCounts}()},
-\code{\link{getPowerMeans}()},
-\code{\link{getPowerRates}()}
+Other power functions:
+\code{\link[=getPowerCounts]{getPowerCounts()}},
+\code{\link[=getPowerMeans]{getPowerMeans()}},
+\code{\link[=getPowerRates]{getPowerRates()}}
 }
 \concept{power functions}

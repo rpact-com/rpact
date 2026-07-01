@@ -76,10 +76,12 @@ default is \code{seq(0.2, 0.5, 0.1)} (power calculations and simulations) or
 \item{pi2}{A numeric value that represents the assumed event rate in the control group, default is \code{0.2}.}
 
 \item{lambda1}{The assumed hazard rate in the treatment group, there is no default.
-\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
+\code{lambda1} can also be used to define piecewise exponentially distributed survival times (see details).
+Must be a positive numeric of length 1.}
 
 \item{lambda2}{The assumed hazard rate in the reference group, there is no default.
-\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details). Must be a positive numeric of length 1.}
+\code{lambda2} can also be used to define piecewise exponentially distributed survival times (see details).
+Must be a positive numeric of length 1.}
 
 \item{median1}{The assumed median survival time in the treatment group, there is no default.}
 
@@ -99,7 +101,7 @@ This function is equivalent to \code{pweibull(t, shape = kappa, scale = 1 / lamb
 of the \code{stats} package, i.e., the scale parameter is \code{1 / 'hazard rate'}.\cr
 For example,
 \code{getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)}
-and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the sample result.}
+and \code{pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)} provide the same result.}
 
 \item{piecewiseSurvivalTime}{A vector that specifies the time intervals for the piecewise
 definition of the exponential survival time cumulative distribution function \cr
@@ -326,6 +328,27 @@ user defined with \code{thetaH1}.
 \code{\link[=getRawData]{getRawData()}} can be used to get the simulated raw data from the
 object as \code{\link[base]{data.frame}}. Note that \code{getSimulationSurvival()}
 must called before with \code{maxNumberOfRawDatasetsPerStage} > 0.
+
+\strong{What \code{maxNumberOfRawDatasetsPerStage} does}
+
+When \code{maxNumberOfRawDatasetsPerStage = 0} (the default), simulations run as usual but \emph{no}
+patient-level ("raw") data are kept - only summary results.
+
+If you set \code{maxNumberOfRawDatasetsPerStage > 0}, rpact will \strong{save up to that many
+full patient-level datasets \emph{per stage}} (i.e., per interim/final look).
+Each saved dataset corresponds to one simulated iteration and contains all
+subject-wise records accrued up to the stage at which that iteration stopped.
+You can later retrieve these datasets with \code{\link[=getRawData]{getRawData()}}.
+
+\strong{Why "max" and not \code{numberOfRawDatasetsPerStage}?}
+
+The value is an \emph{upper bound per stage}, not a fixed count. The actual number of datasets stored can be smaller because:
+\itemize{
+\item Some iterations stop early (e.g., at stage 1), so later stages receive fewer datasets.
+\item The simulation might finish before reaching the cap due to other stopping or iteration limits.
+}
+
+As a result, the number specified is the \strong{maximum possible} datasets saved \emph{per stage}, not the exact number.
 }
 
 \section{How to get help for generic functions}{

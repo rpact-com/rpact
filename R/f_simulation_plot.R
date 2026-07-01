@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8246 $
-## |  Last changed: $Date: 2024-09-20 12:10:36 +0200 (Fr, 20 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_utilities.R
 NULL
@@ -24,35 +20,39 @@ NULL
 .assertIsValidVariedParameterVectorForSimulationResultsPlotting <- function(simulationResults, plotType) {
     if (inherits(simulationResults, "SimulationResultsMeans")) {
         if (is.null(simulationResults$alternative) ||
-                any(is.na(simulationResults$alternative)) ||
+                anyNA(simulationResults$alternative) ||
                 length(simulationResults$alternative) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'alternative' with length > 1 is defined"
+                " is only available if 'alternative' with length > 1 is defined",
+                call. = FALSE
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsRates")) {
         if (is.null(simulationResults$pi1) ||
-                any(is.na(simulationResults$pi1)) ||
+                anyNA(simulationResults$pi1) ||
                 length(simulationResults$pi1) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'pi1' with length > 1 is defined"
+                " is only available if 'pi1' with length > 1 is defined",
+                call. = FALSE
             )
         }
     } else if (inherits(simulationResults, "SimulationResultsSurvival")) {
         if (is.null(simulationResults$hazardRatio) ||
-                any(is.na(simulationResults$hazardRatio)) ||
+                anyNA(simulationResults$hazardRatio) ||
                 length(simulationResults$hazardRatio) <= 1) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'hazardRatio' with length > 1 is defined or derived"
+                " is only available if 'hazardRatio' with length > 1 is defined or derived",
+                call. = FALSE
             )
         }
         if (length(simulationResults$hazardRatio) != length(simulationResults$overallReject)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is not available for piecewise survival (only type 13 and 14)"
+                " is not available for piecewise survival (only type 13 and 14)",
+                call. = FALSE
             )
         }
     }
@@ -203,7 +203,7 @@ NULL
     multiArmEnabled <- grepl("MultiArm", .getClassName(simulationResults))
     enrichmentEnabled <- grepl("Enrichment", .getClassName(simulationResults))
     countDataEnabled <- grepl("CountData", .getClassName(simulationResults))
-    userDefinedEffectMatrix <- multiArmEnabled && 
+    userDefinedEffectMatrix <- multiArmEnabled &&
         simulationResults$.getParameterType("effectMatrix") == C_PARAM_USER_DEFINED
 
     gMax <- NA_integer_
@@ -216,17 +216,18 @@ NULL
 
     # use first value for plotting
     if (survivalEnabled) {
-        nMax <- simulationResults$expectedNumberOfEvents[1] 
+        nMax <- simulationResults$expectedNumberOfEvents[1]
     } else if (countDataEnabled) {
-        nMax <- simulationResults$numberOfSubjects[1] 
+        nMax <- simulationResults$numberOfSubjects[1]
     } else {
-        nMax <- simulationResults$expectedNumberOfSubjects[1] 
+        nMax <- simulationResults$expectedNumberOfSubjects[1]
     }
 
     if (type %in% c(1:3) && !multiArmEnabled && !enrichmentEnabled) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-            ") is not available for non-multi-arm/non-enrichment simulation results (type must be > 3)"
+            ") is not available for non-multi-arm/non-enrichment simulation results (type must be > 3)",
+            call. = FALSE
         )
     }
 
@@ -234,12 +235,14 @@ NULL
         if (multiArmEnabled || enrichmentEnabled) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-                ") is only available for non-multi-arm/non-enrichment survival simulation results"
+                ") is only available for non-multi-arm/non-enrichment survival simulation results",
+                call. = FALSE
             )
         } else {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-                ") is only available for survival simulation results"
+                ") is only available for survival simulation results",
+                call. = FALSE
             )
         }
     }
@@ -751,7 +754,7 @@ NULL
         )
     } else if (type == 8) {
         if (designMaster$kMax == 1) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type 8 (Early Stopping) is not available for 'kMax' = 1")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type 8 (Early Stopping) is not available for 'kMax' = 1", call. = FALSE)
         }
 
         .assertIsValidVariedParameterVectorForSimulationResultsPlotting(simulationResults, type)
@@ -893,7 +896,7 @@ NULL
             showSource = showSource, plotSettings = plotSettings
         ))
     } else {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 5, 6, ..., 14")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 5, 6, ..., 14", call. = FALSE)
     }
 
     if (!is.null(srcCmd)) {
@@ -970,29 +973,27 @@ NULL
 #'
 #' @export
 #'
-plot.SimulationResults <- function(
-        x, 
-        y, 
-        ..., 
+plot.SimulationResults <- function(x,
+        y,
+        ...,
         main = NA_character_,
-        xlab = NA_character_, 
-        ylab = NA_character_, 
-        type = NA_integer_, 
+        xlab = NA_character_,
+        ylab = NA_character_,
+        type = NA_integer_,
         palette = "Set1",
-        theta = seq(-1, 1, 0.01), 
+        theta = seq(-1, 1, 0.01),
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_, 
+        legendPosition = NA_integer_,
         showSource = FALSE,
-        grid = 1, 
+        grid = 1,
         plotSettings = NULL) {
-    
     .assertIsValidPlotType(type, naAllowed = TRUE)
     if (all(is.na(type))) {
         type <- na.omit(getAvailablePlotTypes(x))
         if (length(type) == 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "not plot type available")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "not plot type available", call. = FALSE)
         }
-        
+
         type <- type[1]
     }
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
@@ -1000,23 +1001,24 @@ plot.SimulationResults <- function(
     if (is.na(markdown)) {
         markdown <- .isMarkdownEnabled("plot")
     }
-    
+
     args <- list(
-        x = x, 
+        x = x,
         y = NULL,
         main = main,
         xlab = xlab,
         ylab = ylab,
         type = type,
         palette = palette,
-        theta = theta, 
+        theta = theta,
         plotPointsEnabled = plotPointsEnabled,
         legendPosition = legendPosition,
         showSource = showSource,
         grid = grid,
-        plotSettings = plotSettings, 
-        ...)
-    
+        plotSettings = plotSettings,
+        ...
+    )
+
     if (markdown) {
         sep <- .getMarkdownPlotPrintSeparator()
         if (!all(is.na(type)) && length(type) > 1 && grid == 1) {
@@ -1024,32 +1026,30 @@ plot.SimulationResults <- function(
             args$grid <- 0
         }
         if (grid > 0) {
-            print(do.call(.plot.SimulationResults, args))            
+            print(do.call(.plot.SimulationResults, args))
         } else {
             do.call(.plot.SimulationResults, args)
         }
         return(.knitPrintQueue(x, sep = sep, prefix = sep))
     }
-    
+
     return(do.call(.plot.SimulationResults, args))
 }
 
-.plot.SimulationResults <- function(
-        x, 
-        y, 
-        ..., 
+.plot.SimulationResults <- function(x,
+        y,
+        ...,
         main = NA_character_,
-        xlab = NA_character_, 
-        ylab = NA_character_, 
-        type = 1L, 
+        xlab = NA_character_,
+        ylab = NA_character_,
+        type = 1L,
         palette = "Set1",
-        theta = seq(-1, 1, 0.01), 
+        theta = seq(-1, 1, 0.01),
         plotPointsEnabled = NA,
-        legendPosition = NA_integer_, 
+        legendPosition = NA_integer_,
         showSource = FALSE,
-        grid = 1, 
+        grid = 1,
         plotSettings = NULL) {
-        
     fCall <- match.call(expand.dots = FALSE)
     simulationResultsName <- deparse(fCall$x)
     .assertGgplotIsInstalled()

@@ -16,7 +16,10 @@ testPackage(
   testInstalledBasicPackages = TRUE,
   scope = c("basic", "devel", "both", "internet", "all"),
   openHtmlReport = TRUE,
-  keepSourceFiles = FALSE
+  keepSourceFiles = FALSE,
+  reportFileBaseName = "rpact_test_result_report",
+  metaData = list(),
+  metaDataFile = NULL
 )
 }
 \arguments{
@@ -57,9 +60,19 @@ Only available if \code{testInstalledBasicPackages = TRUE}.}
 
 \item{keepSourceFiles}{If \code{TRUE}, the source files are kept after the tests are completed.
 A copy of them can be found in the subdirectory \code{src}.}
+
+\item{reportFileBaseName}{The base name for the report files (without path or extension).}
+
+\item{metaData}{A named \code{list} containing additional metadata to be included in the test report.
+This can include information such as \code{company}, \code{container name}, \code{host name}, etc.
+Default is an empty list.
+For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.}
+
+\item{metaDataFile}{An optional path to a text file containing metadata: one entry per line in the form \code{KEY=VALUE}.
+For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.}
 }
 \value{
-Invisibly returns the value of \code{completeUnitTestSetEnabled}.
+Invisibly returns an \code{\link[=InstallationQualificationResult]{InstallationQualificationResult}}) object.
 }
 \description{
 This function ensures the correct installation of the \code{rpact} package by performing
@@ -77,7 +90,7 @@ Installation qualification is a critical step in the validation process. Without
 the package cannot be considered fully validated. To gain access to the full set of unit tests,
 users must provide \code{token} and \code{secret} credentials, which are distributed to
 members of the rpact user group as part of the validation documentation.
-For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification}{rpact_installation_qualification}.
+For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}{rpact_installation_qualification}.
 }
 \examples{
 \dontrun{
@@ -101,5 +114,5 @@ testPackage(downloadTestsOnly = TRUE)
 
 }
 \references{
-For more information, please visit: \url{https://www.rpact.org/iq}
+For more information, please visit: \url{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}
 }

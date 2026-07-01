@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8575 $
-## |  Last changed: $Date: 2025-02-28 14:45:47 +0100 (Fr, 28 Feb 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_utilities.R
 NULL
@@ -35,7 +31,6 @@ NULL
 
     if (designPlan$normalApproximation) {
         criticalValues <- .getCriticalValues(design)
-        futilityBounds <- design$futilityBounds
     } else {
         criticalValues <- stats::qt(
             1 - design$stageLevels,
@@ -44,8 +39,8 @@ NULL
 
         # outside validated range
         criticalValues[criticalValues > 50] <- NA_real_
-        if (design$typeOfDesign == "noEarlyEfficacy") {
-            if ((is.matrix(criticalValues) && any(is.na(criticalValues[design$kMax, ]))) ||
+        if (design$kMax > 1 && identical(design$typeOfDesign, "noEarlyEfficacy")) {
+            if ((is.matrix(criticalValues) && anyNA(criticalValues[design$kMax, ])) ||
                     (is.vector(criticalValues) && is.na(criticalValues[design$kMax]))) {
                 warning("The computation of last stage efficacy boundary on treatment ",
                     "effect scale not performed presumably ",
@@ -54,8 +49,8 @@ NULL
                 )
             }
         } else {
-            numberOfNAs <- sum(as.vector(criticalValues) > 50, na.rm = TRUE)
-            if (any(is.na(criticalValues))) {
+            numberOfNAs <- sum(is.na(criticalValues))
+            if (numberOfNAs > 0) {
                 warning("The computation of ", .integerToWrittenNumber(numberOfNAs), " ",
                     "efficacy boundar", ifelse(numberOfNAs == 1, "y", "ies"), " ",
                     "on treatment effect scale not performed presumably ",
@@ -64,29 +59,30 @@ NULL
                 )
             }
         }
-
-        if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+    }
+    
+    if (design$kMax > 1) {
+        futilityBounds <- .getFutilityBounds(design)
+        if (!designPlan$normalApproximation && .hasApplicableFutilityBounds(design)) {
             futilityBounds <- stats::qt(
-                stats::pnorm(design$futilityBounds),
+                stats::pnorm(futilityBounds),
                 pmax(design$informationRates[1:(design$kMax - 1)] %*%
-                    t(maxNumberOfSubjects) - designPlan$groups, 1e-04)
+                        t(maxNumberOfSubjects) - designPlan$groups, 1e-04)
             )
 
             # outside validated range
             futilityBounds[abs(futilityBounds) > 50] <- NA_real_
-            if (any(is.na(futilityBounds))) {
+            if (anyNA(futilityBounds)) {
                 warning("The computation of futility boundaries on ",
                     "treatment effect scale not performed presumably ",
                     "due to too small degrees of freedom",
                     call. = FALSE
                 )
             }
-        } else {
-            futilityBounds <- design$futilityBounds
         }
+        futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
     }
-    futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
-
+    
     if ((length(stDev) == 1) && (designPlan$groups == 2)) {
         stDev <- rep(stDev, 2)
     }
@@ -96,11 +92,11 @@ NULL
             sqrt(design$informationRates %*% t(maxNumberOfSubjects))
         criticalValuesEffectScaleLower <- thetaH0 - criticalValues * stDev /
             sqrt(design$informationRates %*% t(maxNumberOfSubjects))
-        if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
             futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds * stDev /
                 sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects))
         }
-        if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * stDev /
@@ -117,14 +113,14 @@ NULL
             sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) /
             (sqrt(allocationRatioPlanned *
                 design$informationRates %*% t(maxNumberOfSubjects)))
-        if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
             futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds *
                 sqrt(1 + allocationRatioPlanned) *
                 sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) /
                 (sqrt(allocationRatioPlanned *
                     design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
-        if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds *
@@ -142,13 +138,13 @@ NULL
             sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
             (sqrt(design$informationRates %*% t(maxNumberOfSubjects)))
 
-        if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
             futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds *
                 sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
                 sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
                 (sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }
-        if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
+        if (design$kMax > 1 && !.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds *
@@ -581,7 +577,7 @@ NULL
         allocationRatioPlanned = NA_real_) {
     objectType <- match.arg(objectType)
 
-    .assertIsTrialDesignInverseNormalOrGroupSequential(design)
+    .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
     .assertIsValidAlphaAndBeta(design$alpha, design$beta)
     .assertIsValidSidedParameter(design$sided)
     .assertIsValidGroupsParameter(groups)
@@ -595,7 +591,9 @@ NULL
         if (identical(alternative, C_ALTERNATIVE_POWER_SIMULATION_DEFAULT)) {
             alternative <- C_ALTERNATIVE_POWER_SIMULATION_MEAN_RATIO_DEFAULT
         }
-        .assertIsInOpenInterval(alternative, "alternative", 0, NULL, naAllowed = TRUE)
+        .assertIsInOpenInterval(alternative, "alternative",
+            lower = 0, upper = NULL, naAllowed = TRUE
+        )
     }
 
     directionUpper <- .assertIsValidDirectionUpper(directionUpper,
@@ -603,12 +601,13 @@ NULL
         objectType = objectType, userFunctionCallEnabled = TRUE
     )
 
-    if (objectType == "sampleSize" && !any(is.na(alternative))) {
+    if (objectType == "sampleSize" && !anyNA(alternative)) {
         if (design$sided == 1 && any(alternative - thetaH0 <= 0)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "any 'alternative' (", .arrayToString(alternative),
-                ") must be > 'thetaH0' (", thetaH0, ")"
+                ") must be > 'thetaH0' (", thetaH0, ")",
+                call. = FALSE
             )
         }
 
@@ -616,7 +615,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "any 'alternative' (", .arrayToString(alternative),
-                ") must be != 'thetaH0' (", thetaH0, ")"
+                ") must be != 'thetaH0' (", thetaH0, ")",
+                call. = FALSE
             )
         }
     }
@@ -631,7 +631,7 @@ NULL
     designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_NOT_APPLICABLE)
 
     if (.hasApplicableFutilityBounds(design)) {
-        designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)
+        designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(.getFutilityBounds(design)), ncol = 1)
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }
 
@@ -641,7 +641,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "two-sided case is implemented only for superiority testing ",
-                "(i.e., thetaH0 = ", ifelse(meanRatio, 1, 0), ")"
+                "(i.e., thetaH0 = ", ifelse(meanRatio, 1, 0), ")",
+                call. = FALSE
             )
         }
 
@@ -652,7 +653,8 @@ NULL
         if (allocationRatioPlanned < 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0"
+                "'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0",
+                call. = FALSE
             )
         }
 
@@ -665,7 +667,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "null hypothesis mean ratio is not allowed be negative or zero, ",
-                "i.e., 'thetaH0' must be > 0 if 'meanRatio' = TRUE"
+                "i.e., 'thetaH0' must be > 0 if 'meanRatio' = TRUE",
+                call. = FALSE
             )
         }
     }
@@ -720,6 +723,7 @@ NULL
     return(designPlan)
 }
 
+#'
 #' @title
 #' Get Sample Size Means
 #'
@@ -757,7 +761,8 @@ NULL
 #'
 #' @export
 #'
-getSampleSizeMeans <- function(design = NULL, ...,
+getSampleSizeMeans <- function(design = NULL,
+        ...,
         groups = 2L,
         normalApproximation = FALSE,
         meanRatio = FALSE,
@@ -798,6 +803,7 @@ getSampleSizeMeans <- function(design = NULL, ...,
     return(.calculateSampleSizeMeansAndRates(designPlan))
 }
 
+#'
 #' @title
 #' Get Power Means
 #'

@@ -13,16 +13,12 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8603 $
-## |  Last changed: $Date: 2025-03-11 17:40:42 +0100 (Tue, 11 Mar 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_core_utilities.R
 NULL
 
 .hideFutilityStopsIfNotApplicable <- function(designPlan) {
-    if (all(designPlan$.design$futilityBounds == C_FUTILITY_BOUNDS_DEFAULT)) {
+    if (!.isTrialDesignWithValidFutilityBounds(designPlan$.design)) {
         designPlan$.setParameterType("futilityStop", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("futilityPerStage", C_PARAM_NOT_APPLICABLE)
     }
@@ -52,7 +48,8 @@ NULL
 
         boundaries <- .getEffectScaleBoundaryDataMeans(designPlan)
     } else if (.isTrialDesignPlanRates(designPlan)) {
-        if (designPlan$.isSampleSizeObject()) { # comes from getSampleSize
+        if (designPlan$.isSampleSizeObject()) {
+            # comes from getSampleSize
             if (designPlan$groups == 1) {
                 designPlan$directionUpper <- (designPlan$pi1 > designPlan$thetaH0)
             } else {
@@ -69,7 +66,8 @@ NULL
         }
         boundaries <- .getEffectScaleBoundaryDataRates(designPlan)
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
-        if (designPlan$.isSampleSizeObject()) { # comes from getSampleSize
+        if (designPlan$.isSampleSizeObject()) {
+            # comes from getSampleSize
             designPlan$directionUpper <- (designPlan$hazardRatio > designPlan$thetaH0)
             designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
         }
@@ -79,7 +77,7 @@ NULL
         }
         boundaries <- .getEffectScaleBoundaryDataSurvival(designPlan)
     } else if (.isTrialDesignPlanCountData(designPlan)) {
-        boundaries <- .getEffectScaleBoundaryDataCounts(designPlan)
+        boundaries <- .getEffectScaleBoundaryCountData(designPlan)
     }
 
     if (designPlan$.design$sided == 1) {
@@ -102,7 +100,9 @@ NULL
             designPlan$futilityBoundsEffectScale <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
             designPlan$.setParameterType("futilityBoundsEffectScale", C_PARAM_GENERATED)
         } else {
-            if (all(designPlan$futilityBoundsEffectScaleLower < designPlan$futilityBoundsEffectScaleUpper, na.rm = TRUE)) {
+            if (
+                all(designPlan$futilityBoundsEffectScaleLower < designPlan$futilityBoundsEffectScaleUpper, na.rm = TRUE)
+                ) {
                 designPlan$futilityBoundsEffectScaleLower <- round(boundaries$futilityBoundsEffectScaleLower, 8)
                 designPlan$futilityBoundsEffectScaleUpper <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
             } else {
@@ -164,11 +164,12 @@ NULL
     }
     designPlan$numberOfSubjects <- matrix(designPlan$nFixed, nrow = 1)
 
-    if (!is.null(sampleSizeFixed$allocationRatioPlanned) &&
-            (length(designPlan$allocationRatioPlanned) !=
-                length(sampleSizeFixed$allocationRatioPlanned) ||
+    if (
+        !is.null(sampleSizeFixed$allocationRatioPlanned) &&
+            (length(designPlan$allocationRatioPlanned) != length(sampleSizeFixed$allocationRatioPlanned) ||
                 sum(designPlan$allocationRatioPlanned == sampleSizeFixed$allocationRatioPlanned) !=
-                    length(designPlan$allocationRatioPlanned))) {
+                    length(designPlan$allocationRatioPlanned))
+        ) {
         designPlan$allocationRatioPlanned <- sampleSizeFixed$allocationRatioPlanned
         designPlan$.setParameterType("allocationRatioPlanned", C_PARAM_GENERATED)
     }
@@ -178,17 +179,21 @@ NULL
         designCharacteristics <- getDesignCharacteristics(designPlan$.design)
         if (.isTrialDesignPlanMeans(designPlan)) {
             sampleSizeSequential <- .getSampleSizeSequentialMeans(
-                sampleSizeFixed, designCharacteristics
+                sampleSizeFixed,
+                designCharacteristics
             )
         } else {
             sampleSizeSequential <- .getSampleSizeSequentialRates(
-                sampleSizeFixed, designCharacteristics
+                sampleSizeFixed,
+                designCharacteristics
             )
         }
 
         designPlan$informationRates <- sampleSizeSequential$informationRates
-        if (ncol(designPlan$informationRates) == 1 &&
-                identical(designPlan$informationRates[, 1], designPlan$.design$informationRates)) {
+        if (
+            ncol(designPlan$informationRates) == 1 &&
+                identical(designPlan$informationRates[, 1], designPlan$.design$informationRates)
+            ) {
             designPlan$.setParameterType("informationRates", C_PARAM_NOT_APPLICABLE)
         } else {
             designPlan$.setParameterType("informationRates", C_PARAM_GENERATED)
@@ -198,10 +203,12 @@ NULL
         designPlan$.setParameterType("maxNumberOfSubjects", C_PARAM_GENERATED)
         if (designPlan$groups == 2) {
             designPlan$maxNumberOfSubjects1 <- .getNumberOfSubjects1(
-                designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
+                designPlan$maxNumberOfSubjects,
+                designPlan$allocationRatioPlanned
             )
             designPlan$maxNumberOfSubjects2 <- .getNumberOfSubjects2(
-                designPlan$maxNumberOfSubjects, designPlan$allocationRatioPlanned
+                designPlan$maxNumberOfSubjects,
+                designPlan$allocationRatioPlanned
             )
             designPlan$.setParameterType("maxNumberOfSubjects1", C_PARAM_GENERATED)
             designPlan$.setParameterType("maxNumberOfSubjects2", C_PARAM_GENERATED)
@@ -235,17 +242,18 @@ NULL
         }
 
         if (!is.null(sampleSizeSequential$rejectPerStage)) {
-            designPlan$rejectPerStage <- matrix(sampleSizeSequential$rejectPerStage,
-                nrow = designPlan$.design$kMax
-            )
+            designPlan$rejectPerStage <- matrix(sampleSizeSequential$rejectPerStage, nrow = designPlan$.design$kMax)
             designPlan$.setParameterType("rejectPerStage", C_PARAM_GENERATED)
 
             designPlan$earlyStop <- sum(designPlan$rejectPerStage[1:(designPlan$.design$kMax - 1), ])
             designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
         }
-        if (!is.null(sampleSizeSequential$futilityPerStage) &&
-                any(designPlan$.design$futilityBounds != C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
-            designPlan$futilityPerStage <- matrix(sampleSizeSequential$futilityPerStage,
+        if (
+            !is.null(sampleSizeSequential$futilityPerStage) &&
+                any(.getFutilityBounds(designPlan$.design) != C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
+            ) {
+            designPlan$futilityPerStage <- matrix(
+                sampleSizeSequential$futilityPerStage,
                 nrow = designPlan$.design$kMax - 1
             )
             designPlan$.setParameterType("futilityPerStage", C_PARAM_GENERATED)
@@ -254,6 +262,7 @@ NULL
             designPlan$.setParameterType("futilityStop", C_PARAM_GENERATED)
 
             designPlan$earlyStop <- designPlan$earlyStop + sum(designPlan$futilityPerStage)
+            designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
         }
     }
 
@@ -346,15 +355,16 @@ NULL
 }
 
 .getPiecewiseExpStartTimesWithoutLeadingZero <- function(piecewiseSurvivalTime) {
-    if (is.null(piecewiseSurvivalTime) || length(piecewiseSurvivalTime) == 0 ||
-            all(is.na(piecewiseSurvivalTime))) {
+    if (is.null(piecewiseSurvivalTime) || length(piecewiseSurvivalTime) == 0 || all(is.na(piecewiseSurvivalTime))) {
         return(NA_real_)
     }
 
     if (piecewiseSurvivalTime[1] != 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "the first value of 'piecewiseSurvivalTime' (",
-            .arrayToString(piecewiseSurvivalTime), ") must be 0",
+            .arrayToString(piecewiseSurvivalTime),
+            ") must be 0",
             call. = FALSE
         )
     }
@@ -365,8 +375,11 @@ NULL
 
     if (length(piecewiseSurvivalTime) < 2) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "length of 'piecewiseSurvivalTime' (",
-            length(piecewiseSurvivalTime), ") must be > 1"
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "length of 'piecewiseSurvivalTime' (",
+            length(piecewiseSurvivalTime),
+            ") must be > 1",
+            call. = FALSE
         )
     }
 
@@ -377,8 +390,14 @@ NULL
     .assertIsSingleNumber(timeValue, "timeValue")
     if (length(accrualTime) != length(accrualIntensity)) {
         stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "length of 'accrualTime' (", length(accrualIntensity), ") ",
-            "must be equel to length of 'accrualIntensity' (", length(accrualIntensity), ")"
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "length of 'accrualTime' (",
+            length(accrualIntensity),
+            ") ",
+            "must be equel to length of 'accrualIntensity' (",
+            length(accrualIntensity),
+            ")",
+            call. = FALSE
         )
     }
 
@@ -393,8 +412,11 @@ NULL
             if (l == 1) {
                 return(timeValue * densityVector[l] * maxNumberOfSubjects)
             } else {
-                return((sum(densityVector[1:(l - 1)] * densityIntervals[1:(l - 1)]) +
-                    (timeValue - accrualTime[l - 1]) * densityVector[l]) * maxNumberOfSubjects)
+                return(
+                    (sum(densityVector[1:(l - 1)] * densityIntervals[1:(l - 1)]) +
+                        (timeValue - accrualTime[l - 1]) * densityVector[l]) *
+                        maxNumberOfSubjects
+                )
             }
         }
     }
@@ -408,16 +430,19 @@ NULL
     designPlan$numberOfSubjects[1, 1] <- design$informationRates[1] * designPlan$maxNumberOfSubjects
     if (design$kMax > 1) {
         designPlan$numberOfSubjects[2:design$kMax, 1] <- (design$informationRates[2:design$kMax] -
-            design$informationRates[1:(design$kMax - 1)]) * designPlan$maxNumberOfSubjects
+            design$informationRates[1:(design$kMax - 1)]) *
+            designPlan$maxNumberOfSubjects
     }
 
     designPlan$numberOfSubjects <- .getColumnCumSum(designPlan$numberOfSubjects)
 
     designPlan$numberOfSubjects1 <- .getNumberOfSubjects1(
-        designPlan$numberOfSubjects, designPlan$allocationRatioPlanned
+        designPlan$numberOfSubjects,
+        designPlan$allocationRatioPlanned
     )
     designPlan$numberOfSubjects2 <- .getNumberOfSubjects2(
-        designPlan$numberOfSubjects, designPlan$allocationRatioPlanned
+        designPlan$numberOfSubjects,
+        designPlan$allocationRatioPlanned
     )
 
     if (designPlan$.design$kMax == 1) {

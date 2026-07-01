@@ -22,8 +22,12 @@ getDesignGroupSequential(
   typeBetaSpending = c("none", "bsP", "bsOF", "bsKD", "bsHSD", "bsUser"),
   userAlphaSpending = NA_real_,
   userBetaSpending = NA_real_,
+  efficacyStops = NA,
+  futilityStops = NA,
   gammaB = NA_real_,
   bindingFutility = NA,
+  futilityBoundsScale = c("zValue", "pValue", "reverseCondPower", "condPowerAtObserved",
+    "predictivePower"),
   directionUpper = NA,
   betaAdjustment = NA,
   constantBoundsHP = 3,
@@ -55,7 +59,7 @@ default is \code{(1:kMax) / kMax}. For the weighted inverse normal design, the w
 through w_1 = sqrt(t_1), and w_k = sqrt(t_k - t_(k-1)). For the weighted Fisher's combination test, the
 weights (scales) are w_k = sqrt((t_k - t_(k-1)) / t_1) (see the documentation).}
 
-\item{futilityBounds}{The futility bounds, defined on the test statistic z scale
+\item{futilityBounds}{The futility bounds, defined on the scale defined by \code{futilityBoundsScale}.
 (numeric vector of length \code{kMax - 1}).}
 
 \item{typeOfDesign}{The type of design. Type of design is one of the following:
@@ -92,11 +96,20 @@ alpha-spending (Type I error rate) up to each interim stage: \code{0 <= alpha_1 
 \item{userBetaSpending}{The user defined beta spending. Vector of length \code{kMax} containing the cumulative
 beta-spending up to each interim stage.}
 
+\item{efficacyStops}{Logical vector of length \code{kMax - 1} indicating efficacy stops. Default is \code{NA}.}
+
+\item{futilityStops}{Logical vector of length \code{kMax - 1} indicating futility stops. Default is \code{NA}.}
+
 \item{gammaB}{Parameter for beta spending function.}
 
 \item{bindingFutility}{Logical. If \code{bindingFutility = TRUE} is specified the calculation of
 the critical values is affected by the futility bounds and the futility threshold is binding in the
 sense that the study must be stopped if the futility condition was reached (default is \code{FALSE}).}
+
+\item{futilityBoundsScale}{Character. The scale of the futility bounds.
+Must be one of \code{"zValue"}, \code{"pValue"}, \code{"reverseCondPower"},
+\code{"condPowerAtObserved"}, or \code{"predictivePower"}.
+Default is \code{"zValue"}.}
 
 \item{directionUpper}{Logical. Specifies the direction of the alternative,
 only applicable for one-sided testing; default is \code{TRUE}
@@ -112,7 +125,7 @@ Haybittle & Peto design (default is \code{3}).}
 \item{twoSidedPower}{For two-sided testing, if \code{twoSidedPower = TRUE} is specified
 the sample size calculation is performed by considering both tails of the distribution.
 Default is \code{FALSE}, i.e., it is assumed that one tail probability is equal to 0 or the power
-should be directed to one part.}
+should be directed to one part.#'}
 
 \item{delayedInformation}{Delay of information for delayed response designs. Can be a numeric value or a
 numeric vector of length \code{kMax - 1}}
@@ -181,12 +194,18 @@ getDesignGroupSequential(informationRates = c(0.4, 0.7), typeOfDesign = "asP")
 \seealso{
 \code{\link[=getDesignSet]{getDesignSet()}} for creating a set of designs to compare different designs.
 
-Other design functions: 
-\code{\link{getDesignCharacteristics}()},
-\code{\link{getDesignConditionalDunnett}()},
-\code{\link{getDesignFisher}()},
-\code{\link{getDesignInverseNormal}()},
-\code{\link{getGroupSequentialProbabilities}()},
-\code{\link{getPowerAndAverageSampleNumber}()}
+\code{\link[=getFutilityBounds]{getFutilityBounds()}} for the
+specification of futility bounds on scales other than the z-value scale.
+
+\href{https://www.rpact.org/vignettes/planning/rpact_futility_bounds/}{Vignette: Enhanced Futility Bounds Specification}
+
+Other design functions:
+\code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}},
+\code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}},
+\code{\link[=getDesignFisher]{getDesignFisher()}},
+\code{\link[=getDesignFixed]{getDesignFixed()}},
+\code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+\code{\link[=getGroupSequentialProbabilities]{getGroupSequentialProbabilities()}},
+\code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 }
 \concept{design functions}

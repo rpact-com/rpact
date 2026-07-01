@@ -53,6 +53,8 @@ In the survival setting, \code{normalApproximation = FALSE} has no effect.}
 \item{\code{equalVariances}}{The type of t test. For testing means in two treatment groups, either
 the t test assuming that the variances are equal or the t test without assuming this,
 i.e., the test of Welch-Satterthwaite is calculated, default is \code{TRUE}.}
+\item{\code{stdErrorEstimate}}{Estimate of standard error for calculation of final confidence intervals for
+comparing rates in two treatment groups, default is \code{"pooled"}.}
 \item{\code{intersectionTest}}{Defines the multiple test for the intersection
 hypotheses in the closed system of hypotheses when testing multiple hypotheses.
 Five options are available in multi-arm designs: \code{"Dunnett"}, \code{"Bonferroni"}, \code{"Simes"},
@@ -285,16 +287,16 @@ if (require(ggplot2)) plot(x, type = 2)
 \seealso{
 \code{\link[=getObservedInformationRates]{getObservedInformationRates()}}
 
-Other analysis functions: 
-\code{\link{getClosedCombinationTestResults}()},
-\code{\link{getClosedConditionalDunnettTestResults}()},
-\code{\link{getConditionalPower}()},
-\code{\link{getConditionalRejectionProbabilities}()},
-\code{\link{getFinalConfidenceInterval}()},
-\code{\link{getFinalPValue}()},
-\code{\link{getRepeatedConfidenceIntervals}()},
-\code{\link{getRepeatedPValues}()},
-\code{\link{getStageResults}()},
-\code{\link{getTestActions}()}
+Other analysis functions:
+\code{\link[=getClosedCombinationTestResults]{getClosedCombinationTestResults()}},
+\code{\link[=getClosedConditionalDunnettTestResults]{getClosedConditionalDunnettTestResults()}},
+\code{\link[=getConditionalPower]{getConditionalPower()}},
+\code{\link[=getConditionalRejectionProbabilities]{getConditionalRejectionProbabilities()}},
+\code{\link[=getFinalConfidenceInterval]{getFinalConfidenceInterval()}},
+\code{\link[=getFinalPValue]{getFinalPValue()}},
+\code{\link[=getRepeatedConfidenceIntervals]{getRepeatedConfidenceIntervals()}},
+\code{\link[=getRepeatedPValues]{getRepeatedPValues()}},
+\code{\link[=getStageResults]{getStageResults()}},
+\code{\link[=getTestActions]{getTestActions()}}
 }
 \concept{analysis functions}

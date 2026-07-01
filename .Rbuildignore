@@ -51,3 +51,8 @@ testthat-problems\.rds
 Rplots\.pdf
 ^\.lintr$
 index\.txt$
+^air\.toml$
+^log\.txt$
+^private-tests$
+^release-notes-draft-full\.md$
+^release-notes-draft\.md$

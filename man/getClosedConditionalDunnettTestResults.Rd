@@ -36,7 +36,7 @@ Calculates and returns the results from the closed conditional Dunnett test.
 \details{
 For performing the conditional Dunnett test the design must be defined through the function
 \code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}}.\cr
-See Koenig et al. (2008) and Wassmer & Brannath (2016), chapter 11 for details of the test procedure.
+See Koenig et al. (2008) and Wassmer & Brannath (2025), chapter 11 for details of the test procedure.
 }
 \section{How to get help for generic functions}{
 
@@ -80,16 +80,16 @@ getClosedConditionalDunnettTestResults(stageResults)
 
 }
 \seealso{
-Other analysis functions: 
-\code{\link{getAnalysisResults}()},
-\code{\link{getClosedCombinationTestResults}()},
-\code{\link{getConditionalPower}()},
-\code{\link{getConditionalRejectionProbabilities}()},
-\code{\link{getFinalConfidenceInterval}()},
-\code{\link{getFinalPValue}()},
-\code{\link{getRepeatedConfidenceIntervals}()},
-\code{\link{getRepeatedPValues}()},
-\code{\link{getStageResults}()},
-\code{\link{getTestActions}()}
+Other analysis functions:
+\code{\link[=getAnalysisResults]{getAnalysisResults()}},
+\code{\link[=getClosedCombinationTestResults]{getClosedCombinationTestResults()}},
+\code{\link[=getConditionalPower]{getConditionalPower()}},
+\code{\link[=getConditionalRejectionProbabilities]{getConditionalRejectionProbabilities()}},
+\code{\link[=getFinalConfidenceInterval]{getFinalConfidenceInterval()}},
+\code{\link[=getFinalPValue]{getFinalPValue()}},
+\code{\link[=getRepeatedConfidenceIntervals]{getRepeatedConfidenceIntervals()}},
+\code{\link[=getRepeatedPValues]{getRepeatedPValues()}},
+\code{\link[=getStageResults]{getStageResults()}},
+\code{\link[=getTestActions]{getTestActions()}}
 }
 \concept{analysis functions}

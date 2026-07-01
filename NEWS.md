@@ -1,14 +1,106 @@
+# rpact 4.5.0
+
+## New features
+
+* The new function `getDesignFixed()` can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class `TrialDesignFixed` with `kMax = 1`.
+* rpact options can now be configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles; see the new vignette [Hidden rpact Features: Options and Environment Variables](https://www.rpact.org/vignettes/utilities/rpact_hidden_features/).
+* Optimized the display of `criticalValues` and `futilityBounds` for designs with `directionUpper = FALSE`. If the direction of the alternative is already specified when creating a design, e.g., with `getDesignGroupSequential(directionUpper = FALSE)`, the boundaries are now shown in the correct direction, typically as negative values. This also applies to futility bounds generated for beta-spending designs.
+
+## Improvements, issues, and changes
+
+* Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
+
+# rpact 4.4.0
+
+## New features
+
+* Extended `testPackage()` with additional options for report customization
+  and metadata handling. A new argument `reportFileBaseName` allows explicit
+  control over the base name of all generated report files.
+* `testPackage()` now supports structured metadata via the new arguments
+  `metaData` and `metaDataFile`. Users can either pass a named list of
+  key–value pairs directly or provide an external text file in `KEY=VALUE`
+  format. This metadata is included in the generated test reports and
+  supports reproducible, auditable installation qualification and validation
+  workflows.
+* Added two internal utility functions, `writeKeyValueFile()` and
+  `readKeyValueFile()`, for writing and reading human-editable key–value
+  metadata files (`KEY=VALUE`, INI/.env-like format).
+  These functions are implemented using base R only, support UTF-8 encoding,
+  comments, and robust parsing, and are intended for use in regulated
+  environments.
+* The new key–value file utilities are used internally by `testPackage()`
+  to support structured metadata handling via the `metaData` and
+  `metaDataFile` arguments, enabling reproducible and auditable inclusion of
+  environment- and system-specific information in installation qualification
+  and validation reports.
+
+## Improvements, issues, and changes
+
+* Improved parameter defaulting and assignment logic.
+* Used `identical()` for user-defined parameter checks.
+* Enhanced warning messages for ignored parameters.
+* Adjusted the calculation in `getHazardRatioByPi()` to return the hazard
+  ratio directly derived from the corresponding rate parameters, i.e., 
+  the hazard ratio is defined as `lambda1` / `lambda2`; 
+  the Weibull shape parameter `kappa` controls time-dependence only.
+* Enhanced count data parameter validation logic
+* Update version, citation handling, and references for rpact package
+* Corrected calculation of `finalPValues` for two-sided group-sequential
+  designs in specific edge cases (see issue [#114](https://github.com/rpact-com/rpact/issues/114)).
+
+# rpact 4.3.0
+
+## New features
+
+* The new function `getFutilityBounds()` converts futility bounds between different 
+  scales such as z-value, p-value, conditional power, predictive power, reverse conditional
+  power, and effect estimate.
+* The new argument `futilityBoundsScale` in `getDesignInverseNormal()` and
+  `getDesignGroupSequential()` allows specifying futility bounds directly
+  on alternative scales (e.g. p-value), which are internally converted as needed.
+* The new argument `alpha0Scale` in `getDesignFisher()` allows specifying alpha0 bounds directly
+  on alternative scales, which are internally converted as needed.
+
+## Improvements, issues, and changes
+
+* Documentation for `maxNumberOfRawDatasetsPerStage` in survival clarified
+* Issue [#94](https://github.com/rpact-com/rpact/issues/94) fixed
+* Issue [#99](https://github.com/rpact-com/rpact/issues/99) fixed
+* Testing improved, e.g., new helper function `getTestLabel()` introduced
+* Several minor improvements
+
+
+# rpact 4.2.1
+
+## New features
+
+* `efficacyStops` and `futilityStops` parameter added  (issue [#88](https://github.com/rpact-com/rpact/issues/88))
+* parameter `stdErrorEstimate` (`"pooled"` or `"unpooled"`) added for calculation of final confidence intervals in two-sample situation for rates
+* `testPackage()` returns an `InstallationQualificationResult` object
+
+## Improvements, issues, and changes
+
+* Issue for conditional power calculation for group sequential designs in analysis tool fixed
+* Recruitment times for count and survival data situation improved (issue [#86](https://github.com/rpact-com/rpact/issues/86))
+* Bug fix for `getSimulationCounts()` (issue [#84](https://github.com/rpact-com/rpact/issues/84))
+* Minor improvements
+
+
 # rpact 4.2.0
 
 ## New features
 
 * For the functions `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()` it is now possible to specify a parameter `doseLevels` to define the dose levels for a `linear` or `sigmoidEmax` dose-response relationship (see feature request [#63](https://github.com/rpact-com/rpact/issues/63))
 * Added support for unequal variances between two groups in `getSampleSizeMeans()`, `getPowerMeans()`, and `getSimulationMeans()` functions, see enhancement [#70](https://github.com/rpact-com/rpact/issues/70)
-* `testPackage()` produces a comprehensive installation qualification report in html and pdf format (see new vignette [Installation Qualification of rpact](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification))
+* `testPackage()` produces a comprehensive installation qualification report in html and pdf format (see new vignette [Installation Qualification of rpact](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/))
 * `setupPackageTests()` sets up the package tests by downloading the test files and copying them to the rpact installation directory
 * `saveOptions()` saves the current `rpact` options to a configuration file
 * `resetOptions()` resets the `rpact` options to their default values
 * Argument `conservative` added to `getSampleSizeRates()` function, see enhancement [#39](https://github.com/rpact-com/rpact/issues/39)
+* Enable futility boundaries in *Boundaries p Values Scale plot* plot (type = 3) using `options("rpact.plot.show.futility.on.pvalue.scale" = TRUE)` or argument `showFutilityBounds = TRUE`, see enhancement [#79](https://github.com/rpact-com/rpact/issues/79)
+* Enable beta-spending in *Error Spending* plot (type = 4) using `options("rpact.plot.show.beta.spent" = TRUE)` or argument `showBetaSpent = TRUE`, see enhancement [#80](https://github.com/rpact-com/rpact/issues/80). Furthermore, `options("rpact.plot.show.alpha.spent" = FALSE)` or argument `showAlphaSpent = FALSE` can be used to show only beta-spending in the plot
+* `getSampleSizeMeans()`, `getPowerMeans()`, `getSimulationMeans()`: For two-armed trials, it is allowed to specify the standard deviations (`stDev`) separately, i.e., as vector with two elements. 
 
 ## Improvements, issues, and changes
 
@@ -16,15 +108,16 @@
   (`getDesignConditionalDunnett()`) in analysis tool is fixed.
 * The full set of unit tests for rpact is now stored in a private repository. 
   Only members of the 'RPACT User Group' have access to the tests.
-  For more information, please visit: [rpact.org/iq](https://www.rpact.org/iq) and [RPACT Connect](https://connect.rpact.com/)
+  For more information, please visit: [rpact.org/iq](https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/) and [RPACT Connect](https://rpact-connect.share.connect.posit.cloud)
 * Usage of `maxInformation` improved (see enhancement [#65](https://github.com/rpact-com/rpact/issues/65))
-* `testPackage()`: additional warning details will be added to the test report if warnings exist
-* Issue [#61](https://github.com/rpact-com/rpact/issues/61) fixed
+* Line breaks in the output of `getObjectRCode()` improved (see [#81](https://github.com/rpact-com/rpact/issues/81))
+* `testPackage()`: additional warning details will be added to the test report if warnings exist* Issue [#61](https://github.com/rpact-com/rpact/issues/61) fixed
 * Issue [#68](https://github.com/rpact-com/rpact/issues/68) fixed
 * Flexibility of function `getPiecewiseSurvivalTime()` improved
 * Simulation allows the case #events = #patients
 * Test coverage improved
 * Plot subtitles improved
+* Warning message added for extreme choice of `informationRates`, `userAlphaSpending`, and `userBetaSpending`  
 * Minor improvements
 
 
@@ -98,7 +191,7 @@
 * R package `mnormt` dependency has been removed 
 * Argument `theta` can be used for plotting of sample size and power results
 * Pipe operator usage improved
-* Shiny app link changed to https://rpact.shinyapps.io/cloud
+* Shiny app link changed to https://rpact-cloud.share.connect.posit.cloud
 * Several minor improvements
 
 

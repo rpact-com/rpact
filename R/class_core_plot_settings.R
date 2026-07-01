@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8579 $
-## |  Last changed: $Date: 2025-03-04 16:57:07 +0100 (Di, 04 Mrz 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 PlotSubTitleItem <- R6::R6Class("PlotSubTitleItem",
     public = list(
@@ -34,7 +30,7 @@ PlotSubTitleItem <- R6::R6Class("PlotSubTitleItem",
             } else {
                 self$value <- value
             }
-            
+
             if (length(self$value) > 1) {
                 self$value <- .arrayToString(self$value, vectorLookAndFeelEnabled = TRUE)
             }
@@ -145,7 +141,7 @@ PlotSubTitleItems <- R6::R6Class("PlotSubTitleItems",
                     atop(.(self$subtitle) * "," ~ .(quotedItems))
                 )))
             }
-            
+
             return(bquote(atop(
                 bold(.(self$title)),
                 atop(.(quotedItems))
@@ -438,7 +434,12 @@ PlotSettings <- R6::R6Class("PlotSettings",
                 xAxisLabel <- xlab
             }
 
-            plotLabsType <- getOption("rpact.plot.labs.type", "quote")
+            plotLabsType <- .getEnvironmentVariable(
+                "RPACT_PLOT_LABS_TYPE",
+                "rpact.plot.labs.type",
+                default = "quote",
+                type = "character"
+            )
             if (plotLabsType == "quote" && !is.null(xAxisLabel)) {
                 if (xAxisLabel == "Theta") {
                     xAxisLabel <- bquote(bold("Theta" ~ Theta))
@@ -501,14 +502,14 @@ PlotSettings <- R6::R6Class("PlotSettings",
         getLegendPositionArguments = function(position, justification) {
             if (packageVersion("ggplot2") < "3.5.0") {
                 return(list(
-                    legend.position = position, 
+                    legend.position = position,
                     legend.justification = justification
                 ))
             }
-            
+
             return(list(
                 legend.position = "inside",
-                legend.position.inside = position, 
+                legend.position.inside = position,
                 legend.justification = justification
             ))
         },
@@ -516,12 +517,12 @@ PlotSettings <- R6::R6Class("PlotSettings",
             .assertIsValidLegendPosition(legendPosition)
 
             legendPosition <- as.character(legendPosition)
-            
+
             if (legendPosition %in% c("none", "left", "right", "bottom", "top")) {
                 p <- p + ggplot2::theme(legend.position = legendPosition)
                 return(p)
             }
-            
+
             args <- list()
             switch(legendPosition,
                 "-1" = {
@@ -549,11 +550,11 @@ PlotSettings <- R6::R6Class("PlotSettings",
                     args <- self$getLegendPositionArguments(c(0.95, 0.05), c(1, 0))
                 }
             )
-            
+
             if (length(args) > 0) {
-                p <- p + do.call(ggplot2::theme, args) 
+                p <- p + do.call(ggplot2::theme, args)
             }
-            
+
             return(p)
         },
         setLegendBorder = function(p) {
@@ -602,7 +603,12 @@ PlotSettings <- R6::R6Class("PlotSettings",
             caption <- NA_character_
             self$.htmlTitle <- NA_character_
             if (!is.null(mainTitle) && inherits(mainTitle, "PlotSubTitleItems")) {
-                plotLabsType <- getOption("rpact.plot.labs.type", "quote")
+                plotLabsType <- .getEnvironmentVariable(
+                    "RPACT_PLOT_LABS_TYPE",
+                    "rpact.plot.labs.type",
+                    default = "quote",
+                    type = "character"
+                )
                 if (plotLabsType == "quote") {
                     mainTitle <- mainTitle$toQuote()
                 } else {
@@ -617,8 +623,11 @@ PlotSettings <- R6::R6Class("PlotSettings",
                     }
                     s <- items$toString()
                     if (length(s) == 1 && !is.na(s) && nchar(s) > 0) {
-                        plotLabsCaptionEnabled <- as.logical(getOption(
-                            "rpact.plot.labs.caption.enabled", "true"
+                        plotLabsCaptionEnabled <- as.logical(.getEnvironmentVariable(
+                            "RPACT_PLOT_LABS_CAPTION_ENABLED",
+                            "rpact.plot.labs.caption.enabled",
+                            default = "true",
+                            type = "logical"
                         ))
                         if (isTRUE(plotLabsCaptionEnabled)) {
                             caption <- s
@@ -658,8 +667,8 @@ PlotSettings <- R6::R6Class("PlotSettings",
 
             p <- p + ggplot2::theme(
                 plot.title = ggplot2::element_text(
-                    hjust = 0.5, 
-                    size = self$scaleSize(self$mainTitleFontSize), 
+                    hjust = 0.5,
+                    size = self$scaleSize(self$mainTitleFontSize),
                     face = "bold"
                 )
             )
@@ -685,8 +694,7 @@ PlotSettings <- R6::R6Class("PlotSettings",
             if (!(length(margin) %in% c(1, 4))) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'margin' (", .arrayToString(margin),
-                    ") must be a numeric vector with length 1 or 4", 
-                    call. = FALSE
+                    ") must be a numeric vector with length 1 or 4"
                 )
             }
             p <- p + ggplot2::theme(plot.margin = ggplot2::unit(margin, "cm"))

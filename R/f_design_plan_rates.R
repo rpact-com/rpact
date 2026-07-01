@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8607 $
-## |  Last changed: $Date: 2025-03-12 12:57:53 +0100 (Mi, 12 Mrz 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_core_utilities.R
 NULL
@@ -26,27 +22,31 @@ NULL
     return(boundaries)
 }
 
-.getPiUniRoot <- function(boundary, pi2, thetaH0, n1, n2,
-        ar, directionUpper, method) {
+.getPiUniRoot <- function(boundary, pi2, thetaH0, n1, n2, allocationRatio, directionUpper, method) {
     tryCatch(
         {
             pi1Bound <- stats::uniroot(
                 function(x) {
                     fm <- .getFarringtonManningValues(
-                        rate1 = x, rate2 = pi2, theta = thetaH0,
-                        allocation = ar, method = method
+                        rate1 = x,
+                        rate2 = pi2,
+                        theta = thetaH0,
+                        allocation = allocationRatio,
+                        method = method
                     )
                     if (method == "diff") {
-                        (x - pi2 - thetaH0) / sqrt(fm$ml1 * (1 - fm$ml1) /
-                            n1 + fm$ml2 * (1 - fm$ml2) / n2) -
+                        (x - pi2 - thetaH0) /
+                            sqrt(fm$ml1 * (1 - fm$ml1) / n1 + fm$ml2 * (1 - fm$ml2) / n2) -
                             (2 * directionUpper - 1) * boundary
                     } else {
-                        (x - thetaH0 * pi2) / sqrt(fm$ml1 * (1 - fm$ml1) / n1 +
-                            thetaH0^2 * fm$ml2 * (1 - fm$ml2) / n2) -
+                        (x - thetaH0 * pi2) /
+                            sqrt(fm$ml1 * (1 - fm$ml1) / n1 + thetaH0^2 * fm$ml2 * (1 - fm$ml2) / n2) -
                             (2 * directionUpper - 1) * boundary
                     }
                 },
-                lower = 0, upper = 1, tol = .Machine$double.eps^0.5
+                lower = 0,
+                upper = 1,
+                tol = .Machine$double.eps^0.5
             )$root
         },
         error = function(e) {
@@ -75,30 +75,45 @@ NULL
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, nParameters)
     }
-    futilityBounds <- design$futilityBounds
+    futilityBounds <- .getFutilityBounds(design)
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
 
     if (designPlan$groups == 1) {
         criticalValues <- .getCriticalValues(design)
         n1 <- design$informationRates %*% t(maxNumberOfSubjects)
         for (j in 1:nParameters) {
-            criticalValuesEffectScaleUpper[, j] <- thetaH0 + (2 * directionUpper[j] - 1) *
-                criticalValues * sqrt(thetaH0 * (1 - thetaH0)) / sqrt(n1[, j])
+            criticalValuesEffectScaleUpper[, j] <- thetaH0 +
+                (2 * directionUpper[j] - 1) *
+                    criticalValues *
+                    sqrt(thetaH0 * (1 - thetaH0)) /
+                    sqrt(n1[, j])
             if (design$sided == 2) {
-                criticalValuesEffectScaleLower[, j] <- thetaH0 - (2 * directionUpper[j] - 1) *
-                    criticalValues * sqrt(thetaH0 * (1 - thetaH0)) / sqrt(n1[, j])
+                criticalValuesEffectScaleLower[, j] <- thetaH0 -
+                    (2 * directionUpper[j] - 1) *
+                        criticalValues *
+                        sqrt(thetaH0 * (1 - thetaH0)) /
+                        sqrt(n1[, j])
             }
             if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
-                futilityBoundsEffectScaleUpper[, j] <- thetaH0 + (2 * directionUpper[j] - 1) *
-                    futilityBounds * sqrt(thetaH0 * (1 - thetaH0)) /
-                    sqrt(n1[1:(design$kMax - 1), j])
+                futilityBoundsEffectScaleUpper[, j] <- thetaH0 +
+                    (2 * directionUpper[j] - 1) *
+                        futilityBounds *
+                        sqrt(thetaH0 * (1 - thetaH0)) /
+                        sqrt(n1[1:(design$kMax - 1), j])
             }
-            if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-                    (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) &&
-                        design$typeBetaSpending != "none")) {
-                futilityBoundsEffectScaleLower[, j] <- thetaH0 - (2 * directionUpper[j] - 1) *
-                    futilityBounds * sqrt(thetaH0 * (1 - thetaH0)) /
-                    sqrt(n1[1:(design$kMax - 1), j])
+            if (
+                !.isTrialDesignFisher(design) &&
+                    design$sided == 2 &&
+                    design$kMax > 1 &&
+                    (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                        !is.null(design$typeBetaSpending) &&
+                            design$typeBetaSpending != "none")
+                ) {
+                futilityBoundsEffectScaleLower[, j] <- thetaH0 -
+                    (2 * directionUpper[j] - 1) *
+                        futilityBounds *
+                        sqrt(thetaH0 * (1 - thetaH0)) /
+                        sqrt(n1[1:(design$kMax - 1), j])
             }
         }
 
@@ -111,59 +126,83 @@ NULL
         # calculate pi1 that solves (pi1 - pi2 - thetaH0) / SE(pi1 - pi2 - thetaH0)
         # = crit by using Farrington & Manning approach
         for (j in 1:nParameters) {
-            n1 <- allocationRatioPlanned[j] * design$informationRates *
-                maxNumberOfSubjects[j] / (1 + allocationRatioPlanned[j])
+            n1 <- allocationRatioPlanned[j] *
+                design$informationRates *
+                maxNumberOfSubjects[j] /
+                (1 + allocationRatioPlanned[j])
             n2 <- n1 / allocationRatioPlanned[j]
 
             for (i in seq_len(length(boundaries))) {
                 criticalValuesEffectScaleUpper[i, j] <- .getPiUniRoot(
                     boundaries[i],
-                    pi2, thetaH0,
-                    n1[i], n2[i],
+                    pi2,
+                    thetaH0,
+                    n1[i],
+                    n2[i],
                     allocationRatioPlanned[j],
-                    directionUpper[j], "diff"
-                ) - pi2
+                    directionUpper[j],
+                    "diff"
+                ) -
+                    pi2
             }
             if (design$sided == 2) {
                 for (i in seq_len(length(boundaries))) {
                     criticalValuesEffectScaleLower[i, j] <- .getPiUniRoot(
                         -boundaries[i],
-                        pi2, thetaH0,
-                        n1[i], n2[i],
+                        pi2,
+                        thetaH0,
+                        n1[i],
+                        n2[i],
                         allocationRatioPlanned[j],
-                        directionUpper[j], "diff"
-                    ) - pi2
+                        directionUpper[j],
+                        "diff"
+                    ) -
+                        pi2
                 }
             }
         }
         if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
             boundaries <- futilityBounds
             for (j in 1:nParameters) {
-                n1 <- allocationRatioPlanned[j] * design$informationRates *
-                    maxNumberOfSubjects[j] / (1 + allocationRatioPlanned[j])
+                n1 <- allocationRatioPlanned[j] *
+                    design$informationRates *
+                    maxNumberOfSubjects[j] /
+                    (1 + allocationRatioPlanned[j])
                 n2 <- n1 / allocationRatioPlanned[j]
                 for (i in seq_len(length(boundaries))) {
                     futilityBoundsEffectScaleUpper[i, j] <- .getPiUniRoot(
                         boundaries[i],
-                        pi2, thetaH0,
-                        n1[i], n2[i],
+                        pi2,
+                        thetaH0,
+                        n1[i],
+                        n2[i],
                         allocationRatioPlanned[j],
-                        directionUpper[j], "diff"
-                    ) - pi2
+                        directionUpper[j],
+                        "diff"
+                    ) -
+                        pi2
                 }
 
-                if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
+                if (
+                    !.isTrialDesignFisher(design) &&
+                        design$sided == 2 &&
+                        design$kMax > 1 &&
                         (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                             !is.null(design$typeBetaSpending) &&
-                                design$typeBetaSpending != "none")) {
+                                design$typeBetaSpending != "none")
+                    ) {
                     for (i in seq_len(length(boundaries))) {
                         futilityBoundsEffectScaleLower[i, j] <- .getPiUniRoot(
                             -boundaries[i],
-                            pi2, thetaH0,
-                            n1[i], n2[i],
+                            pi2,
+                            thetaH0,
+                            n1[i],
+                            n2[i],
                             allocationRatioPlanned[j],
-                            directionUpper[j], "diff"
-                        ) - pi2
+                            directionUpper[j],
+                            "diff"
+                        ) -
+                            pi2
                     }
                 }
             }
@@ -173,59 +212,83 @@ NULL
         # calculate pi1 that solves (pi1 - thetaH0 * pi2) / SE(pi1 - thetaH0 * pi2)
         # = crit by using Farrington & Manning approach
         for (j in 1:nParameters) {
-            n1 <- allocationRatioPlanned[j] * design$informationRates *
-                maxNumberOfSubjects[j] / (1 + allocationRatioPlanned[j])
+            n1 <- allocationRatioPlanned[j] *
+                design$informationRates *
+                maxNumberOfSubjects[j] /
+                (1 + allocationRatioPlanned[j])
             n2 <- n1 / allocationRatioPlanned[j]
 
             for (i in seq_len(length(boundaries))) {
                 criticalValuesEffectScaleUpper[i, j] <- .getPiUniRoot(
                     boundaries[i],
-                    pi2, thetaH0,
-                    n1[i], n2[i],
+                    pi2,
+                    thetaH0,
+                    n1[i],
+                    n2[i],
                     allocationRatioPlanned[j],
-                    directionUpper[j], "ratio"
-                ) / pi2
+                    directionUpper[j],
+                    "ratio"
+                ) /
+                    pi2
             }
             if (design$sided == 2) {
                 for (i in seq_len(length(boundaries))) {
                     criticalValuesEffectScaleLower[i, j] <- .getPiUniRoot(
                         -boundaries[i],
-                        pi2, thetaH0,
-                        n1[i], n2[i],
+                        pi2,
+                        thetaH0,
+                        n1[i],
+                        n2[i],
                         allocationRatioPlanned[j],
-                        directionUpper[j], "ratio"
-                    ) / pi2
+                        directionUpper[j],
+                        "ratio"
+                    ) /
+                        pi2
                 }
             }
         }
         if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
             boundaries <- futilityBounds
             for (j in (1:nParameters)) {
-                n1 <- allocationRatioPlanned[j] * design$informationRates *
-                    maxNumberOfSubjects[j] / (1 + allocationRatioPlanned[j])
+                n1 <- allocationRatioPlanned[j] *
+                    design$informationRates *
+                    maxNumberOfSubjects[j] /
+                    (1 + allocationRatioPlanned[j])
                 n2 <- n1 / allocationRatioPlanned[j]
                 for (i in seq_len(length(boundaries))) {
                     futilityBoundsEffectScaleUpper[i, j] <- .getPiUniRoot(
                         boundaries[i],
-                        pi2, thetaH0,
-                        n1[i], n2[i],
+                        pi2,
+                        thetaH0,
+                        n1[i],
+                        n2[i],
                         allocationRatioPlanned[j],
-                        directionUpper[j], "ratio"
-                    ) / pi2
+                        directionUpper[j],
+                        "ratio"
+                    ) /
+                        pi2
                 }
 
-                if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
+                if (
+                    !.isTrialDesignFisher(design) &&
+                        design$sided == 2 &&
+                        design$kMax > 1 &&
                         (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                             !is.null(design$typeBetaSpending) &&
-                                design$typeBetaSpending != "none")) {
+                                design$typeBetaSpending != "none")
+                    ) {
                     for (i in seq_len(length(boundaries))) {
                         futilityBoundsEffectScaleLower[i, j] <- .getPiUniRoot(
                             -boundaries[i],
-                            pi2, thetaH0,
-                            n1[i], n2[i],
+                            pi2,
+                            thetaH0,
+                            n1[i],
+                            n2[i],
                             allocationRatioPlanned[j],
-                            directionUpper[j], "ratio"
-                        ) / pi2
+                            directionUpper[j],
+                            "ratio"
+                        ) /
+                            pi2
                     }
                 }
             }
@@ -251,10 +314,18 @@ NULL
     ))
 }
 
-.getSampleSizeFixedRates <- function(..., alpha = 0.025, beta = 0.2, sided = 1,
-        normalApproximation = TRUE, conservative = TRUE, riskRatio = FALSE,
-        thetaH0 = 0, pi1 = seq(0.4, 0.6, 0.1), pi2 = 0.2,
-        groups = 2, allocationRatioPlanned = 1) {
+.getSampleSizeFixedRates <- function(...,
+        alpha = 0.025,
+        beta = 0.2,
+        sided = 1,
+        normalApproximation = TRUE,
+        conservative = TRUE,
+        riskRatio = FALSE,
+        thetaH0 = 0,
+        pi1 = seq(0.4, 0.6, 0.1),
+        pi2 = 0.2,
+        groups = 2,
+        allocationRatioPlanned = 1) {
     if (groups == 1) {
         nFixed <- rep(NA_real_, length(pi1))
 
@@ -268,14 +339,16 @@ NULL
                 ifelse(pi1[i] > thetaH0, lower.tail <- FALSE, lower.tail <- TRUE)
                 iterations <- 1
                 nup <- 2
-                while ((stats::pbinom(
-                    stats::qbinom(alpha, nup,
-                        thetaH0,
+                while (
+                    (stats::pbinom(
+                        stats::qbinom(alpha, nup, thetaH0, lower.tail = lower.tail) - as.integer(lower.tail),
+                        nup,
+                        pi1[i],
                         lower.tail = lower.tail
-                    ) - as.integer(lower.tail),
-                    nup, pi1[i],
-                    lower.tail = lower.tail
-                ) < 1 - beta) && (iterations <= 50)) {
+                    ) <
+                        1 - beta) &&
+                        (iterations <= 50)
+                ) {
                     nup <- 2 * nup
                     iterations <- iterations + 1
                 }
@@ -284,23 +357,28 @@ NULL
                 } else {
                     tryCatch(
                         if (conservative) {
-                            nFixed[i] <- max(which(stats::pbinom(
-                                stats::qbinom(alpha, (1:(2 * nup)),
-                                    thetaH0,
+                            nFixed[i] <- max(which(
+                                stats::pbinom(
+                                    stats::qbinom(alpha, (1:(2 * nup)), thetaH0, lower.tail = lower.tail) -
+                                        as.integer(lower.tail),
+                                    (1:(2 * nup)),
+                                    pi1[i],
                                     lower.tail = lower.tail
-                                ) - as.integer(lower.tail),
-                                (1:(2 * nup)), pi1[i],
-                                lower.tail = lower.tail
-                            ) < 1 - beta)) + 1
+                                ) <
+                                    1 - beta
+                            )) +
+                                1
                         } else {
-                            nFixed[i] <- min(which(stats::pbinom(
-                                stats::qbinom(alpha, (1:nup),
-                                    thetaH0,
+                            nFixed[i] <- min(which(
+                                stats::pbinom(
+                                    stats::qbinom(alpha, (1:nup), thetaH0, lower.tail = lower.tail) -
+                                        as.integer(lower.tail),
+                                    (1:nup),
+                                    pi1[i],
                                     lower.tail = lower.tail
-                                ) - as.integer(lower.tail),
-                                (1:nup), pi1[i],
-                                lower.tail = lower.tail
-                            ) >= 1 - beta))
+                                ) >=
+                                    1 - beta
+                            ))
                         },
                         error = function(e) {
                             nFixed[i] <<- NA_real_
@@ -338,66 +416,106 @@ NULL
             if (!riskRatio) {
                 # allocationRatioPlanned = 0 provides optimum sample size
                 if (allocationRatioPlanned == 0) {
-                    allocationRatioPlannedVec[i] <- stats::optimize(function(x) {
-                        fm <- .getFarringtonManningValues(
-                            rate1 = pi1[i], rate2 = pi2,
-                            theta = thetaH0, allocation = x, method = "diff"
-                        )
-                        n1 <- (.getOneMinusQNorm(alpha / sided) *
-                            sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * x) +
-                            .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * x))^2 /
-                            (pi1[i] - pi2 - thetaH0)^2
-                        return((1 + x) / x * n1)
-                    }, interval = c(0, 5), tol = 0.0001)$minimum
+                    allocationRatioPlannedVec[i] <- stats::optimize(
+                        function(x) {
+                            fm <- .getFarringtonManningValues(
+                                rate1 = pi1[i],
+                                rate2 = pi2,
+                                theta = thetaH0,
+                                allocation = x,
+                                method = "diff"
+                            )
+                            n1 <- (.getOneMinusQNorm(alpha / sided) *
+                                sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * x) +
+                                .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * x))^2 /
+                                (pi1[i] - pi2 - thetaH0)^2
+                            return((1 + x) / x * n1)
+                        },
+                        interval = c(0, 5),
+                        tol = 0.0001
+                    )$minimum
                     fm <- .getFarringtonManningValues(
-                        rate1 = pi1[i], rate2 = pi2, theta = thetaH0,
-                        allocation = allocationRatioPlannedVec[i], method = "diff"
+                        rate1 = pi1[i],
+                        rate2 = pi2,
+                        theta = thetaH0,
+                        allocation = allocationRatioPlannedVec[i],
+                        method = "diff"
                     )
-                    n1Fixed[i] <- (.getOneMinusQNorm(alpha / sided) * sqrt(fm$ml1 * (1 - fm$ml1) +
-                        fm$ml2 * (1 - fm$ml2) * allocationRatioPlannedVec[i]) +
-                        .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) *
-                            allocationRatioPlannedVec[i]))^2 / (pi1[i] - pi2 - thetaH0)^2
+                    n1Fixed[i] <- (.getOneMinusQNorm(alpha / sided) *
+                        sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlannedVec[i]) +
+                        .getOneMinusQNorm(beta) *
+                            sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlannedVec[i]))^2 /
+                        (pi1[i] - pi2 - thetaH0)^2
                 } else {
                     fm <- .getFarringtonManningValues(
-                        rate1 = pi1[i], rate2 = pi2,
-                        theta = thetaH0, allocation = allocationRatioPlanned, method = "diff"
+                        rate1 = pi1[i],
+                        rate2 = pi2,
+                        theta = thetaH0,
+                        allocation = allocationRatioPlanned,
+                        method = "diff"
                     )
-                    n1Fixed[i] <- (.getOneMinusQNorm(alpha / sided) * sqrt(fm$ml1 * (1 - fm$ml1) +
-                        fm$ml2 * (1 - fm$ml2) * allocationRatioPlanned) +
-                        .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) *
-                            allocationRatioPlanned))^2 / (pi1[i] - pi2 - thetaH0)^2
+                    n1Fixed[i] <- (.getOneMinusQNorm(alpha / sided) *
+                        sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlanned) +
+                        .getOneMinusQNorm(beta) *
+                            sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlanned))^2 /
+                        (pi1[i] - pi2 - thetaH0)^2
                 }
             } else {
                 if (allocationRatioPlanned == 0) {
                     # allocationRatioPlanned = 0 provides optimum sample size
-                    allocationRatioPlannedVec[i] <- stats::optimize(function(x) {
-                        fm <- .getFarringtonManningValues(
-                            rate1 = pi1[i], rate2 = pi2,
-                            theta = thetaH0, allocation = x, method = "ratio"
-                        )
-                        n1 <- (.getOneMinusQNorm(alpha / sided) * sqrt(fm$ml1 * (1 - fm$ml1) +
-                            fm$ml2 * (1 - fm$ml2) * x * thetaH0^2) +
-                            .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i]) + pi2 *
-                                (1 - pi2) * x * thetaH0^2))^2 / (pi1[i] - thetaH0 * pi2)^2
-                        return((1 + x) / x * n1)
-                    }, interval = c(0, 5), tol = 0.0001)$minimum
+                    allocationRatioPlannedVec[i] <- stats::optimize(
+                        function(x) {
+                            fm <- .getFarringtonManningValues(
+                                rate1 = pi1[i],
+                                rate2 = pi2,
+                                theta = thetaH0,
+                                allocation = x,
+                                method = "ratio"
+                            )
+                            n1 <- (.getOneMinusQNorm(alpha / sided) *
+                                sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * x * thetaH0^2) +
+                                .getOneMinusQNorm(beta) *
+                                    sqrt(
+                                        pi1[i] *
+                                            (1 - pi1[i]) +
+                                            pi2 *
+                                                (1 - pi2) *
+                                                x *
+                                                thetaH0^2
+                                    ))^2 /
+                                (pi1[i] - thetaH0 * pi2)^2
+                            return((1 + x) / x * n1)
+                        },
+                        interval = c(0, 5),
+                        tol = 0.0001
+                    )$minimum
                     fm <- .getFarringtonManningValues(
-                        rate1 = pi1[i], rate2 = pi2, theta = thetaH0,
-                        allocation = allocationRatioPlannedVec[i], method = "ratio"
+                        rate1 = pi1[i],
+                        rate2 = pi2,
+                        theta = thetaH0,
+                        allocation = allocationRatioPlannedVec[i],
+                        method = "ratio"
                     )
-                    n1Fixed[i] <- (.getOneMinusQNorm(alpha / sided) * sqrt(fm$ml1 * (1 - fm$ml1) +
-                        fm$ml2 * (1 - fm$ml2) * allocationRatioPlannedVec[i] * thetaH0^2) +
-                        .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) *
-                            allocationRatioPlannedVec[i] * thetaH0^2))^2 / (pi1[i] - thetaH0 * pi2)^2
+                    n1Fixed[i] <- (.getOneMinusQNorm(alpha / sided) *
+                        sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlannedVec[i] * thetaH0^2) +
+                        .getOneMinusQNorm(beta) *
+                            sqrt(
+                                pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlannedVec[i] * thetaH0^2
+                            ))^2 /
+                        (pi1[i] - thetaH0 * pi2)^2
                 } else {
                     fm <- .getFarringtonManningValues(
-                        rate1 = pi1[i], rate2 = pi2,
-                        theta = thetaH0, allocation = allocationRatioPlanned, method = "ratio"
+                        rate1 = pi1[i],
+                        rate2 = pi2,
+                        theta = thetaH0,
+                        allocation = allocationRatioPlanned,
+                        method = "ratio"
                     )
-                    n1Fixed[i] <- (.getOneMinusQNorm(alpha / sided) * sqrt(fm$ml1 * (1 - fm$ml1) +
-                        fm$ml2 * (1 - fm$ml2) * allocationRatioPlanned * thetaH0^2) +
-                        .getOneMinusQNorm(beta) * sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) *
-                            allocationRatioPlanned * thetaH0^2))^2 / (pi1[i] - thetaH0 * pi2)^2
+                    n1Fixed[i] <- (.getOneMinusQNorm(alpha / sided) *
+                        sqrt(fm$ml1 * (1 - fm$ml1) + fm$ml2 * (1 - fm$ml2) * allocationRatioPlanned * thetaH0^2) +
+                        .getOneMinusQNorm(beta) *
+                            sqrt(pi1[i] * (1 - pi1[i]) + pi2 * (1 - pi2) * allocationRatioPlanned * thetaH0^2))^2 /
+                        (pi1[i] - thetaH0 * pi2)^2
                 }
             }
         }
@@ -442,10 +560,11 @@ NULL
         maxNumberOfSubjects[i] <- fixedSampleSize$nFixed[i] *
             designCharacteristics$inflationFactor
 
-        numberOfSubjects[, i] <- maxNumberOfSubjects[i] * c(
-            informationRates[1],
-            (informationRates[2:kMax] - informationRates[1:(kMax - 1)])
-        )
+        numberOfSubjects[, i] <- maxNumberOfSubjects[i] *
+            c(
+                informationRates[1],
+                (informationRates[2:kMax] - informationRates[1:(kMax - 1)])
+            )
 
         expectedNumberOfSubjectsH0[i] <- designCharacteristics$averageSampleNumber0 *
             fixedSampleSize$nFixed[i]
@@ -460,8 +579,7 @@ NULL
             } else {
                 allocationRatioPlanned <- fixedSampleSize$allocationRatioPlanned
             }
-            numberOfSubjects1[, i] <- numberOfSubjects[, i] * allocationRatioPlanned /
-                (1 + allocationRatioPlanned)
+            numberOfSubjects1[, i] <- numberOfSubjects[, i] * allocationRatioPlanned / (1 + allocationRatioPlanned)
             numberOfSubjects2[, i] <- numberOfSubjects[, i] / (1 + allocationRatioPlanned)
         }
     }
@@ -529,7 +647,7 @@ NULL
         allocationRatioPlanned = NA_real_) {
     objectType <- match.arg(objectType)
 
-    .assertIsTrialDesignInverseNormalOrGroupSequential(design)
+    .assertIsTrialDesignInverseNormalOrGroupSequentialOrFixed(design)
     .assertIsValidAlphaAndBeta(design$alpha, design$beta)
     .assertIsValidSidedParameter(design$sided)
     .assertIsValidGroupsParameter(groups)
@@ -540,102 +658,151 @@ NULL
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsSingleLogical(riskRatio, "riskRatio")
     directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper, design,
-        objectType = objectType, userFunctionCallEnabled = TRUE
+        directionUpper,
+        design,
+        objectType = objectType,
+        userFunctionCallEnabled = TRUE
     )
 
     if (groups == 1) {
-        if (!any(is.na(pi1)) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
+        if (!anyNA(pi1) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'pi1' (", .arrayToString(pi1), ") must be != 'thetaH0' (", thetaH0, ")"
+                "any 'pi1' (",
+                .arrayToString(pi1),
+                ") must be != 'thetaH0' (",
+                thetaH0,
+                ")",
+                call. = FALSE
             )
         }
 
-        if (any(is.na(pi1)) || any(pi1 <= 0) || any(pi1 >= 1)) {
+        if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "probability 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)"
+                "probability 'pi1' (",
+                .arrayToString(pi1),
+                ") is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
         if (thetaH0 >= 1 || thetaH0 <= 0) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'thetaH0' (", thetaH0, ") is out of bounds (0; 1)"
+                "'thetaH0' (",
+                thetaH0,
+                ") is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "exact sample size calculation not available for two-sided testing"
+                "exact sample size calculation not available for two-sided testing",
+                call. = FALSE
             )
         }
 
         if (normalApproximation && !conservative && (objectType == "sampleSize")) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'conservative' (", conservative, ") has no effect on sample size calculation"
+                "'conservative' (",
+                conservative,
+                ") has no effect on sample size calculation",
+                call. = FALSE
             )
         }
     } else if (groups == 2) {
-        if (!any(is.na(c(pi1, pi2))) && any(abs(pi1 - pi2 - thetaH0) < 1e-12) &&
-                (objectType == "sampleSize") && !riskRatio) {
+        if (
+            !anyNA(c(pi1, pi2)) &&
+                any(abs(pi1 - pi2 - thetaH0) < 1e-12) &&
+                (objectType == "sampleSize") &&
+                !riskRatio
+            ) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'pi1 - pi2' (", .arrayToString(pi1 - pi2), ") ",
-                "must be != 'thetaH0' (", thetaH0, ")"
+                "any 'pi1 - pi2' (",
+                .arrayToString(pi1 - pi2),
+                ") ",
+                "must be != 'thetaH0' (",
+                thetaH0,
+                ")",
+                call. = FALSE
             )
         }
 
-        if (!any(is.na(c(pi1, pi2))) && any(abs(pi1 / pi2 - thetaH0) < 1e-12) &&
-                (objectType == "sampleSize") && riskRatio) {
+        if (
+            !anyNA(c(pi1, pi2)) &&
+                any(abs(pi1 / pi2 - thetaH0) < 1e-12) &&
+                (objectType == "sampleSize") &&
+                riskRatio
+            ) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'pi1 / pi2' (", .arrayToString(pi1 / pi2), ") ",
-                "must be != 'thetaH0' (", thetaH0, ")"
+                "any 'pi1 / pi2' (",
+                .arrayToString(pi1 / pi2),
+                ") ",
+                "must be != 'thetaH0' (",
+                thetaH0,
+                ")",
+                call. = FALSE
             )
         }
 
-        if (any(is.na(pi1)) || any(pi1 <= 0) || any(pi1 >= 1)) {
+        if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "probability 'pi1' (", .arrayToString(pi1), ") ",
-                "is out of bounds (0; 1)"
+                "probability 'pi1' (",
+                .arrayToString(pi1),
+                ") ",
+                "is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
-        if (any(is.na(pi2)) || any(pi2 <= 0) || any(pi2 >= 1)) {
+        if (anyNA(pi2) || any(pi2 <= 0) || any(pi2 >= 1)) {
             stop(
                 C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "probability 'pi2' (", .arrayToString(pi2), ") ",
-                "is out of bounds (0; 1)"
+                "probability 'pi2' (",
+                .arrayToString(pi2),
+                ") ",
+                "is out of bounds (0; 1)",
+                call. = FALSE
             )
         }
 
-        if (design$sided == 2 && ((thetaH0 != 0 && !riskRatio) ||
-                (thetaH0 != 1 && riskRatio))) {
+        if (
+            design$sided == 2 &&
+                ((thetaH0 != 0 && !riskRatio) ||
+                    (thetaH0 != 1 && riskRatio))
+            ) {
             stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "two-sided case ",
-                "is implemented only for superiority testing"
+                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                "two-sided case ",
+                "is implemented only for superiority testing",
+                call. = FALSE
             )
         }
 
         if (!normalApproximation) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "only normal approximation case is implemented for two groups"
+                "only normal approximation case is implemented for two groups",
+                call. = FALSE
             )
         }
 
         if (!conservative) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'conservative' (", conservative, ") has no effect on sample size calculation for two groups"
+                "'conservative' (",
+                conservative,
+                ") has no effect on sample size calculation for two groups",
+                call. = FALSE
             )
         }
-
 
         if (is.na(allocationRatioPlanned)) {
             allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
@@ -644,7 +811,10 @@ NULL
         if (allocationRatioPlanned < 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0"
+                "'allocationRatioPlanned' (",
+                allocationRatioPlanned,
+                ") must be >= 0",
+                call. = FALSE
             )
         }
 
@@ -652,7 +822,8 @@ NULL
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "null hypothesis risk ratio is not allowed be negative or zero, ",
-                "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE"
+                "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE",
+                call. = FALSE
             )
         }
     }
@@ -668,7 +839,7 @@ NULL
 
     if (.hasApplicableFutilityBounds(design)) {
         designPlan$futilityBoundsPValueScale <-
-            matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)
+            matrix(1 - stats::pnorm(.getFutilityBounds(design)), ncol = 1)
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }
 
@@ -695,7 +866,10 @@ NULL
     .setValueAndParameterType(designPlan, "pi2", pi2, 0.2, notApplicableIfNA = TRUE)
     if (groups == 1) {
         if (designPlan$.getParameterType("pi2") == C_PARAM_USER_DEFINED) {
-            warning("'pi2' (", pi2, ") will be ignored ",
+            warning(
+                "'pi2' (",
+                pi2,
+                ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
                 call. = FALSE
             )
@@ -703,7 +877,10 @@ NULL
         designPlan$.setParameterType("pi2", C_PARAM_NOT_APPLICABLE)
 
         if (isTRUE(riskRatio)) {
-            warning("'riskRatio' (", riskRatio, ") will be ignored ",
+            warning(
+                "'riskRatio' (",
+                riskRatio,
+                ") will be ignored ",
                 "because it is not applicable for 'groups' = 1",
                 call. = FALSE
             )
@@ -711,7 +888,9 @@ NULL
         designPlan$.setParameterType("riskRatio", C_PARAM_NOT_APPLICABLE)
 
         if (length(allocationRatioPlanned) == 1 && !is.na(allocationRatioPlanned)) {
-            warning("'allocationRatioPlanned' (", allocationRatioPlanned,
+            warning(
+                "'allocationRatioPlanned' (",
+                allocationRatioPlanned,
                 ") will be ignored because it is not applicable for 'groups' = 1",
                 call. = FALSE
             )
@@ -720,8 +899,10 @@ NULL
     } else {
         .setValueAndParameterType(designPlan, "riskRatio", riskRatio, FALSE)
         .setValueAndParameterType(
-            designPlan, "allocationRatioPlanned",
-            allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
+            designPlan,
+            "allocationRatioPlanned",
+            allocationRatioPlanned,
+            C_ALLOCATION_RATIO_DEFAULT
         )
     }
     .setValueAndParameterType(designPlan, "groups", groups, 2)
@@ -771,7 +952,8 @@ NULL
 #'
 #' @export
 #'
-getPowerRates <- function(design = NULL, ...,
+getPowerRates <- function(design = NULL,
+        ...,
         groups = 2L,
         riskRatio = FALSE,
         thetaH0 = ifelse(riskRatio, 1, 0),
@@ -788,7 +970,8 @@ getPowerRates <- function(design = NULL, ...,
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
                 design,
                 powerCalculationEnabled = TRUE
-            ), ...
+            ),
+            ...
         )
     } else {
         .warnInCaseOfUnknownArguments(functionName = "getPowerRates", ...)
@@ -800,15 +983,20 @@ getPowerRates <- function(design = NULL, ...,
 
     designPlan <- .createDesignPlanRates(
         objectType = "power",
-        design = design, riskRatio = riskRatio,
-        thetaH0 = thetaH0, pi1 = pi1, pi2 = pi2,
+        design = design,
+        riskRatio = riskRatio,
+        thetaH0 = thetaH0,
+        pi1 = pi1,
+        pi2 = pi2,
         directionUpper = directionUpper,
-        maxNumberOfSubjects = maxNumberOfSubjects, groups = groups,
-        allocationRatioPlanned = allocationRatioPlanned, ...
+        maxNumberOfSubjects = maxNumberOfSubjects,
+        groups = groups,
+        allocationRatioPlanned = allocationRatioPlanned,
+        ...
     )
 
     if (!is.na(allocationRatioPlanned) && allocationRatioPlanned <= 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "allocation ratio must be > 0")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "allocation ratio must be > 0", call. = FALSE)
     }
 
     allocationRatioPlanned <- designPlan$allocationRatioPlanned
@@ -816,39 +1004,62 @@ getPowerRates <- function(design = NULL, ...,
     theta <- rep(NA_real_, length(pi1))
     if (groups == 1) {
         designPlan$effect <- pi1 - thetaH0
-        theta <- (pi1 - thetaH0) / sqrt(pi1 * (1 - pi1)) + sign(pi1 - thetaH0) *
-            .getOneMinusQNorm(design$alpha / design$sided) *
-            (1 - sqrt(thetaH0 * (1 - thetaH0) / (pi1 * (1 - pi1)))) / sqrt(maxNumberOfSubjects)
+        theta <- (pi1 - thetaH0) /
+            sqrt(pi1 * (1 - pi1)) +
+            sign(pi1 - thetaH0) *
+                .getOneMinusQNorm(design$alpha / design$sided) *
+                (1 - sqrt(thetaH0 * (1 - thetaH0) / (pi1 * (1 - pi1)))) /
+                sqrt(maxNumberOfSubjects)
     } else {
         if (!riskRatio) {
             designPlan$effect <- pi1 - pi2 - thetaH0
             for (i in seq_len(length(pi1))) {
                 fm <- .getFarringtonManningValues(
-                    rate1 = pi1[i], rate2 = pi2,
-                    theta = thetaH0, allocation = allocationRatioPlanned, method = "diff"
+                    rate1 = pi1[i],
+                    rate2 = pi2,
+                    theta = thetaH0,
+                    allocation = allocationRatioPlanned,
+                    method = "diff"
                 )
-                theta[i] <- sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned) *
-                    (pi1[i] - pi2 - thetaH0) * sqrt(1 + allocationRatioPlanned) /
+                theta[i] <- sqrt(allocationRatioPlanned) /
+                    (1 + allocationRatioPlanned) *
+                    (pi1[i] - pi2 - thetaH0) *
+                    sqrt(1 + allocationRatioPlanned) /
                     sqrt(pi1[i] * (1 - pi1[i]) + allocationRatioPlanned * pi2 * (1 - pi2)) +
-                    sign(pi1[i] - pi2 - thetaH0) * .getOneMinusQNorm(design$alpha / design$sided) *
-                        (1 - sqrt(fm$ml1 * (1 - fm$ml1) + allocationRatioPlanned * fm$ml2 * (1 - fm$ml2)) /
-                            sqrt(pi1[i] * (1 - pi1[i]) + allocationRatioPlanned * pi2 * (1 - pi2))) /
+                    sign(pi1[i] - pi2 - thetaH0) *
+                        .getOneMinusQNorm(design$alpha / design$sided) *
+                        (1 -
+                            sqrt(fm$ml1 * (1 - fm$ml1) + allocationRatioPlanned * fm$ml2 * (1 - fm$ml2)) /
+                                sqrt(pi1[i] * (1 - pi1[i]) + allocationRatioPlanned * pi2 * (1 - pi2))) /
                         sqrt(maxNumberOfSubjects)
             }
         } else {
             designPlan$effect <- pi1 / pi2 - thetaH0
             for (i in seq_len(length(pi1))) {
                 fm <- .getFarringtonManningValues(
-                    rate1 = pi1[i], rate2 = pi2,
-                    theta = thetaH0, allocation = allocationRatioPlanned, method = "ratio"
+                    rate1 = pi1[i],
+                    rate2 = pi2,
+                    theta = thetaH0,
+                    allocation = allocationRatioPlanned,
+                    method = "ratio"
                 )
-                theta[i] <- sqrt(allocationRatioPlanned) / (1 + allocationRatioPlanned) *
-                    (pi1[i] - thetaH0 * pi2) * sqrt(1 + allocationRatioPlanned) /
+                theta[i] <- sqrt(allocationRatioPlanned) /
+                    (1 + allocationRatioPlanned) *
+                    (pi1[i] - thetaH0 * pi2) *
+                    sqrt(1 + allocationRatioPlanned) /
                     sqrt(pi1[i] * (1 - pi1[i]) + allocationRatioPlanned * thetaH0^2 * pi2 * (1 - pi2)) +
-                    sign(pi1[i] - thetaH0 * pi2) * .getOneMinusQNorm(design$alpha / design$sided) *
-                        (1 - sqrt(fm$ml1 * (1 - fm$ml1) + allocationRatioPlanned * thetaH0^2 *
-                            fm$ml2 * (1 - fm$ml2)) / sqrt(pi1[i] * (1 - pi1[i]) + allocationRatioPlanned *
-                            thetaH0^2 * pi2 * (1 - pi2))) /
+                    sign(pi1[i] - thetaH0 * pi2) *
+                        .getOneMinusQNorm(design$alpha / design$sided) *
+                        (1 -
+                            sqrt(fm$ml1 * (1 - fm$ml1) + allocationRatioPlanned * thetaH0^2 * fm$ml2 * (1 - fm$ml2)) /
+                                sqrt(
+                                    pi1[i] *
+                                        (1 - pi1[i]) +
+                                        allocationRatioPlanned *
+                                            thetaH0^2 *
+                                            pi2 *
+                                            (1 - pi2)
+                                )) /
                         sqrt(maxNumberOfSubjects)
             }
         }
@@ -859,7 +1070,9 @@ getPowerRates <- function(design = NULL, ...,
     }
 
     powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
-        design, theta, maxNumberOfSubjects
+        design,
+        theta,
+        maxNumberOfSubjects
     )
 
     designPlan$expectedNumberOfSubjects <- powerAndAverageSampleNumber$averageSampleNumber
@@ -935,7 +1148,8 @@ getPowerRates <- function(design = NULL, ...,
 #'
 #' @export
 #'
-getSampleSizeRates <- function(design = NULL, ...,
+getSampleSizeRates <- function(design = NULL,
+        ...,
         groups = 2L,
         normalApproximation = TRUE,
         conservative = TRUE,
@@ -952,7 +1166,8 @@ getSampleSizeRates <- function(design = NULL, ...,
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
                 design,
                 powerCalculationEnabled = FALSE
-            ), ...
+            ),
+            ...
         )
     } else {
         .assertIsTrialDesign(design)
@@ -963,15 +1178,15 @@ getSampleSizeRates <- function(design = NULL, ...,
 
     designPlan <- .createDesignPlanRates(
         objectType = "sampleSize",
-        design = design, 
-        normalApproximation = normalApproximation, 
+        design = design,
+        normalApproximation = normalApproximation,
         conservative = conservative,
-        riskRatio = riskRatio, 
-        thetaH0 = thetaH0, 
-        pi1 = pi1, 
-        pi2 = pi2, 
+        riskRatio = riskRatio,
+        thetaH0 = thetaH0,
+        pi1 = pi1,
+        pi2 = pi2,
         groups = groups,
-        allocationRatioPlanned = allocationRatioPlanned, 
+        allocationRatioPlanned = allocationRatioPlanned,
         ...
     )
 

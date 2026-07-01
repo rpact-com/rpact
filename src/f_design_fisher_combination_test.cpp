@@ -14,10 +14,6 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 8151 $
- * Last changed: $Date: 2024-08-30 10:39:49 +0200 (Fr, 30 Aug 2024) $
- * Last changed by: $Author: pahlke $
- *
  */
 
 #include <Rcpp.h>

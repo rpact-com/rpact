@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8416 $
-## |  Last changed: $Date: 2024-11-18 16:13:44 +0100 (Mo, 18 Nov 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_assertions.R
 #' @include f_core_utilities.R
@@ -27,7 +23,8 @@ NULL
 }
 
 .getDefaultDesign <- function(...,
-        type = c("sampleSize", "power", "simulation", "simulationCounts", "analysis", "characteristics"),
+        type = c("sampleSize", "power", "simulation", 
+            "simulationCounts", "analysis", "characteristics"),
         ignore = c()) {
     type <- match.arg(type)
 
@@ -69,29 +66,19 @@ NULL
     } else {
         ignore <- c(ignore, "twoSidedPower")
     }
-    if (type %in% c("analysis", "simulation")) {
-        design <- getDesignInverseNormal(
-            kMax = 1, 
-            alpha = alpha, 
-            beta = beta,
-            sided = sided, 
-            twoSidedPower = twoSidedPower,
-            directionUpper = directionUpper
-        )
-    } else {
-        design <- getDesignGroupSequential(
-            kMax = 1, 
-            alpha = alpha, 
-            beta = beta,
-            sided = sided, 
-            twoSidedPower = twoSidedPower,
-            directionUpper = directionUpper
-        )
-    }
+    
+    design <- getDesignFixed(
+        alpha = alpha,
+        beta = beta,
+        sided = sided,
+        twoSidedPower = twoSidedPower,
+        directionUpper = directionUpper
+    )
     return(design)
 }
 
-.getDesignArgumentsToIgnoreAtUnknownArgumentCheck <- function(design, powerCalculationEnabled = FALSE) {
+.getDesignArgumentsToIgnoreAtUnknownArgumentCheck <- function(
+        design, powerCalculationEnabled = FALSE) {
     baseArgsToIgnore <- c("showObservedInformationRatesMessage", "showWarnings")
 
     if (design$kMax > 1) {
@@ -105,14 +92,20 @@ NULL
     return(c(baseArgsToIgnore, "alpha", "beta", "sided", "twoSidedPower"))
 }
 
-
 .getValidatedFutilityBounds <- function(design, kMaxLowerBound = 1,
         writeToDesign = TRUE, twoSidedWarningForDefaultValues = TRUE) {
+    if (.isTrialDesignFixed(design)) {
+        return(numeric(0))
+    }
+        
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     return(.getValidatedFutilityBoundsOrAlpha0Vec(
-        design = design, parameterName = "futilityBounds",
-        defaultValue = C_FUTILITY_BOUNDS_DEFAULT, kMaxLowerBound = kMaxLowerBound,
-        writeToDesign = writeToDesign, twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
+        design = design, 
+        parameterName = "futilityBounds",
+        defaultValue = .getFutilityBoundsDefaultValue(design), 
+        kMaxLowerBound = kMaxLowerBound,
+        writeToDesign = writeToDesign, 
+        twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
     ))
 }
 
@@ -120,9 +113,12 @@ NULL
         writeToDesign = TRUE, twoSidedWarningForDefaultValues = TRUE) {
     .assertIsTrialDesignFisher(design)
     return(.getValidatedFutilityBoundsOrAlpha0Vec(
-        design = design, parameterName = "alpha0Vec",
-        defaultValue = C_ALPHA_0_VEC_DEFAULT, kMaxLowerBound = kMaxLowerBound,
-        writeToDesign = writeToDesign, twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
+        design = design, 
+        parameterName = "alpha0Vec",
+        defaultValue = C_ALPHA_0_VEC_DEFAULT, 
+        kMaxLowerBound = kMaxLowerBound,
+        writeToDesign = writeToDesign, 
+        twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
     ))
 }
 
@@ -142,15 +138,18 @@ NULL
                 kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
             )
         } else {
-            .assertAreValidFutilityBounds(parameterValues,
+            .assertAreValidFutilityBounds(
+                futilityBounds = parameterValues,
                 kMax = design$kMax,
-                kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
+                directionUpper = design$directionUpper,
+                kMaxLowerBound = kMaxLowerBound, 
+                kMaxUpperBound = kMaxUpperBound
             )
         }
     }
-    
+
     if (design$sided == 2 && .isDefinedArgument(parameterValues) &&
-            (!.isTrialDesignInverseNormalOrGroupSequential(design) ||
+            (!.isTrialDesignInverseNormalOrGroupSequentialOrFixed(design) ||
                 (design$typeOfDesign != C_TYPE_OF_DESIGN_PT) && !.isBetaSpendingDesignType(design$typeBetaSpending)
             ) &&
             (twoSidedWarningForDefaultValues && !all(is.na(parameterValues)) ||
@@ -199,7 +198,8 @@ NULL
             }
         }
 
-        if (.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds(design, parameterName, writeToDesign)) {
+        if (.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds(
+                design, parameterName, writeToDesign)) {
             return(rep(defaultValue, design$kMax - 1))
         }
 
@@ -219,9 +219,12 @@ NULL
             kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
         )
     } else {
-        .assertAreValidFutilityBounds(parameterValues,
+        .assertAreValidFutilityBounds(
+            futilityBounds = parameterValues,
             kMax = design$kMax,
-            kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
+            directionUpper = design$directionUpper,
+            kMaxLowerBound = kMaxLowerBound, 
+            kMaxUpperBound = kMaxUpperBound
         )
     }
 
@@ -233,7 +236,8 @@ NULL
 }
 
 # Check whether design is a beta spending or Pampallona Tsiatis design
-.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds <- function(design, parameterName, writeToDesign) {
+.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds <- function(
+        design, parameterName, writeToDesign) {
     if (.isTrialDesignFisher(design)) {
         return(FALSE)
     }
@@ -397,6 +401,13 @@ NULL
             design$kMax, design$alpha
         ))
     }
+
+    if (design$kMax > 2 && (any(design$userAlphaSpending[2:design$kMax] - design$userAlphaSpending[1:(design$kMax - 1)] < design$tolerance))) {
+        warning("Chosen 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending, vectorLookAndFeelEnabled = FALSE),
+            ") might yield imprecise critical values due to numerical inaccuracy",
+            call. = FALSE
+        )
+    }
 }
 
 .validateUserBetaSpending <- function(design) {
@@ -456,6 +467,13 @@ NULL
             design$kMax, design$beta
         ))
     }
+
+    if (design$kMax > 2 && (any(design$userBetaSpending[2:design$kMax] - design$userBetaSpending[1:(design$kMax - 1)] < design$tolerance))) {
+        warning("Chosen 'userBetaSpending' (", .arrayToString(design$userBetaSpending, vectorLookAndFeelEnabled = FALSE),
+            ") might yield imprecise futility bounds due to numerical inaccuracy",
+            call. = FALSE
+        )
+    }
 }
 
 .validateUserAlphaSpendingLength <- function(design) {
@@ -512,17 +530,18 @@ NULL
 .getPiecewiseExponentialDistributionSingleTime <- function(time, piecewiseLambda, piecewiseSurvivalTime = NA_real_, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'kappa' (", kappa, ") must be > 0")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'kappa' (", kappa, ") must be > 0", call. = FALSE)
         }
 
-        return(pweibull(time, kappa, scale = 1 / piecewiseLambda, lower.tail = TRUE, log.p = FALSE))
+        return(stats::pweibull(time, kappa, scale = 1 / piecewiseLambda, lower.tail = TRUE, log.p = FALSE))
     }
 
     if (length(piecewiseSurvivalTime) != length(piecewiseLambda)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "length of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime),
-            ") must be equal to length of 'piecewiseLambda' (", .arrayToString(piecewiseLambda), ")"
+            ") must be equal to length of 'piecewiseLambda' (", .arrayToString(piecewiseLambda), ")",
+            call. = FALSE
         )
     }
 
@@ -531,7 +550,8 @@ NULL
     if (kappa != 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Weibull distribution cannot be used for piecewise survival definition"
+            "Weibull distribution cannot be used for piecewise survival definition",
+            call. = FALSE
         )
     }
 
@@ -567,16 +587,20 @@ NULL
         if (kappa <= 0) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "kappa needs to a positive number"
+                "kappa needs to a positive number",
+                call. = FALSE
             )
         }
+
+        # kappa is required here because quantiles depend on the Weibull shape parameter
         return((-log(1 - quantile))^(1 / kappa) / piecewiseLambda[1])
     }
 
     if (kappa != 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Weibull distribution cannot be used for piecewise survival definition"
+            "Weibull distribution cannot be used for piecewise exponential survival definition",
+            call. = FALSE
         )
     }
 
@@ -641,11 +665,12 @@ NULL
         stop(
             C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
             "'piecewiseSurvivalTime' needs to be a numeric vector and not a list ",
-            "because 'piecewiseLambda' (", piecewiseLambda, ") is defined separately"
+            "because 'piecewiseLambda' (", piecewiseLambda, ") is defined separately",
+            call. = FALSE
         )
     }
 
-    if (any(is.na(piecewiseSurvivalTime))) {
+    if (anyNA(piecewiseSurvivalTime)) {
         .assertIsSingleNumber(kappa, "kappa")
     }
 
@@ -743,19 +768,22 @@ getPiecewiseExponentialDistribution <- function(time, ...,
     if (any(time < 0)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "time needs to be a non-negative number"
+            "time needs to be a non-negative number",
+            call. = FALSE
         )
     }
 
     settings <- .getPiecewiseExponentialSettings(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
-        piecewiseLambda = piecewiseLambda, kappa = kappa
+        piecewiseLambda = piecewiseLambda,
+        kappa = kappa
     )
 
     return(.getPiecewiseExponentialDistribution(
         time = time,
         piecewiseSurvivalTime = settings$piecewiseSurvivalTime,
-        piecewiseLambda = settings$piecewiseLambda, kappa = kappa
+        piecewiseLambda = settings$piecewiseLambda,
+        kappa = kappa
     ))
 }
 
@@ -777,7 +805,8 @@ getPiecewiseExponentialQuantile <- function(quantile, ...,
     if (any(quantile < 0) || any(quantile > 1)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "quantile needs to be within [0; 1]"
+            "quantile needs to be within [0; 1]",
+            call. = FALSE
         )
     }
 
@@ -859,17 +888,17 @@ rpwexp <- function(n, ..., s = NA_real_, lambda = NA_real_, kappa = 1) {
 
 #'
 #' @title
-#' Survival Helper Functions for Conversion of Pi, Lambda, Median
+#' Survival Helper Functions for Conversion of Pi, Lambda, Median, and Hazard Ratio Values
 #'
 #' @description
-#' Functions to convert pi, lambda and median values into each other.
+#' Functions to convert pi, lambda, median, and hazard ratio values into each other.
 #'
-#' @param piValue,pi1,pi2,lambda,median Value that shall be converted.
+#' @param piValue,pi1,pi2,lambda,lambda1,lambda2,median,median1,median2 Value that shall be converted.
 #' @inheritParams param_eventTime
 #' @inheritParams param_kappa
 #'
 #' @details
-#' Can be used, e.g., to convert median values into pi or lambda values for usage in
+#' Can be used, e.g., to convert pi, median, or lambda values into pi, median, lambda, or hazard ratio values, e.g, for usage in
 #' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}} or \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
 #'
 #' @return Returns a \code{\link[base]{numeric}} value or vector will be returned.
@@ -889,9 +918,12 @@ getLambdaByPi <- function(piValue,
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
     for (value in piValue) {
         if (!is.na(value) && value > 1 - 1e-16 && value < 1 + 1e-16) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'pi' must be != 1")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'pi' must be != 1", call. = FALSE)
         }
     }
+
+    # kappa enters here because lambda is derived from
+    # a Weibull distributional relationship (pi -> lambda)
     return((-log(1 - piValue))^(1 / kappa) / eventTime)
 }
 
@@ -903,17 +935,105 @@ getLambdaByMedian <- function(median, kappa = 1) {
     return(log(2)^(1 / kappa) / median)
 }
 
+.assertHasCompatibleLength <- function(paramValue1,
+        paramValue2,
+        paramName1,
+        paramName2) {
+    if (length(paramValue1) == 1L || length(paramValue2) == 1L) {
+        return(invisible())
+    }
+
+    if (length(paramValue1) == length(paramValue2)) {
+        return(invisible())
+    }
+
+    stop(
+        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+        "invalid length of ", sQuote(paramName2), ". ",
+        "Expected length 1 or the same length as ", sQuote(paramName1), " (",
+        length(paramValue1), "), but got length ",
+        length(paramValue2), ".",
+        call. = FALSE
+    )
+}
+
 #' @rdname utilitiesForSurvivalTrials
 #' @export
-getHazardRatioByPi <- function(pi1, pi2,
+getHazardRatioByPi <- function(pi1,
+        pi2,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
     .assertIsValidPi(pi1, "pi1")
     .assertIsValidPi(pi2, "pi2")
+    .assertHasCompatibleLength(pi1, pi2, "pi1", "pi2")
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
-    return((getLambdaByPi(pi1, eventTime, kappa) / getLambdaByPi(pi2, eventTime, kappa))^kappa)
+    return(getLambdaByPi(pi1, eventTime, kappa) / getLambdaByPi(pi2, eventTime, kappa))
+}
+
+#' @rdname utilitiesForSurvivalTrials
+#' @export
+getHazardRatioByLambda <- function(lambda1, lambda2) {
+    .assertIsValidLambda(lambda1, 1)
+    .assertIsValidLambda(lambda2, 2)
+    .assertHasCompatibleLength(lambda1, lambda2, "lambda1", "lambda2")
+    return(lambda1 / lambda2)
+}
+
+#' @rdname utilitiesForSurvivalTrials
+#' @export
+getHazardRatioByMedian <- function(median1, median2, kappa = 1) {
+    .assertIsNumericVector(median1, "median1")
+    .assertIsNumericVector(median2, "median2")
+    .assertHasCompatibleLength(median1, median2, "median1", "median2")
+    return(getLambdaByMedian(median1, kappa = kappa) / getLambdaByMedian(median2, kappa = kappa))
+}
+
+#' @rdname utilitiesForSurvivalTrials
+#' @export
+#' @keywords internal
+getLambda1ByLambda2AndHazardRatio <- function(lambda2, hazardRatio) {
+    .assertIsValidLambda(lambda2, 2)
+    .assertIsValidHazardRatioVector(hazardRatio)
+    .assertHasCompatibleLength(lambda2, hazardRatio, "lambda2", "hazardRatio")
+    return(lambda2 * hazardRatio)
+}
+
+#' @rdname utilitiesForSurvivalTrials
+#' @export
+#' @keywords internal
+getLambda2ByLambda1AndHazardRatio <- function(lambda1, hazardRatio) {
+    .assertIsValidLambda(lambda1, 1)
+    .assertIsValidHazardRatioVector(hazardRatio)
+    .assertHasCompatibleLength(lambda1, hazardRatio, "lambda1", "hazardRatio")
+    return(lambda1 / hazardRatio)
+}
+
+#' @rdname utilitiesForSurvivalTrials
+#' @export
+#' @keywords internal
+getPi1ByPi2AndHazardRatio <- function(pi2, hazardRatio, eventTime = 12, kappa = 1) {
+    .assertIsValidPi(pi2, "pi2")
+    .assertIsValidHazardRatioVector(hazardRatio)
+    .assertIsValidKappa(kappa)
+    lambda2 <- getLambdaByPi(pi2, eventTime, kappa = kappa)
+    lambda1 <- getLambda1ByLambda2AndHazardRatio(lambda2, hazardRatio)
+    pi1 <- getPiByLambda(lambda1, eventTime, kappa = kappa)
+    return(pi1)
+}
+
+#' @rdname utilitiesForSurvivalTrials
+#' @export
+#' @keywords internal
+getPi2ByPi1AndHazardRatio <- function(pi1, hazardRatio, eventTime = 12, kappa = 1) {
+    .assertIsValidPi(pi1, "pi1")
+    .assertIsValidHazardRatioVector(hazardRatio)
+    .assertIsValidKappa(kappa)
+    lambda1 <- getLambdaByPi(pi1, eventTime, kappa = kappa)
+    lambda2 <- getLambda2ByLambda1AndHazardRatio(lambda1, hazardRatio)
+    pi2 <- getPiByLambda(lambda2, eventTime, kappa = kappa)
+    return(pi2)
 }
 
 #' @rdname utilitiesForSurvivalTrials
@@ -928,14 +1048,14 @@ getPiByLambda <- function(lambda,
     x <- exp(-(lambda * eventTime)^kappa)
     if (any(x < 1e-15, na.rm = TRUE)) {
         warning("Calculation of pi (1) by lambda (", .arrayToString(round(lambda, 4)),
-            ") results in a possible loss of precision because pi = 1 was returned but pi is not exactly 1",
+            ") results in a possible loss of precision ",
+            "because pi = 1 was returned but pi is not exactly 1",
             call. = FALSE
         )
     }
     return(1 - x)
 }
 
-# alternative: return(1 - exp(-(log(2)^(1 / kappa) / median * eventTime)^kappa))
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getPiByMedian <- function(median,
@@ -1052,6 +1172,10 @@ getMedianByPi <- function(piValue,
 }
 
 .isNoEarlyEfficacy <- function(design) {
+    if (.isTrialDesignFixed(design)) {
+        return(FALSE)
+    }
+    
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
 
     if (design$kMax == 1) {

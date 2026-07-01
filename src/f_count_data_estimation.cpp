@@ -14,10 +14,6 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
- * File version: $Revision: 7496 $
- * Last changed: $Date: 2023-12-15 10:42:15 +0100 (Fr, 15 Dez 2023) $
- * Last changed by: $Author: pahlke $
- *
  */
 
 #include <cmath>

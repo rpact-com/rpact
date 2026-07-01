@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 7742 $
-## |  Last changed: $Date: 2024-03-22 13:46:29 +0100 (Fr, 22 Mrz 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_core_utilities.R
 NULL
@@ -84,6 +80,14 @@ NULL
     ))
 }
 
+.getParameterValueFormattedByFormatFunctionName <- function(formatFunctionName, paramValue, parameterSet) {
+    if (identical(formatFunctionName, ".formatCriticalValues") && .isTrialDesign(parameterSet)) {
+        return(.formatCriticalValues(paramValue, design = parameterSet))
+    }
+    
+    return(eval(call(formatFunctionName, paramValue)))
+}
+
 .getParameterValueFormatted <- function(obj, parameterName) {
     tryCatch(
         {
@@ -144,8 +148,18 @@ NULL
                 }
             } else {
                 formatFunctionName <- .getParameterFormatFunction(parameterName, obj)
-                if (!is.null(formatFunctionName)) {
-                    paramValueFormatted <- eval(call(formatFunctionName, paramValueFormatted))
+                if (!is.null(formatFunctionName) && !is.null(paramValueFormatted)) {
+                    tryCatch(
+                        {
+                            paramValueFormatted <- .getParameterValueFormattedByFormatFunctionName(formatFunctionName, paramValueFormatted, obj)
+                        },
+                        error = function(e) {
+                            warning("Failed to format value ", sQuote(parameterName), " with function ",
+                                formatFunctionName, "(): ", e$message,
+                                call. = FALSE
+                            )
+                        }
+                    )
                     if (.isArray(paramValue) && length(dim(paramValue)) == 2) {
                         paramValueFormatted <- matrix(paramValueFormatted, ncol = ncol(paramValue))
                     }

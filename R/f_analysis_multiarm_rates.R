@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8545 $
-## |  Last changed: $Date: 2025-02-10 12:37:59 +0100 (Mo, 10 Feb 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include f_logger.R
 NULL
@@ -37,7 +33,7 @@ NULL
 #' @noRd
 #'
 .getAnalysisResultsRatesMultiArm <- function(..., design, dataInput) {
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getAnalysisResultsRatesInverseNormalMultiArm(
             design = design,
             dataInput = dataInput, ...
@@ -73,7 +69,7 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT) {
-    .assertIsTrialDesignInverseNormal(design)
+    .assertIsTrialDesignInverseNormalOrFixed(design)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     .warnInCaseOfUnknownArguments(
         functionName = ".getAnalysisResultsRatesInverseNormalMultiArm",
@@ -337,7 +333,7 @@ NULL
 .getStageResultsRatesMultiArm <- function(...,
         design,
         dataInput,
-        thetaH0 = C_THETA_H0_RATES_DEFAULT,
+        thetaH0 = NA_real_,
         directionUpper = C_DIRECTION_UPPER_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
@@ -346,6 +342,7 @@ NULL
     .assertIsTrialDesign(design)
     .assertIsDatasetRates(dataInput)
     .assertIsValidThetaH0DataInput(thetaH0, dataInput)
+    thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsSingleLogical(calculateSingleStepAdjusted, "calculateSingleStepAdjusted")
     .warnInCaseOfUnknownArguments(
@@ -356,7 +353,7 @@ NULL
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
     gMax <- dataInput$getNumberOfGroups() - 1
     kMax <- design$kMax
-    
+
     if (.isTrialDesignConditionalDunnett(design)) {
         if (!normalApproximation) {
             if (userFunctionCallEnabled) {
@@ -442,14 +439,16 @@ NULL
                 }
 
                 separatePValues[treatmentArm, k] <- .applyDirectionOfAlternative(
-                    stats::pnorm(testStatistics[treatmentArm, k]), 
-                    directionUpper, type = "oneMinusValue", phase = "analysis"
+                    stats::pnorm(testStatistics[treatmentArm, k]),
+                    directionUpper,
+                    type = "oneMinusValue", phase = "analysis"
                 )
             } else {
                 if (thetaH0 != 0) {
                     stop(
                         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test"
+                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
+                        call. = FALSE
                     )
                 }
 
@@ -471,10 +470,11 @@ NULL
 
                 testStatistics <- .applyDirectionOfAlternative(
                     .getOneMinusQNorm(separatePValues),
-                    directionUpper, type = "negateIfLower", phase = "analysis"
+                    directionUpper,
+                    type = "negateIfLower", phase = "analysis"
                 )
             }
-            
+
             # overall test statistics
             actEv <- dataInput$getOverallEvents(stage = k, group = treatmentArm)
             ctrEv <- dataInput$getOverallEvents(stage = k, group = gMax + 1)
@@ -505,14 +505,16 @@ NULL
                 }
 
                 overallPValues[treatmentArm, k] <- .applyDirectionOfAlternative(
-                    stats::pnorm(overallTestStatistics[treatmentArm, k]), 
-                    directionUpper, type = "oneMinusValue", phase = "analysis"
+                    stats::pnorm(overallTestStatistics[treatmentArm, k]),
+                    directionUpper,
+                    type = "oneMinusValue", phase = "analysis"
                 )
             } else {
                 if (thetaH0 != 0) {
                     stop(
                         C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test"
+                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
+                        call. = FALSE
                     )
                 }
 
@@ -534,7 +536,8 @@ NULL
 
                 overallTestStatistics <- .applyDirectionOfAlternative(
                     .getOneMinusQNorm(overallPValues),
-                    directionUpper, type = "negateIfLower", phase = "analysis"
+                    directionUpper,
+                    type = "negateIfLower", phase = "analysis"
                 )
             }
         }
@@ -562,15 +565,19 @@ NULL
 
     # Calculation of single stage adjusted p-Values and overall test statistics
     # for determination of RCIs for combination tests
-    
+
     singleStepAdjustedPValues <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     combInverseNormal <- matrix(NA_real_, nrow = gMax, ncol = kMax)
     combFisher <- matrix(NA_real_, nrow = gMax, ncol = kMax)
 
+    weightsInverseNormal <- NULL
+    weightsFisher <- NULL
     if (.isTrialDesignInverseNormal(design)) {
         weightsInverseNormal <- stageResults$weightsInverseNormal
     } else if (.isTrialDesignFisher(design)) {
         weightsFisher <- stageResults$weightsFisher
+    } else if (.isTrialDesignFixed(design)) {
+        weightsInverseNormal <- 1
     }
 
     for (k in 1:stage) {
@@ -601,14 +608,15 @@ NULL
                     df <- NA_real_
                     singleStepAdjustedPValues[treatmentArm, k] <- 1 - .getMultivariateDistribution(
                         type = "normal",
-                        upper = ifelse(!isFALSE(directionUpper), 
-                            testStatistics[treatmentArm, k], 
-                            -testStatistics[treatmentArm, k]),
+                        upper = ifelse(!isFALSE(directionUpper),
+                            testStatistics[treatmentArm, k],
+                            -testStatistics[treatmentArm, k]
+                        ),
                         sigma = sigma, df = df
                     )
                 }
             }
-            if (.isTrialDesignInverseNormal(design)) {
+            if (.isTrialDesignInverseNormalOrFixed(design)) {
                 combInverseNormal[treatmentArm, k] <- (weightsInverseNormal[1:k] %*%
                     .getOneMinusQNorm(singleStepAdjustedPValues[treatmentArm, 1:k])) /
                     sqrt(sum(weightsInverseNormal[1:k]^2))
@@ -624,7 +632,7 @@ NULL
     if (.isTrialDesignFisher(design)) {
         stageResults$combFisher <- combFisher
         stageResults$.setParameterType("combFisher", C_PARAM_GENERATED)
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else if (.isTrialDesignInverseNormalOrFixed(design)) {
         stageResults$combInverseNormal <- combInverseNormal
         stageResults$.setParameterType("combInverseNormal", C_PARAM_GENERATED)
     }
@@ -778,15 +786,15 @@ NULL
             border <- C_ALPHA_0_VEC_DEFAULT
             criticalValues <- .getCriticalValues(design)
             conditionFunction <- .isFirstValueSmallerThanSecondValue
-        } else if (.isTrialDesignInverseNormal(design)) {
-            bounds <- design$futilityBounds
+        } else if (.isTrialDesignInverseNormalOrFixed(design)) {
+            bounds <- .getFutilityBounds(design)
             border <- C_FUTILITY_BOUNDS_DEFAULT
             criticalValues <- .getCriticalValues(design)
             criticalValues[is.infinite(criticalValues) & criticalValues > 0] <- C_QNORM_MAXIMUM
             criticalValues[is.infinite(criticalValues) & criticalValues < 0] <- C_QNORM_MINIMUM
             conditionFunction <- .isFirstValueGreaterThanSecondValue
         }
-        
+
         # necessary for adjustment for binding futility boundaries
         futilityCorr <- rep(NA_real_, design$kMax)
 
@@ -992,7 +1000,7 @@ NULL
 #' @noRd
 #'
 .getRepeatedConfidenceIntervalsRatesMultiArm <- function(..., design) {
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getRepeatedConfidenceIntervalsRatesMultiArmInverseNormal(design = design, ...))
     }
     if (.isTrialDesignFisher(design)) {
@@ -1059,7 +1067,7 @@ NULL
         allocationRatioPlanned = allocationRatioPlanned
     )
 
-    if (any(is.na(nPlanned))) {
+    if (anyNA(nPlanned)) {
         return(results)
     }
 
@@ -1078,7 +1086,9 @@ NULL
 
     .assertIsValidNPlanned(nPlanned, kMax, stage)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
     .setValueAndParameterType(results, "allocationRatioPlanned", allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
     piControl <- .assertIsValidPiControlForMultiArm(piControl, stageResults, stage, results = results)
     piTreatments <- .assertIsValidPiTreatmentsForMultiArm(piTreatments, stageResults, stage, results = results)
@@ -1101,7 +1111,7 @@ NULL
         )
     }
 
-    if (.isTrialDesignInverseNormal(design)) {
+    if (.isTrialDesignInverseNormalOrFixed(design)) {
         return(.getConditionalPowerRatesMultiArmInverseNormal(
             results = results,
             design = design,
@@ -1145,7 +1155,8 @@ NULL
     stop(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
-        "or TrialDesignConditionalDunnett"
+        "or TrialDesignConditionalDunnett",
+        call. = FALSE
     )
 }
 
@@ -1219,7 +1230,7 @@ NULL
             if (stage == kMax - 1) {
                 shiftedFutilityBounds <- c()
             } else {
-                shiftedFutilityBounds <- design$futilityBounds[(stage + 1):(kMax - 1)] *
+                shiftedFutilityBounds <- .getFutilityBounds(design, (stage + 1):(kMax - 1)) *
                     sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):(kMax - 1)]^2)) /
                     sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
                     min(ctr$overallAdjustedTestStatistics[ctr$indices[, treatmentArm] == 1, stage], na.rm = TRUE) *
@@ -1476,7 +1487,9 @@ NULL
         seed = NA_real_) {
     .associatedArgumentsAreDefined(nPlanned = nPlanned, piTreatmentRange = piTreatmentRange)
     .assertIsSingleNumber(allocationRatioPlanned, "allocationRatioPlanned")
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
+    )
 
     design <- stageResults$.design
     kMax <- design$kMax
@@ -1487,7 +1500,8 @@ NULL
     if (length(piControl) != 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'piControl' (", .arrayToString(piControl), ") must be equal to 1"
+            "length of 'piControl' (", .arrayToString(piControl), ") must be equal to 1",
+            call. = FALSE
         )
     }
 
@@ -1515,7 +1529,7 @@ NULL
             treatmentArms[j] <- treatmentArm
             effectValues[j] <- piTreatmentRange[i]
 
-            if (.isTrialDesignInverseNormal(design)) {
+            if (.isTrialDesignInverseNormalOrFixed(design)) {
                 condPowerValues[j] <- .getConditionalPowerRatesMultiArmInverseNormal(
                     results = results,
                     design = design,

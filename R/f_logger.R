@@ -13,12 +13,12 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8087 $
-## |  Last changed: $Date: 2024-08-15 16:34:30 +0200 (Do, 15 Aug 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
-.logBase <- function(s, ..., logLevel) {
+.logBase <- function(s, ..., logLevel, logEnabled = TRUE) {
+    if (isFALSE(logEnabled)) {
+        return(invisible())
+    }
+    
     .assertIsSingleCharacter(s, "s")
     if (length(list(...)) > 0) {
         cat(paste0("[", logLevel, "]"), sprintf(s, ...), "\n")
@@ -85,7 +85,7 @@
     if (isFALSE(enforceLogging) && !interactive()) {
         return(invisible())
     }
-    
+
     if (!(getLogLevel() %in% c(
             C_LOG_LEVEL_TRACE, C_LOG_LEVEL_DEBUG,
             C_LOG_LEVEL_INFO, C_LOG_LEVEL_WARN,
@@ -93,7 +93,7 @@
         ))) {
         return(invisible())
     }
-    
+
     if (.isMarkdownEnabled()) {
         return(invisible())
     }

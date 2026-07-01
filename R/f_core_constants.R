@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8603 $
-## |  Last changed: $Date: 2025-03-11 17:40:42 +0100 (Tue, 11 Mar 2025) $
-## |  Last changed by: $Author: wassmer $
-## |
 
 #' @include class_dictionary.R
 #' @include f_core_utilities.R
@@ -41,6 +37,7 @@ C_POSITION_LEFT_BOTTOM <- 3
 C_POSITION_RIGHT_TOP <- 4
 C_POSITION_RIGHT_CENTER <- 5
 C_POSITION_RIGHT_BOTTOM <- 6
+C_POSITION_OUTSIDE_BOTTOM <- "bottom"
 
 C_DESIGN_TOLERANCE_DEFAULT <- 1e-08
 C_CONST_NEWTON_COTES <- 15
@@ -65,10 +62,13 @@ C_ANALYSIS_TOLERANCE_FISHER_DEFAULT <- 1e-14
 
 C_UPPER_BOUNDS_DEFAULT <- 8
 C_FUTILITY_BOUNDS_DEFAULT <- -6
+C_FUTILITY_BOUNDS_MIN_VALUE <- C_FUTILITY_BOUNDS_DEFAULT
+C_FUTILITY_BOUNDS_MAX_VALUE <- abs(C_FUTILITY_BOUNDS_DEFAULT)
 C_ALPHA_0_VEC_DEFAULT <- 1
 C_THETA_H0_MEANS_DEFAULT <- 0
 C_THETA_H0_RATES_DEFAULT <- 0
 C_THETA_H0_SURVIVAL_DEFAULT <- 1
+C_THETA_H0_COUNTS_DEFAULT <- 1
 C_ALLOCATION_RATIO_DEFAULT <- 1
 C_ALLOCATION_RATIO_MAXIMUM <- 100
 C_DIRECTION_UPPER_DEFAULT <- TRUE
@@ -83,6 +83,7 @@ C_VARIED_PARAMETER_SEQUENCE_LENGTH_DEFAULT <- 30
 
 C_HEADING_BASE_NUMBER_DEFAULT <- -2L
 
+C_CLASS_NAME_TRIAL_DESIGN_FIXED <- "TrialDesignFixed"
 C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL <- "TrialDesignGroupSequential"
 C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL <- "TrialDesignInverseNormal"
 C_CLASS_NAME_TRIAL_DESIGN_FISHER <- "TrialDesignFisher"
@@ -90,6 +91,7 @@ C_CLASS_NAME_TRIAL_DESIGN_CONDITIONAL_DUNNETT <- "TrialDesignConditionalDunnett"
 
 .getTrialDesignClassNames <- function(inclusiveConditionalDunnett = TRUE) {
     trialDesignClassNames <- c(
+        C_CLASS_NAME_TRIAL_DESIGN_FIXED,
         C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL,
         C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL,
         C_CLASS_NAME_TRIAL_DESIGN_FISHER
@@ -138,11 +140,13 @@ C_INTERSECTION_TESTS_ENRICHMENT <- c(
     "Sidak",
     "SpiessensDebois"
 )
+C_RATES_STD_ERROR_ESTIMATE <- c("pooled", "unpooled")
+C_RATES_STD_ERROR_ESTIMATE_DEFAULT <- "pooled"
 C_VARIANCE_OPTION_DUNNETT <- "overallPooled"
-C_VARIANCE_OPTION_MULTIARMED_DEFAULT <- "overallPooled"
 C_VARIANCE_OPTIONS_MULTIARMED <- c("overallPooled", "pairwisePooled", "notPooled")
-C_VARIANCE_OPTION_ENRICHMENT_DEFAULT <- "pooled"
+C_VARIANCE_OPTION_MULTIARMED_DEFAULT <- "overallPooled"
 C_VARIANCE_OPTIONS_ENRICHMENT <- c("pooled", "notPooled", "pooledFromFull")
+C_VARIANCE_OPTION_ENRICHMENT_DEFAULT <- "pooled"
 C_STRATIFIED_ANALYSIS_DEFAULT <- TRUE
 
 #
@@ -558,6 +562,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     accountForObservationTimes = "Account for observation times",
     eventTime = "Event time",
     accrualTime = "Accrual time",
+    accrualTimeOriginal = "Accrual time",
     totalAccrualTime = "Total accrual time",
     remainingTime = "Remaining time",
     followUpTime = "Follow up time",
@@ -624,6 +629,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     singleEventsPerStage = "Single number of events",
     singleEventsPerArmAndStage = "Single number of events",
     singleEventsPerSubsetAndStage = "Single number of events",
+    populationEventsPerStage = "Number of events per population",
     endOfAccrualIsUserDefined = "End of accrual is user defined",
     followUpTimeMustBeUserDefined = "Follow-up time must be user defined",
     maxNumberOfSubjectsIsUserDefined = "Max number of subjects is user defined",
@@ -716,13 +722,16 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
     expectedInformationH1 = "Expected information under H1",
-    plannedCalendarTime = "Planned calendar time"
+    plannedCalendarTime = "Planned calendar time",
+    efficacyStops = "Efficacy stops",
+    futilityStops = "Futility stops",
+    stdErrorEstimate = "Standard error estimate"
 ))
 
 C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     iterations = "Iterations",
     seed = "Seed",
-    groups = "Treatment group",
+    groups = "Treatment groups",
     stages = "Stage",
     sampleSizes = "Sample size",
     means = "Mean",
@@ -871,6 +880,7 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     accountForObservationTimes = "Account for observation times",
     eventTime = "Event time",
     accrualTime = "Accrual time",
+    accrualTimeOriginal = "Accrual time",
     totalAccrualTime = "Total accrual time",
     remainingTime = "Remaining time",
     followUpTime = "Follow up time",
@@ -1023,7 +1033,10 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     expectedInformationH0 = "Expected information under H0",
     expectedInformationH01 = "Expected information under H0/H1",
     expectedInformationH1 = "Expected information under H1",
-    plannedCalendarTime = "Planned calendar time"
+    plannedCalendarTime = "Planned calendar time",
+    efficacyStops = "Efficacy stops",
+    futilityStops = "Futility stops",
+    stdErrorEstimate = "Standard error estimate"
 ))
 
 C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETTINGS", list(
@@ -1036,7 +1049,7 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     "scalingFactor" = "Scaling factor"
 ))
 
-.getParameterNameTrialDesign <- function(parameterName, obj) {
+.getTrialDesign <- function(obj) {
     if (inherits(obj, "TrialDesignSet") && length(obj$designs) > 0) {
         obj <- obj$designs[[1]]
     }
@@ -1046,29 +1059,38 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (is.null(obj) || !inherits(obj, "TrialDesign")) {
+        return(NULL)
+    }
+
+    return(obj)
+}
+
+.getParameterNameTrialDesign <- function(parameterName, obj) {
+    design <- .getTrialDesign(obj)
+    if (is.null(design)) {
         return(parameterName)
     }
 
     if (identical(parameterName, "futilityBounds")) {
-        if (.isDelayedInformationEnabled(design = obj)) {
-            if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
+        if (.isDelayedInformationEnabled(design = design)) {
+            if (!is.na(design$bindingFutility) && !design$bindingFutility) {
                 return("futilityBoundsDelayedInformationNonBinding")
             }
             return("futilityBoundsDelayedInformation")
-        } else if (!is.na(obj$bindingFutility) && !obj$bindingFutility) {
+        } else if (!is.na(design$bindingFutility) && !design$bindingFutility) {
             return("futilityBoundsNonBinding")
         }
     }
-    if (identical(parameterName, "criticalValues") && .isDelayedInformationEnabled(design = obj)) {
+    if (identical(parameterName, "criticalValues") && .isDelayedInformationEnabled(design = design)) {
         return("criticalValuesDelayedInformation")
     }
-    if (identical(parameterName, "criticalValuesEffectScale") && .isDelayedInformationEnabled(design = obj)) {
+    if (identical(parameterName, "criticalValuesEffectScale") && .isDelayedInformationEnabled(design = design)) {
         return("criticalValuesEffectScaleDelayedInformation")
     }
-    if (identical(parameterName, "futilityBoundsEffectScale") && .isDelayedInformationEnabled(design = obj)) {
+    if (identical(parameterName, "futilityBoundsEffectScale") && .isDelayedInformationEnabled(design = design)) {
         return("futilityBoundsEffectScaleDelayedInformation")
     }
-    if (identical(parameterName, "futilityBoundsPValueScale") && .isDelayedInformationEnabled(design = obj)) {
+    if (identical(parameterName, "futilityBoundsPValueScale") && .isDelayedInformationEnabled(design = design)) {
         return("futilityBoundsPValueScaleDelayedInformation")
     }
     return(parameterName)
@@ -1100,8 +1122,6 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     if (inherits(obj, "PlotSettings")) {
         return(C_PARAMETER_NAMES_PLOT_SETTINGS[[parameterName]])
     }
-
-    parameterName <- .getParameterNameTrialDesign(parameterName, obj)
 
     pluralExt <- ifelse(tableOutputEnabled, "", "s")
 
@@ -1177,10 +1197,23 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
     }
 
     if (tableOutputEnabled) {
-        return(C_TABLE_COLUMN_NAMES[[parameterName]])
+        paramCaption <- C_TABLE_COLUMN_NAMES[[parameterName]]
+    } else {
+        paramCaption <- C_PARAMETER_NAMES[[parameterName]]
+    }
+    
+    if (grepl("DelayedInformation", parameterName)) {
+        design <- .getTrialDesign(obj)
+        if (!is.null(design) && isFALSE(design$directionUpper)) {
+            if (grepl("Lower bounds of continuation", paramCaption)) {
+                paramCaption <- sub("Lower bounds of continuation", "Upper bounds of continuation", paramCaption)
+            } else {
+                paramCaption <- sub("Upper bounds of continuation", "Lower bounds of continuation", paramCaption)
+            }
+        }
     }
 
-    return(C_PARAMETER_NAMES[[parameterName]])
+    return(paramCaption)
 }
 
 .getParameterFormatFunction <- function(parameterName, obj = NULL) {
@@ -1207,10 +1240,24 @@ C_PARAMETER_NAMES_PLOT_SETTINGS <- createDictionary("C_PARAMETER_NAMES_PLOT_SETT
         return(".formatCriticalValuesFisher")
     }
 
-    if (parameterName == "accrualTime" && inherits(obj, "TrialDesignPlanCountData")) {
-        if (obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
-            return(".formatHowItIs")
-        }
+    if (parameterName == "accrualTime" && inherits(obj, "TrialDesignPlanCountData") &&
+            obj$.getParameterType("accrualTime") == C_PARAM_USER_DEFINED) {
+        return(".formatHowItIs")
+    }
+
+    if (parameterName == "accrualTimeOriginal" && inherits(obj, "TrialDesignPlanCountData") &&
+            obj$.getParameterType("accrualTimeOriginal") == C_PARAM_USER_DEFINED) {
+        return(".formatHowItIs")
+    }
+
+    if (parameterName == "userAlphaSpending" &&
+            obj$.getParameterType("userAlphaSpending") == C_PARAM_GENERATED) {
+        return(".formatProbabilities")
+    }
+
+    if (parameterName == "userBetaSpending" &&
+            obj$.getParameterType("userBetaSpending") == C_PARAM_GENERATED) {
+        return(".formatProbabilities")
     }
 
     return(C_PARAMETER_FORMAT_FUNCTIONS[[parameterName]])
@@ -1317,6 +1364,7 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     lambda1 = ".formatRates",
     eventTime = ".formatEventTime",
     accrualTime = ".formatTime",
+    accrualTimeOriginal = ".formatTime",
     totalAccrualTime = ".formatTime",
     remainingTime = ".formatTime",
     followUpTime = ".formatTime",

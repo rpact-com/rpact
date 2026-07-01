@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8113 $
-## |  Last changed: $Date: 2024-08-21 10:25:39 +0200 (Mi, 21 Aug 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 createDictionary <- function(name, keyValuePairList = NULL) {
     result <- new.env(parent = emptyenv())
@@ -32,13 +28,15 @@ createDictionary <- function(name, keyValuePairList = NULL) {
     if (is.null(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'x' must be a valid 'Dictionary' (is NULL)"
+            "'x' must be a valid 'Dictionary' (is NULL)",
+            call. = FALSE
         )
     }
     if (!inherits(x, "Dictionary")) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'x' must be an instance of class 'Dictionary' (is ", .getClassName(x), ")"
+            "'x' must be an instance of class 'Dictionary' (is ", .getClassName(x), ")",
+            call. = FALSE
         )
     }
 }
@@ -49,7 +47,7 @@ createDictionary <- function(name, keyValuePairList = NULL) {
 #' x <- createDictionary("x", list(a = 1, b = 2, c = 3))
 #' getDictionaryKeyByValue(x, 2)
 #' }
-#' 
+#'
 #' @noRd
 #'
 getDictionaryKeyByValue <- function(x, value) {
@@ -65,7 +63,7 @@ getDictionaryKeyByValue <- function(x, value) {
 #' x <- createDictionary("x", list(a = 1, b = 2, c = 3))
 #' getDictionarySubset(x, c("b", "c"))
 #' }
-#' 
+#'
 #' @noRd
 #'
 getDictionarySubset <- function(x, subsetNames) {
@@ -131,11 +129,11 @@ print.Dictionary <- function(x, ...) {
 initDictionary <- function(x, keyValuePairList) {
     .assertIsDictionary(x)
     if (is.null(keyValuePairList) || length(keyValuePairList) == 0 || !is.list(keyValuePairList)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'keyValuePairList' must be a valid list")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'keyValuePairList' must be a valid list", call. = FALSE)
     }
 
     if (any(names(keyValuePairList) == "")) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'keyValuePairList' must be a named list")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'keyValuePairList' must be a named list", call. = FALSE)
     }
 
     for (key in names(keyValuePairList)) {

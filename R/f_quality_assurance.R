@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8578 $
-## |  Last changed: $Date: 2025-03-04 08:17:05 +0100 (Di, 04 Mrz 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 #' @include f_logger.R
 NULL
@@ -24,7 +20,7 @@ NULL
 # See testthat::skip_on_cran()
 .skipTestIfDisabled <- function(msg = "Test is disabled", ..., ignoreInTestPlan = FALSE) {
     if (!isTRUE(.isCompleteUnitTestSetEnabled()) &&
-            base::requireNamespace("testthat", quietly = TRUE)) {
+            .isPackageNamespaceLoaded("testthat", quietly = TRUE)) {
         if (isTRUE(ignoreInTestPlan)) {
             msg <- paste(msg, "and ignored in test plan")
         }
@@ -46,7 +42,7 @@ NULL
 }
 
 .skipTestIfNotX64 <- function() {
-    if (!.isMachine64Bit() && !.isMinimumRVersion4() && base::requireNamespace("testthat", quietly = TRUE)) {
+    if (!.isMachine64Bit() && !.isMinimumRVersion4() && .isPackageNamespaceLoaded("testthat", quietly = TRUE)) {
         testthat::skip("The test is only intended for R version 4.x or 64-bit computers (x86-64)")
     }
 }
@@ -74,23 +70,30 @@ NULL
 }
 
 .getTestthatResultLine <- function(fileContent) {
-    if (grepl("\\[ OK:", fileContent)) {
-        indexStart <- regexpr("\\[ OK: \\d", fileContent)[[1]]
-        indexEnd <- regexpr("FAILED: \\d{1,5} \\]", fileContent)
-        indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
-        resultPart <- substr(fileContent, indexStart, indexEnd)
-        return(resultPart)
-    }
+    tryCatch(
+        {
+            if (grepl("\\[ OK:", fileContent)) {
+                indexStart <- regexpr("\\[ OK: \\d", fileContent)[[1]]
+                indexEnd <- regexpr("FAILED: \\d{1,5} \\]", fileContent)
+                indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
+                resultPart <- substr(fileContent, indexStart, indexEnd)
+                return(resultPart)
+            }
 
-    indexStart <- regexpr("\\[ FAIL \\d", fileContent)[[1]]
-    if (indexStart == -1) {
-        return("[ FAIL 0 | WARN 0 | SKIP 0 | PASS 0 ]")
-    }
+            indexStart <- regexpr("\\[ FAIL \\d", fileContent)[[1]]
+            if (indexStart == -1) {
+                return("[ FAIL 0 | WARN 0 | SKIP 0 | PASS 0 ]")
+            }
 
-    indexEnd <- regexpr("PASS \\d{1,5} \\]", fileContent)
-    indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
-    resultPart <- substr(fileContent, indexStart, indexEnd)
-    return(resultPart)
+            indexEnd <- regexpr("PASS \\d{1,5} \\]", fileContent)
+            indexEnd <- indexEnd[[1]] + attr(indexEnd, "match.length") - 1
+            resultPart <- substr(fileContent, indexStart, indexEnd)
+            return(resultPart)
+        },
+        error = function(e) {
+            return(NA_character_)
+        }
+    )
 }
 
 .getTestthatResultNumberOfTests <- function(fileContent) {
@@ -109,35 +112,49 @@ NULL
 }
 
 .getTestthatResultNumberOfFailures <- function(fileContent) {
-    if (grepl("FAILED:", fileContent)) {
-        line <- .getTestthatResultLine(fileContent)
-        index <- regexpr("FAILED: \\d{1,5} \\]", line)
-        indexStart <- index[[1]] + 8
-        indexEnd <- index[[1]] + attr(index, "match.length") - 3
-        return(substr(line, indexStart, indexEnd))
-    }
+    tryCatch(
+        {
+            if (grepl("FAILED:", fileContent)) {
+                line <- .getTestthatResultLine(fileContent)
+                index <- regexpr("FAILED: \\d{1,5} \\]", line)
+                indexStart <- index[[1]] + 8
+                indexEnd <- index[[1]] + attr(index, "match.length") - 3
+                return(as.integer(substr(line, indexStart, indexEnd)))
+            }
 
-    line <- .getTestthatResultLine(fileContent)
-    index <- regexpr("FAIL \\d{1,5} ", line)
-    indexStart <- index[[1]] + 5
-    indexEnd <- index[[1]] + attr(index, "match.length") - 2
-    return(substr(line, indexStart, indexEnd))
+            line <- .getTestthatResultLine(fileContent)
+            index <- regexpr("FAIL \\d{1,5} ", line)
+            indexStart <- index[[1]] + 5
+            indexEnd <- index[[1]] + attr(index, "match.length") - 2
+            return(as.integer(substr(line, indexStart, indexEnd)))
+        },
+        error = function(e) {
+            return(NA_integer_)
+        }
+    )
 }
 
 .getTestthatResultNumberOfSkippedTests <- function(fileContent) {
-    if (grepl("SKIPPED:", fileContent)) {
-        line <- .getTestthatResultLine(fileContent)
-        index <- regexpr("SKIPPED: \\d{1,5} {1,1}", line)
-        indexStart <- index[[1]] + 9
-        indexEnd <- index[[1]] + attr(index, "match.length") - 2
-        return(substr(line, indexStart, indexEnd))
-    }
+    tryCatch(
+        {
+            if (grepl("SKIPPED:", fileContent)) {
+                line <- .getTestthatResultLine(fileContent)
+                index <- regexpr("SKIPPED: \\d{1,5} {1,1}", line)
+                indexStart <- index[[1]] + 9
+                indexEnd <- index[[1]] + attr(index, "match.length") - 2
+                return(as.integer(substr(line, indexStart, indexEnd)))
+            }
 
-    line <- .getTestthatResultLine(fileContent)
-    index <- regexpr("SKIP \\d{1,5} {1,1}", line)
-    indexStart <- index[[1]] + 5
-    indexEnd <- index[[1]] + attr(index, "match.length") - 2
-    return(substr(line, indexStart, indexEnd))
+            line <- .getTestthatResultLine(fileContent)
+            index <- regexpr("SKIP \\d{1,5} {1,1}", line)
+            indexStart <- index[[1]] + 5
+            indexEnd <- index[[1]] + attr(index, "match.length") - 2
+            return(as.integer(substr(line, indexStart, indexEnd)))
+        },
+        error = function(e) {
+            return(NA_integer_)
+        }
+    )
 }
 
 # testFileTargetDirectory <- "D:/R/_temp/test_debug"
@@ -152,7 +169,8 @@ NULL
     if (grepl("testthat(/|\\\\)?$", testFileTargetDirectory)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'testFileTargetDirectory' (", testFileTargetDirectory, ") must not end with 'testthat'"
+            "'testFileTargetDirectory' (", testFileTargetDirectory, ") must not end with 'testthat'",
+            call. = FALSE
         )
     }
 
@@ -201,14 +219,14 @@ NULL
     }
 
     if (!grepl("\\.tar\\.gz$", packageSource)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " must have a .tar.gz extension")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " must have a .tar.gz extension", call. = FALSE)
     }
 
     unlinkFile <- FALSE
     if (grepl("^http", packageSource)) {
         tempFile <- tempfile(fileext = ".tar.gz")
         if (utils::download.file(packageSource, tempFile) != 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(packageSource), " seems to be an invalid URL")
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(packageSource), " seems to be an invalid URL", call. = FALSE)
         }
         packageSource <- tempFile
         unlinkFile <- TRUE
@@ -219,7 +237,7 @@ NULL
         {
             contentLines <- utils::untar(packageSource, list = TRUE)
             if (!("rpact/DESCRIPTION" %in% contentLines) || !("rpact/tests/testthat/" %in% contentLines)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " is not an rpact package source file")
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " is not an rpact package source file", call. = FALSE)
             }
 
             testthatTempDirectory <- file.path(testFileTargetDirectory, "temp")
@@ -249,7 +267,7 @@ NULL
 }
 
 .downloadUnitTestsViaHttp <- function(testFileTargetDirectory, ..., testthatSubDirectory, token, secret) {
-    indexFile <- file.path(testFileTargetDirectory, "index.html")
+    indexFile <- file.path(testFileTargetDirectory, "index.txt")
     currentFile <- NA_character_
     tryCatch(
         {
@@ -274,7 +292,7 @@ NULL
                     method = "auto", mode = "wb"
                 )
                 if (result != 0) {
-                    warning("'testthat.R' download result in ", result)
+                    warning("'testthat.R' download result in ", result, call. = FALSE)
                 }
             }
 
@@ -285,7 +303,7 @@ NULL
                 method = "auto", mode = "wb"
             )
             if (result != 0) {
-                warning("Unit test index file download result in ", result)
+                warning("Unit test index file download result in ", result, call. = FALSE)
             }
 
             lines <- .readLinesFromFile(indexFile)
@@ -296,12 +314,14 @@ NULL
             if (length(testFiles) == 0) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "online source does not contain any unit test files"
+                    "online source does not contain any unit test files",
+                    call. = FALSE
                 )
             }
 
             startTime <- Sys.time()
             message("Start to download ", length(testFiles), " unit test files (http). Please wait...")
+            counter <- 0
             for (testFile in testFiles) {
                 currentFile <- testFile
                 result <- utils::download.file(
@@ -309,31 +329,41 @@ NULL
                     destfile = file.path(testthatSubDirectory, testFile), quiet = TRUE,
                     method = "auto", mode = "wb"
                 )
+                if (identical(result, 0) || identical(result, 0L)) {
+                    counter <- counter + 1
+                }
             }
-            message(
-                length(testFiles), " unit test files downloaded successfully (needed ",
-                .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
-            )
+            if (counter < length(testFiles)) {
+                warning(
+                    "Only ", counter, " of ", length(testFiles),
+                    " unit test files were downloaded successfully (needed ",
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
+                    call. = FALSE
+                )
+            } else {
+                message(
+                    counter, " unit test files downloaded successfully (needed ",
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
+                )
+            }
         },
         warning = function(w) {
             if (grepl("404 Not Found", w$message)) {
                 stop(
                     C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "failed to download unit test files (http): file ", sQuote(currentFile), " not found",
-                    call. = FALSE
+                    "failed to download unit test files (http): file ", sQuote(currentFile), " not found"
                 )
             }
         },
         error = function(e) {
             if (grepl(C_EXCEPTION_TYPE_RUNTIME_ISSUE, e$message)) {
-                stop(e$message)
+                stop(e$message, call. = FALSE)
             }
             .logDebug(e$message)
             stop(
                 C_EXCEPTION_TYPE_RUNTIME_ISSUE,
                 "failed to download unit test files (http): ",
-                "illegal 'token' / 'secret' or rpact version ", version, " unknown",
-                call. = FALSE
+                "illegal 'token' / 'secret' or rpact version ", version, " unknown"
             )
         },
         finally = {
@@ -363,7 +393,7 @@ NULL
             if (file.exists(testthatBaseFile)) {
                 file.copy(testthatBaseFile, file.path(testFileTargetDirectory, "testthat.R"))
             } else {
-                result <- download.file(
+                result <- utils::download.file(
                     url = paste0(baseUrl, "testthat.R"),
                     destfile = file.path(testFileTargetDirectory, "testthat.R"),
                     method = method, quiet = TRUE, mode = mode,
@@ -374,7 +404,7 @@ NULL
                 }
             }
 
-            result <- download.file(
+            result <- utils::download.file(
                 url = paste0(baseUrl, "testthat/"),
                 destfile = indexFile,
                 method = method, quiet = TRUE, mode = mode,
@@ -391,14 +421,16 @@ NULL
             if (length(testFiles) == 0) {
                 stop(
                     C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "online source does not contain any unit test files"
+                    "online source does not contain any unit test files",
+                    call. = FALSE
                 )
             }
 
             startTime <- Sys.time()
             message("Start to download ", length(testFiles), " unit test files (ftp). Please wait...")
+            counter <- 0
             for (testFile in testFiles) {
-                result <- download.file(
+                result <- utils::download.file(
                     url = paste0(baseUrl, "testthat/", testFile),
                     destfile = file.path(testthatSubDirectory, testFile),
                     method = method, quiet = TRUE, mode = mode,
@@ -406,19 +438,30 @@ NULL
                     extra = extra,
                     headers = NULL
                 )
+                if (identical(result, 0) || identical(result, 0L)) {
+                    counter <- counter + 1
+                }
             }
-            message(
-                length(testFiles), " unit test files downloaded successfully (needed ",
-                .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
-            )
+            if (counter < length(testFiles)) {
+                warning(
+                    "Only ", counter, " of ", length(testFiles),
+                    " unit test files were downloaded successfully (needed ",
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")",
+                    call. = FALSE
+                )
+            } else {
+                message(
+                    counter, " unit test files downloaded successfully (needed ",
+                    .getRuntimeString(startTime, runtimeUnits = "secs"), ")"
+                )
+            }
         },
         error = function(e) {
             .logDebug(e$message)
             stop(
                 C_EXCEPTION_TYPE_RUNTIME_ISSUE,
                 "failed to download unit test files (ftp): ",
-                "illegal 'token' / 'secret' or rpact version ", version, " unknown",
-                call. = FALSE
+                "illegal 'token' / 'secret' or rpact version ", version, " unknown"
             )
         },
         finally = {
@@ -443,7 +486,8 @@ NULL
     if (is.null(connection) || !is.list(connection)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'connection' must be a list (is ", .getClassName(connection), ")"
+            "'connection' must be a list (is ", .getClassName(connection), ")",
+            call. = FALSE
         )
     }
 
@@ -467,24 +511,31 @@ NULL
     return(value)
 }
 
-.getReportAuthor <- function(token, secret, action) {
+.getReportAuthor <- function(token, secret, action, default = "RPACT") {
     tryCatch(
         {
-            result <- base::readLines(sprintf(
-                paste(c(
-                    "https://rpact.shinyapps.io",
-                    "metadata",
+            result <- suppressWarnings(base::readLines(sprintf(
+                paste0(
+                    "https://rpact-",
+                    paste0(c(
+                        "metadata",
+                        "share",
+                        "connect",
+                        "posit",
+                        "cloud"
+                    ), collapse = "."),
                     "?token=%s&secret=%s&action=%s"
-                ), collapse = "/"),
+                ),
                 token, secret, action
-            ))
+            )))
             companyLine <- grep('<meta name="company"', result, value = TRUE)
             company <- sub('.*content="([^"]+)".*', "\\1", companyLine)
             company <- gsub("&amp;", "&", company)
+            company <- ifelse(grepl("unknown|anonymous", company, ignore.case = TRUE), default, company)
             return(company)
         },
         error = function(e) {
-            return("RPACT")
+            return(default)
         }
     )
 }
@@ -562,19 +613,204 @@ NULL
 
 .installationQualificationDone <- function() {
     return(identical(
-        getOption("rpact.system.identifier"),
-        getSystemIdentifier(getOption("rpact.system.test.date"))
+        .getEnvironmentVariable("RPACT_SYSTEM_IDENTIFIER", 
+            "rpact.system.identifier", type = "character"),
+        getSystemIdentifier(.getEnvironmentVariable("RPACT_SYSTEM_TEST_DATE", 
+            "rpact.system.test.date", type = "character"))
     ))
 }
 
 .setSystemIdentifier <- function() {
-    date <- getOption("rpact.system.test.date")
+    date <- .getEnvironmentVariable("RPACT_SYSTEM_TEST_DATE", "rpact.system.test.date")
     if (is.null(date)) {
         date <- Sys.Date()
         base::options("rpact.system.test.date" = date)
     }
     base::options("rpact.system.identifier" = getSystemIdentifier(date))
     saveOptions()
+}
+
+
+#' Check if Startup Messaging is Enabled
+#'
+#' @description
+#' This function checks whether the startup messages for the `rpact` package are enabled.
+#' It also ensures that the messages are displayed only once within a 72-hour period.
+#'
+#' @details
+#' The function retrieves the `rpact.startup.message.enabled` option to determine if startup
+#' messages are enabled. If enabled, it checks the last timestamp when the message was shown
+#' and ensures that the message is displayed again only if more than 72 hours have passed.
+#' The timestamp is updated after the message is shown.
+#'
+#' @return
+#' Returns \code{TRUE} if startup messaging is enabled and should be displayed, otherwise \code{FALSE}.
+#'
+#' @examples
+#' \dontrun{
+#' if (.isStartupMessagingEnabled()) {
+#'     message("Welcome to rpact!")
+#' }
+#' }
+#'
+#' @keywords internal
+#'
+#' @noRd
+#'
+.isStartupMessagingEnabled <- function() {
+    if (isFALSE(.getEnvironmentVariable(
+        "RPACT_STARTUP_MESSAGE_ENABLED",
+        "rpact.startup.message.enabled",
+        default = TRUE,
+        type = "logical"
+    ))) {
+        return(FALSE)
+    }
+
+    lastShownTime <- .getEnvironmentVariable(
+        "RPACT_STARTUP_MESSAGE_TIMESTAMP",
+        "rpact.startup.message.timestamp",
+        type = "character"
+    )
+    currentTime <- Sys.time()
+    if (is.null(lastShownTime) || !grepl("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", lastShownTime)) {
+        base::options("rpact.startup.message.timestamp" = currentTime)
+        return(TRUE)
+    }
+
+    lastShownTime <- as.POSIXct(lastShownTime, tz = "UTC")
+    timeDiff <- as.numeric(difftime(currentTime, lastShownTime, units = "mins"))
+
+    # If the time difference is greater than 72 hours, show the message again
+    if (timeDiff > 72 * 60) {
+        base::options("rpact.startup.message.timestamp" = currentTime)
+        saveOptions()
+        return(TRUE)
+    }
+
+    return(FALSE)
+}
+
+#' Disable Startup Messages
+#'
+#' @description
+#' This function disables the startup messages for the `rpact` package by setting
+#' the `rpact.startup.message.enabled` option to `FALSE`.
+#'
+#' @details
+#' Once this function is called, the startup messages will remain disabled until
+#' explicitly re-enabled using the `enableStartupMessages()` function. The current
+#' state is saved using the `saveOptions()` function.
+#'
+#' @return
+#' This function does not return a value. It is called for its side effects.
+#'
+#' @examples
+#' \dontrun{
+#' disableStartupMessages()
+#' }
+#'
+#' @export
+#'
+#' @keywords internal
+#'
+disableStartupMessages <- function() {
+    if (isFALSE(.getEnvironmentVariable(
+        "RPACT_STARTUP_MESSAGE_ENABLED",
+        "rpact.startup.message.enabled",
+        default = TRUE,
+        type = "logical"
+    ))) {
+        return(invisible())
+    }
+
+    base::options("rpact.startup.message.enabled" = FALSE)
+    saveOptions()
+}
+
+#' Enable Startup Messages
+#'
+#' @description
+#' This function enables the startup messages for the `rpact` package by setting
+#' the `rpact.startup.message.enabled` option to `TRUE`.
+#'
+#' @details
+#' Once this function is called, the startup messages will remain enabled until
+#' explicitly disabled using the `disableStartupMessages()` function. The current
+#' state is saved using the `saveOptions()` function.
+#'
+#' @return
+#' This function does not return a value. It is called for its side effects.
+#'
+#' @examples
+#' \dontrun{
+#' enableStartupMessages()
+#' }
+#'
+#' @export
+#'
+#' @keywords internal
+#'
+enableStartupMessages <- function() {
+    if (isTRUE(.getEnvironmentVariable(
+        "RPACT_STARTUP_MESSAGE_ENABLED",
+        "rpact.startup.message.enabled",
+        default = TRUE,
+        type = "logical"
+    ))) {
+        return(invisible())
+    }
+
+    base::options("rpact.startup.message.enabled" = TRUE)
+    saveOptions()
+}
+
+
+#'
+#' @title
+#' Check Installation Qualification Status
+#'
+#' @description
+#' This function checks whether the installation qualification for the `rpact` package
+#' has been completed. If not, it provides a message prompting the user to run the
+#' `testPackage()` function to perform the qualification.
+#'
+#' @param showMessage A logical value indicating whether to display a message if the
+#' installation qualification has not been completed. Default is \code{TRUE}.
+#'
+#' @details
+#' The installation qualification is a critical step in ensuring that the `rpact` package
+#' is correctly installed and validated for use in GxP-relevant environments. This function
+#' verifies the qualification status and informs the user if further action is required.
+#'
+#' @return
+#' Invisibly returns \code{TRUE} if the installation qualification has been completed,
+#' otherwise returns \code{FALSE}.
+#'
+#' @examples
+#' \dontrun{
+#' checkInstallationQualificationStatus()
+#' }
+#'
+#' @export
+#'
+#' @keywords internal
+#'
+checkInstallationQualificationStatus <- function(showMessage = TRUE) {
+    if (isTRUE(.installationQualificationDone())) {
+        return(invisible(TRUE))
+    }
+
+    if (!isTRUE(showMessage)) {
+        return(invisible(FALSE))
+    }
+
+    message(
+        "Installation qualification for rpact ", .getPackageVersionString(),
+        " has not yet been performed. Please run testPackage() ",
+        "before using the package in GxP relevant environments."
+    )
+    return(invisible(FALSE))
 }
 
 #'
@@ -631,7 +867,7 @@ getSystemIdentifier <- function(date = NULL) {
 #' @return
 #' The function returns \code{TRUE} if all test files are downloaded and copied successfully to the rpact installation directory; otherwise, it returns \code{FALSE}.
 #'
-#' @references For more information, please visit: <https://www.rpact.org/iq>
+#' @references For more information, please visit: <https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/>
 #'
 #' @export
 #'
@@ -643,22 +879,19 @@ setupPackageTests <- function(token, secret) {
     installPath <- find.package("rpact")
     if (!dir.exists(installPath)) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "the rpact package directory was not found",
-            call. = FALSE
+            "the rpact package directory was not found"
         )
     }
 
     if (!dir.exists(file.path(installPath, "tests"))) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "the rpact package directory does not contain a test directory",
-            call. = FALSE
+            "the rpact package directory does not contain a test directory"
         )
     }
 
     if (!dir.exists(file.path(installPath, "tests", "testthat"))) {
         stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "the rpact package directory does not contain a testthat directory",
-            call. = FALSE
+            "the rpact package directory does not contain a testthat directory"
         )
     }
 
@@ -718,6 +951,81 @@ setupPackageTests <- function(token, secret) {
     )
 }
 
+.getExistingTestResultFiles <- function(path) {
+    .assertIsSingleCharacter(path, "path", naAllowed = FALSE)
+    subDir <- file.path(path, "rpact-tests")
+    if (dir.exists(subDir)) {
+        path <- c(path, subDir)
+    }
+    resultFiles <- list.files(
+        path = path,
+        pattern = "^testthat\\.Rout(\\.fail)?$",
+        recursive = FALSE,
+        full.names = TRUE
+    )
+    return(resultFiles)
+}
+
+.getTestExecutionMode <- function(testFileDirectory, credentialsAvailable, downloadOnlyModeEnabled) {
+    if (!is.na(testFileDirectory)) {
+        # run test files from the user defined directory 'testFileDirectory'
+        return("runTestsInTestFileDirectory")
+    }
+
+    if (credentialsAvailable) {
+        if (downloadOnlyModeEnabled) {
+            # download test files only
+            return("downloadOnly")
+        }
+
+        # download test files and run them
+        return("downloadAndRunTests")
+    }
+
+    # run test from directory 'inst/tests'
+    return("default")
+}
+
+.getTestFileTargetDirectory <- function(outDir, testFileDirectory, executionMode, pkgName) {
+    if (executionMode == "runTestsInTestFileDirectory") {
+        return(testFileDirectory)
+    }
+
+    if (executionMode %in% c("downloadAndRunTests", "downloadOnly")) {
+        return(file.path(outDir, paste0(pkgName, "-tests")))
+    }
+
+    return(file.path(find.package("rpact"), "tests"))
+}
+
+.getTestReportFileNames <- function(reportType, markdownReportFileName,
+        keepSourceFiles, testFileTargetDirectory, resultDir, reportFileBaseName) {
+    if (identical(reportType, "Rout") || is.null(markdownReportFileName)) {
+        return(NULL)
+    }
+
+    reportFileNames <- character()
+    if (keepSourceFiles && file.exists(file.path(testFileTargetDirectory, markdownReportFileName))) {
+        reportFileNames <- c(reportFileNames, markdownReportFileName)
+    }
+
+    reportFileNameHtml <- paste0(reportFileBaseName, ".html")
+    if (file.exists(file.path(testFileTargetDirectory, reportFileNameHtml))) {
+        reportFileNames <- c(reportFileNames, reportFileNameHtml)
+    }
+
+    reportFileNamePdf <- paste0(reportFileBaseName, ".pdf")
+    if (file.exists(file.path(testFileTargetDirectory, reportFileNamePdf))) {
+        reportFileNames <- c(reportFileNames, reportFileNamePdf)
+    }
+
+    if (length(reportFileNames) > 0) {
+        file.copy(file.path(testFileTargetDirectory, reportFileNames), resultDir)
+    }
+
+    return(reportFileNames)
+}
+
 #' @title
 #' Test and Validate the rpact Package Installation
 #'
@@ -750,6 +1058,13 @@ setupPackageTests <- function(token, secret) {
 #' @param openHtmlReport If \code{TRUE}, the HTML report is opened after the tests are completed, default is \code{TRUE}.
 #' @param keepSourceFiles If \code{TRUE}, the source files are kept after the tests are completed.
 #'     A copy of them can be found in the subdirectory \code{src}.
+#' @param reportFileBaseName The base name for the report files (without path or extension).
+#' @param metaData A named \code{list} containing additional metadata to be included in the test report.
+#'    This can include information such as \code{company}, \code{container name}, \code{host name}, etc.
+#'    Default is an empty list.
+#'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
+#' @param metaDataFile An optional path to a text file containing metadata: one entry per line in the form \code{KEY=VALUE}.
+#'    For more information, see \code{\link{writeKeyValueFile}} and \code{\link{readKeyValueFile}}.
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -763,11 +1078,11 @@ setupPackageTests <- function(token, secret) {
 #' the package cannot be considered fully validated. To gain access to the full set of unit tests,
 #' users must provide \code{token} and \code{secret} credentials, which are distributed to
 #' members of the rpact user group as part of the validation documentation.
-#' For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification}{rpact_installation_qualification}.
+#' For more information, see vignette \href{https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/}{rpact_installation_qualification}.
 #'
-#' @return Invisibly returns the value of \code{completeUnitTestSetEnabled}.
+#' @return Invisibly returns an \code{\link[=InstallationQualificationResult]{InstallationQualificationResult}}) object.
 #'
-#' @references For more information, please visit: <https://www.rpact.org/iq>
+#' @references For more information, please visit: <https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/>
 #'
 #' @examples
 #' \dontrun{
@@ -802,29 +1117,74 @@ testPackage <- function(outDir = ".",
         testInstalledBasicPackages = TRUE,
         scope = c("basic", "devel", "both", "internet", "all"),
         openHtmlReport = TRUE,
-        keepSourceFiles = FALSE) {
+        keepSourceFiles = FALSE,
+        reportFileBaseName = "rpact_test_result_report",
+        metaData = list(),
+        metaDataFile = NULL) {
     .assertTestthatIsInstalled()
     .assertIsSingleCharacter(outDir, "outDir", naAllowed = FALSE)
     .assertIsSingleLogical(completeUnitTestSetEnabled, "completeUnitTestSetEnabled", naAllowed = FALSE)
     .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = TRUE)
+    .assertIsSingleCharacter(reportFileBaseName, "reportFileBaseName", naAllowed = FALSE)
     .assertIsSingleLogical(downloadTestsOnly, "downloadTestsOnly", naAllowed = FALSE)
     .assertIsSingleLogical(addWarningDetailsToReport, "addWarningDetailsToReport", naAllowed = FALSE)
     .assertIsSingleLogical(testInstalledBasicPackages, "testInstalledBasicPackages", naAllowed = FALSE)
     .assertIsSingleLogical(openHtmlReport, "openHtmlReport", naAllowed = FALSE)
     .assertIsSingleLogical(keepSourceFiles, "keepSourceFiles", naAllowed = FALSE)
+
+    token <- .getConnectionArgument(connection, "token")
+    secret <- .getConnectionArgument(connection, "secret")
+    credentialsAvailable <- (!is.null(token) && !is.null(secret) &&
+        length(token) == 1 && length(secret) == 1 &&
+        !is.na(token) && !is.na(secret))
+
+    downloadOnlyModeEnabled <- is.na(testFileDirectory) &&
+        isTRUE(downloadTestsOnly) && isTRUE(credentialsAvailable)
+
+    executionMode <- .getTestExecutionMode(testFileDirectory, credentialsAvailable, downloadOnlyModeEnabled)
+
+    pkgName <- "rpact"
+    testFileTargetDirectory <- .getTestFileTargetDirectory(outDir, testFileDirectory, executionMode, pkgName)
+    if (!is.null(metaData) && length(metaData) > 0) {
+        if (is.null(metaDataFile)) {
+            metaDataFile <- file.path(testFileTargetDirectory, "meta_data.txt")
+        }
+        writeKeyValueFile(
+            keyValueList = metaData,
+            filePath = metaDataFile,
+            safeKeyCheck = FALSE
+        )
+    }
+
+    if (!is.null(metaDataFile)) {
+        metaData <- readKeyValueFile(metaDataFile)
+    }
+
     reportType <- match.arg(reportType)
     scope <- match.arg(scope)
+
+    if (grepl("/|:|\\\\", reportFileBaseName)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "'reportFileBaseName' (", dQuote(reportFileBaseName), ") ",
+            "must not contain path separators or drive specifiers",
+            call. = FALSE
+        )
+    }
+
     if (!dir.exists(outDir)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test output directory '", outDir, "' does not exist"
+            "test output directory '", outDir, "' does not exist",
+            call. = FALSE
         )
     }
 
     if (outDir != "." && !grepl("^([a-zA-Z]{1,1}:)?(/|\\\\)", outDir, ignore.case = TRUE)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test output directory '", outDir, "' must be an absolute path"
+            "test output directory '", outDir, "' must be an absolute path",
+            call. = FALSE
         )
     }
 
@@ -835,7 +1195,8 @@ testPackage <- function(outDir = ".",
     if (!is.na(testFileDirectory) && !dir.exists(testFileDirectory)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test file directory '", testFileDirectory, "' does not exist"
+            "test file directory '", testFileDirectory, "' does not exist",
+            call. = FALSE
         )
     }
 
@@ -870,12 +1231,6 @@ testPackage <- function(outDir = ".",
     }
     on.exit(resetLogLevel(), add = TRUE)
 
-    token <- .getConnectionArgument(connection, "token")
-    secret <- .getConnectionArgument(connection, "secret")
-    credentialsAvailable <- (!is.null(token) && !is.null(secret) &&
-        length(token) == 1 && length(secret) == 1 &&
-        !is.na(token) && !is.na(secret))
-
     author <- NA_character_
     if (credentialsAvailable) {
         author <- .getReportAuthor(
@@ -884,11 +1239,11 @@ testPackage <- function(outDir = ".",
         )
     }
     if (is.null(author) || length(author) != 1 || is.na(author)) {
+        author <- .getOptionalArgument("author", ...)
+    }
+    if (is.null(author) || length(author) != 1 || is.na(author) || nchar(trimws(author)) == 0) {
         author <- "RPACT"
     }
-
-    downloadOnlyModeEnabled <- is.na(testFileDirectory) &&
-        isTRUE(downloadTestsOnly) && isTRUE(credentialsAvailable)
 
     if (!is.na(testFileDirectory)) {
         if (credentialsAvailable) {
@@ -900,24 +1255,6 @@ testPackage <- function(outDir = ".",
         credentialsAvailable <- TRUE
     }
 
-    if (is.na(testFileDirectory)) {
-        if (credentialsAvailable) {
-            if (downloadOnlyModeEnabled) {
-                # download test files only
-                executionMode <- "downloadOnly"
-            } else {
-                # download test files and run them
-                executionMode <- "downloadAndRunTests"
-            }
-        } else {
-            # run test from directory 'inst/tests'
-            executionMode <- "default"
-        }
-    } else {
-        # run test files from the user defined directory 'testFileDirectory'
-        executionMode <- "runTestsInTestFileDirectory"
-    }
-
     if (executionMode == "downloadOnly") {
         if (testInstalledBasicPackages) {
             warning("The test of installed R basic packages is not supported in 'downloadOnly' mode")
@@ -926,47 +1263,38 @@ testPackage <- function(outDir = ".",
     }
 
     if (executionMode == "default") {
-        cat("Run a small subset of all tests. Please wait...\n")
-        cat("This is just a quick test (see comments below).\n")
-        cat("The entire test will take only some seconds.\n")
+        cat("Run a small subset of the available rpact unit tests. Please wait...\n")
+        cat("This is just a quick test for demonstration purposes.\n")
+        cat("The test will take about a minute.\n")
     } else if (executionMode == "downloadOnly") {
         cat("The unit test files are only downloaded and not executed.\n")
     } else if (executionMode %in% c("downloadAndRunTests", "runTestsInTestFileDirectory")) {
         if (completeUnitTestSetEnabled) {
             cat("Run all tests. Please wait...\n")
-            cat("Have a break - it takes about 20 minutes.\n")
+            cat("Have a break - it takes about 45 minutes.\n")
             cat("Exceution of all available unit tests startet at ",
                 format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
                 sep = ""
             )
         } else {
-            cat("Run a subset of all tests. Please wait...\n")
+            cat("Run a small subset of the available rpact unit tests. Please wait...\n")
             cat("This is just a quick test, i.e., all time consuming tests will be skipped.\n")
-            cat("The entire test will take about a minute.\n")
+            cat("The test will take about a minute.\n")
         }
     }
 
-    oldResultFiles <- list.files(
-        path = outDir,
-        pattern = "^testthat\\.Rout(\\.fail)?$",
-        recursive = TRUE,
-        full.names = TRUE
-    )
+    if (!is.null(metaData) && length(metaData) > 0) {
+        cat("The following additional metadata will be included in the test report:\n")
+        for (key in names(metaData)) {
+            cat("- ", key, ": ", metaData[[key]], "\n", sep = "")
+        }
+    }
+
+    oldResultFiles <- .getExistingTestResultFiles(outDir)
     for (oldResultFile in oldResultFiles) {
         if (file.exists(oldResultFile)) {
             file.remove(oldResultFile)
         }
-    }
-
-    markdownReportFileName <- NULL
-    pkgName <- "rpact"
-
-    if (executionMode == "default") {
-        testFileTargetDirectory <- file.path(find.package("rpact"), "tests")
-    } else if (executionMode == "runTestsInTestFileDirectory") {
-        testFileTargetDirectory <- testFileDirectory
-    } else if (executionMode %in% c("downloadAndRunTests", "downloadOnly")) {
-        testFileTargetDirectory <- file.path(outDir, paste0(pkgName, "-tests"))
     }
 
     if (executionMode %in% c("downloadAndRunTests", "downloadOnly")) {
@@ -982,10 +1310,11 @@ testPackage <- function(outDir = ".",
             connectionType = .getConnectionArgument(connection, "connectionType")
         )
         if (downloadOnlyModeEnabled) {
-            return(invisible())
+            return(invisible(NULL))
         }
     }
 
+    markdownReportFileName <- NULL
     if (reportType %in% c("compact", "detailed")) {
         testthatMainFile <- file.path(testFileTargetDirectory, "testthat.R")
         if (file.exists(testthatMainFile)) {
@@ -994,7 +1323,8 @@ testPackage <- function(outDir = ".",
             on.exit(file.rename(testthatMainFileBak, testthatMainFile))
         }
 
-        markdownReportFileName <- "rpact_test_result_report.md"
+        markdownReportFileName <- paste0(reportFileBaseName, ".md")
+        testFileTargetDirectory <- gsub("\\\\", "/", testFileTargetDirectory)
         testthatCommands <- paste0(
             "\n",
             "library(testthat)\n",
@@ -1007,7 +1337,8 @@ testPackage <- function(outDir = ".",
             "keepSourceFiles = ", keepSourceFiles, ", ",
             "testInstalledBasicPackages = ", testInstalledBasicPackages, ", ",
             'author = "', author, '", ',
-            'scope = "', scope, '"',
+            'scope = "', scope, '", ',
+            'metaDataFile = "', metaDataFile, '"',
             ")",
             ")\n\n"
         )
@@ -1019,12 +1350,10 @@ testPackage <- function(outDir = ".",
         pkgName = pkgName
     )
 
-    newResultFiles <- list.files(
-        path = outDir,
-        pattern = "^testthat\\.Rout(\\.fail)?$",
-        recursive = TRUE,
-        full.names = TRUE
-    )
+    newResultFiles <- .getExistingTestResultFiles(outDir)
+    if (length(newResultFiles) == 0) {
+        newResultFiles <- .getExistingTestResultFiles(testFileTargetDirectory)
+    }
 
     resultDir <- file.path(outDir, paste0(pkgName, "-tests"))
     if (!dir.exists(resultDir)) {
@@ -1047,30 +1376,26 @@ testPackage <- function(outDir = ".",
         endTime = endTime, runtimeUnits = "auto"
     ), ".\n", sep = "")
 
-    reportFileName <- NULL
-    if (reportType != "Rout" && !is.null(markdownReportFileName) &&
-            file.exists(file.path(testFileTargetDirectory, markdownReportFileName))) {
-        reportFileName <- character()
-        reportFileNameHtml <- sub("\\.md$", ".html", markdownReportFileName)
-        if (file.exists(file.path(testFileTargetDirectory, reportFileNameHtml))) {
-            reportFileName <- c(reportFileName, reportFileNameHtml)
-        }
-        reportFileNamePdf <- sub("\\.md$", ".pdf", markdownReportFileName)
-        if (file.exists(file.path(testFileTargetDirectory, reportFileNamePdf))) {
-            reportFileName <- c(reportFileName, reportFileNamePdf)
-        }
-        if (length(reportFileName) == 0) {
-            reportFileName <- markdownReportFileName
-        }
-    }
+    reportFileNames <- .getTestReportFileNames(
+        reportType, markdownReportFileName,
+        keepSourceFiles, testFileTargetDirectory, resultDir, reportFileBaseName
+    )
 
     minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
+    totalNumberOfTests <- NA_integer_
+    numberOfFailedTests <- 0
+    numberOfSkippedTests <- 0
     resultOuputFile <- "testthat.Rout"
     inputFileName <- file.path(resultDir, resultOuputFile)
+    resultMessage <- NA_character_
+    statusMessage <- NA_character_
+    status <- "incomplete"
     if (file.exists(inputFileName)) {
         fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
         totalNumberOfTests <- .getTestthatResultNumberOfTests(fileContent)
         if (completeUnitTestSetEnabled && minNumberOfExpectedTests <= totalNumberOfTests) {
+            statusMessage <- "Installation qualification successfully completed"
+            status <- "success"
             .setSystemIdentifier()
             cat("All unit tests were completed successfully, i.e., the installation \n",
                 "qualification was successful.\n",
@@ -1079,29 +1404,25 @@ testPackage <- function(outDir = ".",
         } else {
             cat("Unit tests were completed successfully.\n")
             if (totalNumberOfTests < minNumberOfExpectedTests) {
-                cat("Only a subset of the ", minNumberOfExpectedTests, "
-					available rpact unit tests were executed.\n", sep = "")
+                cat("Only a subset of the ", minNumberOfExpectedTests,
+                    " available rpact unit tests were executed.\n",
+                    sep = ""
+                )
                 cat("This means the package is not yet validated for use in GxP-compliant settings.\n")
+                statusMessage <- "Installation qualification not completed (only a subset of tests executed)"
             }
         }
         cat("\n")
 
         cat("Results:\n")
-        cat(.getTestthatResultLine(fileContent), "\n")
+        resultMessage <- .getTestthatResultLine(fileContent)
+        cat(resultMessage, "\n")
         cat("\n")
-        cat("Test results were written to directory \n")
-        if (!is.null(reportFileName)) {
-            cat("'", testFileTargetDirectory, "' (see file(s) ",
-                .arrayToString(sQuote(reportFileName), mode = "and"), ")\n",
-                sep = ""
-            )
-        } else {
-            cat("'", resultDir, "' (see file ", sQuote(resultOuputFile), ")\n", sep = "")
-        }
-        skipped <- .getTestthatResultNumberOfSkippedTests(fileContent)
-        if (skipped > 0) {
+        .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
+        numberOfSkippedTests <- .getTestthatResultNumberOfSkippedTests(fileContent)
+        if (numberOfSkippedTests > 0) {
             cat("-------------------------------------------------------------------------\n")
-            cat("Note that ", skipped, " tests were skipped; ",
+            cat("Note that ", numberOfSkippedTests, " tests were skipped; ",
                 "a possible reason may be that expected \n",
                 "error messages could not be tested ",
                 "because of local translation.\n",
@@ -1109,42 +1430,44 @@ testPackage <- function(outDir = ".",
             )
         }
         cat("-------------------------------------------------------------------------\n")
-        cat("Please visit www.rpact.com to learn how to use rpact on FDA/GxP-compliant \n",
+        cat("Please visit www.rpact.org/iq to learn how to use rpact on FDA/GxP-compliant \n",
             "validated corporate computer systems and how to get a copy of the formal \n",
             "validation documentation that is customized and licensed for exclusive use \n",
-            "by your company/organization, e.g., to fulfill regulatory requirements.\n",
+            "by your organization, e.g., to fulfill regulatory requirements.\n",
             sep = ""
         )
     } else {
         inputFileName <- file.path(resultDir, "testthat.Rout.fail")
+        status <- "failed"
         if (file.exists(inputFileName)) {
             fileContent <- base::readChar(inputFileName, file.info(inputFileName)$size)
             numberOfFailedTests <- .getTestthatResultNumberOfFailures(fileContent)
             if (completeUnitTestSetEnabled) {
                 if (numberOfFailedTests > 0) {
                     cat(numberOfFailedTests,
-                        " unit tests failed, i.e., the installation qualification was not successful.\n",
+                        " unit test", ifelse(numberOfFailedTests == 1, "", "s"),
+                        " failed, i.e., the installation qualification was not successful.\n",
                         sep = ""
                     )
+                    statusMessage <- paste0("Installation qualification was not successful (", numberOfFailedTests, " failures)")
                 } else {
                     cat("Unexpected failures, i.e., the installation qualification was not successful.\n")
+                    statusMessage <- "Installation qualification was not successful (unexpected failures)"
                 }
             } else {
-                cat(numberOfFailedTests, " unit tests failed :(\n", sep = "")
-            }
-            cat("Results:\n")
-            cat(.getTestthatResultLine(fileContent), "\n")
-            cat("Test results were written to directory ")
-            if (!is.null(reportFileName)) {
-                cat("'", testFileTargetDirectory, "' (see file(s) ",
-                    .arrayToString(sQuote(reportFileName), mode = "and"), ")\n",
+                cat(numberOfFailedTests, " unit test",
+                    ifelse(numberOfFailedTests == 1, "", "s"), " failed :(\n",
                     sep = ""
                 )
-            } else {
-                cat("'", resultDir, "' (see file ", sQuote(resultOuputFile), ")\n", sep = "")
+                statusMessage <- paste0("Installation qualification was not successful (subset with ", numberOfFailedTests, " failures)")
             }
+            cat("Results:\n")
+            resultMessage <- .getTestthatResultLine(fileContent)
+            cat(resultMessage, "\n")
+            .showResultsWereWrittenToDirectoryMessage(resultDir, reportFileNames, resultOuputFile)
         } else {
             cat("No test results found in directory '", resultDir, "'\n", sep = "")
+            statusMessage <- "Installation qualification was not successful (no test results found)"
         }
     }
     if (!credentialsAvailable) {
@@ -1152,19 +1475,143 @@ testPackage <- function(outDir = ".",
         cat("Note that only a small subset of all available unit tests were executed.\n")
         cat("You need a personal 'token' and 'secret' to perform all unit tests.\n")
         cat("You can find these data in the appendix of the validation documentation \n")
-        cat("licensed for your company/organization.\n")
+        cat("licensed for your company/organization or at https://connect.rpact.com.\n")
     } else if (!completeUnitTestSetEnabled) {
         cat("Note that only a small subset of all available unit tests were executed.\n")
         cat("Use testPackage(completeUnitTestSetEnabled = TRUE) to perform all unit tests.\n")
     }
 
-    invisible(.isCompleteUnitTestSetEnabled())
+    result <- list(
+        completeUnitTestSetEnabled = completeUnitTestSetEnabled,
+        testFileDirectory = testFileDirectory,
+        testFileTargetDirectory = testFileTargetDirectory,
+        reportType = reportType,
+        executionMode = executionMode,
+        scope = scope,
+        resultDir = resultDir,
+        resultOuputFile = resultOuputFile,
+        reportFileNames = reportFileNames,
+        minNumberOfExpectedTests = minNumberOfExpectedTests,
+        totalNumberOfTests = totalNumberOfTests,
+        numberOfFailedTests = numberOfFailedTests,
+        numberOfSkippedTests = numberOfSkippedTests,
+        resultMessage = resultMessage,
+        statusMessage = statusMessage,
+        status = status
+    )
+
+    result <- structure(result, class = "InstallationQualificationResult")
+
+    return(invisible(result))
+}
+
+#'
+#' @title
+#' Installation Qualification Result Object
+#'
+#' @description
+#' This object represents the structured result of a full or partial
+#' installation qualification test execution. It includes metadata about
+#' the executed test suite, paths used, summary statistics, and status
+#' messages.
+#'
+#' @details
+#' The object is returned by the function \code{\link{testPackage}} and
+#' is of class \code{InstallationQualificationResult}.
+#'
+#' @format An S3 object of class \code{InstallationQualificationResult} with the following elements:
+#' \describe{
+#'   \item{completeUnitTestSetEnabled}{Logical indicating whether the full test set was enabled}
+#'   \item{testFileDirectory}{Directory containing test scripts}
+#'   \item{testFileTargetDirectory}{Directory to which tests are copied or linked}
+#'   \item{reportType}{Report type selected (\code{"compact"}, \code{"detailed"}, or \code{"Rout"})}
+#'   \item{executionMode}{Execution mode (\code{"default"}, \code{"downloadOnly"},
+#'        \code{"downloadAndRunTests"}, or \code{"runTestsInTestFileDirectory"})}
+#'   \item{scope}{Scope of the qualification (`"basic"`, `"devel"`, `"both"`, `"internet"`, or `"all"`)}
+#'   \item{resultDir}{Directory where the result reports are stored}
+#'   \item{resultOuputFile}{Main output report filename}
+#'   \item{reportFileNames}{Vector of report files generated}
+#'   \item{minNumberOfExpectedTests}{Minimum number of expected tests}
+#'   \item{totalNumberOfTests}{Number of tests actually run}
+#'   \item{numberOfFailedTests}{Number of failed tests}
+#'   \item{numberOfSkippedTests}{Number of skipped tests}
+#'   \item{resultMessage}{Message summarizing the result}
+#'   \item{statusMessage}{Detailed status message}
+#'   \item{status}{Overall result status (\code{"success"}, \code{"incomplete"}, or \code{"failed"})}
+#' }
+#'
+#' @name InstallationQualificationResult
+#' @keywords internal
+#' @seealso \code{\link{testPackage}}
+#' @docType class
+#' @aliases InstallationQualificationResult-class
+#'
+NULL
+
+#'
+#' @title
+#' Print Installation Qualification Result
+#'
+#' @description
+#' This function prints the details of an `InstallationQualificationResult` object in a user-friendly format.
+#'
+#' @param x An object of class `InstallationQualificationResult` containing the results of the installation qualification.
+#' @param ... Additional arguments passed to or from other methods.
+#'
+#' @details
+#' The function displays the result message, followed by the parameters and their values. It skips parameters with `NULL` or `NA` values.
+#'
+#' @return
+#' This function does not return a value. It is called for its side effects of printing the result.
+#'
+#' @examples
+#' \dontrun{
+#' result <- testPackage()
+#' print(result)
+#' }
+#'
+#' @keywords internal
+#'
+#' @export
+#'
+print.InstallationQualificationResult <- function(x, ...) {
+    cat("Installation Qualification Result:\n")
+    cat(x$resultMessage, "\n\n")
+    cat("Parameters:\n")
+    paramNames <- names(x)
+    paramNames <- paramNames[!grepl("resultMessage", paramNames)]
+    for (paramName in paramNames) {
+        paramValue <- x[[paramName]]
+        if (is.null(paramValue) || all(is.na(paramValue))) {
+            next
+        }
+
+        if (is.character(paramValue)) {
+            if (grepl("Dir(ectory)?$", paramName)) {
+                paramValue <- gsub("\\\\", "/", paramValue)
+            }
+            paramValue <- sQuote(paramValue)
+        }
+        cat("  ", paramName, ": ", .arrayToString(paramValue), "\n", sep = "")
+    }
+}
+
+.showResultsWereWrittenToDirectoryMessage <- function(resultDir, reportFileName, resultOuputFile) {
+    cat("Test results were written to directory \n")
+    if (!is.null(reportFileName)) {
+        cat("'", resultDir, "' (see file", ifelse(length(reportFileName) == 1, "", "s"), " ",
+            .arrayToString(sQuote(reportFileName), mode = "and"), ")\n",
+            sep = ""
+        )
+    } else {
+        cat("'", resultDir, "' (see file ", sQuote(resultOuputFile), ")\n", sep = "")
+    }
 }
 
 .testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", Ropts = character()) {
     .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = FALSE)
     if (!dir.exists(testFileDirectory)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'testFileDirectory' (", testFileDirectory, ") does not exist")
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'testFileDirectory' (", testFileDirectory, ") does not exist", call. = FALSE)
     }
 
     workingDirectoryBefore <- getwd()
@@ -1186,7 +1633,7 @@ testPackage <- function(outDir = ".",
             shQuote(outfile)
         )
         cmd <- if (.Platform$OS.type == "windows") paste(cmd, "LANGUAGE=C") else paste("LANGUAGE=C", cmd)
-        res <- system(cmd)
+        res <- base::system(cmd)
         if (res) {
             file.rename(outfile, paste(outfile, "fail", sep = "."))
             return(invisible(1L))
@@ -1366,6 +1813,8 @@ MarkdownReporter <- R6::R6Class(
         author = "RPACT",
         scope = "basic",
         rpactCranReference = "[rpact](https://cran.r-project.org/package=rpact)",
+        metaData = list(),
+        metaDataFile = NULL,
         initialize = function(...,
                 outputSize = c("compact", "detailed"),
                 outputFile = "test_results.md",
@@ -1374,7 +1823,8 @@ MarkdownReporter <- R6::R6Class(
                 keepSourceFiles = FALSE,
                 testInstalledBasicPackages = TRUE,
                 author = "RPACT",
-                scope = "basic") {
+                scope = "basic",
+                metaDataFile = NULL) {
             # self$capabilities$parallel_support <- TRUE
             super$initialize(...)
             self$outputSize <- match.arg(outputSize)
@@ -1385,17 +1835,32 @@ MarkdownReporter <- R6::R6Class(
             self$testInstalledBasicPackages <- testInstalledBasicPackages
             self$author <- author
             self$scope <- scope
+            self$metaDataFile <- metaDataFile
             self$minNumberOfExpectedTests <- .getMinNumberOfExpectedTests()
+            if (!is.null(self$metaDataFile) &&
+                    length(self$metaDataFile) == 1 &&
+                    !is.na(self$metaDataFile) &&
+                    is.character(self$metaDataFile) &&
+                    file.exists(self$metaDataFile)) {
+                self$metaData <- readKeyValueFile(self$metaDataFile)
+            }
         },
         log = function(...) {
             args <- list(...)
             self$output <- c(self$output, paste(args, collapse = ""))
         },
         start_reporter = function() {
+            authorValidated <- ifelse(is.null(self$author) ||
+                length(self$author) != 1 ||
+                is.na(self$author) ||
+                nchar(trimws(self$author)) == 0 ||
+                grepl("unknown|anonymous", self$author, ignore.case = TRUE),
+            "RPACT", self$author
+            )
             self$startTime <- Sys.time()
             self$log("---")
             self$log('title: "Installation Qualification for rpact"')
-            self$log('author: "', self$author, '"')
+            self$log('author: "', authorValidated, '"')
             self$log('date: "', format(Sys.time(), "%B %d, %Y"), '"')
             self$log("output:")
             self$log("  html_document:")
@@ -1439,6 +1904,14 @@ MarkdownReporter <- R6::R6Class(
             self$log("- **rpact package release date**: ", format(packageDate("rpact"), "%B %d, %Y"))
             self$log("- **System user**: *", Sys.info()[["user"]], "*")
             self$log("- **System ID**: ", getSystemIdentifier(), "")
+            if (!is.null(self$metaData) && length(self$metaData) > 0) {
+                for (metaDataName in names(self$metaData)) {
+                    self$log(
+                        "- **", metaDataName, "**: ",
+                        self$metaData[[metaDataName]], ""
+                    )
+                }
+            }
             self$log("")
             self$log(.getSessionInfoMarkdown())
             self$log("")
@@ -1515,12 +1988,12 @@ MarkdownReporter <- R6::R6Class(
 
             resultStatusIcon <-
                 if (failureEnabled) {
-                        private$COLORS$FAILURE$unicode
-                    } else if (warningEnabled) {
-                        private$COLORS$WARNING$unicode
-                    } else {
-                        private$COLORS$SUCCESS$unicode
-                    }
+                    private$COLORS$FAILURE$unicode
+                } else if (warningEnabled) {
+                    private$COLORS$WARNING$unicode
+                } else {
+                    private$COLORS$SUCCESS$unicode
+                }
             if (self$outputSize == "detailed" || failureEnabled ||
                     (warningEnabled && self$addWarningDetailsToReport)) {
                 self$log(
@@ -1614,7 +2087,7 @@ MarkdownReporter <- R6::R6Class(
                     )
                     self$log(
                         "Please read the vignette [Installation Qualification of rpact]",
-                        "(https://www.rpact.org/vignettes/utilities/rpact_installation_qualification) ",
+                        "(https://www.rpact.org/vignettes/utilities/rpact_installation_qualification/) ",
                         "to learn how to qualify ", self$rpactCranReference, " for reliable ",
                         "statistical planning, simulation, and analyses in regulated areas."
                     )
@@ -1640,9 +2113,26 @@ MarkdownReporter <- R6::R6Class(
             self$log("## References")
             self$log("")
             citePackage <- utils::capture.output(print(citation("rpact"), bibtex = FALSE))
-            citePackage <- trimws(citePackage[!grepl("(^$)|(^To cite package)", citePackage)])
-            citePackage <- paste(citePackage, collapse = " ")
-            self$log("- ", citePackage)
+            citePackage <- trimws(citePackage[!grepl("^($)|(To cite )|(Um Paket )|(Please )", citePackage)])
+
+            indices <- grep("^Wassmer", citePackage)
+            if (length(indices) > 1) {
+                if (indices[length(indices)] < length(citePackage)) {
+                    indices <- c(indices, length(citePackage))
+                }
+
+                citePackageParts <- list()
+                for (i in 2:length(indices)) {
+                    part <- citePackage[indices[i - 1]:indices[i]]
+                    citePackageParts[[length(citePackageParts) + 1]] <- paste(part, collapse = " ")
+                }
+            } else {
+                citePackagePart <- list(paste(citePackage, collapse = " "))
+            }
+
+            for (citePackagePart in citePackageParts) {
+                self$log("- ", citePackagePart)
+            }
             self$log(
                 "- rpact test coverage: [app.codecov.io/gh/rpact-com/rpact]",
                 "(https://app.codecov.io/gh/rpact-com/rpact?branch=main)"

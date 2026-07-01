@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8474 $
-## |  Last changed: $Date: 2025-01-14 14:32:53 +0100 (Di, 14 Jan 2025) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 
 #'
@@ -119,9 +115,10 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             .assertIsValidSidedParameter(self$.design$sided)
 
             if (self$nMax <= 0) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, 
-                    "'nMax' must be an integer > 0", 
-                    call. = FALSE)
+                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                    "'nMax' must be an integer > 0",
+                    call. = FALSE
+                )
             }
 
             self$.setParameterType("nMax", ifelse(self$nMax == C_NA_MAX_DEFAULT,
@@ -182,7 +179,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
         },
         .getPowerAndAverageSampleNumber = function(theta) {
             kMax <- self$.design$kMax
-            futilityBounds <- self$.design$futilityBounds
+            futilityBounds <- .getFutilityBounds(self$.design)
             informationRates <- self$.design$informationRates
             criticalValues <- .getCriticalValues(self$.design)
             sided <- self$.design$sided
@@ -191,16 +188,16 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
             .earlyStop <- rep(NA_real_, kMax)
             .futilityPerStage <- rep(NA_real_, kMax)
 
-            if (!any(is.na(delayedInformation))) {
+            if (!is.null(delayedInformation) && !anyNA(delayedInformation)) {
                 contRegionLower <- futilityBounds
                 contRegionUpper <- criticalValues
                 decisionCriticalValues <- self$.design$decisionCriticalValues
                 probs <- .calculateDecisionProbabilities(
                     sqrtShift = sqrt(self$nMax) * theta,
-                    informationRates, 
-                    delayedInformation, 
-                    contRegionUpper, 
-                    contRegionLower, 
+                    informationRates,
+                    delayedInformation,
+                    contRegionUpper,
+                    contRegionLower,
                     decisionCriticalValues
                 )
 
@@ -212,7 +209,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                 .futilityPerStage <- probs$futilityProbabilities
             } else {
                 if (sided == 2) {
-                    if (self$.design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                    if (self$.design$kMax > 1 && self$.design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                             !is.null(self$.design$typeBetaSpending) && self$.design$typeBetaSpending != "none") {
                         futilityBounds[is.na(futilityBounds)] <- 0
                         decisionMatrix <- matrix(c(
@@ -237,7 +234,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                 }
 
                 probs <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
-
+                
                 if (nrow(probs) == 3) {
                     .averageSampleNumber <- self$nMax - sum((probs[3, 1:(kMax - 1)] - probs[2, 1:(kMax - 1)] + probs[1, 1:(kMax - 1)]) *
                         (informationRates[kMax] - informationRates[1:(kMax - 1)]) * self$nMax)
@@ -321,7 +318,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
 #' head(data)
 #' dim(data)
 #' }
-#' 
+#'
 #' @export
 #'
 #' @keywords internal

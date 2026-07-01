@@ -34,7 +34,7 @@ That is, the output matrix of the function provides per stage (column) the cumul
 for values specified in decisionMatrix and Inf, and reaching the stage, i.e., the test
 statistics is in the continuation region for the preceding stages.
 For 4 rows, the continuation region contains of two regions and the probability matrix is
-obtained analogously (cf., Wassmer and Brannath, 2016).
+obtained analogously (cf., Wassmer and Brannath, 2025).
 }
 \examples{
 \dontrun{
@@ -93,12 +93,13 @@ sum(probs[5, ] - probs[4, ] + probs[1, ])
 
 }
 \seealso{
-Other design functions: 
-\code{\link{getDesignCharacteristics}()},
-\code{\link{getDesignConditionalDunnett}()},
-\code{\link{getDesignFisher}()},
-\code{\link{getDesignGroupSequential}()},
-\code{\link{getDesignInverseNormal}()},
-\code{\link{getPowerAndAverageSampleNumber}()}
+Other design functions:
+\code{\link[=getDesignCharacteristics]{getDesignCharacteristics()}},
+\code{\link[=getDesignConditionalDunnett]{getDesignConditionalDunnett()}},
+\code{\link[=getDesignFisher]{getDesignFisher()}},
+\code{\link[=getDesignFixed]{getDesignFixed()}},
+\code{\link[=getDesignGroupSequential]{getDesignGroupSequential()}},
+\code{\link[=getDesignInverseNormal]{getDesignInverseNormal()}},
+\code{\link[=getPowerAndAverageSampleNumber]{getPowerAndAverageSampleNumber()}}
 }
 \concept{design functions}

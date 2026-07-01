@@ -13,10 +13,6 @@
 ## |
 ## |  Contact us for information about our services: info@rpact.com
 ## |
-## |  File version: $Revision: 8225 $
-## |  Last changed: $Date: 2024-09-18 09:38:40 +0200 (Mi, 18 Sep 2024) $
-## |  Last changed by: $Author: pahlke $
-## |
 
 .getSimulationRatesStageSubjects <- function(...,
         stage,
@@ -211,35 +207,49 @@ getSimulationRates <- function(design = NULL, ...,
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
     }
-    directionUpper <- .assertIsValidDirectionUpper(directionUpper, 
-        design, objectType = "power", userFunctionCallEnabled = TRUE)
+    directionUpper <- .assertIsValidDirectionUpper(directionUpper,
+        design,
+        objectType = "power", userFunctionCallEnabled = TRUE
+    )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsValidGroupsParameter(groups)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .assertIsSingleLogical(riskRatio, "riskRatio")
     if (groups == 1L) {
-        .assertIsInOpenInterval(thetaH0, "thetaH0", 0, 1, naAllowed = FALSE)
+        .assertIsInOpenInterval(thetaH0, "thetaH0",
+            lower = 0, upper = 1, naAllowed = FALSE
+        )
     } else {
         if (riskRatio) {
-            .assertIsInOpenInterval(thetaH0, "thetaH0", 0, NULL, naAllowed = TRUE)
+            .assertIsInOpenInterval(thetaH0, "thetaH0",
+                lower = 0, upper = NULL, naAllowed = TRUE
+            )
         } else {
-            .assertIsInOpenInterval(thetaH0, "thetaH0", -1, 1, naAllowed = TRUE)
+            .assertIsInOpenInterval(thetaH0, "thetaH0",
+                lower = -1, upper = 1, naAllowed = TRUE
+            )
         }
     }
     .assertIsNumericVector(pi1, "pi1", naAllowed = FALSE)
-    .assertIsInOpenInterval(pi1, "pi1", 0, 1, naAllowed = FALSE)
+    .assertIsInOpenInterval(pi1, "pi1",
+        lower = 0, upper = 1, naAllowed = FALSE
+    )
     .assertIsNumericVector(pi2, "pi2", naAllowed = TRUE)
-    .assertIsInOpenInterval(pi2, "pi2", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsNumericVector(minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
     .assertIsNumericVector(maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
-    .assertIsInOpenInterval(conditionalPower, "conditionalPower", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(conditionalPower, "conditionalPower",
+        lower = 0, upper = 1, naAllowed = TRUE
+    )
     .assertIsSingleNumber(pi1H1, "pi1H1", naAllowed = TRUE)
-    .assertIsInOpenInterval(pi1H1, "pi1H1", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(pi1H1, "pi1H1", lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsSingleNumber(pi2H1, "pi2H1", naAllowed = TRUE)
-    .assertIsInOpenInterval(pi2H1, "pi2H1", 0, 1, naAllowed = TRUE)
+    .assertIsInOpenInterval(pi2H1, "pi2H1", lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
-    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned", 0, C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE)
+    .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
+        lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
+    )
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
@@ -248,14 +258,16 @@ getSimulationRates <- function(design = NULL, ...,
     if (design$sided == 2) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "only one-sided case is implemented for the simulation design"
+            "only one-sided case is implemented for the simulation design",
+            call. = FALSE
         )
     }
 
     if (!normalApproximation && (groups == 2) && (riskRatio || (thetaH0 != 0))) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "in the two-sample case, exact test is implemented only for testing H0: pi1 - pi2 = 0"
+            "in the two-sample case, exact test is implemented only for testing H0: pi1 - pi2 = 0",
+            call. = FALSE
         )
     }
 
@@ -288,7 +300,8 @@ getSimulationRates <- function(design = NULL, ...,
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'maxNumberOfSubjectsPerStage' (",
                 .arrayToString(maxNumberOfSubjectsPerStage),
                 ") must be not smaller than minNumberOfSubjectsPerStage' (",
-                .arrayToString(minNumberOfSubjectsPerStage), ")"
+                .arrayToString(minNumberOfSubjectsPerStage), ")",
+                call. = FALSE
             )
         }
         .setValueAndParameterType(
@@ -365,7 +378,7 @@ getSimulationRates <- function(design = NULL, ...,
         }
         simulationResults$.setParameterType("pi2", C_PARAM_NOT_APPLICABLE)
     } else {
-        if (any(is.na(allocationRatioPlanned))) {
+        if (anyNA(allocationRatioPlanned)) {
             allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
         }
         if (is.na(pi2)) {
@@ -379,7 +392,8 @@ getSimulationRates <- function(design = NULL, ...,
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
-                "must have length 1 or ", design$kMax, " (kMax)"
+                "must have length 1 or ", design$kMax, " (kMax)",
+                call. = FALSE
             )
         }
 
@@ -452,7 +466,9 @@ getSimulationRates <- function(design = NULL, ...,
     ))
     simulationResults$seed <- .setSeed(seed)
 
-    if (.isTrialDesignGroupSequential(design)) {
+    if (.isTrialDesignFixed(design)) {
+        designNumber <- 0L
+    } else if (.isTrialDesignGroupSequential(design)) {
         designNumber <- 1L
     } else if (.isTrialDesignInverseNormal(design)) {
         designNumber <- 2L
@@ -465,7 +481,7 @@ getSimulationRates <- function(design = NULL, ...,
         futilityBounds <- rep(NA_real_, design$kMax - 1)
     } else {
         alpha0Vec <- rep(NA_real_, design$kMax - 1)
-        futilityBounds <- design$futilityBounds
+        futilityBounds <- .getFutilityBounds(design)
     }
 
     calcSubjectsFunctionList <- .getCalcSubjectsFunction(
@@ -504,11 +520,11 @@ getSimulationRates <- function(design = NULL, ...,
         calcSubjectsFunctionR       = calcSubjectsFunctionR,
         calcSubjectsFunctionCpp     = calcSubjectsFunctionCpp
     )
-    
+
     data <- cppResult$data
     data <- data[!is.na(data$pi1), ]
     simulationResults$.data <- data
-    
+
     simulationResults$iterations <- cppResult$iterations
     simulationResults$sampleSizes <- cppResult$sampleSizes
     simulationResults$rejectPerStage <- cppResult$rejectPerStage
@@ -516,6 +532,10 @@ getSimulationRates <- function(design = NULL, ...,
     simulationResults$futilityPerStage <- cppResult$futilityPerStage
     simulationResults$futilityStop <- cppResult$futilityStop
     simulationResults$earlyStop <- cppResult$earlyStop
+    if (design$kMax > 1) {
+        simulationResults$.setParameterType("futilityStop", C_PARAM_GENERATED)
+        simulationResults$.setParameterType("earlyStop", C_PARAM_GENERATED)
+    }
     simulationResults$expectedNumberOfSubjects <- cppResult$expectedNumberOfSubjects
     simulationResults$conditionalPowerAchieved <- cppResult$conditionalPowerAchieved
 
