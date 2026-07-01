@@ -201,7 +201,7 @@ FieldSet <- R6::R6Class("FieldSet",
         #' 
         #' @param ... Additional args passed to print/show methods
         #' @param collapse Character used to join multiple output lines (default "")
-        #' @param outputType Type of output to capture: "all", "print", "summary", or "json" (default "all")
+        #' @param outputType One or more types of output to capture: "default", "print", "summary", or "json" (default "default")
         #' @return Character scalar with markdown-formatted content
         #' 
         #' @keywords internal
@@ -209,7 +209,7 @@ FieldSet <- R6::R6Class("FieldSet",
         getStructuredContent = function(
                 ..., 
                 collapse = "", 
-                outputType = c("all", "print", "summary", "json"), 
+                outputType = c("default", "print", "summary", "json"), 
                 addHeading = TRUE,
                 addMetaData = TRUE, 
                 addFunctionCall = TRUE) {
@@ -222,7 +222,6 @@ FieldSet <- R6::R6Class("FieldSet",
                 return(character())
             }
             
-            outputType <- match.arg(outputType)
             output <- character()
             if (addHeading) {
                 output <- c(output, "# rpact Output\n\n")
@@ -259,14 +258,19 @@ FieldSet <- R6::R6Class("FieldSet",
                 }
             }
             
-            if (outputType %in% c("all", "print")) {
+            if (any(outputType == "default")) {
+                outputType <- c("summary", "json")
+            }
+            
+            if (any(outputType == "print")) {
                 if (addHeading) {
                     output <- c(output, "## User-facing print output\n\n")
                 }
                 output <- c(output, paste(self$.catLines, collapse = collapse))
             }
-            if (outputType %in% c("all", "summary") && !isSummayObject()) {
-                if (outputType %in% c("all", "print")) {
+            
+            if (any(outputType == "summary") && !isSummayObject()) {
+                if (any(outputType == "print")) {
                     output <- c(output, "")
                 }
                 if (addHeading) {
@@ -282,8 +286,8 @@ FieldSet <- R6::R6Class("FieldSet",
             }
             
             jsonOutput <- character()
-            if (outputType %in% c("all", "json") && !isSummayObject()) {
-                if (outputType == "all") {
+            if (any(outputType == "json") && !isSummayObject()) {
+                if (length(outputType) > 1) {
                     jsonOutput <- paste0(jsonOutput, "\n")
                 }
                 if (addHeading) {
@@ -291,8 +295,17 @@ FieldSet <- R6::R6Class("FieldSet",
                 }
                 jsonOutput <- paste0(jsonOutput,
                     "```json\n",
-                    paste(design$.jsonLines, collapse = "\n"),
-                    "\n```"
+                    paste(self$.jsonLines, collapse = "\n"),
+                    "\n```\n\n"
+                )
+                if (addHeading) {
+                    jsonOutput <- paste0(jsonOutput, "### Table output of all input and ouput values\n\n")
+                }
+                df <- as.data.frame(self)
+                jsonOutput <- paste0(jsonOutput,
+                    "```json\n",
+                    private$.dataFrameToJson(df),
+                    "\n```\n\n"
                 )
             }
 
@@ -431,6 +444,68 @@ FieldSet <- R6::R6Class("FieldSet",
 
             items <- unlist(lapply(value, private$.getJsonValueItems), use.names = FALSE)
             return(paste0("[", paste(items, collapse = ", "), "]"))
+        },
+        .dataFrameToJson = function(df, indent = 2, digits = 6) {
+            # df: data.frame
+            if (is.null(df) || !is.data.frame(df) || nrow(df) == 0) {
+                return("[]")
+            }
+
+            indentString <- function(level) paste0(rep(" ", level), collapse = "")
+            quoteVal <- function(v) {
+                # handle NULL/NA
+                if (is.null(v) || (length(v) == 1 && (is.na(v) || is.nan(v)))) {
+                    return("null")
+                }
+                
+                # logical
+                if (is.logical(v) && length(v) == 1) {
+                    return(tolower(as.character(v)))
+                }
+
+                # numeric
+                sChar <- as.character(v)
+                numericVal <- suppressWarnings(as.numeric(sChar))
+                if (!is.na(numericVal) && is.finite(numericVal) && !is.logical(v)) {
+                    # use general format with digits significant digits
+                    return(formatC(numericVal, digits = digits, format = "g"))
+                }
+
+                # character: also handle explicit true/false or comma-separated lists
+                s <- as.character(v)
+                sTrim <- trimws(s)
+                # boolean-like strings
+                lower <- tolower(sTrim)
+                if (lower %in% c("true", "false")) {
+                    return(lower)
+                }
+
+                # fallback: quote string
+                return(private$.quoteJsonString(sTrim))
+            }
+
+            lines <- c("[")
+            n <- nrow(df)
+            cols <- colnames(df)
+            for (i in seq_len(n)) {
+                lines <- c(lines, paste0(indentString(indent), "{"))
+                entries <- character()
+                for (j in seq_along(cols)) {
+                    name <- cols[j]
+                    value <- df[i, j]
+                    jsonValue <- trimws(quoteVal(value))
+                    entry <- paste0(indentString(indent * 2), private$.quoteJsonString(name), ": ", jsonValue)
+                    entries <- c(entries, entry)
+                }
+                # join entries with commas
+                if (length(entries) > 0) {
+                    entries[length(entries)] <- paste0(entries[length(entries)], ifelse(i < n, ",", ""))
+                    lines <- c(lines, entries)
+                }
+                lines <- c(lines, paste0(indentString(indent), ifelse(i < n, "},", "}")))
+            }
+            lines <- c(lines, "]")
+            return(paste(lines, collapse = "\n"))
         },
         .getJsonValueItems = function(value) {
             if (is.null(value) || length(value) == 0 || is.na(value[1])) {
