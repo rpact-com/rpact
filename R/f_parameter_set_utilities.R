@@ -80,6 +80,14 @@ NULL
     ))
 }
 
+.getParameterValueFormattedByFormatFunctionName <- function(formatFunctionName, paramValue, parameterSet) {
+    if (identical(formatFunctionName, ".formatCriticalValues") && .isTrialDesign(parameterSet)) {
+        return(.formatCriticalValues(paramValue, design = parameterSet))
+    }
+    
+    return(eval(call(formatFunctionName, paramValue)))
+}
+
 .getParameterValueFormatted <- function(obj, parameterName) {
     tryCatch(
         {
@@ -143,7 +151,7 @@ NULL
                 if (!is.null(formatFunctionName) && !is.null(paramValueFormatted)) {
                     tryCatch(
                         {
-                            paramValueFormatted <- eval(call(formatFunctionName, paramValueFormatted))
+                            paramValueFormatted <- .getParameterValueFormattedByFormatFunctionName(formatFunctionName, paramValueFormatted, obj)
                         },
                         error = function(e) {
                             warning("Failed to format value ", sQuote(parameterName), " with function ",

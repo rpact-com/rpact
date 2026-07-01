@@ -23,6 +23,45 @@ NULL
     return(ifelse(is.na(result), FALSE, result))
 }
 
+.getParsedEnvironmentVariable <- function(value, type = c("unknown", "character", "integer", "numeric", "logical")) {
+    type <- match.arg(type)
+    if (identical(type, "character")) {
+        return(as.character(value))
+    } else if (identical(type, "integer")) {
+        return(as.integer(value))
+    } else if (identical(type, "numeric")) {
+        return(as.numeric(value))
+    } else if (identical(type, "logical")) {
+        if (is.character(value)) {
+            return(tolower(trimws(value)) %in% c("true", "1", "yes", "on"))
+        }
+        return(as.logical(value))
+    }
+    return(value)
+}
+
+.getEnvironmentVariableKey <- function(optionKey) {
+    return(toupper(gsub("\\.", "_", optionKey)))
+}
+
+.getEnvironmentVariable <- function(envKey, optionKey = NULL, ..., type = c("unknown", "character", "integer", "numeric", "logical")) {
+    type <- match.arg(type)
+
+    value <- Sys.getenv(envKey)
+    if (!is.null(value) && !identical(value, "")) {
+        return(.getParsedEnvironmentVariable(value, type = type))
+    }
+
+    if (!is.null(optionKey)) {
+        value <- base::getOption(optionKey, ...)
+        if (!is.null(value)) {
+            return(.getParsedEnvironmentVariable(value, type = type))
+        }
+    }
+
+    return(NULL)
+}
+
 .getPackageName <- function(functionName) {
     .assertIsSingleCharacter(functionName, "functionName")
     tryCatch(
@@ -1522,7 +1561,13 @@ getParameterName <- function(obj, parameterCaption) {
 
 .isMarkdownEnabled <- function(type = c("all", "print", "summary", "plot")) {
     type <- match.arg(type)
-    if (!as.logical(getOption(paste0("rpact.auto.markdown.", type), TRUE))) {
+    optionKey <- paste0("rpact.auto.markdown.", type)
+    if (isFALSE(.getEnvironmentVariable(
+        .getEnvironmentVariableKey(optionKey),
+        optionKey,
+        default = TRUE,
+        type = "logical"
+    ))) {
         return(FALSE)
     }
 
@@ -1554,7 +1599,12 @@ getParameterName <- function(obj, parameterCaption) {
     type <- match.arg(type)
 
     if (is.null(eps) || length(eps) != 1 || is.na(eps)) {
-        epsilon <- getOption("rpact.multivar.dist.eps", 1e-05)
+        epsilon <- .getEnvironmentVariable(
+            "RPACT_MULTIVAR_DIST_EPS",
+            "rpact.multivar.dist.eps",
+            default = 1e-05,
+            type = "numeric"
+        )
         if (is.numeric(epsilon) && epsilon < 0.1) {
             eps <- epsilon
         }
@@ -1681,18 +1731,96 @@ getParameterName <- function(obj, parameterCaption) {
 }
 
 .getMarkdownPlotPrintSeparator <- function() {
-    return(getOption("rpact.markdown.plot.print.separator", C_MARKDOWN_PLOT_PRINT_SEPARATOR))
+    return(.getEnvironmentVariable(
+        "RPACT_MARKDOWN_PLOT_PRINT_SEPARATOR",
+        "rpact.markdown.plot.print.separator",
+        default = C_MARKDOWN_PLOT_PRINT_SEPARATOR,
+        type = "character"
+    ))
 }
 
-.getCriticalValues <- function(design, indices = NULL) {
+.getCriticalValues <- function(design, indices = NULL) {   
+    criticalValues <- abs(design$criticalValues)
     if (!is.null(indices)) {
-        return(design$criticalValues[indices])
+        return(criticalValues[indices])
+    }
+    return(criticalValues)
+}
+
+.getFutilityBounds <- function(
+        design, 
+        indices = NULL, 
+        ..., 
+        phase = c("unknown", "design", "planning", "analysis"),
+        adjustLengthToKMax = FALSE) {
+        
+    phase <- match.arg(phase)
+    futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
+        design$directionUpper, type = "negateIfLower", phase = phase)
+    if (adjustLengthToKMax) {
+        futilityBounds <- c(futilityBounds, C_FUTILITY_BOUNDS_DEFAULT)
+    }
+    if (!is.null(indices)) {
+        return(futilityBounds[indices])
+    }
+    return(futilityBounds)
+}
+
+.getInvalidFutilityBoundsIndices <- function(design) {
+    if (is.null(design) || !.isTrialDesignInverseNormalOrGroupSequential(design)) {
+        return(integer(0))
     }
 
-    return(design$criticalValues)
+    futilityBounds <- .getFutilityBounds(design)
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
+        return(integer(0))
+    }
+
+    if (isFALSE(design$directionUpper)) {
+        return(which(futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE))
+    }
+
+    return(which(futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE))
 }
 
-.applyDirectionOfAlternative <- function(value,
+.getFutilityBoundsDefaultValue <- function(design) {
+    if (.isTrialDesign(design) && isFALSE(design$directionUpper)) {
+        return(C_FUTILITY_BOUNDS_MAX_VALUE)
+    }
+
+    return(C_FUTILITY_BOUNDS_MIN_VALUE)
+}
+
+.getFormattedFutilityBounds <- function(design, futilityBounds = design$futilityBounds) {
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
+        return(futilityBounds)
+    }
+
+    futilityBoundsFormatted <- futilityBounds
+    if (!is.null(design) && isFALSE(design$directionUpper)) {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- Inf
+    } else {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- -Inf
+    }
+    return(futilityBoundsFormatted)
+}
+
+.getHarmonizedFutilityBounds <- function(design, futilityBounds = design$futilityBounds) {
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
+        return(futilityBounds)
+    }
+
+    futilityBoundsFormatted <- futilityBounds
+    if (isFALSE(design$directionUpper)) {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- C_FUTILITY_BOUNDS_MAX_VALUE
+    } else {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- C_FUTILITY_BOUNDS_MIN_VALUE
+    }
+    return(futilityBoundsFormatted)
+}
+
+.applyDirectionOfAlternative <- function(
+        value,
         directionUpper,
         ...,
         type = c(
@@ -1707,10 +1835,6 @@ getParameterName <- function(obj, parameterCaption) {
         syncLength = FALSE) {
     type <- match.arg(type)
     phase <- match.arg(phase)
-
-    if (phase == "design") {
-        return(value) # deactivate for current release
-    }
 
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
         return(value)

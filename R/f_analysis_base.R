@@ -176,7 +176,7 @@ getAnalysisResults <- function(design,
         stage = NA_integer_,
         maxInformation = NULL,
         informationEpsilon = NULL) {
-    on.exit(base::options("rpact.analyis.repeated.p.values.warnings.enabled" = "TRUE"))
+    on.exit(base::options("rpact.analysis.repeated.p.values.warnings.enabled" = "TRUE"))
     designAndDataInput <- .getDesignAndDataInput(design = design, dataInput = dataInput, ...)
     design <- designAndDataInput$design
     dataInput <- designAndDataInput$dataInput
@@ -496,7 +496,7 @@ getTestActions <- function(stageResults, ...) {
                 if (k < design$kMax) {
                     if (stageResults$combInverseNormal[k] > criticalValues[k]) {
                         testActions[k] <- "reject and stop"
-                    } else if (stageResults$combInverseNormal[k] < design$futilityBounds[k]) {
+                    } else if (stageResults$combInverseNormal[k] < .getFutilityBounds(design, k)) {
                         testActions[k] <- "accept and stop"
                     } else {
                         testActions[k] <- "continue"
@@ -531,7 +531,7 @@ getTestActions <- function(stageResults, ...) {
                 if (k < design$kMax) {
                     if (.getOneMinusQNorm(stageResults$overallPValues[k]) > criticalValues[k]) {
                         testActions[k] <- "reject and stop"
-                    } else if (.getOneMinusQNorm(stageResults$overallPValues[k]) < design$futilityBounds[k]) {
+                    } else if (.getOneMinusQNorm(stageResults$overallPValues[k]) < .getFutilityBounds(design, k)) {
                         testActions[k] <- "accept and stop"
                     } else {
                         testActions[k] <- "continue"
@@ -1025,7 +1025,12 @@ getRepeatedPValues <- function(stageResults, ...,
 
     if (.isTrialDesignInverseNormalOrGroupSequential(design) &&
             design$typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER, C_TYPE_OF_DESIGN_WT_OPTIMUM)) {
-        showWarnings <- as.logical(getOption("rpact.analyis.repeated.p.values.warnings.enabled", "TRUE"))
+        showWarnings <- .getEnvironmentVariable(
+            "RPACT_ANALYSIS_REPEATED_P_VALUES_WARNINGS_ENABLED",
+            "rpact.analysis.repeated.p.values.warnings.enabled",
+            default = TRUE,
+            type = "logical"
+        )
         if (showWarnings) {
             warning("Repeated p-values not available for 'typeOfDesign' = '",
                 design$typeOfDesign, "'",
@@ -1095,7 +1100,7 @@ getRepeatedPValues <- function(stageResults, ...,
                 if (.isTrialDesignInverseNormal(design)) {
                     decisionMatrix <- matrix(
                         c(
-                            design$futilityBounds[1:(finalStage - 1)], C_FUTILITY_BOUNDS_DEFAULT,
+                            .getFutilityBounds(design, 1:(finalStage - 1)), C_FUTILITY_BOUNDS_DEFAULT,
                             c(criticalValues[1:(finalStage - 1)], stageResults$combInverseNormal[finalStage])
                         ),
                         nrow = 2, byrow = TRUE
@@ -1103,7 +1108,7 @@ getRepeatedPValues <- function(stageResults, ...,
                 } else {
                     decisionMatrix <- matrix(
                         c(
-                            design$futilityBounds[1:(finalStage - 1)], C_FUTILITY_BOUNDS_DEFAULT,
+                            .getFutilityBounds(design, 1:(finalStage - 1)), C_FUTILITY_BOUNDS_DEFAULT,
                             c(criticalValues[1:(finalStage - 1)], .getOneMinusQNorm(stageResults$overallPValues[finalStage]))
                         ),
                         nrow = 2, byrow = TRUE
@@ -1232,8 +1237,8 @@ getRepeatedPValues <- function(stageResults, ...,
             }
         }
 
-        if (design$bindingFutility && k < design$kMax && stageResults$combInverseNormal[k] <=
-                design$futilityBounds[k]) {
+        if (design$bindingFutility && k < design$kMax && 
+                stageResults$combInverseNormal[k] <= .getFutilityBounds(design, k)) {
             return(k)
         }
     }
@@ -1259,7 +1264,7 @@ getRepeatedPValues <- function(stageResults, ...,
         }
 
         if (design$bindingFutility && k < design$kMax &&
-                .getQNorm(max(1e-8, 1 - stageResults$overallPValues[k])) <= design$futilityBounds[k]) {
+                .getQNorm(max(1e-8, 1 - stageResults$overallPValues[k])) <= .getFutilityBounds(design, k)) {
             return(k)
         }
     }
@@ -1628,6 +1633,7 @@ getFinalConfidenceInterval <- function(design,
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
 
     repeatedPValues <- rep(NA_real_, design$kMax)
+    futilityBounds <- .getFutilityBounds(design)
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_HP && stageResults$stage == design$kMax) {
         if (!is.na(stageResults$overallPValues[design$kMax]) &&
                 .getOneMinusQNorm(stageResults$overallPValues[design$kMax]) == Inf) {
@@ -1639,7 +1645,7 @@ getFinalConfidenceInterval <- function(design,
                 sided = design$sided,
                 informationRates = design$informationRates,
                 typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                futilityBounds = design$futilityBounds,
+                futilityBounds = futilityBounds,
                 bindingFutility = design$bindingFutility
             )$alphaSpent[design$kMax - 1] + tolerance
             upper <- 0.5
@@ -1650,7 +1656,7 @@ getFinalConfidenceInterval <- function(design,
                         sided = design$sided,
                         informationRates = design$informationRates,
                         typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                        futilityBounds = design$futilityBounds,
+                        futilityBounds = futilityBounds,
                         bindingFutility = design$bindingFutility
                     )
                     if (design$sided == 2) {
@@ -1704,7 +1710,7 @@ getFinalConfidenceInterval <- function(design,
                             deltaPT1 = design$deltaPT1,
                             beta = design$beta,
                             gammaA = design$gammaA,
-                            futilityBounds = design$futilityBounds,
+                            futilityBounds = futilityBounds,
                             bindingFutility = design$bindingFutility
                         )
                         if (design$sided == 2) {
@@ -1734,7 +1740,7 @@ getFinalConfidenceInterval <- function(design,
     .warnInCaseOfUnknownArguments(functionName = ".getRepeatedPValuesInverseNormal", ...)
 
     repeatedPValues <- rep(NA_real_, design$kMax)
-
+    futilityBounds <- .getFutilityBounds(design)
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_HP && stageResults$stage == design$kMax) {
         if (!is.na(stageResults$combInverseNormal[design$kMax]) &&
                 stageResults$combInverseNormal[design$kMax] == Inf) {
@@ -1746,7 +1752,7 @@ getFinalConfidenceInterval <- function(design,
                 sided = design$sided,
                 informationRates = design$informationRates,
                 typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                futilityBounds = design$futilityBounds,
+                futilityBounds = futilityBounds,
                 bindingFutility = design$bindingFutility
             )$alphaSpent[design$kMax - 1] + tolerance
             upper <- 0.5
@@ -1758,7 +1764,7 @@ getFinalConfidenceInterval <- function(design,
                         sided = design$sided,
                         informationRates = design$informationRates,
                         typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                        futilityBounds = design$futilityBounds,
+                        futilityBounds = futilityBounds,
                         bindingFutility = design$bindingFutility
                     )
                     if (design$sided == 2) {
@@ -1812,7 +1818,7 @@ getFinalConfidenceInterval <- function(design,
                             deltaPT1 = design$deltaPT1,
                             beta = design$beta,
                             gammaA = design$gammaA,
-                            futilityBounds = design$futilityBounds,
+                            futilityBounds = futilityBounds,
                             bindingFutility = design$bindingFutility
                         )
                         if (design$sided == 2) {
@@ -1953,7 +1959,7 @@ getFinalConfidenceInterval <- function(design,
     criticalValues <- .getCriticalValues(design)
     informationRates <- design$informationRates
     weights <- stageResults$weightsInverseNormal
-    futilityBounds <- design$futilityBounds
+    futilityBounds <- .getFutilityBounds(design, phase = "analysis")
 
     kMax <- design$kMax
     conditionalRejectionProbabilities <- rep(NA_real_, kMax)
@@ -2261,7 +2267,7 @@ getConditionalRejectionProbabilities <- function(stageResults, ...) {
     result <- .getOneDimensionalRoot(
         function(theta) {
             if (design$bindingFutility) {
-                row1part1 <- design$futilityBounds[1:(stage - 1)]
+                row1part1 <- .getFutilityBounds(design, 1:(stage - 1))
             } else {
                 row1part1 <- rep(C_FUTILITY_BOUNDS_DEFAULT, stage - 1)
             }

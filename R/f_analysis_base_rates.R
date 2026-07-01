@@ -883,7 +883,7 @@ NULL
     } else {
         criticalValues[is.infinite(criticalValues) & criticalValues > 0] <- C_QNORM_MAXIMUM
         criticalValues[is.infinite(criticalValues) & criticalValues < 0] <- C_QNORM_MINIMUM
-        bounds <- design$futilityBounds
+        bounds <- .getFutilityBounds(design)
         border <- C_FUTILITY_BOUNDS_DEFAULT
         conditionFunction <- .isFirstValueGreaterThanSecondValue
     }
@@ -1241,7 +1241,7 @@ NULL
     if (stage == kMax - 1) {
         shiftedFutilityBounds <- c()
     } else {
-        shiftedFutilityBounds <- design$futilityBounds[(stage + 1):(kMax - 1)] *
+        shiftedFutilityBounds <- .getFutilityBounds(design, (stage + 1):(kMax - 1)) *
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):(kMax - 1)]^2)) /
             sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
             .getOneMinusQNorm(stageResults$overallPValues[stage]) *
@@ -1366,7 +1366,7 @@ NULL
     if (stage == kMax - 1) {
         shiftedFutilityBounds <- c()
     } else {
-        shiftedFutilityBounds <- design$futilityBounds[(stage + 1):(kMax - 1)] *
+        shiftedFutilityBounds <- .getFutilityBounds(design, (stage + 1):(kMax - 1)) *
             sqrt(sum(weights[1:stage]^2) + cumsum(weights[(stage + 1):(kMax - 1)]^2)) /
             sqrt(cumsum(weights[(stage + 1):(kMax - 1)]^2)) -
             c(weights[1:stage] %*% .getOneMinusQNorm(stageResults$pValues[1:stage])) /
@@ -1536,7 +1536,6 @@ NULL
     }
 
     results <- ConditionalPowerResultsRates$new(
-        # R6$new
         .stageResults = stageResults,
         .design = stageResults$.design,
         nPlanned = nPlanned,
@@ -1587,7 +1586,7 @@ NULL
     } else {
         .stopWithWrongDesignMessage(stageResults$.design, inclusiveConditionalDunnett = FALSE)
     }
-
+    
     results$nPlanned <- cp$nPlanned
     results$conditionalPower <- cp$conditionalPower
     results$.setParameterType("nPlanned", C_PARAM_GENERATED)
@@ -2172,7 +2171,7 @@ NULL
 
     message(
         "Calculation of final confidence interval for Fisher's ",
-        "design not implemented yet"
+        "design not yet implemented"
     )
 
     return(list(

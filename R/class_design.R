@@ -395,6 +395,7 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
     public = list(
         beta = NULL,
         sided = NULL,
+        power = NULL,
         twoSidedPower = NULL,
         futilityBounds = NULL,
         initialize = function(
@@ -404,6 +405,7 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
                 twoSidedPower = C_TWO_SIDED_POWER_DEFAULT) {
             self$kMax <- 1L
             self$beta <- beta
+            self$power <- 1 - beta
             self$sided <- sided
             self$twoSidedPower <- twoSidedPower
             super$initialize(...) # important: don't move to first line of constructor
@@ -412,6 +414,7 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
             
             self$.initParameterTypes()
             self$.initStages()
+            self$.setParameterType("power", C_PARAM_NOT_APPLICABLE)
         },
         hasChanged = function(
                 ...,
@@ -549,7 +552,7 @@ TrialDesignFisher <- R6::R6Class("TrialDesignFisher",
             }
             alpha0VecTemp <- alpha0Vec[1:(kMax - 1)]
             if (anyNA(alpha0VecTemp)) {
-                alpha0VecTemp <- rep(C_FUTILITY_BOUNDS_DEFAULT, kMax - 1)
+                alpha0VecTemp <- rep(C_ALPHA_0_VEC_DEFAULT, kMax - 1)
             }
             if (!isTRUE(all.equal(kMax, self$kMax))) {
                 return(TRUE)
@@ -770,6 +773,7 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
                 typeBetaSpending,
                 efficacyStops,
                 futilityStops,
+                directionUpper,
                 gammaA,
                 gammaB,
                 bindingFutility,
@@ -801,6 +805,9 @@ TrialDesignInverseNormal <- R6::R6Class("TrialDesignInverseNormal",
             }
             if (!identical(twoSidedPower, self$twoSidedPower)) {
                 return(self$.pasteComparisonResult("twoSidedPower", twoSidedPower, self$twoSidedPower))
+            }
+            if (!identical(directionUpper, self$directionUpper)) {
+                return(self$.pasteComparisonResult("directionUpper", directionUpper, self$directionUpper))
             }
             if (kMax == 1) {
                 return(FALSE)

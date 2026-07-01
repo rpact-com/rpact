@@ -383,7 +383,7 @@ NULL
         allocationRatioPlanned <- rep(allocationRatioPlanned, nParameters)
     }
 
-    futilityBounds <- design$futilityBounds
+    futilityBounds <- .getFutilityBounds(design)
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
 
     criticalValuesEffectScaleUpper <- matrix(, nrow = design$kMax, ncol = nParameters)
@@ -768,7 +768,7 @@ NULL
     designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_NOT_APPLICABLE)
 
     if (.hasApplicableFutilityBounds(design)) {
-        designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)
+        designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(.getFutilityBounds(design)), ncol = 1)
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }
 
@@ -1525,9 +1525,9 @@ NULL
         designPlan$earlyStop <- sum(designPlan$rejectPerStage[1:(designPlan$.design$kMax - 1), ])
         designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
     }
-
+    
     if (!is.null(designCharacteristics$futilityProbabilities) &&
-            any(designPlan$.design$futilityBounds != C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
+            any(.getFutilityBounds(designPlan$.design) != C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
         designPlan$futilityPerStage <- matrix(designCharacteristics$futilityProbabilities,
             nrow = designPlan$.design$kMax - 1
         )

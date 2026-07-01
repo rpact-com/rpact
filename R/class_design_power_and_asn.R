@@ -179,7 +179,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
         },
         .getPowerAndAverageSampleNumber = function(theta) {
             kMax <- self$.design$kMax
-            futilityBounds <- self$.design$futilityBounds
+            futilityBounds <- .getFutilityBounds(self$.design)
             informationRates <- self$.design$informationRates
             criticalValues <- .getCriticalValues(self$.design)
             sided <- self$.design$sided
@@ -234,7 +234,7 @@ PowerAndAverageSampleNumberResult <- R6::R6Class("PowerAndAverageSampleNumberRes
                 }
 
                 probs <- .getGroupSequentialProbabilities(decisionMatrix, informationRates)
-
+                
                 if (nrow(probs) == 3) {
                     .averageSampleNumber <- self$nMax - sum((probs[3, 1:(kMax - 1)] - probs[2, 1:(kMax - 1)] + probs[1, 1:(kMax - 1)]) *
                         (informationRates[kMax] - informationRates[1:(kMax - 1)]) * self$nMax)

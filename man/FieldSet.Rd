@@ -3,6 +3,16 @@
 \name{FieldSet}
 \alias{FieldSet}
 \title{Field Set}
+\arguments{
+\item{...}{Additional args passed to print/show methods}
+
+\item{collapse}{Character used to join multiple output lines (default "")}
+
+\item{outputType}{Type of output to capture: "all", "print", "summary", or "json" (default "all")}
+}
+\value{
+Character scalar with markdown-formatted content
+}
 \description{
 Basic class for field sets.
 }

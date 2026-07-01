@@ -613,13 +613,15 @@ NULL
 
 .installationQualificationDone <- function() {
     return(identical(
-        getOption("rpact.system.identifier"),
-        getSystemIdentifier(getOption("rpact.system.test.date"))
+        .getEnvironmentVariable("RPACT_SYSTEM_IDENTIFIER", 
+            "rpact.system.identifier", type = "character"),
+        getSystemIdentifier(.getEnvironmentVariable("RPACT_SYSTEM_TEST_DATE", 
+            "rpact.system.test.date", type = "character"))
     ))
 }
 
 .setSystemIdentifier <- function() {
-    date <- getOption("rpact.system.test.date")
+    date <- .getEnvironmentVariable("RPACT_SYSTEM_TEST_DATE", "rpact.system.test.date")
     if (is.null(date)) {
         date <- Sys.Date()
         base::options("rpact.system.test.date" = date)
@@ -656,11 +658,20 @@ NULL
 #' @noRd
 #'
 .isStartupMessagingEnabled <- function() {
-    if (isFALSE(as.logical(base::getOption("rpact.startup.message.enabled")))) {
+    if (isFALSE(.getEnvironmentVariable(
+        "RPACT_STARTUP_MESSAGE_ENABLED",
+        "rpact.startup.message.enabled",
+        default = TRUE,
+        type = "logical"
+    ))) {
         return(FALSE)
     }
 
-    lastShownTime <- base::getOption("rpact.startup.message.timestamp")
+    lastShownTime <- .getEnvironmentVariable(
+        "RPACT_STARTUP_MESSAGE_TIMESTAMP",
+        "rpact.startup.message.timestamp",
+        type = "character"
+    )
     currentTime <- Sys.time()
     if (is.null(lastShownTime) || !grepl("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", lastShownTime)) {
         base::options("rpact.startup.message.timestamp" = currentTime)
@@ -704,7 +715,12 @@ NULL
 #' @keywords internal
 #'
 disableStartupMessages <- function() {
-    if (isFALSE(as.logical(base::getOption("rpact.startup.message.enabled")))) {
+    if (isFALSE(.getEnvironmentVariable(
+        "RPACT_STARTUP_MESSAGE_ENABLED",
+        "rpact.startup.message.enabled",
+        default = TRUE,
+        type = "logical"
+    ))) {
         return(invisible())
     }
 
@@ -736,7 +752,12 @@ disableStartupMessages <- function() {
 #' @keywords internal
 #'
 enableStartupMessages <- function() {
-    if (isTRUE(as.logical(base::getOption("rpact.startup.message.enabled")))) {
+    if (isTRUE(.getEnvironmentVariable(
+        "RPACT_STARTUP_MESSAGE_ENABLED",
+        "rpact.startup.message.enabled",
+        default = TRUE,
+        type = "logical"
+    ))) {
         return(invisible())
     }
 
@@ -1250,7 +1271,7 @@ testPackage <- function(outDir = ".",
     } else if (executionMode %in% c("downloadAndRunTests", "runTestsInTestFileDirectory")) {
         if (completeUnitTestSetEnabled) {
             cat("Run all tests. Please wait...\n")
-            cat("Have a break - it takes about 30 minutes.\n")
+            cat("Have a break - it takes about 45 minutes.\n")
             cat("Exceution of all available unit tests startet at ",
                 format(startTime, "%H:%M (%d-%B-%Y)"), "\n",
                 sep = ""

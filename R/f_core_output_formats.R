@@ -230,7 +230,8 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 .assertIsValitOutputFormatOptionValue("rpact.output.format.sample.size", "roundFunction = ceiling")
 
 .getOutputFormatOptions <- function(optionKey) {
-    str <- getOption(optionKey)
+    str <- .getEnvironmentVariable(.getEnvironmentVariableKey(optionKey), 
+        optionKey, type = "character")
     if (is.null(str) || length(str) == 0 || nchar(trimws(str)) == 0) {
         return(NULL)
     }
@@ -503,8 +504,8 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 # @details
 # Digits = 3, nsmall = 3
 #
-.formatCriticalValues <- function(value) {
-    value[value == C_FUTILITY_BOUNDS_DEFAULT] <- -Inf
+.formatCriticalValues <- function(value, design = NULL) {
+    value <- .getFormattedFutilityBounds(design = design, futilityBounds = value)
     x <- .getOptionBasedFormattedValue("rpact.output.format.critical.value",
         value = value, digits = 3, nsmall = 3
     )
@@ -1130,8 +1131,11 @@ getOutputFormat <- function(parameterName = NA_character_, ...,
             currentOutputFormats <- C_OUTPUT_FORMAT_DEFAULT_VALUES
         } else {
             for (key in names(C_OUTPUT_FORMAT_DEFAULT_VALUES)) {
-                currentOutputFormats[[key]] <- getOption(key,
-                    default = C_OUTPUT_FORMAT_DEFAULT_VALUES[[key]]
+                currentOutputFormats[[key]] <- .getEnvironmentVariable(
+                    .getEnvironmentVariableKey(key),
+                    key,
+                    default = C_OUTPUT_FORMAT_DEFAULT_VALUES[[key]],
+                    type = "character"
                 )
             }
         }
@@ -1146,7 +1150,12 @@ getOutputFormat <- function(parameterName = NA_character_, ...,
     if (default) {
         value <- C_OUTPUT_FORMAT_DEFAULT_VALUES[[key]]
     } else {
-        value <- getOption(key, default = C_OUTPUT_FORMAT_DEFAULT_VALUES[[key]])
+        value <- .getEnvironmentVariable(
+            .getEnvironmentVariableKey(key),
+            key,
+            default = C_OUTPUT_FORMAT_DEFAULT_VALUES[[key]],
+            type = "character"
+        )
     }
     currentOutputFormats[[key]] <- value
     if (!is.na(file)) {

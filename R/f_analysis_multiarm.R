@@ -570,7 +570,7 @@ getClosedCombinationTestResults <- function(stageResults) {
     }
 
     intersectionTest <- stageResults$intersectionTest
-
+    futilityBounds <- .getFutilityBounds(design)
     if (!.isTrialDesignFixed(design) && !.isTrialDesignFisher(design) && (design$typeOfDesign == C_TYPE_OF_DESIGN_HP)) {
         if (stage == kMax) {
             startTime <- Sys.time()
@@ -582,7 +582,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                         sided = design$sided,
                         informationRates = design$informationRates,
                         typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                        futilityBounds = design$futilityBounds,
+                        futilityBounds = futilityBounds,
                         bindingFutility = design$bindingFutility
                     )$alphaSpent[kMax - 1] + tolerance
                     upper <- 0.5
@@ -592,7 +592,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                         designAlpha <- .getDesignInverseNormal(
                             kMax = kMax,
                             alpha = alpha, typeOfDesign = C_TYPE_OF_DESIGN_HP,
-                            futilityBounds = design$futilityBounds,
+                            futilityBounds = futilityBounds,
                             sided = design$sided, bindingFutility = design$bindingFutility,
                             informationRates = design$informationRates
                         )
@@ -623,11 +623,12 @@ getClosedCombinationTestResults <- function(stageResults) {
                     if (.isTrialDesignFisher(design)) {
                         designAlpha <- .getDesignFisher(kMax = 1, alpha = alpha)
                     } else {
-                        designAlpha <- .getDesignInverseNormal(kMax = 1, alpha = alpha)
+                        suppressWarnings(designAlpha <- .getDesignInverseNormal(kMax = 1, alpha = alpha))
                     }
                     ctr <- .performClosedCombinationTest(
                         stageResults = stageResults,
-                        design = designAlpha, intersectionTest = intersectionTest
+                        design = designAlpha, 
+                        intersectionTest = intersectionTest
                     )
                     ifelse(ctr$rejected[g, 1], upper <- alpha, lower <- alpha)
                     prec <- upper - lower
@@ -670,7 +671,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                                 deltaPT1 = design$deltaPT1,
                                 beta = design$beta,
                                 gammaA = design$gammaA,
-                                futilityBounds = design$futilityBounds,
+                                futilityBounds = futilityBounds,
                                 sided = design$sided,
                                 bindingFutility = design$bindingFutility,
                                 informationRates = design$informationRates
@@ -1086,7 +1087,7 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
                 if (stageIndex == kMax - 1) {
                     shiftedFutilityBounds <- c()
                 } else {
-                    shiftedFutilityBounds <- design$futilityBounds[(stageIndex + 1):(kMax - 1)] *
+                    shiftedFutilityBounds <- .getFutilityBounds(design, (stageIndex + 1):(kMax - 1)) *
                         sqrt(sum(weights[1:stageIndex]^2) + cumsum(weights[(stageIndex + 1):(kMax - 1)]^2)) /
                         sqrt(cumsum(weights[(stageIndex + 1):(kMax - 1)]^2)) -
                         min(ctr$overallAdjustedTestStatistics[ctr$indices[, g] == 1, stageIndex], na.rm = TRUE) *

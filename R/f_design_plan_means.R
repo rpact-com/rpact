@@ -62,27 +62,22 @@ NULL
     }
     
     if (design$kMax > 1) {
-        if (designPlan$normalApproximation) {
-            futilityBounds <- design$futilityBounds
-        } else {
-            if (any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
-                futilityBounds <- stats::qt(
-                    stats::pnorm(design$futilityBounds),
-                    pmax(design$informationRates[1:(design$kMax - 1)] %*%
-                            t(maxNumberOfSubjects) - designPlan$groups, 1e-04)
-                )
+        futilityBounds <- .getFutilityBounds(design)
+        if (!designPlan$normalApproximation && .hasApplicableFutilityBounds(design)) {
+            futilityBounds <- stats::qt(
+                stats::pnorm(futilityBounds),
+                pmax(design$informationRates[1:(design$kMax - 1)] %*%
+                        t(maxNumberOfSubjects) - designPlan$groups, 1e-04)
+            )
 
-                # outside validated range
-                futilityBounds[abs(futilityBounds) > 50] <- NA_real_
-                if (anyNA(futilityBounds)) {
-                    warning("The computation of futility boundaries on ",
-                        "treatment effect scale not performed presumably ",
-                        "due to too small degrees of freedom",
-                        call. = FALSE
-                    )
-                }
-            } else {
-                futilityBounds <- design$futilityBounds
+            # outside validated range
+            futilityBounds[abs(futilityBounds) > 50] <- NA_real_
+            if (anyNA(futilityBounds)) {
+                warning("The computation of futility boundaries on ",
+                    "treatment effect scale not performed presumably ",
+                    "due to too small degrees of freedom",
+                    call. = FALSE
+                )
             }
         }
         futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
@@ -636,7 +631,7 @@ NULL
     designPlan$.setParameterType("criticalValuesPValueScale", C_PARAM_NOT_APPLICABLE)
 
     if (.hasApplicableFutilityBounds(design)) {
-        designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)
+        designPlan$futilityBoundsPValueScale <- matrix(1 - stats::pnorm(.getFutilityBounds(design)), ncol = 1)
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }
 

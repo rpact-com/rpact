@@ -668,7 +668,7 @@ getSimulationCounts <- function(design = NULL,
                             index <- index + 1
                             break
                         }
-                        if (zValue < design$futilityBounds[k] && k < kMax) {
+                        if (zValue < .getFutilityBounds(design, k) && k < kMax) {
                             futility[k] <- futility[k] + 1
                             dataTrialStop[index] <- TRUE
                             dataFutility[index] <- 1

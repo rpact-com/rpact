@@ -821,7 +821,12 @@ getDataSet <- function(..., floatingPointNumbersEnabled = FALSE) {
         }
     )
 
-    stDevCalcMode <- getOption("rpact.dataset.stdev.calc.mode", "auto") # auto, sigma, norm, t
+    stDevCalcMode <- .getEnvironmentVariable(
+        "RPACT_DATASET_STDEV_CALC_MODE",
+        "rpact.dataset.stdev.calc.mode",
+        default = "auto",
+        type = "character"
+    ) # auto, sigma, norm, t
     for (stage in seq_len(length(emmeansResults))) {
         emmeansResult <- emmeansResults[[stage]]
         emmeansResultsSummary <- summary(emmeansResult)
@@ -2634,7 +2639,7 @@ plot.Dataset <- function(x, y, ...,
 .plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_character_,
         legendTitle = "Group", palette = "Set1", showSource = FALSE, plotSettings = NULL) {
     if (x$.enrichmentEnabled) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of enrichment data is not implemented yet")
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of enrichment data is not yet implemented")
     }
 
     .assertGgplotIsInstalled()
@@ -2651,11 +2656,11 @@ plot.Dataset <- function(x, y, ...,
         }
     } else if (x$isDatasetSurvival()) {
         # Open work: implement dataset plot of survival data
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of survival data is not implemented yet")
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of survival data is not yet implemented")
     }
 
     if (!is.logical(showSource) || isTRUE(showSource)) {
-        warning("'showSource' != FALSE is not implemented yet for class ", .getClassName(x))
+        warning("'showSource' != FALSE is not yet implemented for class ", .getClassName(x))
     }
 
     if (is.null(plotSettings)) {
@@ -3688,7 +3693,7 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
         getRandomData = function() {
             stop(
                 C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "the function 'DatasetSurvival.getRandomData()' is not implemented yet"
+                "the function 'DatasetSurvival.getRandomData()' is not yet implemented"
             )
         },
         .getOverallLogRanks = function(logRanks, events, overallEvents,
@@ -4068,7 +4073,12 @@ summary.Dataset <- function(object, ..., type = 1, digits = NA_integer_) {
         return(summary.ParameterSet(object, type = type, digits = digits, ...))
     }
 
-    intervalFormat <- getOption("rpact.summary.intervalFormat", "[%s; %s]")
+    intervalFormat <- .getEnvironmentVariable(
+        "RPACT_SUMMARY_INTERVALFORMAT",
+        "rpact.summary.intervalFormat",
+        "[%s; %s]",
+        type = "character"
+    )
     .assertIsValidSummaryIntervalFormat(intervalFormat)
 
     summaryFactory <- SummaryFactory$new(object = object, intervalFormat = intervalFormat)

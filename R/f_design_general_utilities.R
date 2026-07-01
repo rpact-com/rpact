@@ -23,7 +23,8 @@ NULL
 }
 
 .getDefaultDesign <- function(...,
-        type = c("sampleSize", "power", "simulation", "simulationCounts", "analysis", "characteristics"),
+        type = c("sampleSize", "power", "simulation", 
+            "simulationCounts", "analysis", "characteristics"),
         ignore = c()) {
     type <- match.arg(type)
 
@@ -65,29 +66,19 @@ NULL
     } else {
         ignore <- c(ignore, "twoSidedPower")
     }
-    if (type %in% c("analysis", "simulation")) {
-        design <- getDesignInverseNormal(
-            kMax = 1,
-            alpha = alpha,
-            beta = beta,
-            sided = sided,
-            twoSidedPower = twoSidedPower,
-            directionUpper = directionUpper
-        )
-    } else {
-        design <- getDesignGroupSequential(
-            kMax = 1,
-            alpha = alpha,
-            beta = beta,
-            sided = sided,
-            twoSidedPower = twoSidedPower,
-            directionUpper = directionUpper
-        )
-    }
+    
+    design <- getDesignFixed(
+        alpha = alpha,
+        beta = beta,
+        sided = sided,
+        twoSidedPower = twoSidedPower,
+        directionUpper = directionUpper
+    )
     return(design)
 }
 
-.getDesignArgumentsToIgnoreAtUnknownArgumentCheck <- function(design, powerCalculationEnabled = FALSE) {
+.getDesignArgumentsToIgnoreAtUnknownArgumentCheck <- function(
+        design, powerCalculationEnabled = FALSE) {
     baseArgsToIgnore <- c("showObservedInformationRatesMessage", "showWarnings")
 
     if (design$kMax > 1) {
@@ -109,9 +100,12 @@ NULL
         
     .assertIsTrialDesignInverseNormalOrGroupSequential(design)
     return(.getValidatedFutilityBoundsOrAlpha0Vec(
-        design = design, parameterName = "futilityBounds",
-        defaultValue = C_FUTILITY_BOUNDS_DEFAULT, kMaxLowerBound = kMaxLowerBound,
-        writeToDesign = writeToDesign, twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
+        design = design, 
+        parameterName = "futilityBounds",
+        defaultValue = .getFutilityBoundsDefaultValue(design), 
+        kMaxLowerBound = kMaxLowerBound,
+        writeToDesign = writeToDesign, 
+        twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
     ))
 }
 
@@ -119,9 +113,12 @@ NULL
         writeToDesign = TRUE, twoSidedWarningForDefaultValues = TRUE) {
     .assertIsTrialDesignFisher(design)
     return(.getValidatedFutilityBoundsOrAlpha0Vec(
-        design = design, parameterName = "alpha0Vec",
-        defaultValue = C_ALPHA_0_VEC_DEFAULT, kMaxLowerBound = kMaxLowerBound,
-        writeToDesign = writeToDesign, twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
+        design = design, 
+        parameterName = "alpha0Vec",
+        defaultValue = C_ALPHA_0_VEC_DEFAULT, 
+        kMaxLowerBound = kMaxLowerBound,
+        writeToDesign = writeToDesign, 
+        twoSidedWarningForDefaultValues = twoSidedWarningForDefaultValues
     ))
 }
 
@@ -141,9 +138,12 @@ NULL
                 kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
             )
         } else {
-            .assertAreValidFutilityBounds(parameterValues,
+            .assertAreValidFutilityBounds(
+                futilityBounds = parameterValues,
                 kMax = design$kMax,
-                kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
+                directionUpper = design$directionUpper,
+                kMaxLowerBound = kMaxLowerBound, 
+                kMaxUpperBound = kMaxUpperBound
             )
         }
     }
@@ -198,7 +198,8 @@ NULL
             }
         }
 
-        if (.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds(design, parameterName, writeToDesign)) {
+        if (.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds(
+                design, parameterName, writeToDesign)) {
             return(rep(defaultValue, design$kMax - 1))
         }
 
@@ -218,9 +219,12 @@ NULL
             kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
         )
     } else {
-        .assertAreValidFutilityBounds(parameterValues,
+        .assertAreValidFutilityBounds(
+            futilityBounds = parameterValues,
             kMax = design$kMax,
-            kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
+            directionUpper = design$directionUpper,
+            kMaxLowerBound = kMaxLowerBound, 
+            kMaxUpperBound = kMaxUpperBound
         )
     }
 
@@ -232,7 +236,8 @@ NULL
 }
 
 # Check whether design is a beta spending or Pampallona Tsiatis design
-.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds <- function(design, parameterName, writeToDesign) {
+.isBetaSpendingOrPampallonaTsiatisDesignWithDefinedFutilityBounds <- function(
+        design, parameterName, writeToDesign) {
     if (.isTrialDesignFisher(design)) {
         return(FALSE)
     }

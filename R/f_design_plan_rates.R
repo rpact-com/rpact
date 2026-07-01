@@ -75,7 +75,7 @@ NULL
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, nParameters)
     }
-    futilityBounds <- design$futilityBounds
+    futilityBounds <- .getFutilityBounds(design)
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
 
     if (designPlan$groups == 1) {
@@ -839,7 +839,7 @@ NULL
 
     if (.hasApplicableFutilityBounds(design)) {
         designPlan$futilityBoundsPValueScale <-
-            matrix(1 - stats::pnorm(design$futilityBounds), ncol = 1)
+            matrix(1 - stats::pnorm(.getFutilityBounds(design)), ncol = 1)
         designPlan$.setParameterType("futilityBoundsPValueScale", C_PARAM_GENERATED)
     }
 

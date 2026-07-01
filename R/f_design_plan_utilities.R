@@ -18,7 +18,7 @@
 NULL
 
 .hideFutilityStopsIfNotApplicable <- function(designPlan) {
-    if (all(designPlan$.design$futilityBounds == C_FUTILITY_BOUNDS_DEFAULT)) {
+    if (!.isTrialDesignWithValidFutilityBounds(designPlan$.design)) {
         designPlan$.setParameterType("futilityStop", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("futilityPerStage", C_PARAM_NOT_APPLICABLE)
     }
@@ -250,7 +250,7 @@ NULL
         }
         if (
             !is.null(sampleSizeSequential$futilityPerStage) &&
-                any(designPlan$.design$futilityBounds != C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
+                any(.getFutilityBounds(designPlan$.design) != C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
             ) {
             designPlan$futilityPerStage <- matrix(
                 sampleSizeSequential$futilityPerStage,

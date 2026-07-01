@@ -1046,8 +1046,9 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
         data$xValues <- data[[xParameterName]]
         data$yValues <- data[[yParameterName1]]
         if (yParameterName1 == "futilityBounds") {
+            futilityBoundsDefault <- .getFutilityBoundsDefaultValue(parameterSet)
             data$yValues[!is.na(data$yValues) &
-                (is.infinite(data$yValues) | data$yValues == C_FUTILITY_BOUNDS_DEFAULT)] <- NA_real_
+                (is.infinite(data$yValues) | data$yValues == futilityBoundsDefault)] <- NA_real_
         } else if (yParameterName1 == "alpha0Vec") {
             data$yValues[!is.na(data$yValues) & data$yValues == C_ALPHA_0_VEC_DEFAULT] <- NA_real_
         }

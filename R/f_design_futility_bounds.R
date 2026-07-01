@@ -188,10 +188,10 @@ summary.FutilityBounds <- function(object, ...) {
         objAttr$design$value <- objAttr$design$value$.toString(TRUE)
     }
 
-    userDefinedParams <- character(0)
-    derivedDefinedParams <- character(0)
-    defaultParams <- character(0)
-    generatedParams <- character(0)
+    userDefinedParams <- character()
+    derivedDefinedParams <- character()
+    defaultParams <- character()
+    generatedParams <- character()
 
     for (paramName in names(objAttr)) {
         entry <- objAttr[[paramName]]
@@ -337,15 +337,17 @@ summary.FutilityBounds <- function(object, ...) {
     msg <- paste0(
         C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale),
-        " is available only for one-sided two-stage designs "
+        " is available only for one-sided two-stage designs; invalid user input: "
     )
+    
+    invalidInputs <- character()
     if (design$sided != 1) {
-        stop(msg, "(sided = ", design$sided, ")", call. = FALSE)
+        invalidInputs <- c(invalidInputs, paste0("sided = ", design$sided))
     }
-
     if (design$kMax != 2) {
-        stop(msg, "(kMax = ", design$kMax, ")", call. = FALSE)
+        invalidInputs <- c(invalidInputs, paste0("kMax = ", design$kMax))
     }
+    stop(msg, paste(invalidInputs, collapse = ", "), call. = FALSE)
 }
 
 .futilityBoundsCalculationRequiresDesign <- function(scale) {

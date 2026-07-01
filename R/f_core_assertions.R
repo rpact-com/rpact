@@ -1111,7 +1111,12 @@ NULL
             suffix <- paste0(" ", trimws(suffix))
         }
 
-        type <- getOption("rpact.out.of.validated.bounds.message.type", "warning")
+        type <- .getEnvironmentVariable(
+            "RPACT_OUT_OF_VALIDATED_BOUNDS_MESSAGE_TYPE",
+            "rpact.out.of.validated.bounds.message.type",
+            default = "warning",
+            type = "character"
+        )
         if (identical(type, "warning")) {
             warning("The parameter ", sQuote(parameterName), " (", parameterValue, ") ",
                 spendingFunctionName, "is out of validated bounds ",
@@ -1542,6 +1547,7 @@ NULL
 .assertAreValidFutilityBounds <- function(
         futilityBounds, 
         kMax = length(futilityBounds) + 1,
+        directionUpper = TRUE,
         kMaxLowerBound = 1, 
         kMaxUpperBound = C_KMAX_UPPER_BOUND) {
     if (length(futilityBounds) < kMaxLowerBound - 1) {
@@ -1568,8 +1574,11 @@ NULL
             call. = FALSE
         )
     }
-
-    .assertValuesAreInsideBounds("futilityBounds", futilityBounds, -Inf, 6)
+    
+    lowerBound <- ifelse(isFALSE(directionUpper), -6, -Inf)
+    upperBound <- ifelse(isFALSE(directionUpper), Inf, 6)
+    .assertValuesAreInsideBounds("futilityBounds", futilityBounds, 
+        lowerBound = lowerBound, upperBound = upperBound)
 }
 
 .assertIsValidCipher <- function(key, value) {
@@ -1878,16 +1887,23 @@ NULL
         return(FALSE)
     }
 
-    futilityBounds <- design[["futilityBounds"]]
-    if (is.null(futilityBounds)) {
+    return(.hasApplicableFutilityBounds(design))
+}
+
+.anyFutilityBoundsAreInvalid <- function(futilityBounds, directionUpper) {
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
         return(FALSE)
     }
 
-    if (length(futilityBounds) == 0 || sum(is.na(futilityBounds)) == design$kMax) {
-        return(FALSE)
+    if (isFALSE(directionUpper)) {
+        return(any(futilityBounds < C_FUTILITY_BOUNDS_MAX_VALUE, na.rm = TRUE))
     }
 
-    return(any(na.omit(futilityBounds) > C_FUTILITY_BOUNDS_DEFAULT))
+    return(any(futilityBounds > C_FUTILITY_BOUNDS_MIN_VALUE, na.rm = TRUE))
+}
+
+.hasApplicableFutilityBounds <- function(design) {
+    return(.anyFutilityBoundsAreInvalid(design$futilityBounds, design$directionUpper))
 }
 
 .isTrialDesignWithValidAlpha0Vec <- function(design) {
@@ -3429,7 +3445,7 @@ NULL
         forbiddenParamNames,
         params,
         ...,
-        requiredParamNames = character(0)) {
+        requiredParamNames = character()) {
     theta <- numeric(0)
     for (existingParamName in existingParamNames) {
         existingParamValue <- params[[existingParamName]]
@@ -3461,7 +3477,7 @@ NULL
         }
     }
 
-    foundParamNames <- character(0)
+    foundParamNames <- character()
     for (forbiddenParamName in forbiddenParamNames) {
         forbiddenParamValue <- params[[forbiddenParamName]]
         if (!is.null(forbiddenParamValue) && !all(is.na(forbiddenParamValue))) {
@@ -3812,13 +3828,6 @@ NULL
     if (is.numeric(type)) {
         .assertIsIntegerVector(type, "type", naAllowed = naAllowed, validateType = FALSE)
     }
-}
-
-.hasApplicableFutilityBounds <- function(design) {
-    return(
-        !all(is.na(design$futilityBounds)) &&
-            any(design$futilityBounds > C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)
-    )
 }
 
 .showFutilityBoundsUnnecessaryArgumentWarning <- function(argumentName, argValue, sourceScale, targetScale) {
