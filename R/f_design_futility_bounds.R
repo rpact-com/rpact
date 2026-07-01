@@ -386,8 +386,13 @@ summary.FutilityBounds <- function(object, ...) {
 #' \code{targetScale} is \code{"reverseCondPower"} or if the conversion
 #' involves conditional or predictive power in a group sequential or Fisher design.
 #' Must be a one-sided two-stage group sequential design or Fisher's combination test design.
-#' @param theta Numeric. The assumed effect size under the alternative hypothesis.
-#' @param information Numeric vector of length 2. The information levels at the two stages.
+#' @param theta Numeric. The assumed effect size under the alternative hypothesis on the scale of the
+#'   test statistic. For example, in a survival design, this would be the on the log hazard ratio scale.
+#' @param information Numeric vector of length 1 or 2. The stage-wise information levels
+#'   (i.e. this is *not* the cumulative information). Note that depending on which conversion is performed,
+#'   either the first or second stage information may not be needed. In that case, a warning will be issued
+#'   if the unused information is provided. The warning can be avoided by either passing a single number,
+#'   or setting the unused information to \code{NA}.
 #' @param naAllowed Logical. Indicates if \code{NA} \code{sourceValue} are permitted. Default is \code{FALSE}.
 #' @inheritParams param_three_dots
 #'
