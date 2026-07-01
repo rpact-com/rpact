@@ -1747,14 +1747,76 @@ getParameterName <- function(obj, parameterCaption) {
     return(criticalValues)
 }
 
-.getFutilityBounds <- function(design, indices = NULL, ..., phase = c("unknown", "design", "planning", "analysis")) {
+.getFutilityBounds <- function(
+        design, 
+        indices = NULL, 
+        ..., 
+        phase = c("unknown", "design", "planning", "analysis"),
+        adjustLengthToKMax = FALSE) {
+        
     phase <- match.arg(phase)
     futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
         design$directionUpper, type = "negateIfLower", phase = phase)
+    if (adjustLengthToKMax) {
+        futilityBounds <- c(futilityBounds, C_FUTILITY_BOUNDS_DEFAULT)
+    }
     if (!is.null(indices)) {
         return(futilityBounds[indices])
     }
     return(futilityBounds)
+}
+
+.getInvalidFutilityBoundsIndices <- function(design) {
+    if (is.null(design) || !.isTrialDesignInverseNormalOrGroupSequential(design)) {
+        return(integer(0))
+    }
+
+    futilityBounds <- .getFutilityBounds(design)
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
+        return(integer(0))
+    }
+
+    if (isFALSE(design$directionUpper)) {
+        return(which(futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE))
+    }
+
+    return(which(futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE))
+}
+
+.getFutilityBoundsDefaultValue <- function(design) {
+    if (.isTrialDesign(design) && isFALSE(design$directionUpper)) {
+        return(C_FUTILITY_BOUNDS_MAX_VALUE)
+    }
+
+    return(C_FUTILITY_BOUNDS_MIN_VALUE)
+}
+
+.getFormattedFutilityBounds <- function(design, futilityBounds = design$futilityBounds) {
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
+        return(futilityBounds)
+    }
+
+    futilityBoundsFormatted <- futilityBounds
+    if (!is.null(design) && isFALSE(design$directionUpper)) {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- Inf
+    } else {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- -Inf
+    }
+    return(futilityBoundsFormatted)
+}
+
+.getHarmonizedFutilityBounds <- function(design, futilityBounds = design$futilityBounds) {
+    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
+        return(futilityBounds)
+    }
+
+    futilityBoundsFormatted <- futilityBounds
+    if (isFALSE(design$directionUpper)) {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- C_FUTILITY_BOUNDS_MAX_VALUE
+    } else {
+        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- C_FUTILITY_BOUNDS_MIN_VALUE
+    }
+    return(futilityBoundsFormatted)
 }
 
 .applyDirectionOfAlternative <- function(

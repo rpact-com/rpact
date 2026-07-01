@@ -1547,6 +1547,7 @@ NULL
 .assertAreValidFutilityBounds <- function(
         futilityBounds, 
         kMax = length(futilityBounds) + 1,
+        directionUpper = TRUE,
         kMaxLowerBound = 1, 
         kMaxUpperBound = C_KMAX_UPPER_BOUND) {
     if (length(futilityBounds) < kMaxLowerBound - 1) {
@@ -1573,8 +1574,11 @@ NULL
             call. = FALSE
         )
     }
-
-    .assertValuesAreInsideBounds("futilityBounds", futilityBounds, -Inf, 6)
+    
+    lowerBound <- ifelse(isFALSE(directionUpper), -6, -Inf)
+    upperBound <- ifelse(isFALSE(directionUpper), Inf, 6)
+    .assertValuesAreInsideBounds("futilityBounds", futilityBounds, 
+        lowerBound = lowerBound, upperBound = upperBound)
 }
 
 .assertIsValidCipher <- function(key, value) {
@@ -1900,59 +1904,6 @@ NULL
 
 .hasApplicableFutilityBounds <- function(design) {
     return(.anyFutilityBoundsAreInvalid(design$futilityBounds, design$directionUpper))
-}
-
-.getInvalidFutilityBoundsIndices <- function(design) {
-    if (is.null(design) || !.isTrialDesignInverseNormalOrGroupSequential(design)) {
-        return(integer(0))
-    }
-
-    futilityBounds <- .getFutilityBounds(design)
-    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
-        return(integer(0))
-    }
-
-    if (isFALSE(design$directionUpper)) {
-        return(which(futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE))
-    }
-
-    return(which(futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE))
-}
-
-.getFutilityBoundsDefaultValue <- function(design) {
-    if (.isTrialDesign(design) && isFALSE(design$directionUpper)) {
-        return(C_FUTILITY_BOUNDS_MAX_VALUE)
-    }
-
-    return(C_FUTILITY_BOUNDS_MIN_VALUE)
-}
-
-.getFormattedFutilityBounds <- function(design, futilityBounds = design$futilityBounds) {
-    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
-        return(futilityBounds)
-    }
-
-    futilityBoundsFormatted <- futilityBounds
-    if (!is.null(design) && isFALSE(design$directionUpper)) {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- Inf
-    } else {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- -Inf
-    }
-    return(futilityBoundsFormatted)
-}
-
-.getHarmonizedFutilityBounds <- function(design, futilityBounds = design$futilityBounds) {
-    if (is.null(futilityBounds) || length(futilityBounds) == 0 || all(is.na(futilityBounds))) {
-        return(futilityBounds)
-    }
-
-    futilityBoundsFormatted <- futilityBounds
-    if (isFALSE(design$directionUpper)) {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds >= C_FUTILITY_BOUNDS_MAX_VALUE] <- C_FUTILITY_BOUNDS_MAX_VALUE
-    } else {
-        futilityBoundsFormatted[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- C_FUTILITY_BOUNDS_MIN_VALUE
-    }
-    return(futilityBoundsFormatted)
 }
 
 .isTrialDesignWithValidAlpha0Vec <- function(design) {

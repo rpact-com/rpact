@@ -251,7 +251,10 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         }
 
         if (.isDefinedArgument(design$futilityBounds)) {
-            .assertAreValidFutilityBounds(design$futilityBounds, design$kMax)
+            .assertAreValidFutilityBounds(
+                futilityBounds = design$futilityBounds, 
+                kMax = design$kMax, 
+                directionUpper = design$directionUpper)
         }
     }
 
@@ -480,38 +483,25 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 # Wang and Tsiatis design
 #
 .getDesignGroupSequentialWangAndTsiatis <- function(design) {
+    callArgs <- list(
+        kMax = design$kMax,
+        alpha = design$alpha,
+        sided = design$sided,
+        informationRates = design$informationRates,
+        bindingFutility = design$bindingFutility,
+        futilityBounds = .getFutilityBounds(design),
+        tolerance = design$tolerance)
+    
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_P) {
-        design$criticalValues <- .getDesignGroupSequentialPocockCpp(
-            design$kMax,
-            design$alpha,
-            design$sided,
-            design$informationRates,
-            design$bindingFutility,
-            design$futilityBounds,
-            design$tolerance
-        )
+        callFun <- .getDesignGroupSequentialPocockCpp
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_OF) {
-        design$criticalValues <- .getDesignGroupSequentialOBrienAndFlemingCpp(
-            design$kMax,
-            design$alpha,
-            design$sided,
-            design$informationRates,
-            design$bindingFutility,
-            design$futilityBounds,
-            design$tolerance
-        )
+        callFun <- .getDesignGroupSequentialOBrienAndFlemingCpp
     } else {
-        design$criticalValues <- .getDesignGroupSequentialDeltaWTCpp(
-            design$kMax,
-            design$alpha,
-            design$sided,
-            design$informationRates,
-            design$bindingFutility,
-            design$futilityBounds,
-            design$tolerance,
-            design$deltaWT
-        )
+        callFun <- .getDesignGroupSequentialDeltaWTCpp
+        callArgs$deltaWT <- design$deltaWT
     }
+    
+    design$criticalValues <- do.call(callFun, callArgs)
 
     .calculateAlphaSpent(design)
     return(invisible(design))
@@ -558,6 +548,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 .calculateAlphaSpent <- function(design) {
     criticalValues <- .getCriticalValues(design)
     futilityBounds <- .getFutilityBounds(design)
+    
     if (design$sided == 2) {
         if (design$bindingFutility) {
             futilityBounds[is.na(futilityBounds)] <- 0
@@ -624,7 +615,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             } else {
                 if (design$bindingFutility) {
                     decisionMatrix <- matrix(c(
-                        design$futilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
+                        .getFutilityBounds(design, adjustLengthToKMax = TRUE),
                         criticalValues
                     ), nrow = 2, byrow = TRUE)
                 } else {
@@ -659,7 +650,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             } else {
                 if (design$bindingFutility) {
                     decisionMatrix <- matrix(c(
-                        design$futilityBounds, C_FUTILITY_BOUNDS_DEFAULT,
+                        .getFutilityBounds(design, adjustLengthToKMax = TRUE),
                         criticalValues
                     ), nrow = 2, byrow = TRUE)
                 } else {
@@ -716,7 +707,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         design$sided,
         design$informationRates,
         design$bindingFutility,
-        design$futilityBounds,
+        .getFutilityBounds(design),
         design$tolerance,
         design$deltaWT
     )
@@ -770,7 +761,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     } else {
         design$criticalValues <- .getDesignGroupSequentialUserDefinedAlphaSpendingCpp(
             design$kMax, design$userAlphaSpending, design$sided,
-            design$informationRates, design$bindingFutility, design$futilityBounds, design$tolerance
+            design$informationRates, design$bindingFutility, .getFutilityBounds(design), design$tolerance
         )
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY) {
             design$criticalValues[1:(design$kMax - 1)] <- C_QNORM_THRESHOLD
@@ -833,7 +824,9 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         design$twoSidedPower
     )
 
-    design$futilityBounds <- cppResult$futilityBounds
+    design$futilityBounds <- cppResult$futilityBounds 
+    design$futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
+        design$directionUpper, type = "negateIfLower", phase = "design")
     design$criticalValues <- cppResult$criticalValues
     design$betaSpent <- cppResult$betaSpent
     design$power <- cppResult$power
@@ -882,6 +875,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     )
 
     design$futilityBounds <- cppResult$futilityBounds
+    design$futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
+        design$directionUpper, type = "negateIfLower", phase = "design")
     design$criticalValues <- cppResult$criticalValues
     design$betaSpent <- cppResult$betaSpent
     design$power <- cppResult$power
@@ -1524,7 +1519,7 @@ getDesignInverseNormal <- function(...,
     
     newDesign <- do.call(.getDesignGroupSequential, args)
     newDesign$criticalValues[which(!efficacyStops)] <- Inf
-    newDesign$futilityBounds[which(!futilityStops)] <- C_FUTILITY_BOUNDS_DEFAULT
+    newDesign$futilityBounds[which(!futilityStops)] <- .getFutilityBoundsDefaultValue(newDesign)
 
     newDesign$efficacyStops <- efficacyStops
     newDesign$.setParameterType("efficacyStops", C_PARAM_USER_DEFINED)
@@ -1641,10 +1636,6 @@ getDesignInverseNormal <- function(...,
         }
     }
 
-    futilityBounds <- .applyDirectionOfAlternative(futilityBounds, directionUpper,
-        type = "negateIfLower", phase = "design", syncLength = TRUE
-    )
-
     design <- .createDesign(
         designClass = designClass,
         kMax = kMax,
@@ -1671,7 +1662,7 @@ getDesignInverseNormal <- function(...,
         delayedInformation = delayedInformation,
         tolerance = tolerance
     )
-
+    
     if (userFunctionCallEnabled) {
         .validateBaseParameters(design, twoSidedWarningForDefaultValues = FALSE)
         .validateTypeOfDesign(design, userDefinedInterimStops = userDefinedInterimStops)
@@ -1824,7 +1815,7 @@ getDesignInverseNormal <- function(...,
         directionUpper, type = "negateIfLower", phase = "design")
 
     design$futilityBounds[!is.na(design$futilityBounds) & .getFutilityBounds(design) <=
-        C_FUTILITY_BOUNDS_DEFAULT] <- C_FUTILITY_BOUNDS_DEFAULT
+        C_FUTILITY_BOUNDS_DEFAULT] <- .getFutilityBoundsDefaultValue(design)
 
     if (design$kMax == 1) {
         if (!identical(design$informationRates, 1)) {
@@ -1843,9 +1834,6 @@ getDesignInverseNormal <- function(...,
 
     .assertIsNumericVector(delayedInformation, "delayedInformation", naAllowed = TRUE)
     if (all(is.na(delayedInformation))) {
-        design$futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds, 
-            directionUpper, type = "negateIfLower", phase = "design")
-
         # delayed response design is disabled
         return(design)
     }
@@ -1856,31 +1844,37 @@ getDesignInverseNormal <- function(...,
             call. = FALSE
         )
 
-        design$futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds, 
-            directionUpper, type = "negateIfLower", phase = "design")
-
         return(design)
     }
 
     # proceed with delayed response design
     .assertIsInClosedInterval(delayedInformation, "delayedInformation", lower = 0, upper = NULL)
+    if (design$sided != 1) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "decision critical values for delayed response design ",
+            "are only available for one-sided designs",
+            call. = FALSE
+        )
+    }
+    
     kMax <- design$kMax
     contRegionUpper <- .getCriticalValues(design)
-    contRegionLower <- design$futilityBounds
+    contRegionLower <- .getFutilityBounds(design)
     informationRates <- design$informationRates
 
     decisionCriticalValues <- numeric(kMax)
     reversalProbabilities <- numeric(kMax - 1)
 
-    if (!all(is.na(delayedInformation)) &&
-            (design$sided != 1 || all(design$futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT + 1e-06))) {
+    if (all(contRegionLower <= C_FUTILITY_BOUNDS_DEFAULT + 1e-06)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "decision critical values for delayed response design are only available for ",
-            "one-sided designs with valid futility bounds",
+            "decision critical values for delayed response design are ",
+            "only available for designs with valid futility bounds",
             call. = FALSE
         )
     }
+    
     if (length(delayedInformation) == 1) {
         delayedInformation <- rep(delayedInformation, kMax - 1)
     }
@@ -2010,21 +2004,16 @@ getDesignInverseNormal <- function(...,
 
     decisionCriticalValues[decisionCriticalValues <= -C_UPPER_BOUNDS_DEFAULT + 1e-06] <- NA_real_
     decisionCriticalValues[decisionCriticalValues >= C_UPPER_BOUNDS_DEFAULT - 1e-06] <- NA_real_
+    decisionCriticalValues <- .applyDirectionOfAlternative(decisionCriticalValues,
+        design$directionUpper, type = "negateIfLower", phase = "design")
     
-    # TODO negate decisionCriticalValues for directionUpper = FALSE? (currently not negated, but negated in .getDesignWithInterimStops())
-    #      The decision critical values for each stage of the trial in a delayed response design. 
-    # TODO futilityBoundsDelayedInformation = "Lower bounds of continuation (binding)" becomes the upper bounds for directionUpper = FALSE?
-    # TODO criticalValuesDelayedInformation = "Upper bounds of continuation" becomes the lower bounds for directionUpper = FALSE?
-
     design$decisionCriticalValues <- decisionCriticalValues
     design$reversalProbabilities <- reversalProbabilities
     design$delayedInformation <- delayedInformation
     design$delayedInformation[design$delayedInformation < 1e-03] <- 0
     design$.setParameterType("decisionCriticalValues", C_PARAM_GENERATED)
     design$.setParameterType("reversalProbabilities", C_PARAM_GENERATED)
-    design$futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds, 
-        directionUpper, type = "negateIfLower", phase = "design")
-
+    
     warning("The delayed information design feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
         call. = FALSE

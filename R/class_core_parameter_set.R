@@ -2361,7 +2361,7 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
 
     stop(
         C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-        "sorry, function 'plot' is not implemented yet for class '", .getClassName(x), "'"
+        "sorry, function 'plot' is not yet implemented for class '", .getClassName(x), "'"
     )
 }
 

@@ -138,9 +138,12 @@ NULL
                 kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
             )
         } else {
-            .assertAreValidFutilityBounds(parameterValues,
+            .assertAreValidFutilityBounds(
+                futilityBounds = parameterValues,
                 kMax = design$kMax,
-                kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
+                directionUpper = design$directionUpper,
+                kMaxLowerBound = kMaxLowerBound, 
+                kMaxUpperBound = kMaxUpperBound
             )
         }
     }
@@ -216,9 +219,12 @@ NULL
             kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
         )
     } else {
-        .assertAreValidFutilityBounds(parameterValues,
+        .assertAreValidFutilityBounds(
+            futilityBounds = parameterValues,
             kMax = design$kMax,
-            kMaxLowerBound = kMaxLowerBound, kMaxUpperBound = kMaxUpperBound
+            directionUpper = design$directionUpper,
+            kMaxLowerBound = kMaxLowerBound, 
+            kMaxUpperBound = kMaxUpperBound
         )
     }
 

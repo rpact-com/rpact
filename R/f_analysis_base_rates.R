@@ -2171,7 +2171,7 @@ NULL
 
     message(
         "Calculation of final confidence interval for Fisher's ",
-        "design not implemented yet"
+        "design not yet implemented"
     )
 
     return(list(

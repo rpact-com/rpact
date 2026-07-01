@@ -2044,7 +2044,7 @@ NULL
 
     message(
         "Calculation of final confidence interval for Fisher's ",
-        "design not implemented yet"
+        "design not yet implemented"
     )
 
     return(list(
@@ -2088,7 +2088,7 @@ NULL
             if (design$kMax >= 1) {
                 message(
                     "Calculation of final confidence interval for Fisher's ",
-                    "design not implemented yet"
+                    "design not yet implemented"
                 )
                 return(list(
                     finalStage = NA_integer_,

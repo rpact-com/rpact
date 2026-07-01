@@ -2639,7 +2639,7 @@ plot.Dataset <- function(x, y, ...,
 .plot.Dataset <- function(x, y, ..., main = "Dataset", xlab = "Stage", ylab = NA_character_,
         legendTitle = "Group", palette = "Set1", showSource = FALSE, plotSettings = NULL) {
     if (x$.enrichmentEnabled) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of enrichment data is not implemented yet")
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of enrichment data is not yet implemented")
     }
 
     .assertGgplotIsInstalled()
@@ -2656,11 +2656,11 @@ plot.Dataset <- function(x, y, ...,
         }
     } else if (x$isDatasetSurvival()) {
         # Open work: implement dataset plot of survival data
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of survival data is not implemented yet")
+        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "plot of survival data is not yet implemented")
     }
 
     if (!is.logical(showSource) || isTRUE(showSource)) {
-        warning("'showSource' != FALSE is not implemented yet for class ", .getClassName(x))
+        warning("'showSource' != FALSE is not yet implemented for class ", .getClassName(x))
     }
 
     if (is.null(plotSettings)) {
@@ -3693,7 +3693,7 @@ DatasetSurvival <- R6::R6Class("DatasetSurvival",
         getRandomData = function() {
             stop(
                 C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "the function 'DatasetSurvival.getRandomData()' is not implemented yet"
+                "the function 'DatasetSurvival.getRandomData()' is not yet implemented"
             )
         },
         .getOverallLogRanks = function(logRanks, events, overallEvents,
