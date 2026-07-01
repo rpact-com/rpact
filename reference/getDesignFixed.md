@@ -7,8 +7,8 @@ constructs an object of class `TrialDesignFixed` with `kMax = 1`.
 
 ``` r
 getDesignFixed(
-  alpha = 0.025,
-  beta = 0.2,
+  alpha = NA_real_,
+  beta = NA_real_,
   sided = 1L,
   directionUpper = NA,
   twoSidedPower = NA

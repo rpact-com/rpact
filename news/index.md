@@ -1,5 +1,30 @@
 # Changelog
 
+## rpact 4.5.0
+
+### New features
+
+- The new function
+  [`getDesignFixed()`](https://docs.rpact.org/reference/getDesignFixed.md)
+  can be used to create a fixed (single-stage) trial design. This
+  convenience wrapper constructs an object of class `TrialDesignFixed`
+  with `kMax = 1`.
+- rpact options can now be configured through environment variables,
+  which is useful for reproducible scripts, CI jobs, validation runs,
+  and shared project profiles; see the new vignette [Hidden rpact
+  Features: Options and Environment
+  Variables](https://www.rpact.org/vignettes/utilities/rpact_hidden_features/).
+- Optimized the display of `criticalValues` and `futilityBounds` for
+  designs with `directionUpper = FALSE`. If the direction of the
+  alternative is already specified when creating a design, e.g., with
+  `getDesignGroupSequential(directionUpper = FALSE)`, the boundaries are
+  now shown in the correct direction, typically as negative values. This
+  also applies to futility bounds generated for beta-spending designs.
+
+### Improvements, issues, and changes
+
+- Issue [\#118](https://github.com/rpact-com/rpact/issues/118) fixed
+
 ## rpact 4.4.0
 
 CRAN release: 2026-03-04
