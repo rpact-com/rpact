@@ -14,6 +14,10 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
+ * File version: $Revision: 7019 $
+ * Last changed: $Date: 2023-05-31 07:23:47 +0200 (Mi, 31 Mai 2023) $
+ * Last changed by: $Author: pahlke $
+ *
  */
 
 #include <Rcpp.h>
@@ -46,6 +50,11 @@ double getRandomPiecewiseExponentialDistribution(
 bool isPiecewiseExponentialSurvivalEnabled(NumericVector lambdaVec2);
 
 double getLambdaByPi(double pi, double eventTime, double kappa);
+
+NumericVector getLambdasByPis(
+		NumericVector pis,
+		double eventTime,
+		double kappa);
 
 double getPiByLambda(double lambda, double eventTime, double kappa);
 

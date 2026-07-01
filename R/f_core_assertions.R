@@ -2386,7 +2386,9 @@ NULL
     }
 }
 
-.assertIsValidFunction <- function(fun, ...,
+.assertIsValidFunction <- function(
+        fun, 
+        ...,
         funArgName = "fun",
         expectedArguments = NULL,
         expectedFunction = NULL,

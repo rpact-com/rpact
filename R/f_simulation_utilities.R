@@ -192,7 +192,7 @@ NULL
 
 C_EFFECT_LIST_NAMES_EXPECTED_MEANS <- c("subGroups", "prevalences", "effects", "stDevs")
 C_EFFECT_LIST_NAMES_EXPECTED_RATES <- c("subGroups", "prevalences", "piControls", "piTreatments")
-C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piControls", "hazardRatios")
+C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piControls", "piTreatments", "hazardRatios")
 
 .getEffectData <- function(effectList, ...,
         endpoint = NA_character_,
@@ -293,7 +293,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         } else if (endpoint == "rates") {
             matrixNames <- "piTreatments"
         } else if (endpoint == "survival") {
-            matrixNames <- "hazardRatios"
+            matrixNames <- c("hazardRatios", "piTreatments")
         }
     }
 

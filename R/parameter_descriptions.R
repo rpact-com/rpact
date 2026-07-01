@@ -133,6 +133,13 @@ NULL
 #' @keywords internal
 NULL
 
+#' Parameter Description: Effect Under Alternative
+#' @param estimatedTheta If specified, the value of the alternative under which
+#'   the conditional power or sample size recalculation calculation is performed. Must be a numeric of length 1.
+#' @name param_estimatedTheta
+#' @keywords internal
+NULL
+
 #' Parameter Description: Standard Deviation
 #' @param stDev The standard deviation under which the sample size or power
 #'   calculation is performed, default is \code{1}.
@@ -956,6 +963,35 @@ NULL
 #' @param plannedCalendarTime For simulating count data, the time points where an analysis is planned to be performed.
 #'     Should be a vector of length \code{kMax}
 #' @name param_plannedCalendarTime
+#' @keywords internal
+NULL
+
+#' Parameter Description: Simulation Type
+#' @param simulationType Character value specifying the simulation approach:
+#' \code{"auto"}, \code{"patientWise"}, \code{"testStatisticBased"}, or
+#' \code{"patientWiseBasic"}.
+#' If \code{"auto"} is specified, the simulation type is selected automatically based on
+#' the explicitly specified arguments. If patient-wise-specific arguments such as
+#' \code{eventTime}, \code{accrualTime}, \code{accrualIntensity}, \code{dropoutRate1},
+#' \code{dropoutRate2}, \code{dropoutTime}, \code{maxNumberOfSubjects}, or \code{kappa}
+#' are provided, patient-wise simulation is used; otherwise the test-statistic-based
+#' simulation is used for backward compatibility.
+#' @name param_simulationType_enrichment_survival
+#' @keywords internal
+NULL
+
+#' Parameter Description: Simulation Type
+#' @param simulationType Character value specifying the simulation approach:
+#' \code{"auto"}, \code{"patientWise"}, \code{"testStatisticBased"}, or
+#' \code{"patientWiseBasic"}.
+#' If \code{"auto"} is specified, the simulation type is selected automatically based on
+#' the explicitly specified arguments. If patient-wise-specific arguments such as
+#' \code{piControl}, \code{eventTime}, \code{accrualTime}, \code{accrualIntensity},
+#' \code{accrualIntensityType}, \code{dropoutRate1}, \code{dropoutRate2},
+#' \code{dropoutTime}, \code{maxNumberOfSubjects}, or \code{kappa} are provided,
+#' a patient-wise simulation approach is used; otherwise the test-statistic-based
+#' simulation is used for backward compatibility.
+#' @name param_simulationType_multiarm_survival
 #' @keywords internal
 NULL
 

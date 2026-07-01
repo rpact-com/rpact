@@ -14,6 +14,10 @@
  *
  * Contact us for information about our services: info@rpact.com
  *
+ * File version: $Revision: 8463 $
+ * Last changed: $Date: 2024-12-20 15:26:37 +0100 (Fr, 20 Dez 2024) $
+ * Last changed by: $Author: wassmer $
+ *
  */
 
 #include <Rcpp.h>
@@ -24,6 +28,7 @@
 
 using namespace Rcpp;
 
+// [[Rcpp::export(name = ".findObservationTimeCpp")]]
 double findObservationTime(
 		NumericVector accrualTime,
 		NumericVector survivalTime,
@@ -169,6 +174,19 @@ bool isPiecewiseExponentialSurvivalEnabled(NumericVector lambdaVec2) {
 
 double getLambdaByPi(double pi, double eventTime, double kappa) {
 	return pow(-log(1 - pi), 1 / kappa) / eventTime;
+}
+
+NumericVector getLambdasByPis(
+		NumericVector pis,
+		double eventTime,
+		double kappa) {
+
+	int n = pis.size();
+	NumericVector lambdas(n);
+	for (int i = 0; i < n; i++) {
+		lambdas[i] = getLambdaByPi(pis[i], eventTime, kappa);
+	}
+	return lambdas;
 }
 
 double getPiByLambda(double lambda, double eventTime, double kappa) {

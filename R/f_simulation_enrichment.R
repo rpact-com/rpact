@@ -406,6 +406,20 @@ NULL
     }
 
     effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
+    if (endpoint == "survival" && is.null(effectList$hazardRatios) && !is.null(effectList$piTreatments)) {
+        if (is.null(effectList$piControls)) {
+            stop(
+                C_EXCEPTION_TYPE_MISSING_ARGUMENT,
+                sQuote("effectList$piControls"),
+                " must be specified when 'effectList$piTreatments' is used",
+                call. = FALSE
+            )
+        }
+
+        effectList$hazardRatios <- t(apply(effectList$piTreatments, 1, function(piTreatments) {
+            getHazardRatioByPi(piTreatments, effectList$piControls, eventTime = eventTime, kappa = kappa)
+        }))
+    }
     gMax <- .getGMaxFromSubGroups(effectList$subGroups)
     if (gMax > 4) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (", gMax, ") must not exceed 4", call. = FALSE)

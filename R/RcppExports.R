@@ -9,6 +9,10 @@
     .Call(`_rpact_mvstud`, ndf, a, b, bpd, d, eps, inf, ierc, hnc)
 }
 
+.as251NormalCpp <- function(lower, upper, sigma, eps = 1e-06, errorControl = "strict", intervalSimpsonsRule = 0.0) {
+    .Call(`_rpact_as251Normal`, lower, upper, sigma, eps, errorControl, intervalSimpsonsRule)
+}
+
 .getNegativeBinomialEstimates <- function(counts1, counts2, t1, t2) {
     .Call(`_rpact_estimate_nb`, counts1, counts2, t1, t2)
 }
@@ -705,12 +709,128 @@ NULL
     .Call(`_rpact_getSimulationRatesCpp`, kMax, informationRates, criticalValues, pi1, pi2, maxNumberOfIterations, designNumber, groups, futilityBounds, alpha0Vec, minNumberOfSubjectsPerStage, maxNumberOfSubjectsPerStage, conditionalPower, pi1H1, pi2H1, normalApproximation, plannedSubjects, directionUpper, allocationRatioPlanned, riskRatio, thetaH0, calcSubjectsFunctionType, calcSubjectsFunctionR, calcSubjectsFunctionCpp)
 }
 
+.logRankTestCpp <- function(accrualTime, survivalTime, dropoutTime, treatmentGroup, time, directionUpper, thetaH0, returnRawData) {
+    .Call(`_rpact_logRankTest`, accrualTime, survivalTime, dropoutTime, treatmentGroup, time, directionUpper, thetaH0, returnRawData)
+}
+
 .getSimulationSurvivalCpp <- function(designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocationRatioPlanned, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa, calcEventsFunctionType, calcEventsFunctionR, calcEventsFunctionCpp) {
     .Call(`_rpact_getSimulationSurvivalCpp`, designNumber, kMax, sided, criticalValues, informationRates, conditionalPower, plannedEvents, thetaH1, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, directionUpper, allocationRatioPlanned, accrualTime, treatmentGroup, thetaH0, futilityBounds, alpha0Vec, pi1Vec, pi2, eventTime, piecewiseSurvivalTime, cdfValues1, cdfValues2, lambdaVec1, lambdaVec2, phi, maxNumberOfSubjects, maxNumberOfIterations, maxNumberOfRawDatasetsPerStage, kappa, calcEventsFunctionType, calcEventsFunctionR, calcEventsFunctionCpp)
 }
 
+.selectPopulationsCpp <- function(effectVector, typeOfSelection, epsilonValue = NA_real_, rValue = NA_integer_, threshold = NA_real_) {
+    .Call(`_rpact_selectPopulations`, effectVector, typeOfSelection, epsilonValue, rValue, threshold)
+}
+
+.performClosedCombinationTestForSimulationEnrichmentCpp <- function(stageResults, design, indices, intersectionTest, successCriterion) {
+    .Call(`_rpact_performClosedCombinationTestForSimulationEnrichment`, stageResults, design, indices, intersectionTest, successCriterion)
+}
+
+.createSelectedSubsetsCpp <- function(selectedPopulationsAtStagek) {
+    .Call(`_rpact_createSelectedSubsets`, selectedPopulationsAtStagek)
+}
+
+.createSubGroupsCpp <- function(gMax) {
+    .Call(`_rpact_createSubGroups`, gMax)
+}
+
+.createSubGroupsFromPopulationCpp <- function(gMax, subPopulation) {
+    .Call(`_rpact_createSubGroupsFromPopulation`, gMax, subPopulation)
+}
+
+.logRankTestEnrichmentCpp <- function(gMax, survivalDataSet, time, subPopulation, stratifiedAnalysis, directionUpper = TRUE, thetaH0 = 1.0) {
+    .Call(`_rpact_logRankTestEnrichment`, gMax, survivalDataSet, time, subPopulation, stratifiedAnalysis, directionUpper, thetaH0)
+}
+
+.getSimulationSurvivalEnrichmentStageEventsCpp <- function(stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedPopulations, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage) {
+    .Call(`_rpact_getSimulationSurvivalEnrichmentStageEvents`, stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedPopulations, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage)
+}
+
+.getTreatmentsSubgroupsCpp <- function(maxNumberOfSubjects, allocationFraction, subGroups, prevalences) {
+    .Call(`_rpact_getTreatmentsSubgroups`, maxNumberOfSubjects, allocationFraction, subGroups, prevalences)
+}
+
+.updateSubGroupVectorCpp <- function(k, maxNumberOfSubjects, numberOfSubjects, subGroupVector, subGroups, prevSelected, allocationFraction) {
+    .Call(`_rpact_updateSubGroupVector`, k, maxNumberOfSubjects, numberOfSubjects, subGroupVector, subGroups, prevSelected, allocationFraction)
+}
+
+.getSimulatedStageResultsSurvivalEnrichmentSubjectsBasedCpp <- function(design, weights, subGroups, prevalences, piControls, kappa, phi, eventTime, hazardRatios, directionUpper, stratifiedAnalysis, plannedEvents_, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction = NULL, calcEventsFunctionIsUserDefined = FALSE, selectPopulationsFunction = NULL) {
+    .Call(`_rpact_getSimulatedStageResultsSurvivalEnrichmentSubjectsBased`, design, weights, subGroups, prevalences, piControls, kappa, phi, eventTime, hazardRatios, directionUpper, stratifiedAnalysis, plannedEvents_, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectPopulationsFunction)
+}
+
+.performSimulationEnrichmentSurvivalLoopCpp <- function(cols, maxNumberOfIterations, design, weights, effectList, kappa, phi, eventTime, recruitmentTimes, allocationFraction, directionUpper, stratifiedAnalysis, plannedEvents, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectPopulationsFunction, indices, intersectionTest, successCriterion, gMax, kMax) {
+    .Call(`_rpact_performSimulationEnrichmentSurvivalLoop`, cols, maxNumberOfIterations, design, weights, effectList, kappa, phi, eventTime, recruitmentTimes, allocationFraction, directionUpper, stratifiedAnalysis, plannedEvents, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectPopulationsFunction, indices, intersectionTest, successCriterion, gMax, kMax)
+}
+
+.dunnettIntegrand1IntCpp <- function(criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow) {
+    .Call(`_rpact_dunnettIntegrand1Int`, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow)
+}
+
+.dunnettIntegrand1EvaluateCpp <- function(x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow) {
+    .Call(`_rpact_dunnettIntegrand1Evaluate`, x, criticalValue, informationAtInterim, signedTestStatistics, frac, indicesRow)
+}
+
+.dunnettIntegrand2IntCpp <- function(maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics) {
+    .Call(`_rpact_dunnettIntegrand2Int`, maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics)
+}
+
+.dunnettIntegrand2EvaluateCpp <- function(x, maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics) {
+    .Call(`_rpact_dunnettIntegrand2Evaluate`, x, maxOverallTestStatistic, informationAtInterim, signedTestStatistics, frac, indicesRow, overallTestStatistics)
+}
+
+.dunnettIntegrand3IntCpp <- function(maxTestStatistic, frac, indicesRow, separatePValues) {
+    .Call(`_rpact_dunnettIntegrand3Int`, maxTestStatistic, frac, indicesRow, separatePValues)
+}
+
+.dunnettIntegrand3EvaluateCpp <- function(x, maxTestStatistic, frac, indicesRow, separatePValues) {
+    .Call(`_rpact_dunnettIntegrand3Evaluate`, x, maxTestStatistic, frac, indicesRow, separatePValues)
+}
+
+.performClosedConditionalDunnettTestForSimulationCpp <- function(stageResults, design, indices, criticalValuesDunnett, successCriterion) {
+    .Call(`_rpact_performClosedConditionalDunnettTestForSimulation`, stageResults, design, indices, criticalValuesDunnett, successCriterion)
+}
+
+.performClosedCombinationTestForSimulationMultiArmCpp <- function(stageResults, design, indices, intersectionTest, successCriterion) {
+    .Call(`_rpact_performClosedCombinationTestForSimulationMultiArm`, stageResults, design, indices, intersectionTest, successCriterion)
+}
+
+.selectTreatmentArmsCpp <- function(effectVector, typeOfSelection, epsilonValue = NA_real_, rValue = NA_integer_, threshold = NA_real_, survival = FALSE) {
+    .Call(`_rpact_selectTreatmentArms`, effectVector, typeOfSelection, epsilonValue, rValue, threshold, survival)
+}
+
+.getSimulationSurvivalMultiArmStageEventsCpp <- function(stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedArms, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage) {
+    .Call(`_rpact_getSimulationSurvivalMultiArmStageEvents`, stage, directionUpper, conditionalPower, conditionalCriticalValue, plannedEvents, allocationRatioPlanned, selectedArms, thetaH1, overallEffects, minNumberOfEventsPerStage, maxNumberOfEventsPerStage)
+}
+
+.logRankTestMultiArmCpp <- function(survivalDataSet, time, comparedTreatmentArms, directionUpper = TRUE, thetaH0 = 1.0) {
+    .Call(`_rpact_logRankTestMultiArm`, survivalDataSet, time, comparedTreatmentArms, directionUpper, thetaH0)
+}
+
+.getTreatmentsMultiArmCpp <- function(gMax, maxNumberOfSubjects, allocationFraction) {
+    .Call(`_rpact_getTreatmentsMultiArm`, gMax, maxNumberOfSubjects, allocationFraction)
+}
+
+.updateTreatmentsVectorCpp <- function(k, gMax, maxNumberOfSubjects, numberOfSubjects, treatments, selectedArms, allocationFraction) {
+    .Call(`_rpact_updateTreatmentsVector`, k, gMax, maxNumberOfSubjects, numberOfSubjects, treatments, selectedArms, allocationFraction)
+}
+
+.getSimulatedStageResultsSurvivalMultiArmSubjectsBasedCpp <- function(design, weights, directionUpper, omegaVector, piControl, kappa, phi, eventTime, plannedEvents, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction = NULL, calcEventsFunctionIsUserDefined = FALSE, selectArmsFunction = NULL) {
+    .Call(`_rpact_getSimulatedStageResultsSurvivalMultiArmSubjectsBased`, design, weights, directionUpper, omegaVector, piControl, kappa, phi, eventTime, plannedEvents, recruitmentTimes, allocationFraction, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectArmsFunction)
+}
+
+.performSimulationMultiArmSurvivalLoopCpp <- function(cols, maxNumberOfIterations, design, weights, directionUpper, effectMatrix, omegaMaxVector, piControl, kappa, phi, eventTime, plannedEvents, recruitmentTimes, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationFraction, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectArmsFunction, indices, intersectionTest, criticalValuesDunnett, successCriterion, gMax, kMax) {
+    .Call(`_rpact_performSimulationMultiArmSurvivalLoop`, cols, maxNumberOfIterations, design, weights, directionUpper, effectMatrix, omegaMaxVector, piControl, kappa, phi, eventTime, plannedEvents, recruitmentTimes, typeOfSelection, effectMeasure, adaptations, epsilonValue, rValue, threshold, allocationFraction, minNumberOfEventsPerStage, maxNumberOfEventsPerStage, conditionalPower, thetaH1, calcEventsFunction, calcEventsFunctionIsUserDefined, selectArmsFunction, indices, intersectionTest, criticalValuesDunnett, successCriterion, gMax, kMax)
+}
+
+.findObservationTimeCpp <- function(accrualTime, survivalTime, dropoutTime, requiredStageEvents) {
+    .Call(`_rpact_findObservationTime`, accrualTime, survivalTime, dropoutTime, requiredStageEvents)
+}
+
 getOneMinusQNorm <- function(p, mean = 0, sd = 1, lowerTail = 1, logP = 0, epsilon = 1.0e-100) {
     .Call(`_rpact_getOneMinusQNorm`, p, mean, sd, lowerTail, logP, epsilon)
+}
+
+.orderCpp <- function(x) {
+    .Call(`_rpact_order`, x)
 }
 
 zeroin <- function(f, lower, upper, tolerance, maxIter) {
@@ -727,5 +847,13 @@ getCipheredValue <- function(x) {
 
 .getFractions <- function(x, epsilon = 1.0e-6, maxNumberOfSearchSteps = 30L) {
     .Call(`_rpact_getFractions`, x, epsilon, maxNumberOfSearchSteps)
+}
+
+.getMultivarNormalDistributionCpp <- function(upper, sigma) {
+    .Call(`_rpact_getMultivarNormalDistribution`, upper, sigma)
+}
+
+.tcrossprodCpp <- function(x) {
+    .Call(`_rpact_tcrossprod`, x)
 }
 
