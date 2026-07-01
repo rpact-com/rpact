@@ -148,7 +148,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(design = NULL,
             ...
         )
     } else {
-        .assertIsTrialDesignInverseNormalOrFisher(design)
+        .assertIsTrialDesignInverseNormalOrFisherOrFixed(design)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationEnrichmentSurvival",
             ignore = "showStatistics",

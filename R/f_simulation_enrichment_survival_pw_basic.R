@@ -516,7 +516,7 @@ updateSubGroupVector <- function(
             ...
         )
     } else {
-        .assertIsTrialDesignInverseNormalOrFisher(design)
+        .assertIsTrialDesignInverseNormalOrFisherOrFixed(design)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationEnrichmentSurvival",
             ignore = "showStatistics",
