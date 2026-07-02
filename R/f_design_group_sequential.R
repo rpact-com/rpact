@@ -514,6 +514,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         design$sided, design$bindingFutility
     )
     futilityBounds <- cppResult$futilityBounds
+    futilityBounds <- .applyDirectionOfAlternative(futilityBounds,
+        design$directionUpper, type = "negateIfLower", phase = "design")
     criticalValues <- cppResult$criticalValues
     probs <- cppResult$probs
 

@@ -8,7 +8,7 @@
 
 \item{collapse}{Character used to join multiple output lines (default "")}
 
-\item{outputType}{Type of output to capture: "all", "print", "summary", or "json" (default "all")}
+\item{outputType}{One or more types of output to capture: "default", "print", "summary", or "json" (default "default")}
 }
 \value{
 Character scalar with markdown-formatted content
