@@ -1167,6 +1167,9 @@ getMedianByPi <- function(piValue,
         }
 
         designParametersToShow <- c(designParametersToShow, ".design$sided")
+        if (design$sided == 1 && !is.na(design$directionUpper)) {
+            designParametersToShow <- c(designParametersToShow, ".design$directionUpper")
+        }
     }
     return(designParametersToShow)
 }
