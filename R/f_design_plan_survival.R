@@ -364,69 +364,6 @@ NULL
     return(.getEventProbabilitiesOverall(eventProbs, allocationRatioPlanned))
 }
 
-.getEffectScaleBoundaryDataSurvival <- function(designPlan) {
-    design <- designPlan$.design
-    thetaH0 <- designPlan$thetaH0
-    cumulativeEventsPerStage <- designPlan$cumulativeEventsPerStage
-    allocationRatioPlanned <- designPlan$allocationRatioPlanned
-    directionUpper <- designPlan$directionUpper
-
-    if (design$kMax == 1) {
-        nParameters <- length(cumulativeEventsPerStage)
-    } else {
-        nParameters <- ncol(cumulativeEventsPerStage)
-    }
-
-    directionUpper[is.na(directionUpper)] <- TRUE
-
-    if (length(allocationRatioPlanned) == 1) {
-        allocationRatioPlanned <- rep(allocationRatioPlanned, nParameters)
-    }
-
-    futilityBounds <- .getFutilityBounds(design)
-    futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
-
-    criticalValuesEffectScaleUpper <- matrix(, nrow = design$kMax, ncol = nParameters)
-    criticalValuesEffectScaleLower <- matrix(, nrow = design$kMax, ncol = nParameters)
-    futilityBoundsEffectScaleUpper <- matrix(, nrow = design$kMax - 1, ncol = nParameters)
-    futilityBoundsEffectScaleLower <- matrix(, nrow = design$kMax - 1, ncol = nParameters)
-
-    criticalValues <- .getCriticalValues(design)
-    for (j in (1:nParameters)) {
-        if (design$sided == 1) {
-            criticalValuesEffectScaleUpper[, j] <- thetaH0 * (exp((2 * directionUpper[j] - 1) * criticalValues *
-                (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    cumulativeEventsPerStage[, j])))
-        } else {
-            criticalValuesEffectScaleUpper[, j] <- thetaH0 * (exp((2 * directionUpper[j] - 1) * criticalValues *
-                (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    cumulativeEventsPerStage[, j])))
-            criticalValuesEffectScaleLower[, j] <- thetaH0 * (exp(-(2 * directionUpper[j] - 1) * criticalValues *
-                (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    cumulativeEventsPerStage[, j])))
-        }
-
-        if (!.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
-            futilityBoundsEffectScaleUpper[, j] <- thetaH0 * (exp((2 * directionUpper[j] - 1) * futilityBounds *
-                (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    cumulativeEventsPerStage[1:(design$kMax - 1), j])))
-        }
-        if (!.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-                (design$typeOfDesign == C_TYPE_OF_DESIGN_PT || !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
-            futilityBoundsEffectScaleLower[, j] <- thetaH0 * (exp(-(2 * directionUpper[j] - 1) * futilityBounds *
-                (1 + allocationRatioPlanned[j]) / sqrt(allocationRatioPlanned[j] *
-                    cumulativeEventsPerStage[1:(design$kMax - 1), j])))
-        }
-    }
-
-    return(list(
-        criticalValuesEffectScaleUpper = matrix(criticalValuesEffectScaleUpper, nrow = design$kMax),
-        criticalValuesEffectScaleLower = matrix(criticalValuesEffectScaleLower, nrow = design$kMax),
-        futilityBoundsEffectScaleUpper = matrix(futilityBoundsEffectScaleUpper, nrow = design$kMax - 1),
-        futilityBoundsEffectScaleLower = matrix(futilityBoundsEffectScaleLower, nrow = design$kMax - 1)
-    ))
-}
-
 .calculateSampleSizeSurvival <- function(designPlan) {
     # Fixed
     designPlan <- .getSampleSizeFixedSurvival(designPlan)

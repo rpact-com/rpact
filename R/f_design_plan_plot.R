@@ -220,19 +220,19 @@
     if (showBetaSpent) {
         yParameterNames <- c(yParameterNames, "betaSpent")
     }
-    
+
     if (length(yParameterNames) == 0) {
         yParameterNames <- "alphaSpent"
         if (isFALSE(.getEnvironmentVariable(
-            "RPACT_PLOT_SHOW_ALPHA_SPENT",
-            "rpact.plot.show.alpha.spent",
-            default = TRUE,
-            type = "logical"
-        )) &&
+                "RPACT_PLOT_SHOW_ALPHA_SPENT",
+                "rpact.plot.show.alpha.spent",
+                default = TRUE,
+                type = "logical"
+            )) &&
                 isFALSE(.getEnvironmentVariable(
                     "RPACT_PLOT_SHOW_BETA_SPENT",
                     "rpact.plot.show.beta.spent",
-                    default = TRUE,
+                    default = FALSE,
                     type = "logical"
                 ))) {
             warning("Options 'rpact.plot.show.alpha.spent' and ",
@@ -263,13 +263,16 @@
         showSource = FALSE,
         designPlanName = NA_character_,
         plotSettings = NULL,
-        ...) {
+        ...
+        ) {
     .assertGgplotIsInstalled()
     .assertIsTrialDesignPlan(designPlan)
     .assertIsValidLegendPosition(legendPosition)
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
 
-    availablePlotTypes <- getAvailablePlotTypes(designPlan, output = "numeric", numberInCaptionEnabled = FALSE)
+    availablePlotTypes <- getAvailablePlotTypes(designPlan,
+        output = "numeric", numberInCaptionEnabled = FALSE
+    )
     if (!(type %in% availablePlotTypes)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
@@ -317,7 +320,7 @@
             designPlan <- do.call(designPlan$recreate, parameterList)
         }
     }
-    
+
     showBetaSpent <- .getOptionalArgument("showBetaSpent", ..., optionalArgumentDefaultValue = NA)
     if (is.na(showBetaSpent)) {
         showBetaSpent <- .getEnvironmentVariable(
@@ -327,7 +330,7 @@
             type = "logical"
         )
     }
-    
+
     srcCmd <- NULL
     if (type == 1) { # Boundaries Z Scale
         if (survivalDesignPlanEnabled) {
@@ -340,7 +343,10 @@
                 designPlan <- data.frame(
                     cumulativeEventsPerStage = designPlan$cumulativeEventsPerStage[, 1],
                     criticalValues = designMaster$criticalValues,
-                    futilityBounds = c(designMaster$futilityBounds, designMaster$criticalValues[designMaster$kMax])
+                    futilityBounds = c(
+                        designMaster$futilityBounds,
+                        designMaster$criticalValues[designMaster$kMax]
+                    )
                 )
             } else {
                 designPlan <- data.frame(
@@ -360,7 +366,10 @@
                 yParameterNamesSrc <- yParameterNames
             } else {
                 yParameterNames <- c("criticalValues", "criticalValuesMirrored")
-                yParameterNamesSrc <- c("criticalValues", paste0("-", designPlanName, "$.design$criticalValues"))
+                yParameterNamesSrc <- c(
+                    "criticalValues",
+                    paste0("-", designPlanName, "$.design$criticalValues")
+                )
             }
 
             if (is.na(legendPosition)) {
@@ -442,7 +451,8 @@
                 yParameterNamesSrc <- c(yParameterNamesSrc, "criticalValuesEffectScale[, 1]")
                 yParameterNamesSrc <- c(yParameterNamesSrc, paste0(
                     "c(", designPlanName, "$futilityBoundsEffectScale[, 1], ",
-                    designPlanName, "$criticalValuesEffectScale[nrow(", designPlanName, "$criticalValuesEffectScale), 1])"
+                    designPlanName, "$criticalValuesEffectScale[nrow(",
+                    designPlanName, "$criticalValuesEffectScale), 1])"
                 ))
             } else {
                 data <- data.frame(
@@ -467,11 +477,13 @@
             yParameterNamesSrc <- c(yParameterNamesSrc, "criticalValuesEffectScaleLower[, 1]")
             yParameterNamesSrc <- c(yParameterNamesSrc, paste0(
                 "c(", designPlanName, "$futilityBoundsEffectScaleUpper[, 1], ",
-                designPlanName, "$criticalValuesEffectScaleUpper[nrow(", designPlanName, "$criticalValuesEffectScaleUpper), 1])"
+                designPlanName, "$criticalValuesEffectScaleUpper[nrow(",
+                designPlanName, "$criticalValuesEffectScaleUpper), 1])"
             ))
             yParameterNamesSrc <- c(yParameterNamesSrc, paste0(
                 "c(", designPlanName, "$futilityBoundsEffectScaleLower[, 1], ",
-                designPlanName, "$criticalValuesEffectScaleLower[nrow(", designPlanName, "$criticalValuesEffectScaleLower), 1])"
+                designPlanName, "$criticalValuesEffectScaleLower[nrow(",
+                designPlanName, "$criticalValuesEffectScaleLower), 1])"
             ))
             groupedPlotEnabled <- TRUE
         } else {
@@ -562,11 +574,11 @@
 
         yParameterNames <- "criticalValuesPValueScale"
         futilityBoundsPValueScaleEnabled <- .getEnvironmentVariable(
-                "RPACT_PLOT_SHOW_FUTILITY_ON_PVALUE_SCALE",
-                "rpact.plot.show.futility.on.pvalue.scale",
-                default = FALSE,
-                type = "logical"
-            ) || isTRUE(.getOptionalArgument("showFutilityBounds", ..., optionalArgumentDefaultValue = FALSE))
+            "RPACT_PLOT_SHOW_FUTILITY_ON_PVALUE_SCALE",
+            "rpact.plot.show.futility.on.pvalue.scale",
+            default = FALSE,
+            type = "logical"
+        ) || isTRUE(.getOptionalArgument("showFutilityBounds", ..., optionalArgumentDefaultValue = FALSE))
         if (futilityBoundsPValueScaleEnabled && .isTrialDesignWithValidFutilityBounds(designMaster)) {
             yParameterNames <- c(yParameterNames, "futilityBoundsPValueScale")
             df$futilityBoundsPValueScale <- c(
@@ -645,7 +657,10 @@
                 xParameterName <- "alternative"
                 yParameterNames <- c("nFixed")
                 if (designMaster$kMax > 1) {
-                    yParameterNames <- c(yParameterNames, "maxNumberOfSubjects", "expectedNumberOfSubjectsH1")
+                    yParameterNames <- c(
+                        yParameterNames,
+                        "maxNumberOfSubjects", "expectedNumberOfSubjectsH1"
+                    )
                 }
                 if (is.na(ylab)) {
                     ylab <- "Sample Size"
@@ -659,7 +674,10 @@
                 xParameterName <- "pi1"
                 yParameterNames <- c("nFixed")
                 if (designMaster$kMax > 1) {
-                    yParameterNames <- c(yParameterNames, "maxNumberOfSubjects", "expectedNumberOfSubjectsH1")
+                    yParameterNames <- c(
+                        yParameterNames,
+                        "maxNumberOfSubjects", "expectedNumberOfSubjectsH1"
+                    )
                 }
                 if (is.na(ylab)) {
                     ylab <- "Sample Size"
@@ -679,7 +697,10 @@
                 xParameterName <- "hazardRatio"
                 yParameterNames <- c("eventsFixed")
                 if (designMaster$kMax > 1) {
-                    yParameterNames <- c(yParameterNames, "maxNumberOfEvents", "expectedEventsH1")
+                    yParameterNames <- c(
+                        yParameterNames,
+                        "maxNumberOfEvents", "expectedEventsH1"
+                    )
                 }
                 if (is.na(ylab)) {
                     ylab <- "# Events"
@@ -696,7 +717,11 @@
                 xParameterName <- "theta" # "lambda1"
                 yParameterNames <- c("nFixed")
                 if (designMaster$kMax > 1) {
-                    yParameterNames <- c("maxNumberOfSubjects", "maxNumberOfSubjects", "expectedNumberOfSubjectsH1")
+                    yParameterNames <- c(
+                        "maxNumberOfSubjects",
+                        "maxNumberOfSubjects",
+                        "expectedNumberOfSubjectsH1"
+                    )
                 }
                 if (is.na(ylab)) {
                     ylab <- "Sample Size"
@@ -707,7 +732,10 @@
                 }
                 yParameterNamesSrc <- yParameterNames
             } else {
-                stop("Plot type 5 is not implemented for class ", sQuote(.getClassName(designPlan)))
+                stop(
+                    "Plot type 5 is not implemented for class ",
+                    sQuote(.getClassName(designPlan))
+                )
             }
 
             srcCmd <- .showPlotSourceInformation(
@@ -1048,10 +1076,16 @@
                 ...
             ))
         } else {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1, 2, ..., 14", call. = FALSE)
+            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
+                ") is not allowed; must be 1, 2, ..., 14",
+                call. = FALSE
+            )
         }
     } else {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type, ") is not allowed; must be 1, 2, ..., 9", call. = FALSE)
+        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
+            ") is not allowed; must be 1, 2, ..., 9",
+            call. = FALSE
+        )
     }
 
     if (!is.null(srcCmd)) {
@@ -1083,7 +1117,9 @@
     if (!is.na(showBetaSpent)) {
         args$showBetaSpent <- showBetaSpent
     }
-    showFutilityBound <- .getOptionalArgument("showFutilityBound", ..., optionalArgumentDefaultValue = NA)
+    showFutilityBound <- .getOptionalArgument("showFutilityBound", ...,
+        optionalArgumentDefaultValue = NA
+    )
     if (!is.na(showFutilityBound)) {
         args$showFutilityBound <- showFutilityBound
     }
@@ -1096,8 +1132,10 @@
     return(p)
 }
 
-.getSurvivalFunctionPlotCommand <- function(functionType = c("pwExpDist", "lambdaStep"), timeValues, lambda,
-        designPlan, type, piecewiseSurvivalEnabled, multiplyByHazardRatio = FALSE) {
+.getSurvivalFunctionPlotCommand <- function(
+        functionType = c("pwExpDist", "lambdaStep"), timeValues, lambda,
+        designPlan, type, piecewiseSurvivalEnabled, multiplyByHazardRatio = FALSE
+        ) {
     functionType <- match.arg(functionType)
     signPrefix <- ifelse(type == 13, "", "-")
     if (functionType == "pwExpDist") {
@@ -1127,10 +1165,12 @@
 }
 
 # Cumulative Distribution Function / Survival function
-.plotSurvivalFunction <- function(designPlan, ..., designMaster, type = c(13, 14), main = NA_character_,
+.plotSurvivalFunction <- function(
+        designPlan, ..., designMaster, type = c(13, 14), main = NA_character_,
         xlab = NA_character_, ylab = NA_character_, palette = "Set1",
         legendPosition = NA_integer_, showSource = FALSE,
-        designPlanName = NA_character_, plotSettings = NULL) {
+        designPlanName = NA_character_, plotSettings = NULL
+        ) {
     startTime <- Sys.time()
     if (is.null(designPlan$piecewiseSurvivalTime) ||
             length(designPlan$piecewiseSurvivalTime) == 0) {
@@ -1550,7 +1590,8 @@
 #'
 #' @export
 #'
-plot.TrialDesignPlan <- function(x,
+plot.TrialDesignPlan <- function(
+        x,
         y, ...,
         main = NA_character_,
         xlab = NA_character_,
@@ -1562,7 +1603,8 @@ plot.TrialDesignPlan <- function(x,
         legendPosition = NA_integer_,
         showSource = FALSE,
         grid = 1,
-        plotSettings = NULL) {
+        plotSettings = NULL
+        ) {
     .assertIsValidPlotType(type, naAllowed = TRUE)
     .assertIsSingleInteger(grid, "grid", validateType = FALSE)
     markdown <- .getOptionalArgument("markdown", ..., optionalArgumentDefaultValue = NA)
@@ -1616,7 +1658,8 @@ plot.TrialDesignPlan <- function(x,
     return(do.call(.plot.TrialDesignPlan, args))
 }
 
-.plot.TrialDesignPlan <- function(x,
+.plot.TrialDesignPlan <- function(
+        x,
         y,
         ...,
         main = NA_character_,
@@ -1629,7 +1672,8 @@ plot.TrialDesignPlan <- function(x,
         legendPosition = NA_integer_,
         showSource = FALSE,
         grid = 1,
-        plotSettings = NULL) {
+        plotSettings = NULL
+        ) {
     fCall <- match.call(expand.dots = FALSE)
 
     designPlanName <- deparse(fCall$x)

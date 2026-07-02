@@ -396,7 +396,8 @@ getSimulationMultiArmMeans <- function(design = NULL, ...,
         calcSubjectsFunction        = calcSubjectsFunction, # means + rates only
         selectArmsFunction          = selectArmsFunction,
         showStatistics              = showStatistics,
-        endpoint                    = "means"
+        endpoint                    = "means",
+        simulationType              = "testStatisticBased"
     )
 
     design <- simulationResults$.design

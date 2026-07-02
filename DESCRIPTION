@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.5.0.9307
-Date: 2026-07-01
+Version: 4.5.0.9308
+Date: 2026-07-02
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -137,6 +137,7 @@ Collate:
     'f_design_plan_plot.R'
     'f_design_plan_rates.R'
     'f_design_plan_survival.R'
+    'f_design_plan_boundary_data.R'
     'f_design_plan_utilities.R'
     'f_io_utilities.R'
     'f_quality_assurance.R'
@@ -147,12 +148,20 @@ Collate:
     'f_simulation_enrichment_means.R'
     'f_simulation_enrichment_rates.R'
     'f_simulation_enrichment_survival.R'
+    'f_simulation_enrichment_survival_crude.R'
+    'f_simulation_enrichment_survival_function.R'
+    'f_simulation_enrichment_survival_pw.R'
+    'f_simulation_enrichment_survival_pw_basic.R'
     'f_simulation_multiarm.R'
     'f_simulation_multiarm_means.R'
     'f_simulation_multiarm_rates.R'
     'f_simulation_multiarm_survival.R'
+    'f_simulation_multiarm_survival_crude.R'
+    'f_simulation_multiarm_survival_function.R'
+    'f_simulation_multiarm_survival_pw.R'
+    'f_simulation_multiarm_survival_pw_basic.R'
     'f_simulation_performance_score.R'
     'f_simulation_plot.R'
     'parameter_descriptions.R'
     'pkgname.R'
-Config/roxygen2/version: 7.3.3.9000
+Config/roxygen2/version: 8.0.0

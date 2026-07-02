@@ -392,7 +392,9 @@ NULL
 #'
 #' @export
 #'
-getSimulationMultiArmRates <- function(design = NULL, ...,
+getSimulationMultiArmRates <- function(
+        design = NULL, 
+        ...,
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT
@@ -480,7 +482,8 @@ getSimulationMultiArmRates <- function(design = NULL, ...,
         calcSubjectsFunction        = calcSubjectsFunction, # means + rates only
         selectArmsFunction          = selectArmsFunction,
         showStatistics              = showStatistics,
-        endpoint                    = "rates"
+        endpoint                    = "rates",
+        simulationType              = "testStatisticBased"
     )
 
     design <- simulationResults$.design

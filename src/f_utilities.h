@@ -58,6 +58,8 @@ double getOneMinusPNorm(double q, double mean = 0, double sd = 1,
 
 IntegerVector getOrder(SEXP x, bool desc = false);
 
+IntegerVector order(NumericVector x);
+
 NumericVector vectorSum(NumericVector x, NumericVector y);
 
 NumericVector vectorSub(NumericVector x, NumericVector y);
@@ -121,5 +123,26 @@ std::string getCipheredValue(String x);
 void logDebug(std::string s);
 
 double getRandomTDistribution(double df, double ncp);
+
+IntegerVector which(const LogicalVector& x);
+
+LogicalVector charInSet(const CharacterVector& x, CharacterVector set);
+
+LogicalVector intInSet(const IntegerVector& x, IntegerVector set);
+
+IntegerVector repInt(const IntegerVector& values, const IntegerVector& times);
+
+int firstMatch(const CharacterVector& x, std::string value);
+
+NumericVector applyDirectionOfAlternative(const NumericVector& values, 
+                                          bool directionUpper, 
+                                          String type,
+                                          String phase);
+
+std::string getClassName(const Environment& x);
+
+double getMultivarNormalDistribution(NumericVector upper, NumericMatrix sigma);
+
+NumericMatrix tcrossprod(NumericVector x);
 
 #endif

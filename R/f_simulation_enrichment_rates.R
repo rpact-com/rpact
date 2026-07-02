@@ -1094,7 +1094,8 @@ getSimulationEnrichmentRates <- function(design = NULL,
         calcSubjectsFunction = calcSubjectsFunction, # means + rates only
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
-        endpoint = "rates"
+        endpoint = "rates",
+        simulationType = "testStatisticBased"
     )
 
     design <- simulationResults$.design
