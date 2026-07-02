@@ -357,7 +357,8 @@ getAnalysisResults <- function(design,
 #'
 #' @export
 #'
-getStageResults <- function(design,
+getStageResults <- function(
+        design,
         dataInput,
         ...,
         stage = NA_integer_,

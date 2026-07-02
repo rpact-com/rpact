@@ -1952,7 +1952,17 @@ NULL
         ratioEnabled = FALSE,
         naAllowed = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsValidThetaH0", ...)
-    .assertIsSingleNumber(thetaH0, "thetaH0", naAllowed = naAllowed)
+    .assertIsSingleNumber(thetaH0, "thetaH0", naAllowed = TRUE)
+    if (endpoint == "rates" && groups == 1 && is.na(thetaH0)) {
+        stop(
+            ifelse(is.na(thetaH0), C_EXCEPTION_TYPE_MISSING_ARGUMENT, C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT),
+            "'thetaH0' must be specified for testing a rate in one sample",
+            call. = FALSE
+        )
+    }
+    if (isFALSE(naAllowed)) {
+        .assertIsSingleNumber(thetaH0, "thetaH0", naAllowed = naAllowed)
+    }
     if (naAllowed && is.na(thetaH0)) {
         return(invisible())
     }
