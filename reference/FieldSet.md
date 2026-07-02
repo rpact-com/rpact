@@ -14,8 +14,8 @@ Basic class for field sets.
 
 - outputType:
 
-  Type of output to capture: "all", "print", "summary", or "json"
-  (default "all")
+  One or more types of output to capture: "default", "print", "summary",
+  or "json" (default "default")
 
 ## Value
 

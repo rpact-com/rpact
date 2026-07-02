@@ -55,11 +55,19 @@ getFutilityBounds(
 
 - theta:
 
-  Numeric. The assumed effect size under the alternative hypothesis.
+  Numeric. The assumed effect size under the alternative hypothesis on
+  the scale of the test statistic. For example, in a survival design,
+  this would be the on the log hazard ratio scale.
 
 - information:
 
-  Numeric vector of length 2. The information levels at the two stages.
+  Numeric vector of length 1 or 2. The stage-wise information levels
+  (i.e. this is *not* the cumulative information). Note that depending
+  on which conversion is performed, either the first or second stage
+  information may not be needed. In that case, a warning will be issued
+  if the unused information is provided. The warning can be avoided by
+  either passing a single number, or setting the unused information to
+  `NA`.
 
 - naAllowed:
 

@@ -152,10 +152,14 @@
 <url><loc>https://docs.rpact.org/reference/getSimulationEnrichmentMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationEnrichmentRates.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/getSimulationEnrichmentSurvivalBasic.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/getSimulationEnrichmentSurvivalPatientWise.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationMultiArmMeans.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationMultiArmRates.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationMultiArmSurvival.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/getSimulationMultiArmSurvivalBasic.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/getSimulationMultiArmSurvivalPatientWise.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationRates.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getSimulationSurvival.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/getStageResults.html</loc></url>
@@ -207,6 +211,7 @@
 <url><loc>https://docs.rpact.org/reference/param_effectMatrix.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_effectMeasure.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_epsilonValue.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/param_estimatedTheta.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_eventTime.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_fixedExposureTime_counts.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_followUpTime_counts.html</loc></url>
@@ -261,6 +266,8 @@
 <url><loc>https://docs.rpact.org/reference/param_showSource.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_showStatistics.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_sided.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/param_simulationType_enrichment_survival.html</loc></url>
+<url><loc>https://docs.rpact.org/reference/param_simulationType_multiarm_survival.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_slope.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_stDev.html</loc></url>
 <url><loc>https://docs.rpact.org/reference/param_stDevH1.html</loc></url>

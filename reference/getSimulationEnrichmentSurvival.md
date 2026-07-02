@@ -7,13 +7,69 @@ an enrichment design testing situation. In contrast to
 (where survival times are simulated), normally distributed logrank test
 statistics are simulated.
 
+Returns the simulated power, stopping and selection probabilities,
+conditional power, and expected sample size for testing hazard ratios in
+an enrichment design testing situation.
+
+Depending on `simulationType`, either a patient-wise survival simulation
+is performed or normally distributed log-rank test statistics are
+simulated. The default `simulationType = "auto"` chooses the simulation
+approach automatically based on the explicitly specified arguments.
+
 ## Usage
 
 ``` r
 getSimulationEnrichmentSurvival(
   design = NULL,
   ...,
+  simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
   effectList = NULL,
+  kappa = 1,
+  eventTime = 12,
+  accrualTime = c(0, 12),
+  accrualIntensity = 0.1,
+  accrualIntensityType = c("auto", "absolute", "relative"),
+  dropoutRate1 = 0,
+  dropoutRate2 = 0,
+  dropoutTime = 12,
+  maxNumberOfSubjects = NA_real_,
+  intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
+  stratifiedAnalysis = TRUE,
+  directionUpper = NA,
+  adaptations = NA,
+  typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
+  effectMeasure = c("effectEstimate", "testStatistic"),
+  successCriterion = c("all", "atLeastOne"),
+  epsilonValue = NA_real_,
+  rValue = NA_real_,
+  threshold = -Inf,
+  plannedEvents = NA_real_,
+  allocationRatioPlanned = NA_real_,
+  minNumberOfEventsPerStage = NA_real_,
+  maxNumberOfEventsPerStage = NA_real_,
+  conditionalPower = NA_real_,
+  thetaH1 = NA_real_,
+  maxNumberOfIterations = 1000L,
+  seed = NA_real_,
+  calcEventsFunction = NULL,
+  selectPopulationsFunction = NULL,
+  showStatistics = FALSE
+)
+
+getSimulationEnrichmentSurvival(
+  design = NULL,
+  ...,
+  simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
+  effectList = NULL,
+  kappa = 1,
+  eventTime = 12,
+  accrualTime = c(0, 12),
+  accrualIntensity = 0.1,
+  accrualIntensityType = c("auto", "absolute", "relative"),
+  dropoutRate1 = 0,
+  dropoutRate2 = 0,
+  dropoutTime = 12,
+  maxNumberOfSubjects = NA_real_,
   intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"),
   stratifiedAnalysis = TRUE,
   directionUpper = NA,
@@ -52,11 +108,82 @@ getSimulationEnrichmentSurvival(
   Ensures that all arguments (starting from the "...") are to be named
   and that a warning will be displayed if unknown arguments are passed.
 
+- simulationType:
+
+  Character value specifying the simulation approach: `"auto"`,
+  `"patientWise"`, `"testStatisticBased"`, or `"patientWiseBasic"`. If
+  `"auto"` is specified, the simulation type is selected automatically
+  based on the explicitly specified arguments. If patient-wise-specific
+  arguments such as `eventTime`, `accrualTime`, `accrualIntensity`,
+  `dropoutRate1`, `dropoutRate2`, `dropoutTime`, `maxNumberOfSubjects`,
+  or `kappa` are provided, patient-wise simulation is used; otherwise
+  the test-statistic-based simulation is used for backward
+  compatibility.
+
 - effectList:
 
   List of subsets, prevalences, and effect sizes with columns and number
   of rows reflecting the different situations to consider (see
   examples).
+
+- kappa:
+
+  A numeric value \> 0. A `kappa != 1` will be used for the
+  specification of the shape of the Weibull distribution. Default is
+  `1`, i.e., the exponential survival distribution is used instead of
+  the Weibull distribution. Note that the Weibull distribution cannot be
+  used for the piecewise definition of the survival time distribution,
+  i.e., only `piecewiselambda` (as a single value) and `kappa` can be
+  specified. This function is equivalent to
+  `pweibull(t, shape = kappa, scale = 1 / lambda)` of the `stats`
+  package, i.e., the scale parameter is `1 / 'hazard rate'`.  
+  For example,
+  `getPiecewiseExponentialDistribution(time = 130, piecewiseLambda = 0.01, kappa = 4.2)`
+  and `pweibull(q = 130, shape = 4.2, scale = 1 / 0.01)` provide the
+  same result.
+
+- eventTime:
+
+  The assumed time under which the event rates are calculated, default
+  is `12`.
+
+- accrualTime:
+
+  The assumed accrual time intervals for the study, default is
+  `c(0, 12)` (for details see
+  [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)).
+
+- accrualIntensity:
+
+  A numeric vector of accrual intensities, default is the relative
+  intensity `0.1` (for details see
+  [`getAccrualTime()`](https://docs.rpact.org/reference/getAccrualTime.md)).
+
+- accrualIntensityType:
+
+  A character value specifying the accrual intensity input type. Must be
+  one of `"auto"`, `"absolute"`, or `"relative"`; default is `"auto"`,
+  i.e., if all values are \< 1 the type is `"relative"`, otherwise it is
+  `"absolute"`.
+
+- dropoutRate1:
+
+  The assumed drop-out rate in the treatment group, default is `0`.
+
+- dropoutRate2:
+
+  The assumed drop-out rate in the control group, default is `0`.
+
+- dropoutTime:
+
+  The assumed time for drop-out rates in the control and the treatment
+  group, default is `12`.
+
+- maxNumberOfSubjects:
+
+  `maxNumberOfSubjects > 0` needs to be specified. If accrual time and
+  accrual intensity are specified, this will be calculated. Must be a
+  positive integer of length 1.
 
 - intersectionTest:
 
@@ -245,6 +372,31 @@ this object:
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
+Returns a
+[`SimulationResults`](https://docs.rpact.org/reference/SimulationResults.md)
+object. The following generics (R generic functions) are available for
+this object:
+
+- [`names()`](https://docs.rpact.org/reference/names.FieldSet.md) to
+  obtain the field names,
+
+- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
+  print the object,
+
+- [`summary()`](https://docs.rpact.org/reference/summary.ParameterSet.md)
+  to display a summary of the object,
+
+- [`plot()`](https://docs.rpact.org/reference/plot.SimulationResults.md)
+  to plot the object,
+
+- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.ParameterSet.md)
+  to coerce the object to a
+  [`data.frame`](https://rdrr.io/r/base/data.frame.html),
+
+- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
+  to coerce the object to a
+  [`matrix`](https://rdrr.io/r/base/matrix.html).
+
 ## Details
 
 At given design the function simulates the power, stopping
@@ -253,6 +405,35 @@ given number of events, parameter configuration, and population
 selection rule in the enrichment situation. An allocation ratio can be
 specified referring to the ratio of number of subjects in the active
 treatment group as compared to the control group.
+
+The definition of `thetaH1` makes only sense if `kMax` \> 1 and if
+`conditionalPower`, `minNumberOfEventsPerStage`, and
+`maxNumberOfEventsPerStage` (or `calcEventsFunction`) are defined.
+
+`calcEventsFunction`  
+This function returns the number of events at given conditional power
+and conditional critical value for specified testing situation. The
+function might depend on the variables `stage`, `selectedPopulations`,
+`plannedEvents`, `directionUpper`, `allocationRatioPlanned`,
+`minNumberOfEventsPerStage`, `maxNumberOfEventsPerStage`,
+`conditionalPower`, `conditionalCriticalValue`, and `overallEffects`.
+The function has to contain the three-dots argument '...' (see
+examples).
+
+At given design the function simulates the power, stopping
+probabilities, selection probabilities, and expected event number at
+given number of events, parameter configuration, and population
+selection rule in the enrichment situation. An allocation ratio can be
+specified referring to the ratio of number of subjects in the active
+treatment group as compared to the control group.
+
+If `simulationType = "patientWise"`, patient-wise survival data are
+simulated based on the specified accrual, event-time, and dropout
+assumptions. If `simulationType = "testStatisticBased"`, normally
+distributed log-rank test statistics are simulated instead. The default
+`simulationType = "auto"` selects the patient-wise approach if
+patient-wise-specific arguments were explicitly specified; otherwise the
+test-statistic-based approach is used for backward compatibility.
 
 The definition of `thetaH1` makes only sense if `kMax` \> 1 and if
 `conditionalPower`, `minNumberOfEventsPerStage`, and
@@ -280,9 +461,57 @@ you can find, e.g., `plot.AnalysisResults` and obtain the specific help
 documentation linked above by typing
 [`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
 
+Click on the link of a generic in the list above to go directly to the
+help documentation of the `rpact` specific implementation of the
+generic. Note that you can use the R function
+[`methods`](https://rdrr.io/r/utils/methods.html) to get all the methods
+of a generic and to identify the object specific name of it, e.g., use
+`methods("plot")` to get all the methods for the `plot` generic. There
+you can find, e.g., `plot.AnalysisResults` and obtain the specific help
+documentation linked above by typing
+[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
+
 ## Examples
 
 ``` r
+if (FALSE) { # \dontrun{
+# Assess a population selection strategy with one subset population and
+# a survival endpoint. The considered situations are defined through the 
+# event rates yielding a range of hazard ratios in the subsets. Design 
+# with O'Brien and Fleming alpha spending and a reassessment of event 
+# number in the first interim based on conditional power and assumed 
+# hazard ratio using weighted inverse normal combination test.  
+    
+subGroups <- c("S", "R")
+prevalences <- c(0.40, 0.60)
+ 
+p2 <- c(0.3, 0.4)
+range1 <- p2[1] + seq(0, 0.3, 0.05)
+
+p1 <- c()
+for (x1 in range1) {
+    p1 <- c(p1, x1, p2[2] + 0.1)
+}    
+hazardRatios <- log(matrix(1 - p1, byrow = TRUE, ncol = 2)) /
+    matrix(log(1 - p2), byrow = TRUE, ncol = 2,
+    nrow = length(range1))
+
+effectList <- list(subGroups=subGroups, prevalences=prevalences,
+    hazardRatios = hazardRatios)
+
+design <- getDesignInverseNormal(informationRates = c(0.3, 0.7, 1),
+    typeOfDesign = "asOF")
+
+simResultsPE <- getSimulationEnrichmentSurvival(design, 
+    plannedEvents = c(40, 90, 120),
+    effectList = effectList,
+    typeOfSelection = "rbest", rValue = 2,
+    conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA, 50, 30),
+    maxNumberOfEventsPerStage = c(NA, 150, 30), thetaH1 = 4 / 3,
+    maxNumberOfIterations = 100)
+print(simResultsPE)
+} # }
+
 if (FALSE) { # \dontrun{
 # Assess a population selection strategy with one subset population and
 # a survival endpoint. The considered situations are defined through the 
