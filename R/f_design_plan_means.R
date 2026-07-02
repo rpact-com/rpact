@@ -124,7 +124,9 @@ NULL
                 (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                     !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds *
-                stDev * (1 + allocationRatioPlanned) /
+                sqrt(1 + allocationRatioPlanned) *
+                sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) /
+                # stDev * (1 + allocationRatioPlanned) /
                 (sqrt(allocationRatioPlanned *
                     design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
         }

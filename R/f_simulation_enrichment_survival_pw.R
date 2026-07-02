@@ -218,7 +218,8 @@ getSimulationEnrichmentSurvivalPatientWise <- function(design = NULL,
         calcEventsFunction = calcEventsFunction, # survival only
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
-        endpoint = "survival"
+        endpoint = "survival",
+        simulationType = "patientWise"
     )
 
     design <- simulationResults$.design

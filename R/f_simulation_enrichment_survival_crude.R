@@ -588,7 +588,8 @@ getSimulationEnrichmentSurvivalBasic <- function(
         calcEventsFunction = calcEventsFunction, # survival only
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
-        endpoint = "survival"
+        endpoint = "survival",
+        simulationType = "testStatisticBased"
     )
 
     design <- simulationResults$.design

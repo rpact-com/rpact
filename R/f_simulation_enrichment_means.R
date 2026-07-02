@@ -570,7 +570,8 @@ getSimulationEnrichmentMeans <- function(design = NULL,
         calcSubjectsFunction = calcSubjectsFunction, # means + rates only
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
-        endpoint = "means"
+        endpoint = "means",
+        simulationType = "testStatisticBased"
     )
 
     design <- simulationResults$.design

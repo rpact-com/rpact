@@ -586,7 +586,8 @@ updateSubGroupVector <- function(
         calcEventsFunction = calcEventsFunction, # survival only
         selectPopulationsFunction = selectPopulationsFunction,
         showStatistics = showStatistics,
-        endpoint = "survival"
+        endpoint = "survival",
+        simulationType = "patientWiseBasic"
     )
     
     design <- simulationResults$.design
