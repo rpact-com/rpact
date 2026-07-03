@@ -1788,6 +1788,8 @@ getDesignInverseNormal <- function(...,
 
     if (design$kMax == 1) {
         design$.setParameterType("futilityBounds", C_PARAM_NOT_APPLICABLE)
+        design$.setParameterType("bindingFutility", C_PARAM_NOT_APPLICABLE)
+        design$.setParameterType("tolerance", C_PARAM_NOT_APPLICABLE)
     }
 
     if (.hasApplicableFutilityBounds(design)) {

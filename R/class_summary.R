@@ -4255,9 +4255,13 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
             " does not contain the field ", sQuote(parameterName)
         )
     }
-
-    numberOfVariedParams <- dim(arrayData)[2]
-    numberOfGroups <- dim(arrayData)[3]
+    
+    numberOfVariedParams <- 1
+    numberOfGroups <- 1
+    if (dim(arrayData)[1] > 1) {
+        numberOfVariedParams <- dim(arrayData)[2]
+        numberOfGroups <- dim(arrayData)[3]
+    }
 
     for (variedParamNumber in 1:numberOfVariedParams) {
         summaryGroup <- .getSummaryGroup(
@@ -4273,7 +4277,11 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
         }
 
         for (groupNumber in 1:numberOfGroups) {
-            dataPerGroupAndStage <- arrayData[, variedParamNumber, groupNumber]
+            if (numberOfVariedParams == 1 && numberOfGroups == 1 && length(dim(arrayData)) == 2) {
+                dataPerGroupAndStage <- arrayData
+            } else {
+                dataPerGroupAndStage <- arrayData[, variedParamNumber, groupNumber]
+            }
             if (numberOfGroups > 1) {
                 groupCaption <- .getSummaryGroupCaption(
                     designPlan,

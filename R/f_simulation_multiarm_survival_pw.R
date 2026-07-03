@@ -584,13 +584,14 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     recruitmentTimes[length(recruitmentTimes)] <- accrualTime[length(accrualTime)]
 
     loopResult <- if (isTRUE(cppEnabled)) {
-        weights <- if (.isTrialDesignFisher(design)) {
-            .getWeightsFisher(design)
-        } else if (.isTrialDesignInverseNormal(design)) {
+        weights <- if (.isTrialDesignFixed(design) || .isTrialDesignInverseNormal(design)) {
             .getWeightsInverseNormal(design)
+        } else if (.isTrialDesignFisher(design)) {
+            .getWeightsFisher(design)
         } else if (.isTrialDesignConditionalDunnett(design)) {
             numeric(0) # not used
         }
+    
         .performSimulationMultiArmSurvivalLoopCpp(
             cols = cols,
             maxNumberOfIterations = maxNumberOfIterations,

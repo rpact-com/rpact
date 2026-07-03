@@ -705,7 +705,12 @@ List getSimulatedStageResultsSurvivalMultiArmSubjectsBased(
                         _["thetaH1"] = thetaH1,
                         _["overallEffects"] = overallEffects
                     );
-                    Function selectTreatmentArmsR(".selectTreatmentArms");
+
+					// get namespace environment of the 'rpact' package
+					Environment ns = Environment::namespace_env("rpact");
+
+					// access internal function '.selectTreatmentArms'
+					Function selectTreatmentArmsR = ns[".selectTreatmentArms"];
 
                     selectedNow = selectTreatmentArmsR(
                         Named("typeOfSelection") = typeOfSelection,

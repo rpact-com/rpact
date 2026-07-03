@@ -690,7 +690,7 @@ updateSubGroupVector <- function(
     
     if (.isTrialDesignFisher(design)) {
         weights <- .getWeightsFisher(design)
-    } else if (.isTrialDesignInverseNormal(design)) {
+    } else if (.isTrialDesignFixed(design) || .isTrialDesignInverseNormal(design)) {
         weights <- .getWeightsInverseNormal(design)
     } else {
         stop(
