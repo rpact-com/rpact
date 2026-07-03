@@ -142,7 +142,6 @@ Collate:
     'f_design_plan_utilities.R'
     'f_io_utilities.R'
     'f_quality_assurance.R'
-    'f_rpact_code_api.R'
     'f_simulation_base_means.R'
     'f_simulation_base_rates.R'
     'f_simulation_calc_subjects_function.R'
