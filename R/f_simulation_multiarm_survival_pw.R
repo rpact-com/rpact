@@ -44,6 +44,7 @@ NULL
 #' @inheritParams param_effectMatrix
 #' @inheritParams param_activeArms
 #' @inheritParams param_successCriterion
+#' @inheritParams param_correlationComputation
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_design_with_default
 #' @inheritParams param_directionUpper

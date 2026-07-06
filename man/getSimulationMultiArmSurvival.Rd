@@ -161,6 +161,14 @@ if the efficacy criterion is fulfilled for all selected treatment arms/populatio
 \code{"atLeastOne"} stops if at least one of the selected treatment arms/populations is shown to be
 superior to control at interim, default is \code{"all"}.}
 
+\item{correlationComputation}{If \code{correlationComputation = "alternative"},
+for simulating log-rank statistics in the many-to-one design, a correlation
+matrix according to Deng et al. (Biometrics, 2019) accounting for the
+respective alternative is used;
+if \code{correlationComputation = "null"}, a constant correlation matrix valid
+under the null, i.e., not accounting for the alternative is used,
+default is \code{"alternative"}.}
+
 \item{epsilonValue}{For \code{typeOfSelection = "epsilon"} (select treatment arm / population not worse than
 epsilon compared to the best), the parameter \code{epsilonValue} has to be specified. Must be a numeric of length 1.}
 

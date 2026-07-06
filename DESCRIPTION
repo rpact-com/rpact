@@ -69,7 +69,6 @@ Imports:
 	graphics,
 	tools,
 	rlang,
-	jsonlite,
     R6 (>= 2.5.1),
 	knitr (>= 1.19), 
 	Rcpp (>= 1.0.3)
