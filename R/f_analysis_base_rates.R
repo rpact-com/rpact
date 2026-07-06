@@ -459,7 +459,7 @@ NULL
         stage = NA_integer_,
         userFunctionCallEnabled = FALSE) {
     .assertIsDatasetRates(dataInput)
-    .assertIsValidThetaH0DataInput(thetaH0, dataInput)
+    .assertIsValidThetaH0DataInput(thetaH0, dataInput, naAllowed = dataInput$getNumberOfGroups() > 1)
     thetaH0 <- .getDefaultThetaH0(dataInput, thetaH0)
     .assertIsSingleLogical(normalApproximation, "normalApproximation")
     .warnInCaseOfUnknownArguments(

@@ -172,7 +172,7 @@ List performClosedCombinationTestForSimulationEnrichment(
     
     // Get weights based on design type
     bool isDesignFisher = designClass == "TrialDesignFisher";
-    bool isDesignInverseNormal = designClass == "TrialDesignInverseNormal";
+    bool isDesignInverseNormal = (designClass == "TrialDesignFixed") || (designClass == "TrialDesignInverseNormal");
     NumericVector weights;    
     if (isDesignFisher) {
         weights = getWeightsFisher(design);

@@ -163,6 +163,17 @@ For Fisher's combination test, the conditional power for more than one remaining
 Final stage p-values, median unbiased effect estimates, and final confidence intervals are not calculated
 for multi-arm and enrichment designs.
 }
+\section{Note}{
+
+Repeated p-values are calculated by identifying the smallest global
+significance level for which the observed test statistic would lead to
+rejection under the same design rule. Therefore, they require that the
+design can be re-created for arbitrary values of the global significance
+level. For user-defined designs with fixed userAlphaSpending values,
+this alpha-dependent design family is not uniquely defined.
+Consequently, repeated p-values are not available for such designs.
+}
+
 \section{How to get help for generic functions}{
 
 Click on the link of a generic in the list above to go directly to the help documentation of

@@ -77,7 +77,35 @@ NULL
     return(selectedVector)
 }
 
-.selectPopulations <- function(typeOfSelection,
+#' 
+#' Select populations for enrichment simulation
+#'
+#' Internal helper to determine which sub-populations are selected at a stage.
+#'
+#' @param typeOfSelection Character. Selection strategy. One of "all", "best", "rBest"/"rbest",
+#'   "epsilon", or "userDefined".
+#' @param epsilonValue Numeric. Tolerance used for "epsilon" selection (populations with
+#'   max(effectVector, na.rm = TRUE) - effect <= epsilonValue are selected).
+#' @param rValue Integer. Number of top populations to select for 'rBest' selection. May be NA.
+#' @param threshold Numeric. Minimum effect threshold; populations with effect <= threshold are not selected.
+#' @param selectPopulationsFunction Function or NULL. User-defined selection function used when
+#'   typeOfSelection == "userDefined". The function will be validated against the provided
+#'   selectPopulationsFunctionArgs.
+#' @param selectPopulationsFunctionArgs Named list. Arguments passed to selectPopulationsFunction.
+#'   Must contain an element named 'effectVector' (numeric vector of length gMax).
+#' @return Logical vector of length gMax indicating which populations are selected. Entries
+#'   corresponding to NA in the provided effect vector are set to FALSE.
+#' @details For built-in selection types the function performs the corresponding selection
+#'   logic on the provided effect vector. If typeOfSelection == "userDefined" the
+#'   provided function is called (using only the declared argument names) and its result
+#'   is validated: it must be a logical vector of length gMax. Otherwise an error is thrown.
+#' 
+#' @keywords internal
+#' 
+#' @noRd 
+#' 
+.selectPopulations <- function(
+        typeOfSelection,
         epsilonValue,
         rValue,
         threshold,

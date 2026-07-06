@@ -144,6 +144,15 @@ NULL
 #'
 #' Final stage p-values, median unbiased effect estimates, and final confidence intervals are not calculated
 #' for multi-arm and enrichment designs.
+#' 
+#' @section Note:
+#' Repeated p-values are calculated by identifying the smallest global 
+#' significance level for which the observed test statistic would lead to 
+#' rejection under the same design rule. Therefore, they require that the 
+#' design can be re-created for arbitrary values of the global significance 
+#' level. For user-defined designs with fixed userAlphaSpending values, 
+#' this alpha-dependent design family is not uniquely defined. 
+#' Consequently, repeated p-values are not available for such designs.
 #'
 #' @return Returns an \code{\link{AnalysisResults}} object.
 #' The following generics (R generic functions) are available for this result object:
@@ -357,7 +366,8 @@ getAnalysisResults <- function(design,
 #'
 #' @export
 #'
-getStageResults <- function(design,
+getStageResults <- function(
+        design,
         dataInput,
         ...,
         stage = NA_integer_,
@@ -988,6 +998,15 @@ getConditionalPower <- function(stageResults,
 #'
 #' In multi-arm trials, the repeated p-values are defined separately for each
 #' treatment comparison within the closed testing procedure.
+#' 
+#' @section Note:
+#' Repeated p-values are calculated by identifying the smallest global 
+#' significance level for which the observed test statistic would lead to 
+#' rejection under the same design rule. Therefore, they require that the 
+#' design can be re-created for arbitrary values of the global significance 
+#' level. For user-defined designs with fixed userAlphaSpending values, 
+#' this alpha-dependent design family is not uniquely defined. 
+#' Consequently, repeated p-values are not available for such designs.
 #'
 #' @return Returns a \code{\link[base]{numeric}} vector of length \code{kMax} or in case of multi-arm stage results
 #' a \code{\link[base]{matrix}} (each column represents a stage, each row a comparison)

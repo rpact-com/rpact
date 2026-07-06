@@ -46,3 +46,5 @@ testthat-problems.rds
 /release-notes-draft-full.md
 /release-notes-draft.md
 /pkgdown
+/tests/testthat/test-f_simulation_enrichment_survival_patient_wise_dummy.R
+/tests/testthat/test-f_simulation_multiarm_survival_patient_wise_dummy.R

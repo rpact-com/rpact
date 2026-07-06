@@ -268,13 +268,7 @@ NULL
 #' @inheritParams param_effectMatrix
 #' @inheritParams param_activeArms
 #' @inheritParams param_successCriterion
-#' @param correlationComputation If \code{correlationComputation = "alternative"},
-#'        for simulating log-rank statistics in the many-to-one design, a correlation
-#'        matrix according to Deng et al. (Biometrics, 2019) accounting for the
-#'        respective alternative is used;
-#'        if \code{correlationComputation = "null"}, a constant correlation matrix valid
-#'        under the null, i.e., not accounting for the alternative is used, 
-#'        default is \code{"alternative"}.
+#' @inheritParams param_correlationComputation
 #' @inheritParams param_typeOfShapeSurvival
 #' @inheritParams param_typeOfSelection
 #' @inheritParams param_design_with_default

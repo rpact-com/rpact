@@ -1,7 +1,7 @@
 Package: rpact
 Title: Confirmatory Adaptive Clinical Trial Design and Analysis
-Version: 4.5.0.9308
-Date: 2026-07-02
+Version: 4.5.0.9310
+Date: 2026-07-06
 Authors@R: c(
 	person(
 		given = "Gernot", 
@@ -132,12 +132,12 @@ Collate:
     'f_design_fixed.R'
     'f_design_futility_bounds.R'
     'f_design_group_sequential.R'
+    'f_design_plan_boundary_data.R'
     'f_design_plan_counts.R'
     'f_design_plan_means.R'
     'f_design_plan_plot.R'
     'f_design_plan_rates.R'
     'f_design_plan_survival.R'
-    'f_design_plan_boundary_data.R'
     'f_design_plan_utilities.R'
     'f_io_utilities.R'
     'f_quality_assurance.R'
@@ -147,7 +147,6 @@ Collate:
     'f_simulation_enrichment.R'
     'f_simulation_enrichment_means.R'
     'f_simulation_enrichment_rates.R'
-    'f_simulation_enrichment_survival.R'
     'f_simulation_enrichment_survival_crude.R'
     'f_simulation_enrichment_survival_function.R'
     'f_simulation_enrichment_survival_pw.R'
@@ -155,7 +154,6 @@ Collate:
     'f_simulation_multiarm.R'
     'f_simulation_multiarm_means.R'
     'f_simulation_multiarm_rates.R'
-    'f_simulation_multiarm_survival.R'
     'f_simulation_multiarm_survival_crude.R'
     'f_simulation_multiarm_survival_function.R'
     'f_simulation_multiarm_survival_pw.R'

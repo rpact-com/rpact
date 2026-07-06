@@ -1003,3 +1003,15 @@ NULL
 #' @name param_twoSidedPower
 #' @keywords internal
 NULL
+
+#' Parameter Description: Correlation Computation
+#' @param correlationComputation If \code{correlationComputation = "alternative"},
+#'        for simulating log-rank statistics in the many-to-one design, a correlation
+#'        matrix according to Deng et al. (Biometrics, 2019) accounting for the
+#'        respective alternative is used;
+#'        if \code{correlationComputation = "null"}, a constant correlation matrix valid
+#'        under the null, i.e., not accounting for the alternative is used, 
+#'        default is \code{"alternative"}.
+#' @name param_correlationComputation
+#' @keywords internal
+NULL

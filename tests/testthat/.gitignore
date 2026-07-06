@@ -1,1 +1,3 @@
 *.R
+!test-f_simulation_multiarm_survival_patient_wise_dummy.R
+!test-f_simulation_enrichment_survival_patient_wise_dummy.R

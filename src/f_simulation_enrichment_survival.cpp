@@ -847,8 +847,13 @@ List getSimulatedStageResultsSurvivalEnrichmentSubjectsBased(
 						_["overallEffects"] = overallEffects
 					);
 
-					Function selectPopulations(".selectPopulations");
-					selectedNow = selectPopulations(
+					// get namespace environment of the 'rpact' package
+					Environment ns = Environment::namespace_env("rpact");
+
+					// access internal function '.selectPopulations'
+					Function selectPopulationsR = ns[".selectPopulations"];
+
+					selectedNow = selectPopulationsR(
 						Named("typeOfSelection") = typeOfSelection,
 						Named("epsilonValue") = epsilonValue,
 						Named("rValue") = rValue,
