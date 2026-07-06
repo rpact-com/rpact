@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9308</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,8 @@
 <div class="section level3">
 <h3 id="new-features-4-5-0">New features<a class="anchor" aria-label="anchor" href="#new-features-4-5-0"></a></h3>
 <ul><li>The new function <code><a href="../reference/getDesignFixed.html">getDesignFixed()</a></code> can be used to create a fixed (single-stage) trial design. This convenience wrapper constructs an object of class <code>TrialDesignFixed</code> with <code>kMax = 1</code>.</li>
+<li>
+<code><a href="../reference/getSimulationMultiArmSurvival.html">getSimulationMultiArmSurvival()</a></code> and <code><a href="../reference/getSimulationEnrichmentSurvival.html">getSimulationEnrichmentSurvival()</a></code> now support patient-wise survival simulations in addition to the existing test-statistic-based simulation approach. The new argument <code>simulationType</code> can be used to choose between the new C++ implementation (<code>"patientWise"</code>), the previous test-statistic-based approach (<code>"testStatisticBased"</code>), and a basic R reference implementation (<code>"patientWiseBasic"</code>) intended for validation and testing. The default <code>"auto"</code> setting selects the appropriate simulation approach based on the specified arguments. Patient-wise simulation enables scenarios based on individual patient accrual, event, censoring, dropout, and maximum-subject constraints while preserving the previous test-statistic-based workflow for existing use cases.</li>
 <li>rpact options can now be configured through environment variables, which is useful for reproducible scripts, CI jobs, validation runs, and shared project profiles; see the new vignette <a href="https://www.rpact.org/vignettes/utilities/rpact_hidden_features/" class="external-link">Hidden rpact Features: Options and Environment Variables</a>.</li>
 <li>Optimized the display of <code>criticalValues</code> and <code>futilityBounds</code> for designs with <code>directionUpper = FALSE</code>. If the direction of the alternative is already specified when creating a design, e.g., with <code>getDesignGroupSequential(directionUpper = FALSE)</code>, the boundaries are now shown in the correct direction, typically as negative values. This also applies to futility bounds generated for beta-spending designs.</li>
 </ul></div>

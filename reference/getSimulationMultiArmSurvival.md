@@ -2,13 +2,6 @@
 
 Returns the simulated power, stopping and selection probabilities,
 conditional power, and expected sample size for testing hazard ratios in
-a multi-arm treatment groups testing situation. In contrast to
-[`getSimulationSurvival()`](https://docs.rpact.org/reference/getSimulationSurvival.md)
-(where survival times are simulated), normally distributed logrank test
-statistics are simulated.
-
-Returns the simulated power, stopping and selection probabilities,
-conditional power, and expected sample size for testing hazard ratios in
 a multi-arm treatment groups testing situation.
 
 Depending on `simulationType`, either a patient-wise survival simulation
@@ -20,50 +13,6 @@ based on the explicitly specified arguments.
 ## Usage
 
 ``` r
-getSimulationMultiArmSurvival(
-  design = NULL,
-  ...,
-  simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic"),
-  activeArms = NA_integer_,
-  piControl = 0.2,
-  effectMatrix = NULL,
-  typeOfShape = c("linear", "sigmoidEmax", "userDefined"),
-  omegaMaxVector = seq(1, 2.6, 0.4),
-  kappa = 1,
-  gED50 = NA_real_,
-  slope = 1,
-  doseLevels = NA_real_,
-  eventTime = 12,
-  accrualTime = c(0, 12),
-  accrualIntensity = 0.1,
-  accrualIntensityType = c("auto", "absolute", "relative"),
-  dropoutRate1 = 0,
-  dropoutRate2 = 0,
-  dropoutTime = 12,
-  maxNumberOfSubjects = NA_real_,
-  intersectionTest = c("Dunnett", "Bonferroni", "Simes", "Sidak", "Hierarchical"),
-  directionUpper = NA,
-  adaptations = NA,
-  typeOfSelection = c("best", "rBest", "epsilon", "all", "userDefined"),
-  effectMeasure = c("effectEstimate", "testStatistic"),
-  successCriterion = c("all", "atLeastOne"),
-  correlationComputation = c("alternative", "null"),
-  epsilonValue = NA_real_,
-  rValue = NA_real_,
-  threshold = -Inf,
-  plannedEvents = NA_real_,
-  allocationRatioPlanned = NA_real_,
-  minNumberOfEventsPerStage = NA_real_,
-  maxNumberOfEventsPerStage = NA_real_,
-  conditionalPower = NA_real_,
-  thetaH1 = NA_real_,
-  maxNumberOfIterations = 1000L,
-  seed = NA_real_,
-  calcEventsFunction = NULL,
-  selectArmsFunction = NULL,
-  showStatistics = FALSE
-)
-
 getSimulationMultiArmSurvival(
   design = NULL,
   ...,
@@ -429,53 +378,7 @@ this object:
   to coerce the object to a
   [`matrix`](https://rdrr.io/r/base/matrix.html).
 
-Returns a
-[`SimulationResults`](https://docs.rpact.org/reference/SimulationResults.md)
-object. The following generics (R generic functions) are available for
-this object:
-
-- [`names()`](https://docs.rpact.org/reference/names.FieldSet.md) to
-  obtain the field names,
-
-- [`print()`](https://docs.rpact.org/reference/print.FieldSet.md) to
-  print the object,
-
-- [`summary()`](https://docs.rpact.org/reference/summary.ParameterSet.md)
-  to display a summary of the object,
-
-- [`plot()`](https://docs.rpact.org/reference/plot.SimulationResults.md)
-  to plot the object,
-
-- [`as.data.frame()`](https://docs.rpact.org/reference/as.data.frame.ParameterSet.md)
-  to coerce the object to a
-  [`data.frame`](https://rdrr.io/r/base/data.frame.html),
-
-- [`as.matrix()`](https://docs.rpact.org/reference/as.matrix.FieldSet.md)
-  to coerce the object to a
-  [`matrix`](https://rdrr.io/r/base/matrix.html).
-
 ## Details
-
-At given design the function simulates the power, stopping
-probabilities, selection probabilities, and expected sample size at
-given number of subjects, parameter configuration, and treatment arm
-selection rule in the multi-arm situation. An allocation ratio can be
-specified referring to the ratio of number of subjects in the active
-treatment groups as compared to the control group.
-
-The definition of `thetaH1` makes only sense if `kMax` \> 1 and if
-`conditionalPower`, `minNumberOfEventsPerStage`, and
-`maxNumberOfEventsPerStage` (or `calcEventsFunction`) are defined.
-
-`calcEventsFunction`  
-This function returns the number of events at given conditional power
-and conditional critical value for specified testing situation. The
-function might depend on the variables `stage`, `selectedArms`,
-`plannedEvents`, `directionUpper`, `allocationRatioPlanned`,
-`minNumberOfEventsPerStage`, `maxNumberOfEventsPerStage`,
-`conditionalPower`, `conditionalCriticalValue`, and `overallEffects`.
-The function has to contain the three-dots argument '...' (see
-examples).
 
 At given design the function simulates the analysis times, power,
 stopping probabilities, expected sample size and events, and selection
@@ -522,55 +425,9 @@ you can find, e.g., `plot.AnalysisResults` and obtain the specific help
 documentation linked above by typing
 [`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
 
-Click on the link of a generic in the list above to go directly to the
-help documentation of the `rpact` specific implementation of the
-generic. Note that you can use the R function
-[`methods`](https://rdrr.io/r/utils/methods.html) to get all the methods
-of a generic and to identify the object specific name of it, e.g., use
-`methods("plot")` to get all the methods for the `plot` generic. There
-you can find, e.g., `plot.AnalysisResults` and obtain the specific help
-documentation linked above by typing
-[`?plot.AnalysisResults`](https://docs.rpact.org/reference/plot.AnalysisResults.md).
-
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# Assess different selection rules for a two-stage survival design with 
-# O'Brien & Fleming alpha spending boundaries and (non-binding) stopping 
-# for futility if the test statistic is negative. 
-# Number of events at the second stage is adjusted based on conditional 
-# power 80% and specified minimum and maximum number of Events.
-design <- getDesignInverseNormal(typeOfDesign = "asOF", futilityBounds = 0)
-
-y1 <- getSimulationMultiArmSurvival(design = design, activeArms = 4, 
-    intersectionTest = "Simes", typeOfShape = "sigmoidEmax", 
-    omegaMaxVector = seq(1, 2, 0.5), gED50 = 2, slope = 4, 
-    typeOfSelection = "best", conditionalPower = 0.8, 
-    minNumberOfEventsPerStage = c(NA_real_, 30), 
-    maxNumberOfEventsPerStage = c(NA_real_, 90),
-    maxNumberOfIterations = 50, 
-    plannedEvents = c(75, 120))
-
-y2 <- getSimulationMultiArmSurvival(design = design, activeArms = 4, 
-    intersectionTest = "Simes", typeOfShape = "sigmoidEmax", 
-    omegaMaxVector = seq(1,2,0.5), gED50 = 2, slope = 4,
-    typeOfSelection = "epsilon", epsilonValue = 0.2, 
-    effectMeasure = "effectEstimate",
-    conditionalPower = 0.8, minNumberOfEventsPerStage = c(NA_real_, 30), 
-    maxNumberOfEventsPerStage = c(NA_real_, 90),
-    maxNumberOfIterations = 50, 
-     plannedEvents = c(75, 120))
-
-y1$effectMatrix
-
-y1$rejectAtLeastOne
-y2$rejectAtLeastOne
-
-y1$selectedArms
-y2$selectedArms
-} # }
-
 if (FALSE) { # \dontrun{
 # Assess different selection rules for a two-stage survival design with 
 # O'Brien & Fleming alpha spending boundaries and (non-binding) stopping 

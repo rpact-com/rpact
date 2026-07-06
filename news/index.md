@@ -9,6 +9,21 @@
   can be used to create a fixed (single-stage) trial design. This
   convenience wrapper constructs an object of class `TrialDesignFixed`
   with `kMax = 1`.
+- [`getSimulationMultiArmSurvival()`](https://docs.rpact.org/reference/getSimulationMultiArmSurvival.md)
+  and
+  [`getSimulationEnrichmentSurvival()`](https://docs.rpact.org/reference/getSimulationEnrichmentSurvival.md)
+  now support patient-wise survival simulations in addition to the
+  existing test-statistic-based simulation approach. The new argument
+  `simulationType` can be used to choose between the new C++
+  implementation (`"patientWise"`), the previous test-statistic-based
+  approach (`"testStatisticBased"`), and a basic R reference
+  implementation (`"patientWiseBasic"`) intended for validation and
+  testing. The default `"auto"` setting selects the appropriate
+  simulation approach based on the specified arguments. Patient-wise
+  simulation enables scenarios based on individual patient accrual,
+  event, censoring, dropout, and maximum-subject constraints while
+  preserving the previous test-statistic-based workflow for existing use
+  cases.
 - rpact options can now be configured through environment variables,
   which is useful for reproducible scripts, CI jobs, validation runs,
   and shared project profiles; see the new vignette [Hidden rpact

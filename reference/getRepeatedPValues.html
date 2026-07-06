@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rpact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9308</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">4.5.0.9310</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,6 +77,18 @@ stage of the trial and can thus be used as a monitoring tool.</p>
 <p>The repeated p-values are provided up to the specified stage.</p>
 <p>In multi-arm trials, the repeated p-values are defined separately for each
 treatment comparison within the closed testing procedure.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+
+
+<p>Repeated p-values are calculated by identifying the smallest global
+significance level for which the observed test statistic would lead to
+rejection under the same design rule. Therefore, they require that the
+design can be re-created for arbitrary values of the global significance
+level. For user-defined designs with fixed userAlphaSpending values,
+this alpha-dependent design family is not uniquely defined.
+Consequently, repeated p-values are not available for such designs.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
