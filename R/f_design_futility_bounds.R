@@ -816,6 +816,54 @@ getFutilityBounds <- function(sourceValue,
     return(NA_real_)
 }
 
+#'
+#' @title
+#' Get Fisher Information From a Design Plan
+#'
+#' @description
+#' Calculates the Fisher information at the first planned analysis stage for
+#' a design plan for means, rates, or survival endpoints.
+#'
+#' @param designPlan A trial design plan object as returned by functions such as
+#' \code{\link[=getSampleSizeMeans]{getSampleSizeMeans()}},
+#' \code{\link[=getPowerMeans]{getPowerMeans()}},
+#' \code{\link[=getSampleSizeRates]{getSampleSizeRates()}},
+#' \code{\link[=getPowerRates]{getPowerRates()}},
+#' \code{\link[=getSampleSizeSurvival]{getSampleSizeSurvival()}}, or
+#' \code{\link[=getPowerSurvival]{getPowerSurvival()}}.
+#'
+#' @details
+#' The returned information is the information used at the first stage of the
+#' design plan. For group sequential designs, information at later stages can be
+#' obtained by multiplying this value by the ratio of the corresponding
+#' information rate to the first information rate.
+#'
+#' For means, the information is based on the planned sample size, standard
+#' deviations, allocation ratio, and, if applicable, the mean-ratio null value.
+#' For rates, it is based on the planned sample size and the binomial variance
+#' under the corresponding planning assumptions. For survival endpoints, it is
+#' based on the planned number of events and the allocation ratio.
+#'
+#' @return
+#' A numeric value or numeric vector containing the first-stage Fisher
+#' information. A vector is returned if the design plan contains several
+#' planning alternatives or sample size values. \code{NA_real_} is returned if
+#' the endpoint type is not supported by this helper.
+#'
+#' @examples
+#' \dontrun{
+#' designPlan <- getSampleSizeMeans(alternative = 0.4)
+#' getFisherInformation(designPlan)
+#'
+#' design <- getDesignGroupSequential(kMax = 3)
+#' designPlan <- getPowerMeans(design,
+#'     alternative = c(0.3, 0.4), maxNumberOfSubjects = 100
+#' )
+#' getFisherInformation(designPlan)
+#'}
+#' 
+#' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}}
+#'
 #' @export
 getFisherInformation <- function(designPlan) {
     fisherInformation <- NA_real_

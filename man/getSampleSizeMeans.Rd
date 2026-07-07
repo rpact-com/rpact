@@ -13,6 +13,7 @@ getSampleSizeMeans(
   thetaH0 = ifelse(meanRatio, 1, 0),
   alternative = seq(0.2, 1, 0.2),
   stDev = 1,
+  directionUpper = NA,
   allocationRatioPlanned = NA_real_
 )
 }
@@ -58,6 +59,10 @@ For two-armed trials, it is allowed to specify the standard deviations separatel
 i.e., as vector with two elements.
 If \code{meanRatio = TRUE} is specified, \code{stDev} defines
 the coefficient of variation \code{sigma / mu2}.}
+
+\item{directionUpper}{Logical. Specifies the direction of the alternative,
+only applicable for one-sided testing; default is \code{TRUE}
+which means that larger values of the test statistics yield smaller p-values.}
 
 \item{allocationRatioPlanned}{The planned allocation ratio \code{n1 / n2} for a two treatment groups
 design, default is \code{1}. If \code{allocationRatioPlanned = 0} is entered,
