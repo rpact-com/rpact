@@ -2358,7 +2358,8 @@ NULL
         design,
         ...,
         objectType = c("sampleSize", "power", "analysis"),
-        userFunctionCallEnabled = FALSE) {
+        userFunctionCallEnabled = FALSE,
+        default = C_DIRECTION_UPPER_DEFAULT) {
     objectType <- match.arg(objectType)
 
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
@@ -2378,7 +2379,7 @@ NULL
             if (!is.na(design$directionUpper)) {
                 directionUpper <- design$directionUpper
             } else {
-                directionUpper <- C_DIRECTION_UPPER_DEFAULT
+                directionUpper <- default
             }
         }
         directionUpper <- .warnInCaseOfIgnoredDirectionUpper(directionUpper, design$sided, 
@@ -2387,7 +2388,7 @@ NULL
         if (!is.na(design$directionUpper)) {
             directionUpper <- design$directionUpper
         } else {
-            directionUpper <- C_DIRECTION_UPPER_DEFAULT
+            directionUpper <- default
         }
     }
 

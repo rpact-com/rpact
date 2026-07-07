@@ -621,7 +621,7 @@ NULL
     }
 
     if (endpoint %in% c("rates", "survival")) {
-        .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, TRUE)
+        .setValueAndParameterType(simulationResults, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
     }
 
     if (endpoint == "means") {

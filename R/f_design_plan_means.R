@@ -430,23 +430,24 @@ NULL
     }
 
     directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-        design,
-        objectType = objectType, userFunctionCallEnabled = TRUE
+        design, objectType = objectType, userFunctionCallEnabled = TRUE, default = NA
     )
-
+    
     if (objectType == "sampleSize" && !anyNA(alternative)) {
-        effect <- alternative - thetaH0
-        effect <- .applyDirectionOfAlternative(effect, directionUpper,
-            type = "negateIfLower", phase = "planning")
-        if (design$sided == 1 && any(effect <= 0)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'alternative' (", .arrayToString(alternative),
-                ") must be ", ifelse(isFALSE(directionUpper), "<", ">"), " 'thetaH0' (", thetaH0, ")",
-                call. = FALSE
-            )
+        if (!is.na(directionUpper)) {
+            effect <- alternative - thetaH0
+            effect <- .applyDirectionOfAlternative(effect, directionUpper,
+                type = "negateIfLower", phase = "planning")
+            if (design$sided == 1 && any(effect <= 0)) {
+                stop(
+                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                    "any 'alternative' (", .arrayToString(alternative),
+                    ") must be ", ifelse(isFALSE(directionUpper), "<", ">"), " 'thetaH0' (", thetaH0, ")",
+                    call. = FALSE
+                )
+            }
         }
-
+    
         if (any(alternative - thetaH0 == 0)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -527,7 +528,7 @@ NULL
         )
     }
     .setValueAndParameterType(designPlan, "stDev", stDev, C_STDEV_DEFAULT)
-    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, TRUE)
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
     if (objectType == "power") {
         .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
         .setValueAndParameterType(

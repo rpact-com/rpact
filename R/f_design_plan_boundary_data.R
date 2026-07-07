@@ -27,10 +27,8 @@
     return(directionUpper)
 }
 
-# New solution
 .getEffectScaleBoundaryDataMeans <- function(designPlan) {
     design <- designPlan$.design
-    #directionUpper <- .getDirectionUpper(designPlan)
     thetaH0 <- designPlan$thetaH0
     stDev <- designPlan$stDev
     maxNumberOfSubjects <- designPlan$maxNumberOfSubjects
@@ -166,6 +164,7 @@
         }
     }
     
+#    directionUpper <- .getDirectionUpper(designPlan)
 #    if (length(directionUpper) > 0 && all(!directionUpper)) {
 #        criticalValuesEffectScaleUpper <- -criticalValuesEffectScaleUpper + 2 * thetaH0
 #        criticalValuesEffectScaleLower <- -criticalValuesEffectScaleLower + 2 * thetaH0
@@ -880,4 +879,116 @@
         futilityBoundsEffectScaleUpper = matrix(futilityBoundsEffectScaleUpper, nrow = design$kMax - 1),
         futilityBoundsEffectScaleLower = matrix(futilityBoundsEffectScaleLower, nrow = design$kMax - 1)
     ))
+}
+
+.getDirectionUpperCalculated <- function(designPlan) {
+    if (.isTrialDesignPlanMeans(designPlan)) {
+        if (isTRUE(designPlan$meanRatio)) {
+            directionUpperCalculated <- (designPlan$alternative / designPlan$thetaH0 > 1)
+        } else {
+            directionUpperCalculated <- (designPlan$alternative > designPlan$thetaH0)
+        }
+    } else if (.isTrialDesignPlanRates(designPlan)) {
+        if (designPlan$groups == 1) {
+            directionUpperCalculated <- (designPlan$pi1 > designPlan$thetaH0)
+        } else {
+            if (designPlan$riskRatio) {
+                directionUpperCalculated <- (designPlan$pi1 / designPlan$pi2 > designPlan$thetaH0)
+            } else {
+                directionUpperCalculated <- (designPlan$pi1 - designPlan$pi2 > designPlan$thetaH0)
+            }
+        }
+    } else if (.isTrialDesignPlanSurvival(designPlan)) {
+        directionUpperCalculated <- (designPlan$hazardRatio > designPlan$thetaH0)
+    } else if (.isTrialDesignPlanCountData(designPlan)) {
+        if (!is.null(designPlan$theta) && !all(is.na(designPlan$theta))) {
+            directionUpperCalculated <- (designPlan$theta > designPlan$thetaH0)
+        } else {
+            directionUpperCalculated <- (designPlan$lambda1 / designPlan$lambda2 > designPlan$thetaH0)
+        }
+    }
+    return(directionUpperCalculated)
+}
+
+.setDirectionUpper <- function(designPlan) {
+    if (!designPlan$.isSampleSizeObject()) {
+        return(invisible())
+    }
+    
+    directionUpperCalculated <- .getDirectionUpperCalculated(designPlan)
+    if (is.null(designPlan$directionUpper) || all(is.na(designPlan$directionUpper))) {
+        designPlan$directionUpper <- directionUpperCalculated
+        designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
+    } else if (!identical(designPlan$directionUpper, directionUpperCalculated)) {
+        warning(
+            C_EXCEPTION_TYPE_WARNING,
+            "The specified 'directionUpper' (", designPlan$directionUpper, ") ",
+            "is not consistent with the calculated 'directionUpper' (", directionUpperCalculated, "). ",
+            "The calculated 'directionUpper' will be used.", call. = FALSE
+        )
+        designPlan$directionUpper <- directionUpperCalculated
+        designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
+    }
+}
+
+.addEffectScaleBoundaryDataToDesignPlan <- function(designPlan) {
+    .assertIsTrialDesignPlan(designPlan)
+
+    design <- designPlan$.design
+    .setDirectionUpper(designPlan)
+    if (.isTrialDesignPlanMeans(designPlan)) {
+        if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
+            designPlan$maxNumberOfSubjects <- designPlan$nFixed
+        }
+        boundaries <- .getEffectScaleBoundaryDataMeans(designPlan)
+    } else if (.isTrialDesignPlanRates(designPlan)) {
+        if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
+            designPlan$maxNumberOfSubjects <- designPlan$nFixed
+        }
+        boundaries <- .getEffectScaleBoundaryDataRates(designPlan)
+    } else if (.isTrialDesignPlanSurvival(designPlan)) {
+        if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
+            designPlan$cumulativeEventsPerStage <- matrix(designPlan$eventsFixed, nrow = 1)
+        }
+        boundaries <- .getEffectScaleBoundaryDataSurvival(designPlan)
+    } else if (.isTrialDesignPlanCountData(designPlan)) {
+        boundaries <- .getEffectScaleBoundaryCountData(designPlan)
+    }
+
+    if (designPlan$.design$sided == 1) {
+        if (.isTrialDesignPlanMeans(designPlan) && isFALSE(.getDirectionUpper(designPlan))) {
+            designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleLower
+        } else {
+            designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleUpper
+        }
+        #designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleUpper
+        designPlan$.setParameterType("criticalValuesEffectScale", C_PARAM_GENERATED)
+    } else {
+        if (all(boundaries$criticalValuesEffectScaleLower < boundaries$criticalValuesEffectScaleUpper, na.rm = TRUE)) {
+            designPlan$criticalValuesEffectScaleLower <- boundaries$criticalValuesEffectScaleLower
+            designPlan$criticalValuesEffectScaleUpper <- boundaries$criticalValuesEffectScaleUpper
+        } else {
+            designPlan$criticalValuesEffectScaleLower <- boundaries$criticalValuesEffectScaleUpper
+            designPlan$criticalValuesEffectScaleUpper <- boundaries$criticalValuesEffectScaleLower
+        }
+        designPlan$.setParameterType("criticalValuesEffectScaleUpper", C_PARAM_GENERATED)
+        designPlan$.setParameterType("criticalValuesEffectScaleLower", C_PARAM_GENERATED)
+    }
+
+    if (.hasApplicableFutilityBounds(design)) {
+        if (design$sided == 1) {
+            designPlan$futilityBoundsEffectScale <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
+            designPlan$.setParameterType("futilityBoundsEffectScale", C_PARAM_GENERATED)
+        } else {
+            if (all(boundaries$futilityBoundsEffectScaleLower < boundaries$futilityBoundsEffectScaleUpper, na.rm = TRUE)) {
+                designPlan$futilityBoundsEffectScaleLower <- round(boundaries$futilityBoundsEffectScaleLower, 8)
+                designPlan$futilityBoundsEffectScaleUpper <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
+            } else {
+                designPlan$futilityBoundsEffectScaleLower <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
+                designPlan$futilityBoundsEffectScaleUpper <- round(boundaries$futilityBoundsEffectScaleLower, 8)
+            }
+            designPlan$.setParameterType("futilityBoundsEffectScaleLower", C_PARAM_GENERATED)
+            designPlan$.setParameterType("futilityBoundsEffectScaleUpper", C_PARAM_GENERATED)
+        }
+    }
 }

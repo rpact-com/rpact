@@ -364,7 +364,8 @@ NULL
         directionUpper,
         design,
         objectType = objectType,
-        userFunctionCallEnabled = TRUE
+        userFunctionCallEnabled = TRUE,
+        default = NA
     )
 
     if (groups == 1) {
@@ -549,7 +550,7 @@ NULL
     if (objectType == "power") {
         .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
         .setValueAndParameterType(designPlan, "maxNumberOfSubjects", maxNumberOfSubjects, NA_real_)
-        .setValueAndParameterType(designPlan, "directionUpper", directionUpper, TRUE)
+        .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
 
         designPlan$.setParameterType("effect", C_PARAM_GENERATED)
     }
@@ -827,6 +828,7 @@ getPowerRates <- function(design = NULL,
 #' @inheritParams param_thetaH0
 #' @inheritParams param_pi1_rates
 #' @inheritParams param_pi2_rates
+#' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned_sampleSize
 #' @inheritParams param_three_dots
 #'
@@ -860,6 +862,7 @@ getSampleSizeRates <- function(design = NULL,
         thetaH0 = ifelse(riskRatio, 1, 0),
         pi1 = c(0.4, 0.5, 0.6), # C_PI_1_SAMPLE_SIZE_DEFAULT
         pi2 = 0.2, # C_PI_2_DEFAULT
+        directionUpper = NA,
         allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
         ) {
     if (is.null(design)) {
@@ -889,6 +892,7 @@ getSampleSizeRates <- function(design = NULL,
         pi1 = pi1,
         pi2 = pi2,
         groups = groups,
+        directionUpper = directionUpper,
         allocationRatioPlanned = allocationRatioPlanned,
         ...
     )

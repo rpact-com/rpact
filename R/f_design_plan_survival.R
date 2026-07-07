@@ -585,8 +585,7 @@ NULL
         .assertIsValidThetaH0(thetaH0, endpoint = "survival", groups = 2)
         .assertIsValidKappa(kappa)
         directionUpper <- .assertIsValidDirectionUpper(directionUpper,
-            design,
-            objectType = objectType, userFunctionCallEnabled = TRUE
+            design, objectType = objectType, userFunctionCallEnabled = TRUE, default = NA
         )
 
         if (objectType == "power") {
@@ -862,7 +861,7 @@ NULL
         }
     }
 
-    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, TRUE)
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
     if (objectType == "power") {
         .setValueAndParameterType(designPlan, "maxNumberOfEvents", maxNumberOfEvents, NA_real_)
         designPlan$.setParameterType("accountForObservationTimes", C_PARAM_NOT_APPLICABLE)
