@@ -499,7 +499,8 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentMeans <- function(design = NULL,
+getSimulationEnrichmentMeans <- function(
+        design = NULL,
         ...,
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT

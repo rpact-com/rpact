@@ -1010,7 +1010,8 @@ NULL
 #'
 #' @export
 #'
-getSimulationEnrichmentRates <- function(design = NULL,
+getSimulationEnrichmentRates <- function(
+        design = NULL,
         ...,
         effectList = NULL,
         intersectionTest = c("Simes", "SpiessensDebois", "Bonferroni", "Sidak"), # C_INTERSECTION_TEST_ENRICHMENT_DEFAULT
@@ -1036,7 +1037,7 @@ getSimulationEnrichmentRates <- function(design = NULL,
         selectPopulationsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationEnrichmentRates",
             ignore = c(

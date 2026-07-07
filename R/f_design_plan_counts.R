@@ -588,7 +588,8 @@
 #'
 #' @export
 #'
-getSampleSizeCounts <- function(design = NULL,
+getSampleSizeCounts <- function(
+        design = NULL,
         ...,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
@@ -603,7 +604,7 @@ getSampleSizeCounts <- function(design = NULL,
         maxNumberOfSubjects = NA_integer_,
         allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize")
+        design <- .getDefaultDesign(..., type = "sampleSize") # TODO directionUpper = directionUpper, 
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = FALSE),
@@ -1136,7 +1137,8 @@ getSampleSizeCounts <- function(design = NULL,
 #'
 #' @export
 #'
-getPowerCounts <- function(design = NULL,
+getPowerCounts <- function(
+        design = NULL,
         ...,
         directionUpper = NA,
         maxNumberOfSubjects = NA_real_,
@@ -1152,7 +1154,7 @@ getPowerCounts <- function(design = NULL,
         followUpTime = NA_real_,
         allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "power")
+        design <- .getDefaultDesign(..., type = "power") # TODO directionUpper = directionUpper, 
         .warnInCaseOfUnknownArguments(
             functionName = "getPowerCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(

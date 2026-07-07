@@ -40,6 +40,8 @@ NULL
 .addEffectScaleBoundaryDataToDesignPlan <- function(designPlan) {
     .assertIsTrialDesignPlan(designPlan)
 
+    directionUpper <- .getDirectionUpper(designPlan)
+    
     design <- designPlan$.design
     if (.isTrialDesignPlanMeans(designPlan)) {
         if (design$kMax == 1 && designPlan$.isSampleSizeObject()) {
@@ -81,7 +83,12 @@ NULL
     }
 
     if (designPlan$.design$sided == 1) {
-        designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleUpper
+        if (.isTrialDesignPlanMeans(designPlan) && isFALSE(.getDirectionUpper(designPlan))) {
+            designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleLower
+        } else {
+            designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleUpper
+        }
+        #designPlan$criticalValuesEffectScale <- boundaries$criticalValuesEffectScaleUpper
         designPlan$.setParameterType("criticalValuesEffectScale", C_PARAM_GENERATED)
     } else {
         if (all(boundaries$criticalValuesEffectScaleLower < boundaries$criticalValuesEffectScaleUpper, na.rm = TRUE)) {
@@ -100,9 +107,7 @@ NULL
             designPlan$futilityBoundsEffectScale <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
             designPlan$.setParameterType("futilityBoundsEffectScale", C_PARAM_GENERATED)
         } else {
-            if (
-                all(designPlan$futilityBoundsEffectScaleLower < designPlan$futilityBoundsEffectScaleUpper, na.rm = TRUE)
-                ) {
+            if (all(boundaries$futilityBoundsEffectScaleLower < boundaries$futilityBoundsEffectScaleUpper, na.rm = TRUE)) {
                 designPlan$futilityBoundsEffectScaleLower <- round(boundaries$futilityBoundsEffectScaleLower, 8)
                 designPlan$futilityBoundsEffectScaleUpper <- round(boundaries$futilityBoundsEffectScaleUpper, 8)
             } else {
@@ -132,6 +137,7 @@ NULL
             thetaH0 = designPlan$thetaH0,
             alternative = designPlan$alternative,
             stDev = designPlan$stDev,
+            directionUpper = designPlan$directionUpper,
             groups = designPlan$groups,
             allocationRatioPlanned = designPlan$allocationRatioPlanned
         )

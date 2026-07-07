@@ -1835,7 +1835,7 @@ getParameterName <- function(obj, parameterCaption) {
         syncLength = FALSE) {
     type <- match.arg(type)
     phase <- match.arg(phase)
-
+    
     if (is.null(value) || length(value) == 0 || all(is.na(value))) {
         return(value)
     }

@@ -101,7 +101,8 @@ NULL
 #'
 #' @keywords internal
 #'
-getSimulationEnrichmentSurvivalPatientWise <- function(design = NULL,
+getSimulationEnrichmentSurvivalPatientWise <- function(
+        design = NULL,
         ...,
         effectList = NULL,
         kappa = 1,
@@ -135,7 +136,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(design = NULL,
         selectPopulationsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationEnrichmentSurvival",
             ignore = c(

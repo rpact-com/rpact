@@ -667,7 +667,7 @@ getPowerRates <- function(design = NULL,
         allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
         ) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "power")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "power", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getPowerRates",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -863,7 +863,7 @@ getSampleSizeRates <- function(design = NULL,
         allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
         ) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "sampleSize", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeRates",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(

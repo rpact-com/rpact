@@ -315,7 +315,9 @@ NULL
 #'
 #' @export
 #'
-getSimulationMultiArmMeans <- function(design = NULL, ...,
+getSimulationMultiArmMeans <- function(
+        design = NULL, 
+        ...,
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
         typeOfShape = c("linear", "sigmoidEmax", "userDefined"), # C_TYPE_OF_SHAPE_DEFAULT

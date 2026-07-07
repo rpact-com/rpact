@@ -327,7 +327,8 @@ NULL
 #'
 #' @keywords internal
 #'
-getSimulationMultiArmSurvivalBasic <- function(design = NULL,
+getSimulationMultiArmSurvivalBasic <- function(
+        design = NULL,
         ...,
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
@@ -358,7 +359,7 @@ getSimulationMultiArmSurvivalBasic <- function(design = NULL,
         selectArmsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMultiArmSurvival",
             ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design,

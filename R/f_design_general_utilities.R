@@ -55,7 +55,7 @@ NULL
     } else {
         ignore <- c(ignore, "directionUpper")
     }
-
+    
     twoSidedPower <- .getOptionalArgument("twoSidedPower", ...)
     if (is.null(twoSidedPower)) {
         if (type %in% c("power", "simulation", "simulationCounts") && sided == 2) {

@@ -2336,7 +2336,25 @@ NULL
     }
 }
 
-.assertIsValidDirectionUpper <- function(directionUpper,
+.warnInCaseOfIgnoredDirectionUpper <- function(
+        directionUpper, 
+        sided, 
+        ..., 
+        userFunctionCallEnabled = TRUE) {
+    if (sided == 2 && !is.na(directionUpper)) {
+        if (userFunctionCallEnabled) {
+            warning("'directionUpper' will be ignored because it ",
+                "is not applicable for 'sided' = 2",
+                call. = FALSE)
+        }
+        return(invisible(NA))
+    }
+    
+    return(invisible(directionUpper))
+}
+
+.assertIsValidDirectionUpper <- function(
+        directionUpper,
         design,
         ...,
         objectType = c("sampleSize", "power", "analysis"),
@@ -2355,21 +2373,16 @@ NULL
         )
     }
 
-    if (objectType %in% c("power", "analysis")) {
-        sided <- design$sided
-        if (sided == 1 && is.na(directionUpper)) {
+    if (objectType %in% c("sampleSize", "power", "analysis")) {
+        if (design$sided == 1 && is.na(directionUpper)) {
             if (!is.na(design$directionUpper)) {
                 directionUpper <- design$directionUpper
             } else {
                 directionUpper <- C_DIRECTION_UPPER_DEFAULT
             }
         }
-        if (userFunctionCallEnabled && sided == 2 && !is.na(directionUpper)) {
-            warning("'directionUpper' will be ignored because it ",
-                "is not applicable for 'sided' = 2",
-                call. = FALSE
-            )
-        }
+        directionUpper <- .warnInCaseOfIgnoredDirectionUpper(directionUpper, design$sided, 
+            userFunctionCallEnabled = userFunctionCallEnabled)
     } else if (is.na(directionUpper)) {
         if (!is.na(design$directionUpper)) {
             directionUpper <- design$directionUpper

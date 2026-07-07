@@ -91,6 +91,8 @@ getDesignFixed <- function(
             twoSidedPower <- FALSE
         }
         .setValueAndParameterType(design, "twoSidedPower", twoSidedPower, FALSE)
+        directionUpper <- .warnInCaseOfIgnoredDirectionUpper(directionUpper, sided)
+        design$.setParameterType("directionUpper", C_PARAM_NOT_APPLICABLE)
     } else {
         .setValueAndParameterType(design, "twoSidedPower", twoSidedPower, NA)
         design$.setParameterType("twoSidedPower", C_PARAM_NOT_APPLICABLE)
@@ -102,7 +104,11 @@ getDesignFixed <- function(
         }
     }
     
-    design$criticalValues <- .getOneMinusQNorm(alpha / sided)
+    criticalValues <- .getOneMinusQNorm(alpha / sided)
+    criticalValues <- .applyDirectionOfAlternative(criticalValues, directionUpper,
+        type = "negateIfLower", phase = "design"
+    )
+    design$criticalValues <- criticalValues
     design$.setParameterType("criticalValues", C_PARAM_GENERATED)
     design$stageLevels <- 1 - stats::pnorm(.getCriticalValues(design))
     design$.setParameterType("stageLevels", C_PARAM_GENERATED)

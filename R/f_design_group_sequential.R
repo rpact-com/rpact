@@ -1637,6 +1637,9 @@ getDesignInverseNormal <- function(...,
             )
         }
     }
+    
+    directionUpper <- .warnInCaseOfIgnoredDirectionUpper(directionUpper, sided, 
+        userFunctionCallEnabled = userFunctionCallEnabled)
 
     design <- .createDesign(
         designClass = designClass,

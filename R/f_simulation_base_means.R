@@ -153,7 +153,8 @@
 #'
 #' @export
 #'
-getSimulationMeans <- function(design = NULL, ...,
+getSimulationMeans <- function(
+        design = NULL, ...,
         groups = 2L,
         normalApproximation = TRUE,
         meanRatio = FALSE,
@@ -173,7 +174,7 @@ getSimulationMeans <- function(design = NULL, ...,
         calcSubjectsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMeans",
             ignore = c(

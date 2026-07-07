@@ -425,7 +425,7 @@ getSimulationMultiArmRates <- function(
         selectArmsFunction = NULL,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMultiArmRates",
             ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(

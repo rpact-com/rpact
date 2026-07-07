@@ -257,7 +257,7 @@ getSimulationCounts <- function(design = NULL,
         seed = NA_real_,
         showStatistics = FALSE) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulationCounts")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulationCounts", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(

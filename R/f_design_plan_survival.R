@@ -1991,7 +1991,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         dropoutTime = 12 # C_DROP_OUT_TIME_DEFAULT
         ) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize", ignore = c("accountForObservationTimes"))
+        design <- .getDefaultDesign(..., type = "sampleSize", ignore = c("accountForObservationTimes")) # TODO directionUpper = directionUpper, 
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeSurvival",
             ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -2482,7 +2482,7 @@ getPowerSurvival <- function(design = NULL, ...,
         dropoutTime = 12 # C_DROP_OUT_TIME_DEFAULT
         ) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "power")
+        design <- .getDefaultDesign(..., type = "power") # TODO directionUpper = directionUpper,
         .warnInCaseOfUnknownArguments(
             functionName = "getPowerSurvival",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = TRUE), ...

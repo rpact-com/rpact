@@ -418,7 +418,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         cppEnabled = TRUE
         ) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "simulation")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "simulation", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMultiArmSurvival",
             ignore = c(

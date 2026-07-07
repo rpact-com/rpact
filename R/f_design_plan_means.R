@@ -27,6 +27,7 @@ NULL
         thetaH0 = 0,
         alternative = C_ALTERNATIVE_DEFAULT,
         stDev = C_STDEV_DEFAULT,
+        directionUpper = C_DIRECTION_UPPER_DEFAULT,
         groups = 2,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
     nFixed <- rep(NA_real_, length(alternative))
@@ -34,9 +35,13 @@ NULL
     if ((length(stDev) == 1) && (groups == 2)) {
         stDev <- rep(stDev, 2)
     }
-
+    
     for (i in seq_len(length(alternative))) {
         theta <- alternative[i]
+        effect <- theta - thetaH0
+        effect <- .applyDirectionOfAlternative(effect, directionUpper,
+            type = "negateIfLower", phase = "planning")
+        effectAbsolute <- abs(effect)
 
         if (groups == 1) {
             if (sided == 1 || !twoSidedPower) {
@@ -44,7 +49,7 @@ NULL
                     up <- 2
                     while (stats::pt(
                         stats::qt(1 - alpha / sided, up - 1), max(0.001, up - 1),
-                        sqrt(up) * abs(theta - thetaH0) / stDev
+                        sqrt(up) * effectAbsolute / stDev
                     ) > beta) {
                         up <- 2 * up
                     }
@@ -52,7 +57,7 @@ NULL
                         function(n) {
                             return(stats::pt(
                                 stats::qt(1 - alpha / sided, max(0.001, n - 1)),
-                                max(0.001, n - 1), sqrt(n) * abs(theta - thetaH0) / stDev
+                                max(0.001, n - 1), sqrt(n) * effectAbsolute / stDev
                             ) - beta)
                         },
                         lower = 0.001, upper = up, tolerance = 1e-04,
@@ -60,17 +65,17 @@ NULL
                     )
                 } else {
                     nFixed[i] <- (.getOneMinusQNorm(alpha / sided) +
-                        .getOneMinusQNorm(beta))^2 / ((theta - thetaH0) / stDev)^2
+                        .getOneMinusQNorm(beta))^2 / (effect / stDev)^2
                 }
             } else {
                 up <- 2
                 while (stats::pt(
                     stats::qt(1 - alpha / 2, max(0.001, up - 1)), max(0.001, up - 1),
-                    sqrt(up) * (theta - thetaH0) / stDev
+                    sqrt(up) * effect / stDev
                 ) -
                     stats::pt(
                         -stats::qt(1 - alpha / 2, max(0.001, up - 1)),
-                        max(0.001, up - 1), sqrt(up) * (theta - thetaH0) / stDev
+                        max(0.001, up - 1), sqrt(up) * effect / stDev
                     ) > beta) {
                     up <- 2 * up
                 }
@@ -79,10 +84,10 @@ NULL
                         function(n) {
                             return(stats::pt(
                                 stats::qt(1 - alpha / 2, max(0.001, n - 1)), max(0.001, n - 1),
-                                sqrt(n) * (theta - thetaH0) / stDev
+                                sqrt(n) * effect / stDev
                             ) - stats::pt(
                                 -stats::qt(1 - alpha / 2, max(0.001, n - 1)),
-                                max(0.001, n - 1), sqrt(n) * (theta - thetaH0) / stDev
+                                max(0.001, n - 1), sqrt(n) * effect / stDev
                             ) - beta)
                         },
                         lower = 0.001, upper = up, tolerance = 1e-04,
@@ -92,8 +97,8 @@ NULL
                     nFixed[i] <- .getOneDimensionalRoot(
                         function(n) {
                             return(stats::pnorm(.getOneMinusQNorm(alpha / 2) -
-                                sqrt(n) * (theta - thetaH0) / stDev) -
-                                stats::pnorm(-.getOneMinusQNorm(alpha / 2) - sqrt(n) * (theta - thetaH0) / stDev) - beta)
+                                sqrt(n) * effect / stDev) -
+                                stats::pnorm(-.getOneMinusQNorm(alpha / 2) - sqrt(n) * effect / stDev) - beta)
                         },
                         lower = 0.001, upper = up, tolerance = 1e-04,
                         callingFunctionInformation = ".getSampleSizeFixedMeans"
@@ -114,7 +119,7 @@ NULL
                                 (1 + allocationRatioPlanned) - 2),
                             up * (1 + allocationRatioPlanned) - 2,
                             sqrt(up) *
-                                abs(theta - thetaH0) /
+                                effectAbsolute /
                                 sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)
                         ) > beta) {
                             up <- 2 * up
@@ -130,7 +135,7 @@ NULL
                                 }
                                 return(stats::pt(
                                     stats::qt(1 - alpha / sided, df), df,
-                                    sqrt(n2) * abs(theta - thetaH0) /
+                                    sqrt(n2) * effectAbsolute /
                                         sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)
                                 ) - beta)
                             },
@@ -142,12 +147,14 @@ NULL
                         nFixed[i] <- (1 + allocationRatioPlanned) *
                             (stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) / allocationRatioPlanned *
                             (.getOneMinusQNorm(alpha / sided) + .getOneMinusQNorm(beta))^2 /
-                            (theta - thetaH0)^2
+                            effect^2
                     }
                 } else {
+                    theta <- ifelse(isFALSE(directionUpper), alternative, thetaH0)
+                    
                     # allocationRatioPlanned = 0 provides optimum sample size
                     if (allocationRatioPlanned == 0) {
-                        allocationRatioPlanned <- 1 / thetaH0 * stDev[1] / stDev[2]
+                        allocationRatioPlanned <- 1 / theta * stDev[1] / stDev[2]
                     }
                     if (!normalApproximation) {
                         up <- 2
@@ -157,8 +164,8 @@ NULL
                                 up * (1 + allocationRatioPlanned) - 2
                             ),
                             up * (1 + allocationRatioPlanned) - 2,
-                            sqrt(up) * abs(theta - thetaH0) /
-                                sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2 * thetaH0^2)
+                            sqrt(up) * effectAbsolute /
+                                sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2 * theta^2)
                         ) > beta) {
                             up <- 2 * up
                         }
@@ -173,8 +180,8 @@ NULL
                                 }
                                 return(stats::pt(
                                     stats::qt(1 - alpha / sided, df), df,
-                                    sqrt(n2) * abs(theta - thetaH0) /
-                                        sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2 * thetaH0^2)
+                                    sqrt(n2) * effectAbsolute /
+                                        sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2 * theta^2)
                                 ) - beta)
                             },
                             lower = 0.001, upper = up, tolerance = 1e-04,
@@ -183,9 +190,9 @@ NULL
                         nFixed[i] <- n2Fixed * (1 + allocationRatioPlanned)
                     } else {
                         nFixed[i] <- (1 + allocationRatioPlanned) *
-                            (stDev[1]^2 / allocationRatioPlanned + thetaH0^2 * stDev[2]^2) *
+                            (stDev[1]^2 / allocationRatioPlanned + theta^2 * stDev[2]^2) *
                             (.getOneMinusQNorm(alpha / sided) + .getOneMinusQNorm(beta))^2 /
-                            (theta - thetaH0)^2
+                            effect^2
                     }
                 }
             } else {
@@ -200,7 +207,7 @@ NULL
                             up * (1 + allocationRatioPlanned) - 2
                         ),
                         up * (1 + allocationRatioPlanned) - 2,
-                        sqrt(up) * (theta - thetaH0) /
+                        sqrt(up) * effect /
                             sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)
                     ) - stats::pt(
                         -stats::qt(
@@ -208,7 +215,7 @@ NULL
                             up * (1 + allocationRatioPlanned) - 2
                         ),
                         up * (1 + allocationRatioPlanned) - 2,
-                        sqrt(up) * (theta - thetaH0) /
+                        sqrt(up) * effect /
                             sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)
                     ) > beta) {
                         up <- 2 * up
@@ -224,13 +231,13 @@ NULL
                             }
                             return(stats::pt(
                                 stats::qt(1 - alpha / 2, df), df,
-                                sqrt(n2) * (theta - thetaH0) /
+                                sqrt(n2) * effect /
                                     sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)
                             ) - stats::pt(
                                 -stats::qt(
                                     1 - alpha / 2, df
                                 ), df,
-                                sqrt(n2) * (theta - thetaH0) /
+                                sqrt(n2) * effect /
                                     sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)
                             ) - beta)
                         },
@@ -241,10 +248,10 @@ NULL
                 } else {
                     up <- 2
                     while (stats::pnorm(.getOneMinusQNorm(alpha / 2) -
-                        sqrt(up) * (theta - thetaH0) /
+                        sqrt(up) * effect /
                             sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)) -
                         stats::pnorm(-.getOneMinusQNorm(alpha / 2) -
-                            sqrt(up) * (theta - thetaH0) /
+                            sqrt(up) * effect /
                                 sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2))
                     > beta) {
                         up <- 2 * up
@@ -253,10 +260,10 @@ NULL
                         .getOneDimensionalRoot(
                             function(n2) {
                                 return(stats::pnorm(.getOneMinusQNorm(alpha / 2) -
-                                    sqrt(n2) * (theta - thetaH0) /
+                                    sqrt(n2) * effect /
                                         sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2)) -
                                     stats::pnorm(-.getOneMinusQNorm(alpha / 2) -
-                                        sqrt(n2) * (theta - thetaH0) /
+                                        sqrt(n2) * effect /
                                             sqrt(stDev[1]^2 / allocationRatioPlanned + stDev[2]^2))
                                     - beta)
                             },
@@ -278,6 +285,7 @@ NULL
             thetaH0 = thetaH0,
             alternative = alternative,
             stDev = stDev,
+            directionUpper = directionUpper,
             normalApproximation = normalApproximation,
             nFixed = nFixed
         ))
@@ -294,6 +302,7 @@ NULL
             meanRatio = meanRatio,
             alternative = alternative,
             stDev = stDev,
+            directionUpper = directionUpper,
             normalApproximation = normalApproximation,
             n1Fixed = n1Fixed,
             n2Fixed = n2Fixed,
@@ -386,7 +395,8 @@ NULL
 
 # Note that 'directionUpper' and 'maxNumberOfSubjects' are only applicable
 # for 'objectType' = "power"
-.createDesignPlanMeans <- function(...,
+.createDesignPlanMeans <- function(
+        ...,
         objectType = c("sampleSize", "power"),
         design,
         normalApproximation = FALSE,
@@ -425,11 +435,14 @@ NULL
     )
 
     if (objectType == "sampleSize" && !anyNA(alternative)) {
-        if (design$sided == 1 && any(alternative - thetaH0 <= 0)) {
+        effect <- alternative - thetaH0
+        effect <- .applyDirectionOfAlternative(effect, directionUpper,
+            type = "negateIfLower", phase = "planning")
+        if (design$sided == 1 && any(effect <= 0)) {
             stop(
                 C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
                 "any 'alternative' (", .arrayToString(alternative),
-                ") must be > 'thetaH0' (", thetaH0, ")",
+                ") must be ", ifelse(isFALSE(directionUpper), "<", ">"), " 'thetaH0' (", thetaH0, ")",
                 call. = FALSE
             )
         }
@@ -514,14 +527,13 @@ NULL
         )
     }
     .setValueAndParameterType(designPlan, "stDev", stDev, C_STDEV_DEFAULT)
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, TRUE)
     if (objectType == "power") {
         .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects)
         .setValueAndParameterType(
             designPlan, "maxNumberOfSubjects",
             maxNumberOfSubjects, NA_real_
         )
-        .setValueAndParameterType(designPlan, "directionUpper", directionUpper, TRUE)
-
         designPlan$.setParameterType("effect", C_PARAM_GENERATED)
     }
     .setValueAndParameterType(designPlan, "groups", groups, 2)
@@ -563,6 +575,7 @@ NULL
 #' @inheritParams param_thetaH0
 #' @inheritParams param_alternative
 #' @inheritParams param_stDev
+#' @inheritParams param_directionUpper
 #' @inheritParams param_allocationRatioPlanned_sampleSize
 #' @inheritParams param_three_dots
 #'
@@ -584,7 +597,8 @@ NULL
 #'
 #' @export
 #'
-getSampleSizeMeans <- function(design = NULL,
+getSampleSizeMeans <- function(
+        design = NULL,
         ...,
         groups = 2L,
         normalApproximation = FALSE,
@@ -592,10 +606,11 @@ getSampleSizeMeans <- function(design = NULL,
         thetaH0 = ifelse(meanRatio, 1, 0),
         alternative = seq(0.2, 1, 0.2), # C_ALTERNATIVE_DEFAULT
         stDev = 1, # C_STDEV_DEFAULT
+        directionUpper = NA,
         allocationRatioPlanned = NA_real_ # C_ALLOCATION_RATIO_DEFAULT
         ) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "sampleSize", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeMeans",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -609,7 +624,7 @@ getSampleSizeMeans <- function(design = NULL,
         .warnInCaseOfTwoSidedPowerArgument(...)
         design <- .resetPipeOperatorQueue(design)
     }
-
+    
     designPlan <- .createDesignPlanMeans(
         objectType = "sampleSize",
         design = design,
@@ -618,6 +633,7 @@ getSampleSizeMeans <- function(design = NULL,
         thetaH0 = thetaH0,
         alternative = alternative,
         stDev = stDev,
+        directionUpper = directionUpper,
         groups = groups,
         allocationRatioPlanned = allocationRatioPlanned,
         ...
@@ -644,9 +660,9 @@ getSampleSizeMeans <- function(design = NULL,
 #' @inheritParams param_thetaH0
 #' @inheritParams param_alternative
 #' @inheritParams param_stDev
-#' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_directionUpper
 #' @inheritParams param_maxNumberOfSubjects
+#' @inheritParams param_allocationRatioPlanned
 #' @inheritParams param_three_dots
 #'
 #' @details
@@ -688,7 +704,7 @@ getPowerMeans <- function(design = NULL, ...,
     }
 
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "power")
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "power", ...)
         .warnInCaseOfUnknownArguments(
             functionName = "getPowerMeans",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
