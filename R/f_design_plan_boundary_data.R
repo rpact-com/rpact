@@ -14,13 +14,15 @@
 ## |  Contact us for information about our services: info@rpact.com
 ## |
 
-.getDirectionUpper <- function(designPlan, nParameters = 1) {
+.getDirectionUpper <- function(designPlan, nParameters = 1, ..., setDefault = TRUE) {
     design <- designPlan$.design
     directionUpper <- design$directionUpper
     if (is.null(directionUpper) || length(directionUpper) == 0 || all(is.na(directionUpper))) {
         directionUpper <- designPlan$directionUpper
     }
-    directionUpper[is.na(directionUpper)] <- C_DIRECTION_UPPER_DEFAULT
+    if (setDefault) {
+        directionUpper[is.na(directionUpper)] <- C_DIRECTION_UPPER_DEFAULT
+    }
     if (length(directionUpper) == 1 && nParameters > 1) {
         directionUpper <- rep(directionUpper, nParameters)
     }
@@ -34,7 +36,6 @@
     maxNumberOfSubjects <- designPlan$maxNumberOfSubjects
     allocationRatioPlanned <- designPlan$allocationRatioPlanned
 
-    # initialize effect scale matrix
     futilityBoundsEffectScaleUpper <- rep(NA_real_, design$kMax - 1)
     futilityBoundsEffectScaleLower <- rep(NA_real_, design$kMax - 1)
 
@@ -46,7 +47,6 @@
             pmax(design$informationRates %*% t(maxNumberOfSubjects) - designPlan$groups, 1e-04)
         )
 
-        # outside validated range
         criticalValues[criticalValues > 50] <- NA_real_
         if (design$kMax > 1 && identical(design$typeOfDesign, "noEarlyEfficacy")) {
             if ((is.matrix(criticalValues) && anyNA(criticalValues[design$kMax, ])) ||
@@ -70,28 +70,6 @@
         }
     }
 
-    if (design$kMax > 1) {
-        futilityBounds <- design$futilityBounds
-        if (!designPlan$normalApproximation && .hasApplicableFutilityBounds(design)) {
-            futilityBounds <- stats::qt(
-                stats::pnorm(futilityBounds),
-                pmax(design$informationRates[1:(design$kMax - 1)] %*%
-                    t(maxNumberOfSubjects) - designPlan$groups, 1e-04)
-            )
-
-            # outside validated range
-            futilityBounds[abs(futilityBounds) > 50] <- NA_real_
-            if (anyNA(futilityBounds)) {
-                warning("The computation of futility boundaries on ",
-                    "treatment effect scale not performed presumably ",
-                    "due to too small degrees of freedom",
-                    call. = FALSE
-                )
-            }
-        }
-        futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
-    }
-
     if ((length(stDev) == 1) && (designPlan$groups == 2)) {
         stDev <- rep(stDev, 2)
     }
@@ -101,16 +79,6 @@
             sqrt(design$informationRates %*% t(maxNumberOfSubjects))
         criticalValuesEffectScaleLower <- thetaH0 - criticalValues * stDev /
             sqrt(design$informationRates %*% t(maxNumberOfSubjects))
-        if (design$kMax > 1 && !.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
-            futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds * stDev /
-                sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects))
-        }
-        if (design$kMax > 1 && !.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-                (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-                    !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
-            futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds * stDev /
-                sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects))
-        }
     } else if (!designPlan$meanRatio) {
         criticalValuesEffectScaleUpper <- thetaH0 + criticalValues *
             sqrt(1 + allocationRatioPlanned) *
@@ -122,22 +90,6 @@
             sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) /
             (sqrt(allocationRatioPlanned *
                 design$informationRates %*% t(maxNumberOfSubjects)))
-        if (design$kMax > 1 && !.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
-            futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds *
-                sqrt(1 + allocationRatioPlanned) *
-                sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) /
-                (sqrt(allocationRatioPlanned *
-                    design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
-        }
-        if (design$kMax > 1 && !.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-                (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-                    !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
-            futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds *
-                sqrt(1 + allocationRatioPlanned) *
-                sqrt(stDev[1]^2 + allocationRatioPlanned * stDev[2]^2) /
-                (sqrt(allocationRatioPlanned *
-                    design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
-        }
     } else {
         criticalValuesEffectScaleUpper <- thetaH0 + criticalValues *
             sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
@@ -147,32 +99,25 @@
             sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
             sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
             (sqrt(design$informationRates %*% t(maxNumberOfSubjects)))
+    }
 
-        if (design$kMax > 1 && !.isTrialDesignFisher(design) && !all(is.na(futilityBounds))) {
-            futilityBoundsEffectScaleUpper <- thetaH0 + futilityBounds *
-                sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
-                sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
-                (sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
-        }
-        if (design$kMax > 1 && !.isTrialDesignFisher(design) && design$sided == 2 && design$kMax > 1 &&
-                (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-                    !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
-            futilityBoundsEffectScaleLower <- thetaH0 - futilityBounds *
-                sqrt((1 + allocationRatioPlanned) / allocationRatioPlanned) *
-                sqrt(stDev[1]^2 + thetaH0^2 * allocationRatioPlanned * stDev[2]^2) /
-                (sqrt(design$informationRates[1:(design$kMax - 1)] %*% t(maxNumberOfSubjects)))
+    if (design$kMax > 1 && !.isTrialDesignFisher(design) && .hasApplicableFutilityBounds(design)) {
+        if (design$sided == 1) {
+            futilityBoundsEffectScaleUpper <- .getFutilityBoundsTreatmentEffectScale(designPlan)
+        } else {
+            futilityBoundsEffectScaleUpper <- .getFutilityBoundsTreatmentEffectScale(
+                designPlan,
+                boundary = "upper"
+            )
+            if (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                    (!is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                futilityBoundsEffectScaleLower <- .getFutilityBoundsTreatmentEffectScale(
+                    designPlan,
+                    boundary = "lower"
+                )
+            }
         }
     }
-    
-#    directionUpper <- .getDirectionUpper(designPlan)
-#    if (length(directionUpper) > 0 && all(!directionUpper)) {
-#        criticalValuesEffectScaleUpper <- -criticalValuesEffectScaleUpper + 2 * thetaH0
-#        criticalValuesEffectScaleLower <- -criticalValuesEffectScaleLower + 2 * thetaH0
-#        if (!all(is.na(futilityBoundsEffectScaleUpper))) {
-#            futilityBoundsEffectScaleUpper <- -futilityBoundsEffectScaleUpper + 2 * thetaH0
-#            futilityBoundsEffectScaleLower <- -futilityBoundsEffectScaleLower + 2 * thetaH0
-#        }
-#    }
 
     if (designPlan$meanRatio) {
         criticalValuesEffectScaleUpper[!is.na(criticalValuesEffectScaleUpper) &
@@ -264,8 +209,10 @@
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, nParameters)
     }
-    futilityBounds <- .getFutilityBounds(design)
-    futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
+    #futilityBounds <- .getFutilityBounds(design) # TODO remove
+    #futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
+    futilityBounds <- design$futilityBounds
+    futilityBounds[.getInvalidFutilityBoundsIndices(design)] <- NA_real_
 
     if (designPlan$groups == 1) {
         criticalValues <- .getCriticalValues(design)
@@ -518,8 +465,10 @@
         allocationRatioPlanned <- rep(allocationRatioPlanned, nParameters)
     }
 
-    futilityBounds <- .getFutilityBounds(design)
-    futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
+    #futilityBounds <- .getFutilityBounds(design) # TODO remove
+    #futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
+    futilityBounds <- design$futilityBounds
+    futilityBounds[.getInvalidFutilityBoundsIndices(design)] <- NA_real_
 
     criticalValuesEffectScaleUpper <- matrix(, nrow = design$kMax, ncol = nParameters)
     criticalValuesEffectScaleLower <- matrix(, nrow = design$kMax, ncol = nParameters)
@@ -739,7 +688,7 @@
 
     informationRates <- design$informationRates
     criticalValues <- .getCriticalValues(design)
-    futilityBounds <- .getFutilityBounds(design)
+    futilityBounds <- .getFutilityBounds(design) # TODO check if this is correct, maybe use designPlan$futilityBounds instead
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
 
     for (iCase in 1:nParameters) {
@@ -914,20 +863,19 @@
     if (!designPlan$.isSampleSizeObject()) {
         return(invisible())
     }
-    
+
     directionUpperCalculated <- .getDirectionUpperCalculated(designPlan)
-    if (is.null(designPlan$directionUpper) || all(is.na(designPlan$directionUpper))) {
+    directionUpperDefined <- .getDirectionUpper(designPlan, setDefault = FALSE)
+    if (is.null(directionUpperDefined) || all(is.na(directionUpperDefined))) {
         designPlan$directionUpper <- directionUpperCalculated
         designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
-    } else if (!identical(designPlan$directionUpper, directionUpperCalculated)) {
-        warning(
-            C_EXCEPTION_TYPE_WARNING,
-            "The specified 'directionUpper' (", designPlan$directionUpper, ") ",
+    } else if (!identical(directionUpperDefined, directionUpperCalculated)) {
+        stop(
+            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+            "The specified 'directionUpper' (", directionUpperDefined, ") ",
             "is not consistent with the calculated 'directionUpper' (", directionUpperCalculated, "). ",
-            "The calculated 'directionUpper' will be used.", call. = FALSE
+            call. = FALSE
         )
-        designPlan$directionUpper <- directionUpperCalculated
-        designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
     }
 }
 
