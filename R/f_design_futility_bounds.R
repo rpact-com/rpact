@@ -920,12 +920,87 @@ getFisherInformation <- function(designPlan) {
     return(fisherInformation)
 }
 
+.getFutilityBoundsTreatmentEffectScaleRatesTwoGroups <- function(designPlan, boundary, nStages) {
+    design <- designPlan$.design
+    maxNumberOfSubjects <- designPlan$maxNumberOfSubjects
+    allocationRatioPlanned <- designPlan$allocationRatioPlanned
+    nParameters <- length(maxNumberOfSubjects)
+
+    if (length(allocationRatioPlanned) == 1) {
+        allocationRatioPlanned <- rep(allocationRatioPlanned, nParameters)
+    }
+
+    result <- matrix(NA_real_, nrow = nStages, ncol = nParameters)
+    if (nStages == 0 || !.hasApplicableFutilityBounds(design)) {
+        return(result)
+    }
+
+    futilityBounds <- .getFutilityBounds(design)
+    if (length(futilityBounds) == 0) {
+        return(result)
+    }
+    futilityBounds[.getInvalidFutilityBoundsIndices(design)] <- NA_real_
+    futilityBounds <- futilityBounds[seq_len(nStages)]
+
+    directionUpper <- .getDirectionUpper(designPlan, nParameters)
+    method <- ifelse(designPlan$riskRatio, "ratio", "diff")
+
+    for (index in seq_len(nParameters)) {
+        n1 <- allocationRatioPlanned[index] *
+            design$informationRates[seq_len(nStages)] *
+            maxNumberOfSubjects[index] /
+            (1 + allocationRatioPlanned[index])
+        n2 <- n1 / allocationRatioPlanned[index]
+
+        for (stage in seq_len(nStages)) {
+            if (is.na(futilityBounds[stage])) {
+                next
+            }
+
+            futilityBound <- futilityBounds[stage]
+            directionUpperBound <- directionUpper[index]
+            if (identical(boundary, "upper")) {
+                directionUpperBound <- TRUE
+            } else if (identical(boundary, "lower")) {
+                futilityBound <- -futilityBound
+                directionUpperBound <- TRUE
+            }
+
+            pi1Bound <- .getEffectScaleBoundaryDataRatesPi(
+                futilityBound,
+                designPlan$pi2,
+                designPlan$thetaH0,
+                n1[stage],
+                n2[stage],
+                allocationRatioPlanned[index],
+                directionUpperBound,
+                method
+            )
+            if (designPlan$riskRatio) {
+                result[stage, index] <- pi1Bound / designPlan$pi2
+            } else {
+                result[stage, index] <- pi1Bound - designPlan$pi2
+            }
+        }
+    }
+
+    if (designPlan$riskRatio) {
+        result[!is.na(result) & result <= 0] <- NA_real_
+    }
+
+    return(result)
+}
+
 .getFutilityBoundsTreatmentEffectScale <- function(designPlan, boundary = c("directed", "upper", "lower")) {
     .assertIsTrialDesignPlan(designPlan)
     boundary <- match.arg(boundary)
 
     design <- designPlan$.design
     nStages <- max(design$kMax - 1, 0)
+    if (.isTrialDesignPlanRates(designPlan) && designPlan$groups == 2) {
+        return(.getFutilityBoundsTreatmentEffectScaleRatesTwoGroups(designPlan, boundary, nStages))
+    }
+
     fisherInformation <- getFisherInformation(designPlan)
     nParameters <- max(length(fisherInformation), 1)
 
