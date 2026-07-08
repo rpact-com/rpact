@@ -412,14 +412,23 @@
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned) {
+        allocationRatioPlanned,
+        directionUpper) {
     designPlan <- TrialDesignPlanCountData$new(
         design = design,
         designCharacteristics = designCharacteristics
     )
     designPlan$.setObjectType(objectType)
     sampleSizeEnabled <- identical(objectType, "sampleSize")
-
+    
+    directionUpper <- .assertIsValidDirectionUpper(
+        directionUpper,
+        design,
+        objectType = "power",
+        userFunctionCallEnabled = TRUE,
+        default = NA
+    )
+    
     if (sampleSizeEnabled || design$kMax == 1) {
         designPlan$.setParameterType("overallReject", C_PARAM_NOT_APPLICABLE)
         designPlan$.setParameterType("rejectPerStage", C_PARAM_NOT_APPLICABLE)
@@ -565,6 +574,7 @@
 #' @inheritParams param_accrualTime_counts
 #' @inheritParams param_accrualIntensity_counts
 #' @inheritParams param_followUpTime_counts
+#' @inheritParams param_directionUpper
 #' @inheritParams param_maxNumberOfSubjects
 #' @inheritParams param_overdispersion_counts
 #' @inheritParams param_allocationRatioPlanned_sampleSize
@@ -591,6 +601,7 @@
 getSampleSizeCounts <- function(
         design = NULL,
         ...,
+        directionUpper = NA,
         lambda1 = NA_real_,
         lambda2 = NA_real_,
         lambda = NA_real_,
@@ -604,7 +615,7 @@ getSampleSizeCounts <- function(
         maxNumberOfSubjects = NA_integer_,
         allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize") # TODO directionUpper = directionUpper, 
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "sampleSize", ...) 
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(design, powerCalculationEnabled = FALSE),
@@ -641,7 +652,8 @@ getSampleSizeCounts <- function(
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned
+        allocationRatioPlanned,
+        directionUpper
     )
     totalCases <- attr(designPlan, "totalCases")
     attr(designPlan, "totalCases") <- NULL
@@ -978,9 +990,7 @@ getSampleSizeCounts <- function(
     designPlan$lambda2 <- lambda2
     designPlan$allocationRatioPlanned <- allocationRatioPlanned
 
-    # TODO compare with specified directionUpper
-    designPlan$directionUpper <- (lambda1 / lambda2 > thetaH0)
-    designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
+    .setDirectionUpper(designPlan)
 
     designPlan$calendarTime <- calendarTime
     designPlan$.setParameterType(
@@ -1155,7 +1165,7 @@ getPowerCounts <- function(
         followUpTime = NA_real_,
         allocationRatioPlanned = NA_real_) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "power") # TODO directionUpper = directionUpper, 
+        design <- .getDefaultDesign(directionUpper = directionUpper, type = "power", ...) 
         .warnInCaseOfUnknownArguments(
             functionName = "getPowerCounts",
             ignore = .getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -1176,8 +1186,7 @@ getPowerCounts <- function(
     alpha <- design$alpha
     sided <- design$sided
     designCharacteristics <- getDesignCharacteristics(design)
-#    shift <- designCharacteristics$shift
-
+    
     designPlan <- .getDesignPlanCountData(
         design,
         designCharacteristics,
@@ -1194,8 +1203,12 @@ getPowerCounts <- function(
         accrualIntensity,
         followUpTime,
         maxNumberOfSubjects,
-        allocationRatioPlanned
+        allocationRatioPlanned,
+        directionUpper
     )
+    designPlan$directionUpper <- directionUpper
+    directionUpper <- .getDirectionUpper(designPlan)
+    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
     totalCases <- attr(designPlan, "totalCases")
     attr(designPlan, "totalCases") <- NULL
     allocationRatioPlanned <- designPlan$allocationRatioPlanned
@@ -1205,15 +1218,7 @@ getPowerCounts <- function(
     if (length(accrualTime) > 1) {
         accrualTime <- accrualTime[-1]
     }
-
-    directionUpper <- .assertIsValidDirectionUpper(
-        directionUpper,
-        design,
-        objectType = "power",
-        userFunctionCallEnabled = TRUE
-    )
-    .setValueAndParameterType(designPlan, "directionUpper", directionUpper, C_DIRECTION_UPPER_DEFAULT)
-
+    
     futilityPerStage <- matrix(NA_real_, kMax - 1, totalCases)
     rejectPerStage <- matrix(NA_real_, kMax, totalCases)
     earlyStop <- rep(NA_real_, totalCases)
@@ -1264,7 +1269,6 @@ getPowerCounts <- function(
             varianceEstimate <- nTotal * (1 / sumLambda1 + 1 / sumLambda2)
         }
         oneSidedFactor <- ifelse(sided == 1, 2 * directionUpper - 1, 1)
-
         powerAndAverageSampleNumber <- getPowerAndAverageSampleNumber(
             design = design,
             theta = oneSidedFactor * log(lambda1[iCase] / lambda2 / thetaH0) / sqrt(varianceEstimate),

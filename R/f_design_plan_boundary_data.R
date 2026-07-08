@@ -23,6 +23,9 @@
     if (setDefault) {
         directionUpper[is.na(directionUpper)] <- C_DIRECTION_UPPER_DEFAULT
     }
+    if (length(directionUpper) == 0) {
+        directionUpper <- ifelse(setDefault, C_DIRECTION_UPPER_DEFAULT, NA) 
+    }
     if (length(directionUpper) == 1 && nParameters > 1) {
         directionUpper <- rep(directionUpper, nParameters)
     }
@@ -399,7 +402,7 @@
             boundary = "upper"
         )
         if (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-            (!is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                (!is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
             futilityBoundsEffectScaleLower <- .getFutilityBoundsTreatmentEffectScale(
                 designPlan,
                 boundary = "lower"
@@ -452,21 +455,19 @@
 #'
 #' @noRd
 #'
-.getEffectScaleBoundaryCountDataTheta <- function(
-        boundary,
-        informationRate,
-        lambda2,
-        thetaH0,
-        directionUpper,
-        allocationRatio,
-        overdispersion,
-        accrualTime,
-        followUpTime,
-        fixedExposureTime,
-        numberOfSubjects,
-        recruit1,
-        recruit2
-        ) {
+.getEffectScaleBoundaryCountDataTheta <- function(boundary,
+                                                          informationRate,
+                                                          lambda2,
+                                                          thetaH0,
+                                                          directionUpper,
+                                                          allocationRatio,
+                                                          overdispersion,
+                                                          accrualTime,
+                                                          followUpTime,
+                                                          fixedExposureTime,
+                                                          numberOfSubjects,
+                                                          recruit1,
+                                                          recruit2) {
     tryCatch(
         {
             if ((2 * directionUpper - 1) * boundary < 0) {
@@ -592,8 +593,16 @@
 
     informationRates <- design$informationRates
     criticalValues <- .getCriticalValues(design)
-    futilityBounds <- .getFutilityBounds(design) # TODO check if this is correct, maybe use designPlan$futilityBounds instead
-    futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_DEFAULT] <- NA_real_
+    futilityBounds <- .getFutilityBounds(design) 
+    futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- NA_real_
+
+    funArgs <- list(
+        thetaH0 = thetaH0,
+        lambda2 = lambda2,
+        accrualTime = accrualTime,
+        overdispersion = overdispersion,
+        fixedExposureTime = fixedExposureTime
+    )
 
     for (iCase in 1:nParameters) {
         allocationRatio <- allocationRatioPlanned[iCase]
@@ -619,6 +628,10 @@
             recruit2 <- NA_real_
         }
 
+        funArgs$allocationRatio <- allocationRatio
+        funArgs$directionUpper <- directionUpper[iCase]
+        funArgs$followUpTime <- followUpTime[iCase]
+
         # calculate theta that solves (ln(theta) - ln(thetaH0)) sqrt(FisherInformation_k) = boundary
         for (j in seq_len(length(criticalValues))) {
             if (all(is.na(numberOfSubjects[, iCase]))) {
@@ -626,84 +639,39 @@
             } else {
                 numberOfSubjectsPerStage <- numberOfSubjects[j, iCase]
             }
-            criticalValuesEffectScaleUpper[j, iCase] <- .getEffectScaleBoundaryCountDataTheta(
-                criticalValues[j],
-                informationRates[j],
-                lambda2,
-                thetaH0,
-                directionUpper[iCase],
-                allocationRatio,
-                overdispersion,
-                accrualTime,
-                followUpTime[iCase],
-                fixedExposureTime,
-                numberOfSubjectsPerStage,
-                recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
-                recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
-            )
+
+            funArgs$boundary <- criticalValues[j]
+            funArgs$informationRate <- informationRates[j]
+            funArgs$numberOfSubjects <- numberOfSubjectsPerStage
+            funArgs$recruit1 <- recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))]
+            funArgs$recruit2 <- recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
+            criticalValuesEffectScaleUpper[j, iCase] <- do.call(.getEffectScaleBoundaryCountDataTheta, funArgs)
 
             if (design$sided == 2) {
-                criticalValuesEffectScaleLower[j, iCase] <- .getEffectScaleBoundaryCountDataTheta(
-                    -criticalValues[j],
-                    informationRates[j],
-                    lambda2,
-                    thetaH0,
-                    directionUpper[iCase],
-                    allocationRatio,
-                    overdispersion,
-                    accrualTime,
-                    followUpTime[iCase],
-                    fixedExposureTime,
-                    numberOfSubjectsPerStage,
-                    recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
-                    recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
-                )
+                funArgs$boundary <- -criticalValues[j]
+                criticalValuesEffectScaleLower[j, iCase] <- do.call(.getEffectScaleBoundaryCountDataTheta, funArgs)
             }
         }
 
-        if (!all(is.na(futilityBounds))) {
+        if (design$kMax > 1 && !all(is.na(futilityBounds))) {
             for (j in seq_len(length(futilityBounds))) {
                 if (all(is.na(numberOfSubjects[, iCase]))) {
                     numberOfSubjectsPerStage <- maxNumberOfSubjects[iCase]
                 } else {
                     numberOfSubjectsPerStage <- numberOfSubjects[j, iCase]
                 }
-                futilityBoundsEffectScaleUpper[j, iCase] <- .getEffectScaleBoundaryCountDataTheta(
-                    futilityBounds[j],
-                    informationRates[j],
-                    lambda2,
-                    thetaH0,
-                    directionUpper[iCase],
-                    allocationRatio,
-                    overdispersion,
-                    accrualTime,
-                    followUpTime[iCase],
-                    fixedExposureTime,
-                    numberOfSubjectsPerStage,
-                    recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
-                    recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
-                )
-                if (
-                    design$sided == 2 &&
-                        design$kMax > 1 &&
-                        (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
-                            !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")
-                    ) {
-                    futilityBoundsEffectScaleLower[j, iCase] <- .getEffectScaleBoundaryCountDataTheta(
-                        -futilityBounds[j],
-                        informationRates[j],
-                        lambda2,
-                        thetaH0,
-                        directionUpper[iCase],
-                        allocationRatio,
-                        overdispersion,
-                        accrualTime,
-                        followUpTime[iCase],
-                        fixedExposureTime,
-                        numberOfSubjectsPerStage,
-                        recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))],
-                        recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
-                    )
+
+                funArgs$boundary <- futilityBounds[j]
+                funArgs$informationRate <- informationRates[j]
+                funArgs$numberOfSubjects <- numberOfSubjectsPerStage
+                funArgs$recruit1 <- recruit1[1:(allocationRatio * numberOfSubjectsPerStage / (1 + allocationRatio))]
+                funArgs$recruit2 <- recruit2[1:(numberOfSubjectsPerStage / (1 + allocationRatio))]
+                futilityBoundsEffectScaleUpper[j, iCase] <- do.call(.getEffectScaleBoundaryCountDataTheta, funArgs)
+
+                if (design$sided == 2 && (design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
+                        !is.null(design$typeBetaSpending) && design$typeBetaSpending != "none")) {
+                    funArgs$boundary <- -futilityBounds[j]
+                    futilityBoundsEffectScaleLower[j, iCase] <- do.call(.getEffectScaleBoundaryCountDataTheta, funArgs)
                 }
             }
         }
@@ -769,7 +737,7 @@
             designPlan$directionUpper <- C_DIRECTION_UPPER_DEFAULT
             designPlan$.setParameterType("directionUpper", C_PARAM_DEFAULT_VALUE)
         }
-        
+
         return(invisible())
     }
 
