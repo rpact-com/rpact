@@ -687,7 +687,9 @@ getSampleSizeMeans <- function(
 #'
 #' @export
 #'
-getPowerMeans <- function(design = NULL, ...,
+getPowerMeans <- function(
+        design = NULL, 
+        ...,
         groups = 2L,
         normalApproximation = FALSE,
         meanRatio = FALSE,

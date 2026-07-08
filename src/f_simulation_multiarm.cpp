@@ -675,6 +675,7 @@ List performClosedCombinationTestForSimulationMultiArm(
             }
             // Determine rejection and futility
             NumericVector criticalValues = design.get("criticalValues");
+            criticalValues = Rcpp::abs(criticalValues);
             
             if (isDesignFisher) {
                 rejectedIntersections(i, k) = overallAdjustedTestStatistics(i, k) <= criticalValues[k];

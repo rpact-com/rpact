@@ -2456,7 +2456,8 @@ getSampleSizeSurvival <- function(design = NULL, ...,
 #'
 #' @export
 #'
-getPowerSurvival <- function(design = NULL, ...,
+getPowerSurvival <- function(
+        design = NULL, ...,
         typeOfComputation = c("Schoenfeld", "Freedman", "HsiehFreedman"),
         thetaH0 = 1, # C_THETA_H0_SURVIVAL_DEFAULT
         directionUpper = NA,

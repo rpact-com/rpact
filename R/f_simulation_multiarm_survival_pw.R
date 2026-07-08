@@ -463,7 +463,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         objectType = "power",
         userFunctionCallEnabled = TRUE
     )
-
+    
     if (length(allocationRatioPlanned) != 1) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -690,7 +690,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     expectedNumberOfSubjects <- loopResult$expectedNumberOfSubjects
     expectedStudyDuration <- loopResult$expectedStudyDuration
     iterations <- loopResult$iterations
-
+    
     simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$analysisTime <- simulatedAnalysisTime

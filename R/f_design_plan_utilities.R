@@ -54,12 +54,12 @@ NULL
             thetaH0 = designPlan$thetaH0,
             alternative = designPlan$alternative,
             stDev = designPlan$stDev,
-            directionUpper = designPlan$directionUpper,
+            directionUpper = designPlan$directionUpper, 
             groups = designPlan$groups,
             allocationRatioPlanned = designPlan$allocationRatioPlanned
         )
     } else {
-        sampleSizeFixed <- .getSampleSizeFixedRates(
+        sampleSizeFixed <- .getSampleSizeFixedRates( 
             alpha = designPlan$getAlpha(),
             beta = designPlan$getBeta(),
             sided = designPlan$getSided(),
@@ -69,6 +69,7 @@ NULL
             thetaH0 = designPlan$thetaH0,
             pi1 = designPlan$pi1,
             pi2 = designPlan$pi2,
+            # TODO directionUpper = designPlan$directionUpper,
             groups = designPlan$groups,
             allocationRatioPlanned = designPlan$allocationRatioPlanned
         )

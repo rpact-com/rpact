@@ -978,6 +978,7 @@ getSampleSizeCounts <- function(
     designPlan$lambda2 <- lambda2
     designPlan$allocationRatioPlanned <- allocationRatioPlanned
 
+    # TODO compare with specified directionUpper
     designPlan$directionUpper <- (lambda1 / lambda2 > thetaH0)
     designPlan$.setParameterType("directionUpper", C_PARAM_GENERATED)
 
