@@ -687,7 +687,7 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     calcSubjectsFunction = "Calculate subjects function",
     calcEventsFunction = "Calculate events function",
     selectArmsFunction = "Select arms function",
-    numberOfActiveArms = "Number of active arms",
+    numberOfActiveArms = "Number of active arms", # TODO rename in "numberOfSelectedArms" / "Number of selected arms"
     selectPopulationsFunction = "Select populations function",
     numberOfPopulations = "Number of populations",
     correlationComputation = "Correlation computation method",
@@ -805,9 +805,9 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     pi1H1 = "pi(1) under H1",
     pi2H1 = "pi(2) under H1",
     nPlanned = "Planned sample size",
-    piControl = "Assumed control rate",
+    piControl = "Assumed control rate", # TODO Assumed rate(2)
     piControls = "Assumed control rates",
-    piTreatment = "Assumed treatment rate",
+    piTreatment = "Assumed treatment rate", # TODO Assumed rate(1)
     piTreatments = "Assumed treatment rates",
     piTreatmentH1 = "pi(treatment) under H1",
     piTreatmentsH1 = "pi(treatment) under H1",
