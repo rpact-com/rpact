@@ -432,7 +432,6 @@ getSimulationMultiArmSurvivalPatientWise <- function(
         )
     } else {
         .assertIsTrialDesignInverseNormalOrFisherOrConditionalDunnettOrFixed(design)
-        print(list(...)) # TODO remove
         .warnInCaseOfUnknownArguments(
             functionName = "getSimulationMultiArmSurvival",
             ignore = "showStatistics",
