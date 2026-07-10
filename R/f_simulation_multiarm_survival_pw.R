@@ -712,6 +712,9 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             simulationResults$successPerStage[1:(kMax - 1), ]
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
+    if (activeArms == 1) {
+        simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
+    }
 
     ## set parameter types in simulationResults
     if (kMax > 1) {
