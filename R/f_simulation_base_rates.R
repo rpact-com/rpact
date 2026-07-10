@@ -230,14 +230,16 @@ getSimulationRates <- function(design = NULL, ...,
             )
         }
     }
-    .assertIsNumericVector(pi1, "pi1", naAllowed = FALSE)
+    pi1 <- .assertIsNumericVector(pi1, "pi1", naAllowed = FALSE)
     .assertIsInOpenInterval(pi1, "pi1",
         lower = 0, upper = 1, naAllowed = FALSE
     )
-    .assertIsNumericVector(pi2, "pi2", naAllowed = TRUE)
+    pi2 <- .assertIsNumericVector(pi2, "pi2", naAllowed = TRUE)
     .assertIsInOpenInterval(pi2, "pi2", lower = 0, upper = 1, naAllowed = TRUE)
-    .assertIsNumericVector(minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
-    .assertIsNumericVector(maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
+    minNumberOfSubjectsPerStage <- .assertIsNumericVector(
+        minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
+    maxNumberOfSubjectsPerStage <- .assertIsNumericVector(
+        maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
     .assertIsInOpenInterval(conditionalPower, "conditionalPower",
         lower = 0, upper = 1, naAllowed = TRUE
@@ -246,7 +248,8 @@ getSimulationRates <- function(design = NULL, ...,
     .assertIsInOpenInterval(pi1H1, "pi1H1", lower = 0, upper = 1, naAllowed = TRUE)
     .assertIsSingleNumber(pi2H1, "pi2H1", naAllowed = TRUE)
     .assertIsInOpenInterval(pi2H1, "pi2H1", lower = 0, upper = 1, naAllowed = TRUE)
-    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    allocationRatioPlanned <- .assertIsNumericVector(
+        allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
         lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
     )

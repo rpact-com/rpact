@@ -146,8 +146,8 @@
 #'
 .generateRecruitmentTimes <- function(allocationRatio, accrualTime, accrualIntensity) {
     .assertIsSingleNumber(allocationRatio, "allocationRatio")
-    .assertIsNumericVector(accrualTime, "accrualTime")
-    .assertIsNumericVector(accrualIntensity, "accrualIntensity")
+    accrualTime <- .assertIsNumericVector(accrualTime, "accrualTime")
+    accrualIntensity <- .assertIsNumericVector(accrualIntensity, "accrualIntensity")
 
     if (length(accrualTime) != length(accrualIntensity)) {
         stop(
@@ -455,7 +455,7 @@
         allocationRatioPlanned <- C_ALLOCATION_RATIO_DEFAULT
     }
 
-    .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
+    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     .assertIsValidEffectCountData(
         sampleSizeEnabled = sampleSizeEnabled,
         sided = sided,

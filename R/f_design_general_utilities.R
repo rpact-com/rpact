@@ -127,7 +127,7 @@ NULL
     parameterValues <- design[[parameterName]]
 
     if (length(parameterValues) > 1) {
-        .assertIsNumericVector(parameterValues, parameterName, naAllowed = TRUE)
+        parameterValues <- .assertIsNumericVector(parameterValues, parameterName, naAllowed = TRUE)
     }
 
     kMaxUpperBound <- ifelse(.isTrialDesignFisher(design), C_KMAX_UPPER_BOUND_FISHER, C_KMAX_UPPER_BOUND)
@@ -764,7 +764,7 @@ NULL
 getPiecewiseExponentialDistribution <- function(time, ...,
         piecewiseSurvivalTime = NA_real_, piecewiseLambda = NA_real_, kappa = 1) {
     .warnInCaseOfUnknownArguments(functionName = "getPiecewiseExponentialDistribution", ...)
-    .assertIsNumericVector(time, "time")
+    time <- .assertIsNumericVector(time, "time")
     if (any(time < 0)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -801,7 +801,7 @@ ppwexp <- function(t, ..., s = NA_real_, lambda = NA_real_, kappa = 1) {
 getPiecewiseExponentialQuantile <- function(quantile, ...,
         piecewiseSurvivalTime = NA_real_, piecewiseLambda = NA_real_, kappa = 1) {
     .warnInCaseOfUnknownArguments(functionName = "getPiecewiseExponentialQuantile", ...)
-    .assertIsNumericVector(quantile, "quantile")
+    quantile <- .assertIsNumericVector(quantile, "quantile")
     if (any(quantile < 0) || any(quantile > 1)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -930,7 +930,7 @@ getLambdaByPi <- function(piValue,
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getLambdaByMedian <- function(median, kappa = 1) {
-    .assertIsNumericVector(median, "median")
+    median <- .assertIsNumericVector(median, "median")
     .assertIsValidKappa(kappa)
     return(log(2)^(1 / kappa) / median)
 }
@@ -975,8 +975,8 @@ getHazardRatioByPi <- function(pi1,
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getHazardRatioByLambda <- function(lambda1, lambda2) {
-    .assertIsValidLambda(lambda1, 1)
-    .assertIsValidLambda(lambda2, 2)
+    lambda1 <- .assertIsValidLambda(lambda1, 1)
+    lambda2 <- .assertIsValidLambda(lambda2, 2)
     .assertHasCompatibleLength(lambda1, lambda2, "lambda1", "lambda2")
     return(lambda1 / lambda2)
 }
@@ -984,8 +984,8 @@ getHazardRatioByLambda <- function(lambda1, lambda2) {
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getHazardRatioByMedian <- function(median1, median2, kappa = 1) {
-    .assertIsNumericVector(median1, "median1")
-    .assertIsNumericVector(median2, "median2")
+    median1 <- .assertIsNumericVector(median1, "median1")
+    median2 <- .assertIsNumericVector(median2, "median2")
     .assertHasCompatibleLength(median1, median2, "median1", "median2")
     return(getLambdaByMedian(median1, kappa = kappa) / getLambdaByMedian(median2, kappa = kappa))
 }
@@ -994,7 +994,7 @@ getHazardRatioByMedian <- function(median1, median2, kappa = 1) {
 #' @export
 #' @keywords internal
 getLambda1ByLambda2AndHazardRatio <- function(lambda2, hazardRatio) {
-    .assertIsValidLambda(lambda2, 2)
+    lambda2 <- .assertIsValidLambda(lambda2, 2)
     .assertIsValidHazardRatioVector(hazardRatio)
     .assertHasCompatibleLength(lambda2, hazardRatio, "lambda2", "hazardRatio")
     return(lambda2 * hazardRatio)
@@ -1004,7 +1004,7 @@ getLambda1ByLambda2AndHazardRatio <- function(lambda2, hazardRatio) {
 #' @export
 #' @keywords internal
 getLambda2ByLambda1AndHazardRatio <- function(lambda1, hazardRatio) {
-    .assertIsValidLambda(lambda1, 1)
+    lambda1 <- .assertIsValidLambda(lambda1, 1)
     .assertIsValidHazardRatioVector(hazardRatio)
     .assertHasCompatibleLength(lambda1, hazardRatio, "lambda1", "hazardRatio")
     return(lambda1 / hazardRatio)
@@ -1041,7 +1041,7 @@ getPi2ByPi1AndHazardRatio <- function(pi1, hazardRatio, eventTime = 12, kappa = 
 getPiByLambda <- function(lambda,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
-    .assertIsValidLambda(lambda)
+    lambda <- .assertIsValidLambda(lambda)
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
@@ -1061,7 +1061,7 @@ getPiByLambda <- function(lambda,
 getPiByMedian <- function(median,
         eventTime = 12, # C_EVENT_TIME_DEFAULT
         kappa = 1) {
-    .assertIsNumericVector(median, "median")
+    median <- .assertIsNumericVector(median, "median")
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(eventTime, "eventTime")
     .assertIsInOpenInterval(eventTime, "eventTime", lower = 0, upper = NULL)
@@ -1071,7 +1071,7 @@ getPiByMedian <- function(median,
 #' @rdname utilitiesForSurvivalTrials
 #' @export
 getMedianByLambda <- function(lambda, kappa = 1) {
-    .assertIsValidLambda(lambda)
+    lambda <- .assertIsValidLambda(lambda)
     .assertIsValidKappa(kappa)
     return(log(2)^(1 / kappa) / lambda)
 }

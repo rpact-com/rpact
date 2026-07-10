@@ -358,7 +358,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
     if (is.null(prevalences)) {
         stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, sQuote("effectList$prevalences"), " must be specified", call. = FALSE)
     }
-    .assertIsNumericVector(prevalences, "effectList$prevalences")
+    prevalences <- .assertIsNumericVector(prevalences, "effectList$prevalences")
     .assertArgumentFitsWithSubGroups(prevalences, "prevalences", subGroups)
     if (abs(sum(prevalences) - 1) > 1e-04) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote("effectList$prevalences"), " must sum to 1", call. = FALSE)
@@ -374,7 +374,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         if (is.null(stDevs)) {
             stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, sQuote("effectList$stDevs"), " must be specified", call. = FALSE)
         }
-        .assertIsNumericVector(stDevs, "effectList$stDevs")
+        stDevs <- .assertIsNumericVector(stDevs, "effectList$stDevs")
         if (!is.null(stDevs) && length(stDevs) == 1) {
             stDevs <- rep(stDevs, length(prevalences))
         }
@@ -392,7 +392,7 @@ C_EFFECT_LIST_NAMES_EXPECTED_SURVIVAL <- c("subGroups", "prevalences", "piContro
         if (is.null(piControls)) {
             stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, sQuote("effectList$piControls"), " must be specified", call. = FALSE)
         }
-        .assertIsNumericVector(piControls, "effectList$piControls")
+        piControls <- .assertIsNumericVector(piControls, "effectList$piControls")
         .assertArgumentFitsWithSubGroups(piControls, "piControls", subGroups)
         for (i in indices) {
             longData$piControls[longData$subGroupNumber == i] <- piControls[i]

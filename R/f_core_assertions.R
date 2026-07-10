@@ -702,11 +702,13 @@ NULL
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
-
-    if ((!naAllowed && anyNA(x)) || !is.numeric(x)) {
+    
+    illegalMatrix <- !all(is.na(x)) && is.matrix(x) && all(dim(x) > 1)
+    if (illegalMatrix || (!naAllowed && anyNA(x)) || !is.numeric(x)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
             .arrayToString(x), ") must be a valid numeric value or vector",
+            ifelse(!is.vector(x), paste0(" (is ", .getClassName(x), ")"), ""),
             call. = call.
         )
     }
@@ -718,6 +720,8 @@ NULL
             call. = call.
         )
     }
+    
+    return(invisible(as.numeric(x)))
 }
 
 .assertIsIntegerVector <- function(x, argumentName, ..., naAllowed = FALSE,
@@ -734,7 +738,7 @@ NULL
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
 
     if (naAllowed && all(is.na(x))) {
-        return(invisible())
+        return(invisible(as.integer(x)))
     }
 
     if (!is.numeric(x) || (!naAllowed && anyNA(x)) || (validateType && !is.integer(x)) ||
@@ -745,6 +749,8 @@ NULL
             call. = call.
         )
     }
+    
+    return(invisible(as.integer(x)))
 }
 
 .assertIsLogicalVector <- function(x, argumentName, ..., naAllowed = FALSE,
@@ -765,6 +771,8 @@ NULL
             call. = call.
         )
     }
+    
+    return(invisible(as.logical(x)))
 }
 
 .assertIsNoDefault <- function(x, argumentName, noDefaultAvailable, ..., checkNA = FALSE, call. = FALSE) {
@@ -801,6 +809,8 @@ NULL
             call. = call.
         )
     }
+    
+    return(invisible(as.logical(x)))
 }
 
 .assertIsSingleNumber <- function(x, argumentName, ..., naAllowed = FALSE, 
@@ -829,11 +839,13 @@ NULL
             call. = call.
         )
     }
+    
+    return(invisible(as.numeric(x)))
 }
 
 .assertIsSingleInteger <- function(x, argumentName, ..., naAllowed = FALSE,
         validateType = TRUE, noDefaultAvailable = FALSE, call. = FALSE) {
-    .assertIsSinglePositiveInteger(
+    return(invisible(.assertIsSinglePositiveInteger(
         x = x,
         argumentName = argumentName,
         naAllowed = naAllowed,
@@ -841,7 +853,7 @@ NULL
         mustBePositive = FALSE,
         noDefaultAvailable = noDefaultAvailable,
         call. = call.
-    )
+    )))
 }
 
 .assertIsSinglePositiveInteger <- function(x,
@@ -891,6 +903,8 @@ NULL
             call. = call.
         )
     }
+    
+    return(invisible(as.integer(x)))
 }
 
 .assertIsSingleCharacter <- function(x,
@@ -935,6 +949,8 @@ NULL
             call. = call.
         )
     }
+    
+    return(invisible(as.character(x)))
 }
 
 .assertIsCharacter <- function(x, argumentName, ..., naAllowed = FALSE, call. = FALSE) {
@@ -969,6 +985,8 @@ NULL
             call. = call.
         )
     }
+    
+    return(invisible(as.character(x)))
 }
 
 .assertDesignParameterExists <- function(design, parameterName, defaultValue) {
@@ -1143,9 +1161,9 @@ NULL
     if (lambdaNumber >= 1) {
         argumentName <- paste0("lambda", lambdaNumber)
     }
-    .assertIsNumericVector(lambda, argumentName, naAllowed = TRUE)
+    lambda <- .assertIsNumericVector(lambda, argumentName, naAllowed = TRUE)
     if (all(is.na(lambda))) {
-        return(invisible())
+        return(invisible(lambda))
     }
 
     if (anyNA(lambda)) {
@@ -1165,6 +1183,8 @@ NULL
             call. = FALSE
         )
     }
+    
+    return(invisible(lambda))
 }
 
 .assertIsValidFollowUpTime <- function(followUpTime) {
@@ -1182,10 +1202,10 @@ NULL
 }
 
 .assertIsValidAccrualTime <- function(accrualTime, ..., naAllowed = TRUE) {
-    .assertIsNumericVector(accrualTime, "accrualTime", naAllowed = naAllowed)
+    accrualTime <- .assertIsNumericVector(accrualTime, "accrualTime", naAllowed = naAllowed)
 
     if (length(accrualTime) == 0 || all(is.na(accrualTime))) {
-        return(invisible())
+        return(invisible(accrualTime))
     }
 
     if (length(accrualTime) > 1 && accrualTime[1] != 0) {
@@ -1207,17 +1227,19 @@ NULL
 
     .assertIsInClosedInterval(accrualTime, "accrualTime", lower = 0, upper = NULL, naAllowed = naAllowed)
     .assertValuesAreStrictlyIncreasing(accrualTime, "accrualTime")
+    
+    return(invisible(accrualTime))
 }
 
 .assertIsValidStandardDeviation <- function(stDev, groups = 1L, ..., name = "stDev", naAllowed = TRUE) {
     if (groups == 1L) {
-        .assertIsSingleNumber(stDev, name, naAllowed = naAllowed)
+        stDev <- .assertIsSingleNumber(stDev, name, naAllowed = naAllowed)
     } else {
-        .assertIsNumericVector(stDev, name, len = unique(c(1L, groups)), naAllowed = naAllowed)
+        stDev <- .assertIsNumericVector(stDev, name, len = unique(c(1L, groups)), naAllowed = naAllowed)
     }
 
     if (naAllowed && all(is.na(stDev))) {
-        return(invisible())
+        return(invisible(stDev))
     }
 
     if (any(stDev <= 0)) {
@@ -1227,6 +1249,8 @@ NULL
             call. = FALSE
         )
     }
+    
+    return(invisible(stDev))
 }
 
 .assertIsValidAlpha <- function(alpha, ..., naAllowed = FALSE) {
@@ -2008,8 +2032,8 @@ NULL
         minValue <- thetaRange[1]
         maxValue <- thetaRange[2]
         if (survivalDataEnabled) {
-            .assertIsValidHazardRatio(minValue, "thetaRange[1]")
-            .assertIsValidHazardRatio(maxValue, "thetaRange[2]")
+            minValue <- .assertIsValidHazardRatio(minValue, "thetaRange[1]")
+            maxValue <- .assertIsValidHazardRatio(maxValue, "thetaRange[2]")
         }
         if (minValue >= maxValue) {
             stop(
@@ -2135,7 +2159,7 @@ NULL
 }
 
 .assertIsValidAllocationRatioPlannedSampleSize <- function(allocationRatioPlanned, maxNumberOfSubjects = NA_integer_) {
-    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    allocationRatioPlanned <- .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInClosedInterval(allocationRatioPlanned, "allocationRatioPlanned",
         lower = 0,
         upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
@@ -2298,13 +2322,13 @@ NULL
             results$.setParameterType("piControls", C_PARAM_GENERATED)
         }
     }
-    .assertIsNumericVector(piControls, "piControls", naAllowed = TRUE)
+    piControls <- .assertIsNumericVector(piControls, "piControls", naAllowed = TRUE)
     .assertIsInClosedInterval(piControls, "piControls", lower = 0, upper = 1, naAllowed = TRUE)
-    invisible(piControls)
+    invisible(invisible(piControls))
 }
 
 .assertIsValidHazardRatio <- function(hazardRatio, thetaH0) {
-    .assertIsNumericVector(hazardRatio, "hazardRatio")
+    hazardRatio <- .assertIsNumericVector(hazardRatio, "hazardRatio")
     if (any(hazardRatio == thetaH0)) {
         stop(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -2315,10 +2339,11 @@ NULL
             call. = FALSE
         )
     }
+    return(invisible(hazardRatio))
 }
 
 .assertIsValidHazardRatioVector <- function(hazardRatio) {
-    .assertIsNumericVector(hazardRatio, "hazardRatio")
+    hazardRatio <- .assertIsNumericVector(hazardRatio, "hazardRatio")
     if (any(hazardRatio <= 0)) {
         if (length(hazardRatio) == 1) {
             stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
@@ -2334,6 +2359,7 @@ NULL
             )
         }
     }
+    return(invisible(hazardRatio))
 }
 
 .warnInCaseOfIgnoredDirectionUpper <- function(

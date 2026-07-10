@@ -2530,7 +2530,7 @@ DatasetMeans <- R6::R6Class("DatasetMeans",
                             if (is.null(covEffect)) {
                                 covEffect <- 1
                             } else {
-                                .assertIsNumericVector(covEffect, paste0("covariateEffects$", fixedCovariateName))
+                                covEffect <- .assertIsNumericVector(covEffect, paste0("covariateEffects$", fixedCovariateName))
                                 if (showMessage) {
                                     message(
                                         "Add effect ", covEffect, " to ",

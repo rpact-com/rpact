@@ -384,7 +384,8 @@ NULL
 
     .assertIsSinglePositiveInteger(rValue, "rValue", naAllowed = TRUE, validateType = FALSE)
 
-    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    allocationRatioPlanned <- .assertIsNumericVector(
+        allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned",
@@ -399,11 +400,15 @@ NULL
     .assertIsLogicalVector(adaptations, "adaptations", naAllowed = TRUE)
 
     if (endpoint %in% c("means", "rates")) {
-        .assertIsNumericVector(minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
-        .assertIsNumericVector(maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
+        minNumberOfSubjectsPerStage <- .assertIsNumericVector(
+            minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
+        maxNumberOfSubjectsPerStage <- .assertIsNumericVector(
+            maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
     } else if (endpoint == "survival") {
-        .assertIsNumericVector(minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
-        .assertIsNumericVector(maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage", naAllowed = TRUE)
+        minNumberOfSubjectsPerStage <- .assertIsNumericVector(
+            minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
+        maxNumberOfSubjectsPerStage <- .assertIsNumericVector(
+            maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage", naAllowed = TRUE)
     }
 
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)

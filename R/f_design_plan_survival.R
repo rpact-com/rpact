@@ -665,7 +665,7 @@ NULL
     }
 
     if (userFunctionCallEnabled) {
-        .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
+        allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     }
 
     designPlan <- TrialDesignPlanSurvival$new(
@@ -984,8 +984,7 @@ NULL
     piecewiseSurvivalTime <- designPlan$piecewiseSurvivalTime
     maxNumberOfSubjects <- designPlan$maxNumberOfSubjects
     hazardRatio <- designPlan$hazardRatio
-
-    .assertIsValidHazardRatio(hazardRatio, thetaH0)
+    hazardRatio <- .assertIsValidHazardRatio(hazardRatio, thetaH0)
 
     if (designPlan$.piecewiseSurvivalTime$.isLambdaBased()) {
         numberOfResults <- length(hazardRatio)
@@ -1613,9 +1612,9 @@ getEventProbabilities <- function(time,
         maxNumberOfSubjects = NA_real_) {
     .warnInCaseOfUnknownArguments(functionName = "getEventProbabilities", ...)
 
-    .assertIsNumericVector(time, "time")
+    time <- .assertIsNumericVector(time, "time")
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
-    .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
+    allocationRatioPlanned <- .assertIsValidAllocationRatioPlannedSampleSize(allocationRatioPlanned, maxNumberOfSubjects)
     .assertIsValidKappa(kappa)
     .assertIsSingleNumber(hazardRatio, "hazardRatio", naAllowed = TRUE)
 
@@ -1711,7 +1710,7 @@ getEventProbabilities <- function(time,
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all drop-out rates (phi) must be >= 0", call. = FALSE)
     }
 
-    .assertIsNumericVector(lambda2, "lambda2")
+    lambda2 <- .assertIsNumericVector(lambda2, "lambda2")
     if (any(lambda2 <= 0)) {
         stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all rates (lambda2) must be > 0", call. = FALSE)
     }
@@ -1845,8 +1844,7 @@ getNumberOfSubjects <- function(time, ...,
         maxNumberOfSubjects = NA_real_) {
     .warnInCaseOfUnknownArguments(functionName = "getNumberOfSubjects", ...)
 
-    .assertIsNumericVector(time, "time")
-
+    time <- .assertIsNumericVector(time, "time")
     accrualSetup <- getAccrualTime(
         accrualTime = accrualTime,
         accrualIntensity = accrualIntensity,
@@ -2058,7 +2056,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         }
 
         if (!anyNA(hazardRatio) && !is.na(thetaH0)) {
-            .assertIsValidHazardRatio(hazardRatio, thetaH0)
+            hazardRatio <- .assertIsValidHazardRatio(hazardRatio, thetaH0)
         }
 
         pwst <- getPiecewiseSurvivalTime(
@@ -2113,7 +2111,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
             hr <- pwst$hazardRatio
         }
         if (all(is.na(hazardRatio))) {
-            .assertIsValidHazardRatio(hr, thetaH0)
+            hazardRatio <- .assertIsValidHazardRatio(hr, thetaH0)
         }
 
         maxNumberOfSubjectsTarget <- NA_real_

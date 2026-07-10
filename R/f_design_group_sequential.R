@@ -327,7 +327,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     .assertIsSingleLogical(bindingFutility, "bindingFutility")
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
-    .assertIsNumericVector(delayedInformation, "delayedInformation", naAllowed = TRUE)
+    delayedInformation <- .assertIsNumericVector(delayedInformation, "delayedInformation", naAllowed = TRUE)
     .assertIsInClosedInterval(delayedInformation, "delayedInformation", lower = 0, upper = NULL, naAllowed = TRUE)
 
     if (designClass == C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL) {
@@ -368,10 +368,10 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     .assertIsSingleNumber(deltaPT0, "deltaPT0", naAllowed = TRUE)
     .assertIsSingleNumber(gammaA, "gammaA", naAllowed = TRUE)
     .assertIsSingleNumber(gammaB, "gammaB", naAllowed = TRUE)
-    .assertIsNumericVector(futilityBounds, "futilityBounds", naAllowed = TRUE)
-    .assertIsNumericVector(informationRates, "informationRates", naAllowed = TRUE)
-    .assertIsNumericVector(userAlphaSpending, "userAlphaSpending", naAllowed = TRUE)
-    .assertIsNumericVector(userBetaSpending, "userBetaSpending", naAllowed = TRUE)
+    futilityBounds <- .assertIsNumericVector(futilityBounds, "futilityBounds", naAllowed = TRUE)
+    informationRates <- .assertIsNumericVector(informationRates, "informationRates", naAllowed = TRUE)
+    userAlphaSpending <- .assertIsNumericVector(userAlphaSpending, "userAlphaSpending", naAllowed = TRUE)
+    userBetaSpending <- .assertIsNumericVector(userBetaSpending, "userBetaSpending", naAllowed = TRUE)
 
     design$alpha <- alpha
     design$beta <- beta
@@ -1839,15 +1839,18 @@ getDesignInverseNormal <- function(...,
         design$.setParameterType("stages", C_PARAM_NOT_APPLICABLE)
     }
 
-    .assertIsNumericVector(delayedInformation, "delayedInformation", naAllowed = TRUE)
+    delayedInformation <- .assertIsNumericVector(
+        delayedInformation, "delayedInformation", naAllowed = TRUE)
     if (all(is.na(delayedInformation))) {
         # delayed response design is disabled
         return(design)
     }
 
     if (all(!is.na(delayedInformation)) && all(delayedInformation < 1e-03)) {
-        warning("At least one delayed information value must be >= 1e-03 to enable delayed response.",
-            " 'delayedInformation' (", .arrayToString(delayedInformation), ") will be ignored",
+        warning("At least one delayed information value must ",
+            "be >= 1e-03 to enable delayed response. ",
+            "'delayedInformation' (", .arrayToString(delayedInformation), ") ",
+            "will be ignored",
             call. = FALSE
         )
 

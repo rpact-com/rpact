@@ -27,7 +27,7 @@ NULL
             !all(is.na(information)) && length(information) > 0) {
         indices <- .getValidFutilityBoundVectorIndices(sourceScale, targetScale)
         if (length(information) > 1) {
-            .assertIsNumericVector(information, "information", naAllowed = TRUE, len = 2L)
+            information <- .assertIsNumericVector(information, "information", naAllowed = TRUE, len = 2L)
 
             information1 <- information[1]
             information2 <- information[2]
@@ -256,7 +256,7 @@ summary.FutilityBounds <- function(object, ...) {
 
     for (arg in args) {
         if (is(arg, "FutilityBounds")) {
-            .assertIsNumericVector(as.numeric(arg), "futilityBounds", naAllowed = TRUE)
+            arg <- .assertIsNumericVector(as.numeric(arg), "futilityBounds", naAllowed = TRUE)
             return(arg)
         }
     }
@@ -307,7 +307,7 @@ summary.FutilityBounds <- function(object, ...) {
             )
         }
     } else {
-        .assertIsNumericVector(futilityBounds, futilityBoundsName, naAllowed = TRUE)
+        futilityBounds <- .assertIsNumericVector(futilityBounds, futilityBoundsName, naAllowed = TRUE)
         if (futilityBoundsScale != targetScale) {
             if (!all(is.na(futilityBounds))) {
                 futilityBounds <- getFutilityBounds(
@@ -467,7 +467,7 @@ getFutilityBounds <- function(sourceValue,
         ...
     )
 
-    .assertIsNumericVector(sourceValue, "sourceValue", naAllowed = naAllowed)
+    sourceValue <- .assertIsNumericVector(sourceValue, "sourceValue", naAllowed = naAllowed)
     if (is(sourceValue, "FutilityBounds")) {
         sourceValue <- as.numeric(sourceValue)
     }

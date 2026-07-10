@@ -208,22 +208,24 @@ getSimulationMeans <- function(
         )
     }
     .assertIsValidGroupsParameter(groups)
-    .assertIsNumericVector(alternative, "alternative", naAllowed = FALSE)
-    .assertIsNumericVector(minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
-    .assertIsNumericVector(maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
+    alternative <- .assertIsNumericVector(alternative, "alternative", naAllowed = FALSE)
+    minNumberOfSubjectsPerStage <- .assertIsNumericVector(
+        minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
+    maxNumberOfSubjectsPerStage <- .assertIsNumericVector(
+        maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
     .assertIsInOpenInterval(conditionalPower, "conditionalPower",
         lower = 0, upper = 1, naAllowed = TRUE
     )
     .assertIsSingleNumber(thetaH1, "thetaH1", naAllowed = TRUE)
-    .assertIsValidStandardDeviation(stDevH1, groups = groups, name = "stDevH1", naAllowed = TRUE)
-    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    stDevH1 <- .assertIsValidStandardDeviation(stDevH1, groups = groups, name = "stDevH1", naAllowed = TRUE)
+    allocationRatioPlanned <- .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
         lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM, naAllowed = TRUE
     )
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
-    .assertIsValidStandardDeviation(stDev, groups = groups)
+    stDev <- .assertIsValidStandardDeviation(stDev, groups = groups)
     .assertIsSingleLogical(showStatistics, "showStatistics", naAllowed = FALSE)
     .assertIsSingleLogical(normalApproximation, "normalApproximation", naAllowed = FALSE)
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")

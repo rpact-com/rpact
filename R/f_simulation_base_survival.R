@@ -310,8 +310,10 @@ getSimulationSurvival <- function(design = NULL, ...,
     )
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsInOpenInterval(thetaH0, "thetaH0", lower = 0, upper = NULL, naAllowed = TRUE)
-    .assertIsNumericVector(minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
-    .assertIsNumericVector(maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage", naAllowed = TRUE)
+    minNumberOfEventsPerStage <- .assertIsNumericVector(
+        minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
+    maxNumberOfEventsPerStage <- .assertIsNumericVector(
+        maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage", naAllowed = TRUE)
     .assertIsSingleNumber(conditionalPower, "conditionalPower", naAllowed = TRUE)
     .assertIsInOpenInterval(conditionalPower, "conditionalPower",
         lower = 0, upper = 1, naAllowed = TRUE
@@ -320,8 +322,8 @@ getSimulationSurvival <- function(design = NULL, ...,
     .assertIsInOpenInterval(thetaH1, "thetaH1", lower = 0, upper = NULL, naAllowed = TRUE)
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
     .assertIsSingleNumber(seed, "seed", naAllowed = TRUE)
-    .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)
-    .assertIsNumericVector(lambda2, "lambda2", naAllowed = TRUE)
+    lambda1 <- .assertIsNumericVector(lambda1, "lambda1", naAllowed = TRUE)
+    lambda2 <- .assertIsNumericVector(lambda2, "lambda2", naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
     .assertIsIntegerVector(allocation1, "allocation1", validateType = FALSE)
     .assertIsIntegerVector(allocation2, "allocation2", validateType = FALSE)
@@ -507,6 +509,7 @@ getSimulationSurvival <- function(design = NULL, ...,
     )
 
     simulationResults$.piecewiseSurvivalTime <- pwsTimeObject
+    
     simulationResults$hazardRatio <- pwsTimeObject$hazardRatio
     simulationResults$.setParameterType("hazardRatio", pwsTimeObject$.getParameterType("hazardRatio"))
     simulationResults$.setParameterType("eventTime", pwsTimeObject$.getParameterType("eventTime"))
@@ -765,7 +768,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         design = rep(sub("^TrialDesign", "", .getClassName(design)), n),
         overview
     )
-
+    
     if (pwsTimeObject$.isPiBased() &&
             pwsTimeObject$.getParameterType("hazardRatio") != C_PARAM_USER_DEFINED) {
         simulationResults$hazardRatio <- matrix(overview$hazardRatio, nrow = design$kMax)[1, ]

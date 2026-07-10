@@ -115,7 +115,7 @@ getDesignFisher <- function(...,
     }
 
     if (alpha0Scale %in% c("condPowerAtObserved", "predictivePower")) {
-        .assertIsNumericVector(alpha0Vec, "alpha0Vec")
+        alpha0Vec <- .assertIsNumericVector(alpha0Vec, "alpha0Vec")
         if (!all(is.na(alpha0Vec))) {
             eps <- ifelse(identical(alpha0Scale, "condPowerAtObserved"), 1e-08, 0.00002)
             alpha0Vec[!is.na(alpha0Vec) & alpha0Vec < eps] <- eps
@@ -196,7 +196,7 @@ getDesignFisher <- function(...,
         userFunctionCallEnabled = FALSE) {
     method <- .matchArgument(method, C_FISHER_METHOD_DEFAULT)
 
-    .assertIsNumericVector(alpha0Vec, "alpha0Vec", naAllowed = TRUE)
+    alpha0Vec <- .assertIsNumericVector(alpha0Vec, "alpha0Vec", naAllowed = TRUE)
     .assertIsSingleLogical(directionUpper, "directionUpper", naAllowed = TRUE)
 
     if (.isDefinedArgument(kMax, argumentExistsValidationEnabled = userFunctionCallEnabled)) {

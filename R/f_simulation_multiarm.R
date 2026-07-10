@@ -544,7 +544,8 @@ NULL
 
     .assertIsSinglePositiveInteger(rValue, "rValue", naAllowed = TRUE, validateType = FALSE)
 
-    .assertIsNumericVector(allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
+    allocationRatioPlanned <- .assertIsNumericVector(
+        allocationRatioPlanned, "allocationRatioPlanned", naAllowed = TRUE)
     .assertIsInOpenInterval(
         allocationRatioPlanned,
         "allocationRatioPlanned",
@@ -559,11 +560,15 @@ NULL
     .assertIsLogicalVector(adaptations, "adaptations", naAllowed = TRUE)
 
     if (endpoint %in% c("means", "rates")) {
-        .assertIsNumericVector(minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
-        .assertIsNumericVector(maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
+        minNumberOfSubjectsPerStage <- .assertIsNumericVector(
+            minNumberOfSubjectsPerStage, "minNumberOfSubjectsPerStage", naAllowed = TRUE)
+        maxNumberOfSubjectsPerStage <- .assertIsNumericVector(
+            maxNumberOfSubjectsPerStage, "maxNumberOfSubjectsPerStage", naAllowed = TRUE)
     } else if (endpoint == "survival") {
-        .assertIsNumericVector(minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
-        .assertIsNumericVector(maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage", naAllowed = TRUE)
+        minNumberOfEventsPerStage <- .assertIsNumericVector(
+            minNumberOfEventsPerStage, "minNumberOfEventsPerStage", naAllowed = TRUE)
+        maxNumberOfEventsPerStage <- .assertIsNumericVector(
+            maxNumberOfEventsPerStage, "maxNumberOfEventsPerStage", naAllowed = TRUE)
     }
 
     .assertIsSinglePositiveInteger(maxNumberOfIterations, "maxNumberOfIterations", validateType = FALSE)
@@ -579,7 +584,7 @@ NULL
     }
 
     if (endpoint == "means") {
-        .assertIsValidStandardDeviation(stDev) # means only
+        stDev <- .assertIsValidStandardDeviation(stDev) # means only
         .assertIsSingleNumber(stDevH1, "stDevH1", naAllowed = TRUE)
         .assertIsInOpenInterval(stDevH1, "stDevH1", lower = 0, upper = NULL, naAllowed = TRUE)
     }
@@ -638,7 +643,7 @@ NULL
         if (typeOfShape == "userDefined") {
             muMaxVector <- effectMatrix[, gMax]
         } else {
-            .assertIsNumericVector(muMaxVector, "muMaxVector")
+            muMaxVector <- .assertIsNumericVector(muMaxVector, "muMaxVector")
         }
         .setValueAndParameterType(
             simulationResults,
@@ -712,10 +717,13 @@ NULL
             omegaMaxVector <- effectMatrix[, gMax]
         }
         .setValueAndParameterType(simulationResults, "omegaMaxVector", omegaMaxVector, C_RANGE_OF_HAZARD_RATIOS_DEFAULT)
-        if (typeOfShape == "userDefined") {
+        if (activeArms == 1) {
+            simulationResults$.setParameterType("omegaMaxVector", C_PARAM_NOT_APPLICABLE)
+        }
+        else if (typeOfShape == "userDefined") {
             simulationResults$.setParameterType("omegaMaxVector", C_PARAM_DERIVED)
         }
-
+        
         .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)
         .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = TRUE)
         .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
@@ -1167,6 +1175,9 @@ NULL
     )
     .setValueAndParameterType(simulationResults, "typeOfSelection", typeOfSelection, C_TYPE_OF_SELECTION_DEFAULT)
     .setValueAndParameterType(simulationResults, "typeOfShape", typeOfShape, C_TYPE_OF_SHAPE_DEFAULT)
+    if (activeArms == 1) {
+        simulationResults$.setParameterType("typeOfShape", C_PARAM_NOT_APPLICABLE)
+    }
     .setValueAndParameterType(simulationResults, "successCriterion", successCriterion, C_SUCCESS_CRITERION_DEFAULT)
     .setValueAndParameterType(simulationResults, "effectMeasure", effectMeasure, C_EFFECT_MEASURE_DEFAULT)
 

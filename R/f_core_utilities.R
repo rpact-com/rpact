@@ -925,7 +925,7 @@ getTestLabel <- function(x) {
 }
 
 .getNextHigherValue <- function(x) {
-    .assertIsNumericVector(x, "x")
+    x <- .assertIsNumericVector(x, "x")
     values <- c()
     for (value in x) {
         value <- round(value, 15)

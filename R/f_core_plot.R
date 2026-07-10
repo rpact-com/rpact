@@ -1658,9 +1658,9 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
 #' @keywords internal
 #'
 getLambdaStepFunction <- function(timeValues, ..., piecewiseSurvivalTime, piecewiseLambda) {
-    .assertIsNumericVector(timeValues, "timeValues")
-    .assertIsNumericVector(piecewiseSurvivalTime, "piecewiseSurvivalTime")
-    .assertIsNumericVector(piecewiseLambda, "piecewiseLambda")
+    timeValues <- .assertIsNumericVector(timeValues, "timeValues")
+    piecewiseSurvivalTime <- .assertIsNumericVector(piecewiseSurvivalTime, "piecewiseSurvivalTime")
+    piecewiseLambda <- .assertIsNumericVector(piecewiseLambda, "piecewiseLambda")
     .warnInCaseOfUnknownArguments(functionName = "getLambdaStepFunction", ...)
 
     .getLambdaStepFunction(

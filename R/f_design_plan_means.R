@@ -414,7 +414,7 @@ NULL
     .assertIsValidAlphaAndBeta(design$alpha, design$beta)
     .assertIsValidSidedParameter(design$sided)
     .assertIsValidGroupsParameter(groups)
-    .assertIsValidStandardDeviation(stDev, groups = groups)
+    stDev <- .assertIsValidStandardDeviation(stDev, groups = groups)
     .assertIsSingleNumber(thetaH0, "thetaH0")
     .assertIsSingleLogical(meanRatio, "meanRatio")
     .assertIsValidThetaH0(thetaH0, endpoint = "means", groups = groups, ratioEnabled = meanRatio)

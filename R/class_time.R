@@ -256,15 +256,15 @@ getPiecewiseSurvivalTime <- function(piecewiseSurvivalTime = NA_real_,
 
     .assertIsValidLambda(lambda1, 1)
     .assertIsValidLambda(lambda2, 2)
-    .assertIsNumericVector(hazardRatio, "hazardRatio", naAllowed = TRUE)
-    .assertIsNumericVector(pi1, "pi1", naAllowed = TRUE)
-    .assertIsSingleNumber(pi2, "pi2", naAllowed = TRUE)
-    .assertIsNumericVector(median1, "median1", naAllowed = TRUE)
-    .assertIsSingleNumber(median2, "median2", naAllowed = TRUE)
-    .assertIsSingleNumber(eventTime, "eventTime", naAllowed = TRUE)
+    hazardRatio <- .assertIsNumericVector(hazardRatio, "hazardRatio", naAllowed = TRUE)
+    pi1 <- .assertIsNumericVector(pi1, "pi1", naAllowed = TRUE)
+    pi2 <- .assertIsSingleNumber(pi2, "pi2", naAllowed = TRUE)
+    median1 <- .assertIsNumericVector(median1, "median1", naAllowed = TRUE)
+    median2 <- .assertIsSingleNumber(median2, "median2", naAllowed = TRUE)
+    eventTime <- .assertIsSingleNumber(eventTime, "eventTime", naAllowed = TRUE)
     .assertIsValidKappa(kappa)
-    .assertIsSingleLogical(delayedResponseAllowed, "delayedResponseAllowed")
-
+    delayedResponseAllowed <- .assertIsSingleLogical(delayedResponseAllowed, "delayedResponseAllowed")
+    
     return(PiecewiseSurvivalTime$new(
         piecewiseSurvivalTime = piecewiseSurvivalTime,
         lambda1 = lambda1,
@@ -347,7 +347,7 @@ getAccrualTime <- function(accrualTime = NA_real_,
 
     accrualIntensityType <- match.arg(accrualIntensityType)
 
-    .assertIsNumericVector(accrualIntensity, "accrualIntensity", naAllowed = TRUE)
+    accrualIntensity <- .assertIsNumericVector(accrualIntensity, "accrualIntensity", naAllowed = TRUE)
     .assertIsValidMaxNumberOfSubjects(maxNumberOfSubjects, naAllowed = TRUE)
     .assertIsSingleCharacter(accrualIntensityType, "accrualIntensityType")
 
