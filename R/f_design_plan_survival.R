@@ -48,10 +48,8 @@ NULL
 .getEventProbabilityFunction <- function(..., time, piecewiseLambda, piecewiseSurvivalTime, phi, kappa) {
     if (length(piecewiseLambda) == 1) {
         if (kappa != 1 && phi > 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "Weibull distribution cannot ",
-                "be used together with specified dropout rate (use simulation instead)",
-                call. = FALSE
-            )
+            stopIllegalArgument("Weibull distribution cannot ", "be used together with specified dropout rate (use simulation instead)",
+                functionName = ".getEventProbabilityFunction")
         }
 
         return(piecewiseLambda / (piecewiseLambda + phi) *
@@ -59,21 +57,15 @@ NULL
     }
 
     if (length(piecewiseSurvivalTime) != length(piecewiseLambda)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime),
-            ") must be equal to length of 'piecewiseLambda' (", .arrayToString(piecewiseLambda), ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("length of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime), ") must be equal to length of 'piecewiseLambda' (",
+            .arrayToString(piecewiseLambda), ")", functionName = ".getEventProbabilityFunction", parameter = "piecewiseSurvivalTime",
+            value = piecewiseSurvivalTime, relatedParameter = "piecewiseLambda", relatedValue = piecewiseLambda)
     }
 
     piecewiseSurvivalTime <- .getPiecewiseExpStartTimesWithoutLeadingZero(piecewiseSurvivalTime)
 
     if (kappa != 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Weibull distribution cannot be used for piecewise survival definition",
-            call. = FALSE
-        )
+        stopIllegalArgument("Weibull distribution cannot be used for piecewise survival definition", functionName = ".getEventProbabilityFunction")
     }
     len <- length(piecewiseSurvivalTime)
     for (i in 1:len) {
@@ -181,11 +173,10 @@ NULL
 
     if (length(densityIntervals) > 1 && length(accrualIntensity) > 1 &&
             length(densityIntervals) != length(accrualIntensity)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'densityIntervals' (", .arrayToString(densityIntervals),
-            ") and 'accrualIntensity' (", .arrayToString(accrualIntensity), ") must have same length",
-            call. = FALSE
-        )
+        stopIllegalArgument("'densityIntervals' (", .arrayToString(densityIntervals), ") and 'accrualIntensity' (",
+            .arrayToString(accrualIntensity), ") must have same length", functionName = ".getEventProbabilitiesGroupwise",
+            parameter = "densityIntervals", value = densityIntervals, relatedParameter = "accrualIntensity",
+            relatedValue = accrualIntensity)
     }
 
     densityVector <- accrualIntensity / sum(densityIntervals * accrualIntensity)
@@ -381,7 +372,7 @@ NULL
 
     .addEffectScaleBoundaryDataToDesignPlan(designPlan)
     designPlan$singleEventsPerStage <- .getSingleEventsPerStage(designPlan$cumulativeEventsPerStage)
-    .addDeprecatedFieldValues(designPlan, "eventsPerStage", 
+    .addDeprecatedFieldValues(designPlan, "eventsPerStage",
         designPlan$cumulativeEventsPerStage, "2024-06-10")
 
     paramName <- ifelse(designPlan$.design$kMax == 1, "nFixed", "maxNumberOfSubjects")
@@ -396,12 +387,8 @@ NULL
         }
 
         if (any(designPlan$accrualIntensity < 0)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'accrualIntensityRelative' (",
-                .arrayToString(designPlan$accrualIntensity), ") must be >= 0",
-                call. = FALSE
-            )
+            stopIllegalArgument("'accrualIntensityRelative' (", .arrayToString(designPlan$accrualIntensity), ") must be >= 0",
+                functionName = ".calculateSampleSizeSurvival", parameter = "accrualIntensityRelative")
         }
 
         designPlan$accrualIntensityRelative <- designPlan$accrualIntensity
@@ -440,17 +427,9 @@ NULL
             if (!is.null(paramName)) {
                 paramValue <- designPlan[[paramName]]
                 if (!is.null(paramValue) && length(paramValue) > 1) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "the definition of relative accrual intensities ",
-                        "(all 'accrualIntensity' values < 1) ",
-                        "is only available for a single value ",
-                        "(", paramName, " = ", .arrayToString(
-                            paramValue,
-                            vectorLookAndFeelEnabled = TRUE
-                        ), ")",
-                        call. = FALSE
-                    )
+                    stopIllegalArgument("the definition of relative accrual intensities ", "(all 'accrualIntensity' values < 1) ",
+                        "is only available for a single value ", "(", paramName, " = ", .arrayToString(paramValue, vectorLookAndFeelEnabled = TRUE),
+                        ")", functionName = ".calculateSampleSizeSurvival", parameter = "accrualIntensity")
                 }
             }
         }
@@ -597,52 +576,32 @@ NULL
         }
 
         if (!anyNA(pi1) && (any(pi1 <= 0) || any(pi1 >= 1))) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "event rate 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("event rate 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)", functionName = ".createDesignPlanSurvival",
+                parameter = "pi1", value = pi1)
         }
 
         if (!anyNA(pi2) && (any(pi2 <= 0) || any(pi2 >= 1))) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "event rate 'pi2' (", .arrayToString(pi2), ") is out of bounds (0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("event rate 'pi2' (", .arrayToString(pi2), ") is out of bounds (0; 1)", functionName = ".createDesignPlanSurvival",
+                parameter = "pi2", value = pi2)
         }
 
         if (design$sided == 2 && thetaH0 != 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
-                call. = FALSE
-            )
+            stopIllegalArgument("two-sided case is implemented for superiority testing only (i.e., thetaH0 = 1)",
+                functionName = ".createDesignPlanSurvival")
         }
 
         if (thetaH0 <= 0) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "null hypothesis hazard ratio is not allowed be negative or zero",
-                call. = FALSE
-            )
+            stopIllegalArgument("null hypothesis hazard ratio is not allowed be negative or zero", functionName = ".createDesignPlanSurvival")
         }
 
         if (!(typeOfComputation %in% c("Schoenfeld", "Freedman", "HsiehFreedman"))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "computation type ('", typeOfComputation, "') must be one of the following: ",
-                "'Schoenfeld', 'Freedman', or 'HsiehFreedman' ",
-                call. = FALSE
-            )
+            stopIllegalArgument("computation type ('", typeOfComputation, "') must be one of the following: ", "'Schoenfeld', 'Freedman', or 'HsiehFreedman' ",
+                functionName = ".createDesignPlanSurvival", parameter = "Schoenfeld", relatedParameter = "Freedman")
         }
 
         if (typeOfComputation != "Schoenfeld" && thetaH0 != 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Freedman test calculation is possible only for superiority testing (thetaH0 != 1)",
-                call. = FALSE
-            )
+            stopIllegalArgument("Freedman test calculation is possible only for superiority testing (thetaH0 != 1)",
+                functionName = ".createDesignPlanSurvival")
         }
     }
 
@@ -796,27 +755,23 @@ NULL
         .assertIsSingleNumber(dropoutTime, "dropoutTime")
 
         if (!is.na(dropoutTime) && dropoutTime <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0", call. = FALSE)
+            stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0", functionName = ".createDesignPlanSurvival",
+                parameter = "dropoutTime", value = dropoutTime)
         }
 
         if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)", functionName = ".createDesignPlanSurvival",
+                parameter = "dropoutRate1", value = dropoutRate1)
         }
 
         if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)", functionName = ".createDesignPlanSurvival",
+                parameter = "dropoutRate2", value = dropoutRate2)
         }
 
         if (!is.na(eventTime) && eventTime <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'eventTime' (", eventTime, ") must be > 0", call. = FALSE)
+            stopIllegalArgument("'eventTime' (", eventTime, ") must be > 0", functionName = ".createDesignPlanSurvival",
+                parameter = "eventTime", value = eventTime)
         }
 
         .assertIsValidAccrualTime(accrualSetup$accrualTime)
@@ -934,11 +889,8 @@ NULL
             if (length(designPlan$accountForObservationTimes) != 0 &&
                     !is.na(designPlan$accountForObservationTimes) &&
                     !designPlan$accountForObservationTimes) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'accountForObservationTimes' must be TRUE because 'maxNumberOfSubjects' is > 0",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'accountForObservationTimes' must be TRUE because 'maxNumberOfSubjects' is > 0",
+                    functionName = ".initDesignPlanSurvival", parameter = "accountForObservationTimes", relatedParameter = "maxNumberOfSubjects")
             }
 
             designPlan$.setParameterType("accountForObservationTimes", C_PARAM_GENERATED)
@@ -1007,12 +959,9 @@ NULL
 
     userDefinedMaxNumberOfSubjects <- .isUserDefinedMaxNumberOfSubjects(designPlan)
     if (userDefinedMaxNumberOfSubjects && allocationRatioPlanned == 0) {
-        stop(
-            C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "determination of optimum allocation ('allocationRatioPlanned' = 0) not possible ",
-            "for given 'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ")",
-            call. = FALSE
-        )
+        stopConflictingArguments("determination of optimum allocation ('allocationRatioPlanned' = 0) not possible ",
+            "for given 'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ")", functionName = ".getSampleSizeFixedSurvival",
+            parameter = "allocationRatioPlanned", relatedParameter = "maxNumberOfSubjects", relatedValue = designPlan$maxNumberOfSubjects)
     }
 
     if (userDefinedMaxNumberOfSubjects) {
@@ -1085,12 +1034,8 @@ NULL
             designPlan$nFixed[i] <- designPlan$eventsFixed[i] / designPlan$chi[i]
         } else {
             if (length(maxNumberOfSubjects) > 1) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "length of user defined 'maxNumberOfSubjects' (",
-                    .arrayToString(maxNumberOfSubjects), ") must be 1",
-                    call. = FALSE
-                )
+                stopIllegalArgument("length of user defined 'maxNumberOfSubjects' (", .arrayToString(maxNumberOfSubjects),
+                    ") must be 1", functionName = ".getSampleSizeFixedSurvival", parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects)
             }
 
             designPlan$.calculateFollowUpTime <- TRUE
@@ -1104,27 +1049,13 @@ NULL
             designPlan$nFixed[i] <- maxNumberOfSubjects
             if (designPlan$eventsFixed[i] > maxNumberOfSubjects) {
                 if (length(hazardRatio) > 1) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        sprintf(
-                            paste0(
-                                "'maxNumberOfSubjects' (%s) is smaller than the number ",
-                                "of events (%.3f) at index %s (hazard ratio = %.3f)"
-                            ),
-                            maxNumberOfSubjects, designPlan$eventsFixed[i], i, hazardRatio[i]
-                        )
-                    )
+                    stopIllegalArgument(sprintf(paste0("'maxNumberOfSubjects' (%s) is smaller than the number ", "of events (%.3f) at index %s (hazard ratio = %.3f)"),
+                        maxNumberOfSubjects, designPlan$eventsFixed[i], i, hazardRatio[i]), functionName = ".getSampleSizeFixedSurvival",
+                        parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects)
                 } else {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        sprintf(
-                            paste0(
-                                "'maxNumberOfSubjects' (%s) is smaller than the number ",
-                                "of events (%.3f)"
-                            ),
-                            maxNumberOfSubjects, designPlan$eventsFixed[i]
-                        )
-                    )
+                    stopIllegalArgument(sprintf(paste0("'maxNumberOfSubjects' (%s) is smaller than the number ", "of events (%.3f)"),
+                        maxNumberOfSubjects, designPlan$eventsFixed[i]), functionName = ".getSampleSizeFixedSurvival", parameter = "maxNumberOfSubjects",
+                        value = maxNumberOfSubjects)
                 }
             }
 
@@ -1140,12 +1071,8 @@ NULL
                 up <- 2 * up
                 iterate <- iterate + 1
                 if (iterate > 50) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "the number of subjects is too small to reach maximum number of events ",
-                        "(presumably due to drop-out rates), search algorithm failed",
-                        call. = FALSE
-                    )
+                    stopIllegalArgument("the number of subjects is too small to reach maximum number of events ", "(presumably due to drop-out rates), search algorithm failed",
+                        functionName = ".getSampleSizeFixedSurvival")
                 }
             }
 
@@ -1270,17 +1197,8 @@ NULL
 
             if (designPlan$.calculateFollowUpTime) {
                 if (designPlan$cumulativeEventsPerStage[kMax, i] > designPlan$maxNumberOfSubjects[i]) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        sprintf(
-                            paste0(
-                                "the number of subjects (%s) is smaller than the number ",
-                                "of events (%s) at stage %s"
-                            ),
-                            designPlan$maxNumberOfSubjects[i],
-                            designPlan$cumulativeEventsPerStage[kMax, i], i
-                        )
-                    )
+                    stopIllegalArgument(sprintf(paste0("the number of subjects (%s) is smaller than the number ", "of events (%s) at stage %s"),
+                        designPlan$maxNumberOfSubjects[i], designPlan$cumulativeEventsPerStage[kMax, i], i), functionName = ".getSampleSizeSequentialSurvival")
                 }
 
                 up <- 2
@@ -1299,12 +1217,8 @@ NULL
                     up <- 2 * up
                     iterate <- iterate + 1
                     if (iterate > 50) {
-                        stop(
-                            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                            "the number of subjects is too small to reach maximum number of events ",
-                            "(presumably due to drop-out rates)",
-                            call. = FALSE
-                        )
+                        stopIllegalArgument("the number of subjects is too small to reach maximum number of events ", "(presumably due to drop-out rates)",
+                            functionName = ".getSampleSizeSequentialSurvival")
                     }
                 }
 
@@ -1365,11 +1279,9 @@ NULL
                 }
 
                 if (is.na(designPlan$followUpTime)) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'followUpTime' must be defined because 'designPlan$.calculateFollowUpTime' = FALSE",
-                        call. = FALSE
-                    )
+                    stopIllegalArgument("'followUpTime' must be defined because 'designPlan$.calculateFollowUpTime' = FALSE",
+                        functionName = ".getSampleSizeSequentialSurvival", parameter = "followUpTime", relatedParameter = "designPlan$.calculateFollowUpTime",
+                        relatedValue = designPlan$.calculateFollowUpTime)
                 }
 
                 designPlan$chi[i] <- .getEventProbabilities(
@@ -1461,7 +1373,7 @@ NULL
         designPlan$earlyStop <- sum(designPlan$rejectPerStage[1:(designPlan$.design$kMax - 1), ])
         designPlan$.setParameterType("earlyStop", C_PARAM_GENERATED)
     }
-    
+
     if (!is.null(designCharacteristics$futilityProbabilities) &&
             any(.getFutilityBounds(designPlan$.design) != C_FUTILITY_BOUNDS_DEFAULT, na.rm = TRUE)) {
         designPlan$futilityPerStage <- matrix(designCharacteristics$futilityProbabilities,
@@ -1620,23 +1532,18 @@ getEventProbabilities <- function(time,
     .assertIsSingleNumber(hazardRatio, "hazardRatio", naAllowed = TRUE)
 
     if (!is.na(dropoutTime) && dropoutTime <= 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0", call. = FALSE)
+        stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0", functionName = "getEventProbabilities",
+            parameter = "dropoutTime", value = dropoutTime)
     }
 
     if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
-            call. = FALSE
-        )
+        stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)", functionName = "getEventProbabilities",
+            parameter = "dropoutRate1", value = dropoutRate1)
     }
 
     if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
-            call. = FALSE
-        )
+        stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)", functionName = "getEventProbabilities",
+            parameter = "dropoutRate2", value = dropoutRate2)
     }
 
     accrualSetup <- getAccrualTime(
@@ -1684,36 +1591,33 @@ getEventProbabilities <- function(time,
     phi <- -log(1 - c(dropoutRate1, dropoutRate2)) / dropoutTime
 
     if (length(accrualTime) != length(accrualIntensity)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'accrualTime' (", (length(accrualTime) + 1),
-            ") must be equal to length of 'accrualIntensity' (", length(accrualIntensity), ")"
-        )
+        stopIllegalArgument("length of 'accrualTime' (", (length(accrualTime) + 1), ") must be equal to length of 'accrualIntensity' (",
+            length(accrualIntensity), ")", functionName = "getEventProbabilities", parameter = "accrualTime",
+            relatedParameter = "accrualIntensity", relatedValue = length(accrualIntensity), value = length(accrualTime))
     }
 
     if (any(accrualIntensity <= 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualIntensity' must be > 0", call. = FALSE)
+        stopIllegalArgument("all values of 'accrualIntensity' must be > 0", functionName = "getEventProbabilities", parameter = "accrualIntensity",
+    value = accrualIntensity)
     }
 
     if (any(accrualTime <= 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualTime' must be > 0", call. = FALSE)
+        stopIllegalArgument("all values of 'accrualTime' must be > 0", functionName = "getEventProbabilities", parameter = "accrualTime",
+    value = accrualTime)
     }
 
     if (kappa != 1 && any(phi > 0)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "for Weibull distribution (kappa != 1) drop-out rates (phi) cannot be specified",
-            call. = FALSE
-        )
+        stopIllegalArgument("for Weibull distribution (kappa != 1) drop-out rates (phi) cannot be specified",
+            functionName = "getEventProbabilities")
     }
 
     if (any(phi < 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all drop-out rates (phi) must be >= 0", call. = FALSE)
+        stopIllegalArgument("all drop-out rates (phi) must be >= 0", functionName = "getEventProbabilities")
     }
 
     lambda2 <- .assertIsNumericVector(lambda2, "lambda2")
     if (any(lambda2 <= 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all rates (lambda2) must be > 0", call. = FALSE)
+        stopIllegalArgument("all rates (lambda2) must be > 0", functionName = "getEventProbabilities")
     }
 
     eventProbabilities <- EventProbabilities$new(
@@ -1857,24 +1761,24 @@ getNumberOfSubjects <- function(time, ...,
     maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
 
     if (length(accrualTime) != length(accrualIntensity)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'accrualTime' (", length(accrualTime),
-            ") must be equal to length of 'accrualIntensity' (", length(accrualIntensity), ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("length of 'accrualTime' (", length(accrualTime), ") must be equal to length of 'accrualIntensity' (",
+            length(accrualIntensity), ")", functionName = "getNumberOfSubjects", parameter = "accrualTime", value = length(accrualTime),
+            relatedParameter = "accrualIntensity", relatedValue = length(accrualIntensity))
     }
 
     if (any(accrualIntensity < 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualIntensity' must be >= 0", call. = FALSE)
+        stopIllegalArgument("all values of 'accrualIntensity' must be >= 0", functionName = "getNumberOfSubjects", parameter = "accrualIntensity",
+    value = accrualIntensity)
     }
 
     if (all(accrualIntensity < 1)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "at least one value of 'accrualIntensity' must be >= 1", call. = FALSE)
+        stopIllegalArgument("at least one value of 'accrualIntensity' must be >= 1", functionName = "getNumberOfSubjects", parameter = "accrualIntensity",
+    value = accrualIntensity)
     }
 
     if (any(accrualTime <= 0)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "all values of 'accrualTime' must be > 0", call. = FALSE)
+        stopIllegalArgument("all values of 'accrualTime' must be > 0", functionName = "getNumberOfSubjects", parameter = "accrualTime",
+    value = accrualTime)
     }
 
     numberOfSubjects <- .getNumberOfSubjects(
@@ -1989,7 +1893,7 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         dropoutTime = 12 # C_DROP_OUT_TIME_DEFAULT
         ) {
     if (is.null(design)) {
-        design <- .getDefaultDesign(..., type = "sampleSize", ignore = c("accountForObservationTimes")) # TODO directionUpper = directionUpper, 
+        design <- .getDefaultDesign(..., type = "sampleSize", ignore = c("accountForObservationTimes")) # TODO directionUpper = directionUpper,
         .warnInCaseOfUnknownArguments(
             functionName = "getSampleSizeSurvival",
             ignore = c(.getDesignArgumentsToIgnoreAtUnknownArgumentCheck(
@@ -2031,25 +1935,22 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         if (is.na(followUpTime)) {
             if (accrualSetup$piecewiseAccrualEnabled && !accrualSetup$endOfAccrualIsUserDefined) {
                 if (length(accrualIntensity) + 1 < length(accrualTime)) {
-                    stop(
-                        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
+                    stopConflictingArguments(
                         "length of 'accrualTime' (", length(accrualTime), ") must be greater ",
                         "than length of 'accrualIntensity' (", length(accrualIntensity), ") + 1",
-                        call. = FALSE
+                        functionName = "getSampleSizeSurvival",
+                        parameter = "accrualTime",
+                        value = accrualTime,
+                        relatedParameter = "accrualIntensity",
+                        relatedValue = accrualIntensity
                     )
                 }
-                stop(
-                    C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                    "'followUpTime', 'maxNumberOfSubjects' or end of accrual must be defined",
-                    call. = FALSE
-                )
+                stopMissingArgument("'followUpTime', 'maxNumberOfSubjects' or end of accrual must be defined", functionName = "getSampleSizeSurvival",
+    parameter = "followUpTime", relatedParameter = "maxNumberOfSubjects", value = followUpTime)
             }
 
-            stop(
-                C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                "'followUpTime' or 'maxNumberOfSubjects' must be defined",
-                call. = FALSE
-            )
+            stopMissingArgument("'followUpTime' or 'maxNumberOfSubjects' must be defined", functionName = "getSampleSizeSurvival", parameter = "followUpTime",
+    relatedParameter = "maxNumberOfSubjects", value = followUpTime)
         }
 
         if (followUpTime == Inf) {
@@ -2094,16 +1995,9 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         if (!is.null(paramName)) {
             paramValue <- pwst[[paramName]]
             if (!is.null(paramValue) && length(paramValue) > 1) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "the calculation of 'maxNumberOfSubjects' for given 'followUpTime' ",
-                    "is only available for a single '", paramName, "'; ",
-                    paramName, " = ", .arrayToString(
-                        paramValue,
-                        vectorLookAndFeelEnabled = TRUE
-                    ),
-                    call. = FALSE
-                )
+                stopIllegalArgument("the calculation of 'maxNumberOfSubjects' for given 'followUpTime' ", "is only available for a single '",
+                    paramName, "'; ", paramName, " = ", .arrayToString(paramValue, vectorLookAndFeelEnabled = TRUE),
+                    functionName = "getSampleSizeSurvival", parameter = paramName, value = paramValue, relatedParameter = "followUpTime")
             }
         }
 
@@ -2180,11 +2074,14 @@ getSampleSizeSurvival <- function(design = NULL, ...,
 
                 if (is.null(sampleSize) || is.na(sampleSize$followUpTime)) {
                     if (!is.na(expectionMessage) && grepl("'allocationRatioPlanned' > 0", expectionMessage)) {
-                        stop(expectionMessage, call. = FALSE)
+                        stopIllegalArgument(expectionMessage, parameter = "allocationRatioPlanned", constraint = "must be > 0", functionName = "getSampleSizeSurvival",
+    value = allocationRatioPlanned)
                     }
-                    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+                    stopRuntimeIssue(
                         "'additionalAccrual' could not be found in ", steps,
-                        " search iterations, change accrual time specification"
+                        " search iterations, change accrual time specification",
+                        functionName = "getSampleSizeSurvival",
+                        parameter = "additionalAccrual"
                     )
                 }
 
@@ -2194,9 +2091,10 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                     as.vector(sampleSize$cumulativeEventsPerStage)
                 ))))
                 if (is.na(maxNumberOfSubjectsLower)) {
-                    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
+                    stopIllegalArgument(
                         "'maxNumberOfSubjectsLower' could not be found",
-                        call. = FALSE
+                        functionName = "getSampleSizeSurvival",
+                        parameter = "maxNumberOfSubjectsLower"
                     )
                 }
 
@@ -2211,8 +2109,9 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                     fut <- 2 * abs(fut)
                     iterations <- iterations + 1
                     if (iterations > 50) {
-                        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                            "search algorithm failed to end"
+                        stopRuntimeIssue(
+                            "search algorithm failed to end",
+                            functionName = "getSampleSizeSurvival"
                         )
                     }
                 }
@@ -2240,9 +2139,13 @@ getSampleSizeSurvival <- function(design = NULL, ...,
                     maxSearchIterations <- maxSearchIterations - 1
                 }
                 if (is.na(maxNumberOfSubjectsUpper)) {
-                    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
+                    stopRuntimeIssue(
                         "'maxNumberOfSubjectsUpper' could not be found ",
-                        "(fut = ", fut, ", followUpTime = ", followUpTime, ")"
+                        "(fut = ", fut, ", followUpTime = ", followUpTime, ")",
+                        functionName = "getSampleSizeSurvival",
+                        parameter = "maxNumberOfSubjectsUpper",
+                        relatedParameter = "followUpTime",
+                        relatedValue = followUpTime
                     )
                 }
 
@@ -2326,11 +2229,9 @@ getSampleSizeSurvival <- function(design = NULL, ...,
         )
 
         if (is.na(maxNumberOfSubjectsTarget)) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "failed to calculate 'maxNumberOfSubjects' by given 'followUpTime' ",
-                "(lower = ", maxNumberOfSubjectsLower, ", upper = ", maxNumberOfSubjectsUpper, ")"
-            )
+            stopRuntimeIssue("failed to calculate 'maxNumberOfSubjects' by given 'followUpTime' ", "(lower = ", maxNumberOfSubjectsLower,
+    ", upper = ", maxNumberOfSubjectsUpper, ")", functionName = "getSampleSizeSurvival", parameter = "maxNumberOfSubjects",
+    relatedParameter = "followUpTime", value = maxNumberOfSubjects)
         }
 
         sampleSizeSurvival <- .getSampleSizeSurvival(
@@ -2593,13 +2494,9 @@ getPowerSurvival <- function(
             up <- 2 * up
             iterate <- iterate + 1
             if (iterate > 50) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ") ",
-                    "is too small to reach maximum number of events ",
-                    "(presumably due to drop-out rates)",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'maxNumberOfSubjects' (", designPlan$maxNumberOfSubjects, ") ", "is too small to reach maximum number of events ",
+                    "(presumably due to drop-out rates)", functionName = "getPowerSurvival", parameter = "maxNumberOfSubjects",
+                    value = designPlan$maxNumberOfSubjects)
             }
         }
         for (j in 1:kMax) {
@@ -2664,7 +2561,7 @@ getPowerSurvival <- function(
 
     designPlan$cumulativeEventsPerStage <- matrix(cumulativeEventsPerStage, ncol = 1)
     designPlan$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(designPlan, "eventsPerStage", 
+    .addDeprecatedFieldValues(designPlan, "eventsPerStage",
         designPlan$cumulativeEventsPerStage, "2024-06-10")
 
     designPlan$expectedNumberOfEvents <- powerAndAverageSampleNumber$averageSampleNumber

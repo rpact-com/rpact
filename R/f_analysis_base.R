@@ -21,7 +21,8 @@ NULL
 
 .getDesignAndDataInput <- function(..., design, dataInput) {
     if (missing(design) && missing(dataInput)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, sQuote("dataInput"), " must be specified", call. = FALSE)
+        stopMissingArgument(sQuote("dataInput"), " must be specified", functionName = ".getDesignAndDataInput", parameter = "dataInput",
+    value = dataInput)
     }
 
     if (missing(dataInput) && !missing(design) && inherits(design, "Dataset")) {
@@ -144,14 +145,14 @@ NULL
 #'
 #' Final stage p-values, median unbiased effect estimates, and final confidence intervals are not calculated
 #' for multi-arm and enrichment designs.
-#' 
+#'
 #' @section Note:
-#' Repeated p-values are calculated by identifying the smallest global 
-#' significance level for which the observed test statistic would lead to 
-#' rejection under the same design rule. Therefore, they require that the 
-#' design can be re-created for arbitrary values of the global significance 
-#' level. For user-defined designs with fixed userAlphaSpending values, 
-#' this alpha-dependent design family is not uniquely defined. 
+#' Repeated p-values are calculated by identifying the smallest global
+#' significance level for which the observed test statistic would lead to
+#' rejection under the same design rule. Therefore, they require that the
+#' design can be re-created for arbitrary values of the global significance
+#' level. For user-defined designs with fixed userAlphaSpending values,
+#' this alpha-dependent design family is not uniquely defined.
 #' Consequently, repeated p-values are not available for such designs.
 #'
 #' @return Returns an \code{\link{AnalysisResults}} object.
@@ -499,7 +500,7 @@ getTestActions <- function(stageResults, ...) {
     design <- stageResults$.design
     criticalValues <- .getCriticalValues(design)
     testActions <- rep(NA_character_, design$kMax)
-    
+
     if (.isTrialDesignInverseNormalOrFixed(design)) {
         for (k in 1:stageResults$stage) {
             if (design$sided == 1) {
@@ -740,7 +741,8 @@ getRepeatedConfidenceIntervals <- function(design,
 
 .getStageResultsObject <- function(stageResults, ..., functionName) {
     if (missing(stageResults)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined", call. = FALSE)
+        stopMissingArgument("'stageResults' must be defined", functionName = ".getStageResultsObject", parameter = "stageResults",
+    value = stageResults)
     }
 
     .stopInCaseOfIllegalStageDefinition(stageResults, ...)
@@ -748,7 +750,8 @@ getRepeatedConfidenceIntervals <- function(design,
     args <- list(...)
     if (.isTrialDesign(stageResults)) {
         if (length(args) == 0) {
-            stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined", call. = FALSE)
+            stopMissingArgument("'stageResults' must be defined", functionName = ".getStageResultsObject", parameter = "stageResults",
+    value = stageResults)
         }
 
         stageResults <- args[[1]]
@@ -768,7 +771,8 @@ getRepeatedConfidenceIntervals <- function(design,
                 return(arg)
             }
         }
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'stageResults' must be defined", call. = FALSE)
+        stopMissingArgument("'stageResults' must be defined", functionName = ".getStageResultsObject", parameter = "stageResults",
+    value = stageResults)
     }
 
     return(stageResults)
@@ -998,14 +1002,14 @@ getConditionalPower <- function(stageResults,
 #'
 #' In multi-arm trials, the repeated p-values are defined separately for each
 #' treatment comparison within the closed testing procedure.
-#' 
+#'
 #' @section Note:
-#' Repeated p-values are calculated by identifying the smallest global 
-#' significance level for which the observed test statistic would lead to 
-#' rejection under the same design rule. Therefore, they require that the 
-#' design can be re-created for arbitrary values of the global significance 
-#' level. For user-defined designs with fixed userAlphaSpending values, 
-#' this alpha-dependent design family is not uniquely defined. 
+#' Repeated p-values are calculated by identifying the smallest global
+#' significance level for which the observed test statistic would lead to
+#' rejection under the same design rule. Therefore, they require that the
+#' design can be re-created for arbitrary values of the global significance
+#' level. For user-defined designs with fixed userAlphaSpending values,
+#' this alpha-dependent design family is not uniquely defined.
 #' Consequently, repeated p-values are not available for such designs.
 #'
 #' @return Returns a \code{\link[base]{numeric}} vector of length \code{kMax} or in case of multi-arm stage results
@@ -1256,7 +1260,7 @@ getRepeatedPValues <- function(stageResults, ...,
             }
         }
 
-        if (design$bindingFutility && k < design$kMax && 
+        if (design$bindingFutility && k < design$kMax &&
                 stageResults$combInverseNormal[k] <= .getFutilityBounds(design, k)) {
             return(k)
         }
@@ -1340,7 +1344,7 @@ getRepeatedPValues <- function(stageResults, ...,
     }
 
     if (is.na(alpha1Adj)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "failed to calculate 'alpha1Adj'")
+        stopRuntimeIssue("failed to calculate 'alpha1Adj'", functionName = ".getQFunctionResult", parameter = "alpha1Adj")
     }
 
     if (theta != 0) {
@@ -1352,7 +1356,7 @@ getRepeatedPValues <- function(stageResults, ...,
     }
 
     if (is.na(alpha0Adj)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "failed to calculate 'alpha0Adj'")
+        stopRuntimeIssue("failed to calculate 'alpha0Adj'", functionName = ".getQFunctionResult", parameter = "alpha0Adj")
     }
 
     if (stageResults$pValues[1] <= alpha1Adj || stageResults$pValues[1] >= alpha0Adj) {
@@ -1928,16 +1932,13 @@ getFinalConfidenceInterval <- function(design,
 
     p <- prod(pValues[1:stage]^weightsFisher[1:stage])
     if (is.na(p)) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE, "calculation of 'p' failed for stage ", stage,
-            " ('pValues' = ", .arrayToString(pValues), ", 'weightsFisher' = ", .arrayToString(weightsFisher), ")"
-        )
+        stopRuntimeIssue("calculation of 'p' failed for stage ", stage, " ('pValues' = ", .arrayToString(pValues),
+            ", 'weightsFisher' = ", .arrayToString(weightsFisher), ")", functionName = ".getRejectValueFisherForOneStage",
+            parameter = "p", relatedParameter = "pValues", relatedValue = pValues)
     }
     if (is.na(criticalValues[stage])) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE, "no critical value available for stage ", stage,
-            " ('criticalValues' = ", .arrayToString(criticalValues), ")"
-        )
+        stopRuntimeIssue("no critical value available for stage ", stage, " ('criticalValues' = ", .arrayToString(criticalValues),
+            ")", functionName = ".getRejectValueFisherForOneStage", parameter = "criticalValues", value = criticalValues)
     }
 
     if (p < criticalValues[stage]) {
@@ -2357,7 +2358,8 @@ getConditionalRejectionProbabilities <- function(stageResults, ...) {
             } else if (case == "medianUnbiasedGeneral") {
                 return(sum(probs[3, ] - probs[2, ]) - 0.50)
             } else {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'case' = '", case, "' is not implemented")
+                stopRuntimeIssue("'case' = '", case, "' is not implemented", functionName = ".getDecisionMatrixRoot",
+                    parameter = "case", value = case)
             }
         },
         lower = -8,

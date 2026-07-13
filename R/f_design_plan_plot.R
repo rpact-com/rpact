@@ -131,29 +131,20 @@
     if (.isTrialDesignPlanMeans(designPlan)) {
         if (is.null(designPlan$alternative) || anyNA(designPlan$alternative) ||
                 length(designPlan$alternative) <= 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'alternative' with length > 1 is defined",
-                call. = FALSE
-            )
+            stopIllegalArgument("plot type ", plotType, " is only available if 'alternative' with length > 1 is defined",
+                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "alternative")
         }
     } else if (.isTrialDesignPlanRates(designPlan)) {
         if (is.null(designPlan$pi1) || anyNA(designPlan$pi1) ||
                 length(designPlan$pi1) <= 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'pi1' with length > 1 is defined",
-                call. = FALSE
-            )
+            stopIllegalArgument("plot type ", plotType, " is only available if 'pi1' with length > 1 is defined",
+                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "pi1")
         }
     } else if (.isTrialDesignPlanSurvival(designPlan)) {
         if (is.null(designPlan$hazardRatio) || anyNA(designPlan$hazardRatio) ||
                 length(designPlan$hazardRatio) <= 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "plot type ", plotType,
-                " is only available if 'hazardRatio' with length > 1 is defined",
-                call. = FALSE
-            )
+            stopIllegalArgument("plot type ", plotType, " is only available if 'hazardRatio' with length > 1 is defined",
+                functionName = ".assertIsValidVariedParameterVectorForPlotting", parameter = "hazardRatio")
         }
     }
 }
@@ -274,11 +265,9 @@
         output = "numeric", numberInCaptionEnabled = FALSE
     )
     if (!(type %in% availablePlotTypes)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-            ") is not available; 'type' can ", ifelse(length(availablePlotTypes) == 1, "only ", ""),
-            "be ", .arrayToString(availablePlotTypes, mode = "or")
-        )
+        stopIllegalArgument("'type' (", type, ") is not available; 'type' can ", ifelse(length(availablePlotTypes) ==
+            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"), functionName = ".plotTrialDesignPlan",
+            parameter = "type", value = type)
     }
 
     survivalDesignPlanEnabled <- .isTrialDesignPlanSurvival(designPlan)
@@ -732,10 +721,8 @@
                 }
                 yParameterNamesSrc <- yParameterNames
             } else {
-                stop(
-                    "Plot type 5 is not implemented for class ",
-                    sQuote(.getClassName(designPlan))
-                )
+                stopRuntimeIssue("Plot type 5 is not implemented for class ", sQuote(.getClassName(designPlan)), parameter = "type",
+                    value = 5L, relatedParameter = "designPlan", relatedValue = .getClassName(designPlan), functionName = ".plotTrialDesignPlan")
             }
 
             srcCmd <- .showPlotSourceInformation(
@@ -954,11 +941,10 @@
             }
         } else if (.isTrialDesignPlanCountData(designPlan)) {
             if (!designPlan$isGeneratedParameter("expectedNumberOfSubjectsH1")) {
-                stop(
-                    "Plot type 9 is only available for count data endpoint ",
-                    "if 'expectedNumberOfSubjectsH1' was not calculated",
-                    call. = FALSE
-                )
+                stopIllegalArgument("Plot type 9 is only available for count data endpoint ", "if 'expectedNumberOfSubjectsH1' was not calculated",
+                    parameter = "type", value = 9L, constraint = "expectedNumberOfSubjectsH1 must be generated for count data endpoint plots",
+                    relatedParameter = "expectedNumberOfSubjectsH1", relatedValue = designPlan$isGeneratedParameter("expectedNumberOfSubjectsH1"),
+                    functionName = ".plotTrialDesignPlan")
             }
 
             xParameterName <- "theta"
@@ -1076,16 +1062,12 @@
                 ...
             ))
         } else {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-                ") is not allowed; must be 1, 2, ..., 14",
-                call. = FALSE
-            )
+            stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 14", functionName = ".plotTrialDesignPlan",
+                parameter = "type", value = type)
         }
     } else {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-            ") is not allowed; must be 1, 2, ..., 9",
-            call. = FALSE
-        )
+        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 9", functionName = ".plotTrialDesignPlan",
+            parameter = "type", value = type)
     }
 
     if (!is.null(srcCmd)) {
@@ -1174,26 +1156,27 @@
     startTime <- Sys.time()
     if (is.null(designPlan$piecewiseSurvivalTime) ||
             length(designPlan$piecewiseSurvivalTime) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'piecewiseSurvivalTime' must be specified", call. = FALSE)
+        stopMissingArgument("'piecewiseSurvivalTime' must be specified", functionName = ".plotSurvivalFunction",
+            parameter = "piecewiseSurvivalTime")
     }
 
     type <- type[1]
     if (!(type %in% c(13, 14))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' must be 13 or 14", call. = FALSE)
+        stopIllegalArgument("'type' must be 13 or 14", functionName = ".plotSurvivalFunction", parameter = "type", value = type)
     }
 
     lambda1 <- designPlan[["lambda1"]]
     lambda2 <- designPlan[["lambda2"]]
     if (is.null(lambda2) || length(lambda2) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'lambda2' must be specified", call. = FALSE)
+        stopMissingArgument("'lambda2' must be specified", functionName = ".plotSurvivalFunction", parameter = "lambda2")
     }
 
     if (is.null(designPlan$kappa) || length(designPlan$kappa) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'kappa' must be specified", call. = FALSE)
+        stopMissingArgument("'kappa' must be specified", functionName = ".plotSurvivalFunction", parameter = "kappa")
     }
 
     if (is.null(designPlan$hazardRatio) || length(designPlan$hazardRatio) == 0) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'hazardRatio' must be specified", call. = FALSE)
+        stopMissingArgument("'hazardRatio' must be specified", functionName = ".plotSurvivalFunction", parameter = "hazardRatio")
     }
 
     piecewiseSurvivalEnabled <- designPlan$.piecewiseSurvivalTime$piecewiseSurvivalEnabled
@@ -1682,22 +1665,16 @@ plot.TrialDesignPlan <- function(
 
     nMax <- list(...)[["nMax"]]
     if (!is.null(nMax)) {
-        warning(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'nMax' (", nMax,
-            ") will be ignored because it will be taken from design plan",
-            call. = FALSE
-        )
+        warning("'nMax' (", nMax, ") will be ignored because it will be taken from design plan",
+            call. = FALSE)
     }
 
     if (all(is.na(type))) {
         availablePlotTypes <- getAvailablePlotTypes(x)
         if (length(availablePlotTypes) == 0) {
-            stop(
-                "No plot available for this ",
-                .formatCamelCaseSingleWord(x$.objectType), " ", x$.toString(),
-                " result object",
-                call. = FALSE
-            )
+            stopRuntimeIssue("No plot available for this ", .formatCamelCaseSingleWord(x$.objectType), " ", x$.toString(),
+                " result object", parameter = "x", value = .getClassName(x), context = list(objectType = x$.objectType),
+                functionName = ".plot.TrialDesignPlan")
         }
 
         type <- 1L

@@ -1407,9 +1407,8 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         dataInput <- x[[".dataInput"]]
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "failed to get 'dataInput' from ", .getClassName(x)
-        )
+        stopRuntimeIssue("failed to get 'dataInput' from ", .getClassName(x), functionName = ".getTreatmentArmsToShow",
+            parameter = "dataInput")
     }
 
     numberOfTreatments <- dataInput$getNumberOfGroups()
@@ -1427,12 +1426,9 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
             all(is.na(treatmentArmsToShow)) || !is.numeric(treatmentArmsToShow)) {
         treatmentArmsToShow <- validComparisons
     } else if (!all(treatmentArmsToShow %in% validComparisons)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'treatmentArms' (",
-            .arrayToString(treatmentArmsToShow), ") must be a vector ",
-            "containing one or more values of ", .arrayToString(validComparisons),
-            call. = FALSE
-        )
+        stopIllegalArgument("'treatmentArms' (", .arrayToString(treatmentArmsToShow), ") must be a vector ",
+            "containing one or more values of ", .arrayToString(validComparisons), functionName = ".getTreatmentArmsToShow",
+            parameter = "treatmentArms")
     }
     treatmentArmsToShow <- sort(unique(treatmentArmsToShow))
     return(treatmentArmsToShow)
@@ -1444,9 +1440,8 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
         dataInput <- x[[".dataInput"]]
     }
     if (is.null(dataInput) || !inherits(dataInput, "Dataset")) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "failed to get 'dataInput' from ", .getClassName(x)
-        )
+        stopRuntimeIssue("failed to get 'dataInput' from ", .getClassName(x), functionName = ".getPopulationsToShow",
+            parameter = "dataInput")
     }
 
     numberOfPopulations <- gMax
@@ -1465,12 +1460,8 @@ as.data.frame.StageResults <- function(x, row.names = NULL,
             all(is.na(populationsToShow)) || !is.numeric(populationsToShow)) {
         populationsToShow <- validComparisons
     } else if (!all(populationsToShow %in% validComparisons)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (",
-            .arrayToString(populationsToShow), ") must be a vector ",
-            "containing one or more values of ", .arrayToString(validComparisons),
-            call. = FALSE
-        )
+        stopIllegalArgument("'populations' (", .arrayToString(populationsToShow), ") must be a vector ", "containing one or more values of ",
+            .arrayToString(validComparisons), functionName = ".getPopulationsToShow", parameter = "populations")
     }
     populationsToShow <- sort(unique(populationsToShow))
     return(populationsToShow)
@@ -1609,10 +1600,7 @@ plot.StageResults <- function(x,
     .stopInCaseOfIllegalStageDefinition2(...)
 
     if (x$.design$kMax == 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "cannot plot stage results of a fixed design",
-            call. = FALSE
-        )
+        stopIllegalArgument("cannot plot stage results of a fixed design", functionName = ".plot.StageResults")
     }
 
     if (!is.logical(showSource) || isTRUE(showSource)) {

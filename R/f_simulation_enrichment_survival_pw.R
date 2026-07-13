@@ -178,13 +178,9 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     )
 
     if (length(allocationRatioPlanned) != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'allocationRatioPlanned' (",
-            .arrayToString(allocationRatioPlanned),
-            ") ",
-            "must have length 1"
-        )
+        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1",
+            functionName = "getSimulationEnrichmentSurvivalPatientWise", parameter = "allocationRatioPlanned",
+            value = allocationRatioPlanned)
     }
 
     simulationResults <- .createSimulationResultsEnrichmentObject(
@@ -252,15 +248,11 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     )
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (identical(accrualIntensity, 1L)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'"
-            )
+            stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'", functionName = "getSimulationEnrichmentSurvivalPatientWise",
+    parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity)
         }
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'maxNumberOfSubjects' must be defined"
-        )
+        stopIllegalArgument("'maxNumberOfSubjects' must be defined", functionName = "getSimulationEnrichmentSurvivalPatientWise",
+    parameter = "maxNumberOfSubjects", value = maxNumberOfSubjects)
     }
     simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
     simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
@@ -404,7 +396,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationEnrichmentSurvivalPatientWise")
     }
 
     simulationResults$.data <- loopResult$data
@@ -500,7 +492,7 @@ getSimulationEnrichmentSurvivalPatientWise <- function(
 #' @template examples_get_simulation_enrichment_survival
 #'
 #' @export
-#' 
+#'
 getSimulationEnrichmentSurvival <- function(
         design = NULL,
         ...,
@@ -572,16 +564,14 @@ getSimulationEnrichmentSurvival <- function(
 
     if (identical(simulationType, "testStatisticBased")) {
         if (usesPatientWiseOnlyArgs) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"",
-                call. = FALSE
-            )
+            stopIllegalArgument("patient-wise simulation arguments cannot be specified if 'simulationType' = \"testStatisticBased\"",
+    functionName = "getSimulationEnrichmentSurvival", parameter = "simulationType", value = simulationType)
         }
 
         message("Note: 'simulationType' = \"testStatisticBased\" simulates normally distributed log-rank test statistics instead of patient-wise survival data. ",
             "To simulate patient-wise survival data, specify 'simulationType' = \"patientWise\" and the corresponding arguments."
         )
-        
+
         return(getSimulationEnrichmentSurvivalBasic(
             design = design,
             effectList = effectList,
@@ -649,11 +639,11 @@ getSimulationEnrichmentSurvival <- function(
     }
 
     if (identical(simulationType, "patientWiseBasic")) {
-        
+
         message("Note: 'simulationType' = \"patientWiseBasic\" simulates patient-wise survival data using R code instead of C++ code. ",
             "This approach is less efficient and should only be used for testing purposes. ",
             "To perform a more efficient patient-wise simulation, specify 'simulationType' = \"patientWise\".")
-        
+
         return(.getSimulationEnrichmentSurvivalPatientWiseBasic(
             design = design,
             effectList = effectList,
@@ -691,5 +681,6 @@ getSimulationEnrichmentSurvival <- function(
         ))
     }
 
-    stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "unknown simulation type: ", dQuote(simulationType), call. = FALSE)
+    stopRuntimeIssue("unknown simulation type: ", dQuote(simulationType), functionName = "getSimulationEnrichmentSurvival",
+        parameter = simulationType)
 }

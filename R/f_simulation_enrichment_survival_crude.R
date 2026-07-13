@@ -40,7 +40,7 @@ NULL
         calcEventsFunction,
         calcEventsFunctionIsUserDefined,
         selectPopulationsFunction) {
-        
+
     kMax <- length(plannedEvents)
     pMax <- length(hazardRatios)
     gMax <- log(length(hazardRatios), 2) + 1
@@ -382,14 +382,8 @@ NULL
                 )
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcEventsFunction' returned an illegal or undefined result (",
-                        newEvents,
-                        "); ",
-                        "the output must be a single numeric value",
-                        call. = FALSE
-                    )
+                    stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
+    functionName = ".getSimulatedStageSurvivalEnrichment", parameter = "calcEventsFunction", value = calcEventsFunction)
                 }
 
                 if (!is.na(conditionalPower) || calcEventsFunctionIsUserDefined) {
@@ -818,7 +812,7 @@ getSimulationEnrichmentSurvivalBasic <- function(
 
     simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
     simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", 
+    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage",
         simulatedSingleEventsPerStage, "2024-06-10")
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
@@ -830,7 +824,7 @@ getSimulationEnrichmentSurvivalBasic <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationEnrichmentSurvivalBasic")
     }
 
     data <- data.frame(

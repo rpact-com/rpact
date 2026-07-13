@@ -139,28 +139,22 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
         },
         .setObjectType = function(objectType) {
             if (length(objectType) == 0 || !(objectType %in% c("sampleSize", "power"))) {
-                stop(
-                    C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'.objectType' (", objectType,
-                    ") must be specified as 'sampleSize' or 'power'"
-                )
+                stopRuntimeIssue("'.objectType' (", objectType, ") must be specified as 'sampleSize' or 'power'", functionName = ".setObjectType",
+                    parameter = ".objectType", relatedParameter = "sampleSize")
             }
             self$.objectType <- objectType
         },
         .isSampleSizeObject = function() {
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
-                stop(
-                    C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "'.objectType' must be specified as 'sampleSize' or 'power'"
-                )
+                stopRuntimeIssue("'.objectType' must be specified as 'sampleSize' or 'power'", functionName = ".isSampleSizeObject",
+                    parameter = ".objectType", relatedParameter = "sampleSize")
             }
             return(self$.objectType == "sampleSize")
         },
         .isPowerObject = function() {
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
-                stop(
-                    C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "'.objectType' must be specified as 'sampleSize' or 'power'"
-                )
+                stopRuntimeIssue("'.objectType' must be specified as 'sampleSize' or 'power'", functionName = ".isPowerObject",
+                    parameter = ".objectType", relatedParameter = "sampleSize")
             }
             return(self$.objectType == "power")
         },

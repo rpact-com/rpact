@@ -167,11 +167,9 @@ NULL
     connectionType <- match.arg(connectionType)
 
     if (grepl("testthat(/|\\\\)?$", testFileTargetDirectory)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'testFileTargetDirectory' (", testFileTargetDirectory, ") must not end with 'testthat'",
-            call. = FALSE
-        )
+        stopIllegalArgument("'testFileTargetDirectory' (", testFileTargetDirectory, ") must not end with 'testthat'",
+            functionName = ".downloadUnitTests", parameter = "testFileTargetDirectory", value = testFileTargetDirectory,
+            relatedParameter = "testthat")
     }
 
     if (cleanOldFiles) {
@@ -219,14 +217,16 @@ NULL
     }
 
     if (!grepl("\\.tar\\.gz$", packageSource)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " must have a .tar.gz extension", call. = FALSE)
+        stopIllegalArgument("file ", sQuote(packageSource), " must have a .tar.gz extension", functionName = ".prepareUnitTestFiles",
+            parameter = packageSource)
     }
 
     unlinkFile <- FALSE
     if (grepl("^http", packageSource)) {
         tempFile <- tempfile(fileext = ".tar.gz")
         if (utils::download.file(packageSource, tempFile) != 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, sQuote(packageSource), " seems to be an invalid URL", call. = FALSE)
+            stopIllegalArgument(sQuote(packageSource), " seems to be an invalid URL", functionName = ".prepareUnitTestFiles",
+                parameter = packageSource)
         }
         packageSource <- tempFile
         unlinkFile <- TRUE
@@ -237,7 +237,8 @@ NULL
         {
             contentLines <- utils::untar(packageSource, list = TRUE)
             if (!("rpact/DESCRIPTION" %in% contentLines) || !("rpact/tests/testthat/" %in% contentLines)) {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "file ", sQuote(packageSource), " is not an rpact package source file", call. = FALSE)
+                stopIllegalArgument("file ", sQuote(packageSource), " is not an rpact package source file", functionName = ".prepareUnitTestFiles",
+                    parameter = packageSource)
             }
 
             testthatTempDirectory <- file.path(testFileTargetDirectory, "temp")
@@ -312,11 +313,7 @@ NULL
             testFiles <- gsub(".*>", "", testFiles)
             testFiles <- gsub(" *$", "", testFiles)
             if (length(testFiles) == 0) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "online source does not contain any unit test files",
-                    call. = FALSE
-                )
+                stopIllegalArgument("online source does not contain any unit test files", functionName = ".downloadUnitTestsViaHttp")
             }
 
             startTime <- Sys.time()
@@ -349,22 +346,17 @@ NULL
         },
         warning = function(w) {
             if (grepl("404 Not Found", w$message)) {
-                stop(
-                    C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "failed to download unit test files (http): file ", sQuote(currentFile), " not found"
-                )
+                stopRuntimeIssue("failed to download unit test files (http): file ", sQuote(currentFile), " not found",
+                    functionName = ".downloadUnitTestsViaHttp", parameter = currentFile)
             }
         },
         error = function(e) {
             if (grepl(C_EXCEPTION_TYPE_RUNTIME_ISSUE, e$message)) {
-                stop(e$message, call. = FALSE)
+                stopRuntimeIssue(e$message, functionName = ".downloadUnitTestsViaHttp")
             }
             .logDebug(e$message)
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "failed to download unit test files (http): ",
-                "illegal 'token' / 'secret' or rpact version ", version, " unknown"
-            )
+            stopRuntimeIssue("failed to download unit test files (http): ", "illegal 'token' / 'secret' or rpact version ",
+                version, " unknown", functionName = ".downloadUnitTestsViaHttp", parameter = "token", relatedParameter = "secret")
         },
         finally = {
             if (file.exists(indexFile)) {
@@ -419,11 +411,7 @@ NULL
             testFiles <- gsub("\\.R<.*", ".R", lines)
             testFiles <- gsub(".*>", "", testFiles)
             if (length(testFiles) == 0) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "online source does not contain any unit test files",
-                    call. = FALSE
-                )
+                stopIllegalArgument("online source does not contain any unit test files", functionName = ".downloadUnitTestsViaFtp")
             }
 
             startTime <- Sys.time()
@@ -458,11 +446,8 @@ NULL
         },
         error = function(e) {
             .logDebug(e$message)
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                "failed to download unit test files (ftp): ",
-                "illegal 'token' / 'secret' or rpact version ", version, " unknown"
-            )
+            stopRuntimeIssue("failed to download unit test files (ftp): ", "illegal 'token' / 'secret' or rpact version ",
+                version, " unknown", functionName = ".downloadUnitTestsViaFtp", parameter = "token", relatedParameter = "secret")
         },
         finally = {
             if (file.exists(indexFile)) {
@@ -484,11 +469,8 @@ NULL
             "mode", "cacheEnabled", "extra", "cleanOldFiles", "connectionType"
         )) {
     if (is.null(connection) || !is.list(connection)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'connection' must be a list (is ", .getClassName(connection), ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("'connection' must be a list (is ", .getClassName(connection), ")", functionName = ".getConnectionArgument",
+            parameter = "connection", value = connection)
     }
 
     name <- match.arg(name)
@@ -613,9 +595,9 @@ NULL
 
 .installationQualificationDone <- function() {
     return(identical(
-        .getEnvironmentVariable("RPACT_SYSTEM_IDENTIFIER", 
+        .getEnvironmentVariable("RPACT_SYSTEM_IDENTIFIER",
             "rpact.system.identifier", type = "character"),
-        getSystemIdentifier(.getEnvironmentVariable("RPACT_SYSTEM_TEST_DATE", 
+        getSystemIdentifier(.getEnvironmentVariable("RPACT_SYSTEM_TEST_DATE",
             "rpact.system.test.date", type = "character"))
     ))
 }
@@ -878,21 +860,15 @@ setupPackageTests <- function(token, secret) {
     .assertIsSingleCharacter(secret, "secret")
     installPath <- find.package("rpact")
     if (!dir.exists(installPath)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "the rpact package directory was not found"
-        )
+        stopRuntimeIssue("the rpact package directory was not found", functionName = "setupPackageTests")
     }
 
     if (!dir.exists(file.path(installPath, "tests"))) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "the rpact package directory does not contain a test directory"
-        )
+        stopRuntimeIssue("the rpact package directory does not contain a test directory", functionName = "setupPackageTests")
     }
 
     if (!dir.exists(file.path(installPath, "tests", "testthat"))) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "the rpact package directory does not contain a testthat directory"
-        )
+        stopRuntimeIssue("the rpact package directory does not contain a testthat directory", functionName = "setupPackageTests")
     }
 
     tmpDir <- tempdir()
@@ -903,7 +879,8 @@ setupPackageTests <- function(token, secret) {
     )
     tmpTestsDir <- file.path(tmpDir, "rpact-tests")
     if (!dir.exists(tmpTestsDir)) {
-        stop("The test package directory was not created", call. = FALSE)
+        stopRuntimeIssue("The test package directory was not created", parameter = "tmpTestsDir", value = tmpTestsDir,
+            constraint = "existing test package directory", functionName = "setupPackageTests")
     }
 
     testFiles <- list.files(tmpTestsDir, full.names = FALSE, recursive = TRUE)
@@ -1164,28 +1141,18 @@ testPackage <- function(outDir = ".",
     scope <- match.arg(scope)
 
     if (grepl("/|:|\\\\", reportFileBaseName)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'reportFileBaseName' (", dQuote(reportFileBaseName), ") ",
-            "must not contain path separators or drive specifiers",
-            call. = FALSE
-        )
+        stopIllegalArgument("'reportFileBaseName' (", dQuote(reportFileBaseName), ") ", "must not contain path separators or drive specifiers",
+            functionName = "testPackage", parameter = "reportFileBaseName", value = reportFileBaseName)
     }
 
     if (!dir.exists(outDir)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test output directory '", outDir, "' does not exist",
-            call. = FALSE
-        )
+        stopIllegalArgument("test output directory '", outDir, "' does not exist", functionName = "testPackage",
+            parameter = "outDir", value = outDir)
     }
 
     if (outDir != "." && !grepl("^([a-zA-Z]{1,1}:)?(/|\\\\)", outDir, ignore.case = TRUE)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test output directory '", outDir, "' must be an absolute path",
-            call. = FALSE
-        )
+        stopIllegalArgument("test output directory '", outDir, "' must be an absolute path", functionName = "testPackage",
+            parameter = "outDir", value = outDir)
     }
 
     if (outDir == ".") {
@@ -1193,11 +1160,8 @@ testPackage <- function(outDir = ".",
     }
 
     if (!is.na(testFileDirectory) && !dir.exists(testFileDirectory)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "test file directory '", testFileDirectory, "' does not exist",
-            call. = FALSE
-        )
+        stopIllegalArgument("test file directory '", testFileDirectory, "' does not exist", functionName = "testPackage",
+            parameter = "testFileDirectory", value = testFileDirectory)
     }
 
     if (isTRUE(addWarningDetailsToReport)) {
@@ -1611,7 +1575,8 @@ print.InstallationQualificationResult <- function(x, ...) {
 .testInstalledPackage <- function(testFileDirectory, ..., pkgName = "rpact", Ropts = character()) {
     .assertIsSingleCharacter(testFileDirectory, "testFileDirectory", naAllowed = FALSE)
     if (!dir.exists(testFileDirectory)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'testFileDirectory' (", testFileDirectory, ") does not exist", call. = FALSE)
+        stopIllegalArgument("'testFileDirectory' (", testFileDirectory, ") does not exist", functionName = ".testInstalledPackage",
+            parameter = "testFileDirectory", value = testFileDirectory)
     }
 
     workingDirectoryBefore <- getwd()

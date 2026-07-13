@@ -384,14 +384,8 @@ NULL
                         is.na(newSubjects) ||
                         newSubjects < 0
                     ) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcSubjectsFunction' returned an illegal or undefined result (",
-                        newSubjects,
-                        "); ",
-                        "the output must be a single numeric value >= 0",
-                        call. = FALSE
-                    )
+                    stopIllegalArgument("'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ", "the output must be a single numeric value >= 0",
+    functionName = ".getSimulatedStageMeansEnrichment", parameter = "calcSubjectsFunction", value = calcSubjectsFunction)
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
                     plannedSubjects[(k + 1):kMax] <- plannedSubjects[k] + cumsum(rep(newSubjects, kMax - k))
@@ -805,7 +799,7 @@ getSimulationEnrichmentMeans <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationEnrichmentMeans")
     }
 
     data <- data.frame(

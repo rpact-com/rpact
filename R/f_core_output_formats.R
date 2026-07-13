@@ -56,7 +56,7 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
     }
 
     if (!is.numeric(value)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'value' must be a numeric vector")
+        stopRuntimeIssue("'value' must be a numeric vector", functionName = ".getFormattedValue", parameter = "value", value = value)
     }
 
     if (futilityProbabilityEnabled) {
@@ -75,21 +75,15 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
         } else if (roundFunction == "signif") {
             value <- signif(value, digits = digits)
         } else {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "invalid 'roundFunction' specified: ", dQuote(roundFunction),
-                call. = FALSE
-            )
+            stopIllegalArgument("invalid 'roundFunction' specified: ", dQuote(roundFunction), functionName = ".getFormattedValue",
+                parameter = "roundFunction", value = roundFunction)
         }
         if (digits <= 0) {
             return(value)
         }
     } else if (digits <= 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'digits' must be greater than 0 if no 'roundFunction' is specified",
-            call. = FALSE
-        )
+        stopIllegalArgument("'digits' must be greater than 0 if no 'roundFunction' is specified", functionName = ".getFormattedValue",
+    parameter = "digits", relatedParameter = "roundFunction", value = digits)
     }
 
     if (is.na(nsmall)) {
@@ -159,69 +153,56 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 
     parts <- base::strsplit(optionValue, " *, *", fixed = FALSE)[[1]]
     if (length(parts) == 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "the value (", optionValue, ") of output format option '", optionKey, "' is invalid",
-            call. = FALSE
-        )
+        stopIllegalArgument("the value (", optionValue, ") of output format option '", optionKey, "' is invalid",
+            functionName = ".assertIsValitOutputFormatOptionValue", parameter = "optionValue", value = optionValue,
+            relatedParameter = "optionKey", relatedValue = optionKey)
     }
 
     for (part in parts) {
         if (!grepl(" *= *", part)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", optionKey, "' (", part,
-                ") must contain a valid argument-value-pair: \"argument = value\"",
-                call. = FALSE
-            )
+            stopIllegalArgument("'", optionKey, "' (", part, ") must contain a valid argument-value-pair: \"argument = value\"",
+                functionName = ".assertIsValitOutputFormatOptionValue", parameter = "optionKey", value = optionKey,
+                relatedParameter = "part", relatedValue = part)
         }
 
         keyValuePair <- base::strsplit(part, " *= *", fixed = FALSE)[[1]]
         if (length(keyValuePair) != 2) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", optionKey,
-                "' contains an invalid argument-value-pair: ", part,
-                call. = FALSE
-            )
+            stopIllegalArgument("'", optionKey, "' contains an invalid argument-value-pair: ", part, functionName = ".assertIsValitOutputFormatOptionValue",
+                parameter = "optionKey", value = optionKey, relatedParameter = "part", relatedValue = part)
         }
 
         key <- trimws(keyValuePair[1])
         if (nchar(key) == 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", optionKey, "' contains an invalid argument", call. = FALSE)
+            stopIllegalArgument("'", optionKey, "' contains an invalid argument", functionName = ".assertIsValitOutputFormatOptionValue",
+                parameter = "optionKey", value = optionKey)
         }
 
         if (!(key %in% C_OUTPUT_FORMAT_ARGUMENTS)) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", optionKey, "' contains an invalid argument: ", key, call. = FALSE)
+            stopIllegalArgument("'", optionKey, "' contains an invalid argument: ", key, functionName = ".assertIsValitOutputFormatOptionValue",
+                parameter = "optionKey", value = optionKey, relatedParameter = "key", relatedValue = key)
         }
 
         value <- trimws(keyValuePair[2])
         if (nchar(value) == 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", optionKey, "' contains an invalid value", call. = FALSE)
+            stopIllegalArgument("'", optionKey, "' contains an invalid value", functionName = ".assertIsValitOutputFormatOptionValue",
+                parameter = "optionKey", value = optionKey)
         }
 
         if (key %in% c("digits", "nsmall")) {
             if (grepl("\\D", value)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "the value (", value, ") of '", optionKey, "' must be an integer value",
-                    call. = FALSE
-                )
+                stopIllegalArgument("the value (", value, ") of '", optionKey, "' must be an integer value", functionName = ".assertIsValitOutputFormatOptionValue",
+                    parameter = "value", value = value, relatedParameter = "optionKey", relatedValue = optionKey)
             }
         } else if (key %in% c("roundFunction")) {
             if (!(value %in% C_ROUND_FUNCTIONS)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "the value (", value, ") of '", optionKey, "' must be one of these character values: ",
-                    .arrayToString(C_ROUND_FUNCTIONS, encapsulate = TRUE),
-                    call. = FALSE
-                )
+                stopIllegalArgument("the value (", value, ") of '", optionKey, "' must be one of these character values: ",
+                    .arrayToString(C_ROUND_FUNCTIONS, encapsulate = TRUE), functionName = ".assertIsValitOutputFormatOptionValue",
+                    parameter = "value", value = value, relatedParameter = "optionKey", relatedValue = optionKey)
             }
         } else if (key %in% c("trimSingleZeros", "futilityProbabilityEnabled")) {
             if (!grepl("TRUE|FALSE", toupper(value))) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "the value (", value, ") of '", optionKey, "' must be a logical value",
-                    call. = FALSE
-                )
+                stopIllegalArgument("the value (", value, ") of '", optionKey, "' must be a logical value", functionName = ".assertIsValitOutputFormatOptionValue",
+                    parameter = "value", value = value, relatedParameter = "optionKey", relatedValue = optionKey)
             }
         }
     }
@@ -230,7 +211,7 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 .assertIsValitOutputFormatOptionValue("rpact.output.format.sample.size", "roundFunction = ceiling")
 
 .getOutputFormatOptions <- function(optionKey) {
-    str <- .getEnvironmentVariable(.getEnvironmentVariableKey(optionKey), 
+    str <- .getEnvironmentVariable(.getEnvironmentVariableKey(optionKey),
         optionKey, type = "character")
     if (is.null(str) || length(str) == 0 || nchar(trimws(str)) == 0) {
         return(NULL)
@@ -774,19 +755,18 @@ C_OUTPUT_FORMAT_DEFAULT_VALUES <- pairlist(
 
 .getFormattedVariableName <- function(name, n, prefix = "", postfix = "") {
     if (!is.character(name)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'name' must be of type 'character' (is '", .getClassName(name), "')",
-            call. = FALSE
-        )
+        stopIllegalArgument("'name' must be of type 'character' (is '", .getClassName(name), "')", functionName = ".getFormattedVariableName",
+            parameter = "name", value = name, relatedParameter = "character")
     }
 
     if (!is.numeric(n)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'n' must be of type 'numeric' (is '", .getClassName(n), "')", call. = FALSE)
+        stopIllegalArgument("'n' must be of type 'numeric' (is '", .getClassName(n), "')", functionName = ".getFormattedVariableName",
+            parameter = "n", value = n, relatedParameter = "numeric")
     }
 
     if (n < 1 || n > 300) {
-        stop(C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, "'n' (", n, ") is out of bounds [1; 300]", call. = FALSE)
+        stopArgumentOutOfBounds("'n' (", n, ") is out of bounds [1; 300]", functionName = ".getFormattedVariableName",
+            parameter = "n", value = n)
     }
 
     if (nchar(prefix) > 0) {
@@ -890,7 +870,8 @@ setOutputFormat <- function(parameterName = NA_character_, ...,
 
     if (!is.na(file)) {
         if (!file.exists(file)) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'file' (", file, ") does not exist", call. = FALSE)
+            stopIllegalArgument("'file' (", file, ") does not exist", functionName = "setOutputFormat", parameter = "file",
+                value = file)
         }
 
         args <- list()
@@ -994,7 +975,8 @@ setOutputFormat <- function(parameterName = NA_character_, ...,
                 return(NULL)
             }
 
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterName' (", parameterName, ") does not exist", call. = FALSE)
+            stopIllegalArgument("'parameterName' (", parameterName, ") does not exist", functionName = ".getOutputFormatKey",
+                parameter = parameterName)
         }
 
         return(parameterName)
@@ -1024,7 +1006,8 @@ setOutputFormat <- function(parameterName = NA_character_, ...,
         return(NULL)
     }
 
-    stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "output format key for 'parameterName' (", parameterName, ") could not be found", call. = FALSE)
+    stopIllegalArgument("output format key for 'parameterName' (", parameterName, ") could not be found",
+        functionName = ".getOutputFormatKey", parameter = parameterName)
 }
 
 .writeOutputFormatsToFile <- function(outputFormatList, file) {
@@ -1182,7 +1165,8 @@ getOutputFormat <- function(parameterName = NA_character_, ...,
 .getOutputFormatParameterNames <- function(key) {
     functionName <- .getOutputFormatFunctionName(key)
     if (is.null(functionName)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'key' (", key, ") does not exist", call. = FALSE)
+        stopIllegalArgument("'key' (", key, ") does not exist", functionName = ".getOutputFormatParameterNames",
+            parameter = "key", value = key)
     }
 
     parameterNames <- c()

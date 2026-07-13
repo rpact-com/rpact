@@ -122,11 +122,8 @@ NULL
                 )
             } else {
                 if (thetaH0 != 0) {
-                    stop(
-                        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
-                        call. = FALSE
-                    )
+                    stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test", functionName = ".calcRatesTestStatistics",
+                        parameter = "thetaH0", value = thetaH0)
                 }
 
                 separatePValues <- stats::phyper(
@@ -211,43 +208,26 @@ NULL
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
 
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
-            call. = FALSE
-        )
+        stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
+            functionName = ".getStageResultsRatesEnrichment", parameter = "gMax", value = gMax)
     }
 
     if (intersectionTest == "SpiessensDebois" && !normalApproximation) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Spiessens & Debois test cannot be used with Fisher's ",
-            "exact test (normalApproximation = FALSE)",
-            call. = FALSE
-        )
+        stopIllegalArgument("Spiessens & Debois test cannot be used with Fisher's ", "exact test (normalApproximation = FALSE)",
+            functionName = ".getStageResultsRatesEnrichment")
     }
 
     if (stratifiedAnalysis && !normalApproximation) {
-        stop(
-            C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "stratified version is not available for Fisher's exact test",
-            call. = FALSE
-        )
+        stopConflictingArguments("stratified version is not available for Fisher's exact test", functionName = ".getStageResultsRatesEnrichment")
     }
 
     if (stratifiedAnalysis && !dataInput$isStratified()) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "stratified analysis is only possible for stratified data input",
-            call. = FALSE
-        )
+        stopIllegalArgument("stratified analysis is only possible for stratified data input", functionName = ".getStageResultsRatesEnrichment")
     }
 
     if (dataInput$isStratified() && (gMax > 4)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 4: stratified analysis not implemented",
-            call. = FALSE
-        )
+        stopIllegalArgument("gMax (", gMax, ") > 4: stratified analysis not implemented", functionName = ".getStageResultsRatesEnrichment",
+            parameter = "gMax", value = gMax)
     }
 
     stageResults <- StageResultsEnrichmentRates$new(
@@ -1018,23 +998,15 @@ NULL
     )
 
     if ((length(piTreatments) != 1) && (length(piTreatments) != gMax)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'piTreatments' (%s) ",
-                "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(piTreatments), gMax)
-        )
+        stopIllegalArgument(sprintf(paste0("length of 'piTreatments' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+            .arrayToString(piTreatments), gMax), functionName = ".getConditionalPowerRatesEnrichment", parameter = "piTreatments",
+            value = piTreatments, relatedParameter = "gMax", relatedValue = gMax)
     }
 
     if ((length(piControls) != 1) && (length(piControls) != gMax)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'piControls' (%s) ",
-                "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(piControls), gMax)
-        )
+        stopIllegalArgument(sprintf(paste0("length of 'piControls' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+            .arrayToString(piControls), gMax), functionName = ".getConditionalPowerRatesEnrichment", parameter = "piControls",
+            value = piControls, relatedParameter = "gMax", relatedValue = gMax)
     }
 
     if (.isTrialDesignInverseNormalOrFixed(design)) {
@@ -1066,11 +1038,8 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        call. = FALSE
-    )
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
+        functionName = ".getConditionalPowerRatesEnrichment", parameter = "design")
 }
 
 #'

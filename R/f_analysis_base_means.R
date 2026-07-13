@@ -125,11 +125,8 @@ NULL
         .assertIsSingleNumber(assumedStDev, "assumedStDev", naAllowed = TRUE)
         if (!is.na(assumedStDev)) {
             if (!identical(assumedStDev, stDevH1)) {
-                stop(
-                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                    "either 'assumedStDev' or 'stDevH1' must be defined",
-                    call. = FALSE
-                )
+                stopConflictingArguments("either 'assumedStDev' or 'stDevH1' must be defined", functionName = ".getAnalysisResultsMeansGroupSequential",
+    parameter = "assumedStDev", relatedParameter = "stDevH1", value = assumedStDev)
             }
         }
         assumedStDev <- stDevH1
@@ -803,20 +800,8 @@ NULL
 
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                sprintf(
-                    paste0(
-                        "failed to find theta (k = %s, firstValue = %s, ",
-                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
-                    ),
-                    stage,
-                    stageResults[[firstParameterName]][stage],
-                    secondValue,
-                    firstValue,
-                    theta
-                )
-            )
+            stopRuntimeIssue(sprintf(paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                stage, stageResults[[firstParameterName]][stage], secondValue, firstValue, theta), functionName = ".getUpperLowerThetaMeans")
         }
     }
 

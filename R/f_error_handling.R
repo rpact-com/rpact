@@ -17,11 +17,11 @@
 #' @include f_core_constants.R
 NULL
 
-.getRpactErrorMessage <- function(...) {
+.getErrorMessage <- function(...) {
     return(paste0(unlist(list(...)), collapse = ""))
 }
 
-.getRpactErrorCall <- function(call., call) {
+.getErrorCall <- function(call. = getOption("rpact.error.call", FALSE), call = NULL) {
     if (!is.null(call)) {
         return(call)
     }
@@ -33,7 +33,7 @@ NULL
     return(NULL)
 }
 
-.getRpactErrorFunctionName <- function(functionName = NULL) {
+.getErrorFunctionName <- function(functionName = NULL) {
     if (!is.null(functionName)) {
         return(functionName)
     }
@@ -45,15 +45,7 @@ NULL
     return(NULL)
 }
 
-.getRpactErrorContextCall <- function() {
-    if (sys.nframe() > 3L) {
-        return(sys.call(-3L))
-    }
-
-    return(NULL)
-}
-
-.getRpactErrorParameterName <- function(message) {
+.getErrorParameterName <- function(message) {
     match <- regmatches(message, regexec("'([^']+)'", message))[[1]]
     if (length(match) > 1L && nzchar(match[2L])) {
         return(match[2L])
@@ -62,7 +54,7 @@ NULL
     return(NULL)
 }
 
-.stripRpactExceptionType <- function(message, exceptionType) {
+.stripErrorExceptionType <- function(message, exceptionType) {
     if (startsWith(message, exceptionType)) {
         return(substring(message, nchar(exceptionType) + 1L))
     }
@@ -70,7 +62,7 @@ NULL
     return(message)
 }
 
-.mergeRpactErrorContext <- function(defaults, context = list()) {
+.mergeErrorContext <- function(defaults, context = list()) {
     if (is.null(context)) {
         context <- list()
     }
@@ -88,7 +80,7 @@ NULL
     return(context)
 }
 
-.createRpactErrorContext <- function(
+.createErrorContext <- function(
         message,
         ...,
         functionName = NULL,
@@ -100,21 +92,20 @@ NULL
         context = list()) {
 
     if (is.null(parameter)) {
-        parameter <- .getRpactErrorParameterName(message)
+        parameter <- .getErrorParameterName(message)
     }
 
     defaults <- list(
-        functionName = .getRpactErrorFunctionName(functionName),
+        functionName = .getErrorFunctionName(functionName),
         parameter = parameter,
         value = value,
         constraint = constraint,
         relatedParameter = relatedParameter,
         relatedValue = relatedValue,
-        call = .getRpactErrorContextCall(),
         ...
     )
 
-    return(.mergeRpactErrorContext(defaults, context))
+    return(.mergeErrorContext(defaults, context))
 }
 
 .createCondition <- function(
@@ -143,7 +134,10 @@ NULL
                 call = call,
                 class = class
             ),
-            error = function(e) NULL
+            error = function(e) {
+                message("Error in condition factory: ", e$message)
+                NULL
+            }
         )
         if (inherits(condition, "condition")) {
             return(condition)
@@ -164,11 +158,11 @@ NULL
         category,
         class,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .stripRpactExceptionType(message, exceptionType)
-    call <- .getRpactErrorCall(call., call)
+    message <- .stripErrorExceptionType(message, exceptionType)
+    call <- .getErrorCall(call. = call., call = call)
     condition <- .createCondition(
         paste0(exceptionType, message),
         ...,
@@ -198,11 +192,11 @@ stopRuntimeIssue <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .getRpactErrorMessage(...)
-    context <- .createRpactErrorContext(
+    message <- .getErrorMessage(...)
+    context <- .createErrorContext(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -212,9 +206,14 @@ stopRuntimeIssue <- function(
         relatedValue = relatedValue,
         context = context
     )
-
     .stopRpactError(
         message,
+        functionName = context$functionName,
+        parameter = context$parameter,
+        value = context$value,
+        constraint = context$constraint,
+        relatedParameter = context$relatedParameter,
+        relatedValue = context$relatedValue,
         exceptionType = C_EXCEPTION_TYPE_RUNTIME_ISSUE,
         factoryKey = "rpact.error.factory.runtime.issue.condition",
         code = "RUNTIME_ISSUE",
@@ -241,11 +240,11 @@ stopIllegalArgument <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .getRpactErrorMessage(...)
-    context <- .createRpactErrorContext(
+    message <- .getErrorMessage(...)
+    context <- .createErrorContext(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -255,9 +254,14 @@ stopIllegalArgument <- function(
         relatedValue = relatedValue,
         context = context
     )
-
     .stopRpactError(
         message,
+        functionName = context$functionName,
+        parameter = context$parameter,
+        value = context$value,
+        constraint = context$constraint,
+        relatedParameter = context$relatedParameter,
+        relatedValue = context$relatedValue,
         exceptionType = C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         factoryKey = "rpact.error.factory.illegal.argument.condition",
         code = "ILLEGAL_ARGUMENT",
@@ -278,11 +282,11 @@ stopIllegalDataInput <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .getRpactErrorMessage(...)
-    context <- .createRpactErrorContext(
+    message <- .getErrorMessage(...)
+    context <- .createErrorContext(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -292,9 +296,14 @@ stopIllegalDataInput <- function(
         relatedValue = relatedValue,
         context = context
     )
-
     .stopRpactError(
         message,
+        functionName = context$functionName,
+        parameter = context$parameter,
+        value = context$value,
+        constraint = context$constraint,
+        relatedParameter = context$relatedParameter,
+        relatedValue = context$relatedValue,
         exceptionType = C_EXCEPTION_TYPE_ILLEGAL_DATA_INPUT,
         factoryKey = "rpact.error.factory.illegal.data.input.condition",
         code = "ILLEGAL_DATA_INPUT",
@@ -315,11 +324,11 @@ stopConflictingArguments <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .getRpactErrorMessage(...)
-    context <- .createRpactErrorContext(
+    message <- .getErrorMessage(...)
+    context <- .createErrorContext(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -329,9 +338,14 @@ stopConflictingArguments <- function(
         relatedValue = relatedValue,
         context = context
     )
-
     .stopRpactError(
         message,
+        functionName = context$functionName,
+        parameter = context$parameter,
+        value = context$value,
+        constraint = context$constraint,
+        relatedParameter = context$relatedParameter,
+        relatedValue = context$relatedValue,
         exceptionType = C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
         factoryKey = "rpact.error.factory.conflicting.arguments.condition",
         code = "CONFLICTING_ARGUMENTS",
@@ -349,26 +363,37 @@ stopArgumentOutOfBounds <- function(
         value = NULL,
         constraint = NULL,
         functionName = NULL,
+        relatedParameter = NULL,
+        relatedValue = NULL,
         lowerBound = NULL,
         upperBound = NULL,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .getRpactErrorMessage(...)
-    context <- .createRpactErrorContext(
+    message <- .getErrorMessage(...)
+    context <- .createErrorContext(
         message,
         functionName = functionName,
         parameter = parameter,
         value = value,
         constraint = constraint,
+        relatedParameter = relatedParameter,
+        relatedValue = relatedValue,
         lowerBound = lowerBound,
         upperBound = upperBound,
         context = context
     )
-
     .stopRpactError(
         message,
+        functionName = context$functionName,
+        parameter = context$parameter,
+        value = context$value,
+        constraint = context$constraint,
+        relatedParameter = context$relatedParameter,
+        relatedValue = context$relatedValue,
+        lowerBound = context$lowerBound,
+        upperBound = context$upperBound,
         exceptionType = C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
         factoryKey = "rpact.error.factory.argument.out.of.bounds.condition",
         code = "ARGUMENT_OUT_OF_BOUNDS",
@@ -386,30 +411,43 @@ stopArgumentLengthOutOfBounds <- function(
         value = NULL,
         constraint = NULL,
         functionName = NULL,
+        relatedParameter = NULL,
+        relatedValue = NULL,
         lowerBound = NULL,
         upperBound = NULL,
         expectedLength = NULL,
         actualLength = NULL,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .getRpactErrorMessage(...)
-    context <- .createRpactErrorContext(
+    message <- .getErrorMessage(...)
+    context <- .createErrorContext(
         message,
         functionName = functionName,
         parameter = parameter,
         value = value,
         constraint = constraint,
+        relatedParameter = relatedParameter,
+        relatedValue = relatedValue,
         lowerBound = lowerBound,
         upperBound = upperBound,
         expectedLength = expectedLength,
         actualLength = actualLength,
         context = context
     )
-
     .stopRpactError(
         message,
+        functionName = context$functionName,
+        parameter = context$parameter,
+        value = context$value,
+        constraint = context$constraint,
+        relatedParameter = context$relatedParameter,
+        relatedValue = context$relatedValue,
+        lowerBound = context$lowerBound,
+        upperBound = context$upperBound,
+        expectedLength = context$expectedLength,
+        actualLength = context$actualLength,
         exceptionType = C_EXCEPTION_TYPE_ARGUMENT_LENGTH_OUT_OF_BOUNDS,
         factoryKey = "rpact.error.factory.argument.length.out.of.bounds.condition",
         code = "ARGUMENT_LENGTH_OUT_OF_BOUNDS",
@@ -427,28 +465,40 @@ stopIndexOutOfBounds <- function(
         value = NULL,
         constraint = NULL,
         functionName = NULL,
+        relatedParameter = NULL,
+        relatedValue = NULL,
         lowerBound = NULL,
         upperBound = NULL,
         index = NULL,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .getRpactErrorMessage(...)
-    context <- .createRpactErrorContext(
+    message <- .getErrorMessage(...)
+    context <- .createErrorContext(
         message,
         functionName = functionName,
         parameter = parameter,
         value = value,
         constraint = constraint,
+        relatedParameter = relatedParameter,
+        relatedValue = relatedValue,
         lowerBound = lowerBound,
         upperBound = upperBound,
         index = index,
         context = context
     )
-
     .stopRpactError(
         message,
+        functionName = context$functionName,
+        parameter = context$parameter,
+        value = context$value,
+        constraint = context$constraint,
+        relatedParameter = context$relatedParameter,
+        relatedValue = context$relatedValue,
+        lowerBound = context$lowerBound,
+        upperBound = context$upperBound,
+        index = context$index,
         exceptionType = C_EXCEPTION_TYPE_INDEX_OUT_OF_BOUNDS,
         factoryKey = "rpact.error.factory.index.out.of.bounds.condition",
         code = "INDEX_OUT_OF_BOUNDS",
@@ -469,11 +519,11 @@ stopMissingArgument <- function(
         relatedParameter = NULL,
         relatedValue = NULL,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .getRpactErrorMessage(...)
-    context <- .createRpactErrorContext(
+    message <- .getErrorMessage(...)
+    context <- .createErrorContext(
         message,
         functionName = functionName,
         parameter = parameter,
@@ -483,9 +533,14 @@ stopMissingArgument <- function(
         relatedValue = relatedValue,
         context = context
     )
-
     .stopRpactError(
         message,
+        functionName = context$functionName,
+        parameter = context$parameter,
+        value = context$value,
+        constraint = context$constraint,
+        relatedParameter = context$relatedParameter,
+        relatedValue = context$relatedValue,
         exceptionType = C_EXCEPTION_TYPE_MISSING_ARGUMENT,
         factoryKey = "rpact.error.factory.missing.argument.condition",
         code = "MISSING_ARGUMENT",
@@ -503,26 +558,37 @@ stopIncompleteArguments <- function(
         value = NULL,
         constraint = NULL,
         functionName = NULL,
+        relatedParameter = NULL,
+        relatedValue = NULL,
         missingParameters = NULL,
         definedParameters = NULL,
         context = list(),
-        call. = FALSE,
+        call. = getOption("rpact.error.call", FALSE),
         call = NULL) {
 
-    message <- .getRpactErrorMessage(...)
-    context <- .createRpactErrorContext(
+    message <- .getErrorMessage(...)
+    context <- .createErrorContext(
         message,
         functionName = functionName,
         parameter = parameter,
         value = value,
         constraint = constraint,
+        relatedParameter = relatedParameter,
+        relatedValue = relatedValue,
         missingParameters = missingParameters,
         definedParameters = definedParameters,
         context = context
     )
-
     .stopRpactError(
         message,
+        functionName = context$functionName,
+        parameter = context$parameter,
+        value = context$value,
+        constraint = context$constraint,
+        relatedParameter = context$relatedParameter,
+        relatedValue = context$relatedValue,
+        missingParameters = context$missingParameters,
+        definedParameters = context$definedParameters,
         exceptionType = C_EXCEPTION_TYPE_INCOMPLETE_ARGUMENTS,
         factoryKey = "rpact.error.factory.incomplete.arguments.condition",
         code = "INCOMPLETE_ARGUMENTS",

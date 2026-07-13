@@ -370,53 +370,27 @@ NULL
 
     if (groups == 1) {
         if (!anyNA(pi1) && any(pi1 == thetaH0) && (objectType == "sampleSize")) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'pi1' (",
-                .arrayToString(pi1),
-                ") must be != 'thetaH0' (",
-                thetaH0,
-                ")",
-                call. = FALSE
-            )
+            stopIllegalArgument("any 'pi1' (", .arrayToString(pi1), ") must be != 'thetaH0' (", thetaH0, ")", functionName = ".createDesignPlanRates",
+                parameter = "pi1", value = pi1, relatedParameter = "thetaH0", relatedValue = thetaH0)
         }
 
         if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "probability 'pi1' (",
-                .arrayToString(pi1),
-                ") is out of bounds (0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") is out of bounds (0; 1)", functionName = ".createDesignPlanRates",
+                parameter = "pi1", value = pi1)
         }
 
         if (thetaH0 >= 1 || thetaH0 <= 0) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'thetaH0' (",
-                thetaH0,
-                ") is out of bounds (0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("'thetaH0' (", thetaH0, ") is out of bounds (0; 1)", functionName = ".createDesignPlanRates",
+                parameter = "thetaH0", value = thetaH0)
         }
 
         if (!normalApproximation && design$sided == 2 && (objectType == "sampleSize")) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "exact sample size calculation not available for two-sided testing",
-                call. = FALSE
-            )
+            stopIllegalArgument("exact sample size calculation not available for two-sided testing", functionName = ".createDesignPlanRates")
         }
 
         if (normalApproximation && !conservative && (objectType == "sampleSize")) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'conservative' (",
-                conservative,
-                ") has no effect on sample size calculation",
-                call. = FALSE
-            )
+            stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation", functionName = ".createDesignPlanRates",
+                parameter = "conservative", value = conservative)
         }
     } else if (groups == 2) {
         if (
@@ -425,16 +399,9 @@ NULL
                 (objectType == "sampleSize") &&
                 !riskRatio
             ) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'pi1 - pi2' (",
-                .arrayToString(pi1 - pi2),
-                ") ",
-                "must be != 'thetaH0' (",
-                thetaH0,
-                ")",
-                call. = FALSE
-            )
+            stopIllegalArgument("any 'pi1 - pi2' (", .arrayToString(pi1 - pi2), ") ", "must be != 'thetaH0' (", thetaH0,
+                ")", functionName = ".createDesignPlanRates", parameter = "pi1 - pi2", value = pi1 - pi2, relatedParameter = "thetaH0",
+                relatedValue = thetaH0)
         }
 
         if (
@@ -443,38 +410,19 @@ NULL
                 (objectType == "sampleSize") &&
                 riskRatio
             ) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any 'pi1 / pi2' (",
-                .arrayToString(pi1 / pi2),
-                ") ",
-                "must be != 'thetaH0' (",
-                thetaH0,
-                ")",
-                call. = FALSE
-            )
+            stopIllegalArgument("any 'pi1 / pi2' (", .arrayToString(pi1/pi2), ") ", "must be != 'thetaH0' (", thetaH0,
+                ")", functionName = ".createDesignPlanRates", parameter = "pi1 / pi2", value = pi1 / pi2,
+                relatedParameter = "thetaH0", relatedValue = thetaH0)
         }
 
         if (anyNA(pi1) || any(pi1 <= 0) || any(pi1 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "probability 'pi1' (",
-                .arrayToString(pi1),
-                ") ",
-                "is out of bounds (0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("probability 'pi1' (", .arrayToString(pi1), ") ", "is out of bounds (0; 1)",
+                functionName = ".createDesignPlanRates", parameter = "pi1", value = pi1)
         }
 
         if (anyNA(pi2) || any(pi2 <= 0) || any(pi2 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "probability 'pi2' (",
-                .arrayToString(pi2),
-                ") ",
-                "is out of bounds (0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("probability 'pi2' (", .arrayToString(pi2), ") ", "is out of bounds (0; 1)",
+                functionName = ".createDesignPlanRates", parameter = "pi2", value = pi2)
         }
 
         if (
@@ -482,30 +430,16 @@ NULL
                 ((thetaH0 != 0 && !riskRatio) ||
                     (thetaH0 != 1 && riskRatio))
             ) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "two-sided case ",
-                "is implemented only for superiority testing",
-                call. = FALSE
-            )
+            stopIllegalArgument("two-sided case ", "is implemented only for superiority testing", functionName = ".createDesignPlanRates")
         }
 
         if (!normalApproximation) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "only normal approximation case is implemented for two groups",
-                call. = FALSE
-            )
+            stopIllegalArgument("only normal approximation case is implemented for two groups", functionName = ".createDesignPlanRates")
         }
 
         if (!conservative) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'conservative' (",
-                conservative,
-                ") has no effect on sample size calculation for two groups",
-                call. = FALSE
-            )
+            stopIllegalArgument("'conservative' (", conservative, ") has no effect on sample size calculation for two groups",
+                functionName = ".createDesignPlanRates", parameter = "conservative", value = conservative)
         }
 
         if (is.na(allocationRatioPlanned)) {
@@ -513,22 +447,13 @@ NULL
         }
 
         if (allocationRatioPlanned < 0) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'allocationRatioPlanned' (",
-                allocationRatioPlanned,
-                ") must be >= 0",
-                call. = FALSE
-            )
+            stopIllegalArgument("'allocationRatioPlanned' (", allocationRatioPlanned, ") must be >= 0", functionName = ".createDesignPlanRates",
+                parameter = "allocationRatioPlanned", value = allocationRatioPlanned)
         }
 
         if (riskRatio && thetaH0 <= 0) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "null hypothesis risk ratio is not allowed be negative or zero, ",
-                "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE",
-                call. = FALSE
-            )
+            stopIllegalArgument("null hypothesis risk ratio is not allowed be negative or zero, ", "i.e., 'thetaH0' must be > 0 if 'riskRatio' = TRUE",
+    functionName = ".createDesignPlanRates", parameter = "thetaH0", relatedParameter = "riskRatio", value = thetaH0)
         }
     }
 
@@ -700,7 +625,7 @@ getPowerRates <- function(design = NULL,
     )
 
     if (!is.na(allocationRatioPlanned) && allocationRatioPlanned <= 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "allocation ratio must be > 0", call. = FALSE)
+        stopIllegalArgument("allocation ratio must be > 0", functionName = "getPowerRates")
     }
 
     allocationRatioPlanned <- designPlan$allocationRatioPlanned

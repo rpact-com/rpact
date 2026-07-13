@@ -155,12 +155,8 @@ NULL
             any(round(subjectsPerStage[selsubs, k] * const / (1 + const)) < 1) ||
                 any(round(subjectsPerStage[selsubs, k] / (1 + const)) < 1)
             ) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "at least one sample size specification too small to create simulation results, ",
-                "e.g., due to small prevalences of subsets",
-                call. = FALSE
-            )
+            stopIllegalArgument("at least one sample size specification too small to create simulation results, ",
+                "e.g., due to small prevalences of subsets", functionName = ".getSimulatedStageRatesEnrichment")
         }
 
         simEventsTreatment[selsubs, k] <- stats::rbinom(
@@ -851,15 +847,8 @@ NULL
                 if (
                     is.null(newSubjects) || length(newSubjects) != 1 || !is.numeric(newSubjects) || is.na(newSubjects)
                     ) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcSubjectsFunction' returned an illegal or ",
-                        "undefined result (",
-                        newSubjects,
-                        "); ",
-                        "the output must be a single numeric value",
-                        call. = FALSE
-                    )
+                    stopIllegalArgument("'calcSubjectsFunction' returned an illegal or ", "undefined result (", newSubjects, "); ", "the output must be a single numeric value",
+    functionName = ".getSimulatedStageRatesEnrichment", parameter = "calcSubjectsFunction", value = calcSubjectsFunction)
                 }
 
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
@@ -1331,7 +1320,7 @@ getSimulationEnrichmentRates <- function(
     }
 
     if (any(simulationResults$rejectedPopulationsPerStage < 0)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "internal error, simulation not possible due to numerical overflow")
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationEnrichmentRates")
     }
 
     data <- data.frame(

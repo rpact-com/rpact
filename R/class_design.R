@@ -411,7 +411,7 @@ TrialDesignFixed <- R6::R6Class("TrialDesignFixed",
             super$initialize(...) # important: don't move to first line of constructor
             self$informationRates <- 1
             self$futilityBounds <- numeric(0)
-            
+
             self$.initParameterTypes()
             self$.initStages()
             self$.setParameterType("power", C_PARAM_NOT_APPLICABLE)
@@ -1279,22 +1279,20 @@ plot.TrialDesign <- function(
             "showFutilityBounds", "showAlphaSpent", "showBetaSpent"
         ), ...
     )
-    
+
     availablePlotTypes <- getAvailablePlotTypes(x, output = "numeric", numberInCaptionEnabled = FALSE)
     if (length(availablePlotTypes) == 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "no plot type available for the specified design")
+        stopIllegalArgument("no plot type available for the specified design", functionName = "plot.TrialDesign")
     }
     if (is.na(type)) {
         type <- availablePlotTypes[1]
     }
     if (!(type %in% availablePlotTypes)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'type' (", type,
-            ") is not available; 'type' can ", ifelse(length(availablePlotTypes) == 1, "only ", ""),
-            "be ", .arrayToString(availablePlotTypes, mode = "or")
-        )
+        stopIllegalArgument("'type' (", type, ") is not available; 'type' can ", ifelse(length(availablePlotTypes) ==
+            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"), functionName = "plot.TrialDesign",
+            parameter = "type", value = type)
     }
-    
+
     .showWarningIfPlotArgumentWillBeIgnored(type, ..., obj = x)
 
     args <- list(
@@ -1442,11 +1440,8 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
 
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
     if (any(.isTrialDesignFisher(x)) && !(type %in% c(1, 3, 4))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4",
-            call. = FALSE
-        )
+        stopIllegalArgument("'type' (", type, ") is not allowed for Fisher designs; must be 1, 3 or 4", functionName = ".plotTrialDesign",
+            parameter = "type", value = type)
     }
 
     if ((type < 5 || type > 9) && !identical(theta, seq(-1, 1, 0.01))) {
@@ -1461,18 +1456,14 @@ plot.TrialDesignCharacteristics <- function(x, y, ..., type = 1L, grid = 1) {
         variedParameters <- args[["variedParameters"]]
         if (is.null(variedParameters)) {
             if (!.isTrialDesignFixed(x) &&
-                    !.isTrialDesignFixed(y) && 
+                    !.isTrialDesignFixed(y) &&
                     .isTrialDesignInverseNormalOrGroupSequential(x) &&
                     .isTrialDesignInverseNormalOrGroupSequential(y) &&
                     x$typeOfDesign != y$typeOfDesign) {
                 variedParameters <- "typeOfDesign"
             } else {
-                stop(
-                    C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                    "'variedParameters' needs to be specified, ",
-                    "e.g., variedParameters = \"typeOfDesign\"",
-                    call. = FALSE
-                )
+                stopMissingArgument("'variedParameters' needs to be specified, ", "e.g., variedParameters = \"typeOfDesign\"",
+                    functionName = ".plotTrialDesign", parameter = "variedParameters")
             }
         }
         designSet <- getDesignSet(designs = c(x, y), variedParameters = variedParameters)

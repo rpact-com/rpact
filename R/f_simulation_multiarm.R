@@ -81,16 +81,19 @@ NULL
         selectedArms <- do.call(what = selectArmsFunction, args = selectArmsFunctionArgs[functionArgumentNames])
 
         msg <- paste0(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'selectArmsFunction' returned an illegal or undefined result (",
             .arrayToString(selectedArms),
             "); "
         )
         if (length(selectedArms) != gMax) {
-            stop(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")", call. = FALSE)
+            stopIllegalArgument(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")", parameter = "selectArmsFunction",
+                value = selectedArms, constraint = paste0("logical vector of length ", gMax), relatedParameter = "gMax",
+                relatedValue = gMax, functionName = ".selectTreatmentArms")
         }
         if (!is.logical(selectedArms)) {
-            stop(msg, "the output must be a logical vector (is ", .getClassName(selectedArms), ")", call. = FALSE)
+            stopIllegalArgument(msg, "the output must be a logical vector (is ", .getClassName(selectedArms), ")",
+                parameter = "selectArmsFunction", value = selectedArms, constraint = "logical vector", relatedParameter = "class of selected arms",
+                relatedValue = .getClassName(selectedArms), functionName = ".selectTreatmentArms")
         }
     }
     if (!survival) {
@@ -106,11 +109,8 @@ NULL
         intersectionTest,
         successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Group sequential design cannot be used for designs with treatment arm selection",
-            call. = FALSE
-        )
+        stopIllegalArgument("Group sequential design cannot be used for designs with treatment arm selection",
+            functionName = ".performClosedCombinationTestForSimulationMultiArm")
     }
 
     gMax <- nrow(stageResults$testStatistics)
@@ -275,11 +275,7 @@ NULL
 
 .getCriticalValuesDunnettForSimulation <- function(alpha, indices, allocationRatioPlanned) {
     if (allocationRatioPlanned[1] != allocationRatioPlanned[2]) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "The conditional Dunnett test assumes equal allocation ratios over the stages",
-            call. = FALSE
-        )
+        stopIllegalArgument("The conditional Dunnett test assumes equal allocation ratios over the stages", functionName = ".getCriticalValuesDunnettForSimulation")
     }
 
     gMax <- ncol(indices)
@@ -473,7 +469,7 @@ NULL
         simulationType = c("auto", "patientWise", "testStatisticBased", "patientWiseBasic")) {
     endpoint <- match.arg(endpoint)
     simulationType <- match.arg(simulationType)
-    
+
     .assertIsSinglePositiveInteger(activeArms, "activeArms", naAllowed = TRUE, validateType = FALSE)
 
     if (endpoint == "means") {
@@ -489,13 +485,8 @@ NULL
 
     if (!is.null(effectMatrix)) {
         if (typeOfShape != "userDefined") {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Change 'typeOfShape' (",
-                typeOfShape,
-                ") to 'userDefined'",
-                call. = FALSE
-            )
+            stopIllegalArgument("Change 'typeOfShape' (", typeOfShape, ") to 'userDefined'", functionName = ".createSimulationResultsMultiArmObject",
+                parameter = "typeOfShape", value = typeOfShape, relatedParameter = "userDefined")
         }
     }
 
@@ -517,22 +508,17 @@ NULL
         }
     } else {
         if (!is.null(effectMatrix) && activeArms != ncol(effectMatrix)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "Number of columns of effect matrix (",
-                ncol(effectMatrix),
-                ") is not equal to specified 'activeArms' (",
-                activeArms,
-                ")",
-                call. = FALSE
-            )
+            stopIllegalArgument("Number of columns of effect matrix (", ncol(effectMatrix), ") is not equal to specified 'activeArms' (",
+                activeArms, ")", functionName = ".createSimulationResultsMultiArmObject", parameter = "activeArms",
+                value = activeArms)
         }
         simulationResults$activeArms <- activeArms
         simulationResults$.setParameterType("activeArms", C_PARAM_USER_DEFINED)
     }
 
     if (activeArms > 8) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'activeArms' (", activeArms, ") max not exceed 8", call. = FALSE)
+        stopIllegalArgument("'activeArms' (", activeArms, ") max not exceed 8", functionName = ".createSimulationResultsMultiArmObject",
+            parameter = "activeArms", value = activeArms)
     }
 
     .assertIsSingleNumber(threshold, "threshold", naAllowed = FALSE)
@@ -723,14 +709,15 @@ NULL
         else if (typeOfShape == "userDefined") {
             simulationResults$.setParameterType("omegaMaxVector", C_PARAM_DERIVED)
         }
-        
+
         .assertIsSingleNumber(piControl, "piControl", naAllowed = TRUE)
         .assertIsInOpenInterval(piControl, "piControl", lower = 0, upper = 1, naAllowed = TRUE)
         .setValueAndParameterType(simulationResults, "piControl", piControl, 0.2)
         .setValueAndParameterType(simulationResults, "eventTime", eventTime, 12)
 
         if (!is.na(eventTime) && eventTime <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'eventTime' (", eventTime, ") must be > 0", call. = FALSE)
+            stopIllegalArgument("'eventTime' (", eventTime, ") must be > 0", functionName = ".createSimulationResultsMultiArmObject",
+                parameter = "eventTime", value = eventTime)
         }
 
         .setValueAndParameterType(simulationResults, "kappa", kappa, 1)
@@ -743,37 +730,22 @@ NULL
         .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, 12)
 
         if (!is.na(dropoutTime) && dropoutTime <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0", call. = FALSE)
+            stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0", functionName = ".createSimulationResultsMultiArmObject",
+                parameter = "dropoutTime", value = dropoutTime)
         }
         if (!is.na(dropoutRate1) && (dropoutRate1 < 0 || dropoutRate1 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'dropoutRate1' (",
-                dropoutRate1,
-                ") is out of bounds [0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)", functionName = ".createSimulationResultsMultiArmObject",
+                parameter = "dropoutRate1", value = dropoutRate1)
         }
         if (!is.na(dropoutRate2) && (dropoutRate2 < 0 || dropoutRate2 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'dropoutRate2' (",
-                dropoutRate2,
-                ") is out of bounds [0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)", functionName = ".createSimulationResultsMultiArmObject",
+                parameter = "dropoutRate2", value = dropoutRate2)
         }
 
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'plannedEvents' (",
-                .arrayToString(plannedEvents),
-                ") must have length ",
-                kMax,
-                call. = FALSE
-            )
+            stopIllegalArgument("'plannedEvents' (", .arrayToString(plannedEvents), ") must have length ", kMax,
+                functionName = ".createSimulationResultsMultiArmObject", parameter = "plannedEvents", value = plannedEvents)
         }
         .assertIsInClosedInterval(plannedEvents, "plannedEvents", lower = 1, upper = NULL)
         .assertValuesAreStrictlyIncreasing(plannedEvents, "plannedEvents")
@@ -853,15 +825,9 @@ NULL
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage)) &&
                     any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0)
                 ) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'maxNumberOfSubjectsPerStage' (",
-                    .arrayToString(maxNumberOfSubjectsPerStage),
-                    ") must be not smaller than minNumberOfSubjectsPerStage' (",
-                    .arrayToString(minNumberOfSubjectsPerStage),
-                    ")",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+                    .arrayToString(minNumberOfSubjectsPerStage), ")", functionName = ".createSimulationResultsMultiArmObject",
+                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage)
             }
             .setValueAndParameterType(
                 simulationResults,
@@ -914,15 +880,10 @@ NULL
                 !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage)) &&
                     any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0)
                 ) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'maxNumberOfEventsPerStage' (",
-                    .arrayToString(maxNumberOfEventsPerStage),
-                    ") must be not smaller than 'minNumberOfEventsPerStage' (",
-                    .arrayToString(minNumberOfEventsPerStage),
-                    ")",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than 'minNumberOfEventsPerStage' (",
+                    .arrayToString(minNumberOfEventsPerStage), ")", functionName = ".createSimulationResultsMultiArmObject",
+                    parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage, relatedParameter = "minNumberOfEventsPerStage",
+                    relatedValue = minNumberOfEventsPerStage)
             }
             .setValueAndParameterType(
                 simulationResults,
@@ -1043,7 +1004,7 @@ NULL
         } else {
             .getSimulationSurvivalMultiArmStageEvents
         }
-    
+
         if (is.null(calcEventsFunction)) {
             calcEventsFunction <- expectedFunction
         } else {
@@ -1067,16 +1028,9 @@ NULL
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
     } else if (length(allocationRatioPlanned) != design$kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'allocationRatioPlanned' (",
-            .arrayToString(allocationRatioPlanned),
-            ") ",
-            "must have length 1 or ",
-            design$kMax,
-            " (kMax)",
-            call. = FALSE
-        )
+        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+            design$kMax, " (kMax)", functionName = ".createSimulationResultsMultiArmObject", parameter = "allocationRatioPlanned",
+            value = allocationRatioPlanned)
     }
 
     if (length(unique(allocationRatioPlanned)) == 1) {
@@ -1154,7 +1108,8 @@ NULL
         adaptations <- rep(TRUE, kMax - 1)
     }
     if (length(adaptations) != kMax - 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'adaptations' must have length ", (kMax - 1), " (kMax - 1)", call. = FALSE)
+        stopIllegalArgument("'adaptations' must have length ", (kMax - 1), " (kMax - 1)", functionName = ".createSimulationResultsMultiArmObject",
+    parameter = "adaptations", value = adaptations)
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))
 

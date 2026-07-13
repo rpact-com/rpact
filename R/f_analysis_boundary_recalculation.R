@@ -38,10 +38,8 @@
             informationRates[k] <- absoluteInformations[k] / maxInformation
         }
     } else {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'dataInput' class ",
-            .getClassName(dataInput), " is not supported"
-        )
+        stopRuntimeIssue("'dataInput' class ", .getClassName(dataInput), " is not supported", functionName = ".getRecalculatedInformationRates",
+            parameter = "dataInput", value = dataInput)
     }
 
     return(list(
@@ -329,12 +327,8 @@ getObservedInformationRates <- function(dataInput,
     }
 
     if (design$typeOfDesign == "asUser") {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "recalculation of the information rates not possible ",
-            "for user-defined alpha spending designs",
-            call. = FALSE
-        )
+        stopIllegalArgument("recalculation of the information rates not possible ", "for user-defined alpha spending designs",
+            functionName = ".getDesignWithRecalculatedBoundaries")
     }
 
     showObservedInformationRatesMessage <- .getOptionalArgument(
@@ -369,11 +363,7 @@ getObservedInformationRates <- function(dataInput,
 
     stageFromData <- dataInput$getNumberOfStages()
     if (stageFromData == 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "recalculation of the information rates not possible at stage 1",
-            call. = FALSE
-        )
+        stopIllegalArgument("recalculation of the information rates not possible at stage 1", functionName = ".getDesignWithRecalculatedBoundaries")
     }
 
     if (!(getLogLevel() %in% c(C_LOG_LEVEL_DISABLED, C_LOG_LEVEL_PROGRESS))) {

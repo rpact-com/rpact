@@ -372,8 +372,8 @@ NULL
 
     if (intersectionTest == "Dunnett" && varianceOption != "overallPooled" &&
             !normalApproximation) {
-        stop("Dunnett t test can only be performed with overall variance estimation,
-						select 'varianceOption' = \"overallPooled\"", call. = FALSE)
+        stopIllegalArgument("Dunnett t test can only be performed with overall variance estimation,\n\t\t\t\t\t\tselect 'varianceOption' = \"overallPooled\"",
+            parameter = "varianceOption", value = varianceOption, constraint = "overallPooled", functionName = ".getStageResultsMeansMultiArm")
     }
 
     stageResults <- StageResultsMultiArmMeans$new(
@@ -555,7 +555,7 @@ NULL
                         )
                     }
                 } else if (intersectionTest == "Sidak") {
-                    if (.isTrialDesignGroupSequential(design)) { 
+                    if (.isTrialDesignGroupSequential(design)) {
                         overallPValues[treatmentArm, k] <- 1 - (1 - overallPValues[treatmentArm, k])^selected
                     } else {
                         singleStepAdjustedPValues[treatmentArm, k] <- 1 - (1 -
@@ -614,7 +614,7 @@ NULL
         stageResults$testStatistics <- testStatistics
         stageResults$separatePValues <- separatePValues
     }
-    
+
     return(stageResults)
 }
 
@@ -681,7 +681,7 @@ NULL
         varianceOption = varianceOption,
         calculateSingleStepAdjusted = TRUE
     )
-    
+
     firstValue <- stageResults[[firstParameterName]][treatmentArm, stage]
     maxSearchIterations <- 30
     while (conditionFunction(secondValue, firstValue)) {
@@ -701,17 +701,9 @@ NULL
         firstValue <- stageResults[[firstParameterName]][treatmentArm, stage]
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                sprintf(
-                    paste0(
-                        "failed to find theta (k = %s, firstValue = %s, ",
-                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
-                    ),
-                    stage, stageResults[[firstParameterName]][treatmentArm, stage], secondValue,
-                    firstValue, theta
-                )
-            )
+            stopRuntimeIssue(sprintf(paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                stage, stageResults[[firstParameterName]][treatmentArm, stage], secondValue, firstValue, theta),
+                functionName = ".getUpperLowerThetaMeansMultiArm")
         }
     }
 
@@ -863,40 +855,40 @@ NULL
 
         # Necessary for adjustment for binding futility boundaries
         futilityCorr <- rep(NA_real_, design$kMax)
-        
+
         stages <- (1:stage)
         for (k in stages) {
             startTime <- Sys.time()
             for (treatmentArm in 1:gMax) {
                 if (!is.na(stageResults$testStatistics[treatmentArm, k]) && criticalValues[k] < C_QNORM_MAXIMUM) {
-                    
+
                     # finding maximum upper and minimum lower bounds for RCIs
                     thetaLow <- .getUpperLowerThetaMeansMultiArm(
-                        design = design, 
+                        design = design,
                         dataInput = dataInput,
-                        theta = -1, 
-                        treatmentArm = treatmentArm, 
-                        stage = k, 
+                        theta = -1,
+                        treatmentArm = treatmentArm,
+                        stage = k,
                         directionUpper = TRUE,
-                        normalApproximation = normalApproximation, 
+                        normalApproximation = normalApproximation,
                         varianceOption = varianceOption,
                         conditionFunction = conditionFunction,
-                        intersectionTest = intersectionTest, 
+                        intersectionTest = intersectionTest,
                         firstParameterName = firstParameterName,
                         secondValue = criticalValues[k]
                     )
 
                     thetaUp <- .getUpperLowerThetaMeansMultiArm(
-                        design = design, 
+                        design = design,
                         dataInput = dataInput,
-                        theta = 1, 
-                        treatmentArm = treatmentArm, 
-                        stage = k, 
+                        theta = 1,
+                        treatmentArm = treatmentArm,
+                        stage = k,
                         directionUpper = FALSE,
-                        normalApproximation = normalApproximation, 
+                        normalApproximation = normalApproximation,
                         varianceOption = varianceOption,
                         conditionFunction = conditionFunction,
-                        intersectionTest = intersectionTest, 
+                        intersectionTest = intersectionTest,
                         firstParameterName = firstParameterName,
                         secondValue = criticalValues[k]
                     )
@@ -1171,13 +1163,9 @@ NULL
     thetaH1 <- .assertIsValidThetaH1ForMultiArm(thetaH1, stageResults, stage, results = results)
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
     if (length(thetaH1) != 1 && length(thetaH1) != gMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'thetaH1' (%s) ",
-                "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(thetaH1), gMax)
-        )
+        stopIllegalArgument(sprintf(paste0("length of 'thetaH1' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+            .arrayToString(thetaH1), gMax), functionName = ".getConditionalPowerMeansMultiArm", parameter = "thetaH1",
+            value = thetaH1, relatedParameter = "gMax", relatedValue = gMax)
     }
 
     if (length(assumedStDevs) == 1) {
@@ -1212,12 +1200,8 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or ",
-        "TrialDesignConditionalDunnett",
-        call. = FALSE
-    )
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or ",
+        "TrialDesignConditionalDunnett", functionName = ".getConditionalPowerMeansMultiArm", parameter = "design")
 }
 
 #'

@@ -222,44 +222,29 @@ NULL
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
 
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
-            call. = FALSE
-        )
+        stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
+            functionName = ".getStageResultsMeansEnrichment", parameter = "gMax", value = gMax)
     }
     if (varianceOption == "pooledFromFull") {
         if (gMax > 2) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-                ") > 2: varianceOption 'pooledFromFull' can only be used for one subset",
-                call. = FALSE
-            )
+            stopIllegalArgument("gMax (", gMax, ") > 2: varianceOption 'pooledFromFull' can only be used for one subset",
+                functionName = ".getStageResultsMeansEnrichment", parameter = "pooledFromFull")
         }
     }
 
     if (intersectionTest == "SpiessensDebois" && varianceOption != "pooledFromFull" && !normalApproximation) {
-        stop("Spiessens & Depois t test can only be performed with pooled ",
-            "residual (stratified) variance from full population,
-			 select 'varianceOption' = \"pooledFromFull\"",
-            call. = FALSE
-        )
+        stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ", "residual (stratified) variance from full population,\n\t\t\t select 'varianceOption' = \"pooledFromFull\"",
+            parameter = "varianceOption", value = varianceOption, constraint = "pooledFromFull", functionName = ".getStageResultsMeansEnrichment")
     }
 
     if (intersectionTest == "SpiessensDebois" && !stratifiedAnalysis && !normalApproximation) {
-        stop("Spiessens & Depois t test can only be performed with pooled ",
-            "residual (stratified) variance from full population,
-			select 'stratifiedAnalysis' = TRUE",
-            call. = FALSE
-        )
+        stopIllegalArgument("Spiessens & Depois t test can only be performed with pooled ", "residual (stratified) variance from full population,\n\t\t\tselect 'stratifiedAnalysis' = TRUE",
+            parameter = "stratifiedAnalysis", value = stratifiedAnalysis, constraint = TRUE, functionName = ".getStageResultsMeansEnrichment")
     }
 
     if (dataInput$isStratified() && (gMax > 4)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 4: Stratified analysis not implemented",
-            call. = FALSE
-        )
+        stopIllegalArgument("gMax (", gMax, ") > 4: Stratified analysis not implemented", functionName = ".getStageResultsMeansEnrichment",
+            parameter = "gMax", value = gMax)
     }
 
     stageResults <- StageResultsEnrichmentMeans$new(
@@ -783,17 +768,8 @@ NULL
         firstValue <- stageResults[[firstParameterName]][population, stage]
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                sprintf(
-                    paste0(
-                        "failed to find theta (k = %s, firstValue = %s, ",
-                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
-                    ),
-                    stage, stageResults[[firstParameterName]][population, stage], secondValue,
-                    firstValue, theta
-                )
-            )
+            stopRuntimeIssue(sprintf(paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                stage, stageResults[[firstParameterName]][population, stage], secondValue, firstValue, theta), functionName = ".getUpperLowerThetaMeansEnrichment")
         }
     }
 
@@ -1159,13 +1135,9 @@ NULL
     .assertIsValidAssumedStDevs(assumedStDevs, gMax)
     thetaH1 <- .assertIsValidThetaH1ForEnrichment(thetaH1, stageResults, stage, results = results)
     if (length(thetaH1) != 1 && length(thetaH1) != gMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'thetaH1' (%s) ",
-                "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(thetaH1), gMax)
-        )
+        stopIllegalArgument(sprintf(paste0("length of 'thetaH1' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+            .arrayToString(thetaH1), gMax), functionName = ".getConditionalPowerMeansEnrichment", parameter = "thetaH1",
+            value = thetaH1, relatedParameter = "gMax", relatedValue = gMax)
     }
 
     if (length(assumedStDevs) == 1) {
@@ -1173,21 +1145,15 @@ NULL
         results$.setParameterType("assumedStDevs", C_PARAM_GENERATED)
     } else {
         if (any(is.na(assumedStDevs[!is.na(stageResults$testStatistics[, stage])]))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any of 'assumedStDevs' not correctly specified",
-                call. = FALSE
-            )
+            stopIllegalArgument("any of 'assumedStDevs' not correctly specified", functionName = ".getConditionalPowerMeansEnrichment",
+    parameter = "assumedStDevs", value = assumedStDevs)
         }
     }
 
     if (length(thetaH1) > 1) {
         if (any(is.na(thetaH1[!is.na(stageResults$testStatistics[, stage])]))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "any of 'thetaH1' not correctly specified",
-                call. = FALSE
-            )
+            stopIllegalArgument("any of 'thetaH1' not correctly specified", functionName = ".getConditionalPowerMeansEnrichment", parameter = "thetaH1",
+    value = thetaH1)
         }
     }
 
@@ -1210,11 +1176,8 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        call. = FALSE
-    )
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
+        functionName = ".getConditionalPowerMeansEnrichment", parameter = "design")
 }
 
 #'

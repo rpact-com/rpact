@@ -24,7 +24,7 @@
         directionUpper[is.na(directionUpper)] <- C_DIRECTION_UPPER_DEFAULT
     }
     if (length(directionUpper) == 0) {
-        directionUpper <- ifelse(setDefault, C_DIRECTION_UPPER_DEFAULT, NA) 
+        directionUpper <- ifelse(setDefault, C_DIRECTION_UPPER_DEFAULT, NA)
     }
     if (length(directionUpper) == 1 && nParameters > 1) {
         directionUpper <- rep(directionUpper, nParameters)
@@ -486,12 +486,8 @@
                         )
 
                         if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                            stop(
-                                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                                "Cannot find theta. ",
-                                "The calculated variance estimate is invalid: ",
-                                vHat
-                            )
+                            stopRuntimeIssue("Cannot find theta. ", "The calculated variance estimate is invalid: ", vHat, functionName = ".getEffectScaleBoundaryCountDataTheta",
+                                parameter = "vHat", value = vHat)
                         }
                         (log(x) - log(thetaH0)) / sqrt(vHat) * sqrt(informationRate * numberOfSubjects)
                     },
@@ -521,12 +517,8 @@
                     )
 
                     if (is.null(vHat) || length(vHat) == 0 || is.na(vHat) || is.nan(vHat)) {
-                        stop(
-                            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                            "cannot find theta. ",
-                            "The calculated variance estimate is invalid: ",
-                            vHat
-                        )
+                        stopRuntimeIssue("cannot find theta. ", "The calculated variance estimate is invalid: ", vHat, functionName = ".getEffectScaleBoundaryCountDataTheta",
+                            parameter = "vHat", value = vHat)
                     }
 
                     (log(x) - log(thetaH0)) /
@@ -593,7 +585,7 @@
 
     informationRates <- design$informationRates
     criticalValues <- .getCriticalValues(design)
-    futilityBounds <- .getFutilityBounds(design) 
+    futilityBounds <- .getFutilityBounds(design)
     futilityBounds[!is.na(futilityBounds) & futilityBounds <= C_FUTILITY_BOUNDS_MIN_VALUE] <- NA_real_
 
     funArgs <- list(
@@ -758,13 +750,8 @@
                 call. = FALSE
             )
         } else {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "The specified 'directionUpper' (", directionUpperDefined, ") ",
-                "is not consistent with the calculated 'directionUpper' (",
-                .arrayToString(directionUpperCalculated), "). ",
-                call. = FALSE
-            )
+            stopIllegalArgument("The specified 'directionUpper' (", directionUpperDefined, ") ", "is not consistent with the calculated 'directionUpper' (",
+                .arrayToString(directionUpperCalculated), "). ", functionName = ".setDirectionUpper", parameter = "directionUpper")
         }
     }
 }

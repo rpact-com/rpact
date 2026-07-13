@@ -627,7 +627,7 @@ getClosedCombinationTestResults <- function(stageResults) {
                     }
                     ctr <- .performClosedCombinationTest(
                         stageResults = stageResults,
-                        design = designAlpha, 
+                        design = designAlpha,
                         intersectionTest = intersectionTest
                     )
                     ifelse(ctr$rejected[g, 1], upper <- alpha, lower <- alpha)
@@ -1040,11 +1040,8 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or TrialDesignDunnett",
-        call. = FALSE
-    )
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, or TrialDesignDunnett",
+        functionName = ".getConditionalRejectionProbabilitiesMultiArm", parameter = "design")
 }
 
 #'
@@ -1238,15 +1235,12 @@ getClosedConditionalDunnettTestResults <- function(stageResults,
         stage <- kMax - 1
     }
     if (stage < 1 || kMax == 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "cannot plot conditional power of a fixed design", call. = FALSE)
+        stopIllegalArgument("cannot plot conditional power of a fixed design", functionName = ".getConditionalPowerPlotMultiArm")
     }
     if (stage >= kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "the conditional power plot is only available for subsequent stages. ",
-            "Please specify a 'stage' (", stage, ") < 'kMax' (", kMax, ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("the conditional power plot is only available for subsequent stages. ", "Please specify a 'stage' (",
+            stage, ") < 'kMax' (", kMax, ")", functionName = ".getConditionalPowerPlotMultiArm", parameter = "stage",
+            value = stage, relatedParameter = "kMax", relatedValue = kMax)
     }
 
     .assertIsValidNPlanned(nPlanned = nPlanned, kMax = kMax, stage = stage)

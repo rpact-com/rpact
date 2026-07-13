@@ -356,11 +356,8 @@ plot.EventProbabilities <- function(x,
         maxNumberOfSubjectsToUse <- x$maxNumberOfSubjects
     } else if (!is.na(x$maxNumberOfSubjects) &&
             x$maxNumberOfSubjects != maxNumberOfSubjectsToUse) {
-        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "'x' (EventProbabilities) and 'y' (NumberOfSubjects) ",
-            "must have the same 'maxNumberOfSubjects' defined",
-            call. = FALSE
-        )
+        stopConflictingArguments("'x' (EventProbabilities) and 'y' (NumberOfSubjects) ", "must have the same 'maxNumberOfSubjects' defined",
+    functionName = ".plot.EventProbabilities", parameter = "x", relatedParameter = "y", value = x)
     }
 
     if (!is.na(maxNumberOfSubjectsToUse)) {

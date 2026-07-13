@@ -141,13 +141,8 @@ SimulationResults <- R6::R6Class(
                 super$.show(showType = showType, digits = digits, consoleOutputEnabled = consoleOutputEnabled)
             } else {
                 if (is.null(showStatistics) || length(showStatistics) != 1) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'showStatistics' (",
-                        .arrayToString(showStatistics),
-                        ") must be a single logical or character",
-                        call. = FALSE
-                    )
+                    stopIllegalArgument("'showStatistics' (", .arrayToString(showStatistics), ") must be a single logical or character",
+                        functionName = ".show", parameter = "showStatistics", value = showStatistics)
                 }
 
                 if (!is.character(showStatistics) || showStatistics != "exclusive") {

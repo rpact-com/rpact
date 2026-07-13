@@ -535,17 +535,9 @@ NULL
         firstValue <- stageResults[[firstParameterName]][treatmentArm, stage]
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                sprintf(
-                    paste0(
-                        "failed to find theta (k = %s, firstValue = %s, ",
-                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
-                    ),
-                    stage, stageResults[[firstParameterName]][treatmentArm, stage], secondValue,
-                    firstValue, theta
-                )
-            )
+            stopRuntimeIssue(sprintf(paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                stage, stageResults[[firstParameterName]][treatmentArm, stage], secondValue, firstValue, theta),
+                functionName = ".getUpperLowerThetaSurvivalMultiArm")
         }
     }
 
@@ -982,16 +974,13 @@ NULL
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
 
     if (any(thetaH1 <= 0, na.rm = TRUE)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'thetaH1' (", thetaH1, ") must be > 0", call. = FALSE)
+        stopIllegalArgument("'thetaH1' (", thetaH1, ") must be > 0", functionName = ".getConditionalPowerSurvivalMultiArm",
+            parameter = "thetaH1", value = thetaH1)
     }
     if ((length(thetaH1) != 1) && (length(thetaH1) != gMax)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'thetaH1' (%s) must be ",
-                "equal to 'gMax' (%s) or 1"
-            ), .arrayToString(thetaH1), gMax)
-        )
+        stopIllegalArgument(sprintf(paste0("length of 'thetaH1' (%s) must be ", "equal to 'gMax' (%s) or 1"),
+            .arrayToString(thetaH1), gMax), functionName = ".getConditionalPowerSurvivalMultiArm", parameter = "thetaH1",
+            value = thetaH1, relatedParameter = "gMax", relatedValue = gMax)
     }
 
     if (.isTrialDesignInverseNormalOrFixed(design)) {
@@ -1031,12 +1020,8 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
-        "or TrialDesignConditionalDunnett",
-        call. = FALSE
-    )
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
+        "or TrialDesignConditionalDunnett", functionName = ".getConditionalPowerSurvivalMultiArm", parameter = "design")
 }
 
 #'
@@ -1320,11 +1305,8 @@ NULL
     thetaRange <- .assertIsValidThetaH1ForMultiArm(thetaH1 = thetaRange)
 
     if (length(thetaRange) == 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2",
-            call. = FALSE
-        )
+        stopIllegalArgument("length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2", functionName = ".getConditionalPowerLikelihoodSurvivalMultiArm",
+            parameter = "thetaRange", value = thetaRange)
     }
 
     treatmentArms <- numeric(gMax * length(thetaRange))

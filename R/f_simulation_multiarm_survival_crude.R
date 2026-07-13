@@ -205,12 +205,8 @@ NULL
                 )
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ",
-                        "the output must be a single numeric value",
-                        call. = FALSE
-                    )
+                    stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
+    functionName = ".getSimulatedStageSurvivalMultiArm", parameter = "calcEventsFunction", value = calcEventsFunction)
                 }
 
                 if (!is.na(conditionalPower) || calcEventsFunctionIsUserDefined) {
@@ -446,7 +442,7 @@ getSimulationMultiArmSurvivalBasic <- function(
     maxNumberOfEventsPerStage <- simulationResults$maxNumberOfEventsPerStage # survival only
     allocationRatioPlanned <- simulationResults$allocationRatioPlanned
     calcEventsFunction <- simulationResults$calcEventsFunction
-    
+
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, kMax)
     }
@@ -668,7 +664,7 @@ getSimulationMultiArmSurvivalBasic <- function(
     }
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations
-    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms", 
+    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms",
         simulationResults$numberOfSelectedArms, , "2026-07-13")
 
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
@@ -688,7 +684,7 @@ getSimulationMultiArmSurvivalBasic <- function(
             simulationResults$cumulativeEventsPerStage[, , gMax + 1]
     }
     simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
-    .addDeprecatedFieldValues(simulationResults, "eventsPerStage", 
+    .addDeprecatedFieldValues(simulationResults, "eventsPerStage",
         simulationResults$cumulativeEventsPerStage, "2024-06-10")
 
     simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
@@ -700,7 +696,7 @@ getSimulationMultiArmSurvivalBasic <- function(
 
     simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
     simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", 
+    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage",
         simulatedSingleEventsPerStage, "2024-06-10")
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
@@ -712,10 +708,7 @@ getSimulationMultiArmSurvivalBasic <- function(
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "internal error, simulation not possible due to numerical overflow"
-        )
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationMultiArmSurvivalBasic")
     }
 
     data <- data.frame(

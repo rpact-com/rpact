@@ -77,7 +77,7 @@ NULL
     return(selectedVector)
 }
 
-#' 
+#'
 #' Select populations for enrichment simulation
 #'
 #' Internal helper to determine which sub-populations are selected at a stage.
@@ -99,11 +99,11 @@ NULL
 #'   logic on the provided effect vector. If typeOfSelection == "userDefined" the
 #'   provided function is called (using only the declared argument names) and its result
 #'   is validated: it must be a logical vector of length gMax. Otherwise an error is thrown.
-#' 
+#'
 #' @keywords internal
-#' 
-#' @noRd 
-#' 
+#'
+#' @noRd
+#'
 .selectPopulations <- function(
         typeOfSelection,
         epsilonValue,
@@ -145,16 +145,20 @@ NULL
         selectedPopulations[is.na(effectVector)] <- FALSE
 
         msg <- paste0(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
             "'selectPopulationsFunction' returned an illegal or undefined result (",
             .arrayToString(selectedPopulations),
             "); "
         )
         if (length(selectedPopulations) != gMax) {
-            stop(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")", call. = FALSE)
+            stopIllegalArgument(msg, "the output must be a logical vector of length 'gMax' (", gMax, ")", parameter = "selectPopulationsFunction",
+                value = selectedPopulations, constraint = paste0("logical vector of length ", gMax), relatedParameter = "gMax",
+                relatedValue = gMax, functionName = ".selectPopulations")
         }
         if (!is.logical(selectedPopulations)) {
-            stop(msg, "the output must be a logical vector (is ", .getClassName(selectedPopulations), ")", call. = FALSE)
+            stopIllegalArgument(msg, "the output must be a logical vector (is ", .getClassName(selectedPopulations),
+                ")", parameter = "selectPopulationsFunction", value = selectedPopulations, constraint = "logical vector",
+                relatedParameter = "class of selected populations", relatedValue = .getClassName(selectedPopulations),
+                functionName = ".selectPopulations")
         }
     }
     return(selectedPopulations)
@@ -168,11 +172,8 @@ NULL
         intersectionTest,
         successCriterion) {
     if (.isTrialDesignGroupSequential(design) && (design$kMax > 1)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Group sequential design cannot be used for enrichment designs with population selection",
-            call. = FALSE
-        )
+        stopIllegalArgument("Group sequential design cannot be used for enrichment designs with population selection",
+            functionName = ".performClosedCombinationTestForSimulationEnrichment")
     }
 
     gMax <- nrow(stageResults$testStatistics)
@@ -443,12 +444,9 @@ NULL
     effectList <- .getValidatedEffectList(effectList, endpoint = endpoint)
     if (endpoint == "survival" && is.null(effectList$hazardRatios) && !is.null(effectList$piTreatments)) {
         if (is.null(effectList$piControls)) {
-            stop(
-                C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-                sQuote("effectList$piControls"),
-                " must be specified when 'effectList$piTreatments' is used",
-                call. = FALSE
-            )
+            stopMissingArgument(sQuote("effectList$piControls"), " must be specified when 'effectList$piTreatments' is used",
+                functionName = ".createSimulationResultsEnrichmentObject", parameter = "effectList$piControls", value = effectList$piControls,
+                relatedParameter = "effectList$piTreatments", relatedValue = effectList$piTreatments)
         }
 
         effectList$hazardRatios <- t(apply(effectList$piTreatments, 1, function(piTreatments) {
@@ -457,7 +455,8 @@ NULL
     }
     gMax <- .getGMaxFromSubGroups(effectList$subGroups)
     if (gMax > 4) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'populations' (", gMax, ") must not exceed 4", call. = FALSE)
+        stopIllegalArgument("'populations' (", gMax, ") must not exceed 4", functionName = ".createSimulationResultsEnrichmentObject",
+            parameter = "populations")
     }
 
     .assertIsValidThreshold(threshold, activeArms = gMax)
@@ -466,12 +465,8 @@ NULL
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
 
     if (intersectionTest == "SpiessensDebois" && gMax > 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Spiessen & Debois intersection test cannot generally ",
-            "be used for enrichment designs with more than two populations",
-            call. = FALSE
-        )
+        stopIllegalArgument("Spiessen & Debois intersection test cannot generally ", "be used for enrichment designs with more than two populations",
+            functionName = ".createSimulationResultsEnrichmentObject")
     }
 
     typeOfSelection <- .assertIsValidTypeOfSelection(typeOfSelection, rValue, epsilonValue, gMax)
@@ -505,11 +500,7 @@ NULL
     }
 
     if (!stratifiedAnalysis && endpoint %in% c("means")) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "For testing means, only stratified analysis is supported",
-            call. = FALSE
-        )
+        stopIllegalArgument("For testing means, only stratified analysis is supported", functionName = ".createSimulationResultsEnrichmentObject")
     }
 
     kMax <- design$kMax
@@ -547,7 +538,8 @@ NULL
         .setValueAndParameterType(simulationResults, "eventTime", eventTime, 12)
 
         if (!is.na(eventTime) && eventTime <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'eventTime' (", eventTime, ") must be > 0", call. = FALSE)
+            stopIllegalArgument("'eventTime' (", eventTime, ") must be > 0", functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "eventTime", value = eventTime)
         }
 
         .setValueAndParameterType(simulationResults, "kappa", kappa, 1)
@@ -560,37 +552,22 @@ NULL
         .setValueAndParameterType(simulationResults, "dropoutTime", dropoutTime, 12)
 
         if (!is.na(dropoutTime) && dropoutTime <= 0) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0", call. = FALSE)
+            stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0", functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "dropoutTime", value = dropoutTime)
         }
         if (!is.na(dropoutRate1) && (dropoutRate1 < 0 || dropoutRate1 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'dropoutRate1' (",
-                dropoutRate1,
-                ") is out of bounds [0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)", functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "dropoutRate1", value = dropoutRate1)
         }
         if (!is.na(dropoutRate2) && (dropoutRate2 < 0 || dropoutRate2 >= 1)) {
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-                "'dropoutRate2' (",
-                dropoutRate2,
-                ") is out of bounds [0; 1)",
-                call. = FALSE
-            )
+            stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)", functionName = ".createSimulationResultsEnrichmentObject",
+                parameter = "dropoutRate2", value = dropoutRate2)
         }
 
         .assertIsIntegerVector(plannedEvents, "plannedEvents", validateType = FALSE)
         if (length(plannedEvents) != kMax) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'plannedEvents' (",
-                .arrayToString(plannedEvents),
-                ") must have length ",
-                kMax,
-                call. = FALSE
-            )
+            stopIllegalArgument("'plannedEvents' (", .arrayToString(plannedEvents), ") must have length ", kMax,
+                functionName = ".createSimulationResultsEnrichmentObject", parameter = "plannedEvents", value = plannedEvents)
         }
         .assertIsInClosedInterval(plannedEvents, "plannedEvents", lower = 1, upper = NULL)
         .assertValuesAreStrictlyIncreasing(plannedEvents, "plannedEvents")
@@ -658,15 +635,9 @@ NULL
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage)) &&
                     any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0)
                 ) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'maxNumberOfSubjectsPerStage' (",
-                    .arrayToString(maxNumberOfSubjectsPerStage),
-                    ") must be not smaller than minNumberOfSubjectsPerStage' (",
-                    .arrayToString(minNumberOfSubjectsPerStage),
-                    ")",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+                    .arrayToString(minNumberOfSubjectsPerStage), ")", functionName = ".createSimulationResultsEnrichmentObject",
+                    parameter = "maxNumberOfSubjectsPerStage", value = maxNumberOfSubjectsPerStage)
             }
             .setValueAndParameterType(
                 simulationResults,
@@ -719,15 +690,10 @@ NULL
                 !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage)) &&
                     any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0)
                 ) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'maxNumberOfEventsPerStage' (",
-                    .arrayToString(maxNumberOfEventsPerStage),
-                    ") must be not smaller than 'minNumberOfEventsPerStage' (",
-                    .arrayToString(minNumberOfEventsPerStage),
-                    ")",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than 'minNumberOfEventsPerStage' (",
+                    .arrayToString(minNumberOfEventsPerStage), ")", functionName = ".createSimulationResultsEnrichmentObject",
+                    parameter = "maxNumberOfEventsPerStage", value = maxNumberOfEventsPerStage, relatedParameter = "minNumberOfEventsPerStage",
+                    relatedValue = minNumberOfEventsPerStage)
             }
             .setValueAndParameterType(
                 simulationResults,
@@ -867,16 +833,9 @@ NULL
     if (length(allocationRatioPlanned) == 1) {
         allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
     } else if (length(allocationRatioPlanned) != design$kMax) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'allocationRatioPlanned' (",
-            .arrayToString(allocationRatioPlanned),
-            ") ",
-            "must have length 1 or ",
-            design$kMax,
-            " (kMax)",
-            call. = FALSE
-        )
+        stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+            design$kMax, " (kMax)", functionName = ".createSimulationResultsEnrichmentObject", parameter = "allocationRatioPlanned",
+            value = allocationRatioPlanned)
     }
 
     if (length(unique(allocationRatioPlanned)) == 1) {
@@ -954,7 +913,8 @@ NULL
         adaptations <- rep(TRUE, kMax - 1)
     }
     if (length(adaptations) != kMax - 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'adaptations' must have length ", (kMax - 1), " (kMax - 1)", call. = FALSE)
+        stopIllegalArgument("'adaptations' must have length ", (kMax - 1), " (kMax - 1)", functionName = ".createSimulationResultsEnrichmentObject",
+    parameter = "adaptations", value = adaptations)
     }
     .setValueAndParameterType(simulationResults, "adaptations", adaptations, rep(TRUE, kMax - 1))
 

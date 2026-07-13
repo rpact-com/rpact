@@ -289,11 +289,10 @@ summary.FutilityBounds <- function(object, ...) {
     if (!all(is.na(futilityBoundsFromArgs))) {
         if (is(futilityBoundsFromArgs, "FutilityBounds") &&
                 !identical(attr(futilityBoundsFromArgs, "targetScale")$value, targetScale)) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'", futilityBoundsName, "' (", .arrayToString(futilityBoundsFromArgs), ") ",
-                "must be on '", targetScale, "' scale or converted to '", targetScale, "' scale",
-                call. = FALSE
-            )
+            stopIllegalArgument("'", futilityBoundsName, "' (", .arrayToString(futilityBoundsFromArgs), ") ", "must be on '",
+                targetScale, "' scale or converted to '", targetScale, "' scale", functionName = ".getFutilityBoundsFromArgs",
+                parameter = futilityBoundsName, value = futilityBoundsFromArgs, relatedParameter = futilityBoundsScaleName,
+                relatedValue = targetScale)
         }
 
         futilityBoundsOld <- futilityBounds
@@ -335,11 +334,10 @@ summary.FutilityBounds <- function(object, ...) {
     }
 
     msg <- paste0(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
         "Futility bounds conversion ", sQuote(sourceScale), " -> ", sQuote(targetScale),
         " is available only for one-sided two-stage designs; invalid user input: "
     )
-    
+
     invalidInputs <- character()
     if (design$sided != 1) {
         invalidInputs <- c(invalidInputs, paste0("sided = ", design$sided))
@@ -347,7 +345,9 @@ summary.FutilityBounds <- function(object, ...) {
     if (design$kMax != 2) {
         invalidInputs <- c(invalidInputs, paste0("kMax = ", design$kMax))
     }
-    stop(msg, paste(invalidInputs, collapse = ", "), call. = FALSE)
+    stopIllegalArgument(msg, paste(invalidInputs, collapse = ", "), parameter = c("sided", "kMax"), value = list(sided = design$sided,
+        kMax = design$kMax), constraint = "one-sided two-stage design", context = list(sourceScale = sourceScale,
+        targetScale = targetScale), functionName = ".assertIsValidDesignForFutilityBoundsConversion")
 }
 
 .futilityBoundsCalculationRequiresDesign <- function(scale) {
@@ -651,11 +651,8 @@ getFutilityBounds <- function(sourceValue,
         return(.addFutilityBoundParameterTypes(result, args))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "conversion from '", sourceScale, "' to '", targetScale, "' not implemented",
-        call. = FALSE
-    )
+    stopIllegalArgument("conversion from '", sourceScale, "' to '", targetScale, "' not implemented", functionName = "getFutilityBounds",
+        parameter = "sourceScale", value = sourceScale, relatedParameter = "targetScale", relatedValue = targetScale)
 }
 
 .getFutilityBoundSourceValueFisher <- function(sourceValue,
@@ -861,7 +858,7 @@ getFutilityBounds <- function(sourceValue,
 #' )
 #' getFisherInformation(designPlan)
 #'}
-#' 
+#'
 #' @seealso \code{\link[=getFutilityBounds]{getFutilityBounds()}}
 #'
 #' @export

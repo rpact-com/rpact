@@ -473,7 +473,7 @@ NULL
 
     if (dataInput$getNumberOfGroups() == 1) {
         if (is.na(thetaH0)) {
-            stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'thetaH0' must be defined", call. = FALSE)
+            stopMissingArgument("'thetaH0' must be defined", functionName = ".getStageResultsRates", parameter = "thetaH0", value = thetaH0)
         }
 
         if (normalApproximation) {
@@ -581,11 +581,7 @@ NULL
                 )
             } else {
                 if (thetaH0 != 0) {
-                    stop(
-                        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "thetaH0 must be equal 0 for performing Fisher's exact test",
-                        call. = FALSE
-                    )
+                    stopConflictingArguments("thetaH0 must be equal 0 for performing Fisher's exact test", functionName = ".getStageResultsRates")
                 }
 
                 overallPValues[k] <- stats::phyper(
@@ -1100,9 +1096,8 @@ NULL
     # Inverse normal method
     condError <- getConditionalRejectionProbabilities(stageResults = stageResults)[stage]
     if (is.na(condError)) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "conditional error could not be calculated at stage ", stage
-        )
+        stopRuntimeIssue("conditional error could not be calculated at stage ", stage, functionName = ".calculateThetaH1",
+            parameter = "stage", value = stage)
     }
 
     if (stageResults$isOneSampleDataset()) {
@@ -1586,7 +1581,7 @@ NULL
     } else {
         .stopWithWrongDesignMessage(stageResults$.design, inclusiveConditionalDunnett = FALSE)
     }
-    
+
     results$nPlanned <- cp$nPlanned
     results$conditionalPower <- cp$conditionalPower
     results$.setParameterType("nPlanned", C_PARAM_GENERATED)

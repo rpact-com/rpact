@@ -512,11 +512,11 @@ NULL
                 if (is.na(thetaH1)) {
                     estimatedTheta <- min(overallEffects[, k], na.rm = TRUE)
                 }
-                
+
                 if (!directionUpper) {
                     estimatedTheta <- 1 / estimatedTheta
                 }
-                
+
                 conditionalCriticalValuePerStage <- conditionalCriticalValue
                 if (calcEventsFunctionIsUserDefined) {
                     conditionalCriticalValuePerStage <- conditionalCriticalValue[k]
@@ -541,13 +541,8 @@ NULL
                 )
 
                 if (is.null(newEvents) || length(newEvents) != 1 || !is.numeric(newEvents) || is.na(newEvents)) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcEventsFunction' returned an illegal or undefined result (",
-                        newEvents,
-                        "); ",
-                        "the output must be a single numeric value"
-                    )
+                    stopIllegalArgument("'calcEventsFunction' returned an illegal or undefined result (", newEvents, "); ", "the output must be a single numeric value",
+    functionName = ".getSimulatedStageResultsSurvivalMultiArmPatientWise", parameter = "calcEventsFunction", value = calcEventsFunction)
                 }
 
                 if (!is.na(conditionalPower)) {

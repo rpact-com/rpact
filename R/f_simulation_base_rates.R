@@ -259,19 +259,12 @@ getSimulationRates <- function(design = NULL, ...,
     .assertIsValidPlannedSubjectsOrEvents(design, plannedSubjects, parameterName = "plannedSubjects")
 
     if (design$sided == 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "only one-sided case is implemented for the simulation design",
-            call. = FALSE
-        )
+        stopIllegalArgument("only one-sided case is implemented for the simulation design", functionName = "getSimulationRates")
     }
 
     if (!normalApproximation && (groups == 2) && (riskRatio || (thetaH0 != 0))) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "in the two-sample case, exact test is implemented only for testing H0: pi1 - pi2 = 0",
-            call. = FALSE
-        )
+        stopIllegalArgument("in the two-sample case, exact test is implemented only for testing H0: pi1 - pi2 = 0",
+            functionName = "getSimulationRates")
     }
 
     simulationResults <- SimulationResultsRates$new(design, showStatistics = showStatistics)
@@ -299,13 +292,9 @@ getSimulationRates <- function(design = NULL, ...,
     if (design$kMax > 1) {
         if (any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0) &&
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'maxNumberOfSubjectsPerStage' (",
-                .arrayToString(maxNumberOfSubjectsPerStage),
-                ") must be not smaller than minNumberOfSubjectsPerStage' (",
-                .arrayToString(minNumberOfSubjectsPerStage), ")",
-                call. = FALSE
-            )
+            stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+                .arrayToString(minNumberOfSubjectsPerStage), ")", functionName = "getSimulationRates", parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage)
         }
         .setValueAndParameterType(
             simulationResults, "minNumberOfSubjectsPerStage",
@@ -392,12 +381,9 @@ getSimulationRates <- function(design = NULL, ...,
         if (length(allocationRatioPlanned) == 1) {
             allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
         } else if (length(allocationRatioPlanned) != design$kMax) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
-                "must have length 1 or ", design$kMax, " (kMax)",
-                call. = FALSE
-            )
+            stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+                design$kMax, " (kMax)", functionName = "getSimulationRates", parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned)
         }
 
         if (length(unique(allocationRatioPlanned)) == 1) {

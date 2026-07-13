@@ -233,11 +233,7 @@ getSimulationMeans <- function(
     simulationResults <- SimulationResultsMeans$new(design, showStatistics = showStatistics)
 
     if (design$sided == 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "only one-sided case is implemented for the simulation design",
-            call. = FALSE
-        )
+        stopIllegalArgument("only one-sided case is implemented for the simulation design", functionName = "getSimulationMeans")
     }
 
     if (groups == 1L) {
@@ -263,12 +259,9 @@ getSimulationMeans <- function(
         if (length(allocationRatioPlanned) == 1) {
             allocationRatioPlanned <- rep(allocationRatioPlanned, design$kMax)
         } else if (length(allocationRatioPlanned) != design$kMax) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ",
-                "must have length 1 or ", design$kMax, " (kMax)",
-                call. = FALSE
-            )
+            stopIllegalArgument("'allocationRatioPlanned' (", .arrayToString(allocationRatioPlanned), ") ", "must have length 1 or ",
+                design$kMax, " (kMax)", functionName = "getSimulationMeans", parameter = "allocationRatioPlanned",
+                value = allocationRatioPlanned)
         }
 
         if (length(unique(allocationRatioPlanned)) == 1) {
@@ -325,22 +318,14 @@ getSimulationMeans <- function(
     if (design$kMax > 1) {
         if (!normalApproximation) {
             if (!all(is.na(minNumberOfSubjectsPerStage)) && (any(minNumberOfSubjectsPerStage < groups * 2))) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "minNumberOfSubjectsPerStage not correctly specified",
-                    call. = FALSE
-                )
+                stopIllegalArgument("minNumberOfSubjectsPerStage not correctly specified", functionName = "getSimulationMeans")
             }
         }
         if (any(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage < 0) &&
                 !all(is.na(maxNumberOfSubjectsPerStage - minNumberOfSubjectsPerStage))) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'maxNumberOfSubjectsPerStage' (",
-                .arrayToString(maxNumberOfSubjectsPerStage),
-                ") must be not smaller than minNumberOfSubjectsPerStage' (",
-                .arrayToString(minNumberOfSubjectsPerStage), ")",
-                call. = FALSE
-            )
+            stopIllegalArgument("'maxNumberOfSubjectsPerStage' (", .arrayToString(maxNumberOfSubjectsPerStage), ") must be not smaller than minNumberOfSubjectsPerStage' (",
+                .arrayToString(minNumberOfSubjectsPerStage), ")", functionName = "getSimulationMeans", parameter = "maxNumberOfSubjectsPerStage",
+                value = maxNumberOfSubjectsPerStage)
         }
         .setValueAndParameterType(
             simulationResults, "minNumberOfSubjectsPerStage",
@@ -452,7 +437,8 @@ getSimulationMeans <- function(
     } else if (.isTrialDesignFisher(design)) {
         designNumber <- 3L
     } else {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "design type ", sQuote(.getClassName(design)), " not supported")
+        stopRuntimeIssue("design type ", sQuote(.getClassName(design)), " not supported", functionName = "getSimulationMeans",
+            parameter = .getClassName(design))
     }
 
     if (.isTrialDesignFisher(design)) {
@@ -511,7 +497,7 @@ getSimulationMeans <- function(
         calcSubjectsFunctionR = calcSubjectsFunctionR,
         calcSubjectsFunctionCpp = calcSubjectsFunctionCpp
     )
-    
+
     sampleSizes <- cppResult$sampleSizes
     sampleSizes[is.na(sampleSizes)] <- 0
 

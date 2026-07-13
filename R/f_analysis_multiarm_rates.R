@@ -371,10 +371,8 @@ NULL
     .assertIsValidIntersectionTestMultiArm(design, intersectionTest)
 
     if (intersectionTest == "Dunnett" && !normalApproximation) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Dunnett test cannot be used with Fisher's exact test (normalApproximation = FALSE)",
-            call. = FALSE
-        )
+        stopIllegalArgument("Dunnett test cannot be used with Fisher's exact test (normalApproximation = FALSE)",
+            functionName = ".getStageResultsRatesMultiArm")
     }
 
     stageResults <- StageResultsMultiArmRates$new(
@@ -445,11 +443,8 @@ NULL
                 )
             } else {
                 if (thetaH0 != 0) {
-                    stop(
-                        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
-                        call. = FALSE
-                    )
+                    stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test", functionName = ".getStageResultsRatesMultiArm",
+                        parameter = "thetaH0", value = thetaH0)
                 }
 
                 if (directionUpper) {
@@ -511,11 +506,8 @@ NULL
                 )
             } else {
                 if (thetaH0 != 0) {
-                    stop(
-                        C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                        "'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
-                        call. = FALSE
-                    )
+                    stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test", functionName = ".getStageResultsRatesMultiArm",
+                        parameter = "thetaH0", value = thetaH0)
                 }
 
                 if (directionUpper) {
@@ -1095,20 +1087,14 @@ NULL
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
 
     if ((length(piTreatments) != 1) && (length(piTreatments) != gMax)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'piTreatments' (%s) ",
-                "must be equal to 'gMax' (%s) or 1"
-            ), .arrayToString(piTreatments), gMax)
-        )
+        stopIllegalArgument(sprintf(paste0("length of 'piTreatments' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+            .arrayToString(piTreatments), gMax), functionName = ".getConditionalPowerRatesMultiArm", parameter = "piTreatments",
+            value = piTreatments, relatedParameter = "gMax", relatedValue = gMax)
     }
 
     if (length(piControl) != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0("length of 'piControl' (%s) must be equal to 1"), .arrayToString(piControl))
-        )
+        stopIllegalArgument(sprintf(paste0("length of 'piControl' (%s) must be equal to 1"), .arrayToString(piControl)),
+            functionName = ".getConditionalPowerRatesMultiArm", parameter = "piControl", value = piControl)
     }
 
     if (.isTrialDesignInverseNormalOrFixed(design)) {
@@ -1152,12 +1138,8 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
-        "or TrialDesignConditionalDunnett",
-        call. = FALSE
-    )
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
+        "or TrialDesignConditionalDunnett", functionName = ".getConditionalPowerRatesMultiArm", parameter = "design")
 }
 
 #'
@@ -1498,11 +1480,8 @@ NULL
 
     piControl <- .assertIsValidPiControlForMultiArm(piControl, stageResults, stage)
     if (length(piControl) != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'piControl' (", .arrayToString(piControl), ") must be equal to 1",
-            call. = FALSE
-        )
+        stopIllegalArgument("length of 'piControl' (", .arrayToString(piControl), ") must be equal to 1", functionName = ".getConditionalPowerLikelihoodRatesMultiArm",
+            parameter = "piControl", value = piControl)
     }
 
     piTreatmentRange <- .assertIsValidPiTreatmentRange(piTreatmentRange = piTreatmentRange)

@@ -230,11 +230,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
         },
         .getParameterType = function(parameterName) {
             if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterName' must be a valid character with length > 0",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'parameterName' must be a valid character with length > 0", functionName = ".getParameterType",
+                    parameter = parameterName)
             }
 
             parameterType <- self$.parameterTypes[[parameterName]]
@@ -249,11 +246,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
         },
         .setParameterType = function(parameterName, parameterType) {
             if (is.null(parameterName) || length(parameterName) == 0 || is.na(parameterName)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterName' must be a valid character with length > 0",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'parameterName' must be a valid character with length > 0", functionName = ".setParameterType",
+                    parameter = parameterName)
             }
 
             parameterType <- parameterType[1]
@@ -262,11 +256,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                     C_PARAM_USER_DEFINED, C_PARAM_DEFAULT_VALUE,
                     C_PARAM_GENERATED, C_PARAM_DERIVED, C_PARAM_NOT_APPLICABLE
                 ))) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'parameterType' ('", parameterType, "') is invalid",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'parameterType' ('", parameterType, "') is invalid", functionName = ".setParameterType",
+                    parameter = "parameterType", value = parameterType)
             }
 
             self$.parameterTypes[[parameterName]] <- parameterType
@@ -392,10 +383,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                 self$.showAllParameters(consoleOutputEnabled = consoleOutputEnabled)
                 self$.showParameterTypeDescription(consoleOutputEnabled = consoleOutputEnabled)
             } else {
-                stop(
-                    C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                    "method '.show()' is not implemented in class '", .getClassName(self), "'"
-                )
+                stopRuntimeIssue("method '.show()' is not implemented in class '", .getClassName(self), "'", functionName = ".show",
+                    parameter = ".show()")
             }
         },
         .showParametersOfOneGroup = function(parameters, title,
@@ -670,10 +659,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
                         } else if (inherits(self, "ClosedCombinationTestResults")) {
                             populations <- self$.getHypothesisPopulationVariants()[matrixRow]
                         } else {
-                            stop(
-                                C_EXCEPTION_TYPE_RUNTIME_ISSUE, "only ClosedCombinationTestResults ",
-                                "supports function .getHypothesisPopulationVariants() (object is ", .getClassName(self), ")"
-                            )
+                            stopRuntimeIssue("only ClosedCombinationTestResults ", "supports function .getHypothesisPopulationVariants() (object is ",
+                                .getClassName(self), ")", functionName = ".showParameterFormatted", parameter = "self", value = self)
                         }
                         paramCaption <- paste0(paramCaption, " ", populations)
                     } else {
@@ -817,7 +804,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
         },
         .getDataFrameColumnCaption = function(parameterName, niceColumnNamesEnabled) {
             if (length(parameterName) == 0 || parameterName == "") {
-                stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'parameterName' must be a valid parameter name", call. = FALSE)
+                stopIllegalArgument("'parameterName' must be a valid parameter name", functionName = ".getDataFrameColumnCaption",
+                    parameter = parameterName)
             }
 
             if (!niceColumnNamesEnabled) {
@@ -894,11 +882,13 @@ ParameterSet <- R6::R6Class("ParameterSet",
         .getSubListByNames = function(x, listEntryNames) {
             "Returns a sub-list."
             if (!is.list(x) && !inherits(x, "Dictionary")) {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'x' must be a list or Dictionary (is ", .getClassName(x), ")")
+                stopRuntimeIssue("'x' must be a list or Dictionary (is ", .getClassName(x), ")", functionName = ".getSubListByNames",
+                    parameter = "x", value = x)
             }
 
             if (!is.character(listEntryNames)) {
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "'listEntryNames' must be a character vector")
+                stopRuntimeIssue("'listEntryNames' must be a character vector", functionName = ".getSubListByNames", parameter = "listEntryNames",
+    value = listEntryNames)
             }
 
             if (inherits(x, "Dictionary")) {
@@ -1048,11 +1038,8 @@ ParameterSet <- R6::R6Class("ParameterSet",
             return(paste(parameterValues, collapse = ", "))
         }
 
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "parameter '", parameterName, "' has an invalid ",
-            "dimension (length is ", length(parameterValues), ")"
-        )
+        stopRuntimeIssue("parameter '", parameterName, "' has an invalid ", "dimension (length is ", length(parameterValues),
+            ")", functionName = ".getDataFrameColumnValues", parameter = parameterName, value = length(parameterValues))
     } else if (parameterName == "effectMatrix") {
         # return effect matrix row if 'effectMatrix' is user defined
         if (parameterSet$.getParameterType("effectMatrix") == C_PARAM_USER_DEFINED) {
@@ -1117,12 +1104,10 @@ ParameterSet <- R6::R6Class("ParameterSet",
         return(rep(parameterValues[, 1], numberOfVariants))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-        "parameter '", parameterName, "' has an invalid ",
-        "dimension (", nrow(parameterValues), " x ", ncol(parameterValues), "); ",
-        "expected was (", numberOfStages, " x ", numberOfVariants, ")"
-    )
+    stopRuntimeIssue("parameter '", parameterName, "' has an invalid ", "dimension (", nrow(parameterValues),
+        " x ", ncol(parameterValues), "); ", "expected was (", numberOfStages, " x ", numberOfVariants, ")",
+        functionName = ".getDataFrameColumnValues", parameter = parameterName, relatedParameter = "numberOfStages",
+        relatedValue = numberOfStages)
 }
 
 .getAsDataFrameMultidimensional <- function(parameterSet,
@@ -1965,7 +1950,8 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
             }
         }
         if (length(var) == 0 || !(var %in% names(x))) {
-            stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "variable ", sQuote(varRoot), " does not exist", call. = FALSE)
+            stopIllegalArgument("variable ", sQuote(varRoot), " does not exist", functionName = ".getParameterSetValue",
+                parameter = varRoot)
         }
 
         value <- x[[var]]
@@ -1995,7 +1981,8 @@ fetch.ParameterSet <- function(x, ..., output = c("named", "labeled", "value", "
     varNames <- names(x)
     .assertIsInClosedInterval(var, "var", lower = -length(varNames), upper = length(varNames))
     if (var == 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'var' (", var, ") must != 0", call. = FALSE)
+        stopIllegalArgument("'var' (", var, ") must != 0", functionName = ".getParameterSetValue", parameter = "var",
+            value = var)
     }
     if (var < 0) {
         var <- length(varNames) + var + 1
@@ -2054,10 +2041,8 @@ plot.ParameterSet <- function(x, y, ..., main = NA_character_,
         legendPosition = NA_integer_, showSource = FALSE, plotSettings = NULL) {
     .assertGgplotIsInstalled()
 
-    stop(
-        C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-        "sorry, function 'plot' is not yet implemented for class '", .getClassName(x), "'"
-    )
+    stopRuntimeIssue("sorry, function 'plot' is not yet implemented for class '", .getClassName(x), "'",
+        functionName = "plot.ParameterSet", parameter = "plot")
 }
 
 #'
@@ -2165,12 +2150,9 @@ kable.ParameterSet <- function(x, ...) {
                 objName <- paste0(objName[1], "...")
             }
             if (grepl("^ *print\\(", objName)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "kable(", objName, ") ",
-                    "does not work correctly. ",
-                    "Use ", sub("print", "kable", objName), " without 'print' ",
-                    "instead or ", sub("\\)", ", markdown = TRUE, call. = FALSE)", objName)
-                )
+                stopIllegalArgument("kable(", objName, ") ", "does not work correctly. ", "Use ", sub("print", "kable",
+                    objName), " without 'print' ", "instead or ", sub("\\)", ", markdown = TRUE, call. = FALSE)", objName),
+                    functionName = "kable.ParameterSet", parameter = "print")
             }
         }
 

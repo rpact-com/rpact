@@ -322,13 +322,11 @@ getSimulationCounts <- function(design = NULL,
         .assertAreValidCalendarTimes(plannedCalendarTime, kMax)
         if (!is.na(followUpTime)) {
             if (abs(plannedCalendarTime[kMax] - max(accrualTime) - followUpTime) > 1e-04) {
-                stop(sprintf(
-                    paste0(
-                        "Last 'plannedCalendarTime' (%s) ",
-                        "must be equal to %s (accrualTime + followUpTime)"
-                    ),
-                    plannedCalendarTime[kMax], max(accrualTime) + followUpTime
-                ))
+                stopConflictingArguments(sprintf(paste0("Last 'plannedCalendarTime' (%s) ", "must be equal to %s (accrualTime + followUpTime)"),
+                    plannedCalendarTime[kMax], max(accrualTime) + followUpTime), parameter = "plannedCalendarTime", value = plannedCalendarTime[kMax],
+                    constraint = "last plannedCalendarTime must equal max(accrualTime) + followUpTime", relatedParameter = c("accrualTime",
+                        "followUpTime"), relatedValue = list(accrualTime = accrualTime, followUpTime = followUpTime),
+                    functionName = "getSimulationCounts")
             }
         }
     } else if (!all(is.na(plannedCalendarTime))) {

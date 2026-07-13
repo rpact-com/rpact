@@ -212,7 +212,7 @@ getDesignFisher <- function(...,
     }
 
     if (sided != 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "Fisher's combination test only available for one-sided testing", call. = FALSE)
+        stopIllegalArgument("Fisher's combination test only available for one-sided testing", functionName = ".getDesignFisher")
     }
 
     if (is.na(bindingFutility)) {
@@ -261,11 +261,8 @@ getDesignFisher <- function(...,
     .assertDesignParameterExists(design, "method", C_FISHER_METHOD_DEFAULT)
     .assertIsSingleCharacter(design$method, "method")
     if (!.isFisherMethod(design$method)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'method' must be one of the following: ", .printFisherMethods(),
-            call. = FALSE
-        )
+        stopIllegalArgument("'method' must be one of the following: ", .printFisherMethods(), functionName = ".getDesignFisher",
+    parameter = "method", value = method)
     }
 
     .assertDesignParameterExists(design, "bindingFutility", C_BINDING_FUTILITY_FISHER_DEFAULT)
@@ -311,12 +308,9 @@ getDesignFisher <- function(...,
     .assertIsSingleInteger(design$kMax, "kMax")
     .assertIsValidKMax(design$kMax, kMaxUpperBound = C_KMAX_UPPER_BOUND_FISHER)
     if (design$method == C_FISHER_METHOD_NO_INTERACTION && design$kMax < 3) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "method '", C_FISHER_METHOD_NO_INTERACTION,
-            "' is only allowed for kMax > 2 (kMax is ", design$kMax, ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("method '", C_FISHER_METHOD_NO_INTERACTION, "' is only allowed for kMax > 2 (kMax is ",
+            design$kMax, ")", functionName = ".getDesignFisher", parameter = "C_FISHER_METHOD_NO_INTERACTION",
+            value = C_FISHER_METHOD_NO_INTERACTION)
     }
 
     if (design$kMax > 1) {
@@ -336,13 +330,9 @@ getDesignFisher <- function(...,
 
     if (design$method == C_FISHER_METHOD_NO_INTERACTION && !anyNA(alpha0Vec) &&
             all(alpha0Vec == C_ALPHA_0_VEC_DEFAULT)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "for specified 'method' (\"", C_FISHER_METHOD_NO_INTERACTION,
-            "\") the 'alpha0Vec' must be unequal to ", .arrayToString(alpha0Vec, vectorLookAndFeelEnabled = TRUE),
-            " and 'bindingFutility' must be TRUE",
-            call. = FALSE
-        )
+        stopIllegalArgument("for specified 'method' (\"", C_FISHER_METHOD_NO_INTERACTION, "\") the 'alpha0Vec' must be unequal to ",
+    .arrayToString(alpha0Vec, vectorLookAndFeelEnabled = TRUE), " and 'bindingFutility' must be TRUE", functionName = ".getDesignFisher",
+    parameter = "method", relatedParameter = "alpha0Vec", relatedValue = alpha0Vec, value = method)
     }
 
     design$.setParameterType("stageLevels", C_PARAM_GENERATED)
@@ -414,12 +404,12 @@ getDesignFisher <- function(...,
 
     if (userFunctionCallEnabled) {
         if (design$method == C_FISHER_METHOD_NO_INTERACTION && abs(size - design$alpha) > 1e-03) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "numerical overflow in computation routine")
+            stopRuntimeIssue("numerical overflow in computation routine", functionName = ".getDesignFisher")
         }
 
         if (design$method == C_FISHER_METHOD_EQUAL_ALPHA && !all(is.na(design$stageLevels)) &&
                 abs(mean(na.omit(design$stageLevels)) - design$stageLevels[1]) > 1e-03) {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "numerical overflow in computation routine")
+            stopRuntimeIssue("numerical overflow in computation routine", functionName = ".getDesignFisher")
         }
 
         if (design$kMax > 1) {
@@ -430,26 +420,20 @@ getDesignFisher <- function(...,
                     .arrayToString(design$criticalValues, vectorLookAndFeelEnabled = TRUE), ", ",
                     "i.e., differences are ", .arrayToString(diff, vectorLookAndFeelEnabled = TRUE)
                 )
-                stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "no calculation possible")
+                stopRuntimeIssue("no calculation possible", functionName = ".getDesignFisher")
             }
 
             if (!all(is.na(design$stageLevels)) && any(na.omit(design$stageLevels[1:(design$kMax - 1)]) > design$alpha)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'alpha' (", design$alpha, ") not correctly specified",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'alpha' (", design$alpha, ") not correctly specified", functionName = ".getDesignFisher",
+                    parameter = "alpha", value = design$alpha)
             }
         }
 
         if (design$method == C_FISHER_METHOD_USER_DEFINED_ALPHA) {
             if (any(abs(design$alphaSpent - design$userAlphaSpending) > 1e-05)) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                    "'alpha' (", design$alpha, ") or 'userAlphaSpending' (",
-                    .arrayToString(design$userAlphaSpending), ") not correctly specified",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'alpha' (", design$alpha, ") or 'userAlphaSpending' (", .arrayToString(design$userAlphaSpending),
+                    ") not correctly specified", functionName = ".getDesignFisher", parameter = "alpha", value = design$alpha,
+                    relatedParameter = "userAlphaSpending", relatedValue = design$userAlphaSpending)
             }
         }
     }

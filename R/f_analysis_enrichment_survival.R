@@ -154,27 +154,17 @@ NULL
     .assertIsValidIntersectionTestEnrichment(design, intersectionTest)
 
     if (gMax > 2 && intersectionTest == "SpiessensDebois") {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
-            call. = FALSE
-        )
+        stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
+            functionName = ".getStageResultsSurvivalEnrichment", parameter = "gMax", value = gMax)
     }
 
     if (!stratifiedAnalysis) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "only stratified analysis can be performed for enrichment survival designs",
-            call. = FALSE
-        )
+        stopIllegalArgument("only stratified analysis can be performed for enrichment survival designs", functionName = ".getStageResultsSurvivalEnrichment")
     }
 
     if (dataInput$isStratified() && gMax > 4) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "gMax (", gMax,
-            ") > 4: Stratified analysis not implemented",
-            call. = FALSE
-        )
+        stopIllegalArgument("gMax (", gMax, ") > 4: Stratified analysis not implemented", functionName = ".getStageResultsSurvivalEnrichment",
+            parameter = "gMax", value = gMax)
     }
 
     stageResults <- StageResultsEnrichmentSurvival$new(
@@ -611,17 +601,9 @@ NULL
         firstValue <- stageResults[[firstParameterName]][treatmentArm, stage]
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stop(
-                C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-                sprintf(
-                    paste0(
-                        "failed to find theta (k = %s, firstValue = %s, ",
-                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
-                    ),
-                    stage, stageResults[[firstParameterName]][treatmentArm, stage], secondValue,
-                    firstValue, theta
-                )
-            )
+            stopRuntimeIssue(sprintf(paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
+                stage, stageResults[[firstParameterName]][treatmentArm, stage], secondValue, firstValue, theta),
+                functionName = ".getUpperLowerThetaSurvivalEnrichment")
         }
     }
 
@@ -947,16 +929,13 @@ NULL
     thetaH1 <- .assertIsValidThetaH1ForEnrichment(thetaH1, stageResults, stage, results = results)
 
     if (any(thetaH1 <= 0, na.rm = TRUE)) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'thetaH1' (", thetaH1, ") must be > 0", call. = FALSE)
+        stopIllegalArgument("'thetaH1' (", thetaH1, ") must be > 0", functionName = ".getConditionalPowerSurvivalEnrichment",
+            parameter = "thetaH1", value = thetaH1)
     }
     if ((length(thetaH1) != 1) && (length(thetaH1) != gMax)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            sprintf(paste0(
-                "length of 'thetaH1' (%s) must be ",
-                "equal to 'gMax' (%s) or 1"
-            ), .arrayToString(thetaH1), gMax)
-        )
+        stopIllegalArgument(sprintf(paste0("length of 'thetaH1' (%s) must be ", "equal to 'gMax' (%s) or 1"),
+            .arrayToString(thetaH1), gMax), functionName = ".getConditionalPowerSurvivalEnrichment", parameter = "thetaH1",
+            value = thetaH1, relatedParameter = "gMax", relatedValue = gMax)
     }
 
     if (.isTrialDesignInverseNormalOrFixed(design)) {
@@ -984,11 +963,8 @@ NULL
         ))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-        "'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        call. = FALSE
-    )
+    stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
+        functionName = ".getConditionalPowerSurvivalEnrichment", parameter = "design")
 }
 
 #'
@@ -1211,11 +1187,8 @@ NULL
     thetaRange <- .assertIsValidThetaH1ForEnrichment(thetaH1 = thetaRange)
 
     if (length(thetaRange) == 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2",
-            call. = FALSE
-        )
+        stopIllegalArgument("length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2", functionName = ".getConditionalPowerLikelihoodSurvivalEnrichment",
+            parameter = "thetaRange", value = thetaRange)
     }
 
     populations <- numeric(gMax * length(thetaRange))

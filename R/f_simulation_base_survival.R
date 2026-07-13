@@ -45,20 +45,14 @@ NULL
 
     if (pwsTimeObject$kappa != 1) {
         if (length(pwsTimeObject$lambda1) != 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "if 'kappa' != 1 then 'lambda1' (",
-                .arrayToString(pwsTimeObject$lambda1), ") must be a single numeric value",
-                call. = FALSE
-            )
+            stopIllegalArgument("if 'kappa' != 1 then 'lambda1' (", .arrayToString(pwsTimeObject$lambda1), ") must be a single numeric value",
+                functionName = ".isLambdaBasedSimulationEnabled", parameter = "kappa", relatedParameter = "lambda1",
+                relatedValue = pwsTimeObject$lambda1)
         }
         if (length(pwsTimeObject$lambda2) != 1) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "if 'kappa' != 1 then 'lambda2' (",
-                .arrayToString(pwsTimeObject$lambda2), ") must be a single numeric value",
-                call. = FALSE
-            )
+            stopIllegalArgument("if 'kappa' != 1 then 'lambda2' (", .arrayToString(pwsTimeObject$lambda2), ") must be a single numeric value",
+                functionName = ".isLambdaBasedSimulationEnabled", parameter = "kappa", relatedParameter = "lambda2",
+                relatedValue = pwsTimeObject$lambda2)
         }
 
         return(TRUE)
@@ -337,36 +331,25 @@ getSimulationSurvival <- function(design = NULL, ...,
     .assertIsValidPlannedSubjectsOrEvents(design, plannedEvents, parameterName = "plannedEvents")
 
     if (!is.na(dropoutTime) && dropoutTime <= 0) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'dropoutTime' (", dropoutTime, ") must be > 0", call. = FALSE)
+        stopIllegalArgument("'dropoutTime' (", dropoutTime, ") must be > 0", functionName = "getSimulationSurvival",
+            parameter = "dropoutTime", value = dropoutTime)
     }
     if (dropoutRate1 < 0 || dropoutRate1 >= 1) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)",
-            call. = FALSE
-        )
+        stopArgumentOutOfBounds("'dropoutRate1' (", dropoutRate1, ") is out of bounds [0; 1)", functionName = "getSimulationSurvival",
+            parameter = "dropoutRate1", value = dropoutRate1)
     }
     if (dropoutRate2 < 0 || dropoutRate2 >= 1) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)",
-            call. = FALSE
-        )
+        stopArgumentOutOfBounds("'dropoutRate2' (", dropoutRate2, ") is out of bounds [0; 1)", functionName = "getSimulationSurvival",
+            parameter = "dropoutRate2", value = dropoutRate2)
     }
     if (design$sided == 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "Only one-sided case is implemented for the survival simulation design",
-            call. = FALSE
-        )
+        stopIllegalArgument("Only one-sided case is implemented for the survival simulation design", functionName = "getSimulationSurvival")
     }
     if (!all(is.na(lambda2)) && !all(is.na(lambda1)) &&
             length(lambda2) != length(lambda1) && length(lambda2) > 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "length of 'lambda2' (", length(lambda2),
-            ") must be equal to length of 'lambda1' (", length(lambda1), ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("length of 'lambda2' (", length(lambda2), ") must be equal to length of 'lambda1' (",
+            length(lambda1), ")", functionName = "getSimulationSurvival", parameter = "lambda2", value = length(lambda2),
+            relatedParameter = "lambda1", relatedValue = length(lambda1))
     }
     if (all(is.na(lambda2)) && !all(is.na(lambda1))) {
         warning("'lambda1' (", .arrayToString(lambda1), ") will be ignored ",
@@ -376,12 +359,9 @@ getSimulationSurvival <- function(design = NULL, ...,
         lambda1 <- NA_real_
     }
     if (!all(is.na(lambda2)) && is.list(piecewiseSurvivalTime)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'piecewiseSurvivalTime' needs to be a numeric vector and not a list ",
-            "because 'lambda2' (", .arrayToString(lambda2), ") is defined separately",
-            call. = FALSE
-        )
+        stopIllegalArgument("'piecewiseSurvivalTime' needs to be a numeric vector and not a list ", "because 'lambda2' (", .arrayToString(lambda2),
+    ") is defined separately", functionName = "getSimulationSurvival", parameter = "piecewiseSurvivalTime", relatedParameter = "lambda2",
+    relatedValue = lambda2, value = piecewiseSurvivalTime)
     }
     thetaH1 <- .ignoreParameterIfNotUsed(
         "thetaH1", thetaH1, design$kMax > 1,
@@ -416,13 +396,9 @@ getSimulationSurvival <- function(design = NULL, ...,
         if (design$kMax > 1) {
             if (any(maxNumberOfEventsPerStage - minNumberOfEventsPerStage < 0) &&
                     !all(is.na(maxNumberOfEventsPerStage - minNumberOfEventsPerStage))) {
-                stop(
-                    C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'maxNumberOfEventsPerStage' (",
-                    .arrayToString(maxNumberOfEventsPerStage),
-                    ") must be not smaller than minNumberOfEventsPerStage' (",
-                    .arrayToString(minNumberOfEventsPerStage), ")",
-                    call. = FALSE
-                )
+                stopIllegalArgument("'maxNumberOfEventsPerStage' (", .arrayToString(maxNumberOfEventsPerStage), ") must be not smaller than minNumberOfEventsPerStage' (",
+                    .arrayToString(minNumberOfEventsPerStage), ")", functionName = "getSimulationSurvival", parameter = "maxNumberOfEventsPerStage",
+                    value = maxNumberOfEventsPerStage)
             }
             .setValueAndParameterType(
                 simulationResults, "minNumberOfEventsPerStage",
@@ -454,17 +430,11 @@ getSimulationSurvival <- function(design = NULL, ...,
     )
     if (is.na(accrualSetup$maxNumberOfSubjects)) {
         if (identical(accrualIntensity, 1L)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'",
-                call. = FALSE
-            )
+            stopIllegalArgument("choose a 'accrualIntensity' > 1 or define 'maxNumberOfSubjects'", functionName = "getSimulationSurvival",
+    parameter = "accrualIntensity", relatedParameter = "maxNumberOfSubjects", value = accrualIntensity)
         }
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'maxNumberOfSubjects' must be defined",
-            call. = FALSE
-        )
+        stopIllegalArgument("'maxNumberOfSubjects' must be defined", functionName = "getSimulationSurvival", parameter = "maxNumberOfSubjects",
+    value = maxNumberOfSubjects)
     }
 
     simulationResults$.setParameterType("seed", ifelse(is.na(seed),
@@ -509,7 +479,7 @@ getSimulationSurvival <- function(design = NULL, ...,
     )
 
     simulationResults$.piecewiseSurvivalTime <- pwsTimeObject
-    
+
     simulationResults$hazardRatio <- pwsTimeObject$hazardRatio
     simulationResults$.setParameterType("hazardRatio", pwsTimeObject$.getParameterType("hazardRatio"))
     simulationResults$.setParameterType("eventTime", pwsTimeObject$.getParameterType("eventTime"))
@@ -601,14 +571,11 @@ getSimulationSurvival <- function(design = NULL, ...,
     maxNumberOfSimStepsTotal <- 10 * 100000 * 100
     if (numberOfSimStepsTotal > maxNumberOfSimStepsTotal) {
         if (!longTimeSimulationAllowed) {
-            stop(
-                "Simulation stopped because long time simulation is disabled ",
-                "and the defined number of single simulation steps (", numberOfSimStepsTotal,
-                ") is larger than the threshold ", maxNumberOfSimStepsTotal, ". ",
-                "Set 'longTimeSimulationAllowed = TRUE' to enable simulations ",
-                "that take a long time (> 30 sec)",
-                call. = FALSE
-            )
+            stopIllegalArgument("Simulation stopped because long time simulation is disabled ", "and the defined number of single simulation steps (",
+                numberOfSimStepsTotal, ") is larger than the threshold ", maxNumberOfSimStepsTotal, ". ", "Set 'longTimeSimulationAllowed = TRUE' to enable simulations ",
+                "that take a long time (> 30 sec)", parameter = "longTimeSimulationAllowed", value = longTimeSimulationAllowed,
+                constraint = "must be TRUE for simulations exceeding the long-time threshold", context = list(numberOfSimStepsTotal = numberOfSimStepsTotal,
+                    maxNumberOfSimStepsTotal = maxNumberOfSimStepsTotal), functionName = "getSimulationSurvival")
         }
 
         message(
@@ -760,7 +727,7 @@ getSimulationSurvival <- function(design = NULL, ...,
 
     overview <- resultData$overview
     if (length(overview) == 0 || nrow(overview) == 0) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "no simulation results calculated")
+        stopRuntimeIssue("no simulation results calculated", functionName = "getSimulationSurvival")
     }
 
     n <- nrow(overview)
@@ -768,7 +735,7 @@ getSimulationSurvival <- function(design = NULL, ...,
         design = rep(sub("^TrialDesign", "", .getClassName(design)), n),
         overview
     )
-    
+
     if (pwsTimeObject$.isPiBased() &&
             pwsTimeObject$.getParameterType("hazardRatio") != C_PARAM_USER_DEFINED) {
         simulationResults$hazardRatio <- matrix(overview$hazardRatio, nrow = design$kMax)[1, ]
@@ -835,7 +802,7 @@ getSimulationSurvival <- function(design = NULL, ...,
     }
     if (design$kMax > 1) {
         simulationResults$futilityStop <- matrix(overview$futilityStop, nrow = design$kMax)[1, ]
-        simulationResults$earlyStop <- simulationResults$futilityPerStage + 
+        simulationResults$earlyStop <- simulationResults$futilityPerStage +
             simulationResults$rejectPerStage[1:(design$kMax - 1), ]
         simulationResults$.setParameterType("earlyStop", C_PARAM_GENERATED)
     } else {
@@ -862,7 +829,7 @@ getSimulationSurvival <- function(design = NULL, ...,
                 simulationResults$singleEventsPerStage
             )
             simulationResults$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
-            .addDeprecatedFieldValues(simulationResults, "overallEventsPerStage", 
+            .addDeprecatedFieldValues(simulationResults, "overallEventsPerStage",
                 simulationResults$cumulativeEventsPerStage, "2024-06-10")
             simulationResults$expectedNumberOfEvents <-
                 diag(t(simulationResults$cumulativeEventsPerStage) %*% pStop)
@@ -874,7 +841,7 @@ getSimulationSurvival <- function(design = NULL, ...,
                 nrow(simulationResults$singleEventsPerStage) > 0 &&
                 ncol(simulationResults$singleEventsPerStage) > 0) {
             simulationResults$cumulativeEventsPerStage <- simulationResults$singleEventsPerStage
-            .addDeprecatedFieldValues(simulationResults, "overallEventsPerStage", 
+            .addDeprecatedFieldValues(simulationResults, "overallEventsPerStage",
                 simulationResults$cumulativeEventsPerStage, "2024-06-10")
             simulationResults$expectedNumberOfEvents <-
                 as.numeric(simulationResults$cumulativeEventsPerStage)

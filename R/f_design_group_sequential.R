@@ -102,11 +102,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     design$.setParameterType("constantBoundsHP", C_PARAM_NOT_APPLICABLE)
 
     if (!(design$typeOfDesign %in% .getDesignTypes())) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "type of design (", design$typeOfDesign, ") must be one of the following: ", .printDesignTypes(),
-            call. = FALSE
-        )
+        stopIllegalArgument("type of design (", design$typeOfDesign, ") must be one of the following: ", .printDesignTypes(),
+            functionName = ".validateTypeOfDesign")
     }
 
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT) {
@@ -123,11 +120,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_WT_OPTIMUM) {
         .assertDesignParameterExists(design, "optimizationCriterion", C_OPTIMIZATION_CRITERION_DEFAULT)
         if (!.isOptimizationCriterion(design$optimizationCriterion)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "optimization criterion must be one of the following: ", .printOptimizationCriterion(),
-                call. = FALSE
-            )
+            stopIllegalArgument("optimization criterion must be one of the following: ", .printOptimizationCriterion(),
+                functionName = ".validateTypeOfDesign")
         }
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_HP) {
         .assertDesignParameterExists(design, "constantBoundsHP", C_CONST_BOUND_HP_DEFAULT)
@@ -169,22 +163,15 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     if ((.isBetaSpendingDesignType(design$typeBetaSpending) || !.isAlphaSpendingDesignType(design$typeOfDesign)) &&
             (design$informationRates[length(design$informationRates)] != 1)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "For specified design, last information rate should be equal 1",
-            call. = FALSE
-        )
+        stopIllegalArgument("For specified design, last information rate should be equal 1", functionName = ".validateTypeOfDesign")
     }
 
     if (.isAlphaSpendingDesignType(design$typeOfDesign)) {
         .assertDesignParameterExists(design, "typeBetaSpending", C_TYPE_OF_DESIGN_BS_NONE)
 
         if (!.isBetaSpendingDesignType(design$typeBetaSpending, noneIncluded = TRUE)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "type of beta spending must be one of the following: ", .printBetaSpendingDesignTypes(),
-                call. = FALSE
-            )
+            stopIllegalArgument("type of beta spending must be one of the following: ", .printBetaSpendingDesignTypes(),
+                functionName = ".validateTypeOfDesign")
         }
 
         if (design$typeBetaSpending == C_TYPE_OF_DESIGN_BS_KD) {
@@ -252,8 +239,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
         if (.isDefinedArgument(design$futilityBounds)) {
             .assertAreValidFutilityBounds(
-                futilityBounds = design$futilityBounds, 
-                kMax = design$kMax, 
+                futilityBounds = design$futilityBounds,
+                kMax = design$kMax,
                 directionUpper = design$directionUpper)
         }
     }
@@ -270,11 +257,8 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     .assertDesignParameterExists(design, "tolerance", C_DESIGN_TOLERANCE_DEFAULT)
     if (design$tolerance < 1e-10 || design$tolerance > 1e-03) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'tolerance' (", design$tolerance, ") out of bounds [1e-10; 1e-03]",
-            call. = FALSE
-        )
+        stopArgumentOutOfBounds("'tolerance' (", design$tolerance, ") out of bounds [1e-10; 1e-03]", functionName = ".validateBaseParameters",
+            parameter = "tolerance", value = design$tolerance)
     }
 
     return(invisible(design))
@@ -310,13 +294,9 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 
     if (typeOfDesign == C_TYPE_OF_DESIGN_AS_USER && !anyNA(userAlphaSpending)) {
         if (!is.na(kMax) && kMax != length(userAlphaSpending)) {
-            stop(sprintf(
-                paste0(
-                    C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-                    "length of 'userAlphaSpending' (%s) must be equal to 'kMax' (%s)"
-                ),
-                length(userAlphaSpending), kMax
-            ))
+            stopConflictingArguments(sprintf("length of 'userAlphaSpending' (%s) must be equal to 'kMax' (%s)", length(userAlphaSpending),
+                kMax), parameter = "userAlphaSpending", value = length(userAlphaSpending), constraint = "length must equal kMax",
+                relatedParameter = "kMax", relatedValue = kMax, functionName = ".createDesign")
         }
         kMax <- length(userAlphaSpending)
         if (kMax > 1 && all(userAlphaSpending[1:(kMax - 1)] == 0)) {
@@ -345,12 +325,9 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             delayedInformation = delayedInformation
         )
     } else {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'designClass' ('", designClass, "') must be '", C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL, "' or ",
-            "'", C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL, "'",
-            call. = FALSE
-        )
+        stopIllegalArgument("'designClass' ('", designClass, "') must be '", C_CLASS_NAME_TRIAL_DESIGN_INVERSE_NORMAL,
+            "' or ", "'", C_CLASS_NAME_TRIAL_DESIGN_GROUP_SEQUENTIAL, "'", functionName = ".createDesign", parameter = "designClass",
+            value = designClass, relatedParameter = ") must be ")
     }
 
     .assertIsSingleInteger(sided, "sided", naAllowed = FALSE, validateType = FALSE)
@@ -491,7 +468,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         bindingFutility = design$bindingFutility,
         futilityBounds = .getFutilityBounds(design),
         tolerance = design$tolerance)
-    
+
     if (design$typeOfDesign == C_TYPE_OF_DESIGN_P) {
         callFun <- .getDesignGroupSequentialPocockCpp
     } else if (design$typeOfDesign == C_TYPE_OF_DESIGN_OF) {
@@ -500,7 +477,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         callFun <- .getDesignGroupSequentialDeltaWTCpp
         callArgs$deltaWT <- design$deltaWT
     }
-    
+
     design$criticalValues <- do.call(callFun, callArgs)
 
     .calculateAlphaSpent(design)
@@ -550,7 +527,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 .calculateAlphaSpent <- function(design) {
     criticalValues <- .getCriticalValues(design)
     futilityBounds <- .getFutilityBounds(design)
-    
+
     if (design$sided == 2) {
         if (design$bindingFutility) {
             futilityBounds[is.na(futilityBounds)] <- 0
@@ -581,7 +558,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
     tryCatch(
         {
             probs <- .getGroupSequentialProbabilities(decisionMatrix, design$informationRates)
-            
+
             if (design$sided == 1) {
                 design$alphaSpent <- cumsum(probs[3, ] - probs[2, ])
             } else if (nrow(decisionMatrix) == 2) {
@@ -592,7 +569,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
             if (!is.na(design$alphaSpent[design$kMax])) {
                 design$alphaSpent[design$kMax] <- floor(design$alphaSpent[design$kMax] * 1e8) / 1e8
             }
-            
+
             design$.setParameterType("alphaSpent", C_PARAM_GENERATED)
         },
         error = function(e) {
@@ -826,7 +803,7 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
         design$twoSidedPower
     )
 
-    design$futilityBounds <- cppResult$futilityBounds 
+    design$futilityBounds <- cppResult$futilityBounds
     design$futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
         design$directionUpper, type = "negateIfLower", phase = "design")
     design$criticalValues <- cppResult$criticalValues
@@ -853,11 +830,9 @@ getGroupSequentialProbabilities <- function(decisionMatrix, informationRates) {
 #'
 .getDesignGroupSequentialUserDefinedBetaSpending <- function(design) {
     if (design$typeBetaSpending != C_TYPE_OF_DESIGN_BS_USER) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'typeBetaSpending' ('", design$typeBetaSpending, "') must be '", C_TYPE_OF_DESIGN_BS_USER, "'",
-            call. = FALSE
-        )
+        stopIllegalArgument("'typeBetaSpending' ('", design$typeBetaSpending, "') must be '", C_TYPE_OF_DESIGN_BS_USER,
+            "'", functionName = ".getDesignGroupSequentialUserDefinedBetaSpending", parameter = "typeBetaSpending",
+            value = design$typeBetaSpending, relatedParameter = ") must be ")
     }
 
     cppResult <- .getDesignGroupSequentialUserDefinedBetaSpendingCpp(
@@ -1193,7 +1168,7 @@ getDesignInverseNormal <- function(...,
     if (anyNA(boundaryStops) || all(boundaryStops)) {
         return(FALSE)
     }
-    
+
     return(TRUE)
 }
 
@@ -1234,7 +1209,7 @@ getDesignInverseNormal <- function(...,
                 call. = FALSE
             )
         }
-        
+
         return(.getDesignWithInterimStops(
             designClass = designClass,
             kMax = kMax,
@@ -1342,11 +1317,9 @@ getDesignInverseNormal <- function(...,
     argNames <- argNames[argNames != "..."]
     missingArgNames <- argNames[!(argNames %in% names(defaultValues))]
     if (length(missingArgNames) > 0) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            ".getDesignGroupSequentialDefaultValues() does return the arguments ",
-            .arrayToString(missingArgNames, encapsulate = TRUE)
-        )
+        stopRuntimeIssue(".getDesignGroupSequentialDefaultValues() does return the arguments ", .arrayToString(missingArgNames,
+            encapsulate = TRUE), functionName = ".assertAllArgumentsHaveDefaultValues", parameter = "missingArgNames",
+            value = missingArgNames)
     }
 }
 
@@ -1412,19 +1385,15 @@ getDesignInverseNormal <- function(...,
         tolerance = 1e-08) {
     validTypesOfDesign <- c("asOF", "asP", "asKD", "asHSD")
     if (!(typeOfDesign %in% validTypesOfDesign)) {
-        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "'typeOfDesign' (", dQuote(typeOfDesign), ") must be one of the following ",
-            "when 'efficacyStops' or 'futilityStops' are specified: ",
-            .arrayToString(validTypesOfDesign, encapsulate = TRUE),
-            call. = FALSE
-        )
+        stopConflictingArguments("'typeOfDesign' (", dQuote(typeOfDesign), ") must be one of the following ",
+            "when 'efficacyStops' or 'futilityStops' are specified: ", .arrayToString(validTypesOfDesign, encapsulate = TRUE),
+            functionName = ".getDesignWithInterimStops", parameter = "typeOfDesign", relatedParameter = "efficacyStops",
+            value = typeOfDesign)
     }
     if (identical(typeBetaSpending, C_TYPE_OF_DESIGN_BS_USER)) {
-        stop(C_EXCEPTION_TYPE_CONFLICTING_ARGUMENTS,
-            "'typeBetaSpending' cannot be ", dQuote(C_TYPE_OF_DESIGN_BS_USER), " ",
-            "when 'efficacyStops' or 'futilityStops' are specified",
-            call. = FALSE
-        )
+        stopConflictingArguments("'typeBetaSpending' cannot be ", dQuote(C_TYPE_OF_DESIGN_BS_USER), " ", "when 'efficacyStops' or 'futilityStops' are specified",
+    functionName = ".getDesignWithInterimStops", parameter = "typeBetaSpending", relatedParameter = C_TYPE_OF_DESIGN_BS_USER,
+    value = typeBetaSpending)
     }
 
     coreDesign <- .getDesignGroupSequential(
@@ -1455,13 +1424,9 @@ getDesignInverseNormal <- function(...,
     }
 
     if (length(efficacyStops) != kMax - 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'efficacyStops' (", .arrayToString(efficacyStops,
-                vectorLookAndFeelEnabled = FALSE
-            ),
-            ") must have length kMax - 1 (", kMax - 1, ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("'efficacyStops' (", .arrayToString(efficacyStops, vectorLookAndFeelEnabled = FALSE),
+            ") must have length kMax - 1 (", kMax - 1, ")", functionName = ".getDesignWithInterimStops", parameter = "efficacyStops",
+            value = efficacyStops)
     }
 
     if (betaSpendingEnabled && length(futilityStops) == 1 && is.na(futilityStops)) {
@@ -1469,13 +1434,9 @@ getDesignInverseNormal <- function(...,
     }
 
     if (betaSpendingEnabled && length(futilityStops) != kMax - 1) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'futilityStops' (", .arrayToString(futilityStops,
-                vectorLookAndFeelEnabled = FALSE
-            ),
-            ") must have length kMax - 1 (", kMax - 1, ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("'futilityStops' (", .arrayToString(futilityStops, vectorLookAndFeelEnabled = FALSE),
+            ") must have length kMax - 1 (", kMax - 1, ")", functionName = ".getDesignWithInterimStops", parameter = "futilityStops",
+            value = futilityStops)
     }
 
     efficacyStops[is.na(efficacyStops)] <- TRUE
@@ -1518,7 +1479,7 @@ getDesignInverseNormal <- function(...,
         args$typeBetaSpending <- "bsUser"
         args$userBetaSpending <- newBetaSpending
     }
-    
+
     newDesign <- do.call(.getDesignGroupSequential, args)
     newDesign$criticalValues[which(!efficacyStops)] <- Inf
     newDesign$futilityBounds[which(!futilityStops)] <- .getFutilityBoundsDefaultValue(newDesign)
@@ -1563,7 +1524,7 @@ getDesignInverseNormal <- function(...,
     if (length(indices) > 0) {
         newDesign$stageLevels[indices] <- 0
     }
-    
+
     return(newDesign)
 }
 
@@ -1637,8 +1598,8 @@ getDesignInverseNormal <- function(...,
             )
         }
     }
-    
-    directionUpper <- .warnInCaseOfIgnoredDirectionUpper(directionUpper, sided, 
+
+    directionUpper <- .warnInCaseOfIgnoredDirectionUpper(directionUpper, sided,
         userFunctionCallEnabled = userFunctionCallEnabled)
 
     design <- .createDesign(
@@ -1667,7 +1628,7 @@ getDesignInverseNormal <- function(...,
         delayedInformation = delayedInformation,
         tolerance = tolerance
     )
-    
+
     if (userFunctionCallEnabled) {
         .validateBaseParameters(design, twoSidedWarningForDefaultValues = FALSE)
         .validateTypeOfDesign(design, userDefinedInterimStops = userDefinedInterimStops)
@@ -1782,7 +1743,7 @@ getDesignInverseNormal <- function(...,
         else if (design$typeOfDesign %in% c(C_TYPE_OF_DESIGN_AS_USER, C_TYPE_OF_DESIGN_NO_EARLY_EFFICACY)) {
             .getDesignGroupSequentialUserDefinedAlphaSpending(design, userFunctionCallEnabled)
         } else {
-            stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "no calculation routine defined for ", design$typeOfDesign)
+            stopRuntimeIssue("no calculation routine defined for ", design$typeOfDesign, functionName = ".getDesignGroupSequential")
         }
     }
 
@@ -1801,12 +1762,8 @@ getDesignInverseNormal <- function(...,
             design$.setParameterType("futilityBounds", C_PARAM_NOT_APPLICABLE)
         } else if (userFunctionCallEnabled &&
                 any(.getFutilityBounds(design) > .getCriticalValues(design, 1:(design$kMax - 1)) - 0.01, na.rm = TRUE)) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'futilityBounds' (", .arrayToString(design$futilityBounds), ") ",
-                "too extreme for this situation",
-                call. = FALSE
-            )
+            stopIllegalArgument("'futilityBounds' (", .arrayToString(design$futilityBounds), ") ", "too extreme for this situation",
+                functionName = ".getDesignGroupSequential", parameter = "futilityBounds", value = design$futilityBounds)
         }
     }
 
@@ -1860,14 +1817,10 @@ getDesignInverseNormal <- function(...,
     # proceed with delayed response design
     .assertIsInClosedInterval(delayedInformation, "delayedInformation", lower = 0, upper = NULL)
     if (design$sided != 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "decision critical values for delayed response design ",
-            "are only available for one-sided designs",
-            call. = FALSE
-        )
+        stopIllegalArgument("decision critical values for delayed response design ", "are only available for one-sided designs",
+            functionName = ".getDesignGroupSequential")
     }
-    
+
     kMax <- design$kMax
     contRegionUpper <- .getCriticalValues(design)
     contRegionLower <- .getFutilityBounds(design)
@@ -1877,24 +1830,17 @@ getDesignInverseNormal <- function(...,
     reversalProbabilities <- numeric(kMax - 1)
 
     if (all(contRegionLower <= C_FUTILITY_BOUNDS_DEFAULT + 1e-06)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "decision critical values for delayed response design are ",
-            "only available for designs with valid futility bounds",
-            call. = FALSE
-        )
+        stopIllegalArgument("decision critical values for delayed response design are ", "only available for designs with valid futility bounds",
+            functionName = ".getDesignGroupSequential")
     }
-    
+
     if (length(delayedInformation) == 1) {
         delayedInformation <- rep(delayedInformation, kMax - 1)
     }
     if (length(delayedInformation) != kMax - 1) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'delayedInformation' (", .arrayToString(delayedInformation), ") must have length ",
-            (kMax - 1), " (kMax - 1)",
-            call. = FALSE
-        )
+        stopIllegalArgument("'delayedInformation' (", .arrayToString(delayedInformation), ") must have length ",
+            (kMax - 1), " (kMax - 1)", functionName = ".getDesignGroupSequential", parameter = "delayedInformation",
+            value = delayedInformation)
     }
 
     indices <- which(delayedInformation > 0 & delayedInformation < 1e-03)
@@ -1913,15 +1859,10 @@ getDesignInverseNormal <- function(...,
     if (!anyNA(eps) && any(eps >= 1)) {
         stages <- which(eps >= 1)
         stagesInfo <- ifelse(length(stages) == 1, paste0(" ", stages), paste0("s ", .arrayToString(stages, mode = "and")))
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'delayedInformation[stage] + informationRates[stage]' for ",
-            "stage", stagesInfo, " too large (>= 1). Recruitment stop analysis information + pipeline data ",
-            "information cannot exceed overall trial information. Instead, the ",
-            "recruitment stop analysis would be skipped, directly proceeding to the ",
-            "final analysis",
-            call. = FALSE
-        )
+        stopIllegalArgument("'delayedInformation[stage] + informationRates[stage]' for ", "stage", stagesInfo,
+            " too large (>= 1). Recruitment stop analysis information + pipeline data ", "information cannot exceed overall trial information. Instead, the ",
+            "recruitment stop analysis would be skipped, directly proceeding to the ", "final analysis", functionName = ".getDesignGroupSequential",
+            parameter = "delayedInformation", value = delayedInformation, relatedParameter = "informationRates", relatedValue = informationRates)
     }
 
     # loop iterating through the stages calculation the decision critical values
@@ -2016,14 +1957,14 @@ getDesignInverseNormal <- function(...,
     decisionCriticalValues[decisionCriticalValues >= C_UPPER_BOUNDS_DEFAULT - 1e-06] <- NA_real_
     decisionCriticalValues <- .applyDirectionOfAlternative(decisionCriticalValues,
         design$directionUpper, type = "negateIfLower", phase = "design")
-    
+
     design$decisionCriticalValues <- decisionCriticalValues
     design$reversalProbabilities <- reversalProbabilities
     design$delayedInformation <- delayedInformation
     design$delayedInformation[design$delayedInformation < 1e-03] <- 0
     design$.setParameterType("decisionCriticalValues", C_PARAM_GENERATED)
     design$.setParameterType("reversalProbabilities", C_PARAM_GENERATED)
-    
+
     warning("The delayed information design feature is experimental and ",
         "hence not fully validated (see www.rpact.com/experimental)",
         call. = FALSE
@@ -2043,10 +1984,8 @@ getDesignInverseNormal <- function(...,
     }
 
     if (is.na(design$alphaSpent[design$kMax]) || abs(design$alphaSpent[design$kMax] - design$alpha) > 1e-05) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE, "critical values cannot be calculated ",
-            "(alpha: ", design$alpha, "; alpha spent at maximum stage: ", design$alphaSpent[design$kMax], ")"
-        )
+        stopRuntimeIssue("critical values cannot be calculated ", "(alpha: ", design$alpha, "; alpha spent at maximum stage: ",
+            design$alphaSpent[design$kMax], ")", functionName = ".assertIsValidAlphaSpent")
     }
 }
 
@@ -2060,14 +1999,12 @@ getDesignInverseNormal <- function(...,
     }
 
     if (iteration < 0) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "critical values cannot be calculated")
+        stopRuntimeIssue("critical values cannot be calculated", functionName = ".assertIsValidBetaSpent")
     }
 
     if (is.na(design$betaSpent[design$kMax]) || abs(design$betaSpent[design$kMax] - design$beta) > 1e-05) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE, "critical values cannot be calculated ",
-            "(beta spent at maximum stage: ", design$betaSpent[design$kMax], ")"
-        )
+        stopRuntimeIssue("critical values cannot be calculated ", "(beta spent at maximum stage: ", design$betaSpent[design$kMax],
+            ")", functionName = ".assertIsValidBetaSpent")
     }
 }
 
@@ -2355,14 +2292,14 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         if (userFunctionCallEnabled) {
             .validateAlphaAndBeta(design = design)
         }
-    
+
         design$informationRates <- .getValidatedInformationRates(design, writeToDesign = FALSE)
-    
+
         if ((design$typeOfDesign == C_TYPE_OF_DESIGN_PT ||
                 .isBetaSpendingDesignType(design$typeBetaSpending)) && design$sided == 2 && design$kMax == 2) {
             design$futilityBounds[is.na(design$futilityBounds)] <- 0
         }
-    
+
         design$futilityBounds <- .getValidatedFutilityBounds(design,
             writeToDesign = FALSE, twoSidedWarningForDefaultValues = FALSE
         )
@@ -2420,7 +2357,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
         type = "negateIfLower", phase = "design", syncLength = TRUE
     )
     criticalValues <- .getCriticalValues(design)
-    
+
     if (!anyNA(design$delayedInformation) &&
             length(design$decisionCriticalValues) > 0) {
         contRegionUpper <- criticalValues
@@ -2679,7 +2616,7 @@ getDesignCharacteristics <- function(design = NULL, ...) {
 
     if (is.na(designCharacteristics$inflationFactor) ||
             designCharacteristics$inflationFactor > 4 || designCharacteristics$inflationFactor < 1 - 1e-05) {
-        stop(C_EXCEPTION_TYPE_RUNTIME_ISSUE, "inflation factor cannot be calculated")
+        stopRuntimeIssue("inflation factor cannot be calculated", functionName = ".getDesignCharacteristics")
     }
 
     return(designCharacteristics)
@@ -2804,11 +2741,8 @@ getSimulatedRejectionsDelayedResponse <- function(design, ..., delta = 0, iterat
     .assertIsSingleNumber(delta, "delta")
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     if (!design$.isDelayedResponseDesign()) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'design' must be a delayed ",
-            "response design with specified 'delayedInformation'",
-            call. = FALSE
-        )
+        stopIllegalArgument("'design' must be a delayed ", "response design with specified 'delayedInformation'", functionName = "getSimulatedRejectionsDelayedResponse",
+    parameter = "design", relatedParameter = "delayedInformation", value = design)
     }
     startTime <- Sys.time()
     result <- .getSimulatedRejectionsDelayedResponse(

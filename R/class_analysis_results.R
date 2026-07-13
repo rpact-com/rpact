@@ -1972,11 +1972,8 @@ plot.AnalysisResults <- function(x, y, ...,
 
     data <- .getConfidenceIntervalData(x, treatmentArmsToShow)
     if (nrow(data) == 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "unable to create plot because no RCIs are available in the specified analysis result",
-            call. = FALSE
-        )
+        stopIllegalArgument("unable to create plot because no RCIs are available in the specified analysis result",
+            functionName = ".plotAnalysisResultsRCI")
     }
 
     .warnInCaseOfUnusedArgument(nPlanned, "nPlanned", NA_real_, "plot")
@@ -2137,10 +2134,8 @@ plot.AnalysisResults <- function(x, y, ...,
         plotSettings = NULL) {
     .assertIsSingleInteger(type, "type", naAllowed = FALSE, validateType = FALSE)
     if (!(type %in% c(1, 2))) {
-        stop(C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'type' (", type, ") is not allowed; must be 1 or 2",
-            call. = FALSE
-        )
+        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1 or 2", functionName = ".plotAnalysisResults",
+            parameter = "type", value = type)
     }
 
     .assertIsAnalysisResults(x)
@@ -2166,10 +2161,8 @@ plot.AnalysisResults <- function(x, y, ...,
     }
 
     if (!.isConditionalPowerEnabled(x$nPlanned) && !.isConditionalPowerEnabled(nPlanned)) {
-        stop(C_EXCEPTION_TYPE_MISSING_ARGUMENT,
-            "'nPlanned' must be defined to create conditional power plot",
-            call. = FALSE
-        )
+        stopMissingArgument("'nPlanned' must be defined to create conditional power plot", functionName = ".plotAnalysisResults",
+    parameter = "nPlanned", value = nPlanned)
     }
 
     .warnInCaseOfUnknownArguments(

@@ -54,12 +54,12 @@ NULL
             thetaH0 = designPlan$thetaH0,
             alternative = designPlan$alternative,
             stDev = designPlan$stDev,
-            directionUpper = designPlan$directionUpper, 
+            directionUpper = designPlan$directionUpper,
             groups = designPlan$groups,
             allocationRatioPlanned = designPlan$allocationRatioPlanned
         )
     } else {
-        sampleSizeFixed <- .getSampleSizeFixedRates( 
+        sampleSizeFixed <- .getSampleSizeFixedRates(
             alpha = designPlan$getAlpha(),
             beta = designPlan$getBeta(),
             sided = designPlan$getSided(),
@@ -284,13 +284,9 @@ NULL
     }
 
     if (piecewiseSurvivalTime[1] != 0) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "the first value of 'piecewiseSurvivalTime' (",
-            .arrayToString(piecewiseSurvivalTime),
-            ") must be 0",
-            call. = FALSE
-        )
+        stopIllegalArgument("the first value of 'piecewiseSurvivalTime' (", .arrayToString(piecewiseSurvivalTime),
+            ") must be 0", functionName = ".getPiecewiseExpStartTimesWithoutLeadingZero", parameter = "piecewiseSurvivalTime",
+            value = piecewiseSurvivalTime)
     }
 
     if (length(piecewiseSurvivalTime) == 1) {
@@ -298,13 +294,9 @@ NULL
     }
 
     if (length(piecewiseSurvivalTime) < 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'piecewiseSurvivalTime' (",
-            length(piecewiseSurvivalTime),
-            ") must be > 1",
-            call. = FALSE
-        )
+        stopIllegalArgument("length of 'piecewiseSurvivalTime' (", length(piecewiseSurvivalTime), ") must be > 1",
+            functionName = ".getPiecewiseExpStartTimesWithoutLeadingZero", parameter = "piecewiseSurvivalTime",
+            value = length(piecewiseSurvivalTime))
     }
 
     return(piecewiseSurvivalTime[2:length(piecewiseSurvivalTime)])
@@ -313,16 +305,9 @@ NULL
 .getNumberOfSubjectsInner <- function(..., timeValue, accrualTime, accrualIntensity, maxNumberOfSubjects) {
     .assertIsSingleNumber(timeValue, "timeValue")
     if (length(accrualTime) != length(accrualIntensity)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "length of 'accrualTime' (",
-            length(accrualIntensity),
-            ") ",
-            "must be equel to length of 'accrualIntensity' (",
-            length(accrualIntensity),
-            ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("length of 'accrualTime' (", length(accrualIntensity), ") ", "must be equel to length of 'accrualIntensity' (",
+    length(accrualIntensity), ")", functionName = ".getNumberOfSubjectsInner", parameter = "accrualTime", relatedParameter = "accrualIntensity",
+    relatedValue = length(accrualIntensity), value = accrualTime)
     }
 
     densityIntervals <- accrualTime

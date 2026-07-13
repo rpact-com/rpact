@@ -248,11 +248,8 @@ NULL
         return(.getGeneratorFunctionName(obj$object))
     }
 
-    stop(
-        C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-        "function '.getGeneratorFunctionName' is not implemented for class ",
-        .getClassName(obj)
-    )
+    stopRuntimeIssue("function '.getGeneratorFunctionName' is not implemented for class ", .getClassName(obj),
+        functionName = ".getGeneratorFunctionName", parameter = ".getGeneratorFunctionName")
 }
 
 #' @rdname getObjectRCode
@@ -504,14 +501,8 @@ getObjectRCode <- function(obj,
     .assertIsParameterSetClass(obj, "ParameterSet")
 
     if (!is.list(newArgumentValues)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'newArgumentValues' must be a named list ",
-            "(is ",
-            .getClassName(newArgumentValues),
-            ")",
-            call. = FALSE
-        )
+        stopIllegalArgument("'newArgumentValues' must be a named list ", "(is ", .getClassName(newArgumentValues),
+            ")", functionName = "getObjectRCode", parameter = "newArgumentValues", value = newArgumentValues)
     }
 
     if (!inherits(obj, "ConditionalPowerResults") &&
@@ -775,15 +766,9 @@ getObjectRCode <- function(obj,
         newArgumentValueNames <- names(newArgumentValues)
         illegalArgumentValueNames <- newArgumentValueNames[which(!(newArgumentValueNames %in% names(obj)))]
         if (length(illegalArgumentValueNames) > 0) {
-            stop(
-                C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                "'",
-                illegalArgumentValueNames,
-                "' is not a valid ",
-                functionName,
-                "() argument",
-                call. = FALSE
-            )
+            stopIllegalArgument("'", illegalArgumentValueNames, "' is not a valid ", functionName, "() argument",
+                functionName = "getObjectRCode", parameter = "illegalArgumentValueNames", value = illegalArgumentValueNames,
+                relatedParameter = "functionName", relatedValue = functionName)
         }
 
         defaultParams <- newArgumentValueNames[!(newArgumentValueNames %in% objNames)]

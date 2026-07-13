@@ -50,19 +50,12 @@ getPerformanceScore <- function(simulationResult) {
     design <- simulationResult$.design
 
     if (!inherits(simulationResult, "SimulationResultsMeans") && !inherits(simulationResult, "SimulationResultsRates")) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "performance score so far implemented only for single comparisons with continuous and binary endpoints",
-            call. = FALSE
-        )
+        stopIllegalArgument("performance score so far implemented only for single comparisons with continuous and binary endpoints",
+            functionName = "getPerformanceScore")
     }
 
     if (design$kMax != 2) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "performance score so far implemented only for two-stage designs",
-            call. = FALSE
-        )
+        stopIllegalArgument("performance score so far implemented only for two-stage designs", functionName = "getPerformanceScore")
     }
 
     # initialize necessary sample size values
@@ -103,12 +96,7 @@ getPerformanceScore <- function(simulationResult) {
         referenceValue <- simulationResult$pi2
         args$pi2 <- referenceValue
     } else {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "performance score is not available for class ",
-            class(simulationResult)[1],
-            call. = FALSE
-        )
+        stopIllegalArgument("performance score is not available for class ", class(simulationResult)[1], functionName = "getPerformanceScore")
     }
     alternativeValues <- simulationResult[[alternativeParamName]]
 

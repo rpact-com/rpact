@@ -201,12 +201,8 @@ NULL
 
                 if (is.null(newSubjects) || length(newSubjects) != 1 ||
                         !is.numeric(newSubjects) || is.na(newSubjects) || newSubjects < 0) {
-                    stop(
-                        C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-                        "'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ",
-                        "the output must be a single numeric value >= 0",
-                        call. = FALSE
-                    )
+                    stopIllegalArgument("'calcSubjectsFunction' returned an illegal or undefined result (", newSubjects, "); ", "the output must be a single numeric value >= 0",
+    functionName = ".getSimulatedStageMeansMultiArm", parameter = "calcSubjectsFunction", value = calcSubjectsFunction)
                 }
                 if (!is.na(conditionalPower) || calcSubjectsFunctionIsUserDefined) {
                     plannedSubjects[(k + 1):kMax] <- sum(subjectsPerStage[gMax + 1, 1:k] *
@@ -316,7 +312,7 @@ NULL
 #' @export
 #'
 getSimulationMultiArmMeans <- function(
-        design = NULL, 
+        design = NULL,
         ...,
         activeArms = NA_integer_, # C_ACTIVE_ARMS_DEFAULT = 3L
         effectMatrix = NULL,
@@ -606,7 +602,7 @@ getSimulationMultiArmMeans <- function(
         simulatedConditionalPower[2:kMax, ] <- simulatedConditionalPower[2:kMax, ] / iterations[2:kMax, ]
     }
     simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations - 1
-    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms", 
+    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms",
         simulationResults$numberOfSelectedArms, "2026-07-13")
 
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
@@ -630,10 +626,7 @@ getSimulationMultiArmMeans <- function(
     }
 
     if (any(simulationResults$rejectedArmsPerStage < 0)) {
-        stop(
-            C_EXCEPTION_TYPE_RUNTIME_ISSUE,
-            "internal error, simulation not possible due to numerical overflow"
-        )
+        stopRuntimeIssue("internal error, simulation not possible due to numerical overflow", functionName = "getSimulationMultiArmMeans")
     }
 
     data <- data.frame(
