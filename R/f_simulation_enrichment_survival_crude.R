@@ -818,7 +818,8 @@ getSimulationEnrichmentSurvivalBasic <- function(
 
     simulationResults$singleEventsPerSubsetAndStage <- simulatedSingleEventsPerStage
     simulationResults$.setParameterType("singleEventsPerSubsetAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", simulatedSingleEventsPerStage)
+    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", 
+        simulatedSingleEventsPerStage, "2024-06-10")
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 

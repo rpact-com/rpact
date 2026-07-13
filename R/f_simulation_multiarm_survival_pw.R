@@ -691,7 +691,9 @@ getSimulationMultiArmSurvivalPatientWise <- function(
     expectedStudyDuration <- loopResult$expectedStudyDuration
     iterations <- loopResult$iterations
     
-    simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms
+    simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms
+    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms", 
+        simulationResults$numberOfSelectedArms, "2026-07-13")
     simulationResults$numberOfSubjects <- simulatedNumberOfSubjects
     simulationResults$analysisTime <- simulatedAnalysisTime
     simulationResults$eventsNotAchieved <- simulatedNumberEventsNotAchieved / maxNumberOfIterations
@@ -712,7 +714,7 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             simulationResults$successPerStage[1:(kMax - 1), ]
         simulationResults$conditionalPowerAchieved <- simulatedConditionalPower
     }
-    if (activeArms == 1) {
+    if (gMax == 1) {
         simulationResults$.setParameterType("successPerStage", C_PARAM_NOT_APPLICABLE)
     }
 

@@ -381,7 +381,8 @@ NULL
 
     .addEffectScaleBoundaryDataToDesignPlan(designPlan)
     designPlan$singleEventsPerStage <- .getSingleEventsPerStage(designPlan$cumulativeEventsPerStage)
-    .addDeprecatedFieldValues(designPlan, "eventsPerStage", designPlan$cumulativeEventsPerStage)
+    .addDeprecatedFieldValues(designPlan, "eventsPerStage", 
+        designPlan$cumulativeEventsPerStage, "2024-06-10")
 
     paramName <- ifelse(designPlan$.design$kMax == 1, "nFixed", "maxNumberOfSubjects")
     if (designPlan$isGeneratedParameter(paramName) &&
@@ -2663,7 +2664,8 @@ getPowerSurvival <- function(
 
     designPlan$cumulativeEventsPerStage <- matrix(cumulativeEventsPerStage, ncol = 1)
     designPlan$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(designPlan, "eventsPerStage", designPlan$cumulativeEventsPerStage)
+    .addDeprecatedFieldValues(designPlan, "eventsPerStage", 
+        designPlan$cumulativeEventsPerStage, "2024-06-10")
 
     designPlan$expectedNumberOfEvents <- powerAndAverageSampleNumber$averageSampleNumber
     designPlan$overallReject <- powerAndAverageSampleNumber$overallReject

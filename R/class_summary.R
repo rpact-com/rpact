@@ -695,7 +695,7 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                                 "expectedNumberOfEvents",
                                 "singleEventsPerArmAndStage",
                                 "singleEventsPerSubsetAndStage",
-                                "numberOfActiveArms",
+                                "numberOfSelectedArms",
                                 "numberOfPopulations",
                                 "conditionalPowerAchieved",
                                 "plannedCalendarTime"
@@ -3840,8 +3840,8 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
 
         if (multiArmEnabled && outputSize %in% c("medium", "large")) {
             summaryFactory$addParameter(designPlan,
-                parameterName = "numberOfActiveArms",
-                parameterCaption = "Number of active arms",
+                parameterName = "numberOfSelectedArms",
+                parameterCaption = "Number of selected arms",
                 roundDigits = digitSettings$digitsGeneral,
                 transpose = TRUE
             )

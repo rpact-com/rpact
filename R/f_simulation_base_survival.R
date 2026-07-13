@@ -838,8 +838,8 @@ getSimulationSurvival <- function(design = NULL, ...,
     }
     if (design$kMax > 1) {
         simulationResults$futilityStop <- matrix(overview$futilityStop, nrow = design$kMax)[1, ]
-        simulationResults$earlyStop <- simulationResults$futilityStop +
-            simulationResults$overallReject - simulationResults$rejectPerStage[design$kMax, ]
+        simulationResults$earlyStop <- simulationResults$futilityPerStage + 
+            simulationResults$rejectPerStage[1:(design$kMax - 1), ]
         simulationResults$.setParameterType("earlyStop", C_PARAM_GENERATED)
     } else {
         simulationResults$futilityStop <- rep(0, numberOfResults)
@@ -865,10 +865,8 @@ getSimulationSurvival <- function(design = NULL, ...,
                 simulationResults$singleEventsPerStage
             )
             simulationResults$.setParameterType("cumulativeEventsPerStage", C_PARAM_GENERATED)
-            .addDeprecatedFieldValues(
-                simulationResults,
-                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage
-            )
+            .addDeprecatedFieldValues(simulationResults, "overallEventsPerStage", 
+                simulationResults$cumulativeEventsPerStage, "2024-06-10")
             simulationResults$expectedNumberOfEvents <-
                 diag(t(simulationResults$cumulativeEventsPerStage) %*% pStop)
         }
@@ -879,10 +877,8 @@ getSimulationSurvival <- function(design = NULL, ...,
                 nrow(simulationResults$singleEventsPerStage) > 0 &&
                 ncol(simulationResults$singleEventsPerStage) > 0) {
             simulationResults$cumulativeEventsPerStage <- simulationResults$singleEventsPerStage
-            .addDeprecatedFieldValues(
-                simulationResults,
-                "overallEventsPerStage", simulationResults$cumulativeEventsPerStage
-            )
+            .addDeprecatedFieldValues(simulationResults, "overallEventsPerStage", 
+                simulationResults$cumulativeEventsPerStage, "2024-06-10")
             simulationResults$expectedNumberOfEvents <-
                 as.numeric(simulationResults$cumulativeEventsPerStage)
         }

@@ -605,7 +605,9 @@ getSimulationMultiArmMeans <- function(
     if (kMax > 1) {
         simulatedConditionalPower[2:kMax, ] <- simulatedConditionalPower[2:kMax, ] / iterations[2:kMax, ]
     }
-    simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms / iterations - 1
+    simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations - 1
+    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms", 
+        simulationResults$numberOfSelectedArms, "2026-07-13")
 
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations

@@ -1673,7 +1673,25 @@ getParameterName <- function(obj, parameterCaption) {
     }
 }
 
-.addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues) {
+#' 
+#' @title Add deprecated field values
+#'
+#' @description
+#' Internal helper that assigns values to a field of a parameter set and
+#' marks that field as deprecated. This is used to maintain backward
+#' compatibility when fields are removed or replaced.
+#'
+#' @param parameterSet The parameter set object (typically an object with
+#'        list-like access and management methods).
+#' @param fieldName Character scalar. Name of the field to mark deprecated.
+#' @param fieldValues Values to assign to the deprecated field.
+#'
+#' @return The modified `parameterSet` invisibly.
+#'
+#' @keywords internal
+#' @noRd
+#' 
+.addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues, deprecationDate = NULL) {
     if (!fieldName %in% names(parameterSet)) {
         stop(
             C_EXCEPTION_TYPE_RUNTIME_ISSUE,

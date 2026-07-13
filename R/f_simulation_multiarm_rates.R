@@ -694,7 +694,9 @@ getSimulationMultiArmRates <- function(
         simulatedConditionalPower[2:kMax, ] <- as.matrix(simulatedConditionalPower[2:kMax, ] / iterations[2:kMax, ])
     }
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
-    simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms / iterations - 1
+    simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations - 1
+    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms", 
+        simulationResults$numberOfSelectedArms, "2026-07-13")
 
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations

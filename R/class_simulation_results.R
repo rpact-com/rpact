@@ -625,7 +625,7 @@ SimulationResults <- R6::R6Class(
                 "successPerStage",
                 "selectedArms",
                 "selectedPopulations",
-                "numberOfActiveArms",
+                "numberOfSelectedArms",
                 "numberOfPopulations",
                 "singleEventsPerStage",
                 "singleEventsPerArmAndStage",
@@ -845,7 +845,8 @@ SimulationResultsMultiArmMeans <- R6::R6Class(
         gED50 = NULL,
         intersectionTest = NULL,
         muMaxVector = NULL,
-        numberOfActiveArms = NULL,
+        numberOfActiveArms = NULL, # deprecated, use numberOfSelectedArms instead
+        numberOfSelectedArms = NULL,
         rejectAtLeastOne = NULL,
         rejectedArmsPerStage = NULL,
         rValue = NULL,
@@ -864,7 +865,7 @@ SimulationResultsMultiArmMeans <- R6::R6Class(
             for (generatedParam in c(
                 "rejectAtLeastOne",
                 "selectedArms",
-                "numberOfActiveArms",
+                "numberOfSelectedArms",
                 "rejectedArmsPerStage",
                 "successPerStage"
             )) {
@@ -1083,7 +1084,8 @@ SimulationResultsMultiArmRates <- R6::R6Class(
         epsilonValue = NULL,
         gED50 = NULL,
         intersectionTest = NULL,
-        numberOfActiveArms = NULL,
+        numberOfActiveArms = NULL, # deprecated, use numberOfSelectedArms instead
+        numberOfSelectedArms = NULL,
         piControl = NULL,
         piControlH1 = NULL,
         piMaxVector = NULL,
@@ -1106,7 +1108,7 @@ SimulationResultsMultiArmRates <- R6::R6Class(
             for (generatedParam in c(
                 "rejectAtLeastOne",
                 "selectedArms",
-                "numberOfActiveArms",
+                "numberOfSelectedArms",
                 "rejectedArmsPerStage",
                 "successPerStage"
             )) {
@@ -1419,7 +1421,8 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
         intersectionTest = NULL,
         kappa = NULL,
         maxNumberOfSubjects = NULL,
-        numberOfActiveArms = NULL,
+        numberOfActiveArms = NULL, # deprecated, use numberOfSelectedArms instead
+        numberOfSelectedArms = NULL,
         numberOfSubjects = NULL,
         omegaMaxVector = NULL,
         piControl = NULL,
@@ -1445,7 +1448,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
                 "eventsNotAchieved",
                 "rejectAtLeastOne",
                 "selectedArms",
-                "numberOfActiveArms",
+                "numberOfSelectedArms",
                 "rejectedArmsPerStage",
                 "studyDuration",
                 "successPerStage"

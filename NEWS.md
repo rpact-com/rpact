@@ -10,6 +10,7 @@
 ## Improvements, issues, and changes
 
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
+* In `getSimulationSurvival()` the early stopping probability ("Early stop") will be displayed stage-wise instead of overall
 
 # rpact 4.4.0
 

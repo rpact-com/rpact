@@ -687,7 +687,8 @@ C_PARAMETER_NAMES <- createDictionary("C_PARAMETER_NAMES", list(
     calcSubjectsFunction = "Calculate subjects function",
     calcEventsFunction = "Calculate events function",
     selectArmsFunction = "Select arms function",
-    numberOfActiveArms = "Number of active arms", # TODO rename in "numberOfSelectedArms" / "Number of selected arms"
+    numberOfSelectedArms = "Number of selected arms",
+    numberOfActiveArms = "Number of active arms", # deprecated
     selectPopulationsFunction = "Select populations function",
     numberOfPopulations = "Number of populations",
     correlationComputation = "Correlation computation method",
@@ -805,9 +806,9 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     pi1H1 = "pi(1) under H1",
     pi2H1 = "pi(2) under H1",
     nPlanned = "Planned sample size",
-    piControl = "Assumed control rate", # TODO Assumed rate(2)
+    piControl = "Assumed control rate", 
     piControls = "Assumed control rates",
-    piTreatment = "Assumed treatment rate", # TODO Assumed rate(1)
+    piTreatment = "Assumed treatment rate",
     piTreatments = "Assumed treatment rates",
     piTreatmentH1 = "pi(treatment) under H1",
     piTreatmentsH1 = "pi(treatment) under H1",
@@ -1000,7 +1001,9 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     calcSubjectsFunction = "Calc subjects fun",
     calcEventsFunction = "Calc events fun",
     selectArmsFunction = "Select arms fun",
-    numberOfActiveArms = "Number of active arms",
+    numberOfSelectedArms = "Number of selected arms",
+    numberOfSelectedArms = "Number of selected arms",
+    numberOfActiveArms = "Number of active arms", # deprecated
     correlationComputation = "Correlation computation",
     subsets = "Subset",
     subset = "Subset",
@@ -1452,7 +1455,8 @@ C_PARAMETER_FORMAT_FUNCTIONS <- createDictionary("C_PARAMETER_FORMAT_FUNCTIONS",
     omegaMaxVector = ".formatRates",
     muMaxVector = ".formatMeans",
     numberOfEvents = ".formatEvents",
-    numberOfActiveArms = ".formatRates",
+    numberOfSelectedArms = ".formatRates",
+    numberOfActiveArms = ".formatRates", # deprecated
     maxInformation = ".formatHowItIs",
     informationEpsilon = ".formatProbabilities",
     delayedInformation = ".formatRates",

@@ -667,7 +667,9 @@ getSimulationMultiArmSurvivalBasic <- function(
         simulatedConditionalPower[2:kMax, ] <- simulatedConditionalPower[2:kMax, ] / iterations[2:kMax, ]
     }
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
-    simulationResults$numberOfActiveArms <- simulatedNumberOfActiveArms / iterations
+    simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations
+    .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms", 
+        simulationResults$numberOfSelectedArms, , "2026-07-13")
 
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations
@@ -686,7 +688,8 @@ getSimulationMultiArmSurvivalBasic <- function(
             simulationResults$cumulativeEventsPerStage[, , gMax + 1]
     }
     simulationResults$cumulativeEventsPerStage <- .removeLastEntryFromArray(simulationResults$cumulativeEventsPerStage)
-    .addDeprecatedFieldValues(simulationResults, "eventsPerStage", simulationResults$cumulativeEventsPerStage)
+    .addDeprecatedFieldValues(simulationResults, "eventsPerStage", 
+        simulationResults$cumulativeEventsPerStage, "2024-06-10")
 
     simulationResults$singleEventsPerStage <- simulatedSingleEventsPerStage
     for (g in 1:gMax) {
@@ -697,7 +700,8 @@ getSimulationMultiArmSurvivalBasic <- function(
 
     simulationResults$singleEventsPerArmAndStage <- simulatedSingleEventsPerStage
     simulationResults$.setParameterType("singleEventsPerArmAndStage", C_PARAM_GENERATED)
-    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", simulatedSingleEventsPerStage)
+    .addDeprecatedFieldValues(simulationResults, "singleNumberOfEventsPerStage", 
+        simulatedSingleEventsPerStage, "2024-06-10")
 
     simulationResults$expectedNumberOfEvents <- expectedNumberOfEvents
 
