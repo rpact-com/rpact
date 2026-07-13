@@ -11,6 +11,9 @@
 
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
 * In `getSimulationSurvival()` the early stopping probability ("Early stop") will be displayed stage-wise instead of overall
+* Fixed inconsistent naming of variables and class fields 
+    - `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()`:
+       + Field `numberOfActiveArms` replaced by `numberOfSelectedArms`
 
 # rpact 4.4.0
 
