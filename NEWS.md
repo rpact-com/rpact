@@ -11,10 +11,10 @@
 
 * Issue [#118](https://github.com/rpact-com/rpact/issues/118) fixed
 * In `getSimulationSurvival()` the early stopping probability ("Early stop") will be displayed stage-wise instead of overall
-* Fixed inconsistent naming of variables and class fields 
+* Improved naming of variables and class fields 
     - `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()`:
        + Field `numberOfActiveArms` replaced by `numberOfSelectedArms`
-* `getSimulationSurvival()`: `numberOfSubjects1` and `numberOfSubjects2` will no longer be displayed in the print output, but are still available in the result object
+* `getSimulationSurvival()`: `numberOfSubjects1` and `numberOfSubjects2` will no longer be displayed in the print output, but are still available in the result object; `singleEventsPerStage` will be displayed in the print output
 
 # rpact 4.4.0
 
