@@ -385,35 +385,58 @@ NULL
 #'
 #' @noRd
 #'
-.assertIsInClosedInterval <- function(x, xName, ..., lower, upper, naAllowed = FALSE, call. = FALSE) {
+.assertIsInClosedInterval <- function(
+        x, 
+        xName, 
+        ..., 
+        lower, 
+        upper, 
+        naAllowed = FALSE, 
+        functionName = ".assertIsInClosedInterval", # TODO @Codex: this is a new argument; use calling function name instead of the assertion function name
+        call. = FALSE) {
     .warnInCaseOfUnknownArguments(functionName = ".assertIsInClosedInterval", ...)
     if (naAllowed && all(is.na(x))) {
         return(invisible())
     }
 
-    if (!naAllowed && length(x) > 1 && anyNA(x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT,
-            "'", xName, "' (", .arrayToString(x), ") must be a valid numeric vector or a single NA",
-            call. = call.
-        )
-    }
+    .assertIsNumericVector(x, xName, naAllowed = naAllowed, functionName = functionName, call. = call.)
 
     if (is.null(upper) || is.na(upper)) {
         if (any(x < lower, na.rm = TRUE)) {
             prefix <- ifelse(length(x) > 1, "each value of ", "")
-            stop(
-                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, prefix,
-                "'", xName, "' (", .arrayToString(x), ") must be >= ", lower,
-                call. = call.
-            )
+
+# TODO @Codex:  remove old solution and use only new solution below
+#            stop(
+#                C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS, prefix,
+#                "'", xName, "' (", .arrayToString(x), ") must be >= ", lower,
+#                call. = call.
+#            )
+            
+            stopArgumentOutOfBounds(
+                prefix, sQuote(xName), " (", .arrayToString(x), ") must be >= ", lower, 
+                parameter = xName, 
+                value = x, 
+                constraint = paste0(sQuote(xName), " >= ", lower),
+                functionName = functionName, 
+                lowerBound = lower, 
+                upperBound = NULL)
         }
     } else if (any(x < lower, na.rm = TRUE) || any(x > upper, na.rm = TRUE)) {
-        stop(
-            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
-            "'", xName, "' (", .arrayToString(x), ") is out of bounds [", lower, "; ", upper, "]",
-            call. = call.
-        )
+# TODO @Codex:  remove old solution and use only new solution below
+#        stop(
+#            C_EXCEPTION_TYPE_ARGUMENT_OUT_OF_BOUNDS,
+#            "'", xName, "' (", .arrayToString(x), ") is out of bounds [", lower, "; ", upper, "]",
+#            call. = call.
+#        )
+
+        stopArgumentOutOfBounds(
+            sQuote(xName), " (", .arrayToString(x), ") is out of bounds [", lower, "; ", upper, "]", 
+            parameter = xName, 
+            value = x, 
+            constraint = paste0(sQuote(xName), " >= ", lower, " and ", sQuote(xName), " <= ", upper),
+            functionName = functionName, 
+            lowerBound = lower, 
+            upperBound = upper)
     }
 }
 
@@ -685,40 +708,71 @@ NULL
         inherits(dataInput, "DatasetEnrichmentSurvival"))
 }
 
-.assertIsNumericVector <- function(x,
+.assertIsNumericVector <- function(
+        x,
         argumentName,
         ...,
         naAllowed = FALSE,
         noDefaultAvailable = FALSE,
         len = NA_integer_,
+        functionName = ".assertIsNumericVector", # TODO @Codex: this is a new argument; use calling function name instead of the assertion function name
         call. = FALSE) {
     if (missing("x") || is.null(x) || length(x) == 0) {
         .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = FALSE)
-        stop(
-            C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
-            "' must be a valid numeric value or vector",
-            call. = call.
-        )
+# TODO @Codex:  remove old solution and use only new solution below
+#        stop(
+#            C_EXCEPTION_TYPE_MISSING_ARGUMENT, "'", argumentName,
+#            "' must be a valid numeric value or vector",
+#            call. = call.
+#        )
+        stopIllegalArgument(
+            sQuote(argumentName), " must be a valid numeric value or vector",
+            parameter = argumentName, 
+            value = x, 
+            constraint = "must be a valid numeric value or vector",
+            functionName = functionName, 
+            relatedParameter = NULL, 
+            relatedValue = NULL)
     }
 
     .assertIsNoDefault(x, argumentName, noDefaultAvailable, checkNA = TRUE)
     
     illegalMatrix <- !all(is.na(x)) && is.matrix(x) && all(dim(x) > 1)
     if (illegalMatrix || (!naAllowed && anyNA(x)) || !is.numeric(x)) {
-        stop(
-            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must be a valid numeric value or vector",
-            ifelse(!is.vector(x), paste0(" (is ", .getClassName(x), ")"), ""),
-            call. = call.
-        )
+# TODO @Codex:  remove old solution and use only new solution below
+#        stop(
+#            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
+#            .arrayToString(x), ") must be a valid numeric value or vector",
+#            ifelse(!is.vector(x), paste0(" (is ", .getClassName(x), ")"), ""),
+#            call. = call.
+#        )
+        stopIllegalArgument(
+            sQuote(argumentName), " (", .arrayToString(x), ") must be a valid numeric value or vector",
+                ifelse(!is.vector(x), paste0(" (is ", .getClassName(x), ")"), ""),
+            parameter = argumentName, 
+            value = x, 
+            constraint = "must be a valid numeric value or vector",
+            functionName = functionName, 
+            relatedParameter = paste0("class of ", argumentName),
+            relatedValue = .getClassName(x))
     }
 
     if (!anyNA(len) && !length(x) %in% len) {
-        stop(
+# TODO @Codex:  remove old solution and use only new solution below
+#        stop(
+#            C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
+#            .arrayToString(x), ") must have length ", .arrayToString(len, mode = "or"),
+#            call. = call.
+#        )
+        stopIllegalArgument(
             C_EXCEPTION_TYPE_ILLEGAL_ARGUMENT, "'", argumentName, "' (",
-            .arrayToString(x), ") must have length ", .arrayToString(len, mode = "or"),
-            call. = call.
-        )
+                .arrayToString(x), ") must have length ", .arrayToString(len, mode = "or"),
+            parameter = argumentName, 
+            value = x, 
+            constraint = "must be a valid numeric value or vector",
+            functionName = functionName, 
+            relatedParameter = "expected length of argument",
+            relatedValue = .arrayToString(len, mode = "or"))
     }
     
     return(invisible(as.numeric(x)))
