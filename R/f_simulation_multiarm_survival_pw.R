@@ -566,12 +566,17 @@ getSimulationMultiArmSurvivalPatientWise <- function(
             "'maxNumberOfSubjects' must be defined"
         )
     }
+    simulationResults$.accrualTime <- accrualSetup
+    
     simulationResults$maxNumberOfSubjects <- accrualSetup$maxNumberOfSubjects
+    simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
+    
     allocationFraction <- .getFraction(allocationRatioPlanned)
     .warnInCaseOfExtremeAllocationRatios(allocationFraction[1], allocationFraction[2])
 
-    simulationResults$.setParameterType("maxNumberOfSubjects", accrualSetup$.getParameterType("maxNumberOfSubjects"))
-
+    simulationResults$accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
+    simulationResults$.setParameterType("accrualTime", accrualSetup$.getParameterType("accrualTime"))
+    
     accrualTime <- accrualSetup$.getAccrualTimeWithoutLeadingZero()
     recruitmentTimes <- .generateRecruitmentTimes(
         allocationRatioPlanned,

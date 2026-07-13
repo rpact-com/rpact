@@ -1397,6 +1397,7 @@ SimulationResultsMultiArmSurvival <- R6::R6Class(
     "SimulationResultsMultiArmSurvival",
     inherit = SimulationResultsBaseSurvival,
     public = list(
+        .accrualTime = NULL,
         accrualIntensity = NULL,
         accrualTime = NULL,
         activeArms = NULL,

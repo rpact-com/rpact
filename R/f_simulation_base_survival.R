@@ -776,6 +776,7 @@ getSimulationSurvival <- function(design = NULL, ...,
     simulationResults$iterations <- matrix(as.integer(overview$iterations), nrow = design$kMax)
     if (!is.null(overview$eventsPerStage)) {
         simulationResults$singleEventsPerStage <- matrix(overview$eventsPerStage, nrow = design$kMax)
+        simulationResults$.setParameterType("singleEventsPerStage", C_PARAM_GENERATED)
         .addDeprecatedFieldValues(simulationResults, "eventsPerStage", simulationResults$singleEventsPerStage)
     }
     simulationResults$eventsNotAchieved <- matrix(overview$eventsNotAchieved, nrow = design$kMax)
@@ -795,10 +796,6 @@ getSimulationSurvival <- function(design = NULL, ...,
         .getNumberOfSubjects1(simulationResults$numberOfSubjects, allocationRatioPlanned)
     simulationResults$numberOfSubjects2 <-
         .getNumberOfSubjects2(simulationResults$numberOfSubjects, allocationRatioPlanned)
-    if (any(allocationRatioPlanned != 1)) {
-        simulationResults$.setParameterType("numberOfSubjects1", C_PARAM_GENERATED)
-        simulationResults$.setParameterType("numberOfSubjects2", C_PARAM_GENERATED)
-    }
 
     simulationResults$overallReject <- matrix(overview$overallReject, nrow = design$kMax)[1, ]
     if (design$kMax > 1) {

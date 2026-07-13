@@ -14,6 +14,7 @@
 * Fixed inconsistent naming of variables and class fields 
     - `getSimulationMultiArmMeans()`, `getSimulationMultiArmRates()`, and `getSimulationMultiArmSurvival()`:
        + Field `numberOfActiveArms` replaced by `numberOfSelectedArms`
+* `getSimulationSurvival()`: `numberOfSubjects1` and `numberOfSubjects2` will no longer be displayed in the print output, but are still available in the result object
 
 # rpact 4.4.0
 
