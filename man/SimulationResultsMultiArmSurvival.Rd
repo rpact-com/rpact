@@ -73,7 +73,7 @@ to create an object of this type.
 
 \item{\code{minNumberOfEventsPerStage}}{Determines the minimum number of events per stage for data-driven sample size recalculation. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
-\item{\code{numberOfActiveArms}}{The number of active arms in a multi-armed design. Is a numeric matrix.}
+\item{\code{numberOfSelectedArms}}{The number of selected arms in a multi-armed design. Is a numeric matrix.}
 
 \item{\code{omegaMaxVector}}{The range of hazard ratios with highest response for \code{"linear"} and \code{"sigmoidEmax"} model. Is a numeric vector.}
 

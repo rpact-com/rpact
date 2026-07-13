@@ -797,7 +797,7 @@ SimulationResultsMeans <- R6::R6Class(
 #' @template field_maxNumberOfSubjectsPerStage
 #' @template field_minNumberOfSubjectsPerStage
 #' @template field_muMaxVector
-#' @template field_numberOfActiveArms
+#' @template field_numberOfSelectedArms
 #' @template field_plannedSubjects
 #' @template field_rejectAtLeastOne
 #' @template field_rejectedArmsPerStage
@@ -1035,7 +1035,7 @@ SimulationResultsRates <- R6::R6Class(
 #' @template field_iterations
 #' @template field_maxNumberOfIterations
 #' @template field_maxNumberOfSubjects
-#' @template field_numberOfActiveArms
+#' @template field_numberOfSelectedArms
 #' @template field_piControl
 #' @template field_piControlH1
 #' @template field_piH1
@@ -1360,7 +1360,7 @@ SimulationResultsSurvival <- R6::R6Class(
 #' @template field_maxNumberOfIterations
 #' @template field_maxNumberOfSubjects
 #' @template field_minNumberOfEventsPerStage
-#' @template field_numberOfActiveArms
+#' @template field_numberOfSelectedArms
 #' @template field_omegaMaxVector
 #' @template field_plannedEvents
 #' @template field_rejectAtLeastOne

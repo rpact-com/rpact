@@ -51,7 +51,7 @@ to create an object of this type.
 
 \item{\code{maxNumberOfSubjects}}{The maximum number of subjects for power calculations. Is a numeric vector.}
 
-\item{\code{numberOfActiveArms}}{The number of active arms in a multi-armed design. Is a numeric matrix.}
+\item{\code{numberOfSelectedArms}}{The number of selected arms in a multi-armed design. Is a numeric matrix.}
 
 \item{\code{piControl}}{The assumed probability in the control arm for simulation and under which the sample size recalculation is performed. Is a numeric vector of length 1 containing a value between 0 and 1.}
 

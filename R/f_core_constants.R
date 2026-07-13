@@ -1002,7 +1002,6 @@ C_TABLE_COLUMN_NAMES <- createDictionary("C_TABLE_COLUMN_NAMES", list(
     calcEventsFunction = "Calc events fun",
     selectArmsFunction = "Select arms fun",
     numberOfSelectedArms = "Number of selected arms",
-    numberOfSelectedArms = "Number of selected arms",
     numberOfActiveArms = "Number of active arms", # deprecated
     correlationComputation = "Correlation computation",
     subsets = "Subset",

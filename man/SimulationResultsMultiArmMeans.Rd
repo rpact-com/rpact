@@ -52,7 +52,7 @@ Use \code{\link[=getSimulationMultiArmMeans]{getSimulationMultiArmMeans()}} to c
 
 \item{\code{muMaxVector}}{The range of effect sizes for the treatment group with highest response for \code{"linear"} and \code{"sigmoidEmax"} model. Is a numeric vector.}
 
-\item{\code{numberOfActiveArms}}{The number of active arms in a multi-armed design. Is a numeric matrix.}
+\item{\code{numberOfSelectedArms}}{The number of selected arms in a multi-armed design. Is a numeric matrix.}
 
 \item{\code{plannedSubjects}}{Determines the number of cumulated (overall) subjects when the interim stages are planned. For two treatment arms, is the number of subjects for both treatment arms. For multi-arm designs, refers to the number of subjects per selected active arm. Is a numeric vector of length \code{kMax} containing whole numbers.}
 
