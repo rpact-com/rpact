@@ -139,22 +139,31 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
         },
         .setObjectType = function(objectType) {
             if (length(objectType) == 0 || !(objectType %in% c("sampleSize", "power"))) {
-                stopRuntimeIssue("'.objectType' (", objectType, ") must be specified as 'sampleSize' or 'power'", functionName = ".setObjectType",
-                    parameter = ".objectType", relatedParameter = "sampleSize")
+                stopRuntimeIssue("'.objectType' (", objectType, ") must be specified as 'sampleSize' or 'power'",
+                    functionName = ".setObjectType",
+                    parameter = "objectType",
+                    value = objectType
+                )
             }
             self$.objectType <- objectType
         },
         .isSampleSizeObject = function() {
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
-                stopRuntimeIssue("'.objectType' must be specified as 'sampleSize' or 'power'", functionName = ".isSampleSizeObject",
-                    parameter = ".objectType", relatedParameter = "sampleSize")
+                stopRuntimeIssue("'.objectType' must be specified as 'sampleSize' or 'power'",
+                    functionName = ".isSampleSizeObject",
+                    parameter = ".objectType",
+                    value = self$.objectType
+                )
             }
             return(self$.objectType == "sampleSize")
         },
         .isPowerObject = function() {
             if (length(self$.objectType) == 0 || !(self$.objectType %in% c("sampleSize", "power"))) {
-                stopRuntimeIssue("'.objectType' must be specified as 'sampleSize' or 'power'", functionName = ".isPowerObject",
-                    parameter = ".objectType", relatedParameter = "sampleSize")
+                stopRuntimeIssue("'.objectType' must be specified as 'sampleSize' or 'power'",
+                    functionName = ".isPowerObject",
+                    parameter = ".objectType",
+                    value = self$.objectType
+                )
             }
             return(self$.objectType == "power")
         },
@@ -284,8 +293,13 @@ TrialDesignPlan <- R6::R6Class("TrialDesignPlan",
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesignPlan <- function(x, row.names = NULL,
-        optional = FALSE, niceColumnNamesEnabled = FALSE, includeAllParameters = FALSE, ...) {
+as.data.frame.TrialDesignPlan <- function(
+        x,
+        row.names = NULL,
+        optional = FALSE,
+        niceColumnNamesEnabled = FALSE,
+        includeAllParameters = FALSE,
+        ...) {
     return(.getAsDataFrame(
         parameterSet = x,
         parameterNames = NULL,
@@ -394,7 +408,8 @@ TrialDesignPlanMeans <- R6::R6Class("TrialDesignPlanMeans",
         futilityBoundsEffectScaleLower = NULL,
         futilityBoundsEffectScaleUpper = NULL,
         futilityBoundsPValueScale = NULL,
-        initialize = function(...,
+        initialize = function(
+                ...,
                 normalApproximation = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS[["normalApproximation"]],
                 meanRatio = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS[["meanRatio"]],
                 thetaH0 = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_MEANS[["thetaH0"]],
@@ -577,7 +592,8 @@ TrialDesignPlanRates <- R6::R6Class("TrialDesignPlanRates",
         futilityBoundsEffectScaleLower = NULL,
         futilityBoundsEffectScaleUpper = NULL,
         futilityBoundsPValueScale = NULL,
-        initialize = function(...,
+        initialize = function(
+                ...,
                 normalApproximation = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["normalApproximation"]],
                 riskRatio = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["riskRatio"]],
                 thetaH0 = C_TRIAL_DESIGN_PLAN_DEFAULT_VALUES_RATES[["thetaH0"]],
@@ -811,7 +827,9 @@ TrialDesignPlanSurvival <- R6::R6Class("TrialDesignPlanSurvival",
         futilityBoundsEffectScaleLower = NULL,
         futilityBoundsEffectScaleUpper = NULL,
         futilityBoundsPValueScale = NULL,
-        initialize = function(..., typeOfComputation = NULL,
+        initialize = function(
+                ...,
+                typeOfComputation = NULL,
                 thetaH0 = NULL,
                 allocationRatioPlanned = NULL,
                 accountForObservationTimes = NULL,
@@ -1073,7 +1091,8 @@ TrialDesignPlanCountData <- R6::R6Class("TrialDesignPlanCountData",
         futilityBoundsEffectScaleUpper = NULL,
         futilityBoundsPValueScale = NULL,
         maxInformation = NULL,
-        initialize = function(...,
+        initialize = function(
+                ...,
                 designCharacteristics,
                 lambda1 = NA_real_,
                 lambda2 = NA_real_,

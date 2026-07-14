@@ -244,7 +244,9 @@ NULL
             },
             error = function(e) {
                 stopMissingArgument("the object '", paramName, "' has not been defined anywhere. ", "Please define it first, e.g., run '",
-                    paramName, " <- 1'", functionName = ".isDefinedArgument", parameter = paramName)
+                    paramName, " <- 1'",
+                    functionName = ".isDefinedArgument", parameter = paramName
+                )
             }
         )
     }
@@ -371,7 +373,10 @@ getTestLabel <- function(x) {
     return(.arrayToString(x, mode = "vector", digits = 4, maxLength = 10L, maxCharacters = 40L))
 }
 
-.arrayToString <- function(x, ..., separator = ", ",
+.arrayToString <- function(
+        x,
+        ...,
+        separator = ", ",
         vectorLookAndFeelEnabled = FALSE,
         encapsulate = FALSE,
         digits = 3,
@@ -500,18 +505,24 @@ getTestLabel <- function(x) {
 
 .getInputForZeroOutputInsideTolerance <- function(input, output, tolerance = .Machine$double.eps^0.25) {
     if (is.null(tolerance) || is.na(tolerance)) {
-        stopIllegalArgument("'tolerance' must be a valid double", functionName = ".getInputForZeroOutputInsideTolerance", parameter = "tolerance",
-    value = tolerance)
+        stopIllegalArgument("'tolerance' must be a valid double",
+            functionName = ".getInputForZeroOutputInsideTolerance", parameter = "tolerance",
+            value = tolerance
+        )
     }
 
     if (tolerance < 0) {
-        stopIllegalArgument("'tolerance' (", tolerance, ") must be >= 0", functionName = ".getInputForZeroOutputInsideTolerance",
-            parameter = "tolerance", value = tolerance)
+        stopIllegalArgument("'tolerance' (", tolerance, ") must be >= 0",
+            functionName = ".getInputForZeroOutputInsideTolerance",
+            parameter = "tolerance", value = tolerance
+        )
     }
 
     if (is.null(input)) {
-        stopIllegalArgument("'input' must be a valid double or NA", functionName = ".getInputForZeroOutputInsideTolerance", parameter = "input",
-    value = input)
+        stopIllegalArgument("'input' must be a valid double or NA",
+            functionName = ".getInputForZeroOutputInsideTolerance", parameter = "input",
+            value = input
+        )
     }
 
     if (is.null(output) || is.na(output)) {
@@ -525,7 +536,11 @@ getTestLabel <- function(x) {
     return(NA_real_)
 }
 
-.getInputProducingZeroOutput <- function(input1, output1, input2, output2,
+.getInputProducingZeroOutput <- function(
+        input1,
+        output1,
+        input2,
+        output2,
         tolerance = .Machine$double.eps^0.25) {
     if ((is.na(output1) || is.null(output1)) &&
             (is.na(output2) || is.null(output2))) {
@@ -566,7 +581,8 @@ getTestLabel <- function(x) {
 #'
 #' @noRd
 #'
-.getOneDimensionalRoot <- function(fun,
+.getOneDimensionalRoot <- function(
+        fun,
         ...,
         lower,
         upper,
@@ -704,7 +720,11 @@ getTestLabel <- function(x) {
 #'
 #' @noRd
 #'
-.getOneDimensionalRootBisectionMethod <- function(fun, ..., lower, upper,
+.getOneDimensionalRootBisectionMethod <- function(
+        fun,
+        ...,
+        lower,
+        upper,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
         acceptResultsOutOfTolerance = FALSE,
         maxSearchIterations = 50,
@@ -823,24 +843,32 @@ getTestLabel <- function(x) {
 
 .isFirstValueGreaterThanSecondValue <- function(firstValue, secondValue) {
     if (is.null(firstValue) || length(firstValue) != 1 || is.na(firstValue)) {
-        stopIllegalArgument("'firstValue' (", firstValue, ") must be a valid numeric value", functionName = ".isFirstValueGreaterThanSecondValue",
-            parameter = "firstValue", value = firstValue)
+        stopIllegalArgument("'firstValue' (", firstValue, ") must be a valid numeric value",
+            functionName = ".isFirstValueGreaterThanSecondValue",
+            parameter = "firstValue", value = firstValue
+        )
     }
     if (is.null(secondValue) || length(secondValue) != 1 || is.na(secondValue)) {
-        stopIllegalArgument("'secondValue' (", secondValue, ") must be a valid numeric value", functionName = ".isFirstValueGreaterThanSecondValue",
-            parameter = "secondValue", value = secondValue)
+        stopIllegalArgument("'secondValue' (", secondValue, ") must be a valid numeric value",
+            functionName = ".isFirstValueGreaterThanSecondValue",
+            parameter = "secondValue", value = secondValue
+        )
     }
     return(firstValue > secondValue)
 }
 
 .isFirstValueSmallerThanSecondValue <- function(firstValue, secondValue) {
     if (is.null(firstValue) || length(firstValue) != 1 || is.na(firstValue)) {
-        stopIllegalArgument("'firstValue' (", firstValue, ") must be a valid numeric value", functionName = ".isFirstValueSmallerThanSecondValue",
-            parameter = "firstValue", value = firstValue)
+        stopIllegalArgument("'firstValue' (", firstValue, ") must be a valid numeric value",
+            functionName = ".isFirstValueSmallerThanSecondValue",
+            parameter = "firstValue", value = firstValue
+        )
     }
     if (is.null(secondValue) || length(secondValue) != 1 || is.na(secondValue)) {
-        stopIllegalArgument("'secondValue' (", secondValue, ") must be a valid numeric value", functionName = ".isFirstValueSmallerThanSecondValue",
-            parameter = "secondValue", value = secondValue)
+        stopIllegalArgument("'secondValue' (", secondValue, ") must be a valid numeric value",
+            functionName = ".isFirstValueSmallerThanSecondValue",
+            parameter = "secondValue", value = secondValue
+        )
     }
     return(firstValue < secondValue)
 }
@@ -853,19 +881,27 @@ getTestLabel <- function(x) {
     parameterSet$.setParameterType(parameterName, parameterType)
 }
 
-.setValueAndParameterType <- function(parameterSet, parameterName, value, defaultValue,
+.setValueAndParameterType <- function(
+        parameterSet,
+        parameterName,
+        value,
+        defaultValue,
         notApplicableIfNA = FALSE) {
     .assertIsParameterSetClass(parameterSet, "parameterSet")
 
     if (is.null(parameterSet)) {
-        stopIllegalArgument("'parameterSet' must be not null", functionName = ".setValueAndParameterType", parameter = "parameterSet",
-    value = parameterSet)
+        stopIllegalArgument("'parameterSet' must be not null",
+            functionName = ".setValueAndParameterType", parameter = "parameterSet",
+            value = parameterSet
+        )
     }
 
     if (!(parameterName %in% names(parameterSet))) {
         stopIllegalArgument("'", .getClassName(parameterSet), "' does not contain a field with name '", parameterName,
-            "'", functionName = ".setValueAndParameterType", parameter = "parameterName", value = parameterName,
-            relatedParameter = "parameterSet", relatedValue = names(parameterSet))
+            "'",
+            functionName = ".setValueAndParameterType", parameter = "parameterName", value = parameterName,
+            relatedParameter = "parameterSet", relatedValue = names(parameterSet)
+        )
     }
 
     parameterSet[[parameterName]] <- value
@@ -941,8 +977,10 @@ getTestLabel <- function(x) {
     maxValue <- variedParameter[2]
     if (minValue == maxValue) {
         stopIllegalArgument("'", variedParameterName, "' with length 2 must contain minimum != maximum (", minValue,
-            " == ", maxValue, ")", functionName = ".getVariedParameterVector", parameter = "variedParameterName",
-            value = variedParameterName, relatedParameter = "minValue", relatedValue = minValue)
+            " == ", maxValue, ")",
+            functionName = ".getVariedParameterVector", parameter = "variedParameterName",
+            value = variedParameterName, relatedParameter = "minValue", relatedValue = minValue
+        )
     }
     by <- .getVariedParameterVectorByValue(variedParameter)
     variedParameter <- seq(minValue, maxValue, by)
@@ -1126,8 +1164,10 @@ printCitation <- function(inclusiveR = TRUE, language = "en", markdown = NA) {
 getParameterCaption <- function(obj, var) {
     fCall <- match.call(expand.dots = FALSE)
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
-        stopIllegalArgument("'obj' ", "(", .getClassName(obj), ") must be an rpact result object", functionName = "getParameterCaption",
-            parameter = "obj", value = obj)
+        stopIllegalArgument("'obj' ", "(", .getClassName(obj), ") must be an rpact result object",
+            functionName = "getParameterCaption",
+            parameter = "obj", value = obj
+        )
     }
     parameterName <- .getParameterSetVar(fCall, var)
     .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
@@ -1167,8 +1207,10 @@ getParameterType <- function(obj, var) {
     fCall <- match.call(expand.dots = FALSE)
     parameterName <- .getParameterSetVar(fCall, var)
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
-        stopIllegalArgument("'obj' ", "(", .getClassName(obj), ") must be an rpact result object", functionName = "getParameterType",
-            parameter = "obj", value = obj)
+        stopIllegalArgument("'obj' ", "(", .getClassName(obj), ") must be an rpact result object",
+            functionName = "getParameterType",
+            parameter = "obj", value = obj
+        )
     }
 
     .assertIsSingleCharacter(parameterName, "parameterName", naAllowed = FALSE)
@@ -1207,8 +1249,10 @@ getParameterType <- function(obj, var) {
 #'
 getParameterName <- function(obj, parameterCaption) {
     if (is.null(obj) || !.isResultObjectBaseClass(obj) || !inherits(obj, "FieldSet")) {
-        stopIllegalArgument("'obj' ", "(", .getClassName(obj), ") must be an rpact result object", functionName = "getParameterName",
-            parameter = "obj", value = obj)
+        stopIllegalArgument("'obj' ", "(", .getClassName(obj), ") must be an rpact result object",
+            functionName = "getParameterName",
+            parameter = "obj", value = obj
+        )
     }
     .assertIsSingleCharacter(parameterCaption, "parameterCaption", naAllowed = FALSE)
     parameterCaption <- trimws(parameterCaption)
@@ -1249,8 +1293,10 @@ getParameterName <- function(obj, parameterCaption) {
 
 .removeLastEntryFromArray <- function(x) {
     if (!is.array(x)) {
-        stopIllegalArgument("'x' (", .getClassName(x), ") must be an array", functionName = ".removeLastEntryFromArray",
-            parameter = "x", value = x)
+        stopIllegalArgument("'x' (", .getClassName(x), ") must be an array",
+            functionName = ".removeLastEntryFromArray",
+            parameter = "x", value = x
+        )
     }
 
     dataDim <- dim(x)
@@ -1268,30 +1314,37 @@ getParameterName <- function(obj, parameterCaption) {
 
 .moveColumn <- function(data, columnName, insertPositionColumnName) {
     if (!is.data.frame(data)) {
-        stopIllegalArgument(sQuote("data"), " (", .getClassName(data), ") must be a data.frame", parameter = "data",
-            value = .getClassName(data), constraint = "data.frame", functionName = ".moveColumn")
+        stopIllegalArgument(sQuote("data"), " (", .getClassName(data), ") must be a data.frame",
+            parameter = "data",
+            value = .getClassName(data), constraint = "data.frame", functionName = ".moveColumn"
+        )
     }
     if (is.null(insertPositionColumnName) || length(insertPositionColumnName) != 1 ||
             is.na(insertPositionColumnName) || !is.character(insertPositionColumnName)) {
         stopIllegalArgument(sQuote("insertPositionColumnName"), " (", .getClassName(insertPositionColumnName),
-            ") must be a valid character value", parameter = "insertPositionColumnName", value = insertPositionColumnName,
-            constraint = "valid character value", functionName = ".moveColumn")
+            ") must be a valid character value",
+            parameter = "insertPositionColumnName", value = insertPositionColumnName,
+            constraint = "valid character value", functionName = ".moveColumn"
+        )
     }
     if (is.null(columnName) || length(columnName) != 1 || is.na(columnName) || !is.character(columnName)) {
         stopIllegalArgument(sQuote("columnName"), " (", .getClassName(columnName), ") must be a valid character value",
-            parameter = "columnName", value = columnName, constraint = "valid character value", functionName = ".moveColumn")
+            parameter = "columnName", value = columnName, constraint = "valid character value", functionName = ".moveColumn"
+        )
     }
 
     colNames <- colnames(data)
     if (!(columnName %in% colNames)) {
         stopIllegalArgument(sQuote("columnName"), " (", columnName, ") does not exist in the specified data.frame 'data'",
             parameter = "columnName", value = columnName, constraint = "existing column in data", relatedParameter = "data",
-            relatedValue = colNames, functionName = ".moveColumn")
+            relatedValue = colNames, functionName = ".moveColumn"
+        )
     }
     if (!(insertPositionColumnName %in% colNames)) {
         stopIllegalArgument(sQuote("insertPositionColumnName"), " (", insertPositionColumnName, ") does not exist in the specified data.frame 'data'",
             parameter = "insertPositionColumnName", value = insertPositionColumnName, constraint = "existing column in data",
-            relatedParameter = "data", relatedValue = colNames, functionName = ".moveColumn")
+            relatedParameter = "data", relatedValue = colNames, functionName = ".moveColumn"
+        )
     }
     if (columnName == insertPositionColumnName) {
         return(data)
@@ -1337,8 +1390,12 @@ getParameterName <- function(obj, parameterCaption) {
 #'
 #' @noRd
 #'
-.isConditionTrue <- function(x, condType = c("and", "or"), xName = NA_character_,
-        level = 0, showDebugMessages = FALSE) {
+.isConditionTrue <- function(
+        x,
+        condType = c("and", "or"),
+        xName = NA_character_,
+        level = 0,
+        showDebugMessages = FALSE) {
     if (is.logical(x)) {
         if (showDebugMessages) {
             message(rep("\t", level), x, "")
@@ -1359,7 +1416,8 @@ getParameterName <- function(obj, parameterCaption) {
             type <- gsub("\\d*", "", listName)
             if (!(type %in% c("and", "or"))) {
                 stopRuntimeIssue("all list names (", type, " / ", listName, ") must have the format 'and[number]' or 'or[number]', where [number] is an integer",
-                    functionName = ".isConditionTrue", parameter = "and[number]", relatedParameter = "or[number]")
+                    functionName = ".isConditionTrue", parameter = "and[number]", relatedParameter = "or[number]"
+                )
             }
 
             subList <- x[[listName]]
@@ -1386,8 +1444,10 @@ getParameterName <- function(obj, parameterCaption) {
         return(result)
     }
 
-    stopRuntimeIssue("x must be of type logical or list (is ", .getClassName(x), functionName = ".isConditionTrue",
-        parameter = "x", value = x)
+    stopRuntimeIssue("x must be of type logical or list (is ", .getClassName(x),
+        functionName = ".isConditionTrue",
+        parameter = "x", value = x
+    )
 }
 
 .getClassName <- function(x) {
@@ -1458,19 +1518,25 @@ getParameterName <- function(obj, parameterCaption) {
 .moveValue <- function(values, value, insertPositionValue) {
     if (is.null(insertPositionValue) || length(insertPositionValue) != 1 || is.na(insertPositionValue)) {
         stopIllegalArgument("'insertPositionValue' (", class(insertPositionValue), ") must be a valid single value",
-            functionName = ".moveValue", parameter = "insertPositionValue", value = insertPositionValue)
+            functionName = ".moveValue", parameter = "insertPositionValue", value = insertPositionValue
+        )
     }
     if (is.null(value) || length(value) != 1 || is.na(value)) {
-        stopIllegalArgument("'value' (", class(value), ") must be a valid single value", functionName = ".moveValue",
-            parameter = "value", value = value)
+        stopIllegalArgument("'value' (", class(value), ") must be a valid single value",
+            functionName = ".moveValue",
+            parameter = "value", value = value
+        )
     }
     if (!(value %in% values)) {
-        stopIllegalArgument("'value' (", value, ") does not exist in the specified vector 'values'", functionName = ".moveValue",
-            parameter = "value", value = value, relatedParameter = "values")
+        stopIllegalArgument("'value' (", value, ") does not exist in the specified vector 'values'",
+            functionName = ".moveValue",
+            parameter = "value", value = value, relatedParameter = "values"
+        )
     }
     if (!(insertPositionValue %in% values)) {
         stopIllegalArgument("'insertPositionValue' (", insertPositionValue, ") does not exist in the specified vector 'values'",
-            functionName = ".moveValue", parameter = "insertPositionValue", value = insertPositionValue, relatedParameter = "values")
+            functionName = ".moveValue", parameter = "insertPositionValue", value = insertPositionValue, relatedParameter = "values"
+        )
     }
     if (value == insertPositionValue) {
         return(values)
@@ -1524,11 +1590,11 @@ getParameterName <- function(obj, parameterCaption) {
     type <- match.arg(type)
     optionKey <- paste0("rpact.auto.markdown.", type)
     if (isFALSE(.getEnvironmentVariable(
-        .getEnvironmentVariableKey(optionKey),
-        optionKey,
-        default = TRUE,
-        type = "logical"
-    ))) {
+            .getEnvironmentVariableKey(optionKey),
+            optionKey,
+            default = TRUE,
+            type = "logical"
+        ))) {
         return(FALSE)
     }
 
@@ -1551,12 +1617,14 @@ getParameterName <- function(obj, parameterCaption) {
 #' options("rpact.multivar.dist.eps" = 1e-06)
 #'
 #' @noRd
-.getMultivariateDistribution <- function(...,
+.getMultivariateDistribution <- function(
+        ...,
         type = c("normal", "t", "quantile", "tQuantile"),
         upper,
         sigma,
         eps = NA_real_,
-        df = NA_real_, alpha = NA_real_) {
+        df = NA_real_,
+        alpha = NA_real_) {
     type <- match.arg(type)
 
     if (is.null(eps) || length(eps) != 1 || is.na(eps)) {
@@ -1654,9 +1722,14 @@ getParameterName <- function(obj, parameterCaption) {
 #'
 .addDeprecatedFieldValues <- function(parameterSet, fieldName, fieldValues, deprecationDate = NULL) {
     if (!fieldName %in% names(parameterSet)) {
-        stopRuntimeIssue("'", .getClassName(parameterSet), "' does not contain a field with name '", fieldName,
-            "'", functionName = ".addDeprecatedFieldValues", parameter = "fieldName", value = fieldName, relatedParameter = "parameterSet",
-            relatedValue = names(parameterSet))
+        stopRuntimeIssue("'", .getClassName(parameterSet), "' does not ",
+            "contain a field with name '", fieldName, "'",
+            functionName = ".addDeprecatedFieldValues",
+            parameter = "fieldName",
+            value = fieldName,
+            relatedParameter = "parameterSet",
+            relatedValue = names(parameterSet)
+        )
     }
 
     parameterSet[[fieldName]] <- fieldValues
@@ -1731,10 +1804,11 @@ getParameterName <- function(obj, parameterCaption) {
         ...,
         phase = c("unknown", "design", "planning", "analysis"),
         adjustLengthToKMax = FALSE) {
-
     phase <- match.arg(phase)
     futilityBounds <- .applyDirectionOfAlternative(design$futilityBounds,
-        design$directionUpper, type = "negateIfLower", phase = phase)
+        design$directionUpper,
+        type = "negateIfLower", phase = phase
+    )
     if (adjustLengthToKMax) {
         futilityBounds <- c(futilityBounds, C_FUTILITY_BOUNDS_DEFAULT)
     }
@@ -1824,8 +1898,10 @@ getParameterName <- function(obj, parameterCaption) {
 
     if (length(directionUpper) > 1 && length(value) != length(directionUpper)) {
         stopIllegalArgument("'value' (", .arrayToString(value), ") and ", "'directionUpper' (", .arrayToString(directionUpper),
-            ") must have the same length", functionName = ".applyDirectionOfAlternative", parameter = "value",
-            value = value, relatedParameter = "directionUpper", relatedValue = directionUpper)
+            ") must have the same length",
+            functionName = ".applyDirectionOfAlternative", parameter = "value",
+            value = value, relatedParameter = "directionUpper", relatedValue = directionUpper
+        )
     }
 
     if (length(value) <= 1 || length(directionUpper) == 1) {
@@ -1850,7 +1926,8 @@ getParameterName <- function(obj, parameterCaption) {
     return(values)
 }
 
-.applyDirectionOfAlternativeSingle <- function(...,
+.applyDirectionOfAlternativeSingle <- function(
+        ...,
         value,
         directionUpper,
         type = c(
@@ -1966,7 +2043,7 @@ saveOptions <- function() {
             optionFileContent <- character()
             for (optionName in optionNames) {
                 optionValue <- getOption(optionName)
-                if (!is.null(optionValue) && length(optionValue) == 1 && 
+                if (!is.null(optionValue) && length(optionValue) == 1 &&
                         (is.character(optionValue) || is.numeric(optionValue) || is.logical(optionValue))) {
                     optionFileContent <- c(optionFileContent, paste0(optionName, ": ", optionValue))
                 }

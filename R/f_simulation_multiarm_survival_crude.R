@@ -665,7 +665,7 @@ getSimulationMultiArmSurvivalBasic <- function(
     simulationResults$rejectAtLeastOne <- simulatedRejectAtLeastOne / maxNumberOfIterations
     simulationResults$numberOfSelectedArms <- simulatedNumberOfActiveArms / iterations
     .addDeprecatedFieldValues(simulationResults, "numberOfActiveArms",
-        simulationResults$numberOfSelectedArms, , "2026-07-13")
+        simulationResults$numberOfSelectedArms, "2026-07-13")
 
     simulationResults$selectedArms <- simulatedSelections / maxNumberOfIterations
     simulationResults$rejectedArmsPerStage <- simulatedRejections / maxNumberOfIterations

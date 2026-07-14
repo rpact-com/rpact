@@ -485,8 +485,12 @@ NULL
 
     if (!is.null(effectMatrix)) {
         if (typeOfShape != "userDefined") {
-            stopIllegalArgument("Change 'typeOfShape' (", typeOfShape, ") to 'userDefined'", functionName = ".createSimulationResultsMultiArmObject",
-                parameter = "typeOfShape", value = typeOfShape, relatedParameter = "userDefined")
+            stopIllegalArgument("Change 'typeOfShape' (", typeOfShape, ") to 'userDefined'", 
+                functionName = ".createSimulationResultsMultiArmObject",
+                parameter = "typeOfShape", 
+                value = typeOfShape, 
+                relatedParameter = "effectMatrix",
+                relatedValue = "not NULL")
         }
     }
 

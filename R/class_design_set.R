@@ -308,13 +308,17 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
         },
         .validateDesignsArgument = function(designsToAdd, args) {
             if (!is.list(designsToAdd)) {
-                stopIllegalArgument("'designsToAdd' must be a list", functionName = ".validateDesignsArgument", parameter = "designsToAdd",
-    value = designsToAdd)
+                stopIllegalArgument("'designsToAdd' must be a list",
+                    functionName = ".validateDesignsArgument", parameter = "designsToAdd",
+                    value = designsToAdd
+                )
             }
 
             if (length(designsToAdd) == 0) {
-                stopIllegalArgument("'designsToAdd' must be not empty", functionName = ".validateDesignsArgument", parameter = "designsToAdd",
-    value = designsToAdd)
+                stopIllegalArgument("'designsToAdd' must be not empty",
+                    functionName = ".validateDesignsArgument", parameter = "designsToAdd",
+                    value = designsToAdd
+                )
             }
 
             designsToAddValidated <- list()
@@ -324,8 +328,10 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
                 } else {
                     parentDesign <- d[[".design"]]
                     if (is.null(parentDesign)) {
-                        stopIllegalArgument("'designsToAdd' must be a list of trial designs (found '", .getClassName(d), "')", functionName = ".validateDesignsArgument",
-    parameter = "designsToAdd", value = designsToAdd)
+                        stopIllegalArgument("'designsToAdd' must be a list of trial designs (found '", .getClassName(d), "')",
+                            functionName = ".validateDesignsArgument",
+                            parameter = "designsToAdd", value = designsToAdd
+                        )
                     }
 
                     warning("Only the parent design of ", .getClassName(d),
@@ -354,8 +360,10 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
         },
         addVariedParameters = function(varPar) {
             if (is.null(varPar) || !is.character(varPar)) {
-                stopIllegalArgument("'varPar' must be a valid character vector", functionName = "addVariedParameters", parameter = "varPar",
-    value = varPar)
+                stopIllegalArgument("'varPar' must be a valid character vector",
+                    functionName = "addVariedParameters", parameter = "varPar",
+                    value = varPar
+                )
             }
 
             self$variedParameters <- c(self$variedParameters, varPar)
@@ -372,7 +380,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             optionalArgumentsDefined <- (length(args) > 0)
             if (is.null(design) && !optionalArgumentsDefined) {
                 stopIllegalArgument("please specify a 'design' to add and/or a design parameter, ", "e.g., deltaWT = c(0.1, 0.3, 0.4)",
-                    functionName = ".validateOptionalArguments", parameter = "design")
+                    functionName = ".validateOptionalArguments", parameter = "design"
+                )
             }
 
             if (is.null(design) && length(args) == 1 && .isTrialDesign(args[[1]])) {
@@ -383,7 +392,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
             if (is.null(design) && optionalArgumentsDefined && length(self$designs) == 0) {
                 stopIncompleteArguments("at least one design (master) must be defined in this ", "design set to respect any design parameters",
-                    functionName = ".validateOptionalArguments")
+                    functionName = ".validateOptionalArguments"
+                )
             }
 
             if (!is.null(design)) {
@@ -393,8 +403,12 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             }
 
             if (!.isTrialDesign(design)) {
-                stopIllegalArgument("'design' (", .getClassName(design), ") must be an instance of class 'TrialDesign'",
-                    functionName = ".validateOptionalArguments", parameter = "design", value = design, relatedParameter = "TrialDesign")
+                stopIllegalArgument("'design' (", .getClassName(design), ") ",
+                    "must be an instance of class 'TrialDesign'",
+                    functionName = ".validateOptionalArguments",
+                    parameter = "design",
+                    value = .getClassName(design)
+                )
             }
 
             self$.getArgumentNames(validatedDesign = design, ...)
@@ -423,10 +437,18 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             visibleFieldNames <- validatedDesign$.getVisibleFieldNames()
             for (arg in argumentNames) {
                 if (!(arg %in% visibleFieldNames)) {
-                    stopRuntimeIssue(sprintf("'%s' does not contain a field with name '%s'", .getClassName(validatedDesign),
-                        arg), parameter = arg, constraint = "visible design field name", relatedParameter = "validatedDesign",
-                        relatedValue = .getClassName(validatedDesign), context = list(visibleFieldNames = visibleFieldNames),
-                        functionName = ".getArgumentNames")
+                    stopRuntimeIssue(
+                        sprintf(
+                            "'%s' does not contain a field with name '%s'",
+                            .getClassName(validatedDesign),
+                            arg
+                        ),
+                        parameter = arg,
+                        constraint = "visible design field name",
+                        relatedParameter = "validatedDesign",
+                        relatedValue = .getClassName(validatedDesign),
+                        functionName = ".getArgumentNames"
+                    )
                 }
             }
 
@@ -475,7 +497,8 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
             if (length(argumentNames) > 2) {
                 stopIllegalArgument("too many arguments (", .arrayToString(argumentNames, encapsulate = TRUE), "): up to 2 design parameters are allowed",
-                    functionName = ".createDesignVariants", parameter = "argumentNames", value = argumentNames)
+                    functionName = ".createDesignVariants", parameter = "argumentNames", value = argumentNames
+                )
             }
 
             designVariants <- self$.createDesignVariantsRecursive(
@@ -485,8 +508,12 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
 
             return(designVariants)
         },
-        .designSettingExists = function(parameterName, parameterValue, numberOfArguments = 1,
-                parameterNameBefore = NULL, parameterValueBefore = NULL) {
+        .designSettingExists = function(
+                parameterName,
+                parameterValue,
+                numberOfArguments = 1,
+                parameterNameBefore = NULL,
+                parameterValueBefore = NULL) {
             if (length(self$designs) == 0) {
                 return(FALSE)
             }
@@ -505,8 +532,13 @@ TrialDesignSet <- R6::R6Class("TrialDesignSet",
             }
             return(FALSE)
         },
-        .createDesignVariantsRecursive = function(designMaster, args, argumentIndex, argumentNames,
-                parameterNameBefore = NULL, parameterValueBefore = NULL) {
+        .createDesignVariantsRecursive = function(
+                designMaster,
+                args,
+                argumentIndex,
+                argumentNames,
+                parameterNameBefore = NULL,
+                parameterValueBefore = NULL) {
             if (argumentIndex > length(argumentNames)) {
                 return(list())
             }
@@ -692,9 +724,15 @@ length.TrialDesignSet <- function(x) {
     colNames1 <- colnames(df1)
     colNames2 <- colnames(df2)
     if (length(colNames1) != length(colNames2)) {
-        stopRuntimeIssue("cannot harmonize column names of two data frames if number of columns is unequal (",
-            length(colNames1), " != ", length(colNames2), ")", functionName = ".getHarmonizedColumnNames", parameter = "colNames1",
-            value = length(colNames1), relatedParameter = "colNames2", relatedValue = length(colNames2))
+        stopRuntimeIssue("cannot harmonize column names of two ",
+            "data frames if number of columns is unequal (",
+            length(colNames1), " != ", length(colNames2), ")",
+            functionName = ".getHarmonizedColumnNames",
+            parameter = "colNames1",
+            value = length(colNames1),
+            relatedParameter = "colNames2",
+            relatedValue = length(colNames2)
+        )
     }
 
     colNames <- character()
@@ -781,14 +819,16 @@ length.TrialDesignSet <- function(x) {
 #'
 #' @keywords internal
 #'
-as.data.frame.TrialDesignSet <- function(x,
+as.data.frame.TrialDesignSet <- function(
+        x,
         row.names = NULL,
         optional = FALSE,
         niceColumnNamesEnabled = FALSE,
         includeAllParameters = FALSE,
         addPowerAndAverageSampleNumber = FALSE,
         theta = seq(-1, 1, 0.02),
-        nMax = NA_integer_, ...) {
+        nMax = NA_integer_,
+        ...) {
     .assertIsTrialDesignSet(x)
     if (x$isEmpty()) {
         stopIllegalArgument("cannot create data.frame because the design set is empty", functionName = "as.data.frame.TrialDesignSet")
@@ -808,9 +848,15 @@ as.data.frame.TrialDesignSet <- function(x,
     dataFrame <- NULL
     for (design in x$designs) {
         if (fisherDesignEnabled != .isTrialDesignFisher(design)) {
-            stopConflictingArguments("all trial designs must be from the same type ", "('", .getClassName(x$designs[[1]]),
-                "' != '", .getClassName(design), ")'", functionName = "as.data.frame.TrialDesignSet", parameter = "design",
-                value = design, relatedParameter = "designs", relatedValue = x$designs[[1]])
+            stopConflictingArguments("all trial designs must be from the same type ",
+                "('", .getClassName(x$designs[[1]]),
+                "' != '", .getClassName(design), ")'",
+                functionName = "as.data.frame.TrialDesignSet",
+                parameter = "design",
+                value = design,
+                relatedParameter = "designs",
+                relatedValue = .getClassName(x$designs[[1]])
+            )
         }
 
         suppressWarnings(df <- as.data.frame(design,
@@ -963,8 +1009,10 @@ plot.TrialDesignSet <- function(
     }
     if (!(type %in% availablePlotTypes)) {
         stopIllegalArgument("'type' (", type, ") is not available; 'type' can ", ifelse(length(availablePlotTypes) ==
-            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"), functionName = "plot.TrialDesignSet",
-            parameter = "type", value = type)
+            1, "only ", ""), "be ", .arrayToString(availablePlotTypes, mode = "or"),
+        functionName = "plot.TrialDesignSet",
+        parameter = "type", value = type
+        )
     }
 
     args <- list(
@@ -1002,7 +1050,8 @@ plot.TrialDesignSet <- function(
     return(do.call(.plot.TrialDesignSet, args))
 }
 
-.plot.TrialDesignSet <- function(x,
+.plot.TrialDesignSet <- function(
+        x,
         y,
         ...,
         type = 1L,
@@ -1071,7 +1120,8 @@ plot.TrialDesignSet <- function(
     return(main)
 }
 
-.plotTrialDesignSet <- function(...,
+.plotTrialDesignSet <- function(
+        ...,
         x,
         y,
         type = 1L,
@@ -1149,8 +1199,10 @@ plot.TrialDesignSet <- function(
         xParameterName <- "theta"
         yParameterNames <- "averageSampleNumber"
     } else {
-        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 9", functionName = ".plotTrialDesignSet",
-            parameter = "type", value = type)
+        stopIllegalArgument("'type' (", type, ") is not allowed; must be 1, 2, ..., 9",
+            functionName = ".plotTrialDesignSet",
+            parameter = "type", value = type
+        )
     }
 
     if (type >= 5 && type <= 9) {

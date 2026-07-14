@@ -17,7 +17,8 @@
 #' @include f_logger.R
 NULL
 
-.calcRatesTestStatistics <- function(dataInput,
+.calcRatesTestStatistics <- function(
+        dataInput,
         subset,
         stage,
         thetaH0,
@@ -122,8 +123,10 @@ NULL
                 )
             } else {
                 if (thetaH0 != 0) {
-                    stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test", functionName = ".calcRatesTestStatistics",
-                        parameter = "thetaH0", value = thetaH0)
+                    stopConflictingArguments("'thetaH0' (", thetaH0, ") must be 0 to perform Fisher's exact test",
+                        functionName = ".calcRatesTestStatistics",
+                        parameter = "thetaH0", value = thetaH0
+                    )
                 }
 
                 separatePValues <- stats::phyper(
@@ -172,7 +175,8 @@ NULL
     ))
 }
 
-.getStageResultsRatesEnrichment <- function(...,
+.getStageResultsRatesEnrichment <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = NA_real_,
@@ -209,12 +213,14 @@ NULL
 
     if ((gMax > 2) && intersectionTest == "SpiessensDebois") {
         stopIllegalArgument("gMax (", gMax, ") > 2: Spiessens & Debois intersection test test can only be used for one subset",
-            functionName = ".getStageResultsRatesEnrichment", parameter = "gMax", value = gMax)
+            functionName = ".getStageResultsRatesEnrichment", parameter = "gMax", value = gMax
+        )
     }
 
     if (intersectionTest == "SpiessensDebois" && !normalApproximation) {
         stopIllegalArgument("Spiessens & Debois test cannot be used with Fisher's ", "exact test (normalApproximation = FALSE)",
-            functionName = ".getStageResultsRatesEnrichment")
+            functionName = ".getStageResultsRatesEnrichment"
+        )
     }
 
     if (stratifiedAnalysis && !normalApproximation) {
@@ -226,8 +232,10 @@ NULL
     }
 
     if (dataInput$isStratified() && (gMax > 4)) {
-        stopIllegalArgument("gMax (", gMax, ") > 4: stratified analysis not implemented", functionName = ".getStageResultsRatesEnrichment",
-            parameter = "gMax", value = gMax)
+        stopIllegalArgument("gMax (", gMax, ") > 4: stratified analysis not implemented",
+            functionName = ".getStageResultsRatesEnrichment",
+            parameter = "gMax", value = gMax
+        )
     }
 
     stageResults <- StageResultsEnrichmentRates$new(
@@ -380,7 +388,8 @@ NULL
     .stopWithWrongDesignMessageEnrichment(design)
 }
 
-.getAnalysisResultsRatesInverseNormalEnrichment <- function(...,
+.getAnalysisResultsRatesInverseNormalEnrichment <- function(
+        ...,
         design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
@@ -425,7 +434,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsRatesFisherEnrichment <- function(...,
+.getAnalysisResultsRatesFisherEnrichment <- function(
+        ...,
         design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
@@ -477,7 +487,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsRatesEnrichmentAll <- function(...,
+.getAnalysisResultsRatesEnrichmentAll <- function(
+        ...,
         results,
         design,
         dataInput,
@@ -636,7 +647,8 @@ NULL
     return(results)
 }
 
-.getRootThetaRatesEnrichment <- function(...,
+.getRootThetaRatesEnrichment <- function(
+        ...,
         design,
         dataInput,
         population,
@@ -675,8 +687,10 @@ NULL
     return(result)
 }
 
-.getRepeatedConfidenceIntervalsRatesEnrichmentAll <- function(...,
-        design, dataInput,
+.getRepeatedConfidenceIntervalsRatesEnrichmentAll <- function(
+        ...,
+        design,
+        dataInput,
         directionUpper = NA,
         stratifiedAnalysis = C_STRATIFIED_ANALYSIS_DEFAULT,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -810,7 +824,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesEnrichmentInverseNormal <- function(...,
+.getRepeatedConfidenceIntervalsRatesEnrichmentInverseNormal <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -850,7 +865,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsRatesEnrichmentFisher <- function(...,
+.getRepeatedConfidenceIntervalsRatesEnrichmentFisher <- function(
+        ...,
         design,
         dataInput,
         normalApproximation = C_NORMAL_APPROXIMATION_RATES_DEFAULT,
@@ -907,7 +923,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesEnrichment <- function(...,
+.getConditionalPowerRatesEnrichment <- function(
+        ...,
         stageResults,
         stage = stageResults$stage,
         nPlanned,
@@ -998,15 +1015,29 @@ NULL
     )
 
     if ((length(piTreatments) != 1) && (length(piTreatments) != gMax)) {
-        stopIllegalArgument(sprintf(paste0("length of 'piTreatments' (%s) ", "must be equal to 'gMax' (%s) or 1"),
-            .arrayToString(piTreatments), gMax), functionName = ".getConditionalPowerRatesEnrichment", parameter = "piTreatments",
-            value = piTreatments, relatedParameter = "gMax", relatedValue = gMax)
+        stopIllegalArgument(
+            sprintf(
+                paste0("length of 'piTreatments' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                .arrayToString(piTreatments), gMax
+            ),
+            functionName = ".getConditionalPowerRatesEnrichment", parameter = "piTreatments",
+            value = piTreatments,
+            relatedParameter = "gMax",
+            relatedValue = gMax
+        )
     }
 
     if ((length(piControls) != 1) && (length(piControls) != gMax)) {
-        stopIllegalArgument(sprintf(paste0("length of 'piControls' (%s) ", "must be equal to 'gMax' (%s) or 1"),
-            .arrayToString(piControls), gMax), functionName = ".getConditionalPowerRatesEnrichment", parameter = "piControls",
-            value = piControls, relatedParameter = "gMax", relatedValue = gMax)
+        stopIllegalArgument(
+            sprintf(
+                paste0("length of 'piControls' (%s) ", "must be equal to 'gMax' (%s) or 1"),
+                .arrayToString(piControls), gMax
+            ),
+            functionName = ".getConditionalPowerRatesEnrichment", parameter = "piControls",
+            value = piControls,
+            relatedParameter = "gMax",
+            relatedValue = gMax
+        )
     }
 
     if (.isTrialDesignInverseNormalOrFixed(design)) {
@@ -1039,7 +1070,8 @@ NULL
     }
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        functionName = ".getConditionalPowerRatesEnrichment", parameter = "design")
+        functionName = ".getConditionalPowerRatesEnrichment", parameter = "design"
+    )
 }
 
 #'
@@ -1047,7 +1079,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesEnrichmentInverseNormal <- function(...,
+.getConditionalPowerRatesEnrichmentInverseNormal <- function(
+        ...,
         results,
         design,
         stageResults,
@@ -1159,7 +1192,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerRatesEnrichmentFisher <- function(...,
+.getConditionalPowerRatesEnrichmentFisher <- function(
+        ...,
         results,
         design,
         stageResults,
@@ -1289,7 +1323,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerLikelihoodRatesEnrichment <- function(...,
+.getConditionalPowerLikelihoodRatesEnrichment <- function(
+        ...,
         stageResults,
         stage,
         nPlanned,

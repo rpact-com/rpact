@@ -26,7 +26,8 @@ NULL
 #'
 #' @noRd
 #'
-.getAnalysisResultsEnrichment <- function(design,
+.getAnalysisResultsEnrichment <- function(
+        design,
         dataInput,
         ...,
         intersectionTest = C_INTERSECTION_TEST_ENRICHMENT_DEFAULT,
@@ -91,7 +92,8 @@ NULL
 #'
 #' @noRd
 #'
-.getStageResultsEnrichment <- function(design,
+.getStageResultsEnrichment <- function(
+        design,
         dataInput,
         ...,
         directionUpper = C_DIRECTION_UPPER_DEFAULT) {
@@ -141,7 +143,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsEnrichment <- function(design,
+.getRepeatedConfidenceIntervalsEnrichment <- function(
+        design,
         dataInput,
         ...) {
     .assertIsTrialDesignInverseNormalOrFisherOrFixed(design)
@@ -183,7 +186,10 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerEnrichment <- function(..., stageResults, nPlanned,
+.getConditionalPowerEnrichment <- function(
+        ...,
+        stageResults,
+        nPlanned,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT) {
     .assertIsStageResults(stageResults)
 
@@ -240,8 +246,12 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalRejectionProbabilitiesEnrichment <- function(stageResults, ...,
-        stage = stageResults$stage, iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+.getConditionalRejectionProbabilitiesEnrichment <- function(
+        stageResults,
+        ...,
+        stage = stageResults$stage,
+        iterations = C_ITERATIONS_DEFAULT,
+        seed = NA_real_) {
     .assertIsValidStage(stage, stageResults$.design$kMax)
     gMax <- stageResults$getGMax()
 
@@ -256,7 +266,8 @@ NULL
     }
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal or TrialDesignFisher",
-        functionName = ".getConditionalRejectionProbabilitiesEnrichment", parameter = "design")
+        functionName = ".getConditionalRejectionProbabilitiesEnrichment", parameter = "design"
+    )
 }
 
 #'
@@ -406,11 +417,18 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerPlotEnrichment <- function(stageResults, ...,
-        nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
-        thetaRange = NA_real_, assumedStDevs = NA_real_,
-        piTreatmentRange = NA_real_, piControls = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_, showArms = NA_real_) {
+.getConditionalPowerPlotEnrichment <- function(
+        stageResults,
+        ...,
+        nPlanned,
+        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
+        thetaRange = NA_real_,
+        assumedStDevs = NA_real_,
+        piTreatmentRange = NA_real_,
+        piControls = NA_real_,
+        iterations = C_ITERATIONS_DEFAULT,
+        seed = NA_real_,
+        showArms = NA_real_) {
     .stopInCaseOfIllegalStageDefinition2(...)
 
     kMax <- stageResults$.design$kMax
@@ -419,12 +437,19 @@ NULL
         stage <- kMax - 1
     }
     if (stage < 1 || kMax == 1) {
-        stopIllegalArgument("cannot plot conditional power of a fixed design", functionName = ".getConditionalPowerPlotEnrichment")
+        stopIllegalArgument("cannot plot conditional power of a fixed design",
+            functionName = ".getConditionalPowerPlotEnrichment"
+        )
     }
     if (stage >= kMax) {
-        stopIllegalArgument("the conditional power plot is only available for subsequent stages. ", "Please specify a 'stage' (",
-            stage, ") < 'kMax' (", kMax, ")", functionName = ".getConditionalPowerPlotEnrichment", parameter = "stage",
-            value = stage, relatedParameter = "kMax", relatedValue = kMax)
+        stopIllegalArgument("the conditional power plot is only available for subsequent stages. ",
+            "Please specify a 'stage' (", stage, ") < 'kMax' (", kMax, ")",
+            functionName = ".getConditionalPowerPlotEnrichment",
+            parameter = "stage",
+            value = stage,
+            relatedParameter = "kMax",
+            relatedValue = kMax
+        )
     }
 
     .assertIsValidNPlanned(nPlanned = nPlanned, kMax = kMax, stage = stage)
