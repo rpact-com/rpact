@@ -984,7 +984,6 @@ SummaryFactory <- R6::R6Class("SummaryFactory",
                     stopRuntimeIssue(".getColumnValues(", dQuote(parameterName), "): ", e$message, "; .getClassName(values) = ",
                         .getClassName(values), "; dim(values) = ", .arrayToString(dim(values), vectorLookAndFeelEnabled = TRUE),
                         "; variantIndex = ", variantIndex, "; transposed = ", transposed, parameter = parameterName, value = values,
-                        context = list(variantIndex = variantIndex, transposed = transposed, valuesDimension = dim(values)),
                         functionName = ".getColumnValues")
                 }
             )

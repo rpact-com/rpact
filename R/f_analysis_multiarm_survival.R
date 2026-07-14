@@ -59,8 +59,10 @@ NULL
     .stopWithWrongDesignMessage(design)
 }
 
-.getAnalysisResultsSurvivalInverseNormalMultiArm <- function(...,
-        design, dataInput,
+.getAnalysisResultsSurvivalInverseNormalMultiArm <- function(
+        ...,
+        design,
+        dataInput,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
         directionUpper = NA,
         thetaH0 = C_THETA_H0_SURVIVAL_DEFAULT,
@@ -97,7 +99,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsSurvivalFisherMultiArm <- function(...,
+.getAnalysisResultsSurvivalFisherMultiArm <- function(
+        ...,
         design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
@@ -107,7 +110,8 @@ NULL
         nPlanned = NA_real_,
         allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         tolerance = C_ANALYSIS_TOLERANCE_DEFAULT,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+        iterations = C_ITERATIONS_DEFAULT,
+        seed = NA_real_) {
     .assertIsTrialDesignFisher(design)
     .assertIsValidIterationsAndSeed(iterations, seed, zeroIterationsAllowed = FALSE)
     stage <- .getStageFromOptionalArguments(..., dataInput = dataInput, design = design)
@@ -139,7 +143,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsSurvivalConditionalDunnettMultiArm <- function(...,
+.getAnalysisResultsSurvivalConditionalDunnettMultiArm <- function(
+        ...,
         design,
         dataInput,
         intersectionTest = C_INTERSECTION_TEST_MULTIARMED_DEFAULT,
@@ -182,7 +187,8 @@ NULL
     return(results)
 }
 
-.getAnalysisResultsSurvivalMultiArmAll <- function(...,
+.getAnalysisResultsSurvivalMultiArmAll <- function(
+        ...,
         results,
         design,
         dataInput,
@@ -297,7 +303,8 @@ NULL
     return(results)
 }
 
-.getStageResultsSurvivalMultiArm <- function(...,
+.getStageResultsSurvivalMultiArm <- function(
+        ...,
         design,
         dataInput,
         thetaH0 = NA_real_,
@@ -468,7 +475,8 @@ NULL
     return(stageResults)
 }
 
-.getRootThetaSurvivalMultiArm <- function(...,
+.getRootThetaSurvivalMultiArm <- function(
+        ...,
         design,
         dataInput,
         treatmentArm,
@@ -500,7 +508,8 @@ NULL
     return(result)
 }
 
-.getUpperLowerThetaSurvivalMultiArm <- function(...,
+.getUpperLowerThetaSurvivalMultiArm <- function(
+        ...,
         design,
         dataInput,
         theta,
@@ -535,16 +544,24 @@ NULL
         firstValue <- stageResults[[firstParameterName]][treatmentArm, stage]
         maxSearchIterations <- maxSearchIterations - 1
         if (maxSearchIterations < 0) {
-            stopRuntimeIssue(sprintf(paste0("failed to find theta (k = %s, firstValue = %s, ", "secondValue = %s, levels(firstValue) = %s, theta = %s)"),
-                stage, stageResults[[firstParameterName]][treatmentArm, stage], secondValue, firstValue, theta),
-                functionName = ".getUpperLowerThetaSurvivalMultiArm")
+            stopRuntimeIssue(
+                sprintf(
+                    paste0(
+                        "failed to find theta (k = %s, firstValue = %s, ",
+                        "secondValue = %s, levels(firstValue) = %s, theta = %s)"
+                    ),
+                    stage, stageResults[[firstParameterName]][treatmentArm, stage], secondValue, firstValue, theta
+                ),
+                functionName = ".getUpperLowerThetaSurvivalMultiArm"
+            )
         }
     }
 
     return(theta)
 }
 
-.getRepeatedConfidenceIntervalsSurvivalMultiArmAll <- function(...,
+.getRepeatedConfidenceIntervalsSurvivalMultiArmAll <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -658,7 +675,8 @@ NULL
         # Repeated onfidence intervals when using combination tests
 
         if (intersectionTest == "Hierarchical") {
-            warning("Repeated confidence intervals not available for ",
+            warning(
+                "Repeated confidence intervals not available for ",
                 "'intersectionTest' = \"Hierarchical\""
             )
             return(repeatedConfidenceIntervals)
@@ -808,7 +826,9 @@ NULL
                     }
                 }
             }
-            .logProgress("Repeated confidence intervals for stage %s calculated", startTime = startTime, k)
+            .logProgress("Repeated confidence intervals for stage %s calculated",
+                startTime = startTime, k
+            )
         }
     }
 
@@ -820,7 +840,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsSurvivalMultiArmInverseNormal <- function(...,
+.getRepeatedConfidenceIntervalsSurvivalMultiArmInverseNormal <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -851,7 +872,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsSurvivalMultiArmFisher <- function(...,
+.getRepeatedConfidenceIntervalsSurvivalMultiArmFisher <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -882,7 +904,8 @@ NULL
 #'
 #' @noRd
 #'
-.getRepeatedConfidenceIntervalsSurvivalMultiArmConditionalDunnett <- function(...,
+.getRepeatedConfidenceIntervalsSurvivalMultiArmConditionalDunnett <- function(
+        ...,
         design,
         dataInput,
         directionUpper = NA,
@@ -931,10 +954,15 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalMultiArm <- function(..., stageResults, stage = stageResults$stage,
-        nPlanned, allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
+.getConditionalPowerSurvivalMultiArm <- function(
+        ...,
+        stageResults,
+        stage = stageResults$stage,
+        nPlanned,
+        allocationRatioPlanned = C_ALLOCATION_RATIO_DEFAULT,
         thetaH1 = NA_real_,
-        iterations = C_ITERATIONS_DEFAULT, seed = NA_real_) {
+        iterations = C_ITERATIONS_DEFAULT,
+        seed = NA_real_) {
     design <- stageResults$.design
     gMax <- stageResults$getGMax()
     kMax <- design$kMax
@@ -969,18 +997,32 @@ NULL
     .assertIsInOpenInterval(allocationRatioPlanned, "allocationRatioPlanned",
         lower = 0, upper = C_ALLOCATION_RATIO_MAXIMUM
     )
-    .setValueAndParameterType(results, "allocationRatioPlanned", allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT)
+    .setValueAndParameterType(
+        results, "allocationRatioPlanned",
+        allocationRatioPlanned, C_ALLOCATION_RATIO_DEFAULT
+    )
     thetaH1 <- .assertIsValidThetaH1ForMultiArm(thetaH1, stageResults, stage, results = results)
     results$.setParameterType("nPlanned", C_PARAM_USER_DEFINED)
 
     if (any(thetaH1 <= 0, na.rm = TRUE)) {
-        stopIllegalArgument("'thetaH1' (", thetaH1, ") must be > 0", functionName = ".getConditionalPowerSurvivalMultiArm",
-            parameter = "thetaH1", value = thetaH1)
+        stopIllegalArgument("'thetaH1' (", thetaH1, ") must be > 0",
+            functionName = ".getConditionalPowerSurvivalMultiArm",
+            parameter = "thetaH1",
+            value = thetaH1
+        )
     }
     if ((length(thetaH1) != 1) && (length(thetaH1) != gMax)) {
-        stopIllegalArgument(sprintf(paste0("length of 'thetaH1' (%s) must be ", "equal to 'gMax' (%s) or 1"),
-            .arrayToString(thetaH1), gMax), functionName = ".getConditionalPowerSurvivalMultiArm", parameter = "thetaH1",
-            value = thetaH1, relatedParameter = "gMax", relatedValue = gMax)
+        stopIllegalArgument(
+            sprintf(
+                paste0("length of 'thetaH1' (%s) must be ", "equal to 'gMax' (%s) or 1"),
+                .arrayToString(thetaH1), gMax
+            ),
+            functionName = ".getConditionalPowerSurvivalMultiArm",
+            parameter = "thetaH1",
+            value = thetaH1,
+            relatedParameter = "gMax",
+            relatedValue = gMax
+        )
     }
 
     if (.isTrialDesignInverseNormalOrFixed(design)) {
@@ -1021,7 +1063,9 @@ NULL
     }
 
     stopIllegalArgument("'design' must be an instance of TrialDesignInverseNormal, TrialDesignFisher, ",
-        "or TrialDesignConditionalDunnett", functionName = ".getConditionalPowerSurvivalMultiArm", parameter = "design")
+        "or TrialDesignConditionalDunnett",
+        functionName = ".getConditionalPowerSurvivalMultiArm", parameter = "design"
+    )
 }
 
 #'
@@ -1029,7 +1073,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalMultiArmInverseNormal <- function(...,
+.getConditionalPowerSurvivalMultiArmInverseNormal <- function(
+        ...,
         results,
         design,
         stageResults,
@@ -1119,7 +1164,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalMultiArmFisher <- function(...,
+.getConditionalPowerSurvivalMultiArmFisher <- function(
+        ...,
         results,
         design,
         stageResults,
@@ -1223,7 +1269,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerSurvivalMultiArmConditionalDunnett <- function(...,
+.getConditionalPowerSurvivalMultiArmConditionalDunnett <- function(
+        ...,
         results,
         design,
         stageResults,
@@ -1283,7 +1330,8 @@ NULL
 #'
 #' @noRd
 #'
-.getConditionalPowerLikelihoodSurvivalMultiArm <- function(...,
+.getConditionalPowerLikelihoodSurvivalMultiArm <- function(
+        ...,
         stageResults,
         stage,
         nPlanned,
@@ -1305,8 +1353,10 @@ NULL
     thetaRange <- .assertIsValidThetaH1ForMultiArm(thetaH1 = thetaRange)
 
     if (length(thetaRange) == 1) {
-        stopIllegalArgument("length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2", functionName = ".getConditionalPowerLikelihoodSurvivalMultiArm",
-            parameter = "thetaRange", value = thetaRange)
+        stopIllegalArgument("length of 'thetaRange' (", .arrayToString(thetaRange), ") must be at least 2",
+            functionName = ".getConditionalPowerLikelihoodSurvivalMultiArm",
+            parameter = "thetaRange", value = thetaRange
+        )
     }
 
     treatmentArms <- numeric(gMax * length(thetaRange))

@@ -1298,7 +1298,7 @@ getAvailablePlotTypes <- function(obj, output = c("numeric", "caption", "numcap"
     if (is.infinite(scalingFactor2)) {
         stopRuntimeIssue("Failed to calculate 'scalingFactor2' (", scalingFactor2, ") for ", .arrayToString(leftAxisValues,
             maxLength = 15), " and ", .arrayToString(rightAxisValues, maxLength = 15), parameter = "scalingFactor2",
-            value = scalingFactor2, context = list(leftAxisValues = leftAxisValues, rightAxisValues = rightAxisValues),
+            value = scalingFactor2, 
             functionName = ".getScalingFactors")
     }
 

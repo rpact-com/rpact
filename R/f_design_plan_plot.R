@@ -1677,7 +1677,7 @@ plot.TrialDesignPlan <- function(
         availablePlotTypes <- getAvailablePlotTypes(x)
         if (length(availablePlotTypes) == 0) {
             stopRuntimeIssue("No plot available for this ", .formatCamelCaseSingleWord(x$.objectType), " ", x$.toString(),
-                " result object", parameter = "x", value = .getClassName(x), context = list(objectType = x$.objectType),
+                " result object", parameter = "x", value = .getClassName(x), 
                 functionName = ".plot.TrialDesignPlan")
         }
 
